@@ -1,0 +1,23 @@
+<#-- 在线帮助导航  集合 -->
+<#--可选参数：helpTypeId -->
+
+<@function helpTypeId="${url_helpTypeId}">
+<div class="helpNavigation">
+	<div class="navigation">
+		<a href="">首页</a> &gt; 
+		<a href="help.htm">帮助</a> &gt; 
+		<#-- 返回的是Map<String,String>类型 -->
+		
+		<#assign helpNavigation = helpRelated_helpNavigation_collection>
+		
+		<#list helpNavigation as key, value> 
+			<#if !key_has_next><#-- 如果是最后一个 -->
+				<span>${value}</span>
+			<#else>
+				<a href="help.htm?helpTypeId=${key}" >${value}</a> &gt; 
+			</#if>
+		    
+		</#list> 
+	</div>
+</div>
+</@function> 

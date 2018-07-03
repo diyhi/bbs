@@ -1,0 +1,69 @@
+
+/* 星级评分 */
+/*  key:  B=空白 : O=橙色：G =绿色*/
+/* B B B B B - (0 0)*/
+/* G B B B B - (0 -16px)*/
+/* G G B B B - (0 -32px)*/
+/* G G G B B - (0 -48px)*/
+/* G G G G B - (0 -64px)*/
+/* G G G G G - (0 -80px)*/
+/* O B B B B - (0 -96px)*/
+/* O O B B B - (0 -112px)*/
+/* O O O B B - (0 -128px)*/
+/* O O O O B - (0 -144px)*/
+/* O O O O O - (0 -160px)*/
+
+
+/* 默认的评级是放在UL 的背景图像/ */
+/* 使用背景位置根据上表显示所需的图像*/
+.rating{
+	width:80px;
+	height:16px;
+	margin:5px 0 5px 0;
+	padding:0;
+	list-style:none;
+	clear:both;
+	position:relative;
+	background: url(star_matrix.gif) no-repeat 0 0;
+}
+/* 显示星星数量 */
+.star_0 {background-position:0 0}
+.star_1 {background-position:0 -16px}
+.star_2 {background-position:0 -32px}
+.star_3 {background-position:0 -48px}
+.star_4 {background-position:0 -64px}
+.star_5 {background-position:0 -80px}
+ul.rating li {
+	cursor: pointer;
+ /*ie5 mac */
+	float:left;
+	/* end hide*/
+	text-indent:-999em;
+}
+ul.rating li a {
+	position:absolute;
+	left:0;
+	top:0;
+	width:16px;
+	height:16px;
+	text-decoration:none;
+	z-index: 200;
+}
+ul.rating li.one a {left:0}
+ul.rating li.two a {left:16px;}
+ul.rating li.three a {left:32px;}
+ul.rating li.four a {left:48px;}
+ul.rating li.five a {left:64px;}
+ul.rating li a:hover {
+	z-index:2;
+	width:80px;
+	height:16px;
+	overflow:hidden;
+	left:0;	
+	background: url(star_matrix.gif) no-repeat 0 0
+}
+ul.rating li.one a:hover {background-position:0 -96px;}
+ul.rating li.two a:hover {background-position:0 -112px;}
+ul.rating li.three a:hover {background-position:0 -128px}
+ul.rating li.four a:hover {background-position:0 -144px}
+ul.rating li.five a:hover {background-position:0 -160px}

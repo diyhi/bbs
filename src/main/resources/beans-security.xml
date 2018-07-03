@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<b:beans xmlns="http://www.springframework.org/schema/security" 
+xmlns:b="http://www.springframework.org/schema/beans" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xsi:schemaLocation="http://www.springframework.org/schema/beans 
+http://www.springframework.org/schema/beans/spring-beans-4.3.xsd 
+http://www.springframework.org/schema/security 
+http://www.springframework.org/schema/security/spring-security.xsd">
+
+
+	<!-- 不要过滤图片等静态资源，其中**代表可以跨越目录，*不可以跨越目录 -->
+	<http pattern="/**/*.jpg" security="none" />
+	<http pattern="/**/*.jpeg" security="none" />
+	<http pattern="/**/*.png" security="none"/>
+	<http pattern="/**/*.gif" security="none"/>
+	<http pattern="/**/*.bmp" security="none"/>
+	<http pattern="/**/*.css" security="none"/>
+	<http pattern="/**/*.js" security="none"/>
+	
+	
+
+	<!--	<http auto-config="true" access-denied-page="/jsp/common/permissionsError.jsp"  >-->
+ 	<http use-expressions="true"  entry-point-ref="authenticationProcessingFilterEntryPoint">
+
+
+		<!-- 用户登录成功后更改sessionId --> 
+		<session-management session-authentication-strategy-ref="sas" />
+		
+		<!-- 没权限时跳转页面 -->
+		<access-denied-handler error-page="/admin/permission.htm"/>  
+		
+		
+		<!-- 自定义登陆页面的form action -->
+		<custom-filter ref="MyUsernamePasswordAuthenticationFilter"  before="FORM_LOGIN_FILTER"/>
+		
+		
+		<!-- 增加一个自定义的filter，放在FILTER_SECURITY_INTERCEPTOR之前，
+		实现用户、角色、权限、资源的数据库管理。 -->
+		<custom-filter ref="customFilter" before="FILTER_SECURITY_INTERCEPTOR"/> 
+
+		<!-- 自定义退出登陆 -->
+		<custom-filter ref="logoutFilter" before="LOGOUT_FILTER"/>
+		
+		<!-- 配置HeaderWriterFilter，为response添加安全header信息,解决iframe中的内容无法加载-->
+		<headers defaults-disabled="true">
+			<!-- 允许加载本站点内的页面 -->
+			<frame-options policy="SAMEORIGIN"/>
+		</headers>
+		
+		
+		<!-- disabled 默认启用CSRF防御，要求每个POST请求都要都要带上CSRF token参数，true为禁用 -->
+		<!-- token-repository-ref: 设置CsrfTokenRepository, 缺省是HttpSessionCsrfTokenRepository -->
+		<!-- request-matcher-ref: 设置RequestMatcher用于决定是否对当前request进行CSRF保护, 缺省是除了"GET", "TRACE", "HEAD", "OPTIONS"的任何http method进行保护 --> 
+		<csrf disabled="false" request-matcher-ref="csrfSecurityRequestMatcher" token-repository-ref="tokenRepository"/>
+		
+		
+		
+	</http>
+	
+	<!-- 过滤掉不需要CSRF保护的URL -->
+	<b:bean id="csrfSecurityRequestMatcher" class="cms.web.filter.CsrfSecurityRequestMatcher">
+	</b:bean>
+	<!-- Cookie储存XSRF-TOKEN 默认cookieHttpOnly=true -->
+	<b:bean id="tokenRepository" class="org.springframework.security.web.csrf.CookieCsrfTokenRepository" />
+ 
+    <b:bean id="sas"  
+       class="org.springframework.security.web.authentication.session.ConcurrentSessionControlAuthenticationStrategy">   
+        <b:constructor-arg name="sessionRegistry" ref="sessionRegistry" />  
+        <!-- 相同用户名同时成功并发登录同一个web应用的次数 --> 
+        <b:property name="maximumSessions" value="1" />  
+        <!-- 为true时, 如果已有一个该用户登录了, 那么在另一个地方登录该用户将抛出异常   
+			如果设置为false, 那么, 如果已有一个该用户登录了系统, 那么在另一个地方也可以登录, 登录后前者会被逼退出系统   -->  
+        <b:property name="exceptionIfMaximumExceeded" value="false" />  
+
+    </b:bean> 
+    
+    <!-- org.springframework.security.core.session.SessionRegistryImpl -->
+	<b:bean id="sessionRegistry"  
+        class="org.springframework.security.core.session.SessionRegistryImpl" /> 
+    <!-- 未登录的切入点   继承org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint-->  
+	<b:bean id="authenticationProcessingFilterEntryPoint"   
+    	class="cms.web.action.staff.MyLoginUrlAuthenticationEntryPoint">   
+    	<!-- 登陆页面
+    	<b:property name="loginFormUrl" value="/admin/login.htm"></b:property>  --> 
+   		<b:constructor-arg value="/admin/login.htm"/>
+	</b:bean>   
+	<b:bean id="MyUsernamePasswordAuthenticationFilter"   
+	    class="cms.web.action.staff.MyUsernamePasswordAuthenticationFilter">   
+	    <!-- 用户登录成功后更改sessionId -->
+	    <b:property name="sessionAuthenticationStrategy" ref="sas" />  
+	   
+	    <!-- 登陆验证 -->
+	    <b:property name="filterProcessesUrl" value="/admin/loginVerification.htm"></b:property>   
+  
+	    <b:property name="authenticationSuccessHandler" 
+	        ref="loginLogAuthenticationSuccessHandler"></b:property>   
+	    <b:property name="authenticationFailureHandler"   
+	        ref="simpleUrlAuthenticationFailureHandler"></b:property>   
+	    <b:property name="authenticationManager" ref="authenticationManager"></b:property>   
+	</b:bean>   
+	<b:bean id="loginLogAuthenticationSuccessHandler"   
+	    class="cms.web.action.staff.MySavedRequestAwareAuthenticationSuccessHandler">   
+	    <!-- 登陆成功后跳转 -->
+	    <b:property name="defaultTargetUrl" value="/control/center/admin.htm"></b:property>  
+	    <!-- 默认为false,如果为true，则跳转地址始终为defaultTargetUrl -->
+	    <b:property name="alwaysUseDefaultTargetUrl" value="true"></b:property>  
+	</b:bean>   
+	<b:bean id="simpleUrlAuthenticationFailureHandler"   
+	    class="cms.web.action.staff.MySimpleUrlAuthenticationFailureHandler">   
+	    <!-- 登陆失败后跳转 -->
+	    <b:property name="defaultFailureUrl" value="/admin/login.htm"></b:property>   
+	</b:bean>
+	<!-- 用户退出时处理 -->
+	<b:bean id="logoutFilter" class="org.springframework.security.web.authentication.logout.LogoutFilter">
+        <b:constructor-arg value="/admin/login.htm" />
+        <b:constructor-arg>
+            <b:list>
+                <b:bean class="cms.web.action.staff.MySecurityContextLogoutHandler" />
+            </b:list>
+        </b:constructor-arg>
+        <b:property name="filterProcessesUrl" value="/admin/logout" />
+    </b:bean>
+	  
+	
+	<!-- 认证过滤器 一个自定义的filter，必须包含authenticationManager,
+		accessDecisionManager,securityMetadataSource三个属性。  -->
+	<b:bean id="customFilter" 
+		class="cms.web.action.staff.CustomFilterSecurityInterceptor">
+		<!-- 用户拥有的权限 -->  
+		<b:property name="authenticationManager" 
+			ref="authenticationManager"/>
+		<!-- 用户是否拥有所请求资源的权限 -->  	
+		<b:property name="accessDecisionManager" 
+			ref="customAccessDecisionManager"/>
+		<!-- 资源与权限对应关系 -->  
+		<b:property name="securityMetadataSource" 
+			ref="customSecurityMetadataSource"/>
+	</b:bean>
+	
+	<!-- <salt-source user-property="username"/> 这一句即声明了所加的盐值，即数据库中的username字段。
+	<password-encoder hash="md5"> 在他的属性中指明了加盐之后的加密算法 即MD5(32位)
+	这样设置后你的数据库中的密码也应该是经过盐值加密的。
+	比如username:user2 在数据库中的password应该是123456789{user2}经过MD5加密后的 d6240c0ab270dcc905650fcc0ec2e4e2。
+	在你登陆的时候你输入用户密码后security也会用同样的加密方式去和数据库中的password匹配。-->
+	<!-- 注意能够为authentication-manager 设置alias别名  -->
+	<authentication-manager alias="authenticationManager">
+		<authentication-provider user-service-ref="userDetailsManager">
+			<password-encoder ref="passwordEncoder"/>	
+		</authentication-provider>
+		
+	</authentication-manager>
+		
+	
+	<!-- 采用的Bcrypt加密算法 -->
+	<b:bean class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" id="passwordEncoder">	
+	</b:bean>
+
+
+
+	<!-- 访问决策器，决定某个用户具有的角色，是否有足够的权限去访问某个资源。-->
+	<b:bean id="customAccessDecisionManager"
+		class="cms.web.action.staff.CustomAccessDecisionManager">
+	</b:bean>  
+
+
+	<!-- 资源源数据定义，将所有的资源和权限对应关系建立起来，即定义某一资源可以被哪些角色去访问。-->
+	<b:bean id="customSecurityMetadataSource"
+		class="cms.web.action.staff.CustomInvocationSecurityMetadataSourceService">
+		<!-- 使用构造加载解决DAO注入null的问题-->
+		<b:constructor-arg><b:ref bean="aclService"/></b:constructor-arg>    
+	</b:bean> 
+	
+	<!-- ACL管理 -->
+	<b:bean id="aclService" class="cms.service.staff.impl.ACLServiceBean"></b:bean>
+    
+</b:beans> 

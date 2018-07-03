@@ -1,0 +1,85 @@
+<#-- 用户中心页 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<base href="${baseURL}">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>管理 - ${title}</title>
+	<meta name="keywords" content="${keywords}"/>
+	<meta name="description" content="${description}"/>
+	<#-- 获取令牌 -->
+	<meta name="csrfToken" content="${token}"/>
+	<link rel="shortcut icon" type="image/x-icon" href="${baseURL}${commonPath}images/favicon.ico" media="screen" />
+	<link href="${commonPath}css/common.css" type="text/css" rel="stylesheet">
+	<script language="javascript" src="${commonPath}js/tool.js" type="text/javascript"></script>
+	<script language="javascript" src="${commonPath}js/ajax.js" type="text/javascript"></script>
+	<script language="javascript" src="${commonPath}js/json2.js" type="text/javascript"></script>
+</head>
+<body>
+<#-- 引入页头 -->
+<@include action="${newPublic_2}"/>
+<div class="fixedBottom wrap clearfix">
+	<div style="background: #fff; height: 1px;"></div>
+	<div class="selfInfo">
+		<div class="userLeft">
+			<div class="userAvatar"><img
+				src="${commonPath}images/min_avata.png">
+			</div>
+		</div>
+		<div class="cut-line"></div>
+		<div class="detailInfo">
+			<div class="box">
+				<span class="userName" >
+					${user.userName}
+				</span> 
+				
+				<span class="grade" >
+					${user.gradeName}&nbsp;
+				</span> 
+			</div>
+			<div class="userAssets">
+				<div class="assetsItem">
+					<span class="assetsNum">${user.point}</span> 
+					<span class="assetsTitle">积分</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div class="selfService">
+        <h1>服务</h1>
+        <div class="box clearfix">  
+            <a href="user/control/topicList" onfocus="this.blur();">
+                <p>发表主题</p>
+            </a>
+            <a href="user/control/commentList" onfocus="this.blur();">
+                <p>发表评论</p>
+            </a>
+            <a href="user/control/replyList" onfocus="this.blur();">
+                <p>发表回复</p>
+            </a>
+            <a href="user/control/editUser" onfocus="this.blur();">
+                <p>修改个人资料</p>
+            </a>
+            <a href="user/control/realNameAuthentication" onfocus="this.blur();">
+                <p>实名认证</p>
+            </a>
+            <a href="user/control/point" onfocus="this.blur();">
+                <p>积分日志</p>
+            </a>
+            <a href="user/control/userLoginLogList" onfocus="this.blur();">
+                <p>登录日志</p>
+            </a>
+            <a href="" onfocus="this.blur();">
+                <p></p>
+            </a>
+        </div>
+	 </div>
+
+	<div style="clear:both;"></div>
+	<div class="push"><!-- 把div#footer推下去 --></div>
+</div>
+<#-- 引入页脚 -->
+<@include action="${newPublic_3}"/>
+
+</body></html>

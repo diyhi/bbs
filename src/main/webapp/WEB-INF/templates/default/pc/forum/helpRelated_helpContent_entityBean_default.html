@@ -1,0 +1,19 @@
+<#-- 在线帮助内容  实体对象 -->
+<@function helpId="${url_helpId}"> 
+<div class="helpContent">
+        <div class="helpContentBox">	
+			<#assign help_entity = helpRelated_helpContent_entityBean>
+			<#if help_entity != null && help_entity??>    
+			<h1>${help_entity.name}</h1>
+			<div class="helpContentMain">
+				<#-- 使用不转义标签 -->
+            	<#noescape>
+                	${help_entity.content}
+                </#noescape>
+				
+			</div>
+			</#if>    
+			
+        </div>
+    </div>
+</@function> 

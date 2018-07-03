@@ -1,0 +1,34 @@
+<#--  友情链接列表 -->
+
+<@function>
+<#if linksRelated_links_collection?? && linksRelated_links_collection?size gt 0>
+<div class="linkModule clearfix" >
+	<div class="title">友情链接</div>
+	
+	<#--  有图片 -->
+	<div class="links-logo">
+    	<ul>
+    		<#list linksRelated_links_collection as links>
+    			<#if links.image != null && links.image != ''>
+			    	<li>
+			    		<a target="_blank" href="${links.website}">
+			    		<img width="88" height="31" border="0" alt="${links.name}" src="${links.image}"></a>
+			    	</li>
+		    	</#if>
+	    	</#list>
+    	</ul>
+	</div>
+	
+	<#--  无图片 -->
+	<div class="links-text">
+    	<ul>
+    		<#list linksRelated_links_collection as links>
+    			<#if links.image == null || links.image == ''>
+    				<li><a target="_blank" href="${links.website}">${links.name}</a></li>
+    			</#if>
+	    	</#list>
+    	</ul>
+	</div>
+</div>
+</#if>
+</@function>	

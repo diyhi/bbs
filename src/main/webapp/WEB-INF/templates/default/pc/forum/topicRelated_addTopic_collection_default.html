@@ -1,0 +1,180 @@
+<#-- 添加话题  集合 -->
+<@function>
+	<#-- 已登录 -->
+	<#if systemUser != null>
+		<#--  返回Map<String,Object>类型 -->
+		<#assign returnValue = topicRelated_addTopic_collection>
+		
+		<#--  全局允许提交话题 -->
+		<#if returnValue['allowTopic'] == true>
+			<div class="topic-formModule">
+				<form id="addTopicForm" action="user/control/topic/add?page=${url_page}" method="post">
+					
+					<#-- 提交后跳转参数  参数必须经过encodeBase64URL编码后才能提交 不填写时默认跳转回当前页 -->
+					<input type="hidden" id="jumpUrl" name="jumpUrl" value="">
+					
+					<div style="height: 40px;">
+						<div style="float:left; *margin-top: 5px;">
+							<select name="tagId" class="formSelect" >
+								<option value="" >选择标签</option>
+								<#-- 引入标签选择 -->
+								<@include action="${quote_1}"/>
+							</select>
+							<span id="tagId_error" class="error">${(error['tagId'])!}</span>
+						</div>
+						<div style="float:left;">
+							
+							<input type="text" name="title" class="formText" size="90" value="${topic.title}" alt="标题" title="标题"/>
+							<span id="title_error" class="error">${(error['title'])!}</span>
+						</div>
+					</div>
+	
+					<p><textarea class="textarea" onfocus="" id="topicContent" name="content" >${topic.content}</textarea></p>
+					
+					<span class="error">${(error['content'])!}</span> 
+					<span id="topic_error" class="error">${error['topic']}</span>
+					<div class="form-action">
+						<#-- 获取令牌 -->
+						<input type="hidden" id="token" name="token" value="${token!}">
+						
+						<div class="topicSubmit">
+				        	<span class="submitButton"><INPUT type="button" value="提交" onClick="javascript:sureSubmit(this.form)"></span>
+				        </div>
+						
+						
+						<#-- identificationNumber:识别号：用来区别每次请求 -->
+						<#-- 验证码 -->
+						<#if returnValue['captchaKey'] != "">	
+						<div class="captchaModule">
+							<div class="captcha_div">
+								<div class="captchaBox">
+									<input type="hidden" id="${identificationNumber}_captchaKey" name="captchaKey" value="${(returnValue['captchaKey'])!}">
+									<input id="${identificationNumber}_captchaValue" name="captchaValue" type="text" maxLength="5" autocomplete="off" tabindex="3" onfocus="inputBoxTip_click(this);" onblur="inputBoxTip_leave('${identificationNumber}',this);"/>
+									<label class="promptTag" id="${identificationNumber}_captchaValueBoxTip"  for="captchaValue">验证码</label>
+								</div>
+								<a class="captchaImage" href="javascript:void(0);" >
+									<img id="${identificationNumber}_captcha" src="captcha/${(returnValue['captchaKey'])!}.jpg" onClick="replaceCaptcha('${identificationNumber}');" tabindex="4" />
+								</a>
+								<a  href="javascript:void(0);" onClick="replaceCaptcha('${identificationNumber}');" tabindex="5">换一幅</a>
+							</div>
+							<p class="tips">
+								
+								<#-- 验证码错误 -->
+								<span id="${identificationNumber}_captchaValue_error">${(error['captchaValue'])!}</span>
+								
+							</p>
+						</div>
+						</#if>
+					</div>
+					
+					<script language="javascript" type="text/javascript">
+						//点击输入框提示 
+						function inputBoxTip_click(obj){
+							document.getElementById(obj.id+"BoxTip").style.display="none";
+						
+						}
+						//离开输入框提示
+						function inputBoxTip_leave(identificationNumber,obj){
+							if(obj.value != ""){
+								document.getElementById(obj.id+"BoxTip").style.display="none";
+							}else{
+								document.getElementById(obj.id+"BoxTip").style.display="";
+							}
+							verificationCode(identificationNumber);
+						}
+						
+						//校对验证码 identificationNumber:识别号：用来区别每次请求
+						function verificationCode(identificationNumber){
+							var flag = true;
+							if( document.getElementById(identificationNumber+"_"+"captchaKey") != null){
+								
+								var captchaKey = document.getElementById(identificationNumber+"_"+"captchaKey").value;
+								var parameter = document.getElementById(identificationNumber+"_"+"captchaValue").value;
+								if(parameter != ""){
+								
+									var parameter_trim = trim(parameter);
+									if(parameter_trim != ""){
+										//ajax使用同步提交
+										get_request(function(value){
+							            	if(value == "false"){
+							            	
+								            	document.getElementById(identificationNumber+"_"+"captchaValue_error").innerHTML = "验证码错误";
+								            	flag = false;
+							            	}
+							            },
+									 		"checkCaptcha.htm?captchaKey="+captchaKey+"&captchaValue="+parameter_trim+"&timestamp=" + new Date().getTime(), false);
+							            	
+									}else{
+										document.getElementById(identificationNumber+"_"+"captchaValue_error").innerHTML = "验证码不能为空";
+										flag = false;
+									}
+								}else{
+									document.getElementById(identificationNumber+"_"+"captchaValue_error").innerHTML = "验证码不能为空";
+									flag = false;
+								}
+								if(flag == true){
+									document.getElementById(identificationNumber+"_"+"captchaValue_error").innerHTML = "";
+								}
+							}
+						
+							return flag;
+						}
+						//更换验证码
+						function replaceCaptcha(identificationNumber){
+							var captchaKey = document.getElementById(identificationNumber+"_"+"captchaKey").value;
+							document.getElementById(identificationNumber+"_"+"captcha").src = "captcha/"+captchaKey+".jpg?" + Math.random(); 
+						}
+						
+						//表单Form方式提交
+						function sureSubmit(obj){
+							obj.submit();
+						} 
+						
+						
+						
+						
+	
+						var editor;
+						KindEditor.ready(function(K) {
+							editor = K.create('textarea[id="topicContent"]', {
+								
+								basePath : '${commonPath}js/kindeditor/',//指定编辑器的根目录路径
+								formatUploadUrl :false,//false时不会自动格式化上传后的URL
+								resizeType : 1,//2或1或0，2时可以拖动改变宽度和高度，1时只能改变高度，0时不能拖动。默认值: 2 
+								allowPreviewEmoticons : true,//true或false，true时鼠标放在表情上可以预览表情
+								allowImageUpload : true,//true时显示图片上传按钮
+								uploadJson :'user/control/topic/upload.htm?method=upload',//指定浏览远程图片的服务器端程序
+								
+								items : ['source', 'fontsize', 'forecolor', 'hilitecolor', 'bold',
+							        'italic', 'underline',  '|', 'image', 'multiimage',
+							        'justifyleft','justifycenter','justifyright', 'insertorderedlist', 'insertunorderedlist',   'emoticons',
+							         'link', 'unlink','removeformat'],
+								afterChange : function() {
+									this.sync();
+								}
+						
+							});
+						});
+						</script>
+					
+				</form>
+			</div>
+		</#if>
+	<#else>
+		<#-- 未登录 -->
+		<div class="addCommentModule" >
+			
+		
+			<div class="respond">
+				<p style="font-size:13px;padding:8px;text-align:center;background:#eee;overflow:hidden">请 
+				<a href="login">登录</a> 
+					后发表评论。没有帐号？
+					<a href="register">注册</a> 一个。
+				</p>
+			</div>
+		</div>
+	</#if>
+</@function>
+
+
+

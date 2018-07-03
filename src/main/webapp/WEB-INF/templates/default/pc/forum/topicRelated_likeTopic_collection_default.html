@@ -1,0 +1,20 @@
+<#--  相拟话题 集合 -->
+<#--  topicId 本模板由引入模块传参 -->
+<@function > 	
+	<#if topicRelated_likeTopic_collection?? && topicRelated_likeTopic_collection?size gt 0 >  
+	<div class="likeTopic">
+	    <ul class="head"><span>相关话题</span></ul>
+	    <ul class="content">
+	    	<#list topicRelated_likeTopic_collection as likeTopic>
+				<li>
+					<a href="thread?topicId=${likeTopic.id}" title="${likeTopic.title}" target="_blank">
+		                ${likeTopic.title}
+		            </a>
+				</li>
+			</#list>
+		</ul>
+	</div>
+	  
+		
+	</#if>
+</@function>

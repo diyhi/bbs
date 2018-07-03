@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns="http://xmlns.jcp.org/xml/ns/javaee" 
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" 
+	version="3.1">
+	
+	<!-- Spring 刷新Introspector防止内存泄露 -->
+    <listener>
+        <listener-class>org.springframework.web.util.IntrospectorCleanupListener</listener-class>
+    </listener>
+    
+	<!-- 对Spring容器进行实例化-->
+	<listener>
+	  <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener> 
+	
+	<!-- 读取Spring配置文件  /WEB-INF/beans.xml -->
+	<context-param>
+	  <param-name>contextConfigLocation</param-name>
+	  <param-value>classpath*:beans.xml</param-value>
+	</context-param> 
+	
+	<!-- 系统启动或关闭执行 -->
+	<listener>  
+		<listener-class>cms.web.filter.BasicConfig</listener-class>    
+    </listener>  
+	
+	<!-- 所有页面间参数的传递设置统一的字符编码 -->
+	<filter>  
+		<filter-name>characterEncodingFilter</filter-name>  
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>  
+		<async-supported>true</async-supported>
+		<init-param>  
+			<param-name>encoding</param-name>  
+			<param-value>UTF-8</param-value>  
+		</init-param>  
+		<!-- forceEncoding默认是false，
+		(此种情况不能改变response的编码方式)如果设置成true则不管请求是否已有编码，
+		都强制转换成encoding指定的编码，同时在响应可设置编码的前提下设置响应编码。 -->
+		<init-param>  
+			<param-name>forceEncoding</param-name>  
+			<param-value>true</param-value>  
+		</init-param>  
+		
+	</filter>  
+	<filter-mapping>  
+		<filter-name>characterEncodingFilter</filter-name>  
+		<url-pattern>/*</url-pattern>  
+	</filter-mapping>  
+	
+	<!-- Spring Secutiry 过滤器链配置  -->
+	<filter>
+	  <filter-name>springSecurityFilterChain</filter-name>
+	  <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	  <async-supported>true</async-supported>
+	</filter>
+	<filter-mapping>
+	  <filter-name>springSecurityFilterChain</filter-name>
+	  <url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<!-- 启动Spring MVC -->
+	<servlet>  
+	    <servlet-name>SpringMVC</servlet-name>  
+	        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>  
+	    <load-on-startup>30</load-on-startup> 
+	    <!-- 默认取值为 false，要启用异步处理支持，则将其设为 true  -->
+	    <async-supported>true</async-supported>
+	    <!-- 文件上传
+	    	max-file-size: 表示单个文件的最大大小。默认为-1，表示不限制
+	    	max-request-size: 表示一次上传文件的最大大小。默认为-1，表示不限制
+	    	file-size-threshold:当文件大小超过指定的大小后将写入到硬盘上.默认是0
+		-->
+	    <multipart-config>
+			<max-file-size>-1</max-file-size>
+			<max-request-size>-1</max-request-size>
+			<file-size-threshold>0</file-size-threshold>
+   		</multipart-config>  
+	</servlet>
+
+	<!-- spring mvc的首页访问不再使用跳转 -->
+	<servlet-mapping>   
+        <servlet-name>SpringMVC</servlet-name>   
+        <url-pattern>/index.htm</url-pattern>   
+    </servlet-mapping>
+    <servlet-mapping>  
+     <servlet-name>SpringMVC</servlet-name>  
+     <url-pattern>/</url-pattern>  
+  	</servlet-mapping> 
+  	
+ 
+  	
+  	
+   
+    
+    
+    <!-- Druid连接池监控界面使用配置 
+    <servlet>
+    	<servlet-name>DruidStatView</servlet-name>
+    	<servlet-class>com.alibaba.druid.support.http.StatViewServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+    	<servlet-name>DruidStatView</servlet-name>
+    	<url-pattern>/druid/*</url-pattern>
+    </servlet-mapping> -->
+
+	<!-- session超时时间 ; 20则设置过期时间为20分钟 -->
+	<session-config>
+		<session-timeout>180</session-timeout>
+		<!-- 设置HttpOnly -->
+		<cookie-config>
+			<http-only>true</http-only>
+		</cookie-config>	
+	</session-config>
+	
+	<!-- 前台检查登录用户 -->
+	<filter>
+        <filter-name>LoginFilter</filter-name>
+        <filter-class>cms.web.filter.LoginFilter</filter-class>
+        <async-supported>true</async-supported>
+    </filter>
+    <filter-mapping>
+        <filter-name>LoginFilter</filter-name>
+        <url-pattern>/user/*</url-pattern>
+    </filter-mapping>
+
+	<!-- 去掉URL带的jsessionid -->
+	<filter>
+		<filter-name>DisableUrlSessionFilter</filter-name>
+		<filter-class>cms.web.filter.DisableUrlSessionFilter</filter-class>
+		<async-supported>true</async-supported>
+	</filter>
+	<filter-mapping>  
+	  	<filter-name>DisableUrlSessionFilter</filter-name>  
+	  	<url-pattern>/*</url-pattern>  
+	</filter-mapping>  
+	
+	<welcome-file-list>
+    	<welcome-file>index.htm</welcome-file>
+	</welcome-file-list>
+  
+	<!-- 配置display-name,使log4j2能用${web:rootDir}参数 -->
+	<context-param>
+		<param-name>log4jContextName</param-name>
+		<param-value>cms</param-value>
+	</context-param>
+</web-app>

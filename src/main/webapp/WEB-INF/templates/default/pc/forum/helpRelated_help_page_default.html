@@ -1,0 +1,28 @@
+<#-- 在线帮助列表  分页 -->
+<@function page="${url_page}">
+	<table cellspacing="0" cellpadding="0" width="100%" class="helpTable">
+    	<thead>
+        	<tr>
+            	<th>帮助</th>
+            	<th>创建时间</th>
+            </tr>
+        </thead>
+    	<tbody>
+    		<#if helpRelated_help_page?exists && helpRelated_help_page.records?exists && helpRelated_help_page.records?size gt 0>
+
+			<#list helpRelated_help_page.records as help>
+				<tr>
+					<td><a href="help.htm?helpId=${help.id}">${help.name}</a> </td> 
+					<td class="date">${help.times}</td>
+				</tr>
+			</#list>
+			</#if>
+			
+ 		</tbody>
+	</table>
+	<DIV class="helpTablePage">
+		<#assign pageView = helpRelated_help_page>
+		<#--引入分页-->
+		<@include action="${newPublic_5}"/>
+	</DIV>
+</@function>

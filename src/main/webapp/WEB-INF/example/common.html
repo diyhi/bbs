@@ -1,0 +1,368 @@
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="2">返回值调用说明</th>
+		</tr> 
+		<tr> 
+			<th width="30%">说明</th>
+			<th width="70%">示例</th>
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>布局类型为'默认页'或'更多'的返回值可以直接调用</td>
+			<td align="left">
+				<textarea name="exampleCode">
+					<#-- '默认页'修改会员返回值调用 -->
+					${user.userName}
+				</textarea>
+			</td>
+		<tr> 
+		<tr> 
+			<td>布局类型为'更多'的返回值和'默认页'更多的返回值相同</td>
+			<td align="left">
+				<textarea name="exampleCode" >
+					<#-- 默认页在线帮助'更多'的返回值变量 -->
+					more_help_page
+					
+					<#-- 布局添加在线帮助'更多'的返回值变量 -->
+					more_help_page
+				</textarea>
+			</td>
+		<tr> 
+		<tr> 
+			<td>'布局 -- 版块'的调用方式为'引用代码'时,版块代码块必须由&lt@function>&lt/@function>标签包裹</td>
+			<td>
+				<textarea name="exampleCode" >
+					&lt@function>
+						版块返回对象
+						例如【评论列表】【分页】${topicRelated_comment_page.totalpage}
+					&lt/@function>
+				</textarea>
+			</td>
+		<tr> 
+			<td>'布局 -- 版块'的调用方式为'调用对象'时,对象代码块必须由&lt@object action="">&lt/@object>标签包裹</td>
+			<td>
+				<textarea name="exampleCode" >
+					action参数的值由系统自动生成
+					&lt@object action="${topicRelated_tag_1}">
+						版块返回对象
+						例如【标签列表】【集合】
+						&lt#list topicRelated_tag_collection as tag>
+							标签名称：${tag.name}
+						&lt/#list>
+					&lt/@object>
+				</textarea>
+			</td>
+		</tr>
+		<tr> 
+			<td>'布局 -- 版块'的调用方式为'引用代码'时,引入本代码块的标签为&lt@include action=""/></td>
+			<td>
+				<textarea name="exampleCode" >
+					action参数的值由系统自动生成
+					引入【标签】版块
+					&lt@include action="${topicRelated_tag_1}"/>
+				</textarea>
+			</td>
+		</tr>
+	</tbody> 
+</table>
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">公共对象</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th>
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>baseURL</td>
+			<td>String</td>
+			<td>系统路径</td>
+		</tr>
+		<tr> 
+			<td>commonPath</td>
+			<td>String</td>
+			<td>资源路径</td>
+		</tr>
+		<tr> 
+			<td>contextPath</td>
+			<td>String</td>
+			<td>系统虚拟目录</td>
+		</tr>
+		<tr> 
+			<td>suffix</td>
+			<td>String</td>
+			<td>站点后缀名</td>
+		</tr>
+		<tr> 
+			<td>templateDir</td>
+			<td>String</td>
+			<td>模板目录名称</td>
+		</tr>
+		<tr> 
+			<td>title</td>
+			<td>String</td>
+			<td>站点名称</td>
+		</tr>
+		<tr> 
+			<td>keywords</td>
+			<td>String</td>
+			<td>站点关键词</td>
+		</tr>
+		<tr> 
+			<td>description</td>
+			<td>String</td>
+			<td>站点描述</td>
+		</tr>
+		<tr> 
+			<td>systemUser</td>
+			<td><a style="color: #317ee7" onclick="anchorJump('#anchor_40'); return false;">AccessUser</a></td>
+			<td>登录用户</td>
+		</tr>
+		<tr> 
+			<td>baseURI</td>
+			<td>String</td>
+			<td>系统资源标识符</td>
+		</tr>
+		<tr> 
+			<td>token</td>
+			<td>String</td>
+			<td>令牌</td>
+		</tr>
+		<tr> 
+			<td>identificationNumber</td>
+			<td>String</td>
+			<td>识别号：用来区别每次请求</td>
+		</tr>
+	</tbody> 
+</table>
+<table id="anchor_40" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">用户 AccessUser</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>id</td> 
+			<td>long</td>
+			<td>Id</td>
+		</tr>
+		<tr> 
+			<td>userName</td> 
+			<td>String</td>
+			<td>会员用户名</td>
+		</tr>
+	</tbody> 
+</table>
+
+
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">模板引擎内置函数</th>
+		</tr> 
+		<tr> 
+			<th width="20%"></th>
+			<th width="30%">参数</th>
+			<th width="50%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td rowspan="6">
+				List集合
+			</td> 
+			<td>
+				&lt#list sequence as item>
+					<br>
+				&lt/#list>
+			</td> 
+			<td>遍历集合</td>
+		</tr>
+		<tr> 
+			<td>
+				${item_index}<br>
+			</td> 
+			<td>当前迭代项在所有迭代项中的位置</td>
+		</tr>
+		<tr> 
+			<td>
+				${item_has_next}<br>
+			</td> 
+			<td>用于判断当前迭代项是否是所有迭代项中的最后一项</td>
+		</tr>
+		<tr> 
+			<td>sequence?first</td>
+			<td>获取集合第一个元素</td>
+		</tr>
+		<tr> 
+			<td>sequence?last</td> 
+			<td>获取集合最后一个元素</td>
+		</tr>
+		<tr> 
+			<td>
+				sequence?size
+			</td> 
+			<td>获取队列长度</td>
+		</tr>
+		
+		<tr> 
+			<td rowspan="5">
+				Map集合
+			</td> 
+			<td>
+				&lt#list hash as key, value>
+					<br>
+				&lt/#list>
+			</td> 
+			<td>遍历集合</td>
+		</tr>
+		<tr> 
+			<td>
+				${key}<br>
+			</td> 
+			<td>获取集合的键</td>
+		</tr>
+		<tr> 
+			<td>
+				${value}<br>
+			</td> 
+			<td>获取集合的值</td>
+		</tr>
+	</tbody> 
+</table>
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">模板引擎比较符号</th>
+		</tr> 
+		<tr> 
+			<th width="30%">参数</th>
+			<th width="70%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>lt</td>
+			<td>小于( &lt )</td>
+		</tr>
+		<tr> 
+			<td>gt</td> 
+			<td>大于( &gt )</td>
+		</tr>
+		<tr> 
+			<td>lte</td> 
+			<td>小于或等于( &lt= )</td>
+		</tr>
+		<tr> 
+			<td>gte</td> 
+			<td>大于或等于( >= )</td>
+		</tr>
+		
+	</tbody> 
+</table>
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">模板引擎判断空值</th>
+		</tr> 
+		<tr> 
+			<th width="30%">参数</th>
+			<th width="20%">说明</th> 
+			<th width="50%">示例</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>??</td>
+			<td>空值判断</td>
+			<td align="left" >
+				<textarea name="exampleCode">
+					变量name判断是否为空
+					&lt#if name??>
+						有值
+					&lt#else>
+						没有值
+					&lt/#if>
+				</textarea>
+				
+				
+					当服务器返回Map变量时不能先定义变量再判断,例如<br>
+				<span style="text-decoration:line-through;">
+					&lt#assign error = returnValue['error']><br>
+					&lt#if error?? && error?size gt 0><br>
+						&lt#list returnValue['error'] as key, value> <br>
+						    ${value} <br>
+						&lt/#list> <br>
+					&lt#else><br>
+						没有可以领取的优惠券<br>
+					&lt/#if><br>
+					</span>
+					以上的写法会抛出错误
+				
+				<textarea name="exampleCode">
+					正确的写法是拿返回值直接判断 如下：
+					&lt#if returnValue['error']?? && returnValue['error']?size gt 0>
+						&lt#list returnValue['error'] as key, value> 
+						    ${value} 
+						&lt/#list> 
+					&lt#else>
+						没有可以领取的优惠券
+					&lt/#if>
+				</textarea>
+			</td>
+		</tr>
+		<tr> 
+			<td>?size</td> 
+			<td>集合大小判断</td>
+			<td align="left">
+				<textarea name="exampleCode">
+					<textarea name="exampleCode">
+					&lt#if returnValue['error']?? && returnValue['error']?size gt 0>
+						&lt#list returnValue['error'] as key, value> 
+						    ${value} 
+						&lt/#list> 
+					&lt#else>
+						没有可以领取的优惠券
+					&lt/#if>
+				</textarea>
+				</textarea>
+			</td>
+		</tr>
+		
+	</tbody> 
+</table>
+
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">注意事项</th>
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>JavaScript提交参数除密码框值外建议都用encodeURIComponent()函数进行编码</td>
+		</tr>
+		<tr> 
+			<td>因为JavaScript中的数字类型不能包含所有的java long值,所以JSON返回值中含有Long都转为String类型</td> 
+		</tr>
+		<tr> 
+			<td>Freemarker模板不支持直接输出布尔类型(boolean),布尔类型对象输出要使用内建函数c将布尔值转换为字符串；例如布尔类型${formCaptcha.showCaptcha}要写成${formCaptcha.showCaptcha?c}才能正确显示；比较${formCaptcha.showCaptcha?c == 'true'}</td> 
+		</tr>
+		<tr> 
+			<td>因为手机版采用单页应用设计,框架不支持加上网页后缀,建议电脑版网页链接不要加上后缀(.htm)，让手机版和网页版URL保持一致</td>
+		</tr>
+	</tbody> 
+</table>
+

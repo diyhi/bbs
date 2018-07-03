@@ -1,0 +1,287 @@
+<#-- 更换绑定手机第一步 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<base href="${baseURL}">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>更换绑定手机 - ${title}</title>
+	<meta name="keywords" content="${keywords}"/>
+	<meta name="description" content="${description}"/>
+	<link rel="shortcut icon" type="image/x-icon" href="${baseURL}${commonPath}images/favicon.ico" media="screen" />
+	<link href="${commonPath}css/common.css" type="text/css" rel="stylesheet">
+	<script language="javascript" src="${commonPath}js/tool.js" type="text/javascript"></script>
+	<script language="javascript" src="${commonPath}js/ajax.js" type="text/javascript"></script>
+	<script language="javascript" src="${commonPath}js/json2.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript" language="javascript"> 
+	//确认提交
+	function sureSubmit(objForm){
+		if(verification("smsCode") == false){
+			return;
+		}
+		objForm.submit();
+	}
+	
+	//ajax提交
+	function ajaxSubmit(){
+		if(verification("smsCode") == false){
+			return;
+		}
+		var parameter = "";
+		//令牌标记
+		var token = document.getElementById("token").value;
+		parameter += "&token="+token;
+
+		var smsCode = document.getElementById("smsCode").value;
+		if(smsCode !=""){
+			parameter += "&smsCode="+encodeURIComponent(smsCode);
+		}	
+		post_request(function(value){
+			if(value != ""){
+				var returnValue = JSON.parse(value);//JSON转为对象
+				var jumpUrl = "";
+				var success = "false";
+				for(var key in returnValue){
+					if(key == "success"){	
+						success = returnValue[key];
+					}if(key == "jumpUrl"){	
+						jumpUrl = returnValue[key];	
+					}else if(key == "error"){
+						var errorValue = returnValue[key];
+						for(var error in errorValue){
+							if(error != ""){
+								document.getElementById(error+"_error").innerHTML=errorValue[error];	
+							}
+						}
+					}else if(key == "captchaKey"){//显示验证码	
+						var captchaKey = returnValue[key];
+						if(captchaKey != ""){
+							//设置验证码Key
+							if(document.getElementById("captchaKey")!= null){
+								document.getElementById("captchaKey").value = captchaKey;
+								//设置验证码图片
+								replaceCaptcha();
+							}	
+						}
+					}
+				}
+				if(success == "true"){
+					//跳转到第二步
+					window.location.href = getBasePath()+jumpUrl;
+				}
+			}	
+		},
+			"user/control/updatePhoneBinding/step1?&timestamp=" + new Date().getTime(), true,parameter);
+	}
+	
+	
+	
+	//获取短信验证码
+	function getSmsCode(){
+		//清除所有错误
+		var errorTag_object = getElementsByName_pseudo("span", "errorTag");
+		for(i = 0; i < errorTag_object.length; i++) {	
+			if(errorTag_object[i].id != ""){
+				document.getElementById(errorTag_object[i].id).innerHTML = "";
+			}	
+		}
+		document.getElementById("successInfo").innerHTML="";		
+		
+	//	if(verification("captchaValue") == false){
+	//		return;
+	//	}
+		
+		
+		var parameter = "";
+		//令牌标记
+		var token = document.getElementById("token").value;
+		parameter += "&token="+token;
+
+		//模块
+		parameter += "&module=2";
+		
+		//验证码Key
+		var captchaKey = document.getElementById("captchaKey");
+		if(captchaKey != null){
+			parameter += "&captchaKey="+captchaKey.value;
+		}
+		
+		//验证码值
+		var captchaValue = document.getElementById("captchaValue");
+		if(captchaValue != null){
+			parameter += "&captchaValue="+captchaValue.value;
+		}
+		
+		post_request(function(value){
+			if(value != ""){
+				var returnValue = JSON.parse(value);//JSON转为对象
+				var success = "false";
+				for(var key in returnValue){
+					if(key == "success"){	
+						var success = returnValue[key];
+						if(success == "true"){
+							document.getElementById("successInfo").innerHTML="短信验证码已发送";
+							//隐藏提交按钮60秒
+							document.getElementById("smsCodeButton").disabled = true;
+							
+							document.getElementById("smsCodeButton").value="60秒后没收到可重新获取";
+							window.setTimeout(function(){
+								document.getElementById("smsCodeButton").disabled = false;
+								document.getElementById("smsCodeButton").value="获取短信校验码";
+							},60000);  
+							
+								
+						}		
+					}else if(key == "error"){
+						var errorValue = returnValue[key];
+						for(var error in errorValue){
+							if(error != ""){
+								document.getElementById(error+"_error").innerHTML=errorValue[error];	
+							}
+						}
+					}else if(key == "captchaKey"){//显示验证码	
+						var captchaKey = returnValue[key];
+						if(captchaKey != ""){
+							//设置验证码Key
+							if(document.getElementById("captchaKey")!= null){
+								document.getElementById("captchaKey").value = captchaKey;
+								//设置验证码图片
+								replaceCaptcha();
+							}	
+						}
+					}
+				}
+			}	
+		},
+			"user/control/getSmsCode?&timestamp=" + new Date().getTime(), true,parameter);
+	}
+
+
+	//验证参数
+	function verification(field){
+		if(field == "smsCode"){//手机验证码
+			var parameter = document.getElementById(field).value;
+			if(parameter != null && parameter != ""){
+			
+				var parameter_trim = trim(parameter);
+				if(parameter_trim != ""){
+					if(getStringLeng(parameter_trim)  != 6){
+						document.getElementById(field+"_error").innerHTML = "手机验证码不正确";
+						return false;
+					}
+				}else{
+					document.getElementById(field+"_error").innerHTML = "手机验证码不能为空";
+					return false;
+				}
+			}else{
+			
+				document.getElementById(field+"_error").innerHTML = "手机验证码不能为空";
+				return false;
+			}
+			
+		}
+		if(field == "captchaValue"){//验证码
+			if( document.getElementById("captchaKey") != null){
+				var captchaKey = document.getElementById("captchaKey").value;
+				var parameter = document.getElementById(field).value;
+				if(parameter != ""){
+				
+					var parameter_trim = trim(parameter);
+					if(parameter_trim != ""){
+						get_request(function(value){
+			            	if(value == "false"){
+				            	document.getElementById(field+"_error").innerHTML = "验证码错误";
+			            	}
+			            },
+					 		"userVerification.htm?captchaKey="+captchaKey+"&captchaValue="+parameter_trim+"&timestamp=" + new Date().getTime(), true);
+			            	
+					}else{
+						document.getElementById(field+"_error").innerHTML = "验证码不能为空";
+						return false;
+					}
+				}else{
+					document.getElementById(field+"_error").innerHTML = "验证码不能为空";
+					return false;
+				}
+			}
+		}
+		if(document.getElementById(field+"_error") != null){
+			document.getElementById(field+"_error").innerHTML = "";
+		}
+		return true;
+	}
+	//更换验证码
+	function replaceCaptcha(){
+		var captchaKey = document.getElementById("captchaKey").value;
+		document.getElementById("captcha").src = "captcha/"+captchaKey+".jpg?" + Math.random(); 
+	}
+</script>
+<body>
+<#-- 引入页头 -->
+<@include action="${newPublic_2}"/>
+<div class="fixedBottom  wrap clearfix">
+
+	<#-- 引入服务导航 -->
+	<@include action="${newPublic_4}"/>
+
+	<form method="post" autocomplete="off" action="user/control/updatePhoneBinding/step1">
+	
+		<!-- 令牌标记 -->
+		<input type="hidden" id="token" name="token" value="${token}">
+		<div class="phoneBindingModule blankTableModule">
+			<table class="blankTable" border="0" cellSpacing="2" cellPadding="0" >
+				<tbody>
+					<tr>
+			    		<td width="120px" align="right">已绑定手机： </td>
+			    		<td align="left" colspan="2">
+			    			${mobile}
+			    		</td>
+					</tr>
+					<tr>
+			    		<td width="120px" align="right">手机校验码： </td>
+			    		<td align="left" colspan="2">
+			    			<input type="text" id="smsCode" name="smsCode" class="formText" size="7" maxlength="7" value=""/>
+			    			<span class="functionButton"><INPUT id="smsCodeButton" type="button" value="获取短信校验码" onClick="javascript:getSmsCode();"></span>
+			    			<span id="successInfo" class="successInfo"></span>
+			    			<span id="smsCode_error" name="errorTag" class="error">${(error['smsCode'])!}</span>
+			    		</td>
+					</tr>
+					
+					
+					<tr>
+						<td width="120px" align="right">验证码： </td>
+						<td width="40px">
+							<!-- 验证码Key -->
+							<input type="hidden" id="captchaKey" name="captchaKey" value="${captchaKey}">
+							<input id="captchaValue" name="captchaValue" type="text" class="formText"  size="7" maxlength="7" autocomplete="off" onBlur="verification(this.id)"/>		
+						</td>
+						<td align="left">
+							<img id="captcha" src="captcha/${captchaKey!}.jpg" onClick="replaceCaptcha()"/>
+							<span id="captchaValue_error" name="errorTag" class="error">${(error['captchaValue'])!}</span> 
+						
+						</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td colspan="2">
+							<span class="submitButton"><INPUT type="button" value="提交" onClick="javascript:sureSubmit(this.form);"></span>
+							<!-- 
+							<span class="submitButton"><INPUT type="button" value="ajax提交" onClick="javascript:ajaxSubmit();"></span>
+							  -->
+							<span id="token_error" class="error">${error['token']}</span>  
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</form>
+<div style="clear:both;"></div>
+<div class="push"><!-- 把div#footer推下去 --></div>
+
+
+</div>
+<#--引入页脚-->
+<@include action="${newPublic_3}"/>
+</body>
+
+</html>

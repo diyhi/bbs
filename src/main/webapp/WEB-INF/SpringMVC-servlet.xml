@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns:p="http://www.springframework.org/schema/p"
+xmlns:aop="http://www.springframework.org/schema/aop"
+xmlns:tx="http://www.springframework.org/schema/tx"
+xmlns:mvc="http://www.springframework.org/schema/mvc"
+xmlns:context="http://www.springframework.org/schema/context" 
+xsi:schemaLocation="
+http://www.springframework.org/schema/beans 
+http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
+http://www.springframework.org/schema/mvc
+http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+http://www.springframework.org/schema/context 
+http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+
+	<!-- 对web包中的所有类进行扫描，以完成Bean创建和自动依赖注入的功能 ;mvc 的只扫描controller组件 注意使用 use-default-filters="false"-->
+	<context:component-scan base-package="cms" use-default-filters="false" > 
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller" /> 	
+	</context:component-scan> 
+	
+	<!-- 静态资源访问 -->
+    <mvc:resources location="/robots.txt" mapping="/robots.txt" order="0"/>
+	<mvc:resources location="/backstage/" mapping="/backstage/**"/> 
+    <mvc:resources location="/common/" mapping="/common/**"/> 
+    <mvc:resources location="/file/" mapping="/file/**"/>
+      
+	<!-- 处理器适配器 -->
+	<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">  
+		<!-- 解决json乱码 -->
+		<property name="messageConverters">     
+			<list>
+				<!-- HTTP消息转换器 -->
+				<bean class="org.springframework.http.converter.StringHttpMessageConverter">
+					<property name = "supportedMediaTypes">     
+					    <list>
+					 		<value>text/html;charset=UTF-8</value>      
+					    </list>
+					</property>
+				</bean>
+				<!-- 文件下载配置 -->
+				<bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter"/>   
+                <bean id="mappingJacksonHttpMessageConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">      
+                    <property name="supportedMediaTypes">      
+                        <list>      
+                            <value>text/plain;charset=UTF-8</value>      
+                       </list>      
+                    </property>    
+                </bean>
+                <!-- Json转换器 -->
+                <bean id="mappingJacksonHttpMessageConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">          
+                    <property name="supportedMediaTypes">      
+                        <list>
+                            <value>text/plain;charset=UTF-8</value> 
+                       </list>      
+                    </property>    
+                </bean>
+			 </list>
+		</property>
+	</bean>
+
+	<!-- 处理器映射 -->
+	<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping">  
+		<!-- 自定义拦截器  这里只拦截页面 -->
+		<property name="interceptors">  
+	        <list>  
+	        	<!-- 模板拦截器(将模板显示功能加入指定的页面中)  -->
+	            <bean class="cms.web.filter.TempletesInterceptor"/>
+	        </list>  
+	    </property>  
+	</bean> 
+
+    
+	<!-- FreeMarker页面解析器--> 
+	<bean id="freemarkerViewResolver" class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
+		<property name="order" value="1" />  
+		<property name="suffix" value=".html"/><!-- 后缀 -->
+		<property name="contentType" value="text/html;charset=UTF-8"/><!-- 页面编码 -->
+		<property name="viewClass">
+		    <value>org.springframework.web.servlet.view.freemarker.FreeMarkerView</value>
+		</property>	
+		<property name="attributesMap"> 
+			<map>
+				<!-- 自定义引入函数 url安全转义 -->  
+	            <entry key="encodeBase64URL">  
+	                <bean class="cms.web.taglib.Base64Tag" />  
+	            </entry>      
+			</map> 
+		</property>
+		
+	</bean>
+	
+	<!-- 对模型视图名称的解析，即在模型视图名称添加前后缀 -->
+	<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="order" value="2" /><!-- 视图解析顺序 -->
+		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView"></property>   
+		<property name="prefix" value="/WEB-INF/"></property> <!--前缀 -->
+		<property name="suffix" value=".jsp"></property> <!-- 后缀 -->
+	</bean>
+	
+	
+	
+	<!-- 文件上传 
+    <bean id="multipartResolver"  
+        class="org.springframework.web.multipart.commons.CommonsMultipartResolver"  
+        p:defaultEncoding="utf-8" />  -->  
+  	<!-- 文件上传 -->  
+  	<bean id="multipartResolver"  class="org.springframework.web.multipart.support.StandardServletMultipartResolver" />      
+     
+        
+	<!-- 自定义异常-->
+	<bean id="exceptionResolver" class="cms.web.action.SystemExceptionHandler"></bean> 
+	
+	<!-- 自定义拦截器 （这里可以拦截所有内容）
+	<mvc:interceptors>
+		<bean class="cms.web.filter.TempletesInterceptor"/>
+	</mvc:interceptors> -->
+	<!-- 自定义拦截器
+	<mvc:interceptors>
+		
+		<mvc:interceptor>
+			<mvc:mapping path="/"/>
+			<bean class="cms.web.filter.TempletesInterceptor" />
+		</mvc:interceptor>
+	</mvc:interceptors>-->
+
+ 	
+</beans>

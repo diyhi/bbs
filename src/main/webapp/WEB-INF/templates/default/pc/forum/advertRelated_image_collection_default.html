@@ -1,0 +1,35 @@
+<#-- 图片广告  集合 -->
+<#-- 页面需引入slide.js -->
+<@function>
+<div id="container" class="slide">
+	<#assign advertList = advertRelated_image_collection>
+	<table id="scroller"  class="scroller" border="0" cellspacing="0">
+		<tr>
+			<#list advertList as advert>	
+			<td><img src="${advert.path}" /></td>
+			</#list>	
+		</tr>
+	</table>
+	<ul id="page" class="slide-page"></ul>
+</div>
+</@function>
+<script type="text/javascript">
+//图片数量
+var carousel_imageQuantity = 0;
+//统计轮播广告图片数量
+function statistic_imageQuantity(){
+	var td = document.getElementById("scroller").getElementsByTagName("td");
+	if(td != null){
+		carousel_imageQuantity = td.length;
+	}
+}
+statistic_imageQuantity();
+
+//轮播图片
+Slide.scroll(
+	'container' ,/*外部容器ID*/
+	'scroller', /*滑动容器ID*/
+	'page', /*分页ID*/
+	carousel_imageQuantity, /*切换图片数目*/
+	{trigger: 0} /*默认配置*/);
+</script>

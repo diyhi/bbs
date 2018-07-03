@@ -1,0 +1,8 @@
+<#-- 在线帮助列表  集合 -->
+<@function helpTypeId="${url_helpTypeId}"> 
+	<#if helpRelated_help_collection?exists && helpRelated_help_collection?size gt 0 >   
+		<#list helpRelated_help_collection as help>
+			<a href="help.htm?helpId=${help.id}"><span >${help.name}</span></a>
+		</#list>
+	</#if>
+</@function> 

@@ -1,0 +1,10 @@
+<#--  标签导航 -->
+<#--  适用话题列表 -->
+<@function>
+	<div class="tabModule">
+		<a href="" <#if url_tagId == ''>class='tab_current'<#else> class='tab'</#if>>全部</a>
+		<#list topicRelated_tag_collection as tag>	
+			<a href="?tagId=${tag.id}" <#if tag.id == url_tagId> class='tab_current'<#else> class='tab'</#if>>${tag.name}</a>
+		</#list>
+	</div>	
+</@function>	

@@ -1,0 +1,182 @@
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">返回值</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="20%">类型</th> 
+			<th width="50%">说明</th> 
+		</tr>
+	</thead> 
+	 <tbody> 
+		<tr> 
+			<td>helpRelated_help_page</td> 
+			<td><a style="color: #317ee7" onclick="anchorJump('#anchor_10'); return false;">PageView</a></td>
+			<td>帮助分页</td> 
+		</tr> 
+	</tbody> 
+</table>
+
+<table id="anchor_10" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">分页 PageView</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>records</td> 
+			<td>List&lt<a style="color: #317ee7" onclick="anchorJump('#anchor_20'); return false;">Help</a>></td>
+			<td>数据展示列表</td>
+		</tr>
+		<tr> 
+			<td>pageIndex</td> 
+			<td><a style="color: #317ee7" onclick="anchorJump('#anchor_30'); return false;">PageIndex</a></td>
+			<td>页码索引</td>
+		</tr>
+		<tr> 
+			<td>totalpage</td> 
+			<td>long</td>
+			<td>总页数</td>
+		</tr>
+		<tr> 
+			<td>maxresult</td> 
+			<td>long</td>
+			<td>每页显示记录数</td>
+		</tr>
+		<tr> 
+			<td>currentpage</td> 
+			<td>long</td>
+			<td>当前页</td>
+		</tr>
+		<tr> 
+			<td>pagecount</td> 
+			<td>long</td>
+			<td>页码显示总数</td>
+		</tr>
+		<tr> 
+			<td>onUrl</td> 
+			<td>String</td>
+			<td>上一页URL</td>
+		</tr>
+		<tr> 
+			<td>nextUrl</td> 
+			<td>String</td>
+			<td>下一页URL</td>
+		</tr>
+	</tbody> 
+</table>
+<table id="anchor_30" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">分页索引 PageIndex</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>startindex</td> 
+			<td>long</td>
+			<td>分页开始索引</td>
+		</tr>
+		<tr> 
+			<td>endindex</td> 
+			<td>long</td>
+			<td>分页结束索引</td>
+		</tr>
+	</tbody> 
+</table>
+<table id="anchor_20" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">帮助 Help</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>id</td> 
+			<td>Long</td>
+			<td>帮助Id</td>
+		</tr>
+		<tr> 
+			<td>name</td> 
+			<td>String</td>
+			<td>帮助名称</td>
+		</tr>
+		<tr> 
+			<td>userName</td> 
+			<td>String</td>
+			<td>用户名称</td>
+		</tr>
+		<tr> 
+			<td>helpTypeId</td> 
+			<td>Long</td>
+			<td>帮助分类Id</td>
+		</tr>
+		<tr> 
+			<td>content</td> 
+			<td>String</td>
+			<td>帮助内容</td>
+		</tr>
+		<tr> 
+			<td>times</td> 
+			<td>Date</td>
+			<td>发表时间</td>
+		</tr>
+	</tbody> 
+</table>
+<table class="exampleTable" > 
+	<thead>
+		<tr> 
+			<th colspan="4">方法支持参数</th>
+		</tr>
+		<tr> 
+			<th width="30%">参数</th> 
+			<th width="20%">类型</th> 
+			<th width="10%">是否必填</th> 
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	 <tbody> 
+		<tr> 
+			<td>helpTypeId</td> 
+			<td>Long</td>
+			<td>否</td>
+			<td>帮助分类Id</td> 
+		</tr>
+		<tr> 
+			<td>page</td> 
+			<td>Integer</td>
+			<td>否</td>
+			<td>页码</td> 
+		</tr>
+	</tbody> 
+</table>
+<h2 style="margin:0;padding:0; margin-top: 10px;">示例</h2>
+<textarea name="exampleCode">
+<@function page="${url_page}" helpTypeId="${url_helpTypeId}">
+   	<#if helpRelated_help_page?exists && helpRelated_help_page.records?exists && helpRelated_help_page.records?size gt 0>
+		<#list helpRelated_help_page.records as help>
+			<#-- 帮助名称 -->
+			<a href="">${help.name}</a>
+			<#-- 发表时间 -->
+			${help.times}	
+		</#list>
+	</#if>
+</@function>
+</textarea>

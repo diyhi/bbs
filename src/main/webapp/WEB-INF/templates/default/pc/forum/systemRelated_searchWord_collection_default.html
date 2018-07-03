@@ -1,0 +1,7 @@
+<#-- 热门搜索词  集合 -->
+<@function>
+	<#assign searchWordList = systemRelated_searchWord_collection>
+	<#list searchWordList as searchWord>
+		<a href="search?content=${searchWord?url}" target="_blank">${searchWord}</a>
+	</#list>
+</@function>

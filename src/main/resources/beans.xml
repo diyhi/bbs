@@ -1,0 +1,392 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns:p="http://www.springframework.org/schema/p"
+xmlns:aop="http://www.springframework.org/schema/aop"
+xmlns:tx="http://www.springframework.org/schema/tx"
+xmlns:context="http://www.springframework.org/schema/context"
+xmlns:mvc="http://www.springframework.org/schema/mvc"
+xmlns:websocket="http://www.springframework.org/schema/websocket" 
+xmlns:security="http://www.springframework.org/schema/security"
+xmlns:cache="http://www.springframework.org/schema/cache"
+xmlns:task="http://www.springframework.org/schema/task"
+xmlns:util="http://www.springframework.org/schema/util"
+xsi:schemaLocation="
+http://www.springframework.org/schema/beans 
+http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
+http://www.springframework.org/schema/context 
+http://www.springframework.org/schema/context/spring-context-4.3.xsd
+http://www.springframework.org/schema/mvc
+http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+http://www.springframework.org/schema/websocket http://www.springframework.org/schema/websocket/spring-websocket-4.3.xsd
+http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.3.xsd
+http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache-4.3.xsd
+http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.3.xsd">
+	
+	<!-- 主体的扫描除controller外的所有组件  --> 
+	<context:component-scan base-package="cms">
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller" /> 
+	</context:component-scan>   
+	
+	<!-- 让controller也支持async则需要在dispatcher中这样配置  
+	<mvc:annotation-driven/>--> 
+	
+	<!-- 启动Spring 自带定时器功能 -->      
+	<task:annotation-driven/> 
+	
+	<!-- 配置应用参数 -->
+	<bean id="propertyPlaceholderConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">   
+	    <property name="locations">   
+	        <list>   
+	            <value>classpath:druid.properties</value>
+	            <value>classpath:memcache.properties</value>
+	            <value>classpath:httpClient.properties</value>  
+	        </list>   
+	    </property>   
+	</bean> 
+	
+	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+		 <!-- 驱动名称 --> 
+        <property name="driverClassName" value="${jdbc_driver}" />     
+		<property name="url" value="${jdbc_url}" />
+		<property name="username" value="${jdbc_user}" />
+		<property name="password" value="${jdbc_password}" />
+
+		 <!-- 配置初始化大小、最小、最大 -->
+		<property name="initialSize" value="1" />     
+		<property name="minIdle" value="5" />      
+		<property name="maxActive" value="200" /> 
+		      
+		<!-- 配置获取连接等待超时的时间 -->     
+		<property name="maxWait" value="60000" />       
+		<!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->     
+		<property name="timeBetweenEvictionRunsMillis" value="60000" />       
+		<!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->     
+		<property name="minEvictableIdleTimeMillis" value="300000" />   
+		<!-- 测试有效用的SQL Query -->       
+		<property name="validationQuery" value="SELECT 'x'" />  
+		<!-- 连接空闲时测试是否有效 -->     
+		<property name="testWhileIdle" value="true" /> 
+		<!-- 获取连接时测试是否有效 -->     
+		<property name="testOnBorrow" value="false" /> 
+		<!-- 归还连接时是否测试有效 -->    
+		<property name="testOnReturn" value="false" />       
+		<!-- 设置字符集为utf8mb4 -->
+		<property name="connectionInitSqls" value="set names utf8mb4;"/> 
+		<!-- 打开PSCache，并且指定每个连接上PSCache的大小  如果用Oracle，则把poolPreparedStatements配置为true，mysql可以配置为false     
+		<property name="poolPreparedStatements" value="true" />     
+		<property name="maxPoolPreparedStatementPerConnectionSize" value="20" /> --> 
+		<!-- 配置监控统计拦截的filters 
+		<property name="filters" value="stat" /> -->     
+		
+		<property name="filters" value="config" />
+		<!-- 数据库密码提供加密功能 -->
+		<property name="connectionProperties" value="${jdbc_publickey}" /> 
+	</bean>
+  	
+  	
+  	<bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		
+		<property name="persistenceXmlLocation" value="classpath:META-INF/persistence.xml" />
+		<property name="loadTimeWeaver">
+	         <bean class="org.springframework.instrument.classloading.InstrumentationLoadTimeWeaver"/>
+	    </property>  
+	</bean> 
+	
+
+	
+	 <!-- 将加有@Repository注解的使用JPA或者Hibernate原生API的方法所抛出的异常转化为Spring的DataAccessException中的异常 -->  
+   <bean class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor"></bean> 
+   <!-- 事务管理器 --> 
+   <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactory"/>
+        <!-- 设置Spring支持嵌套事务回滚 -->
+        <property name="nestedTransactionAllowed" value="true"></property>
+   </bean>
+	<!-- 通过注解方式使用事务 -->
+   <tx:annotation-driven transaction-manager="transactionManager"/>
+	
+	
+	<!--1:配置一个JdbcTemplate实例，并将这个"共享的"，"安全的"实例注入到不同的DAO类中去-->   
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">    
+         <property name="dataSource" ref="dataSource"/>   
+    </bean> 
+	<!-- 配置FreeMarker 只有在主文件才能注入bean,org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer cms.web.action.MyFreeMarkerConfigurer加入了自动escape功能-->
+	<bean id="freeMarkerConfigurer" class="cms.web.action.MyFreeMarkerConfigurer">
+		<property name="templateLoaderPath">
+		    <value>/WEB-INF/</value>
+		</property>
+		<property name="freemarkerSettings">
+		    <props>
+		    	<prop key="template_update_delay">5</prop><!--刷新模板的周期，单位为秒;如果模板不经常更新，此属性设置更新延迟时间-->       
+		        <prop key="default_encoding">UTF-8</prop><!--模板的编码格式 -->     
+		        <prop key="locale">zh_CN</prop><!-- 本地化设置-->
+		        <prop key="classic_compatible">true</prop><!-- 空值处理 -->
+		        <prop key="datetime_format">yyyy-MM-dd HH:mm:ss</prop>
+		        <prop key="time_format">HH:mm:ss</prop>
+		        <prop key="number_format">0.######</prop><!-- 设置数字格式 以免出现 000.00 -->
+		        <prop key="boolean_format">true,false</prop><!-- 布尔值格式化输出的格式 -->
+		        <prop key="whitespace_stripping">true</prop><!-- 剥去空白域 -->
+		        <prop key="tag_syntax">auto_detect</prop><!-- tag_syntax = square_bracket||auto_detect 设置标签类型 两种：[] 和 <> 。[] 这种标记解析要快些-->
+		        <prop key="url_escaping_charset">UTF-8</prop><!-- URL编码的字符集 -->
+		    </props>
+		</property>
+		<property name="freemarkerVariables">  
+			<map>  
+				<!-- 自定义JAVA -->
+                <entry key="function" value-ref="templateCustomMethods"/>  
+                <!-- 自定义引入指令 -->
+                <entry key="include" value-ref="templateIncludeMethods"/>
+                <!-- 自定义调用对象 -->
+                <entry key="object" value-ref="templateObjectMethods"/> 
+                <!-- 从模板中访问类的公有字段 
+                <entry key="objectWrapper" value-ref="beansWrapper" />
+                -->
+                 
+			</map>
+		</property>
+	</bean>
+	<bean id="templateCustomMethods" class="cms.web.action.template.TemplateCustomMethods" />
+	<bean id="templateIncludeMethods" class="cms.web.action.template.TemplateIncludeMethods" />
+	<bean id="templateObjectMethods" class="cms.web.action.template.TemplateObjectMethods" /> 
+	<bean id="beansWrapper" class="freemarker.ext.beans.BeansWrapper">
+		<!-- 返回是否暴露出对象的公有字段给模板 -->
+	    <property name="exposeFields" value="true" />
+	</bean>
+	
+	
+
+	<!-- 指定lobHandler时，对于MySQL、DB2、MS SQL Server、Oracle 10g，使用DefaultLobHandler即可，而Oracle 9i，
+		   则可以使用OracleLobHandler。因为Oracle9i处理lob的方式和不太一样,所以这里要用spring提供的SimpleNativeJdbcExtractor. -->
+	<bean id="lobHandler" class="org.springframework.jdbc.support.lob.DefaultLobHandler" lazy-init="true" />
+
+	<!-- 当使用Oracle9i时使用dbcp连接池要用本方法 
+	<bean id="nativeJdbcExtractor" class="org.springframework.jdbc.support.nativejdbc.CommonsDbcpNativeJdbcExtractor" lazy-init="true"/>
+	<bean id="lobHandler" class="org.springframework.jdbc.support.lob.OracleLobHandler" lazy-init="true">-->
+		<!-- 设置本地 Jdbc 对象抽取器 
+		<property name="nativeJdbcExtractor" ref="nativeJdbcExtractor"/>
+	</bean>-->
+	
+	<!-- 定时任务 - 生成话题全文索引 每隔1分钟执行一次-->
+	<task:scheduler id="scheduler_topicIndex" pool-size="1"/>
+	<task:scheduled-tasks scheduler="scheduler_topicIndex">
+		<task:scheduled ref="task" method="topicIndex" cron="0 0/1 * * * ?"/>
+	</task:scheduled-tasks>
+	
+	
+	<!-- 定时任务 - 处理缩略图 每隔10分钟运行一次-->
+	<task:scheduler id="scheduler_treatmentThumbnail" pool-size="1"/>
+	<task:scheduled-tasks scheduler="scheduler_treatmentThumbnail">
+		<task:scheduled ref="task" method="treatmentThumbnail" cron="0 0/10 * * * ?"/>
+	</task:scheduled-tasks>
+	
+	<!-- 定时任务 - 删除无效的上传临时文件 每隔两小时的50分运行一次-->
+	<task:scheduler id="scheduler_deleteInvalidFile" pool-size="1"/>
+	<task:scheduled-tasks scheduler="scheduler_deleteInvalidFile">
+		<task:scheduled ref="task" method="deleteInvalidFile" cron="0 50 0/2 * * ?"/>
+	</task:scheduled-tasks>
+
+
+   
+   <!-- Kaptcha验证码 -->
+   <bean id="captchaProducer" class="com.google.code.kaptcha.impl.DefaultKaptcha"> 
+        <property name="config"> 
+            <bean class="com.google.code.kaptcha.util.Config"> 
+                <constructor-arg> 
+                    <props> 
+                        <prop key="kaptcha.border">no</prop> <!-- 是否有边框 默认为true 我们可以自己设置yes，no -->  
+                        <prop key="kaptcha.border.color">105,179,90</prop> <!-- 边框颜色 默认为Color.BLACKkaptcha.border.thickness 边框粗细度 默认为1 -->
+                        <prop key="kaptcha.textproducer.font.color">31,31,31</prop> <!-- 验证码文本字符颜色 默认为Color.BLACK -->
+                        <prop key="kaptcha.image.width">120</prop> <!-- 宽度默认为200 -->
+                        <prop key="kaptcha.image.height">40</prop> <!-- 验证码图片高度 默认为50 -->
+                        <prop key="kaptcha.textproducer.char.space">2</prop> <!-- 验证码文本字符间距 默认为2 -->
+                        <prop key="kaptcha.textproducer.font.size">38</prop> <!-- 验证码文本字符大小 默认为40 -->
+                        <prop key="kaptcha.noise.color">31,31,31</prop> <!-- 验证码噪点颜色 默认为Color.BLACK black -->
+                        <prop key="kaptcha.word.impl">cms.web.action.DefaultWordRenderer</prop><!-- 验证码文本字符渲染-->
+                       	<prop key="kaptcha.obscurificator.impl">com.google.code.kaptcha.impl.WaterRipple</prop><!-- 图片样式  com.google.code.kaptcha.impl.WaterRipple水纹     com.google.code.kaptcha.impl.ShadowGimpy阴影效果   cms.web.action.FishEyeGimpy鱼眼效果-->
+                       	<prop key="kaptcha.background.clear.from">255,255,255</prop><!-- 背景颜色渐变，开始颜色-->
+                       	<prop key="kaptcha.background.clear.to">255,255,255</prop><!-- 背景颜色渐变，结束颜色-->
+                       <!--  <prop key="kaptcha.session.key">code</prop> 放入session的KEY名称 -->
+                        <prop key="kaptcha.textproducer.char.length">4</prop> <!-- 验证码文本字符长度 默认为5 -->
+                        <prop key="kaptcha.textproducer.font.names">宋体,楷体,微软雅黑</prop> <!-- 验证码文本字体样式 默认为new Font("Arial", 1, fontSize), new Font("Courier", 1, fontSize)-->
+                    </props> 
+                </constructor-arg> 
+            </bean> 
+        </property> 
+    </bean> 
+
+    
+    <!-- 启用何种缓存 memcached  ehcache -->
+    <bean id="selectCache" class="cms.web.action.cache.SelectCache">
+		<property name="cacheName" value="${cacheName}"></property>
+	</bean>
+    
+    <!-- 启用Ehcache缓存注解功能 -->
+	<cache:annotation-driven cache-manager="cacheManager" />
+	<!-- cacheManager工厂类 p:shared="true" --> 
+	<bean id="cacheManagerFactory" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean" 
+		p:configLocation="classpath:ehcache.xml"  /> 
+		
+		
+    <!-- 声明缓存管理 -->
+    <bean id="cacheManager" class="cms.web.action.cache.SystemCacheManager">
+		<property name="ehCacheManager" ref="cacheManagerFactory"></property>
+		<property name="memcachedClient" ref="memcachedClient"></property>
+		<property name="selectCache" ref="selectCache"></property>
+		<property name="memcachedManager" ref="memcachedManager"></property>
+	</bean>
+	
+	<!-- 缓存Key生成策略配置 -->
+	<bean id="cacheKeyGenerator" class="cms.web.action.cache.CacheKeyGenerator"/>
+	
+	
+	<!-- memcached缓存操作 -->
+	<bean id="memcachedManager" class="cms.web.action.cache.MemcachedManager">
+		<property name="memcachedClient" ref="memcachedClient"></property>
+	</bean>
+	
+		
+		
+	<bean name="memcachedClientBuilder" class="net.rubyeye.xmemcached.XMemcachedClientBuilder"> 
+    	<!-- XMemcachedClientBuilder有两个参数.第二个是服务器列表，第二个是数组 --> 
+        <constructor-arg> 
+        	<list> 
+            	<bean class="java.net.InetSocketAddress"> 
+                	<constructor-arg> 
+                    	<value>${memcache.server_1}</value> 
+                    </constructor-arg> 
+                    <constructor-arg> 
+                        <value>${memcache.port_1}</value> 
+                    </constructor-arg> 
+                 </bean> 
+             </list> 
+         </constructor-arg> 
+         <constructor-arg> 
+              <list> 
+                   <value>1</value> 
+              </list> 
+          </constructor-arg> 
+          
+          <!-- nio的连接池大小 -->
+          <property name="connectionPoolSize" value="${memcache.connectionPoolSize}"></property> 
+           <!-- 操作超时时间,单位ms -->
+          <property name="opTimeout" value="${memcache.opTimeout}"></property> 
+          <!-- 使用二进制协议，默认为TextCommandFactory -->
+          <property name="commandFactory"> 
+               <bean class="net.rubyeye.xmemcached.command.TextCommandFactory"></bean> 
+          </property> 
+          <!-- 分布式策略 -->
+          <property name="sessionLocator"> 
+               <bean class="net.rubyeye.xmemcached.impl.KetamaMemcachedSessionLocator"></bean> 
+          </property> 
+          <!-- 序列化转码器 -->
+          <property name="transcoder"> 
+               <bean class="net.rubyeye.xmemcached.transcoders.SerializingTranscoder" /> 
+          </property> 
+    </bean> 
+    <!-- 使用工厂bean来构建memcached的客户端 --> 
+    <bean name="memcachedClient" factory-bean="memcachedClientBuilder" factory-method="build" destroy-method="shutdown"/>
+
+   
+	 <!-- 设置权限的前缀为AUTH_  -->
+	<bean id="roleVoter" class="org.springframework.security.access.vote.RoleVoter">
+    	<property name="rolePrefix" value="AUTH_"/>
+    </bean> 
+    <!-- 引入spring security -->
+    <import resource="beans-security.xml"/>
+    
+    <!-- 线池程 -->
+    <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor" >  
+		<!-- 默认开启线程数   -->
+		<property name="corePoolSize" value="2" />  
+		<!-- 最大线程  -->
+		<property name="maxPoolSize" value="8" />  
+		<!-- 缓冲任务队列的长度    去掉queueCapacity属性则延后执行，放在无界队列当中，任务过多仍然可能内存溢出
+		<property name="queueCapacity" value="100" /> -->   
+		<!-- 线程池对拒绝任务(无线程可用)的处理策略 -->   
+        <property name="rejectedExecutionHandler">   
+        	<!-- 处理的方法是运行计算任务,除非ThreadPoolExecutor被关闭，这样的话，任务会被丢弃 -->
+            <bean class="java.util.concurrent.ThreadPoolExecutor$CallerRunsPolicy"/>   
+        </property> 
+	</bean>
+	
+	
+	<!-- httpClient连接管理器 -->
+    <bean id="connectionManager" class="org.apache.http.impl.conn.PoolingHttpClientConnectionManager"
+          destroy-method="close">
+        <!-- 最大连接数 -->
+        <property name="maxTotal" value="${http.maxTotal}"/>
+        <!--设置每个主机最大的并发数-->
+        <property name="defaultMaxPerRoute" value="${http.defaultMaxPerRoute}"/>
+    </bean>
+
+    <!--定义HttpClient构建器-->
+    <bean id="httpClientBuilder" class="org.apache.http.impl.client.HttpClientBuilder" factory-method="create">
+        <property name="connectionManager" ref="connectionManager"/>
+    </bean>
+
+    <!--定义httpClient对象，该bean一定是多例的-->
+    <bean id="httpClient" class="org.apache.http.impl.client.CloseableHttpClient" factory-bean="httpClientBuilder"
+          factory-method="build" scope="prototype"></bean>
+    <!--定义requestConfig构建器-->
+    <bean id="requestConfigBuilder" class="org.apache.http.client.config.RequestConfig.Builder">
+        <!--设置创建连接的最长时间-->
+        <property name="connectTimeout" value="${http.connectTimeout}"/>
+        <!--从连接池中获取到连接的最长时间-->
+        <property name="connectionRequestTimeout" value="${http.connectionRequestTimeout}"/>
+        <!--数据传输的最长时间-->
+        <property name="socketTimeout" value="${http.socketTimeout}"/>
+        <!-- 提交请求前测试连接是否可用 -->
+		<property name="staleConnectionCheckEnabled" value="${http.staleConnectionCheckEnabled}"/>
+    </bean>
+    <!--请求参数对象-->
+    <bean class="org.apache.http.client.config.RequestConfig" factory-bean="requestConfigBuilder"
+          factory-method="build"></bean>
+	<!--定期清理无效连接-->
+    <bean class="org.apache.http.impl.client.IdleConnectionEvictor" destroy-method="shutdown">
+        <constructor-arg index="0" ref="connectionManager"/>
+        <constructor-arg index="1" value="${http.maxIdleTime}"/>
+        <constructor-arg index="2" value="MINUTES"/>
+    </bean>
+	
+	
+	<!-- 异常国际化文件 -->
+ 	<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource" >
+        <property name="basenames">
+            <list>
+                <value>errorMessages</value>
+                <value>springSecurityMessages</value>
+            </list>
+        </property>
+        <!-- 是否使用系统默认的编码  默认为true -->
+        <property name="fallbackToSystemLocale" value="false" />
+    </bean>
+    
+   
+    <!-- 积分日志配置 -->
+    <bean id="pointLogConfig" class="cms.web.action.user.PointLogConfig">
+        <!-- 积分日志分表数量 -->
+        <property name="tableQuantity" value="4" />    
+    </bean>
+    
+    <!-- 创建用户登录日志配置 -->
+    <bean id="userLoginLogConfig" class="cms.web.action.user.UserLoginLogConfig" >
+        <!-- 用户登录日志分表数量 -->
+        <property name="tableQuantity" value="4" />    
+    </bean>
+    <!-- 创建员工登录日志配置 -->
+    <bean id="staffLoginLogConfig" class="cms.web.action.staff.StaffLoginLogConfig" >
+        <!-- 员工登录日志分表数量 -->
+        <property name="tableQuantity" value="4" />    
+    </bean>
+
+   	<!-- 让普通的java类获取spring 的bean配置 -->
+   	<bean id="SpringConfigTool" class="cms.utils.SpringConfigTool"></bean>
+   	
+   	<!-- 后置处理器，可以修改bean的配置信息 -->
+   	<bean id="beanFactoryPost" class="cms.web.action.BeanFactoryPost"></bean> 
+
+</beans>

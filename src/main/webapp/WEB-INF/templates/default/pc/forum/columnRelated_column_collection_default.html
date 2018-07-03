@@ -1,0 +1,10 @@
+<#-- 站点栏目列表  集合 -->
+<@function>
+<div class="nav">
+	<ul class="clearfix">
+		<#list columnRelated_column_collection as column>
+			<li><a href="${column.url}">${column.name}</a></li>
+		</#list>
+	</ul>
+</div>
+</@function>

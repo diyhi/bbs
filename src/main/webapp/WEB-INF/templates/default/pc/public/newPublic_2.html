@@ -1,0 +1,32 @@
+<#-- 页头 公共页(生成新引用页) -->
+<div class="headerModule">
+	<div class="box">
+		<a href="" class="logo">
+			<img alt="LOGO" src="${commonPath}images/logo.gif" >
+		</a>
+		<#-- 引入站点栏目 -->
+		<@include action="${columnRelated_column_1}"/> 
+
+		<div class="head-search">
+			<form action="search" method="get">
+				<input name="keyword" value="${keyword}" autocomplete="off" placeholder="搜索">
+				<input type="submit" class="sub-button">
+			</form>
+		</div>
+		<div class="menu" >
+			<ul class="clearfix">
+				<#-- 未登录 -->
+				<#if systemUser == null>
+					<li><a href="register">注册</a></li>
+					<li><a href="login">登录</a></li>
+				<#else>
+					<#-- 已登录 -->
+					<li><a href="user/control/home">${systemUser.userName}</a></li>
+					<li><a href="" onClick="javascript:document.getElementById('logout').submit();return false;">退出</a></li>
+					<li><a href="user/control/home">用户中心</a></li>
+					<form id="logout" action="logout.htm?token=${token}" method="post" ></form>
+				</#if>
+			</ul>
+		</div>
+	</div>
+</div>

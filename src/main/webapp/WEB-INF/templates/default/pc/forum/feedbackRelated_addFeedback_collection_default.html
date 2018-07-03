@@ -1,0 +1,172 @@
+<#--  添加在线留言 -->
+<@function>
+	<#--  返回Map<String,Object>类型 -->
+	<#assign returnValue = feedbackRelated_addFeedback_collection>
+	<div class="addFeedbackModule" >
+	<#--  全局允许提交在线留言 -->
+	<#if returnValue['allowFeedback'] == true>
+	
+		<form method="post" action="feedback/control/add">
+			<!-- 令牌标记 -->
+			<input type="hidden" id="token" name="token" value="${token}">
+		
+		
+			<div class="box wrapper">
+				<h2>在线留言</h2>
+			
+				<div class="item">
+					<table>
+						<tr>
+							<th><span class="required">*</span><label>称呼：</label></th>
+							<td><input type="text" id="name" name="name" class="inputBox formText" autocomplete="off" size="25" value="${feedback.name}" /></td>
+							<td>
+								<span id="name_error" class="error">${(error['name'])!}</span> 
+							</td>
+						</tr>
+					</table>
+				</div>
+				<div class="item">
+					<table>
+						<tr>
+							<th><span class="required">*</span><label>邮箱：</label></th>
+							<td><input type="text" id="contact" name="contact" class="inputBox formText" autocomplete="off" size="30"  value="${feedback.contact}" /></td>
+							<td>
+								<span id="contact_error" class="error">${(error['contact'])!}</span> 
+							</td>
+						</tr>
+					</table>
+				</div>
+				<div class="item">
+					<table>
+						<tr>
+							<th><span class="required">*</span><label>内容：</label></th>
+							<td>
+								<textarea id="content" name="content"  rows="10" cols="50">${feedback.content}</textarea>
+							</td>
+							<td>
+								<span id="contenterror" class="error">${(error['content'])!}</span> 
+							</td>
+						</tr>
+					</table>
+				</div>
+				<#-- identificationNumber:识别号：用来区别每次请求 -->
+				<#-- 验证码 -->
+				<#if returnValue['captchaKey'] != "">	
+					<div class="item">
+						<table>
+							<tr>
+								<th><label><span class="required">*</span>验证码：</label></th>
+								<td >
+									<div class="captcha_div">
+										<div class="captchaBox">
+											<input type="hidden" id="${identificationNumber}_captchaKey" name="captchaKey" value="${(returnValue['captchaKey'])!}">
+											<input id="${identificationNumber}_captchaValue" name="captchaValue" type="text" maxLength="5" autocomplete="off" tabindex="3" onfocus="inputBoxTip_click(this);" onblur="inputBoxTip_leave('${identificationNumber}',this);"/>
+											<label class="promptTag" id="${identificationNumber}_captchaValueBoxTip"  for="captchaValue">验证码</label>
+										</div>
+										<a class="captchaImage" href="javascript:void(0);" >
+											<img id="${identificationNumber}_captcha" src="captcha/${(returnValue['captchaKey'])!}.jpg" onClick="replaceCaptcha('${identificationNumber}');" tabindex="4" />
+										</a>
+										<a  href="javascript:void(0);" onClick="replaceCaptcha('${identificationNumber}');" tabindex="5">换一幅</a>
+									</div>
+								</td>
+								<td>
+									<p class="tips">
+										<#-- 验证码错误 -->
+										<span id="${identificationNumber}_captchaValue_error">${(error['captchaValue'])!}</span>
+									</p>
+								</td>
+							</tr>
+						</table>
+					</div>
+				</#if>
+				
+				
+				
+				<div class="item">
+					<div class="submit">
+						<span class="submitButton"><INPUT type="button" value="提交" onClick="javascript:sureSubmit(this.form);"></span>
+						<span id="feedback_error" class="error">${(error['feedback'])!}</span> 
+						<span id="token_error" class="error">${error['token']}</span>  
+					</div>
+				</div>
+			</div>
+			
+			
+			
+			<script language="javascript" type="text/javascript">
+				//点击输入框提示 
+				function inputBoxTip_click(obj){
+					document.getElementById(obj.id+"BoxTip").style.display="none";
+				
+				}
+				//离开输入框提示
+				function inputBoxTip_leave(identificationNumber,obj){
+					if(obj.value != ""){
+						document.getElementById(obj.id+"BoxTip").style.display="none";
+					}else{
+						document.getElementById(obj.id+"BoxTip").style.display="";
+					}
+					verificationCode(identificationNumber);
+				}
+				
+				//校对验证码 identificationNumber:识别号：用来区别每次请求
+				function verificationCode(identificationNumber){
+					var flag = true;
+					if( document.getElementById(identificationNumber+"_"+"captchaKey") != null){
+						
+						var captchaKey = document.getElementById(identificationNumber+"_"+"captchaKey").value;
+						var parameter = document.getElementById(identificationNumber+"_"+"captchaValue").value;
+						if(parameter != ""){
+						
+							var parameter_trim = trim(parameter);
+							if(parameter_trim != ""){
+								//ajax使用同步提交
+								get_request(function(value){
+					            	if(value == "false"){
+					            	
+						            	document.getElementById(identificationNumber+"_"+"captchaValue_error").innerHTML = "验证码错误";
+						            	flag = false;
+					            	}
+					            },
+							 		"checkCaptcha.htm?captchaKey="+captchaKey+"&captchaValue="+parameter_trim+"&timestamp=" + new Date().getTime(), false);
+					            	
+							}else{
+								document.getElementById(identificationNumber+"_"+"captchaValue_error").innerHTML = "验证码不能为空";
+								flag = false;
+							}
+						}else{
+							document.getElementById(identificationNumber+"_"+"captchaValue_error").innerHTML = "验证码不能为空";
+							flag = false;
+						}
+						if(flag == true){
+							document.getElementById(identificationNumber+"_"+"captchaValue_error").innerHTML = "";
+						}
+					}
+				
+					return flag;
+				}
+				//更换验证码
+				function replaceCaptcha(identificationNumber){
+					var captchaKey = document.getElementById(identificationNumber+"_"+"captchaKey").value;
+					document.getElementById(identificationNumber+"_"+"captcha").src = "captcha/"+captchaKey+".jpg?" + Math.random(); 
+				}
+				
+				//表单Form方式提交
+				function sureSubmit(obj){
+					obj.submit();
+				} 
+						
+			</script>
+			
+		</form>
+	<#else>
+		<div class="prompt" >
+			<div class="respond">
+				<p style="font-size:13px;padding:8px;text-align:center;background:#eee;overflow:hidden">
+					在线留言已关闭
+				</p>
+			</div>
+		</div>
+	</#if>
+	</div>
+</@function>

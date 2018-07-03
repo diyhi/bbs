@@ -1,0 +1,7 @@
+<#-- 标签列表  集合 -->
+<#-- 本方法适用发表话题标签选择框 -->
+<@function>
+	<#list topicRelated_tag_collection as tag>	
+		<option value="${tag.id}" <#if topic.tagId == tag.id> selected='selected'</#if>>${tag.name}</option>
+	</#list>	
+</@function>	

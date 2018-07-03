@@ -1,0 +1,37 @@
+<#-- 分页 公共页(生成新引用页) -->
+<#-- 引用前必须建立pageView对象-->
+
+<#if pageView!=null && pageView.records?exists>  
+<DIV class="pg">
+	<span class="count">共${pageView.totalrecord}条</span>  
+	<#if pageView.currentpage != 1>  
+		<A class="prev" href="${pageView.onUrl}">上一页</A>
+    </#if>  
+	<#if (pageView.pageindex.startindex > 1)>  
+       <A class=last href="javascript:topage('1');" title="第1页">1 ...</A>
+    </#if> 
+    
+    
+	<#list pageView.pageindex.startindex..pageView.pageindex.endindex as index>  
+        <#if (index > 0)>  
+        	<#if pageView.currentpage == index>  
+                <STRONG>${index}</STRONG>  
+            <#else>  
+                <A href="javascript:topage('${index}')" title="第${index}页">${index}</A>  
+            </#if> 
+        </#if>  
+         
+    </#list>
+    <#if (pageView.pageindex.endindex < pageView.totalpage)>  
+       <A class=last href="javascript:topage('${pageView.totalpage}')" title="第${pageView.totalpage}页">... ${pageView.totalpage}</A>
+    </#if> 
+    
+    <LABEL>
+		<INPUT onkeydown="if(event.keyCode==13) {topage(this.value);}" class="pg_input" title="输入页码，按回车跳转" value="${pageView.currentpage}" size="2">
+		<SPAN title="共${pageView.totalpage}页"> / ${pageView.totalpage}页</SPAN>
+	</LABEL>
+    <#if (pageView.pageindex.endindex >0 && pageView.currentpage != pageView.totalpage && pageView.records?size gt 0)>
+    	<A class=nxt href="${pageView.nextUrl}">下一页</A>  
+    </#if>  
+</DIV>
+</#if>

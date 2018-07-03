@@ -1,0 +1,786 @@
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">页面访问</th>
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td  width="30%">请求路径</td> 
+			<td  width="70%" colspan="2">register.htm</td>
+		</tr>
+		<tr> 
+			<td>请求方式</td> 
+			<td colspan="2">GET</td>
+		</tr>
+		<tr>
+			<td rowspan="3">返回值</td> 
+			<td>验证码编号</td> 
+			<td>
+				变量：captchaKey<br>
+				类型：String
+			</td>
+		</tr>
+		<tr>  
+			<td>用户自定义注册功能项</td> 
+			<td>
+				变量：userCustomList<br>
+				类型：List&lt<a style="color: #317ee7" onclick="anchorJump('#anchor_50'); return false;">UserCustom</a>>
+			</td>
+		</tr>
+		<tr> 
+			<td>说明</td> 
+			<td colspan="2">点示超链接访问登录页时如果URL不是注册页面，则URL会自动带有jumpUrl参数，为当前URL的Base64编码,可以设计注册成功后跳转到注册前页面功能</td>
+		</tr>
+	</tbody> 
+</table>
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">页面访问 - AJAX方式</th>
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td  width="30%">请求路径</td> 
+			<td  width="70%" colspan="2">register.htm</td>
+		</tr>
+		<tr> 
+			<td>请求方式</td> 
+			<td colspan="2">GET</td>
+		</tr>
+		<tr> 
+			<td>自定义请求头</td> 
+			<td colspan="2">协议头：X-Requested-With  值：XMLHttpRequest</td>
+		</tr>
+		<tr> 
+			<td width="30%" rowspan="4">请求成功返回</td> 
+			<td width="30%" rowspan="4">JSON格式值 类型:Map&ltString,Object></td>
+			<td width="40%">键参数：captchaKey<br>值内容说明：验证码编号<br>值类型：String</td> 
+		</tr>
+		<tr> 
+			<td>键参数：userCustomList<br>值内容说明：用户自定义注册功能项<br>值类型：List&lt<a style="color: #317ee7" onclick="anchorJump('#anchor_50'); return false;">UserCustom</a>></td>
+		</tr>	
+	</tbody> 
+</table>
+
+<table id="anchor_50" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">用户自定义注册功能项 UserCustom</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>id</td> 
+			<td>Integer</td>
+			<td>Id</td>
+		</tr>
+		<tr> 
+			<td>name</td> 
+			<td>String</td>
+			<td>注册项名称</td>
+		</tr>
+		<tr> 
+			<td>required</td> 
+			<td>boolean</td>
+			<td>是否必填</td>
+		</tr>
+		<tr> 
+			<td>chooseType</td> 
+			<td>Integer</td>
+			<td>选框类型  1.输入框 2.单选按钮  3.多选按钮 4.下拉列表  5.文本域textarea</td>
+		</tr>
+		<tr> 
+			<td>itemValue</td> 
+			<td>Map&ltString,String></td>
+			<td>参数值</td>
+		</tr>
+		<tr> 
+			<td>size</td> 
+			<td>Integer</td>
+			<td>输入框的宽度</td>
+		</tr>
+		<tr> 
+			<td>maxlength</td> 
+			<td>Integer</td>
+			<td>输入框中字符的最大长度</td>
+		</tr>
+		<tr> 
+			<td>multiple</td> 
+			<td>boolean</td>
+			<td>是否可选择多个选项 true: multiple='multiple'  false:</td>
+		</tr>
+		<tr> 
+			<td>selete_size</td> 
+			<td>Integer</td>
+			<td>下拉列表中可见选项的数目</td>
+		</tr>
+		<tr> 
+			<td>rows</td> 
+			<td>Integer</td>
+			<td>文本域内的可见行数</td>
+		</tr>
+		<tr> 
+			<td>cols</td> 
+			<td>Integer</td>
+			<td>文本域内的可见宽度</td>
+		</tr>
+		<tr> 
+			<td>tip</td> 
+			<td>String</td>
+			<td>提示</td>
+		</tr>
+		<tr> 
+			<td>userInputValueList</td> 
+			<td>List&lt<a style="color: #317ee7" onclick="anchorJump('#anchor_60'); return false;">UserInputValue</a>></td>
+			<td>用户自定义注册功能项用户输入值</td>
+		</tr>	
+	</tbody> 
+</table>
+<table id="anchor_60" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">用户自定义注册功能项用户输入值 UserInputValue</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>id</td> 
+			<td>Long</td>
+			<td>Id</td>
+		</tr>
+		<tr> 
+			<td>userId</td> 
+			<td>Long</td>
+			<td>用户Id</td>
+		</tr>
+		<tr> 
+			<td>userCustomId</td> 
+			<td>Integer</td>
+			<td>用户自定义注册功能项Id</td>
+		</tr>
+		<tr> 
+			<td>content</td> 
+			<td>String</td>
+			<td>用户输入内容</td>
+		</tr>
+		<tr> 
+			<td>options</td> 
+			<td>String</td>
+			<td>选项值</td>
+		</tr>
+	</tbody>
+</table>
+
+
+
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">提交 会员注册 - 默认方式</th>
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td width="30%" >请求路径</td> 
+			<td width="70%" colspan="2">register.htm</td>
+		</tr>
+		<tr> 
+			<td>请求方式</td> 
+			<td colspan="2">POST</td>
+		</tr>
+		<tr> 
+			<td>请求参数</td> 
+			<td colspan="2"><a style="color: #317ee7" onclick="anchorJump('#anchor_600'); return false;">参数表</a></td>
+		</tr>
+		<tr> 
+			<td>提交成功返回</td> 
+			<td>默认跳转到jump模板页显示提交成功信息；跳转路径参数jumpUrl有值时按参数值路径跳转</td>
+		</tr>
+		<tr> 
+			<td rowspan="3">提交失败返回</td> 
+			<td>错误值</td> 
+			<td width="30%" >
+				变量：error<br>
+				类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_70'); return false;">Map&ltString,String></a><br>
+			</td>
+		</tr>
+		<tr>
+			<td>会员</td> 
+			<td width="30%" >
+				变量：user<br>
+				类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_40'); return false;">User</a>
+			</td>
+		</tr>
+		<tr>
+			<td>用户自定义注册功能项</td> 
+			<td width="30%" >
+				变量：userCustomList<br>
+				类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_50'); return false;">List&ltUserCustom></a>
+			</td>
+		</tr>
+	</tbody> 
+</table>
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">提交 会员注册 - AJAX方式</th>
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td>请求路径</td> 
+			<td colspan="2">register.htm</td>
+		</tr>
+		<tr> 
+			<td>请求方式</td> 
+			<td colspan="2">POST</td>
+		</tr> 
+		<tr> 
+			<td>自定义请求头</td> 
+			<td colspan="2">协议头：X-Requested-With  值：XMLHttpRequest</td>
+		</tr>
+		<tr> 
+			<td>请求参数</td> 
+			<td colspan="2"><a style="color: #317ee7" onclick="anchorJump('#anchor_600'); return false;">参数表</a></td>
+		</tr>
+		<tr> 
+			<td width="30%" rowspan="4">提交返回</td> 
+			<td width="30%" rowspan="4">JSON格式值 类型:Map&ltString,Object></td>
+			<td width="40%">键参数：success<br>值内容说明：成功返回true 失败返回false<br>值类型：String</td> 
+		</tr>
+		<tr> 
+			<td>键参数：error<br>值内容说明：错误值集合<br>值类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_70'); return false;">Map&ltString,String></a></td> 
+		</tr>
+		<tr> 
+			<td>键参数：captchaKey<br>值内容说明：验证码编号</td> 
+		</tr>
+		<tr> 
+			<td>键参数：jumpUrl<br>值内容说明：注册前URL；success为true时有值</td> 
+		</tr>
+	</tbody> 
+</table>
+
+
+
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">会员注册校验</th>
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td>请求路径</td> 
+			<td colspan="2">userVerification.htm</td>
+		</tr>
+		<tr> 
+			<td>请求方式</td> 
+			<td colspan="2">GET</td>
+		</tr> 
+		<tr> 
+			<td>返回类型</td> 
+			<td colspan="2">JSON</td>
+		</tr> 
+		<tr> 
+			<td rowspan="2">选填参数</td> 
+			<td>
+				userName：会员用户名<br>
+			</td>
+			<td rowspan="2">
+				当前两组参数每次提交只能填一组
+			</td>
+		</tr>
+		<tr>
+			<td>
+				captchaKey : 验证码编号<br>
+				captchaValue : 验证码值  同一编号验证码每分钟提交次数不能超过60次,超出时验证码图片返回空字符
+			</td>
+		</tr>
+		<tr> 
+			<td width="30%" >提交返回</td> 
+			<td width="30%" >字符串格式值 类型:String</td>
+			<td width="40%">值内容说明：成功返回true 失败返回false<br>值类型：String</td> 
+		</tr>
+	</tbody> 
+</table>
+
+<table id="anchor_40" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">用户 user</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>userName</td> 
+			<td>String</td>
+			<td>会员用户名</td>
+		</tr>
+		<tr> 
+			<td>email</td> 
+			<td>String</td>
+			<td>邮箱地址</td>
+		</tr>
+		<tr> 
+			<td>issue</td> 
+			<td>String</td>
+			<td>密码提示问题</td>
+		</tr>
+	</tbody> 
+</table>
+<table id="anchor_70"  class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">会员注册 错误值 error</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td>userCustom_用户自定义注册功能项Id</td> 
+			<td>String</td>
+			<td>用户自定义注册功能项参数值错误</td>
+		</tr>
+		<tr> 
+			<td>userName</td> 
+			<td>String</td>
+			<td>用户名称错误</td>
+		</tr>
+		<tr> 
+			<td>password</td> 
+			<td>String</td>
+			<td>密码错误</td>
+		</tr>
+		<tr> 
+			<td>issue</td> 
+			<td>String</td>
+			<td>密码提示问题</td>
+		</tr>
+		<tr> 
+			<td>answer</td> 
+			<td>String</td>
+			<td>密码提示答案</td>
+		</tr>
+		<tr> 
+			<td>email</td> 
+			<td>String</td>
+			<td>邮箱</td>
+		</tr>
+		<tr> 
+			<td>register</td> 
+			<td>String</td>
+			<td>注册错误</td>
+		</tr>
+		<tr> 
+			<td>captchaValue</td> 
+			<td>String</td>
+			<td>验证码错误</td>
+		</tr>
+	 	<tr> 
+			<td>token</td> 
+			<td>String</td>
+			<td>令牌错误</td>
+		</tr>
+	</tbody> 
+</table>
+<table id="anchor_600" class="exampleTable" > 
+	<thead>
+		<tr> 
+			<th colspan="4">提交'会员注册'参数</th>
+		</tr>
+		<tr> 
+			<th width="30%">参数</th> 
+			<th width="20%">类型</th> 
+			<th width="10%">是否必填</th> 
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	 <tbody>
+	 	<tr> 
+			<td>userName</td> 
+			<td>String</td>
+			<td>是</td>
+			<td>会员用户名</td> 
+		</tr>
+	 	<tr> 
+			<td>password</td> 
+			<td>String</td>
+			<td>是</td>
+			<td>密码 必须执行sha256一次</td> 
+		</tr>
+		<tr> 
+			<td>email</td> 
+			<td>String</td>
+			<td>否</td>
+			<td>邮箱</td> 
+		</tr>
+		<tr> 
+			<td>issue</td> 
+			<td>String</td>
+			<td>是</td>
+			<td>密码提示问题</td> 
+		</tr>
+		<tr> 
+			<td>answer</td> 
+			<td>String</td>
+			<td>是</td>
+			<td>密码提示答案</td> 
+		</tr>
+		<tr> 
+			<td>captchaKey</td> 
+			<td>String</td>
+			<td>按需填写</td>
+			<td>验证码编号</td> 
+		</tr>
+		<tr>
+			<td>captchaValue</td> 
+			<td>String</td>
+			<td>按需填写</td>
+			<td>验证码值 同一编号验证码每分钟提交次数不能超过60次,超出时验证码图片返回空字符</td> 
+		</tr>
+		<tr> 
+			<td>userCustom_用户自定义注册功能项Id</td> 
+			<td>String或String[]</td>
+			<td>按需填写</td>
+			<td>用户自定义注册功能项参数值；根据选框类型(chooseType)确定接收类型是String或String[]</td> 
+		</tr>
+		<tr> 
+			<td>token</td> 
+			<td>String</td>
+			<td>是</td>
+			<td>令牌</td> 
+		</tr>
+		<tr> 
+			<td>jumpUrl</td> 
+			<td>String</td>
+			<td>否</td>
+			<td>'提交表单 - 默认方式'提交成功后跳转路径,不填写默认跳转到首页；参数必须经过encodeBase64URL编码后才能提交。例${encodeBase64URL('/index')}</td> 
+		</tr>
+	</tbody> 
+</table>
+
+<h2 style="margin:0;padding:0; margin-top: 10px;">示例</h2>
+<textarea name="exampleCode">
+<form method="post" action="register?jumpUrl=${jumpUrl}">
+	
+	<!-- 令牌标记 -->
+	<input type="hidden" id="token" name="token" value="${token}">
+
+	<#-- 用户名 -->
+	<input type="text" id="userName" name="userName" value="<#if user??>${user.userName}</#if>" />
+	<#-- 用户名错误 -->
+	${(error['userName'])!}
+
+	<#-- 密码 -->
+	<input type="password" id="password" name="password" value=""/>
+	<#-- 密码错误 -->
+	${(error['password'])!}
+
+	<#-- 密码提示问题 -->
+	<input type="text" id="issue" name="issue" value="<#if user??>${user.issue}</#if>" />
+	<#-- 密码提示问题错误 -->
+	${(error['issue'])!}
+
+	<#-- 密码提示答案 -->
+	<input type="text" id="answer" name="answer" value=""/>
+	<#-- 密码提示答案错误 -->
+	${(error['answer'])!}
+	
+	<#-- 邮箱 -->
+	<input type="text" id="email" name="email"  value="<#if user??>${user.email}</#if>" />
+	<#-- 邮箱错误 -->
+	${(error['email'])!}
+	
+	<#-- 用户自定义注册功能项 -->
+	<#list userCustomList as userCustom>
+		
+		<#if userCustom.required == true>
+			必填
+		</#if>
+		<#-- 用户自定义注册功能项名称 -->
+		${userCustom.name}
+		
+		<#-- 输入框 -->
+		<#if userCustom.chooseType ==1>
+			<input type="text" name="userCustom_${userCustom.id}" value="<#list userCustom.userInputValueList as userInputValue>${userInputValue.content}</#list>" size="${userCustom.size}" maxlength="${userCustom.maxlength}">
+		</#if>
+		<#-- 单选按钮 -->
+		<#if userCustom.chooseType ==2>
+			<#if userCustom.itemValue?has_content>
+				<#list userCustom.itemValue?keys as itemValue>
+				<#-- 选中项 -->
+				<#assign _checked = "">
+				<#list userCustom.userInputValueList as userInputValue>
+					<#if userInputValue.options == itemValue>
+						<#assign _checked=" checked='checked'">
+					</#if>
+				</#list>
+				
+				<#-- 默认选第一项 -->
+				<#if itemValue_index == 0  && userCustom.userInputValueList?exists && userCustom.userInputValueList?size == 0> 
+				<#assign _checked = " checked='checked'">
+				</#if>
+				<input type="radio" name="userCustom_${userCustom.id}" value="${itemValue}" ${_checked} >${userCustom.itemValue[itemValue]}
+				</#list>
+			</#if>
+		</#if>
+		<#-- 多选按钮 -->
+		<#if userCustom.chooseType ==3>
+			<#if userCustom.itemValue?has_content>
+				<#list userCustom.itemValue?keys as itemValue>
+					<#-- 选中项 -->
+					<#assign _checked = "">
+					<#list userCustom.userInputValueList as userInputValue>
+						<#if userInputValue.options == itemValue>
+							<#assign _checked=" checked='checked'">
+						</#if>
+					</#list>
+					<input type="checkbox" name="userCustom_${userCustom.id}" value="${itemValue}" ${_checked}>${userCustom.itemValue[itemValue]}
+				</#list>
+			</#if>
+		</#if>
+		<#-- 下拉列表 -->
+		<#if userCustom.chooseType ==4>
+			<select name="userCustom_${userCustom.id}" <#if userCustom.multiple == true> multiple='multiple'</#if> <#if userCustom.selete_size != null> size='${userCustom.selete_size}'</#if>>
+				<#if userCustom.itemValue?has_content>
+				<#list userCustom.itemValue?keys as itemValue>
+					<#assign _selected = "">
+					<#list userCustom.userInputValueList as userInputValue>
+						<#if userInputValue.options == itemValue>
+							<#assign _selected=" selected='selected'">
+						</#if>
+					</#list>			
+					<option value="${itemValue}" ${_selected}>${userCustom.itemValue[itemValue]}</option>		
+				</#list>
+				</#if>	
+			</select>
+		</#if>
+		<#-- 文本域 -->
+		<#if userCustom.chooseType ==5>
+			&lttextarea name="userCustom_${userCustom.id}" rows="${userCustom.rows}" cols="${userCustom.cols}"><#list userCustom.userInputValueList as userInputValue>${userInputValue.content}</#list>&lt/textarea>
+		</#if>
+		
+		<#-- 提示 -->
+		${userCustom.tip}
+		
+		<#-- 错误 -->
+		<#assign userCustom_id = "userCustom_"+userCustom.id>
+		${error[userCustom_id]}
+	</#list>
+	
+	
+
+	<#-- 验证码 -->
+	<#if captchaKey != ''>
+		<#-- 验证码 -->
+		<input type="hidden" id="captchaKey" name="captchaKey" value="${captchaKey}">
+		<#-- 验证码值 -->
+		<input id="captchaValue" name="captchaValue" type="text" value=""/>		
+		<#-- 验证码图片 -->
+		&ltimg id="captcha" src="captcha/${captchaKey!}.jpg"/>
+		<#-- 验证码错误 -->
+		${(error['captchaValue'])!}
+	</#if>
+
+	
+	
+	<#-- 令牌错误 -->
+	${error['token']}
+	
+	<#-- 注册错误 -->
+	<span id="register_error" class="error">${(error['register'])!}</span> 
+	
+	<#-- '密码'和'密码提示答案'必须使用sha256加密一次才能提交 CryptoJS.SHA256(password) -->
+	<input type="submit" value="默认提交" />
+	
+	<#-- ajax提交请看下面示例 -->
+	<input type="button" value="ajax提交" onClick="javascript:ajaxSubmit();">
+	
+	
+</form>
+
+
+<#-- 组装提交参数 必须引入cryptoJS/core.js 和cryptoJS/sha256.js -->
+<script type="text/javascript" language="javascript"> 
+	//组装参数
+	function getParameter(){
+		var parameter = "";
+
+		//url跳转参数
+		var jumpUrl = getUrlParam("jumpUrl");
+		if(jumpUrl != null){
+			parameter += "&jumpUrl="+jumpUrl;
+		}
+		//令牌标记
+		var token = document.getElementById("token").value;
+		parameter += "&token="+token;
+		
+		//验证码Key
+		var captchaKey = document.getElementById("captchaKey");
+		if(captchaKey != null){
+			parameter += "&captchaKey="+encodeURIComponent(captchaKey.value);
+		}
+		//验证码值
+		var captchaValue = document.getElementById("captchaValue");
+		if(captchaValue != null){
+			parameter += "&captchaValue="+encodeURIComponent(captchaValue.value);
+		}
+
+		//用户名
+		var userName = document.getElementById("userName").value;
+		parameter += "&userName="+encodeURIComponent(userName);
+		//密码需SHA256加密
+		var password = document.getElementById("password").value;
+		if(password != ""){
+			//password在加密前要原始数据，不能进行任何转义
+			parameter += "&password="+ CryptoJS.SHA256(password);
+		}
+		
+		//密码提示问题
+		var issue = document.getElementById("issue").value;
+		parameter += "&issue="+encodeURIComponent(issue);
+		//密码提示答案需SHA256加密
+		var answer = document.getElementById("answer").value;
+		if(answer != ""){
+			//answer在加密前要原始数据，不能进行任何转义
+			parameter += "&answer=" + CryptoJS.SHA256(answer);
+		}
+		
+		//邮箱
+		var email = document.getElementById("email").value;
+		parameter += "&email=" +encodeURIComponent(email);
+		
+		//自定义表单name集合
+		var array = new Array();
+		
+		//读取表单所有的input标签
+		var all_input = document.getElementsByTagName("input");
+		for(var i=0;i<all_input.length; i++){
+			var obj = all_input[i];
+			if(obj.name.substring(0,11) =="userCustom_"){
+				var isExist = false;//是否已存在数组中
+				//如果存在，则不添加
+				for(var j=0;j<array.length; j++){
+					if(array[j] == all_input[i].name){
+						isExist = true;
+						break;
+					}
+				}
+				if(isExist == false){
+					array.push (all_input[i].name); 
+				}		
+			}
+		}
+		//读取表单所有的select标签
+		var all_select = document.getElementsByTagName("select");
+		for(var i=0;i<all_select.length; i++){
+			var obj = all_select[i];
+			if(obj.name.substring(0,11) =="userCustom_"){
+				var isExist = false;//是否已存在数组中
+				//如果存在，则不添加
+				for(var j=0;j<array.length; j++){
+					if(array[j] == all_select[i].name){
+						isExist = true;
+						break;
+					}
+				}
+				if(isExist == false){
+					array.push (all_select[i].name); 
+				}		
+			}
+		}
+		//读取表单所有的textarea标签
+		var all_textarea = document.getElementsByTagName("textarea");
+		for(var i=0;i<all_textarea.length; i++){
+			var obj = all_textarea[i];
+			if(obj.name.substring(0,11) =="userCustom_"){
+				var isExist = false;//是否已存在数组中
+				//如果存在，则不添加
+				for(var j=0;j<array.length; j++){
+					if(array[j] == all_textarea[i].name){
+						isExist = true;
+						break;
+					}
+				}
+				if(isExist == false){
+					array.push (all_textarea[i].name); 
+				}		
+			}
+		}
+
+		for(var i=0;i<array.length; i++){
+			//读取表单参数
+			var obj = document.getElementsByName(array[i]);
+			if(obj[0].type == "text"){//输入框
+				parameter += "&"+obj[0].name+"="+encodeURIComponent(obj[0].value);
+			}
+			
+			if(obj[0].type == "radio"){//单选
+				for(var j=0;j<obj.length;j++){ 
+					if(obj[j].checked){
+						parameter += "&"+obj[0].name+"="+obj[j].value;
+						break; 
+					}
+				}
+			}
+			if(obj[0].type == "checkbox"){//多选
+				for(var j=0;j<obj.length;j++){ 
+					if(obj[j].checked){
+						parameter += "&"+obj[0].name+"="+obj[j].value;
+					}
+				}
+			}
+			if(obj[0].type.substring(0,6) == "select"){//下拉列表
+				for(var j=0;j<obj[0].length;j++){ 
+					if(obj[0][j].selected){
+						parameter += "&"+obj[0].name+"="+obj[0][j].value;
+					}
+				}
+			}
+			if(obj[0].type == "textarea"){//表单域
+				parameter += "&"+obj[0].name+"="+encodeURIComponent(obj[0].value);
+			
+			}
+		}
+
+		//删除第一个&号,防止因为多了&号而出现警告: Parameters: Invalid chunk ignored.信息
+		if(parameter.indexOf("&") == 0){
+			parameter = parameter.substring(1,parameter.length);
+		}
+		return parameter;
+	}
+</script>
+<#-- ajax提交示例 -->
+<script type="text/javascript" language="javascript"> 
+	//ajax提交
+	function ajaxSubmit(){
+		//直接将组装好的参数提交即可
+		var parameter = getParameter();
+	
+	}
+</script>
+
+</textarea>
+
+

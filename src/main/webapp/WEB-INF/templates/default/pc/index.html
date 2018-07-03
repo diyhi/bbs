@@ -1,0 +1,54 @@
+<#-- 首页 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+	<base href="${baseURL}" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<title>${title}</title>
+	<meta name="keywords" content="${keywords}"/>
+	<meta name="description" content="${description}"/>
+	<link rel="shortcut icon" type="image/x-icon" href="${baseURL}${commonPath}images/favicon.ico" media="screen" />
+
+	<link href="${commonPath}css/common.css" rel="stylesheet" type="text/css" />
+	<!--[if (IE 6)|(IE 7)|(IE 8)]>
+	<script type="text/javascript" src="${commonPath}js/css3pie/PIE_IE678.js"></script> 
+	<![endif]-->
+	<script type="text/javascript" src="${commonPath}js/jquery/jquery.min.js" language="javascript"></script>
+	<link href="${commonPath}js/imageZoom/style.css" rel="stylesheet" type="text/css" />
+	<script type="text/javascript" src="${commonPath}js/imageZoom/comment.js?1"></script> 
+	<script type="text/javascript" src="${commonPath}js/tool.js" language="javascript"></script>
+	<link href="${commonPath}js/kindeditor/themes/default/default.css" type="text/css" rel="stylesheet"/>
+	<script type="text/javascript" src="${commonPath}js/kindeditor/kindeditor-min.js" language="javascript"></script>
+	<script type="text/javascript" src="${commonPath}js/kindeditor/lang/zh-CN.js" language="javascript"></script>
+	<script type="text/javascript" src="${commonPath}js/ajax.js" language="javascript" ></script>
+	<script type="text/javascript" src="${commonPath}js/json2.js" language="javascript" ></script
+</head>
+<body>
+<#-- 引入页头 -->
+<@include action="${newPublic_2}"/>
+<div class="fixedBottom wrap clearfix">
+	
+	<#-- 引入标签 -->
+	<@include action="${topicRelated_tag_2}"/> 
+
+   	<#-- 引入话题分页 -->
+    <@include action="${topicRelated_topic_1}"/>
+       
+    <#-- 引入提交话题 -->
+    <@include action="${topicRelated_addTopic_1}"/> 
+    
+    <#-- 引入友情链接 -->
+    <@include action="${linksRelated_links_1}"/> 
+	
+    <div class="clear"></div>
+	<div class="push"><!-- 把div#footer推下去 --></div>
+</div>
+<#-- 引入页脚 -->
+<@include action="${newPublic_3}"/>
+
+</body>
+</html>
+
+
+
+

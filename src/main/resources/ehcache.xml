@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- updateCheck="false":关闭EhCache自动更新 -->
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="ehcache.xsd"
+         updateCheck="false" monitoring="autodetect"
+         dynamicConfig="true" >
+         
+	<!-- diskStore ：指定一个文件目录，当EHCache把数据写到硬盘上时，将把数据写到这个文件目录下 ;diskStroe的"path"属性是用来配置磁盘缓存使用的物理路径的，Ehcache磁盘缓存使用的文件后缀名是.data和.index-->
+    <diskStore path="java.io.tmpdir"/>
+
+
+ 	<!-- name ：缓存名称。通常为缓存对象的类名（非严格标准）  -->
+    <!-- maxElementsInMemory : 内存中最大缓存对象数-->
+    <!-- maxElementsOnDisk ：磁盘中最大缓存对象数，若是0表示无穷大 -->
+    <!-- eternal : 如果为true，表示对象永远不会过期，此时会忽略timeToIdleSeconds和timeToLiveSeconds属性，默认为false;-->
+    <!-- timeToIdleSeconds : 设定允许对象处于空闲状态的最长时间，以秒为单位。当对象自从最近一次被访问后，如果处于空闲状态的时间超过了timeToIdleSeconds属性值，这个对象就会过期。当对象过期，EHCache将把它从缓存中清空。只有当eternal属性为false，该属性才有效。如果该属性值为0，则表示对象可以无限期地处于空闲状态-->
+    <!-- timeToLiveSeconds : 设定对象允许存在于缓存中的最长时间，以秒为单位。当对象自从被存放到缓存中后，如果处于缓存中的时间超过了 timeToLiveSeconds属性值，这个对象就会过期。当对象过期，EHCache将把它从缓存中清除。只有当eternal属性为false，该属性才有效。如果该属性值为0，则表示对象可以无限期地存在于缓存中。timeToLiveSeconds必须大于timeToIdleSeconds属性，才有意义-->
+    <!-- overflowToDisk : 如果为true,表示当基于内存的缓存中的对象数目达到了maxElementsInMemory界限后，会把益出的对象写到基于硬盘的缓存中-->
+    <!-- diskPersistent ：是否disk store在虚拟机启动时持久化。默认为false  -->
+    <!-- diskExpiryThreadIntervalSeconds：磁盘失效线程运行时间间隔，默认是120秒 -->
+    <!-- diskSpoolBufferSizeMB：这个参数设置DiskStore（磁盘缓存）的缓存区大小。默认是30MB。每个Cache都应该有自己的一个缓冲区 -->
+    <!-- memoryStoreEvictionPolicy：当达到maxElementsInMemory限制时，Ehcache将会根据指定的策略去清理内存。默认策略是LRU（一段时间里数据项被使用的次数最少）。你可以设置为FIFO（先进先出）或是LFU（较少使用,现有缓存元素中时间戳离当前时间最远的元素将被清出缓存） -->
+    <!-- Ehcache配置的时间单位是秒 -->
+    <!-- copyOnRead：当指定该属性为true时，我们在从Cache中读数据时取到的是Cache中对应元素的一个copy副本，而不是对应的一个引用。默认为false。-->
+    <!-- copyOnWrite：当指定该属性为true时，我们在往Cache中写入数据时用的是原对象的一个copy副本，而不是对应的一个引用。默认为false。-->
+    <!-- copyOnRead和copyOnWrite: 如果对取出的对象操作，就会修改cache中的对象。因为序列化问题。因此，如果想要对缓存的数据修改而不改变缓存中的原始数据，应该将这两个设为true。-->
+    
+    
+    <!-- defaultCache : 设定缓存的默认数据过期策略-->
+    <defaultCache
+        maxElementsInMemory="10000"
+        eternal="false"
+        timeToIdleSeconds="120"
+        timeToLiveSeconds="120"
+        overflowToDisk="true"/>
+ 
+	<!-- 保存最近查询的一系列表的时间戳  -->     
+    <cache name ="org.hibernate.cache.UpdateTimestampsCache" 
+		maxElementsInMemory ="5000"
+		eternal ="true" 
+		overflowToDisk ="true"/> 
+     	     
+    <cache name="SearchFormCache" 
+     	maxElementsInMemory="10000"
+        eternal="false"
+        timeToIdleSeconds="500"
+        timeToLiveSeconds="500"
+        overflowToDisk="true"/>
+
+
+
+
+	<!-- 缩略图 (更新一个全部刷新)  -->	
+	<cache name="thumbnailServiceBean_cache" maxElementsInMemory="1" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>
+	<!-- 系统设置 - 查询系统设置 -->	
+	<cache name="settingServiceBean_cache" maxElementsInMemory="1" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>
+	<!-- 模板 (更新一个全部刷新) -->	
+	<cache name="templateServiceBean_cache" maxElementsInMemory="90000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
+	<!-- 会员等级 (更新一个全部刷新) -->	
+	<cache name="userGradeServiceBean_cache" maxElementsInMemory="1" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
+	<!-- 会员注册项 (更新一个全部刷新) -->	
+	<cache name="userCustomServiceBean_cache" maxElementsInMemory="1" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
+	<!-- 会员注册禁止的用户名称 (更新一个全部刷新) -->	
+	<cache name="userServiceBean_disableUserName_cache" maxElementsInMemory="1" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
+	
+		
+	<!-- 开放授权管理 - 刷新令牌 2592000为30天-->		
+	<cache name="oAuthManage_cache_refreshToken" maxElementsInMemory="99999999" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="2592000" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>		
+	<!-- 开放授权管理 - 访问令牌 604800为一个星期-->		
+	<cache name="oAuthManage_cache_accessToken" maxElementsInMemory="99999999" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="7200" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>		
+		
+			
+	<!-- 设置管理 - 用户每分钟提交次数 -->
+	<cache name="settingManage_cache_submitQuantity" maxElementsInMemory="1000000"
+		overflowToDisk="true"
+		eternal="false"  timeToIdleSeconds="0" timeToLiveSeconds="60"
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>
+	<!-- 短信管理 (更新一个全部刷新)-->	
+	<cache name="smsServiceBean_cache" maxElementsInMemory="1" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
+	<!-- 绑定手机验证码 -->		
+	<cache name="smsManage_cache_smsCode" maxElementsInMemory="100000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
+	<!-- 用户发短信次数  -->	
+	<cache name="smsManage_cache_sentSmsCount" maxElementsInMemory="100000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="120" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
+	<!-- 更换绑定手机验证码 -->		
+	<cache name="smsManage_cache_replaceCode" maxElementsInMemory="100000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="10800" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
+			
+	<!-- 验证码管理 - 生成验证码  -->	
+	<cache name="captchaManage_cache_captcha" maxElementsInMemory="1000000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="120" timeToLiveSeconds="120" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>
+	<!-- 验证码管理 - 生成令牌标记 
+	<cache name="captchaManage_cache_token" maxElementsInMemory="1000000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="600" 
+		memoryStoreEvictionPolicy="LFU" /> -->     
+	<!-- 话题全文索引定时索引管理 - 重建话题索引任务运行标记 -->
+	<cache name="topicIndexManage_cache_taskRunMark" maxElementsInMemory="1"
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="20"
+		memoryStoreEvictionPolicy="LFU" />
+	
+	<!--  MySQL备份/还原管理 任务运行标记 -->
+	<cache name="dataRunMarkManage_cache_taskRunMark" maxElementsInMemory="1"
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="20"
+		memoryStoreEvictionPolicy="LFU" />
+	<!-- 升级管理 任务运行标记 -->
+	<cache name="upgradeManage_cache_taskRunMark" maxElementsInMemory="1"
+		overflowToDisk="true"
+		eternal="false"  timeToIdleSeconds="0" timeToLiveSeconds="20"
+		memoryStoreEvictionPolicy="LFU" />
+		
+	
+	<!-- 话题 - 话题缓存 -->		
+	<cache name="topicManage_cache_topic" maxElementsInMemory="99999999" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
+	<!-- 标签 - 查询所有标签 -->	
+	<cache name="findAllTag_cache" maxElementsInMemory="1" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>
+	<!-- 友情链接 - 查询所有友情链接 -->	
+	<cache name="findAllLinks_cache" maxElementsInMemory="1" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>
+	<!-- 话题展示IP记录 -->	
+	<cache name="topicManage_cache_ipRecord" maxElementsInMemory="9999999" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="86400" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>
+	
+	
+	<!-- 查询员工安全摘要 -->
+	<cache name="staffManage_cache_staffSecurityDigest" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" />		
+	<!-- 员工管理 - 员工登陆错误总数  -->	
+	<cache name="staffManage_cache_loginFailureCount" maxElementsInMemory="100000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="120" 
+		memoryStoreEvictionPolicy="LFU" />	
+	<!-- 查询用户状态 -->
+	<cache name="userManage_cache_userState" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" />	
+	
+</ehcache>

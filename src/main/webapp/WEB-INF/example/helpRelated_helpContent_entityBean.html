@@ -1,0 +1,102 @@
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">返回值</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="20%">类型</th> 
+			<th width="50%">说明</th> 
+		</tr>
+	</thead> 
+	 <tbody> 
+		<tr> 
+			<td>helpRelated_helpContent_entityBean</td> 
+			<td><a style="color: #317ee7" onclick="anchorJump('#anchor_10'); return false;">Help</a></td>
+			<td>帮助</td> 
+		</tr> 
+	</tbody> 
+</table>
+<table id="anchor_10" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">帮助 Help</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>id</td> 
+			<td>Long</td>
+			<td>帮助Id</td>
+		</tr>
+		<tr> 
+			<td>name</td> 
+			<td>String</td>
+			<td>帮助名称</td>
+		</tr>
+		<tr> 
+			<td>userName</td> 
+			<td>String</td>
+			<td>用户名称</td>
+		</tr>
+		<tr> 
+			<td>helpTypeId</td> 
+			<td>Long</td>
+			<td>帮助分类Id</td>
+		</tr>
+		<tr> 
+			<td>helpTypeName</td> 
+			<td>String</td>
+			<td>帮助分类名称</td>
+		</tr>
+		<tr> 
+			<td>content</td> 
+			<td>String</td>
+			<td>帮助内容；本字段在存入数据库时已进行安全过滤，可以加上&lt#noescape>&lt/#noescape>标签关闭转义，以输出html标签</td>
+		</tr>
+		<tr> 
+			<td>times</td> 
+			<td>Date</td>
+			<td>发表时间</td>
+		</tr>
+	</tbody> 
+</table>
+<table class="exampleTable" > 
+	<thead>
+		<tr> 
+			<th colspan="5">方法支持参数</th>
+		</tr>
+		<tr> 
+			<th width="30%">参数</th> 
+			<th width="20%">类型</th> 
+			<th width="10%">是否必填</th> 
+			<th width="40%" colspan="2">说明</th> 
+		</tr> 
+	</thead> 
+	 <tbody> 
+		<tr> 
+			<td>helpId</td> 
+			<td>Long</td>
+			<td>是</td>
+			<td>帮助Id</td> 
+		</tr>
+	</tbody> 
+</table>
+<h2 style="margin:0;padding:0; margin-top: 10px;">示例</h2>
+<textarea name="exampleCode">
+<#-- 从URL参数中获取值 -->
+<@function helpId="${url_helpId}"> 
+	<#assign help_entity = helpRelated_helpContent_entityBean>
+	<#if help_entity != null && help_entity??> 
+	   <#-- 帮助名称 -->
+		${help_entity.name}	
+		<#-- 帮助内容 -->
+        <#noescape>${help_entity.content}</#noescape>
+	</#if> 
+</@function>
+</textarea>

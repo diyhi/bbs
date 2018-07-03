@@ -1,0 +1,23 @@
+解决文件上传自动填充文件名
+7580行urlBox.val(url);下面加入titleBox.val(data.title);
+
+
+
+kindeditor.js文件修改以支持<base href="${config:url()}"></base>标签显示图片
+233行加入:
+function _getPageBasePath() {   
+    var els = document.getElementsByTagName('base');   
+    for (var i = 0, len = els.length; i < len; i++) {   
+        var href = els[i].href;   
+        if (href) {   
+            return href;   
+        }   
+    }   
+    return '';   
+}   
+K.pageBasePath = _getPageBasePath();  
+
+3613行加入:(K.pageBasePath === '' ? '' : '<base href="' + K.pageBasePath + '">'),
+
+
+kindeditor不支持输入emoji表情结尾,必须加空格结尾才可以完整提交

@@ -1,0 +1,8 @@
+<#--  话题内容导航标签 -->
+<@function>
+	<div class="tabModule">
+		<#list topicRelated_tag_collection as tag>	
+			<a href="?tagId=${tag.id}" <#if tag.id == topic.tagId> class='tab_current'<#else> class='tab'</#if>>${tag.name}</a>
+		</#list>
+	</div>	
+</@function>	

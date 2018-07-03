@@ -1,0 +1,324 @@
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">页面访问</th>
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td  width="30%">请求路径</td> 
+			<td  width="70%" colspan="2">search.htm</td>
+		</tr>
+		<tr> 
+			<td>请求方式</td> 
+			<td colspan="2">GET</td>
+		</tr>
+		<tr> 
+			<td>请求参数</td> 
+			<td colspan="2"><a style="color: #317ee7" onclick="anchorJump('#anchor_600'); return false;">参数表</a></td> 
+		</tr>
+		<tr> 
+			<td>请求失败返回</td> 
+			<td colspan="2">跳转到message模板页显示错误</td> 
+		</tr>
+		<tr> 
+			<td rowspan="7">请求成功返回</td> 
+			<td>话题分页</td> 
+			<td width="30%" >
+				变量：topicPage<br>
+				类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_10'); return false;">PageView</a>
+			</td>
+		</tr> 
+		<tr>
+			<td>搜索关键词</td> 
+			<td width="30%" >
+				变量：keyword<br>
+				类型：String
+			</td>
+		</tr> 
+	</tbody> 
+</table>
+
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">页面访问 - AJAX方式</th>
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td  width="30%">请求路径</td> 
+			<td  width="70%" colspan="2">search.htm</td>
+		</tr>
+		<tr> 
+			<td>请求方式</td> 
+			<td colspan="2">GET</td>
+		</tr>
+		<tr> 
+			<td>自定义请求头</td> 
+			<td colspan="2">协议头：X-Requested-With  值：XMLHttpRequest</td>
+		</tr>
+		<tr> 
+			<td>请求参数</td> 
+			<td colspan="2"><a style="color: #317ee7" onclick="anchorJump('#anchor_600'); return false;">参数表</a></td> 
+		</tr>
+		<tr> 
+			<td width="30%" rowspan="9">请求返回</td> 
+			<td width="30%" rowspan="9">JSON格式值 类型:Map&ltString,Object></td>
+			<td width="40%">键参数：success<br>值内容说明：成功返回true 失败返回false<br>值类型：String</td> 
+		</tr>
+		<tr> 
+			<td>键参数：error<br>值内容说明：错误值集合<br>值类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_80'); return false;">Map&ltString,String></a></td> 
+		</tr>
+		<tr> 
+			<td>键参数：topicPage<br>值内容说明：话题分页<br>值类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_10'); return false;">PageView</a></td>
+		</tr>
+	</tbody> 
+</table>
+
+<table id="anchor_10" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">分页 PageView</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>records</td> 
+			<td>List&lt<a style="color: #317ee7" onclick="anchorJump('#anchor_20'); return false;">Topic</a>></td>
+			<td>数据展示列表</td>
+		</tr>
+		<tr> 
+			<td>pageIndex</td> 
+			<td><a style="color: #317ee7" onclick="anchorJump('#anchor_30'); return false;">PageIndex</a></td>
+			<td>页码索引</td>
+		</tr>
+		<tr> 
+			<td>totalpage</td> 
+			<td>long</td>
+			<td>总页数</td>
+		</tr>
+		<tr> 
+			<td>maxresult</td> 
+			<td>long</td>
+			<td>每页显示记录数</td>
+		</tr>
+		<tr> 
+			<td>currentpage</td> 
+			<td>long</td>
+			<td>当前页</td>
+		</tr>
+		<tr> 
+			<td>pagecount</td> 
+			<td>long</td>
+			<td>页码显示总数</td>
+		</tr>
+		<tr> 
+			<td>onUrl</td> 
+			<td>String</td>
+			<td>上一页URL</td>
+		</tr>
+		<tr> 
+			<td>nextUrl</td> 
+			<td>String</td>
+			<td>下一页URL</td>
+		</tr>
+	</tbody> 
+</table>
+<table id="anchor_30" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">分页索引 PageIndex</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>startindex</td> 
+			<td>long</td>
+			<td>分页开始索引</td>
+		</tr>
+		<tr> 
+			<td>endindex</td> 
+			<td>long</td>
+			<td>分页结束索引</td>
+		</tr>
+	</tbody> 
+</table>
+<table id="anchor_20" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">话题 Topic</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>id</td> 
+			<td>Long</td>
+			<td>话题Id</td>
+		</tr>
+		<tr> 
+			<td>title</td> 
+			<td>String</td>
+			<td>标题；本字段高亮字符用&ltB>&lt/B>标签包裹，字段在搜索时已进行安全过滤，可以加上<#noescape></#noescape>标签关闭转义，以输出html标签</td>
+		</tr>
+		<tr> 
+			<td>tagId</td> 
+			<td>Long</td>
+			<td>标签Id</td>
+		</tr>
+		<tr> 
+			<td>tagName</td> 
+			<td>String</td>
+			<td>标签名称</td>
+		</tr>
+		<tr> 
+			<td>content</td> 
+			<td>String</td>
+			<td>话题内容；本字段高亮字符用&ltB>&lt/B>标签包裹，字段在搜索时已进行安全过滤，可以加上<#noescape></#noescape>标签关闭转义，以输出html标签</td>
+		</tr>
+		
+		<tr> 
+			<td>summary</td> 
+			<td>String</td>
+			<td>内容摘要</td>
+		</tr>
+		<tr> 
+			<td>postTime</td> 
+			<td>Date</td>
+			<td>发表时间</td>
+		</tr>
+		<tr> 
+			<td>lastReplyTime</td> 
+			<td>Date</td>
+			<td>最后回复时间</td>
+		</tr>
+		<tr> 
+			<td>commentTotal</td> 
+			<td>Long</td>
+			<td>评论总数</td>
+		</tr>
+		<tr> 
+			<td>allow</td> 
+			<td>boolean</td>
+			<td>允许评论</td>
+		</tr>
+		<tr> 
+			<td>viewTotal</td> 
+			<td>Long</td>
+			<td>查看总数</td>
+		</tr>
+		<tr> 
+			<td>userName</td> 
+			<td>String</td>
+			<td>用户名称</td>
+		</tr>
+		<tr> 
+			<td>isStaff</td> 
+			<td>boolean</td>
+			<td>是否为员工</td>
+		</tr>
+	</tbody> 
+</table>
+
+
+
+
+<table id="anchor_80"  class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">页面访问 搜索 错误值 error</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+	 	<tr> 
+			<td>message</td> 
+			<td>String</td>
+			<td>搜索错误</td>
+		</tr>
+	</tbody> 
+</table>
+
+<table id="anchor_600" class="exampleTable" > 
+	<thead>
+		<tr> 
+			<th colspan="5">请求参数</th>
+		</tr>
+		<tr> 
+			<th width="30%">参数</th> 
+			<th width="20%">类型</th> 
+			<th width="10%">是否必填</th> 
+			<th width="40%" colspan="2">说明</th> 
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td>keyword</td> 
+			<td>String</td>
+			<td>是</td>
+			<td>搜索关键词</td> 
+		</tr>	
+		<tr> 
+			<td>page</td> 
+			<td>Integer</td>
+			<td>否</td>
+			<td>页码</td> 
+		</tr>
+	</tbody> 
+</table>
+
+<h2 style="margin:0;padding:0; margin-top: 10px;">示例</h2>
+<textarea name="exampleCode">
+
+<#-- 话题分页 -->
+<#if topicPage?exists && topicPage.records?exists && topicPage.records?size gt 0>
+	<#list topicPage.records as topic>
+		<a href="thread?topicId=${topic.id}" class="title">
+			【${topic.tagName}】<span><#noescape>${topic.title}</#noescape></span>
+		</a>
+		<#-- 话题内容 因为要高亮显示，所以不转义-->
+	    <#noescape>${topic.content}</#noescape>
+	</#list>
+</#if>
+
+
+
+<#-- 搜索话题 -->
+<input type="text" id="keyword" value="${keyword}" onkeydown="javascript:if(event.keyCode==13){ search();}">
+<input type="button" value="搜索" class="button" onclick="search();return false">
+<script type="text/javascript" language="javascript">
+//搜索跳转
+function search(){	
+	var content =  document.getElementById("keyword").value;
+	if(trim(content) == ""){
+		return;
+	}
+	
+	//获取系统路径  注意所有网页head标签内都要加入<base href="">标签
+	var basePath =  getBasePath();
+	//参数
+	basePath = basePath+"search?keyword="+encodeURIComponent(content);
+	window.location.href = basePath;
+	return;
+}
+</script>
+</textarea>

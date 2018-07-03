@@ -1,0 +1,118 @@
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">页面访问</th>
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td  width="30%">请求路径</td> 
+			<td  width="70%" colspan="2">user/control/realNameAuthentication.htm</td>
+		</tr>
+		<tr> 
+			<td>请求方式</td> 
+			<td colspan="2">GET</td>
+		</tr>
+		<tr> 
+			<td rowspan="3">返回值</td> 
+			<td>用户</td> 
+			<td>
+				变量：user<br>
+				类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_40'); return false;">User</a>
+			</td>
+		</tr>	
+	</tbody> 
+</table>
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">页面访问 - AJAX方式</th>
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td  width="30%">请求路径</td> 
+			<td  width="70%" colspan="2">user/control/realNameAuthentication.htm</td>
+		</tr>
+		<tr> 
+			<td>请求方式</td> 
+			<td colspan="2">GET</td>
+		</tr>
+		<tr> 
+			<td>自定义请求头</td> 
+			<td colspan="2">协议头：X-Requested-With  值：XMLHttpRequest</td>
+		</tr>
+		<tr> 
+			<td width="30%" rowspan="3">提交返回</td> 
+			<td width="30%" rowspan="3">JSON格式值 类型:Map&ltString,Object></td>
+			<td width="40%">键参数：user<br>值内容说明：用户<br>值类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_40'); return false;">User</a></td> 
+		</tr>	
+	</tbody> 
+</table>
+
+
+<table id="anchor_40" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">用户 user</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>id</td> 
+			<td>long</td>
+			<td>Id</td>
+		</tr>
+		<tr> 
+			<td>userName</td> 
+			<td>String</td>
+			<td>会员用户名</td>
+		</tr>
+		<tr> 
+			<td>mobile</td> 
+			<td>String</td>
+			<td>手机号</td>
+		</tr>
+		<tr> 
+			<td>realNameAuthentication</td> 
+			<td>boolean</td>
+			<td>是否已经实名认证</td>
+		</tr>
+	</tbody> 
+</table>
+
+
+<h2 style="margin:0;padding:0; margin-top: 10px;">示例</h2>
+<textarea name="exampleCode">
+<table class="realNameAuthenticationTable" border="0" cellSpacing="2" cellPadding="0" >
+	<tbody>
+		<tr>
+    		<td width="120px" align="center"><h2 class="projectName">手机绑定</h2></td>
+    		<td align="left" width="300px">
+    			<#if user.mobile != null && user.mobile != ''>
+    				您绑定的手机号：${user.mobile}
+    			<#else>
+    				你还没绑定手机
+    			</#if>
+    		
+    			
+    		</td>
+    		<td align="left" >
+    			<#if user.mobile != null && user.mobile != ''>
+    				<a href="user/control/updatePhoneBinding/step1" class="operating">修改</a>
+    			<#else>
+    				<a href="user/control/phoneBinding" class="operating">立即绑定</a>
+    			</#if>
+    		</td>
+		</tr>
+	</tbody>
+</table>
+
+</textarea>
+
+

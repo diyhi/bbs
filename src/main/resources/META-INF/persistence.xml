@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence
+             http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd"
+             version="2.1">
+<persistence-unit name="cms" transaction-type="RESOURCE_LOCAL">
+  	<!-- 持久化单元 -->
+  	<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+	<properties>
+ 
+ 		<property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5InnoDBDialect"/>
+ 
+        <!--设置外连接抓取树的最大深度 -->
+        <property name="hibernate.max_fetch_depth" value="3"/>
+        <property name="hibernate.hbm2ddl.auto" value="update"/>
+	    <property name="hibernate.jdbc.fetch_size" value="18"/>
+	    <property name="hibernate.jdbc.batch_size" value="10"/>
+	    <property name="hibernate.show_sql" value="false"/>
+	    <property name="hibernate.format_sql" value="true"/> 
+	    <!-- 强制Hibernate按照被更新数据的主键，为SQL更新排序。减少在高并发系统中事务的死锁 -->
+	    <property name="hibernate.order_updates" value="true"/> 
+	     
+		<!-- 设置注解命名策略 -->
+		<property name="hibernate.physical_naming_strategy" value="cms.web.filter.MyPhysicalNamingStrategy"/>
+
+	
+  		<!-- 开启二级缓存 -->
+		<property name="hibernate.cache.use_second_level_cache" value="false"/>
+		<!-- 查询缓存 -->
+		<property name="hibernate.cache.use_query_cache" value="false" />
+	</properties>
+</persistence-unit>
+</persistence>

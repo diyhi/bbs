@@ -1,0 +1,90 @@
+<#-- 话题搜索页 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+	<base href="${baseURL}" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<title>${title}</title>
+	<meta name="keywords" content="${keywords}"/>
+	<meta name="description" content="${description}"/>
+	<link rel="shortcut icon" type="image/x-icon" href="${baseURL}${commonPath}images/favicon.ico" media="screen" />
+	<link href="${commonPath}css/common.css" rel="stylesheet" type="text/css" />
+	<script type="text/javascript" src="${commonPath}js/css3pie/PIE_IE678.js"></script> 
+	<script type="text/javascript" src="${commonPath}js/tool.js" language="javascript"></script>
+</head>
+<body>
+<#-- 引入页头 -->
+<@include action="${newPublic_2}"/>
+<div class="fixedBottom wrap clearfix">
+	<div class="topicModule">
+		<table cellspacing="0" cellpadding="0">  
+			<#if topicPage?exists && topicPage.records?exists && topicPage.records?size gt 0>
+				<#list topicPage.records as topic>
+					<tbody>               
+						<tr>
+				    		<th> 
+						        <div class="avatarBox">
+						            <a class="avatarLink">
+						                <img src="${commonPath}images/min_avata.png"/>                                                               
+						            </a>   
+						        </div>
+						        <div class="content highlight">
+						            <a href="thread?topicId=${topic.id}" class="title">
+							          	【${topic.tagName}】<span><#noescape>${topic.title}</#noescape></span>
+									</a>
+									<div class="clear"></div>
+									<div class="info clearfix">
+						
+										<a href="javascript:;" class="clear">
+											<em class="replies">${topic.commentTotal}</em>
+											<img class="images" src="${commonPath}images/comment.png" style="float: right;*margin-top: 26px;" alt=""/>
+										</a>
+						
+										<a href="" class="view" style="*margin-top: 20px;">
+											<img class="images" src="${commonPath}images/pageview.png" alt="" style="float: left;"/>${topic.viewTotal}
+										</a>
+										<em>  
+						                	<a href="#" >
+							           			<span style="display:inline-block;margin-left: 7px;">
+							                    	${topic.userName}
+							                    </span>
+						                    </a>
+						                </em>
+						                <em>发表时间：${topic.postTime}</em>
+						                <em>最新回复：${topic.lastReplyTime}</em>
+						                
+						                
+									</div>
+								</div>
+								<div class="highlight" style="margin-left: 70px;margin-right: 8px;margin-top:5px; font-size: 14px;">
+									<#noescape>${topic.content}</#noescape>
+								</div>
+							</th>    
+				        	<td></td>
+						</tr>
+					</tbody>          
+				</#list>
+			</#if>                                    
+		</table>
+		
+		<div class="topicPage">
+			<#assign pageView = topicPage>
+			<#--引入分页-->
+			<@include action="${newPublic_1}"/>
+		</div>
+	</div>
+	
+	
+	
+    <div class="clear"></div>
+	<div class="push"><!-- 把div#footer推下去 --></div>
+</div>
+<#-- 引入页脚 -->
+<@include action="${newPublic_3}"/>
+
+</body>
+</html>
+
+
+
+

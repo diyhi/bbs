@@ -1,0 +1,15 @@
+<#-- 话题内容  实体对象 -->
+<@function topicId="${url_topicId}">
+<#assign topic = topicRelated_topicContent_entityBean>
+	<#if topic != null && topic?? >
+		<div class="articleModule" >
+			<div class="articleBox">
+				<h1>${topic.title}</h1>			
+				<div class="articleContent">
+					<#noescape>${topic.content}</#noescape>
+				</div>
+				<h2>${topic.commentTotal}个评论</h2>
+			</div>
+		</div>
+	</#if>
+</@function>

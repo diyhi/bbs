@@ -1,0 +1,83 @@
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">返回值</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="20%">类型</th> 
+			<th width="50%">说明</th> 
+		</tr>
+	</thead> 
+	 <tbody> 
+		<tr> 
+			<td>helpRelated_helpType_collection</td> 
+			<td>List&lt<a style="color: #317ee7" onclick="anchorJump('#anchor_10'); return false;">HelpType</a>&gt</td>
+			<td>帮助分类集合</td> 
+		</tr> 
+	</tbody> 
+</table>
+<table id="anchor_10" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">帮助分类 HelpType</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>id</td> 
+			<td>Long</td>
+			<td>帮助分类Id</td>
+		</tr>
+		<tr> 
+			<td>name</td> 
+			<td>String</td>
+			<td>类别名称</td>
+		</tr>
+		<tr> 
+			<td>parentId</td> 
+			<td>Long</td>
+			<td>所属父类Id</td>
+		</tr>
+		<tr> 
+			<td>childNodeNumber</td> 
+			<td>Integer</td>
+			<td>子节点数量</td>
+		</tr>
+		<tr> 
+			<td>helpQuantity</td> 
+			<td>Long</td>
+			<td>帮助数量</td>
+		</tr>
+		<tr> 
+			<td>childHelpType</td> 
+			<td>List&lt<a style="color: #317ee7" onclick="anchorJump('#anchor_10'); return false;">HelpType</a>&gt</td>
+			<td>子节点帮助分类</td>
+		</tr>	
+	</tbody> 
+</table>
+
+<h2 style="margin:0;padding:0; margin-top: 10px;">示例</h2>
+<textarea name="exampleCode">
+<@function> 
+	<#-- 本示例只遍历两层，要遍历多层可以写多个查询子分类或递归遍历-->
+	
+	<#if helpRelated_helpType_collection?exists && helpRelated_helpType_collection?size gt 0 >    
+		<#list helpRelated_helpType_collection as helpType>
+			<#-- 帮助分类名称-->
+			${helpType.name}
+			<#-- 子分类-->
+			<#list helpType.childHelpType as childHelpType>
+				<#-- 子帮助分类名称-->
+				${childHelpType.name}
+			</#list>
+
+		</#list>
+	</#if>
+</@function>
+</textarea>

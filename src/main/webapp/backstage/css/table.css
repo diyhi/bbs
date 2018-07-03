@@ -1,0 +1,371 @@
+@charset "utf-8";
+
+
+/* border-collapse: collapse解决单元格内容为空时，无法显示单元格边框的问题 rules='none'*/
+.t-table {
+	margin-top: 5px; background-color: #BFE3FF;  
+}
+.t-label {
+	padding-right: 3px; background-color: #F9FCFF; text-align: right
+}
+.t-label-topic {
+	padding-right: 3px; background-color: #F9FCFF; text-align: center;
+}
+.t-label-h {
+	height: 27px
+}
+.t-content {
+	padding-left: 5px; background-color: #ffffff;
+	
+}
+.t-content-frame {
+	padding-left: 5px; background-color: #ffffff;border:red 1px solid;
+	
+}
+.t-header {
+	background-color: #ffffff; text-align: center;background-image: url(../images/pop_header.png);
+}
+.t-thead TH {
+	font-weight:normal;border-bottom: #BFE3FF 1px dotted;background-image: url(../images/pop_header.png);
+}
+.t-button {
+	background-color: #ffffff; text-align: center;
+}
+.t-leftContent {
+	background-color: #ffffff; text-align: left;
+}
+.span-text {
+	color: red
+}
+
+.span-prompt {
+	color: gray;font-size: 12px;font-weight:normal
+}
+.span-highlight{
+	color: green;  
+}
+.span-help{padding-right: 0px; padding-left: 0px; padding-bottom: 3px; color: #747474; padding-top: 3px}
+	
+.t-list-thead {
+	
+}
+.t-list-thead TH {
+	background-image: url(../images/blue_skin_bg.png); height: 27px;
+}
+
+.t-list-thead-dotted TH{
+	border-bottom: #EEEEEE 1px solid;height: 25px;
+}
+.t-list-tbody {
+	background-color: #ffffff; table-layout:fixed; word-break : break-all; word-wrap : break-word ;
+}
+.t-list-tbody TR {
+	height: 25px;
+	line-height: 18px;
+	onmouseover: expression(onmouseover=function (){this.style.borderColor ='blue'; this.style.backgroundColor ='#ECF7FE'});
+	onmouseout: expression(onmouseout=function (){this.style.borderColor='';this.style.backgroundColor =''});
+}
+.t-list-tbody > tr:hover{background-color: #ECF7FE;}
+.t-list-tbody > tr:hover td{background:none; }
+.t-list-tbody .noDiscolor:hover{background-color: transparent;}
+
+.t-list-table {
+	margin: 5px auto 0px; background-color: #BFE3FF;
+}
+
+.td-header {
+	background-color: #ffffff; text-align: center;font-weight:bold;font-size: 13px;height:25px;   
+}
+.td-header-line {
+	background-color: #ffffff; text-align: center;font-weight:bold;font-size: 13px;height:25px; 
+	border-bottom: #EEEEEE 2px solid;  
+}
+.td-label-align {
+	padding-right: 3px; background-color: #f9fbfd; text-align: center
+}
+.td-content-align {
+	padding-left: 5px; background-color: #ffffff; text-align: center
+}
+
+.comment{
+	margin-left:5px;margin-right:5px;margin-top: 5px;margin-bottom: 5px;text-align: left; *width: 600px;/*IE 6和7*/
+}
+.comment img{
+	max-width: 650px;
+	max-height:500px\9; width:expression(document.body.clientHeight>500?"500px":"auto"); overflow:hidden;
+	
+}
+.quote{
+	padding:5px 8px;border-bottom:none;text-align: left;
+}
+.quote div{
+	background:#ffe;padding:3px;border:1px solid #aaa;line-height:140%;margin-bottom:5px;
+}
+.quote div span{
+	color:#666666;font-size:12px;
+}
+
+/* 提示模块 */
+.tipModule{width:800px; margin:0px auto; margin-top: 50px;border: 1px solid #BFE3FF;border-radius: 5px;background-color: #F9FCFF;}
+.tipModule_head{ height:25px;width:99%;margin-left: auto; margin-right: auto;font-size:14px; line-height:32px;color:#444;font-weight: bold;border-bottom: #BFE3FF 1px dotted;}
+.tipModule_head .error {margin-left:2px;padding-left:22px;background: url("../images/error.png") no-repeat;}
+.tipModule_head .prompt{margin-left:2px;padding-left:22px;background: url("../images/warning.png") no-repeat;}
+.tipModule_content{ width:100%;margin:5px 0 10px 10px;line-height:30px; margin: 0 auto;} 
+.tipModule_content span{font-size:25px;text-align: center;}
+.tipModule_bottom{width:99%;text-align: center;border-top: #BFE3FF 1px dotted;margin-left: auto; margin-right: auto;}
+.tipModule_bottom span{margin-top: 3px;margin-bottom: 3px;}
+
+/* 功能按钮 */
+.functionButton { 
+font: 12px Tahoma, Verdana; 
+padding: 0 5px; 
+color: #333333;
+background-image: url("../images/button.gif"); 
+background-repeat: repeat-x; 
+background-position: 0 50%; 
+outline: 1px solid #FFFFFF; 
+height: 24px !important; 
+border: 1px solid #6DC1FF;
+height: 25px; 
+line-height: 17px;
+width:auto;
+overflow:visible;
+vertical-align:middle ;
+margin-left:2px;
+margin-top:2px;
+} 
+
+
+
+/* 功能按钮 */
+.functionButton5 {
+  -webkit-box-sizing: content-box;
+          box-sizing: content-box;
+  display: inline-block;
+  border: 1px solid #ddd;
+  *border: 0 none;
+  border-radius: 2px;
+  *margin-right: .3em;
+  margin-bottom: 0;
+  padding: 0 10px;
+  *padding: 1px 10px;
+  width: auto;
+  height: 21px;
+  line-height: 21px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  border-bottom-color: #bbb !important;
+  background-color: #f4f4f4;
+  background-repeat: repeat-x;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#f8f8f8), to(#eeeeee));
+  background-image: -webkit-linear-gradient(top, #f8f8f8, #eeeeee);
+  background-image: linear-gradient(to bottom, #f8f8f8, #eeeeee);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fff8f8f8', endColorstr='#ffeeeeee', GradientType=0);
+}
+
+.functionButton5,
+.functionButton5:hover,
+.functionButton5:visited {
+  color: #333 !important;
+}
+
+.functionButton5:hover {
+  -webkit-box-shadow: none;
+          box-shadow: none;
+  background-color: #ededed;
+  background-repeat: repeat-x;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#f2f2f2), to(#e6e6e6));
+  background-image: -webkit-linear-gradient(top, #f2f2f2, #e6e6e6);
+  background-image: linear-gradient(to bottom, #f2f2f2, #e6e6e6);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fff2f2f2', endColorstr='#ffe6e6e6', GradientType=0);
+}
+
+.functionButton5:active {
+  background-color: #ebebeb;
+  background-repeat: repeat-x;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#e6e6e6), to(#f2f2f2));
+  background-image: -webkit-linear-gradient(top, #e6e6e6, #f2f2f2);
+  background-image: linear-gradient(to bottom, #e6e6e6, #f2f2f2);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffe6e6e6', endColorstr='#fff2f2f2', GradientType=0);
+}
+
+
+
+/*提交按钮*/
+.submitButton{ display:inline-block; vertical-align:middle; padding:1px 0; margin:0 1px; background:#0098ef;}
+.submitButton span,
+.submitButton input{ float:left; display:inline; margin:0 -1px; height:30px; line-height:30px; padding:0 18px; font-size:18px; border:0; overflow:visible; background:#0098ef; color:#fff; cursor:pointer; font-family:Microsoft Yahei,simsun,sans-serif;}
+.submitButton:hover,
+.submitButton:hover span,
+.submitButton:hover input{background:#0191e4;}
+.submitButton input:disabled{  
+    border: 1px solid #e6e6e6;  
+    background-color: #fbfbfb;  
+    color:#c9c9c9;
+    margin-top: -1px;
+    margin-bottom: -1px;
+    border-radius:2px;
+} 
+
+/*提交按钮*/
+.submitButton2{ display:inline-block; vertical-align:middle; padding:1px 0; margin:0 1px; background:#0098ef;}
+.submitButton2 span,
+.submitButton2 input{ float:left; display:inline; margin:0 -1px; height:23px; line-height:23px; padding:0 14px; font-size:14px; border:0; overflow:visible; background:#0098ef; color:#fff; cursor:pointer;font-family:Microsoft Yahei,simsun,sans-serif;}
+.submitButton2:hover,
+.submitButton2:hover span,
+.submitButton2:hover input{background:#0191e4;}
+
+
+
+
+.functionButton2 {
+	display: inline-block;
+	border-radius: 2px;
+	border: 1px solid transparent;
+	text-decoration: none;
+	cursor: pointer;
+	background-image: -webkit-linear-gradient(top,#fcfcfc 0,#f2f2f2 100%);
+	background-image: linear-gradient(to bottom,#fcfcfc 0,#f2f2f2 100%);
+	background-repeat: repeat-x;
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fffcfcfc', endColorstr='#fff2f2f2', GradientType=1);
+	color: #666666;
+	border-color: #ccc;
+
+	
+}
+
+.functionButton2:visited {
+	color: #333;
+	text-decoration: none
+}
+
+.functionButton2:hover,.functionButton2:active,.functionButton2:focus {
+	background-image: -webkit-linear-gradient(top,#f8f8f8 0,#e9e9e9 100%);
+	background-image: linear-gradient(to bottom,#f8f8f8 0,#e9e9e9 100%);
+	background-repeat: repeat-x;
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fff8f8f8', endColorstr='#ffe9e9e9', GradientType=1);
+	border-color: #bbbdbf;
+	color: #3b3b3b;
+	text-decoration: none
+}
+
+.functionButton2:disabled{
+	background-image: -webkit-linear-gradient(top,#fff 0,#fafafa 100%);
+	background-image: linear-gradient(to bottom,#fff 0,#fafafa 100%);
+	background-repeat: repeat-x;
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#fffafafa', GradientType=1);
+	border-color: #d9d9d9;
+	color: #c3c3c3;
+	cursor: not-allowed;
+	text-decoration: none
+}
+
+
+.functionButton2-small {
+	line-height: normal!important;
+	padding: 4px 8px;
+	font-size: 12px
+}
+
+
+/*上传按钮*/
+.fileButtonPic{
+display: inline-block;
+position: relative;
+height: 21px;
+overflow: hidden;
+padding: 0 8px;
+border: 1px solid #ddd;
+background: none repeat scroll 0 0 #f4f4f4;
+color: #999999;
+font-size:14px;
+line-height:20px;
+font-family:Microsoft Yahei,simsun,sans-serif;
+cursor: pointer;
+text-align: center;
+}
+.fileButtonPic em {
+background:url(../images/plus_sign.png) 0 0;
+display: inline-block;
+width: 16px;
+height: 16px;
+overflow: hidden;
+margin: 3px 4px 6px 0;
+line-height: 20em;
+vertical-align: middle;
+}
+.fileButtonPic:hover em{
+background-position:-16px 0;}
+.fileButton {
+display: block;
+position: absolute;
+top: 0;
+left: 0;
+width: 75px;
+height: 20px;
+cursor: pointer;
+opacity: 0;
+filter:alpha(opacity: 0);
+}
+
+
+
+
+/* 编辑器表格 */
+.exampleTable{
+	width: 100%;
+    overflow: auto;
+    word-break: normal;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+.exampleTable th {
+    font-weight: bold;
+}
+
+.exampleTable th,
+.exampleTable td {
+    padding: 6px 13px;
+    border: 1px solid #BFE3FF;
+}
+
+.exampleTable tr {
+    background-color: #fff;
+    border-top: 1px solid #ccc;
+    line-height: 20px;
+}
+
+
+
+/*用户登录**/
+.wrapper{ width:1000px; position:absolute; top:50%; left:50%; margin:-245px 0 0 -500px; z-index:2;}
+.loginForm{ position:relative;width:700px; margin:-30px auto 0; }
+.loginForm .inner{width:700px; padding-top:5px; background-color:#fff; border-radius:5px; 
+-webkit-box-shadow:0 3px 13px rgba(0,0,0,.4);
+-moz-box-shadow:0 3px 13px rgba(0,0,0,.4);
+box-shadow:0 3px 13px rgba(0,0,0,.4);
+}
+.loginForm .head{width: 700px; height: 40px;text-align: center;color: #424242;margin-bottom: 10px;}
+.loginForm .head h2{font-size: 30px;}
+.loginForm .formField{ clear:both; width:320px; margin:0 auto; padding-top:5px; zoom:1\9;}
+.loginForm .formField input{ width:306px; height:28px; border:1px solid #d8d8d8; border-radius:4px; font-size:14px; color:#666; line-height:28px; padding:6px 0 6px 12px; box-shadow:0 0 5px #fff; outline:none; transition:box-shadow 0.25s linear 0s; -webkit-transition:box-shadow 0.25s linear 0s;}
+.loginForm .formField input:focus{ border:1px solid #26a2ff; box-shadow:0 0 5px #26a2ff; outline:none; transition:box-shadow 0.25s linear 0s; -webkit-transition:box-shadow 0.25s linear 0s;}
+
+.loginForm .err-tip{ clear:both; padding:5px 0 3px 10px; width:300px; font-size:12px; color:#ff3c00;  text-align:left; }
+
+.loginForm .formField input.captchaInput{ width:174px; margin-right:10px;  float:left;}
+.loginForm .captchaImage{ width:120px; height:40px; line-height:40px; display:inline-block;text-align:center; border:1px solid #dfdfdf; border-radius:4px; background:#f2f2f2; background:-moz-linear-gradient(top,#fff,#f2f2f2); background:-webkit-gradient(linear,0 0,0 100%,from(#fff),to(#f2f2f2)); color:#333; vertical-align:top; float:right; overflow:hidden;}
+.loginForm .captchaImage:hover{ background:#fff; text-decoration:none;}
+.loginForm .captchaImage.disabled{background: #f2f2f2;cursor: default;color: #b3b3b3;}
+.loginForm .loginButton{clear:both; width:320px; margin:0 auto; padding:12px 0 0;}
+.loginForm .loginButton input{ width:320px; height:42px; border:none; background-color:#26a2ff; border-radius:5px; text-align:center; line-height:40px; color:#fff; font-size:18px; font-weight:bold; cursor:pointer;}
+.loginForm .loginButton input:hover{ background-color:#36a9ff;}
+.loginForm .loginButton input.disabled{ background-color:#999; color:#fff; cursor:pointer;}
+
+.loginForm .connect{ clear:both; overflow:hidden; margin-top:30px;}
+.loginForm .connect .prompt{ padding:15px 0 20px 24px; font-size:12px; color:#999; border-top:1px solid #ebebeb;}
+
+
+
+

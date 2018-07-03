@@ -1,0 +1,54 @@
+<#-- 在线帮助分类  集合 -->
+<@function> 
+	<#-- 本样式只支持两层分类显示-->
+	<div class="helpLeft">
+		<div class="helpTypeBox" style="margin-top:10px;">
+		
+				<#if helpRelated_helpType_collection?exists && helpRelated_helpType_collection?size gt 0 >    
+				<#list helpRelated_helpType_collection as helpType>
+					
+					<div class="helpTypeItem">
+						<div class="helpTypeName">
+							<a href="#"  helpTypeId="${helpType.id}" onclick="expandCloseLayer(this); return false;" onfocus="this.blur();">
+								<img id="helpImage_${helpType.id}" src="${commonPath}images/fold.gif" width="9" height="9" /> 
+								${helpType.name}
+							</a>
+						</div>
+						<div id = "helpName_${helpType.id}" style="display: block;">
+							<div class = "helpName">
+								<#list helpType.childHelpType as childHelpType>
+									<a href="#"><span >${childHelpType.name}</span></a>
+								</#list>
+							</div>
+						</div>
+					</div>
+				</#list>
+				</#if>
+			
+	   </div>
+	</div>
+	
+	<script type="text/javascript">
+	//展开关闭层
+	function expandCloseLayer(obj){
+		var helpTypeId = obj.attributes["helpTypeId"].nodeValue;
+		
+		
+		var helpNameLayer = document.getElementById("helpName_"+helpTypeId);
+		if(helpNameLayer.style.display == "none"){//如果层已收缩
+			helpNameLayer.style.display = "";
+			document.getElementById("helpImage_"+helpTypeId).src = "${commonPath}images/fold.gif";
+		
+		}else{
+			helpNameLayer.style.display = "none";
+			document.getElementById("helpImage_"+helpTypeId).src = "${commonPath}images/expand.gif";
+		
+		}
+		
+
+	}
+</script>
+</@function>
+	
+	
+

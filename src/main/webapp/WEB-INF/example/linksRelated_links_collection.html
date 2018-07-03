@@ -1,0 +1,81 @@
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">返回值</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="20%">类型</th> 
+			<th width="50%">说明</th> 
+		</tr>
+	</thead> 
+	 <tbody> 
+		<tr> 
+			<td>linksRelated_links_collection</td> 
+			<td>List&lt<a style="color: #317ee7" onclick="anchorJump('#anchor_10'); return false;">Links</a>&gt</td>
+			<td>友情链接集合</td> 
+		</tr> 
+	</tbody> 
+</table>
+<table id="anchor_10" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">友情链接 Links</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>id</td> 
+			<td>Integer</td>
+			<td>Id</td>
+		</tr>
+		<tr> 
+			<td>name</td> 
+			<td>String</td>
+			<td>名称</td>
+		</tr>
+		<tr> 
+			<td>website</td> 
+			<td>String</td>
+			<td>网址</td>
+		</tr>
+		<tr> 
+			<td>sort</td> 
+			<td>Integer</td>
+			<td>排序</td>
+		</tr>
+		<tr> 
+			<td>image</td> 
+			<td>String</td>
+			<td>图片</td>
+		</tr>
+		<tr> 
+			<td>createDate</td> 
+			<td>Date</td>
+			<td>创建时间</td>
+		</tr>
+	</tbody> 
+</table>
+
+<h2 style="margin:0;padding:0; margin-top: 10px;">示例</h2>
+<textarea name="exampleCode">
+<@function>
+	<#if linksRelated_links_collection?? && linksRelated_links_collection?size gt 0>
+	  	<#list linksRelated_links_collection as links>
+  			<#if links.image != null && links.image != ''>
+		    	<li>
+		    		<a target="_blank" href="${links.website}">
+		    		<img width="88" height="31" border="0" alt="${links.name}" src="${links.image}"></a>
+		    	</li>
+	    	</#if>
+	   	</#list>	
+	</div>
+	</#if>
+</@function>	
+	
+</textarea>

@@ -1,0 +1,167 @@
+BODY {
+	padding-right: 0px; padding-left: 0px; font-size: 12px; padding-bottom: 0px; margin: 0px; color: #333333; padding-top: 0px; background-color: #ffffff;
+	font-size:12px;font-family: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
+}
+html {overflow-y:auto!important;*overflow-y:scroll;}
+IMG {
+	border-top-width: 0px; border-left-width: 0px; border-bottom-width: 0px; border-right-width: 0px
+}
+FORM {
+	padding-right: 0px; padding-left: 0px; padding-bottom: 0px; margin: 0px; padding-top: 0px
+}
+A {
+	text-decoration: none;        
+}
+A:link {
+	color: #222222
+}
+A:visited {
+	color: #888888
+}
+A:hover {
+	color: #ff6600
+}
+A:active {
+	color: #0099CC; 
+}
+
+
+input::-moz-focus-inner{ border: 0;padding: 0;}
+
+
+.date-input{border:1px solid #ddd;background:url(../images/dateSelect.gif) center right no-repeat #f7f7f7;cursor:pointer;font:12px tahoma,arial;height:18px;width:150px;}
+
+
+.d-box {
+	margin: 0px auto; width: 99%;   
+}
+.d-head {
+	border-right: #BFE3FF 1px solid; padding-right: 15px; border-top: #BFE3FF 1px solid; margin-top: 5px; padding-left: 15px; padding-bottom: 5px; border-left: #BFE3FF 1px solid; padding-top: 5px; border-bottom: #BFE3FF 1px solid
+}
+.d-location{
+	padding-right: 0px; padding-left: 20px; float: left; padding-bottom: 3px; padding-top: 3px
+}
+.d-clear {
+	clear: both
+}
+.d-button {
+	border:1px solid #BFE3FF; margin-top: 2px; height: 30px; 
+}
+.d-checkBoxNoSel{  
+    background: url("../images/checkboxNoSel.jpg") no-repeat center center;  
+    float:left;  
+    width:15px;  
+    height:15px;  
+    border:1px solid #BDBDBD;  
+    color:#FFF;  
+}  
+.d-checkBoxSel{  
+    background: url("../images/checkboxSel.jpg") no-repeat center center;
+    float:left;  
+    width:15px;  
+    height:15px;  
+    border:1px solid #BDBDBD;  
+    color:#FFF;  
+} 
+
+/* 星级评分 */
+/*  key:  B=空白 : O=橙色：G =绿色*/
+/* B B B B B - (0 0)*/
+/* G B B B B - (0 -16px)*/
+/* G G B B B - (0 -32px)*/
+/* G G G B B - (0 -48px)*/
+/* G G G G B - (0 -64px)*/
+/* G G G G G - (0 -80px)*/
+/* O B B B B - (0 -96px)*/
+/* O O B B B - (0 -112px)*/
+/* O O O B B - (0 -128px)*/
+/* O O O O B - (0 -144px)*/
+/* O O O O O - (0 -160px)*/
+
+
+/* 默认的评级是放在UL 的背景图像/ */
+/* 使用背景位置根据上表显示所需的图像*/
+.rating{
+	width:80px;
+	height:16px;
+	margin:5px 0 5px 0;
+	padding:0;
+	list-style:none;
+	clear:both;
+	position:relative;
+	background: url(../images/star_matrix.gif) no-repeat 0 0;
+}
+/* 显示星星数量 */
+.star_0 {background-position:0 0}
+.star_1 {background-position:0 -16px}
+.star_2 {background-position:0 -32px}
+.star_3 {background-position:0 -48px}
+.star_4 {background-position:0 -64px}
+.star_5 {background-position:0 -80px}
+ul.rating li {
+	cursor: pointer;
+ /*ie5 mac */
+	float:left;
+	/* end hide*/
+	text-indent:-999em;
+}
+ul.rating li a {
+	position:absolute;
+	left:0;
+	top:0;
+	width:16px;
+	height:16px;
+	text-decoration:none;
+	z-index: 200;
+}
+ul.rating li.one a {left:0}
+ul.rating li.two a {left:16px;}
+ul.rating li.three a {left:32px;}
+ul.rating li.four a {left:48px;}
+ul.rating li.five a {left:64px;}
+ul.rating li a:hover {
+	z-index:2;
+	width:80px;
+	height:16px;
+	overflow:hidden;
+	left:0;	
+	background: url(../images/star_matrix.gif) no-repeat 0 0
+}
+ul.rating li.one a:hover {background-position:0 -96px;}
+ul.rating li.two a:hover {background-position:0 -112px;}
+ul.rating li.three a:hover {background-position:0 -128px}
+ul.rating li.four a:hover {background-position:0 -144px}
+ul.rating li.five a:hover {background-position:0 -160px}
+
+
+/*分页#BFE3FF*/
+.pg_div {
+	margin-top: 3px;
+}
+.pg {
+	float: right;line-height: 26px; 
+}
+.pg A {
+	border-bottom: #c2d5e3 1px solid; border-left: #c2d5e3 1px solid; padding-bottom: 0px; background-color: #fff; padding-left: 8px; padding-right: 8px; display: inline; background-repeat: no-repeat; float: left; height: 26px; color: #333; margin-left: 4px; overflow: hidden; border-top: #c2d5e3 1px solid; border-right: #c2d5e3 1px solid; text-decoration: none; padding-top: 0px;border-bottom-color: #BFE3FF; border-top-color: #BFE3FF; border-right-color: #BFE3FF; border-left-color: #BFE3FF
+}
+.pg A.prev {
+	padding-bottom: 0px; padding-left: 10px; padding-right: 10px; padding-top: 0px; 
+}
+.pg A.nxt {
+	padding-bottom: 0px; padding-left: 10px; padding-right: 10px; padding-top: 0px;  
+}
+.pg A:hover {
+	border-bottom-color: #3198e7; border-top-color: #3198e7; color: #3198e7; border-right-color: #3198e7; border-left-color: #3198e7;     
+}
+.pg LABEL {
+	border-bottom: #BFE3FF 1px solid; border-left: #BFE3FF 1px solid; padding-bottom: 0px; background-color: #fff; padding-left: 8px; padding-right: 8px; display: inline; background-repeat: no-repeat; float: left; height: 26px; color: #333; margin-left: 4px; overflow: hidden; border-top: #BFE3FF 1px solid; border-right: #BFE3FF 1px solid; text-decoration: none; padding-top: 0px
+}
+.pg LABEL .pg_input {
+	padding:0;width:25px;height:15px;line-height:15px;margin-bottom: 3px;*margin-bottom: 0px; 
+}
+.pg STRONG {
+	border-bottom: #c2d5e3 1px solid; border-left: #c2d5e3 1px solid; padding-bottom: 0px; background-color: #fff; padding-left: 8px; padding-right: 8px; display: inline; background-repeat: no-repeat; float: left; height: 26px; color: #333; margin-left: 4px; overflow: hidden; border-top: #c2d5e3 1px solid; border-right: #c2d5e3 1px solid; text-decoration: none; padding-top: 0px;border-bottom-color: #BFE3FF; border-top-color: #BFE3FF; border-right-color: #BFE3FF; border-left-color: #BFE3FF;background-color: #BFE3FF
+}
+.pg span.count {
+	border-bottom: #c2d5e3 1px solid; border-left: #c2d5e3 1px solid; padding-bottom: 0px; background-color: #fff; padding-left: 8px; padding-right: 8px; display: inline; background-repeat: no-repeat; float: left; height: 26px; color: #333; margin-left: 4px; overflow: hidden; border-top: #c2d5e3 1px solid; border-right: #c2d5e3 1px solid; text-decoration: none; padding-top: 0px;border-bottom-color: #BFE3FF; border-top-color: #BFE3FF; border-right-color: #BFE3FF; border-left-color: #BFE3FF;
+}

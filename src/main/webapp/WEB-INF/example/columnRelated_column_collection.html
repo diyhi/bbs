@@ -1,0 +1,83 @@
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">返回值</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="20%">类型</th> 
+			<th width="50%">说明</th> 
+		</tr>
+	</thead> 
+	 <tbody> 
+		<tr> 
+			<td>columnRelated_column_collection</td> 
+			<td>List&lt<a style="color: #317ee7" onclick="anchorJump('#anchor_10'); return false;">Column</a>></td>
+			<td>站点栏目集合</td> 
+		</tr> 
+	</tbody> 
+</table>
+<table id="anchor_10" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">站点栏目 Column</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>id</td> 
+			<td>Integer</td>
+			<td>Id</td>
+		</tr>
+		<tr> 
+			<td>name</td> 
+			<td>String</td>
+			<td>栏目名称</td>
+		</tr>
+		<tr> 
+			<td>parentId</td> 
+			<td>Integer</td>
+			<td>所属父类Id</td>
+		</tr>
+		<tr> 
+			<td>linkMode</td> 
+			<td>Integer</td>
+			<td>链接方式   1.无   2.外部URL  3.内部URL  4.空白页</td>
+		</tr>
+		<tr> 
+			<td>url</td> 
+			<td>String</td>
+			<td>URL</td>
+		</tr>
+		<tr> 
+			<td>childColumn</td> 
+			<td>List&lt<a style="color: #317ee7" onclick="anchorJump('#anchor_10'); return false;">Column</a>></td>
+			<td>子栏目</td>
+		</tr>
+	</tbody> 
+</table>
+<h2 style="margin:0;padding:0; margin-top: 10px;">示例</h2>
+<textarea name="exampleCode">
+<#-- 需要多级子栏目可以循环多个子栏目取值或使用递归方式取值 -->
+<@function>		
+	<#list columnRelated_column_collection.columnList as column>
+		<#-- 栏目名称 -->
+		${column.name}
+		<#-- 栏目URL -->
+		${column.url}
+		
+		<#-- 下级栏目 -->
+		<#list column.childColumn as childColumn>
+			<#-- 子栏目名称 -->
+			${childColumn.name}
+			<#-- 子栏目URL -->
+			${childColumn.url}
+		</#list>
+	</#list>
+</@function>
+</textarea>
