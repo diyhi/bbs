@@ -1,4 +1,4 @@
-﻿package cms.web.action.data;
+package cms.web.action.data;
 
 import java.util.List;
 

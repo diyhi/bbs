@@ -299,6 +299,8 @@ function initConfig(){
 	config.additem('浏览量列表',t,'${config:url(pageContext.request)}control/pageView/list${config:suffix()}');
 	t=config.addtitle('文件打包管理','运营管理',1);
 	config.additem('压缩文件列表',t,'${config:url(pageContext.request)}control/filePackage/list${config:suffix()}');
+	t=config.addtitle('系统通知管理','运营管理',1);
+	config.additem('系统通知列表',t,'${config:url(pageContext.request)}control/systemNotify/list${config:suffix()}');
 
 	t=config.addtitle('全站设置','系统设置',1);
 	config.additem('基本设置',t,'${config:url(pageContext.request)}control/systemSetting/manage/edit${config:suffix()}');

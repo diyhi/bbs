@@ -1,14 +1,18 @@
 package cms.web.action.common;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
+import javax.persistence.Column;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -27,17 +31,24 @@ import cms.bean.ErrorView;
 import cms.bean.PageForm;
 import cms.bean.PageView;
 import cms.bean.QueryResult;
+import cms.bean.message.PrivateMessage;
+import cms.bean.message.SubscriptionSystemNotify;
+import cms.bean.message.SystemNotify;
+import cms.bean.message.UnreadMessage;
 import cms.bean.topic.Comment;
 import cms.bean.topic.Reply;
 import cms.bean.topic.Tag;
 import cms.bean.topic.Topic;
 import cms.bean.user.AccessUser;
+import cms.bean.user.FormCaptcha;
 import cms.bean.user.PointLog;
 import cms.bean.user.User;
 import cms.bean.user.UserCustom;
 import cms.bean.user.UserGrade;
 import cms.bean.user.UserInputValue;
 import cms.bean.user.UserLoginLog;
+import cms.service.message.PrivateMessageService;
+import cms.service.message.SystemNotifyService;
 import cms.service.setting.SettingService;
 import cms.service.template.TemplateService;
 import cms.service.topic.CommentService;
@@ -47,6 +58,7 @@ import cms.service.user.UserCustomService;
 import cms.service.user.UserGradeService;
 import cms.service.user.UserService;
 import cms.utils.Base64;
+import cms.utils.HtmlEscape;
 import cms.utils.IpAddress;
 import cms.utils.JsonUtils;
 import cms.utils.RefererCompare;
@@ -59,6 +71,9 @@ import cms.web.action.AccessSourceDeviceManage;
 import cms.web.action.CSRFTokenManage;
 import cms.web.action.FileManage;
 import cms.web.action.TextFilterManage;
+import cms.web.action.message.PrivateMessageManage;
+import cms.web.action.message.SubscriptionSystemNotifyManage;
+import cms.web.action.message.SystemNotifyManage;
 import cms.web.action.setting.SettingManage;
 import cms.web.action.sms.SmsManage;
 import cms.web.action.user.UserManage;
@@ -97,7 +112,11 @@ public class HomeManageAction {
 	
 	@Resource CSRFTokenManage csrfTokenManage;
 	@Resource UserManage userManage;
-	
+	@Resource PrivateMessageManage privateMessageManage;
+	@Resource PrivateMessageService privateMessageService;
+	@Resource SystemNotifyService systemNotifyService;
+	@Resource SubscriptionSystemNotifyManage subscriptionSystemNotifyManage;
+	@Resource SystemNotifyManage systemNotifyManage;
 	
 	/**--------------------------------- 首页 -----------------------------------**/
 	/**
@@ -107,7 +126,7 @@ public class HomeManageAction {
 	 * @throws Exception
 	 */
 	@RequestMapping(value="/user/control/home",method=RequestMethod.GET) 
-	public String homeUI(ModelMap model,
+	public String homeUI(ModelMap model,String userName,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 			
@@ -120,8 +139,21 @@ public class HomeManageAction {
 	    //获取登录用户
 	  	AccessUser accessUser = AccessUserThreadLocal.get();
 
+	  	String _userName = accessUser.getUserName();
+	  	//是否为会员自身
+	  	boolean flag = true;
+	  	if(userName != null && !"".equals(userName.trim())){
+	  		if(!userName.trim().equals(accessUser.getUserName())){
+	  			_userName = userName.trim();
+	  			flag = false;
+	  		}
+	  	}
+	  	
+	  	
+	  	
+	  	
 	    //获取登录用户
-  		User new_user = userService.findUserByUserName(accessUser.getUserName());
+  		User new_user = userManage.query_cache_findUserByUserName(_userName);
   		if(new_user != null){
   			List<UserGrade> userGradeList = userGradeService.findAllGrade_cache();//取得用户所有等级
 			if(userGradeList != null && userGradeList.size() >0){
@@ -135,10 +167,35 @@ public class HomeManageAction {
 					
 				
 			}
+      		if(flag){
+      			//仅显示指定的字段
+    			User viewUser = new User();
+    			viewUser.setId(new_user.getId());
+    			viewUser.setUserName(new_user.getUserName());//会员用户名
+    			viewUser.setState(new_user.getState());//用户状态
+    			viewUser.setEmail(new_user.getEmail());//邮箱地址
+    			viewUser.setIssue(new_user.getIssue());//密码提示问题
+    			viewUser.setRegistrationDate(new_user.getRegistrationDate());//注册日期
+    			viewUser.setPoint(new_user.getPoint());//当前积分
+    			viewUser.setGradeId(new_user.getGradeId());//等级Id
+    			viewUser.setGradeName(new_user.getGradeName());//等级名称
+    			viewUser.setMobile(new_user.getMobile());//绑定手机
+    			viewUser.setRealNameAuthentication(new_user.isRealNameAuthentication());//是否实名认证
+    			
+      			model.addAttribute("user", viewUser);
+          		returnValue.put("user", viewUser);
+      		}else{//如果不是登录会员自身，则仅显示指定字段
+      			User other_user = new User();
+      			other_user.setId(new_user.getId());//Id
+      			other_user.setUserName(new_user.getUserName());//会员用户名
+      			other_user.setState(new_user.getState());//用户状态
+      			other_user.setGradeId(new_user.getGradeId());//等级Id
+      			other_user.setGradeName(new_user.getGradeName());//等级名称
+      			model.addAttribute("user", other_user);
+          		returnValue.put("user", other_user);
+      		}
       		
       		
-      		model.addAttribute("user", new_user);
-      		returnValue.put("user", new_user);
       	}
      	if(isAjax){
 			WebUtil.writeToWeb(JsonUtils.toJSONString(returnValue), "json", response);
@@ -411,7 +468,7 @@ public class HomeManageAction {
 		int firstIndex = (pageForm.getPage()-1)*pageView.getMaxresult();
 		
 		
-		User user = userService.findUserByUserName(accessUser.getUserName());
+		User user = userManage.query_cache_findUserByUserName(accessUser.getUserName());
 		if(user != null){
 			QueryResult<PointLog> qr =  userService.findPointLogPage(user.getId(),user.getUserName(),firstIndex, pageView.getMaxresult());
 			//将查询结果集传给分页List
@@ -818,9 +875,7 @@ public class HomeManageAction {
 		new_user.setUserName(user.getUserName());
 		
 		new_user.setUserVersion(user.getUserVersion());
-		
-		
-		
+
 		//提交
 		if(error.size() == 0){
 			List<UserInputValue> userInputValueList= userCustomService.findUserInputValueByUserName(user.getId());
@@ -877,6 +932,11 @@ public class HomeManageAction {
 			
 			int i = userService.updateUser2(new_user,add_userInputValue,delete_userInputValueIdList);
 			userManage.delete_userState(new_user.getUserName());
+			//删除缓存
+			userManage.delete_cache_findUserById(new_user.getId());
+			userManage.delete_cache_findUserByUserName(new_user.getUserName());
+			
+			
 			if(i == 0){
 				error.put("user", ErrorView._810.name());//修改用户失败
 			}
@@ -1106,6 +1166,9 @@ public class HomeManageAction {
 	    
 	    if(error.size() ==0){
 	    	userService.updateUserMobile(new_user.getUserName(),mobile.trim(),true);
+	    	//删除缓存
+			userManage.delete_cache_findUserById(new_user.getId());
+			userManage.delete_cache_findUserByUserName(new_user.getUserName());
 	    }
 	    
 		Map<String,String> returnError = new HashMap<String,String>();//错误
@@ -1235,7 +1298,7 @@ public class HomeManageAction {
   		
   		//获取登录用户
 	  	AccessUser accessUser = AccessUserThreadLocal.get();
-	  	User new_user = userService.findUserByUserName(accessUser.getUserName());
+	  	User new_user = userManage.query_cache_findUserByUserName(accessUser.getUserName());
 	  	
 		if(module.equals(1) || module.equals(3)){//1.绑定手机  3.更换绑定手机第二步
   			if(mobile != null && !"".equals(mobile.trim())){
@@ -1370,7 +1433,7 @@ public class HomeManageAction {
   			error.put("token", ErrorView._11.name());
   		}
   		
-	    User new_user = userService.findUserByUserName(accessUser.getUserName());
+	    User new_user = userManage.query_cache_findUserByUserName(accessUser.getUserName());
   		if(new_user != null){
   			if(new_user.getMobile() == null || "".equals(new_user.getMobile())){
   				error.put("smsCode", ErrorView._858.name());//你还没有绑定手机
@@ -1588,6 +1651,9 @@ public class HomeManageAction {
 	    
 	    if(error.size() ==0){
 	    	userService.updateUserMobile(new_user.getUserName(),mobile.trim(),true);
+	    	//删除缓存
+			userManage.delete_cache_findUserById(new_user.getId());
+			userManage.delete_cache_findUserByUserName(new_user.getUserName());
 	    }
 	    
 		Map<String,String> returnError = new HashMap<String,String>();//错误
@@ -1696,4 +1762,918 @@ public class HomeManageAction {
 			return "templates/"+dirName+"/"+accessPath+"/userLoginLogList";	
 		}
 	}
+	
+	
+	
+	/**----------------------------------- 私信 ----------------------------------**/
+	
+	
+	/**
+	 * 私信列表
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/user/control/privateMessageList",method=RequestMethod.GET) 
+	public String privateMessageList(ModelMap model,PageForm pageForm,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+		
+		String dirName = templateService.findTemplateDir_cache();
+		
+		
+		String accessPath = accessSourceDeviceManage.accessDevices(request);
+	   
+		
+		//获取登录用户
+	  	AccessUser accessUser = AccessUserThreadLocal.get();
+		
+		//调用分页算法代码
+		PageView<PrivateMessage> pageView = new PageView<PrivateMessage>(settingService.findSystemSetting_cache().getForestagePageNumber(),pageForm.getPage(),10,request.getRequestURI(),request.getQueryString());
+		//当前页
+		int firstIndex = (pageForm.getPage()-1)*pageView.getMaxresult();
+
+		//用户Id集合
+		Set<Long> userIdList = new HashSet<Long>();
+		//用户集合
+		Map<Long,User> userMap = new HashMap<Long,User>();
+		
+		QueryResult<PrivateMessage> qr = privateMessageService.findPrivateMessageByUserId(accessUser.getUserId(),100,firstIndex,pageView.getMaxresult());
+		if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
+			for(PrivateMessage privateMessage : qr.getResultlist()){
+				userIdList.add(privateMessage.getSenderUserId());//发送者用户Id 
+				userIdList.add(privateMessage.getReceiverUserId());//接受者用户Id
+
+				privateMessage.setSendTime(new Timestamp(privateMessage.getSendTimeFormat()));
+				if(privateMessage.getReadTimeFormat() != null){
+					privateMessage.setReadTime(new Timestamp(privateMessage.getReadTimeFormat()));
+				}
+				privateMessage.setMessageContent(textFilterManage.filterText(privateMessage.getMessageContent()));
+				
+				
+				
+				
+				
+			}
+		}
+		
+		if(userIdList != null && userIdList.size() >0){
+			for(Long userId : userIdList){
+				User user = userManage.query_cache_findUserById(userId);
+				if(user != null){
+					userMap.put(userId, user);
+				}
+			}
+		}
+		if(userMap != null && userMap.size() >0){
+			if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
+				for(PrivateMessage privateMessage : qr.getResultlist()){
+					User friend_user = userMap.get(privateMessage.getFriendUserId());
+					if(friend_user != null){
+						privateMessage.setFriendUserName(friend_user.getUserName());//私信对方用户名称
+					}
+					User sender_user = userMap.get(privateMessage.getSenderUserId());
+					if(sender_user != null){
+						privateMessage.setSenderUserName(sender_user.getUserName());//私信发送者用户名称
+					}
+					
+				}
+			}
+			
+			
+			
+		}
+		
+		
+		
+		
+
+		//将查询结果集传给分页List
+		pageView.setQueryResult(qr);
+		if(isAjax){
+			WebUtil.writeToWeb(JsonUtils.toJSONString(pageView), "json", response);
+			return null;
+		}else{
+			model.addAttribute("pageView", pageView);
+			return "templates/"+dirName+"/"+accessPath+"/privateMessageList";	
+		}
+	}
+	
+	
+	/**
+	 * 私信对话列表
+	 * @param model
+	 * @param pageForm
+	 * @param friendUserName 对方用户名称
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/user/control/privateMessageChatList",method=RequestMethod.GET) 
+	public String privateMessageChatList(ModelMap model,PageForm pageForm,String friendUserName,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+		
+		String dirName = templateService.findTemplateDir_cache();
+		
+		//获取登录用户
+	  	AccessUser accessUser = AccessUserThreadLocal.get();
+		String accessPath = accessSourceDeviceManage.accessDevices(request);
+		//调用分页算法代码
+		PageView<PrivateMessage> pageView = new PageView<PrivateMessage>(settingService.findSystemSetting_cache().getForestagePageNumber(),pageForm.getPage(),10,request.getRequestURI(),request.getQueryString());
+		//当前页
+		int firstIndex = (pageForm.getPage()-1)*pageView.getMaxresult();
+		//对话用户
+		User chatUser = null;
+		
+		//用户Id集合
+		Set<Long> userIdList = new HashSet<Long>();
+		//用户集合
+		Map<Long,User> userMap = new HashMap<Long,User>();
+		
+		//未读私信Id集合
+		List<String> unreadPrivateMessageIdList = new ArrayList<String>();
+		
+		if(friendUserName != null && !"".equals(friendUserName.trim())){
+			chatUser = userManage.query_cache_findUserByUserName(friendUserName.trim());
+			if(chatUser != null){
+
+				QueryResult<PrivateMessage> qr = privateMessageService.findPrivateMessageChatByUserId(accessUser.getUserId(),chatUser.getId(),100,firstIndex,pageView.getMaxresult());
+				if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
+					for(PrivateMessage privateMessage : qr.getResultlist()){
+						userIdList.add(privateMessage.getSenderUserId());//发送者用户Id 
+						userIdList.add(privateMessage.getReceiverUserId());//接受者用户Id
+
+						privateMessage.setSendTime(new Timestamp(privateMessage.getSendTimeFormat()));
+						if(privateMessage.getReadTimeFormat() != null){
+							privateMessage.setReadTime(new Timestamp(privateMessage.getReadTimeFormat()));
+						}
+						
+						if(privateMessage.getStatus().equals(10)){
+							unreadPrivateMessageIdList.add(privateMessage.getId());
+						}
+					}
+				}
+				
+				if(userIdList != null && userIdList.size() >0){
+					for(Long userId : userIdList){
+						User user = userManage.query_cache_findUserById(userId);
+						if(user != null){
+							userMap.put(userId, user);
+						}
+					}
+				}
+				if(userMap != null && userMap.size() >0){
+					if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
+						for(PrivateMessage privateMessage : qr.getResultlist()){
+							User friend_user = userMap.get(privateMessage.getFriendUserId());
+							if(friend_user != null){
+								privateMessage.setFriendUserName(friend_user.getUserName());//私信对方用户名称
+							}
+							User sender_user = userMap.get(privateMessage.getSenderUserId());
+							if(sender_user != null){
+								privateMessage.setSenderUserName(sender_user.getUserName());//私信发送者用户名称
+							}
+							
+						}
+					}
+					
+					
+					
+				}
+				//将查询结果集传给分页List
+				pageView.setQueryResult(qr);
+				
+				if(unreadPrivateMessageIdList != null && unreadPrivateMessageIdList.size() >0){
+					
+					//将未读私信设置为已读
+					privateMessageService.updatePrivateMessageStatus(accessUser.getUserId(), unreadPrivateMessageIdList);
+					//删除私信缓存
+					privateMessageManage.delete_cache_findUnreadPrivateMessageByUserId(accessUser.getUserId());
+				}
+				
+				
+			}
+		}
+		
+		if(chatUser != null){
+			//仅显示指定的字段
+			User viewUser = new User();
+			viewUser.setId(chatUser.getId());
+			viewUser.setUserName(chatUser.getUserName());//会员用户名
+			viewUser.setRegistrationDate(chatUser.getRegistrationDate());//注册日期
+
+			List<UserGrade> userGradeList = userGradeService.findAllGrade_cache();//取得用户所有等级
+			if(userGradeList != null && userGradeList.size() >0){
+				for(UserGrade userGrade : userGradeList){
+					if(chatUser.getPoint() >= userGrade.getNeedPoint()){
+						viewUser.setGradeId(userGrade.getId());//等级Id
+						viewUser.setGradeName(userGrade.getName());//将等级值设进等级参数里
+						break;
+					}
+				} 
+			}
+
+			chatUser = viewUser;
+		}
+		
+		
+		if(isAjax){
+			Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
+			returnValue.put("chatUser", chatUser);
+			returnValue.put("pageView", pageView);
+			WebUtil.writeToWeb(JsonUtils.toJSONString(returnValue), "json", response);
+			return null;
+		}else{
+			model.addAttribute("chatUser", chatUser);//对话用户
+			model.addAttribute("pageView", pageView);
+			return "templates/"+dirName+"/"+accessPath+"/privateMessageChatList";	
+		}
+	}
+	
+	/**
+	 * 添加私信界面
+	 * @param friendUserName 对方用户名称
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/user/control/addPrivateMessage",method=RequestMethod.GET) 
+	public String addPrivateMessageUI(ModelMap model,String friendUserName,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+		//获取登录用户
+	  	AccessUser accessUser = AccessUserThreadLocal.get();
+	  	Map<String,Object> returnValue = new HashMap<String,Object>();
+	  	FormCaptcha formCaptcha = new FormCaptcha();
+		if(accessUser != null){
+			boolean captchaKey = captchaManage.privateMessage_isCaptcha(accessUser.getUserName());//验证码标记
+			if(captchaKey ==true){
+				formCaptcha.setShowCaptcha(true);
+				formCaptcha.setCaptchaKey(UUIDUtil.getUUID32());
+			}
+		}
+		
+		if(friendUserName != null && !"".equals(friendUserName.trim())){		
+			User user = userManage.query_cache_findUserByUserName(friendUserName.trim());
+			if(user != null){
+				returnValue.put("allowSendPrivateMessage",true);//允许发私信
+			}else{
+				returnValue.put("allowSendPrivateMessage",false);//不允许发私信
+			}
+		}else{
+			returnValue.put("allowSendPrivateMessage",false);//不允许发私信
+		}
+		
+		if(isAjax){
+			returnValue.put("formCaptcha", formCaptcha);
+			WebUtil.writeToWeb(JsonUtils.toJSONString(returnValue), "json", response);
+			return null;
+		}else{
+			model.addAttribute("formCaptcha", formCaptcha);
+			model.addAttribute("allowSendPrivateMessage", returnValue.get("allowSendPrivateMessage"));
+			String dirName = templateService.findTemplateDir_cache();
+			String accessPath = accessSourceDeviceManage.accessDevices(request);		
+			return "templates/"+dirName+"/"+accessPath+"/addPrivateMessage";	
+		}
+	}
+
+	
+	/**
+	 * 私信  添加
+	 * @param model
+	 * @param friendUserName 对方用户名称
+	 * @param messageContent 消息内容
+	 * @param jumpUrl 跳转地址
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/user/control/addPrivateMessage", method=RequestMethod.POST)
+	public String addPrivateMessage(ModelMap model,String friendUserName,String messageContent,
+			String token,String captchaKey,String captchaValue,String jumpUrl,
+			RedirectAttributes redirectAttrs,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
+		//获取登录用户
+	  	AccessUser accessUser = AccessUserThreadLocal.get();
+		
+		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+		
+		
+		Map<String,String> error = new HashMap<String,String>();
+		
+			
+		
+		//判断令牌
+		if(token != null && !"".equals(token.trim())){	
+			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌
+			if(token_sessionid != null && !"".equals(token_sessionid.trim())){
+				if(!token_sessionid.equals(token)){
+					error.put("token", ErrorView._13.name());//令牌错误
+				}
+			}else{
+				error.put("token", ErrorView._12.name());//令牌过期
+			}
+		}else{
+			error.put("token", ErrorView._11.name());//令牌为空
+		}
+		
+		//验证码
+		boolean isCaptcha = captchaManage.privateMessage_isCaptcha(accessUser.getUserName());
+		if(isCaptcha){//如果需要验证码
+			//验证验证码
+			if(captchaKey != null && !"".equals(captchaKey.trim())){
+				//增加验证码重试次数
+				//统计每分钟原来提交次数
+				int quantity = settingManage.submitQuantity_add("captcha", captchaKey.trim(), 0);
+				//删除每分钟原来提交次数
+				settingManage.submitQuantity_delete("captcha", captchaKey.trim());
+				//刷新每分钟原来提交次数
+				settingManage.submitQuantity_add("captcha", captchaKey.trim(), quantity+1);
+				
+				String _captcha = captchaManage.captcha_generate(captchaKey.trim(),"");
+				if(captchaValue != null && !"".equals(captchaValue.trim())){
+					if(_captcha != null && !"".equals(_captcha.trim())){
+						if(!_captcha.equals(captchaValue)){
+							error.put("captchaValue",ErrorView._15.name());//验证码错误
+						}
+					}else{
+						error.put("captchaValue",ErrorView._17.name());//验证码过期
+					}
+				}else{
+					error.put("captchaValue",ErrorView._16.name());//请输入验证码
+				}
+				//删除验证码
+				captchaManage.captcha_delete(captchaKey.trim());	
+			}else{
+				error.put("captchaValue", ErrorView._14.name());//验证码参数错误
+			}
+			
+		}
+		
+		User friendUser = null;
+		
+		
+		if(friendUserName != null && !"".equals(friendUserName.trim())){		
+			friendUser = userManage.query_cache_findUserByUserName(friendUserName.trim());
+			if(friendUser != null){
+				if(friendUser.getState() >1){
+					error.put("privateMessage", ErrorView._1000.name());//不允许给当前用户发私信
+				}
+				if(friendUser.getUserName().equals(accessUser.getUserName())){
+					error.put("privateMessage", ErrorView._1010.name());//不允许给自己发私信
+				}
+			}else{
+				error.put("privateMessage", ErrorView._910.name());//用户不存在
+			}
+		}else{
+			error.put("privateMessage", ErrorView._1020.name());//对方用户名称不能为空
+		}
+		
+		if(messageContent != null && !"".equals(messageContent.trim())){
+			if(messageContent.length() >1000){
+				error.put("messageContent", ErrorView._1030.name());//私信内容不能超过1000个字符
+			}
+		}else{
+			error.put("messageContent", ErrorView._1040.name());//私信内容不能为空
+		}
+		
+		
+		if(error.size() ==0){
+			Long time = new Date().getTime();
+			String content = WebUtil.urlToHyperlink(HtmlEscape.escape(messageContent.trim()));
+			
+			
+			//保存发送者私信
+			PrivateMessage sender_privateMessage = new PrivateMessage();
+			sender_privateMessage.setId(privateMessageManage.createPrivateMessageId(accessUser.getUserId()));
+			sender_privateMessage.setUserId(accessUser.getUserId());//私信用户Id
+			sender_privateMessage.setFriendUserId(friendUser.getId());//私信对方用户Id
+			sender_privateMessage.setSenderUserId(accessUser.getUserId());//发送者用户Id
+			sender_privateMessage.setReceiverUserId(friendUser.getId());//接受者用户Id
+			sender_privateMessage.setMessageContent(content);//消息内容
+			sender_privateMessage.setStatus(20);//消息状态 20:已读
+			sender_privateMessage.setSendTimeFormat(time);//发送时间格式化
+			sender_privateMessage.setReadTimeFormat(time);//阅读时间格式化
+			Object sender_privateMessage_object = privateMessageManage.createPrivateMessageObject(sender_privateMessage);
+			
+			
+			//保存接收者私信
+			PrivateMessage receiver_privateMessage = new PrivateMessage();
+			receiver_privateMessage.setId(privateMessageManage.createPrivateMessageId(friendUser.getId()));
+			receiver_privateMessage.setUserId(friendUser.getId());//私信用户Id
+			receiver_privateMessage.setFriendUserId(accessUser.getUserId());//私信对方用户Id
+			receiver_privateMessage.setSenderUserId(accessUser.getUserId());//发送者用户Id
+			receiver_privateMessage.setReceiverUserId(friendUser.getId());//接受者用户Id
+			receiver_privateMessage.setMessageContent(content);//消息内容
+			receiver_privateMessage.setStatus(10);//消息状态 10:未读
+			receiver_privateMessage.setSendTimeFormat(time);//发送时间格式化
+			Object receiver_privateMessage_object = privateMessageManage.createPrivateMessageObject(receiver_privateMessage);
+			
+			privateMessageService.savePrivateMessage(sender_privateMessage_object, receiver_privateMessage_object);
+			
+			//删除私信缓存
+			privateMessageManage.delete_cache_findUnreadPrivateMessageByUserId(accessUser.getUserId());
+			privateMessageManage.delete_cache_findUnreadPrivateMessageByUserId(friendUser.getId());
+			
+			
+			//统计每分钟原来提交次数
+			int quantity = settingManage.submitQuantity_add("privateMessage", accessUser.getUserName(), 0);
+			//删除每分钟原来提交次数
+			settingManage.submitQuantity_delete("privateMessage", accessUser.getUserName());
+			//刷新每分钟原来提交次数
+			settingManage.submitQuantity_add("privateMessage", accessUser.getUserName(), quantity+1);
+		}
+		
+		
+		
+		Map<String,String> returnError = new HashMap<String,String>();//错误
+		if(error.size() >0){
+			//将枚举数据转为错误提示字符
+    		for (Map.Entry<String,String> entry : error.entrySet()) {
+    			if(ErrorView.get(entry.getValue()) != null){
+    				returnError.put(entry.getKey(),  ErrorView.get(entry.getValue()));
+    			}else{
+    				returnError.put(entry.getKey(),  entry.getValue());
+    			}
+    			
+			}
+		}
+	    
+	    if(isAjax == true){
+			
+    		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
+    		
+    		if(error != null && error.size() >0){
+    			returnValue.put("success", "false");
+    			returnValue.put("error", returnError);
+    			if(isCaptcha){
+    				returnValue.put("captchaKey", UUIDUtil.getUUID32());
+    			}
+    		}else{
+    			returnValue.put("success", "true");
+    		}
+    		
+    		WebUtil.writeToWeb(JsonUtils.toJSONString(returnValue), "json", response);
+			return null;
+		}else{
+			String dirName = templateService.findTemplateDir_cache();
+			
+			String accessPath = accessSourceDeviceManage.accessDevices(request);
+
+			
+			if(error != null && error.size() >0){//如果有错误
+				
+				redirectAttrs.addFlashAttribute("error", returnError);//重定向传参
+				
+				PrivateMessage privateMessage = new PrivateMessage();
+				privateMessage.setFriendUserName(friendUserName);
+				privateMessage.setMessageContent(messageContent);
+				redirectAttrs.addFlashAttribute("privateMessage", privateMessage);
+				
+				String referer = request.getHeader("referer");	
+
+				referer = StringUtils.removeStartIgnoreCase(referer,Configuration.getUrl(request));//移除开始部分的相同的字符,不区分大小写
+				referer = StringUtils.substringBefore(referer, ".");//截取到等于第二个参数的字符串为止
+				referer = StringUtils.substringBefore(referer, "?");//截取到等于第二个参数的字符串为止
+				
+				String queryString = request.getQueryString() != null && !"".equals(request.getQueryString().trim()) ? "?"+request.getQueryString() :"";
+				return "redirect:/"+referer+queryString;
+					
+			}
+			
+			
+			
+			
+			if(jumpUrl != null && !"".equals(jumpUrl.trim())){
+				String url = Base64.decodeBase64URL(jumpUrl.trim());
+				return "redirect:"+url;
+			}else{//默认跳转
+				model.addAttribute("message", "提交私信成功");
+				String referer = request.getHeader("referer");
+				if(RefererCompare.compare(request, "login")){//如果是登录页面则跳转到首页
+					referer = Configuration.getUrl(request);
+				}
+				model.addAttribute("urlAddress", referer);
+				
+				return "templates/"+dirName+"/"+accessPath+"/jump";	
+			}
+		}
+		
+	}
+	
+	
+	/**
+	 * 删除私信
+	 * @param model
+	 * @param jumpUrl 跳转地址   页面post方式提交有效
+	 * @param token 令牌标记
+	 * @param friendUserName 对方用户名称
+	 */
+	@RequestMapping(value="/user/control/deletePrivateMessage", method=RequestMethod.POST)
+	public String deletePrivateMessage(ModelMap model,String jumpUrl,String token,String friendUserName,
+			RedirectAttributes redirectAttrs,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		
+		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+		Map<String,String> error = new HashMap<String,String>();//错误
+		
+		
+		//判断令牌
+		if(token != null && !"".equals(token.trim())){	
+			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌
+			if(token_sessionid != null && !"".equals(token_sessionid.trim())){
+				if(!token_sessionid.equals(token)){
+					error.put("token", ErrorView._13.name());
+				}
+			}else{
+				error.put("token", ErrorView._12.name());
+			}
+		}else{
+			error.put("token", ErrorView._11.name());
+		}
+		
+		//获取登录用户
+	  	AccessUser accessUser = AccessUserThreadLocal.get();
+	  	
+	  	//对话用户
+  		User chatUser = null;
+  	
+  		if(friendUserName != null && !"".equals(friendUserName.trim())){
+  			chatUser = userService.findUserByUserName(friendUserName.trim());
+  			if(chatUser == null){
+  				error.put("privateMessage", ErrorView._910.name());//用户不存在
+  			}
+  			
+  		}else{
+  			error.put("privateMessage", ErrorView._1020.name());//对方用户名称不能为空
+  		}
+
+		if(error.size() == 0){
+			int i = privateMessageService.softDeletePrivateMessage(accessUser.getUserId(),chatUser.getId());
+			if(i == 0){
+				error.put("privateMessage", ErrorView._1050.name());//删除私信失败
+			}
+			
+			//删除私信缓存
+			privateMessageManage.delete_cache_findUnreadPrivateMessageByUserId(accessUser.getUserId());
+		}
+		
+		Map<String,String> returnError = new HashMap<String,String>();//错误
+		if(error.size() >0){
+			//将枚举数据转为错误提示字符
+    		for (Map.Entry<String,String> entry : error.entrySet()) {		 
+    			returnError.put(entry.getKey(),  ErrorView.get(entry.getValue()));
+			}
+		}
+		
+		if(isAjax == true){
+    		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
+    		
+    		if(error != null && error.size() >0){
+    			returnValue.put("success", "false");
+    			returnValue.put("error", returnError);
+    		}else{
+    			returnValue.put("success", "true");
+    			
+    		}
+
+    		WebUtil.writeToWeb(JsonUtils.toJSONString(returnValue), "json", response);
+			return null;
+		}else{
+			String dirName = templateService.findTemplateDir_cache();
+			String accessPath = accessSourceDeviceManage.accessDevices(request);
+			if(error != null && error.size() >0){//如果有错误
+				
+				for (Map.Entry<String,String> entry : returnError.entrySet()) {		 
+					model.addAttribute("message",entry.getValue());//提示
+		  			return "templates/"+dirName+"/"+accessPath+"/message";
+				}
+					
+			}
+			
+			
+			if(jumpUrl != null && !"".equals(jumpUrl.trim())){
+				String url = Base64.decodeBase64URL(jumpUrl.trim());
+				return "redirect:"+url;
+			}else{//默认跳转
+				model.addAttribute("message", "删除私信成功");
+				String referer = request.getHeader("referer");
+				if(RefererCompare.compare(request, "login")){//如果是登录页面则跳转到首页
+					referer = Configuration.getUrl(request);
+				}
+				model.addAttribute("urlAddress", referer);
+				
+				return "templates/"+dirName+"/"+accessPath+"/jump";	
+			}
+		}
+		
+	}
+	
+
+	/**----------------------------------- 系统通知 ----------------------------------**/
+	
+	/**
+	 * 系统通知列表
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/user/control/systemNotifyList",method=RequestMethod.GET) 
+	public String systemNotifyList(ModelMap model,PageForm pageForm,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+		
+		String dirName = templateService.findTemplateDir_cache();
+		
+		
+		String accessPath = accessSourceDeviceManage.accessDevices(request);
+	   
+		
+		//获取登录用户
+	  	AccessUser accessUser = AccessUserThreadLocal.get();
+	  	User user = userManage.query_cache_findUserById(accessUser.getUserId());
+	  	
+	  	//拉取系统通知
+	  	this.pullSystemNotify(user.getId(),user.getRegistrationDate());
+	  	
+	  	
+		//调用分页算法代码
+		PageView<SubscriptionSystemNotify> pageView = new PageView<SubscriptionSystemNotify>(settingService.findSystemSetting_cache().getForestagePageNumber(),pageForm.getPage(),10,request.getRequestURI(),request.getQueryString());
+		//当前页
+		int firstIndex = (pageForm.getPage()-1)*pageView.getMaxresult();
+
+		//系统通知Id集合
+		Set<Long> systemNotifyIdList = new HashSet<Long>();
+		//系统通知内容集合
+		Map<Long,String> systemNotifyMap = new HashMap<Long,String>();
+		//未读订阅系统通知Id集合
+		List<String> unreadSystemNotifyIdList = new ArrayList<String>();	
+				
+		QueryResult<SubscriptionSystemNotify> qr = systemNotifyService.findSubscriptionSystemNotifyByUserId(accessUser.getUserId(),100,firstIndex,pageView.getMaxresult());
+		if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
+			for(SubscriptionSystemNotify subscriptionSystemNotify : qr.getResultlist()){
+				systemNotifyIdList.add(subscriptionSystemNotify.getSystemNotifyId());
+				
+				if(subscriptionSystemNotify.getStatus().equals(10)){
+					unreadSystemNotifyIdList.add(subscriptionSystemNotify.getId());
+				}
+			}
+		}
+		
+	
+		if(systemNotifyIdList != null && systemNotifyIdList.size() >0){
+			for(Long systemNotifyId : systemNotifyIdList){
+				SystemNotify systemNotify = systemNotifyManage.query_cache_findById(systemNotifyId);
+				if(systemNotify != null){
+					systemNotifyMap.put(systemNotifyId, systemNotify.getContent());
+				}
+			}
+		}
+		if(systemNotifyIdList != null && systemNotifyIdList.size() >0){
+			if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
+				for(SubscriptionSystemNotify subscriptionSystemNotify : qr.getResultlist()){
+					String content = systemNotifyMap.get(subscriptionSystemNotify.getSystemNotifyId());
+					if(content != null){
+						subscriptionSystemNotify.setContent(content);
+					}
+					
+				}
+			}
+		}
+		
+		if(unreadSystemNotifyIdList != null && unreadSystemNotifyIdList.size() >0){
+			//将未读订阅系统通知设置为已读
+			systemNotifyService.updateSubscriptionSystemNotifyStatus(accessUser.getUserId(), unreadSystemNotifyIdList);
+		}
+		
+
+		//将查询结果集传给分页List
+		pageView.setQueryResult(qr);
+		if(isAjax){
+			WebUtil.writeToWeb(JsonUtils.toJSONString(pageView), "json", response);
+			return null;
+		}else{
+			model.addAttribute("pageView", pageView);
+			return "templates/"+dirName+"/"+accessPath+"/systemNotifyList";	
+		}
+	}
+	
+	/**
+	 * 拉取系统通知
+	 * @param userId 用户Id
+	 * @param registrationDate 用户注册时间
+	 */
+	private void pullSystemNotify(Long userId,Date registrationDate){
+		List<Object> subscriptionSystemNotifyList = new ArrayList<Object>();
+		//查询用户订阅系统通知最新订阅系统Id
+		Long maxSystemNotifyId = systemNotifyService.findMaxSystemNotifyIdByUserId(userId);
+		Map<Long,Date> systemNotifyMap = null;
+		if(maxSystemNotifyId == null){//如果还没有拉取系统通知
+			systemNotifyMap = systemNotifyService.findSystemNotifyBySendTime(registrationDate);
+		}else{
+			systemNotifyMap = systemNotifyService.findSystemNotifyById(maxSystemNotifyId);
+		}
+		
+		if(systemNotifyMap != null && systemNotifyMap.size() >0){
+			for(Map.Entry<Long,Date> entry : systemNotifyMap.entrySet()){
+				//系统通知Id
+				Long systemNotifyId = entry.getKey();
+				SubscriptionSystemNotify subscriptionSystemNotify = new SubscriptionSystemNotify();
+				subscriptionSystemNotify.setId(subscriptionSystemNotifyManage.createSubscriptionSystemNotifyId(systemNotifyId, userId));
+				subscriptionSystemNotify.setSystemNotifyId(systemNotifyId);
+				subscriptionSystemNotify.setUserId(userId);
+				subscriptionSystemNotify.setStatus(10);
+				subscriptionSystemNotify.setSendTime(entry.getValue());
+				
+				Object subscriptionSystemNotify_object = subscriptionSystemNotifyManage.createSubscriptionSystemNotifyObject(subscriptionSystemNotify);
+				subscriptionSystemNotifyList.add(subscriptionSystemNotify_object);
+			}
+		}
+		
+		
+		
+		if(subscriptionSystemNotifyList != null && subscriptionSystemNotifyList.size() >0){
+			try {
+				systemNotifyService.saveSubscriptionSystemNotify(subscriptionSystemNotifyList);
+			} catch (Exception e) {
+				//e.printStackTrace();
+			}
+			
+			//删除缓存
+			systemNotifyManage.delete_cache_findMinUnreadSystemNotifyIdByUserId(userId);
+			systemNotifyManage.delete_cache_findMaxReadSystemNotifyIdByUserId(userId);
+		}
+	}
+	
+	
+	/**
+	 * 删除系统通知
+	 * @param model
+	 * @param jumpUrl 跳转地址   页面post方式提交有效
+	 * @param token 令牌标记
+	 * @param subscriptionSystemNotifyId 订阅系统通知Id
+	 */
+	@RequestMapping(value="/user/control/deleteSystemNotify", method=RequestMethod.POST)
+	public String deleteSystemNotify(ModelMap model,String jumpUrl,String token,String subscriptionSystemNotifyId,
+			RedirectAttributes redirectAttrs,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		
+		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+		Map<String,String> error = new HashMap<String,String>();//错误
+		
+		
+		//判断令牌
+		if(token != null && !"".equals(token.trim())){	
+			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌
+			if(token_sessionid != null && !"".equals(token_sessionid.trim())){
+				if(!token_sessionid.equals(token)){
+					error.put("token", ErrorView._13.name());
+				}
+			}else{
+				error.put("token", ErrorView._12.name());
+			}
+		}else{
+			error.put("token", ErrorView._11.name());
+		}
+		
+		if(subscriptionSystemNotifyId == null || "".equals(subscriptionSystemNotifyId.trim())){
+			error.put("systemNotify", ErrorView._1100.name());//订阅系统通知Id不能为空
+		}
+		
+		//获取登录用户
+	  	AccessUser accessUser = AccessUserThreadLocal.get();
+	  	
+	 
+
+
+		if(error.size() == 0){
+			int i = systemNotifyService.softDeleteSubscriptionSystemNotify(accessUser.getUserId(),subscriptionSystemNotifyId);
+			
+			//删除缓存
+			systemNotifyManage.delete_cache_findMinUnreadSystemNotifyIdByUserId(accessUser.getUserId());
+			systemNotifyManage.delete_cache_findMaxReadSystemNotifyIdByUserId(accessUser.getUserId());
+			if(i == 0){
+				error.put("systemNotify", ErrorView._1110.name());//删除系统通知失败
+			}
+		}
+		
+		Map<String,String> returnError = new HashMap<String,String>();//错误
+		if(error.size() >0){
+			//将枚举数据转为错误提示字符
+    		for (Map.Entry<String,String> entry : error.entrySet()) {		 
+    			returnError.put(entry.getKey(),  ErrorView.get(entry.getValue()));
+			}
+		}
+		
+		if(isAjax == true){
+    		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
+    		
+    		if(error != null && error.size() >0){
+    			returnValue.put("success", "false");
+    			returnValue.put("error", returnError);
+    		}else{
+    			returnValue.put("success", "true");
+    			
+    		}
+
+    		WebUtil.writeToWeb(JsonUtils.toJSONString(returnValue), "json", response);
+			return null;
+		}else{
+			String dirName = templateService.findTemplateDir_cache();
+			String accessPath = accessSourceDeviceManage.accessDevices(request);
+			if(error != null && error.size() >0){//如果有错误
+				
+				for (Map.Entry<String,String> entry : returnError.entrySet()) {		 
+					model.addAttribute("message",entry.getValue());//提示
+		  			return "templates/"+dirName+"/"+accessPath+"/message";
+				}
+					
+			}
+			
+			
+			if(jumpUrl != null && !"".equals(jumpUrl.trim())){
+				String url = Base64.decodeBase64URL(jumpUrl.trim());
+				return "redirect:"+url;
+			}else{//默认跳转
+				model.addAttribute("message", "删除系统通知成功");
+				String referer = request.getHeader("referer");
+				if(RefererCompare.compare(request, "login")){//如果是登录页面则跳转到首页
+					referer = Configuration.getUrl(request);
+				}
+				model.addAttribute("urlAddress", referer);
+				
+				return "templates/"+dirName+"/"+accessPath+"/jump";	
+			}
+		}
+		
+	}
+	
+	
+	/**
+	 * 未读消息数量
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/user/control/unreadMessageCount",method=RequestMethod.GET) 
+	@ResponseBody//方式来做ajax,直接返回字符串
+	public String unreadMessageCount(ModelMap model,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+
+		//获取登录用户
+	  	AccessUser accessUser = AccessUserThreadLocal.get();
+	  	
+	  	UnreadMessage unreadMessage = new UnreadMessage();
+	  	
+	  	//查询未读私信数量
+	  	Long unreadPrivateMessageCount = privateMessageManage.query_cache_findUnreadPrivateMessageByUserId(accessUser.getUserId());
+	  	unreadMessage.setPrivateMessageCount(unreadPrivateMessageCount);
+	  	
+	  	//起始系统通知Id
+	  	Long start_systemNotifyId = 0L;
+	  	//起始系统通知发送时间
+	  	Date start_systemNotifySendTime = null;
+	  	
+	  	//最早的未读系统通知Id
+	  	Long minUnreadSystemNotifyId = systemNotifyManage.query_cache_findMinUnreadSystemNotifyIdByUserId(accessUser.getUserId());
+	  	if(minUnreadSystemNotifyId == null){
+	  		
+	  		//最大的已读系统通知Id
+	  		Long maxReadSystemNotifyId = systemNotifyManage.query_cache_findMaxReadSystemNotifyIdByUserId(accessUser.getUserId());
+	  		if(maxReadSystemNotifyId != null){
+	  			start_systemNotifyId = maxReadSystemNotifyId;
+	  		}else{
+	  			//获取用户
+	  	  		User user = userManage.query_cache_findUserByUserName(accessUser.getUserName());
+	  	  		start_systemNotifySendTime = user.getRegistrationDate();
+	  	  		
+	  		}
+	  		
+	  		
+	  	}else{
+	  		start_systemNotifyId = minUnreadSystemNotifyId -1L;//-1是为了SQL查询时包含起始系统通知Id
+	  	}
+	  	if(start_systemNotifySendTime == null){
+	  		//查询未读系统通知数量(如果顺序已读Id之间含有未读Id,则计数从最小的未读Id算起)
+		  	Long unreadSystemNotifyCount = systemNotifyManage.query_cache_findSystemNotifyCountBySystemNotifyId(start_systemNotifyId);
+		  	unreadMessage.setSystemNotifyCount(unreadSystemNotifyCount);
+	  	}else{
+	  		Long unreadSystemNotifyCount = systemNotifyManage.query_cache_findSystemNotifyCountBySendTime(start_systemNotifySendTime);
+	  		unreadMessage.setSystemNotifyCount(unreadSystemNotifyCount);
+	  	}
+	  	
+	  	return JsonUtils.toJSONString(unreadMessage);
+	}
+	
 }

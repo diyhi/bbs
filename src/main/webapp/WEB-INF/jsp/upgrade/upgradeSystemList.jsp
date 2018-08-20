@@ -331,7 +331,6 @@ function clearError(){
 function queryUpgradePackageList(){
 	get_request(function(value){
 		if(value != ""){
-			
 			var upgradePackageList = JSON.parse(value);//JSON转为对象
 			
 			var html = "<TABLE class='t-list-table' cellSpacing='1' cellPadding='0' width='100%' border='0'>";
@@ -432,7 +431,11 @@ function uploadUpgradePackageSubmit(){
         	}
 			//按钮设置 disabled="disabled"
 			document.getElementById("uploadSubmit").disabled=false;
-        }
+        },
+		error: function(XMLHttpRequest, textStatus, errorThrown) {
+			//jquery请求session过期跳转
+			timeoutJump(XMLHttpRequest);
+		}
     });
     
 }
@@ -516,7 +519,7 @@ function uploadChangeIcon(){
 <TABLE class="t-table" cellSpacing="1" cellPadding="2" width="100%" border="0">
 	<TBODY>
 		<TR>
-		    <TD class="t-label t-label-h" width="15%">当前CMS版本：</TD>
+		    <TD class="t-label t-label-h" width="15%">当前BBS版本：</TD>
 		    <TD class="t-content" width="85%" colspan="3">
 		    	<enhance:out escapeXml="false">
 		    	<pre>${currentVersion}</pre>
@@ -570,7 +573,7 @@ function uploadChangeIcon(){
 		    </TD>
 		</TR>
 		<TR>
-		    <TD class="t-label t-label-h" width="15%">旧CMS版本：</TD>
+		    <TD class="t-label t-label-h" width="15%">旧BBS版本：</TD>
 		    <TD class="t-content" width="35%" >
 		    	${notCompletedUpgrade.oldSystemVersion}
 		    </TD>
@@ -610,7 +613,7 @@ function uploadChangeIcon(){
   <THEAD class="t-list-thead">
   <TR>
   	<TH width="20%">当前版本</TH>
-    <TH width="20%">旧CMS版本</TH>
+    <TH width="20%">旧BBS版本</TH>
     <TH width="20%">升级包版本</TH>
     <TH width="20%">升级时间</TH>
     <TH width="20%">操作</TH>

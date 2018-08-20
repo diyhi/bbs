@@ -1,4 +1,4 @@
-﻿package cms.service.user;
+package cms.service.user;
 
 import java.util.Date;
 import java.util.List;
@@ -43,11 +43,7 @@ public interface UserService extends DAO<User> {
 	 * @param sort 排序 true:升序 false:降序
 	 */
 	public QueryResult<User> findUserByCustomCondition(String param,List<Object> paramValue,String customParam,int firstIndex, int maxResult,boolean sort);
-	/**
-	 * 根据用户名称查询用户状态
-	 * @param userName 用户名称
-	 
-	public Integer findUserStateByUserName(String userName);*/
+
 	/**
 	 * 根据用户Id查询当前用户
 	 * @param id 用户Id

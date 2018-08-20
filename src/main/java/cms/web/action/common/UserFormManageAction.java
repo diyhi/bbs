@@ -555,19 +555,7 @@ public class UserFormManageAction {
 				userLoginLog.setLogonTime(new Date());
 				Object new_userLoginLog = userLoginLogManage.createUserLoginLogObject(userLoginLog);
 				userService.saveUserLoginLog(new_userLoginLog);
-  
-				
-				//仅显示指定的字段
-				User viewUser = new User();
-				viewUser.setId(user.getId());
-				viewUser.setUserName(user.getUserName());//会员用户名
-				viewUser.setEmail(user.getEmail());//邮箱地址
-				viewUser.setIssue(user.getIssue());//密码提示问题
-				viewUser.setRegistrationDate(user.getRegistrationDate());//注册日期
-				viewUser.setPoint(user.getPoint());//当前积分
-				viewUser.setGradeId(user.getGradeId());//等级Id
-				viewUser.setGradeName(user.getGradeName());//将等级值设进等级参数里
-				
+	
 				//自动登录
 				
 				//访问令牌
@@ -584,7 +572,9 @@ public class UserFormManageAction {
 				WebUtil.addCookie(response, "cms_refreshToken", refreshToken, 0);
 				AccessUserThreadLocal.set(new AccessUser(user.getId(),user.getUserName(),user.getSecurityDigest(),false));
 				
-				
+				//删除缓存
+				userManage.delete_cache_findUserById(user.getId());
+				userManage.delete_cache_findUserByUserName(user.getUserName());
 			}
 			
 		}
@@ -633,6 +623,8 @@ public class UserFormManageAction {
     			
     			returnValue.put("success", "true");
     			returnValue.put("jumpUrl", _jumpUrl);
+    			returnValue.put("systemUser", new AccessUser(user.getId(),user.getUserName(),null,false));//登录用户
+    			
     		}
     		
     		WebUtil.writeToWeb(JsonUtils.toJSONString(returnValue), "json", response);
@@ -1038,7 +1030,7 @@ public class UserFormManageAction {
     		}else{
     			ajax_return.put("success", "true");
     			ajax_return.put("jumpUrl", _jumpUrl);
-    			
+    			ajax_return.put("systemUser", new AccessUser(user.getId(),user.getUserName(),null,false));//登录用户
     		}
     		
     		WebUtil.writeToWeb(JsonUtils.toJSONString(ajax_return), "json", response);
@@ -1310,7 +1302,7 @@ public class UserFormManageAction {
 		}  
 	    
 	    if(userName != null && !"".equals(userName.trim())){
-	    	 User user = userService.findUserByUserName(userName.trim());
+	    	 User user = userManage.query_cache_findUserByUserName(userName.trim());
 	    	 if(user == null){
 	    		 error.put("userName", ErrorView._910.name());//用户不存在
 	    	 } 

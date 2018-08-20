@@ -1,6 +1,6 @@
 /*!
- * better-normal-scroll v1.5.6
- * (c) 2016-2017 ustbhuangyi
+ * better-normal-scroll v1.12.0
+ * (c) 2016-2018 ustbhuangyi
  * Released under the MIT License.
  *  * 滚动结构
 <div class="shop_box" ref="shopBox">
@@ -15,7 +15,7 @@
 第二层 div:
 	高度不固定，只设置宽度 100%。
 第三层 div: 
-    数据部分，肯能有很多很多
+    数据部分，可能有很多很多
  */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
@@ -97,17 +97,12 @@ function eventMixin(BScroll) {
   BScroll.prototype.once = function (type, fn) {
     var context = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : this;
 
-    var fired = false;
-
     function magic() {
       this.off(type, magic);
 
-      if (!fired) {
-        fired = true;
-        fn.apply(context, arguments);
-      }
+      fn.apply(context, arguments);
     }
-    // 将参数中的回调函数挂载在magic对象的fn属性上,为了执行off方法的时候，暴露对应的函数方法
+    // To expose the corresponding function method in order to execute the off method
     magic.fn = fn;
 
     this.on(type, magic);
@@ -121,7 +116,6 @@ function eventMixin(BScroll) {
 
     var count = _events.length;
     while (count--) {
-      // 移除通过on或者once绑定的回调函数
       if (_events[count][0] === fn || _events[count][0] && _events[count][0].fn === fn) {
         _events[count][0] = undefined;
       }
@@ -150,13 +144,44 @@ function eventMixin(BScroll) {
   };
 }
 
-var ua = navigator.userAgent;
+// ssr support
+var inBrowser = typeof window !== 'undefined';
+var ua = inBrowser && navigator.userAgent.toLowerCase();
+var isWeChatDevTools = ua && /wechatdevtools/.test(ua);
+var isAndroid = ua && ua.indexOf('android') > 0;
 
-var isWeChatDevTools = /wechatdevtools/.test(ua);
+function getNow() {
+  return window.performance && window.performance.now ? window.performance.now() + window.performance.timing.navigationStart : +new Date();
+}
 
-var elementStyle = document.createElement('div').style;
+function extend(target) {
+  for (var _len = arguments.length, rest = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    rest[_key - 1] = arguments[_key];
+  }
+
+  for (var i = 0; i < rest.length; i++) {
+    var source = rest[i];
+    for (var key in source) {
+      target[key] = source[key];
+    }
+  }
+  return target;
+}
+
+function isUndef(v) {
+  return v === undefined || v === null;
+}
+
+function getDistance(x, y) {
+  return Math.sqrt(x * x + y * y);
+}
+
+var elementStyle = inBrowser && document.createElement('div').style;
 
 var vendor = function () {
+  if (!inBrowser) {
+    return false;
+  }
   var transformNames = {
     webkit: 'webkitTransform',
     Moz: 'MozTransform',
@@ -213,19 +238,27 @@ function offset(el) {
   };
 }
 
+function offsetToBody(el) {
+  var rect = el.getBoundingClientRect();
+
+  return {
+    left: -(rect.left + window.pageXOffset),
+    top: -(rect.top + window.pageYOffset)
+  };
+}
+
 var transform = prefixStyle('transform');
 
-var hasPerspective = prefixStyle('perspective') in elementStyle;
+var hasPerspective = inBrowser && prefixStyle('perspective') in elementStyle;
 // fix issue #361
-var hasTouch = 'ontouchstart' in window || isWeChatDevTools;
+var hasTouch = inBrowser && ('ontouchstart' in window || isWeChatDevTools);
 var hasTransform = transform !== false;
-var hasTransition = prefixStyle('transition') in elementStyle;
+var hasTransition = inBrowser && prefixStyle('transition') in elementStyle;
 
 var style = {
   transform: transform,
   transitionTimingFunction: prefixStyle('transitionTimingFunction'),
   transitionDuration: prefixStyle('transitionDuration'),
-  transitionProperty: prefixStyle('transitionProperty'),
   transitionDelay: prefixStyle('transitionDelay'),
   transformOrigin: prefixStyle('transformOrigin'),
   transitionEnd: prefixStyle('transitionEnd')
@@ -281,15 +314,51 @@ function tap(e, eventName) {
 }
 
 function click(e) {
-  var target = e.target;
+  var event = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'click';
 
-  if (!/(SELECT|INPUT|TEXTAREA)/i.test(target.tagName)) {
-    var ev = document.createEvent(window.MouseEvent ? 'MouseEvents' : 'Event');
-    // cancelable 设置为 false 是为了解决和 fastclick 冲突问题
-    ev.initEvent('click', true, false);
-    ev._constructed = true;
-    target.dispatchEvent(ev);
+  var eventSource = void 0;
+  if (e.type === 'mouseup' || e.type === 'mousecancel') {
+    eventSource = e;
+  } else if (e.type === 'touchend' || e.type === 'touchcancel') {
+    eventSource = e.changedTouches[0];
   }
+  var posSrc = {};
+  if (eventSource) {
+    posSrc.screenX = eventSource.screenX || 0;
+    posSrc.screenY = eventSource.screenY || 0;
+    posSrc.clientX = eventSource.clientX || 0;
+    posSrc.clientY = eventSource.clientY || 0;
+  }
+  var ev = void 0;
+  var bubbles = true;
+  var cancelable = true;
+  if (typeof MouseEvent !== 'undefined') {
+    try {
+      ev = new MouseEvent(event, extend({
+        bubbles: bubbles,
+        cancelable: cancelable
+      }, posSrc));
+    } catch (e) {
+      createEvent();
+    }
+  } else {
+    createEvent();
+  }
+
+  function createEvent() {
+    ev = document.createEvent('Event');
+    ev.initEvent(event, bubbles, cancelable);
+    extend(ev, posSrc);
+  }
+
+  // forwardedTouchEvent set to true in case of the conflict with fastclick
+  ev.forwardedTouchEvent = true;
+  ev._constructed = true;
+  e.target.dispatchEvent(ev);
+}
+
+function dblclick(e) {
+  click(e, 'dblclick');
 }
 
 function prepend(el, target) {
@@ -308,24 +377,6 @@ function removeChild(el, child) {
   el.removeChild(child);
 }
 
-function getNow() {
-  return window.performance && window.performance.now ? window.performance.now() + window.performance.timing.navigationStart : +new Date();
-}
-
-function extend(target) {
-  for (var _len = arguments.length, rest = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-    rest[_key - 1] = arguments[_key];
-  }
-
-  for (var i = 0; i < rest.length; i++) {
-    var source = rest[i];
-    for (var key in source) {
-      target[key] = source[key];
-    }
-  }
-  return target;
-}
-
 var DEFAULT_OPTIONS = {
   startX: 0,
   startY: 0,
@@ -336,14 +387,23 @@ var DEFAULT_OPTIONS = {
   eventPassthrough: '',
   click: false,
   tap: false,
+  /**
+   * support any side
+   * bounce: {
+   *   top: true,
+   *   bottom: true,
+   *   left: true,
+   *   right: true
+   * }
+   */
   bounce: true,
-  bounceTime: 700,
+  bounceTime: 800,
   momentum: true,
   momentumLimitTime: 300,
   momentumLimitDistance: 15,
   swipeTime: 2500,
   swipeBounceTime: 500,
-  deceleration: 0.001,
+  deceleration: 0.0015,
   flickLimitTime: 200,
   flickLimitDistance: 100,
   resizePolling: 60,
@@ -359,6 +419,7 @@ var DEFAULT_OPTIONS = {
   disableMouse: hasTouch,
   disableTouch: !hasTouch,
   observeDOM: true,
+  autoBlur: true,
   /**
    * for picker
    * wheel: {
@@ -378,6 +439,13 @@ var DEFAULT_OPTIONS = {
    *   threshold: 0.1,
    *   stepX: 100,
    *   stepY: 100,
+   *   speed: 400,
+   *   easing: {
+   *     style: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+   *     fn: function (t) {
+   *       return t * (2 - t)
+   *     }
+   *   }
    *   listenFlick: true
    * }
    */
@@ -385,7 +453,8 @@ var DEFAULT_OPTIONS = {
   /**
    * for scrollbar
    * scrollbar: {
-   *   fade: true
+   *   fade: true,
+   *   interactive: false
    * }
    */
   scrollbar: false,
@@ -403,7 +472,45 @@ var DEFAULT_OPTIONS = {
    *   threshold: 50
    * }
    */
-  pullUpLoad: false
+  pullUpLoad: false,
+  /**
+   * for mouse wheel
+   * mouseWheel: {
+   *   speed: 20,
+   *   invert: false,
+   *   easeTime: 300
+   * }
+   */
+  mouseWheel: false,
+  stopPropagation: false,
+  /**
+   * for zoom
+   * zoom: {
+   *   start: 1,
+   *   min: 1,
+   *   max: 4
+   * }
+   */
+  zoom: false,
+  /**
+   * for infinity
+   * infinity: {
+   *   render(item, div) {
+   *   },
+   *   createTombstone() {
+   *   },
+   *   fetch(count) {
+   *   }
+   * }
+   */
+  infinity: false,
+  /**
+   * for double click
+   * dblclick: {
+   *   delay: 300
+   * }
+   */
+  dblclick: false
 };
 
 function initMixin(BScroll) {
@@ -418,6 +525,8 @@ function initMixin(BScroll) {
     this.directionX = 0;
     this.directionY = 0;
 
+    this.setScale(1);
+
     this._addDOMEvents();
 
     this._initExtFeatures();
@@ -428,6 +537,10 @@ function initMixin(BScroll) {
       this._initDOMObserver();
     }
 
+    if (this.options.autoBlur) {
+      this._handleAutoBlur();
+    }
+
     this.refresh();
 
     if (!this.options.snap) {
@@ -435,6 +548,11 @@ function initMixin(BScroll) {
     }
 
     this.enable();
+  };
+
+  BScroll.prototype.setScale = function (scale) {
+    this.lastScale = isUndef(this.scale) ? scale : this.scale;
+    this.scale = scale;
   };
 
   BScroll.prototype._handleOptions = function (options) {
@@ -512,6 +630,15 @@ function initMixin(BScroll) {
     if (this.options.wheel) {
       this._initWheel();
     }
+    if (this.options.mouseWheel) {
+      this._initMouseWheel();
+    }
+    if (this.options.zoom) {
+      this._initZoom();
+    }
+    if (this.options.infinity) {
+      this._initInfinite();
+    }
   };
 
   BScroll.prototype._watchTransition = function () {
@@ -520,7 +647,8 @@ function initMixin(BScroll) {
     }
     var me = this;
     var isInTransition = false;
-    Object.defineProperty(this, 'isInTransition', {
+    var key = this.useTransition ? 'isInTransition' : 'isAnimating';
+    Object.defineProperty(this, key, {
       get: function get() {
         return isInTransition;
       },
@@ -532,6 +660,15 @@ function initMixin(BScroll) {
         for (var i = 0; i < el.length; i++) {
           el[i].style.pointerEvents = pointerEvents;
         }
+      }
+    });
+  };
+
+  BScroll.prototype._handleAutoBlur = function () {
+    this.on('scrollStart', function () {
+      var activeElement = document.activeElement;
+      if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA')) {
+        activeElement.blur();
       }
     });
   };
@@ -588,7 +725,7 @@ function initMixin(BScroll) {
   };
 
   BScroll.prototype._shouldNotRefresh = function () {
-    var outsideBoundaries = this.x > 0 || this.x < this.maxScrollX || this.y > 0 || this.y < this.maxScrollY;
+    var outsideBoundaries = this.x > this.minScrollX || this.x < this.maxScrollX || this.y > this.minScrollY || this.y < this.maxScrollY;
 
     return this.isInTransition || this.stopFromTransition || outsideBoundaries;
   };
@@ -631,16 +768,27 @@ function initMixin(BScroll) {
       case 'touchstart':
       case 'mousedown':
         this._start(e);
+        if (this.options.zoom && e.touches && e.touches.length > 1) {
+          this._zoomStart(e);
+        }
         break;
       case 'touchmove':
       case 'mousemove':
-        this._move(e);
+        if (this.options.zoom && e.touches && e.touches.length > 1) {
+          this._zoom(e);
+        } else {
+          this._move(e);
+        }
         break;
       case 'touchend':
       case 'mouseup':
       case 'touchcancel':
       case 'mousecancel':
-        this._end(e);
+        if (this.scaled) {
+          this._zoomEnd(e);
+        } else {
+          this._end(e);
+        }
         break;
       case 'orientationchange':
       case 'resize':
@@ -660,6 +808,11 @@ function initMixin(BScroll) {
           }
         }
         break;
+      case 'wheel':
+      case 'DOMMouseScroll':
+      case 'mousewheel':
+        this._onMouseWheel(e);
+        break;
     }
   };
 
@@ -669,8 +822,14 @@ function initMixin(BScroll) {
     this.wrapperHeight = wrapperRect.height;
 
     var scrollerRect = getRect(this.scroller);
-    this.scrollerWidth = scrollerRect.width;
-    this.scrollerHeight = scrollerRect.height;
+    this.scrollerWidth = Math.round(scrollerRect.width * this.scale);
+    this.scrollerHeight = Math.round(scrollerRect.height * this.scale);
+
+    this.relativeX = scrollerRect.left;
+    this.relativeY = scrollerRect.top;
+
+    this.minScrollX = 0;
+    this.minScrollY = 0;
 
     var wheel = this.options.wheel;
     if (wheel) {
@@ -684,19 +843,35 @@ function initMixin(BScroll) {
       this.maxScrollY = -this.itemHeight * (this.items.length - 1);
     } else {
       this.maxScrollX = this.wrapperWidth - this.scrollerWidth;
-      this.maxScrollY = this.wrapperHeight - this.scrollerHeight;
+      if (!this.options.infinity) {
+        this.maxScrollY = this.wrapperHeight - this.scrollerHeight;
+      }
+      if (this.maxScrollX < 0) {
+        this.maxScrollX -= this.relativeX;
+        this.minScrollX = -this.relativeX;
+      } else if (this.scale > 1) {
+        this.maxScrollX = this.maxScrollX / 2 - this.relativeX;
+        this.minScrollX = this.maxScrollX;
+      }
+      if (this.maxScrollY < 0) {
+        this.maxScrollY -= this.relativeY;
+        this.minScrollY = -this.relativeY;
+      } else if (this.scale > 1) {
+        this.maxScrollY = this.maxScrollY / 2 - this.relativeY;
+        this.minScrollY = this.maxScrollY;
+      }
     }
 
-    this.hasHorizontalScroll = this.options.scrollX && this.maxScrollX < 0;
-    this.hasVerticalScroll = this.options.scrollY && this.maxScrollY < 0;
+    this.hasHorizontalScroll = this.options.scrollX && this.maxScrollX < this.minScrollX;
+    this.hasVerticalScroll = this.options.scrollY && this.maxScrollY < this.minScrollY;
 
     if (!this.hasHorizontalScroll) {
-      this.maxScrollX = 0;
+      this.maxScrollX = this.minScrollX;
       this.scrollerWidth = this.wrapperWidth;
     }
 
     if (!this.hasVerticalScroll) {
-      this.maxScrollY = 0;
+      this.maxScrollY = this.minScrollY;
       this.scrollerHeight = this.wrapperHeight;
     }
 
@@ -707,7 +882,7 @@ function initMixin(BScroll) {
 
     this.trigger('refresh');
 
-    this.resetPosition();
+    !this.scaled && this.resetPosition();
   };
 
   BScroll.prototype.enable = function () {
@@ -720,30 +895,30 @@ function initMixin(BScroll) {
 }
 
 var ease = {
-	// easeOutQuint
-	swipe: {
-		style: 'cubic-bezier(0.23, 1, 0.32, 1)',
-		fn: function fn(t) {
-			return 1 + --t * t * t * t * t;
-		}
-	},
-	// easeOutQuard
-	swipeBounce: {
-		style: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-		fn: function fn(t) {
-			return t * (2 - t);
-		}
-	},
-	// easeOutQuart
-	bounce: {
-		style: 'cubic-bezier(0.165, 0.84, 0.44, 1)',
-		fn: function fn(t) {
-			return 1 - --t * t * t * t;
-		}
-	}
+  // easeOutQuint
+  swipe: {
+    style: 'cubic-bezier(0.23, 1, 0.32, 1)',
+    fn: function fn(t) {
+      return 1 + --t * t * t * t * t;
+    }
+  },
+  // easeOutQuard
+  swipeBounce: {
+    style: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+    fn: function fn(t) {
+      return t * (2 - t);
+    }
+  },
+  // easeOutQuart
+  bounce: {
+    style: 'cubic-bezier(0.165, 0.84, 0.44, 1)',
+    fn: function fn(t) {
+      return 1 - --t * t * t * t;
+    }
+  }
 };
 
-function momentum(current, start, time, lowerMargin, wrapperSize, options) {
+function momentum(current, start, time, lowerMargin, upperMargin, wrapperSize, options) {
   var distance = current - start;
   var speed = Math.abs(distance) / time;
 
@@ -763,10 +938,10 @@ function momentum(current, start, time, lowerMargin, wrapperSize, options) {
   }
 
   if (destination < lowerMargin) {
-    destination = wrapperSize ? lowerMargin - wrapperSize / rate * speed : lowerMargin;
+    destination = wrapperSize ? Math.max(lowerMargin - wrapperSize / 4, lowerMargin - wrapperSize / rate * speed) : lowerMargin;
     duration = swipeBounceTime;
-  } else if (destination > 0) {
-    destination = wrapperSize ? wrapperSize / rate * speed : 0;
+  } else if (destination > upperMargin) {
+    destination = wrapperSize ? Math.min(upperMargin + wrapperSize / 4, upperMargin + wrapperSize / rate * speed) : upperMargin;
     duration = swipeBounceTime;
   }
 
@@ -778,7 +953,13 @@ function momentum(current, start, time, lowerMargin, wrapperSize, options) {
 
 var DEFAULT_INTERVAL = 100 / 60;
 
+function noop() {}
+
 var requestAnimationFrame = function () {
+  if (!inBrowser) {
+    /* istanbul ignore if */
+    return noop;
+  }
   return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame ||
   // if all else fails, use setTimeout
   function (callback) {
@@ -787,6 +968,10 @@ var requestAnimationFrame = function () {
 }();
 
 var cancelAnimationFrame = function () {
+  if (!inBrowser) {
+    /* istanbul ignore if */
+    return noop;
+  }
   return window.cancelAnimationFrame || window.webkitCancelAnimationFrame || window.mozCancelAnimationFrame || window.oCancelAnimationFrame || function (id) {
     window.clearTimeout(id);
   };
@@ -796,6 +981,20 @@ var DIRECTION_UP = 1;
 var DIRECTION_DOWN = -1;
 var DIRECTION_LEFT = 1;
 var DIRECTION_RIGHT = -1;
+
+var PROBE_DEBOUNCE = 1;
+
+var PROBE_REALTIME = 3;
+
+function warn(msg) {
+  console.error('[BScroll warn]: ' + msg);
+}
+
+function assert(condition, msg) {
+  if (!condition) {
+    throw new Error('[BScroll] ' + msg);
+  }
+}
 
 function coreMixin(BScroll) {
   BScroll.prototype._start = function (e) {
@@ -812,6 +1011,9 @@ function coreMixin(BScroll) {
 
     if (this.options.preventDefault && !preventDefaultException(e.target, this.options.preventDefaultException)) {
       e.preventDefault();
+    }
+    if (this.options.stopPropagation) {
+      e.stopPropagation();
     }
 
     this.moved = false;
@@ -851,6 +1053,9 @@ function coreMixin(BScroll) {
 
     if (this.options.preventDefault) {
       e.preventDefault();
+    }
+    if (this.options.stopPropagation) {
+      e.stopPropagation();
     }
 
     var point = e.touches ? e.touches[0] : e;
@@ -910,19 +1115,30 @@ function coreMixin(BScroll) {
     var newX = this.x + deltaX;
     var newY = this.y + deltaY;
 
+    var top = false;
+    var bottom = false;
+    var left = false;
+    var right = false;
     // Slow down or stop if outside of the boundaries
-    if (newX > 0 || newX < this.maxScrollX) {
-      if (this.options.bounce) {
+    var bounce = this.options.bounce;
+    if (bounce !== false) {
+      top = bounce.top === undefined ? true : bounce.top;
+      bottom = bounce.bottom === undefined ? true : bounce.bottom;
+      left = bounce.left === undefined ? true : bounce.left;
+      right = bounce.right === undefined ? true : bounce.right;
+    }
+    if (newX > this.minScrollX || newX < this.maxScrollX) {
+      if (newX > this.minScrollX && left || newX < this.maxScrollX && right) {
         newX = this.x + deltaX / 3;
       } else {
-        newX = newX > 0 ? 0 : this.maxScrollX;
+        newX = newX > this.minScrollX ? this.minScrollX : this.maxScrollX;
       }
     }
-    if (newY > 0 || newY < this.maxScrollY) {
-      if (this.options.bounce) {
+    if (newY > this.minScrollY || newY < this.maxScrollY) {
+      if (newY > this.minScrollY && top || newY < this.maxScrollY && bottom) {
         newY = this.y + deltaY / 3;
       } else {
-        newY = newY > 0 ? 0 : this.maxScrollY;
+        newY = newY > this.minScrollY ? this.minScrollY : this.maxScrollY;
       }
     }
 
@@ -938,7 +1154,7 @@ function coreMixin(BScroll) {
       this.startX = this.x;
       this.startY = this.y;
 
-      if (this.options.probeType === 1) {
+      if (this.options.probeType === PROBE_DEBOUNCE) {
         this.trigger('scroll', {
           x: this.x,
           y: this.y
@@ -946,7 +1162,7 @@ function coreMixin(BScroll) {
       }
     }
 
-    if (this.options.probeType > 1) {
+    if (this.options.probeType > PROBE_DEBOUNCE) {
       this.trigger('scroll', {
         x: this.x,
         y: this.y
@@ -973,6 +1189,9 @@ function coreMixin(BScroll) {
     if (this.options.preventDefault && !preventDefaultException(e.target, this.options.preventDefaultException)) {
       e.preventDefault();
     }
+    if (this.options.stopPropagation) {
+      e.stopPropagation();
+    }
 
     this.trigger('touchEnd', {
       x: this.x,
@@ -980,6 +1199,15 @@ function coreMixin(BScroll) {
     });
 
     this.isInTransition = false;
+
+    // ensures that the last position is rounded
+    var newX = Math.round(this.x);
+    var newY = Math.round(this.y);
+
+    var deltaX = newX - this.absStartX;
+    var deltaY = newY - this.absStartY;
+    this.directionX = deltaX > 0 ? DIRECTION_RIGHT : deltaX < 0 ? DIRECTION_LEFT : 0;
+    this.directionY = deltaY > 0 ? DIRECTION_DOWN : deltaY < 0 ? DIRECTION_UP : 0;
 
     // if configure pull down refresh, check it first
     if (this.options.pullDownRefresh && this._checkPullDown()) {
@@ -997,19 +1225,9 @@ function coreMixin(BScroll) {
       return;
     }
 
-    // ensures that the last position is rounded
-    var newX = Math.round(this.x);
-    var newY = Math.round(this.y);
-
     this.scrollTo(newX, newY);
 
-    var deltaX = newX - this.absStartX;
-    var deltaY = newY - this.absStartY;
-    this.directionX = deltaX > 0 ? DIRECTION_RIGHT : deltaX < 0 ? DIRECTION_LEFT : 0;
-    this.directionY = deltaY > 0 ? DIRECTION_DOWN : deltaY < 0 ? DIRECTION_UP : 0;
-
     this.endTime = getNow();
-
     var duration = this.endTime - this.startTime;
     var absDistX = Math.abs(newX - this.startX);
     var absDistY = Math.abs(newY - this.startY);
@@ -1023,8 +1241,21 @@ function coreMixin(BScroll) {
     var time = 0;
     // start momentum animation if needed
     if (this.options.momentum && duration < this.options.momentumLimitTime && (absDistY > this.options.momentumLimitDistance || absDistX > this.options.momentumLimitDistance)) {
-      var momentumX = this.hasHorizontalScroll ? momentum(this.x, this.startX, duration, this.maxScrollX, this.options.bounce ? this.wrapperWidth : 0, this.options) : { destination: newX, duration: 0 };
-      var momentumY = this.hasVerticalScroll ? momentum(this.y, this.startY, duration, this.maxScrollY, this.options.bounce ? this.wrapperHeight : 0, this.options) : { destination: newY, duration: 0 };
+      var top = false;
+      var bottom = false;
+      var left = false;
+      var right = false;
+      var bounce = this.options.bounce;
+      if (bounce !== false) {
+        top = bounce.top === undefined ? true : bounce.top;
+        bottom = bounce.bottom === undefined ? true : bounce.bottom;
+        left = bounce.left === undefined ? true : bounce.left;
+        right = bounce.right === undefined ? true : bounce.right;
+      }
+      var wrapperWidth = this.directionX === DIRECTION_RIGHT && left || this.directionX === DIRECTION_LEFT && right ? this.wrapperWidth : 0;
+      var wrapperHeight = this.directionY === DIRECTION_DOWN && top || this.directionY === DIRECTION_UP && bottom ? this.wrapperHeight : 0;
+      var momentumX = this.hasHorizontalScroll ? momentum(this.x, this.startX, duration, this.maxScrollX, this.minScrollX, wrapperWidth, this.options) : { destination: newX, duration: 0 };
+      var momentumY = this.hasVerticalScroll ? momentum(this.y, this.startY, duration, this.maxScrollY, this.minScrollY, wrapperHeight, this.options) : { destination: newY, duration: 0 };
       newX = momentumX.destination;
       newY = momentumY.destination;
       time = Math.max(momentumX.duration, momentumY.duration);
@@ -1046,12 +1277,12 @@ function coreMixin(BScroll) {
 
       this.directionX = 0;
       this.directionY = 0;
-      easing = ease.bounce;
+      easing = this.options.snap.easing || ease.bounce;
     }
 
     if (newX !== this.x || newY !== this.y) {
       // change easing function when scroller goes out of the boundaries
-      if (newX > 0 || newX < this.maxScrollX || newY > 0 || newY < this.maxScrollY) {
+      if (newX > this.minScrollX || newX < this.maxScrollX || newY > this.minScrollY || newY < this.maxScrollY) {
         easing = ease.swipeBounce;
       }
       this.scrollTo(newX, newY, time, easing);
@@ -1077,20 +1308,32 @@ function coreMixin(BScroll) {
       if (this.options.wheel) {
         if (this.target && this.target.className === this.options.wheel.wheelWrapperClass) {
           var index = Math.abs(Math.round(this.y / this.itemHeight));
-          var _offset = Math.round((this.pointY + offset(this.target).top - this.itemHeight / 2) / this.itemHeight);
+          var _offset = Math.round((this.pointY + offsetToBody(this.wrapper).top - this.wrapperHeight / 2) / this.itemHeight);
           this.target = this.items[index + _offset];
         }
         this.scrollToElement(this.target, this.options.wheel.adjustTime || 400, true, true, ease.swipe);
         return true;
       } else {
         if (!preventClick) {
+          var _dblclick = this.options.dblclick;
+          var dblclickTrigged = false;
+          if (_dblclick && this.lastClickTime) {
+            var _dblclick$delay = _dblclick.delay,
+                delay = _dblclick$delay === undefined ? 300 : _dblclick$delay;
+
+            if (getNow() - this.lastClickTime < delay) {
+              dblclickTrigged = true;
+              dblclick(e);
+            }
+          }
           if (this.options.tap) {
             tap(e, this.options.tap);
           }
 
-          if (this.options.click) {
+          if (this.options.click && !preventDefaultException(e.target, this.options.preventDefaultException)) {
             click(e);
           }
+          this.lastClickTime = dblclickTrigged ? null : getNow();
           return true;
         }
         return false;
@@ -1105,7 +1348,10 @@ function coreMixin(BScroll) {
     if (!this.enabled) {
       return;
     }
-
+    // fix a scroll problem under Android condition
+    if (isAndroid) {
+      this.wrapper.scrollTop = 0;
+    }
     clearTimeout(this.resizeTimeout);
     this.resizeTimeout = setTimeout(function () {
       _this.refresh();
@@ -1119,19 +1365,14 @@ function coreMixin(BScroll) {
     var me = this;
 
     function probe() {
-      if (!me.isInTransition) {
-        return;
-      }
       var pos = me.getComputedPosition();
       me.trigger('scroll', pos);
+      if (!me.isInTransition) {
+        me.trigger('scrollEnd', pos);
+        return;
+      }
       me.probeTimer = requestAnimationFrame(probe);
     }
-  };
-
-  BScroll.prototype._transitionProperty = function () {
-    var property = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'transform';
-
-    this.scrollerStyle[style.transitionProperty] = property;
   };
 
   BScroll.prototype._transitionTime = function () {
@@ -1174,18 +1415,25 @@ function coreMixin(BScroll) {
     }
 
     this._transitionTime();
-    if (!this.pulling && !this.resetPosition(this.options.bounceTime, ease.bounce)) {
+    var needReset = !this.pulling || this.movingDirectionY === DIRECTION_UP;
+    if (needReset && !this.resetPosition(this.options.bounceTime, ease.bounce)) {
       this.isInTransition = false;
-      this.trigger('scrollEnd', {
-        x: this.x,
-        y: this.y
-      });
+      if (this.options.probeType !== PROBE_REALTIME) {
+        this.trigger('scrollEnd', {
+          x: this.x,
+          y: this.y
+        });
+      }
     }
   };
 
-  BScroll.prototype._translate = function (x, y) {
+  BScroll.prototype._translate = function (x, y, scale) {
+    assert(!isUndef(x) && !isUndef(y), 'Translate x or y is null or undefined.');
+    if (isUndef(scale)) {
+      scale = this.scale;
+    }
     if (this.options.useTransform) {
-      this.scrollerStyle[style.transform] = 'translate(' + x + 'px,' + y + 'px)' + this.translateZ;
+      this.scrollerStyle[style.transform] = 'translate(' + x + 'px,' + y + 'px) scale(' + scale + ')' + this.translateZ;
     } else {
       x = Math.round(x);
       y = Math.round(y);
@@ -1205,6 +1453,7 @@ function coreMixin(BScroll) {
 
     this.x = x;
     this.y = y;
+    this.setScale(scale);
 
     if (this.indicators) {
       for (var _i3 = 0; _i3 < this.indicators.length; _i3++) {
@@ -1217,6 +1466,8 @@ function coreMixin(BScroll) {
     var me = this;
     var startX = this.x;
     var startY = this.y;
+    var startScale = this.lastScale;
+    var destScale = this.scale;
     var startTime = getNow();
     var destTime = startTime + duration;
 
@@ -1225,7 +1476,7 @@ function coreMixin(BScroll) {
 
       if (now >= destTime) {
         me.isAnimating = false;
-        me._translate(destX, destY);
+        me._translate(destX, destY, destScale);
 
         if (!me.pulling && !me.resetPosition(me.options.bounceTime)) {
           me.trigger('scrollEnd', {
@@ -1239,14 +1490,15 @@ function coreMixin(BScroll) {
       var easing = easingFn(now);
       var newX = (destX - startX) * easing + startX;
       var newY = (destY - startY) * easing + startY;
+      var newScale = (destScale - startScale) * easing + startScale;
 
-      me._translate(newX, newY);
+      me._translate(newX, newY, newScale);
 
       if (me.isAnimating) {
         me.animateTimer = requestAnimationFrame(step);
       }
 
-      if (me.options.probeType === 3) {
+      if (me.options.probeType === PROBE_REALTIME) {
         me.trigger('scroll', {
           x: me.x,
           y: me.y
@@ -1276,17 +1528,16 @@ function coreMixin(BScroll) {
     this.isInTransition = this.options.useTransition && time > 0 && (x !== this.x || y !== this.y);
 
     if (!time || this.options.useTransition) {
-      this._transitionProperty();
       this._transitionTimingFunction(easing.style);
       this._transitionTime(time);
       this._translate(x, y);
 
-      if (time && this.options.probeType === 3) {
+      if (time && this.options.probeType === PROBE_REALTIME) {
         this._startProbe();
       }
 
       if (this.options.wheel) {
-        if (y > 0) {
+        if (y > this.minScrollY) {
           this.selectedIndex = 0;
         } else if (y < this.maxScrollY) {
           this.selectedIndex = this.items.length - 1;
@@ -1323,8 +1574,8 @@ function coreMixin(BScroll) {
 
     pos.left -= offsetX || 0;
     pos.top -= offsetY || 0;
-    pos.left = pos.left > 0 ? 0 : pos.left < this.maxScrollX ? this.maxScrollX : pos.left;
-    pos.top = pos.top > 0 ? 0 : pos.top < this.maxScrollY ? this.maxScrollY : pos.top;
+    pos.left = pos.left > this.minScrollX ? this.minScrollX : pos.left < this.maxScrollX ? this.maxScrollX : pos.left;
+    pos.top = pos.top > this.minScrollY ? this.minScrollY : pos.top < this.maxScrollY ? this.maxScrollY : pos.top;
 
     if (this.options.wheel) {
       pos.top = Math.round(pos.top / this.itemHeight) * this.itemHeight;
@@ -1339,16 +1590,16 @@ function coreMixin(BScroll) {
 
     var x = this.x;
     var roundX = Math.round(x);
-    if (!this.hasHorizontalScroll || roundX > 0) {
-      x = 0;
+    if (!this.hasHorizontalScroll || roundX > this.minScrollX) {
+      x = this.minScrollX;
     } else if (roundX < this.maxScrollX) {
       x = this.maxScrollX;
     }
 
     var y = this.y;
     var roundY = Math.round(y);
-    if (!this.hasVerticalScroll || roundY > 0) {
-      y = 0;
+    if (!this.hasVerticalScroll || roundY > this.minScrollY) {
+      y = this.minScrollY;
     } else if (roundY < this.maxScrollY) {
       y = this.maxScrollY;
     }
@@ -1385,6 +1636,7 @@ function coreMixin(BScroll) {
   BScroll.prototype.stop = function () {
     if (this.options.useTransition && this.isInTransition) {
       this.isInTransition = false;
+      cancelAnimationFrame(this.probeTimer);
       var pos = this.getComputedPosition();
       this._translate(pos.x, pos.y);
       if (this.options.wheel) {
@@ -1398,6 +1650,7 @@ function coreMixin(BScroll) {
       this.stopFromTransition = true;
     } else if (!this.options.useTransition && this.isAnimating) {
       this.isAnimating = false;
+      cancelAnimationFrame(this.animateTimer);
       this.trigger('scrollEnd', {
         x: this.x,
         y: this.y
@@ -1409,7 +1662,11 @@ function coreMixin(BScroll) {
   BScroll.prototype.destroy = function () {
     this.destroyed = true;
     this.trigger('destroy');
-
+    if (this.options.useTransition) {
+      cancelAnimationFrame(this.probeTimer);
+    } else {
+      cancelAnimationFrame(this.animateTimer);
+    }
     this._removeDOMEvents();
     // remove custom events
     this._events = {};
@@ -1425,9 +1682,12 @@ function snapMixin(BScroll) {
 
     if (snap.loop) {
       var children = this.scroller.children;
-      if (children.length > 0) {
+      if (children.length > 1) {
         prepend(children[children.length - 1].cloneNode(true), this.scroller);
         this.scroller.appendChild(children[1].cloneNode(true));
+      } else {
+        // Loop does not make any sense if there is only one child.
+        snap.loop = false;
       }
     }
 
@@ -1516,10 +1776,13 @@ function snapMixin(BScroll) {
         }
       }
 
-      var initPage = snap.loop ? 1 : 0;
-      _this.goToPage(_this.currentPage.pageX || initPage, _this.currentPage.pageY || 0, 0);
+      _this._checkSnapLoop();
 
-      // Update snap threshold if needed
+      var initPageX = snap._loopX ? 1 : 0;
+      var initPageY = snap._loopY ? 1 : 0;
+      _this._goToPage(_this.currentPage.pageX || initPageX, _this.currentPage.pageY || initPageY, 0);
+
+      // Update snap threshold if needed.
       var snapThreshold = snap.threshold;
       if (snapThreshold % 1 === 0) {
         _this.snapThresholdX = snapThreshold;
@@ -1532,11 +1795,20 @@ function snapMixin(BScroll) {
 
     this.on('scrollEnd', function () {
       if (snap.loop) {
-        if (_this.currentPage.pageX === 0) {
-          _this.goToPage(_this.pages.length - 2, _this.currentPage.pageY, 0);
-        }
-        if (_this.currentPage.pageX === _this.pages.length - 1) {
-          _this.goToPage(1, _this.currentPage.pageY, 0);
+        if (snap._loopX) {
+          if (_this.currentPage.pageX === 0) {
+            _this._goToPage(_this.pages.length - 2, _this.currentPage.pageY, 0);
+          }
+          if (_this.currentPage.pageX === _this.pages.length - 1) {
+            _this._goToPage(1, _this.currentPage.pageY, 0);
+          }
+        } else {
+          if (_this.currentPage.pageY === 0) {
+            _this._goToPage(_this.currentPage.pageX, _this.pages[0].length - 2, 0);
+          }
+          if (_this.currentPage.pageY === _this.pages[0].length - 1) {
+            _this._goToPage(_this.currentPage.pageX, 1, 0);
+          }
         }
       }
     });
@@ -1545,17 +1817,37 @@ function snapMixin(BScroll) {
       this.on('flick', function () {
         var time = snap.speed || Math.max(Math.max(Math.min(Math.abs(_this.x - _this.startX), 1000), Math.min(Math.abs(_this.y - _this.startY), 1000)), 300);
 
-        _this.goToPage(_this.currentPage.pageX + _this.directionX, _this.currentPage.pageY + _this.directionY, time);
+        _this._goToPage(_this.currentPage.pageX + _this.directionX, _this.currentPage.pageY + _this.directionY, time);
       });
     }
 
     this.on('destroy', function () {
       if (snap.loop) {
         var _children = _this.scroller.children;
-        removeChild(_this.scroller, _children[_children.length - 1]);
-        removeChild(_this.scroller, _children[0]);
+        if (_children.length > 2) {
+          removeChild(_this.scroller, _children[_children.length - 1]);
+          removeChild(_this.scroller, _children[0]);
+        }
       }
     });
+  };
+
+  BScroll.prototype._checkSnapLoop = function () {
+    var snap = this.options.snap;
+
+    if (!snap.loop || !this.pages || !this.pages.length) {
+      return;
+    }
+
+    if (this.pages.length > 1) {
+      snap._loopX = true;
+    }
+    if (this.pages[0] && this.pages[0].length > 1) {
+      snap._loopY = true;
+    }
+    if (snap._loopX && snap._loopY) {
+      warn('Loop does not support two direction at the same time.');
+    }
   };
 
   BScroll.prototype._nearestSnap = function (x, y) {
@@ -1569,14 +1861,14 @@ function snapMixin(BScroll) {
       return this.currentPage;
     }
 
-    if (x > 0) {
-      x = 0;
+    if (x > this.minScrollX) {
+      x = this.minScrollX;
     } else if (x < this.maxScrollX) {
       x = this.maxScrollX;
     }
 
-    if (y > 0) {
-      y = 0;
+    if (y > this.minScrollY) {
+      y = this.minScrollY;
     } else if (y < this.maxScrollY) {
       y = this.maxScrollY;
     }
@@ -1631,14 +1923,18 @@ function snapMixin(BScroll) {
     };
   };
 
-  BScroll.prototype.goToPage = function (x, y, time) {
-    var easing = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : ease.bounce;
+  BScroll.prototype._goToPage = function (x) {
+    var y = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+    var time = arguments[2];
+    var easing = arguments[3];
 
     var snap = this.options.snap;
 
-    if (!this.pages) {
+    if (!snap || !this.pages || !this.pages.length) {
       return;
     }
+
+    easing = easing || snap.easing || ease.bounce;
 
     if (x >= this.pages.length) {
       x = this.pages.length - 1;
@@ -1670,7 +1966,41 @@ function snapMixin(BScroll) {
     this.scrollTo(posX, posY, time, easing);
   };
 
+  BScroll.prototype.goToPage = function (x, y, time, easing) {
+    var snap = this.options.snap;
+    if (!snap || !this.pages || !this.pages.length) {
+      return;
+    }
+
+    if (snap.loop) {
+      var len = void 0;
+      if (snap._loopX) {
+        len = this.pages.length - 2;
+        if (x >= len) {
+          x = len - 1;
+        } else if (x < 0) {
+          x = 0;
+        }
+        x += 1;
+      } else {
+        len = this.pages[0].length - 2;
+        if (y >= len) {
+          y = len - 1;
+        } else if (y < 0) {
+          y = 0;
+        }
+        y += 1;
+      }
+    }
+    this._goToPage(x, y, time, easing);
+  };
+
   BScroll.prototype.next = function (time, easing) {
+    var snap = this.options.snap;
+    if (!snap) {
+      return;
+    }
+
     var x = this.currentPage.pageX;
     var y = this.currentPage.pageY;
 
@@ -1680,10 +2010,15 @@ function snapMixin(BScroll) {
       y++;
     }
 
-    this.goToPage(x, y, time, easing);
+    this._goToPage(x, y, time, easing);
   };
 
   BScroll.prototype.prev = function (time, easing) {
+    var snap = this.options.snap;
+    if (!snap) {
+      return;
+    }
+
     var x = this.currentPage.pageX;
     var y = this.currentPage.pageY;
 
@@ -1693,16 +2028,30 @@ function snapMixin(BScroll) {
       y--;
     }
 
-    this.goToPage(x, y, time, easing);
+    this._goToPage(x, y, time, easing);
   };
 
   BScroll.prototype.getCurrentPage = function () {
-    return this.options.snap && this.currentPage;
-  };
-}
+    var snap = this.options.snap;
+    if (!snap) {
+      return null;
+    }
 
-function warn(msg) {
-  console.error("[BScroll warn]: " + msg);
+    if (snap.loop) {
+      var currentPage = void 0;
+      if (snap._loopX) {
+        currentPage = extend({}, this.currentPage, {
+          pageX: this.currentPage.pageX - 1
+        });
+      } else {
+        currentPage = extend({}, this.currentPage, {
+          pageY: this.currentPage.pageY - 1
+        });
+      }
+      return currentPage;
+    }
+    return this.currentPage;
+  };
 }
 
 function wheelMixin(BScroll) {
@@ -1740,8 +2089,11 @@ function scrollbarMixin(BScroll) {
   BScroll.prototype._initScrollbar = function () {
     var _this = this;
 
-    var _options$scrollbar$fa = this.options.scrollbar.fade,
-        fade = _options$scrollbar$fa === undefined ? true : _options$scrollbar$fa;
+    var _options$scrollbar = this.options.scrollbar,
+        _options$scrollbar$fa = _options$scrollbar.fade,
+        fade = _options$scrollbar$fa === undefined ? true : _options$scrollbar$fa,
+        _options$scrollbar$in = _options$scrollbar.interactive,
+        interactive = _options$scrollbar$in === undefined ? false : _options$scrollbar$in;
 
     this.indicators = [];
     var indicator = void 0;
@@ -1750,7 +2102,8 @@ function scrollbarMixin(BScroll) {
       indicator = {
         el: createScrollbar('horizontal'),
         direction: 'horizontal',
-        fade: fade
+        fade: fade,
+        interactive: interactive
       };
       this._insertScrollBar(indicator.el);
 
@@ -1761,7 +2114,8 @@ function scrollbarMixin(BScroll) {
       indicator = {
         el: createScrollbar('vertical'),
         direction: 'vertical',
-        fade: fade
+        fade: fade,
+        interactive: interactive
       };
       this._insertScrollBar(indicator.el);
       this.indicators.push(new Indicator(this, indicator));
@@ -1810,8 +2164,7 @@ function scrollbarMixin(BScroll) {
 
   BScroll.prototype._removeScrollBars = function () {
     for (var i = 0; i < this.indicators.length; i++) {
-      var indicator = this.indicators[i];
-      indicator.remove();
+      this.indicators[i].destroy();
     }
   };
 }
@@ -1854,12 +2207,44 @@ function Indicator(scroller, options) {
   } else {
     this.visible = 1;
   }
+
+  this.sizeRatioX = 1;
+  this.sizeRatioY = 1;
+  this.maxPosX = 0;
+  this.maxPosY = 0;
+  this.x = 0;
+  this.y = 0;
+
+  if (options.interactive) {
+    this._addDOMEvents();
+  }
 }
 
+Indicator.prototype.handleEvent = function (e) {
+  switch (e.type) {
+    case 'touchstart':
+    case 'mousedown':
+      this._start(e);
+      break;
+    case 'touchmove':
+    case 'mousemove':
+      this._move(e);
+      break;
+    case 'touchend':
+    case 'mouseup':
+    case 'touchcancel':
+    case 'mousecancel':
+      this._end(e);
+      break;
+  }
+};
+
 Indicator.prototype.refresh = function () {
-  this.transitionTime();
-  this._calculate();
-  this.updatePosition();
+  if (this._shouldShow()) {
+    this.transitionTime();
+    this._calculate();
+    this.updatePosition();
+  }
 };
 
 Indicator.prototype.fade = function (visible, hold) {
@@ -1943,8 +2328,121 @@ Indicator.prototype.transitionTimingFunction = function (easing) {
   this.indicatorStyle[style.transitionTimingFunction] = easing;
 };
 
-Indicator.prototype.remove = function () {
+Indicator.prototype.destroy = function () {
+  this._removeDOMEvents();
   this.wrapper.parentNode.removeChild(this.wrapper);
+};
+
+Indicator.prototype._start = function (e) {
+  var point = e.touches ? e.touches[0] : e;
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  this.transitionTime();
+
+  this.initiated = true;
+  this.moved = false;
+  this.lastPointX = point.pageX;
+  this.lastPointY = point.pageY;
+
+  this.startTime = getNow();
+
+  this._handleMoveEvents(addEvent);
+  this.scroller.trigger('beforeScrollStart');
+};
+
+Indicator.prototype._move = function (e) {
+  var point = e.touches ? e.touches[0] : e;
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  if (!this.moved) {
+    this.scroller.trigger('scrollStart');
+  }
+
+  this.moved = true;
+
+  var deltaX = point.pageX - this.lastPointX;
+  this.lastPointX = point.pageX;
+
+  var deltaY = point.pageY - this.lastPointY;
+  this.lastPointY = point.pageY;
+
+  var newX = this.x + deltaX;
+  var newY = this.y + deltaY;
+
+  this._pos(newX, newY);
+};
+
+Indicator.prototype._end = function (e) {
+  if (!this.initiated) {
+    return;
+  }
+  this.initiated = false;
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  this._handleMoveEvents(removeEvent);
+
+  var snapOption = this.scroller.options.snap;
+  if (snapOption) {
+    var speed = snapOption.speed,
+        _snapOption$easing = snapOption.easing,
+        easing = _snapOption$easing === undefined ? ease.bounce : _snapOption$easing;
+
+    var snap = this.scroller._nearestSnap(this.scroller.x, this.scroller.y);
+
+    var time = speed || Math.max(Math.max(Math.min(Math.abs(this.scroller.x - snap.x), 1000), Math.min(Math.abs(this.scroller.y - snap.y), 1000)), 300);
+
+    if (this.scroller.x !== snap.x || this.scroller.y !== snap.y) {
+      this.scroller.directionX = 0;
+      this.scroller.directionY = 0;
+      this.scroller.currentPage = snap;
+      this.scroller.scrollTo(snap.x, snap.y, time, easing);
+    }
+  }
+
+  if (this.moved) {
+    this.scroller.trigger('scrollEnd', {
+      x: this.scroller.x,
+      y: this.scroller.y
+    });
+  }
+};
+
+Indicator.prototype._pos = function (x, y) {
+  if (x < 0) {
+    x = 0;
+  } else if (x > this.maxPosX) {
+    x = this.maxPosX;
+  }
+
+  if (y < 0) {
+    y = 0;
+  } else if (y > this.maxPosY) {
+    y = this.maxPosY;
+  }
+
+  x = Math.round(x / this.sizeRatioX);
+  y = Math.round(y / this.sizeRatioY);
+
+  this.scroller.scrollTo(x, y);
+  this.scroller.trigger('scroll', {
+    x: this.scroller.x,
+    y: this.scroller.y
+  });
+};
+
+Indicator.prototype._shouldShow = function () {
+  if (this.direction === 'vertical' && this.scroller.hasVerticalScroll || this.direction === 'horizontal' && this.scroller.hasHorizontalScroll) {
+    this.wrapper.style.display = '';
+    return true;
+  }
+  this.wrapper.style.display = 'none';
+  return false;
 };
 
 Indicator.prototype._calculate = function () {
@@ -1967,10 +2465,41 @@ Indicator.prototype._calculate = function () {
   }
 };
 
+Indicator.prototype._addDOMEvents = function () {
+  var eventOperation = addEvent;
+  this._handleDOMEvents(eventOperation);
+};
+
+Indicator.prototype._removeDOMEvents = function () {
+  var eventOperation = removeEvent;
+  this._handleDOMEvents(eventOperation);
+  this._handleMoveEvents(eventOperation);
+};
+
+Indicator.prototype._handleMoveEvents = function (eventOperation) {
+  if (!this.scroller.options.disableTouch) {
+    eventOperation(window, 'touchmove', this);
+  }
+  if (!this.scroller.options.disableMouse) {
+    eventOperation(window, 'mousemove', this);
+  }
+};
+
+Indicator.prototype._handleDOMEvents = function (eventOperation) {
+  if (!this.scroller.options.disableTouch) {
+    eventOperation(this.indicator, 'touchstart', this);
+    eventOperation(window, 'touchend', this);
+  }
+  if (!this.scroller.options.disableMouse) {
+    eventOperation(this.indicator, 'mousedown', this);
+    eventOperation(window, 'mouseup', this);
+  }
+};
+
 function pullDownMixin(BScroll) {
   BScroll.prototype._initPullDown = function () {
     // must watch scroll in real time
-    this.options.probeType = 3;
+    this.options.probeType = PROBE_REALTIME;
   };
 
   BScroll.prototype._checkPullDown = function () {
@@ -1982,7 +2511,7 @@ function pullDownMixin(BScroll) {
 
     // check if a real pull down action
 
-    if (this.movingDirectionY !== DIRECTION_DOWN || this.y < threshold) {
+    if (this.directionY !== DIRECTION_DOWN || this.y < threshold) {
       return false;
     }
 
@@ -1999,12 +2528,23 @@ function pullDownMixin(BScroll) {
     this.pulling = false;
     this.resetPosition(this.options.bounceTime, ease.bounce);
   };
+
+  BScroll.prototype.openPullDown = function () {
+    var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+
+    this.options.pullDownRefresh = config;
+    this._initPullDown();
+  };
+
+  BScroll.prototype.closePullDown = function () {
+    this.options.pullDownRefresh = false;
+  };
 }
 
 function pullUpMixin(BScroll) {
   BScroll.prototype._initPullUp = function () {
     // must watch scroll in real time
-    this.options.probeType = 3;
+    this.options.probeType = PROBE_REALTIME;
 
     this.pullupWatching = false;
     this._watchPullUp();
@@ -2015,42 +2555,732 @@ function pullUpMixin(BScroll) {
       return;
     }
     this.pullupWatching = true;
+    this.on('scroll', this._checkToEnd);
+  };
+
+  BScroll.prototype._checkToEnd = function (pos) {
+    var _this = this;
+
     var _options$pullUpLoad$t = this.options.pullUpLoad.threshold,
         threshold = _options$pullUpLoad$t === undefined ? 0 : _options$pullUpLoad$t;
 
-
-    this.on('scroll', checkToEnd);
-
-    function checkToEnd(pos) {
-      if (this.movingDirectionY === DIRECTION_UP && pos.y <= this.maxScrollY + threshold) {
-        this.trigger('pullingUp');
-        this.pullupWatching = false;
-        this.off('scroll', checkToEnd);
-      }
+    if (this.movingDirectionY === DIRECTION_UP && pos.y <= this.maxScrollY + threshold) {
+      // reset pullupWatching status after scroll end.
+      this.once('scrollEnd', function () {
+        _this.pullupWatching = false;
+      });
+      this.trigger('pullingUp');
+      this.off('scroll', this._checkToEnd);
     }
   };
 
   BScroll.prototype.finishPullUp = function () {
-    var _this = this;
+    var _this2 = this;
 
-    if (this.isInTransition) {
+    if (this.pullupWatching) {
       this.once('scrollEnd', function () {
-        _this._watchPullUp();
+        _this2._watchPullUp();
       });
     } else {
       this._watchPullUp();
     }
   };
+
+  BScroll.prototype.openPullUp = function () {
+    var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+
+    this.options.pullUpLoad = config;
+    this._initPullUp();
+  };
+
+  BScroll.prototype.closePullUp = function () {
+    this.options.pullUpLoad = false;
+    if (!this.pullupWatching) {
+      return;
+    }
+    this.pullupWatching = false;
+    this.off('scroll', this._checkToEnd);
+  };
 }
+
+function mouseWheelMixin(BScroll) {
+  BScroll.prototype._initMouseWheel = function () {
+    var _this = this;
+
+    this._handleMouseWheelEvent(addEvent);
+
+    this.on('destroy', function () {
+      clearTimeout(_this.mouseWheelTimer);
+      _this._handleMouseWheelEvent(removeEvent);
+    });
+
+    this.firstWheelOpreation = true;
+  };
+
+  BScroll.prototype._handleMouseWheelEvent = function (eventOperation) {
+    eventOperation(this.wrapper, 'wheel', this);
+    eventOperation(this.wrapper, 'mousewheel', this);
+    eventOperation(this.wrapper, 'DOMMouseScroll', this);
+  };
+
+  BScroll.prototype._onMouseWheel = function (e) {
+    var _this2 = this;
+
+    if (!this.enabled) {
+      return;
+    }
+    e.preventDefault();
+
+    if (this.options.stopPropagation) {
+      e.stopPropagation();
+    }
+
+    if (this.firstWheelOpreation) {
+      this.trigger('scrollStart');
+    }
+    this.firstWheelOpreation = false;
+
+    var _options$mouseWheel = this.options.mouseWheel,
+        _options$mouseWheel$s = _options$mouseWheel.speed,
+        speed = _options$mouseWheel$s === undefined ? 20 : _options$mouseWheel$s,
+        _options$mouseWheel$i = _options$mouseWheel.invert,
+        invert = _options$mouseWheel$i === undefined ? false : _options$mouseWheel$i,
+        _options$mouseWheel$e = _options$mouseWheel.easeTime,
+        easeTime = _options$mouseWheel$e === undefined ? 300 : _options$mouseWheel$e;
+
+
+    clearTimeout(this.mouseWheelTimer);
+    this.mouseWheelTimer = setTimeout(function () {
+      if (!_this2.options.snap && !easeTime) {
+        _this2.trigger('scrollEnd', {
+          x: _this2.x,
+          y: _this2.y
+        });
+      }
+      _this2.firstWheelOpreation = true;
+    }, 400);
+
+    var wheelDeltaX = void 0;
+    var wheelDeltaY = void 0;
+
+    switch (true) {
+      case 'deltaX' in e:
+        if (e.deltaMode === 1) {
+          wheelDeltaX = -e.deltaX * speed;
+          wheelDeltaY = -e.deltaY * speed;
+        } else {
+          wheelDeltaX = -e.deltaX;
+          wheelDeltaY = -e.deltaY;
+        }
+        break;
+      case 'wheelDeltaX' in e:
+        wheelDeltaX = e.wheelDeltaX / 120 * speed;
+        wheelDeltaY = e.wheelDeltaY / 120 * speed;
+        break;
+      case 'wheelDelta' in e:
+        wheelDeltaX = wheelDeltaY = e.wheelDelta / 120 * speed;
+        break;
+      case 'detail' in e:
+        wheelDeltaX = wheelDeltaY = -e.detail / 3 * speed;
+        break;
+      default:
+        return;
+    }
+
+    var direction = invert ? -1 : 1;
+    wheelDeltaX *= direction;
+    wheelDeltaY *= direction;
+
+    if (!this.hasVerticalScroll) {
+      wheelDeltaX = wheelDeltaY;
+      wheelDeltaY = 0;
+    }
+
+    var newX = void 0;
+    var newY = void 0;
+    if (this.options.snap) {
+      newX = this.currentPage.pageX;
+      newY = this.currentPage.pageY;
+
+      if (wheelDeltaX > 0) {
+        newX--;
+      } else if (wheelDeltaX < 0) {
+        newX++;
+      }
+
+      if (wheelDeltaY > 0) {
+        newY--;
+      } else if (wheelDeltaY < 0) {
+        newY++;
+      }
+
+      this._goToPage(newX, newY);
+      return;
+    }
+
+    newX = this.x + Math.round(this.hasHorizontalScroll ? wheelDeltaX : 0);
+    newY = this.y + Math.round(this.hasVerticalScroll ? wheelDeltaY : 0);
+
+    this.movingDirectionX = this.directionX = wheelDeltaX > 0 ? -1 : wheelDeltaX < 0 ? 1 : 0;
+    this.movingDirectionY = this.directionY = wheelDeltaY > 0 ? -1 : wheelDeltaY < 0 ? 1 : 0;
+
+    if (newX > this.minScrollX) {
+      newX = this.minScrollX;
+    } else if (newX < this.maxScrollX) {
+      newX = this.maxScrollX;
+    }
+
+    if (newY > this.minScrollY) {
+      newY = this.minScrollY;
+    } else if (newY < this.maxScrollY) {
+      newY = this.maxScrollY;
+    }
+
+    this.scrollTo(newX, newY, easeTime, ease.swipe);
+    this.trigger('scroll', {
+      x: this.x,
+      y: this.y
+    });
+  };
+}
+
+function zoomMixin(BScroll) {
+  BScroll.prototype._initZoom = function () {
+    var _options$zoom = this.options.zoom,
+        _options$zoom$start = _options$zoom.start,
+        start = _options$zoom$start === undefined ? 1 : _options$zoom$start,
+        _options$zoom$min = _options$zoom.min,
+        min = _options$zoom$min === undefined ? 1 : _options$zoom$min,
+        _options$zoom$max = _options$zoom.max,
+        max = _options$zoom$max === undefined ? 4 : _options$zoom$max;
+
+    this.scale = Math.min(Math.max(start, min), max);
+    this.setScale(this.scale);
+    this.scrollerStyle[style.transformOrigin] = '0 0';
+  };
+
+  BScroll.prototype._zoomTo = function (scale, originX, originY, startScale) {
+    this.scaled = true;
+
+    var lastScale = scale / (startScale || this.scale);
+    this.setScale(scale);
+
+    this.refresh();
+
+    var newX = Math.round(this.startX - (originX - this.relativeX) * (lastScale - 1));
+    var newY = Math.round(this.startY - (originY - this.relativeY) * (lastScale - 1));
+
+    if (newX > this.minScrollX) {
+      newX = this.minScrollX;
+    } else if (newX < this.maxScrollX) {
+      newX = this.maxScrollX;
+    }
+
+    if (newY > this.minScrollY) {
+      newY = this.minScrollY;
+    } else if (newY < this.maxScrollY) {
+      newY = this.maxScrollY;
+    }
+
+    if (this.x !== newX || this.y !== newY) {
+      this.scrollTo(newX, newY, this.options.bounceTime);
+    }
+
+    this.scaled = false;
+  };
+
+  BScroll.prototype.zoomTo = function (scale, x, y) {
+    var _offsetToBody = offsetToBody(this.wrapper),
+        left = _offsetToBody.left,
+        top = _offsetToBody.top;
+
+    var originX = x + left - this.x;
+    var originY = y + top - this.y;
+    this._zoomTo(scale, originX, originY);
+  };
+
+  BScroll.prototype._zoomStart = function (e) {
+    var firstFinger = e.touches[0];
+    var secondFinger = e.touches[1];
+    var deltaX = Math.abs(firstFinger.pageX - secondFinger.pageX);
+    var deltaY = Math.abs(firstFinger.pageY - secondFinger.pageY);
+
+    this.startDistance = getDistance(deltaX, deltaY);
+    this.startScale = this.scale;
+
+    var _offsetToBody2 = offsetToBody(this.wrapper),
+        left = _offsetToBody2.left,
+        top = _offsetToBody2.top;
+
+    this.originX = Math.abs(firstFinger.pageX + secondFinger.pageX) / 2 + left - this.x;
+    this.originY = Math.abs(firstFinger.pageY + secondFinger.pageY) / 2 + top - this.y;
+
+    this.trigger('zoomStart');
+  };
+
+  BScroll.prototype._zoom = function (e) {
+    if (!this.enabled || this.destroyed || eventType[e.type] !== this.initiated) {
+      return;
+    }
+
+    if (this.options.preventDefault) {
+      e.preventDefault();
+    }
+
+    if (this.options.stopPropagation) {
+      e.stopPropagation();
+    }
+
+    var firstFinger = e.touches[0];
+    var secondFinger = e.touches[1];
+    var deltaX = Math.abs(firstFinger.pageX - secondFinger.pageX);
+    var deltaY = Math.abs(firstFinger.pageY - secondFinger.pageY);
+    var distance = getDistance(deltaX, deltaY);
+    var scale = distance / this.startDistance * this.startScale;
+
+    this.scaled = true;
+
+    var _options$zoom2 = this.options.zoom,
+        _options$zoom2$min = _options$zoom2.min,
+        min = _options$zoom2$min === undefined ? 1 : _options$zoom2$min,
+        _options$zoom2$max = _options$zoom2.max,
+        max = _options$zoom2$max === undefined ? 4 : _options$zoom2$max;
+
+
+    if (scale < min) {
+      scale = 0.5 * min * Math.pow(2.0, scale / min);
+    } else if (scale > max) {
+      scale = 2.0 * max * Math.pow(0.5, max / scale);
+    }
+
+    var lastScale = scale / this.startScale;
+
+    var x = this.startX - (this.originX - this.relativeX) * (lastScale - 1);
+    var y = this.startY - (this.originY - this.relativeY) * (lastScale - 1);
+
+    this.setScale(scale);
+
+    this.scrollTo(x, y, 0);
+  };
+
+  BScroll.prototype._zoomEnd = function (e) {
+    if (!this.enabled || this.destroyed || eventType[e.type] !== this.initiated) {
+      return;
+    }
+
+    if (this.options.preventDefault) {
+      e.preventDefault();
+    }
+
+    if (this.options.stopPropagation) {
+      e.stopPropagation();
+    }
+
+    this.isInTransition = false;
+    this.isAnimating = false;
+    this.initiated = 0;
+
+    var _options$zoom3 = this.options.zoom,
+        _options$zoom3$min = _options$zoom3.min,
+        min = _options$zoom3$min === undefined ? 1 : _options$zoom3$min,
+        _options$zoom3$max = _options$zoom3.max,
+        max = _options$zoom3$max === undefined ? 4 : _options$zoom3$max;
+
+
+    var scale = this.scale > max ? max : this.scale < min ? min : this.scale;
+
+    this._zoomTo(scale, this.originX, this.originY, this.startScale);
+
+    this.trigger('zoomEnd');
+  };
+}
+
+// import { ease } from '../util/ease'
+
+// Number of items to instantiate beyond current view in the scroll direction.
+var RUNWAY_ITEMS = 30;
+
+// Number of items to instantiate beyond current view in the opposite direction.
+var RUNWAY_ITEMS_OPPOSITE = 10;
+
+// The animation interval (in ms) for fading in content from tombstones.
+var ANIMATION_DURATION_MS = 200;
+
+// The number of pixels of default additional length to allow scrolling to.
+var DEFAULT_SCROLL_RUNWAY = 2000;
+
+function infiniteMixin(BScroll) {
+  BScroll.prototype._initInfinite = function () {
+    this.options.probeType = 3;
+    this.maxScrollY = -DEFAULT_SCROLL_RUNWAY;
+    this.infiniteScroller = new InfiniteScroller(this, this.options.infinity);
+  };
+}
+
+function isTombstoneNode(node) {
+  if (node && node.classList) {
+    return node.classList.contains('tombstone');
+  }
+}
+
+function InfiniteScroller(scroller, options) {
+  var _this = this;
+
+  this.options = options;
+  assert(typeof this.options.createTombstone === 'function', 'Infinite scroll need createTombstone Function to create tombstone');
+
+  assert(typeof this.options.fetch === 'function', 'Infinite scroll need fetch Function to fetch new data.');
+
+  assert(typeof this.options.render === 'function', 'Infinite scroll need render Function to render each item.');
+
+  this.firstAttachedItem = 0;
+  this.lastAttachedItem = 0;
+
+  this.anchorScrollTop = 0;
+  this.anchorItem = {
+    index: 0,
+    offset: 0
+  };
+  this.tombstoneHeight = 0;
+  this.tombstoneWidth = 0;
+  this.tombstones = [];
+
+  this.items = [];
+  this.loadedItems = 0;
+  this.requestInProgress = false;
+  this.hasMore = true;
+
+  this.scroller = scroller;
+  this.wrapperEl = this.scroller.wrapper;
+  this.scrollerEl = this.scroller.scroller;
+  this.scroller.on('scroll', function () {
+    _this.onScroll();
+  });
+  this.scroller.on('resize', function () {
+    _this.onResize();
+  });
+
+  this.onResize();
+}
+
+InfiniteScroller.prototype.onScroll = function () {
+  var scrollTop = -this.scroller.y;
+  var delta = scrollTop - this.anchorScrollTop;
+  if (scrollTop === 0) {
+    this.anchorItem = {
+      index: 0,
+      offset: 0
+    };
+  } else {
+    this.anchorItem = this._calculateAnchoredItem(this.anchorItem, delta);
+  }
+
+  this.anchorScrollTop = scrollTop;
+  var lastScreenItem = this._calculateAnchoredItem(this.anchorItem, this.wrapperEl.offsetHeight);
+
+  var start = this.anchorItem.index;
+  var end = lastScreenItem.index;
+  if (delta < 0) {
+    start -= RUNWAY_ITEMS;
+    end += RUNWAY_ITEMS_OPPOSITE;
+  } else {
+    start -= RUNWAY_ITEMS_OPPOSITE;
+    end += RUNWAY_ITEMS;
+  }
+  this.fill(start, end);
+  this.maybeRequestContent();
+};
+
+InfiniteScroller.prototype.onResize = function () {
+  var tombstone = this.options.createTombstone();
+  tombstone.style.position = 'absolute';
+  this.scrollerEl.appendChild(tombstone);
+  tombstone.style.display = '';
+  this.tombstoneHeight = tombstone.offsetHeight;
+  this.tombstoneWidth = tombstone.offsetWidth;
+  this.scrollerEl.removeChild(tombstone);
+
+  for (var i = 0; i < this.items.length; i++) {
+    this.items[i].height = this.items[i].width = 0;
+  }
+
+  this.onScroll();
+};
+
+InfiniteScroller.prototype.fill = function (start, end) {
+  this.firstAttachedItem = Math.max(0, start);
+  if (!this.hasMore) {
+    end = Math.min(end, this.items.length);
+  }
+  this.lastAttachedItem = end;
+  this.attachContent();
+};
+
+InfiniteScroller.prototype.maybeRequestContent = function () {
+  var _this2 = this;
+
+  if (this.requestInProgress || !this.hasMore) {
+    return;
+  }
+  var itemsNeeded = this.lastAttachedItem - this.loadedItems;
+  if (itemsNeeded <= 0) {
+    return;
+  }
+  this.requestInProgress = true;
+  this.options.fetch(itemsNeeded).then(function (items) {
+    if (items) {
+      _this2.addContent(items);
+    } else {
+      _this2.hasMore = false;
+      var tombstoneLen = _this2._removeTombstones();
+      var curPos = 0;
+      if (_this2.anchorItem.index <= _this2.items.length) {
+        curPos = _this2._fixScrollPosition();
+        _this2._setupAnimations({}, curPos);
+        _this2.scroller.resetPosition(_this2.scroller.options.bounceTime);
+      } else {
+        _this2.anchorItem.index -= tombstoneLen;
+        curPos = _this2._fixScrollPosition();
+        _this2._setupAnimations({}, curPos);
+        _this2.scroller.stop();
+        _this2.scroller.resetPosition();
+        _this2.onScroll();
+      }
+    }
+  });
+};
+
+InfiniteScroller.prototype.addContent = function (items) {
+  this.requestInProgress = false;
+  for (var i = 0; i < items.length; i++) {
+    if (this.items.length <= this.loadedItems) {
+      this._addItem();
+    }
+    this.items[this.loadedItems++].data = items[i];
+  }
+  this.attachContent();
+  this.maybeRequestContent();
+};
+
+InfiniteScroller.prototype.attachContent = function () {
+  var unusedNodes = this._collectUnusedNodes();
+  var tombstoneAnimations = this._createDOMNodes(unusedNodes);
+  this._cleanupUnusedNodes(unusedNodes);
+  this._cacheNodeSize();
+  var curPos = this._fixScrollPosition();
+  this._setupAnimations(tombstoneAnimations, curPos);
+};
+
+InfiniteScroller.prototype._removeTombstones = function () {
+  var markIndex = void 0;
+  var tombstoneLen = 0;
+  var itemLen = this.items.length;
+  for (var i = 0; i < itemLen; i++) {
+    var currentNode = this.items[i].node;
+    var currentData = this.items[i].data;
+    if ((!currentNode || isTombstoneNode(currentNode)) && !currentData) {
+      if (!markIndex) {
+        markIndex = i;
+      }
+      if (currentNode) {
+        this.scrollerEl.removeChild(currentNode);
+      }
+    }
+  }
+  tombstoneLen = itemLen - markIndex;
+  this.items.splice(markIndex);
+  this.lastAttachedItem = Math.min(this.lastAttachedItem, this.items.length);
+  return tombstoneLen;
+};
+
+InfiniteScroller.prototype._collectUnusedNodes = function () {
+  var unusedNodes = [];
+  for (var i = 0; i < this.items.length; i++) {
+    // Skip the items which should be visible.
+    if (i === this.firstAttachedItem) {
+      i = this.lastAttachedItem - 1;
+      continue;
+    }
+    var currentNode = this.items[i].node;
+    if (currentNode) {
+      if (isTombstoneNode(currentNode)) {
+        // Cache tombstones for reuse
+        this.tombstones.push(currentNode);
+        this.tombstones[this.tombstones.length - 1].style.display = 'none';
+      } else {
+        unusedNodes.push(currentNode);
+      }
+    }
+    this.items[i].node = null;
+  }
+  return unusedNodes;
+};
+
+InfiniteScroller.prototype._createDOMNodes = function (unusedNodes) {
+  var tombstoneAnimations = {};
+  for (var i = this.firstAttachedItem; i < this.lastAttachedItem; i++) {
+    while (this.items.length <= i) {
+      this._addItem();
+    }
+    var currentNode = this.items[i].node;
+    var currentData = this.items[i].data;
+    if (currentNode) {
+      if (isTombstoneNode(currentNode) && currentData) {
+        currentNode.style.zIndex = 1;
+        tombstoneAnimations[i] = [currentNode, this.items[i].top - this.anchorScrollTop];
+        this.items[i].node = null;
+      } else {
+        continue;
+      }
+    }
+    var node = currentData ? this.options.render(currentData, unusedNodes.pop()) : this._getTombStone();
+    node.style.position = 'absolute';
+    this.items[i].top = -1;
+    this.scrollerEl.appendChild(node);
+    this.items[i].node = node;
+  }
+  return tombstoneAnimations;
+};
+
+InfiniteScroller.prototype._cleanupUnusedNodes = function (unusedNodes) {
+  while (unusedNodes.length) {
+    this.scrollerEl.removeChild(unusedNodes.pop());
+  }
+};
+
+InfiniteScroller.prototype._cacheNodeSize = function () {
+  for (var i = this.firstAttachedItem; i < this.lastAttachedItem; i++) {
+    // Only cache the height if we have the real contents, not a placeholder.
+    if (this.items[i].data && !this.items[i].height) {
+      this.items[i].height = this.items[i].node.offsetHeight;
+      this.items[i].width = this.items[i].node.offsetWidth;
+    }
+  }
+};
+
+InfiniteScroller.prototype._fixScrollPosition = function () {
+  this.anchorScrollTop = 0;
+  for (var _i = 0; _i < this.anchorItem.index; _i++) {
+    this.anchorScrollTop += this.items[_i].height || this.tombstoneHeight;
+  }
+  this.anchorScrollTop += this.anchorItem.offset;
+
+  // Position all nodes.
+  var curPos = this.anchorScrollTop - this.anchorItem.offset;
+  var i = this.anchorItem.index;
+  while (i > this.firstAttachedItem) {
+    curPos -= this.items[i - 1].height || this.tombstoneHeight;
+    i--;
+  }
+
+  return curPos;
+};
+
+InfiniteScroller.prototype._setupAnimations = function (tombstoneAnimations, curPos) {
+  var _this3 = this;
+
+  for (var i in tombstoneAnimations) {
+    var animation = tombstoneAnimations[i];
+    this.items[i].node.style.transform = 'translateY(' + (this.anchorScrollTop + animation[1]) + 'px) scale(' + this.tombstoneWidth / this.items[i].width + ', ' + this.tombstoneHeight / this.items[i].height + ')';
+    // Call offsetTop on the nodes to be animated to force them to apply current transforms.
+    /* eslint-disable no-unused-expressions */
+    this.items[i].node.offsetTop;
+    animation[0].offsetTop;
+    this.items[i].node.style.transition = 'transform ' + ANIMATION_DURATION_MS + 'ms';
+  }
+
+  for (var _i2 = this.firstAttachedItem; _i2 < this.lastAttachedItem; _i2++) {
+    var _animation = tombstoneAnimations[_i2];
+    if (_animation) {
+      var tombstoneNode = _animation[0];
+      tombstoneNode.style.transition = 'transform ' + ANIMATION_DURATION_MS + 'ms, opacity ' + ANIMATION_DURATION_MS + 'ms';
+      tombstoneNode.style.transform = 'translateY(' + curPos + 'px) scale(' + this.items[_i2].width / this.tombstoneWidth + ', ' + this.items[_i2].height / this.tombstoneHeight + ')';
+      tombstoneNode.style.opacity = 0;
+    }
+    if (curPos !== this.items[_i2].top) {
+      if (!_animation) {
+        this.items[_i2].node.style.transition = '';
+      }
+      this.items[_i2].node.style.transform = 'translateY(' + curPos + 'px)';
+    }
+    this.items[_i2].top = curPos;
+    curPos += this.items[_i2].height || this.tombstoneHeight;
+  }
+
+  this.scroller.maxScrollY = -(curPos - this.wrapperEl.offsetHeight + (this.hasMore ? DEFAULT_SCROLL_RUNWAY : 0));
+
+  setTimeout(function () {
+    for (var _i3 in tombstoneAnimations) {
+      var _animation2 = tombstoneAnimations[_i3];
+      _animation2[0].style.display = 'none';
+      // Tombstone can be recycled now.
+      _this3.tombstones.push(_animation2[0]);
+    }
+  }, ANIMATION_DURATION_MS);
+};
+
+InfiniteScroller.prototype._getTombStone = function () {
+  var tombstone = this.tombstones.pop();
+  if (tombstone) {
+    tombstone.style.display = '';
+    tombstone.style.opacity = 1;
+    tombstone.style.transform = '';
+    tombstone.style.transition = '';
+    return tombstone;
+  }
+  return this.options.createTombstone();
+};
+
+InfiniteScroller.prototype._addItem = function () {
+  this.items.push({
+    data: null,
+    node: null,
+    height: 0,
+    width: 0,
+    top: 0
+  });
+};
+
+InfiniteScroller.prototype._calculateAnchoredItem = function (initialAnchor, delta) {
+  if (delta === 0) {
+    return initialAnchor;
+  }
+  var i = initialAnchor.index;
+  var tombstones = 0;
+
+  delta += initialAnchor.offset;
+  if (delta < 0) {
+    while (delta < 0 && i > 0 && this.items[i - 1].height) {
+      delta += this.items[i - 1].height;
+      i--;
+    }
+    tombstones = Math.max(-i, Math.ceil(Math.min(delta, 0) / this.tombstoneHeight));
+  } else {
+    while (delta > 0 && i < this.items.length && this.items[i].height && this.items[i].height < delta) {
+      delta -= this.items[i].height;
+      i++;
+    }
+    if (i >= this.items.length || !this.items[i].height) {
+      tombstones = Math.floor(Math.max(delta, 0) / this.tombstoneHeight);
+    }
+  }
+  i += tombstones;
+  delta -= tombstones * this.tombstoneHeight;
+
+  return {
+    index: i,
+    offset: delta
+  };
+};
 
 function BScroll(el, options) {
   this.wrapper = typeof el === 'string' ? document.querySelector(el) : el;
   if (!this.wrapper) {
-    warn('can not resolve the wrapper dom');
+    warn('Can not resolve the wrapper DOM.');
   }
   this.scroller = this.wrapper.children[0];
   if (!this.scroller) {
-    warn('the wrapper need at least one child element to be scroller');
+    warn('The wrapper need at least one child element to be scroller.');
   }
   // cache style for better performance
   this.scrollerStyle = this.scroller.style;
@@ -2066,8 +3296,11 @@ wheelMixin(BScroll);
 scrollbarMixin(BScroll);
 pullDownMixin(BScroll);
 pullUpMixin(BScroll);
+mouseWheelMixin(BScroll);
+zoomMixin(BScroll);
+infiniteMixin(BScroll);
 
-BScroll.Version = '1.5.6';
+BScroll.Version = '1.12.0';
 
 return BScroll;
 

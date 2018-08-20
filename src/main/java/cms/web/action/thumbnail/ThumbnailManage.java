@@ -1,4 +1,4 @@
-﻿package cms.web.action.thumbnail;
+package cms.web.action.thumbnail;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -349,7 +349,7 @@ public class ThumbnailManage {
 	        }
 		} catch (SimpleImageException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+	//		e.printStackTrace();
 			if (logger.isErrorEnabled()) {
 	            logger.error("生成缩略图",e);
 	        }
@@ -359,7 +359,7 @@ public class ThumbnailManage {
 					inStream.close();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+			//		e.printStackTrace();
 					if (logger.isErrorEnabled()) {
 			            logger.error("生成缩略图关闭输入流错误",e);
 			        }

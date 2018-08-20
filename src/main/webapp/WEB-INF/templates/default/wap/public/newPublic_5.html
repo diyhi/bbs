@@ -13,6 +13,8 @@
 	<meta name="_commonPath" content="${commonPath}"/>
 	<meta name="_contextPath" content="${contextPath}"/>
 	<meta name="_token" content="${token}"/>
+	<meta name="_userId" content="${systemUser.userId}"/>
+	<meta name="_userName" content="${systemUser.userName}"/>
 	<style>
 		/*兼容template标签*/
 		template { 
@@ -25,8 +27,8 @@
 	<style>
 	
    [v-cloak]{
-  display: none;
-}
+	  display: none;
+	}
 
 
     </style>
@@ -187,7 +189,10 @@
 			    	</h1>
 			    	<div class="info clearfix">                                   
 			            <span class="bLeft">
-			                <div class="userName">{{topic.userName}}</div>
+			            	<!-- router-link渲染成<div>标签-->
+					    	<router-link class="userName"  tag="div" :to="{path: '/user/control/home', query: {userName: topic.userName}}">
+					           {{topic.userName}}
+					        </router-link>
 			                <i class="time">{{topic.postTime}}</i>
 			            </span>
 			            <p class="bRight">
@@ -204,23 +209,35 @@
 				<div class="item" v-for="(comment,index) in commentList" :id="'anchor_'+comment.id">
 					<div class="head">
 						<span class="info" >
-                          	<h2>{{comment.userName}}<span class="badge" v-if="comment.userName == topic.userName && comment.isStaff == topic.isStaff">楼主</span></h2>
-                          	
+							<!-- router-link渲染成<h2>标签-->
+					    	<router-link tag="h2" :to="{path: '/user/control/home', query: {userName: comment.userName}}">
+					           {{comment.userName}}<span class="badge" v-if="comment.userName == topic.userName && comment.isStaff == topic.isStaff">楼主</span>
+					        </router-link>
+                        
                           	<p class="time">{{comment.postTime}}</p>
                         </span>
                         <span class="floor">{{index+1}}楼</span>                     
                     </div>
                     <div class="main">
+                    	<!--
 						<div class="quote"  v-if="comment.quoteList != null && comment.quoteList.length >0" v-html="quoteData[comment.id]">
 							
+						</div>  -->
+						
+						<div class="quote"  v-if="comment.quoteList != null && comment.quoteList.length >0" >
+							<component v-bind:is ="quoteDataComponent(quoteData[comment.id])" v-bind="$props" />
 						</div>
+						
 						<p class="commentContent" v-html="comment.content"></p>
 						
 	                    <div class="replyList" v-if="comment.replyList.length >0">
 							<ul class="box">
 							
 								<li v-for="(reply,index2) in comment.replyList" v-show="(replyExpandOrShrink[comment.id]) || (replyExpandOrShrink[comment.id] == false && index2 <2)">
-									<span class="userName">{{reply.userName}}</span>
+                                    <!-- router-link渲染成<span>标签-->
+							    	<router-link class="userName" tag="span" :to="{path: '/user/control/home', query: {userName: reply.userName}}">
+							           {{reply.userName}}
+							        </router-link>
                                     <span class="badge" v-if="reply.userName == topic.userName && reply.isStaff == topic.isStaff">楼主</span>      
 									<span class="time">{{reply.postTime}}</span>
 									<p class="replyContent">{{reply.content}}</p>
@@ -424,7 +441,7 @@
 		<div class="searchModule">
 			<div class="topicList">
 			    <div class="item" v-for="topic in topicList" >
-			    	 <!-- router-link渲染成<div>标签-->
+			    	<!-- router-link渲染成<div>标签-->
 			    	<router-link class="title"  tag="div" :to="{path: '/thread', query: {topicId: topic.id}}">
 			           <span v-html="topic.title"></span>
 			        </router-link>
@@ -750,15 +767,22 @@
 		        <i class="avatar cms-user2" @click="displayUserSetting();"></i>
 		        <p class="userName" @click="displayUserSetting();">{{user.userName}}</p>
 		        <p class="grade" >{{user.gradeName}}</p>
+		        <span class="privateMessageBox" v-if="user.userName != $store.state.user.userName">
+		         	<!-- router-link渲染成<div>标签-->
+			    	<router-link class="privateMessageButton" tag="div" :to="{path: '/user/control/privateMessageChatList', query: {friendUserName: user.userName}}">
+			           发私信
+			        </router-link>
+				</span>
+		        
 		    </div>
 		    <div class="setting" @click="displayUserSetting();" ><span class="cms-settings"></span></div>
 		    
 	    </div>
-	    <div class="quickTag">
+	    <div class="quickTag" v-if="user.userName == $store.state.user.userName">
 	        <span class="item"><i class="total">{{user.point}}</i>积分</span>
 	    </div>
 	
-		<div class="homeMenuTable">
+		<div class="homeMenuTable" v-if="user.userName == $store.state.user.userName">
 			<ul>
 				<li class="topLine rightLine">
 		        	<router-link to="/user/control/topicList" class="menuLink"><i class="cms-topic" style="font-size: 31px;"></i><span class="name">我的话题</span></router-link>
@@ -774,17 +798,28 @@
 		        </li>
 			</ul>
 			<ul>
-		        <li class="bottomLine rightLine">
+		        <li class="rightLine">
 		        	<router-link to="/user/control/editUser" class="menuLink"><i class="cms-pencil-alt"></i><span class="name">修改个人信息</span></router-link>
 		        </li>
-		        <li class="bottomLine rightLine">
+		        <li class="rightLine">
 		        	<router-link to="/user/control/realNameAuthentication" class="menuLink"><i class="cms-realNameAuthentication"></i><span class="name">实名认证</span></router-link>
 		        </li>
-		        <li class="bottomLine rightLine">
+		        <li class="rightLine">
 		        	<router-link to="/user/control/userLoginLogList" class="menuLink"><i class="cms-login"></i><span class="name">登录日志</span></router-link>
 		        </li>
+		        <li>
+		        	<router-link to="/user/control/privateMessageList" class="menuLink"><i class="cms-email"></i><span class="name">私信</span><span class="badge" style="position: absolute;" v-show="$store.state.privateMessage_badge"></span></router-link>
+		        </li>
+			</ul>
+			<ul>
+		        <li class="bottomLine rightLine">
+		        	<router-link to="/user/control/systemNotifyList" class="menuLink"><i class="cms-announcement"></i><span class="name">系统通知</span><span class="badge" style="position: absolute;" v-show="$store.state.systemNotify_badge"></span></router-link>
+		        </li>
+		        <li class="bottomLine rightLine">
+		        </li>
+		        <li class="bottomLine rightLine">
+		        </li>
 		        <li class="bottomLine">
-		        	
 		        </li>
 			</ul>
 		</div>
@@ -1215,6 +1250,160 @@
 	</div>
 </template>
 
+<!-- 私信 -->
+<template id="privateMessage-template">
+	<div>
+		<mt-header fixed title="私信" style="background: #fafafa; color: #000000;font-size: 14px">
+	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
+	    	<router-link to="/index" slot="right">
+			    <span class="cms-home" style="font-size: 18px;"></span>
+			</router-link>
+		</mt-header>
+		<div class="privateMessageModule" >
+			<div class="privateMessageList">
+				<div v-infinite-scroll="queryPrivateMessage" infinite-scroll-disabled="loading" infinite-scroll-distance="10">
+					<div class="item" v-for="privateMessage in privateMessageList">
+						<div class="head">
+							<span class="info" >
+			                    <h2>{{privateMessage.friendUserName}}<span class="badge" v-if="privateMessage.status == 10">未读</span></h2>
+			                        	
+			                    <p class="time">{{privateMessage.sendTime}}</p>
+			                </span>
+			                <span class="operating"><span class="delete-btn"  @click="deletePrivateMessage(privateMessage.friendUserName)"><span class="cms-trash" style="font-size: 11px;margin-right: 1px;"></span>删除</span></span>                     
+			            </div>
+			            <div class="main">
+							<!-- router-link渲染成<p>标签-->
+					        <router-link class="content"  tag="p" :to="{path: '/user/control/privateMessageChatList', query: {friendUserName: privateMessage.friendUserName}}">
+					            {{privateMessage.messageContent}}
+					        </router-link>                       
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+	</div>
+</template>
+
+<!-- 私信对话 -->
+<template id="privateMessageChat-template">
+	<div>
+		<mt-header fixed title="私信对话" style="background: #fafafa; color: #000000;font-size: 14px">
+	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
+	    	<router-link to="/index" slot="right">
+			    <span class="cms-home" style="font-size: 18px;"></span>
+			</router-link>
+		</mt-header>
+		
+		<div class="privateMessageChatModule" >
+			<div class="headInfo">
+				<div class="title">{{friendUserNameTitle}}</div>
+
+				<div class="button"><mt-button type="primary"  @click.native="addPrivateMessageUI();" style="height: 28px;font-size: 16px;">发私信</mt-button></div>
+				
+			</div>
+			<div class="privateMessageChatList">
+				<div v-infinite-scroll="queryPrivateMessageChat" infinite-scroll-disabled="loading" infinite-scroll-distance="10">
+					<div class="item" v-for="privateMessage in privateMessageChatList">
+						<div class="head">
+							<span class="info" >
+			                    <h2>{{privateMessage.friendUserName}}<span class="badge" v-if="privateMessage.status == 10">未读</span></h2>
+			                        	
+			                    <p class="time">{{privateMessage.sendTime}}</p>
+			                </span>
+			            </div>
+			            <div class="main">
+							<p class="content" v-html="privateMessage.messageContent"></p>                          
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<!-- 发私信 -->
+			<mt-popup v-model="popup_privateMessage" position="right" style="width: 100%;height: 100%;">
+			
+				<mt-header fixed title="发私信" style="background: #fafafa; color: #000000;font-size: 14px">
+			    	<mt-button icon="back" @click.native="popup_privateMessage = false" slot="left" >返回</mt-button>
+			    	<router-link to="/index" slot="right" @click.native="popup_privateMessage = false" >
+			    		<span class="cms-home" style="font-size: 18px;"></span>
+					</router-link>
+				</mt-header> 
+				
+				<div ref="addPrivateMessageFormScroll" class="addPrivateMessageScroll">
+					<div class="box" >
+						<div class="chatUser">
+							<div class="userName">{{friendUserNameTitle}}</div>
+						</div>
+						<div class="addPrivateMessageForm" >
+							<ul>
+								<li>
+									<textarea class="messageContent" v-model.trim="messageContent"  rows="10"  placeholder="输入私信内容" ></textarea>
+									<p class="tips">
+								    	<span>{{error.messageContent}}</span>	
+								    </p>
+								
+								</li>
+								
+								<li v-if="showCaptcha" >
+						        	<input type="hidden" v-model="captchaKey">
+						        	<mt-field v-model.trim="captchaValue"  @change.native="validation_captchaValue" label="验证码" placeholder="请输入验证码"  type="text" >
+										
+									</mt-field>
+									<div style="position: absolute;right: 0px;margin-top: -45px; ">
+										<img :src="imgUrl" @click="replaceCaptcha" height="45px" width="120px" >
+									</div>
+									<p class="tips">
+								    	<span>{{error.captchaValue}}</span>	
+								    </p>
+						        </li>
+						        <li style="margin-left: 10px;margin-right: 10px; margin-top: 10px; padding-bottom: 10px; ">
+									<mt-button  type="primary" size="large"  @click.native="addPrivateMessage">提交</mt-button>
+									<p class="tips">
+								    	<span>{{error.privateMessage}}</span>	
+								    </p>
+									
+								</li>
+							</ul>
+						</div>
+					</div>
+					
+				</div>
+			</mt-popup>
+		</div>
+		
+	</div>
+</template> 
+
+<!-- 系统通知 -->
+<template id="systemNotify-template">
+	<div>
+		<mt-header fixed title="系统通知" style="background: #fafafa; color: #000000;font-size: 14px">
+	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
+	    	<router-link to="/index" slot="right">
+			    <span class="cms-home" style="font-size: 18px;"></span>
+			</router-link>
+		</mt-header>
+		
+		<div class="systemNotifyModule" >
+			<div class="systemNotifyList">
+				<div v-infinite-scroll="querySystemNotify" infinite-scroll-disabled="loading" infinite-scroll-distance="10">
+					<div class="item" v-for="subscriptionSystemNotify in subscriptionSystemNotifyList">
+			            <div class="head">
+							<span class="info" >
+			                    <h2>{{subscriptionSystemNotify.sendTime}}<span class="badge" v-if="subscriptionSystemNotify.status == 10">未读</span></h2>
+			                </span>
+			                <span class="operating"><span class="delete-btn"  @click="deleteSystemNotify(subscriptionSystemNotify.id)"><span class="cms-trash" style="font-size: 11px;margin-right: 1px;"></span>删除</span></span>                     
+			            </div>
+			            <div class="main">
+							<p class="commentContent" v-html="subscriptionSystemNotify.content"></p>                          
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+	</div>
+</template> 
 
 
 <!-- 公共模块 -->
@@ -1252,7 +1441,7 @@
 			    <div style="margin-top: 2px;">搜索</div>
 			</mt-tab-item>
 			<mt-tab-item id="mine">
-			    <span class="cms-user" style="font-size: 22px;"></span>
+			    <span class="cms-user" style="font-size: 22px;"></span><span class="badge" style="position: absolute;" v-show="$store.state.allMessage_badge"></span>
 			    <div style="margin-top: 2px;">我的</div>
 			</mt-tab-item>
 		</mt-tabbar>
@@ -1274,12 +1463,12 @@
 <script src="${commonPath}js/mint-ui/index.js" type="text/javascript"></script>
 <script src="${commonPath}js/wendu.ajaxhook.min.js" type="text/javascript"></script>
 
-<link href="${baseURL}${commonPath}css/common.css?d1" type="text/css" rel="stylesheet">
+<link href="${baseURL}${commonPath}css/common.css" type="text/css" rel="stylesheet">
 <script src="${commonPath}js/better-scroll.min.js" type="text/javascript"></script> 
  
-<script src="${commonPath}js/wangeditor/wangEditor.min.js?1" type="text/javascript"></script>
+<script src="${commonPath}js/wangeditor/wangEditor.min.js" type="text/javascript"></script>
 
-<script src="${commonPath}js/main.js?12sddf" type="text/javascript"></script>
+<script src="${commonPath}js/main.js" type="text/javascript"></script>
 
 
 

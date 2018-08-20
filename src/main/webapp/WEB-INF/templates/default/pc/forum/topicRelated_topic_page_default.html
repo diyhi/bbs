@@ -10,7 +10,7 @@
 				<tr>
 		    		<th> 
 				        <div class="avatarBox">
-				            <a class="avatarLink">
+				            <a class="avatarLink" href="user/control/home?userName=${topic.userName}">
 				                <img src="${commonPath}images/min_avata.png"/>                                                               
 				            </a>   
 				        </div>
@@ -30,7 +30,7 @@
 									<img class="images" src="${commonPath}images/pageview.png" alt="" style="float: left;"/>${topic.viewTotal}
 								</a>
 								<em>  
-				                	<a href="#" >
+				                	<a href="user/control/home?userName=${topic.userName}">
 					           			<span style="display:inline-block;margin-left: 7px;">
 					                    	${topic.userName}
 					                    </span>

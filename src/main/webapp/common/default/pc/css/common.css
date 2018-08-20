@@ -1123,11 +1123,11 @@ html,body{
 	width: auto;
 	height: 151px;
 	float: left;
-	padding: 17px 20px 12px
+	padding: 14px 20px 12px
 }
 .selfInfo .detailInfo .box {
 	font-size: 14px;
-	color: #333
+	color: #333;
 }
 
 /* 用户名称 */
@@ -1139,8 +1139,8 @@ html,body{
 	overflow: hidden;
 	display: block;
 	float: left;
-	height: 21px;
-	line-height: 23px;
+	height: 26px;
+	line-height: 32px;
 	white-space: nowrap;
 	text-overflow: ellipsis;
 	max-width: 145px;
@@ -1150,8 +1150,33 @@ html,body{
 	vertical-align: super;
 	margin-left: 11px;
 	position: relative;
-	top: 1px
+	top: 5px
 }
+
+.selfInfo .detailInfo .box .privateMessageBox{
+	margin-left: 20px;
+}
+.privateMessageButton{
+	color: #0592fe;
+    border-color: #0592fe;
+    outline: none;
+    display: inline-block;
+    padding: 0 16px;
+    font-size: 14px;
+    line-height: 32px;
+    text-align: center;
+    cursor: pointer;
+    background: none;
+    border: 1px solid;
+    border-radius: 3px;
+    margin: 0;
+	
+}
+.privateMessageButton:hover {  
+    background: #e2f2ff;  
+}  
+
+
 /* 用户资产 */
 .selfInfo .detailInfo .userAssets {
 	margin: 20px 0;
@@ -1187,12 +1212,13 @@ html,body{
 	
 }
 .selfService .box{
-	margin-top:2px; 
 	border-right:solid 1px #e6e6e6;
 	border-top:solid 1px #e6e6e6
 }
 .selfService h1{
 	font-size:18px;
+	margin-left:4px;
+	line-height:46px;
 	color:#404040
 }
 .selfService .box a{
@@ -1274,6 +1300,249 @@ html,body{
 
 
 
+
+/* 私信 */
+.privateMessageTitle{
+	line-height:46px;
+	margin-left:8px;
+	margin-right:8px;
+    font-size: 14px;
+    font-weight: 700;
+    border-bottom:1px dotted #eee;
+}
+    
+
+.privateMessageModule{
+	padding: 0px 10px 10px 10px;
+	position: relative;
+	padding-bottom:0;
+}
+.privateMessageModule .privateMessageList{list-style:none;}
+.privateMessageModule .privateMessageList .privateMessage{padding:10px 0 5px 60px;border-bottom:1px solid #EDEDE3;}
+.privateMessageModule .privateMessageList .author{position:relative;color:#999}
+.privateMessageModule .privateMessageList .author img{
+	position:absolute;
+	left:-60px;
+	-webkit-border-radius:50%;
+	-moz-border-radius:50%;
+	border-radius:50%;
+	display:block;
+	behavior: url(common/default/pc/js/css3pie/PIE.htc);  /*通知IE浏览器调用脚本作用于当前类*/
+}
+.privateMessageModule .privateMessageList cite{font-style:normal;font-size: 13px;}
+.privateMessageModule .privateMessageList .time{margin-bottom:5px;color:#999;line-height: 20px;}
+.privateMessageModule .privateMessageList .time a{color:#999}
+.privateMessageModule .privateMessageList .privateMessage .content{padding:0px;word-wrap:break-word;color:#666;line-height: 24px;font-size: 13px;margin-right: 120px;}
+.privateMessageModule .privateMessageList .privateMessage .content:hover{
+	color: #333;
+}
+
+.privateMessageModule .privateMessageList .tipBottom {
+	font-size: 9pt;
+	color: #aaa;
+	margin-top: 5px;
+	float:right;
+}
+.privateMessageModule .privateMessageList .tipBottom .a-toolbar {
+	display: block;
+	width: 100%;
+}
+.privateMessageModule .privateMessageList .tipBottom .a-toolbar a {
+	color: #aaa;
+}
+.privateMessageModule .privateMessagePage {
+	margin-top: 10px; float: right; color: #999; line-height: 22px; margin-right: 0px;*margin-right: 8px;
+}
+/* 私信对话 */
+.privateMessageChatTop{
+	z-index: 1;
+	line-height:46px;
+	margin-left:8px;
+	margin-right:8px;
+	text-align: center;
+	border-bottom:1px dotted #eee;
+}
+.privateMessageChatTop .back-to-list{
+	position: absolute;
+	font-size: 14px;
+	color: #969696;
+	left: 50%;
+	margin-left: -468px;
+}
+
+.privateMessageChatTop .back-to-list:hover{
+	color: #2f2f2f
+}
+
+.privateMessageChatTop b{
+	display: inline-block;
+	font-size: 14px
+}
+
+.privateMessageChatModule{
+	padding: 0px 10px 10px 10px;
+	position: relative;
+	padding-bottom:0;
+}
+.privateMessageChatModule .privateMessageChatList{list-style:none;}
+.privateMessageChatModule .privateMessageChatList .privateMessageChat{padding:10px 0 5px 60px;border-bottom:1px solid #EDEDE3;}
+.privateMessageChatModule .privateMessageChatList .author{position:relative;color:#999}
+.privateMessageChatModule .privateMessageChatList .author img{
+	position:absolute;
+	left:-60px;
+	-webkit-border-radius:50%;
+	-moz-border-radius:50%;
+	border-radius:50%;
+	display:block;
+	behavior: url(common/default/pc/js/css3pie/PIE.htc);  /*通知IE浏览器调用脚本作用于当前类*/
+}
+.privateMessageChatModule .privateMessageChatList cite{font-style:normal;font-size: 13px;}
+.privateMessageChatModule .privateMessageChatList .time{margin-bottom:5px;color:#999;line-height: 20px;}
+.privateMessageChatModule .privateMessageChatList .time a{color:#999}
+.privateMessageChatModule .privateMessageChatList .privateMessageChat .content{padding:0px;word-wrap:break-word;color:#666;line-height: 24px;font-size: 13px;}
+.privateMessageChatModule .privateMessageChatPage {
+	margin-top: 10px; float: right; color: #999; line-height: 22px; margin-right: 0px;*margin-right: 8px;
+}
+.privateMessageChatForm{
+	margin-top: 8px;
+	margin-left: 8px;
+	margin-right: 8px;
+	margin-bottom: 8px;
+}
+.privateMessageChatForm textarea{
+	width:908px;
+	line-height: 1.33em;
+	-webkit-box-shadow: none;
+    box-shadow: none;
+    border-radius: 2px;
+    border: 1px solid #dce3e8;
+	vertical-align: top;
+	
+	margin: 0em;
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: rgba(255,255,255,0);
+    padding: 0.78em 1em;
+    background: #ffffff;
+    border: 1px solid rgba(39,41,43,0.15);
+    outline: none;
+    color: rgba(0,0,0,0.8);
+    border-radius: 0.28rem;
+    -webkit-box-shadow: 0em 0em 0em 0em transparent inset;
+    box-shadow: 0em 0em 0em 0em transparent inset;
+    -webkit-transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    -webkit-transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, -webkit-box-shadow 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, -webkit-box-shadow 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, -webkit-box-shadow 0.2s ease;
+    font-size: 1em;
+    height: 8em;
+    min-height: 8em;
+    max-height: 12em;
+    resize: vertical;
+	
+}
+
+.privateMessageChatForm .form-action {
+	 padding-left: 0px; padding-right: 0px; padding-top: 10px;margin-bottom: 50px;
+}
+.privateMessageChatForm .error {
+	color: red; line-height: 30px;
+}
+.privateMessageChatForm .chatSubmit {
+	width: 70px;
+	height: 38px;
+	float: left;
+	margin-right: 10px;
+	position: relative;
+	z-index: 2
+}
+.privateMessageChatForm .captchaModule .captcha_div{
+	height: 38px;line-height:38px;
+}
+.privateMessageChatForm .captchaModule .captchaBox{
+	height:32px;
+	border:1px solid #e6e6e6;
+	width:85px;
+	float: left;
+	border-radius:2px;
+}
+.privateMessageChatForm .captchaModule .captchaBox input{
+	position: relative;  
+	background-image:url(../images/null.gif);
+	background-color:transparent;
+	outline: none; 
+	float:left;
+	height:30px; 
+	width:85px;
+	line-height:30px;
+	border:0;
+	color:#333;
+	padding:0;
+	font-size:18px; 
+}
+.privateMessageChatForm .captchaModule .promptTag {
+	float:left; 
+	font-size:13px; 
+	height:21px; 
+	line-height:21px; 
+	cursor:text; 
+	margin-top:6px;
+	margin-left:-62px; 
+	color:#B0B0B0;
+}
+.privateMessageChatForm .captchaModule .captcha_div .captchaImage{width:100px;height:32px;float: left;margin:0 15px 0 5px;}
+.privateMessageChatForm .captchaModule .captcha_div .captchaImage img{width:100px;height:34px;outline:none;}
+.privateMessageChatForm .captchaModule .tips{
+	padding-left:10px;height: 10px;line-height: 12px;
+}
+.privateMessageChatForm .captchaModule .tips span{
+	color: red;
+}
+
+
+
+/* 系统通知 */
+.systemNotifyTitle{
+	line-height:46px;
+	margin-left:8px;
+	margin-right:8px;
+    font-size: 14px;
+    font-weight: 700;
+    border-bottom:1px dotted #eee;
+}
+    
+
+.systemNotifyModule{
+	padding: 0px 10px 10px 10px;
+	position: relative;
+	padding-bottom:0;
+}
+.systemNotifyModule .systemNotifyList{list-style:none;}
+.systemNotifyModule .systemNotifyList .systemNotify{padding:10px 0 5px 0px;border-bottom:1px solid #EDEDE3;}
+.systemNotifyModule .systemNotifyList .author{position:relative;color:#999}
+.systemNotifyModule .systemNotifyList .time{margin-bottom:5px;color:#999;line-height: 20px;}
+.systemNotifyModule .systemNotifyList .time a{color:#999}
+.systemNotifyModule .systemNotifyList .systemNotify .content{padding:0px;word-wrap:break-word;color:#666;line-height: 24px;font-size: 13px;margin-right: 120px;}
+
+
+.systemNotifyModule .systemNotifyList .tipBottom {
+	font-size: 9pt;
+	color: #aaa;
+	margin-top: 5px;
+	float:right;
+}
+.systemNotifyModule .systemNotifyList .tipBottom .a-toolbar {
+	display: block;
+	width: 100%;
+}
+.systemNotifyModule .systemNotifyList .tipBottom .a-toolbar a {
+	color: #aaa;
+}
+.systemNotifyModule .systemNotifyPage {
+	margin-top: 10px; float: right; color: #999; line-height: 22px; margin-right: 0px;*margin-right: 8px;
+}
+
+
 /* 数据表格 */
 .dataTable {
 	padding-left: 8px; padding-right: 8px; padding-top: 8px;  padding-bottom: 8px;
@@ -1322,6 +1591,20 @@ html,body{
 
 
 
+.badge{
+	display: inline-block;
+	padding: .15em .4em;
+	min-width: 8px;
+	border-radius: 18px;
+	background-color: #F43530;
+	color: #FFFFFF;
+	line-height: 1.2;
+	text-align: center;
+	font-size: 12px;
+	vertical-align: middle;
+	padding: .3em;
+	min-width: 0;
+}
 
 
 
@@ -1341,6 +1624,7 @@ html,body{
 .footer .copyright a:hover { text-decoration: underline; }
 .footer .copyright span { margin-left: 17px; }
 
+
 /* 将页脚固定在页面底部 在底部上一div中加入*/
 .fixedBottom{
 	
@@ -1353,4 +1637,8 @@ html,body{
 	height: 90px;
 	clear:both;
 }
+
+
+
+
 

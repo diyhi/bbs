@@ -13,14 +13,18 @@
 $.ajaxSettings = $.extend($.ajaxSettings, {
 	beforeSend : function beforeSend(XMLHttpRequest) {
 		//发送请求前
-
 		Vue.$indicator.open({
 			spinnerType : 'fading-circle'
 		}); //显示旋转进度条
 	//	XMLHttpRequest.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 	},
 	complete : function complete(XMLHttpRequest, textStatus) {
-		
+		if(XMLHttpRequest.status == 508){
+			//设置登录用户
+			store.commit('setSystemUserId', '');
+			store.commit('setSystemUserName', '');
+		}
+
 		//关闭网站提示参数
 		if(XMLHttpRequest.status == 503){
 			//弹出提示内容
@@ -45,6 +49,11 @@ Vue.component('v-select', VueSelect.VueSelect);
 //拦截所有的ajax请求
 hookAjax({
 	onreadystatechange:function(XMLHttpRequest){
+		if(XMLHttpRequest.status == 508){
+			//设置登录用户
+			store.commit('setSystemUserId', '');
+			store.commit('setSystemUserName', '');
+		}
 		//关闭网站提示参数
 		if(XMLHttpRequest.status == 503){
 			//弹出提示内容
@@ -61,7 +70,11 @@ hookAjax({
 		}
 	},
 	onload:function(XMLHttpRequest){
-		
+		if(XMLHttpRequest.status == 508){//服务器处理请求时检测到一个无限循环
+			//设置登录用户
+			store.commit('setSystemUserId', '');
+			store.commit('setSystemUserName', '');
+		}
 		//关闭网站提示参数
 		if(XMLHttpRequest.status == 503){
 			//弹出提示内容
@@ -88,6 +101,54 @@ hookAjax({
 
 
 
+
+//定时查询消息
+Vue.prototype.unreadMessageCount = function (){
+	if(store.state.user.userId != ""){//如果在登录状态
+		$.ajax({
+			type : "GET",
+			cache : false,
+			async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+			url : "user/control/unreadMessageCount",
+			success : function success(result) {
+				if (result != "") {
+					var unreadMessage = $.parseJSON(result);
+					var privateMessageCount = parseInt(unreadMessage.privateMessageCount);
+		        	var systemNotifyCount = parseInt(unreadMessage.systemNotifyCount);
+		        	if(privateMessageCount >0){
+		        		//设置私信状态
+						store.commit('setPrivateMessage_badge', true);
+		        	}else{
+		        		
+		        		//设置私信状态
+						store.commit('setPrivateMessage_badge', false);
+		        	}
+		        	if(systemNotifyCount >0){
+		        		//设置系统通知状态
+		        		store.commit('setSystemNotify_badge', true);
+		        	}else{
+		        		//设置系统通知状态
+		        		store.commit('setSystemNotify_badge', false);
+		        	}
+		        	if((privateMessageCount + systemNotifyCount)>0){
+		        		//所有消息状态
+		        		store.commit('setAllMessage_badge', true);
+		        	}else{
+		        		//所有消息状态
+		        		store.commit('setAllMessage_badge', false);
+		        	}
+		        	
+				}
+			},
+			beforeSend : function beforeSend(XMLHttpRequest) {
+				//本空方法不要删除，用来覆盖全局回调默认的旋转进度条
+				
+			},
+		});
+	}
+	
+	
+}
 
 
 
@@ -309,9 +370,7 @@ var index_component = Vue.extend({
 		},
 		//添加话题
 		addTopic : function(event) {
-			if (!event._constructed) { //如果不存在这个属性,则不执行下面的函数
-				return;
-			}
+
 			var _self = this;
 			//清空所有错误
 			_self.error.topicTitle = "";
@@ -376,10 +435,9 @@ var index_component = Vue.extend({
 
 							//清空分页数据
 							_self.topicList = []; //话题列表
-							_self.currentpage = 1; //当前页码
-							_self.totalpage = 1; //总页数
-							_self.on = '';//上一页
-							_self.next = '';//下一页
+							_self.topicContent = '';//清空话题内容
+							_self.topicEditor.txt.clear();//清空编辑器内容
+							
 							
 							//查询话题列表
 							_self.queryTopicList();
@@ -513,6 +571,7 @@ var index_component = Vue.extend({
 			this.scroll = new BScroll(ref, {
 				scrollY : true, //滚动方向为 Y 轴
 				click : true, //是否派发click事件
+				autoBlur:false,//默认值：true 在滚动之前会让当前激活的元素（input、textarea）自动失去焦点
 				preventDefault : true, //是否阻止默认事件
 				preventDefaultException:{ tagName: /^(INPUT|TEXTAREA|BUTTON|SELECT)$/ ,className:/(^|\s)(editor-toolbar|w-e-menu|editor-text|w-e-text)(\s|$)/},//列出哪些元素不屏蔽默认事件 className必须是最里层的元素
 				HWCompositing : true, //是否启用硬件加速
@@ -562,6 +621,7 @@ var thread_component = Vue.extend({
 			},
 			commentEditor : '',//评论富文本编辑器
 			quoteEditor: '',//引用评论富文本编辑器
+
 		};
 	},
 	created : function created() {
@@ -588,6 +648,21 @@ var thread_component = Vue.extend({
 		}
 	},
 
+	computed: {
+		//动态解析评论引用模板数据
+		quoteDataComponent: function quoteDataComponent() {
+			return function (quoteContentData) {
+				return {
+					template: quoteContentData, // use content as template for this component
+					props: this.$options.props, // re-use current props definitions
+					
+				};
+			};
+		
+			
+		},
+	},
+	
 	methods : {
 		//查询话题
 		queryTopic : function() {
@@ -645,8 +720,11 @@ var thread_component = Vue.extend({
 									var quoteContent = "";
 									for (var j = 0; j <comment.quoteList.length; j++) {
 										var quote = comment.quoteList[j];
-										quoteContent = "<div>"+quoteContent+"<span>"+quote.userName+"&nbsp;的评论：</span><br/>"+quote.content+"</div>";
+										quoteContent = "<div>"+quoteContent+"<span><router-link tag=\"span\" :to=\"{path: '/user/control/home', query: {userName: '"+quote.userName+"'}}\">"+quote.userName+"</router-link>&nbsp;的评论：</span><br/>"+quote.content+"</div>";
 									}
+									
+									
+									
 									_self.$set(_self.quoteData, comment.id, quoteContent);
 								}
 								
@@ -666,6 +744,8 @@ var thread_component = Vue.extend({
 						}else{
 							_self.next = '';
 						}
+						console.log(_self.currentpage+" 中S "+_self.totalpage);
+						console.log(_self.on+" 中 "+_self.next);
 						
 						_self.$nextTick(function() {
 							//跳转到锚点
@@ -771,9 +851,9 @@ var thread_component = Vue.extend({
 		
 		//添加评论
 		addComment : function(event) {
-			if (!event._constructed) { //如果不存在这个属性,则不执行下面的函数
-				return;
-			}
+		//	if (!event._constructed) { //如果不存在这个属性,则不执行下面的函数
+		//		return;
+		//	}
 			var _self = this;
 			//清空所有错误
 			_self.error.commentContent = "";
@@ -831,10 +911,9 @@ var thread_component = Vue.extend({
 							
 							//清空分页数据
 							_self.commentList = []; //话题列表
-							_self.currentpage = 1; //当前页码
-							_self.totalpage = 1; //总页数
-							_self.on = '';//上一页
-							_self.next = '';//下一页
+							
+							_self.commentContent = '';//清空评论内容
+							_self.commentEditor.txt.clear();//清空编辑器内容
 						
 							//查询评论列表
 							_self.queryCommentList();
@@ -960,9 +1039,9 @@ var thread_component = Vue.extend({
 		
 		//添加引用评论
 		addQuote : function(event) {
-			if (!event._constructed) { //如果不存在这个属性,则不执行下面的函数
-				return;
-			}
+		//	if (!event._constructed) { //如果不存在这个属性,则不执行下面的函数
+		//		return;
+		//	}
 			var _self = this;
 			//清空所有错误
 			_self.error.quoteContent = "";
@@ -1011,6 +1090,7 @@ var thread_component = Vue.extend({
 
 						//提交成功
 						if (value_success == "true") {
+							
 							_self.$toast({
 								message : "提交成功",
 								duration : 3000,
@@ -1020,10 +1100,12 @@ var thread_component = Vue.extend({
 							
 							//清空分页数据
 							_self.commentList = []; //话题列表
-							_self.currentpage = 1; //当前页码
-							_self.totalpage = 1; //总页数
-							_self.on = '';//上一页
-							_self.next = '';//下一页
+							_self.quoteContent = '';//清空引用评论内容
+							_self.quoteEditor.txt.clear();//清空编辑器内容
+						//	_self.currentpage = 1; //当前页码
+						//	_self.totalpage = 1; //总页数
+						//	_self.on = '';//上一页
+						//	_self.next = '';//下一页
 						
 							//查询评论列表
 							_self.queryCommentList();
@@ -1141,9 +1223,9 @@ var thread_component = Vue.extend({
 		},
 		//添加回复
 		addReply : function(event) {
-			if (!event._constructed) { //如果不存在这个属性,则不执行下面的函数
-				return;
-			}
+		//	if (!event._constructed) { //如果不存在这个属性,则不执行下面的函数
+		//		return;
+		//	}
 			var _self = this;
 			//清空所有错误
 			_self.error.replyContent = "";
@@ -1201,10 +1283,11 @@ var thread_component = Vue.extend({
 							
 							//清空分页数据
 							_self.commentList = []; //话题列表
-							_self.currentpage = 1; //当前页码
-							_self.totalpage = 1; //总页数
-							_self.on = '';//上一页
-							_self.next = '';//下一页
+							
+						//	_self.currentpage = 1; //当前页码
+						//	_self.totalpage = 1; //总页数
+						//	_self.on = '';//上一页
+						//	_self.next = '';//下一页
 						
 							//查询评论列表
 							_self.queryCommentList();
@@ -1323,6 +1406,7 @@ var thread_component = Vue.extend({
 			this.scroll = new BScroll(ref, {
 				scrollY : true, //滚动方向为 Y 轴
 				click : true, //是否派发click事件
+				autoBlur:false,//默认值：true 在滚动之前会让当前激活的元素（input、textarea）自动失去焦点
 				preventDefault : true, //是否阻止默认事件
 				preventDefaultException:{ tagName: /^(INPUT|TEXTAREA|BUTTON|SELECT)$/ ,className:/(^|\s)(editor-toolbar|w-e-menu|editor-text|w-e-text)(\s|$)/},//列出哪些元素不屏蔽默认事件 className必须是最里层的元素
 			
@@ -1746,6 +1830,7 @@ var register_component = Vue.extend({
 						var value_error = null;
 						var value_jumpUrl = "";
 						var value_captchaKey = null;
+						var value_systemUser = null;//登录用户
 						for (var key in returnValue) {
 							if (key == "success") {
 								value_success = returnValue[key];
@@ -1755,9 +1840,15 @@ var register_component = Vue.extend({
 								value_jumpUrl = returnValue[key];
 							} else if (key == "captchaKey") {
 								value_captchaKey = returnValue[key];
+							} else if (key == "systemUser") {
+								value_systemUser = returnValue[key];
 							}
 						}
 						if (value_success == "true") { //成功
+							//设置登录用户
+							_self.$store.commit('setSystemUserId', value_systemUser.userId);
+							_self.$store.commit('setSystemUserName', value_systemUser.userName);
+							
 							_self.$toast({
 								message : "注册成功，3秒后自动跳转到首页",
 								duration : 3000,
@@ -2554,7 +2645,8 @@ var login_component = Vue.extend({
 						var key_error = null;
 						var key_jumpUrl = null;
 						var key_captchaKey = null;
-
+						var value_systemUser = null;//登录用户
+						
 						for (var key in returnValue) {
 							if (key == "success") {
 								key_success = returnValue[key];
@@ -2566,11 +2658,17 @@ var login_component = Vue.extend({
 							} else if (key == "captchaKey") {
 								//显示验证码
 								key_captchaKey = returnValue[key];
+							} else if (key == "systemUser") {
+								value_systemUser = returnValue[key];
 							}
 						}
 
 						//登录成功
 						if (key_success == "true") {
+							//设置登录用户
+							_self.$store.commit('setSystemUserId', value_systemUser.userId);
+							_self.$store.commit('setSystemUserName', value_systemUser.userName);
+							
 							if (key_jumpUrl != null) {
 								_self.$router.push(key_jumpUrl);
 							} else {
@@ -2684,25 +2782,31 @@ var home_component = Vue.extend({
 	data : function data() {
 		return {
 			user : '', //用户
-			waitingPaymentOrderQuantity : '', //待付款数量
-			shippedOrderQuantity : '', //已发货数量
 			popup_userSetting : false, //'用户设置'弹出层
 		}
 	},
 	created : function created() {
 		this.loadHome();
+		
+		//查询消息
+		this.unreadMessageCount();
 	},
 	methods : {
 		//加载用户中心页
 		loadHome : function() {
 			var _self = this;
-
+			var data = "";
+			var userName = getUrlParam("userName");//用户名称
+			if(userName != null){
+				data = "&userName=" + userName;
+			}
+			
 			$.ajax({
 				type : "GET",
 				cache : false,
 				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
 				url : "user/control/home",
-				//	data: data,
+				data: data,
 				success : function success(result) {
 					if (result != "") {
 						var returnValue = $.parseJSON(result);
@@ -2710,10 +2814,6 @@ var home_component = Vue.extend({
 						for (var key in returnValue) {
 							if (key == "user") {
 								_self.user = returnValue[key];
-							} else if (key == "waitingPaymentOrderQuantity") {
-								_self.waitingPaymentOrderQuantity = returnValue[key];
-							} else if (key == "shippedOrderQuantity") {
-								_self.shippedOrderQuantity = returnValue[key];
 							}
 						}
 
@@ -2754,6 +2854,10 @@ var home_component = Vue.extend({
 							}
 						}
 						if (value_success == "true") {
+							//清理登录信息
+							_self.$store.commit('setSystemUserId', '');
+							_self.$store.commit('setSystemUserName', '');
+							
 							_self.$router.replace({ path: '/'+value_jumpUrl });
 						} else {
 							for (var error in value_error) {
@@ -4460,6 +4564,580 @@ var userLoginLog_component = Vue.extend({
 });
 
 
+//私信
+var privateMessage_component = Vue.extend({
+	template : '#privateMessage-template',
+	data : function data() {
+		return {
+			privateMessageList : [], //私信集合
+			loading : false, //加载中
+			currentpage : 0, //当前页码
+			totalpage : 1, //总页数
+		}
+	},
+	created : function created() {
+		this.queryPrivateMessage();
+	},
+	methods : {
+		//查询私信列表
+		queryPrivateMessage : function() {
+			
+			var _self = this;
+			if (_self.currentpage < _self.totalpage) {
+				//先改总页数为0，避免请求为空时死循环
+				_self.totalpage = 0;
+				_self.loading = true;
+				var data = "page=" + (_self.currentpage + 1); //提交参数
+				$.ajax({
+					type : "GET",
+					cache : false,
+					async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+					url : "user/control/privateMessageList",
+					data : data,
+					success : function success(result) {
+						if (result != "") {
+							var pageView = $.parseJSON(result);
+
+							var new_privateMessageList = pageView.records;
+							if (new_privateMessageList != null && new_privateMessageList.length > 0) {
+								_self.privateMessageList.push.apply(_self.privateMessageList, new_privateMessageList); //合并两个数组
+							}
+							_self.currentpage = pageView.currentpage;
+							_self.totalpage = pageView.totalpage;
+						}
+					},
+					complete : function complete(XMLHttpRequest, textStatus) {
+						_self.loading = false;
+						//需手动调用设置的全局complete
+						$.ajaxSettings.complete(XMLHttpRequest, textStatus);
+					}
+				});
+			}
+		},
+		//删除私信
+		deletePrivateMessage : function(friendUserName) {
+			var _self = this;
+			_self.$messagebox.confirm('确定删除私信?').then(function (action) {
+				var parameter = "&friendUserName=" + friendUserName;
+
+				//	alert(parameter);
+				//令牌
+				parameter += "&token=" + _self.$store.state.token;
+				$.ajax({
+					type : "POST",
+					cache : false,
+					async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+					url : "user/control/deletePrivateMessage",
+					data : parameter,
+					success : function success(result) {
+						if (result != "") {
+
+							var returnValue = $.parseJSON(result);
+
+							var value_success = "";
+							var value_error = null;
+
+							for (var key in returnValue) {
+								if (key == "success") {
+									value_success = returnValue[key];
+								} else if (key == "error") {
+									value_error = returnValue[key];
+								}
+							}
+
+							//修改成功
+							if (value_success == "true") {
+								_self.$toast({
+									message : "删除成功",
+									duration : 3000,
+									className : "mint-ui-toast",
+								});
+								setTimeout(function() {
+									_self.privateMessageList = [];
+									_self.currentpage = 0;
+									_self.totalpage = 1;
+									//刷新所有私信
+									_self.queryPrivateMessage();
+								}, 3000);
+								
+							} else {
+								//显示错误
+								if (value_error != null) {
+
+
+									var htmlContent = "";
+									var count = 0;
+									for (var errorKey in value_error) {
+										var errorValue = value_error[errorKey];
+										count++;
+										htmlContent += count + ". " + errorValue + "<br>";
+									}
+									_self.$messagebox('提示', htmlContent);
+
+								}
+							}
+						}
+					}
+				});
+			});
+		}
+	}
+});
+
+
+//私信对话
+var privateMessageChat_component = Vue.extend({
+	template : '#privateMessageChat-template',
+	data : function data() {
+		return {
+			privateMessageChatList : [], //私信对话集合
+			friendUserName:'',//对方用户名称
+			friendUserNameTitle:'',//对方用户名称标题
+			loading : false, //加载中
+			currentpage : 0, //当前页码
+			totalpage : 1, //总页数
+			
+			popup_privateMessage :false,//发私信弹出层
+			messageContent:'',//发私信内容
+
+			showCaptcha : false, //发表评论/引用评论/发表回复是否显示验证码
+			imgUrl : '', //验证码图片
+			captchaKey : '', //验证码key
+			captchaValue : '', //验证码value
+			error : {
+				messageContent : '',
+				captchaValue : '',
+				privateMessage: '',
+			},
+		}
+	},
+	created : function created() {
+		//初始化
+		this.init();
+	},
+	beforeDestroy : function() {
+		//销毁滚动条
+		if (this.scroll != null) {
+			this.scroll.destroy();
+			this.scroll = null;
+		}
+	},
+	methods : {
+		//查询私信对话列表
+		queryPrivateMessageChat : function() {
+			var _self = this;
+			if (_self.currentpage < _self.totalpage) {
+				//先改总页数为0，避免请求为空时死循环
+				_self.totalpage = 0;
+				_self.loading = true;
+				var data = "page=" + (_self.currentpage + 1); //提交参数
+				data += "&friendUserName=" + _self.friendUserName;
+				$.ajax({
+					type : "GET",
+					cache : false,
+					async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+					url : "user/control/privateMessageChatList",
+					data : data,
+					success : function success(result) {
+						if (result != "") {
+							var returnValue = $.parseJSON(result);
+							
+							var chatUser = null;
+							var pageView = null;
+
+							for (var key in returnValue) {
+								if (key == "chatUser") {
+									chatUser = returnValue[key];
+								}else if (key == "pageView") {
+									pageView = returnValue[key];
+								}
+							}
+							var new_privateMessageChatList = pageView.records;
+							if (new_privateMessageChatList != null && new_privateMessageChatList.length > 0) {
+								_self.privateMessageChatList.push.apply(_self.privateMessageChatList, new_privateMessageChatList); //合并两个数组
+							}
+							_self.currentpage = pageView.currentpage;
+							_self.totalpage = pageView.totalpage;
+						}
+					},
+					complete : function complete(XMLHttpRequest, textStatus) {
+						_self.loading = false;
+						//需手动调用设置的全局complete
+						$.ajaxSettings.complete(XMLHttpRequest, textStatus);
+					}
+				});
+			}
+		},
+		//添加私信UI
+		addPrivateMessageUI : function(friendUserName) {
+			var _self = this;
+			this.popup_privateMessage = true;
+
+			//查询添加评论页
+			this.queryAddPrivateMessage();
+		},
+		//添加私信
+		addPrivateMessage : function() {
+			/**
+			if (!event._constructed) { //如果不存在这个属性,则不执行下面的函数
+				return;
+			}**/
+			var _self = this;
+			//清空所有错误
+			_self.error.messageContent = "";
+			_self.error.privateMessage = "";
+			_self.error.captchaValue = "";
+			
+			var parameter = "&friendUserName=" + _self.friendUserName; //提交参数
+			if (_self.messageContent != null && _self.messageContent != "") {
+				parameter += "&messageContent=" + encodeURIComponent(_self.messageContent);
+			}
+			
+			//验证码Key
+			parameter += "&captchaKey=" + encodeURIComponent(_self.captchaKey);
+
+			//验证码值
+			parameter += "&captchaValue=" + encodeURIComponent(_self.captchaValue.trim());
+
+			//令牌
+			parameter += "&token=" + _self.$store.state.token;
+			
+			$.ajax({
+				type : "POST",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "user/control/addPrivateMessage",
+				data : parameter,
+				success : function success(result) {
+					if (result != "") {
+						var returnValue = $.parseJSON(result);
+
+						var value_success = "";
+						var value_error = null;
+						var value_captchaKey = null;
+
+						for (var key in returnValue) {
+							if (key == "success") {
+								value_success = returnValue[key];
+							} else if (key == "error") {
+								value_error = returnValue[key];
+							} else if (key == "captchaKey") {
+								//显示验证码
+								value_captchaKey = returnValue[key];
+							}
+						}
+
+						//提交成功
+						if (value_success == "true") {
+							_self.$toast({
+								message : "提交成功",
+								duration : 3000,
+							});
+							_self.popup_privateMessage = false;
+
+							
+							//清空分页数据
+							_self.privateMessageChatList = []; //私信对话列表
+							_self.currentpage = 0; //当前页码
+							_self.totalpage = 1; //总页数
+							_self.messageContent = '';//发私信内容
+							//查询私信对话列表
+							_self.queryPrivateMessageChat();
+							
+						} else {
+							//显示错误
+							if (value_error != null) {
+								//有错误时清除验证码
+								_self.captchaValue = "";
+								var error_html = "";
+								for (var error in value_error) {
+									if (error != "") {
+										if (error == "messageContent") {
+											_self.error.messageContent = value_error[error];
+										} else if (error == "privateMessage") {
+											_self.error.privateMessage = value_error[error];
+										}  else if (error == "captchaValue") {
+											_self.error.captchaValue = value_error[error];
+										} else if (error == "token") {
+											//如果令牌错误
+											_self.$toast({
+												message : "页面已过期，3秒后自动刷新",
+												duration : 3000,
+											});
+											setTimeout(function() {
+												//刷新当前页面
+												window.location.reload();
+											}, 3000);
+										}
+									}
+								}
+							}
+
+							if (value_captchaKey != null) {
+								_self.showCaptcha = true;
+								_self.captchaKey = value_captchaKey;
+								_self.imgUrl = "captcha/" + value_captchaKey + ".jpg";
+								//设置验证码图片
+								_self.replaceCaptcha();
+							}
+						}
+					}
+				}
+			});
+
+		},
+		//查询添加私信页
+		queryAddPrivateMessage : function() {
+			var _self = this;
+
+			//清空表单
+			_self.showCaptcha = false, //是否显示验证码
+			_self.imgUrl = ''; //验证码图片
+			_self.captchaKey = ''; //验证码key
+			_self.captchaValue = ''; //验证码value
+	
+			var parameter = "&friendUserName=" + _self.friendUserName; //提交参数
+			
+			$.ajax({
+				type : "GET",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "user/control/addPrivateMessage",
+				data : parameter,
+				success : function success(result) {
+					if (result != "") {
+						var returnValue = $.parseJSON(result);
+						if (returnValue != null) {
+							for (var key in returnValue) {
+								if (key == "allowSendPrivateMessage") {
+									if(returnValue[key] == false){
+										_self.popup_reply = false;
+										_self.$toast({
+											message : "不允许发私信",
+											duration : 3000,
+										});
+									}	
+								}else if (key == "formCaptcha") {
+									//显示验证码
+									var formCaptcha = returnValue[key];
+									if (formCaptcha.showCaptcha == true) {
+										//alert(result);
+										_self.showCaptcha = true;
+										_self.captchaKey = formCaptcha.captchaKey;
+										_self.imgUrl = "captcha/" + formCaptcha.captchaKey + ".jpg";
+										//设置验证码图片
+										_self.replaceCaptcha();
+									}
+									
+									
+									
+								}
+							}
+						}
+						
+						//滚动
+						_self.$nextTick(function() {
+							_self.initScroll(_self.$refs.addPrivateMessageFormScroll);
+						});
+					}
+				}
+			});
+		},
+		//更换验证码
+		replaceCaptcha : function replaceCaptcha(event) {
+			var _self = this;
+			_self.imgUrl = "captcha/" + _self.captchaKey + ".jpg?" + Math.random();
+		},
+
+		//验证验证码
+		validation_captchaValue : function validation_captchaValue(event) {
+			var _self = this;
+			var cv = this.captchaValue.trim();
+			if (cv.length < 4) {
+				_self.error.captchaValue = "请填写完整验证码";
+			}
+			if (cv.length >= 4) {
+				var parameter = "";
+				parameter += "&captchaKey=" + _self.captchaKey;
+				parameter += "&captchaValue=" + cv;
+
+				$.ajax({
+					type : "GET",
+					cache : false,
+					async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+					url : "userVerification",
+					data : parameter,
+					success : function success(result) {
+						if (result == "false") {
+							_self.error.captchaValue = "验证码错误";
+						}
+					},
+					beforeSend : function beforeSend(XMLHttpRequest) {
+						//发送请求前
+						_self.$indicator.open({
+							spinnerType : 'fading-circle'
+						}); //显示旋转进度条
+
+						//清除验证码错误
+						_self.error.captchaValue = "";
+					},
+					complete : function complete(XMLHttpRequest, textStatus) {
+						//请求完成后回调函数 (请求成功或失败时均调用)
+						_self.$indicator.close(); //关闭旋转进度条
+					}
+				});
+			}
+		},
+		
+		//初始化
+		init : function() {
+				
+			var friendUserName = getUrlParam("friendUserName");
+			if(friendUserName != null){
+				this.friendUserName = friendUserName;
+				this.friendUserNameTitle = "与 "+friendUserName+" 的对话";
+			}
+			this.queryPrivateMessageChat();
+			
+			
+		},
+		//初始化BScroll滚动插件//this.$refs.addPrivateMessageFormScroll
+		initScroll : function initScroll(ref) {
+			this.scroll = new BScroll(ref, {
+				scrollY : true, //滚动方向为 Y 轴
+				click : true, //是否派发click事件
+				autoBlur:false,//默认值：true 在滚动之前会让当前激活的元素（input、textarea）自动失去焦点
+				preventDefault : true, //是否阻止默认事件
+				preventDefaultException:{ tagName: /^(INPUT|TEXTAREA|BUTTON|SELECT)$/ ,className:/(^|\s)(editor-toolbar|w-e-menu|editor-text|w-e-text)(\s|$)/},//列出哪些元素不屏蔽默认事件 className必须是最里层的元素
+				HWCompositing : true, //是否启用硬件加速
+			});
+		},
+	}
+});
+
+
+//系统通知
+var systemNotify_component = Vue.extend({
+	template : '#systemNotify-template',
+	data : function data() {
+		return {
+			subscriptionSystemNotifyList : [], //订阅系统通知集合
+			loading : false, //加载中
+			currentpage : 0, //当前页码
+			totalpage : 1, //总页数
+		}
+	},
+	created : function created() {
+		this.querySystemNotify();
+		
+	},
+	methods : {
+		//查询系统通知列表
+		querySystemNotify : function() {
+			var _self = this;
+			if (_self.currentpage < _self.totalpage) {
+				//先改总页数为0，避免请求为空时死循环
+				_self.totalpage = 0;
+				_self.loading = true;
+				var data = "page=" + (_self.currentpage + 1); //提交参数
+				$.ajax({
+					type : "GET",
+					cache : false,
+					async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+					url : "user/control/systemNotifyList",
+					data : data,
+					success : function success(result) {
+						if (result != "") {
+							var pageView = $.parseJSON(result);
+
+							var new_subscriptionSystemNotifyList = pageView.records;
+							if (new_subscriptionSystemNotifyList != null && new_subscriptionSystemNotifyList.length > 0) {
+								_self.subscriptionSystemNotifyList.push.apply(_self.subscriptionSystemNotifyList, new_subscriptionSystemNotifyList); //合并两个数组
+							}
+							_self.currentpage = pageView.currentpage;
+							_self.totalpage = pageView.totalpage;
+						}
+					},
+					complete : function complete(XMLHttpRequest, textStatus) {
+						_self.loading = false;
+						//需手动调用设置的全局complete
+						$.ajaxSettings.complete(XMLHttpRequest, textStatus);
+					}
+				});
+			}
+		},
+		//删除系统通知
+		deleteSystemNotify : function(id) {
+			var _self = this;
+			_self.$messagebox.confirm('确定删除系统通知?').then(function (action) {
+				var parameter = "&subscriptionSystemNotifyId=" + id;
+
+				//	alert(parameter);
+				//令牌
+				parameter += "&token=" + _self.$store.state.token;
+				$.ajax({
+					type : "POST",
+					cache : false,
+					async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+					url : "user/control/deleteSystemNotify",
+					data : parameter,
+					success : function success(result) {
+						if (result != "") {
+
+							var returnValue = $.parseJSON(result);
+
+							var value_success = "";
+							var value_error = null;
+
+							for (var key in returnValue) {
+								if (key == "success") {
+									value_success = returnValue[key];
+								} else if (key == "error") {
+									value_error = returnValue[key];
+								}
+							}
+
+							//修改成功
+							if (value_success == "true") {
+								_self.$toast({
+									message : "删除成功",
+									duration : 3000,
+									className : "mint-ui-toast",
+								});
+
+								setTimeout(function() {
+									_self.subscriptionSystemNotifyList = [];
+									_self.currentpage = 0;
+									_self.totalpage = 1;
+									//刷新系统通知
+									_self.querySystemNotify();
+								}, 3000);
+								
+							} else {
+								//显示错误
+								if (value_error != null) {
+
+
+									var htmlContent = "";
+									var count = 0;
+									for (var errorKey in value_error) {
+										var errorValue = value_error[errorKey];
+										count++;
+										htmlContent += count + ". " + errorValue + "<br>";
+									}
+									_self.$messagebox('提示', htmlContent);
+
+								}
+							}
+						}
+					}
+				});
+			});
+		}
+	}
+});
+
+
 
 /**------------------------------------------- 公共组件 ------------------------------------------------**/
 
@@ -4567,6 +5245,7 @@ var bottomTab_component = Vue.extend({
 			this.scroll = new BScroll(this.$refs.tagScroll, {
 				scrollY : true, //滚动方向为 Y 轴
 				click : true, //是否派发click事件
+				autoBlur:false,//默认值：true 在滚动之前会让当前激活的元素（input、textarea）自动失去焦点
 				preventDefault : true, //是否阻止默认事件
 				HWCompositing : true, //是否启用硬件加速
 			});
@@ -4603,6 +5282,10 @@ var routes = [
 	{path : '/user/control/updatePhoneBinding/step2',component : updatePhoneBinding_step2_component}, //更换手机绑定第二步
 	
 	{path : '/user/control/userLoginLogList',component : userLoginLog_component}, //登录日志
+	{path : '/user/control/privateMessageList',component : privateMessage_component}, //私信
+	{path : '/user/control/privateMessageChatList',component : privateMessageChat_component}, //私信对话
+	{path : '/user/control/systemNotifyList',component : systemNotify_component}, //系统通知
+	
 	{path : '*',redirect : '/index'} //其余路由重定向至首页
 ];
 
@@ -4619,7 +5302,10 @@ var store = new Vuex.Store({
 		user : {
 			userId : '',
 			userName : ''
-		}
+		},
+		privateMessage_badge: false,
+		systemNotify_badge: false,
+		allMessage_badge: false,
 	},
 	
 	
@@ -4641,6 +5327,28 @@ var store = new Vuex.Store({
 		//设置令牌标记
 		setToken : function setToken(state, token) {
 			state.token = token;
+		},
+		//设置登录用户Id
+		setSystemUserId : function setSystemUserId(state, userId) {
+			state.user.userId = userId;
+		},
+		//设置登录用户名称
+		setSystemUserName : function setSystemUserName(state, userName) {
+			state.user.userName = userName;
+		},
+		
+		
+		//设置私信未读状态
+		setPrivateMessage_badge : function setPrivateMessage_badge(state, isShow) {
+			state.privateMessage_badge = isShow;
+		},
+		//设置系统通知未读状态
+		setSystemNotify_badge : function setSystemNotify_badge(state, isShow) {
+			state.systemNotify_badge = isShow;
+		},
+		//设置消息未读状态
+		setAllMessage_badge : function setAllMessage_badge(state, isShow) {
+			state.allMessage_badge = isShow;
 		},
 	},
 	// 在store中定义getters（可以认为是store的计算属性）。Getters接收state作为其第一个函数
@@ -4726,6 +5434,18 @@ var vue = new Vue({
 			_self.$store.commit('setCommonPath', getMetaTag().commonPath);
 			_self.$store.commit('setContextPath', getMetaTag().contextPath);
 			_self.$store.commit('setToken', getMetaTag().token);
+			_self.$store.commit('setSystemUserId', getMetaTag().userId);
+			_self.$store.commit('setSystemUserName', getMetaTag().userName);
+			
+			_self.$store.commit('setPrivateMessage_badge', false);
+			_self.$store.commit('setSystemNotify_badge', false);
+			_self.$store.commit('setAllMessage_badge', false);
+			
+			
+			
+			//启动定时查询消息
+			_self.timerUnreadMessage();
+			
 			//	alert("初始化数据"+getMetaTag().contextPath);
 			//	alert("初始化数据"+this.$store.state.contextPath);
 
@@ -4737,6 +5457,15 @@ var vue = new Vue({
 			//	var param = location.search; //获取url中"?"符后的字串
 
 		//	alert(pathname+" -- "+param);
+		},
+		//定时查询消息
+		timerUnreadMessage: function timerUnreadMessage() {
+			var _self = this;
+			_self.unreadMessageCount();
+			
+			setTimeout(function () {
+				_self.timerUnreadMessage();
+			}, 15000);//15秒
 		}
 	}
 });
@@ -4749,6 +5478,9 @@ function getMetaTag() {
 	var commonPath = "";
 	var contextPath = "";
 	var token = "";
+	var userId = "";
+	var userName = "";
+	
 	var meta = document.getElementsByTagName("meta");
 	for (var i = 0; i < meta.length; i++) {
 		if (meta[i].name == "_baseURL") {
@@ -4763,6 +5495,12 @@ function getMetaTag() {
 		if (meta[i].name == "_token") {
 			token = meta[i].getAttribute("content");
 		}
+		if (meta[i].name == "_userId") {
+			userId = meta[i].getAttribute("content");
+		}
+		if (meta[i].name == "_userName") {
+			userName = meta[i].getAttribute("content");
+		}
 	}
 
 	var global = {
@@ -4773,7 +5511,11 @@ function getMetaTag() {
 		//系统虚拟目录
 		contextPath : contextPath,
 		//令牌
-		token : token
+		token : token,
+		//登录用户Id
+		userId : userId,
+		//登录用户名称
+		userName : userName,
 	};
 	return global;
 }
@@ -5007,5 +5749,8 @@ function createEditor(editorToolbar,editorText,imgPath,self,param) {
 	    	}  
 	    },
     };
-	return editor.create();
+    editor.create();
+	return editor;
 }
+
+

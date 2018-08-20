@@ -1,4 +1,4 @@
-﻿package cms.utils;
+package cms.utils;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -6,6 +6,8 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -27,7 +29,9 @@ import org.springframework.http.ResponseEntity;
 public class WebUtil {
 	private static final Logger logger = LogManager.getLogger(WebUtil.class);
 	
-	
+	//String regexp  = "((http[s]{0,1}|ftp)://[a-zA-Z0-9\\.\\-]+\\.([a-zA-Z]{2,4})(:\\d+)?(/[a-zA-Z0-9\\.\\-~!@#$%^&*+?:_/=<>]*)?)|(www.[a-zA-Z0-9\\.\\-]+\\.([a-zA-Z]{2,4})(:\\d+)?(/[a-zA-Z0-9\\.\\-~!@#$%^&*+?:_/=<>]*)?)"; // 结束条件
+	private static Pattern pattern = Pattern.compile("((http[s]{0,1})://[a-zA-Z0-9\\.\\-]+\\.([a-zA-Z]{2,4})(:\\d+)?(/[a-zA-Z0-9\\.\\-~!@#$%^&*+?:_/=<>]*)?)|(www.[a-zA-Z0-9\\.\\-]+\\.([a-zA-Z]{2,4})(:\\d+)?(/[a-zA-Z0-9\\.\\-~!@#$%^&*+?:_/=<>]*)?)", Pattern.CASE_INSENSITIVE);
+		
 	
     /**
      * 添加cookie
@@ -223,4 +227,29 @@ public class WebUtil {
         
         return new ResponseEntity<byte[]>(body, headers, status);
     }
+	
+	
+	
+	/**
+	 * 文本中的URL转超链接
+	 * @param text 文本
+	 * @return
+	 */
+	public static String urlToHyperlink(String text){
+		// url的正则表达式
+        Matcher matcher = pattern.matcher(text);
+        
+        String resultText = "";// （临时变量，保存转换后的文本）
+        int lastEnd = 0;// 保存每个链接最后一行的下标
+        
+        while(matcher.find()){
+        	resultText += text.substring(lastEnd, matcher.start());
+        	resultText += "<a target=\"_blank\" href=\"" + matcher.group() + "\">" + matcher.group() + "</a>";
+        	lastEnd = matcher.end();
+        }
+        resultText += text.substring(lastEnd);
+        return resultText;
+	}
+
+	
 }

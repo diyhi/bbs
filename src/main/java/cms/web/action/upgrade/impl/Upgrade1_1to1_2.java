@@ -44,7 +44,7 @@ public class Upgrade1_1to1_2 {
     		if(upgradeSystem.getRunningStatus()>=200 && upgradeSystem.getRunningStatus()<9999){
     			//更改运行状态
 				upgradeService.updateRunningStatus(upgradeId ,9999,JsonUtils.toJSONString(new UpgradeLog(new Date(),"升级完成",1))+",");
-				//写入当前商城版本
+				//写入当前BBS版本
 				fileManage.writeStringToFile("WEB-INF"+File.separator+"data"+File.separator+"systemVersion.txt",upgradeSystem.getId(),"utf-8",false);
 				
 				//临时目录路径

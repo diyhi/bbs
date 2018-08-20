@@ -82,7 +82,11 @@ function uploadFilterWordSubmit(){
         		
         	}
 			
-        }
+        },
+		error: function(XMLHttpRequest, textStatus, errorThrown) {
+			//jquery请求session过期跳转
+			timeoutJump(XMLHttpRequest);
+		}
     });
 
 }

@@ -1,4 +1,4 @@
-﻿package cms.bean.staff;
+package cms.bean.staff;
 
 import java.util.Set;
 import org.springframework.security.core.userdetails.UserDetails;

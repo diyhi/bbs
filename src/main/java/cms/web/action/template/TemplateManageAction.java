@@ -1,4 +1,4 @@
-﻿package cms.web.action.template;
+package cms.web.action.template;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -55,7 +55,7 @@ import cms.web.action.SystemException;
 import cms.web.action.TextFilterManage;
 
 /**
- * 模板目录管理 
+ * 模板目录管理
  *
  */
 @Controller

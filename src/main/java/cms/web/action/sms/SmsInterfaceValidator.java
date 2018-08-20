@@ -7,7 +7,7 @@ import org.springframework.validation.Validator;
 import cms.bean.sms.SmsInterface;
 
 /**
- * 在线支付接口校验器
+ * 短信接口校验器
  *
  */
 @Component("smsInterfaceValidator")

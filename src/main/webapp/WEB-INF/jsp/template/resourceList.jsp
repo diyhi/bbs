@@ -278,7 +278,11 @@ function uploadSubmit(nodeId,resourceId) {
         		
         	}
         	
-        }
+        },
+		error: function(XMLHttpRequest, textStatus, errorThrown) {
+			//jquery请求session过期跳转
+			timeoutJump(XMLHttpRequest);
+		}
     });
 	
 }

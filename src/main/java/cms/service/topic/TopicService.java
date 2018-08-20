@@ -1,5 +1,6 @@
 package cms.service.topic;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -74,6 +75,13 @@ public interface TopicService extends DAO<Topic>{
 	 * @return
 	 */
 	public Integer markDelete(Long topicId);
+	/**
+	 * 修改话题最后回复时间
+	 * @param topicId 话题Id
+	 * @param lastReplyTime 最后回复时间
+	 * @return
+	 */
+	public Integer updateTopicReplyTime(Long topicId,Date lastReplyTime);
 	/**
 	 * 删除话题
 	 * @param topicId 话题Id

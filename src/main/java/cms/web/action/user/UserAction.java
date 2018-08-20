@@ -1,4 +1,4 @@
-﻿package cms.web.action.user;
+package cms.web.action.user;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -52,7 +52,7 @@ public class UserAction {
 	@Resource UserCustomService userCustomService;
 	
 	@Resource SettingService settingService;
-	
+
 	/**
 	 * 用户列表
 	 * @param formbean
@@ -67,8 +67,9 @@ public class UserAction {
 	@RequestMapping("/control/user/list") 
 	public String execute(User formbean,PageForm pageForm,Boolean queryState,ModelMap model,
 			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {	
-
+			throws Exception {		
+	
+		
 		//调用分页算法代码
 		PageView<User> pageView = new PageView<User>(settingService.findSystemSetting_cache().getBackstagePageNumber(),pageForm.getPage(),10);
 		//当前页

@@ -48,6 +48,8 @@ public class SystemSetting implements Serializable{
 	private Integer topic_submitQuantity = 5;
 	/** 发表评论每分钟提交超过N次出现验证码 **/
 	private Integer comment_submitQuantity = 5;
+	/** 发表私信每分钟提交超过N次出现验证码 **/
+	private Integer privateMessage_submitQuantity = 5;
 	
 	/** 发表话题奖励积分 **/
 	private Long topic_rewardPoint = 0L;
@@ -355,6 +357,14 @@ public class SystemSetting implements Serializable{
 
 	public void setFilterWordReplace(String filterWordReplace) {
 		this.filterWordReplace = filterWordReplace;
+	}
+
+	public Integer getPrivateMessage_submitQuantity() {
+		return privateMessage_submitQuantity;
+	}
+
+	public void setPrivateMessage_submitQuantity(Integer privateMessage_submitQuantity) {
+		this.privateMessage_submitQuantity = privateMessage_submitQuantity;
 	}
 
 	

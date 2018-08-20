@@ -20,7 +20,6 @@ import cms.utils.ObjectConversion;
 
 /**
  * 话题
- * @author Gao
  *
  */
 @Service
@@ -269,6 +268,24 @@ public class TopicServiceBean extends DaoSupport<Topic> implements TopicService{
 		return i;
 		
 	}
+	
+	
+	/**
+	 * 修改话题最后回复时间
+	 * @param topicId 话题Id
+	 * @param lastReplyTime 最后回复时间
+	 * @return
+	 */
+	public Integer updateTopicReplyTime(Long topicId,Date lastReplyTime){
+		int i = 0;
+		Query query = em.createQuery("update Topic o set o.lastReplyTime=?1 where o.id=?2")
+		.setParameter(1, lastReplyTime)
+		.setParameter(2, topicId);
+		i= query.executeUpdate();
+		return i;
+		
+	}
+	
 	
 	
 	

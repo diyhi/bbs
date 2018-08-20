@@ -57,6 +57,7 @@ import cms.web.action.setting.SettingManage;
 import cms.web.action.thumbnail.ThumbnailManage;
 import cms.web.action.topic.TopicManage;
 import cms.web.action.user.PointManage;
+import cms.web.action.user.UserManage;
 import cms.web.taglib.Configuration;
 
 /**
@@ -88,6 +89,7 @@ public class TopicFormAction {
 	@Resource SensitiveWordFilterManage sensitiveWordFilterManage;
 	@Resource ThumbnailService thumbnailService;
 	@Resource ThumbnailManage thumbnailManage;
+	@Resource UserManage userManage;
 	
 	/**
 	 * 话题  添加
@@ -175,7 +177,7 @@ public class TopicFormAction {
 		
 		//如果实名用户才允许提交话题
 		if(systemSetting.isRealNameUserAllowTopic() == true){
-			User _user = userService.findUserByUserName(accessUser.getUserName());
+			User _user = userManage.query_cache_findUserByUserName(accessUser.getUserName());
 			if(_user.isRealNameAuthentication() == false){
 				error.put("topic", ErrorView._109.name());//实名用户才允许提交话题
 			}
@@ -342,7 +344,9 @@ public class TopicFormAction {
 			
 			//增加用户积分
 			userService.addUserPoint(accessUser.getUserName(),systemSetting.getTopic_rewardPoint(), pointManage.createPointLogObject(pointLog));
-			
+			//删除缓存
+			userManage.delete_cache_findUserById(accessUser.getUserId());
+			userManage.delete_cache_findUserByUserName(accessUser.getUserName());
 			
 			String fileNumber = "b"+ accessUser.getUserId();
 			
@@ -524,7 +528,7 @@ public class TopicFormAction {
 		
 		//如果实名用户才允许提交话题
 		if(systemSetting.isRealNameUserAllowTopic() == true){
-			User _user = userService.findUserByUserName(accessUser.getUserName());
+			User _user = userManage.query_cache_findUserByUserName(accessUser.getUserName());
 			if(_user.isRealNameAuthentication() == false){
 				flag = false;
 			}

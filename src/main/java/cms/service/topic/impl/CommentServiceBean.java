@@ -1,10 +1,7 @@
 package cms.service.topic.impl;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 import javax.annotation.Resource;
 import javax.persistence.Query;
 

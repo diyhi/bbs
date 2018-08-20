@@ -1,4 +1,4 @@
-﻿package cms.service.user.impl;
+package cms.service.user.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -23,6 +23,8 @@ import cms.bean.user.UserGrade;
 import cms.bean.user.UserInputValue;
 import cms.bean.user.UserLoginLog;
 import cms.service.besa.DaoSupport;
+import cms.service.message.PrivateMessageService;
+import cms.service.message.SystemNotifyService;
 import cms.service.user.UserGradeService;
 import cms.service.user.UserService;
 import cms.utils.ObjectConversion;
@@ -47,7 +49,8 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 	
 	@Resource UserLoginLogConfig userLoginLogConfig;
 
-	
+	@Resource PrivateMessageService privateMessageService;
+	@Resource SystemNotifyService systemNotifyService;
 	/**
 	 * 根据条件分页查询用户名称
 	 * @param jpql SQL
@@ -284,6 +287,10 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 		return null;
 		
 	}
+	
+	
+	
+	
 	/**
 	 * 根据用户Id集合查询当前用户
 	 * @param userIdList 用户Id集合
@@ -523,7 +530,10 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 				.setParameter("isStaff", false);
 		delete_reply.executeUpdate();
 		
-		
+		//删除私信
+		privateMessageService.deleteUserPrivateMessage(idList);
+		//删除用户所有订阅系统通知
+		systemNotifyService.deleteUserSubscriptionSystemNotify(idList);
 		
 		return j;
 	}

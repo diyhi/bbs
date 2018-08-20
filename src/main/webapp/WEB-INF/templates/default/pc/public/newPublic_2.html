@@ -23,10 +23,68 @@
 					<#-- 已登录 -->
 					<li><a href="user/control/home">${systemUser.userName}</a></li>
 					<li><a href="" onClick="javascript:document.getElementById('logout').submit();return false;">退出</a></li>
-					<li><a href="user/control/home">用户中心</a></li>
+					<li><a href="user/control/home">用户中心<span id="allMessage-badge" class="badge" style="position: absolute; margin-top: 14px; display: none;"></span></a></li>
 					<form id="logout" action="logout.htm?token=${token}" method="post" ></form>
+					<script language="javascript" type="text/javascript">
+						//查询未读消息
+						function queryUnreadMessage(){
+							get_request(function(value){
+						       	if(value != ""){
+						        	var unreadMessage = JSON.parse(value);
+						        	var privateMessageCount = parseInt(unreadMessage.privateMessageCount);
+						        	var systemNotifyCount = parseInt(unreadMessage.systemNotifyCount);
+						        	if(privateMessageCount >0){
+						        		//显示红点
+						        		var privateMessage_badge = document.getElementById("privateMessage-badge");//用户中心页
+						        		if(privateMessage_badge != null){
+						        			privateMessage_badge.style.display = "";//显示
+						        		}
+						        	}else{
+						        		//隐藏红点
+						        		var privateMessage_badge = document.getElementById("privateMessage-badge");//用户中心页
+						        		if(privateMessage_badge != null){
+						        			privateMessage_badge.style.display = "none";//隐藏
+						        		}
+						        	}
+						        	if(systemNotifyCount >0){
+						        		//显示红点
+						        		var systemNotify_badge = document.getElementById("systemNotify-badge");//用户中心页
+						        		if(systemNotify_badge != null){
+						        			systemNotify_badge.style.display = "";//显示
+						        		}
+						        	}else{
+						        		//隐藏红点
+						        		var systemNotify_badge = document.getElementById("systemNotify-badge");//用户中心页
+						        		if(systemNotify_badge != null){
+						        			systemNotify_badge.style.display = "none";//隐藏
+						        		}
+						        	}
+						         	
+						         	//所有消息
+						         	if((privateMessageCount + systemNotifyCount)>0){
+						         		//显示红点
+						        		var allMessage_badge = document.getElementById("allMessage-badge");
+						        		if(allMessage_badge != null){
+						        			allMessage_badge.style.display = "";//显示
+						        		}
+						         	}else{
+						         		//隐藏红点
+						        		var allMessage_badge = document.getElementById("allMessage-badge");
+						        		if(allMessage_badge != null){
+						        			allMessage_badge.style.display = "none";//隐藏
+						        		}
+						         	}
+						       	}
+						     },
+							"user/control/unreadMessageCount?timestamp=" + new Date().getTime(), true);
+						}
+						queryUnreadMessage();
+					</script>
+					
 				</#if>
 			</ul>
 		</div>
 	</div>
 </div>
+
+

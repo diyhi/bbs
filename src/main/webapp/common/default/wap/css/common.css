@@ -30,6 +30,20 @@ html,body{
 .mint-ui-toast{z-index: 999999;}
 
 
+.badge{
+	display: inline-block;
+	padding: .15em .4em;
+	min-width: 8px;
+	border-radius: 18px;
+	background-color: #F43530;
+	color: #FFFFFF;
+	line-height: 1.2;
+	text-align: center;
+	font-size: 12px;
+	vertical-align: middle;
+	padding: .3em;
+	min-width: 0;
+}
 
 
 
@@ -652,7 +666,28 @@ html,body{
 .homeModule .homeHeader .user .avatar{position:absolute;left:10px;top:15px;display:inline-block;background-size:212px 645px;font-size:74px;}
 .homeModule .homeHeader .user .userName{line-height:26px;margin:5px 0; font-size:16px;}
 .homeModule .homeHeader .user .grade{line-height:20px;background-repeat:no-repeat;background-position:left center;background-size:auto 100%;font-size:12px;height:20px;width:60px;display:inline-block;background-color:#56b7ff;border-radius:20px;text-align:center;}
-
+.homeModule .homeHeader .privateMessageBox{
+	margin-left: 30px;
+}
+.privateMessageButton{
+	color: #fff;
+    border-color: #fff;
+    outline: none;
+    display: inline-block;
+    padding: 0 16px;
+    font-size: 14px;
+    line-height: 32px;
+    text-align: center;
+    cursor: pointer;
+    background: none;
+    border: 1px solid;
+    border-radius: 3px;
+    margin: 0;
+	
+}
+.privateMessageButton:hover {  
+    background: #0b90f6;  
+}  
 .homeModule .setting{position: absolute;right: 12px;top: 12px; font-size: 20px; color: #fff; }
 
 /* 用户设置滚动层 */
@@ -916,3 +951,228 @@ html,body{
 }
 
 
+/** 私信 **/
+.privateMessageModule{
+	padding-top: 40px;padding-bottom: 2px;
+}
+.privateMessageModule .privateMessageList {
+	width: 100%;
+	overflow-x: hidden
+}
+.privateMessageModule .privateMessageList .item {
+	border-bottom: 1px solid #eee;
+	margin-left: 8px; 
+	margin-right: 8px;
+}
+.privateMessageModule .privateMessageList .badge {
+	font-size: 10px;
+	color: #fff;
+	vertical-align: top;
+	background-color: #26a2ff;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	padding: 0 3px;
+	margin-left: 3px
+}
+.privateMessageModule .privateMessageList .item .head {
+	min-height: 45px;
+	padding: 8px 3px 0;
+	margin: 0;
+	overflow: hidden;
+}
+.privateMessageModule .privateMessageList .item .head .info {
+	display: block;
+	float: left
+}
+.privateMessageModule .privateMessageList .item .head .info h2 {
+	color:#aaa;
+	font-size:14px;
+	line-height: 16px
+}
+.privateMessageModule .privateMessageList .item .head .time {
+	font-size: 12px;
+	color:#aaa;
+	margin-top: 6px;
+	line-height: 12px
+}
+.privateMessageModule .privateMessageList .item .head .operating {
+	float: right;
+	font-size: 12px;
+	color:#aaa;
+}
+.privateMessageModule .privateMessageList .item .head .operating .delete-btn{
+	color: #999;
+	font-size: 14px;
+}
+.privateMessageModule .privateMessageList .item .main {
+	padding: 0 8px 0 8px;
+	font-size: 16px;
+	line-height: 26px;
+	margin: 0 0 10px
+}
+.privateMessageModule .privateMessageList .item .main .content {
+	margin-bottom: 10px;
+	color:#222;
+}
+
+
+
+
+
+/** 私信对话 **/
+.privateMessageChatModule{
+	padding-top: 40px;padding-bottom: 2px;
+}
+
+.privateMessageChatModule .headInfo{margin-top: 10px; margin-left:8px; margin-right:8px; border-bottom:1px solid #eee; height: 38px; }
+.privateMessageChatModule .headInfo .title{
+	margin-left:10px;
+	float: left;
+	font-size: 16px; 
+	color:#2192f8;
+	padding:6px 0;
+}
+.privateMessageChatModule .headInfo .button{
+	float: right;
+}
+
+
+.privateMessageChatModule .privateMessageChatList {
+	width: 100%;
+	overflow-x: hidden
+}
+.privateMessageChatModule .privateMessageChatList .item {
+	border-bottom: 1px solid #eee;
+	margin-left: 8px; 
+	margin-right: 8px;
+}
+.privateMessageChatModule .privateMessageChatList .badge {
+	font-size: 10px;
+	color: #fff;
+	vertical-align: top;
+	background-color: #26a2ff;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	padding: 0 3px;
+	margin-left: 3px
+}
+.privateMessageChatModule .privateMessageChatList .item .head {
+	min-height: 45px;
+	padding: 8px 3px 0;
+	margin: 0;
+	overflow: hidden;
+}
+.privateMessageChatModule .privateMessageChatList .item .head .info {
+	display: block;
+	float: left
+}
+.privateMessageChatModule .privateMessageChatList .item .head .info h2 {
+	color:#aaa;
+	font-size:14px;
+	line-height: 16px
+}
+.privateMessageChatModule .privateMessageChatList .item .head .time {
+	font-size: 12px;
+	color:#aaa;
+	margin-top: 6px;
+	line-height: 12px
+}
+.privateMessageChatModule .privateMessageChatList .item .main {
+	padding: 0 8px 0 8px;
+	font-size: 16px;
+	line-height: 26px;
+	margin: 0 0 10px
+}
+.privateMessageChatModule .privateMessageChatList .item .main .content {
+	margin-bottom: 10px;
+	color:#222;
+}
+.privateMessageChatModule .addPrivateMessageScroll {
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    right:0;
+    margin-bottom: 0;
+    border-bottom: none;
+    /**
+    overflow-y:hidden;**/
+    -webkit-overflow-scrolling: touch;
+    overflow-scrolling: touch;
+}
+.privateMessageChatModule .addPrivateMessageScroll .box{
+	padding-top: 40px;
+}
+.privateMessageChatModule .addPrivateMessageScroll .box .chatUser{margin-top: 10px; margin-left:2px; margin-right:2px; border-bottom:1px solid #eee; height: 38px; }
+.privateMessageChatModule .addPrivateMessageScroll .box .chatUser .userName{
+	margin-left:10px;
+	float: left;
+	font-size: 16px; 
+	color:#2192f8;
+	padding:6px 0;
+}
+.privateMessageChatModule .addPrivateMessageScroll .box .addPrivateMessageForm{margin-left:5px; margin-right: 5px;}
+.privateMessageChatModule .addPrivateMessageScroll .box .addPrivateMessageForm .messageContent{background: #ffffff;
+    border: 1px solid rgba(39,41,43,0.15);
+    outline: none; color: rgba(0,0,0,0.8);
+    border-radius: 0.28rem;line-height: 20px;font-size: 14px;width: 100%;}
+.privateMessageChatModule .addPrivateMessageScroll .box .addPrivateMessageForm .tips{line-height:30px; margin-left: 115px}
+.privateMessageChatModule .addPrivateMessageScroll .box .addPrivateMessageForm .tips span{color: red;}
+
+
+/** 系统通知 **/
+.systemNotifyModule{
+	padding-top: 40px;padding-bottom: 2px;
+}
+.systemNotifyModule .systemNotifyList {
+	width: 100%;
+	overflow-x: hidden
+}
+.systemNotifyModule .systemNotifyList .item {
+	border-bottom: 1px solid #eee;
+	margin-left: 8px; 
+	margin-right: 8px;
+}
+.systemNotifyModule .systemNotifyList .badge {
+	font-size: 10px;
+	color: #fff;
+	vertical-align: top;
+	background-color: #26a2ff;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	padding: 0 3px;
+	margin-left: 3px
+}
+.systemNotifyModule .systemNotifyList .item .head {
+	min-height: 25px;
+	padding: 8px 3px 0;
+	margin: 0;
+	overflow: hidden;
+}
+.systemNotifyModule .systemNotifyList .item .head .info {
+	display: block;
+	float: left
+}
+.systemNotifyModule .systemNotifyList .item .head .info h2 {
+	color:#aaa;
+	font-size:14px;
+	line-height: 16px
+}
+.systemNotifyModule .systemNotifyList .item .head .operating {
+	float: right;
+	font-size: 12px;
+	color:#aaa;
+}
+.systemNotifyModule .systemNotifyList .item .head .operating .delete-btn{
+	color: #999;
+	font-size: 14px;
+}
+.systemNotifyModule .systemNotifyList .item .main {
+	padding: 0 8px 0 8px;
+	font-size: 16px;
+	line-height: 26px;
+	margin: 0 0 10px
+}
+.systemNotifyModule .systemNotifyList .item .main .content {
+	margin-bottom: 10px;
+	color:#222;
+}

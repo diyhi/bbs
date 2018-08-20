@@ -26,13 +26,13 @@ public class BeanFactoryPost implements BeanFactoryPostProcessor{
 		
 		BeanDefinition pointLog_bd = beanFactory.getBeanDefinition("pointLogConfig");
 		if(pointLog_bd != null){
-			MutablePropertyValues pointLog_mutablePropertyValues = pointLog_bd.getPropertyValues();
-			TypedStringValue pointLog_typedStringValue = (TypedStringValue)pointLog_mutablePropertyValues.getPropertyValue("tableQuantity").getValue();
+			MutablePropertyValues mutablePropertyValues = pointLog_bd.getPropertyValues();
+			TypedStringValue typedStringValue = (TypedStringValue)mutablePropertyValues.getPropertyValue("tableQuantity").getValue();
 
 			//积分日志分表数量
-			Integer pointLog_tableQuantity = Integer.parseInt(pointLog_typedStringValue.getValue());
-			if(pointLog_tableQuantity >1){
-				for(int i =1; i<pointLog_tableQuantity; i++){
+			Integer tableQuantity = Integer.parseInt(typedStringValue.getValue());
+			if(tableQuantity >1){
+				for(int i =1; i<tableQuantity; i++){
 					
 					//初始化积分日志bean
 					CreateBean.createPointLogBean(i);
@@ -43,13 +43,13 @@ public class BeanFactoryPost implements BeanFactoryPostProcessor{
 		
 		BeanDefinition userLoginLog_bd = beanFactory.getBeanDefinition("userLoginLogConfig");
 		if(userLoginLog_bd != null){
-			MutablePropertyValues userLoginLog_mutablePropertyValues = userLoginLog_bd.getPropertyValues();
-			TypedStringValue userLoginLog_typedStringValue = (TypedStringValue)userLoginLog_mutablePropertyValues.getPropertyValue("tableQuantity").getValue();
+			MutablePropertyValues mutablePropertyValues = userLoginLog_bd.getPropertyValues();
+			TypedStringValue typedStringValue = (TypedStringValue)mutablePropertyValues.getPropertyValue("tableQuantity").getValue();
 
 			//用户登录日志分表数量
-			Integer userLoginLog_tableQuantity = Integer.parseInt(userLoginLog_typedStringValue.getValue());
-			if(userLoginLog_tableQuantity >1){
-				for(int i =1; i<userLoginLog_tableQuantity; i++){
+			Integer tableQuantity = Integer.parseInt(typedStringValue.getValue());
+			if(tableQuantity >1){
+				for(int i =1; i<tableQuantity; i++){
 					
 					//初始化登录日志bean
 					CreateBean.createUserLoginLogBean(i);
@@ -59,13 +59,13 @@ public class BeanFactoryPost implements BeanFactoryPostProcessor{
 		
 		BeanDefinition staffLoginLog_bd = beanFactory.getBeanDefinition("staffLoginLogConfig");
 		if(staffLoginLog_bd != null){
-			MutablePropertyValues staffLoginLog_mutablePropertyValues = staffLoginLog_bd.getPropertyValues();
-			TypedStringValue staffLoginLog_typedStringValue = (TypedStringValue)staffLoginLog_mutablePropertyValues.getPropertyValue("tableQuantity").getValue();
+			MutablePropertyValues mutablePropertyValues = staffLoginLog_bd.getPropertyValues();
+			TypedStringValue typedStringValue = (TypedStringValue)mutablePropertyValues.getPropertyValue("tableQuantity").getValue();
 
 			//员工登录日志分表数量
-			Integer staffLoginLog_tableQuantity = Integer.parseInt(staffLoginLog_typedStringValue.getValue());
-			if(staffLoginLog_tableQuantity >1){
-				for(int i =1; i<staffLoginLog_tableQuantity; i++){
+			Integer tableQuantity = Integer.parseInt(typedStringValue.getValue());
+			if(tableQuantity >1){
+				for(int i =1; i<tableQuantity; i++){
 					
 					//初始化登录日志bean
 					CreateBean.createStaffLoginLogBean(i);
@@ -73,5 +73,36 @@ public class BeanFactoryPost implements BeanFactoryPostProcessor{
 			}
 		}
 		
+		BeanDefinition privateMessage_bd = beanFactory.getBeanDefinition("privateMessageConfig");
+		if(privateMessage_bd != null){
+			MutablePropertyValues mutablePropertyValues = privateMessage_bd.getPropertyValues();
+			TypedStringValue typedStringValue = (TypedStringValue)mutablePropertyValues.getPropertyValue("tableQuantity").getValue();
+
+			//私信分表数量
+			Integer tableQuantity = Integer.parseInt(typedStringValue.getValue());
+			if(tableQuantity >1){
+				for(int i =1; i<tableQuantity; i++){
+					
+					//初始化私信bean
+					CreateBean.createPrivateMessageBean(i);
+				}	
+			}
+		}
+		
+		BeanDefinition subscriptionSystemNotify_bd = beanFactory.getBeanDefinition("subscriptionSystemNotifyConfig");
+		if(subscriptionSystemNotify_bd != null){
+			MutablePropertyValues mutablePropertyValues = subscriptionSystemNotify_bd.getPropertyValues();
+			TypedStringValue typedStringValue = (TypedStringValue)mutablePropertyValues.getPropertyValue("tableQuantity").getValue();
+
+			//订阅系统通知分表数量
+			Integer tableQuantity = Integer.parseInt(typedStringValue.getValue());
+			if(tableQuantity >1){
+				for(int i =1; i<tableQuantity; i++){
+					
+					//初始化订阅系统通知bean
+					CreateBean.createSubscriptionSystemNotifyBean(i);
+				}	
+			}
+		}
 	}
 }

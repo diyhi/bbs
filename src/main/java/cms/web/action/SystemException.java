@@ -1,4 +1,4 @@
-﻿package cms.web.action;
+package cms.web.action;
 
 /**
  * 统一异常处理(接收异常参数)

@@ -1,4 +1,4 @@
-﻿package cms.service.setting.impl;
+package cms.service.setting.impl;
 
 import cms.bean.setting.SystemSetting;
 import cms.service.besa.DaoSupport;

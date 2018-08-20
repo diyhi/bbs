@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'themify';
-  src:  url('fonts/themify.eot?p1wons');
-  src:  url('fonts/themify.eot?p1wons#iefix') format('embedded-opentype'),
-    url('fonts/themify.ttf?p1wons') format('truetype'),
-    url('fonts/themify.woff?p1wons') format('woff'),
-    url('fonts/themify.svg?p1wons#themify') format('svg');
+  src:  url('fonts/themify.eot?st72xk');
+  src:  url('fonts/themify.eot?st72xk#iefix') format('embedded-opentype'),
+    url('fonts/themify.ttf?st72xk') format('truetype'),
+    url('fonts/themify.woff?st72xk') format('woff'),
+    url('fonts/themify.svg?st72xk#themify') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -24,8 +24,14 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.cms-quote:before {
-  content: "\e908";
+.cms-announcement:before {
+  content: "\e64f";
+}
+.cms-bell:before {
+  content: "\e6b8";
+}
+.cms-email:before {
+  content: "\e75a";
 }
 .cms-user:before {
   content: "\e602";
@@ -107,6 +113,9 @@
 }
 .cms-realNameAuthentication:before {
   content: "\e907";
+}
+.cms-quote:before {
+  content: "\e908";
 }
 .cms-user2:before {
   content: "\e909";

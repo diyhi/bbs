@@ -1,4 +1,4 @@
-﻿package cms.web.action.staff;
+package cms.web.action.staff;
 
 import java.io.IOException;
 
@@ -20,7 +20,6 @@ import org.springframework.security.web.access.intercept.FilterInvocationSecurit
  * securityMetadataSource相当于本包中自定义的MyInvocationSecurityMetadataSourceService。
  * 该MyInvocationSecurityMetadataSourceService的作用提从数据库提取权限和资源，装配到HashMap中，
  * 供Spring Security使用，用于权限校验。
- * @author sparta 11/3/29
  *
  */
 

@@ -126,7 +126,6 @@ function sureSubmit() {
         	request.setRequestHeader(csrf.header, csrf.token);
         },
 		success:function(result) {
-		
 			var data = $.parseJSON(result);
 				
 			for(var returnValue in data){

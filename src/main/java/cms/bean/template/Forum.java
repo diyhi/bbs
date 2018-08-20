@@ -1,4 +1,4 @@
-﻿package cms.bean.template;
+package cms.bean.template;
 
 
 import java.io.Serializable;

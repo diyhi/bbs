@@ -1,4 +1,4 @@
-﻿package cms.service.upgrade.impl;
+package cms.service.upgrade.impl;
 
 
 import java.util.List;
@@ -100,5 +100,15 @@ public class UpgradeServiceBean extends DaoSupport<UpgradeSystem> implements Upg
 		return query_refund.executeUpdate();
 	}
 	
+	/**
+	 * 插入原生SQL
+	 * @param sql
+	 * @return
+	 */
+	public Integer insertNativeSQL(String sql){
+		Query query = em.createNativeQuery(sql);
+		
+		return query.executeUpdate();
+	}
 	
 }

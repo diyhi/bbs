@@ -20,7 +20,7 @@ CREATE TABLE `comment` (
   KEY `comment_1_idx` (`topicId`,`status`),
   KEY `comment_2_idx` (`quoteIdGroup`(191)),
   KEY `comment_3_idx` (`userName`,`isStaff`)
-) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 #
 # Structure for table "customreply"
@@ -230,6 +230,79 @@ CREATE TABLE `pointlog_3` (
   KEY `pointlog_idx` (`userName`,`times`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+
+CREATE TABLE `privatemessage_0` (
+  `id` varchar(36) NOT NULL,
+  `friendUserId` bigint(20) DEFAULT NULL,
+  `messageContent` longtext,
+  `readTimeFormat` bigint(20) DEFAULT NULL,
+  `receiverUserId` bigint(20) DEFAULT NULL,
+  `sendTimeFormat` bigint(20) DEFAULT NULL,
+  `senderUserId` bigint(20) DEFAULT NULL,
+  `status` int(11) DEFAULT NULL,
+  `userId` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `privateMessage_1_idx` (`userId`,`status`,`sendTimeFormat`),
+  KEY `privateMessage_2_idx` (`userId`,`friendUserId`,`status`,`sendTimeFormat`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "privatemessage_1"
+#
+
+CREATE TABLE `privatemessage_1` (
+  `id` varchar(36) NOT NULL,
+  `friendUserId` bigint(20) DEFAULT NULL,
+  `messageContent` longtext,
+  `readTimeFormat` bigint(20) DEFAULT NULL,
+  `receiverUserId` bigint(20) DEFAULT NULL,
+  `sendTimeFormat` bigint(20) DEFAULT NULL,
+  `senderUserId` bigint(20) DEFAULT NULL,
+  `status` int(11) DEFAULT NULL,
+  `userId` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `privateMessage_1_idx` (`userId`,`status`,`sendTimeFormat`),
+  KEY `privateMessage_2_idx` (`userId`,`friendUserId`,`status`,`sendTimeFormat`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "privatemessage_2"
+#
+
+CREATE TABLE `privatemessage_2` (
+  `id` varchar(36) NOT NULL,
+  `friendUserId` bigint(20) DEFAULT NULL,
+  `messageContent` longtext,
+  `readTimeFormat` bigint(20) DEFAULT NULL,
+  `receiverUserId` bigint(20) DEFAULT NULL,
+  `sendTimeFormat` bigint(20) DEFAULT NULL,
+  `senderUserId` bigint(20) DEFAULT NULL,
+  `status` int(11) DEFAULT NULL,
+  `userId` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `privateMessage_1_idx` (`userId`,`status`,`sendTimeFormat`),
+  KEY `privateMessage_2_idx` (`userId`,`friendUserId`,`status`,`sendTimeFormat`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "privatemessage_3"
+#
+
+CREATE TABLE `privatemessage_3` (
+  `id` varchar(36) NOT NULL,
+  `friendUserId` bigint(20) DEFAULT NULL,
+  `messageContent` longtext,
+  `readTimeFormat` bigint(20) DEFAULT NULL,
+  `receiverUserId` bigint(20) DEFAULT NULL,
+  `sendTimeFormat` bigint(20) DEFAULT NULL,
+  `senderUserId` bigint(20) DEFAULT NULL,
+  `status` int(11) DEFAULT NULL,
+  `userId` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `privateMessage_1_idx` (`userId`,`status`,`sendTimeFormat`),
+  KEY `privateMessage_2_idx` (`userId`,`friendUserId`,`status`,`sendTimeFormat`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 #
 # Structure for table "pv"
 #
@@ -351,6 +424,73 @@ CREATE TABLE `staffloginlog_3` (
   KEY `staffLoginLog_idx` (`staffId`,`logonTime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+
+#
+# Structure for table "subscriptionsystemnotify_0"
+#
+
+CREATE TABLE `subscriptionsystemnotify_0` (
+  `id` varchar(36) NOT NULL,
+  `readTime` datetime DEFAULT NULL,
+  `sendTime` datetime DEFAULT NULL,
+  `status` int(11) DEFAULT NULL,
+  `systemNotifyId` bigint(20) DEFAULT NULL,
+  `userId` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `subscriptionSystemNotify_1_idx` (`systemNotifyId`),
+  KEY `subscriptionSystemNotify_2_idx` (`userId`,`status`,`systemNotifyId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "subscriptionsystemnotify_1"
+#
+
+CREATE TABLE `subscriptionsystemnotify_1` (
+  `id` varchar(36) NOT NULL,
+  `readTime` datetime DEFAULT NULL,
+  `sendTime` datetime DEFAULT NULL,
+  `status` int(11) DEFAULT NULL,
+  `systemNotifyId` bigint(20) DEFAULT NULL,
+  `userId` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `subscriptionSystemNotify_1_idx` (`systemNotifyId`),
+  KEY `subscriptionSystemNotify_2_idx` (`userId`,`status`,`systemNotifyId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "subscriptionsystemnotify_2"
+#
+
+CREATE TABLE `subscriptionsystemnotify_2` (
+  `id` varchar(36) NOT NULL,
+  `readTime` datetime DEFAULT NULL,
+  `sendTime` datetime DEFAULT NULL,
+  `status` int(11) DEFAULT NULL,
+  `systemNotifyId` bigint(20) DEFAULT NULL,
+  `userId` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `subscriptionSystemNotify_1_idx` (`systemNotifyId`),
+  KEY `subscriptionSystemNotify_2_idx` (`userId`,`status`,`systemNotifyId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "subscriptionsystemnotify_3"
+#
+
+CREATE TABLE `subscriptionsystemnotify_3` (
+  `id` varchar(36) NOT NULL,
+  `readTime` datetime DEFAULT NULL,
+  `sendTime` datetime DEFAULT NULL,
+  `status` int(11) DEFAULT NULL,
+  `systemNotifyId` bigint(20) DEFAULT NULL,
+  `userId` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `subscriptionSystemNotify_1_idx` (`systemNotifyId`),
+  KEY `subscriptionSystemNotify_2_idx` (`userId`,`status`,`systemNotifyId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+
 #
 # Structure for table "syspermission"
 #
@@ -413,42 +553,58 @@ CREATE TABLE `sysrolespermission` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=573 DEFAULT CHARSET=utf8mb4;
 
+
+#
+# Structure for table "systemnotify"
+#
+
+CREATE TABLE `systemnotify` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `content` longtext,
+  `sendTime` datetime DEFAULT NULL,
+  `staffName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `systemNotify_1_idx` (`sendTime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
 #
 # Structure for table "systemsetting"
 #
 
 CREATE TABLE `systemsetting` (
   `id` int(11) NOT NULL,
+  `allowComment` bit(1) NOT NULL,
+  `allowFeedback` bit(1) NOT NULL,
+  `allowFilterWord` bit(1) NOT NULL,
   `allowRegister` bit(1) NOT NULL,
+  `allowTopic` bit(1) NOT NULL,
   `backstagePageNumber` int(11) DEFAULT NULL,
   `closeSite` int(11) DEFAULT NULL,
   `closeSitePrompt` longtext,
+  `comment_defaultState` int(11) DEFAULT NULL,
+  `comment_rewardPoint` bigint(20) DEFAULT NULL,
+  `comment_submitQuantity` int(11) DEFAULT NULL,
   `description` varchar(255) DEFAULT NULL,
   `editorTag` longtext,
+  `filterWordReplace` varchar(255) DEFAULT NULL,
   `forestagePageNumber` int(11) DEFAULT NULL,
   `keywords` varchar(255) DEFAULT NULL,
   `login_submitQuantity` int(11) DEFAULT NULL,
+  `realNameUserAllowComment` bit(1) NOT NULL,
+  `realNameUserAllowTopic` bit(1) NOT NULL,
   `registerCaptcha` bit(1) NOT NULL,
+  `reply_defaultState` int(11) DEFAULT NULL,
+  `reply_rewardPoint` bigint(20) DEFAULT NULL,
   `supportAccessDevice` int(11) DEFAULT NULL,
   `temporaryFileValidPeriod` int(11) DEFAULT NULL,
   `title` varchar(255) DEFAULT NULL,
+  `topic_defaultState` int(11) DEFAULT NULL,
+  `topic_rewardPoint` bigint(20) DEFAULT NULL,
+  `topic_submitQuantity` int(11) DEFAULT NULL,
   `userSentSmsCount` int(11) DEFAULT NULL,
   `version` bigint(20) DEFAULT NULL,
-  `comment_submitQuantity` int(11) DEFAULT NULL,
-  `topic_submitQuantity` int(11) DEFAULT NULL,
-  `realNameUserAllowComment` bit(1) NOT NULL,
-  `realNameUserAllowTopic` bit(1) NOT NULL,
-  `comment_rewardPoint` bigint(20) DEFAULT NULL,
-  `reply_rewardPoint` bigint(20) DEFAULT NULL,
-  `topic_rewardPoint` bigint(20) DEFAULT NULL,
-  `allowTopic` bit(1) NOT NULL,
-  `comment_defaultState` int(11) DEFAULT NULL,
-  `reply_defaultState` int(11) DEFAULT NULL,
-  `topic_defaultState` int(11) DEFAULT NULL,
-  `allowFeedback` bit(1) NOT NULL,
-  `allowComment` bit(1) NOT NULL,
-  `allowFilterWord` bit(1) NOT NULL,
-  `filterWordReplace` varchar(255) DEFAULT NULL,
+  `privateMessage_submitQuantity` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

@@ -1,4 +1,4 @@
-﻿package cms.utils;
+package cms.utils;
 
 import java.io.BufferedInputStream;
 import java.io.File;

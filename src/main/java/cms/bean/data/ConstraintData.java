@@ -1,4 +1,4 @@
-﻿package cms.bean.data;
+package cms.bean.data;
 
 import java.io.Serializable;
 import java.util.ArrayList;

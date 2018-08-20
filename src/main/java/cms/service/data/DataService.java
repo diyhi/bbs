@@ -1,4 +1,4 @@
-﻿package cms.service.data;
+package cms.service.data;
 
 import java.util.List;
 import java.util.Map;
@@ -11,7 +11,10 @@ import cms.service.besa.DAO;
  *
  */
 public interface DataService extends DAO {
-	
+	/**
+	 * 查询数据库版本
+	 */
+	public String findDatabaseVersion();
 	/**
 	 * 查询所有表信息
 	 * @param formsgroupid

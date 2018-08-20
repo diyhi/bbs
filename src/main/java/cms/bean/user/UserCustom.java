@@ -1,4 +1,4 @@
-﻿package cms.bean.user;
+package cms.bean.user;
 
 import java.io.Serializable;
 import java.util.ArrayList;

@@ -370,7 +370,49 @@ public enum ErrorView {
 		public String getContent(){
 			return "用户不存在";
 		}
-	},;
+	},
+	_1000{
+		public String getContent(){
+			return "不允许给当前用户发私信";
+		}
+	},
+	_1010{
+		public String getContent(){
+			return "不允许给自己发私信";
+		}
+	},
+	_1020{
+		public String getContent(){
+			return "对方用户名称不能为空";
+		}
+	},
+	_1030{
+		public String getContent(){
+			return "私信内容不能超过1000个字符";
+		}
+	},
+	_1040{
+		public String getContent(){
+			return "私信内容不能为空";
+		}
+	},
+	_1050{
+		public String getContent(){
+			return "删除私信失败";
+		}
+	},
+	_1100{
+		public String getContent(){
+			return "订阅系统通知Id不能为空";
+		}
+	},
+	_1110{
+		public String getContent(){
+			return "删除系统通知失败";
+		}
+	};
+	
+	
 	
 	public abstract String getContent();
 	

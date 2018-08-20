@@ -8,8 +8,16 @@ function getBasePath(){
 
 //jquery请求session过期跳转
 function timeoutJump(XMLHttpRequest){
-	if(XMLHttpRequest.status == 403){
+
+	if(XMLHttpRequest.getResponseHeader("login") != null && XMLHttpRequest.getResponseHeader("login") != ""){//session登陆超时登陆页面响应http头
+		
+		//收到未登陆标记，执行登陆页面跳转
 		window.location.href = getBasePath()+"admin/login.htm";
+		return;
+	}
+
+	if(XMLHttpRequest.status == 403){
+		alert("没有权限");		
 	}
 	if(XMLHttpRequest.status == 400){
 		alert("请求错误");

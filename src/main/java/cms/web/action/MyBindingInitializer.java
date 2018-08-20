@@ -1,4 +1,4 @@
-﻿package cms.web.action;
+package cms.web.action;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

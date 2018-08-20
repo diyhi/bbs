@@ -1,4 +1,4 @@
-﻿package cms.web.action.user;
+package cms.web.action.user;
 
 import java.math.BigDecimal;
 import java.text.DateFormat;
@@ -82,6 +82,7 @@ public class UserManageAction {
 	@Resource TextFilterManage textFilterManage;
 	@Resource TagService tagService;
 	@Resource TopicManage topicManage;
+	
 	
 	/**
 	 * 用户管理 查看
@@ -415,7 +416,11 @@ public class UserManageAction {
 			throw new SystemException("添加用户错误");
 		//	e.printStackTrace();
 		}
-
+		//删除缓存
+		userManage.delete_cache_findUserById(user.getId());
+		userManage.delete_cache_findUserByUserName(user.getUserName());
+		
+		
 		request.setAttribute("message", "添加用户成功");
 		request.setAttribute("urladdress", RedirectPath.readUrl("control.user.list"));
 		return "jsp/common/message";
@@ -812,6 +817,10 @@ public class UserManageAction {
 
 		userManage.delete_userState(new_user.getUserName());
 		
+		//删除缓存
+		userManage.delete_cache_findUserById(user.getId());
+		userManage.delete_cache_findUserByUserName(user.getUserName());
+
 		
 		if(jumpStatus != null && jumpStatus<= -10){
 			model.addAttribute("jumpStatus",jumpStatus);//返回消息
@@ -864,6 +873,9 @@ public class UserManageAction {
 						//删除缓存用户状态
 						for(User user : userList){
 							userManage.delete_userState(user.getUserName());
+							//删除缓存
+							userManage.delete_cache_findUserById(user.getId());
+							userManage.delete_cache_findUserByUserName(user.getUserName());
 						}
 
 						
@@ -875,6 +887,9 @@ public class UserManageAction {
 						//删除缓存用户状态
 						for(User user : userList){
 							userManage.delete_userState(user.getUserName());
+							//删除缓存
+							userManage.delete_cache_findUserById(user.getId());
+							userManage.delete_cache_findUserByUserName(user.getUserName());
 						}
 						if(i >0){
 							return "1";
@@ -916,6 +931,9 @@ public class UserManageAction {
 				//删除缓存用户状态
 				for(User user :userList){
 					userManage.delete_userState(user.getUserName());
+					//删除缓存
+					userManage.delete_cache_findUserById(user.getId());
+					userManage.delete_cache_findUserByUserName(user.getUserName());
 				}
 				
 				

@@ -257,6 +257,14 @@ function setAllowFilterWord(obj){
 			    </TD>
 			</TR>
 			<TR>
+			    <TD class="t-label t-label-h" width="20%">发表私信每分钟提交超过：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<input name="privateMessage_submitQuantity" maxlength="10" size="10" value="${systemSetting.privateMessage_submitQuantity}"/>&nbsp;次以上出现验证码
+			    	<span class="span-help">0为每次都出现验证码</span>
+			    	<web:errors path="privateMessage_submitQuantity" cssStyle="color: red;"/>
+			    </TD>
+			</TR>
+			<TR>
 			    <TD class="t-label t-label-h" width="20%">发表话题奖励积分：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">
 			    	<input name="topic_rewardPoint" maxlength="10" size="10" value="${systemSetting.topic_rewardPoint}"/>

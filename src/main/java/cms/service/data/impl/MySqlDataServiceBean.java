@@ -1,4 +1,4 @@
-﻿package cms.service.data.impl;
+package cms.service.data.impl;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Resource;
+import javax.persistence.Query;
 import javax.sql.DataSource;
 
 import org.apache.commons.csv.CSVFormat;
@@ -46,6 +47,7 @@ import cms.bean.data.TableProperty;
 import cms.service.besa.DaoSupport;
 import cms.service.data.DataService;
 import cms.utils.HexConversion;
+import cms.utils.ObjectConversion;
 import cms.web.action.SystemException;
 import cms.web.action.data.DataRunMarkManage;
 import cms.web.action.data.Threads;
@@ -65,6 +67,25 @@ public class MySqlDataServiceBean extends DaoSupport implements DataService {
 	@Resource  DataSource dataSource;
 	@Resource LobHandler lobHandler;
 	@Resource DataRunMarkManage dataRunMarkManage;
+	
+	/**
+	 * 查询数据库版本
+	 */
+	@Transactional(readOnly=true,propagation=Propagation.NOT_SUPPORTED)
+	public String findDatabaseVersion(){
+		String version = null;
+		Query query = em.createNativeQuery("select version();");
+		List<Object> objectList = query.getResultList();
+		if(objectList != null && objectList.size() >0){
+			for(int o = 0; o<objectList.size(); o++){
+				Object object = objectList.get(o);
+				version = ObjectConversion.conversion(object, ObjectConversion.STRING);
+			}
+		}
+		return version;
+	}
+	
+	
 	
 	/**
 	 * 查询所有表信息

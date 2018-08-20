@@ -58,7 +58,14 @@ public class SystemSettingValidator implements Validator{
 		}else{
 			errors.rejectValue("comment_submitQuantity","errors.required", new String[]{"不能为空"},"");
 		}
-		
+		//发表私信每分钟提交超过
+		if(systemSetting.getPrivateMessage_submitQuantity() != null){
+			if(systemSetting.getPrivateMessage_submitQuantity() <0){
+				errors.rejectValue("privateMessage_submitQuantity","errors.required", new String[]{"不能小于0"},"");
+			}
+		}else{
+			errors.rejectValue("privateMessage_submitQuantity","errors.required", new String[]{"不能为空"},"");
+		}
 		
 		//发表话题奖励积分
 		if(systemSetting.getTopic_rewardPoint() != null){

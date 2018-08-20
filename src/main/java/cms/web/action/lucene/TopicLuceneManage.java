@@ -33,6 +33,7 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.queries.mlt.MoreLikeThis;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
@@ -202,7 +203,7 @@ public class TopicLuceneManage {
 				
 				if(keyword != null && !"".equals(keyword.trim())){
 					BooleanClause.Occur[] clauses = { BooleanClause.Occur.SHOULD, BooleanClause.Occur.SHOULD }; 
-					Query keyword_parser = MultiFieldQueryParser.parse(new String[] {keyword, keyword}, new String[] {"title", "content"}, clauses,analyzer_keyword);
+					Query keyword_parser = MultiFieldQueryParser.parse(new String[] {QueryParser.escape(keyword), QueryParser.escape(keyword)}, new String[] {"title", "content"}, clauses,analyzer_keyword);
 					
 					query.add(keyword_parser,BooleanClause.Occur.MUST);
 				}

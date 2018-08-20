@@ -145,8 +145,8 @@
 			<td colspan="2"><a style="color: #317ee7" onclick="anchorJump('#anchor_600'); return false;">参数表</a></td>
 		</tr>
 		<tr> 
-			<td width="30%" rowspan="4">提交返回</td> 
-			<td width="30%" rowspan="4">JSON格式值 类型:Map&ltString,Object></td>
+			<td width="30%" rowspan="5">提交返回</td> 
+			<td width="30%" rowspan="5">JSON格式值 类型:Map&ltString,Object></td>
 			<td width="40%">键参数：success<br>值内容说明：成功返回true 失败返回false<br>值类型：String</td> 
 		</tr>
 		<tr> 
@@ -158,11 +158,36 @@
 		<tr> 
 			<td>键参数：jumpUrl<br>值内容说明：登录前URL；success为true时有值</td> 
 		</tr>
-		
+		<tr> 
+			<td>键参数：systemUser<br>值内容说明：登录用户；success为true时有值<br>值类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_30'); return false;">AccessUser</a></td> 
+		</tr>
 	</tbody> 
 </table>
 
-
+<table id="anchor_30" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">用户 AccessUser</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>id</td> 
+			<td>long</td>
+			<td>Id</td>
+		</tr>
+		<tr> 
+			<td>userName</td> 
+			<td>String</td>
+			<td>会员用户名</td>
+		</tr>
+	</tbody> 
+</table>
 
 <table class="exampleTable" > 
 	<thead> 
@@ -259,13 +284,13 @@
 		<tr> 
 			<td>captchaKey</td> 
 			<td>String</td>
-			<td>是</td>
+			<td>按需填写</td>
 			<td>验证码编号</td> 
 		</tr>
 		<tr>
 			<td>captchaValue</td> 
 			<td>String</td>
-			<td>是</td>
+			<td>按需填写</td>
 			<td>验证码值 同一编号验证码每分钟提交次数不能超过60次,超出时验证码图片返回空字符</td> 
 		</tr>
 		<tr> 
@@ -310,7 +335,7 @@
 	<#-- 验证码值 -->
 	<input id="captchaValue" name="captchaValue" type="text" value=""/>		
 	<#-- 验证码图片 -->
-	&ltimg id="captcha" src="captcha/${captchaKey!}.jpg"/>
+	&ltimg id="captcha" src="captcha/${formCaptcha.captchaKey!}.jpg"/>
 	<#-- 验证码错误 -->
 	${(error['captchaValue'])!}
     

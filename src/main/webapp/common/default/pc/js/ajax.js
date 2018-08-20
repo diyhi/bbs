@@ -11,6 +11,10 @@ function get_request(callback, urladdress, async){
             	if (xmlhttp.readyState == 4) {//readystate 
  				    try{
  				  //  	alert("pppp1"+xmlhttp.getResponseHeader("jumpPath"));
+ 				    	if(xmlhttp.status == 508){//服务器处理请求时检测到一个无限循环
+ 				    		return;
+ 				    	}
+ 				    	
  				    	
  				    	if(xmlhttp.getResponseHeader("jumpPath") != null && xmlhttp.getResponseHeader("jumpPath") != ""){//session登陆超时登陆页面响应http头
  				    		//收到未登陆标记，执行登陆页面跳转
@@ -58,6 +62,9 @@ function post_request(callback, urladdress, async,params){
         	if (xmlhttp.readyState == 4) {//readystate 
         	//	alert("ssa"+getBasePath()+xmlhttp.getResponseHeader("jumpPath"));
  				    try{
+ 				    	if(xmlhttp.status == 508){//服务器处理请求时检测到一个无限循环
+ 				    		return;
+ 				    	}
  				    	if(xmlhttp.getResponseHeader("jumpPath") != null && xmlhttp.getResponseHeader("jumpPath") != ""){//session登陆超时登陆页面响应http头
  				 //   		alert("ss"+getBasePath()+xmlhttp.getResponseHeader("jumpPath"));
  				    		//收到未登陆标记，执行登陆页面跳转

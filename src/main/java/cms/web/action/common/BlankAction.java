@@ -1,4 +1,4 @@
-﻿package cms.web.action.common;
+package cms.web.action.common;
 
 
 import java.util.HashMap;

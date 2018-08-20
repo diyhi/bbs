@@ -2,6 +2,7 @@ package cms.web.action.topic;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -31,6 +32,7 @@ import cms.bean.topic.Quote;
 import cms.bean.topic.Reply;
 import cms.service.setting.SettingService;
 import cms.service.topic.CommentService;
+import cms.service.topic.TopicService;
 import cms.utils.IpAddress;
 import cms.utils.JsonUtils;
 import cms.utils.UUIDUtil;
@@ -58,7 +60,7 @@ public class CommentManageAction {
 	
 	@Resource SettingService settingService;
 	@Resource TopicManage topicManage;
-	
+	@Resource TopicService topicService;
 	/**
 	 * 评论  添加
 	 */
@@ -102,6 +104,10 @@ public class CommentManageAction {
 				comment.setStatus(20);
 				//保存评论
 				commentService.saveComment(comment);
+				
+				//修改话题最后回复时间
+				topicService.updateTopicReplyTime(topicId,new Date());
+				
 				
 				//上传文件编号
 				String fileNumber = "a"+userId;
@@ -512,6 +518,10 @@ public class CommentManageAction {
 					
 					//保存评论
 					commentService.saveComment(newComment);
+					
+					//修改话题最后回复时间
+					topicService.updateTopicReplyTime(comment.getTopicId(),new Date());
+					
 					//上传文件编号
 					String fileNumber = "a"+userId;
 						
@@ -630,6 +640,9 @@ public class CommentManageAction {
 					//保存评论
 					commentService.saveReply(reply);
 
+					
+					//修改话题最后回复时间
+					topicService.updateTopicReplyTime(comment.getTopicId(),new Date());
 				}else{	
 					error.put("content", "回复内容不能为空");
 					

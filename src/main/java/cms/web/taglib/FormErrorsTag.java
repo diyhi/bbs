@@ -1,4 +1,4 @@
-﻿package cms.web.taglib;
+package cms.web.taglib;
 
 import java.util.ArrayList;
 import java.util.Arrays;

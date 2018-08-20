@@ -1,0 +1,363 @@
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">页面访问</th>
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td  width="30%">请求路径</td> 
+			<td  width="70%" colspan="2">user/control/systemNotifyList.htm</td>
+		</tr>
+		<tr> 
+			<td>请求方式</td> 
+			<td colspan="2">GET</td>
+		</tr> 
+		<tr> 
+			<td>请求参数</td> 
+			<td>页码</td> 
+			<td>
+				变量：page<br>
+				类型：Integer<br>
+				是否必填：否
+			</td>
+		</tr>
+		<tr> 
+			<td width="30%" >返回值</td> 
+			<td width="30%" >订阅系统通知分页</td> 
+			<td width="40%" >
+				变量：pageView<br>
+				类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_10'); return false;">PageView</a>
+			</td>
+		</tr>
+	</tbody> 
+</table>
+
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">页面访问 - AJAX方式</th>
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td  width="30%">请求路径</td> 
+			<td  width="70%" colspan="2">user/control/systemNotifyList.htm</td>
+		</tr>
+		<tr> 
+			<td>请求方式</td> 
+			<td colspan="2">GET</td>
+		</tr>
+		<tr> 
+			<td>自定义请求头</td> 
+			<td colspan="2">协议头：X-Requested-With  值：XMLHttpRequest</td>
+		</tr>
+		<tr> 
+			<td>请求参数</td> 
+			<td>页码</td> 
+			<td>
+				变量：page<br>
+				类型：Integer<br>
+				是否必填：否
+			</td>
+		</tr>
+		<tr> 
+			<td width="30%" >请求成功返回</td> 
+			<td width="30%" >JSON格式值 类型:<a style="color: #317ee7" onclick="anchorJump('#anchor_10'); return false;">PageView</a></td>
+			<td width="40%">值内容说明：订阅系统通知分页</td> 
+		</tr>	
+	</tbody> 
+</table>
+
+<table id="anchor_10" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">分页 PageView</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>records</td> 
+			<td>List&lt<a style="color: #317ee7" onclick="anchorJump('#anchor_20'); return false;">SubscriptionSystemNotify</a>></td>
+			<td>数据展示列表</td>
+		</tr>
+		<tr> 
+			<td>pageIndex</td> 
+			<td><a style="color: #317ee7" onclick="anchorJump('#anchor_30'); return false;">PageIndex</a></td>
+			<td>页码索引</td>
+		</tr>
+		<tr> 
+			<td>totalpage</td> 
+			<td>long</td>
+			<td>总页数</td>
+		</tr>
+		<tr> 
+			<td>maxresult</td> 
+			<td>long</td>
+			<td>每页显示记录数</td>
+		</tr>
+		<tr> 
+			<td>currentpage</td> 
+			<td>long</td>
+			<td>当前页</td>
+		</tr>
+		<tr> 
+			<td>pagecount</td> 
+			<td>long</td>
+			<td>页码显示总数</td>
+		</tr>
+		<tr> 
+			<td>onUrl</td> 
+			<td>String</td>
+			<td>上一页URL</td>
+		</tr>
+		<tr> 
+			<td>nextUrl</td> 
+			<td>String</td>
+			<td>下一页URL</td>
+		</tr>
+	</tbody> 
+</table>
+<table id="anchor_30" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">分页索引 PageIndex</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>startindex</td> 
+			<td>long</td>
+			<td>分页开始索引</td>
+		</tr>
+		<tr> 
+			<td>endindex</td> 
+			<td>long</td>
+			<td>分页结束索引</td>
+		</tr>
+	</tbody> 
+</table>
+<table id="anchor_20" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">订阅系统通知 SubscriptionSystemNotify</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>id</td> 
+			<td>String</td>
+			<td>Id</td>
+		</tr>
+		<tr> 
+			<td>systemNotifyId</td> 
+			<td>Long</td>
+			<td>系统通知Id</td>
+		</tr>
+		<tr> 
+			<td>userId</td> 
+			<td>Long</td>
+			<td>用户Id</td>
+		</tr>
+		<tr> 
+			<td>content</td> 
+			<td>String</td>
+			<td>通知内容；本字段在存入数据库时已进行安全过滤，可以加上&lt#noescape>&lt/#noescape>标签关闭转义，以输出html标签</td>
+		</tr>
+		<tr> 
+			<td>status</td> 
+			<td>Integer</td>
+			<td>消息状态 10:未读  20:已读 </td>
+		</tr>
+		<tr> 
+			<td>sendTime</td> 
+			<td>Date</td>
+			<td>发送时间</td>
+		</tr>
+		<tr> 
+			<td>readTime</td> 
+			<td>Date</td>
+			<td>阅读时间</td>
+		</tr>
+	</tbody> 
+</table>
+
+
+
+<h2 style="margin:0;padding:0; margin-top: 10px;">示例</h2>
+<textarea name="exampleCode">
+<#if pageView.records?exists && pageView.records?size gt 0 >    
+	<#list pageView.records as subscriptionSystemNotify>
+		<#-- 通知内容 -->
+		<#noescape>${subscriptionSystemNotify.content}</#noescape>
+		<#-- 发送时间 -->
+		${subscriptionSystemNotify.sendTime}
+	</#list>
+</#if> 
+<#if !pageView.records?exists || pageView.totalrecord == 0 > 
+	还没有系统通知
+</#if> 
+</textarea>
+
+
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">提交 删除系统通知 - 默认方式</th>
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td width="30%" >请求路径</td> 
+			<td width="70%" colspan="2">user/control/deleteSystemNotify.htm</td>
+		</tr>
+		<tr> 
+			<td>请求方式</td> 
+			<td colspan="2">POST</td>
+		</tr>
+		<tr> 
+			<td>请求参数</td> 
+			<td colspan="2"><a style="color: #317ee7" onclick="anchorJump('#anchor_610'); return false;">参数表</a></td>
+		</tr>
+		<tr> 
+			<td>提交成功返回</td> 
+			<td colspan="2">默认跳转到jump模板页显示提交成功信息；跳转路径参数jumpUrl有值时按参数值路径跳转</td>
+		</tr>
+		<tr> 
+			<td rowspan="2">提交失败返回</td> 
+			<td>跳转到message模板页显示提示信息</td> 
+		</tr>
+	</tbody> 
+</table>
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">提交 删除系统通知 - AJAX方式</th>
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td>请求路径</td> 
+			<td colspan="2">user/control/deleteSystemNotify.htm</td>
+		</tr>
+		<tr> 
+			<td>请求方式</td> 
+			<td colspan="2">POST</td>
+		</tr> 
+		<tr> 
+			<td>自定义请求头</td> 
+			<td colspan="2">协议头：X-Requested-With  值：XMLHttpRequest</td>
+		</tr>
+		<tr> 
+			<td>请求参数</td> 
+			<td colspan="2"><a style="color: #317ee7" onclick="anchorJump('#anchor_610'); return false;">参数表</a></td>
+		</tr>
+		<tr> 
+			<td width="30%" rowspan="2">提交返回</td> 
+			<td width="30%" rowspan="2">JSON格式值 类型:Map&ltString,Object></td>
+			<td width="40%">键参数：success<br>值内容说明：成功返回true 失败返回false<br>值类型：String</td> 
+		</tr>
+		<tr> 
+			<td>键参数：error<br>值内容说明：错误值集合<br>值类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_60'); return false;">Map&ltString,String></a></td> 
+		</tr>
+	</tbody> 
+</table>
+
+<table id="anchor_60"  class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">删除系统通知 错误值 error</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td>systemNotify</td> 
+			<td>String</td>
+			<td>系统通知错误</td>
+		</tr>
+	 	<tr> 
+			<td>token</td> 
+			<td>String</td>
+			<td>令牌错误</td>
+		</tr>
+	</tbody> 
+</table>
+<table id="anchor_610" class="exampleTable" > 
+	<thead>
+		<tr> 
+			<th colspan="4">提交'删除系统通知'参数</th>
+		</tr>
+		<tr> 
+			<th width="30%">参数</th> 
+			<th width="20%">类型</th> 
+			<th width="10%">是否必填</th> 
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	 <tbody>
+	 	<tr> 
+			<td>subscriptionSystemNotifyId</td> 
+			<td>String</td>
+			<td>是</td>
+			<td>订阅系统通知Id</td> 
+		</tr>
+		<tr> 
+			<td>token</td> 
+			<td>String</td>
+			<td>是</td>
+			<td>令牌</td> 
+		</tr>
+		<tr> 
+			<td>jumpUrl</td> 
+			<td>String</td>
+			<td>否</td>
+			<td>'提交表单 - 默认方式'提交成功后跳转路径,不填写默认跳转到表单提交页；参数必须经过encodeBase64URL编码后才能提交。例${encodeBase64URL('/index')}</td> 
+		</tr>
+	</tbody> 
+</table>
+<h2 style="margin:0;padding:0; margin-top: 10px;">提交 删除系统通知 示例</h2>
+<textarea name="exampleCode">
+
+<#-- 
+	引入tool.js文件 
+	并且页头<head>标签上加入<meta name="csrfToken" content="${token}"/>标签
+-->
+<script language="javascript" type="text/javascript">
+//删除系统通知
+function deleteSystemNotify(subscriptionSystemNotifyId){
+	var parameter = "";//URI参数
+	parameter += "&subscriptionSystemNotifyId="+subscriptionSystemNotifyId;
+	
+	//从meta标签获取令牌
+	parameter += "&token="+getCsrf();
+
+	//删除第一个&号,防止因为多了&号而出现警告: Parameters: Invalid chunk ignored.信息
+	if(parameter.indexOf("&") == 0){
+		parameter = parameter.substring(1,parameter.length);
+	}
+
+	//下一步用ajax方式将参数提交到user/control/deleteSystemNotify.htm
+
+}
+</script>
+</textarea>

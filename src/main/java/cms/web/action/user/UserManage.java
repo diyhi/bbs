@@ -40,4 +40,41 @@ public class UserManage {
 	public void delete_userState(String userName){
 		
 	}
+	
+	
+	/**
+	 * 查询缓存 根据用户Id查询当前用户
+	 * @param id 用户Id
+	 * @return
+	 */
+	@Cacheable(value="userManage_cache_findUserById",key="#id")
+	public User query_cache_findUserById(Long id){
+		return userService.findUserById(id);
+	}
+	/**
+	 * 删除缓存 根据用户Id查询当前用户
+	 * @param id 用户Id
+	 * @return
+	 */
+	@CacheEvict(value="userManage_cache_findUserById",key="#id")
+	public void delete_cache_findUserById(Long id){
+	}
+	/**
+	 * 查询缓存 根据用户名称查询当前用户
+	 * @param userName 用户名称
+	 * @return
+	 */
+	@Cacheable(value="userManage_cache_findUserByUserName",key="#userName")
+	public User query_cache_findUserByUserName(String userName){
+		return userService.findUserByUserName(userName);
+	}
+	/**
+	 * 删除缓存 根据用户名称查询当前用户
+	 * @param userName 用户名称
+	 * @return
+	 */
+	@CacheEvict(value="userManage_cache_findUserByUserName",key="#userName")
+	public void delete_cache_findUserByUserName(String userName){
+	}
+
 }

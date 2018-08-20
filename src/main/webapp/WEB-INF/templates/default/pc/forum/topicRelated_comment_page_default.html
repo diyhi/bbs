@@ -12,10 +12,10 @@
 			<#list pageView.records as comment>
 				<div class="comment" id="anchor_${comment.id}">
 					<div class="comment-author">
-						<a href="#">
+						<a href="user/control/home?userName=${comment.userName}">
 						<img src='${commonPath}images/min_avata.png' class='avatar' height='48' width='48' /></a>
 						<cite>
-							<a href="#">${comment.userName}</a>
+							<a href="user/control/home?userName=${comment.userName}">${comment.userName}</a>
 						</cite> 
 					</div>
 					<div class="commentTime">${comment.postTime}</div>

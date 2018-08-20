@@ -1,4 +1,4 @@
-﻿package cms.service.upgrade;
+package cms.service.upgrade;
 
 import java.util.List;
 
@@ -51,4 +51,10 @@ public interface UpgradeService extends DAO<UpgradeSystem> {
 	 * @return
 	 */
 	public Integer addLog(String upgradeId ,String upgradeLog);
+	/**
+	 * 插入原生SQL
+	 * @param sql
+	 * @return
+	 */
+	public Integer insertNativeSQL(String sql);
 }

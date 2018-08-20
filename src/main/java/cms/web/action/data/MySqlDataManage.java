@@ -1,4 +1,4 @@
-﻿package cms.web.action.data;
+package cms.web.action.data;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -60,6 +60,19 @@ public class MySqlDataManage {
 	//未还原数量
 	private int noResetCount = 0;
 	
+	//MySQL版本
+	private String databaseVersion = null;
+	
+	
+	/**
+	 * 查询Mysql版本信息
+	 */
+	public String showVersion(){
+		if(databaseVersion == null){
+			databaseVersion = dataService.findDatabaseVersion();
+		}
+		return databaseVersion;
+	}
 	
 	/**
 	 * 查询表信息

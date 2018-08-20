@@ -1,4 +1,4 @@
-﻿package cms.utils;
+package cms.utils;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;

@@ -201,10 +201,10 @@ public class LinksManageAction {
 		Links links = new Links();
 		links.setId(linksId);
 		
-		Links old_brand = null;
+		Links old_links = null;
 		if(linksId != null && linksId >0){
-			old_brand = linksService.findById(linksId);
-			if(old_brand != null){
+			old_links = linksService.findById(linksId);
+			if(old_links != null){
 				
 			}else{
 				throw new SystemException("友情链接不存在！");
@@ -295,11 +295,11 @@ public class LinksManageAction {
 		//写入数据库操作
 		linksService.updateLinks(links);
 		
-		if(old_brand.getImage() != null && !"".equals(old_brand.getImage().trim())){
-			if(!(_imagePath+_fileName).equals(old_brand.getImage())){//如果图片有变化
+		if(old_links.getImage() != null && !"".equals(old_links.getImage().trim())){
+			if(!(_imagePath+_fileName).equals(old_links.getImage())){//如果图片有变化
 				//删除旧图片
 				//替换路径中的..号
-				String oldPathFile = fileManage.toRelativePath(old_brand.getImage());
+				String oldPathFile = fileManage.toRelativePath(old_links.getImage());
 				//删除旧文件
 				fileManage.deleteFile(fileManage.toSystemPath(oldPathFile));
 			}

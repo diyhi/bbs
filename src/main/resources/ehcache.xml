@@ -126,11 +126,7 @@
 		overflowToDisk="true"
 		eternal="false" timeToIdleSeconds="120" timeToLiveSeconds="120" 
 		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>
-	<!-- 验证码管理 - 生成令牌标记 
-	<cache name="captchaManage_cache_token" maxElementsInMemory="1000000" 
-		overflowToDisk="true"
-		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="600" 
-		memoryStoreEvictionPolicy="LFU" /> -->     
+   
 	<!-- 话题全文索引定时索引管理 - 重建话题索引任务运行标记 -->
 	<cache name="topicIndexManage_cache_taskRunMark" maxElementsInMemory="1"
 		overflowToDisk="true"
@@ -186,5 +182,48 @@
 		overflowToDisk="true"
 		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
 		memoryStoreEvictionPolicy="LFU" />	
+	<!-- 根据用户Id查询当前用户 -->
+	<cache name="userManage_cache_findUserById" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" />	
+	<!-- 根据用户名称查询当前用户 -->
+	<cache name="userManage_cache_findUserByUserName" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" />	
+	
+	
+	<!-- 查询未读私信数量 -->
+	<cache name="privateMessageManage_cache_findUnreadPrivateMessageByUserId" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" />	
+		
+	<!-- 根据用户Id查询最早的未读系统通知Id -->
+	<cache name="systemNotifyManage_cache_findMinUnreadSystemNotifyIdByUserId" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" />	
+	<!-- 根据用户Id查询最大的已读系统通知Id  -->
+	<cache name="systemNotifyManage_cache_findMaxReadSystemNotifyIdByUserId" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" />	
+	<!-- 根据起始系统通知Id查询系统通知数量 -->
+	<cache name="systemNotifyManage_cache_findSystemNotifyCountBySystemNotifyId" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" />	
+	<!-- 根据起始系统通知发送时间查询系统通知数量 -->
+	<cache name="systemNotifyManage_cache_findSystemNotifyCountBySendTime" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" />		
+	<!-- 根据Id查询系统通知 -->
+	<cache name="systemNotifyManage_cache_findById" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" />		
 	
 </ehcache>

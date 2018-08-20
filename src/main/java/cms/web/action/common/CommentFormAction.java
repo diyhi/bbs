@@ -4,6 +4,7 @@ package cms.web.action.common;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +54,7 @@ import cms.web.action.filterWord.SensitiveWordFilterManage;
 import cms.web.action.setting.SettingManage;
 import cms.web.action.topic.TopicManage;
 import cms.web.action.user.PointManage;
+import cms.web.action.user.UserManage;
 import cms.web.taglib.Configuration;
 
 /**
@@ -80,6 +82,8 @@ public class CommentFormAction {
 	
 	@Resource TopicManage topicManage;
 	@Resource SensitiveWordFilterManage sensitiveWordFilterManage;
+	@Resource UserManage userManage;
+	
 	
 	/**
 	 * 评论   添加
@@ -195,7 +199,7 @@ public class CommentFormAction {
 		
 		//如果实名用户才允许评论
 		if(systemSetting.isRealNameUserAllowComment() == true){
-			User _user = userService.findUserByUserName(accessUser.getUserName());
+			User _user = userManage.query_cache_findUserByUserName(accessUser.getUserName());
 			if(_user.isRealNameAuthentication() == false){
 				error.put("comment", ErrorView._108.name());//实名用户才允许评论
 			}
@@ -253,6 +257,14 @@ public class CommentFormAction {
 			
 			//增加用户积分
 			userService.addUserPoint(accessUser.getUserName(),systemSetting.getComment_rewardPoint(), pointManage.createPointLogObject(pointLog));
+			//删除缓存
+			userManage.delete_cache_findUserById(accessUser.getUserId());
+			userManage.delete_cache_findUserByUserName(accessUser.getUserName());
+			
+			
+			//修改话题最后回复时间
+			topicService.updateTopicReplyTime(topicId,new Date());
+			
 			
 			
 			String fileNumber = "b"+ accessUser.getUserId();
@@ -551,7 +563,7 @@ public class CommentFormAction {
 		
 		//如果实名用户才允许评论
 		if(systemSetting.isRealNameUserAllowComment() == true){
-			User _user = userService.findUserByUserName(accessUser.getUserName());
+			User _user = userManage.query_cache_findUserByUserName(accessUser.getUserName());
 			if(_user.isRealNameAuthentication() == false){
 				error.put("comment", ErrorView._108.name());//实名用户才允许评论
 			}
@@ -651,6 +663,13 @@ public class CommentFormAction {
 			
 			//增加用户积分
 			userService.addUserPoint(accessUser.getUserName(),systemSetting.getComment_rewardPoint(), pointManage.createPointLogObject(pointLog));
+			//删除缓存
+			userManage.delete_cache_findUserById(accessUser.getUserId());
+			userManage.delete_cache_findUserByUserName(accessUser.getUserName());
+			
+			//修改话题最后回复时间
+			topicService.updateTopicReplyTime(newComment.getTopicId(),new Date());
+			
 			String fileNumber = "b"+ accessUser.getUserId();
 				
 			if(imageNameList != null && imageNameList.size() >0){
@@ -848,7 +867,7 @@ public class CommentFormAction {
 		
 		//如果实名用户才允许评论
 		if(systemSetting.isRealNameUserAllowComment() == true){
-			User _user = userService.findUserByUserName(accessUser.getUserName());
+			User _user = userManage.query_cache_findUserByUserName(accessUser.getUserName());
 			if(_user.isRealNameAuthentication() == false){
 				error.put("reply", ErrorView._108.name());//实名用户才允许评论
 			}
@@ -925,6 +944,13 @@ public class CommentFormAction {
 			
 			//增加用户积分
 			userService.addUserPoint(accessUser.getUserName(),systemSetting.getReply_rewardPoint(), pointManage.createPointLogObject(pointLog));
+			//删除缓存
+			userManage.delete_cache_findUserById(accessUser.getUserId());
+			userManage.delete_cache_findUserByUserName(accessUser.getUserName());
+			
+			//修改话题最后回复时间
+			topicService.updateTopicReplyTime(comment.getTopicId(),new Date());
+			
 			
 			//统计每分钟原来提交次数
 			int quantity = settingManage.submitQuantity_add("comment", accessUser.getUserName(), 0);

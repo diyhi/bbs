@@ -279,7 +279,50 @@ public class TemplateManage {
 		layoutList.add(layout_userLoginLogList);
 		
 		
+		//私信列表
+		Layout layout_privateMessageList = new Layout();
+		layout_privateMessageList.setId(UUIDUtil.getUUID32());
+		layout_privateMessageList.setName("私信列表");
+		layout_privateMessageList.setDirName(dirName);
+		layout_privateMessageList.setLayoutFile("privateMessageList.html");
+		layout_privateMessageList.setType(1);//默认页
+		layout_privateMessageList.setSort(350);//排序
+		layout_privateMessageList.setReferenceCode("user/control/privateMessageList");
+		layoutList.add(layout_privateMessageList);
 		
+		//私信对话列表
+		Layout layout_privateMessageChatList = new Layout();
+		layout_privateMessageChatList.setId(UUIDUtil.getUUID32());
+		layout_privateMessageChatList.setName("私信对话列表");
+		layout_privateMessageChatList.setDirName(dirName);
+		layout_privateMessageChatList.setLayoutFile("privateMessageChatList.html");
+		layout_privateMessageChatList.setType(1);//默认页
+		layout_privateMessageChatList.setSort(400);//排序
+		layout_privateMessageChatList.setReferenceCode("user/control/privateMessageChatList");
+		layoutList.add(layout_privateMessageChatList);
+		
+		//添加私信
+		Layout layout_addPrivateMessage = new Layout();
+		layout_addPrivateMessage.setId(UUIDUtil.getUUID32());
+		layout_addPrivateMessage.setName("添加私信");
+		layout_addPrivateMessage.setDirName(dirName);
+		layout_addPrivateMessage.setLayoutFile("addPrivateMessage.html");
+		layout_addPrivateMessage.setType(1);//默认页
+		layout_addPrivateMessage.setSort(450);//排序
+		layout_addPrivateMessage.setReferenceCode("user/control/addPrivateMessage");
+		layoutList.add(layout_addPrivateMessage);
+		
+		//系统通知列表
+		Layout layout_systemNotifyList = new Layout();
+		layout_systemNotifyList.setId(UUIDUtil.getUUID32());
+		layout_systemNotifyList.setName("系统通知列表");
+		layout_systemNotifyList.setDirName(dirName);
+		layout_systemNotifyList.setLayoutFile("systemNotifyList.html");
+		layout_systemNotifyList.setType(1);//默认页
+		layout_systemNotifyList.setSort(500);//排序
+		layout_systemNotifyList.setReferenceCode("user/control/systemNotifyList");
+		layoutList.add(layout_systemNotifyList);
+	
 		return layoutList;
 	}
 	

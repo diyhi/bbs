@@ -1,4 +1,4 @@
-﻿package cms.utils;
+package cms.utils;
 import java.util.List;
 import java.util.StringTokenizer;       
 import org.apache.commons.lang3.StringUtils;    

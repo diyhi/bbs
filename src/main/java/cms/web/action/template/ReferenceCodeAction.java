@@ -1,4 +1,4 @@
-﻿package cms.web.action.template;
+package cms.web.action.template;
 
 import javax.annotation.Resource;
 

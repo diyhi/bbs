@@ -14,6 +14,15 @@
 			<td colspan="2">GET</td>
 		</tr> 
 		<tr> 
+			<td>请求参数</td> 
+			<td>用户名称</td> 
+			<td>
+				变量：userName<br>
+				类型：String<br>
+				是否必填：按需填写
+			</td>
+		</tr>
+		<tr> 
 			<td rowspan="3">返回值</td> 
 			<td>用户</td> 
 			<td width="30%" >
@@ -44,6 +53,15 @@
 			<td colspan="2">协议头：X-Requested-With  值：XMLHttpRequest</td>
 		</tr>
 		<tr> 
+			<td>请求参数</td> 
+			<td>用户名称</td> 
+			<td>
+				变量：userName<br>
+				类型：String<br>
+				是否必填：按需填写
+			</td>
+		</tr>
+		<tr> 
 			<td width="30%" rowspan="4">请求成功返回</td> 
 			<td width="30%" rowspan="4">JSON格式值 类型:Map&ltString,Object></td>
 			<td width="40%">键参数：user<br>值内容说明：用户<br>值类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_40'); return false;">User</a></td> 
@@ -67,12 +85,17 @@
 		<tr> 
 			<td>id</td> 
 			<td>long</td>
-			<td>Id</td>
+			<td>Id <span style="color: green;">未登录会员允许显示字段</span></td>
 		</tr>
 		<tr> 
 			<td>userName</td> 
 			<td>String</td>
-			<td>会员用户名</td>
+			<td>会员用户名 <span style="color: green;">未登录会员允许显示字段</span></td>
+		</tr>
+		<tr> 
+			<td>state</td> 
+			<td>Integer</td>
+			<td>用户状态 1:正常用户   2:禁止用户 <span style="color: green;">未登录会员允许显示字段</span></td>
 		</tr>
 		<tr> 
 			<td>email</td> 
@@ -93,6 +116,27 @@
 			<td>point</td> 
 			<td>Long</td>
 			<td>当前积分</td>
+		</tr>
+		<tr> 
+			<td>gradeId</td> 
+			<td>Integer</td>
+			<td>等级Id <span style="color: green;">未登录会员允许显示字段</span></td>
+		</tr>
+		<tr> 
+			<td>gradeName</td> 
+			<td>String</td>
+			<td>等级名称 <span style="color: green;">未登录会员允许显示字段</span></td>
+		</tr>
+		
+		<tr> 
+			<td>mobile</td> 
+			<td>String</td>
+			<td>绑定手机</td>
+		</tr>
+		<tr> 
+			<td>realNameAuthentication</td> 
+			<td>boolean</td>
+			<td>是否实名认证</td>
 		</tr>
 	</tbody> 
 </table>

@@ -82,17 +82,18 @@ function sureSubmit(objForm){
 	    </TD>
 	</TR>
 	<TR>
-  	<TD class="t-label t-label-h" width="12%">允许评论：</TD>
-    <TD class="t-content" width="88%">
-    	<label><input name="allow" type="radio" value="true" <c:if test="${topic.allow == true}"> checked="checked"</c:if>>允许</label>
-    	<label><input name="allow" type="radio" value="false" <c:if test="${topic.allow == false}"> checked="checked"</c:if>>禁止</label>
-    </TD>
-    <TR>
   	<TD class="t-label t-label-h" width="12%">排序：</TD>
     <TD class="t-content" width="88%">
     	<input type="text" name="sort" size="8" maxlength="8" value="${topic.sort}">
 		&nbsp;<SPAN class="span-text">${error["sort"]}</SPAN>
 		<SPAN class="span-help">数字越大越在前</SPAN>
+    </TD>
+   </TR>
+	<TR>
+  	<TD class="t-label t-label-h" width="12%">允许评论：</TD>
+    <TD class="t-content" width="88%">
+    	<label><input name="allow" type="radio" value="true" <c:if test="${topic.allow == true}"> checked="checked"</c:if>>允许</label>
+    	<label><input name="allow" type="radio" value="false" <c:if test="${topic.allow == false}"> checked="checked"</c:if>>禁止</label>
     </TD>
    </TR>
    <TR>
