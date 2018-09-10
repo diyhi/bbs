@@ -20,6 +20,7 @@ import cms.bean.PageView;
 import cms.bean.QueryResult;
 import cms.bean.topic.Tag;
 import cms.bean.topic.Topic;
+import cms.bean.user.User;
 import cms.service.setting.SettingService;
 import cms.service.template.TemplateService;
 import cms.service.topic.TagService;
@@ -28,6 +29,7 @@ import cms.utils.JsonUtils;
 import cms.utils.WebUtil;
 import cms.web.action.AccessSourceDeviceManage;
 import cms.web.action.lucene.TopicLuceneManage;
+import cms.web.action.user.UserManage;
 
 /**
  * 搜索
@@ -41,6 +43,8 @@ public class SearchAction {
 	@Resource TagService tagService;
 	@Resource AccessSourceDeviceManage accessSourceDeviceManage;
 	@Resource SettingService settingService;
+	@Resource UserManage userManage;
+	
 	
 	/**
 	 * 搜索
@@ -75,6 +79,9 @@ public class SearchAction {
 				
 				for(Topic topic : qr.getResultlist()){
 					topicIdList.add(topic.getId());
+					
+					
+					
 				}
 
 				if(topicIdList != null && topicIdList.size() >0){
@@ -86,6 +93,14 @@ public class SearchAction {
 									pi.setTitle(old_t.getTitle());
 									pi.setContent(old_t.getContent());
 									pi.setIp(null);//IP不显示
+									if(pi.getIsStaff() == false){//会员
+										User user = userManage.query_cache_findUserByUserName(pi.getUserName());
+										
+										pi.setAvatarPath(user.getAvatarPath());
+										pi.setAvatarName(user.getAvatarName());
+										
+									}
+									
 									new_topicList.add(pi);
 									break;
 								}

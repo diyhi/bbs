@@ -79,14 +79,17 @@ public class Topic implements Serializable{
 	/** 用户名称 **/
 	@Column(length=30)
 	private String userName;
+	/** 头像路径 **/
+	@Transient
+	private String avatarPath;
+	/** 头像名称 **/
+	@Transient
+	private String avatarName;
 	
 	/** 是否为员工 true:员工  false:会员 **/
 	private Boolean isStaff = false;
-	
 	/** 排序  **/
 	private Integer sort = 0;
-	
-	
 	/** 状态 10.待审核 20.已发布 110.待审核删除 120.已发布删除 **/
 	private Integer status = 10;
 	
@@ -204,6 +207,18 @@ public class Topic implements Serializable{
 	}
 	public void setSort(Integer sort) {
 		this.sort = sort;
+	}
+	public String getAvatarPath() {
+		return avatarPath;
+	}
+	public void setAvatarPath(String avatarPath) {
+		this.avatarPath = avatarPath;
+	}
+	public String getAvatarName() {
+		return avatarName;
+	}
+	public void setAvatarName(String avatarName) {
+		this.avatarName = avatarName;
 	}
 	
 }

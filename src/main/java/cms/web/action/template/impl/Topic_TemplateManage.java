@@ -28,6 +28,7 @@ import cms.bean.topic.Reply;
 import cms.bean.topic.Tag;
 import cms.bean.topic.Topic;
 import cms.bean.user.AccessUser;
+import cms.bean.user.User;
 import cms.service.setting.SettingService;
 import cms.service.topic.CommentService;
 import cms.service.topic.TagService;
@@ -41,6 +42,7 @@ import cms.web.action.lucene.TopicLuceneManage;
 import cms.web.action.setting.SettingManage;
 import cms.web.action.topic.CommentManage;
 import cms.web.action.topic.TopicManage;
+import cms.web.action.user.UserManage;
 
 /**
  * 话题 -- 模板方法实现
@@ -61,6 +63,10 @@ public class Topic_TemplateManage {
 	@Resource TopicManage topicManage;
 	
 	@Resource TopicLuceneManage topicLuceneManage;
+	
+	@Resource UserManage userManage;
+	
+	
 	/**
 	 * 话题列表  -- 分页
 	 * @param forum
@@ -208,6 +214,16 @@ public class Topic_TemplateManage {
 				}
 			}
 			
+			for(Topic topic : qr.getResultlist()){
+				if(topic.getIsStaff() == false){//会员
+					User user = userManage.query_cache_findUserByUserName(topic.getUserName());
+					
+					topic.setAvatarPath(user.getAvatarPath());
+					topic.setAvatarName(user.getAvatarName());
+				}
+				
+			}
+			
 		}
 		
 		
@@ -291,7 +307,9 @@ public class Topic_TemplateManage {
 			Topic topic = topicManage.queryTopicCache(topicId);//先查询缓存
 			if(topic == null){
 				topic = topicService.findById(topicId);
-				topicManage.addTopicCache(topic);//添加到缓存
+				if(topic != null){
+					topicManage.addTopicCache(topic);//添加到缓存
+				}
 			}
 			
 			if(topic != null){
@@ -308,6 +326,14 @@ public class Topic_TemplateManage {
 				if(tag != null){
 					topic.setTagName(tag.getName());
 				}
+				if(topic.getIsStaff() == false){//会员
+					User user = userManage.query_cache_findUserByUserName(topic.getUserName());
+					
+					topic.setAvatarPath(user.getAvatarPath());
+					topic.setAvatarName(user.getAvatarName());
+				}
+				
+				
 				return topic;
 			}
 			
@@ -511,6 +537,12 @@ public class Topic_TemplateManage {
 		if(commentList != null && commentList.size() >0){
 			for(Comment comment : commentList){
 				comment.setIpAddress(null);//IP地址不显示
+				if(comment.getIsStaff() == false){//会员
+					User user = userManage.query_cache_findUserByUserName(comment.getUserName());
+					
+					comment.setAvatarPath(user.getAvatarPath());
+					comment.setAvatarName(user.getAvatarName());
+				}
 				
 				
 				if(comment.getQuoteUpdateId() != null && comment.getQuoteUpdateId().length() >1){
@@ -579,6 +611,13 @@ public class Topic_TemplateManage {
 					for(Reply reply : replyList){
 						if(comment.getId().equals(reply.getCommentId())){
 							reply.setIpAddress(null);//IP地址不显示
+							if(reply.getIsStaff() == false){//会员
+								User user = userManage.query_cache_findUserByUserName(reply.getUserName());
+								
+								reply.setAvatarPath(user.getAvatarPath());
+								reply.setAvatarName(user.getAvatarName());
+							}
+							
 							comment.addReply(reply);
 						}
 					}

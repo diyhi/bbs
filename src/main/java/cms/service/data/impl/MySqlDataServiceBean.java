@@ -1,5 +1,6 @@
 package cms.service.data.impl;
 
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -17,10 +18,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.Resource;
 import javax.persistence.Query;
@@ -39,7 +38,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import cms.bean.data.ConstraintData;
 import cms.bean.data.ConstraintProperty;
 import cms.bean.data.FieldProperties;
 import cms.bean.data.TableInfoObject;
@@ -50,8 +48,6 @@ import cms.utils.HexConversion;
 import cms.utils.ObjectConversion;
 import cms.web.action.SystemException;
 import cms.web.action.data.DataRunMarkManage;
-import cms.web.action.data.Threads;
-
 
 /**
  * MySQL备份/还原管理
@@ -64,7 +60,7 @@ public class MySqlDataServiceBean extends DaoSupport implements DataService {
 	private static final Logger logger = LogManager.getLogger( MySqlDataServiceBean.class);
 	
 	@Resource JdbcTemplate jdbcTemplate;
-	@Resource  DataSource dataSource;
+	@Resource DataSource dataSource;
 	@Resource LobHandler lobHandler;
 	@Resource DataRunMarkManage dataRunMarkManage;
 	
@@ -85,8 +81,6 @@ public class MySqlDataServiceBean extends DaoSupport implements DataService {
 		return version;
 	}
 	
-	
-	
 	/**
 	 * 查询所有表信息
 	 * @param formsgroupid
@@ -99,7 +93,7 @@ public class MySqlDataServiceBean extends DaoSupport implements DataService {
 		List<TableInfoObject> tableInfoObjectList = new ArrayList<TableInfoObject>();
 		String databaseName = "";//数据库名称
 		try {
-			conn = DataSourceUtils.getConnection(dataSource);
+			conn = DataSourceUtils.getConnection(dataSource);//spring的jdbc template中的datasource 
 			databaseMetaData = conn.getMetaData();
 			databaseName = conn.getCatalog();
 			//获取所有表
@@ -547,7 +541,14 @@ public class MySqlDataServiceBean extends DaoSupport implements DataService {
 			 
 			conn  = DataSourceUtils.getConnection(dataSource);
 			conn.setAutoCommit(false);
+			
+			
+			//禁用MySQL外键约束
+			this.disableConstraint(conn);
+			
+		
 			pstmt =  conn.prepareStatement(sql.toString());
+
 			long l = 0;	
 			for (CSVRecord record : records) {//逐行读入除表头的数据       
 				l++;
@@ -631,6 +632,9 @@ public class MySqlDataServiceBean extends DaoSupport implements DataService {
 	            logger.error("还原数据",e2);
 	        }
 		}finally { 
+			//启用MySQL外键约束
+			this.enableConstraint(conn);
+
 			if(pstmt != null){
 				try {
 					pstmt.close();
@@ -666,106 +670,148 @@ public class MySqlDataServiceBean extends DaoSupport implements DataService {
 			}
         }  
 	}
-
+	/**
+     * 启用MySQL外键约束
+     */
+    private void enableConstraint(Connection conn){	
+    	String sql = "SET FOREIGN_KEY_CHECKS=1";
+    	PreparedStatement pstmt = null;
+    	try {
+    		pstmt = conn.prepareStatement(sql);
+    		pstmt.execute();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			if (logger.isErrorEnabled()) {
+	            logger.error("启用MySQL外键约束",e);
+	        }
+		}finally {
+		    if(pstmt != null){
+				try {
+					pstmt.close();
+				} catch (SQLException e) {
+				//	e.printStackTrace();
+					if (logger.isErrorEnabled()) {
+			            logger.error("启用MySQL外键约束关闭PreparedStatement错误",e);
+			        }
+				}
+			}
+		}
+    }
+    /**
+     * 禁用MySQL外键约束
+     */
+    private void disableConstraint(Connection conn){	
+    	String sql = "SET FOREIGN_KEY_CHECKS=0";
+    	PreparedStatement pstmt = null;
+    	try {
+    		pstmt = conn.prepareStatement(sql);
+    		pstmt.execute();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			if (logger.isErrorEnabled()) {
+	            logger.error("禁用MySQL外键约束",e);
+	        }
+		}finally {
+		    if(pstmt != null){
+				try {
+					pstmt.close();
+				} catch (SQLException e) {
+				//	e.printStackTrace();
+					if (logger.isErrorEnabled()) {
+			            logger.error("禁用MySQL外键约束关闭PreparedStatement错误",e);
+			        }
+				}
+			}
+		}
+    }
+    /**
+     * 查询MySQL外键约束状态
+     * @return 1:外键约束启用  0:外键约束已禁用
+     */
+    private int findConstraintStatus(Connection conn){	
+    	String sql = "SELECT @@FOREIGN_KEY_CHECKS";
+    	PreparedStatement pstmt = null;
+    	ResultSet rs = null;
+		try {
+			pstmt= conn.prepareStatement(sql);
+			rs = pstmt.executeQuery();
+			while(rs.next()) {
+		//		System.out.println("查询MySQL外键约束状态 "+rs.getInt(1));
+				return rs.getInt(1);
+			}
+		
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}finally { 
+			if(rs != null){
+				try {
+					rs.close();
+				} catch (SQLException e) {
+				//	e.printStackTrace();
+					if (logger.isErrorEnabled()) {
+			            logger.error("查询MySQL外键约束状态",e);
+			        }
+				}
+			}
+			if(pstmt != null){
+				try {
+					pstmt.close();
+				} catch (SQLException e) {
+				//	e.printStackTrace();
+					if (logger.isErrorEnabled()) {
+			            logger.error("查询MySQL外键约束状态关闭PreparedStatement错误",e);
+			        }
+				}
+			}
+		}
+    	return -1;
+    }
 	
 	/**
      * 清空MySQL数据库
      * @param table
      */
     public void deleteDatabase(List<String> table){	
-    	if(table != null && table.size() >0){
-    		for(String s : table){
-    			String sql = "truncate table "+ s ;
-    			jdbcTemplate.update(sql);
-        	}	
-    	}
+    	Connection  conn  = null;
+    	PreparedStatement pstmt = null;
+		try {
+			conn  = DataSourceUtils.getConnection(dataSource);
+			//禁用MySQL外键约束
+			this.disableConstraint(conn);
+			if(table != null && table.size() >0){
+	    		for(String s : table){
+	    			String sql = "truncate table "+ s ;
+	    			pstmt = conn.prepareStatement(sql);
+	    			pstmt.execute();
+	        	}	
+	    	}	
+		}catch (SQLException e) {
+			//e.printStackTrace();
+			if (logger.isErrorEnabled()) {
+	            logger.error("清空MySQL数据库",e);
+	        }
+		}finally {
+			//启用MySQL外键约束
+		    this.enableConstraint(conn);
+		    if(pstmt != null){
+				try {
+					pstmt.close();
+				} catch (SQLException e) {
+				//	e.printStackTrace();
+					if (logger.isErrorEnabled()) {
+			            logger.error("清空MySQL数据库关闭错误",e);
+			        }
+				}
+			}
+			DataSourceUtils.releaseConnection(conn,dataSource);
+		}
     	
     //	String sql = "DROP TABLE "+ table ;
 		
 	}
-    /**
-     * 删除MySQL约束
-     * @param constraint 约束 key: fk_Name约束名称;  value: fk_Table_Name被哪个表约束
-     */
-    public void deleteMySQLConstraint(Map<String,String> constraint){
-    	
-    	for (Map.Entry<String, String> m : constraint.entrySet()) {
-    		String sql = "alter table "+ m.getValue() +" drop foreign key "+ m.getKey();
-        	jdbcTemplate.execute(sql);
-        }
-    	
-    }
-    /**
-     * 生成MySQL约束语句
-     * @param pk_Table_Name 本表名
-     * @param pk_Column_Name 约束键名
-     * @param fk_Table_Name 被哪个表约束
-     * @param fk_Column_Name 被哪个表的某个键约束
-     * @param fk_Name 约束名称
-     */
-    private String createMySQLConstraint(String pk_Table_Name,List<String> pk_Column_Name, String fk_Table_Name,List<String> fk_Column_Name,String fk_Name){
-    	StringBuffer sql = new StringBuffer();
-    	sql.append("ALTER TABLE `"+fk_Table_Name);
-    	sql.append("` ADD CONSTRAINT "+fk_Name+" FOREIGN KEY (");
-    	for(String value : fk_Column_Name){
-    		sql.append("`"+value+"`,");
-		}
-    	sql.deleteCharAt(sql.length()-1);
-    	sql.append(") REFERENCES `"+pk_Table_Name+"` (");
-    	for(String value : pk_Column_Name){
-    		sql.append("`"+value+"`,");
-		}
-    	sql.deleteCharAt(sql.length()-1).append(")");
-    	return sql.toString();
-    }
     
-    
-    
-    
-    /**
-	 * 保存数据库约束
-	 */
-    public void saveConstraints(){
-    	Set<String> constraintSet = new HashSet<String>();//由Set自动过滤重复的外键约束
-    	
-		List<TableProperty> tablePropertyList = Threads.tablePropertyList;
-		for(TableProperty tableProperty : tablePropertyList){
-			//约束属性
-			List<ConstraintProperty> constraintPropertyList = tableProperty.getConstraintProperty();
-			
-			List<ConstraintData> constraintDataList = new ArrayList<ConstraintData>();//组装约束数据集合
-			
-			//根据约束名称组装数据
-			for(ConstraintProperty cp : constraintPropertyList){
-				if(cp.getKey_SEQ().equals(1)){
-					ConstraintData constraintData = new ConstraintData();
-					constraintData.setPk_Table_Name(cp.getPk_Table_Name());//本表名
-					constraintData.setFk_Name(cp.getFk_Name());//约束名称 
-					constraintData.setFk_Table_Name(cp.getFk_Table_Name());//被哪个表约束
-					constraintData.addPk_Column_Name(cp.getPk_Column_Name());//本表约束键名
-					constraintData.addFk_Column_Name(cp.getFk_Column_Name());//被哪个表的某个键约束
-					constraintDataList.add(constraintData);
-				}else{
-					//取得List列表最后一个元素
-					ConstraintData constraintData = constraintDataList.get(constraintDataList.size()-1);
-					constraintData.addPk_Column_Name(cp.getPk_Column_Name());//本表约束键名
-					constraintData.addFk_Column_Name(cp.getFk_Column_Name());//被哪个表的某个键约束
-				}
-			}
-			for(ConstraintData cd : constraintDataList){
-				//添加数据库约束
-				constraintSet.add(this.createMySQLConstraint(cd.getPk_Table_Name(), cd.getPk_Column_Name(), cd.getFk_Table_Name(), cd.getFk_Column_Name(),cd.getFk_Name()));
-			}
-			
-		}
-		//插入约束到数据库
-		for(String constraint : constraintSet){
-			jdbcTemplate.execute(constraint);
-		}
-		
-		Threads.calculation(0);//重置线程数为0
-		Threads.tablePropertyList.clear();//清除约束全局变量
-	}
-	
+
 	
 }

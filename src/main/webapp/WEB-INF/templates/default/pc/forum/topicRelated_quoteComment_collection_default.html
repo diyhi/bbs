@@ -6,7 +6,7 @@
 	
 	<#--  全局允许提交评论 -->
 	<#if returnValue['allowComment'] == true>
-	<div class="comment-formModule">
+	<div class="comment-formModule comment-formModule-center">
 		<div class="quoteBox">
 			${(returnValue['quoteContent'])!}
 		</div>
@@ -152,10 +152,17 @@
 								
 								if(returnValue == "success"){
 				        			if(data[returnValue] == "true"){
-				        			
-				        				alert("提交成功");
-				        				//刷新页面
-				        				document.location.reload();
+				        				//需引入layer
+				        				layer.open({
+										    type: 1, 
+										    title:"提示",
+										    content: "<div style='line-height: 36px; font-size: 15px;text-align:center; margin-left: 8px;margin-right: 8px;'>提交成功</div>", 
+										    area: ['260px', '120px'],//宽高
+											end: function(layero, index){
+												//刷新页面
+				        						document.location.reload();
+											}
+										});
 				        			}
 				        		}else if(returnValue == "error"){
 				        			
@@ -187,14 +194,16 @@
 					}
 				} 
 				
-				
-				var availableTag = ['source', '|'];
+	
 				var editor;
 				KindEditor.ready(function(K) {
-					var availableTag = document.getElementById("availableTag").value;
-					var availableTag_obj = null;//['source', '|','fontname','fontsize','emoticons'];
-					if(availableTag != ""){
-						var availableTag_obj = JSON.parse(availableTag);//JSON转为对象
+					var availableTag_obj = ['source', '|'];//['source', '|','fontname','fontsize','emoticons'];
+					if(document.getElementById("availableTag") != null){
+						var availableTag = document.getElementById("availableTag").value;
+						if(availableTag != ""){
+						
+							availableTag_obj = JSON.parse(availableTag);//JSON转为对象
+						}
 					}
 					//获取URL中的话题Id
 					var topicId = getUrlParam("topicId");

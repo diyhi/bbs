@@ -5,7 +5,7 @@
 	
 	<#--  全局允许提交回复 -->
 	<#if returnValue['allowReply'] == true>
-	<div class="comment-formModule">
+	<div class="comment-formModule comment-formModule-center">
 		<form id="addReplyCommentForm" action="user/control/comment/addReply" method="post">
 			
 			<#-- 提交后跳转参数  参数必须经过encodeBase64URL编码后才能提交 不填写时默认跳转回当前页 -->
@@ -149,9 +149,17 @@
 								
 								if(returnValue == "success"){
 				        			if(data[returnValue] == "true"){
-				        				alert("提交成功");
-				        				//刷新页面
-				        				document.location.reload();
+				        				//需引入layer
+				        				layer.open({
+										    type: 1, 
+										    title:"提示",
+										    content: "<div style='line-height: 36px; font-size: 15px;text-align:center; margin-left: 8px;margin-right: 8px;'>提交成功</div>", 
+										    area: ['260px', '120px'],//宽高
+											end: function(layero, index){
+												//刷新页面
+				        						document.location.reload();
+											}
+										});
 				        			}
 				        		}else if(returnValue == "error"){
 				        			

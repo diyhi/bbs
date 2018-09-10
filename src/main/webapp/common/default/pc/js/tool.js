@@ -5,6 +5,26 @@ function getBasePath(){
 	var paras = document.getElementsByTagName("base");
 	return paras[0]["href"];
 }
+
+
+//jquery请求session过期跳转
+function timeoutJump(XMLHttpRequest){
+	if(XMLHttpRequest.status == 508){//服务器处理请求时检测到一个无限循环
+		return;
+	}
+	if(XMLHttpRequest.status == 400){//请求错误
+		alert("请求错误");
+		return;
+	}
+	if(XMLHttpRequest.getResponseHeader("jumpPath") != null && XMLHttpRequest.getResponseHeader("jumpPath") != ""){//session登陆超时登陆页面响应http头
+ 		//收到未登陆标记，执行登陆页面跳转
+ 		window.location.href= getBasePath()+XMLHttpRequest.getResponseHeader("jumpPath");
+ 		
+ 		return;
+ 	}
+}
+
+
 /**
  * 获取URL参数
  * @param name 参数名称

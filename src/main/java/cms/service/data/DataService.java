@@ -1,7 +1,6 @@
 package cms.service.data;
 
 import java.util.List;
-import java.util.Map;
 
 import cms.bean.data.TableInfoObject;
 import cms.bean.data.TableProperty;
@@ -57,14 +56,5 @@ public interface DataService extends DAO {
      * @param table
      */
     public void deleteDatabase(List<String> table);
-    /**
-     * 删除MySQL约束
-     * @param constraint 约束 key: fk_Name约束名称;  value: fk_Table_Name被哪个表约束
-     */
-    public void deleteMySQLConstraint(Map<String,String> constraint);
-    /**
-	 * 保存数据库约束
-	 */
-    public void saveConstraints();
-    
+ 
 }

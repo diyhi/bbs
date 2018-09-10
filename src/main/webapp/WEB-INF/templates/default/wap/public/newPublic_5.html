@@ -62,6 +62,10 @@
 			</div>
 			<div class="topicList">
 			    <div class="item" v-for="topic in topicList" >
+			    	<div class="avatarBox">
+			            <img :src="topic.avatarPath+'100x100/'+topic.avatarName" v-if="topic.avatarName != null">
+			            <img :src="$store.state.commonPath+'images/min_avata.png'" v-if="topic.avatarName == null || topic.avatarName == ''">
+			        </div>
 			    	<div class="topInfo">                                   
 			            <span class="bLeft">
 			                <div class="tagName">{{topic.tagName}}</div>
@@ -184,6 +188,11 @@
 		<div class="topicContentModule">
 			<div class="topicDetail">
 				<div class="head">
+					<!-- router-link渲染成<div>标签-->
+			    	<router-link class="avatarBox"  tag="div" :to="{path: '/user/control/home', query: {userName: topic.userName}}">
+			        	<img :src="topic.avatarPath+'100x100/'+topic.avatarName" v-if="topic.avatarName != null">
+			            <img :src="$store.state.commonPath+'images/min_avata.png'" v-if="topic.avatarName == null || topic.avatarName == ''">
+			        </router-link>
 			    	<h1>
 			    		{{topic.title}}
 			    	</h1>
@@ -208,6 +217,11 @@
 			<div class="commentList">
 				<div class="item" v-for="(comment,index) in commentList" :id="'anchor_'+comment.id">
 					<div class="head">
+						<!-- router-link渲染成<div>标签-->
+				    	<router-link class="avatarBox"  tag="div" :to="{path: '/user/control/home', query: {userName: topic.userName}}">
+				        	<img :src="comment.avatarPath+'100x100/'+comment.avatarName" v-if="comment.avatarName != null">
+				            <img :src="$store.state.commonPath+'images/min_avata.png'" v-if="comment.avatarName == null || comment.avatarName == ''">
+				        </router-link>
 						<span class="info" >
 							<!-- router-link渲染成<h2>标签-->
 					    	<router-link tag="h2" :to="{path: '/user/control/home', query: {userName: comment.userName}}">
@@ -234,13 +248,21 @@
 							<ul class="box">
 							
 								<li v-for="(reply,index2) in comment.replyList" v-show="(replyExpandOrShrink[comment.id]) || (replyExpandOrShrink[comment.id] == false && index2 <2)">
-                                    <!-- router-link渲染成<span>标签-->
-							    	<router-link class="userName" tag="span" :to="{path: '/user/control/home', query: {userName: reply.userName}}">
-							           {{reply.userName}}
-							        </router-link>
-                                    <span class="badge" v-if="reply.userName == topic.userName && reply.isStaff == topic.isStaff">楼主</span>      
-									<span class="time">{{reply.postTime}}</span>
-									<p class="replyContent">{{reply.content}}</p>
+							        <div class="reply-top" >
+								        <!-- router-link渲染成<div>标签-->
+								    	<router-link class="avatarBox"  tag="div" :to="{path: '/user/control/home', query: {userName: topic.userName}}">
+								        	<img :src="reply.avatarPath+'100x100/'+reply.avatarName" v-if="reply.avatarName != null">
+								            <img :src="$store.state.commonPath+'images/min_avata.png'" v-if="reply.avatarName == null || reply.avatarName == ''">
+								        </router-link>
+	                                    <!-- router-link渲染成<span>标签-->
+								    	<router-link class="userName" tag="span" :to="{path: '/user/control/home', query: {userName: reply.userName}}">
+								           {{reply.userName}}
+								        </router-link>
+	                                    <span class="badge" v-if="reply.userName == topic.userName && reply.isStaff == topic.isStaff">楼主</span>   
+										<span class="time">{{reply.postTime}}</span>
+									</div>
+									<div style="clear:both; height: 0; line-height: 0; font-size: 0;"></div>
+									<div class="replyContent">{{reply.content}}</div>
 								</li>
 							</ul>
 							
@@ -427,13 +449,13 @@
 <!-- 搜索列表 -->
 <template id="search-template">
 	<div>
-		<mt-header fixed style="background: #fafafa; color: #000000;font-size: 14px; height: 52px; ">
+		<mt-header fixed style="background: #fafafa; color: #000000;font-size: 14px; ">
 	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
 	    	<router-link to="/index" slot="right">
 	    		<span class="cms-home" style="font-size: 18px;"></span>
 			</router-link>
 		</mt-header>
-		<div style=" position:relative; margin-left: 60px; margin-right: 60px;">
+		<div style=" position:relative; margin-left: 60px; margin-right: 60px;margin-top: 3px;">
 			<div style="background-color:transparent; width:100%; position: absolute; ">
 				<searchbar-component></searchbar-component>
 			</div>
@@ -441,6 +463,10 @@
 		<div class="searchModule">
 			<div class="topicList">
 			    <div class="item" v-for="topic in topicList" >
+			    	<div class="avatarBox">
+			            <img :src="topic.avatarPath+'100x100/'+topic.avatarName" v-if="topic.avatarName != null">
+			            <img :src="$store.state.commonPath+'images/min_avata.png'" v-if="topic.avatarName == null || topic.avatarName == ''">
+			        </div>
 			    	<!-- router-link渲染成<div>标签-->
 			    	<router-link class="title"  tag="div" :to="{path: '/thread', query: {topicId: topic.id}}">
 			           <span v-html="topic.title"></span>
@@ -764,8 +790,10 @@
 	<div class="homeModule">
 		<div class="homeHeader">
 		    <div class="user">
-		        <i class="avatar cms-user2" @click="displayUserSetting();"></i>
-		        <p class="userName" @click="displayUserSetting();">{{user.userName}}</p>
+		    	
+		        <i class="avatar cms-user2" v-if="user.avatarName == null || user.avatarName == ''"></i>
+		        <i class="avatarImg" v-if="user.avatarName != null && user.avatarName != ''"><img :src="avatarUrl"></i>
+		        <p class="userName">{{user.userName}}</p>
 		        <p class="grade" >{{user.gradeName}}</p>
 		        <span class="privateMessageBox" v-if="user.userName != $store.state.user.userName">
 		         	<!-- router-link渲染成<div>标签-->
@@ -838,12 +866,59 @@
 							<mt-cell title="修改个人信息" to="user/control/editUser" is-link></mt-cell>
 						</li>
 						<li>
+							<mt-cell title="更换头像"  @click.native="popup_updateAvatar = true"  is-link></mt-cell>
+						</li>
+						<li>
 							<mt-button  type="primary" size="large" @click.native="logout" >退出登录</mt-button>
 						</li>
 					</ul>	
 				</div>
 			</div>
 		</mt-popup>
+
+		<!-- 更换头像 弹出框 -->
+		<mt-popup v-model="popup_updateAvatar" position="right" style="width: 100%;height: 100%" :modal="false">
+			<mt-header fixed title="更换头像" style="background: #fafafa; color: #000000;font-size: 14px">
+		    	<mt-button icon="back" @click.native="popup_updateAvatar = false" slot="left" >返回</mt-button>
+		    	<router-link to="/index" slot="right">
+		    		<span class="cms-home" style="font-size: 18px;"></span>
+				</router-link>
+			</mt-header>
+			<div class="updateAvatarInfo" v-if="popup_updateAvatar">
+				<ul>
+					<li>
+						<div class="screenshot">
+							<vue-cropper
+								  ref="cropper"
+								  :img="option.img"
+								  :output-size="option.outputSize"
+								  :output-type="option.outputType"  
+								  :full="option.full"
+								  :can-move="option.canMove"
+								  :fixed-box="option.fixedBox"
+								  :original="option.original"
+								  :can-move-box="option.canMoveBox"
+								  :auto-crop="option.autoCrop"
+								  :auto-crop-width="option.autoCropWidth"
+								  :auto-crop-height="option.autoCropHeight"
+								  :center-box="option.centerBox"
+								  :high="option.high"
+								  :max-img-size="option.maxImgSize"
+							>
+							</vue-cropper>	
+					    </div>
+					</li>
+					<li style="text-align:center; height: 50px; ">
+						
+						<label class="mint-button mint-button--primary mint-button--normal is-plain selectImage-btn" for="selectImgFile">选择图片</label><input type="file" id="selectImgFile" ref="selectImgFile_ref" style="position:absolute; clip:rect(0 0 0 0);" accept="image/*"  @change="selectImage($event)">
+						
+						<mt-button type="primary"  @click.native="uploadImageSubmit" :disabled="updateAvatar_button">头像上传</mt-button>
+						
+					</li>
+				</ul>	
+			</div>
+		</mt-popup>
+
 	</div>
 	
 	<bottomtab-component></bottomtab-component>
@@ -1263,6 +1338,10 @@
 			<div class="privateMessageList">
 				<div v-infinite-scroll="queryPrivateMessage" infinite-scroll-disabled="loading" infinite-scroll-distance="10">
 					<div class="item" v-for="privateMessage in privateMessageList">
+						<div class="avatarBox">
+				            <img :src="privateMessage.friendAvatarPath+'100x100/'+privateMessage.friendAvatarName" v-if="privateMessage.friendAvatarName != null">
+				            <img :src="$store.state.commonPath+'images/min_avata.png'" v-if="privateMessage.friendAvatarName == null || privateMessage.friendAvatarName == ''">
+				        </div>
 						<div class="head">
 							<span class="info" >
 			                    <h2>{{privateMessage.friendUserName}}<span class="badge" v-if="privateMessage.status == 10">未读</span></h2>
@@ -1305,9 +1384,13 @@
 			<div class="privateMessageChatList">
 				<div v-infinite-scroll="queryPrivateMessageChat" infinite-scroll-disabled="loading" infinite-scroll-distance="10">
 					<div class="item" v-for="privateMessage in privateMessageChatList">
+						<div class="avatarBox">
+				            <img :src="privateMessage.senderAvatarPath+'100x100/'+privateMessage.senderAvatarName" v-if="privateMessage.senderAvatarName != null">
+				            <img :src="$store.state.commonPath+'images/min_avata.png'" v-if="privateMessage.senderAvatarName == null || privateMessage.senderAvatarName == ''">
+				        </div>
 						<div class="head">
 							<span class="info" >
-			                    <h2>{{privateMessage.friendUserName}}<span class="badge" v-if="privateMessage.status == 10">未读</span></h2>
+			                    <h2>{{privateMessage.senderUserName}}<span class="badge" v-if="privateMessage.status == 10">未读</span></h2>
 			                        	
 			                    <p class="time">{{privateMessage.sendTime}}</p>
 			                </span>
@@ -1461,16 +1544,19 @@
 <script src="${commonPath}js/vuex.min.js" type="text/javascript"></script>
 <link href="${baseURL}${commonPath}js/mint-ui/style.css" type="text/css" rel="stylesheet">
 <script src="${commonPath}js/mint-ui/index.js" type="text/javascript"></script>
-<script src="${commonPath}js/wendu.ajaxhook.min.js" type="text/javascript"></script>
 
 <link href="${baseURL}${commonPath}css/common.css" type="text/css" rel="stylesheet">
 <script src="${commonPath}js/better-scroll.min.js" type="text/javascript"></script> 
  
+<script src="${commonPath}js/vue-cropper.js" type="text/javascript"></script>
+ 
 <script src="${commonPath}js/wangeditor/wangEditor.min.js" type="text/javascript"></script>
 
-<script src="${commonPath}js/main.js" type="text/javascript"></script>
+<script src="${commonPath}js/main.js?14" type="text/javascript"></script>
 
 
+
+ 
 
 
 <style>
@@ -1494,16 +1580,26 @@ image[lazy=loading] {
 .my_mint-switch-core::before {width:38px;height:18px;}
 .my_mint-switch-core::after {width:18px;height:18px; }
 
-/*默认使用 display: flex;布局安卓4.4以下版本浏览器不支持*/
+
+/* 搜索框 */
+.mint-searchbar{
+	padding: 2px 2px;
+}
+/*搜索框默认使用 display: flex;布局安卓4.4以下版本浏览器不支持*/
 .mint-searchbar-inner{
 	display: -moz-box; /*Firefox*/
     display: -webkit-box; /*Safari,Opera,Chrome*/
     display: box;
+    height: 20px;
 }
 .mint-searchbar-core{
 	width:95%;
 	display:block;     
 }
+.mint-searchbar-cancel{
+	margin-right: 10px;
+}
+
 
 
 
@@ -1539,6 +1635,23 @@ image[lazy=loading] {
    display: table-cell; **/
    overflow-y: visible;
    display: table-cell;
+}
+
+/** vue-cropper 圆形截图框 **/
+.vue-cropper .cropper-crop-box{
+	border-radius: 100%;
+}
+.vue-cropper .cropper-view-box[data-v-170b9420]{
+	border-radius: 100%;
+	outline:1px solid transparent;
+	border: 1px solid #39f;
+	border-color: rgba(51,153,255,.75);
+}
+.vue-cropper .cropper-face[data-v-170b9420]{
+	background-color:transparent;
+} 
+.vue-cropper .crop-info{
+	border-radius:3px;
 }
 
 </style>

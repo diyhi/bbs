@@ -10,7 +10,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -26,7 +25,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 
-import cms.bean.data.ConstraintProperty;
 import cms.bean.data.FieldProperties;
 import cms.bean.data.TableInfoObject;
 import cms.bean.data.TableProperty;
@@ -65,7 +63,7 @@ public class MySqlDataManage {
 	
 	
 	/**
-	 * 查询Mysql版本信息
+	 * 查询MySQL版本信息
 	 */
 	public String showVersion(){
 		if(databaseVersion == null){
@@ -73,7 +71,6 @@ public class MySqlDataManage {
 		}
 		return databaseVersion;
 	}
-	
 	/**
 	 * 查询表信息
 	 */
@@ -120,7 +117,16 @@ public class MySqlDataManage {
 		}    
 		public void run() {    	
 			if(tableProperty != null){
-				writeData(tableProperty,path);
+				try {
+					writeData(tableProperty,path);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+				//	e.printStackTrace();
+					 if (logger.isErrorEnabled()) {
+			  	         logger.error("数据库备份线程",e);
+			    	 }
+				}
+				
 			}
 		}
 	}
@@ -225,7 +231,7 @@ public class MySqlDataManage {
 					// TODO Auto-generated catch block
 				//	e.printStackTrace();
 					if (logger.isErrorEnabled()) {
-		  	            logger.error("写入数据到文件",e);
+		  	            logger.error("写入数据到文件关闭错误",e);
 		    	      }
 				}
     		 }
@@ -236,7 +242,7 @@ public class MySqlDataManage {
 					// TODO Auto-generated catch block
 					//e.printStackTrace();
 					if (logger.isErrorEnabled()) {
-		  	            logger.error("写入数据到文件",e);
+		  	            logger.error("写入数据到文件关闭错误",e);
 		    	      }
 				}
     		 }
@@ -256,29 +262,18 @@ public class MySqlDataManage {
 		dataRunMarkManage.taskRunMark_add(1L);
 		resetProgress = "开始还原";
 		List<TableInfoObject> tableInfoObjectList = dataService.findTable();//数据库表名
-	
 		this.noResetCount = tableInfoObjectList.size();
 		
 		List<TableProperty> tablePropertyList = new ArrayList<TableProperty>();//数据库表属性
-		List<ConstraintProperty> constraintPropertyList = new ArrayList<ConstraintProperty>();//约束属性
 		List<String> tableName = new ArrayList<String>();//数据库表名
 		for(TableInfoObject tableInfoObject :tableInfoObjectList){
 			tableName.add(tableInfoObject.getName());
 			TableProperty tableProperty = dataService.findFieldBytableName(tableInfoObject.getName());
 			tablePropertyList.add(tableProperty);
-			constraintPropertyList.addAll(tableProperty.getConstraintProperty());
 		}
 		Threads.tablePropertyList = tablePropertyList;//将数据库参数放在全局线程变量中
 		
 		
-		Map<String,String> constraint = new HashMap<String,String>();//约束  key:约束名称  value:被哪个表约束
-		
-		//删除数据库约束
-		for(ConstraintProperty cp : constraintPropertyList){
-			constraint.put(cp.getFk_Name(), cp.getFk_Table_Name());
-		}
-		dataService.deleteMySQLConstraint(constraint);
-		resetProgress = "删除数据库约束";
 		//清空数据库
 		dataService.deleteDatabase(tableName);
 		resetProgress = "清空数据库";
@@ -302,12 +297,24 @@ public class MySqlDataManage {
 		}    
 		public void run() {    	
 			if(tableProperty != null){
-				readData(tableProperty,path);
-				//所有线程已结束
-				int ss = Threads.calculation(-1);
-				if(ss == 0){// 最后一个线程完成后添加约束  Threads.Calculation(-1)线程数-1 
-					dataService.saveConstraints();//保存数据库约束
+				try {
+					readData(tableProperty,path);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+				//	e.printStackTrace();
+					 if (logger.isErrorEnabled()) {
+			  	         logger.error("数据库还原线程",e);
+			    	 }
+				}finally {
+					//所有线程已结束
+					int ss = Threads.calculation(-1);
+					if(ss == 0){// 最后一个线程完成后启用约束  Threads.Calculation(-1)线程数-1 
+						
+						Threads.calculation(0);//重置线程数为0
+						Threads.tablePropertyList.clear();//清除约束全局变量
+					}
 				}
+				
 			}
 		}
 	}
@@ -316,7 +323,7 @@ public class MySqlDataManage {
 	 * @param tableProperty 数据库表属性
 	 * @param path 路径
 	 */
-	public void readData(TableProperty tableProperty,String path ) {  
+	private void readData(TableProperty tableProperty,String path ) {  
 		resetProgress = "还原表-->"+tableProperty.getTableName();
 		path = path+File.separator+tableProperty.getTableName()+".csv";//文件路径
 		//判断文件是否存在

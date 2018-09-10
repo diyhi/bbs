@@ -13,7 +13,11 @@
 				<div class="comment" id="anchor_${comment.id}">
 					<div class="comment-author">
 						<a href="user/control/home?userName=${comment.userName}">
-						<img src='${commonPath}images/min_avata.png' class='avatar' height='48' width='48' /></a>
+						<#if comment.avatarName != null>
+							<img src="${comment.avatarPath}100x100/${comment.avatarName}" >
+						<#else>
+							<img src="${commonPath}images/min_avata.png" >
+						</#if> 
 						<cite>
 							<a href="user/control/home?userName=${comment.userName}">${comment.userName}</a>
 						</cite> 
@@ -28,28 +32,43 @@
 						<#noescape>${quoteContent}</#noescape>
 					</div>
 					</#if> 
-					<p class="commentContent"><#noescape>${comment.content}</#noescape></p>
+					<div class="commentContent"><#noescape>${comment.content}</#noescape></div>
 					<div class="clearfix"></div>
-					<div class="reply">
-						<strong class="replyCount">--- 共有 ${comment.totalReply} 条回复 --- </strong>
-		
-						<table class="reply-table">
-						    <tbody>	 
-						    	<#list comment.replyList as customReply>
-						    		<tr>
-										<td width="60" style="padding-left:10px;"><div class="userName">${customReply.userName}</div></td>
-										<td><span class="replyContent">${customReply.content}</span></td>
-										<td><span class="replyTime">(${customReply.postTime})</span></td>
-									</tr>
-						    	</#list> 
-							</tbody>
-						</table>
-					
-					</div>
+					<#if comment.totalReply gt 0> 
+						<div class="reply">
+							<strong class="replyCount">--- 共有 ${comment.totalReply} 条回复 --- </strong>
+			
+							<table class="reply-table">
+							    <tbody>	 
+							    	<#list comment.replyList as reply>
+							    		<tr>
+							    			<td width="30" >
+							    				<div class="author">
+							    				<a href="user/control/home?userName=${reply.userName}">
+								    				<#if reply.avatarName != null>
+														<img src="${reply.avatarPath}100x100/${reply.avatarName}" >
+													<#else>
+														<img src="${commonPath}images/min_avata.png" >
+													</#if> 
+												</a>
+												</div>
+							    			</td>
+											<td width="60" ><div class="userName"><a href="user/control/home?userName=${reply.userName}">${reply.userName}</a></div></td>
+											<td><span class="replyContent">${reply.content}</span></td>
+											<td><span class="replyTime">${reply.postTime}</span></td>
+										</tr>
+							    	</#list> 
+								</tbody>
+							</table>
+						</div>
+					</#if> 
 					<div class="tipBottom">
 						<span class="a-toolbar">
 							<a href="javascript:" onclick="replyLayer('${comment.id}','${comment.userName}');">回复</a>&nbsp;|&nbsp;
 							<a href="javascript:" onclick="quoteLayer('${comment.id}','${comment.userName}')">引用</a>
+							<!-- 是否登录 -->
+							<input type="hidden" id="isLogin" value="<#if systemUser != null>true<#else>false</#if>">
+							
 							
 						</span>
 					</div>
@@ -88,13 +107,30 @@ $(function() {
 
 //回复弹出层
 function replyLayer(commentId,userName){
+	//判断是否已登录
+	var isLogin = document.getElementById("isLogin").value;
+	if(isLogin == "false"){
+		layer.open({
+		    type: 1, 
+		    title:"提示",
+		    content: "<div style='line-height: 36px; font-size: 15px;text-align:center; margin-left: 8px;margin-right: 8px;'>请先登录</div>", 
+		    area: ['260px', '120px'],//宽高
+			success: function(layero, index){
+				 
+			}
+		});
+		return false;
+	}
+	
+	
+
 	var div = "<div id='divMessage'></div>";
 	layer.open({
 	    type: 1, 
 	    title:"回复 "+userName,
 	    content: div, //这里content是一个普通的String
 	    moveOut:true,//是否允许拖拽到窗口外
-	    area: ['600px', '270px']//宽高
+	    area: ['800px', '500px']//宽高
 
 	});
 	
@@ -115,13 +151,29 @@ function replyLayer(commentId,userName){
 
 //引用弹出层
 function quoteLayer(commentId,userName){
+	//判断是否已登录
+	var isLogin = document.getElementById("isLogin").value;
+	if(isLogin == "false"){
+		layer.open({
+		    type: 1, 
+		    title:"提示",
+		    content: "<div style='line-height: 36px; font-size: 15px;text-align:center; margin-left: 8px;margin-right: 8px;'>请先登录</div>", 
+		    area: ['260px', '120px'],//宽高
+			success: function(layero, index){
+				 
+			}
+		});
+		return false;
+	}
+
+
 	var div = "<div id='divMessage'></div>";
 	layer.open({
 	    type: 1, 
 	    title:"引用 "+userName,
 	    content: div, //这里content是一个普通的String
 	    moveOut:true,//是否允许拖拽到窗口外
-	    area: ['600px', '370px'],//宽高
+	    area: ['800px', '500px'],//宽高
 		zIndex:1,
 		
 		cancel: function(index){
@@ -141,7 +193,7 @@ function quoteLayer(commentId,userName){
 			$("#divMessage").html(value);
 		}
 	},
-	getBasePath()+"comment_quote.htm?"+parameter+"&timestamp=" + new Date().getTime(), true);
+	getBasePath()+"comment_quote?"+parameter+"&timestamp=" + new Date().getTime(), true);
 	
 }
 </script> 

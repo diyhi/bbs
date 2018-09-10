@@ -15,30 +15,32 @@
 					
 					<div style="height: 40px;">
 						<div style="float:left; *margin-top: 5px;">
-							<select name="tagId" class="formSelect" >
+							<select id="tagId" name="tagId" class="formSelect" >
 								<option value="" >选择标签</option>
 								<#-- 引入标签选择 -->
 								<@include action="${quote_1}"/>
 							</select>
-							<span id="tagId_error" class="error">${(error['tagId'])!}</span>
+							<span id="${identificationNumber}_tagId_error" class="error">${(error['tagId'])!}</span>
 						</div>
 						<div style="float:left;">
 							
-							<input type="text" name="title" class="formText" size="90" value="${topic.title}" alt="标题" title="标题"/>
-							<span id="title_error" class="error">${(error['title'])!}</span>
+							<input type="text" id="title" name="title" class="formText" size="90" value="${topic.title}" alt="标题" title="标题"/>
+							<span id="${identificationNumber}_title_error" class="error">${(error['title'])!}</span>
 						</div>
 					</div>
 	
 					<p><textarea class="textarea" onfocus="" id="topicContent" name="content" >${topic.content}</textarea></p>
 					
-					<span class="error">${(error['content'])!}</span> 
-					<span id="topic_error" class="error">${error['topic']}</span>
+					<span id="${identificationNumber}_content_error" class="error">${(error['content'])!}</span> 
+					<span id="${identificationNumber}_topic_error" class="error">${error['topic']}</span>
 					<div class="form-action">
 						<#-- 获取令牌 -->
 						<input type="hidden" id="token" name="token" value="${token!}">
 						
 						<div class="topicSubmit">
-				        	<span class="submitButton"><INPUT type="button" value="提交" onClick="javascript:sureSubmit(this.form)"></span>
+							<!-- 
+				        	<span class="submitButton"><INPUT type="button" value="提交" onClick="javascript:sureSubmit(this.form)"></span> -->
+				        	<span class="submitButton"><INPUT type="button" value="提交" onClick="javascript:ajax_sureSubmit('${identificationNumber}')"></span>
 				        </div>
 						
 						
@@ -129,7 +131,99 @@
 						function sureSubmit(obj){
 							obj.submit();
 						} 
+						//Ajax方式提交
+						function ajax_sureSubmit(identificationNumber){
 						
+							if(verificationCode() == true){
+								var parameter = "";
+	
+								//获取令牌
+								parameter += "&token="+document.getElementById("token").value;
+								
+								//获取验证码key
+								var captchaKey = document.getElementById(identificationNumber+"_"+"captchaKey");
+								if(captchaKey != null){
+									parameter += "&captchaKey="+captchaKey.value;
+								}
+								
+								//获取验证码value
+								var captchaValue = document.getElementById(identificationNumber+"_"+"captchaValue");
+								if(captchaValue != null){
+									parameter += "&captchaValue="+captchaValue.value;
+								}
+								//标签
+								var tagId = document.getElementById("tagId");
+
+								var index = tagId.selectedIndex; // 选中索引
+								
+								var tagId_text = tagId.options[index].text; // 选中文本
+								var tagId_value = tagId.options[index].value; // 选中值
+								
+								//获取标签
+								parameter += "&tagId="+encodeURIComponent(tagId_value);
+								
+								//获取标题
+								var title = document.getElementById("title").value;
+								parameter += "&title="+encodeURIComponent(title);
+
+								//获取内容
+								var content = document.getElementById("topicContent").value;
+								parameter += "&content="+encodeURIComponent(content);
+							
+							
+							
+							   	//删除第一个&号,防止因为多了&号而出现警告: Parameters: Invalid chunk ignored.信息
+								if(parameter.indexOf("&") == 0){
+									parameter = parameter.substring(1,parameter.length);
+								}
+							   	post_request(function(value){
+									var data = JSON.parse(value);
+									for(var returnValue in data){
+										
+										if(returnValue == "success"){
+						        			if(data[returnValue] == "true"){
+						        				//需引入layer
+						        				layer.open({
+												    type: 1, 
+												    title:"提示",
+												    content: "<div style='line-height: 36px; font-size: 15px;text-align:center; margin-left: 8px;margin-right: 8px;'>提交成功</div>", 
+												    area: ['260px', '120px'],//宽高
+													end: function(layero, index){
+														//刷新页面
+						        						document.location.reload();
+													}
+												});
+						        				
+						        			}
+						        		}else if(returnValue == "error"){
+						        			
+						        			var error = data[returnValue];
+						        			for(var key in error){
+						        				var error_html = document.getElementById(identificationNumber+"_"+key+"_error");
+						        	
+						        				if(error_html != null){
+						        					error_html.innerHTML = error[key];
+						        				}
+						        				
+						        			}
+						        		}else if(returnValue == "captchaKey"){//显示验证码
+				        					
+											var captchaKey = data[returnValue];
+											if(captchaKey != ""){
+												//设置验证码Key
+												if(document.getElementById(identificationNumber+"_"+"captchaKey")!= null){
+				
+													document.getElementById(identificationNumber+"_"+"captchaKey").value = captchaKey;
+													//设置验证码图片
+													replaceCaptcha(identificationNumber);
+												}	
+											}
+										}
+						        	}
+								},
+									"user/control/topic/add?timestamp=" + new Date().getTime(), true,parameter);
+							}
+						} 
 						
 						
 						
@@ -137,12 +231,13 @@
 						var editor;
 						KindEditor.ready(function(K) {
 							editor = K.create('textarea[id="topicContent"]', {
-								
+								themeType : 'new',//新外观
 								basePath : '${commonPath}js/kindeditor/',//指定编辑器的根目录路径
 								formatUploadUrl :false,//false时不会自动格式化上传后的URL
 								resizeType : 1,//2或1或0，2时可以拖动改变宽度和高度，1时只能改变高度，0时不能拖动。默认值: 2 
 								allowPreviewEmoticons : true,//true或false，true时鼠标放在表情上可以预览表情
 								allowImageUpload : true,//true时显示图片上传按钮
+								
 								uploadJson :'user/control/topic/upload.htm?method=upload',//指定浏览远程图片的服务器端程序
 								
 								items : ['source', 'fontsize', 'forecolor', 'hilitecolor', 'bold',

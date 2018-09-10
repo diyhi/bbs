@@ -42,13 +42,7 @@ http://www.springframework.org/schema/context/spring-context-4.3.xsd">
 				</bean>
 				<!-- 文件下载配置 -->
 				<bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter"/>   
-                <bean id="mappingJacksonHttpMessageConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">      
-                    <property name="supportedMediaTypes">      
-                        <list>      
-                            <value>text/plain;charset=UTF-8</value>      
-                       </list>      
-                    </property>    
-                </bean>
+
                 <!-- Json转换器 -->
                 <bean id="mappingJacksonHttpMessageConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">          
                     <property name="supportedMediaTypes">      

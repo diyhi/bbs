@@ -146,34 +146,34 @@ html,body{
 
 /*分页*/
 .pg {
-	float: right;line-height: 26px;
+	float: right;line-height: 30px;font-size: 13px;
 }
 .pg A {
-	border-bottom: #c2d5e3 1px solid; border-left: #c2d5e3 1px solid; padding-bottom: 0px; background-color: #fff; padding-left: 8px; padding-right: 8px; display: inline; background-repeat: no-repeat; float: left; height: 26px; color: #333; margin-left: 4px; overflow: hidden; border-top: #c2d5e3 1px solid; border-right: #c2d5e3 1px solid; text-decoration: none; padding-top: 0px;border-bottom-color: #dfdfdf; border-top-color: #dfdfdf; border-right-color: #dfdfdf; border-left-color: #dfdfdf;
+	border-radius: 2px; border-bottom: #c2d5e3 1px solid; border-left: #c2d5e3 1px solid; padding-bottom: 0px; background-color: #fff; padding-left: 10px; padding-right: 10px; display: inline; background-repeat: no-repeat; float: left; height: 30px; color: #333; margin-left: 4px; overflow: hidden; border-top: #c2d5e3 1px solid; border-right: #c2d5e3 1px solid; text-decoration: none; padding-top: 0px;border-bottom-color: #dfdfdf; border-top-color: #dfdfdf; border-right-color: #dfdfdf; border-left-color: #dfdfdf;
 	
 }
 .pg A.prev {
-	padding-bottom: 0px; padding-left: 10px; padding-right: 10px; padding-top: 0px
+	border-radius: 2px; padding-bottom: 0px; padding-left: 10px; padding-right: 10px; padding-top: 0px
 }
-.pg A.nxt {
+.pg A.nxt {border-radius: 2px;
 	padding-bottom: 0px; padding-left: 10px; padding-right: 10px; padding-top: 0px
 }
 .pg A:hover {
 	
 	border-bottom-color: #c9c9c9; border-top-color: #c9c9c9; color: #000000; border-right-color: #c9c9c9; border-left-color: #c9c9c9
 }
-.pg LABEL {
-	border-bottom: #dfdfdf 1px solid; border-left: #dfdfdf 1px solid; padding-bottom: 0px; background-color: #fff; padding-left: 8px; padding-right: 8px; display: inline; background-repeat: no-repeat; float: left; height: 26px; color: #333; margin-left: 4px; overflow: hidden; border-top: #dfdfdf 1px solid; border-right: #dfdfdf 1px solid; text-decoration: none; padding-top: 0px;
+.pg LABEL {border-radius: 2px;
+	border-bottom: #dfdfdf 1px solid; border-left: #dfdfdf 1px solid; padding-bottom: 0px; background-color: #fff; padding-left: 10px; padding-right: 10px; display: inline; background-repeat: no-repeat; float: left; height: 30px; color: #333; margin-left: 4px; overflow: hidden; border-top: #dfdfdf 1px solid; border-right: #dfdfdf 1px solid; text-decoration: none; padding-top: 0px;
 	
 }
 .pg LABEL .pg_input {
 	padding:0;width:25px;height:15px;line-height:15px;margin-bottom: 3px;*margin-bottom: 0px;
 }
 .pg STRONG {
-	border-bottom: #c2d5e3 1px solid; border-left: #c2d5e3 1px solid; padding-bottom: 0px; background-color: #fff; padding-left: 8px; padding-right: 8px; display: inline; background-repeat: no-repeat; float: left; height: 26px; color: #333; margin-left: 4px; overflow: hidden; border-top: #c2d5e3 1px solid; border-right: #c2d5e3 1px solid; text-decoration: none; padding-top: 0px;border-bottom-color: #dfdfdf; border-top-color: #dfdfdf; border-right-color: #dfdfdf; border-left-color: #dfdfdf;background-color: #f5f5f5;
+	border-radius: 2px; border-bottom: #c2d5e3 1px solid; border-left: #c2d5e3 1px solid; padding-bottom: 0px; background-color: #fff; padding-left: 10px; padding-right: 10px; display: inline; background-repeat: no-repeat; float: left; height: 30px; color: #333; margin-left: 4px; overflow: hidden; border-top: #c2d5e3 1px solid; border-right: #c2d5e3 1px solid; text-decoration: none; padding-top: 0px;border-bottom-color: #dfdfdf; border-top-color: #dfdfdf; border-right-color: #dfdfdf; border-left-color: #dfdfdf;background-color: #f5f5f5;
 }
 .pg span.count {
-	border-bottom: #c2d5e3 1px solid; border-left: #c2d5e3 1px solid; padding-bottom: 0px; background-color: #fff; padding-left: 8px; padding-right: 8px; display: inline; background-repeat: no-repeat; float: left; height: 26px; color: #333; margin-left: 4px; overflow: hidden; border-top: #c2d5e3 1px solid; border-right: #c2d5e3 1px solid; text-decoration: none; padding-top: 0px;border-bottom-color: #dfdfdf; border-top-color: #dfdfdf; border-right-color: #dfdfdf; border-left-color: #dfdfdf;
+	border-radius: 2px; border-bottom: #c2d5e3 1px solid; border-left: #c2d5e3 1px solid; padding-bottom: 0px; background-color: #fff; padding-left: 10px; padding-right: 10px; display: inline; background-repeat: no-repeat; float: left; height: 30px; color: #333; margin-left: 4px; overflow: hidden; border-top: #c2d5e3 1px solid; border-right: #c2d5e3 1px solid; text-decoration: none; padding-top: 0px;border-bottom-color: #dfdfdf; border-top-color: #dfdfdf; border-right-color: #dfdfdf; border-left-color: #dfdfdf;
 }
 
 /*功能按钮  F7F7F7 */
@@ -191,7 +191,14 @@ html,body{
 .submitButton:hover,
 .submitButton:hover span,
 .submitButton:hover input{background:#0191e4;}
-
+.submitButton input:disabled{  
+    border: 1px solid #e6e6e6;  
+    background-color: #fbfbfb;  
+    color:#c9c9c9;
+    margin-top: -1px;
+    margin-bottom: -1px;
+    border-radius:2px;
+} 
 
 
 /* 表单 text */
@@ -414,11 +421,12 @@ html,body{
 .topicModule th em {
 	margin-right: 20px;
 	zoom: 1;
-	color: #aaa;
+	color: #c4c4c4;
+	font-size: 13px;
 	*margin-top: 20px;
 }
 .topicModule th em a{
-	color: #aaa;
+	color: #c4c4c4;
 }
 .topicModule th {
 	height: 0px;
@@ -434,17 +442,17 @@ html,body{
 	display: block;
 	position: relative;
 	float: left;
-	padding-left: 12px;
+	padding-left: 6px;
 }
 
 .topicModule .avatarBox .avatarLink  img {
 	float: none;
 	display: block;
-	width: 42px;
-	height: 42px;
+	width: 60px;
+	height: 60px;
 	float: left;
 	margin-right: 10px;
-	border-radius:100px;
+	border-radius:60px;
 	position:relative;
 	behavior: url(common/default/pc/js/css3pie/PIE.htc);  /*通知IE浏览器调用脚本作用于当前类*/
 }
@@ -452,8 +460,8 @@ html,body{
 /* 列表内容 */
 .topicModule .content {
 	position: relative;
-	margin-left: 52px;
-	width: 860px;
+	margin-left: 82px;
+	width: 840px;
 	overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
 .topicModule .highlight B{
@@ -461,14 +469,27 @@ html,body{
 }
 
 .topicModule .content .info {
-	*margin-top: -20px;
+	margin-top: 3px;*margin-top: -16px; margin-bottom: 3px;
 }
 
 .topicModule .content .info a {
 	color: #aaa;
 }
 
-
+.topicModule .content .info .tag{
+	display: inline-block;
+	min-width: 10px;
+	padding: 3px 7px;
+	font-size: 12px;
+	color: #666666;
+	line-height: 1;
+	vertical-align: baseline;
+	white-space: nowrap;
+	text-align: center;
+	background-color: #f5f5f5;
+	border-radius: 2px;
+	
+}
 /* 标题 #555*/
 .topicModule .content .title {
 	font-family: STHeiti,Microsoft YaHei,Tahoma,Helvetica,'SimSun',sans-serif;
@@ -635,10 +656,12 @@ html,body{
 	position: relative;
 	padding-bottom:0;
 }
-.commentModule .commentlist{list-style:none;}
+.commentModule .commentlist{list-style:none;font-size: 13px;}
 .commentModule .commentlist .comment{padding:10px 0 5px 60px;border-bottom:1px solid #EDEDE3;}
 .commentModule .commentlist .comment-author{position:relative;color:#999}
 .commentModule .commentlist .comment-author img{
+	width:48px;
+	height:48px;
 	position:absolute;
 	left:-60px;
 	-webkit-border-radius:50%;
@@ -647,12 +670,12 @@ html,body{
 	display:block;
 	behavior: url(common/default/pc/js/css3pie/PIE.htc);  /*通知IE浏览器调用脚本作用于当前类*/
 }
-.commentModule .commentlist cite{font-style:normal}
+.commentModule .commentlist cite{font-style:normal;}
 .commentModule .commentlist .commentTime{margin-bottom:5px;color:#999}
-.commentModule .commentlist .commentTime a{color:#999}
-.commentModule .commentlist .comment .commentContent{padding:0px;word-wrap:break-word;color:#666}
+.commentModule .commentlist .commentTime a{color:#999;}
+.commentModule .commentlist .comment .commentContent{padding:0px;word-wrap:break-word;color:#666;}
 /* 评论图片尺寸 */
-.commentModule .commentlist .comment .commentContent img {max-width:99.5%;height:auto}
+.commentModule .commentlist .comment .commentContent img {max-width:99.5%;height:auto;}
 
 
 .commentModule .commentlist .quote{
@@ -668,7 +691,7 @@ html,body{
 	float: left;
 	width: 600px;
 	padding-bottom: 10px;
-	font-size: 10.5pt;
+	font-size: 13px;
 	min-height: 22px;
 	margin-left: 45px;
 	word-break: break-word;
@@ -679,40 +702,53 @@ html,body{
 	
 }
 .commentModule .commentlist .reply {
-	margin: 5px 0 10px 50px;
+	margin: 15px 0 10px 50px;background: #fcfcfc;font-size: 13px;
 }
 .commentModule .commentlist .reply .replyCount{
-	font-weight: 400;color:#878787;
+	font-weight: 400;color:#666;
 }
 .commentModule .commentlist .reply a {
 	text-decoration: none;
 }
 .commentModule .commentlist .reply .reply-table {
-	width: 85%;
+	width: 100%;
 }
 .commentModule .commentlist .reply .reply-table td{
-	border-bottom:1px dashed #e4e4e4;padding:6px 0;
+	border-bottom:1px dashed #e4e4e4;padding:10px 5px;
+}
+.commentModule .commentlist .reply .reply-table td .author{position:relative;background: red;}
+.commentModule .commentlist .reply .reply-table td .author img{
+	width:28px;
+	height:28px;
+	margin-top:-14px;
+	position:absolute;
+	-webkit-border-radius:50%;
+	-moz-border-radius:50%;
+	border-radius:50%;
+	display:block;
+	behavior: url(common/default/pc/js/css3pie/PIE.htc);  /*通知IE浏览器调用脚本作用于当前类*/
 }
 .commentModule .commentlist .reply .reply-table td .userName{
 	color: #999;
 }
 .commentModule .commentlist .reply .reply-table td .replyContent{
 	margin-left: 10px;
-	font-size: 12px;
+	font-size: 13px;
 }
 .commentModule .commentlist .reply .reply-table td .replyTime{
 	position: relative;
 	color: #999;
-	font-size: 8pt;
+	font-size: 9pt;
 	margin: 3px 0 0 3px;
 	-webkit-text-size-adjust: none;
 	white-space: nowrap;
 	display: inline-block;
 }
 .commentModule .commentlist .tipBottom {
-	font-size: 9pt;
+	font-size: 10pt;
 	color: #aaa;
-	margin: -5px 0 5px 50px;
+	margin: 15px 10px 5px 50px;
+	text-align: right;
 }
 .commentModule .commentlist .tipBottom .a-toolbar {
 	display: block;
@@ -727,30 +763,67 @@ html,body{
 
 /* 评论提交*/
 .comment-formModule {
-	position: relative;   margin-left: 10px;margin-right: 10px; 
+	position: relative; margin-left: 10px; margin-right: 10px;
+}
+.comment-formModule-center{
+	width:580px;
+	margin-left: auto; margin-right: auto;
+	
 }
 .comment-formModule .textarea{
-	width:100%;visibility:hidden;
+	width:100%;visibility:hidden;height: 200px;
 }
 .comment-formModule .quoteBox{
-	background:#fffee6; padding:10px;border:1px solid #ffe7ce;margin-top: 10px;width: 96%;
+	background:#fffee6; padding:10px;border:1px solid #ffe7ce;margin-top: 10px;
 	
 }
 .comment-formModule .quote-textarea-box {
-	padding-bottom: 10px; padding-left: 0px; padding-right: 0px; padding-top: 10px;width: 100%;
+	padding-bottom: 10px; padding-left: 0px;  padding-right: 2px; padding-top: 10px;
 }
 
 .comment-formModule .quote-textarea {
-	padding-bottom: 4px; padding-left: 15px;  padding-right: 15px; height: 160px; overflow: auto; padding-top: 4px; 
-}
-.comment-formModule .reply-textarea-box {
-	padding-bottom: 10px; padding-left: 0px; padding-right: 0px; padding-top: 10px;width: 100%;
+	padding-bottom: 4px; padding-left: 15px;  padding-right: 15px; height: 200px; overflow: auto; padding-top: 4px; 
 }
 
-.comment-formModule .reply-textarea {
-	padding-bottom: 4px;  width: 90%; height: 120px; overflow: auto; padding-top: 4px; 
+.comment-formModule .reply-textarea-box{
+	
+	margin-top: 8px;
+	margin-left: 0px;
+	margin-right: 0px;
+	margin-bottom: 8px;
 }
-
+.comment-formModule .reply-textarea{
+	width:554px;
+	height:150px;
+	
+	line-height: 1.33em;
+	-webkit-box-shadow: none;
+    box-shadow: none;
+    border-radius: 2px;
+    border: 1px solid #dce3e8;
+	vertical-align: top;
+	
+	margin: 0em;
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: rgba(255,255,255,0);
+    padding: 0.78em 1em;
+    background: #ffffff;
+    border: 1px solid rgba(39,41,43,0.15);
+    outline: none;
+    color: rgba(0,0,0,0.8);
+    border-radius: 0.28rem;
+    -webkit-box-shadow: 0em 0em 0em 0em transparent inset;
+    box-shadow: 0em 0em 0em 0em transparent inset;
+    -webkit-transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    -webkit-transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, -webkit-box-shadow 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, -webkit-box-shadow 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, -webkit-box-shadow 0.2s ease;
+    font-size: 1em;
+   
+    resize: vertical;
+	
+}
 .comment-formModule .form-action {
 	 padding-left: 0px; padding-right: 0px; padding-top: 3px;margin-bottom: 12px;
 }
@@ -830,8 +903,11 @@ html,body{
 .articleInfoModule .user{ 
 	height: 150px;
 	padding:10px 0 20px 25px;
+	font-size: 13px;
 }
 .articleInfoModule .user .author img{
+	width:70px;
+	height:70px;
 	position:absolute;
 	-webkit-border-radius:50%;
 	-moz-border-radius:50%;
@@ -841,13 +917,13 @@ html,body{
 }
 .articleInfoModule .user .author span{
 	position:absolute;
-	margin-top:16px;
-	margin-left:60px;
+	margin-top:22px;
+	margin-left:85px;
 }
 .articleInfoModule .user .userInfo{
 	position:absolute;
 	border-top: 1px solid #EDEDE3;
-	margin-top:70px;
+	margin-top:80px;
 	width: 200px;
 }
 .articleInfoModule .user .userInfo span{
@@ -1542,6 +1618,147 @@ html,body{
 	margin-top: 10px; float: right; color: #999; line-height: 22px; margin-right: 0px;*margin-right: 8px;
 }
 
+/** 头像 **/
+.avatarModule {
+	padding-left: 8px;padding-right: 8px;
+	padding-top: 8px;
+	padding-bottom: 8px;
+	background: #fcfcfc;
+}
+.avatarModule .original-box{
+	width: 400px;
+	height: 400px;
+	background-color: #f6f6f6;
+}
+.avatarModule .preview-pane {
+	display: block;
+	position: absolute;
+	left:436px;
+	top: 20px;
+	z-index: 2100;	
+}
+.avatarModule .preview-pane .preview-container {
+	height: 200px;
+	overflow: hidden;
+	width: 200px;
+}
+.avatarModule .preview-pane2 {
+	border-radius: 100%;
+	overflow: hidden;
+	line-height: 100px;
+	position: absolute;
+	left:488px;
+	top: 265px;
+	z-index: 2200;
+	
+}
+.avatarModule .preview-pane2 .preview-container2 {
+	height: 100px;
+	overflow: hidden;
+	width: 100px;
+}
+/*原图预览DIV*/
+.avatarModule .image-crop-original-div{
+	float: left;
+	display: inline-block;
+	_zoom:1;*display:inline;
+	*position: absolute;
+	
+}
+.avatarModule .original-box img{
+	width: 400px\9;
+	float: left;
+	display: inline-block;
+}
+/*截图预览DIV*/
+.avatarModule .image-crop-preview-div{
+	width: 100%;
+	float: left;
+}
+
+.avatarModule .bottomInfo{
+	margin-top: 10px;line-height:34px; border-top: 1px solid #d9dadb;
+}
+.avatarModule .bottomInfo .avatar-upload-button{
+	padding-top: 12px;float: right;line-height: 36px; 
+}
+.avatarModule .bottomInfo .avatar-submit-button{
+	padding-top: 15px; padding-top:13px\0; *padding-top:12px;   float: right;line-height: 36px;
+}
+
+.avatarModule .bottomInfo .uploadButton{
+	position: relative;
+	color: #0592fe;
+    border-color: #0592fe;
+    outline: none;
+    display: inline-block;
+   	padding-bottom:2px;
+    padding-left: 12px;
+    padding-right:12px; 
+    font-size: 14px;
+    line-height: 28px;
+    text-align: center;
+    cursor: pointer;
+    background: none;
+    border: 1px solid;
+    border-radius: 3px;
+    margin: 0;
+	text-decoration: none;
+}
+.avatarModule .bottomInfo .uploadButton input {
+    position: absolute;
+    font-size: 20px;
+    right: 0;
+    top: 0;
+    opacity: 0;
+    filter:alpha(opacity=0);
+}
+.avatarModule .bottomInfo .uploadButton:hover {
+    background: #f1f9ff;  
+    text-decoration: none;
+}
+
+
+
+/** 修改用户头像 **/
+.updateAvatar {
+	position: absolute;
+	
+	margin-left: 800px;
+	margin-top: 40px;
+	width: 100px;
+	height: 100px;
+	border-radius: 100%;
+	background-color: #e6e6e6;
+	overflow: hidden;
+	text-align: center;
+	line-height: 100px
+}
+
+.updateAvatar img {
+	max-width: 100%;
+	vertical-align: middle;
+	width: 100px;
+	height: auto;
+	margin-top: -2px
+}
+
+.updateAvatar .change {
+	position: absolute;
+	width: 100px;
+	height: 100px;
+	border-radius: 100%;
+	filter:Alpha(opacity=60);/* 只支持IE6、7、8、9 */
+	
+	background-color: rgba(0,0,0,0.6);
+	background: #666666\9;
+}
+
+.updateAvatar .change span {
+	color: #fff;
+}
+
+
 
 /* 数据表格 */
 .dataTable {
@@ -1604,6 +1821,7 @@ html,body{
 	vertical-align: middle;
 	padding: .3em;
 	min-width: 0;
+	*height: 2px;
 }
 
 
@@ -1623,7 +1841,6 @@ html,body{
 .footer .copyright a { font-family: Tahoma; margin-left: 16px; color: #999;}
 .footer .copyright a:hover { text-decoration: underline; }
 .footer .copyright span { margin-left: 17px; }
-
 
 /* 将页脚固定在页面底部 在底部上一div中加入*/
 .fixedBottom{

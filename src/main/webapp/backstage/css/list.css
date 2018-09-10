@@ -165,3 +165,105 @@ ul.rating li.five a:hover {background-position:0 -160px}
 .pg span.count {
 	border-bottom: #c2d5e3 1px solid; border-left: #c2d5e3 1px solid; padding-bottom: 0px; background-color: #fff; padding-left: 8px; padding-right: 8px; display: inline; background-repeat: no-repeat; float: left; height: 26px; color: #333; margin-left: 4px; overflow: hidden; border-top: #c2d5e3 1px solid; border-right: #c2d5e3 1px solid; text-decoration: none; padding-top: 0px;border-bottom-color: #BFE3FF; border-top-color: #BFE3FF; border-right-color: #BFE3FF; border-left-color: #BFE3FF;
 }
+
+
+/** 头像 **/
+.avatarModule {
+	padding-left: 8px;padding-right: 8px;
+	padding-top: 8px;
+	padding-bottom: 8px;
+	background: #fcfcfc;
+}
+.avatarModule .original-box{
+	width: 400px;
+	height: 400px;
+	background-color: #f6f6f6;
+}
+.avatarModule .preview-pane {
+	display: block;
+	position: absolute;
+	left:436px;
+	top: 20px;
+	z-index: 2100;	
+}
+.avatarModule .preview-pane .preview-container {
+	height: 200px;
+	overflow: hidden;
+	width: 200px;
+}
+.avatarModule .preview-pane2 {
+	border-radius: 100%;
+	overflow: hidden;
+	line-height: 100px;
+	position: absolute;
+	left:488px;
+	top: 265px;
+	z-index: 2200;
+	
+}
+.avatarModule .preview-pane2 .preview-container2 {
+	height: 100px;
+	overflow: hidden;
+	width: 100px;
+}
+/*原图预览DIV*/
+.avatarModule .image-crop-original-div{
+	float: left;
+	display: inline-block;
+	_zoom:1;*display:inline;
+	*position: absolute;
+	
+}
+.avatarModule .original-box img{
+	width: 400px\9;
+	float: left;
+	display: inline-block;
+}
+/*截图预览DIV*/
+.avatarModule .image-crop-preview-div{
+	width: 100%;
+	float: left;
+}
+
+.avatarModule .bottomInfo{
+	margin-top: 10px;line-height:34px; border-top: 1px solid #d9dadb;
+}
+.avatarModule .bottomInfo .avatar-upload-button{
+	padding-top: 12px;float: right;line-height: 36px; 
+}
+.avatarModule .bottomInfo .avatar-submit-button{
+	padding-top: 15px; padding-top:13px\0; *padding-top:12px;   float: right;line-height: 36px;
+}
+
+.avatarModule .bottomInfo .uploadButton{
+	position: relative;
+	color: #0592fe;
+    border-color: #0592fe;
+    outline: none;
+    display: inline-block;
+   	padding-bottom:2px;
+    padding-left: 12px;
+    padding-right:12px; 
+    font-size: 14px;
+    line-height: 28px;
+    text-align: center;
+    cursor: pointer;
+    background: none;
+    border: 1px solid;
+    border-radius: 3px;
+    margin: 0;
+	text-decoration: none;
+}
+.avatarModule .bottomInfo .uploadButton input {
+    position: absolute;
+    font-size: 20px;
+    right: 0;
+    top: 0;
+    opacity: 0;
+    filter:alpha(opacity=0);
+}
+.avatarModule .bottomInfo .uploadButton:hover {
+    background: #f1f9ff;  
+    text-decoration: none;
+}
+

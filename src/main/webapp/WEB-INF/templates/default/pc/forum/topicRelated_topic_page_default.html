@@ -11,12 +11,16 @@
 		    		<th> 
 				        <div class="avatarBox">
 				            <a class="avatarLink" href="user/control/home?userName=${topic.userName}">
-				                <img src="${commonPath}images/min_avata.png"/>                                                               
+				            	<#if topic.avatarName != null>
+									<img src="${topic.avatarPath}100x100/${topic.avatarName}">
+								<#else>
+									<img src="${commonPath}images/min_avata.png">
+								</#if>                                   
 				            </a>   
 				        </div>
 				        <div class="content">
 				            <a href="thread?topicId=${topic.id}" class="title">
-					          	【${topic.tagName}】<span>${topic.title}</span>
+					          	<span>${topic.title}</span>
 							</a>
 							<div class="clear"></div>
 							<div class="info clearfix">
@@ -29,6 +33,7 @@
 								<a href="" class="view" style="*margin-top: 20px;">
 									<img class="images" src="${commonPath}images/pageview.png" alt="" style="float: left;"/>${topic.viewTotal}
 								</a>
+								<span class="tag">${topic.tagName}</span>
 								<em>  
 				                	<a href="user/control/home?userName=${topic.userName}">
 					           			<span style="display:inline-block;margin-left: 7px;">
@@ -43,7 +48,7 @@
 				                
 							</div>
 						</div>
-						<div style="margin-left: 70px; position: relative;">
+						<div style="margin-left: 82px; position: relative;">
 							<#if topic.imageInfoList?size gt 0>
 			                	<div class="tm-m-photos topic_thumbnail_${topic.id}">
 									<ul class="tm-m-photos-thumb">

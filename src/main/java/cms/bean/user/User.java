@@ -1,5 +1,6 @@
 package cms.bean.user;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Column;
@@ -14,6 +15,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
+
+import org.joda.time.DateTime;
 
 
 /**
@@ -82,6 +85,12 @@ public class User implements Serializable{
 	/** 当前等级  只用于统计显示,不写入数据库**/
 	@Transient
 	private String gradeName;
+	/** 头像路径 不写入数据库**/
+	@Transient
+	private String avatarPath;
+	/** 头像名称 **/
+	@Column(length=50)
+	private String avatarName;
 	
 	public Long getId() {
 		return id;
@@ -185,6 +194,27 @@ public class User implements Serializable{
 	}
 	public void setSecurityDigest(Long securityDigest) {
 		this.securityDigest = securityDigest;
+	}
+	public String getAvatarPath() {
+		if(this.avatarPath == null || "".equals(this.avatarPath.trim())){
+			if(this.getRegistrationDate() != null){
+				DateTime dateTime = new DateTime(this.getRegistrationDate());     
+				String date = dateTime.toString("yyyy-MM-dd");
+				//头像路径
+				String _avatarPath = "file"+File.separator+"avatar"+File.separator + date +File.separator;
+				this.avatarPath = _avatarPath;
+			}
+		}
+		return avatarPath;	
+	}
+	public void setAvatarPath(String avatarPath) {
+		this.avatarPath = avatarPath;
+	}
+	public String getAvatarName() {
+		return avatarName;
+	}
+	public void setAvatarName(String avatarName) {
+		this.avatarName = avatarName;
 	}
 
 }

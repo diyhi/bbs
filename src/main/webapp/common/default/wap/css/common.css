@@ -180,7 +180,17 @@ html,body{
 	float: right;
 }
 .indexModule .topicList {margin-top: 3px;}
-.indexModule .topicList .item .topInfo{height:24px;line-height:24px;padding:0px 10px 0px 10px;}
+.indexModule .topicList .item {position: relative;}
+.indexModule .topicList .item .avatarBox{
+	position:absolute;display:inline-block;border-radius:100%;
+	left: 6px;top:2px;
+	
+}
+.indexModule .topicList .item .avatarBox img{
+	border-radius:100%;
+	width: 32px;
+}
+.indexModule .topicList .item .topInfo{height:24px;line-height:24px;padding:0px 10px 0px 50px;}
 .indexModule .topicList .item .topInfo .bLeft{float:left!important;display:inline-block;}
 .indexModule .topicList .item .topInfo .bLeft .tagName{
 	background-color: #f5f5f5;
@@ -197,7 +207,7 @@ html,body{
 .indexModule .topicList .item .topInfo .bRight{float:right!important;font-size:14px;color:#aaa;}
 .indexModule .topicList .item .title{
 	position:relative;
-	color:#222;padding:0px 10px 0px 10px;font-size:16px;
+	color:#222;padding:0px 10px 0px 50px;font-size:16px;
     line-height:24px;
     max-height:48px;
     display: -webkit-box;
@@ -205,7 +215,7 @@ html,body{
 	-webkit-line-clamp: 2;
 	overflow: hidden;
 }
-.indexModule .topicList .item .detailInfo{line-height:26px;padding:0px 10px 0px 10px;}
+.indexModule .topicList .item .detailInfo{line-height:26px;padding:0px 10px 0px 50px;}
 .indexModule .topicList .item .detailInfo .bLeft{float:left!important;color:#aaa;display:inline-block;height:25px;font-size:14px;}
 .indexModule .topicList .item .detailInfo .bLeft .userName{float:left!important;}
 .indexModule .topicList .item .detailInfo .time{font-style:normal;}
@@ -213,7 +223,7 @@ html,body{
 
 .indexModule .topicList .item .summary{
 	
-	position:relative;padding:0px 10px 0px 10px;
+	position:relative;padding:0px 10px 0px 50px;
 }
 .indexModule .topicList .item .summary span{
 	color: #aaa;
@@ -226,7 +236,7 @@ html,body{
 	width:100%;
 }
 
-.indexModule .topicList .item .picInfo{position:relative;padding:0px 0px 5px 10px;border-bottom:1px solid #eee;display:inline-block;width: 100%; -webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box; }
+.indexModule .topicList .item .picInfo{position:relative;padding:0px 0px 5px 50px;border-bottom:1px solid #eee;display:inline-block;width: 100%; -webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box; }
 .indexModule .topicList .item .picInfo .imageBox{display:block;color:gray;width:20%;margin-right:2%; float:left!important;}
 .indexModule .topicList .item .picInfo .imageBox .img{
     padding-bottom: 100%;
@@ -272,7 +282,6 @@ html,body{
 }
 
 .topicContentModule .topicDetail {
-	margin-top:10px;
 	margin-left:8px;
 	margin-right:8px;
 	overflow: hidden;
@@ -281,6 +290,7 @@ html,body{
 }
 .topicContentModule .topicDetail .head {
 	position: relative;
+	margin-top:10px;
 	margin-bottom: 2px;
 	padding-bottom: 2px;
 	border-bottom: 1px solid #eee;
@@ -289,6 +299,16 @@ html,body{
 	color: #222;
 	font-weight: 300;
 	font-size: 18px;
+	margin-right: 30px;
+}
+.topicContentModule .topicDetail .head .avatarBox{
+	position:absolute;display:inline-block;border-radius:100%;
+	right: 0px;top:-6px;
+	
+}
+.topicContentModule .topicDetail .head .avatarBox img{
+	border-radius:100%;
+	width: 32px;
 }
 .topicContentModule .topicDetail .head .info{ padding:8px 0px 0px 0px;min-height: 18px;line-height: 18px;}
 .topicContentModule .topicDetail .head .info .bLeft{float:left!important;color:#aaa;display:inline-block;height:18px;font-size:13px;}
@@ -306,7 +326,7 @@ html,body{
 	color:#ececec;
 }**/
 .topicContentModule .topicDetail .main {
-	margin: 10px 0px 0px 0px;
+	margin: 10px 0px 10px 0px;
 	min-height: 80px;
 	font-size: 14px;
 	line-height: 1.8;
@@ -320,7 +340,7 @@ html,body{
 }
 .topicContentModule .commentList {
 	width: 100%;
-	overflow-x: hidden
+	overflow-x: hidden;
 }
 .topicContentModule .commentList .badge {
 	font-size: 10px;
@@ -339,13 +359,25 @@ html,body{
 }
 .topicContentModule .commentList .item .head {
 	min-height: 45px;
-	padding: 8px 3px 0;
+	padding: 8px 0px 0;
 	margin: 0;
 	overflow: hidden;
 }
+.topicContentModule .commentList .item .head .avatarBox{
+	position:absolute;display:inline-block;border-radius:100%;
+	
+	
+}
+.topicContentModule .commentList .item .head .avatarBox img{
+	border-radius:100%;
+	width: 32px;
+	
+}
+
 .topicContentModule .commentList .item .head .info {
 	display: block;
-	float: left
+	float: left;
+	margin-left: 38px;
 }
 .topicContentModule .commentList .item .head .info h2 {
 	color:#aaa;
@@ -424,20 +456,40 @@ html,body{
 	font: 0/0 a
 }
 .topicContentModule .commentList .replyList .box li:after {
-	clear: both
+	clear: both;
 }
-.topicContentModule .commentList .replyList .box li .userName {
-	color:#aaa;
+.topicContentModule .commentList .replyList .box li .reply-top{
+	height: 23px;
 }
-.topicContentModule .commentList .replyList .box li .time {
+
+
+.topicContentModule .commentList .replyList .box li .reply-top .avatarBox{
+	position:absolute;border-radius:100%;
+	
+	
+}
+.topicContentModule .commentList .replyList .box li .reply-top .avatarBox img{
+	border-radius:100%;
+	width: 24px;
+	margin-top: -7px;left: 0px;
+}
+.topicContentModule .commentList .replyList .box li .reply-top .userName {
+	color:#aaa;margin-left: 28px;margin-top:-4px;
+
+	float: left;
+}
+.topicContentModule .commentList .replyList .box li .reply-top .time {
 	float: right;
 	color:#aaa;
 	font-size: 12px;
-	margin-right: 10px
+	margin-right: 10px;
+	margin-top:-5px;
 }
 .topicContentModule .commentList .replyList .box li .replyContent{
 	font-size: 14px;
+	line-height:24px;
 	color:#222;
+	
 }
 .topicContentModule .commentList .replyList .link {
 	text-align: right;
@@ -532,10 +584,19 @@ html,body{
 }
 .searchModule .topicList {margin-top: 3px;}
 	
-.searchModule .topicList .item {border-bottom:1px solid #eee;}
+.searchModule .topicList .item {position: relative; border-bottom:1px solid #eee;}
+.searchModule .topicList .item .avatarBox{
+	position:absolute;display:inline-block;border-radius:100%;
+	left: 6px;top:2px;
+	
+}
+.searchModule .topicList .item .avatarBox img{
+	border-radius:100%;
+	width: 32px;
+}
 .searchModule .topicList .item .title{
 	position:relative;
-	color:#222;padding:4px 10px 5px 10px;font-size:16px;
+	color:#222;padding:4px 10px 5px 50px;font-size:16px;
     line-height:24px;
     max-height:48px;
     display: -webkit-box;
@@ -545,7 +606,7 @@ html,body{
 }
 .searchModule .topicList .item .content{
 	position:relative;
-	color: #aaa;padding:0px 10px 5px 10px;font-size:14px;
+	color: #aaa;padding:0px 10px 5px 50px;font-size:14px;
     line-height:24px;
     max-height:48px;
     display: -webkit-box;
@@ -554,7 +615,7 @@ html,body{
 	overflow: hidden;
 }
 .searchModule .topicList .item B{color: #fc0012;}
-.searchModule .topicList .detailInfo{line-height:26px;padding:0px 10px 0px 10px;height: 26px;}
+.searchModule .topicList .detailInfo{line-height:26px;padding:0px 10px 0px 50px;height: 26px;}
 .searchModule .topicList .detailInfo .bLeft{float:left!important;color:#aaa;display:inline-block;height:25px;font-size:14px;}
 .searchModule .topicList .detailInfo .bLeft .userName{float:left!important;}
 .searchModule .topicList .detailInfo .time{font-style:normal;}
@@ -664,6 +725,17 @@ html,body{
 .homeModule .homeHeader{position:relative;height:100px;background:center center no-repeat;background-size:cover;-webkit-user-select:none;background-color:#26a2ff;}
 .homeModule .homeHeader .user{padding-left:100px;padding-top:15px;font-size:12px;font-weight:bold;color:#fff;-webkit-user-select:none;line-height:30px; }
 .homeModule .homeHeader .user .avatar{position:absolute;left:10px;top:15px;display:inline-block;background-size:212px 645px;font-size:74px;}
+
+.homeModule .homeHeader .user .avatarImg{
+	position:absolute;left:10px;top:10px;display:inline-block;border-radius:100%;
+	
+}
+.homeModule .homeHeader .user .avatarImg img{
+	border-radius:100%;box-shadow: 0 0 0 1px #26a2ff,0 0 0 2px #fff;
+	width: 80px;
+}
+
+
 .homeModule .homeHeader .user .userName{line-height:26px;margin:5px 0; font-size:16px;}
 .homeModule .homeHeader .user .grade{line-height:20px;background-repeat:no-repeat;background-position:left center;background-size:auto 100%;font-size:12px;height:20px;width:60px;display:inline-block;background-color:#56b7ff;border-radius:20px;text-align:center;}
 .homeModule .homeHeader .privateMessageBox{
@@ -758,6 +830,18 @@ html,body{
 	display:block;position: absolute;margin:5px auto;font-size:27px;width:25%;
 	/**display:block;margin:1px auto 5px;font-size:27px;**/
 }
+
+.updateAvatarInfo .screenshot{
+        width: 300px;
+        height: 300px;
+        margin: 50px auto 20px auto;
+}
+
+.updateAvatarInfo .selectImage-btn {
+        padding: 0px 15px; margin-right: 10px;
+      	line-height:40px;
+        overflow: visible;
+      }
 
 
 
@@ -963,6 +1047,7 @@ html,body{
 	border-bottom: 1px solid #eee;
 	margin-left: 8px; 
 	margin-right: 8px;
+	position: relative;
 }
 .privateMessageModule .privateMessageList .badge {
 	font-size: 10px;
@@ -974,9 +1059,20 @@ html,body{
 	padding: 0 3px;
 	margin-left: 3px
 }
+
+.privateMessageModule .privateMessageList .item .avatarBox{
+	position:absolute;display:inline-block;border-radius:100%;
+	left: 0px;top:8px;
+	
+}
+.privateMessageModule .privateMessageList .item .avatarBox img{
+	border-radius:100%;
+	width: 32px;
+}
+
 .privateMessageModule .privateMessageList .item .head {
 	min-height: 45px;
-	padding: 8px 3px 0;
+	padding: 8px 0px 0px 40px;
 	margin: 0;
 	overflow: hidden;
 }
@@ -1045,6 +1141,7 @@ html,body{
 	border-bottom: 1px solid #eee;
 	margin-left: 8px; 
 	margin-right: 8px;
+	position: relative;
 }
 .privateMessageChatModule .privateMessageChatList .badge {
 	font-size: 10px;
@@ -1056,9 +1153,18 @@ html,body{
 	padding: 0 3px;
 	margin-left: 3px
 }
+.privateMessageChatModule .privateMessageChatList .avatarBox{
+	position:absolute;display:inline-block;border-radius:100%;
+	left: 0px;top:8px;
+	
+}
+.privateMessageChatModule .privateMessageChatList .avatarBox img{
+	border-radius:100%;
+	width: 32px;
+}
 .privateMessageChatModule .privateMessageChatList .item .head {
 	min-height: 45px;
-	padding: 8px 3px 0;
+	padding: 8px 0px 0px 40px;
 	margin: 0;
 	overflow: hidden;
 }
@@ -1176,3 +1282,7 @@ html,body{
 	margin-bottom: 10px;
 	color:#222;
 }
+
+
+
+

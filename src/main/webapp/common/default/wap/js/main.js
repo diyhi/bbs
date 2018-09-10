@@ -19,6 +19,7 @@ $.ajaxSettings = $.extend($.ajaxSettings, {
 	//	XMLHttpRequest.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 	},
 	complete : function complete(XMLHttpRequest, textStatus) {
+			
 		if(XMLHttpRequest.status == 508){
 			//设置登录用户
 			store.commit('setSystemUserId', '');
@@ -39,67 +40,13 @@ $.ajaxSettings = $.extend($.ajaxSettings, {
 				path : "/" + XMLHttpRequest.getResponseHeader("jumpPath")
 			});
 		}
+		
 		Vue.$indicator.close(); //关闭旋转进度条
 	}
 });
 Vue.component('v-select', VueSelect.VueSelect);
 
-
-
-//拦截所有的ajax请求
-hookAjax({
-	onreadystatechange:function(XMLHttpRequest){
-		if(XMLHttpRequest.status == 508){
-			//设置登录用户
-			store.commit('setSystemUserId', '');
-			store.commit('setSystemUserName', '');
-		}
-		//关闭网站提示参数
-		if(XMLHttpRequest.status == 503){
-			//弹出提示内容
-			Vue.$messagebox('系统维护', XMLHttpRequest.responseText);
-		}
-		
-		//请求完成后回调函数 (请求成功或失败时均调用)
-		if (XMLHttpRequest.getResponseHeader("jumpPath") != null && XMLHttpRequest.getResponseHeader("jumpPath") != "") {
-			//session登陆超时登陆页面响应http头
-			//收到未登录标记，执行登录页面跳转
-			router.push({
-				path : "/" + XMLHttpRequest.getResponseHeader("jumpPath")
-			});
-		}
-	},
-	onload:function(XMLHttpRequest){
-		if(XMLHttpRequest.status == 508){//服务器处理请求时检测到一个无限循环
-			//设置登录用户
-			store.commit('setSystemUserId', '');
-			store.commit('setSystemUserName', '');
-		}
-		//关闭网站提示参数
-		if(XMLHttpRequest.status == 503){
-			//弹出提示内容
-			Vue.$messagebox('系统维护', XMLHttpRequest.responseText);
-		}
-		
-		//请求完成后回调函数 (请求成功或失败时均调用)
-		if (XMLHttpRequest.getResponseHeader("jumpPath") != null && XMLHttpRequest.getResponseHeader("jumpPath") != "") {
-			//session登陆超时登陆页面响应http头
-			//收到未登录标记，执行登录页面跳转
-			router.push({
-				path : "/" + XMLHttpRequest.getResponseHeader("jumpPath")
-			});
-		}
-	},
-	//拦截函数
-	open:function(arg,xhr){
-
-	},
-	send:function(arg,xhr){
-		xhr.setRequestHeader("X-Requested-With","XMLHttpRequest");//标记报头为AJAX方式
-  }
-});
-
-
+//Vue.component('vue-cropper', window['vue-cropper'].default);
 
 
 //定时查询消息
@@ -744,8 +691,6 @@ var thread_component = Vue.extend({
 						}else{
 							_self.next = '';
 						}
-						console.log(_self.currentpage+" 中S "+_self.totalpage);
-						console.log(_self.on+" 中 "+_self.next);
 						
 						_self.$nextTick(function() {
 							//跳转到锚点
@@ -2776,13 +2721,35 @@ var login_component = Vue.extend({
 	}
 });
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 //用户中心页
 var home_component = Vue.extend({
 	template : '#home-template',
 	data : function data() {
 		return {
 			user : '', //用户
+			avatarUrl: '',//头像URL
+			
 			popup_userSetting : false, //'用户设置'弹出层
+			popup_updateAvatar : false, //'更换头像'弹出层
+			updateAvatar_button: false,//'头像上传'按钮是否禁用
+			option: {
+				img: '',//裁剪图片的地址
+				outputSize: 1,//裁剪生成图片的质量 0.1 - 1
+				outputType: 'png',//裁剪生成图片的质量
+				full: false,//是否输出原图比例的截图
+				canMove: true,//上传图片是否可以移动
+				original: false,//上传图片按照原始比例渲染
+				fixedBox: true,//固定截图框大小 不允许改变
+				canMoveBox: false,//截图框能否拖动
+				autoCrop: true,//是否默认生成截图框
+				autoCropWidth: 200,//默认生成截图框宽度 只有自动截图开启 宽度才生效
+				autoCropHeight: 200,//默认生成截图框高度 只有自动截图开启 宽度才生效
+				centerBox: false,//截图框是否被限制在图片里面
+				high: false,//是否按照设备的dpr 输出等比例图片
+				maxImgSize: 4000 //限制图片最大宽度和高度
+			}
 		}
 	},
 	created : function created() {
@@ -2790,8 +2757,122 @@ var home_component = Vue.extend({
 		
 		//查询消息
 		this.unreadMessageCount();
+		
+	}, 
+	components: {
+	    'vue-cropper': window['vue-cropper'].default
 	},
 	methods : {
+		//选择剪裁图片
+		selectImage: function selectImage(e) {
+			var _self = this;
+		    //上传图片
+		    // this.option.img
+		    var file = e.target.files[0];
+		    if (!/\.(gif|jpg|jpeg|png|bmp|GIF|JPG|PNG)$/.test(e.target.value)) {
+		        alert('图片类型必须是.gif,jpeg,jpg,png,bmp中的一种');
+		        return false;
+		    }
+		    var reader = new FileReader();
+		    reader.onload = function (e) {
+		        var data = void 0;
+		        if (_typeof(e.target.result) === 'object') {
+		          // 把Array Buffer转化为blob 如果是base64不需要
+		          data = window.URL.createObjectURL(new Blob([e.target.result]));
+		        } else {
+		          data = e.target.result;
+		        }
+		        _self.option.img = data;
+		    };
+		      // 转化为base64
+		   //  reader.readAsDataURL(file)
+		      // 转化为blob
+		    reader.readAsArrayBuffer(file);
+		},
+		//提交上传图片
+		uploadImageSubmit : function() {
+			var _self = this;
+			_self.updateAvatar_button = true;//禁用'头像上传'按钮
+			
+			if(_self.option.img == ''){
+				_self.$toast({
+					message : "请先选择图片",
+					duration : 3000,
+					className : "mint-ui-toast",
+				});
+				_self.updateAvatar_button = false;//启用'头像上传'按钮
+				return;
+			}
+			var formData = new FormData();
+			
+			_self.$refs.cropper.startCrop();//开始截图
+			
+			//获取截图的blob数据
+			_self.$refs.cropper.getCropBlob(function (data) {
+
+				formData.append("imgFile", data);
+				$.ajax({
+					type : "POST",
+					cache : false,
+					async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+					url : "user/control/updateAvatar",
+					data : formData,
+					contentType : false, // 不设置内容类型
+					processData : false, // 不处理数据
+					success : function success(result) {
+						if (result != "") {
+							var returnValue = $.parseJSON(result);
+
+							var value_success = "";
+							var value_error = null;
+
+							for (var key in returnValue) {
+								if (key == "success") {
+									value_success = returnValue[key];
+								} else if (key == "error") {
+									value_error = returnValue[key];
+								}
+							}
+
+							//修改成功
+							if (value_success == "true") {
+								_self.$toast({
+									message : "更换头像成功",
+									duration : 3000,
+									className : "mint-ui-toast",
+								});
+								
+								_self.loadHome();
+							//	_self.option.img ='';
+								//清空表单值
+							//	_self.$refs.selectImgFile_ref.value ='';
+								
+								
+								
+							} else {
+								//显示错误
+								if (value_error != null) {
+
+									var htmlContent = "";
+									var count = 0;
+									for (var errorKey in value_error) {
+										var errorValue = value_error[errorKey];
+										count++;
+										htmlContent += count + ". " + errorValue + "<br>";
+									}
+									_self.$messagebox('提示', htmlContent);
+								}
+								
+							}
+							_self.updateAvatar_button = false;//启用'头像上传'按钮
+						}
+					}
+				});
+		    });
+			
+			
+			
+		},
 		//加载用户中心页
 		loadHome : function() {
 			var _self = this;
@@ -2814,6 +2895,9 @@ var home_component = Vue.extend({
 						for (var key in returnValue) {
 							if (key == "user") {
 								_self.user = returnValue[key];
+								
+								_self.avatarUrl = _self.user.avatarPath+""+_self.user.avatarName+"?"+Math.random().toString().slice(-6);
+								
 							}
 						}
 
@@ -5461,6 +5545,7 @@ var vue = new Vue({
 		//定时查询消息
 		timerUnreadMessage: function timerUnreadMessage() {
 			var _self = this;
+			
 			_self.unreadMessageCount();
 			
 			setTimeout(function () {
@@ -5732,6 +5817,50 @@ function createEditor(editorToolbar,editorText,imgPath,self,param) {
 	// 隐藏“网络图片”tab
     editor.customConfig.showLinkImg = false;
     
+    //图片上传
+    editor.customConfig.customUploadImg = function (files, insert) {
+        // files 是 input 中选中的文件列表
+        // insert 是获取图片 url 后，插入到编辑器的方法
+
+    	var formData = new FormData();
+    	files.forEach(function(file) {
+    		formData.append(editor.customConfig.uploadFileName, file);
+    	});
+    	
+		//令牌
+	//	formData.append("token", store.state.token);
+		$.ajax({
+			type : "POST",
+			cache : false,
+			async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+			url : editor.customConfig.uploadImgServer,
+			data : formData,
+			contentType : false, // 不设置内容类型
+			processData : false, // 不处理数据
+			success : function success(result) {
+				if (result != "") {
+					var returnValue = $.parseJSON(result);
+					if(returnValue.error ==0){
+			    		// 举例：假如上传图片成功后，服务器端返回的是 {url:'....'} 这种格式，即可这样插入图片：
+				        var url = returnValue.url;
+				     // 上传代码返回结果之后，将图片插入到编辑器中
+				        insert(url);
+			    		// result 必须是一个 JSON 格式字符串！！！否则报错
+			    	}else{
+			    		//弹出提示内容
+						Vue.$messagebox('错误', returnValue.message);
+			    	} 
+					
+				}
+			}
+		});
+    	
+    	
+    	
+        
+    }
+    
+    /**
     editor.customConfig.uploadImgHooks = {
 	    // 如果服务器端返回的不是 {errno:0, data: [...]} 这种格式，可使用该配置
 	    // （但是，服务器端返回的必须是一个 JSON 格式字符串！！！否则会报错）
@@ -5748,7 +5877,37 @@ function createEditor(editorToolbar,editorText,imgPath,self,param) {
 				Vue.$messagebox('错误', result.message);
 	    	}  
 	    },
-    };
+	    
+	    error: function (xhr, editor) {
+	        // 图片上传出错时触发
+	        // xhr 是 XMLHttpRequst 对象，editor 是编辑器对象
+	    	console.log(xhr.status+"  错误  "+xhr.responseText);
+	    	
+	    	if(xhr.status == 508){
+				//设置登录用户
+				store.commit('setSystemUserId', '');
+				store.commit('setSystemUserName', '');
+				
+			}
+	    	
+			//关闭网站提示参数
+			if(xhr.status == 503){
+				//弹出提示内容
+				Vue.$messagebox('系统维护', xhr.responseText);
+				
+			}
+			
+			//请求完成后回调函数 (请求成功或失败时均调用)
+			if (xhr.getResponseHeader("jumpPath") != null && xhr.getResponseHeader("jumpPath") != "") {
+				//session登陆超时登陆页面响应http头
+				//收到未登录标记，执行登录页面跳转
+				router.push({
+					path : "/" + xhr.getResponseHeader("jumpPath")
+				});
+			}
+	    	
+	    },
+    };**/
     editor.create();
 	return editor;
 }

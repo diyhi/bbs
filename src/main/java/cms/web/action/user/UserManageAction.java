@@ -1,5 +1,7 @@
 package cms.web.action.user;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -14,10 +16,12 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -25,6 +29,7 @@ import org.springframework.validation.Validator;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
@@ -47,12 +52,15 @@ import cms.service.user.UserCustomService;
 import cms.service.user.UserGradeService;
 import cms.service.user.UserService;
 import cms.utils.JsonUtils;
+import cms.utils.PathUtil;
 import cms.utils.RedirectPath;
 import cms.utils.SHA;
 import cms.utils.UUIDUtil;
 import cms.utils.Verification;
+import cms.web.action.FileManage;
 import cms.web.action.SystemException;
 import cms.web.action.TextFilterManage;
+import cms.web.action.thumbnail.ThumbnailManage;
 import cms.web.action.topic.TopicManage;
 
 /**
@@ -83,6 +91,11 @@ public class UserManageAction {
 	@Resource TagService tagService;
 	@Resource TopicManage topicManage;
 	
+	
+	@Resource FileManage fileManage;
+	@Resource ThumbnailManage thumbnailManage;
+	
+
 	
 	/**
 	 * 用户管理 查看
@@ -865,6 +878,18 @@ public class UserManageAction {
 							
 							//删除评论文件
 							topicManage.deleteCommentFile(user.getUserName(), false);
+
+							DateTime dateTime = new DateTime(user.getRegistrationDate());     
+							String date = dateTime.toString("yyyy-MM-dd");
+							
+							String pathFile = "file"+File.separator+"avatar"+File.separator + date +File.separator  +user.getAvatarName();
+							//删除头像
+							fileManage.deleteFile(pathFile);
+							
+							String pathFile_100 = "file"+File.separator+"avatar"+File.separator + date +File.separator +"100x100" +File.separator+user.getAvatarName();
+							//删除头像100*100
+							fileManage.deleteFile(pathFile_100);
+							
 						}
 						
 						
@@ -1326,5 +1351,209 @@ public class UserManageAction {
 	}
 	
 	
+	/**
+	 * 更新头像
+	 * @param model
+	 * @param imgFile
+	 * @param id 用户Id
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(params="method=updateAvatar",method=RequestMethod.POST)
+	@ResponseBody//方式来做ajax,直接返回字符串
+	public String updateAvatar(ModelMap model,MultipartFile imgFile,Long id,
+			HttpServletRequest request,HttpServletResponse response)
+			throws Exception {	
+		
+		Map<String,String> error = new HashMap<String,String>();//错误
+
+	
+		User user = userService.findUserById(id);
+		
+		if(user == null){
+			error.put("user", "用户不存在");
+		}
+		
+		String _width = request.getParameter("width");
+		String _height = request.getParameter("height");
+		String _x = request.getParameter("x");
+		String _y = request.getParameter("y");
+		
+		
+		Integer width = null;//宽
+		Integer height = null;//高
+		Integer x = 0;//坐标X轴
+		Integer y = 0;//坐标Y轴
+		
+		
+		if(_width != null && !"".equals(_width.trim())){
+			if(Verification.isPositiveInteger(_width.trim())){
+				if(_width.trim().length() >=8){
+					error.put("width", "不能超过8位数字");//不能超过8位数字
+				}else{
+					width = Integer.parseInt(_width.trim());
+				}
+				
+				
+			}else{
+				error.put("width", "宽度必须大于0");//宽度必须大于0
+			}
+			
+		}
+		if(_height != null && !"".equals(_height.trim())){
+			if(Verification.isPositiveInteger(_height.trim())){
+				if(_height.trim().length() >=8){
+					error.put("height", "不能超过8位数字");//不能超过8位数字
+				}else{
+					height = Integer.parseInt(_height.trim());
+				}
+				
+			}else{
+				error.put("height", "高度必须大于0 ");//高度必须大于0 
+			}
+		}
+		
+		if(_x != null && !"".equals(_x.trim())){
+			if(Verification.isPositiveIntegerZero(_x.trim())){
+				if(_x.trim().length() >=8){
+					error.put("x", "不能超过8位数字");//不能超过8位数字
+				}else{
+					x = Integer.parseInt(_x.trim());
+				}
+				
+			}else{
+				error.put("x", "X轴必须大于或等于0");//X轴必须大于或等于0
+			}
+			
+		}
+		
+		if(_y != null && !"".equals(_y.trim())){
+			if(Verification.isPositiveIntegerZero(_y.trim())){
+				if(_y.trim().length() >=8){
+					error.put("y","不能超过8位数字");//不能超过8位数字
+				}else{
+					y = Integer.parseInt(_y.trim());
+				}
+				
+			}else{
+				error.put("y","Y轴必须大于或等于0");//Y轴必须大于或等于0
+			}
+			
+		}
+		//构建文件名称
+		String newFileName = "";
+		if(error.size() ==0){
+			
+			DateTime dateTime = new DateTime(user.getRegistrationDate());     
+			String date = dateTime.toString("yyyy-MM-dd");
+			
+			if(imgFile != null && !imgFile.isEmpty()){
+				//当前文件名称
+				String fileName = imgFile.getOriginalFilename();
+				
+				//文件大小
+				Long size = imgFile.getSize();
+				
+
+				
+				//允许上传图片格式
+				List<String> formatList = new ArrayList<String>();
+				formatList.add("gif");
+				formatList.add("jpg");
+				formatList.add("jpeg");
+				formatList.add("bmp");
+				formatList.add("png");
+				//允许上传图片大小 单位KB
+				long imageSize = 3*1024L;
+				
+				if(size/1024 <= imageSize){
+					
+					//验证文件类型
+					boolean authentication = fileManage.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
+			
+					if(authentication){
+						//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
+						String pathDir = "file"+File.separator+"avatar"+File.separator + date +File.separator ;
+						//100*100目录
+						String pathDir_100 = "file"+File.separator+"avatar"+File.separator + date +File.separator +"100x100" +File.separator;
+
+						//生成文件保存目录
+						fileManage.createFolder(pathDir);
+						//生成文件保存目录
+						fileManage.createFolder(pathDir_100);
+						
+						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
+							String oldPathFile = pathDir + user.getAvatarName();
+							//删除旧头像
+							fileManage.deleteFile(oldPathFile);
+							String oldPathFile_100 = pathDir_100 + user.getAvatarName();
+							//删除旧头像100*100
+							fileManage.deleteFile(oldPathFile_100);
+						}
+
+						BufferedImage bufferImage = ImageIO.read(imgFile.getInputStream());  
+			            //获取图片的宽和高  
+			            int srcWidth = bufferImage.getWidth();  
+			            int srcHeight = bufferImage.getHeight();  
+						
+						//取得文件后缀
+						String suffix = fileManage.getExtension(fileName).toLowerCase();
+						//构建文件名称
+						newFileName = user.getId()+ "." + suffix;
+						
+						if(srcWidth <=200 && srcHeight <=200){	
+							//保存文件
+							fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
+							
+							if(srcWidth <=100 && srcHeight <=100){
+								//保存文件
+								fileManage.writeFile(pathDir_100, newFileName,imgFile.getBytes());
+							}else{
+								//生成100*100缩略图
+								thumbnailManage.createImage(imgFile.getInputStream(),PathUtil.path()+File.separator+pathDir_100+newFileName,suffix,100,100);
+							}
+						}else{
+							//生成200*200缩略图
+							thumbnailManage.createImage(imgFile.getInputStream(),PathUtil.path()+File.separator+pathDir+newFileName,suffix,x,y,width,height,200,200);
+
+							//生成100*100缩略图
+							thumbnailManage.createImage(imgFile.getInputStream(),PathUtil.path()+File.separator+pathDir_100+newFileName,suffix,x,y,width,height,100,100);
+    
+						}	
+					}else{
+						error.put("imgFile","当前文件类型不允许上传");//当前文件类型不允许上传
+					}	
+				}else{
+					error.put("imgFile","文件超出允许上传大小");//文件超出允许上传大小
+				}	
+			}else{
+				error.put("imgFile","文件不能为空");//文件不能为空
+			}
+		}
+		
+
+		if(error.size() ==0){
+			userService.updateUserAvatar(user.getUserName(), newFileName);
+			//删除缓存
+			userManage.delete_cache_findUserById(user.getId());
+			userManage.delete_cache_findUserByUserName(user.getUserName());
+		}
+		
+		
+		
+
+		
+		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
+
+		if(error != null && error.size() >0){
+			returnValue.put("success", "false");
+			returnValue.put("error", error);
+		}else{
+			returnValue.put("success", "true");
+		}
+		return JsonUtils.toJSONString(returnValue);
+	}
 	
 }

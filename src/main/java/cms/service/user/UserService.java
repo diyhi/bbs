@@ -107,6 +107,12 @@ public interface UserService extends DAO<User> {
 	 */
 	public Integer updateUserSecurityDigest(String userName,Long securityDigest);
 	/**
+	 * 修改用户头像
+	 * @param userName 用户名称
+	 * @param avatarName 头像名称
+	 */
+	public Integer updateUserAvatar(String userName,String avatarName);
+	/**
 	 * 标记删除
 	 * @param idList Id集合
 	 * @return

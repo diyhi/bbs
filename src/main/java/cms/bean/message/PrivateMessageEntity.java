@@ -31,6 +31,15 @@ public class PrivateMessageEntity implements Serializable{
 	/** 私信对方用户名称 **/
 	@Transient
 	protected String friendUserName;
+	/** 私信对方头像路径 **/
+	@Transient
+	private String friendAvatarPath;
+	/** 私信对方头像名称 **/
+	@Transient
+	private String friendAvatarName;
+	
+	
+	
 	
 	/** 发送者用户Id **/
 	protected Long senderUserId;
@@ -40,6 +49,12 @@ public class PrivateMessageEntity implements Serializable{
 	/** 发送者用户名称  **/
 	@Transient
 	protected String senderUserName;
+	/** 发送者头像路径 **/
+	@Transient
+	private String senderAvatarPath;
+	/** 发送者头像名称 **/
+	@Transient
+	private String senderAvatarName;
 	
 	/** 消息内容 **/
 	@Lob
@@ -137,6 +152,30 @@ public class PrivateMessageEntity implements Serializable{
 	}
 	public void setSenderUserName(String senderUserName) {
 		this.senderUserName = senderUserName;
+	}
+	public String getFriendAvatarPath() {
+		return friendAvatarPath;
+	}
+	public void setFriendAvatarPath(String friendAvatarPath) {
+		this.friendAvatarPath = friendAvatarPath;
+	}
+	public String getFriendAvatarName() {
+		return friendAvatarName;
+	}
+	public void setFriendAvatarName(String friendAvatarName) {
+		this.friendAvatarName = friendAvatarName;
+	}
+	public String getSenderAvatarPath() {
+		return senderAvatarPath;
+	}
+	public void setSenderAvatarPath(String senderAvatarPath) {
+		this.senderAvatarPath = senderAvatarPath;
+	}
+	public String getSenderAvatarName() {
+		return senderAvatarName;
+	}
+	public void setSenderAvatarName(String senderAvatarName) {
+		this.senderAvatarName = senderAvatarName;
 	}
 
 }

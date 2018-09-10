@@ -467,6 +467,18 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 		return query.executeUpdate();
 	}
 	/**
+	 * 修改用户头像
+	 * @param userName 用户名称
+	 * @param avatarName 头像名称
+	 */
+	public Integer updateUserAvatar(String userName,String avatarName){
+		Query query = em.createQuery("update User o set " +
+				" o.avatarName=?1, o.userVersion=o.userVersion+1 where o.userName=?2")
+		.setParameter(1, avatarName)
+		.setParameter(2, userName);
+		return query.executeUpdate();
+	}
+	/**
 	 * 标记删除
 	 * @param idList 用户Id集合
 	 * @return

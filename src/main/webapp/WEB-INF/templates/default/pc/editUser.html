@@ -7,6 +7,7 @@
 	<title>修改会员 - ${title}</title>
 	<meta name="keywords" content="${keywords}"/>
 	<meta name="description" content="${description}"/>
+	<meta name="commonPath" content="${commonPath}"/>
 	<link rel="shortcut icon" type="image/x-icon" href="${baseURL}${commonPath}images/favicon.ico" media="screen" />
 	<link href="${commonPath}css/common.css" type="text/css" rel="stylesheet" >
 	<script language="javascript" src="${commonPath}js/tool.js" type="text/javascript"></script>
@@ -14,9 +15,18 @@
 	<script language="javascript" src="${commonPath}js/json2.js" type="text/javascript"></script>
 	<script src="${commonPath}js/cryptoJS/core.js" language="javascript" type="text/javascript"></script>
 	<script src="${commonPath}js/cryptoJS/sha256.js" language="javascript" type="text/javascript"></script>
+	<script src="${commonPath}js/jquery/jquery.min.js" language="javascript" type="text/javascript"></script>
+	<script src="${commonPath}js/jquery/jquery.form.js" language="javascript" type="text/javascript"></script>
+	<link href="${commonPath}js/jcrop/css/jquery.Jcrop.min.css" type="text/css" rel="stylesheet" >
+	<script src="${commonPath}js/jcrop/js/jquery.Jcrop.min.js" language="javascript" type="text/javascript"></script>
+	
+	<link href="${commonPath}js/layer/skin/default/layer.css"  type="text/css" rel="stylesheet"/>
+	<script type="text/javascript" src="${commonPath}js/layer/layer.js" language="javascript"></script>
 </head>
 
 <script type="text/javascript" language="javascript"> 
+ 
+
 	//确认提交
 	function sureSubmit(objForm){
 		if(allVerification() == false){
@@ -257,9 +267,547 @@
 	}
 
 	//禁止浏览器后退
-	window.history.forward(1);
+//	window.history.forward(1);
+</script> 
+
+
+<script type="text/javascript" language="javascript"> 
+	var commonPath = "";
+
+	//html文件要加入<meta name="commonPath" content="${commonPath}"/>标签
+	//从meta标签获取模板路径
+	var meta = document.getElementsByTagName("meta");
+	for(var i=0;i <meta.length;i++){  
+		if(meta[i].name == "commonPath"){
+			commonPath = meta[i].getAttribute("content");
+		}
+	}  
+	//空白图片
+	var blankImage = commonPath+"images/null.gif";
+	//头像图层
+	var avatarDiv = "<div id='avatarTag'>";
+		avatarDiv += "        <div id='originalImage_box' class='original-box'><div id='image_crop_original_div' class='image-crop-original-div'></div><img id='originalImage' src='"+blankImage+"' alt='原图'></div>";
+		avatarDiv += "        <div id='preview-pane' class='preview-pane'>";
+		avatarDiv += "            <div id='previewImage_box' class='preview-container'>";
+		avatarDiv += "                <div id='image_crop_preview_div' class='image-crop-preview-div'></div>";
+		avatarDiv += "                <img id='previewImage' src='"+blankImage+"' alt='缩略图'>";
+		avatarDiv += "            </div>";
+		avatarDiv += "        </div>";
+		avatarDiv += "        <div id='preview-pane2' class='preview-pane2'>";
+		avatarDiv += "            <div id='previewImage_box2' class='preview-container2'>";
+		avatarDiv += "                <div id='image_crop_preview_div2' class='image-crop-preview-div'></div>";
+		avatarDiv += "                <img id='previewImage2' src='"+blankImage+"' alt='缩略图'>";
+		avatarDiv += "            </div>";
+		avatarDiv += "        </div>";
+		avatarDiv += "</div>";
+
+    //头像表单
+	var avatarForm = "<form id='uploadImageForm' enctype='multipart/form-data'>";
+		avatarForm += "    <div class='avatarModule'>";
+		avatarForm +=          avatarDiv;
+		avatarForm += "        <div class='bottomInfo'>";
+		avatarForm += "            <div class='avatar-submit-button'>";
+		avatarForm += "                <span class='submitButton'><INPUT type='button' id='uploadSubmit' value='上传' onClick='javascript:uploadImageSubmit();'></span>";
+		avatarForm += "            </div>";
+		avatarForm += "            <div class='avatar-upload-button'>";
+		avatarForm += "                <span id='progressBar'></span>&nbsp;&nbsp;";
+		avatarForm += "                <span class='uploadButton' >选择文件";
+		avatarForm += "                    <input type='file' id='imgFile' name='imgFile' onchange='imgForm(this)'/>";
+		avatarForm += "                </span>&nbsp;&nbsp;";
+		avatarForm += "            </div>";
+		avatarForm += "        </div>";
+		avatarForm += "   </div>";
+    	avatarForm += "</form>";
+    
+    //显示/隐藏 更改头像层
+    $(function(){
+	    $("#updateAvatarLink").hide(); // 默认隐藏所有内层元素
+	    $(".updateAvatar").hover(function() {  // 鼠标经过事件
+	        $(this).find("#updateAvatarLink").toggle();  // 切换显示和隐藏
+	    }, function() {
+	        $(this).find("#updateAvatarLink").toggle();  // 切换显示和隐藏
 	
+	    });
+	});
+
+    
+    //更换头像弹出层
+	function avatarLayer(){
+		var div = avatarForm;
+		layer.open({
+		    type: 1, 
+		    title:"更换头像",
+		    content: div, //这里content是一个普通的String
+		    moveOut:true,//是否允许拖拽到窗口外
+		    area: ['666px', '520px'],//宽高
+			success: function(layero, index){
+			}
+		});
+	}
+    
+    
+    var width;// 裁剪框的宽度  
+    var height;// 裁剪框的高度  
+    var x;// 相对于裁剪图片x左边  
+    var y;// 相对于裁剪图片y左边  
+    
+    //创建变量(在这个生命周期)的API和图像大小  
+	var jcrop_api,
+		boundx,//原图的宽
+		boundy,//原图的高
+		originalImage_realSrc,//原图路径 IE7-IE9使用
+		$preview,
+		$pcnt,
+		$pimg,
+		xsize,//预览窗口的宽
+		ysize,//预览窗口的高
+		
+		$preview2,
+		$pcnt2,
+		$pimg2,
+		xsize2,//预览窗口的宽
+		ysize2,//预览窗口的高
+		scaleFactor;//缩放比例
+		
+    //图像裁剪
+	function imageCropp(bgColor){
+		//获取预览窗格相关信息  
+		$preview = $('#preview-pane'),
+		$pcnt = $('#preview-pane .preview-container'),
+		$pimg = $('#preview-pane .preview-container img'),
+		xsize = $pcnt.width(),
+		ysize = $pcnt.height();
+		
+		$preview2 = $('#preview-pane2'),
+		$pcnt2 = $('#preview-pane2 .preview-container2'),
+		$pimg2 = $('#preview-pane2 .preview-container2 img'),
+		xsize2 = $pcnt2.width(),
+		ysize2 = $pcnt2.height();
+		$('#originalImage').Jcrop({
+			onChange: updatePreview,//选框改变时的事件
+		//	onSelect: updatePreview,//创建选框，参数格式为：[x,y,x2,y2]
+			setSelect:[0,0,200,200],//创建默认选框，参数格式为：[x,y,x2,y2]
+			aspectRatio: 1,//选框宽高比。说明：width/height
+			boxWidth: 400,//画布宽度
+			boxHeight: 400,//画布高度
+			minSize: [200,200],//选框最小尺寸 格式： [0,0]
+			bgColor: bgColor,//背景颜色  默认"black"	 透明#00000000
+			allowSelect :false,//允许新选框
+			allowResize :true//允许选框缩放
+			
+		} ,function(){
+			//使用API来获得真实的图像大小  
+			var bounds = this.getBounds();//获取图片实际尺寸，格式为：[w,h]
+			boundx = bounds[0];
+			boundy = bounds[1];
+			
+			//初始化预览图
+			updatePreview(this.tellSelect());//tellSelect()获取选框的值（实际尺寸）。例子：console.log(jcrop_api.tellSelect())
+				
+				
+			scaleFactor = this.getScaleFactor();//获取图片缩放的比例，格式为：[w,h]
+			//jcrop_api变量中存储API  
+			jcrop_api = this;
+			//预览进入jcrop容器css定位  
+			$preview.appendTo(jcrop_api.ui.holder);
+			$preview2.appendTo(jcrop_api.ui.holder);
+		});
+		
+	
+	}
+
+	
+	/**
+	 * 更新预览
+	 * @param select 选区 选框的值（实际尺寸）
+	 */
+    function updatePreview(select){
+		var browserVersion = window.navigator.userAgent.toUpperCase();
+		if (browserVersion.indexOf("MSIE") > -1 && browserVersion.indexOf("MSIE 6") <= -1) {//IE7-IE9
+			thumbnailPreview(select);
+		}else{
+			//设置预览
+			if (parseInt(select.w) > 0) {
+			 
+				var rx = xsize / select.w;//select.w 代表选区的宽
+				var ry = ysize / select.h;//select.h 代表选区的高
+				$pimg.css({
+					width: Math.round(rx * boundx) + 'px',
+					height: Math.round(ry * boundy) + 'px', 
+					marginLeft: '-' + Math.round(rx * select.x) + 'px',
+					marginTop: '-' + Math.round(ry * select.y) + 'px'
+				});
+				
+				var rx2 = xsize2 / select.w;//select.w 代表选区的宽
+				var ry2 = ysize2 / select.h;//select.h 代表选区的高
+				$pimg2.css({
+					width: Math.round(rx2 * boundx) + 'px',
+					height: Math.round(ry2 * boundy) + 'px', 
+					marginLeft: '-' + Math.round(rx2 * select.x) + 'px',
+					marginTop: '-' + Math.round(ry2 * select.y) + 'px'
+				});
+				
+			}
+		}
+
+
+    	
+		// 赋值  
+        x = select.x;  
+		y = select.y;  
+        width = select.w;  
+        height = select.h;  
+	};
+	/**
+	 * ie7+缩略图预览
+	 * @param select 选区
+	 * @param bounds 实际内容
+	 */
+	function thumbnailPreview(select){
+	
+		//设置预览
+		if (parseInt(select.w) > 0) {
+			var rx = xsize / select.w;//select.w 代表选区的宽
+			var ry = ysize / select.h;//select.h 代表选区的高
+			$("#image_crop_preview_div").css(
+				"filter",
+				"progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod='scale',src='" + originalImage_realSrc + "')"
+			);
+			
+			$("#image_crop_preview_div").css({
+				width: Math.round(rx * boundx) + 'px',
+				height: Math.round(ry * boundy) + 'px', 
+				marginLeft: '-' + Math.round(rx * select.x) + 'px',
+				marginTop: '-' + Math.round(ry * select.y) + 'px'
+			});
+			
+			var rx2 = xsize2 / select.w;//select.w 代表选区的宽
+			var ry2 = ysize2 / select.h;//select.h 代表选区的高
+			
+			$("#image_crop_preview_div2").css(
+				"filter",
+				"progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod='scale',src='" + originalImage_realSrc + "')"
+			);
+
+			$("#image_crop_preview_div2").css({
+				width: Math.round(rx2 * boundx) + 'px',
+				height: Math.round(ry2 * boundy) + 'px', 
+				marginLeft: '-' + Math.round(rx2 * select.x) + 'px',
+				marginTop: '-' + Math.round(ry2 * select.y) + 'px'
+			});
+		}
+	}
+	
+	
+	//选择文件
+	function imgForm(file) { 
+		if(!verificationImageFormat(file)){
+			return;
+		}
+		if(jcrop_api){
+			jcrop_api.destroy();//移除 Jcrop
+		}
+		
+		readImagePath(file, function(src) {
+
+			$("#avatarTag").html(avatarDiv); 
+
+			var browserVersion = window.navigator.userAgent.toUpperCase();
+			if (browserVersion.indexOf("MSIE") > -1 && browserVersion.indexOf("MSIE 6") <= -1) {//IE7-IE9
+				originalImage_realSrc = src;
+				
+				//设置原图预览滤镜
+				$("#image_crop_original_div").css(
+						"filter",
+						"progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod='scale',src='" + src + "')"
+					);
+				//获取图片实际大小（由于使用缩放滤镜scale必须指定div宽高，无法做到自适应，因此先通过image滤镜获取实际大小）
+				var bounds = getImageBounds(src);
+				//按比例缩放图片
+				var param = clacImgZoomParam(400, 400, bounds.w, bounds.h);
+				
+			 	$("#image_crop_original_div").width(param.width);
+				$("#image_crop_original_div").height(param.height);
+				
+				//需要对透明的img使用绝对定位并设置offset为预览div的offset，避免jcrop无法覆盖在预览div上面
+				$("#originalImage").css("position","absolute");
+				$("#originalImage").css("display","inline-block");
+				$("#originalImage").offset($("#image_crop_original_div").offset());
+				$("#originalImage").width(bounds.w);
+				$("#originalImage").height(bounds.h);
+				$("#originalImage").attr("src", blankImage);
+				$("#originalImage").attr("realSrc", src);
+
+				imageCropp("#00000000");
+			}else{//支持html5浏览器
+				$('#originalImage').attr('src', src);  
+				$('#previewImage').attr('src', src);  
+				$('#previewImage2').attr('src', src); 
+				
+				imageCropp("black");
+			}
+		});
+	}
+
+	/**
+	 * 获取图片的实际大小
+	 * @param tmpSrc 图片源
+	 * @return {w,h} 宽和高
+	 */
+	function getImageBounds(tmpSrc){
+		var imgObj = new Image();
+		imgObj.src = tmpSrc;
+		var width = imgObj.width;
+		var height = imgObj.height;
+		if((typeof width=="undefined" || width==0) && (typeof height=="undefined" || height==0)){
+			var picpreview=document.getElementById("originalImage_box");
+		    var tempDiv=document.createElement("div");
+		    picpreview.appendChild(tempDiv);
+		    tempDiv.style.width="10px";
+		    tempDiv.style.height="10px";
+		    tempDiv.style.diplay="none";
+		    tempDiv.style.filter="progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod='image',src='" + tmpSrc + "');";
+		    tempDiv.ID="previewTemp" + new Date().getTime();
+		    width=tempDiv.offsetWidth;
+		    height=tempDiv.offsetHeight;
+		    picpreview.removeChild(tempDiv);
+		}
+		return {w:width,h:height};
+	};
+	
+	/**
+	 * 按比例缩放图片
+	 * @param maxWidth 图片最大宽度
+	 * @param maxHeight 图片最大高度
+	 * @param width 图片实际宽度
+	 * @param height 图片实际高度
+	 * @return {width,height} 宽和高
+	 */
+	function clacImgZoomParam (maxWidth, maxHeight, width, height) {
+		var param = {
+			width : width,
+			height : height
+		};
+		if (width > maxWidth || height > maxHeight) {
+			var rateWidth = width / maxWidth;
+			var rateHeight = height / maxHeight;
+
+			if (rateWidth > rateHeight) {
+				param.width = maxWidth;
+				param.height = Math.round(height / rateWidth);
+			} else {
+				param.width = Math.round(width / rateHeight);
+				param.height = maxHeight;
+			}
+		}
+
+		param.left = Math.round((maxWidth - param.width) / 2);
+		param.top = Math.round((maxHeight - param.height) / 2);
+		return param;
+	}
+	
+	
+	//读取图片路径  file：file控件 prvid: 图片预览容器
+	function readImagePath(file, callback) {
+		var supportHTML5 = false;
+		var browserVersion = window.navigator.userAgent.toUpperCase();
+		if(file.files){
+			supportHTML5 = true;
+		}else{
+			supportHTML5 = false;
+		}
+		//进行浏览器判断，选择对应的实现方式
+		if(supportHTML5){
+			for (var i = 0, f; f = file.files[i]; i++) {
+				var fr = new FileReader();
+				fr.onload = function(e) {
+					var src = e.target.result;
+					showPrvImg(src);
+				}
+				fr.readAsDataURL(f);
+			}
+
+		} else if (browserVersion.indexOf("MSIE") > -1 && browserVersion.indexOf("MSIE 6") > -1) {//IE6
+			showPrvImg(file.value);
+		} else if (browserVersion.indexOf("MSIE") > -1 && browserVersion.indexOf("MSIE 6") <= -1) {//IE7-IE9
+			file.select();
+			//如果是ie9需要触发blur事件，避免被安全规则阻拦
+            if (browserVersion.indexOf("MSIE 9") > -1) {
+                file.blur(); //不加上document.selection.createRange().text在ie9会拒绝访问
+             
+            }
+			
+			var reallocalpath = document.selection.createRange().text//IE下获取实际的本地文件路径
+			showPrvImg(reallocalpath);
+		} else if (browserVersion.indexOf("FIREFOX") > -1) {//FIREFOX
+			var firefoxVersion = parseFloat(browserVersion.toLowerCase().match(/firefox\/([\d.]+)/)[1]);
+			var src;
+			if (firefoxVersion < 7) {// firefox7以下版本
+				src = file.files[0].getAsDataURL();
+			
+			} else {// firefox7.0+
+				src = window.URL.createObjectURL(file.files[0]);
+			}
+			showPrvImg(src);
+		}
+
+		function showPrvImg(src) {
+			callback(src);
+		}
+	}
+	
+	
+	
+	//验证图片格式
+    function verificationImageFormat(file) {
+        var array = new Array('gif','jpg', 'jpeg', 'png', 'bmp'); //可以上传的文件类型
+        if (file.value == '') {
+	        layer.open({
+			    type: 1, 
+			    title:"错误",
+			    content: "文件不能为空", 
+			    area: ['260px', '120px'],//宽高
+				success: function(layero, index){
+					 return false;
+				}
+			});
+        }else {
+        	//获取最后一个.的位置
+			var index= file.value.lastIndexOf(".");
+			//获取后缀
+			var ext = file.value.substr(index+1);
+			
+            //循环判断图片的格式是否正确
+            for (var i in array) {
+                if (ext.toLowerCase() == array[i].toLowerCase()) {
+                    return true;
+                }
+            }
+            layer.open({
+			    type: 1, 
+			    title:"错误",
+			    content: "<div style='line-height: 30px; font-size: 14px; margin-left: 8px;margin-right: 8px;'>只允许上传gif、jpg、jpeg、bmp、png格式</div>", 
+			    area: ['260px', '120px'],//宽高
+				success: function(layero, index){
+					 return false;
+				}
+			});
+           
+        }
+    }
+
+    //提交上传图片
+	function uploadImageSubmit(){
+		
+		//按钮设置 disabled="disabled"
+		document.getElementById("uploadSubmit").disabled=true;
+		if(width == null){
+			layer.open({
+			    type: 1, 
+			    title:"错误",
+			    content: "<div style='line-height: 30px; font-size: 14px; margin-left: 8px;margin-right: 8px;'>请先选择图片</div>", 
+			    area: ['260px', '120px'],//宽高
+				success: function(layero, index){
+					 
+				}
+			});
+			//按钮设置 disabled="disabled"
+			document.getElementById("uploadSubmit").disabled=false;
+			return false;
+			
+		}
+		//Math.round(number)四舍五入取整
+		var _width = Math.round(width);
+		var _height = Math.round(height);
+		var _x = Math.round(x);
+		var _y = Math.round(y);
+		if(_x <0){
+		 	_x =0;
+		}
+		if(_y <0){
+			_y =0;
+		}
+		
+		var context = "?width="+_width +"&height="+_height+"&x="+_x+"&y="+_y;
+
+		$("#uploadImageForm").ajaxSubmit({
+	        dataType:'json',//提交成功后返回的数据格式，可选值包括xml，json或者script
+	        type:'POST',// 提交类型可以是"GET"或者"POST"
+	        url:'user/control/updateAvatar'+context,// 表单提交的路径
+	        beforeSend: function() {//表单提交前做表单验证
+
+	        },
+	        //进度条的监听器
+	        xhr: function(){
+	        	
+				var xhr = $.ajaxSettings.xhr();
+	            if(onprogress && xhr.upload) {
+	            	xhr.upload.addEventListener("progress" , onprogress, false);
+	                return xhr;
+	            }
+	        },
+	        success: function(data) {//提交成功后调用      	
+	        	for(var returnValue in data){
+	        		if(returnValue == "success"){
+	        			if(data[returnValue] == "true"){
+	        				layer.msg('更新头像成功,3秒后刷新页面', 
+								{
+								  time: 3000 //3秒关闭（如果不配置，默认是3秒）
+								},function(){
+									//关闭后的操作
+						        	document.location.reload();//刷新页面
+								}
+							);
+	        			}
+	        		}else if(returnValue == "error"){
+	        			var errorValue = data[returnValue];
+						var htmlValue = "";
+						var i = 0;
+						for(var error in errorValue){
+							if(error != ""){	
+								i++;
+								htmlValue += "&nbsp;&nbsp;"+i+"、"+errorValue[error]+"<br>";
+							}
+						}
+						
+						layer.open({
+						  type: 1,
+						  title: '错误', 
+						  skin: 'layui-layer-rim', //加上边框
+						  area: ['300px', '150px'], //宽高
+						  content: htmlValue
+						});
+	        		}
+	        		
+	        	}
+				//按钮设置 disabled="disabled"
+				document.getElementById("uploadSubmit").disabled=false;
+	        },
+			error: function(XMLHttpRequest, textStatus, errorThrown) {
+				//jquery请求session过期跳转
+				timeoutJump(XMLHttpRequest);
+			}
+	    });
+	    
+	}
+	//侦查当前文件上传情况
+	function onprogress(evt){
+       //侦查附件上传情况
+       //通过事件对象侦查
+       //该匿名函数表达式大概0.05-0.1秒执行一次
+      // console.log(evt.loaded);  //已经上传大小情况
+       //evt.total; 附件总大小
+       var loaded = evt.loaded;
+       var tot = evt.total;
+       var per = Math.floor(100*loaded/tot);  //已经上传的百分比
+       var son =  document.getElementById('progressBar');
+       son.innerHTML = per+"%";
+       son.style.width=per+"%";
+   }
 </script>
+
+
+
 
 <BODY>
 <#-- 引入页头 -->
@@ -272,7 +820,19 @@
 	<!-- 令牌标记 -->
 	<input type="hidden" id="token" name="token" value="${token}">
 	<div class="wrap">
+		
 		<div class="blankTableModule">
+			<div class="updateAvatar" >
+	             <a href="javascript:void(0);" onclick="javascript: avatarLayer(); return false;">
+	             	<div id="updateAvatarLink" class="change" style="display: none;"><span>更换头像</span></div>
+	             </a>
+	             
+	             <#if user.avatarName != null>
+					<img src="${user.avatarPath}${user.avatarName}">
+				<#else>
+					<img src="${commonPath}images/min_avata.png">
+				</#if>
+	        </div>
 			<table class="blankTable" border="0" cellSpacing="2" cellPadding="0" width="100%">
 				<tbody>
 					<tr>
@@ -374,10 +934,11 @@
 						<td>
 							<span id="user_error" class="error">${error['user']}</span>  
 							<span class="submitButton"><INPUT type="button" value="提交" onClick="javascript:sureSubmit();"></span>
+							
 							<!-- 
 							<span class="submitButton"><INPUT type="button" value="ajax提交" onClick="javascript:ajaxSubmit();"></span>
 							 -->
-							<span id="token_error" class="error">${error['token']}</span>  
+							<span id="token_error" class="error">${error['token']}</span> 
 						</td>
 					</tr>
 				</tbody>
@@ -385,6 +946,7 @@
 		</div>
 	</div>
 	</form>
+	
 	<div style="clear:both;"></div>
 	<div class="push"><!-- 把div#footer推下去 --></div>
 </div>

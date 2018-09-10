@@ -410,6 +410,56 @@ public enum ErrorView {
 		public String getContent(){
 			return "删除系统通知失败";
 		}
+	},
+	_1200{
+		public String getContent(){
+			return "不能超过8位数字";
+		}
+	},
+	_1210{
+		public String getContent(){
+			return "宽度必须大于0";
+		}
+	},
+	_1230{
+		public String getContent(){
+			return "高度必须大于0";
+		}
+	},
+	_1250{
+		public String getContent(){
+			return "X轴必须大于或等于0";
+		}
+	},
+	_1270{
+		public String getContent(){
+			return "Y轴必须大于或等于0";
+		}
+	},
+	_1290{
+		public String getContent(){
+			return "超出最大宽度";
+		}
+	},
+	_1300{
+		public String getContent(){
+			return "超出最大高度";
+		}
+	},
+	_1310{
+		public String getContent(){
+			return "当前文件类型不允许上传";
+		}
+	},
+	_1320{
+		public String getContent(){
+			return "文件超出允许上传大小";
+		}
+	},
+	_1330{
+		public String getContent(){
+			return "文件不能为空";
+		}
 	};
 	
 	

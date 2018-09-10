@@ -35,6 +35,12 @@ public class Comment implements Serializable{
 	/** 用户名称 **/
 	@Column(length=30)
 	private String userName;
+	/** 头像路径 **/
+	@Transient
+	private String avatarPath;
+	/** 头像名称 **/
+	@Transient
+	private String avatarName;
 	/** IP **/
 	@Column(length=45)
 	private String ip;
@@ -241,6 +247,26 @@ public class Comment implements Serializable{
 
 	public void setStatus(Integer status) {
 		this.status = status;
+	}
+
+
+	public String getAvatarPath() {
+		return avatarPath;
+	}
+
+
+	public void setAvatarPath(String avatarPath) {
+		this.avatarPath = avatarPath;
+	}
+
+
+	public String getAvatarName() {
+		return avatarName;
+	}
+
+
+	public void setAvatarName(String avatarName) {
+		this.avatarName = avatarName;
 	}
 	
 }

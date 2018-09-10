@@ -14,8 +14,8 @@
 					<input type="hidden" id="jumpUrl" name="jumpUrl" value="">
 					<p><textarea class="textarea" onfocus="" id="commentContent" name="content" >${comment.content}</textarea></p>
 					
-					<span class="error">${(error['content'])!}</span> 
-					<span id="comment_error" class="error">${error['comment']}</span>
+					<span id="${identificationNumber}_content_error" class="error">${(error['content'])!}</span> 
+					<span id="${identificationNumber}_comment_error" class="error">${error['comment']}</span>
 					<div class="form-action">
 						<#-- 获取令牌 -->
 						<input type="hidden" id="token" name="token" value="${token!}">
@@ -23,7 +23,8 @@
 						<input type="hidden" id="availableTag" name="availableTag" value="${(returnValue['availableTag'])!}">
 						
 						<div class="commentSubmit">
-				        	<span class="submitButton"><INPUT type="button" value="提交" onClick="javascript:sureSubmit(this.form)"></span>
+				        	<!-- <span class="submitButton"><INPUT type="button" value="提交" onClick="javascript:sureSubmit(this.form)"></span> -->
+				        	<span class="submitButton"><INPUT type="button" value="提交" onClick="javascript:ajax_sureSubmit('${identificationNumber}')"></span>
 				        </div>
 						
 						
@@ -114,7 +115,83 @@
 						function sureSubmit(obj){
 							obj.submit();
 						} 
-						 
+						//Ajax方式提交
+						function ajax_sureSubmit(identificationNumber){
+							if(verificationCode() == true){
+								var parameter = "";
+								parameter += "&topicId="+getUrlParam("topicId");//获取URL参数
+
+								
+								//获取令牌
+								parameter += "&token="+document.getElementById("token").value;
+								
+								//获取验证码key
+								var captchaKey = document.getElementById(identificationNumber+"_"+"captchaKey");
+								if(captchaKey != null){
+									parameter += "&captchaKey="+captchaKey.value;
+								}
+								
+								//获取验证码value
+								var captchaValue = document.getElementById(identificationNumber+"_"+"captchaValue");
+								if(captchaValue != null){
+									parameter += "&captchaValue="+captchaValue.value;
+								}
+								
+								//获取内容
+								var content = document.getElementById("commentContent").value;
+								parameter += "&content="+encodeURIComponent(content);
+							
+							   	//删除第一个&号,防止因为多了&号而出现警告: Parameters: Invalid chunk ignored.信息
+								if(parameter.indexOf("&") == 0){
+									parameter = parameter.substring(1,parameter.length);
+								}
+							   	post_request(function(value){
+									var data = JSON.parse(value);
+									for(var returnValue in data){
+										
+										if(returnValue == "success"){
+						        			if(data[returnValue] == "true"){
+						        				//需引入layer
+						        				layer.open({
+												    type: 1, 
+												    title:"提示",
+												    content: "<div style='line-height: 36px; font-size: 15px;text-align:center; margin-left: 8px;margin-right: 8px;'>提交成功</div>", 
+												    area: ['260px', '120px'],//宽高
+													end: function(layero, index){
+														//刷新页面
+						        						document.location.reload();
+													}
+												});
+						        			}
+						        		}else if(returnValue == "error"){
+						        			
+						        			var error = data[returnValue];
+						        			for(var key in error){
+						        				var error_html = document.getElementById(identificationNumber+"_"+key+"_error");
+						        	
+						        				if(error_html != null){
+						        					error_html.innerHTML = error[key];
+						        				}
+						        				
+						        			}
+						        		}else if(returnValue == "captchaKey"){//显示验证码
+				        					
+											var captchaKey = data[returnValue];
+											if(captchaKey != ""){
+												//设置验证码Key
+												if(document.getElementById(identificationNumber+"_"+"captchaKey")!= null){
+				
+													document.getElementById(identificationNumber+"_"+"captchaKey").value = captchaKey;
+													//设置验证码图片
+													replaceCaptcha(identificationNumber);
+												}	
+											}
+										}
+						        	}
+								},
+									"user/control/comment/add?timestamp=" + new Date().getTime(), true,parameter);
+							}
+						}  
 						 
 						
 						var availableTag = ['source', '|'];
@@ -129,7 +206,7 @@
 							var topicId = getUrlParam("topicId");
 							
 							editor = K.create('textarea[id="commentContent"]', {
-								
+								themeType : 'new',//新外观
 								basePath : '${commonPath}js/kindeditor/',//指定编辑器的根目录路径
 								formatUploadUrl :false,//false时不会自动格式化上传后的URL
 								resizeType : 1,//2或1或0，2时可以拖动改变宽度和高度，1时只能改变高度，0时不能拖动。默认值: 2 

@@ -29,8 +29,13 @@
 	<div style="background: #fff; height: 1px;"></div>
 	<div class="selfInfo">
 		<div class="userLeft">
-			<div class="userAvatar"><img
-				src="${commonPath}images/min_avata.png">
+			<div class="userAvatar">
+				<#if user.avatarName != null>
+					<img src="${user.avatarPath}${user.avatarName}">
+				<#else>
+					<img src="${commonPath}images/min_avata.png">
+				</#if>
+				
 			</div>
 		</div>
 		<div class="cut-line"></div>

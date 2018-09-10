@@ -49,7 +49,7 @@ CREATE TABLE `disableusername` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(30) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 #
 # Structure for table "feedback"
@@ -86,7 +86,7 @@ CREATE TABLE `forum` (
   `queryMode` int(11) DEFAULT NULL,
   `referenceCode` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 #
 # Structure for table "help"
@@ -338,7 +338,7 @@ CREATE TABLE `reply` (
   KEY `reply_1_idx` (`commentId`,`status`),
   KEY `reply_2_idx` (`topicId`),
   KEY `reply_3_idx` (`userName`,`isStaff`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 #
 # Structure for table "sendsmslog"
@@ -513,7 +513,7 @@ CREATE TABLE `syspermissionresources` (
   `permissionId` varchar(255) DEFAULT NULL,
   `resourceId` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1392 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 #
 # Structure for table "sysresources"
@@ -551,7 +551,7 @@ CREATE TABLE `sysrolespermission` (
   `permissionId` varchar(255) DEFAULT NULL,
   `roleId` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=573 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
 #
@@ -639,7 +639,7 @@ CREATE TABLE `sysusersroles` (
   `roleId` varchar(255) DEFAULT NULL,
   `userAccount` varchar(30) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 #
 # Structure for table "tag"
@@ -666,7 +666,7 @@ CREATE TABLE `templates` (
   `thumbnailSuffix` varchar(20) DEFAULT NULL,
   `uses` bit(1) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 #
 # Structure for table "thumbnail"
@@ -730,7 +730,7 @@ CREATE TABLE `topicindex` (
   `dataId` varchar(32) DEFAULT NULL,
   `indexState` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=190 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 #
 # Structure for table "upgradesystem"
@@ -774,10 +774,11 @@ CREATE TABLE `user` (
   `userName` varchar(30) DEFAULT NULL,
   `userVersion` int(11) DEFAULT NULL,
   `securityDigest` bigint(20) DEFAULT NULL,
+  `avatarName` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `UK4bakctviobmdk6ddh2nwg08c2` (`userName`),
   KEY `user_idx` (`state`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 #
 # Structure for table "usercustom"
@@ -802,7 +803,7 @@ CREATE TABLE `usercustom` (
   `value` longtext,
   `visible` bit(1) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 #
 # Structure for table "usergrade"
@@ -813,7 +814,7 @@ CREATE TABLE `usergrade` (
   `name` varchar(50) DEFAULT NULL,
   `needPoint` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 #
 # Structure for table "userinputvalue"
@@ -827,7 +828,7 @@ CREATE TABLE `userinputvalue` (
   `userId` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `userinputvalue_idx` (`userId`,`options`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 #
 # Structure for table "userloginlog_0"

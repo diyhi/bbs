@@ -2,8 +2,8 @@ package cms.web.action.thumbnail;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -30,13 +30,8 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import com.alibaba.simpleimage.ImageRender;
 import com.alibaba.simpleimage.ImageWrapper;
 import com.alibaba.simpleimage.SimpleImageException;
-import com.alibaba.simpleimage.render.ReadRender;
-import com.alibaba.simpleimage.render.ScaleParameter;
-import com.alibaba.simpleimage.render.ScaleRender;
-import com.alibaba.simpleimage.render.WriteRender;
 import com.alibaba.simpleimage.util.ImageReadHelper;
 
 
@@ -173,7 +168,7 @@ public class ThumbnailManage {
 		    		for(String marker : markerList){
 		    			value.append(marker);
 		    		}
-		    		if(value != null && "--".equals(value.toString().trim())){//如果标记文件状态不变，则增加一行-标记
+		    		if(value != null && "--".equals(value.toString().trim())){//如果标记文件状态不变，则删除标记
 		    			fileManage.deleteFile("file"+File.separator+"topic"+File.separator+"thumbnailMarker"+File.separator+entry.getKey()+".txt");
 		    		}
 	
@@ -318,17 +313,17 @@ public class ThumbnailManage {
 	 * 生成缩略图
 	 * @param sourcePath 源图片路径
 	 * @param outputPath 输出图片路径
-	 * @param width 宽
-	 * @param high 高
+	 * @param scaleWidth 缩放宽
+	 * @param scaleHeight 缩放高
 	**/
-	private void createImage(File sourcePath,String outputPath,int width,int high) {
+	private void createImage(File sourcePath,String outputPath,int scaleWidth,int scaleHeight) {
 		FileInputStream inStream = null;
 		try {
 			//获取文件后缀名
 			String extension = FilenameUtils.getExtension(sourcePath.getAbsolutePath());
 			if(extension != null && "gif".equalsIgnoreCase(extension)){
 				Thumbnails.of(sourcePath)
-				.size(width,high)
+				.size(scaleWidth,scaleHeight)
 				.outputQuality(1)
 				.toFile(outputPath);
 			}else{//阿里巴巴工具读取某些gif图片会出错
@@ -338,7 +333,7 @@ public class ThumbnailManage {
 				//watermark指定了水印，通过Positions指定水印位置，BufferedImage指定水印图片，第三个参数指定了水印的不透明性，范围为(0~1.0f),1.0f为不透明。
 			//	.watermark(Positions.BOTTOM_RIGHT, ImageIO.read(new File("watermark.png")), 0.5f)    
 				Thumbnails.of(imageWrapper.getAsBufferedImage())        
-				.size(width,high)
+				.size(scaleWidth,scaleHeight)
 				.outputQuality(1)
 				.toFile(outputPath);
 			}	
@@ -349,7 +344,7 @@ public class ThumbnailManage {
 	        }
 		} catch (SimpleImageException e) {
 			// TODO Auto-generated catch block
-	//		e.printStackTrace();
+		//	e.printStackTrace();
 			if (logger.isErrorEnabled()) {
 	            logger.error("生成缩略图",e);
 	        }
@@ -367,6 +362,115 @@ public class ThumbnailManage {
 			}
 			
 		}
+	}
+	/**
+	 * 生成缩略图
+	 * @param sourcePath 源图片路径
+	 * @param outputPath 输出图片路径
+	 * @param extension 后缀名
+	 * @param scaleWidth 缩放宽
+	 * @param scaleHeight 缩放高
+	**/
+	public void createImage(InputStream sourceInputStream,String outputPath,String extension,int scaleWidth,int scaleHeight) {
+		try {
+			if(extension != null && "gif".equalsIgnoreCase(extension)){
+				Thumbnails.of(sourceInputStream)
+				.size(scaleWidth,scaleHeight)
+				.outputQuality(1)
+				.toFile(outputPath);
+			}else{//阿里巴巴工具读取某些gif图片会出错
+				ImageWrapper imageWrapper = ImageReadHelper.read(sourceInputStream);
+				//outputQuality：输出的图片质量，范围：0.0~1.0，1为最高质量。注意使用该方法时输出的图片格式必须为jpg（即outputFormat("jpg")）。否则若是输出png格式图片，则该方法作用无效
+				//watermark指定了水印，通过Positions指定水印位置，BufferedImage指定水印图片，第三个参数指定了水印的不透明性，范围为(0~1.0f),1.0f为不透明。
+			//	.watermark(Positions.BOTTOM_RIGHT, ImageIO.read(new File("watermark.png")), 0.5f)    
+				Thumbnails.of(imageWrapper.getAsBufferedImage())        
+				.size(scaleWidth,scaleHeight)
+				.outputQuality(1)
+				.toFile(outputPath);
+			}	
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			if (logger.isErrorEnabled()) {
+	            logger.error("生成缩略图IO错误",e);
+	        }
+		} catch (SimpleImageException e) {
+			// TODO Auto-generated catch block
+		//	e.printStackTrace();
+			if (logger.isErrorEnabled()) {
+	            logger.error("生成缩略图",e);
+	        }
+		}finally {	
+			if(sourceInputStream != null){
+				try {
+					sourceInputStream.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+			//		e.printStackTrace();
+					if (logger.isErrorEnabled()) {
+			            logger.error("生成缩略图关闭输入流错误",e);
+			        }
+				}
+			}
+			
+		}
+	}
+	/**
+	 * 生成缩略图
+	 * @param sourcePath 源图片路径
+	 * @param outputPath 输出图片路径
+	 * @param extension 后缀名
+	 * @param x 坐标X轴
+	 * @param y 坐标Y轴
+	 * @param width 剪裁区域宽
+	 * @param high 剪裁区域高
+	 * @param scaleWidth 缩放宽
+	 * @param scaleHeight 缩放高
+	**/
+	public void createImage(InputStream sourceInputStream,String outputPath,String extension,int x,int y,int width,int height,int scaleWidth,int scaleHeight) {
+		try {
+			if(extension != null && "gif".equalsIgnoreCase(extension)){
+				Thumbnails.of(sourceInputStream)
+				.sourceRegion(x, y, width, height)//指定坐标(0, 0)和(400, 400)区域
+				.size(scaleWidth,scaleHeight)
+				.outputQuality(1)
+				.toFile(outputPath);
+			}else{//阿里巴巴工具读取某些gif图片会出错
+				ImageWrapper imageWrapper = ImageReadHelper.read(sourceInputStream);
+				//outputQuality：输出的图片质量，范围：0.0~1.0，1为最高质量。注意使用该方法时输出的图片格式必须为jpg（即outputFormat("jpg")）。否则若是输出png格式图片，则该方法作用无效
+				//watermark指定了水印，通过Positions指定水印位置，BufferedImage指定水印图片，第三个参数指定了水印的不透明性，范围为(0~1.0f),1.0f为不透明。
+			//	.watermark(Positions.BOTTOM_RIGHT, ImageIO.read(new File("watermark.png")), 0.5f)    
+				Thumbnails.of(imageWrapper.getAsBufferedImage())   
+				.sourceRegion(x, y, width, height)//指定坐标(0, 0)和(400, 400)区域
+				.size(scaleWidth,scaleHeight)
+				.outputQuality(1)
+				.toFile(outputPath);
+			}	
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			if (logger.isErrorEnabled()) {
+	            logger.error("生成缩略图IO错误",e);
+	        }
+		} catch (SimpleImageException e) {
+			// TODO Auto-generated catch block
+		//	e.printStackTrace();
+			if (logger.isErrorEnabled()) {
+	            logger.error("生成缩略图",e);
+	        }
+		}finally {	
+			if(sourceInputStream != null){
+				try {
+					sourceInputStream.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+			//		e.printStackTrace();
+					if (logger.isErrorEnabled()) {
+			            logger.error("生成缩略图关闭输入流错误",e);
+			        }
+				}
+			}
+			
+		}
+		
 	}
 
 	/**
