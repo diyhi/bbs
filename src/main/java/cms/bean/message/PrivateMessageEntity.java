@@ -33,10 +33,10 @@ public class PrivateMessageEntity implements Serializable{
 	protected String friendUserName;
 	/** 私信对方头像路径 **/
 	@Transient
-	private String friendAvatarPath;
+	protected String friendAvatarPath;
 	/** 私信对方头像名称 **/
 	@Transient
-	private String friendAvatarName;
+	protected String friendAvatarName;
 	
 	
 	
@@ -51,10 +51,10 @@ public class PrivateMessageEntity implements Serializable{
 	protected String senderUserName;
 	/** 发送者头像路径 **/
 	@Transient
-	private String senderAvatarPath;
+	protected String senderAvatarPath;
 	/** 发送者头像名称 **/
 	@Transient
-	private String senderAvatarName;
+	protected String senderAvatarName;
 	
 	/** 消息内容 **/
 	@Lob

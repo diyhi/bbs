@@ -24,6 +24,7 @@ import cms.bean.user.UserInputValue;
 import cms.bean.user.UserLoginLog;
 import cms.service.besa.DaoSupport;
 import cms.service.message.PrivateMessageService;
+import cms.service.message.RemindService;
 import cms.service.message.SystemNotifyService;
 import cms.service.user.UserGradeService;
 import cms.service.user.UserService;
@@ -51,6 +52,9 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 
 	@Resource PrivateMessageService privateMessageService;
 	@Resource SystemNotifyService systemNotifyService;
+	
+	@Resource RemindService remindService;
+	
 	/**
 	 * 根据条件分页查询用户名称
 	 * @param jpql SQL
@@ -546,6 +550,9 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 		privateMessageService.deleteUserPrivateMessage(idList);
 		//删除用户所有订阅系统通知
 		systemNotifyService.deleteUserSubscriptionSystemNotify(idList);
+		
+		//删除用户提醒
+		remindService.deleteRemindByUserId(idList);
 		
 		return j;
 	}

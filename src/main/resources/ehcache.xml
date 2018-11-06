@@ -225,5 +225,9 @@
 		overflowToDisk="true"
 		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
 		memoryStoreEvictionPolicy="LFU" />		
-	
+	<!-- 根据用户Id查询未读提醒数量 -->
+	<cache name="remindManage_cache_findUnreadRemindByUserId" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" />	
 </ehcache>

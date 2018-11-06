@@ -1501,7 +1501,7 @@ public class UserManageAction {
 						//取得文件后缀
 						String suffix = fileManage.getExtension(fileName).toLowerCase();
 						//构建文件名称
-						newFileName = user.getId()+ "." + suffix;
+						newFileName = UUIDUtil.getUUID32()+ "." + suffix;
 						
 						if(srcWidth <=200 && srcHeight <=200){	
 							//保存文件

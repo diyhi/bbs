@@ -320,6 +320,95 @@ CREATE TABLE `pv` (
   KEY `pv_1_idx` (`times`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+
+#
+# Structure for table "remind_0"
+#
+
+CREATE TABLE `remind_0` (
+  `id` varchar(36) NOT NULL,
+  `friendTopicCommentId` bigint(20) DEFAULT NULL,
+  `friendTopicReplyId` bigint(20) DEFAULT NULL,
+  `readTimeFormat` bigint(20) DEFAULT NULL,
+  `receiverUserId` bigint(20) DEFAULT NULL,
+  `sendTimeFormat` bigint(20) DEFAULT NULL,
+  `senderUserId` bigint(20) DEFAULT NULL,
+  `status` int(11) DEFAULT NULL,
+  `topicCommentId` bigint(20) DEFAULT NULL,
+  `topicId` bigint(20) DEFAULT NULL,
+  `topicReplyId` bigint(20) DEFAULT NULL,
+  `typeCode` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `remind_1_idx` (`receiverUserId`,`status`,`sendTimeFormat`),
+  KEY `remind_2_idx` (`topicId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "remind_1"
+#
+
+CREATE TABLE `remind_1` (
+  `id` varchar(36) NOT NULL,
+  `friendTopicCommentId` bigint(20) DEFAULT NULL,
+  `friendTopicReplyId` bigint(20) DEFAULT NULL,
+  `readTimeFormat` bigint(20) DEFAULT NULL,
+  `receiverUserId` bigint(20) DEFAULT NULL,
+  `sendTimeFormat` bigint(20) DEFAULT NULL,
+  `senderUserId` bigint(20) DEFAULT NULL,
+  `status` int(11) DEFAULT NULL,
+  `topicCommentId` bigint(20) DEFAULT NULL,
+  `topicId` bigint(20) DEFAULT NULL,
+  `topicReplyId` bigint(20) DEFAULT NULL,
+  `typeCode` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `remind_1_idx` (`receiverUserId`,`status`,`sendTimeFormat`),
+  KEY `remind_2_idx` (`topicId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "remind_2"
+#
+
+CREATE TABLE `remind_2` (
+  `id` varchar(36) NOT NULL,
+  `friendTopicCommentId` bigint(20) DEFAULT NULL,
+  `friendTopicReplyId` bigint(20) DEFAULT NULL,
+  `readTimeFormat` bigint(20) DEFAULT NULL,
+  `receiverUserId` bigint(20) DEFAULT NULL,
+  `sendTimeFormat` bigint(20) DEFAULT NULL,
+  `senderUserId` bigint(20) DEFAULT NULL,
+  `status` int(11) DEFAULT NULL,
+  `topicCommentId` bigint(20) DEFAULT NULL,
+  `topicId` bigint(20) DEFAULT NULL,
+  `topicReplyId` bigint(20) DEFAULT NULL,
+  `typeCode` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `remind_1_idx` (`receiverUserId`,`status`,`sendTimeFormat`),
+  KEY `remind_2_idx` (`topicId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "remind_3"
+#
+
+CREATE TABLE `remind_3` (
+  `id` varchar(36) NOT NULL,
+  `friendTopicCommentId` bigint(20) DEFAULT NULL,
+  `friendTopicReplyId` bigint(20) DEFAULT NULL,
+  `readTimeFormat` bigint(20) DEFAULT NULL,
+  `receiverUserId` bigint(20) DEFAULT NULL,
+  `sendTimeFormat` bigint(20) DEFAULT NULL,
+  `senderUserId` bigint(20) DEFAULT NULL,
+  `status` int(11) DEFAULT NULL,
+  `topicCommentId` bigint(20) DEFAULT NULL,
+  `topicId` bigint(20) DEFAULT NULL,
+  `topicReplyId` bigint(20) DEFAULT NULL,
+  `typeCode` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `remind_1_idx` (`receiverUserId`,`status`,`sendTimeFormat`),
+  KEY `remind_2_idx` (`topicId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 #
 # Structure for table "reply"
 #

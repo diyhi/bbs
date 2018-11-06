@@ -21,6 +21,7 @@ import org.queryString.util.UrlEncoded;
 
 import cms.bean.user.AccessUser;
 import cms.bean.user.RefreshUser;
+import cms.bean.user.User;
 import cms.bean.user.UserState;
 import cms.service.user.UserService;
 import cms.utils.Base64;
@@ -88,13 +89,24 @@ public class LoginFilter implements Filter {
 						String new_accessToken = UUIDUtil.getUUID32();
 						String new_refreshToken = UUIDUtil.getUUID32();
 						
-						oAuthManage.addAccessToken(new_accessToken, new AccessUser(refreshUser.getUserId(),refreshUser.getUserName(),refreshUser.getSecurityDigest(),refreshUser.isRememberMe()));
+						//头像路径
+						String avatarPath = null;
+						//头像名称
+						String avatarName = null;
+						User user = userManage.query_cache_findUserById(refreshUser.getUserId());
+						if(user != null){
+							avatarPath = user.getAvatarPath();
+							avatarName = user.getAvatarName();
+						}
+						
+						
+						oAuthManage.addAccessToken(new_accessToken, new AccessUser(refreshUser.getUserId(),refreshUser.getUserName(),avatarPath,avatarName, refreshUser.getSecurityDigest(),refreshUser.isRememberMe()));
 						refreshUser.setAccessToken(new_accessToken);
 						oAuthManage.addRefreshToken(new_refreshToken, refreshUser);
 						
 						//将旧的刷新令牌的accessToken设为0
-						oAuthManage.addRefreshToken(refreshToken, new RefreshUser("0",refreshUser.getUserId(),refreshUser.getUserName(),refreshUser.getSecurityDigest(),refreshUser.isRememberMe()));
-						AccessUserThreadLocal.set(new AccessUser(refreshUser.getUserId(),refreshUser.getUserName(),refreshUser.getSecurityDigest(),refreshUser.isRememberMe()));
+						oAuthManage.addRefreshToken(refreshToken, new RefreshUser("0",refreshUser.getUserId(),refreshUser.getUserName(),avatarPath,avatarName,refreshUser.getSecurityDigest(),refreshUser.isRememberMe()));
+						AccessUserThreadLocal.set(new AccessUser(refreshUser.getUserId(),refreshUser.getUserName(),avatarPath,avatarName,refreshUser.getSecurityDigest(),refreshUser.isRememberMe()));
 						//将访问令牌添加到Cookie
 						WebUtil.addCookie(response, "cms_accessToken", new_accessToken, 0);
 						//将刷新令牌添加到Cookie

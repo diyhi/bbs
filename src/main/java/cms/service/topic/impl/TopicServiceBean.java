@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
 import javax.persistence.Query;
 
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import cms.bean.topic.Topic;
 import cms.service.besa.DaoSupport;
+import cms.service.message.RemindService;
 import cms.service.topic.TopicService;
 import cms.utils.ObjectConversion;
 
@@ -25,6 +27,10 @@ import cms.utils.ObjectConversion;
 @Service
 @Transactional
 public class TopicServiceBean extends DaoSupport<Topic> implements TopicService{
+	
+	@Resource RemindService remindService;
+	
+	
 	/**
 	 * 根据Id查询话题
 	 * @param topicId 话题Id
@@ -310,6 +316,8 @@ public class TopicServiceBean extends DaoSupport<Topic> implements TopicService{
 		delete_reply.setParameter(1, topicId);
 		delete_reply.executeUpdate();
 				
+		//删除提醒
+		remindService.deleteRemindByTopicId(topicId);
 		
 		return i;
 	}

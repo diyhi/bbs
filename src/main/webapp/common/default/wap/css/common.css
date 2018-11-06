@@ -244,6 +244,13 @@ html,body{
 	background:no-repeat ;
 	background-size:cover;
 }
+.indexModule .topicList .item .picInfo .imageBox .img img{
+    position: absolute;
+    width: 20%;
+    height: 100%;
+  	opacity: 0;
+}
+
 .indexModule .topicList .topicPage{
 	padding-top: 5px;padding-bottom: 10px;
 }
@@ -1285,4 +1292,83 @@ html,body{
 
 
 
+/** 提醒 **/
+.remindModule{
+	padding-top: 40px;padding-bottom: 2px;
+}
+.remindModule .remindList {
+	width: 100%;
+	overflow-x: hidden
+}
+.remindModule .remindList .item {
+	border-bottom: 1px solid #eee;
+	margin-left: 8px; 
+	margin-right: 8px;
+	position: relative;
+}
+.remindModule .remindList .badge {
+	font-size: 10px;
+	color: #fff;
+	vertical-align: top;
+	background-color: #26a2ff;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	padding: 0 3px;
+	margin-left: 3px
+}
 
+.remindModule .remindList .item .avatarBox{
+	position:absolute;display:inline-block;border-radius:100%;
+	left: 0px;top:8px;
+	
+}
+.remindModule .remindList .item .avatarBox img{
+	border-radius:100%;
+	width: 32px;
+}
+
+.remindModule .remindList .item .head {
+	min-height: 35px;
+	padding: 8px 0px 0px 40px;
+	margin: 0;
+	overflow: hidden;
+}
+.remindModule .remindList .item .head .info {
+	display: block;
+	float: left
+}
+.remindModule .remindList .item .head .info h2 {
+	color:#aaa;
+	font-size:14px;
+	line-height: 16px
+}
+.remindModule .remindList .item .head .time {
+	font-size: 13px;
+	color:#aaa;
+	margin-top: 8px;
+	line-height: 12px
+}
+.remindModule .remindList .item .head .operating {
+	float: right;
+	font-size: 12px;
+	color:#aaa;
+	margin-top: 5px;
+}
+.remindModule .remindList .item .head .operating .delete-btn{
+	color: #999;
+	font-size: 14px;
+}
+.remindModule .remindList .item .main {
+	padding: 0 8px 0 8px;
+	font-size: 15px;
+	line-height: 26px;
+	margin: 0 0 2px
+}
+.remindModule .remindList .item .main .content {
+	margin-bottom: 2px;
+	color:#222;
+}
+.remindModule .remindList .item .main .link {
+	font-size: 15px;
+	color:#26a2ff;
+}

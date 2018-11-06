@@ -322,7 +322,18 @@ public class TemplateManage {
 		layout_systemNotifyList.setSort(500);//排序
 		layout_systemNotifyList.setReferenceCode("user/control/systemNotifyList");
 		layoutList.add(layout_systemNotifyList);
-	
+		
+		//提醒列表
+		Layout layout_remindList = new Layout();
+		layout_remindList.setId(UUIDUtil.getUUID32());
+		layout_remindList.setName("提醒列表");
+		layout_remindList.setDirName(dirName);
+		layout_remindList.setLayoutFile("remindList.html");
+		layout_remindList.setType(1);//默认页
+		layout_remindList.setSort(550);//排序
+		layout_remindList.setReferenceCode("user/control/remindList");
+		layoutList.add(layout_remindList);
+
 		return layoutList;
 	}
 	

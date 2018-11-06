@@ -48,6 +48,13 @@ Vue.component('v-select', VueSelect.VueSelect);
 
 //Vue.component('vue-cropper', window['vue-cropper'].default);
 
+//图片预览组件
+Vue.use(vuePhotoPreview,{
+	fullscreenEl:false, //关闭全屏按钮
+	history: true //禁用历史记录模块 预览图时后退是退出预览弹出层
+});
+
+
 
 //定时查询消息
 Vue.prototype.unreadMessageCount = function (){
@@ -62,11 +69,11 @@ Vue.prototype.unreadMessageCount = function (){
 					var unreadMessage = $.parseJSON(result);
 					var privateMessageCount = parseInt(unreadMessage.privateMessageCount);
 		        	var systemNotifyCount = parseInt(unreadMessage.systemNotifyCount);
+		        	var remindCount = parseInt(unreadMessage.remindCount);
 		        	if(privateMessageCount >0){
 		        		//设置私信状态
 						store.commit('setPrivateMessage_badge', true);
 		        	}else{
-		        		
 		        		//设置私信状态
 						store.commit('setPrivateMessage_badge', false);
 		        	}
@@ -77,7 +84,15 @@ Vue.prototype.unreadMessageCount = function (){
 		        		//设置系统通知状态
 		        		store.commit('setSystemNotify_badge', false);
 		        	}
-		        	if((privateMessageCount + systemNotifyCount)>0){
+		        	if(remindCount >0){
+		        		//设置提醒状态
+		        		store.commit('setRemind_badge', true);
+		        	}else{
+		        		//设置提醒状态
+		        		store.commit('setRemind_badge', false);
+		        	}
+		        	
+		        	if((privateMessageCount + systemNotifyCount + remindCount)>0){
 		        		//所有消息状态
 		        		store.commit('setAllMessage_badge', true);
 		        	}else{
@@ -512,6 +527,7 @@ var index_component = Vue.extend({
 			
 			//查询话题列表
 			this.queryTopicList();
+
 		},
 		//初始化BScroll滚动插件//this.$refs.addTopicFormScroll
 		initScroll : function initScroll(ref) {
@@ -5222,7 +5238,128 @@ var systemNotify_component = Vue.extend({
 });
 
 
+//提醒
+var remind_component = Vue.extend({
+	template : '#remind-template',
+	data : function data() {
+		return {
+			remindList : [], //提醒集合
+			loading : false, //加载中
+			currentpage : 0, //当前页码
+			totalpage : 1, //总页数
+		}
+	},
+	created : function created() {
+		this.queryRemind();
+	},
+	methods : {
+		//查询提醒列表
+		queryRemind : function() {
+			var _self = this;
+			if (_self.currentpage < _self.totalpage) {
+				//先改总页数为0，避免请求为空时死循环
+				_self.totalpage = 0;
+				_self.loading = true;
+				var data = "page=" + (_self.currentpage + 1); //提交参数
+				$.ajax({
+					type : "GET",
+					cache : false,
+					async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+					url : "user/control/remindList",
+					data : data,
+					success : function success(result) {
+						if (result != "") {
+							var pageView = $.parseJSON(result);
 
+							var new_remindList = pageView.records;
+							if (new_remindList != null && new_remindList.length > 0) {
+								_self.remindList.push.apply(_self.remindList, new_remindList); //合并两个数组
+							}
+							_self.currentpage = pageView.currentpage;
+							_self.totalpage = pageView.totalpage;
+						}
+					},
+					complete : function complete(XMLHttpRequest, textStatus) {
+						_self.loading = false;
+						//需手动调用设置的全局complete
+						$.ajaxSettings.complete(XMLHttpRequest, textStatus);
+					}
+				});
+			}
+		},
+		//删除提醒
+		deleteRemind : function(id) {
+			var _self = this;
+			_self.$messagebox.confirm('确定删除提醒?').then(function (action) {
+				var parameter = "&remindId=" + id;
+
+				//	alert(parameter);
+				//令牌
+				parameter += "&token=" + _self.$store.state.token;
+				$.ajax({
+					type : "POST",
+					cache : false,
+					async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+					url : "user/control/deleteRemind",
+					data : parameter,
+					success : function success(result) {
+						if (result != "") {
+
+							var returnValue = $.parseJSON(result);
+
+							var value_success = "";
+							var value_error = null;
+
+							for (var key in returnValue) {
+								if (key == "success") {
+									value_success = returnValue[key];
+								} else if (key == "error") {
+									value_error = returnValue[key];
+								}
+							}
+
+							//修改成功
+							if (value_success == "true") {
+								_self.$toast({
+									message : "删除成功",
+									duration : 3000,
+									className : "mint-ui-toast",
+								});
+
+								setTimeout(function() {
+									_self.remindList = [];
+									_self.currentpage = 0;
+									_self.totalpage = 1;
+									//刷新提醒
+									_self.queryRemind();
+								}, 3000);
+								
+							} else {
+								//显示错误
+								if (value_error != null) {
+
+
+									var htmlContent = "";
+									var count = 0;
+									for (var errorKey in value_error) {
+										var errorValue = value_error[errorKey];
+										count++;
+										htmlContent += count + ". " + errorValue + "<br>";
+									}
+									_self.$messagebox('提示', htmlContent);
+
+								}
+							}
+						}
+					}
+				});
+			}).catch(function (err){//不捕获 Promise 的异常,若用户点击了取消按钮,会出现警告
+			    console.log(err);
+			});
+		}
+	}
+
+});
 /**------------------------------------------- 公共组件 ------------------------------------------------**/
 
 //底部选项卡
@@ -5369,7 +5506,7 @@ var routes = [
 	{path : '/user/control/privateMessageList',component : privateMessage_component}, //私信
 	{path : '/user/control/privateMessageChatList',component : privateMessageChat_component}, //私信对话
 	{path : '/user/control/systemNotifyList',component : systemNotify_component}, //系统通知
-	
+	{path : '/user/control/remindList',component : remind_component}, //提醒
 	{path : '*',redirect : '/index'} //其余路由重定向至首页
 ];
 
@@ -5389,6 +5526,7 @@ var store = new Vuex.Store({
 		},
 		privateMessage_badge: false,
 		systemNotify_badge: false,
+		remind_badge: false,
 		allMessage_badge: false,
 	},
 	
@@ -5429,6 +5567,10 @@ var store = new Vuex.Store({
 		//设置系统通知未读状态
 		setSystemNotify_badge : function setSystemNotify_badge(state, isShow) {
 			state.systemNotify_badge = isShow;
+		},
+		//设置提醒未读状态
+		setRemind_badge : function setRemind_badge(state, isShow) {
+			state.remind_badge = isShow;
 		},
 		//设置消息未读状态
 		setAllMessage_badge : function setAllMessage_badge(state, isShow) {
@@ -5545,7 +5687,6 @@ var vue = new Vue({
 		//定时查询消息
 		timerUnreadMessage: function timerUnreadMessage() {
 			var _self = this;
-			
 			_self.unreadMessageCount();
 			
 			setTimeout(function () {
@@ -5859,55 +6000,7 @@ function createEditor(editorToolbar,editorText,imgPath,self,param) {
     	
         
     }
-    
-    /**
-    editor.customConfig.uploadImgHooks = {
-	    // 如果服务器端返回的不是 {errno:0, data: [...]} 这种格式，可使用该配置
-	    // （但是，服务器端返回的必须是一个 JSON 格式字符串！！！否则会报错）
-	    customInsert: function (insertImg, result, editor) {
-	        // 图片上传并返回结果，自定义插入图片的事件（而不是编辑器自动插入图片！！！）
-	        // insertImg 是插入图片的函数，editor 是编辑器对象，result 是服务器端返回的结果
-	    	if(result.error ==0){
-	    		// 举例：假如上传图片成功后，服务器端返回的是 {url:'....'} 这种格式，即可这样插入图片：
-		        var url = result.url;
-		        insertImg(url)
-	    		// result 必须是一个 JSON 格式字符串！！！否则报错
-	    	}else{
-	    		//弹出提示内容
-				Vue.$messagebox('错误', result.message);
-	    	}  
-	    },
-	    
-	    error: function (xhr, editor) {
-	        // 图片上传出错时触发
-	        // xhr 是 XMLHttpRequst 对象，editor 是编辑器对象
-	    	console.log(xhr.status+"  错误  "+xhr.responseText);
-	    	
-	    	if(xhr.status == 508){
-				//设置登录用户
-				store.commit('setSystemUserId', '');
-				store.commit('setSystemUserName', '');
-				
-			}
-	    	
-			//关闭网站提示参数
-			if(xhr.status == 503){
-				//弹出提示内容
-				Vue.$messagebox('系统维护', xhr.responseText);
-				
-			}
-			
-			//请求完成后回调函数 (请求成功或失败时均调用)
-			if (xhr.getResponseHeader("jumpPath") != null && xhr.getResponseHeader("jumpPath") != "") {
-				//session登陆超时登陆页面响应http头
-				//收到未登录标记，执行登录页面跳转
-				router.push({
-					path : "/" + xhr.getResponseHeader("jumpPath")
-				});
-			}
-	    	
-	    },
-    };**/
+
     editor.create();
 	return editor;
 }

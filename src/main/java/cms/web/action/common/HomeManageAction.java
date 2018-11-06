@@ -36,6 +36,7 @@ import cms.bean.PageForm;
 import cms.bean.PageView;
 import cms.bean.QueryResult;
 import cms.bean.message.PrivateMessage;
+import cms.bean.message.Remind;
 import cms.bean.message.SubscriptionSystemNotify;
 import cms.bean.message.SystemNotify;
 import cms.bean.message.UnreadMessage;
@@ -52,6 +53,7 @@ import cms.bean.user.UserGrade;
 import cms.bean.user.UserInputValue;
 import cms.bean.user.UserLoginLog;
 import cms.service.message.PrivateMessageService;
+import cms.service.message.RemindService;
 import cms.service.message.SystemNotifyService;
 import cms.service.setting.SettingService;
 import cms.service.template.TemplateService;
@@ -77,11 +79,13 @@ import cms.web.action.CSRFTokenManage;
 import cms.web.action.FileManage;
 import cms.web.action.TextFilterManage;
 import cms.web.action.message.PrivateMessageManage;
+import cms.web.action.message.RemindManage;
 import cms.web.action.message.SubscriptionSystemNotifyManage;
 import cms.web.action.message.SystemNotifyManage;
 import cms.web.action.setting.SettingManage;
 import cms.web.action.sms.SmsManage;
 import cms.web.action.thumbnail.ThumbnailManage;
+import cms.web.action.topic.TopicManage;
 import cms.web.action.user.UserManage;
 import cms.web.taglib.Configuration;
 
@@ -123,6 +127,11 @@ public class HomeManageAction {
 	@Resource SystemNotifyService systemNotifyService;
 	@Resource SubscriptionSystemNotifyManage subscriptionSystemNotifyManage;
 	@Resource SystemNotifyManage systemNotifyManage;
+	@Resource RemindService remindService;
+	@Resource TopicManage topicManage;
+	@Resource RemindManage remindManage;
+	
+	@Resource OAuthManage oAuthManage;
 	
 	@Resource ThumbnailManage thumbnailManage;
 	
@@ -1125,7 +1134,7 @@ public class HomeManageAction {
 		DateTime dateTime = new DateTime(user.getRegistrationDate());     
 		String date = dateTime.toString("yyyy-MM-dd");
 		
-		if(imgFile != null && !imgFile.isEmpty()){
+		if(error.size()==0 && imgFile != null && !imgFile.isEmpty()){
 			//当前文件名称
 			String fileName = imgFile.getOriginalFilename();
 			
@@ -1158,7 +1167,7 @@ public class HomeManageAction {
 				
 				if("blob".equalsIgnoreCase(imgFile.getOriginalFilename())){//Blob类型
 					
-					newFileName = user.getId()+ ".png";
+					newFileName = UUIDUtil.getUUID32()+ ".png";
 					
 					BufferedImage bufferImage = ImageIO.read(imgFile.getInputStream());  
 		            //获取图片的宽和高  
@@ -1211,7 +1220,7 @@ public class HomeManageAction {
 						String suffix = fileManage.getExtension(fileName).toLowerCase();
 						
 						//构建文件名称
-						newFileName = user.getId()+ "." + suffix;
+						newFileName = UUIDUtil.getUUID32()+ "." + suffix;
 						
 						if(srcWidth <=200 && srcHeight <=200){	
 							//保存文件
@@ -1250,6 +1259,13 @@ public class HomeManageAction {
 			//删除缓存
 			userManage.delete_cache_findUserById(user.getId());
 			userManage.delete_cache_findUserByUserName(user.getUserName());
+			
+			
+			String accessToken = WebUtil.getCookieByName(request, "cms_accessToken");
+			if(accessToken != null && !"".equals(accessToken.trim())){
+				//删除访问令牌
+    			oAuthManage.deleteAccessToken(accessToken.trim());
+			}
 		}
 		
 		
@@ -2969,7 +2985,223 @@ public class HomeManageAction {
 	  		unreadMessage.setSystemNotifyCount(unreadSystemNotifyCount);
 	  	}
 	  	
+	  	//未读提醒数量
+	  	Long unreadRemindCount = remindManage.query_cache_findUnreadRemindByUserId(accessUser.getUserId());
+	  	unreadMessage.setRemindCount(unreadRemindCount);
+	  	
+	  	
 	  	return JsonUtils.toJSONString(unreadMessage);
 	}
 	
+	
+	/**
+	 * 提醒列表
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/user/control/remindList",method=RequestMethod.GET) 
+	public String remindList(ModelMap model,PageForm pageForm,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+		
+		String dirName = templateService.findTemplateDir_cache();
+		
+		
+		String accessPath = accessSourceDeviceManage.accessDevices(request);
+	   
+		
+		//获取登录用户
+	  	AccessUser accessUser = AccessUserThreadLocal.get();
+	  	
+	  	
+		//调用分页算法代码
+		PageView<Remind> pageView = new PageView<Remind>(settingService.findSystemSetting_cache().getForestagePageNumber(),pageForm.getPage(),10,request.getRequestURI(),request.getQueryString());
+		//当前页
+		int firstIndex = (pageForm.getPage()-1)*pageView.getMaxresult();
+		
+		//用户Id集合
+		Set<Long> userIdList = new HashSet<Long>();
+		//用户集合
+		Map<Long,User> userMap = new HashMap<Long,User>();
+		
+		//未读提醒Id集合
+		List<String> unreadRemindIdList = new ArrayList<String>();
+		
+		
+		QueryResult<Remind> qr = remindService.findRemindByUserId(accessUser.getUserId(),100,firstIndex,pageView.getMaxresult());
+		if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
+			for(Remind remind : qr.getResultlist()){
+				userIdList.add(remind.getSenderUserId());//发送用户Id
+				
+				if(remind .getStatus().equals(10)){
+					unreadRemindIdList.add(remind.getId());
+				}
+				
+				remind.setSendTime(new Timestamp(remind.getSendTimeFormat()));
+				if(remind.getReadTimeFormat() != null){
+					remind.setReadTime(new Timestamp(remind.getReadTimeFormat()));
+				}
+				
+				if(remind.getTopicId() != null && remind.getTopicId() >0L){
+					Topic topic = topicManage.queryTopicCache(remind.getTopicId());//查询缓存
+					if(topic != null){
+						remind.setTopicTitle(topic.getTitle());
+					}
+					
+				}
+				
+				
+				
+			}
+
+			if(userIdList != null && userIdList.size() >0){
+				for(Long userId : userIdList){
+					User user = userManage.query_cache_findUserById(userId);
+					if(user != null){
+						userMap.put(userId, user);
+					}
+				}
+			}
+			if(userMap != null && userMap.size() >0){
+				if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
+					for(Remind remind : qr.getResultlist()){
+						
+						User sender_user = userMap.get(remind.getSenderUserId());
+						if(sender_user != null){
+							remind.setSenderUserName(sender_user.getUserName());//发送者用户名称
+							if(sender_user.getAvatarName() != null && !"".equals(sender_user.getAvatarName().trim())){
+								remind.setSenderAvatarPath(sender_user.getAvatarPath());//发送者头像路径
+								remind.setSenderAvatarName(sender_user.getAvatarName());//发送者头像名称
+							}
+						}
+						
+					}
+				}
+			}
+		}
+		
+		if(unreadRemindIdList != null && unreadRemindIdList.size() >0){
+			//将未读提醒设置为已读
+			remindService.updateRemindStatus(accessUser.getUserId(), unreadRemindIdList);
+			//删除提醒缓存
+			remindManage.delete_cache_findUnreadRemindByUserId(accessUser.getUserId());
+		}
+		
+		//将查询结果集传给分页List
+		pageView.setQueryResult(qr);
+		
+		if(isAjax){
+			WebUtil.writeToWeb(JsonUtils.toJSONString(pageView), "json", response);
+			return null;
+		}else{
+			model.addAttribute("pageView", pageView);
+			return "templates/"+dirName+"/"+accessPath+"/remindList";	
+		}
+	}
+	
+	/**
+	 * 删除提醒
+	 * @param model
+	 * @param jumpUrl 跳转地址   页面post方式提交有效
+	 * @param token 令牌标记
+	 * @param remindId 提醒Id
+	 */
+	@RequestMapping(value="/user/control/deleteRemind", method=RequestMethod.POST)
+	public String deleteRemind(ModelMap model,String jumpUrl,String token,String remindId,
+			RedirectAttributes redirectAttrs,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		
+		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+		Map<String,String> error = new HashMap<String,String>();//错误
+		
+		
+		//判断令牌
+		if(token != null && !"".equals(token.trim())){	
+			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌
+			if(token_sessionid != null && !"".equals(token_sessionid.trim())){
+				if(!token_sessionid.equals(token)){
+					error.put("token", ErrorView._13.name());
+				}
+			}else{
+				error.put("token", ErrorView._12.name());
+			}
+		}else{
+			error.put("token", ErrorView._11.name());
+		}
+		
+		//获取登录用户
+	  	AccessUser accessUser = AccessUserThreadLocal.get();
+	  	
+	  	
+  		if(remindId == null || "".equals(remindId.trim())){
+  			error.put("remind", ErrorView._1400.name());//提醒不存在
+  		}
+  		
+		if(error.size() == 0){
+			int i = remindService.softDeleteRemind(accessUser.getUserId(),remindId.trim());
+			if(i == 0){
+				error.put("remind", ErrorView._1050.name());//删除提醒失败
+			}
+			//删除提醒缓存
+			remindManage.delete_cache_findUnreadRemindByUserId(accessUser.getUserId());
+		}
+		
+		Map<String,String> returnError = new HashMap<String,String>();//错误
+		if(error.size() >0){
+			//将枚举数据转为错误提示字符
+    		for (Map.Entry<String,String> entry : error.entrySet()) {
+    			if(ErrorView.get(entry.getValue()) != null){
+    				returnError.put(entry.getKey(),  ErrorView.get(entry.getValue()));
+    			}else{
+    				returnError.put(entry.getKey(),  entry.getValue());
+    			}
+    			
+			}
+		}
+		
+		if(isAjax == true){
+    		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
+    		
+    		if(error != null && error.size() >0){
+    			returnValue.put("success", "false");
+    			returnValue.put("error", returnError);
+    		}else{
+    			returnValue.put("success", "true");
+    			
+    		}
+
+    		WebUtil.writeToWeb(JsonUtils.toJSONString(returnValue), "json", response);
+			return null;
+		}else{
+			String dirName = templateService.findTemplateDir_cache();
+			String accessPath = accessSourceDeviceManage.accessDevices(request);
+			if(error != null && error.size() >0){//如果有错误
+				
+				for (Map.Entry<String,String> entry : returnError.entrySet()) {		 
+					model.addAttribute("message",entry.getValue());//提示
+		  			return "templates/"+dirName+"/"+accessPath+"/message";
+				}
+					
+			}
+			
+			
+			if(jumpUrl != null && !"".equals(jumpUrl.trim())){
+				String url = Base64.decodeBase64URL(jumpUrl.trim());
+				return "redirect:"+url;
+			}else{//默认跳转
+				model.addAttribute("message", "删除提醒成功");
+				String referer = request.getHeader("referer");
+				if(RefererCompare.compare(request, "login")){//如果是登录页面则跳转到首页
+					referer = Configuration.getUrl(request);
+				}
+				model.addAttribute("urlAddress", referer);
+				
+				return "templates/"+dirName+"/"+accessPath+"/jump";	
+			}
+		}
+		
+	}
 }

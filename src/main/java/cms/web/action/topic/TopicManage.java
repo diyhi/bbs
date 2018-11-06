@@ -302,7 +302,14 @@ public class TopicManage {
 	 * @param topicId 话题Id
 	 */
 	public Topic queryTopicCache(Long topicId){
-		return (Topic)cacheManage.getCache("topicManage_cache_topic", String.valueOf(topicId));
+		Topic topic = (Topic)cacheManage.getCache("topicManage_cache_topic", String.valueOf(topicId));
+		if(topic == null){
+			topic = topicService.findById(topicId);
+			if(topic != null){
+				topicManage.addTopicCache(topic);//添加到缓存
+			}
+		}
+		return topic;
 	}
 	
 	/**

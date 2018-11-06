@@ -304,13 +304,7 @@ public class Topic_TemplateManage {
 			}
 		}
 		if(topicId != null && topicId > 0){
-			Topic topic = topicManage.queryTopicCache(topicId);//先查询缓存
-			if(topic == null){
-				topic = topicService.findById(topicId);
-				if(topic != null){
-					topicManage.addTopicCache(topic);//添加到缓存
-				}
-			}
+			Topic topic = topicManage.queryTopicCache(topicId);//查询缓存
 			
 			if(topic != null){
 				if(ip != null){

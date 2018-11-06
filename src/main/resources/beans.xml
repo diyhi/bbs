@@ -392,6 +392,11 @@ http://www.springframework.org/schema/task http://www.springframework.org/schema
         <!-- 订阅系统通知分表数量 -->
         <property name="tableQuantity" value="4" />    
     </bean>
+    <!-- 创建提醒配置 -->
+    <bean id="remindConfig" class="cms.web.action.message.RemindConfig" >
+        <!-- 提醒分表数量 -->
+        <property name="tableQuantity" value="4" />    
+    </bean>
    	<!-- 让普通的java类获取spring 的bean配置 -->
    	<bean id="SpringConfigTool" class="cms.utils.SpringConfigTool"></bean>
    	

@@ -1,10 +1,10 @@
-<#-- 默认私信列表 -->
+<#-- 默认提醒列表 -->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<base href="${baseURL}">
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<title>私信列表 - ${title}</title>
+	<title>提醒列表 - ${title}</title>
 	<meta name="keywords" content="${keywords}"/>
 	<meta name="description" content="${description}"/>
 	<#-- 获取令牌 -->
@@ -31,43 +31,92 @@
 	<@include action="${newPublic_4}"/>
 	
 	
-	<div class="privateMessageTitle">全部私信</div>
+	<div class="remindTitle">全部提醒</div>
 	
 	
 	<#if pageView.records?exists> 
-		<div class="privateMessageModule" >
-			<ol class="privateMessageList">
-				<#list pageView.records as privateMessage>
-					<div class="privateMessage">
+		<div class="remindModule" >
+			<ol class="remindList">
+				<#list pageView.records as remind>
+					<div class="remind">
 						<div class="author">
-							<a href="user/control/home?userName=${privateMessage.friendUserName}">
-								<#if privateMessage.friendAvatarName != null>
-									<img src="${privateMessage.friendAvatarPath}${privateMessage.friendAvatarName}" class='avatar' height='48' width='48'>
+							<a href="user/control/home?userName=${remind.senderUserName}">
+								<#if remind.senderAvatarName != null>
+									<img src="${remind.senderAvatarPath}${remind.senderAvatarName}" class='avatar' height='48' width='48'>
 								<#else>
 									<img src="${commonPath}images/min_avata.png" class='avatar' height='48' width='48'>
 								</#if>
 							</a>
-							<cite>
-								<a href="user/control/home?userName=${privateMessage.friendUserName}">${privateMessage.friendUserName}</a>
-							</cite> 
+							
 							<div class="tipBottom">
 								<span class="a-toolbar">
-									<#if privateMessage.status == 10><span>未读</span></#if>
-									<#if privateMessage.status == 20><span style="color: green;">已读</span></#if>
+									<#if remind.status == 10><span>未读</span></#if>
+									<#if remind.status == 20><span style="color: green;">已读</span></#if>
 									&nbsp;|&nbsp;
-									<a href="user/control/privateMessageChatList?friendUserName=${privateMessage.friendUserName}">对话</a>&nbsp;|&nbsp;
-									<a href="javascript:" onclick="deletePrivateMessage('${privateMessage.friendUserName}')">删除</a>
+									<a href="javascript:" onclick="deleteRemind('${remind.id}')">删除</a>
 									
 								</span>
 							</div>
 						</div>
-						<div class="time">${privateMessage.sendTime}</div>
-						<p class="content" onClick="javascript:window.location.href='${baseURL}user/control/privateMessageChatList?friendUserName=${privateMessage.friendUserName}'">${privateMessage.messageContent}</p>
+						<div class="time">${remind.sendTime}</div>
+						<div class="content" >
+							<#if remind.typeCode == 10>
+								<cite>
+									<a href="user/control/home?userName=${remind.senderUserName}">${remind.senderUserName}</a>
+								</cite> 
+								在
+								<cite>
+									<a href="thread?topicId=${remind.topicId}&commentId=${remind.friendTopicCommentId}">${remind.topicTitle}</a>
+								</cite> 
+								评论了我的话题
+								
+							<#elseif remind.typeCode == 20>
+								<cite>
+									<a href="user/control/home?userName=${remind.senderUserName}">${remind.senderUserName}</a>
+								</cite> 
+								在
+								<cite>
+									<a href="thread?topicId=${remind.topicId}&commentId=${remind.friendTopicCommentId}">${remind.topicTitle}</a>
+								</cite> 
+								回复了我的话题
+							<#elseif remind.typeCode == 30>
+								<cite>
+									<a href="user/control/home?userName=${remind.senderUserName}">${remind.senderUserName}</a>
+								</cite> 
+								在
+								<cite>
+									<a href="thread?topicId=${remind.topicId}&commentId=${remind.friendTopicCommentId}">${remind.topicTitle}</a>
+								</cite> 
+								引用了我的评论
+							<#elseif remind.typeCode == 40>
+								<cite>
+									<a href="user/control/home?userName=${remind.senderUserName}">${remind.senderUserName}</a>
+								</cite> 
+								在
+								<cite>
+									<a href="thread?topicId=${remind.topicId}&commentId=${remind.topicCommentId}">${remind.topicTitle}</a>
+								</cite> 
+								回复了我的评论
+							<#elseif remind.typeCode == 50>
+								<cite>
+									<a href="user/control/home?userName=${remind.senderUserName}">${remind.senderUserName}</a>
+								</cite> 
+								在
+								<cite>
+									<a href="thread?topicId=${remind.topicId}&commentId=${remind.friendTopicCommentId}">${remind.topicTitle}</a>
+								</cite> 
+								回复了我回复过的评论
+								
+							</#if>
+							
+							
+						
+						</div>
 						<div class="clearfix"></div>
 					</div>
 				</#list>
 			</ol>
-			<div class="privateMessagePage">
+			<div class="remindPage">
 				<@include action="${newPublic_1}"/>
 			</div>
 		</div>
@@ -88,10 +137,10 @@
 
 <script type="text/javascript" language="javascript"> 
 
-//删除私信
-function deletePrivateMessage(friendUserName){
+//删除提醒
+function deleteRemind(remindId){
 	var parameter = "";//URI参数
-	parameter += "&friendUserName="+friendUserName;
+	parameter += "&remindId="+remindId;
 	//从meta标签获取令牌
 	parameter += "&token="+getCsrf();
 	
@@ -105,7 +154,7 @@ function deletePrivateMessage(friendUserName){
 				if(key == "success"){	
 					var success = returnValue[key];	
 					if(success == "true"){
-						layer.msg('删除私信成功,3秒后刷新页面', 
+						layer.msg('删除提醒成功,3秒后刷新页面', 
 							{
 							  time: 3000 //3秒关闭（如果不配置，默认是3秒）
 							},function(){
@@ -137,7 +186,7 @@ function deletePrivateMessage(friendUserName){
 			}
 		}
 	},
-		getBasePath()+"user/control/deletePrivateMessage?timestamp=" + new Date().getTime(), true,parameter);	
+		getBasePath()+"user/control/deleteRemind?timestamp=" + new Date().getTime(), true,parameter);	
 }
 </script>
 

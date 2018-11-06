@@ -460,6 +460,11 @@ public enum ErrorView {
 		public String getContent(){
 			return "文件不能为空";
 		}
+	},
+	_1400{
+		public String getContent(){
+			return "提醒不存在";
+		}
 	};
 	
 	

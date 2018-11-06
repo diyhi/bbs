@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import javax.persistence.Index;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -624,7 +622,124 @@ public class CreateBean {
 				}  
 			}
 		} 
+	}
+	
+	/**
+	 * 创建提醒bean
+	 * @param number 表号
+	 */
+	public static void createRemindBean(Integer tableNumber){
+		
+		//ClassPool：CtClass对象的容器   
+	    ClassPool pool = ClassPool.getDefault(); 
+	//    ClassClassPath classPath = new ClassClassPath(this.getClass());
+	    ClassClassPath classPath = new ClassClassPath(CreateBean.class);
+	    pool.insertClassPath(classPath);
 
+	      
+	    //通过ClassPool生成一个public新类HistoryOrder.java   
+	    CtClass ctClass = pool.makeClass("cms.bean.message.Remind_"+tableNumber); 
 
+        try {
+        	// 父类
+        	ctClass.setSuperclass(pool.get("cms.bean.message.RemindEntity"));
+        	// 添加接口
+			ctClass.addInterface(pool.get("java.io.Serializable"));
+			
+			// 添加属性   
+			 ctClass.addField(CtField.make("private static final long serialVersionUID = 13000000000000000"+ tableNumber+"L;", ctClass));
+
+			//写入注解(Annotation) 
+			ClassFile cf = ctClass.getClassFile();  
+	        ConstPool cp = cf.getConstPool();
+ 
+	        //@Table(name="historyorder_0",indexes = {@Index(name="historyorder_idx", columnList="state,visible")})
+	        AnnotationsAttribute attr = new AnnotationsAttribute(cp, AnnotationsAttribute.visibleTag);
+	        
+	        //@Entity注解
+	        Annotation entity_a = new Annotation("javax.persistence.Entity", cp);
+	  	  	attr.addAnnotation(entity_a);
+	  	  	
+	        //@Table注解
+	        Annotation a = new Annotation("javax.persistence.Table", cp);
+	        a.addMemberValue("name", new StringMemberValue("remind_"+tableNumber, cp));
+	       
+	        Annotation index_a = new Annotation("javax.persistence.Index", cp);
+	        index_a.addMemberValue("name", new StringMemberValue("remind_1_idx", cp));
+	        index_a.addMemberValue("columnList", new StringMemberValue("receiverUserId,status,sendTimeFormat", cp));
+	        AnnotationMemberValue annotationMemberValue = new AnnotationMemberValue(cp);
+	        annotationMemberValue.setValue(index_a);
+
+	        Annotation index_b = new Annotation("javax.persistence.Index", cp);
+	        index_b.addMemberValue("name", new StringMemberValue("remind_2_idx", cp));
+	        index_b.addMemberValue("columnList", new StringMemberValue("topicId", cp));
+	        AnnotationMemberValue annotationMemberValue_b = new AnnotationMemberValue(cp);
+	        annotationMemberValue_b.setValue(index_b);
+	        
+
+	        MemberValue[] vals = new MemberValue[]{annotationMemberValue,annotationMemberValue_b};
+
+	        ArrayMemberValue arrayMemberValue=new ArrayMemberValue(cp);//数组类型
+	        arrayMemberValue.setValue(vals);
+	      
+	        a.addMemberValue("indexes", arrayMemberValue);//数组类型
+	        attr.addAnnotation(a);
+	        cf.addAttribute(attr);
+	        cf.setVersionToJava5();
+
+	        
+		} catch (NotFoundException e) {
+			// TODO Auto-generated catch block
+		//	e.printStackTrace();
+			if (logger.isErrorEnabled()) {
+	            logger.error("提醒bean",e);
+	        }
+		}   catch (CannotCompileException e) {
+			// TODO Auto-generated catch block
+		//	e.printStackTrace();
+			if (logger.isErrorEnabled()) {
+	            logger.error("提醒bean",e);
+	        }
+		}   
+       
+        
+      //把生成的class文件写入文件   
+        byte[] byteArr;
+        FileOutputStream fos = null;
+		try {
+			File file = new File(PathUtil.path()+File.separator+"WEB-INF"+File.separator+"classes"+File.separator+"cms"+File.separator+"bean"+File.separator+"message"+File.separator+"Remind_"+tableNumber+".class");
+			
+			if(!file.exists()){
+				byteArr = ctClass.toBytecode();
+				//	fos = new FileOutputStream(new File("C://HistoryOrder_5.class"));
+				fos = new FileOutputStream(file);
+				fos.write(byteArr); 
+			}
+			
+			
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+		//	e.printStackTrace();
+			if (logger.isErrorEnabled()) {
+	            logger.error("提醒bean",e);
+	        }
+		} catch (CannotCompileException e) {
+			// TODO Auto-generated catch block
+		//	e.printStackTrace();
+			if (logger.isErrorEnabled()) {
+	            logger.error("提醒bean",e);
+	        }
+		} finally {
+			if(fos != null){
+				try {
+					fos.close();
+				} catch (IOException e) {
+					if (logger.isErrorEnabled()) {
+			            logger.error("提醒bean",e);
+			        }
+				}  
+			}
+		} 
 	}
 }

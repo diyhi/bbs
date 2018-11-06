@@ -6,9 +6,13 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 import javax.annotation.Resource;
+import javax.persistence.Transient;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -25,6 +29,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import cms.bean.ErrorView;
+import cms.bean.message.PrivateMessage;
+import cms.bean.message.Remind;
 import cms.bean.setting.EditorTag;
 import cms.bean.setting.SystemSetting;
 import cms.bean.topic.Comment;
@@ -34,6 +40,7 @@ import cms.bean.topic.Topic;
 import cms.bean.user.AccessUser;
 import cms.bean.user.PointLog;
 import cms.bean.user.User;
+import cms.service.message.RemindService;
 import cms.service.setting.SettingService;
 import cms.service.template.TemplateService;
 import cms.service.topic.CommentService;
@@ -51,6 +58,7 @@ import cms.web.action.CSRFTokenManage;
 import cms.web.action.FileManage;
 import cms.web.action.TextFilterManage;
 import cms.web.action.filterWord.SensitiveWordFilterManage;
+import cms.web.action.message.RemindManage;
 import cms.web.action.setting.SettingManage;
 import cms.web.action.topic.TopicManage;
 import cms.web.action.user.PointManage;
@@ -83,6 +91,10 @@ public class CommentFormAction {
 	@Resource TopicManage topicManage;
 	@Resource SensitiveWordFilterManage sensitiveWordFilterManage;
 	@Resource UserManage userManage;
+	
+	@Resource RemindManage remindManage;
+	@Resource RemindService remindService;
+	
 	
 	
 	/**
@@ -173,9 +185,9 @@ public class CommentFormAction {
 			}
 		}
 		
-		
+		Topic topic = null;
 		if(topicId != null && topicId >0L){
-			Topic topic = topicService.findById(topicId);
+			topic = topicService.findById(topicId);
 			if(topic != null){
 				comment.setTopicId(topicId);
 				//是否全局允许评论
@@ -264,6 +276,32 @@ public class CommentFormAction {
 			
 			//修改话题最后回复时间
 			topicService.updateTopicReplyTime(topicId,new Date());
+			
+			
+			if(!topic.getIsStaff()){
+				User _user = userManage.query_cache_findUserByUserName(topic.getUserName());
+				if(_user != null && !_user.getId().equals(accessUser.getUserId())){//楼主评论不发提醒给自己
+					
+					//提醒楼主
+					Remind remind = new Remind();
+					remind.setId(remindManage.createRemindId(_user.getId()));
+					remind.setReceiverUserId(_user.getId());//接收提醒用户Id
+					remind.setSenderUserId(accessUser.getUserId());//发送用户Id
+					remind.setTypeCode(10);//10:别人评论了我的话题
+					remind.setSendTimeFormat(new Date().getTime());//发送时间格式化
+					remind.setTopicId(topic.getId());//话题Id
+					remind.setFriendTopicCommentId(comment.getId());//对方的话题评论Id
+					
+					Object remind_object = remindManage.createRemindObject(remind);
+					remindService.saveRemind(remind_object);
+					
+					//删除提醒缓存
+					remindManage.delete_cache_findUnreadRemindByUserId(_user.getId());
+				}
+			}
+			
+			
+			
 			
 			
 			
@@ -538,9 +576,9 @@ public class CommentFormAction {
 			comment = commentService.findByCommentId(commentId);
 		}
 		
-		
+		Topic topic = null;
 		if(comment != null){
-			Topic topic = topicService.findById(comment.getTopicId());
+			topic = topicService.findById(comment.getTopicId());
 			if(topic != null){
 				SystemSetting systemSetting = settingService.findSystemSetting_cache();
 				//是否全局允许评论
@@ -558,6 +596,8 @@ public class CommentFormAction {
 				
 			}
 			
+		}else{
+			error.put("comment", ErrorView._14.name());//引用评论不能为空
 		}
 		SystemSetting systemSetting = settingService.findSystemSetting_cache();
 		
@@ -669,6 +709,58 @@ public class CommentFormAction {
 			
 			//修改话题最后回复时间
 			topicService.updateTopicReplyTime(newComment.getTopicId(),new Date());
+			
+			
+			User _user = userManage.query_cache_findUserByUserName(topic.getUserName());
+			//别人评论了我的话题
+			if(!topic.getIsStaff() && _user != null && !_user.getId().equals(accessUser.getUserId())){//楼主评论不发提醒给自己
+				//如果别人引用话题发布者的评论,则不发本类型提醒给话题发布者
+				if(!comment.getUserName().equals(topic.getUserName())){
+					//提醒楼主
+					Remind remind = new Remind();
+					remind.setId(remindManage.createRemindId(_user.getId()));
+					remind.setReceiverUserId(_user.getId());//接收提醒用户Id
+					remind.setSenderUserId(accessUser.getUserId());//发送用户Id
+					remind.setTypeCode(10);//10:别人评论了我的话题
+					remind.setSendTimeFormat(new Date().getTime());//发送时间格式化
+					remind.setTopicId(comment.getTopicId());//话题Id
+					remind.setFriendTopicCommentId(newComment.getId());//对方的话题评论Id
+					
+					Object remind_object = remindManage.createRemindObject(remind);
+					remindService.saveRemind(remind_object);
+					
+					//删除提醒缓存
+					remindManage.delete_cache_findUnreadRemindByUserId(_user.getId());
+					
+				}	
+			}
+			
+			
+			_user = userManage.query_cache_findUserByUserName(comment.getUserName());
+			//别人引用了我的评论
+			if(!comment.getIsStaff() && _user != null && !_user.getId().equals(accessUser.getUserId())){//引用自已的评论不发提醒给自己
+				
+				//提醒楼主
+				Remind remind = new Remind();
+				remind.setId(remindManage.createRemindId(_user.getId()));
+				remind.setReceiverUserId(_user.getId());//接收提醒用户Id
+				remind.setSenderUserId(accessUser.getUserId());//发送用户Id
+				remind.setTypeCode(30);//30:别人引用了我的评论
+				remind.setSendTimeFormat(new Date().getTime());//发送时间格式化
+				remind.setTopicId(comment.getTopicId());//话题Id
+				remind.setTopicCommentId(comment.getId());//我的话题评论Id
+				remind.setFriendTopicCommentId(newComment.getId());//对方的话题评论Id
+				
+				Object remind_object = remindManage.createRemindObject(remind);
+				remindService.saveRemind(remind_object);
+				
+				//删除提醒缓存
+				remindManage.delete_cache_findUnreadRemindByUserId(_user.getId());
+			}
+			
+			
+			
+			
 			
 			String fileNumber = "b"+ accessUser.getUserId();
 				
@@ -950,6 +1042,113 @@ public class CommentFormAction {
 			
 			//修改话题最后回复时间
 			topicService.updateTopicReplyTime(comment.getTopicId(),new Date());
+			
+			
+			Topic topic = topicManage.queryTopicCache(comment.getTopicId());//查询缓存
+			if(topic != null && !topic.getIsStaff()){
+				User _user = userManage.query_cache_findUserByUserName(topic.getUserName());
+				//别人回复了我的话题
+				if(_user != null && !_user.getId().equals(accessUser.getUserId())){//楼主回复不发提醒给自己
+					//如果别人回复了话题发布者的评论，则不发本类型提醒给话题发布者
+					if(!comment.getUserName().equals(topic.getUserName())){
+						Remind remind = new Remind();
+						remind.setId(remindManage.createRemindId(_user.getId()));
+						remind.setReceiverUserId(_user.getId());//接收提醒用户Id
+						remind.setSenderUserId(accessUser.getUserId());//发送用户Id
+						remind.setTypeCode(20);//20:别人回复了我的话题
+						remind.setSendTimeFormat(new Date().getTime());//发送时间格式化
+						remind.setTopicId(comment.getTopicId());//话题Id
+						remind.setFriendTopicCommentId(comment.getId());//对方的话题评论Id
+						remind.setFriendTopicReplyId(reply.getId());//对方的话题回复Id
+						
+						Object remind_object = remindManage.createRemindObject(remind);
+						remindService.saveRemind(remind_object);
+						
+						//删除提醒缓存
+						remindManage.delete_cache_findUnreadRemindByUserId(_user.getId());
+						
+					}		
+				}
+			}
+			
+			User _user = userManage.query_cache_findUserByUserName(comment.getUserName());
+			//别人回复了我的评论
+			if(!comment.getIsStaff() && _user != null && !_user.getId().equals(accessUser.getUserId())){//不发提醒给自己
+
+				Remind remind = new Remind();
+				remind.setId(remindManage.createRemindId(_user.getId()));
+				remind.setReceiverUserId(_user.getId());//接收提醒用户Id
+				remind.setSenderUserId(accessUser.getUserId());//发送用户Id
+				remind.setTypeCode(40);//40:别人回复了我的评论
+				remind.setSendTimeFormat(new Date().getTime());//发送时间格式化
+				remind.setTopicId(comment.getTopicId());//话题Id
+				remind.setTopicCommentId(comment.getId());//我的话题评论Id
+				remind.setFriendTopicReplyId(reply.getId());//对方的话题回复Id
+				
+				
+				Object remind_object = remindManage.createRemindObject(remind);
+				remindService.saveRemind(remind_object);
+				
+				//删除提醒缓存
+				remindManage.delete_cache_findUnreadRemindByUserId(_user.getId());
+			}
+			
+			Set<String> userNameList = new HashSet<String>();
+			List<Reply> replyList = commentService.findReplyByCommentId(comment.getId());
+			if(replyList != null && replyList.size() >0){
+				for(Reply _reply : replyList){
+					//如果是话题发布者的回复，则不发本类型提醒给话题的发布者
+					if(topic != null && !topic.getIsStaff() && _reply.getUserName().equals(topic.getUserName())){
+						continue;
+					}
+					//如果是评论发布者的回复，则不发本类型提醒给评论的发布者
+					if(!comment.getIsStaff() && _reply.getUserName().equals(comment.getUserName())){
+						continue;
+					}
+					//员工的回复不发提醒
+					if(_reply.getIsStaff()){
+						continue;
+					}
+					
+					//如果是自己的回复，则不发本类型提醒给自己
+					if(_reply.getUserName().equals(accessUser.getUserName())){
+						continue;
+					}
+
+					//如果同一个用户有多条回复,只发一条提醒
+					if(userNameList.contains(_reply.getUserName())){
+						continue;
+					}
+					
+					
+					userNameList.add(_reply.getUserName());
+					
+					_user = userManage.query_cache_findUserByUserName(_reply.getUserName());
+					
+					//提醒
+					Remind remind = new Remind();
+					remind.setId(remindManage.createRemindId(_user.getId()));
+					remind.setReceiverUserId(_user.getId());//接收提醒用户Id
+					remind.setSenderUserId(accessUser.getUserId());//发送用户Id
+					remind.setTypeCode(50);//50:别人回复了我回复过的评论
+					remind.setSendTimeFormat(new Date().getTime());//发送时间格式化
+					remind.setTopicId(_reply.getTopicId());//话题Id
+					remind.setTopicReplyId(_reply.getId());//我的话题回复Id
+					
+					
+					remind.setFriendTopicCommentId(comment.getId());//对方的话题评论Id
+					remind.setFriendTopicReplyId(reply.getId());//对方的话题回复Id
+					
+					
+					Object remind_object = remindManage.createRemindObject(remind);
+					remindService.saveRemind(remind_object);
+					
+					//删除提醒缓存
+					remindManage.delete_cache_findUnreadRemindByUserId(_user.getId());
+				}
+			}
+			
+			
 			
 			
 			//统计每分钟原来提交次数

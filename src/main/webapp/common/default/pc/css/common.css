@@ -280,6 +280,20 @@ html,body{
 .headerModule .box .menu ul li a:hover {
 	color:#878787
 }
+.headerModule .box .menu ul li .author{position:relative;color:#999}
+.headerModule .box .menu ul li .author img{
+	width:32px;
+	height:32px;
+	position:absolute;
+	left:-18px;
+	top:9px;
+	-webkit-border-radius:50%;
+	-moz-border-radius:50%;
+	border-radius:50%;
+	display:block;
+	behavior: url(common/default/pc/js/css3pie/PIE.htc);  /*通知IE浏览器调用脚本作用于当前类*/
+}
+
 .headerModule .box .head-search {
 	float: left;
 	margin-left: 20px;
@@ -1617,6 +1631,60 @@ html,body{
 .systemNotifyModule .systemNotifyPage {
 	margin-top: 10px; float: right; color: #999; line-height: 22px; margin-right: 0px;*margin-right: 8px;
 }
+
+/* 提醒 */
+.remindTitle{
+	line-height:46px;
+	margin-left:8px;
+	margin-right:8px;
+    font-size: 14px;
+    font-weight: 700;
+    border-bottom:1px dotted #eee;
+}
+    
+
+.remindModule{
+	padding: 0px 10px 10px 10px;
+	position: relative;
+	padding-bottom:0;
+}
+.remindModule .remindList{list-style:none;}
+.remindModule .remindList .remind{padding:10px 0 5px 60px;border-bottom:1px solid #EDEDE3;}
+.remindModule .remindList .author{position:relative;color:#999}
+.remindModule .remindList .author img{
+	position:absolute;
+	left:-60px;
+	-webkit-border-radius:50%;
+	-moz-border-radius:50%;
+	border-radius:50%;
+	display:block;
+	behavior: url(common/default/pc/js/css3pie/PIE.htc);  /*通知IE浏览器调用脚本作用于当前类*/
+}
+.remindModule .remindList cite{font-style:normal;font-size: 13px;}
+.remindModule .remindList .time{margin-bottom:5px;color:#999;line-height: 20px;}
+.remindModule .remindList .time a{color:#999}
+.remindModule .remindList .remind .content{padding:0px;word-wrap:break-word;color:#666;line-height: 24px;font-size: 13px;margin-right: 120px;margin-top: 10px;}
+.remindModule .remindList .remind .content:hover{
+	color: #333;
+}
+
+.remindModule .remindList .tipBottom {
+	font-size: 9pt;
+	color: #aaa;
+	margin-top: 5px;
+	float:right;
+}
+.remindModule .remindList .tipBottom .a-toolbar {
+	display: block;
+	width: 100%;
+}
+.remindModule .remindList .tipBottom .a-toolbar a {
+	color: #aaa;
+}
+.remindModule .remindPage {
+	margin-top: 10px; float: right; color: #999; line-height: 22px; margin-right: 0px;*margin-right: 8px;
+}
+
 
 /** 头像 **/
 .avatarModule {

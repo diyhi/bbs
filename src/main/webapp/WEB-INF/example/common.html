@@ -144,24 +144,35 @@
 <table id="anchor_40" class="exampleTable" > 
 	<thead> 
 		<tr> 
-			<th colspan="3">用户 AccessUser</th>
+			<th colspan="4">用户 AccessUser</th>
 		</tr> 
 		<tr> 
 			<th width="30%">变量</th> 
 			<th width="30%">类型</th>
-			<th width="40%">说明</th> 
+			<th width="40%" colspan="2">说明</th> 
 		</tr> 
 	</thead> 
 	<tbody> 
 		<tr> 
 			<td>id</td> 
 			<td>long</td>
-			<td>Id</td>
+			<td colspan="2">Id</td>
 		</tr>
 		<tr> 
 			<td>userName</td> 
 			<td>String</td>
-			<td>会员用户名</td>
+			<td colspan="2">会员用户名</td>
+		</tr>
+		<tr> 
+			<td>avatarPath</td> 
+			<td>String</td>
+			<td>头像路径</td>
+			<td width="15%" rowspan="2">页面上显示200*200头像示例${accessUser.avatarPath}${accessUser.avatarName}   &nbsp;&nbsp;显示100*100头像示例${accessUser.avatarPath}100x100/${accessUser.avatarName}</td> 
+		</tr>
+		<tr> 
+			<td>avatarName</td> 
+			<td>String</td>
+			<td>头像名称</td>
 		</tr>
 	</tbody> 
 </table>

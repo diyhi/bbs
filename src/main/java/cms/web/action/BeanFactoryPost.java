@@ -104,5 +104,21 @@ public class BeanFactoryPost implements BeanFactoryPostProcessor{
 				}	
 			}
 		}
+		
+		BeanDefinition remind_bd = beanFactory.getBeanDefinition("remindConfig");
+		if(remind_bd != null){
+			MutablePropertyValues mutablePropertyValues = remind_bd.getPropertyValues();
+			TypedStringValue typedStringValue = (TypedStringValue)mutablePropertyValues.getPropertyValue("tableQuantity").getValue();
+
+			//提醒分表数量
+			Integer tableQuantity = Integer.parseInt(typedStringValue.getValue());
+			if(tableQuantity >1){
+				for(int i =1; i<tableQuantity; i++){
+					
+					//初始化提醒bean
+					CreateBean.createRemindBean(i);
+				}	
+			}
+		}
 	}
 }

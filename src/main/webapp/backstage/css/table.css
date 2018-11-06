@@ -335,6 +335,9 @@ filter:alpha(opacity: 0);
     border-top: 1px solid #ccc;
     line-height: 20px;
 }
+.exampleTable .mask{
+	width: 10px;height: 32px; background: #fff; margin-left: -20px;margin-top:-16px; position: absolute;
+}
 
 
 

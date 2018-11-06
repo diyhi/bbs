@@ -281,6 +281,13 @@ public class TopicFormAction {
 			String trimSpace = cms.utils.StringUtil.replaceSpace(text).trim();
 			//摘要
 			if(trimSpace != null && !"".equals(trimSpace)){
+				if(systemSetting.isAllowFilterWord()){
+					String wordReplace = "";
+					if(systemSetting.getFilterWordReplace() != null){
+						wordReplace = systemSetting.getFilterWordReplace();
+					}
+					trimSpace = sensitiveWordFilterManage.filterSensitiveWord(trimSpace, wordReplace);
+				}
 				if(trimSpace.length() >150){
 					topic.setSummary(trimSpace.substring(0, 150)+"..");
 				}else{
