@@ -23,6 +23,7 @@ import cms.bean.user.UserGrade;
 import cms.bean.user.UserInputValue;
 import cms.bean.user.UserLoginLog;
 import cms.service.besa.DaoSupport;
+import cms.service.favorite.FavoriteService;
 import cms.service.message.PrivateMessageService;
 import cms.service.message.RemindService;
 import cms.service.message.SystemNotifyService;
@@ -54,7 +55,7 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 	@Resource SystemNotifyService systemNotifyService;
 	
 	@Resource RemindService remindService;
-	
+	@Resource FavoriteService favoriteService;
 	/**
 	 * 根据条件分页查询用户名称
 	 * @param jpql SQL
@@ -554,6 +555,11 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 		//删除用户提醒
 		remindService.deleteRemindByUserId(idList);
 		
+		//删除收藏夹
+		favoriteService.deleteFavoriteByUserName(userNameList);
+		
+		//根据发布动态图片的用户名称删除收藏
+		favoriteService.deleteFavoriteByPostUserName(userNameList);
 		return j;
 	}
 	/**

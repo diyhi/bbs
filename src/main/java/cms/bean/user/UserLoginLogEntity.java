@@ -27,6 +27,13 @@ public class UserLoginLogEntity implements Serializable{
 	/** 用户Id **/
 	protected Long userId;
 	
+	/** 用户名称 **/
+	@Transient
+	protected String userName;
+	
+	/** 类型编号 10:登录 20:续期 **/
+	protected Integer typeNumber = 10;
+	
 	/** 登录时间 **/
 	@Temporal(TemporalType.TIMESTAMP)
 	protected Date logonTime = new Date();
@@ -77,6 +84,22 @@ public class UserLoginLogEntity implements Serializable{
 
 	public void setIpAddress(String ipAddress) {
 		this.ipAddress = ipAddress;
+	}
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	public Integer getTypeNumber() {
+		return typeNumber;
+	}
+
+	public void setTypeNumber(Integer typeNumber) {
+		this.typeNumber = typeNumber;
 	}
 	
 	

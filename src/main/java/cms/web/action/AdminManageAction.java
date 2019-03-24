@@ -1,6 +1,7 @@
 package cms.web.action;
 
 import java.util.Date;
+import java.util.TimeZone;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -10,8 +11,10 @@ import javax.servlet.http.HttpSession;
 import cms.bean.setting.SystemSetting;
 import cms.service.setting.SettingService;
 import cms.service.staff.StaffService;
+import cms.utils.JsonUtils;
 import cms.utils.UUIDUtil;
 import cms.utils.WebUtil;
+import cms.web.action.AdminManageAction.TimeData;
 import cms.web.action.common.CaptchaManage;
 import cms.web.action.staff.StaffManage;
 
@@ -107,7 +110,42 @@ public class AdminManageAction {
 	@ResponseBody//方式来做ajax,直接返回字符串
 	public String currentTime(ModelMap model
 			) throws Exception {
-		return String.valueOf(new Date().getTime());
+		TimeData time = new TimeData();
+		time.setCurrentTime(new Date().getTime());
+		
+		TimeZone tz = TimeZone.getDefault();
+	//	TimeZone tz = TimeZone.getTimeZone("America/New_York");//-5
+	
+		//获取当前时区的标准时间到GMT的偏移量。相对于“本初子午线”的偏移，单位/毫秒。
+		int offset = tz.getRawOffset();
+		//时区偏移量 “时间偏移”对应的小时
+		int gmt = offset/(3600*1000);
+	
+		time.setTimezoneOffset(gmt);
+		
+		return JsonUtils.toJSONString(time);
 	}
 	
+	
+	protected class TimeData {
+		//系统当前时间戳
+        private Long currentTime;
+        //系统当前时区偏移
+        private Integer timezoneOffset;
+        
+        
+        public TimeData() {}
+		public Long getCurrentTime() {
+			return currentTime;
+		}
+		public void setCurrentTime(Long currentTime) {
+			this.currentTime = currentTime;
+		}
+		public Integer getTimezoneOffset() {
+			return timezoneOffset;
+		}
+		public void setTimezoneOffset(Integer timezoneOffset) {
+			this.timezoneOffset = timezoneOffset;
+		}
+    }
 }

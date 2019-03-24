@@ -29,8 +29,9 @@
 		<TABLE class="dataList" width="100%">
 			<THEAD>
 				<TR class="dataThead">
-					<TH width="30%">登录IP</TH>	
-					<TH width="40%">IP归属地</TH>	
+					<TH width="20%">登录IP</TH>	
+					<TH width="30%">IP归属地</TH>	
+					<TH width="20%">类型</TH>	
 					<TH width="30%">登录时间</TH>
 				</TR>
 			</THEAD>
@@ -43,6 +44,14 @@
 					</TD>
 					<TD class="dataTD">
 						${userLoginLog.ipAddress}				
+					</TD>
+					<TD class="dataTD">
+						<#if userLoginLog.typeNumber == 10 >   
+							登录
+						</#if>  
+						<#if userLoginLog.typeNumber == 20 >   
+							续期
+						</#if> 	
 					</TD>
 					<TD class="dataTD">
 						${userLoginLog.logonTime}

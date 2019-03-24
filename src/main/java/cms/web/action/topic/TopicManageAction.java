@@ -1245,6 +1245,11 @@ public class TopicManageAction {
 			List<Topic> topicList = topicService.findByIdList(Arrays.asList(topicId));
 			if(topicList != null && topicList.size() >0){
 				topicService.reductionTopic(topicList);
+				for(Topic topic :topicList){
+					//更新索引
+					topicIndexService.addTopicIndex(new TopicIndex(String.valueOf(topic.getId()),2));
+					topicManage.deleteTopicCache(topic.getId());//删除缓存
+				}
 				return "1";
 			}	
 		}
@@ -1264,68 +1269,12 @@ public class TopicManageAction {
 			HttpServletResponse response) throws Exception {
 		if(topicId != null && topicId>0L){
 			topicService.updateTopicStatus(topicId, 20);
+			//更新索引
+			topicIndexService.addTopicIndex(new TopicIndex(String.valueOf(topicId),2));
+			topicManage.deleteTopicCache(topicId);//删除缓存
 			return "1";
 		}
 		return "0";
 	}
 	
-	
-	
-	/**
-	 * 搜索话题分页
-	 * @param searchName 搜索名称
-	 * @param tableName div表名
-	 * @return
-	 
-	@RequestMapping(params="method=ajax_searchInformationPage", method=RequestMethod.GET)
-	public String searchInformationPage(ModelMap model,PageForm pageForm,
-			String searchName,String tableName) {
-		
-			
-		StringBuffer jpql = new StringBuffer("");
-		String sql = "";
-		List<Object> params = new ArrayList<Object>();
-		//调用分页算法代码
-		PageView<Information> pageView = new PageView<Information>(settingService.findSystemSetting_cache().getBackstagePageNumber(),pageForm.getPage(),10);
-		if(searchName != null && !"".equals(searchName.trim())){
-			String searchName_utf8 = "";
-			try {
-				searchName_utf8 = URLDecoder.decode(searchName.trim(),"utf-8");
-			} catch (UnsupportedEncodingException e) {
-				// TODO Auto-generated catch block
-			//	e.printStackTrace();
-				if (logger.isErrorEnabled()) {
-		            logger.error("搜索资讯名称编码错误",e);
-		        }
-			}
-			jpql.append(" and o.name like ?").append((params.size()+1)).append(" escape '/' ");
-			params.add("%/"+ searchName_utf8.trim()+"%" );//加上查询参数
-
-			model.addAttribute("searchName", searchName_utf8);
-		}
-	
-		jpql.append(" and o.visible=?").append((params.size()+1));//and o.code=?1
-		params.add(true);//设置o.visible=?1是否可见
-		//删除第一个and
-		sql = StringUtils.difference(" and", jpql.toString());
-		//当前页
-		int firstindex = (pageForm.getPage()-1)*pageView.getMaxresult();
-		//排序
-		LinkedHashMap<String,String> orderby = new LinkedHashMap<String,String>();
-	//	orderby.put("sell", "desc");//先按是否在售排序
-	//	orderby.put("id", "desc");//根据code字段降序排序
-		QueryResult<Information> qr = informationService.getScrollData(Information.class,firstindex, pageView.getMaxresult(), sql, params.toArray(),orderby);
-		
-		
-		
-		//将查询结果集传给分页List
-		pageView.setQueryResult(qr);
-		model.addAttribute("pageView", pageView);
-		
-		model.addAttribute("tableName", tableName);
-		
-		return "jsp/information/ajax_searchInformationPage";
-		
-		
-	}*/
 }

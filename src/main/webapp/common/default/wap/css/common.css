@@ -345,6 +345,13 @@ html,body{
 .topicContentModule .topicDetail .main img{
 	display: block; max-width: 100%;
 }
+.topicContentModule .operating {
+	display:inline-block;text-align: center;width: 100%;
+}
+.topicContentModule .operating .bottomInfo{
+	margin-top: 20px;line-height:34px; margin-bottom: 10px;
+}
+
 .topicContentModule .commentList {
 	width: 100%;
 	overflow-x: hidden;
@@ -873,6 +880,10 @@ html,body{
     color: #999;
 }
 .topicListModule .topicList .item .topInfo .bRight{float:right!important;font-size:14px;color:#aaa;}
+.topicListModule .topicList .item .topInfo .favorite {
+	font-size: 14px;margin-left:6px;
+	color:#aaa;
+}
 .topicListModule .topicList .item .topInfo .bRight .status{fontsize:13px;padding-right: 5px;}
 .topicListModule .topicList .item .topInfo .bRight .time{font-style:normal;}
 .topicListModule .topicList .item .title{
@@ -1371,4 +1382,52 @@ html,body{
 .remindModule .remindList .item .main .link {
 	font-size: 15px;
 	color:#26a2ff;
+}
+
+/** 收藏夹 **/
+.favoriteModule{
+	padding-top: 40px;padding-bottom: 2px;
+}
+.favoriteModule .favoriteList {
+	width: 100%;
+	overflow-x: hidden
+}
+.favoriteModule .favoriteList .item {
+	border-bottom: 1px solid #eee;
+	margin-left: 8px; 
+	margin-right: 8px;
+}
+.favoriteModule .favoriteList .item .head {
+	min-height: 25px;
+	padding: 8px 3px 0;
+	margin: 0;
+	overflow: hidden;
+}
+.favoriteModule .favoriteList .item .head .info {
+	display: block;
+	float: left
+}
+.favoriteModule .favoriteList .item .head .info h2 {
+	color:#aaa;
+	font-size:14px;
+	line-height: 16px
+}
+.favoriteModule .favoriteList .item .head .operating {
+	float: right;
+	font-size: 12px;
+	color:#aaa;
+}
+.favoriteModule .favoriteList .item .head .operating .delete-btn{
+	color: #999;
+	font-size: 14px;
+}
+.favoriteModule .favoriteList .item .main {
+	padding: 0 8px 0 8px;
+	font-size: 16px;
+	line-height: 26px;
+	margin: 0 0 10px
+}
+.favoriteModule .favoriteList .item .main .content {
+	margin-bottom: 10px;
+	color:#222;
 }

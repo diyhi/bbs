@@ -41,7 +41,7 @@ function sureSubmit(objForm){
 	</TD></TR>
 
   <TR>
-    <TD class="t-label t-label-h" width="12%"><SPAN class="span-text">*</SPAN>Email地址：</TD>
+    <TD class="t-label t-label-h" width="12%">Email地址：</TD>
     <TD class="t-content" width="88%" colSpan="3">
     	<input name="email" size="50" maxlength="40" value="${user.email}"/>
     	&nbsp;&nbsp;<form:errors path="email" class="span-text"/>

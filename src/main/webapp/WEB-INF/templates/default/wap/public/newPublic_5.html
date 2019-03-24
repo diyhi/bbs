@@ -219,12 +219,17 @@
 				<div class="main"> 
 					<div v-html="topic.content"></div>
 				</div>
+				<div class="operating">
+					<div class="bottomInfo">
+						<mt-button type="default" plain @click.native="addFavorite(topic.id);"  :disabled="alreadyCollected">{{alreadyCollected == true ? '已收藏':'收藏'}} ({{favoriteCount}})</mt-button>
+					</div>
+				</div>
 			</div>
 			<div class="commentList">
 				<div class="item" v-for="(comment,index) in commentList" :id="'anchor_'+comment.id">
 					<div class="head">
 						<!-- router-link渲染成<div>标签-->
-				    	<router-link class="avatarBox"  tag="div" :to="{path: '/user/control/home', query: {userName: topic.userName}}">
+				    	<router-link class="avatarBox"  tag="div" :to="{path: '/user/control/home', query: {userName: comment.userName}}">
 				        	<img :src="comment.avatarPath+'100x100/'+comment.avatarName" v-if="comment.avatarName != null">
 				            <img :src="$store.state.commonPath+'images/min_avata.png'" v-if="comment.avatarName == null || comment.avatarName == ''">
 				        </router-link>
@@ -853,6 +858,7 @@
 		        	<router-link to="/user/control/remindList" class="menuLink"><i class="cms-bell"></i><span class="name">提醒</span><span class="badge" style="position: absolute;" v-show="$store.state.remind_badge"></span></router-link>
 		        </li>
 		        <li class="bottomLine rightLine">
+		        	<router-link to="/user/control/favoriteList" class="menuLink"><i class="cms-favorites"></i><span class="name">收藏夹</span></router-link>
 		        </li>
 		        <li class="bottomLine">
 		        </li>
@@ -952,6 +958,9 @@
 			            </span>
 			            <p class="bRight">
 			            	<span class="status" v-if="topic.status == 10">[待审核]</span><i class="time">{{topic.postTime}}</i>
+			            	<router-link tag="span" class="favorite" :to="{path: '/user/control/topicFavoriteList', query: {topicId: topic.id}}" >
+								收藏
+							</router-link>
 			            </p> 
 			        </div>
 			    	<!-- router-link渲染成<h2>标签-->
@@ -1323,9 +1332,8 @@
 			<div v-infinite-scroll="queryUserLoginLog" infinite-scroll-disabled="loading" infinite-scroll-distance="10">
 				<ul>
 					<li v-for="userLoginLog in userLoginLogList">
-						<mt-cell :title="userLoginLog.logonTime" :label="userLoginLog.ip"></mt-cell>
+						<mt-cell :title="userLoginLog.logonTime" :label="userLoginLog.ip" :value="userLoginLog.typeNumber == 10 ? '登录' :(userLoginLog.typeNumber == 20 ? '续期':'')"></mt-cell>
 					</li>
-				
 				</ul>
 			</div>
 		</div>
@@ -1581,6 +1589,59 @@
 	</div>
 </template>
 
+<!-- 收藏夹 -->
+<template id="favorite-template">
+	<div>
+		<mt-header fixed title="收藏夹" style="background: #fafafa; color: #000000;font-size: 14px">
+	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
+	    	<router-link to="/index" slot="right">
+			    <span class="cms-home" style="font-size: 18px;"></span>
+			</router-link>
+		</mt-header>
+		<div class="favoriteModule" >
+			<div class="favoriteList">
+				<div v-infinite-scroll="queryFavorite" infinite-scroll-disabled="loading" infinite-scroll-distance="10">
+					<div class="item" v-for="favorite in favoriteList">
+			            <div class="head">
+							<span class="info" >
+			                    <h2>{{favorite.addtime}}</h2>
+			                </span>
+			                <span class="operating"><span class="delete-btn"  @click="deleteFavorite(favorite.id)"><span class="cms-trash" style="font-size: 11px;margin-right: 1px;"></span>删除</span></span>                     
+			            </div>
+			            <div class="main">
+			            	<!-- router-link渲染成<p>标签-->
+			            	<router-link tag="p" class="content" :to="{path: '/thread', query: {topicId: favorite.topicId}}" >
+								{{favorite.topicTitle}}
+							</router-link>                        
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>
+
+<!-- 话题收藏列表 -->
+<template id="topicFavorite-template">
+	<div>
+		<mt-header fixed title="话题收藏" style="background: #fafafa; color: #000000;font-size: 14px">
+	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
+	    	<router-link to="/index" slot="right">
+			    <span class="cms-home" style="font-size: 18px;"></span>
+			</router-link>
+		</mt-header>
+		<div class="userLoginLogModule">
+			<div v-infinite-scroll="queryTopicFavorite" infinite-scroll-disabled="loading" infinite-scroll-distance="10">
+				<ul>
+					<li v-for="favorite in favoriteList">
+						<mt-cell :title="favorite.userName" :label="favorite.addtime" @click.native="toUser(favorite.userName)" is-link></mt-cell>
+					</li>
+				
+				</ul>
+			</div>
+		</div>
+	</div>
+</template>
 
 
 <!-- 公共模块 -->
@@ -1642,14 +1703,14 @@
 <link href="${baseURL}${commonPath}js/vue-photo-preview/skin.css" type="text/css" rel="stylesheet">
 <script src="${commonPath}js/vue-photo-preview/vue-photo-preview.js" type="text/javascript"></script> 
 
-<link href="${baseURL}${commonPath}css/common.css" type="text/css" rel="stylesheet">
+<link href="${baseURL}${commonPath}css/common.css?2d" type="text/css" rel="stylesheet">
 <script src="${commonPath}js/better-scroll.min.js" type="text/javascript"></script> 
  
 <script src="${commonPath}js/vue-cropper.js" type="text/javascript"></script>
  
 <script src="${commonPath}js/wangeditor/wangEditor.min.js" type="text/javascript"></script>
 
-<script src="${commonPath}js/main.js" type="text/javascript"></script>
+<script src="${commonPath}js/main.js?3d" type="text/javascript"></script>
 
 
 

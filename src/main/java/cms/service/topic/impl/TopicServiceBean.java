@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import cms.bean.topic.Topic;
 import cms.service.besa.DaoSupport;
+import cms.service.favorite.FavoriteService;
 import cms.service.message.RemindService;
 import cms.service.topic.TopicService;
 import cms.utils.ObjectConversion;
@@ -29,7 +30,7 @@ import cms.utils.ObjectConversion;
 public class TopicServiceBean extends DaoSupport<Topic> implements TopicService{
 	
 	@Resource RemindService remindService;
-	
+	@Resource FavoriteService favoriteService;
 	
 	/**
 	 * 根据Id查询话题
@@ -319,6 +320,8 @@ public class TopicServiceBean extends DaoSupport<Topic> implements TopicService{
 		//删除提醒
 		remindService.deleteRemindByTopicId(topicId);
 		
+		//删除收藏
+		favoriteService.deleteFavoriteByTopicId(topicId);
 		return i;
 	}
 

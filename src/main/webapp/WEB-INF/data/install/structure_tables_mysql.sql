@@ -52,6 +52,62 @@ CREATE TABLE `disableusername` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 #
+# Structure for table "favorites_0"
+#
+
+CREATE TABLE `favorites_0` (
+  `id` varchar(36) NOT NULL,
+  `addtime` datetime DEFAULT NULL,
+  `postUserName` varchar(30) DEFAULT NULL,
+  `topicId` bigint(20) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `favorites_1_idx` (`userName`,`addtime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "favorites_1"
+#
+
+CREATE TABLE `favorites_1` (
+  `id` varchar(36) NOT NULL,
+  `addtime` datetime DEFAULT NULL,
+  `postUserName` varchar(30) DEFAULT NULL,
+  `topicId` bigint(20) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `favorites_1_idx` (`userName`,`addtime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "favorites_2"
+#
+
+CREATE TABLE `favorites_2` (
+  `id` varchar(36) NOT NULL,
+  `addtime` datetime DEFAULT NULL,
+  `postUserName` varchar(30) DEFAULT NULL,
+  `topicId` bigint(20) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `favorites_1_idx` (`userName`,`addtime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "favorites_3"
+#
+
+CREATE TABLE `favorites_3` (
+  `id` varchar(36) NOT NULL,
+  `addtime` datetime DEFAULT NULL,
+  `postUserName` varchar(30) DEFAULT NULL,
+  `topicId` bigint(20) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `favorites_1_idx` (`userName`,`addtime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
 # Structure for table "feedback"
 #
 
@@ -811,6 +867,62 @@ CREATE TABLE `topic` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 #
+# Structure for table "topicfavorite_0"
+#
+
+CREATE TABLE `topicfavorite_0` (
+  `id` varchar(40) NOT NULL,
+  `addtime` datetime DEFAULT NULL,
+  `postUserName` varchar(30) DEFAULT NULL,
+  `topicId` bigint(20) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `topicFavorite_1_idx` (`topicId`,`addtime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "topicfavorite_1"
+#
+
+CREATE TABLE `topicfavorite_1` (
+  `id` varchar(40) NOT NULL,
+  `addtime` datetime DEFAULT NULL,
+  `postUserName` varchar(30) DEFAULT NULL,
+  `topicId` bigint(20) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `topicFavorite_1_idx` (`topicId`,`addtime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "topicfavorite_2"
+#
+
+CREATE TABLE `topicfavorite_2` (
+  `id` varchar(40) NOT NULL,
+  `addtime` datetime DEFAULT NULL,
+  `postUserName` varchar(30) DEFAULT NULL,
+  `topicId` bigint(20) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `topicFavorite_1_idx` (`topicId`,`addtime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "topicfavorite_3"
+#
+
+CREATE TABLE `topicfavorite_3` (
+  `id` varchar(40) NOT NULL,
+  `addtime` datetime DEFAULT NULL,
+  `postUserName` varchar(30) DEFAULT NULL,
+  `topicId` bigint(20) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `topicFavorite_1_idx` (`topicId`,`addtime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
 # Structure for table "topicindex"
 #
 
@@ -928,6 +1040,7 @@ CREATE TABLE `userloginlog_0` (
   `ip` varchar(45) DEFAULT NULL,
   `logonTime` datetime DEFAULT NULL,
   `userId` bigint(20) DEFAULT NULL,
+  `typeNumber` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `userLoginLog_idx` (`userId`,`logonTime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -941,6 +1054,7 @@ CREATE TABLE `userloginlog_1` (
   `ip` varchar(45) DEFAULT NULL,
   `logonTime` datetime DEFAULT NULL,
   `userId` bigint(20) DEFAULT NULL,
+  `typeNumber` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `userLoginLog_idx` (`userId`,`logonTime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -954,6 +1068,7 @@ CREATE TABLE `userloginlog_2` (
   `ip` varchar(45) DEFAULT NULL,
   `logonTime` datetime DEFAULT NULL,
   `userId` bigint(20) DEFAULT NULL,
+  `typeNumber` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `userLoginLog_idx` (`userId`,`logonTime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -967,6 +1082,7 @@ CREATE TABLE `userloginlog_3` (
   `ip` varchar(45) DEFAULT NULL,
   `logonTime` datetime DEFAULT NULL,
   `userId` bigint(20) DEFAULT NULL,
+  `typeNumber` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `userLoginLog_idx` (`userId`,`logonTime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

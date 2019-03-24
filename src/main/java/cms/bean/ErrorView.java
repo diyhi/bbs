@@ -465,6 +465,42 @@ public enum ErrorView {
 		public String getContent(){
 			return "提醒不存在";
 		}
+	},
+	_1500{
+		public String getContent(){
+			return "重复收藏";
+		}
+	}
+	,
+	_1510{
+		public String getContent(){
+			return "话题收藏Id不能为空";
+		}
+	},
+	_1520{
+		public String getContent(){
+			return "当前话题已经收藏";
+		}
+	},
+	_1530{
+		public String getContent(){
+			return "收藏Id不存在";
+		}
+	},
+	_1540{
+		public String getContent(){
+			return "删除收藏失败";
+		}
+	},
+	_1550{
+		public String getContent(){
+			return "收藏不存在";
+		}
+	},
+	_1560{
+		public String getContent(){
+			return "本收藏不属于当前用户";
+		}
 	};
 	
 	

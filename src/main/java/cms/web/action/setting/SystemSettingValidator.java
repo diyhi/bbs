@@ -114,6 +114,8 @@ public class SystemSettingValidator implements Validator{
 			if(systemSetting.getTemporaryFileValidPeriod() <=0){
 				errors.rejectValue("temporaryFileValidPeriod","errors.required", new String[]{"必须大于0"},"");
 			}
+		}else{
+			errors.rejectValue("temporaryFileValidPeriod","errors.required", new String[]{"不能为空"},"");
 		}
 		if(systemSetting.getUserSentSmsCount() != null){
 			if(systemSetting.getUserSentSmsCount() <=0){

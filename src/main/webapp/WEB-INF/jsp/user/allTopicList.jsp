@@ -167,7 +167,12 @@ function reductionTopic(){
 	  	<TD width="3%"><INPUT type="checkbox" value="${entry.id}" id="topicId_${entry.id}" name="topicId" onclick="javascript:chooseSelectBox(this);"></TD>
 	    <TD width="24%">${entry.title}</TD>
 	    <TD width="17%">${entry.tagName}</TD>
-	    <TD width="8%"><c:if test="${entry.status == 10 || entry.status == 110}"><span style="color:red;">待审核</span></c:if><c:if test="${entry.status == 20 || entry.status == 120}">已发布</c:if></TD>
+	    <TD width="8%">
+	    	<c:if test="${entry.status == 10}"><span style="color:red;">待审核</span></c:if>
+	    	<c:if test="${entry.status == 110}"><span style="color:red;">待审核已删除</span></c:if>
+	    	<c:if test="${entry.status == 20}">已发布</c:if>
+	    	<c:if test="${entry.status == 120}">已发布<span style="color:red;">已删除</span></c:if>
+	    </TD>
 	    <TD width="8%"><c:if test="${entry.allow == true}">允许</c:if><c:if test="${entry.allow == false}"><span style="color: red;">禁止</span></c:if></TD>
 	    <TD width="13%">${entry.userName}<c:if test="${entry.isStaff == true}"><span style="color: green;">[员工]</span></c:if></TD>
 	    <TD width="15%"><fmt:formatDate value="${entry.postTime}" pattern="yyyy-MM-dd HH:mm:ss"/></TD>

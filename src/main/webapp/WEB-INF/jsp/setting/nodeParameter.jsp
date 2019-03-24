@@ -25,11 +25,17 @@
 				//请求数据返回时长
 				var time = Math.floor((end - start)/2);
 				
-				var serverDate = parseInt(result)+time;
+				var timeData = $.parseJSON(result);
 
+				//服务器时间戳
+				var serverDate = parseInt(timeData.currentTime)+time;
+				
 				var options = {
 			        format: '%Y-%m-%d %H:%M:%S', // 24小时制
-			      	seedTime: serverDate
+			      	seedTime: serverDate,
+			      	utc: true,
+        			utcOffset: timeData.timezoneOffset
+        		
 			    }
 			    $('#jclock').jclock(options);
 			}

@@ -520,6 +520,8 @@ public class TemplateManageAction {
 						oldDirName = templates.getDirName();
 						//重设模板目录名称
 						templates.setDirName(templateDirName);
+						//设置模板没选中
+						templates.setUses(false);
 					}
 					List<Layout> layoutList = templateData.getLayoutList();
 					if(layoutList != null && layoutList.size() >0){

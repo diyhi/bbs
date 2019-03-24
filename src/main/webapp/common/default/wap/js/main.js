@@ -106,6 +106,9 @@ Vue.prototype.unreadMessageCount = function (){
 				//本空方法不要删除，用来覆盖全局回调默认的旋转进度条
 				
 			},
+			complete : function complete(XMLHttpRequest, textStatus) {
+				//本空方法不要删除，用来覆盖全局回调默认的旋转进度条
+			}
 		});
 	}
 	
@@ -585,6 +588,8 @@ var thread_component = Vue.extend({
 			commentEditor : '',//评论富文本编辑器
 			quoteEditor: '',//引用评论富文本编辑器
 
+			alreadyCollected :false,//用户是否已经收藏话题
+			favoriteCount : 0,//话题用户收藏总数
 		};
 	},
 	created : function created() {
@@ -648,6 +653,117 @@ var thread_component = Vue.extend({
 			});
 			
 		},
+		//查询用户是否已经收藏话题
+		queryAlreadyCollected : function() {
+			var _self = this;
+			var data = "topicId=" + _self.topicId; //提交参数
+			$.ajax({
+				type : "GET",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "queryAlreadyCollected",
+				data : data,
+				success : function success(result) {
+					if (result != "") {
+						var alreadyCollected = $.parseJSON(result);
+						if (alreadyCollected != null) {
+							_self.alreadyCollected = alreadyCollected;
+						}
+					}
+				}
+			});
+		},
+		//查询话题用户收藏总数
+		queryFavoriteCount : function() {
+			var _self = this;
+			var data = "topicId=" + _self.topicId; //提交参数
+			$.ajax({
+				type : "GET",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "queryFavoriteCount",
+				data : data,
+				success : function success(result) {
+					if (result != "") {
+						var count = $.parseJSON(result);
+						if (count != null) {
+							_self.favoriteCount = count;
+						}
+					}
+				}
+			});
+		},
+		//加入收藏夹
+		addFavorite : function(id) {
+			var _self = this;
+			_self.$messagebox.confirm('确定加入收藏夹?').then(function (action) {
+				var parameter = "&topicId=" + id;
+
+				//	alert(parameter);
+				//令牌
+				parameter += "&token=" + _self.$store.state.token;
+				$.ajax({
+					type : "POST",
+					cache : false,
+					async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+					url : "user/control/favorite/add",
+					data : parameter,
+					success : function success(result) {
+						if (result != "") {
+
+							var returnValue = $.parseJSON(result);
+
+							var value_success = "";
+							var value_error = null;
+
+							for (var key in returnValue) {
+								if (key == "success") {
+									value_success = returnValue[key];
+								} else if (key == "error") {
+									value_error = returnValue[key];
+								}
+							}
+
+							//加入成功
+							if (value_success == "true") {
+								_self.$toast({
+									message : "加入成功",
+									duration : 3000,
+									className : "mint-ui-toast",
+								});
+
+								setTimeout(function() {
+									//刷新用户是否已经收藏话题
+									_self.queryAlreadyCollected();
+									
+									//刷新话题用户收藏总数
+									_self.queryFavoriteCount();
+								}, 3000);
+								
+							} else {
+								//显示错误
+								if (value_error != null) {
+
+
+									var htmlContent = "";
+									var count = 0;
+									for (var errorKey in value_error) {
+										var errorValue = value_error[errorKey];
+										count++;
+										htmlContent += count + ". " + errorValue + "<br>";
+									}
+									_self.$messagebox('提示', htmlContent);
+
+								}
+							}
+						}
+					}
+				});
+			}).catch(function (err){//不捕获 Promise 的异常,若用户点击了取消按钮,会出现警告
+			    console.log(err);
+			});
+		},
+		
 		//查询评论列表
 		queryCommentList : function() {
 			var _self = this;
@@ -1361,6 +1477,11 @@ var thread_component = Vue.extend({
 			this.queryTopic();
 			//查询评论列表
 			this.queryCommentList();
+			
+			//查询用户是否已经收藏话题
+			this.queryAlreadyCollected();
+			//查询话题用户收藏总数
+			this.queryFavoriteCount();
 		},
 		//初始化BScroll滚动插件//this.$refs.addCommentFormScroll
 		initScroll : function initScroll(ref) {
@@ -5360,6 +5481,201 @@ var remind_component = Vue.extend({
 	}
 
 });
+
+
+
+//收藏夹
+var favorite_component = Vue.extend({
+	template : '#favorite-template',
+	data : function data() {
+		return {
+			favoriteList : [], //收藏夹集合
+			loading : false, //加载中
+			currentpage : 0, //当前页码
+			totalpage : 1, //总页数
+		}
+	},
+	created : function created() {
+		this.queryFavorite();
+	},
+	methods : {
+		//查询收藏夹分页
+		queryFavorite : function() {
+			var _self = this;
+			
+			if (_self.currentpage < _self.totalpage) {
+				
+				//先改总页数为0，避免请求为空时死循环
+				_self.totalpage = 0;
+				_self.loading = true;
+				var data = "page=" + (_self.currentpage + 1); //提交参数
+				$.ajax({
+					type : "GET",
+					cache : false,
+					async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+					url : "user/control/favoriteList",
+					data : data,
+					success : function success(result) {
+						if (result != "") {
+							var pageView = $.parseJSON(result);
+							var new_favoriteList = pageView.records;
+							if (new_favoriteList != null && new_favoriteList.length > 0) {
+								_self.favoriteList.push.apply(_self.favoriteList, new_favoriteList); //合并两个数组
+							}
+							_self.currentpage = pageView.currentpage;
+							_self.totalpage = pageView.totalpage;
+						}
+					},
+					complete : function complete(XMLHttpRequest, textStatus) {
+						_self.loading = false;
+						//需手动调用设置的全局complete
+						$.ajaxSettings.complete(XMLHttpRequest, textStatus);
+					}
+				});
+			}
+		},
+		//删除收藏夹
+		deleteFavorite : function(id) {
+			var _self = this;
+			_self.$messagebox.confirm('确定删除收藏?').then(function (action) {
+				var parameter = "&favoriteId=" + id;
+
+				//	alert(parameter);
+				//令牌
+				parameter += "&token=" + _self.$store.state.token;
+				$.ajax({
+					type : "POST",
+					cache : false,
+					async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+					url : "user/control/deleteFavorite",
+					data : parameter,
+					success : function success(result) {
+						if (result != "") {
+
+							var returnValue = $.parseJSON(result);
+
+							var value_success = "";
+							var value_error = null;
+
+							for (var key in returnValue) {
+								if (key == "success") {
+									value_success = returnValue[key];
+								} else if (key == "error") {
+									value_error = returnValue[key];
+								}
+							}
+
+							//删除成功
+							if (value_success == "true") {
+								_self.$toast({
+									message : "删除成功",
+									duration : 3000,
+									className : "mint-ui-toast",
+								});
+
+								setTimeout(function() {
+									_self.favoriteList = [];
+									_self.currentpage = 0;
+									_self.totalpage = 1;
+									//刷新系统通知
+									_self.queryFavorite();
+								}, 3000);
+								
+							} else {
+								//显示错误
+								if (value_error != null) {
+
+
+									var htmlContent = "";
+									var count = 0;
+									for (var errorKey in value_error) {
+										var errorValue = value_error[errorKey];
+										count++;
+										htmlContent += count + ". " + errorValue + "<br>";
+									}
+									_self.$messagebox('提示', htmlContent);
+
+								}
+							}
+						}
+					}
+				});
+			}).catch(function (err){//不捕获 Promise 的异常,若用户点击了取消按钮,会出现警告
+			    console.log(err);
+			});
+		}
+	}
+});
+
+
+
+//话题收藏列表
+var topicFavorite_component = Vue.extend({
+	template : '#topicFavorite-template',
+	data : function data() {
+		return {
+			favoriteList : [], //收藏集合
+			loading : false, //加载中
+			currentpage : 0, //当前页码
+			totalpage : 1, //总页数
+		}
+	},
+	created : function created() {
+		this.queryTopicFavorite();
+	},
+	methods : {
+		//查询收藏分页
+		queryTopicFavorite : function() {
+			var _self = this;
+			
+			if (_self.currentpage < _self.totalpage) {
+				
+				//先改总页数为0，避免请求为空时死循环
+				_self.totalpage = 0;
+				_self.loading = true;
+				var data = "page=" + (_self.currentpage + 1); //提交参数
+				data += "&topicId="+getUrlParam("topicId");
+				$.ajax({
+					type : "GET",
+					cache : false,
+					async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+					url : "user/control/topicFavoriteList",
+					data : data,
+					success : function success(result) {
+						if (result != "") {
+							var pageView = $.parseJSON(result);
+							var new_favoriteList = pageView.records;
+							if (new_favoriteList != null && new_favoriteList.length > 0) {
+								_self.favoriteList.push.apply(_self.favoriteList, new_favoriteList); //合并两个数组
+							}
+							_self.currentpage = pageView.currentpage;
+							_self.totalpage = pageView.totalpage;
+						}
+					},
+					complete : function complete(XMLHttpRequest, textStatus) {
+						_self.loading = false;
+						//需手动调用设置的全局complete
+						$.ajaxSettings.complete(XMLHttpRequest, textStatus);
+					}
+				});
+			}
+		},
+		
+		//跳转到用户
+		toUser : function(userName) {
+			this.$router.push({
+				path : '/user/control/home',
+				query : {
+					userName : userName
+				}
+			});
+		}
+	}
+});
+
+
+
+
 /**------------------------------------------- 公共组件 ------------------------------------------------**/
 
 //底部选项卡
@@ -5507,6 +5823,8 @@ var routes = [
 	{path : '/user/control/privateMessageChatList',component : privateMessageChat_component}, //私信对话
 	{path : '/user/control/systemNotifyList',component : systemNotify_component}, //系统通知
 	{path : '/user/control/remindList',component : remind_component}, //提醒
+	{path : '/user/control/favoriteList',component : favorite_component}, //收藏夹
+	{path : '/user/control/topicFavoriteList',component : topicFavorite_component}, //话题收藏列表
 	{path : '*',redirect : '/index'} //其余路由重定向至首页
 ];
 

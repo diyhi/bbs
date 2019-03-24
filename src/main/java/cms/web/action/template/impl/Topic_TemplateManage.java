@@ -282,6 +282,16 @@ public class Topic_TemplateManage {
 		
 		Long topicId = null;
 		String ip = null;
+		
+		AccessUser accessUser = null;
+		//获取运行时参数
+		if(runtimeParameter != null && runtimeParameter.size() >0){		
+			for(Map.Entry<String,Object> paramIter : runtimeParameter.entrySet()) {
+				if("accessUser".equals(paramIter.getKey())){
+					accessUser = (AccessUser)paramIter.getValue();
+				}
+			}
+		}
 		if(parameter != null && parameter.size() >0){
 			for(Map.Entry<String,Object> paramIter : parameter.entrySet()) {
 				if("topicId".equals(paramIter.getKey())){
@@ -303,17 +313,28 @@ public class Topic_TemplateManage {
 				}
 			}
 		}
-		if(topicId != null && topicId > 0){
+		if(topicId != null && topicId > 0L){
 			Topic topic = topicManage.queryTopicCache(topicId);//查询缓存
 			
 			if(topic != null){
 				if(ip != null){
 					topicManage.addView(topicId, ip);
 				}
-				if(!topic.getStatus().equals(20)){//已发布
-					return null;
-				}
 				
+				if(topic.getStatus() >20){//20:已发布
+					return null;
+					
+				}else{
+					if(topic.getStatus().equals(10) ){
+						if(accessUser == null){
+							return null;
+						}else{
+							if(!accessUser.getUserName().equals(topic.getUserName())){
+								return null;
+							}
+						}
+					}	
+				}
 				
 				topic.setIpAddress(null);//IP地址不显示
 				Tag tag = tagService.findById(topic.getTagId());

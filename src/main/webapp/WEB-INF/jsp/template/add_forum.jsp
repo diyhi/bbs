@@ -24,6 +24,7 @@
      //定义了分类二维数组，里面的顺序跟分类的顺序是相同的。通过selectedIndex获得分类的下标值来得到相应的分类数组
      var type=[
      ["话题列表","话题内容","评论列表","标签列表","添加话题","添加评论","引用评论","回复评论","相拟话题"],
+     ["加入收藏夹","动态图片会员收藏总数","用户是否已经收藏动态图片"],
      ["添加在线留言"],
      ["友情链接列表"],
      ["图片广告"],
@@ -648,6 +649,7 @@ function delete_searchWord_row(rowId){
 		<SELECT id="firstLevel" onChange="getAllChildForum();" >
 			<OPTION VALUE="0">==请选择版块==</OPTION>
 			<OPTION VALUE="话题">话题</OPTION>
+			<OPTION VALUE="收藏夹">收藏夹</OPTION>
 			<OPTION VALUE="在线留言">在线留言</OPTION>
 			<OPTION VALUE="友情链接">友情链接</OPTION>
             <OPTION VALUE="广告">广告</OPTION>

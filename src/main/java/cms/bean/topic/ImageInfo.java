@@ -13,6 +13,11 @@ public class ImageInfo implements Serializable{
 	/** 图片名称 **/
 	private String name;
 	
+	public ImageInfo() {}
+	public ImageInfo(String path, String name) {
+		this.path = path;
+		this.name = name;
+	}
 	public String getPath() {
 		return path;
 	}

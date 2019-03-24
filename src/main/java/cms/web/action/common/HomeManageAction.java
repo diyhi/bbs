@@ -35,6 +35,7 @@ import cms.bean.ErrorView;
 import cms.bean.PageForm;
 import cms.bean.PageView;
 import cms.bean.QueryResult;
+import cms.bean.favorite.Favorites;
 import cms.bean.message.PrivateMessage;
 import cms.bean.message.Remind;
 import cms.bean.message.SubscriptionSystemNotify;
@@ -52,6 +53,7 @@ import cms.bean.user.UserCustom;
 import cms.bean.user.UserGrade;
 import cms.bean.user.UserInputValue;
 import cms.bean.user.UserLoginLog;
+import cms.service.favorite.FavoriteService;
 import cms.service.message.PrivateMessageService;
 import cms.service.message.RemindService;
 import cms.service.message.SystemNotifyService;
@@ -78,6 +80,7 @@ import cms.web.action.AccessSourceDeviceManage;
 import cms.web.action.CSRFTokenManage;
 import cms.web.action.FileManage;
 import cms.web.action.TextFilterManage;
+import cms.web.action.favorite.FavoriteManage;
 import cms.web.action.message.PrivateMessageManage;
 import cms.web.action.message.RemindManage;
 import cms.web.action.message.SubscriptionSystemNotifyManage;
@@ -134,7 +137,9 @@ public class HomeManageAction {
 	@Resource OAuthManage oAuthManage;
 	
 	@Resource ThumbnailManage thumbnailManage;
+	@Resource FavoriteService favoriteService;
 	
+	@Resource FavoriteManage favoriteManage;
 	/**--------------------------------- 首页 -----------------------------------**/
 	/**
 	 * 用户中心页
@@ -3193,6 +3198,232 @@ public class HomeManageAction {
 				return "redirect:"+url;
 			}else{//默认跳转
 				model.addAttribute("message", "删除提醒成功");
+				String referer = request.getHeader("referer");
+				if(RefererCompare.compare(request, "login")){//如果是登录页面则跳转到首页
+					referer = Configuration.getUrl(request);
+				}
+				model.addAttribute("urlAddress", referer);
+				
+				return "templates/"+dirName+"/"+accessPath+"/jump";	
+			}
+		}
+		
+	}
+	
+	/**
+	 * 话题收藏列表
+	 * @param model
+	 * @param pageForm
+	 * @param topicId 话题Id
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/user/control/topicFavoriteList",method=RequestMethod.GET) 
+	public String topicFavoriteList(ModelMap model,PageForm pageForm,Long topicId,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+		
+		String dirName = templateService.findTemplateDir_cache();
+		
+		
+		String accessPath = accessSourceDeviceManage.accessDevices(request);
+	   
+		//调用分页算法代码
+		PageView<Favorites> pageView = new PageView<Favorites>(settingService.findSystemSetting_cache().getForestagePageNumber(),pageForm.getPage(),10,request.getRequestURI(),request.getQueryString());
+		
+		//获取登录用户
+	  	AccessUser accessUser = AccessUserThreadLocal.get();
+	  	if(topicId != null && topicId > 0L){
+	  		Topic topicInfo = topicManage.queryTopicCache(topicId);//查询缓存
+	  		if(topicInfo != null && topicInfo.getUserName().equals(accessUser.getUserName())){
+	  			//当前页
+	  			int firstIndex = (pageForm.getPage()-1)*pageView.getMaxresult();
+	  			
+	  			
+	  			QueryResult<Favorites> qr = favoriteService.findFavoritePageByTopicId(firstIndex,pageView.getMaxresult(),topicId);
+	  			if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
+	  				for(Favorites favorites : qr.getResultlist()){
+	  					Topic topic = topicManage.queryTopicCache(favorites.getTopicId());//查询缓存
+	  					if(topic != null){
+	  						favorites.setTopicTitle(topic.getTitle());
+	  					}
+	  				}
+	  			}
+	  			//将查询结果集传给分页List
+	  			pageView.setQueryResult(qr);
+	  		}
+	  	}
+	  	
+	  	
+		
+		
+		if(isAjax){
+			WebUtil.writeToWeb(JsonUtils.toJSONString(pageView), "json", response);
+			return null;
+		}else{
+			model.addAttribute("pageView", pageView);
+			return "templates/"+dirName+"/"+accessPath+"/topicFavoriteList";	
+		}
+	}
+	
+	
+	/**
+	 * 收藏夹列表
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/user/control/favoriteList",method=RequestMethod.GET) 
+	public String favoriteList(ModelMap model,PageForm pageForm,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+		
+		String dirName = templateService.findTemplateDir_cache();
+		
+		
+		String accessPath = accessSourceDeviceManage.accessDevices(request);
+	   
+		
+		//获取登录用户
+	  	AccessUser accessUser = AccessUserThreadLocal.get();
+	  	
+	  	
+		//调用分页算法代码
+		PageView<Favorites> pageView = new PageView<Favorites>(settingService.findSystemSetting_cache().getForestagePageNumber(),pageForm.getPage(),10,request.getRequestURI(),request.getQueryString());
+		//当前页
+		int firstIndex = (pageForm.getPage()-1)*pageView.getMaxresult();
+		
+		QueryResult<Favorites> qr = favoriteService.findFavoriteByUserId(accessUser.getUserId(),accessUser.getUserName(),firstIndex,pageView.getMaxresult());
+		if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
+			for(Favorites favorites : qr.getResultlist()){
+				Topic topic = topicManage.queryTopicCache(favorites.getTopicId());//查询缓存
+				if(topic != null){
+					favorites.setTopicTitle(topic.getTitle());
+				}
+			}
+		}
+		//将查询结果集传给分页List
+		pageView.setQueryResult(qr);
+		
+		if(isAjax){
+			WebUtil.writeToWeb(JsonUtils.toJSONString(pageView), "json", response);
+			return null;
+		}else{
+			model.addAttribute("pageView", pageView);
+			return "templates/"+dirName+"/"+accessPath+"/favoriteList";	
+		}
+	}
+	
+	
+	/**
+	 * 删除收藏
+	 * @param model
+	 * @param jumpUrl 跳转地址   页面post方式提交有效
+	 * @param token 令牌标记
+	 * @param remindId 提醒Id
+	 */
+	@RequestMapping(value="/user/control/deleteFavorite", method=RequestMethod.POST)
+	public String deleteFavorite(ModelMap model,String jumpUrl,String token,String favoriteId,
+			RedirectAttributes redirectAttrs,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		
+		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+		Map<String,String> error = new HashMap<String,String>();//错误
+		
+		
+		//判断令牌
+		if(token != null && !"".equals(token.trim())){	
+			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌
+			if(token_sessionid != null && !"".equals(token_sessionid.trim())){
+				if(!token_sessionid.equals(token)){
+					error.put("token", ErrorView._13.name());
+				}
+			}else{
+				error.put("token", ErrorView._12.name());
+			}
+		}else{
+			error.put("token", ErrorView._11.name());
+		}
+		
+		//获取登录用户
+	  	AccessUser accessUser = AccessUserThreadLocal.get();
+	  	Favorites favorites = null;
+	  	//话题收藏Id
+	  	String topicFavoriteId = null;
+  		if(favoriteId == null || "".equals(favoriteId.trim())){
+  			error.put("favorite", ErrorView._1530.name());//收藏Id不存在
+  		}else{
+  			favorites  = favoriteService.findById(favoriteId.trim());
+  			if(favorites != null){
+  				if(favorites.getUserName().equals(accessUser.getUserName())){
+  					topicFavoriteId = favoriteManage.createTopicFavoriteId(favorites.getTopicId(), accessUser.getUserId());
+  				}else{
+  					error.put("favorite", ErrorView._1560.name());//本收藏不属于当前用户
+  				}
+  			}else{
+  				error.put("favorite", ErrorView._1550.name());//收藏不存在
+  			}
+  		}
+  		
+		if(error.size() == 0){
+			int i = favoriteService.deleteFavorite(favoriteId.trim(),topicFavoriteId);
+			if(i == 0){
+				error.put("favorite", ErrorView._1540.name());//删除收藏失败
+			}
+			//删除收藏缓存
+			favoriteManage.delete_cache_findTopicFavoriteById(topicFavoriteId);
+			favoriteManage.delete_cache_findFavoriteCountByTopicId(favorites.getTopicId());
+		}
+		
+		Map<String,String> returnError = new HashMap<String,String>();//错误
+		if(error.size() >0){
+			//将枚举数据转为错误提示字符
+    		for (Map.Entry<String,String> entry : error.entrySet()) {
+    			if(ErrorView.get(entry.getValue()) != null){
+    				returnError.put(entry.getKey(),  ErrorView.get(entry.getValue()));
+    			}else{
+    				returnError.put(entry.getKey(),  entry.getValue());
+    			}
+    			
+			}
+		}
+		
+		if(isAjax == true){
+    		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
+    		
+    		if(error != null && error.size() >0){
+    			returnValue.put("success", "false");
+    			returnValue.put("error", returnError);
+    		}else{
+    			returnValue.put("success", "true");
+    			
+    		}
+
+    		WebUtil.writeToWeb(JsonUtils.toJSONString(returnValue), "json", response);
+			return null;
+		}else{
+			String dirName = templateService.findTemplateDir_cache();
+			String accessPath = accessSourceDeviceManage.accessDevices(request);
+			if(error != null && error.size() >0){//如果有错误
+				
+				for (Map.Entry<String,String> entry : returnError.entrySet()) {		 
+					model.addAttribute("message",entry.getValue());//提示
+		  			return "templates/"+dirName+"/"+accessPath+"/message";
+				}
+					
+			}
+			
+			
+			if(jumpUrl != null && !"".equals(jumpUrl.trim())){
+				String url = Base64.decodeBase64URL(jumpUrl.trim());
+				return "redirect:"+url;
+			}else{//默认跳转
+				model.addAttribute("message", "删除收藏成功");
 				String referer = request.getHeader("referer");
 				if(RefererCompare.compare(request, "login")){//如果是登录页面则跳转到首页
 					referer = Configuration.getUrl(request);

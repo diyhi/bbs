@@ -461,6 +461,42 @@ public class TopicLuceneManage {
 	}
 
 	/**
+	 * 删除用户名称下的索引
+	 * @param userName 用户名称
+	 */
+	public void deleteIndex(String userName){
+		IndexWriter iw = TopicLuceneInit.INSTANCE.getIndexWriter();
+		try { 
+			//精确查询
+			Query q = new TermQuery(new Term("userName", userName));
+			if(q != null){
+				iw.deleteDocuments(q);//删除指定ID的Document   
+				iw.forceMergeDeletes();
+				iw.commit();//提交   
+			}
+		} catch (CorruptIndexException e) {
+			// TODO Auto-generated catch block
+		//	e.printStackTrace();
+			if (logger.isErrorEnabled()) {
+	            logger.error("删除用户名称下索引",e);
+	        }
+		} catch (LockObtainFailedException e) {
+			// TODO Auto-generated catch block
+		//	e.printStackTrace();
+			if (logger.isErrorEnabled()) {
+	            logger.error("删除用户名称下索引",e);
+	        }
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+		//	e.printStackTrace();
+			if (logger.isErrorEnabled()) {
+	            logger.error("删除用户名称下索引",e);
+	        }
+		}
+		
+	}
+	
+	/**
 	 * 删除索引
 	 * @param topicIdList 话题Id集合
 	 */
@@ -472,10 +508,13 @@ public class TopicLuceneManage {
 
 				//集合查询
 				Query q  = LongPoint.newSetQuery("id", topicIdList);
-				iw.deleteDocuments(q);//删除指定ID的Document 
-				
-				iw.forceMergeDeletes();
-				iw.commit();//提交   
+				if(q != null){
+					iw.deleteDocuments(q);//删除指定ID的Document 
+					
+					iw.forceMergeDeletes();
+					iw.commit();//提交  
+				}
+				 
 			}
 		} catch (CorruptIndexException e) {
 			// TODO Auto-generated catch block

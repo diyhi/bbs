@@ -120,5 +120,37 @@ public class BeanFactoryPost implements BeanFactoryPostProcessor{
 				}	
 			}
 		}
+		
+		BeanDefinition favorites_bd = beanFactory.getBeanDefinition("favoritesConfig");
+		if(favorites_bd != null){
+			MutablePropertyValues mutablePropertyValues = favorites_bd.getPropertyValues();
+			TypedStringValue typedStringValue = (TypedStringValue)mutablePropertyValues.getPropertyValue("tableQuantity").getValue();
+
+			//收藏夹分表数量
+			Integer tableQuantity = Integer.parseInt(typedStringValue.getValue());
+			if(tableQuantity >1){
+				for(int i =1; i<tableQuantity; i++){
+					
+					//初始化收藏夹bean
+					CreateBean.createFavoritesBean(i);
+				}	
+			}
+		}
+		
+		BeanDefinition topicFavorite_bd = beanFactory.getBeanDefinition("topicFavoriteConfig");
+		if(topicFavorite_bd != null){
+			MutablePropertyValues mutablePropertyValues = topicFavorite_bd.getPropertyValues();
+			TypedStringValue typedStringValue = (TypedStringValue)mutablePropertyValues.getPropertyValue("tableQuantity").getValue();
+
+			//话题收藏分表数量
+			Integer tableQuantity = Integer.parseInt(typedStringValue.getValue());
+			if(tableQuantity >1){
+				for(int i =1; i<tableQuantity; i++){
+					
+					//初始化话题收藏bean
+					CreateBean.createTopicFavoriteBean(i);
+				}	
+			}
+		}
 	}
 }

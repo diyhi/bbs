@@ -230,4 +230,15 @@
 		overflowToDisk="true"
 		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
 		memoryStoreEvictionPolicy="LFU" />	
+		
+	<!-- 根据Id查询话题收藏 -->
+	<cache name="favoriteManage_cache_findTopicFavoriteById" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" />	
+	<!-- 根据话题Id查询被收藏数量 -->
+	<cache name="favoriteManage_cache_findFavoriteCountByTopicId" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" />		
 </ehcache>

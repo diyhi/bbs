@@ -310,6 +310,10 @@ $(function() {
 	<c:if test="${param.origin == 30 }">
 		<input class="functionButton" type="button" onClick="javascript:window.location.href='${config:url(pageContext.request)}control/user/manage${config:suffix()}?method=allReply&userName=${param.userName}&id=${param.id}&queryState=${param.queryState}&jumpStatus=${param.jumpStatus}&userPage=${param.userPage}&page=${param.replyPage}'" value="返回">
 	</c:if>
+	<!-- 来自用户的收藏夹 -->
+	<c:if test="${param.origin == 40 }">
+		<input class="functionButton" type="button" onClick="javascript:window.location.href='${config:url(pageContext.request)}control/favorite/list${config:suffix()}?userName=${param.userName}&id=${param.id}&queryState=${param.queryState}&jumpStatus=${param.jumpStatus}&userPage=${param.userPage}&page=${param.favoritePage}'" value="返回">
+	</c:if>
 </div>
 
 <TABLE class="t-list-table" cellSpacing="1" cellPadding="0" width="100%" border="0" style="table-layout:fixed;">
@@ -341,11 +345,13 @@ $(function() {
 				<TABLE  cellSpacing="2" cellPadding="0" width="99%"  border="0">
 					<TR class="noDiscolor">
 						<TD width="50%" style="border-top: #bfe3ff 1px dotted;" align="left">
+							查看总数：${topic.viewTotal}&nbsp;&nbsp;&nbsp;&nbsp;评论总数：${topic.commentTotal}
 						</TD>
 						<TD width="50%" style="border-top: #bfe3ff 1px dotted;" align="right">
 							<c:if test="${topic.status == 10}">
 								<A onclick="javascript:if(window.confirm('确定发布吗? ')){auditTopic('${topic.id}');return false;}else{return false};" hidefocus="true" href="#" ondragstart= "return false">立即审核</A>&nbsp;&nbsp;
 							</c:if>
+							<A hidefocus="true"  href="control/topicFavorite/list${config:suffix()}?topicId=${topic.id}&visible=${param.visible}&topicPage=${param.topicPage}&userName=${param.userName}&id=${param.id}&queryState=${param.queryState}&jumpStatus=${param.jumpStatus}&userPage=${param.userPage}&commentPage=${param.commentPage}&replyPage=${param.replyPage}" ondragstart= "return false">收藏夹</A>&nbsp;&nbsp;
 							<A hidefocus="true" onClick="showUpdateTopic('${topic.id}'); return false" href="#" ondragstart= "return false">修改</A>&nbsp;&nbsp;
 							<A hidefocus="true" onClick="deleteTopic('${topic.id}'); return false;" href="#" ondragstart= "return false">删除</A>
 						</TD>

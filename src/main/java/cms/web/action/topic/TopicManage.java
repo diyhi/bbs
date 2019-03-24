@@ -17,15 +17,19 @@ import org.springframework.stereotype.Component;
 import com.google.common.util.concurrent.AtomicLongMap;
 
 import cms.bean.staff.SysUsers;
+import cms.bean.thumbnail.Thumbnail;
+import cms.bean.topic.ImageInfo;
 import cms.bean.topic.Topic;
 import cms.bean.user.User;
 import cms.service.staff.StaffService;
+import cms.service.thumbnail.ThumbnailService;
 import cms.service.topic.CommentService;
 import cms.service.topic.TopicService;
 import cms.service.user.UserService;
 import cms.web.action.FileManage;
 import cms.web.action.TextFilterManage;
 import cms.web.action.cache.CacheManage;
+import cms.web.action.thumbnail.ThumbnailManage;
 /**
  * 话题管理
  *
@@ -39,7 +43,8 @@ public class TopicManage {
 	@Resource StaffService staffService;
 	@Resource UserService userService;
 	@Resource FileManage fileManage;
-	
+	@Resource ThumbnailService thumbnailService;
+	@Resource ThumbnailManage thumbnailManage;
 	@Resource CacheManage cacheManage;
 	
 	//key: 话题Id value:展示次数
@@ -181,13 +186,24 @@ public class TopicManage {
 				
 				if(topicContent != null && !"".equals(topicContent.trim())){
 					Object[] obj = textFilterManage.readPathName(topicContent,"topic");
+					List<Thumbnail> thumbnailList = thumbnailService.findAllThumbnail_cache();
 					if(obj != null && obj.length >0){
 						List<String> filePathList = new ArrayList<String>();
+						List<ImageInfo> imageInfoList = new ArrayList<ImageInfo>();//删除缩略图
 						
 						//删除图片
 						List<String> imageNameList = (List<String>)obj[0];		
 						for(String imageName :imageNameList){
 							filePathList.add(imageName);
+							
+							if(thumbnailList != null && thumbnailList.size() >0){
+								//获取文件路径
+								String path = fileManage.getFullPath(imageName);
+								//获取文件名,含后缀
+								String name = fileManage.getName(imageName);
+								
+								imageInfoList.add(new ImageInfo(path,name));
+							}
 							
 						}
 						//删除Flash
@@ -226,18 +242,21 @@ public class TopicManage {
 								fileManage.failedStateFile("file"+File.separator+"topic"+File.separator+"lock"+File.separator+filePath.replaceAll("/","_"));
 							}
 						}
-						
-						//清空目录
-						Boolean state_ = fileManage.removeDirectory("file"+File.separator+"comment"+File.separator+topicId+File.separator);
-						if(state_ != null && state_ == false){
-							//创建删除失败目录文件
-							fileManage.failedStateFile("file"+File.separator+"comment"+File.separator+"lock"+File.separator+"#"+topicId);
+						//删除缩略图
+						if(imageInfoList != null && imageInfoList.size()>0){
+							thumbnailManage.deleteThumbnail(thumbnailList, imageInfoList);
 						}
 						
 					}
 				}
+				//清空目录
+				Boolean state_ = fileManage.removeDirectory("file"+File.separator+"comment"+File.separator+topicId+File.separator);
+				if(state_ != null && state_ == false){
+					//创建删除失败目录文件
+					fileManage.failedStateFile("file"+File.separator+"comment"+File.separator+"lock"+File.separator+"#"+topicId);
+				}
 			}
-		
+			
 		}
 	}
 	

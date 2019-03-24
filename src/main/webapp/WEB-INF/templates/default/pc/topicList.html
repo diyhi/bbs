@@ -29,9 +29,10 @@
 		<TABLE class="dataList" width="100%">
 			<THEAD>
 				<TR class="dataThead">
-					<TH width="50%">标题</TH>	
+					<TH width="40%">标题</TH>	
 					<TH width="30%">标签</TH>	
 					<TH width="20%">发表时间</TH>
+					<TH width="10%">收藏</TH>
 				</TR>
 			</THEAD>
 			<TBODY>
@@ -46,6 +47,9 @@
 					</TD>
 					<TD class="dataTD">
 						${topic.postTime}
+					</TD>
+					<TD class="dataTD">
+						<a href="user/control/topicFavoriteList?topicId=${topic.id}" class="link">查看</a>
 					</TD>
 	    		</TR>
 	    		</#list>

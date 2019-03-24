@@ -1,13 +1,14 @@
 <#-- 服务导航 公共页(生成新引用页) -->
 <div>
 	<ul class="serviceNav">
-	    <li class="title <#if baseURI == 'user/control/topicList'> selected</#if>"><a href="user/control/topicList">我的话题</a></li>
+	    <li class="title <#if baseURI == 'user/control/topicList'> selected</#if> || baseURI == 'user/control/topicFavoriteList'"><a href="user/control/topicList">我的话题</a></li>
 	    <li class="title <#if baseURI == 'user/control/commentList'> selected</#if>"><a href="user/control/commentList">我的评论</a></li>
 	    <li class="title <#if baseURI == 'user/control/replyList'> selected</#if>"><a href="user/control/replyList">我的回复</a></li>
 	    <li class="title <#if baseURI == 'user/control/editUser'> selected</#if>" ><a href="user/control/editUser">修改个人资料</a></li>
 	    <li class="title <#if baseURI == 'user/control/realNameAuthentication' || baseURI == 'user/control/phoneBinding' || baseURI == 'user/control/updatePhoneBinding/step1' || baseURI == 'user/control/updatePhoneBinding/step2'> selected</#if>"><a href="user/control/realNameAuthentication">实名认证</a></li>
 	    <li class="title <#if baseURI == 'user/control/point'> selected</#if>" ><a href="user/control/point">积分日志</a></li>
 	    <li class="title <#if baseURI == 'user/control/userLoginLogList'> selected</#if>"><a href="user/control/userLoginLogList">登录日志</a></li>
+	    <li class="title <#if baseURI == 'user/control/favoriteList'> selected</#if>"><a href="user/control/favoriteList">收藏夹</a></li>
 	    <li class="title <#if baseURI == 'user/control/privateMessageList' ||  baseURI == 'user/control/privateMessageChatList'> selected</#if>"><a href="user/control/privateMessageList">私信</a></li>
     	<li class="title <#if baseURI == 'user/control/systemNotifyList'> selected</#if>"><a href="user/control/systemNotifyList">系统通知</a></li>
     	<li class="title <#if baseURI == 'user/control/remindList'> selected</#if>"><a href="user/control/remindList">提醒</a></li>

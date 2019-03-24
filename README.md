@@ -46,16 +46,16 @@ JDK 1.8及以上 + Tomcat 8.0及以上 + MySQL 5.5.3及以上
 <br><br>
 #### 源码运行教程
 
-1.将源代码导入到Eclipse中(基于Maven)，然后启动Tomcat
+1.将源代码导入到Eclipse中(基于Maven)
 
 
 2.修改数据库配置文件:修改项目下src\main\resources\druid.properties文件，请自行替换数据库信息
 ![输入图片说明](https://raw.githubusercontent.com/diyhi/bbs/master/image/100.png "100.png")
 
+3.然后启动Tomcat
 
 
-
-3.在Eclipse中打开src\test\java\forum\Init.java执行main方法，将SQL导入到数据库,然后重启Tomcat即可正常运行。管理员初始账号admin 密码1234567(可自行修改)
+4.在Eclipse中打开src\test\java\forum\Init.java执行main方法，将SQL导入到数据库,然后重启Tomcat即可正常运行。管理员初始账号admin 密码1234567(可自行修改)
 ![输入图片说明](https://raw.githubusercontent.com/diyhi/bbs/master/image/200.png "200.png")
 
 
@@ -68,7 +68,7 @@ JDK 1.8及以上 + Tomcat 8.0及以上 + MySQL 5.5.3及以上
 
 （3）友情链接管理(友情链接列表)
 
-（4）会员管理(会员列表、会员等级、会员注册项、会员注册禁止用户名称、会员搜索、登录日志、更换头像、私信、系统通知、提醒)
+（4）会员管理(会员列表、会员等级、会员注册项、会员注册禁止用户名称、会员搜索、登录日志、更换头像、私信、系统通知、提醒、收藏夹)
 
 （5）员工管理(员工列表、角色列表、登录日志)
 

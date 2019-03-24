@@ -27,6 +27,7 @@ import cms.web.action.AccessSourceDeviceManage;
 import cms.web.action.template.impl.Advertising_TemplateManage;
 import cms.web.action.template.impl.Column_TemplateManage;
 import cms.web.action.template.impl.CustomForum_TemplateManage;
+import cms.web.action.template.impl.Favorite_TemplateManage;
 import cms.web.action.template.impl.Feedback_TemplateManage;
 import cms.web.action.template.impl.Help_TemplateManage;
 import cms.web.action.template.impl.Links_TemplateManage;
@@ -58,7 +59,7 @@ public class TemplateMain {
 	@Resource Help_TemplateManage help_TemplateManage;//在线帮助 -- 模板方法实现
 	@Resource Advertising_TemplateManage advertising_TemplateManage;//广告 -- 模板方法实现
 	
-
+	@Resource Favorite_TemplateManage favorite_TemplateManage;//收藏夹 -- 模板方法实现
 	
 	@Resource CustomForum_TemplateManage customForum_TemplateManage;//自定义版块 -- 模板方法实现
 	@Resource System_TemplateManage system_TemplateManage;//系统部分 -- 模板方法实现
@@ -146,6 +147,21 @@ public class TemplateMain {
 		}else if(forum.getForumChildType().equals("回复评论")){
 			if(forum.getDisplayType().equals("collection")){//集合
 				Map<String,Object> value = topic_TemplateManage.replyComment_collection(forum, submitParameter,runtimeParameter);
+				return value;
+			}
+		}else if(forum.getForumChildType().equals("加入收藏夹")){
+			if(forum.getDisplayType().equals("collection")){//集合
+				Map<String,Object> value = favorite_TemplateManage.addFavorite_collection(forum, submitParameter, runtimeParameter);
+				return value;
+			}
+		}else if(forum.getForumChildType().equals("话题会员收藏总数")){
+			if(forum.getDisplayType().equals("entityBean")){//实体对象
+				Long value = favorite_TemplateManage.favoriteCount_entityBean(forum, submitParameter, runtimeParameter);
+				return value;
+			}
+		}else if(forum.getForumChildType().equals("用户是否已经收藏话题")){
+			if(forum.getDisplayType().equals("entityBean")){//实体对象
+				Boolean value = favorite_TemplateManage.alreadyCollected_entityBean(forum, submitParameter, runtimeParameter);
 				return value;
 			}
 		}else if(forum.getForumChildType().equals("添加在线留言")){

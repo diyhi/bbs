@@ -552,6 +552,7 @@ public class UserFormManageAction {
 				userLoginLog.setId(userLoginLogManage.createUserLoginLogId(user.getId()));
 				userLoginLog.setIp(IpAddress.getClientIpAddress(request));
 				userLoginLog.setUserId(user.getId());
+				userLoginLog.setTypeNumber(10);//登录
 				userLoginLog.setLogonTime(new Date());
 				Object new_userLoginLog = userLoginLogManage.createUserLoginLogObject(userLoginLog);
 				userService.saveUserLoginLog(new_userLoginLog);
@@ -941,6 +942,7 @@ public class UserFormManageAction {
 					userLoginLog.setId(userLoginLogManage.createUserLoginLogId(user.getId()));
 					userLoginLog.setIp(IpAddress.getClientIpAddress(request));
 					userLoginLog.setUserId(user.getId());
+					userLoginLog.setTypeNumber(10);//登录
 					userLoginLog.setLogonTime(new Date());
 					Object new_userLoginLog = userLoginLogManage.createUserLoginLogObject(userLoginLog);
 					userService.saveUserLoginLog(new_userLoginLog);

@@ -1,7 +1,10 @@
 package cms.web.action.common;
 
+import java.util.Date;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
@@ -10,7 +13,16 @@ import org.springframework.stereotype.Component;
 
 import cms.bean.user.AccessUser;
 import cms.bean.user.RefreshUser;
+import cms.bean.user.User;
+import cms.bean.user.UserLoginLog;
+import cms.bean.user.UserState;
+import cms.service.user.UserService;
+import cms.utils.IpAddress;
+import cms.utils.UUIDUtil;
 import cms.utils.WebUtil;
+import cms.utils.threadLocal.AccessUserThreadLocal;
+import cms.web.action.user.UserLoginLogManage;
+import cms.web.action.user.UserManage;
 
 /**
  * 开放授权管理
@@ -19,6 +31,10 @@ import cms.utils.WebUtil;
 @Component("oAuthManage")
 public class OAuthManage {
 	@Resource OAuthManage oAuthManage;
+	@Resource UserManage userManage;
+	
+	@Resource UserLoginLogManage userLoginLogManage;
+	@Resource UserService userService;
 	
 	/**
 	 * 添加刷新令牌
@@ -89,6 +105,58 @@ public class OAuthManage {
 	}
 	
     
+	/**
+	 * 令牌续期
+	 * @param oldRefreshToken 旧刷新令牌号
+	 * @param refreshUser 刷新令牌
+	 * @param request
+	 * @param response
+	 */
+	public void tokenRenewal(String oldRefreshToken,RefreshUser refreshUser,HttpServletRequest request,HttpServletResponse response){
+		UserState userState = userManage.query_userState(refreshUser.getUserName().trim());//用户状态
+		if(userState == null || !userState.getSecurityDigest().equals(refreshUser.getSecurityDigest())){
+			return;
+		}
+		
+		//访问令牌续期
+		String new_accessToken = UUIDUtil.getUUID32();
+		String new_refreshToken = UUIDUtil.getUUID32();
+		
+		//头像路径
+		String avatarPath = null;
+		//头像名称
+		String avatarName = null;
+		User user = userManage.query_cache_findUserById(refreshUser.getUserId());
+		if(user != null){
+			avatarPath = user.getAvatarPath();
+			avatarName = user.getAvatarName();
+		}
+		
+		
+		
+		
+		oAuthManage.addAccessToken(new_accessToken, new AccessUser(refreshUser.getUserId(),refreshUser.getUserName(),avatarPath,avatarName, refreshUser.getSecurityDigest(),refreshUser.isRememberMe()));
+		refreshUser.setAccessToken(new_accessToken);
+		oAuthManage.addRefreshToken(new_refreshToken, refreshUser);
+		
+		//将旧的刷新令牌的accessToken设为0
+		oAuthManage.addRefreshToken(oldRefreshToken, new RefreshUser("0",refreshUser.getUserId(),refreshUser.getUserName(),avatarPath,avatarName,refreshUser.getSecurityDigest(),refreshUser.isRememberMe()));
+		AccessUserThreadLocal.set(new AccessUser(refreshUser.getUserId(),refreshUser.getUserName(),avatarPath,avatarName,refreshUser.getSecurityDigest(),refreshUser.isRememberMe()));
+		//将访问令牌添加到Cookie
+		WebUtil.addCookie(response, "cms_accessToken", new_accessToken, 0);
+		//将刷新令牌添加到Cookie
+		WebUtil.addCookie(response, "cms_refreshToken", new_refreshToken, 0);
+		
+		//写入登录日志
+		UserLoginLog userLoginLog = new UserLoginLog();
+		userLoginLog.setId(userLoginLogManage.createUserLoginLogId(user.getId()));
+		userLoginLog.setIp(IpAddress.getClientIpAddress(request));
+		userLoginLog.setTypeNumber(20);//续期
+		userLoginLog.setUserId(user.getId());
+		userLoginLog.setLogonTime(new Date());
+		Object new_userLoginLog = userLoginLogManage.createUserLoginLogObject(userLoginLog);
+		userService.saveUserLoginLog(new_userLoginLog);
+	}
     
     
 

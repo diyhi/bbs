@@ -983,6 +983,29 @@ html,body{
 }
 
 
+/** 收藏夹表单模块 **/
+.favorite-formModule {
+   margin-top: 30px;text-align: center;
+}
+.favorite-formModule .favoriteButton{
+	position: relative;
+	color: rgba(0,0,0,.6);
+    border-color: rgba(34,36,38,.15);
+    outline: none;
+    display: inline-block;
+   	padding-bottom:2px;
+    padding-left: 12px;
+    padding-right:12px; 
+    font-size: 18px;
+    line-height: 34px;
+    text-align: center;
+    cursor: pointer;
+    background: none;
+    border: 1px solid;
+    border-radius: 3px;
+    margin: 0;
+	text-decoration: none;
+}
 
 /** 在线留言 **/
 .addFeedbackModule .box{margin-top:20px !important;padding:10px;}

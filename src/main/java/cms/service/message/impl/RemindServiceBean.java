@@ -123,6 +123,15 @@ public class RemindServiceBean extends DaoSupport<Remind> implements RemindServi
 						.setParameter("userId", userIdList);
 				j += query.executeUpdate();
 			}
+			if(i == 0){//默认对象
+				Query query = em.createQuery("delete from Remind o where o.senderUserId in(:userId)")
+						.setParameter("userId", userIdList);
+				j += query.executeUpdate();		
+			}else{//带下划线对象
+				Query query = em.createQuery("delete from Remind_"+i+" o where o.senderUserId in(:userId)")
+						.setParameter("userId", userIdList);
+				j += query.executeUpdate();
+			}
 		}
 		
 		return j;

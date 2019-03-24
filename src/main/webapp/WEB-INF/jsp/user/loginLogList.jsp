@@ -27,16 +27,21 @@
   <TR>
     <TH>登录IP</TH>
     <TH>IP归属地</TH>
+    <TH>类型</TH>
     <TH>登录时间</TH>
     </TR></THEAD>
   <TBODY class="t-list-tbody" align="center">
    <c:forEach items="${pageView.records}" var="entry">
 	  <TR > 
-	    <TD width="30%">
+	    <TD width="20%">
 	    	${entry.ip}
 	    </TD>
-	    <TD width="40%">
+	    <TD width="30%">
 	    	${entry.ipAddress}
+	    </TD>
+	    <TD width="20%">
+	    	<c:if test="${entry.typeNumber == 10}">登录</c:if>
+	    	<c:if test="${entry.typeNumber == 20}">续期</c:if>
 	    </TD>
 	    <TD width="30%">
 	    	<fmt:formatDate value="${entry.logonTime}"  pattern="yyyy-MM-dd HH:mm:ss"/>

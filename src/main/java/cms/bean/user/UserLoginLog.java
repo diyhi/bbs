@@ -12,7 +12,7 @@ import javax.persistence.Table;
  *
  */
 @Entity
-@Table(name="userLoginLog_0",indexes = {@Index(name="userLoginLog_idx", columnList="userId,logonTime")})
+@Table(name="userloginlog_0",indexes = {@Index(name="userLoginLog_idx", columnList="userId,logonTime")})
 public class UserLoginLog extends UserLoginLogEntity implements Serializable{
 	
 	private static final long serialVersionUID = 3201493519128327032L;

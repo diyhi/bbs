@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import cms.bean.setting.SystemSetting;
 import cms.bean.user.AccessUser;
+import cms.bean.user.RefreshUser;
+import cms.bean.user.UserState;
 import cms.service.setting.SettingService;
 import cms.service.template.TemplateService;
 import cms.service.user.UserService;
@@ -27,6 +29,7 @@ import cms.web.action.CSRFTokenManage;
 import cms.web.action.common.OAuthManage;
 import cms.web.action.statistic.PageViewManage;
 import cms.web.action.template.TemplateMain;
+import cms.web.action.user.UserManage;
 import cms.web.taglib.Configuration;
 
 import org.apache.commons.lang3.StringUtils;
@@ -54,7 +57,7 @@ public class TempletesInterceptor extends HandlerInterceptorAdapter {
 	@Resource PageViewManage pageViewManage;
 	
 	@Resource UserService userService;
-	
+	@Resource UserManage userManage;
 	//?  匹配任何单字符
 	//*  匹配0或者任意数量的字符
 	//** 匹配0或者更多的目录
@@ -103,16 +106,15 @@ public class TempletesInterceptor extends HandlerInterceptorAdapter {
 	    		
 	    		TemplateThreadLocal.addRuntimeParameter("accessUser", accessUser);
 	    	}else{
-	    		String accessToken = WebUtil.getCookieByName(request, "cms_accessToken");
-	    		if(accessToken != null && !"".equals(accessToken.trim())){
-	    			AccessUser _accessUser = oAuthManage.getAccessUserByAccessToken(accessToken);
-	    			if(_accessUser != null){
+	    		//获取登录用户
+	    		AccessUser _accessUser = oAuthManage.getUserName(request);
+	    		if(_accessUser != null){
+	    			UserState userState = userManage.query_userState(_accessUser.getUserName().trim());//用户状态
+	    			if(userState != null && userState.getSecurityDigest().equals(_accessUser.getSecurityDigest())){//验证安全摘要
 	    				TemplateThreadLocal.addRuntimeParameter("accessUser", _accessUser );
 		    			AccessUserThreadLocal.set(_accessUser);
 	    			}
-	    			
-	    		}
-    			
+    			}	
 	    	}
 		}
 		//设置令牌
@@ -145,22 +147,43 @@ public class TempletesInterceptor extends HandlerInterceptorAdapter {
 	  */
 	public void postHandle(HttpServletRequest request, HttpServletResponse response, 
 			 Object handler, ModelAndView modelAndView)throws Exception {  
-		
+
+		//获取登录用户
+	  	AccessUser accessUser = AccessUserThreadLocal.get();
+		if(accessUser == null){
+			//为非user开头URI的登录用户令牌续期,因为user开头的URI由LoginFilter拦截
+			String baseURI = Configuration.baseURI(request.getRequestURI(), request.getContextPath());
+			if(!StringUtils.startsWithIgnoreCase(baseURI, "user/")){//如果不是user/开头
+				String accessToken = WebUtil.getCookieByName(request, "cms_accessToken");
+				String refreshToken = WebUtil.getCookieByName(request, "cms_refreshToken");
+				if(accessToken != null && !"".equals(accessToken.trim()) && refreshToken != null && !"".equals(refreshToken.trim())){
+					RefreshUser refreshUser = oAuthManage.getRefreshUserByRefreshToken(refreshToken.trim());
+					if(refreshUser != null && accessToken.equals(refreshUser.getAccessToken())){
+						
+						//令牌续期
+						oAuthManage.tokenRenewal(refreshToken,refreshUser,request,response);
+						accessUser = AccessUserThreadLocal.get();
+						
+					}
+				}
+			}
+		}
 		
 		String mav = "";
 		if(modelAndView != null){ 
 			mav = modelAndView.getViewName();
 		}
+		
 	    //如果视图方法返回值为templates开头,就将模板显示功能加入页面中	
-		if(mav != null && !"".equals(mav)){   	 		
+		if(mav != null && !"".equals(mav)){
 		//	if(mav.matches("^templates/.*$")){
 			if(mav != null && !"".equals(mav) && mav.length() >10){
 				String begin = mav.substring(0, 9);//取得templates
 				if("templates".equals(begin)){//如果以templates开头
+
 					//统计访问量
 					pageViewManage.addPV(request);
-					
-					
+	
 	    			//获取URL参数
 			       	String queryString = request.getQueryString();
 			       	if(queryString != null && !"".equals(queryString)){
@@ -193,9 +216,7 @@ public class TempletesInterceptor extends HandlerInterceptorAdapter {
     		    	TemplateThreadLocal.setLayoutFile(requestName+".html");
     		    	
     		    	
-    		    	//获取登录用户
-    			  	AccessUser accessUser = AccessUserThreadLocal.get();
-    				
+    		    	
     		    	
     		    	String dirName = templateService.findTemplateDir_cache();	
 

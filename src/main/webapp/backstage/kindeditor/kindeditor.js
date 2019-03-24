@@ -1548,7 +1548,8 @@ _extend(KNode, {
 				var box = node.getBoundingClientRect(),
 					pos = _getScrollPos(self.doc);
 				x = box.left + pos.x;
-				y = box.top + pos.y;
+			//	y = box.top + pos.y;
+				y = (parseInt(box.top) < 0 ? 0 : box.top)  + pos.y;
 			} else {
 				while (node) {
 					x += node.offsetLeft;
@@ -3624,6 +3625,11 @@ function _getInitHtml(themesPath, bodyClass, cssPath, cssData) {
 		'	font-size:0;',
 		'	height:2px;',
 		'}',
+		'.ke-content .prettyprint {',
+		'	background:#f8f8f8;',
+		'	border:1px solid #ddd;',
+		'	padding:5px;',
+		'}',	
 		'</style>'
 	];
 	if (!_isArray(cssPath)) {

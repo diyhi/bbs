@@ -334,6 +334,28 @@ public class TemplateManage {
 		layout_remindList.setReferenceCode("user/control/remindList");
 		layoutList.add(layout_remindList);
 
+		//收藏夹列表
+		Layout layout_favoriteList = new Layout();
+		layout_favoriteList.setId(UUIDUtil.getUUID32());
+		layout_favoriteList.setName("收藏夹列表");
+		layout_favoriteList.setDirName(dirName);
+		layout_favoriteList.setLayoutFile("favoriteList.html");
+		layout_favoriteList.setType(1);//默认页
+		layout_favoriteList.setSort(600);//排序
+		layout_favoriteList.setReferenceCode("user/control/favoriteList");
+		layoutList.add(layout_favoriteList);
+		
+		//话题收藏列表
+		Layout layout_dynamicImageFavoriteList = new Layout();
+		layout_dynamicImageFavoriteList.setId(UUIDUtil.getUUID32());
+		layout_dynamicImageFavoriteList.setName("话题收藏列表");
+		layout_dynamicImageFavoriteList.setDirName(dirName);
+		layout_dynamicImageFavoriteList.setLayoutFile("topicFavoriteList.html");
+		layout_dynamicImageFavoriteList.setType(1);//默认页
+		layout_dynamicImageFavoriteList.setSort(700);//排序
+		layout_dynamicImageFavoriteList.setReferenceCode("user/control/topicFavoriteList");
+		layoutList.add(layout_dynamicImageFavoriteList);
+		
 		return layoutList;
 	}
 	

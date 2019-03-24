@@ -397,6 +397,17 @@ http://www.springframework.org/schema/task http://www.springframework.org/schema
         <!-- 提醒分表数量 -->
         <property name="tableQuantity" value="4" />    
     </bean>
+    <!-- 创建收藏夹配置 -->
+    <bean id="favoritesConfig" class="cms.web.action.favorite.FavoritesConfig" >
+        <!-- 收藏夹分表数量 -->
+        <property name="tableQuantity" value="4" />    
+    </bean>
+    <!-- 创建话题收藏配置 -->
+    <bean id="topicFavoriteConfig" class="cms.web.action.favorite.TopicFavoriteConfig" >
+        <!-- 话题收藏分表数量 -->
+        <property name="tableQuantity" value="4" />    
+    </bean>
+    
    	<!-- 让普通的java类获取spring 的bean配置 -->
    	<bean id="SpringConfigTool" class="cms.utils.SpringConfigTool"></bean>
    	

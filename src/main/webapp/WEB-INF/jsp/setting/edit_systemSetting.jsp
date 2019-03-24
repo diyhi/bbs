@@ -429,7 +429,6 @@ function setAllowFilterWord(obj){
 			    <TD class="t-content" width="80%" colSpan="3">
 			    	文件上传&nbsp;<form:input path="temporaryFileValidPeriod" maxlength="8" size="5" />&nbsp;分钟内未提交表单由定时任务自动删除
 			    	<web:errors path="temporaryFileValidPeriod" cssStyle="color: red;"/>
-			    	<span class="span-help">空为无限制</span>
 			    </TD>
 			</TR>
 			<TR>

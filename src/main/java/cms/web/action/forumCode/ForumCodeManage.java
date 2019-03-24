@@ -56,6 +56,12 @@ public class ForumCodeManage {
 		childNode.add(new ForumCodeNode(1009,"相拟话题","topicRelated_likeTopic_",Arrays.asList(new String[]{"集合"})));
 		forumCodeNodeList.add(new ForumCodeNode(100,"话题",childNode));//添加一级节点
 		
+		//收藏夹
+		List<ForumCodeNode> childNode13 =  new ArrayList<ForumCodeNode>();//添加二级节点	
+		childNode13.add(new ForumCodeNode(13001,"加入收藏夹","favoriteRelated_addFavorite_",Arrays.asList(new String[]{"集合"})));
+		childNode13.add(new ForumCodeNode(13002,"动态图片会员收藏总数","favoriteRelated_favoriteCount_",Arrays.asList(new String[]{"实体对象"})));
+		childNode13.add(new ForumCodeNode(13003,"用户是否已经收藏动态图片","favoriteRelated_alreadyCollected_",Arrays.asList(new String[]{"实体对象"})));
+		forumCodeNodeList.add(new ForumCodeNode(130,"收藏夹",childNode13));//添加一级节点
 		
 		//在线留言
 		List<ForumCodeNode> childNode3 =  new ArrayList<ForumCodeNode>();//添加二级节点	

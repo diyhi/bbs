@@ -21,6 +21,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -60,6 +62,8 @@ import cms.utils.Verification;
 import cms.web.action.FileManage;
 import cms.web.action.SystemException;
 import cms.web.action.TextFilterManage;
+import cms.web.action.lucene.TopicLuceneInit;
+import cms.web.action.lucene.TopicLuceneManage;
 import cms.web.action.thumbnail.ThumbnailManage;
 import cms.web.action.topic.TopicManage;
 
@@ -70,6 +74,7 @@ import cms.web.action.topic.TopicManage;
 @Controller
 @RequestMapping("/control/user/manage") 
 public class UserManageAction {
+	private static final Logger logger = LogManager.getLogger(UserManageAction.class);
 	
 	@Resource(name="userServiceBean")
 	private UserService userService;
@@ -95,7 +100,7 @@ public class UserManageAction {
 	@Resource FileManage fileManage;
 	@Resource ThumbnailManage thumbnailManage;
 	
-
+	@Resource TopicLuceneManage topicLuceneManage;
 	
 	/**
 	 * 用户管理 查看
@@ -895,12 +900,27 @@ public class UserManageAction {
 						
 						
 						int i = userService.delete(idList,userNameList);
-						//删除缓存用户状态
+						
 						for(User user : userList){
+							//删除缓存用户状态
 							userManage.delete_userState(user.getUserName());
 							//删除缓存
 							userManage.delete_cache_findUserById(user.getId());
 							userManage.delete_cache_findUserByUserName(user.getUserName());
+							
+							TopicLuceneInit.INSTANCE.createIndexWriter();//创建IndexWriter
+							try {
+								//删除用户名称下的索引
+								topicLuceneManage.deleteIndex(user.getUserName());
+							} catch (Exception e) {
+								// TODO Auto-generated catch block
+							//	e.printStackTrace();
+								if (logger.isErrorEnabled()) {
+						            logger.error("删除用户名称下的索引",e);
+						        }
+							}finally {
+								TopicLuceneInit.INSTANCE.closeIndexWriter();//关闭IndexWriter
+							}	
 						}
 
 						

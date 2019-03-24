@@ -21,12 +21,10 @@ import org.queryString.util.UrlEncoded;
 
 import cms.bean.user.AccessUser;
 import cms.bean.user.RefreshUser;
-import cms.bean.user.User;
 import cms.bean.user.UserState;
 import cms.service.user.UserService;
 import cms.utils.Base64;
 import cms.utils.SpringConfigTool;
-import cms.utils.UUIDUtil;
 import cms.utils.WebUtil;
 import cms.utils.threadLocal.AccessUserThreadLocal;
 import cms.web.action.common.OAuthManage;
@@ -54,9 +52,7 @@ public class LoginFilter implements Filter {
 		UserManage userManage = (UserManage)SpringConfigTool.getContext().getBean("userManage");
 		AccessUser accessUser = oAuthManage.getUserName(request);
 		
-		
 		if(accessUser != null){
-			AccessUserThreadLocal.set(accessUser);
 			
 			UserState userState = userManage.query_userState(accessUser.getUserName().trim());//用户状态
 			if(userState != null){
@@ -70,10 +66,13 @@ public class LoginFilter implements Filter {
 			}else{
 				isJump = true;
 			}
+			
+			if(isJump == false){
+				AccessUserThreadLocal.set(accessUser);
+			}
 		}else{
 			String accessToken = WebUtil.getCookieByName(request, "cms_accessToken");
 			String refreshToken = WebUtil.getCookieByName(request, "cms_refreshToken");
-			
 			if(accessToken != null && !"".equals(accessToken.trim()) && refreshToken != null && !"".equals(refreshToken.trim())){
 			
 				RefreshUser refreshUser = oAuthManage.getRefreshUserByRefreshToken(refreshToken.trim());
@@ -85,33 +84,8 @@ public class LoginFilter implements Filter {
 						userManage.delete_userState(refreshUser.getUserName());
 						isJump = true;
 					}else if(accessToken.equals(refreshUser.getAccessToken())){
-						//访问令牌续期
-						String new_accessToken = UUIDUtil.getUUID32();
-						String new_refreshToken = UUIDUtil.getUUID32();
-						
-						//头像路径
-						String avatarPath = null;
-						//头像名称
-						String avatarName = null;
-						User user = userManage.query_cache_findUserById(refreshUser.getUserId());
-						if(user != null){
-							avatarPath = user.getAvatarPath();
-							avatarName = user.getAvatarName();
-						}
-						
-						
-						oAuthManage.addAccessToken(new_accessToken, new AccessUser(refreshUser.getUserId(),refreshUser.getUserName(),avatarPath,avatarName, refreshUser.getSecurityDigest(),refreshUser.isRememberMe()));
-						refreshUser.setAccessToken(new_accessToken);
-						oAuthManage.addRefreshToken(new_refreshToken, refreshUser);
-						
-						//将旧的刷新令牌的accessToken设为0
-						oAuthManage.addRefreshToken(refreshToken, new RefreshUser("0",refreshUser.getUserId(),refreshUser.getUserName(),avatarPath,avatarName,refreshUser.getSecurityDigest(),refreshUser.isRememberMe()));
-						AccessUserThreadLocal.set(new AccessUser(refreshUser.getUserId(),refreshUser.getUserName(),avatarPath,avatarName,refreshUser.getSecurityDigest(),refreshUser.isRememberMe()));
-						//将访问令牌添加到Cookie
-						WebUtil.addCookie(response, "cms_accessToken", new_accessToken, 0);
-						//将刷新令牌添加到Cookie
-						WebUtil.addCookie(response, "cms_refreshToken", new_refreshToken, 0);
-						
+						//令牌续期
+						oAuthManage.tokenRenewal(refreshToken,refreshUser,request,response);
 					}else{
 						isJump = true;
 					}
@@ -128,7 +102,6 @@ public class LoginFilter implements Filter {
 		
 		
 		boolean isAjax = WebUtil.submitDataMode(request);
-		
 		if(isJump == true){
 			
 			String uri = request.getRequestURI();

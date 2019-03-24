@@ -514,6 +514,7 @@ public class CommentManageAction {
 					newComment.setIsStaff(true);
 					newComment.setQuoteIdGroup(old_quoteId);
 					newComment.setUserName(username);
+					newComment.setIp(IpAddress.getClientIpAddress(request));
 					newComment.setQuote(JsonUtils.toJSONString(old_quoteList));
 					
 					//保存评论
