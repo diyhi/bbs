@@ -20,24 +20,6 @@ Spring 5.0 + SpringMVC + JPA + Ehcache(可选Memcached) + Lucene
 
 
 
-官方网站：[http://www.diyhi.com/](http://www.diyhi.com/)
-
-
-
-演示网站：[http://www.diyhi.com/cms.html](http://www.diyhi.com/cms.html) 页面可获取前后台演示地址、登录账号和密码
-
-
-
-安装环境配置参考：[http://www.diyhi.com/hostConfig.html](http://www.diyhi.com/hostConfig.html)
-
-
-
-编译好的安装包下载页面：[http://www.diyhi.com/cms.html](http://www.diyhi.com/cms.html)
-
-
-
-编译好的安装包安装参考：[http://www.diyhi.com/forumInstall.html](http://www.diyhi.com/forumInstall.html)
-
 
 <br><br>
 #### 使用平台
