@@ -2,6 +2,7 @@ package cms.service.topic;
 
 import java.util.List;
 
+
 import cms.bean.topic.Comment;
 import cms.bean.topic.Reply;
 import cms.service.besa.DAO;
@@ -48,6 +49,13 @@ public interface CommentService  extends DAO<Comment>{
 	 * @return
 	 */
 	public List<String> findCommentContentByPage(int firstIndex, int maxResult,String userName,boolean isStaff);
+	/**
+	 * 查询用户是否评论话题
+	 * @param topicId 话题Id
+	 * @param userName 用户名称
+	 * @return
+	 */
+	public Boolean findWhetherCommentTopic(Long topicId,String userName);
 	/**
 	 * 保存评论
 	 * @param comment

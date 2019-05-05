@@ -3,6 +3,7 @@ package cms.web.action.topic;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -33,6 +35,7 @@ import cms.bean.QueryResult;
 import cms.bean.staff.SysUsers;
 import cms.bean.thumbnail.Thumbnail;
 import cms.bean.topic.Comment;
+import cms.bean.topic.HideTagType;
 import cms.bean.topic.ImageInfo;
 import cms.bean.topic.Quote;
 import cms.bean.topic.Reply;
@@ -332,37 +335,67 @@ public class TopicManageAction {
 				fileNameList = (List<String>)object[7];
 				isFile = (Boolean)object[8];//是否含有文件
 				isMap = (Boolean)object[9];//是否含有地图
+			
+				//校正隐藏标签
+				String validValue =  textFilterManage.correctionHiddenTag(value);
 				
 				
+				//解析隐藏标签
+				Map<Integer,Object> analysisHiddenTagMap = textFilterManage.analysisHiddenTag(validValue);
+				for (Map.Entry<Integer,Object> entry : analysisHiddenTagMap.entrySet()) {
+					//管理员账户不能发表'余额购买'话题
+					if(entry.getKey().equals(HideTagType.AMOUNT.getName())){
+						error.put("content", "管理员账户不能发表'余额购买'话题");
+						break;
+					}
+				}
+				
+				
+				
+				//删除隐藏标签
+				String new_content = textFilterManage.deleteHiddenTag(value);
+
 				//不含标签内容
-				String text = textFilterManage.filterText(content);
+				String text = textFilterManage.filterText(new_content);
 				//清除空格&nbsp;
 				String trimSpace = cms.utils.StringUtil.replaceSpace(text).trim();
 				//摘要
 				if(trimSpace != null && !"".equals(trimSpace)){
-					if(trimSpace.length() >150){
-						topic.setSummary(trimSpace.substring(0, 150)+"..");
+					if(trimSpace.length() >180){
+						topic.setSummary(trimSpace.substring(0, 180)+"..");
 					}else{
 						topic.setSummary(trimSpace+"..");
 					}
 				}
-				if(isImage == true || isFlash == true || isMedia == true || isFile==true ||isMap== true || (!"".equals(text.trim()) && !"".equals(trimSpace))){
+				
+				//不含标签内容
+				String source_text = textFilterManage.filterText(content);
+				//清除空格&nbsp;
+				String source_trimSpace = cms.utils.StringUtil.replaceSpace(source_text).trim();
+				
+				if(isImage == true || isFlash == true || isMedia == true || isFile==true ||isMap== true || (!"".equals(source_text.trim()) && !"".equals(source_trimSpace))){
 					
 					topic.setIp(IpAddress.getClientIpAddress(request));
 					topic.setUserName(username);
 					topic.setIsStaff(true);
-					topic.setContent(value);
+					topic.setContent(validValue);
 				}else{
 					error.put("content", "话题内容不能为空");
 				}	
 				
-				if(imageNameList != null && imageNameList.size() >0){
-					for(int i=0; i<imageNameList.size(); i++){
+						
+				
+				//非隐藏标签内图片
+				List<String> other_imageNameList = textFilterManage.readImageName(new_content,"topic");
+				
+				if(other_imageNameList != null && other_imageNameList.size() >0){
+					for(int i=0; i<other_imageNameList.size(); i++){
 						ImageInfo imageInfo = new ImageInfo();
-						imageInfo.setName(fileManage.getName(imageNameList.get(i)));
-						imageInfo.setPath(fileManage.getFullPath("file/topic/"+imageNameList.get(i)));
+						imageInfo.setName(fileManage.getName(other_imageNameList.get(i)));
+						imageInfo.setPath(fileManage.getFullPath(other_imageNameList.get(i)));
 						
 						beforeImageList.add(imageInfo);
+						
 						if(i ==2){//只添加3张图片
 							break;
 						}
@@ -370,6 +403,7 @@ public class TopicManageAction {
 					topic.setImage(JsonUtils.toJSONString(beforeImageList));
 					
 				}
+				
 			}else{
 				error.put("content", "话题内容不能为空");
 			}
@@ -809,10 +843,27 @@ public class TopicManageAction {
 					isFile = (Boolean)object[8];//是否含有文件
 					isMap = (Boolean)object[9];//是否含有地图
 					
+					//校正隐藏标签
+					String validValue =  textFilterManage.correctionHiddenTag(value);
+					
+					if(topic.getIsStaff()){//如果是员工
+						//解析隐藏标签
+						Map<Integer,Object> analysisHiddenTagMap = textFilterManage.analysisHiddenTag(validValue);
+						for (Map.Entry<Integer,Object> entry : analysisHiddenTagMap.entrySet()) {
+							//管理员账户不能发表'余额购买'话题
+							if(entry.getKey().equals(HideTagType.AMOUNT.getName())){
+								error.put("content", "管理员账户不能发表'余额购买'话题");
+								break;
+							}
+						}
+					}
+
+					//删除隐藏标签
+					String new_content = textFilterManage.deleteHiddenTag(value);
+					
+					
 					//不含标签内容
-					String text = textFilterManage.filterText(content);
-					
-					
+					String text = textFilterManage.filterText(new_content);
 					
 					
 					//清除空格&nbsp;
@@ -821,25 +872,32 @@ public class TopicManageAction {
 					
 					//摘要
 					if(trimSpace != null && !"".equals(trimSpace)){
-						if(trimSpace.length() >150){
-							topic.setSummary(trimSpace.substring(0, 150)+"..");
+						if(trimSpace.length() >180){
+							topic.setSummary(trimSpace.substring(0, 180)+"..");
 						}else{
 							topic.setSummary(trimSpace+"..");
 						}
 					}
 					
-					
-					if(isImage == true || isFlash == true || isMedia == true || isFile==true ||isMap== true || (!"".equals(text.trim()) && !"".equals(trimSpace))){
-						topic.setContent(value);
+					//不含标签内容
+					String source_text = textFilterManage.filterText(content);
+					//清除空格&nbsp;
+					String source_trimSpace = cms.utils.StringUtil.replaceSpace(source_text).trim();
+					if(isImage == true || isFlash == true || isMedia == true || isFile==true ||isMap== true || (!"".equals(source_text.trim()) && !"".equals(source_trimSpace))){
+						topic.setContent(validValue);
 					}else{
 						error.put("content", "话题内容不能为空");
 					}	
 					
-					if(imageNameList != null && imageNameList.size() >0){
-						for(int i=0; i<imageNameList.size(); i++){
+					//非隐藏标签内图片
+					List<String> other_imageNameList = textFilterManage.readImageName(new_content,"topic");
+					
+					
+					if(other_imageNameList != null && other_imageNameList.size() >0){
+						for(int i=0; i<other_imageNameList.size(); i++){
 							ImageInfo imageInfo = new ImageInfo();
-							imageInfo.setName(fileManage.getName(imageNameList.get(i)));
-							imageInfo.setPath(fileManage.getFullPath("file/topic/"+imageNameList.get(i)));
+							imageInfo.setName(fileManage.getName(other_imageNameList.get(i)));
+							imageInfo.setPath(fileManage.getFullPath(other_imageNameList.get(i)));
 							
 							beforeImageList.add(imageInfo);
 							
@@ -875,10 +933,14 @@ public class TopicManageAction {
 				
 				
 				if(error.size() ==0){
+					topic.setLastUpdateTime(new Date());//最后修改时间
 					topicService.updateTopic(topic);
 					//更新索引
 					topicIndexService.addTopicIndex(new TopicIndex(String.valueOf(topic.getId()),2));
 					
+					//删除缓存
+					topicManage.deleteTopicCache(topic.getId());//删除话题缓存
+					topicManage.delete_cache_analysisHiddenTag(topic.getId());//删除解析隐藏标签缓存
 					
 					
 					Object[] obj = textFilterManage.readPathName(old_content,"topic");
@@ -1108,7 +1170,7 @@ public class TopicManageAction {
 			returnValue.put("error", error);
 		}else{
 			returnValue.put("success", "true");
-			topicManage.deleteTopicCache(topicId);//删除缓存
+			
 		}
 		return JsonUtils.toJSONString(returnValue);
 	}
@@ -1245,11 +1307,13 @@ public class TopicManageAction {
 			List<Topic> topicList = topicService.findByIdList(Arrays.asList(topicId));
 			if(topicList != null && topicList.size() >0){
 				topicService.reductionTopic(topicList);
+				
 				for(Topic topic :topicList){
 					//更新索引
 					topicIndexService.addTopicIndex(new TopicIndex(String.valueOf(topic.getId()),2));
 					topicManage.deleteTopicCache(topic.getId());//删除缓存
 				}
+		
 				return "1";
 			}	
 		}
@@ -1277,4 +1341,63 @@ public class TopicManageAction {
 		return "0";
 	}
 	
+	
+	
+	/**
+	 * 搜索话题分页
+	 * @param searchName 搜索名称
+	 * @param tableName div表名
+	 * @return
+	 
+	@RequestMapping(params="method=ajax_searchInformationPage", method=RequestMethod.GET)
+	public String searchInformationPage(ModelMap model,PageForm pageForm,
+			String searchName,String tableName) {
+		
+			
+		StringBuffer jpql = new StringBuffer("");
+		String sql = "";
+		List<Object> params = new ArrayList<Object>();
+		//调用分页算法代码
+		PageView<Information> pageView = new PageView<Information>(settingService.findSystemSetting_cache().getBackstagePageNumber(),pageForm.getPage(),10);
+		if(searchName != null && !"".equals(searchName.trim())){
+			String searchName_utf8 = "";
+			try {
+				searchName_utf8 = URLDecoder.decode(searchName.trim(),"utf-8");
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+			//	e.printStackTrace();
+				if (logger.isErrorEnabled()) {
+		            logger.error("搜索资讯名称编码错误",e);
+		        }
+			}
+			jpql.append(" and o.name like ?").append((params.size()+1)).append(" escape '/' ");
+			params.add("%/"+ searchName_utf8.trim()+"%" );//加上查询参数
+
+			model.addAttribute("searchName", searchName_utf8);
+		}
+	
+		jpql.append(" and o.visible=?").append((params.size()+1));//and o.code=?1
+		params.add(true);//设置o.visible=?1是否可见
+		//删除第一个and
+		sql = StringUtils.difference(" and", jpql.toString());
+		//当前页
+		int firstindex = (pageForm.getPage()-1)*pageView.getMaxresult();
+		//排序
+		LinkedHashMap<String,String> orderby = new LinkedHashMap<String,String>();
+	//	orderby.put("sell", "desc");//先按是否在售排序
+	//	orderby.put("id", "desc");//根据code字段降序排序
+		QueryResult<Information> qr = informationService.getScrollData(Information.class,firstindex, pageView.getMaxresult(), sql, params.toArray(),orderby);
+		
+		
+		
+		//将查询结果集传给分页List
+		pageView.setQueryResult(qr);
+		model.addAttribute("pageView", pageView);
+		
+		model.addAttribute("tableName", tableName);
+		
+		return "jsp/information/ajax_searchInformationPage";
+		
+		
+	}*/
 }

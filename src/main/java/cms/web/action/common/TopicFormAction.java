@@ -4,6 +4,7 @@ package cms.web.action.common;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,15 +25,20 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 
 import cms.bean.ErrorView;
+import cms.bean.message.Remind;
 import cms.bean.setting.SystemSetting;
 import cms.bean.thumbnail.Thumbnail;
+import cms.bean.topic.HideTagName;
+import cms.bean.topic.HideTagType;
 import cms.bean.topic.ImageInfo;
 import cms.bean.topic.Tag;
 import cms.bean.topic.Topic;
 import cms.bean.topic.TopicIndex;
+import cms.bean.topic.TopicUnhide;
 import cms.bean.user.AccessUser;
 import cms.bean.user.PointLog;
 import cms.bean.user.User;
+import cms.service.message.RemindService;
 import cms.service.setting.SettingService;
 import cms.service.template.TemplateService;
 import cms.service.thumbnail.ThumbnailService;
@@ -53,6 +59,7 @@ import cms.web.action.CSRFTokenManage;
 import cms.web.action.FileManage;
 import cms.web.action.TextFilterManage;
 import cms.web.action.filterWord.SensitiveWordFilterManage;
+import cms.web.action.message.RemindManage;
 import cms.web.action.setting.SettingManage;
 import cms.web.action.thumbnail.ThumbnailManage;
 import cms.web.action.topic.TopicManage;
@@ -90,6 +97,9 @@ public class TopicFormAction {
 	@Resource ThumbnailService thumbnailService;
 	@Resource ThumbnailManage thumbnailManage;
 	@Resource UserManage userManage;
+	
+	@Resource RemindService remindService;
+	@Resource RemindManage remindManage;
 	
 	/**
 	 * 话题  添加
@@ -141,16 +151,18 @@ public class TopicFormAction {
 			if(captchaKey != null && !"".equals(captchaKey.trim())){
 				//增加验证码重试次数
 				//统计每分钟原来提交次数
-				int quantity = settingManage.submitQuantity_add("captcha", captchaKey.trim(), 0);
-				//删除每分钟原来提交次数
-				settingManage.submitQuantity_delete("captcha", captchaKey.trim());
-				//刷新每分钟原来提交次数
-				settingManage.submitQuantity_add("captcha", captchaKey.trim(), quantity+1);
+				Integer original = settingManage.getSubmitQuantity("captcha", captchaKey.trim());
+	    		if(original != null){
+	    			settingManage.addSubmitQuantity("captcha", captchaKey.trim(),original+1);//刷新每分钟原来提交次数
+	    		}else{
+	    			settingManage.addSubmitQuantity("captcha", captchaKey.trim(),1);//刷新每分钟原来提交次数
+	    		}
+				
 				
 				String _captcha = captchaManage.captcha_generate(captchaKey.trim(),"");
 				if(captchaValue != null && !"".equals(captchaValue.trim())){
 					if(_captcha != null && !"".equals(_captcha.trim())){
-						if(!_captcha.equals(captchaValue)){
+						if(!_captcha.equalsIgnoreCase(captchaValue)){
 							error.put("captchaValue",ErrorView._15.name());//验证码错误
 						}
 					}else{
@@ -274,9 +286,31 @@ public class TopicFormAction {
 			isFile = (Boolean)object[8];//是否含有文件
 			isMap = (Boolean)object[9];//是否含有地图
 			
+			//校正隐藏标签
+			String validValue =  textFilterManage.correctionHiddenTag(value);
 			
+			//允许使用的隐藏标签
+			List<Integer> allowHiddenTagList = new ArrayList<Integer>();
+			//输入密码可见
+			allowHiddenTagList.add(HideTagType.PASSWORD.getName());
+			//评论话题可见
+			allowHiddenTagList.add(HideTagType.COMMENT.getName());
+			
+			
+			//解析隐藏标签
+			Map<Integer,Object> analysisHiddenTagMap = textFilterManage.analysisHiddenTag(validValue);
+			for (Map.Entry<Integer,Object> entry : analysisHiddenTagMap.entrySet()) {
+				if(!allowHiddenTagList.contains(entry.getKey())){
+					error.put("content", "发表话题不允许使用 '"+HideTagName.getKey(entry.getKey())+"' 隐藏标签");//隐藏标签
+					break;
+				}
+			}
+			
+			//删除隐藏标签
+			String new_content = textFilterManage.deleteHiddenTag(value);
+
 			//不含标签内容
-			String text = textFilterManage.filterText(content);
+			String text = textFilterManage.filterText(new_content);
 			//清除空格&nbsp;
 			String trimSpace = cms.utils.StringUtil.replaceSpace(text).trim();
 			//摘要
@@ -288,19 +322,25 @@ public class TopicFormAction {
 					}
 					trimSpace = sensitiveWordFilterManage.filterSensitiveWord(trimSpace, wordReplace);
 				}
-				if(trimSpace.length() >150){
-					topic.setSummary(trimSpace.substring(0, 150)+"..");
+				if(trimSpace.length() >180){
+					topic.setSummary(trimSpace.substring(0, 180)+"..");
 				}else{
 					topic.setSummary(trimSpace+"..");
 				}
 			}
-			if(isImage == true || isFlash == true || isMedia == true || isFile==true ||isMap== true || (!"".equals(text.trim()) && !"".equals(trimSpace))){
+			
+			//不含标签内容
+			String source_text = textFilterManage.filterText(content);
+			//清除空格&nbsp;
+			String source_trimSpace = cms.utils.StringUtil.replaceSpace(source_text).trim();
+			
+			if(isImage == true || isFlash == true || isMedia == true || isFile==true ||isMap== true || (!"".equals(source_text.trim()) && !"".equals(source_trimSpace))){
 				if(systemSetting.isAllowFilterWord()){
 					String wordReplace = "";
 					if(systemSetting.getFilterWordReplace() != null){
 						wordReplace = systemSetting.getFilterWordReplace();
 					}
-					value = sensitiveWordFilterManage.filterSensitiveWord(value, wordReplace);
+					validValue = sensitiveWordFilterManage.filterSensitiveWord(validValue, wordReplace);
 				}
 				
 				
@@ -309,18 +349,23 @@ public class TopicFormAction {
 				topic.setIp(IpAddress.getClientIpAddress(request));
 				topic.setUserName(accessUser.getUserName());
 				topic.setIsStaff(false);
-				topic.setContent(value);
+				topic.setContent(validValue);
 			}else{
 				error.put("content", "话题内容不能为空");
 			}	
 			
-			if(imageNameList != null && imageNameList.size() >0){
-				for(int i=0; i<imageNameList.size(); i++){
+			
+			//非隐藏标签内图片
+			List<String> other_imageNameList = textFilterManage.readImageName(new_content,"topic");
+			
+			if(other_imageNameList != null && other_imageNameList.size() >0){
+				for(int i=0; i<other_imageNameList.size(); i++){
 					ImageInfo imageInfo = new ImageInfo();
-					imageInfo.setName(fileManage.getName(imageNameList.get(i)));
-					imageInfo.setPath(fileManage.getFullPath("file/topic/"+imageNameList.get(i)));
+					imageInfo.setName(fileManage.getName(other_imageNameList.get(i)));
+					imageInfo.setPath(fileManage.getFullPath(other_imageNameList.get(i)));
 					
 					beforeImageList.add(imageInfo);
+					
 					if(i ==2){//只添加3张图片
 						break;
 					}
@@ -421,14 +466,14 @@ public class TopicFormAction {
 				}
 			}
 			
-			
 			//统计每分钟原来提交次数
-			int quantity = settingManage.submitQuantity_add("topic", accessUser.getUserName(), 0);
-			//删除每分钟原来提交次数
-			settingManage.submitQuantity_delete("topic", accessUser.getUserName());
-			//刷新每分钟原来提交次数
-			settingManage.submitQuantity_add("topic", accessUser.getUserName(), quantity+1);
-			
+			Integer original = settingManage.getSubmitQuantity("topic", accessUser.getUserName());
+    		if(original != null){
+    			settingManage.addSubmitQuantity("topic", accessUser.getUserName(),original+1);//刷新每分钟原来提交次数
+    		}else{
+    			settingManage.addSubmitQuantity("topic", accessUser.getUserName(),1);//刷新每分钟原来提交次数
+    		}
+
 		}
 		
 		
@@ -516,9 +561,6 @@ public class TopicFormAction {
 	@ResponseBody//方式来做ajax,直接返回字符串
 	public String upload(ModelMap model,
 			MultipartFile imgFile,HttpServletRequest request, HttpServletResponse response) throws Exception {
-		
-		
-		
 		
 		Map<String,Object> returnJson = new HashMap<String,Object>();
 		SystemSetting systemSetting = settingService.findSystemSetting_cache();
@@ -612,7 +654,252 @@ public class TopicFormAction {
 	}
 	
 	
+	/**
+	 * 话题  取消隐藏
+	 * @param model
+	 * @param topicId 话题Id
+	 * @param hideType 隐藏类型
+	 * @param password 密码
+	 * @param token
+	 * @param jumpUrl
+	 * @param redirectAttrs
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/unhide", method=RequestMethod.POST)
+	public String topicUnhide(ModelMap model,Long topicId,Integer hideType, String password,
+			String token,String jumpUrl,
+			RedirectAttributes redirectAttrs,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		//获取登录用户
+	  	AccessUser accessUser = AccessUserThreadLocal.get();
+		
+		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+		
+		
+		Map<String,String> error = new HashMap<String,String>();
+		
+			
+		
+		//判断令牌
+		if(token != null && !"".equals(token.trim())){	
+			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌
+			if(token_sessionid != null && !"".equals(token_sessionid.trim())){
+				if(!token_sessionid.equals(token)){
+					error.put("token", ErrorView._13.name());//令牌错误
+				}
+			}else{
+				error.put("token", ErrorView._12.name());//令牌过期
+			}
+		}else{
+			error.put("token", ErrorView._11.name());//令牌为空
+		}
+		
+		//统计每分钟原来提交次数
+		Integer quantity = settingManage.getSubmitQuantity("topicUnhide", accessUser.getUserName());
+    	if(quantity != null && quantity >30){//如果每分钟提交超过30次，则一分钟内不允许'取消隐藏'
+    		error.put("topicUnhide", ErrorView._1640.name());//提交过于频繁，请稍后再提交
+    	}
+    	
+    	Topic topic = null;
+    	if(error.size() == 0){
+    		if(topicId != null && topicId >0L){
+    	  		
+    	  		topic = topicManage.queryTopicCache(topicId);//查询缓存
+
+    	  		
+    	  	}else{
+    	  		error.put("topicUnhide", ErrorView._103.name());//话题Id不能为空
+    	  	}
+    		
+    	  	if(topic != null){
+    	  		//话题取消隐藏Id
+    		  	String topicUnhideId = topicManage.createTopicUnhideId(accessUser.getUserId(), hideType, topicId);
+    		  
+    		  	TopicUnhide topicUnhide = topicManage.query_cache_findTopicUnhideById(topicUnhideId);
+    	  		
+    	  		if(topicUnhide != null){
+    		  		error.put("topicUnhide", ErrorView._1610.name());//当前话题已经取消隐藏
+    		  	}
+    	  		
+    	  		
+    		}
+    	}
+		
+		
+	  	
+		List<Integer> hideTypeList = new ArrayList<Integer>();
+		hideTypeList.add(HideTagType.PASSWORD.getName());
+		hideTypeList.add(HideTagType.GRADE.getName());
+		hideTypeList.add(HideTagType.POINT.getName());
+		hideTypeList.add(HideTagType.AMOUNT.getName());
+		
+		if(!hideTypeList.contains(hideType)){
+			error.put("topicUnhide", ErrorView._1620.name());//隐藏标签不存在
+		}
+		
+			
+		if(error.size() == 0){
+			//解析隐藏标签
+			Map<Integer,Object> analysisHiddenTagMap = textFilterManage.analysisHiddenTag(topic.getContent());
+			for (Map.Entry<Integer,Object> entry : analysisHiddenTagMap.entrySet()) {
+				if(entry.getKey().equals(HideTagType.PASSWORD.getName()) && HideTagType.PASSWORD.getName().equals(hideType)){//输入密码可见
+					if(password == null || "".equals(password.trim())){
+						error.put("password", ErrorView._1650.name());//密码不能为空
+						break;
+					}
+					
+					
+					if(!entry.getValue().equals(password)){
+						error.put("topicUnhide", ErrorView._1630.name());//密码错误
+					}
+					break;
+				}
+				
+				
+				
+			}
+		}
+
+		//统计每分钟原来提交次数
+		Integer original = settingManage.getSubmitQuantity("topicUnhide", accessUser.getUserName());
+		if(original != null){
+			settingManage.addSubmitQuantity("topicUnhide", accessUser.getUserName(),original+1);//刷新每分钟原来提交次数
+		}else{
+			settingManage.addSubmitQuantity("topicUnhide", accessUser.getUserName(),1);//刷新每分钟原来提交次数
+		}
+		
+		
+		
+
+		if(error.size() == 0){
+			
+			TopicUnhide topicUnhide = new TopicUnhide();
+			String topicUnhideId = topicManage.createTopicUnhideId(accessUser.getUserId(), hideType, topicId);
+			topicUnhide.setId(topicUnhideId);
+			topicUnhide.setUserName(accessUser.getUserName());
+			topicUnhide.setCancelTime(new Date());
+			topicUnhide.setHideTagType(hideType);
+			topicUnhide.setPostUserName(topic.getUserName());//发布话题的用户名称
+			topicUnhide.setTopicId(topicId);
+			
+			
+			try {
+				//保存'话题取消隐藏'
+				topicService.saveTopicUnhide(topicManage.createTopicUnhideObject(topicUnhide));
+				
+				//删除'话题取消隐藏'缓存;
+				topicManage.delete_cache_findTopicUnhideById(topicUnhideId);
+				
+				
+				
+				User _user = userManage.query_cache_findUserByUserName(topic.getUserName());
+				
+				//别人解锁了我的话题  只对(隐藏标签类型 10:输入密码可见  40:积分购买可见  50:余额购买可见)发提醒
+				if(!topic.getIsStaff() && _user != null && !topic.getUserName().equals(accessUser.getUserName())){//不发提醒给自己
+					
+					//提醒楼主
+					Remind remind = new Remind();
+					remind.setId(remindManage.createRemindId(_user.getId()));
+					remind.setReceiverUserId(_user.getId());//接收提醒用户Id
+					remind.setSenderUserId(accessUser.getUserId());//发送用户Id
+					remind.setTypeCode(60);//60:别人解锁了我的话题
+					remind.setSendTimeFormat(new Date().getTime());//发送时间格式化
+					remind.setTopicId(topic.getId());//话题Id
+					
+					Object remind_object = remindManage.createRemindObject(remind);
+					remindService.saveRemind(remind_object);
+					
+					//删除提醒缓存
+					remindManage.delete_cache_findUnreadRemindByUserId(_user.getId());
+						
+					
+				}
+				
+				
+				
+				
+				
+				
+				
+			} catch (org.springframework.orm.jpa.JpaSystemException e) {
+				error.put("topicUnhide", ErrorView._1600.name());//话题重复取消隐藏
+				
+			}
 	
+		}
+		
+		
+		
+		
+		
+		Map<String,String> returnError = new HashMap<String,String>();//错误
+		if(error.size() >0){
+			//将枚举数据转为错误提示字符
+    		for (Map.Entry<String,String> entry : error.entrySet()) {		 
+    			if(ErrorView.get(entry.getValue()) != null){
+    				returnError.put(entry.getKey(),  ErrorView.get(entry.getValue()));
+    			}else{
+    				returnError.put(entry.getKey(),  entry.getValue());
+    			}
+			}
+		}
+		if(isAjax == true){
+			
+    		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
+    		
+    		if(error != null && error.size() >0){
+    			returnValue.put("success", "false");
+    			returnValue.put("error", returnError);
+    			
+    		}else{
+    			returnValue.put("success", "true");
+    		}
+    		WebUtil.writeToWeb(JsonUtils.toJSONString(returnValue), "json", response);
+			return null;
+		}else{
+			
+			
+			if(error != null && error.size() >0){//如果有错误
+				redirectAttrs.addFlashAttribute("error", returnError);//重定向传参
+				redirectAttrs.addFlashAttribute("hideType", hideType);
+				
+
+				String referer = request.getHeader("referer");	
+				
+				
+				referer = StringUtils.removeStartIgnoreCase(referer,Configuration.getUrl(request));//移除开始部分的相同的字符,不区分大小写
+				referer = StringUtils.substringBefore(referer, ".");//截取到等于第二个参数的字符串为止
+				referer = StringUtils.substringBefore(referer, "?");//截取到等于第二个参数的字符串为止
+				
+				String queryString = request.getQueryString() != null && !"".equals(request.getQueryString().trim()) ? "?"+request.getQueryString() :"";
+
+				return "redirect:/"+referer+queryString;
+	
+			}
+			
+			
+			if(jumpUrl != null && !"".equals(jumpUrl.trim())){
+				String url = Base64.decodeBase64URL(jumpUrl.trim());
+				
+				return "redirect:"+url;
+			}else{//默认跳转
+				model.addAttribute("message", "话题取消隐藏成功");
+				String referer = request.getHeader("referer");
+				if(RefererCompare.compare(request, "login")){//如果是登录页面则跳转到首页
+					referer = Configuration.getUrl(request);
+				}
+				model.addAttribute("urlAddress", referer);
+				
+				String dirName = templateService.findTemplateDir_cache();
+				
+				
+				return "templates/"+dirName+"/"+accessSourceDeviceManage.accessDevices(request)+"/jump";	
+			}
+		}
+	}
 	
 	
 }

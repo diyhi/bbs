@@ -100,6 +100,12 @@ JDK 1.8及以上 + Tomcat 8.0及以上 + MySQL 5.5.3及以上
 ![输入图片说明](https://raw.githubusercontent.com/diyhi/bbs/master/image/3.png "3.png")
 
 <br><br>
+![输入图片说明](https://raw.githubusercontent.com/diyhi/bbs/master/image/4.jpg "4.jpg")
+
+<br><br>
+![输入图片说明](https://raw.githubusercontent.com/diyhi/bbs/master/image/5.jpg "4.jpg")
+
+<br><br>
 #### 前端界面(手机版)
 ![输入图片说明](https://raw.githubusercontent.com/diyhi/bbs/master/image/m1.png "m1.png")
 

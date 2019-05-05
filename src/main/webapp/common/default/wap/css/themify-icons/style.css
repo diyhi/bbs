@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'themify';
-  src:  url('fonts/themify.eot?st72xk');
-  src:  url('fonts/themify.eot?st72xk#iefix') format('embedded-opentype'),
-    url('fonts/themify.ttf?st72xk') format('truetype'),
-    url('fonts/themify.woff?st72xk') format('woff'),
-    url('fonts/themify.svg?st72xk#themify') format('svg');
+  src:  url('fonts/themify.eot?utqndr');
+  src:  url('fonts/themify.eot?utqndr#iefix') format('embedded-opentype'),
+    url('fonts/themify.ttf?utqndr') format('truetype'),
+    url('fonts/themify.woff?utqndr') format('woff'),
+    url('fonts/themify.svg?utqndr#themify') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -24,15 +24,6 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.cms-announcement:before {
-  content: "\e64f";
-}
-.cms-bell:before {
-  content: "\e6b8";
-}
-.cms-email:before {
-  content: "\e75a";
-}
 .cms-user:before {
   content: "\e602";
 }
@@ -69,6 +60,9 @@
 .cms-themify-check:before {
   content: "\e64c";
 }
+.cms-announcement:before {
+  content: "\e64f";
+}
 .cms-themify-view-list:before {
   content: "\e667";
 }
@@ -87,36 +81,45 @@
 .cms-clipboard:before {
   content: "\e6b4";
 }
+.cms-bell:before {
+  content: "\e6b8";
+}
 .cms-themify-favicon:before {
   content: "\e6d2";
 }
-.cms-topic:before {
-  content: "\e900";
+.cms-email:before {
+  content: "\e75a";
 }
-.cms-reply:before {
+.cms-topic:before {
   content: "\e901";
 }
-.cms-commentCount:before {
+.cms-reply:before {
   content: "\e902";
 }
-.cms-login:before {
+.cms-commentCount:before {
   content: "\e903";
 }
-.cms-point:before {
+.cms-login:before {
   content: "\e904";
 }
-.cms-log:before {
+.cms-point:before {
   content: "\e905";
 }
-.cms-favorites:before {
+.cms-log:before {
   content: "\e906";
 }
-.cms-realNameAuthentication:before {
+.cms-favorites:before {
   content: "\e907";
 }
-.cms-quote:before {
+.cms-realNameAuthentication:before {
   content: "\e908";
 }
-.cms-user2:before {
+.cms-quote:before {
   content: "\e909";
+}
+.cms-user2:before {
+  content: "\e90a";
+}
+.cms-lock1:before {
+  content: "\e900";
 }

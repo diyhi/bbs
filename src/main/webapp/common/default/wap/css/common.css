@@ -345,6 +345,41 @@ html,body{
 .topicContentModule .topicDetail .main img{
 	display: block; max-width: 100%;
 }
+.topicContentModule .topicDetail .main hide{
+	display:block;
+	background: #f5f5f5;
+	min-height:100px;
+	margin-left: 10px;
+	margin-right: 10px;
+	margin-top: 17px;
+	margin-bottom: 15px;
+	border: 2px dashed #e6e6e6;
+	border-radius: 5px;
+	
+}
+.topicContentModule .topicDetail .main hide .hide-box{
+	margin: 5px;position: relative;text-align: center;
+}
+.topicContentModule .topicDetail .main hide .background-image{
+	margin: auto;
+	margin-top:12px;
+	font-size:40px;
+	
+	opacity:0.4;
+	filter:alpha(opacity=40); 
+}
+.topicContentModule .topicDetail .main hide .background-prompt{
+	margin-top: 2px; color: #999999;font-size: 16px;
+}/*border:#a9a9a9 solid 2px;  边框#b2b5bc #777777*/
+.topicContentModule .topicDetail .main hide .input-box{margin: auto; margin-top: 10px;margin-bottom:18px; border:#b2b5bc solid 2px; width:226px; height:26px; overflow:hidden; border-radius: 2px;}
+.topicContentModule .topicDetail .main hide .input-box .text{ width:145px; height:26px; line-height:26px; border:0; float:left; font-size:14px; color:#4f4f4f; text-indent: 6px; vertical-align:middle;outline:none; background: #f7f8fa;}
+.topicContentModule .topicDetail .main hide .input-box .button{ width:79px;*width:76px; height:26px; line-height:28px; border:0; background:#b2b5bc; font-size:16px; color:#fff; float:right; font-weight:bold; cursor:pointer;text-decoration: none; outline: none}
+.topicContentModule .topicDetail .main hide .input-box .button:hover{background:#787f81;}/*background:#606060;*/
+
+.topicContentModule .topicDetail .main hide .submit-box{margin: auto; margin-top: 10px;margin-bottom:18px; border:#b8bbbf solid 2px; width:96px; height:26px; overflow:hidden; border-radius: 2px;}
+.topicContentModule .topicDetail .main hide .submit-box .button{ width:96px; height:26px; line-height:28px; border:0; background:#b2b5bc; font-size:16px; color:#fff; float:right; font-weight:bold; cursor:pointer;text-decoration: none; outline: none}
+.topicContentModule .topicDetail .main hide .submit-box .button:hover{background:#787f81;}
+
 .topicContentModule .operating {
 	display:inline-block;text-align: center;width: 100%;
 }
@@ -729,13 +764,10 @@ html,body{
 .loginModule .info .register{margin-left: 20px;}
 .loginModule .info .findPassWord{float: right;margin-right: 20px;margin-top: -19px;}
 
-.homeModule{padding-bottom: 45px;}
-
-
-/*------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
-
 
 /* 用户中心页头 */
+.homeModule{padding-bottom: 45px;}
+
 .homeModule .homeHeader{position:relative;height:100px;background:center center no-repeat;background-size:cover;-webkit-user-select:none;background-color:#26a2ff;}
 .homeModule .homeHeader .user{padding-left:100px;padding-top:15px;font-size:12px;font-weight:bold;color:#fff;-webkit-user-select:none;line-height:30px; }
 .homeModule .homeHeader .user .avatar{position:absolute;left:10px;top:15px;display:inline-block;background-size:212px 645px;font-size:74px;}
@@ -885,6 +917,8 @@ html,body{
 	color:#aaa;
 }
 .topicListModule .topicList .item .topInfo .bRight .status{fontsize:13px;padding-right: 5px;}
+.topicListModule .topicList .item .topInfo .bRight .fast{fontsize:13px;padding-right: 5px;}
+
 .topicListModule .topicList .item .topInfo .bRight .time{font-style:normal;}
 .topicListModule .topicList .item .title{
 	position:relative;
@@ -1430,4 +1464,9 @@ html,body{
 .favoriteModule .favoriteList .item .main .content {
 	margin-bottom: 10px;
 	color:#222;
+}
+
+/** 话题取消隐藏用户列表 **/
+.topicUnhideListModule{
+	padding-top: 40px;padding-bottom: 2px;
 }

@@ -136,13 +136,13 @@
 								    	<span>{{error.topicTagId}}</span>
 								    </p>
 						        </li>
+						        
 								<li>
 									<div ref="topicContentEditorToolbar" class="editor-toolbar"></div>
 									<div ref="topicContentEditorText"  class="editor-text"></div>
 									<p class="tips">
 								    	<span>{{error.topicContent}}</span>	
 								    </p>
-								   
 								</li>
 								
 								<li v-if="showCaptcha" >
@@ -217,7 +217,8 @@
 			        </div>
 				</div>
 				<div class="main"> 
-					<div v-html="topic.content"></div>
+					<!-- 内容 -->
+					<component v-bind:is ="hideTagComponent(topic.content)" v-bind="$props" />
 				</div>
 				<div class="operating">
 					<div class="bottomInfo">
@@ -957,10 +958,10 @@
 			                <div class="tagName">{{topic.tagName}}</div>
 			            </span>
 			            <p class="bRight">
-			            	<span class="status" v-if="topic.status == 10">[待审核]</span><i class="time">{{topic.postTime}}</i>
-			            	<router-link tag="span" class="favorite" :to="{path: '/user/control/topicFavoriteList', query: {topicId: topic.id}}" >
-								收藏
-							</router-link>
+			            	<span class="status" v-if="topic.status == 10">[待审核]</span>
+			            	<router-link class="fast cms-lock1"  tag="span" :to="{path: '/user/control/topicUnhideList', query: {topicId: topic.id}}" ></router-link>
+			            	<router-link class="fast cms-favorites"  tag="span" :to="{path: '/user/control/topicFavoriteList', query: {topicId: topic.id}}" ></router-link>
+			            	<i class="time">{{topic.postTime}}</i>
 			            </p> 
 			        </div>
 			    	<!-- router-link渲染成<h2>标签-->
@@ -1579,6 +1580,16 @@
 							        </router-link>
 									评论了我的话题
 								</div>
+								<div v-if="remind.typeCode == 60">
+									<router-link class="link" :to="{path: '/user/control/home', query: {userName: remind.senderUserName}}">
+							            {{remind.senderUserName}}
+							        </router-link>
+									在
+									<router-link class="link" :to="{path: '/thread', query: {topicId: remind.topicId}}">
+							            {{remind.topicTitle}}
+							        </router-link>
+									解锁了我的话题
+								</div>
 							</div>               
 						</div>
 					</div>
@@ -1643,6 +1654,28 @@
 	</div>
 </template>
 
+<!-- 话题取消隐藏用户列表 -->
+<template id="topicUnhide-template">
+	<div>
+		<mt-header fixed title="话题取消隐藏用户" style="background: #fafafa; color: #000000;font-size: 14px">
+	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
+	    	<router-link to="/index" slot="right">
+			    <span class="cms-home" style="font-size: 18px;"></span>
+			</router-link>
+		</mt-header>
+		<div class="topicUnhideListModule">
+			<div v-infinite-scroll="queryTopicUnhide" infinite-scroll-disabled="loading" infinite-scroll-distance="10">
+				<ul>
+					<li v-for="topicUnhide in topicUnhideList">
+						<mt-cell :title="topicUnhide.userName" :label="topicUnhide.cancelTime" v-if="topicUnhide.hideTagType == 10"  value="输入密码" @click.native="toUser(topicUnhide.userName)" is-link></mt-cell>
+						<mt-cell :title="topicUnhide.userName" :label="topicUnhide.cancelTime" v-if="topicUnhide.hideTagType == 40"  value="积分购买" @click.native="toUser(topicUnhide.userName)" is-link></mt-cell>
+					</li>
+				
+				</ul>
+			</div>
+		</div>
+	</div>
+</template>
 
 <!-- 公共模块 -->
 <template id="bottomTab-template">
@@ -1703,14 +1736,14 @@
 <link href="${baseURL}${commonPath}js/vue-photo-preview/skin.css" type="text/css" rel="stylesheet">
 <script src="${commonPath}js/vue-photo-preview/vue-photo-preview.js" type="text/javascript"></script> 
 
-<link href="${baseURL}${commonPath}css/common.css?2d" type="text/css" rel="stylesheet">
-<script src="${commonPath}js/better-scroll.min.js" type="text/javascript"></script> 
+<link href="${baseURL}${commonPath}css/common.css" type="text/css" rel="stylesheet">
+<script src="${commonPath}js/better-scroll.min.js?2d" type="text/javascript"></script> 
  
 <script src="${commonPath}js/vue-cropper.js" type="text/javascript"></script>
  
-<script src="${commonPath}js/wangeditor/wangEditor.min.js" type="text/javascript"></script>
+<script src="${commonPath}js/wangeditor/wangEditor.min.js?3" type="text/javascript"></script>
 
-<script src="${commonPath}js/main.js?3d" type="text/javascript"></script>
+<script src="${commonPath}js/main.js?dddddddvddd" type="text/javascript"></script>
 
 
 

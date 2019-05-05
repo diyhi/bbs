@@ -10,6 +10,9 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -18,24 +21,30 @@ import com.google.common.util.concurrent.AtomicLongMap;
 
 import cms.bean.staff.SysUsers;
 import cms.bean.thumbnail.Thumbnail;
+import cms.bean.topic.HideTagType;
 import cms.bean.topic.ImageInfo;
 import cms.bean.topic.Topic;
+import cms.bean.topic.TopicUnhide;
 import cms.bean.user.User;
 import cms.service.staff.StaffService;
 import cms.service.thumbnail.ThumbnailService;
 import cms.service.topic.CommentService;
 import cms.service.topic.TopicService;
 import cms.service.user.UserService;
+import cms.utils.Verification;
 import cms.web.action.FileManage;
 import cms.web.action.TextFilterManage;
 import cms.web.action.cache.CacheManage;
 import cms.web.action.thumbnail.ThumbnailManage;
+import net.sf.cglib.beans.BeanCopier;
 /**
  * 话题管理
  *
  */
 @Component("topicManage")
 public class TopicManage {
+	private static final Logger logger = LogManager.getLogger(TopicManage.class);
+	
 	@Resource TopicManage topicManage;
 	@Resource TextFilterManage textFilterManage;
 	@Resource TopicService topicService;
@@ -46,6 +55,9 @@ public class TopicManage {
 	@Resource ThumbnailService thumbnailService;
 	@Resource ThumbnailManage thumbnailManage;
 	@Resource CacheManage cacheManage;
+	
+	@Resource TopicUnhideConfig topicUnhideConfig;
+	
 	
 	//key: 话题Id value:展示次数
     private AtomicLongMap<Long> countMap = AtomicLongMap.create();
@@ -321,6 +333,7 @@ public class TopicManage {
 	 * @param topicId 话题Id
 	 */
 	public Topic queryTopicCache(Long topicId){
+		
 		Topic topic = (Topic)cacheManage.getCache("topicManage_cache_topic", String.valueOf(topicId));
 		if(topic == null){
 			topic = topicService.findById(topicId);
@@ -348,4 +361,219 @@ public class TopicManage {
 		cacheManage.deleteCache("topicManage_cache_topic",String.valueOf(topicId));
 	}
 	
+	
+	
+	
+	/**--------------------------------------------- 话题取消隐藏 -----------------------------------------------**/
+	
+	/**
+     * 生成'话题取消隐藏Id'
+     * 话题取消隐藏Id格式（取消隐藏的用户Id-隐藏标签类型-话题Id）
+     * @param userId 用户Id
+     * @param hideTagTypeId 隐藏标签类型Id
+     * @param topicId 话题Id
+     * @return
+     */
+    public String createTopicUnhideId(Long userId,Integer hideTagTypeId,Long topicId){
+    	return userId+"_"+hideTagTypeId+"_"+topicId;
+    }
+	
+	/**
+	 * 解析'话题取消隐藏Id'的话题Id(后N位)
+	 * @param topicUnhideId 话题取消隐藏Id
+	 * @return
+	 */
+    public int analysisTopicId(String topicUnhideId){
+    	String[] idGroup = topicUnhideId.split("_");
+    	Long topicId = Long.parseLong(idGroup[2]);
+    	
+    	//选取得后N位话题Id
+    	String after_topicId = String.format("%04d", Math.abs(topicId)%10000);
+    	return Integer.parseInt(after_topicId);
+    } 
+	
+	
+    /**
+     * 校验话题取消隐藏Id
+     * @param topicUnhideId 话题取消隐藏Id
+     * @return
+     */
+    public boolean verificationTopicUnhideId(String topicUnhideId){
+    	if(topicUnhideId != null && !"".equals(topicUnhideId.trim())){
+    		String[] idGroup = topicUnhideId.split("_");
+    		for(String id : idGroup){
+    			boolean verification = Verification.isPositiveIntegerZero(id);//数字
+    			if(!verification){
+    				return false;
+    			}
+    			return true;
+    		}	
+			
+    	}
+    	return false;
+    }
+	
+	
+    /**
+     * 生成'话题取消隐藏'对象
+     * @return
+     */
+    public Object createTopicUnhideObject(TopicUnhide topicUnhide){
+    	//表编号
+		int tableNumber = topicUnhideConfig.topicUnhideIdRemainder(topicUnhide.getId());
+		if(tableNumber == 0){//默认对象
+			return topicUnhide;
+		}else{//带下划线对象
+			Class<?> c;
+			try {
+				c = Class.forName("cms.bean.topic.TopicUnhide_"+tableNumber);
+				Object object = c.newInstance();
+				
+				BeanCopier copier = BeanCopier.create(TopicUnhide.class,object.getClass(), false); 
+			
+				copier.copy(topicUnhide,object, null);
+				return object;
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+			//	e.printStackTrace();
+				if (logger.isErrorEnabled()) {
+		            logger.error("生成话题取消隐藏对象",e);
+		        }
+			} catch (InstantiationException e) {
+				// TODO Auto-generated catch block
+				//e.printStackTrace();
+				if (logger.isErrorEnabled()) {
+		            logger.error("生成话题取消隐藏对象",e);
+		        }
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				//e.printStackTrace();
+				if (logger.isErrorEnabled()) {
+		            logger.error("生成话题取消隐藏对象",e);
+		        }
+			}	
+		}
+		return null;
+    }
+    
+    /**
+     * 生成处理'隐藏标签'Id
+     * @param topicId 话题Id
+     * @param lastUpdateTime 最后修改时间
+     * @param visibleTagList 允许可见的隐藏标签
+     * @return
+     */
+    public String createProcessHideTagId(Long topicId,Date lastUpdateTime,List<Integer> visibleTagList){
+    	String id = topicId+"|";
+    	
+    	if(visibleTagList != null && visibleTagList.size() >0){
+    		if(visibleTagList.contains(HideTagType.PASSWORD.getName())){
+    			id+="1,";
+    		}else{
+    			id+="0,";
+    		}
+    		if(visibleTagList.contains(HideTagType.COMMENT.getName())){
+    			id+="1,";
+    		}else{
+    			id+="0,";
+    		}
+    		if(visibleTagList.contains(HideTagType.GRADE.getName())){
+    			id+="1,";
+    		}else{
+    			id+="0,";
+    		}
+    		if(visibleTagList.contains(HideTagType.POINT.getName())){
+    			id+="1,";
+    		}else{
+    			id+="0,";
+    		}
+    		if(visibleTagList.contains(HideTagType.AMOUNT.getName())){
+    			id+="1,";
+    		}else{
+    			id+="0,";
+    		}
+    	}
+    	if(lastUpdateTime != null){
+			id+="|"+lastUpdateTime.getTime();
+		}else{
+			id+="|";
+		}
+    	return id;
+    }
+   
+	
+    
+    /**
+	 * 查询缓存 查询'话题取消隐藏'
+	 * @param topicUnhideId 话题取消隐藏Id
+	 * @return
+	 */
+	@Cacheable(value="topicManage_cache_findTopicUnhideById",key="#topicUnhideId")
+	public TopicUnhide query_cache_findTopicUnhideById(String topicUnhideId){
+		return topicService.findTopicUnhideById(topicUnhideId);
+	}
+	/**
+	 * 删除缓存 话题取消隐藏
+	 * @param topicUnhideId 话题取消隐藏Id
+	 * @return
+	 */
+	@CacheEvict(value="topicManage_cache_findTopicUnhideById",key="#topicUnhideId")
+	public void delete_cache_findTopicUnhideById(String topicUnhideId){
+	}
+    
+	/**
+	 * 查询缓存 查询用户是否评论话题
+	 * @param topicId 话题Id
+	 * @param userName 用户名称
+	 * @return
+	 */
+	@Cacheable(value="topicManage_cache_findWhetherCommentTopic",key="#topicId+'_'+#userName")
+	public Boolean query_cache_findTopicUnhideById(Long topicId,String userName){
+		return commentService.findWhetherCommentTopic(topicId, userName);
+	}
+	/**
+	 * 删除缓存 查询用户是否评论话题
+	 * @param topicId 话题Id
+	 * @param userName 用户名称
+	 * @return
+	 */
+	@CacheEvict(value="topicManage_cache_findWhetherCommentTopic",key="#topicId+'_'+#userName")
+	public void delete_cache_findTopicUnhideById(Long topicId,String userName){
+	}
+	
+	/**
+	 * 查询缓存 解析隐藏标签
+	 * @param html 富文本内容
+	 * @param topicId 话题Id
+	 * @return
+	 */
+	@Cacheable(value="topicManage_cache_analysisHiddenTag",key="#topicId")
+	public Map<Integer,Object> query_cache_analysisHiddenTag(String html,Long topicId){
+		return textFilterManage.analysisHiddenTag(html);
+	}
+	/**
+	 * 删除缓存 解析隐藏标签
+	 * @param topicId 话题Id
+	 * @param userName 用户名称
+	 * @return
+	 */
+	@CacheEvict(value="topicManage_cache_analysisHiddenTag",key="#topicId")
+	public void delete_cache_analysisHiddenTag(Long topicId){
+	}
+	
+	
+	/**
+	 * 查询缓存 处理隐藏标签(缓存不做删除处理，到期自动失效，由话题'最后修改时间'做参数,确保查询为最新值)
+	 * @param html 富文本内容
+	 * @param visibleTagList 允许可见的隐藏标签
+	 * @param processHideTagId 处理'隐藏标签'Id
+	 * @return
+	 */
+	@Cacheable(value="topicManage_cache_processHiddenTag",key="#processHideTagId")
+	public String query_cache_processHiddenTag(String html,List<Integer> visibleTagList,String processHideTagId){
+		
+		return textFilterManage.processHiddenTag(html,visibleTagList);
+	}
+
+
 }

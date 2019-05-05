@@ -80,10 +80,10 @@ public class CaptchaManage {
 			isCaptcha = true;
 		}else{
 			//用户每分钟提交次数
-			int quantity = settingManage.submitQuantity_add("topic", userName, 0);//原来总次数
+			Integer quantity = settingManage.getSubmitQuantity("topic", userName); 
 			
 			//如果每用户每分钟提交超过设定次数，则需验证码
-			if(quantity >= systemSetting.getTopic_submitQuantity()){
+			if(quantity != null && quantity >= systemSetting.getTopic_submitQuantity()){
 				isCaptcha = true;
 			}
 			
@@ -106,10 +106,10 @@ public class CaptchaManage {
 			isCaptcha = true;
 		}else{
 			//用户每分钟提交次数
-			int quantity = settingManage.submitQuantity_add("comment", userName, 0);//原来总次数
+			Integer quantity = settingManage.getSubmitQuantity("comment", userName); 
 			
 			//如果每用户每分钟提交超过设定次数，则需验证码
-			if(quantity >= systemSetting.getComment_submitQuantity()){
+			if(quantity != null && quantity >= systemSetting.getComment_submitQuantity()){
 				isCaptcha = true;
 			}
 			
@@ -131,10 +131,10 @@ public class CaptchaManage {
 		boolean isCaptcha = false;
 		
 		//用户每分钟提交次数
-		int quantity = settingManage.submitQuantity_add("login", userName, 0);//原来总次数
+		Integer quantity = settingManage.getSubmitQuantity("login", userName); 
 		
 		//如果每用户每分钟提交超过设定次数，则需验证码
-		if(quantity >= settingService.findSystemSetting_cache().getLogin_submitQuantity()){
+		if(quantity != null && quantity >= settingService.findSystemSetting_cache().getLogin_submitQuantity()){
 			isCaptcha = true;
 		}
 		return isCaptcha;
@@ -155,10 +155,10 @@ public class CaptchaManage {
 			isCaptcha = true;
 		}else{
 			//用户每分钟提交次数
-			int quantity = settingManage.submitQuantity_add("privateMessage", userName, 0);//原来总次数
+			Integer quantity = settingManage.getSubmitQuantity("privateMessage", userName); 
 			
 			//如果每用户每分钟提交超过设定次数，则需验证码
-			if(quantity >= systemSetting.getPrivateMessage_submitQuantity()){
+			if(quantity != null && quantity >= systemSetting.getPrivateMessage_submitQuantity()){
 				isCaptcha = true;
 			}
 			

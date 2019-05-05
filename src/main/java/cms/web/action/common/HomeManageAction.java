@@ -45,6 +45,7 @@ import cms.bean.topic.Comment;
 import cms.bean.topic.Reply;
 import cms.bean.topic.Tag;
 import cms.bean.topic.Topic;
+import cms.bean.topic.TopicUnhide;
 import cms.bean.user.AccessUser;
 import cms.bean.user.FormCaptcha;
 import cms.bean.user.PointLog;
@@ -137,9 +138,11 @@ public class HomeManageAction {
 	@Resource OAuthManage oAuthManage;
 	
 	@Resource ThumbnailManage thumbnailManage;
+	
 	@Resource FavoriteService favoriteService;
 	
 	@Resource FavoriteManage favoriteManage;
+	
 	/**--------------------------------- 首页 -----------------------------------**/
 	/**
 	 * 用户中心页
@@ -1563,17 +1566,18 @@ public class HomeManageAction {
 	    //验证验证码
   		if(captchaKey != null && !"".equals(captchaKey.trim())){
   			//增加验证码重试次数
-  			//统计每分钟原来提交次数
-  			int quantity = settingManage.submitQuantity_add("captcha", captchaKey.trim(), 0);
-  			//删除每分钟原来提交次数
-  			settingManage.submitQuantity_delete("captcha", captchaKey.trim());
-  			//刷新每分钟原来提交次数
-  			settingManage.submitQuantity_add("captcha", captchaKey.trim(), quantity+1);
+  		//统计每分钟原来提交次数
+			Integer original = settingManage.getSubmitQuantity("captcha", captchaKey.trim());
+    		if(original != null){
+    			settingManage.addSubmitQuantity("captcha", captchaKey.trim(),original+1);//刷新每分钟原来提交次数
+    		}else{
+    			settingManage.addSubmitQuantity("captcha", captchaKey.trim(),1);//刷新每分钟原来提交次数
+    		}
   			
   			String _captcha = captchaManage.captcha_generate(captchaKey.trim(),"");
   			if(captchaValue != null && !"".equals(captchaValue.trim())){
   				if(_captcha != null && !"".equals(_captcha.trim())){
-  					if(!_captcha.equals(captchaValue)){
+  					if(!_captcha.equalsIgnoreCase(captchaValue)){
   						error.put("captchaValue",ErrorView._15.name());//验证码错误
   					}
   				}else{
@@ -2399,16 +2403,17 @@ public class HomeManageAction {
 			if(captchaKey != null && !"".equals(captchaKey.trim())){
 				//增加验证码重试次数
 				//统计每分钟原来提交次数
-				int quantity = settingManage.submitQuantity_add("captcha", captchaKey.trim(), 0);
-				//删除每分钟原来提交次数
-				settingManage.submitQuantity_delete("captcha", captchaKey.trim());
-				//刷新每分钟原来提交次数
-				settingManage.submitQuantity_add("captcha", captchaKey.trim(), quantity+1);
+				Integer original = settingManage.getSubmitQuantity("captcha", captchaKey.trim());
+	    		if(original != null){
+	    			settingManage.addSubmitQuantity("captcha", captchaKey.trim(),original+1);//刷新每分钟原来提交次数
+	    		}else{
+	    			settingManage.addSubmitQuantity("captcha", captchaKey.trim(),1);//刷新每分钟原来提交次数
+	    		}
 				
 				String _captcha = captchaManage.captcha_generate(captchaKey.trim(),"");
 				if(captchaValue != null && !"".equals(captchaValue.trim())){
 					if(_captcha != null && !"".equals(_captcha.trim())){
-						if(!_captcha.equals(captchaValue)){
+						if(!_captcha.equalsIgnoreCase(captchaValue)){
 							error.put("captchaValue",ErrorView._15.name());//验证码错误
 						}
 					}else{
@@ -2491,11 +2496,12 @@ public class HomeManageAction {
 			
 			
 			//统计每分钟原来提交次数
-			int quantity = settingManage.submitQuantity_add("privateMessage", accessUser.getUserName(), 0);
-			//删除每分钟原来提交次数
-			settingManage.submitQuantity_delete("privateMessage", accessUser.getUserName());
-			//刷新每分钟原来提交次数
-			settingManage.submitQuantity_add("privateMessage", accessUser.getUserName(), quantity+1);
+			Integer original = settingManage.getSubmitQuantity("privateMessage", accessUser.getUserName());
+    		if(original != null){
+    			settingManage.addSubmitQuantity("privateMessage", accessUser.getUserName(),original+1);//刷新每分钟原来提交次数
+    		}else{
+    			settingManage.addSubmitQuantity("privateMessage", accessUser.getUserName(),1);//刷新每分钟原来提交次数
+    		}
 		}
 		
 		
@@ -3434,5 +3440,56 @@ public class HomeManageAction {
 			}
 		}
 		
+	}
+	
+	
+	
+	/**
+	 * 话题取消隐藏用户列表(只记录'输入密码可见','积分购买可见','余额购买可见'的用户)
+	 * @param model
+	 * @param pageForm
+	 * @param topicId 话题Id
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/user/control/topicUnhideList",method=RequestMethod.GET) 
+	public String topicUnhideList(ModelMap model,PageForm pageForm,Long topicId,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+		
+		String dirName = templateService.findTemplateDir_cache();
+		
+		
+		String accessPath = accessSourceDeviceManage.accessDevices(request);
+	   
+		//调用分页算法代码
+		PageView<TopicUnhide> pageView = new PageView<TopicUnhide>(settingService.findSystemSetting_cache().getForestagePageNumber(),pageForm.getPage(),10,request.getRequestURI(),request.getQueryString());
+		
+		//获取登录用户
+	  	AccessUser accessUser = AccessUserThreadLocal.get();
+	  	if(topicId != null && topicId > 0L){
+	  		Topic topicInfo = topicManage.queryTopicCache(topicId);//查询缓存
+	  		if(topicInfo != null && topicInfo.getUserName().equals(accessUser.getUserName())){
+	  			//当前页
+	  			int firstIndex = (pageForm.getPage()-1)*pageView.getMaxresult();
+	  			
+	  			
+	  			QueryResult<TopicUnhide> qr = topicService.findTopicUnhidePageByTopicId(firstIndex,pageView.getMaxresult(),topicId);
+
+	  			//将查询结果集传给分页List
+	  			pageView.setQueryResult(qr);
+	  		}
+	  	}
+		
+		if(isAjax){
+			WebUtil.writeToWeb(JsonUtils.toJSONString(pageView), "json", response);
+			return null;
+		}else{
+			model.addAttribute("pageView", pageView);
+			return "templates/"+dirName+"/"+accessPath+"/topicUnhideList";	
+		}
 	}
 }

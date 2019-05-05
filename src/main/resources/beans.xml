@@ -407,6 +407,11 @@ http://www.springframework.org/schema/task http://www.springframework.org/schema
         <!-- 话题收藏分表数量 -->
         <property name="tableQuantity" value="4" />    
     </bean>
+    <!-- 创建话题取消隐藏配置 -->
+    <bean id="topicUnhideConfig" class="cms.web.action.topic.TopicUnhideConfig" >
+        <!-- 话题取消隐藏分表数量 -->
+        <property name="tableQuantity" value="4" />    
+    </bean>
     
    	<!-- 让普通的java类获取spring 的bean配置 -->
    	<bean id="SpringConfigTool" class="cms.utils.SpringConfigTool"></bean>

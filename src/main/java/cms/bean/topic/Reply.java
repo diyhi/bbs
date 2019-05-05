@@ -22,7 +22,7 @@ import javax.persistence.Transient;
 @Entity
 @Table(name="reply",indexes = {@Index(name="reply_1_idx", columnList="commentId,status"),@Index(name="reply_2_idx", columnList="topicId"),@Index(name="reply_3_idx", columnList="userName,isStaff")})
 public class Reply implements Serializable{
-	private static final long serialVersionUID = 93326746497425678L;
+	private static final long serialVersionUID = 4931492011929337590L;
 	
 	/** Id **/
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)

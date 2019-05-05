@@ -2126,7 +2126,9 @@ Emoticon.prototype = {
     constructor: Emoticon,
 
     onClick: function onClick() {
+    	
         this._createPanel();
+       
     },
 
     _createPanel: function _createPanel() {
@@ -2847,6 +2849,575 @@ Image.prototype = {
     }
 };
 
+
+
+
+/*
+menu - hide
+*/
+//构造函数
+function Hide(editor) {
+	this.editor = editor;
+	this.$elem = $('<div class="w-e-menu">\n            <i class="w-e-icon-hide"></i>\n        </div>');
+	this.type = 'panel';
+	// 当前是否 active 状态
+	this._active = false;
+}
+
+//原型
+Hide.prototype = {
+	constructor: Hide,
+	
+	// 点击事件
+	onClick: function onClick(e) {
+	    var editor = this.editor;
+	     
+	    if (this._active) {//选中隐藏标签
+	    	var $selectionELem = editor.selection.getSelectionContainerElem();
+	        if (!$selectionELem) {
+	            return;
+	        }
+	        
+	        var $hide = $selectionELem.parentUntil('HIDE');
+	        if ($hide != null){
+	        	var visibleType = $($hide).attr('hide-type');
+	 	        var inputValue = $($hide).attr('input-value')
+	        	
+	 	        this._createPanel(visibleType, inputValue);
+	        }else{
+	        	var visibleType = $selectionELem.attr('hide-type');
+		        var inputValue = $selectionELem.attr('input-value');
+		        
+		    	this._createPanel(visibleType, inputValue);
+	        }
+	        
+	    } else {//没有选中隐藏标签
+	    	this._createPanel(10, "");
+	        
+	    }
+	},
+	
+	// 创建 panel
+	//visibleType 隐藏类型  inputValue
+	_createPanel: function _createPanel(visibleType,inputValue) {
+	    var _this = this;
+	    var editor = this.editor;
+	     
+	    // panel 中需要用到的id
+	    var inputPasswordId = getRandom('input-inputValue_10');//密码
+	    var inputMinPointId = getRandom('input-inputValue_30');//超过积分
+	    var inputPointId = getRandom('input-inputValue_40');//积分购买
+	    var inputAmountId = getRandom('input-inputValue_50');//余额购买
+	    
+	     
+	    var btnOkId = getRandom('btnOkId');//插入标签
+	    var btnEditId = getRandom('btnEditId');//修改标签
+	    var btnDelId = getRandom('btnDelId');//删除标签
+	    
+	    
+	    var visibleTypeName = getRandom('radio-visibleType');
+	    var visibleType_10 = getRandom('radio-visibleType_10');
+	    var visibleType_20 = getRandom('radio-visibleType_20');
+	    var visibleType_30 = getRandom('radio-visibleType_30');
+	    var visibleType_40 = getRandom('radio-visibleType_40');
+	    var visibleType_50 = getRandom('radio-visibleType_50');
+	    
+	    var inputValueBox_10 = getRandom('inputValueBox_10');
+	    var inputValueBox_20 = getRandom('inputValueBox_20');
+	    var inputValueBox_30 = getRandom('inputValueBox_30');
+	    var inputValueBox_40 = getRandom('inputValueBox_40');
+	    var inputValueBox_50 = getRandom('inputValueBox_50');
+	    
+	    
+	    // 是否显示“删除”
+	    var delBtnDisplay = 'inline-block';
+	    // 是否显示“修改隐藏标签”
+	    var editBtnDisplay = 'inline-block';
+	    // 是否显示“插入”
+	    var addBtnDisplay = 'inline-block';
+	    
+	    if (this._active) {//选中隐藏标签
+	    	delBtnDisplay = 'inline-block';
+	    	editBtnDisplay = 'inline-block';
+	    	addBtnDisplay = 'none'; 
+	    } else {//没有选中隐藏标签
+	    	delBtnDisplay = 'none';
+	    	editBtnDisplay = 'none'; 
+	    	addBtnDisplay = 'inline-block';
+	    }
+	    
+	    var visibleType_checked_html_10 = "";
+	    var visibleType_checked_html_20 = "";
+	    var visibleType_checked_html_30 = "";
+	    var visibleType_checked_html_40 = "";
+	    var visibleType_checked_html_50 = "";
+	    if(visibleType == 10){
+	    	visibleType_checked_html_10 = " checked=checked ";
+	    }else if(visibleType == 20){
+	    	visibleType_checked_html_20 = " checked=checked ";
+	    }else if(visibleType == 30){
+	    	visibleType_checked_html_30 = " checked=checked ";
+	    }else if(visibleType == 40){
+	    	visibleType_checked_html_40 = " checked=checked ";
+	    }else if(visibleType == 50){
+	    	visibleType_checked_html_50 = " checked=checked ";
+	    }
+	    
+	    
+	    var inputValue_password = "";
+	    var inputValue_minPoint = "";
+	    var inputValue_point = "";
+	    var inputValue_amount = "";
+	    if(visibleType == 10){
+	    	inputValue_password = inputValue;
+	    }else if(visibleType == 20){
+	    	
+	    }else if(visibleType == 30){
+	    	inputValue_minPoint = inputValue;
+	    }else if(visibleType == 40){
+	    	inputValue_point = inputValue;
+	    }else if(visibleType == 50){
+	    	inputValue_amount = inputValue;
+	    }
+	    
+	    
+	    
+	    
+	    var template = "<div>";
+	    	template += 	"<label>";
+	    	template += 		"<div class='radio-box'><input type='radio' id='"+visibleType_10+"' name='"+visibleTypeName+"' class='radio-input' value='10' "+visibleType_checked_html_10+"> <span class='radio-core'></span><span class='radio-title'>输入密码可见</span></div>";
+	    	template += 	"</label>";
+	    	template += 	"<label>";
+	    	template += 		"<div class='radio-box'><input type='radio' id='"+visibleType_20+"' name='"+visibleTypeName+"' class='radio-input' value='20' "+visibleType_checked_html_20+"> <span class='radio-core'></span><span class='radio-title'>回复话题可见</span></div>";
+	    	template += 	"</label>";
+	    	
+	    	/**
+	    	template += 	"<label>";
+	    	template += 		"<div class='radio-box'><input type='radio' id='"+visibleType_30+"' name='"+visibleTypeName+"' class='radio-input' value='30' "+visibleType_checked_html_30+"> <span class='radio-core'></span><span class='radio-title'>超过积分可见</span></div>";
+	    	template += 	"</label>";
+	    	template += 	"<label>";
+	    	template += 		"<div class='radio-box'><input type='radio' id='"+visibleType_40+"' name='"+visibleTypeName+"' class='radio-input' value='40' "+visibleType_checked_html_40+"> <span class='radio-core'></span><span class='radio-title'>积分购买可见</span></div>";
+	    	template += 	"</label>";
+	    	template += 	"<label>";
+	    	template += 		"<div class='radio-box'><input type='radio' id='"+visibleType_50+"' name='"+visibleTypeName+"' class='radio-input' value='50' "+visibleType_checked_html_50+"> <span class='radio-core'></span><span class='radio-title'>余额购买可见</span></div>";
+	    	template += 	"</label>";
+	    	**/
+	    	
+	    	
+	    	template += 	"</td>";
+	    	
+	    	template += 		"<span id='"+inputValueBox_10+"' style='display:none;'><input id='"+inputPasswordId+"'  type='text' class='block' value='"+inputValue_password+"' placeholder='密码' maxlength='20' /></span>";
+	    	template += 		"<span id='"+inputValueBox_30+"' style='display:none;'>积分超过 <input id='"+inputMinPointId+"' style='width:40px;text-align:center;' type='text' value='"+inputValue_minPoint+"' maxlength='8'/> 以上可见</span>";
+	    	template += 		"<span id='"+inputValueBox_40+"' style='display:none;'>需要支付 <input id='"+inputPointId+"' style='width:40px;text-align:center;' type='text' value='"+inputValue_point+"' maxlength='8'/> 积分可见</span>";
+	    	template += 		"<span id='"+inputValueBox_50+"' style='display:none;'>需要支付 <input id='"+inputAmountId+"' style='width:40px;text-align:center;' type='text' value='"+inputValue_amount+"' maxlength='9'/> 元费用可见</span>";
+	    	template += 	"</td>";
+	    	
+	    	template += 	"<div class='w-e-button-container'>";
+	    	template += 		"<button id='"+btnOkId+"' class='right' style='display:" + addBtnDisplay + "'>插入</button>";
+	    	template += 		"<button id='"+btnEditId+"' class='right' style='display:" + editBtnDisplay + "'>修改</button>";
+	    	template += 		"<button id='"+btnDelId+"' class='right' style='display:" + delBtnDisplay + "'>删除</button>";
+	    	template += 	"</div>";
+	    	template += " </div>";
+	    	
+	    	template += "";
+	    
+
+	    // 初始化并显示 panel
+	    	var panel = new Panel(this, {
+	    	width: 300,
+
+	        // panel 中可包含多个 tab
+	        tabs: [{
+	            // tab 的标题
+	            title: '隐藏',
+	            // 模板
+	            tpl: template,
+	            // 事件绑定
+	            events: [
+	            // 选择隐藏类型
+	            {
+	                selector: '#' + visibleType_10,
+	                type: 'click',
+	                fn: function fn() {
+	                    var $inputValueBox_10 = $('#' + inputValueBox_10).show();
+	                    var $inputValueBox_30 = $('#' + inputValueBox_30).hide();
+	                    var $inputValueBox_40 = $('#' + inputValueBox_40).hide();
+	                    var $inputValueBox_50 = $('#' + inputValueBox_50).hide();
+	                }
+	            },
+	            {
+	            	selector: '#' + visibleType_20,
+	                type: 'click',
+	                fn: function fn() {
+	                	var $inputValueBox_10 = $('#' + inputValueBox_10).hide();
+	                    var $inputValueBox_30 = $('#' + inputValueBox_30).hide();
+	                    var $inputValueBox_40 = $('#' + inputValueBox_40).hide();
+	                    var $inputValueBox_50 = $('#' + inputValueBox_50).hide();
+	                }
+	            },
+	            {
+	                selector: '#' + visibleType_30,
+	                type: 'click',
+	                fn: function fn() {
+	                	var $inputValueBox_10 = $('#' + inputValueBox_10).hide();
+	                    var $inputValueBox_30 = $('#' + inputValueBox_30).show();
+	                    var $inputValueBox_40 = $('#' + inputValueBox_40).hide();
+	                    var $inputValueBox_50 = $('#' + inputValueBox_50).hide();
+	                }
+	            },
+	            {
+	                selector: '#' + visibleType_40,
+	                type: 'click',
+	                fn: function fn() {
+	                	var $inputValueBox_10 = $('#' + inputValueBox_10).hide();
+	                    var $inputValueBox_30 = $('#' + inputValueBox_30).hide();
+	                    var $inputValueBox_40 = $('#' + inputValueBox_40).show();
+	                    var $inputValueBox_50 = $('#' + inputValueBox_50).hide();
+	                }
+	            },
+	            {
+	                selector: '#' + visibleType_50,
+	                type: 'click',
+	                fn: function fn() {
+	                	var $inputValueBox_10 = $('#' + inputValueBox_10).hide();
+	                    var $inputValueBox_30 = $('#' + inputValueBox_30).hide();
+	                    var $inputValueBox_40 = $('#' + inputValueBox_40).hide();
+	                    var $inputValueBox_50 = $('#' + inputValueBox_50).show();
+	                }
+	            },
+	            // 插入标签
+	            {
+	                selector: '#' + btnOkId,
+	                type: 'click',
+	                fn: function fn() {
+	                	var _visibleTypeName = $("input[name='"+visibleTypeName+"']:checked").val();
+	                	var _inputValue = "";
+	                	
+	                	if(_visibleTypeName == 10){
+	                		 _inputValue = $('#' + inputPasswordId).val();//密码
+	                		 if(_inputValue.trim() == ""){
+	                			 alert("请输入密码");
+	                			 return false;
+	                		 }
+	                	}else if(_visibleTypeName == 20){
+	                		 
+	                	}else if(_visibleTypeName == 30){
+	                		_inputValue = $('#' + inputMinPointId).val();//超过积分
+	                		if (_inputValue == "" || !/^[0-9]*[1-9][0-9]*$/.test(_inputValue)) {
+	                			alert("请输入大于0的数字");
+	                			return false;
+	                		}
+	                	}else if(_visibleTypeName == 40){
+	                		_inputValue  = $('#' + inputPointId).val();//积分购买
+	                		if (_inputValue == "" || !/^[0-9]*[1-9][0-9]*$/.test(_inputValue)) {
+		     					alert("请输入大于0的数字");
+		     					return false;
+		                	}
+	                	}else if(_visibleTypeName == 50){
+	                		_inputValue = $('#' + inputAmountId).val();//余额购买
+	                		if (_inputValue == "" || !/^(([1-9]\d*)(\.\d{1,2})?)$|(0\.0?([1-9]\d?))$/.test(_inputValue)) {
+	                			 alert("请输入大于0的金额");
+	                			 return false;
+	                		}
+	                	}
+	                	
+	                	var html = "";
+	                	if(_visibleTypeName == 10){//输入密码可见
+							html = "<hide class='inputValue_10' hide-type='10' input-value='"+_inputValue+"'></hide>";
+						}else if(_visibleTypeName == 20){//回复话题可见
+							html = "<hide class='inputValue_20' hide-type='20' ></hide>";
+						}else if(_visibleTypeName == 30){//超过积分可见
+							html = "<hide class='inputValue_30' hide-type='30' input-value='"+_inputValue+"'></hide>";
+						}else if(_visibleTypeName == 40){//积分购买可见
+							html = "<hide class='inputValue_40' hide-type='40' input-value='"+_inputValue+"'></hide>";
+						}else if(_visibleTypeName == 50){//余额购买可见
+							html = "<hide class='inputValue_50' hide-type='50' input-value='"+_inputValue+"'></hide>";
+						}
+	                	
+	                	_this._insertHide(html);
+	                	
+	                	// 设置同类型标签为相同的值
+	        	        _this._setSameTypeTab(editor.txt.html(),_visibleTypeName,_inputValue);
+	        	        
+	                    // 返回 true，表示该事件执行完之后，panel 要关闭。否则 panel 不会关闭
+	                    return true;
+	                }
+	            },
+	            // 修改标签
+	            {
+	            	selector: '#' + btnEditId,
+	                type: 'click',
+	                fn: function fn() {
+	                	var _visibleTypeName = $("input[name='"+visibleTypeName+"']:checked").val();
+	                	var _inputValue = "";
+	                	
+	                	if(_visibleTypeName == 10){
+	                		 _inputValue = $('#' + inputPasswordId).val();//密码
+	                		 if(_inputValue.trim() == ""){
+	                			 alert("请输入密码");
+	                			 return false;
+	                		 }
+	                	}else if(_visibleTypeName == 20){
+	                		 
+	                	}else if(_visibleTypeName == 30){
+	                		_inputValue = $('#' + inputMinPointId).val();//超过积分
+	                		if (_inputValue == "" || !/^\d*$/.test(_inputValue)) {
+	                			alert("请输入数字类型");
+	                			return false;
+	                		}
+	                	}else if(_visibleTypeName == 40){
+	                		_inputValue  = $('#' + inputPointId).val();//积分购买
+	                		if (_inputValue == "" || !/^\d*$/.test(_inputValue)) {
+		     					alert("请输入数字类型");
+		     					return false;
+		                	}
+	                	}else if(_visibleTypeName == 50){
+	                		_inputValue = $('#' + inputAmountId).val();//余额购买
+	                		if (_inputValue == "" || !/^\d*$/.test(_inputValue)) {
+	                			 alert("请输入数字类型");
+	                			 return false;
+	                		}
+	                	}
+	                	
+	                	var $hide = editor.selection.getSelectionContainerElem().parentUntil('HIDE');
+	        	        if ($hide != null){
+	        	 	       if(_visibleTypeName == 10){//输入密码可见
+		                		$hide.attr('class','inputValue_10');
+		                		$hide.attr('hide-type',10);
+		                		$hide.attr('input-value',_inputValue);
+							}else if(_visibleTypeName == 20){//回复话题可见
+								$hide.attr('class','inputValue_20');
+								$hide.attr('hide-type',20);
+								$hide.attr('input-value','');
+							}else if(_visibleTypeName == 30){//超过积分可见
+								$hide.attr('class','inputValue_30');
+								$hide.attr('hide-type',30);
+								$hide.attr('input-value',_inputValue);
+							}else if(_visibleTypeName == 40){//积分购买可见
+								$hide.attr('class','inputValue_40');
+								$hide.attr('hide-type',40);
+								$hide.attr('input-value',_inputValue);
+							}else if(_visibleTypeName == 50){//余额购买可见
+								$hide.attr('class','inputValue_50');
+								$hide.attr('hide-type',50);
+								$hide.attr('input-value',_inputValue);
+							} 
+	        	        }else{
+	        	        	if(_visibleTypeName == 10){//输入密码可见
+		                		var $selectionELem = editor.selection.getSelectionContainerElem();
+		                		$selectionELem.attr('class','inputValue_10');
+		            	        $selectionELem.attr('hide-type',10);
+		            	        $selectionELem.attr('input-value',_inputValue);
+							}else if(_visibleTypeName == 20){//回复话题可见
+								var $selectionELem = editor.selection.getSelectionContainerElem();
+		                		$selectionELem.attr('class','inputValue_20');
+		            	        $selectionELem.attr('hide-type',20);
+		            	        $selectionELem.attr('input-value','');
+							}else if(_visibleTypeName == 30){//超过积分可见
+								var $selectionELem = editor.selection.getSelectionContainerElem();
+		                		$selectionELem.attr('class','inputValue_30');
+		            	        $selectionELem.attr('hide-type',30);
+		            	        $selectionELem.attr('input-value',_inputValue);
+							}else if(_visibleTypeName == 40){//积分购买可见
+								var $selectionELem = editor.selection.getSelectionContainerElem();
+		                		$selectionELem.attr('class','inputValue_40');
+		            	        $selectionELem.attr('hide-type',40);
+		            	        $selectionELem.attr('input-value',_inputValue);
+							}else if(_visibleTypeName == 50){//余额购买可见
+								var $selectionELem = editor.selection.getSelectionContainerElem();
+		                		$selectionELem.attr('class','inputValue_50');
+		            	        $selectionELem.attr('hide-type',50);
+		            	        $selectionELem.attr('input-value',_inputValue);
+							}
+	        	        	
+	        	        }
+	        	        // 设置同类型标签为相同的值
+	        	        _this._setSameTypeTab(editor.txt.html(),_visibleTypeName,_inputValue);
+	                	
+	                    // 返回 true，表示该事件执行完之后，panel 要关闭。否则 panel 不会关闭
+	                	return true;
+	                }
+	            },
+	             // 删除隐藏标签
+	             {
+	                 selector: '#' + btnDelId,
+	                 type: 'click',
+	                 fn: function fn() {
+	                	 //删除标签
+	                	 _this._delHide();
+	                     // 返回 true，表示该事件执行完之后，panel 要关闭。否则 panel 不会关闭
+	                     return true;
+	                 }
+	            }]
+
+	        } // tab end
+	        ] // tabs end
+	    });
+	
+	
+	    // 显示 panel
+	    panel.show();
+	    
+	    //显示输入值框
+	    if(visibleType == 10){
+		    $('#' + inputValueBox_10).show();
+	    }else if(visibleType == 20){
+	    	
+	    }else if(visibleType == 30){
+	    	$('#' + inputValueBox_30).show();
+	    }else if(visibleType == 40){
+	    	$('#' + inputValueBox_40).show();
+	    }else if(visibleType == 50){
+	    	$('#' + inputValueBox_50).show();
+	    }
+	    
+	    // 记录属性
+	    this.panel = panel;
+	},
+	
+	// 删除标签
+	_delHide: function _delHide() {
+	    if (!this._active) {
+	        return;
+	    }
+	    var editor = this.editor;
+        var $selectionELem = editor.selection.getSelectionContainerElem();
+        if (!$selectionELem) {
+            return;
+        }
+        var $hide = $selectionELem.parentUntil('HIDE');
+        if (!$hide) {
+        	$selectionELem.remove();
+        }else{
+        	
+        	$hide.remove();
+        }
+        
+	},
+	
+	// 插入标签
+	_insertHide: function _insertHide(html) {
+		
+		var editor = this.editor;
+        editor.cmd.do('insertHTML', html);
+
+        var $selectionELem = editor.selection.getSelectionContainerElem();
+        if (!$selectionELem) {
+            return;
+        }
+        editor.selection.saveRange();
+     // 插入 <p> ，并将选取定位到 <p>
+        var $p = $('<p><br></p>');
+        $p.insertAfter($selectionELem);
+        editor.selection.createRangeByElem($p, true);
+        editor.selection.restoreSelection();// 恢复选区
+        
+
+   //     editor.cmd.do('insertHTML', '<p><br></p>');
+	},
+	
+	
+	
+	// 设置同类型标签为相同的值
+	_setSameTypeTab: function _setSameTypeTab(oldHtml,visibleType,inputValue) {
+		var _this = this;
+		if(visibleType == 10){//输入密码可见
+			//替换标签
+			var htmlValue = _this.replaceTab(oldHtml,"hide","inputValue_10",""+inputValue+"");
+			_this.editor.txt.html(htmlValue);
+		}else if(visibleType == 20){//回复话题可见
+			
+		}else if(visibleType == 30){//超过积分可见
+			//替换标签
+			var htmlValue =  _this.replaceTab(oldHtml,"hide","inputValue_30",""+inputValue+"");
+			_this.editor.txt.html(htmlValue);
+		}else if(visibleType == 40){//积分购买可见
+			var htmlValue =  _this.replaceTab(oldHtml,"hide","inputValue_40",""+inputValue+""); 
+			_this.editor.txt.html(htmlValue);
+		}else if(visibleType == 50){//余额购买可见
+			var htmlValue =  _this.replaceTab(oldHtml,"hide","inputValue_50",""+inputValue+""); 
+			_this.editor.txt.html(htmlValue);
+		}
+		
+	},
+	/**
+	 * 替换标签
+	 * html html内容
+	 * tag 标签名称
+	 * className css样式名称
+	 * inputValue 替换标签值
+	 */
+	replaceTab: function replaceTab(html,tag,className,inputValue) {
+		var _this = this;
+		var node = document.createElement("div");
+		node.innerHTML = html;
+		
+		_this.getChildNode(node,tag,className,inputValue);
+		return node.innerHTML;
+	},
+	
+	/**
+	 * 递归获取所有的子节点
+	 * node 节点
+	 * tag 标签名称
+	 * className css样式名称
+	 * inputValue 替换标签值
+	 * 
+	 */
+	getChildNode: function getChildNode(node,tag,className,inputValue) {
+        //先找到子节点
+        var nodeList = node.childNodes;
+        for(var i = 0;i < nodeList.length;i++){
+            //childNode获取到到的节点包含了各种类型的节点
+            //但是我们只需要元素节点  通过nodeType去判断当前的这个节点是不是元素节点
+            var childNode = nodeList[i];
+            
+            //判断是否是元素节点。如果节点是元素(Element)节点，则 nodeType 属性将返回 1。如果节点是属性(Attr)节点，则 nodeType 属性将返回 2。
+            if(childNode.nodeType == 1){
+            	if(childNode.nodeName.toLowerCase() == tag.toLowerCase() && 
+            			childNode.getAttribute("class") == className){
+            		childNode.setAttribute("input-value",inputValue);
+            		 
+            	}
+                getChildNode(childNode,tag,className,inputValue);
+            }
+        }
+    },
+	
+	
+	
+	
+	// 试图改变 active 状态
+    tryChangeActive: function tryChangeActive(e) {
+    	var editor = this.editor;
+        var $elem = this.$elem;
+        var $selectionELem = editor.selection.getSelectionContainerElem();
+        if (!$selectionELem) {
+            return;
+        }
+        
+        var $hide = $selectionELem.parentUntil('HIDE');
+        if ($hide != null){
+        	 this._active = true;
+             $elem.addClass('w-e-active');
+        	 return;
+        }
+
+        var nodeName = $selectionELem.getNodeName();
+        if (nodeName === 'HIDE') {
+            this._active = true;
+            $elem.addClass('w-e-active');
+        } else {
+            this._active = false;
+            $elem.removeClass('w-e-active');
+        }
+
+    }
+	
+};
+
+
+
 /*
     所有菜单的汇总
 */
@@ -2894,6 +3465,7 @@ MenuConstructors.video = Video;
 
 MenuConstructors.image = Image;
 
+MenuConstructors.hide = Hide;
 /*
     菜单集合
 */
@@ -3297,6 +3869,14 @@ Text.prototype = {
                 insertEmptyP($selectionElem);
                 return;
             }
+            /**
+            var nodeName = $selectionElem.getNodeName();
+            if (nodeName === 'HIDE') {
+            	 // 回车之前光标所在一个 <p><hide>.....</hide></p> ，忽然回车生成一个空的 <p><hide><br></hide></p>
+                // 而且继续回车跳不出去，因此只能特殊处理
+                insertEmptyP($selectionElem);
+                return;
+            }**/
 
             if (!$parentElem.equal($textElem)) {
                 // 不是顶级标签
@@ -3308,6 +3888,7 @@ Text.prototype = {
                 // 当前的标签是 P ，不用做处理
                 return;
             }
+           
 
             if ($selectionElem.text()) {
                 // 有内容，不做处理
@@ -3337,51 +3918,79 @@ Text.prototype = {
             var selectionNodeName = $selectionElem.getNodeName();
             var parentNodeName = $parentElem.getNodeName();
 
-            if (selectionNodeName !== 'CODE' || parentNodeName !== 'PRE') {
-                // 不符合要求 忽略
-                return;
-            }
-
             if (!editor.cmd.queryCommandSupported('insertHTML')) {
                 // 必须原生支持 insertHTML 命令
                 return;
             }
-
-            // 处理：光标定位到代码末尾，联系点击两次回车，即跳出代码块
-            if (editor._willBreakCode === true) {
-                // 此时可以跳出代码块
-                // 插入 <p> ，并将选取定位到 <p>
-                var $p = $('<p><br></p>');
-                $p.insertAfter($parentElem);
-                editor.selection.createRangeByElem($p, true);
-                editor.selection.restoreSelection();
-
-                // 修改状态
-                editor._willBreakCode = false;
-
+            
+            //处理隐藏标签
+            if (selectionNodeName === 'HIDE') {
+                //软回车效果
+                if (window.getSelection) {
+                	var selection = window.getSelection(),
+                    range = selection.getRangeAt(0),
+                    br = document.createElement("br");
+                    range.deleteContents();
+                    range.insertNode(br);
+                    range.setStartAfter(br);
+                    range.setEndAfter(br);
+                    range.collapse(false);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                    
+                   
+                }
+                // 阻止默认行为, 防止回车换行
                 e.preventDefault();
-                return;
-            }
 
-            var _startOffset = editor.selection.getRange().startOffset;
+                
+            }else{
+            	if (selectionNodeName !== 'CODE' || parentNodeName !== 'PRE') {
+                    // 不符合要求 忽略
+                    return;
+                }
 
-            // 处理：回车时，不能插入 <br> 而是插入 \n ，因为是在 pre 标签里面
-            editor.cmd.do('insertHTML', '\n');
-            editor.selection.saveRange();
-            if (editor.selection.getRange().startOffset === _startOffset) {
-                // 没起作用，再来一遍
+                // 处理：光标定位到代码末尾，联系点击两次回车，即跳出代码块
+                if (editor._willBreakCode === true) {
+                    // 此时可以跳出代码块
+                    // 插入 <p> ，并将选取定位到 <p>
+                    var $p = $('<p><br></p>');
+                    $p.insertAfter($parentElem);
+                    editor.selection.createRangeByElem($p, true);
+                    editor.selection.restoreSelection();
+
+                    // 修改状态
+                    editor._willBreakCode = false;
+
+                    e.preventDefault();
+                    return;
+                }
+
+                var _startOffset = editor.selection.getRange().startOffset;
+
+                
+                
+                // 处理：回车时，不能插入 <br> 而是插入 \n ，因为是在 pre 标签里面
                 editor.cmd.do('insertHTML', '\n');
-            }
+                editor.selection.saveRange();
+                if (editor.selection.getRange().startOffset === _startOffset) {
+                    // 没起作用，再来一遍
+                    editor.cmd.do('insertHTML', '\n');
+                }
 
-            var codeLength = $selectionElem.html().length;
-            if (editor.selection.getRange().startOffset + 1 === codeLength) {
-                // 说明光标在代码最后的位置，执行了回车操作
-                // 记录下来，以便下次回车时候跳出 code
-                editor._willBreakCode = true;
-            }
+                var codeLength = $selectionElem.html().length;
+                if (editor.selection.getRange().startOffset + 1 === codeLength) {
+                    // 说明光标在代码最后的位置，执行了回车操作
+                    // 记录下来，以便下次回车时候跳出 code
+                    editor._willBreakCode = true;
+                }
 
-            // 阻止默认行为
-            e.preventDefault();
+                // 阻止默认行为, 防止回车换行
+                e.preventDefault();
+            	
+            }
+            
+            
         }
 
         $textElem.on('keydown', function (e) {
@@ -3682,17 +4291,17 @@ Command.prototype = {
 
         // 恢复选取
         editor.selection.restoreSelection();
-
+        
         // 执行
         var _name = '_' + name;
-        if (this[_name]) {
+        if (this[_name]) {	
             // 有自定义事件
             this[_name](value);
         } else {
             // 默认 command
             this._execCommand(name, value);
         }
-
+        
         // 修改菜单状态
         editor.menus.changeActive();
 
@@ -3702,10 +4311,12 @@ Command.prototype = {
 
         // 触发 onchange
         editor.change && editor.change();
+        
     },
 
     // 自定义 insertHTML 事件
     _insertHTML: function _insertHTML(html) {
+    	
         var editor = this.editor;
         var range = editor.selection.getRange();
 
@@ -3733,7 +4344,7 @@ Command.prototype = {
         }
     },
 
-    // 封装 execCommand
+    // 封装 execCommand (夸克浏览器Web537.36 Chrome 57.0.2987.108)不支持本函数
     _execCommand: function _execCommand(name, value) {
         document.execCommand(name, false, value);
     },
@@ -4659,9 +5270,26 @@ try {
 polyfill();
 
 // 这里的 `inlinecss` 将被替换成 css 代码的内容，详情可去 ./gulpfile.js 中搜索 `inlinecss` 关键字
-var inlinecss = '.w-e-toolbar,.w-e-text-container,.w-e-menu-panel {  padding: 0;  margin: 0;  box-sizing: border-box;}.w-e-toolbar *,.w-e-text-container *,.w-e-menu-panel * {  padding: 0;  margin: 0;  box-sizing: border-box;}.w-e-clear-fix:after {  content: "";  display: table;  clear: both;}.w-e-toolbar .w-e-droplist {  position: absolute;  left: 0;  top: 0;  background-color: #fff;  border: 1px solid #f1f1f1;  border-right-color: #ccc;  border-bottom-color: #ccc;}.w-e-toolbar .w-e-droplist .w-e-dp-title {  text-align: center;  color: #999;  line-height: 2;  border-bottom: 1px solid #f1f1f1;  font-size: 13px;}.w-e-toolbar .w-e-droplist ul.w-e-list {  list-style: none;  line-height: 1;}.w-e-toolbar .w-e-droplist ul.w-e-list li.w-e-item {  color: #333;  padding: 5px 0;}.w-e-toolbar .w-e-droplist ul.w-e-list li.w-e-item:hover {  background-color: #f1f1f1;}.w-e-toolbar .w-e-droplist ul.w-e-block {  list-style: none;  text-align: left;  padding: 5px;}.w-e-toolbar .w-e-droplist ul.w-e-block li.w-e-item {  display: inline-block;  *display: inline;  *zoom: 1;  padding: 3px 5px;}.w-e-toolbar .w-e-droplist ul.w-e-block li.w-e-item:hover {  background-color: #f1f1f1;}@font-face {  font-family: \'w-e-icon\';  src: url(data:application/x-font-woff;charset=utf-8;base64,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) format(\'truetype\');  font-weight: normal;  font-style: normal;}[class^="w-e-icon-"],[class*=" w-e-icon-"] {  /* use !important to prevent issues with browser extensions that change fonts */  font-family: \'w-e-icon\' !important;  speak: none;  font-style: normal;  font-weight: normal;  font-variant: normal;  text-transform: none;  line-height: 1;  /* Better Font Rendering =========== */  -webkit-font-smoothing: antialiased;  -moz-osx-font-smoothing: grayscale;}.w-e-icon-close:before {  content: "\\f00d";}.w-e-icon-upload2:before {  content: "\\e9c6";}.w-e-icon-trash-o:before {  content: "\\f014";}.w-e-icon-header:before {  content: "\\f1dc";}.w-e-icon-pencil2:before {  content: "\\e906";}.w-e-icon-paint-brush:before {  content: "\\f1fc";}.w-e-icon-image:before {  content: "\\e90d";}.w-e-icon-play:before {  content: "\\e912";}.w-e-icon-location:before {  content: "\\e947";}.w-e-icon-undo:before {  content: "\\e965";}.w-e-icon-redo:before {  content: "\\e966";}.w-e-icon-quotes-left:before {  content: "\\e977";}.w-e-icon-list-numbered:before {  content: "\\e9b9";}.w-e-icon-list2:before {  content: "\\e9bb";}.w-e-icon-link:before {  content: "\\e9cb";}.w-e-icon-happy:before {  content: "\\e9df";}.w-e-icon-bold:before {  content: "\\ea62";}.w-e-icon-underline:before {  content: "\\ea63";}.w-e-icon-italic:before {  content: "\\ea64";}.w-e-icon-strikethrough:before {  content: "\\ea65";}.w-e-icon-table2:before {  content: "\\ea71";}.w-e-icon-paragraph-left:before {  content: "\\ea77";}.w-e-icon-paragraph-center:before {  content: "\\ea78";}.w-e-icon-paragraph-right:before {  content: "\\ea79";}.w-e-icon-terminal:before {  content: "\\f120";}.w-e-icon-page-break:before {  content: "\\ea68";}.w-e-icon-cancel-circle:before {  content: "\\ea0d";}.w-e-icon-font:before {  content: "\\ea5c";}.w-e-icon-text-heigh:before {  content: "\\ea5f";}.w-e-toolbar {  display: -webkit-box;  display: -ms-flexbox;  display: flex;  padding: 0 5px;  /* flex-wrap: wrap; */  /* 单个菜单 */}.w-e-toolbar .w-e-menu {  position: relative;  text-align: center;  padding: 5px 10px;  cursor: pointer;}.w-e-toolbar .w-e-menu i {  color: #999;}.w-e-toolbar .w-e-menu:hover i {  color: #333;}.w-e-toolbar .w-e-active i {  color: #1e88e5;}.w-e-toolbar .w-e-active:hover i {  color: #1e88e5;}.w-e-text-container .w-e-panel-container {  position: absolute;  top: 0;  left: 50%;  border: 1px solid #ccc;  border-top: 0;  box-shadow: 1px 1px 2px #ccc;  color: #333;  background-color: #fff;  /* 为 emotion panel 定制的样式 */  /* 上传图片的 panel 定制样式 */}.w-e-text-container .w-e-panel-container .w-e-panel-close {  position: absolute;  right: 0;  top: 0;  padding: 5px;  margin: 2px 5px 0 0;  cursor: pointer;  color: #999;}.w-e-text-container .w-e-panel-container .w-e-panel-close:hover {  color: #333;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-title {  list-style: none;  display: -webkit-box;  display: -ms-flexbox;  display: flex;  font-size: 14px;  margin: 2px 10px 0 10px;  border-bottom: 1px solid #f1f1f1;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-title .w-e-item {  padding: 3px 5px;  color: #999;  cursor: pointer;  margin: 0 3px;  position: relative;  top: 1px;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-title .w-e-active {  color: #333;  border-bottom: 1px solid #333;  cursor: default;  font-weight: 700;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content {  padding: 10px 15px 10px 15px;  font-size: 16px;  /* 输入框的样式 */  /* 按钮的样式 */}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content input:focus,.w-e-text-container .w-e-panel-container .w-e-panel-tab-content textarea:focus,.w-e-text-container .w-e-panel-container .w-e-panel-tab-content button:focus {  outline: none;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content textarea {  width: 100%;  border: 1px solid #ccc;  padding: 5px;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content textarea:focus {  border-color: #1e88e5;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content input[type=text] {  border: none;  border-bottom: 1px solid #ccc;  font-size: 14px;  height: 20px;  color: #333;  text-align: left;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content input[type=text].small {  width: 30px;  text-align: center;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content input[type=text].block {  display: block;  width: 100%;  margin: 10px 0;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content input[type=text]:focus {  border-bottom: 2px solid #1e88e5;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content .w-e-button-container button {  font-size: 14px;  color: #1e88e5;  border: none;  padding: 5px 10px;  background-color: #fff;  cursor: pointer;  border-radius: 3px;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content .w-e-button-container button.left {  float: left;  margin-right: 10px;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content .w-e-button-container button.right {  float: right;  margin-left: 10px;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content .w-e-button-container button.gray {  color: #999;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content .w-e-button-container button.red {  color: #c24f4a;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content .w-e-button-container button:hover {  background-color: #f1f1f1;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content .w-e-button-container:after {  content: "";  display: table;  clear: both;}.w-e-text-container .w-e-panel-container .w-e-emoticon-container .w-e-item {  cursor: pointer;  font-size: 18px;  padding: 0 3px;  display: inline-block;  *display: inline;  *zoom: 1;}.w-e-text-container .w-e-panel-container .w-e-up-img-container {  text-align: center;}.w-e-text-container .w-e-panel-container .w-e-up-img-container .w-e-up-btn {  display: inline-block;  *display: inline;  *zoom: 1;  color: #999;  cursor: pointer;  font-size: 60px;  line-height: 1;}.w-e-text-container .w-e-panel-container .w-e-up-img-container .w-e-up-btn:hover {  color: #333;}.w-e-text-container {  position: relative;}.w-e-text-container .w-e-progress {  position: absolute;  background-color: #1e88e5;  bottom: 0;  left: 0;  height: 1px;}.w-e-text {  padding: 0 10px;  overflow-y: scroll;}.w-e-text p,.w-e-text h1,.w-e-text h2,.w-e-text h3,.w-e-text h4,.w-e-text h5,.w-e-text table,.w-e-text pre {  margin: 10px 0;  line-height: 1.5;}.w-e-text ul,.w-e-text ol {  margin: 10px 0 10px 20px;}.w-e-text blockquote {  display: block;  border-left: 8px solid #d0e5f2;  padding: 5px 10px;  margin: 10px 0;  line-height: 1.4;  font-size: 100%;  background-color: #f1f1f1;}.w-e-text code {  display: inline-block;  *display: inline;  *zoom: 1;  background-color: #f1f1f1;  border-radius: 3px;  padding: 3px 5px;  margin: 0 3px;}.w-e-text pre code {  display: block;}.w-e-text table {  border-top: 1px solid #ccc;  border-left: 1px solid #ccc;}.w-e-text table td,.w-e-text table th {  border-bottom: 1px solid #ccc;  border-right: 1px solid #ccc;  padding: 3px 5px;}.w-e-text table th {  border-bottom: 2px solid #ccc;  text-align: center;}.w-e-text:focus {  outline: none;}.w-e-text img {  cursor: pointer;}.w-e-text img:hover {  box-shadow: 0 0 5px #333;}';
+//var inlinecss = '.w-e-toolbar,.w-e-text-container,.w-e-menu-panel {  padding: 0;  margin: 0;  box-sizing: border-box;}.w-e-toolbar *,.w-e-text-container *,.w-e-menu-panel * {  padding: 0;  margin: 0;  box-sizing: border-box;}.w-e-clear-fix:after {  content: "";  display: table;  clear: both;}.w-e-toolbar .w-e-droplist {  position: absolute;  left: 0;  top: 0;  background-color: #fff;  border: 1px solid #f1f1f1;  border-right-color: #ccc;  border-bottom-color: #ccc;}.w-e-toolbar .w-e-droplist .w-e-dp-title {  text-align: center;  color: #999;  line-height: 2;  border-bottom: 1px solid #f1f1f1;  font-size: 13px;}.w-e-toolbar .w-e-droplist ul.w-e-list {  list-style: none;  line-height: 1;}.w-e-toolbar .w-e-droplist ul.w-e-list li.w-e-item {  color: #333;  padding: 5px 0;}.w-e-toolbar .w-e-droplist ul.w-e-list li.w-e-item:hover {  background-color: #f1f1f1;}.w-e-toolbar .w-e-droplist ul.w-e-block {  list-style: none;  text-align: left;  padding: 5px;}.w-e-toolbar .w-e-droplist ul.w-e-block li.w-e-item {  display: inline-block;  *display: inline;  *zoom: 1;  padding: 3px 5px;}.w-e-toolbar .w-e-droplist ul.w-e-block li.w-e-item:hover {  background-color: #f1f1f1;}@font-face {  font-family: \'w-e-icon\';  src: url(data:application/x-font-woff;charset=utf-8;base64,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) format(\'truetype\');  font-weight: normal;  font-style: normal;}[class^="w-e-icon-"],[class*=" w-e-icon-"] {  /* use !important to prevent issues with browser extensions that change fonts */  font-family: \'w-e-icon\' !important;  speak: none;  font-style: normal;  font-weight: normal;  font-variant: normal;  text-transform: none;  line-height: 1;  /* Better Font Rendering =========== */  -webkit-font-smoothing: antialiased;  -moz-osx-font-smoothing: grayscale;}.w-e-icon-close:before {  content: "\\f00d";}.w-e-icon-upload2:before {  content: "\\e9c6";}.w-e-icon-trash-o:before {  content: "\\f014";}.w-e-icon-header:before {  content: "\\f1dc";}.w-e-icon-pencil2:before {  content: "\\e906";}.w-e-icon-paint-brush:before {  content: "\\f1fc";}.w-e-icon-image:before {  content: "\\e90d";}.w-e-icon-play:before {  content: "\\e912";}.w-e-icon-location:before {  content: "\\e947";}.w-e-icon-undo:before {  content: "\\e965";}.w-e-icon-redo:before {  content: "\\e966";}.w-e-icon-quotes-left:before {  content: "\\e977";}.w-e-icon-list-numbered:before {  content: "\\e9b9";}.w-e-icon-list2:before {  content: "\\e9bb";}.w-e-icon-link:before {  content: "\\e9cb";}.w-e-icon-happy:before {  content: "\\e9df";}.w-e-icon-bold:before {  content: "\\ea62";}.w-e-icon-underline:before {  content: "\\ea63";}.w-e-icon-italic:before {  content: "\\ea64";}.w-e-icon-strikethrough:before {  content: "\\ea65";}.w-e-icon-table2:before {  content: "\\ea71";}.w-e-icon-paragraph-left:before {  content: "\\ea77";}.w-e-icon-paragraph-center:before {  content: "\\ea78";}.w-e-icon-paragraph-right:before {  content: "\\ea79";}.w-e-icon-terminal:before {  content: "\\f120";}.w-e-icon-page-break:before {  content: "\\ea68";}.w-e-icon-cancel-circle:before {  content: "\\ea0d";}.w-e-icon-font:before {  content: "\\ea5c";}.w-e-icon-text-heigh:before {  content: "\\ea5f";}.w-e-toolbar {  display: -webkit-box;  display: -ms-flexbox;  display: flex;  padding: 0 5px;  /* flex-wrap: wrap; */  /* 单个菜单 */}.w-e-toolbar .w-e-menu {  position: relative;  text-align: center;  padding: 5px 10px;  cursor: pointer;}.w-e-toolbar .w-e-menu i {  color: #999;}.w-e-toolbar .w-e-menu:hover i {  color: #333;}.w-e-toolbar .w-e-active i {  color: #1e88e5;}.w-e-toolbar .w-e-active:hover i {  color: #1e88e5;}.w-e-text-container .w-e-panel-container {  position: absolute;  top: 0;  left: 50%;  border: 1px solid #ccc;  border-top: 0;  box-shadow: 1px 1px 2px #ccc;  color: #333;  background-color: #fff;  /* 为 emotion panel 定制的样式 */  /* 上传图片的 panel 定制样式 */}.w-e-text-container .w-e-panel-container .w-e-panel-close {  position: absolute;  right: 0;  top: 0;  padding: 5px;  margin: 2px 5px 0 0;  cursor: pointer;  color: #999;}.w-e-text-container .w-e-panel-container .w-e-panel-close:hover {  color: #333;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-title {  list-style: none;  display: -webkit-box;  display: -ms-flexbox;  display: flex;  font-size: 14px;  margin: 2px 10px 0 10px;  border-bottom: 1px solid #f1f1f1;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-title .w-e-item {  padding: 3px 5px;  color: #999;  cursor: pointer;  margin: 0 3px;  position: relative;  top: 1px;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-title .w-e-active {  color: #333;  border-bottom: 1px solid #333;  cursor: default;  font-weight: 700;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content {  padding: 10px 15px 10px 15px;  font-size: 16px;  /* 输入框的样式 */  /* 按钮的样式 */}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content input:focus,.w-e-text-container .w-e-panel-container .w-e-panel-tab-content textarea:focus,.w-e-text-container .w-e-panel-container .w-e-panel-tab-content button:focus {  outline: none;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content textarea {  width: 100%;  border: 1px solid #ccc;  padding: 5px;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content textarea:focus {  border-color: #1e88e5;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content input[type=text] {  border: none;  border-bottom: 1px solid #ccc;  font-size: 14px;  height: 20px;  color: #333;  text-align: left;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content input[type=text].small {  width: 30px;  text-align: center;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content input[type=text].block {  display: block;  width: 100%;  margin: 10px 0;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content input[type=text]:focus {  border-bottom: 2px solid #1e88e5;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content .w-e-button-container button {  font-size: 14px;  color: #1e88e5;  border: none;  padding: 5px 10px;  background-color: #fff;  cursor: pointer;  border-radius: 3px;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content .w-e-button-container button.left {  float: left;  margin-right: 10px;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content .w-e-button-container button.right {  float: right;  margin-left: 10px;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content .w-e-button-container button.gray {  color: #999;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content .w-e-button-container button.red {  color: #c24f4a;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content .w-e-button-container button:hover {  background-color: #f1f1f1;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content .w-e-button-container:after {  content: "";  display: table;  clear: both;}.w-e-text-container .w-e-panel-container .w-e-emoticon-container .w-e-item {  cursor: pointer;  font-size: 18px;  padding: 0 3px;  display: inline-block;  *display: inline;  *zoom: 1;}.w-e-text-container .w-e-panel-container .w-e-up-img-container {  text-align: center;}.w-e-text-container .w-e-panel-container .w-e-up-img-container .w-e-up-btn {  display: inline-block;  *display: inline;  *zoom: 1;  color: #999;  cursor: pointer;  font-size: 60px;  line-height: 1;}.w-e-text-container .w-e-panel-container .w-e-up-img-container .w-e-up-btn:hover {  color: #333;}.w-e-text-container {  position: relative;}.w-e-text-container .w-e-progress {  position: absolute;  background-color: #1e88e5;  bottom: 0;  left: 0;  height: 1px;}.w-e-text {  padding: 0 10px;  overflow-y: scroll;}.w-e-text p,.w-e-text h1,.w-e-text h2,.w-e-text h3,.w-e-text h4,.w-e-text h5,.w-e-text table,.w-e-text pre {  margin: 10px 0;  line-height: 1.5;}.w-e-text ul,.w-e-text ol {  margin: 10px 0 10px 20px;}.w-e-text blockquote {  display: block;  border-left: 8px solid #d0e5f2;  padding: 5px 10px;  margin: 10px 0;  line-height: 1.4;  font-size: 100%;  background-color: #f1f1f1;}.w-e-text code {  display: inline-block;  *display: inline;  *zoom: 1;  background-color: #f1f1f1;  border-radius: 3px;  padding: 3px 5px;  margin: 0 3px;}.w-e-text pre code {  display: block;}.w-e-text table {  border-top: 1px solid #ccc;  border-left: 1px solid #ccc;}.w-e-text table td,.w-e-text table th {  border-bottom: 1px solid #ccc;  border-right: 1px solid #ccc;  padding: 3px 5px;}.w-e-text table th {  border-bottom: 2px solid #ccc;  text-align: center;}.w-e-text:focus {  outline: none;}.w-e-text img {  cursor: pointer;}.w-e-text img:hover {  box-shadow: 0 0 5px #333;}';
 
-// 将 css 代码添加到 <style> 中
+  var inlinecss = '.w-e-toolbar,.w-e-text-container,.w-e-menu-panel {  padding: 0;  margin: 0;  box-sizing: border-box;}.w-e-toolbar *,.w-e-menu-panel * {  padding: 0;  margin: 0;  box-sizing: border-box;}.w-e-clear-fix:after {  content: "";  display: table;  clear: both;}.w-e-toolbar .w-e-droplist {  position: absolute;  left: 0;  top: 0;  background-color: #fff;  border: 1px solid #f1f1f1;  border-right-color: #ccc;  border-bottom-color: #ccc;}.w-e-toolbar .w-e-droplist .w-e-dp-title {  text-align: center;  color: #999;  line-height: 2;  border-bottom: 1px solid #f1f1f1;  font-size: 13px;}.w-e-toolbar .w-e-droplist ul.w-e-list {  list-style: none;  line-height: 1;}.w-e-toolbar .w-e-droplist ul.w-e-list li.w-e-item {  color: #333;  padding: 5px 0;}.w-e-toolbar .w-e-droplist ul.w-e-list li.w-e-item:hover {  background-color: #f1f1f1;}.w-e-toolbar .w-e-droplist ul.w-e-block {  list-style: none;  text-align: left;  padding: 5px;}.w-e-toolbar .w-e-droplist ul.w-e-block li.w-e-item {  display: inline-block;  *display: inline;  *zoom: 1;  padding: 3px 5px;}.w-e-toolbar .w-e-droplist ul.w-e-block li.w-e-item:hover {  background-color: #f1f1f1;}@font-face {  font-family: \'w-e-icon\';  src: url(data:application/x-font-woff;charset=utf-8;base64,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) format(\'truetype\');  font-weight: normal;  font-style: normal;}[class^="w-e-icon-"],[class*=" w-e-icon-"] {  /* use !important to prevent issues with browser extensions that change fonts */  font-family: \'w-e-icon\' !important;  speak: none;  font-style: normal;  font-weight: normal;  font-variant: normal;  text-transform: none;  line-height: 1;  /* Better Font Rendering =========== */  -webkit-font-smoothing: antialiased;  -moz-osx-font-smoothing: grayscale;}.w-e-icon-close:before {  content: "\\f00d";}.w-e-icon-upload2:before {  content: "\\e9c6";}.w-e-icon-trash-o:before {  content: "\\f014";}.w-e-icon-header:before {  content: "\\f1dc";}.w-e-icon-pencil2:before {  content: "\\e906";}.w-e-icon-paint-brush:before {  content: "\\f1fc";}.w-e-icon-image:before {  content: "\\e90d";}.w-e-icon-hide:before {  content: "\\e98f";}.w-e-icon-play:before {  content: "\\e912";}.w-e-icon-location:before {  content: "\\e947";}.w-e-icon-undo:before {  content: "\\e965";}.w-e-icon-redo:before {  content: "\\e966";}.w-e-icon-quotes-left:before {  content: "\\e977";}.w-e-icon-list-numbered:before {  content: "\\e9b9";}.w-e-icon-list2:before {  content: "\\e9bb";}.w-e-icon-link:before {  content: "\\e9cb";}.w-e-icon-happy:before {  content: "\\e9df";}.w-e-icon-bold:before {  content: "\\ea62";}.w-e-icon-underline:before {  content: "\\ea63";}.w-e-icon-italic:before {  content: "\\ea64";}.w-e-icon-strikethrough:before {  content: "\\ea65";}.w-e-icon-table2:before {  content: "\\ea71";}.w-e-icon-paragraph-left:before {  content: "\\ea77";}.w-e-icon-paragraph-center:before {  content: "\\ea78";}.w-e-icon-paragraph-right:before {  content: "\\ea79";}.w-e-icon-terminal:before {  content: "\\f120";}.w-e-icon-page-break:before {  content: "\\ea68";}.w-e-icon-cancel-circle:before {  content: "\\ea0d";}.w-e-icon-font:before {  content: "\\ea5c";}.w-e-icon-text-heigh:before {  content: "\\ea5f";}.w-e-toolbar {  display: -webkit-box;  display: -ms-flexbox;  display: flex;  padding: 0 5px;  /* flex-wrap: wrap; */  /* 单个菜单 */}.w-e-toolbar .w-e-menu {  position: relative;  text-align: center;  padding: 5px 10px;  cursor: pointer;}.w-e-toolbar .w-e-menu i {  color: #999;}.w-e-toolbar .w-e-menu:hover i {  color: #333;}.w-e-toolbar .w-e-active i {  color: #1e88e5;}.w-e-toolbar .w-e-active:hover i {  color: #1e88e5;}.w-e-text-container .w-e-panel-container {  position: absolute;  top: 0;  left: 50%;  border: 1px solid #ccc;  border-top: 0;  box-shadow: 1px 1px 2px #ccc;  color: #333;  background-color: #fff;  /* 为 emotion panel 定制的样式 */  /* 上传图片的 panel 定制样式 */}.w-e-text-container .w-e-panel-container .w-e-panel-close {  position: absolute;  right: 0;  top: 0;  padding: 5px;  margin: 2px 5px 0 0;  cursor: pointer;  color: #999;}.w-e-text-container .w-e-panel-container .w-e-panel-close:hover {  color: #333;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-title {  list-style: none;  display: -webkit-box;  display: -ms-flexbox;  display: flex;  font-size: 14px;  margin: 2px 10px 0 10px;  border-bottom: 1px solid #f1f1f1;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-title .w-e-item {  padding: 3px 5px;  color: #999;  cursor: pointer;  margin: 0 3px;  position: relative;  top: 1px;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-title .w-e-active {  color: #333;  border-bottom: 1px solid #333;  cursor: default;  font-weight: 700;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content {  padding: 10px 15px 10px 15px;  font-size: 16px;  /* 输入框的样式 */  /* 按钮的样式 */}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content input:focus,.w-e-text-container .w-e-panel-container .w-e-panel-tab-content textarea:focus,.w-e-text-container .w-e-panel-container .w-e-panel-tab-content button:focus {  outline: none;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content textarea {  width: 100%;  border: 1px solid #ccc;  padding: 5px;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content textarea:focus {  border-color: #1e88e5;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content input[type=text] {  border: none;  border-bottom: 1px solid #ccc;  font-size: 14px;  height: 20px;  color: #333;  text-align: left;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content input[type=text].small {  width: 30px;  text-align: center;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content input[type=text].block {  display: block;  width: 100%;  margin: 10px 0;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content input[type=text]:focus {  border-bottom: 2px solid #1e88e5;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content .w-e-button-container button {  font-size: 14px;  color: #1e88e5;  border: none;  padding: 5px 10px;  background-color: #fff;  cursor: pointer;  border-radius: 3px;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content .w-e-button-container button.left {  float: left;  margin-right: 10px;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content .w-e-button-container button.right {  float: right;  margin-left: 10px;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content .w-e-button-container button.gray {  color: #999;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content .w-e-button-container button.red {  color: #c24f4a;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content .w-e-button-container button:hover {  background-color: #f1f1f1;}.w-e-text-container .w-e-panel-container .w-e-panel-tab-content .w-e-button-container:after {  content: "";  display: table;  clear: both;}.w-e-text-container .w-e-panel-container .w-e-emoticon-container .w-e-item {  cursor: pointer;  font-size: 18px;  padding: 0 3px;  display: inline-block;  *display: inline;  *zoom: 1;}.w-e-text-container .w-e-panel-container .w-e-up-img-container {  text-align: center;}.w-e-text-container .w-e-panel-container .w-e-up-img-container .w-e-up-btn {  display: inline-block;  *display: inline;  *zoom: 1;  color: #999;  cursor: pointer;  font-size: 60px;  line-height: 1;}.w-e-text-container .w-e-panel-container .w-e-up-img-container .w-e-up-btn:hover {  color: #333;}.w-e-text-container {  position: relative;}.w-e-text-container .w-e-progress {  position: absolute;  background-color: #1e88e5;  bottom: 0;  left: 0;  height: 1px;}.w-e-text {  padding: 0 10px;  overflow-y: scroll;}.w-e-text p,.w-e-text h1,.w-e-text h2,.w-e-text h3,.w-e-text h4,.w-e-text h5,.w-e-text table,.w-e-text pre {  margin: 10px 0;  line-height: 1.5;}.w-e-text ul,.w-e-text ol {  margin: 10px 0 10px 20px;}.w-e-text blockquote {  display: block;  border-left: 8px solid #d0e5f2;  padding: 5px 10px;  margin: 10px 0;  line-height: 1.4;  font-size: 100%;  background-color: #f1f1f1;}.w-e-text code {  display: inline-block;  *display: inline;  *zoom: 1;  background-color: #f1f1f1;  border-radius: 3px;  padding: 3px 5px;  margin: 0 3px;}.w-e-text pre code {  display: block;}.w-e-text table {  border-top: 1px solid #ccc;  border-left: 1px solid #ccc;}.w-e-text table td,.w-e-text table th {  border-bottom: 1px solid #ccc;  border-right: 1px solid #ccc;  padding: 3px 5px;}.w-e-text table th {  border-bottom: 2px solid #ccc;  text-align: center;}.w-e-text:focus {  outline: none;}.w-e-text img {  cursor: pointer;}.w-e-text img:hover {  box-shadow: 0 0 5px #333;}';
+
+  inlinecss += '.w-e-panel-tab-content .radio-input {  display: none;}';
+  inlinecss += '.w-e-panel-tab-content .radio-input:checked + .radio-core {  background-color: #26a2ff;  border-color: #26a2ff;}';
+  inlinecss += '.w-e-panel-tab-content .radio-input:checked + .radio-core::after {  background-color: #fff;  -webkit-transform: scale(1);  transform: scale(1);}';
+  inlinecss += '.w-e-panel-tab-content .radio-input[disabled] + .radio-core {  background-color: #d9d9d9;  border-color: #ccc;}';
+  inlinecss += '.w-e-panel-tab-content .radio-core {  margin-top:-2px;  box-sizing: border-box;  display: inline-block;  background-color: #fff;  border-radius: 100%;  border: 1px solid #ccc;  position: relative;  width: 17px;  height: 17px;  vertical-align: middle;}';
+  inlinecss += '.w-e-panel-tab-content .radio-core::after {  content: " ";  border-radius: 100%;  top: 4px;  left: 4px;  position: absolute;  width: 7px;  height: 7px;  -webkit-transition: -webkit-transform .2s;  transition: -webkit-transform .2s;  transition: transform .2s;  transition: transform .2s, -webkit-transform .2s;  -webkit-transform: scale(0);  transform: scale(0);}';
+  inlinecss += '.w-e-panel-tab-content .radio-title {  font-size: 14px;  margin-left: 5px;  line-height: 28px;}';
+  
+  inlinecss += '.editor-text hide {  border: 0;  border-left: 3px solid #06b5ff;  margin-left: 10px;  padding: 0.5em;  display: block;  min-height:26px;  margin: 30px 0px 0px 0px;}';
+  inlinecss += ".editor-text .inputValue_10::before {  content: '密码: ' attr(input-value) '';  color: #06b5ff;  font-size:14px;  position: absolute;  margin-top: -30px;  line-height: 30px;}";
+  inlinecss += ".editor-text .inputValue_20::before {  content: '回复话题可见';  color: #06b5ff;  font-size:14px;  position: absolute;  margin-top: -30px;  line-height: 30px;}";
+  inlinecss += ".editor-text .inputValue_30::before {  content: '超过积分 ' attr(input-value) ' 可见';  color: #06b5ff;  font-size:14px;  position: absolute;  margin-top: -30px;  line-height: 30px;}";
+  inlinecss += ".editor-text .inputValue_40::before {  content: '需要支付 ' attr(input-value) ' 积分可见';  color: #06b5ff;  font-size:14px;  position: absolute;  margin-top: -30px;  line-height: 30px;}";
+  inlinecss += ".editor-text .inputValue_50::before {  content: '需要支付 ' attr(input-value) ' 元费用可见';  color: #06b5ff;  font-size:14px;  position: absolute;  margin-top: -30px;  line-height: 30px;}";
+   
+  // 将 css 代码添加到 <style> 中
 var style = document.createElement('style');
 style.type = 'text/css';
 style.innerHTML = inlinecss;

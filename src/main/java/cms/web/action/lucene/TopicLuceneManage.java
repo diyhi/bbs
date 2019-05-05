@@ -178,11 +178,12 @@ public class TopicLuceneManage {
 	 * @param maxPostTime 最大发表时间
 	 * @param status 状态
 	 * @param sortCondition 排序条件
+	 * @param isHide 是否显示隐藏标签内容
 	 * @return
 	 */
 	public QueryResult<Topic> findIndexByCondition(int firstIndex, int maxResult,
 			String keyword,Long tagId, String userName,
-			Date minPostTime, Date maxPostTime,Integer status,int sortCondition){
+			Date minPostTime, Date maxPostTime,Integer status,int sortCondition,boolean isHide){
 		QueryResult<Topic> qr = new QueryResult<Topic>();
 		//存储符合条件的记录   
 	    List<Topic> topicList = new ArrayList<Topic>();  
@@ -314,8 +315,12 @@ public class TopicLuceneManage {
 					
 					String _content = targetDoc.get("content");
 					if (_content != null && !"".equals(_content)) { 
-						_content = textFilterManage.filterText(_content);
-					
+						if(isHide){//如果显示隐藏内容
+							_content = textFilterManage.filterText(_content);
+						}else{
+							_content = textFilterManage.filterHideText(_content);
+						}
+						
 		                TokenStream tokenStream = analyzer_keyword.tokenStream("content",new StringReader(_content));    
 		                String highLightText = highlighter.getBestFragment(tokenStream, _content);//高亮显示  
 		                if(highLightText != null && !"".equals(highLightText)){
@@ -512,9 +517,9 @@ public class TopicLuceneManage {
 					iw.deleteDocuments(q);//删除指定ID的Document 
 					
 					iw.forceMergeDeletes();
-					iw.commit();//提交  
+					iw.commit();//提交   
 				}
-				 
+				
 			}
 		} catch (CorruptIndexException e) {
 			// TODO Auto-generated catch block

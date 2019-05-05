@@ -42,7 +42,7 @@ public class RemindEntity implements Serializable{
 	protected String senderAvatarName;
 	
 	
-	/** 提醒类型代码编号  10:别人评论了我的话题  20:别人回复了我的话题 30:别人引用了我的评论 40:别人回复了我的评论 50:别人回复了我回复过的评论  **/
+	/** 提醒类型代码编号  10:别人评论了我的话题  20:别人回复了我的话题 30:别人引用了我的评论 40:别人回复了我的评论 50:别人回复了我回复过的评论 60:别人解锁了我的话题 **/
 	protected Integer typeCode;
 
 	

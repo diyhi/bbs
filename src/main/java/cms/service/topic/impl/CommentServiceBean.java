@@ -138,6 +138,36 @@ public class CommentServiceBean extends DaoSupport<Comment> implements CommentSe
 	
 	
 	/**
+	 * 查询用户是否评论话题
+	 * @param topicId 话题Id
+	 * @param userName 用户名称
+	 * @return
+	 */
+	@Transactional(readOnly=true,propagation=Propagation.NOT_SUPPORTED)
+	public Boolean findWhetherCommentTopic(Long topicId,String userName){
+		
+		String sql = "select o.id from Comment o where o.topicId=?1 and o.userName=?2 and o.isStaff=?3";
+		Query query = em.createQuery(sql);	
+		query.setParameter(1, topicId);
+		query.setParameter(2, userName);
+		query.setParameter(3, false);
+		//索引开始,即从哪条记录开始
+		query.setFirstResult(0);
+		//获取多少条数据
+		query.setMaxResults(1);
+		
+		List<Object> objectList = query.getResultList();
+		if(objectList != null && objectList.size() >0){
+			return true;
+		}
+		
+		return false;
+	}
+	
+	
+	
+	
+	/**
 	 * 保存评论
 	 * @param comment
 	 */

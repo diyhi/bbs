@@ -23,10 +23,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import cms.bean.PageForm;
 import cms.bean.PageView;
 import cms.bean.QueryResult;
+import cms.bean.favorite.Favorites;
 import cms.bean.topic.Comment;
 import cms.bean.topic.Reply;
 import cms.bean.topic.Tag;
 import cms.bean.topic.Topic;
+import cms.bean.topic.TopicUnhide;
 import cms.service.setting.SettingService;
 import cms.service.topic.CommentService;
 import cms.service.topic.TagService;
@@ -198,7 +200,7 @@ public class TopicAction {
 		int firstindex = (pageForm.getPage()-1)*pageView.getMaxresult();
 	
 		if(dataSource.equals(1)){//lucene索引
-			QueryResult<Topic> qr = topicLuceneManage.findIndexByCondition(pageView.getCurrentpage(), pageView.getMaxresult(), _keyword, _tagId, _userName, _start_postTime, _end_postTime, null, 1);
+			QueryResult<Topic> qr = topicLuceneManage.findIndexByCondition(pageView.getCurrentpage(), pageView.getMaxresult(), _keyword, _tagId, _userName, _start_postTime, _end_postTime, null, 1,true);
 
 			if(qr.getResultlist() != null && qr.getResultlist().size() >0){
 				List<Long> topicIdList =  new ArrayList<Long>();//话题Id集合
@@ -506,5 +508,37 @@ public class TopicAction {
 		model.addAttribute("pageView", pageView);
 
 		return "jsp/topic/allAuditReplyList";
+	}
+	
+	
+	/**
+	 * 话题取消隐藏列表
+	 * @param model
+	 * @param pageForm
+	 * @param topicId 话题Id
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/control/topic/topicUnhideList") 
+	public String dynamicImageFavoriteList(ModelMap model,PageForm pageForm,Long topicId,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+
+		if(topicId != null && topicId >0L){
+			
+			//调用分页算法代码
+			PageView<Favorites> pageView = new PageView<Favorites>(settingService.findSystemSetting_cache().getBackstagePageNumber(),pageForm.getPage(),10,request.getRequestURI(),request.getQueryString());
+			//当前页
+			int firstIndex = (pageForm.getPage()-1)*pageView.getMaxresult();
+			
+			QueryResult<TopicUnhide> qr = topicService.findTopicUnhidePageByTopicId(firstIndex,pageView.getMaxresult(),topicId);
+
+			//将查询结果集传给分页List
+			pageView.setQueryResult(qr);
+			model.addAttribute("pageView", pageView);
+		}
+		return "jsp/topic/topicUnhideList";
 	}
 }

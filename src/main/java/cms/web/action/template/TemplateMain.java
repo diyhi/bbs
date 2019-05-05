@@ -119,6 +119,11 @@ public class TemplateMain {
 				List<Topic> value = topic_TemplateManage.topic_like_collection(forum, submitParameter,runtimeParameter);
 				return value;
 			}
+		}else if(forum.getForumChildType().equals("话题取消隐藏")){
+			if(forum.getDisplayType().equals("collection")){//集合
+				Map<String,Object> value = topic_TemplateManage.topicUnhide_collection(forum, submitParameter,runtimeParameter);
+				return value;
+			}
 		}else if(forum.getForumChildType().equals("话题内容")){
 			if(forum.getDisplayType().equals("entityBean")){//实体对象
 				Topic value = topic_TemplateManage.content_entityBean(forum, submitParameter,runtimeParameter);

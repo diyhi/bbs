@@ -19,7 +19,6 @@ $.ajaxSettings = $.extend($.ajaxSettings, {
 	//	XMLHttpRequest.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 	},
 	complete : function complete(XMLHttpRequest, textStatus) {
-			
 		if(XMLHttpRequest.status == 508){
 			//设置登录用户
 			store.commit('setSystemUserId', '');
@@ -41,7 +40,10 @@ $.ajaxSettings = $.extend($.ajaxSettings, {
 			});
 		}
 		
-		Vue.$indicator.close(); //关闭旋转进度条
+		setTimeout(function () {
+			Vue.$indicator.close(); //关闭旋转进度条
+		}, 10);
+		
 	}
 });
 Vue.component('v-select', VueSelect.VueSelect);
@@ -264,9 +266,11 @@ var index_component = Vue.extend({
 			//查询添加话题页
 			this.queryAddTopic();
 			
+			this.$refs.topicContentEditorToolbar.innerHTML = "";
+			this.$refs.topicContentEditorText.innerHTML = "";
 			//创建编辑器
 			this.topicEditor = createEditor(this.$refs.topicContentEditorToolbar,this.$refs.topicContentEditorText,'user/control/topic/upload',this,"topicContent");
-			
+	
 	
 		},
 		//查询添加话题页
@@ -539,12 +543,15 @@ var index_component = Vue.extend({
 				click : true, //是否派发click事件
 				autoBlur:false,//默认值：true 在滚动之前会让当前激活的元素（input、textarea）自动失去焦点
 				preventDefault : true, //是否阻止默认事件
-				preventDefaultException:{ tagName: /^(INPUT|TEXTAREA|BUTTON|SELECT)$/ ,className:/(^|\s)(editor-toolbar|w-e-menu|editor-text|w-e-text)(\s|$)/},//列出哪些元素不屏蔽默认事件 className必须是最里层的元素
+				preventDefaultException:{ tagName: /^(INPUT|TEXTAREA|BUTTON|SELECT|HIDE)$/ ,className:/(^|\s)(editor-toolbar|w-e-menu|editor-text|w-e-text)(\s|$)/},//列出哪些元素不屏蔽默认事件 className必须是最里层的元素
+				eventPassthrough :'horizontal',//解决文本无法复制
 				HWCompositing : true, //是否启用硬件加速
 			});
 		},
 	}
 });
+				
+
 
 //话题内容组件
 var thread_component = Vue.extend({
@@ -590,15 +597,16 @@ var thread_component = Vue.extend({
 
 			alreadyCollected :false,//用户是否已经收藏话题
 			favoriteCount : 0,//话题用户收藏总数
+			hidePasswordIndex:0,//隐藏标签密码框索引
 		};
 	},
+	
 	created : function created() {
 		//初始化
 		this.init();
 	},
 	mounted: function() {
-		
-	
+
 	},
 	//在当前路由改变，但是该组件被复用时调用
 	beforeRouteUpdate : function beforeRouteUpdate(to, from, next) {
@@ -625,13 +633,108 @@ var thread_component = Vue.extend({
 					props: this.$options.props, // re-use current props definitions
 					
 				};
-			};
+			};	
+		},
 		
-			
+		//动态解析隐藏标签模板数据
+		hideTagComponent: function hideTagComponent() {
+			return function (html) {
+				return {
+					template: "<div>"+ html +"</div>", // use content as template for this component 必须用<div>标签包裹，否则会有部分内容不显示
+					
+					data : function data() {
+						return {
+							hide_passwordList :[],//话题隐藏密码
+						};
+					},
+					props: this.$options.props, // re-use current props definitions
+					methods: {
+				        //模板中将点击事件绑定到本函数，作用域只限在这个子组件中
+				        topicUnhide : function(hideType,hidePasswordIndex){
+				        	var _self = this;
+				        	
+				        	var parameter = "&topicId=" + getUrlParam("topicId");
+				        	parameter += "&hideType="+hideType;//获取URL参数
+				        	
+				        	var hide_password = _self.hide_passwordList[hidePasswordIndex];
+				        	if(hide_password != undefined && hide_password != ""){
+				        		parameter += "&password="+encodeURIComponent(hide_password);//获取URL参数
+				        	}else{
+				        		_self.$toast({
+									message : "密码不能为空",
+									duration : 3000,
+									className : "mint-ui-toast",
+								});
+				        		return;
+				        	}
+				        	
+							//令牌
+							parameter += "&token=" + _self.$store.state.token;
+							$.ajax({
+								type : "POST",
+								cache : false,
+								async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+								url : "user/control/topic/unhide",
+								data : parameter,
+								success : function success(result) {
+									if (result != "") {
+
+										var returnValue = $.parseJSON(result);
+
+										var value_success = "";
+										var value_error = null;
+
+										for (var key in returnValue) {
+											if (key == "success") {
+												value_success = returnValue[key];
+											} else if (key == "error") {
+												value_error = returnValue[key];
+											}
+										}
+
+										//加入成功
+										if (value_success == "true") {
+											_self.$toast({
+												message : "话题取消隐藏成功，3秒后自动刷新页面",
+												duration : 3000,
+												className : "mint-ui-toast",
+											});
+
+											setTimeout(function() {
+												//查询话题
+												_self.$parent.queryTopic();//调用父组件方法
+											}, 3000);
+											
+										} else {
+											//显示错误
+											if (value_error != null) {
+
+
+												var htmlContent = "";
+												var count = 0;
+												for (var errorKey in value_error) {
+													var errorValue = value_error[errorKey];
+													count++;
+													htmlContent += count + ". " + errorValue + "<br>";
+												}
+												_self.$messagebox('提示', htmlContent);
+
+											}
+										}
+									}
+								}
+							});
+				        	
+				        }, 
+				        
+				    }
+				};
+			};	
 		},
 	},
 	
 	methods : {
+		
 		//查询话题
 		queryTopic : function() {
 			var _self = this;
@@ -646,6 +749,13 @@ var thread_component = Vue.extend({
 					if (result != "") {
 						var topic = $.parseJSON(result);
 						if (topic != null) {
+							//处理隐藏标签
+							var contentNode = document.createElement("div");
+							contentNode.innerHTML = topic.content;
+							_self.hidePasswordIndex = 0;
+							_self.getChildNode(contentNode);
+							topic.content = contentNode.innerHTML;
+
 							_self.topic = topic;
 						}
 					}
@@ -653,6 +763,49 @@ var thread_component = Vue.extend({
 			});
 			
 		},
+		
+		
+		//递归获取所有的子节点
+		getChildNode : function(node) {
+			//先找到子节点
+	        var nodeList = node.childNodes;
+	        for(var i = 0;i < nodeList.length;i++){
+	            //childNode获取到到的节点包含了各种类型的节点
+	            //但是我们只需要元素节点  通过nodeType去判断当前的这个节点是不是元素节点
+	            var childNode = nodeList[i];
+	            var random = Math.random().toString().slice(2);
+	            //判断是否是元素节点。如果节点是元素(Element)节点，则 nodeType 属性将返回 1。如果节点是属性(Attr)节点，则 nodeType 属性将返回 2。
+	            if(childNode.nodeType == 1){
+	            	if(childNode.nodeName.toLowerCase() == "hide" ){
+	            		if(childNode.getAttribute("hide-type") == "10"){//输入密码可见
+	            			var nodeHtml = "";
+	    					nodeHtml += '<div class="hide-box">';
+	    					nodeHtml += 	'<div class="background-image cms-lock1"></div>';
+	    					nodeHtml += 	'<div class="background-prompt">此处内容已被隐藏，输入密码可见</div>';
+	    					nodeHtml += 	'<div class="input-box">';
+	    					nodeHtml += 		'<input type="password" v-model.trim="hide_passwordList['+this.hidePasswordIndex+']" class="text" maxlength="30"  placeholder="密码" value="">';
+	    					nodeHtml += 		'<input type="button" value="提交" class="button" @click="topicUnhide(10,'+this.hidePasswordIndex+');">';
+	    					nodeHtml += 	'</div>';
+	    					nodeHtml += '</div>';
+	    					childNode.innerHTML = nodeHtml;
+	    					
+	    					this.hidePasswordIndex++;
+	            		}else if(childNode.getAttribute("hide-type") == "20"){
+	            			var nodeHtml = "";
+	            			nodeHtml += '<div class="hide-box">';
+	            			nodeHtml += 	'<div class="background-image cms-lock1"></div>';
+	            			nodeHtml += 	'<div class="background-prompt">此处内容已被隐藏，评论话题可见</div>';
+	            			nodeHtml += '</div>';
+	            			childNode.innerHTML = nodeHtml;
+	    				}
+	            	}
+	               
+	            	this.getChildNode(childNode);
+	            }
+	        }
+	    },
+		
+		
 		//查询用户是否已经收藏话题
 		queryAlreadyCollected : function() {
 			var _self = this;
@@ -863,7 +1016,8 @@ var thread_component = Vue.extend({
 			//查询添加评论页
 			this.queryAddComment();
 			
-			
+			this.$refs.commentContentEditorToolbar.innerHTML = "";
+			this.$refs.commentContentEditorText.innerHTML = "";
 			//创建编辑器
 			this.commentEditor = createEditor(this.$refs.commentContentEditorToolbar,this.$refs.commentContentEditorText,'user/control/comment/uploadImage?topicId='+this.topicId,_self,"commentContent");
 			
@@ -1043,6 +1197,9 @@ var thread_component = Vue.extend({
 
 			//查询引用评论页
 			this.queryAddQuote(commentId);
+			
+			this.$refs.quoteContentEditorToolbar.innerHTML = "";
+			this.$refs.quoteContentEditorText.innerHTML = "";
 			//创建编辑器
 			this.quoteEditor = createEditor(this.$refs.quoteContentEditorToolbar,this.$refs.quoteContentEditorText,'user/control/comment/uploadImage?topicId='+this.topicId,this,"quoteContent");
 			
@@ -1490,8 +1647,8 @@ var thread_component = Vue.extend({
 				click : true, //是否派发click事件
 				autoBlur:false,//默认值：true 在滚动之前会让当前激活的元素（input、textarea）自动失去焦点
 				preventDefault : true, //是否阻止默认事件
-				preventDefaultException:{ tagName: /^(INPUT|TEXTAREA|BUTTON|SELECT)$/ ,className:/(^|\s)(editor-toolbar|w-e-menu|editor-text|w-e-text)(\s|$)/},//列出哪些元素不屏蔽默认事件 className必须是最里层的元素
-			
+				preventDefaultException:{ tagName: /^(INPUT|TEXTAREA|BUTTON|SELECT|HIDE)$/ ,className:/(^|\s)(editor-toolbar|w-e-menu|editor-text|w-e-text)(\s|$)/},//列出哪些元素不屏蔽默认事件 className必须是最里层的元素
+				eventPassthrough :'horizontal',//解决文本无法复制
 				HWCompositing : true, //是否启用硬件加速
 			});
 		},
@@ -1521,7 +1678,7 @@ var searchBar_component = Vue.extend({
 				this.$router.push({
 					path : '/search',
 					query : {
-						keyword : encodeURIComponent(this.keyword)
+						keyword : this.keyword
 					}
 				});
 			}
@@ -5229,7 +5386,8 @@ var privateMessageChat_component = Vue.extend({
 				click : true, //是否派发click事件
 				autoBlur:false,//默认值：true 在滚动之前会让当前激活的元素（input、textarea）自动失去焦点
 				preventDefault : true, //是否阻止默认事件
-				preventDefaultException:{ tagName: /^(INPUT|TEXTAREA|BUTTON|SELECT)$/ ,className:/(^|\s)(editor-toolbar|w-e-menu|editor-text|w-e-text)(\s|$)/},//列出哪些元素不屏蔽默认事件 className必须是最里层的元素
+				preventDefaultException:{ tagName: /^(INPUT|TEXTAREA|BUTTON|SELECT|HIDE)$/ ,className:/(^|\s)(editor-toolbar|w-e-menu|editor-text|w-e-text)(\s|$)/},//列出哪些元素不屏蔽默认事件 className必须是最里层的元素
+				eventPassthrough :'horizontal',//解决文本无法复制
 				HWCompositing : true, //是否启用硬件加速
 			});
 		},
@@ -5483,7 +5641,6 @@ var remind_component = Vue.extend({
 });
 
 
-
 //收藏夹
 var favorite_component = Vue.extend({
 	template : '#favorite-template',
@@ -5673,8 +5830,69 @@ var topicFavorite_component = Vue.extend({
 	}
 });
 
-
-
+//话题取消隐藏用户列表
+var topicUnhide_component = Vue.extend({
+	template : '#topicUnhide-template',
+	data : function data() {
+		return {
+			topicUnhideList : [], //取消隐藏用户集合
+			loading : false, //加载中
+			currentpage : 0, //当前页码
+			totalpage : 1, //总页数
+		}
+	},
+	created : function created() {
+	//	this.queryTopicUnhide();
+	},
+	methods : {
+		//查询取消隐藏用户分页
+		queryTopicUnhide : function() {
+			var _self = this;
+			
+			if (_self.currentpage < _self.totalpage) {
+				
+				//先改总页数为0，避免请求为空时死循环
+				_self.totalpage = 0;
+				_self.loading = true;
+				var data = "page=" + (_self.currentpage + 1); //提交参数
+				data += "&topicId="+getUrlParam("topicId");
+				$.ajax({
+					type : "GET",
+					cache : false,
+					async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+					url : "user/control/topicUnhideList",
+					data : data,
+					success : function success(result) {
+						if (result != "") {
+							var pageView = $.parseJSON(result);
+							var new_topicUnhideList = pageView.records;
+							if (new_topicUnhideList != null && new_topicUnhideList.length > 0) {
+								_self.topicUnhideList.push.apply(_self.topicUnhideList, new_topicUnhideList); //合并两个数组
+							}
+							_self.currentpage = pageView.currentpage;
+							_self.totalpage = pageView.totalpage;
+						}
+					},
+					complete : function complete(XMLHttpRequest, textStatus) {
+						_self.loading = false;
+						//需手动调用设置的全局complete
+						$.ajaxSettings.complete(XMLHttpRequest, textStatus);
+					}
+				});
+			}
+		},
+		
+		//跳转到用户
+		toUser : function(userName) {
+			this.$router.push({
+				path : '/user/control/home',
+				query : {
+					userName : userName
+				}
+			});
+		}
+	}
+});
 
 /**------------------------------------------- 公共组件 ------------------------------------------------**/
 
@@ -5825,6 +6043,7 @@ var routes = [
 	{path : '/user/control/remindList',component : remind_component}, //提醒
 	{path : '/user/control/favoriteList',component : favorite_component}, //收藏夹
 	{path : '/user/control/topicFavoriteList',component : topicFavorite_component}, //话题收藏列表
+	{path : '/user/control/topicUnhideList',component : topicUnhide_component}, //话题取消隐藏用户列表
 	{path : '*',redirect : '/index'} //其余路由重定向至首页
 ];
 
@@ -6083,7 +6302,7 @@ function back() {
 function getUrlParam(name) {
 	var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
 	var r = window.location.search.substr(1).match(reg); //匹配目标参数
-	if (r != null) return unescape(r[2]);
+	if (r != null) return r[2];
 	return null; //返回参数值
 }
 
@@ -6258,12 +6477,11 @@ function createEditor(editorToolbar,editorText,imgPath,self,param) {
 							 //    'code',  // 插入代码
 							  //   'undo',  // 撤销
 							 //   'redo'  // 重复
+							     'hide',  // 插入隐藏栏
 							     ];
     editor.customConfig.uploadImgServer = imgPath;
     editor.customConfig.onchange = function (html) {
 		Vue.set(self, param, html);
-
-		
     };
 //    editor.customConfig.uploadImgHeaders = {
  //   	'X-Requested-With': 'XMLHttpRequest'
@@ -6318,7 +6536,55 @@ function createEditor(editorToolbar,editorText,imgPath,self,param) {
     	
         
     }
-
+    
+    /**
+    editor.customConfig.uploadImgHooks = {
+	    // 如果服务器端返回的不是 {errno:0, data: [...]} 这种格式，可使用该配置
+	    // （但是，服务器端返回的必须是一个 JSON 格式字符串！！！否则会报错）
+	    customInsert: function (insertImg, result, editor) {
+	        // 图片上传并返回结果，自定义插入图片的事件（而不是编辑器自动插入图片！！！）
+	        // insertImg 是插入图片的函数，editor 是编辑器对象，result 是服务器端返回的结果
+	    	if(result.error ==0){
+	    		// 举例：假如上传图片成功后，服务器端返回的是 {url:'....'} 这种格式，即可这样插入图片：
+		        var url = result.url;
+		        insertImg(url)
+	    		// result 必须是一个 JSON 格式字符串！！！否则报错
+	    	}else{
+	    		//弹出提示内容
+				Vue.$messagebox('错误', result.message);
+	    	}  
+	    },
+	    
+	    error: function (xhr, editor) {
+	        // 图片上传出错时触发
+	        // xhr 是 XMLHttpRequst 对象，editor 是编辑器对象
+	    	console.log(xhr.status+"  错误  "+xhr.responseText);
+	    	
+	    	if(xhr.status == 508){
+				//设置登录用户
+				store.commit('setSystemUserId', '');
+				store.commit('setSystemUserName', '');
+				
+			}
+	    	
+			//关闭网站提示参数
+			if(xhr.status == 503){
+				//弹出提示内容
+				Vue.$messagebox('系统维护', xhr.responseText);
+				
+			}
+			
+			//请求完成后回调函数 (请求成功或失败时均调用)
+			if (xhr.getResponseHeader("jumpPath") != null && xhr.getResponseHeader("jumpPath") != "") {
+				//session登陆超时登陆页面响应http头
+				//收到未登录标记，执行登录页面跳转
+				router.push({
+					path : "/" + xhr.getResponseHeader("jumpPath")
+				});
+			}
+	    	
+	    },
+    };**/
     editor.create();
 	return editor;
 }

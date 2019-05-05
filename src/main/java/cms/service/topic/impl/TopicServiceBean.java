@@ -9,17 +9,22 @@ import java.util.Map;
 import javax.annotation.Resource;
 import javax.persistence.Query;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-
+import cms.bean.QueryResult;
 import cms.bean.topic.Topic;
+import cms.bean.topic.TopicUnhide;
 import cms.service.besa.DaoSupport;
 import cms.service.favorite.FavoriteService;
 import cms.service.message.RemindService;
 import cms.service.topic.TopicService;
 import cms.utils.ObjectConversion;
+import cms.web.action.topic.TopicUnhideConfig;
+import net.sf.cglib.beans.BeanCopier;
 
 /**
  * 话题
@@ -28,9 +33,11 @@ import cms.utils.ObjectConversion;
 @Service
 @Transactional
 public class TopicServiceBean extends DaoSupport<Topic> implements TopicService{
+	private static final Logger logger = LogManager.getLogger(TopicServiceBean.class);
 	
 	@Resource RemindService remindService;
 	@Resource FavoriteService favoriteService;
+	@Resource TopicUnhideConfig topicUnhideConfig;
 	
 	/**
 	 * 根据Id查询话题
@@ -230,7 +237,7 @@ public class TopicServiceBean extends DaoSupport<Topic> implements TopicService{
 	 * @return
 	 */
 	public Integer updateTopic(Topic topic){
-		Query query = em.createQuery("update Topic o set o.title=?1, o.content=?2,o.summary=?3,o.tagId=?4,o.allow=?5,o.image=?6,o.status=?7,o.sort=?8 where o.id=?9")
+		Query query = em.createQuery("update Topic o set o.title=?1, o.content=?2,o.summary=?3,o.tagId=?4,o.allow=?5,o.image=?6,o.status=?7,o.sort=?8,o.lastUpdateTime=?9 where o.id=?10")
 		.setParameter(1, topic.getTitle())
 		.setParameter(2, topic.getContent())
 		.setParameter(3, topic.getSummary())
@@ -239,7 +246,8 @@ public class TopicServiceBean extends DaoSupport<Topic> implements TopicService{
 		.setParameter(6, topic.getImage())
 		.setParameter(7, topic.getStatus())
 		.setParameter(8, topic.getSort())
-		.setParameter(9, topic.getId());
+		.setParameter(9, topic.getLastUpdateTime())
+		.setParameter(10, topic.getId());
 		int i = query.executeUpdate();
 		return i;
 	}
@@ -322,6 +330,7 @@ public class TopicServiceBean extends DaoSupport<Topic> implements TopicService{
 		
 		//删除收藏
 		favoriteService.deleteFavoriteByTopicId(topicId);
+		
 		return i;
 	}
 
@@ -376,5 +385,165 @@ public class TopicServiceBean extends DaoSupport<Topic> implements TopicService{
 				.setParameter(1, quantity)
 				.setParameter(2, topicId);
 		return query.executeUpdate();
+	}
+	
+	
+	
+	
+	/**------------------------------------------------ 话题取消隐藏 ------------------------------------------------**/
+	
+	/**
+	 * 保存'话题取消隐藏'
+	 * @param topicUnhide
+	 */
+	public void saveTopicUnhide(Object topicUnhide){
+		this.save(topicUnhide);
+	}
+	
+	/**
+	 * 根据Id查询'话题取消隐藏'
+	 * @param topicUnhideId 话题取消隐藏Id
+	 * @return
+	 */
+	@Transactional(readOnly=true, propagation=Propagation.NOT_SUPPORTED)
+	public TopicUnhide findTopicUnhideById(String topicUnhideId){
+		
+		//表编号
+		int tableNumber = topicUnhideConfig.topicUnhideIdRemainder(topicUnhideId);
+		
+		if(tableNumber == 0){//默认对象
+			Query query = em.createQuery("select o from TopicUnhide o where o.id=?1")
+			.setParameter(1, topicUnhideId);
+			List<TopicUnhide> list = query.getResultList();
+			for(TopicUnhide p : list){
+				return p;
+			}
+			
+		}else{//带下划线对象
+			Query query = em.createQuery("select o from TopicUnhide_"+tableNumber+" o where o.id=?1")
+			.setParameter(1, topicUnhideId);
+			List<?> topicUnhide_List= query.getResultList();
+			
+			try {
+				//带下划线对象
+				Class<?> c = Class.forName("cms.bean.topic.TopicUnhide_"+tableNumber);
+				Object object  = c.newInstance();
+				BeanCopier copier = BeanCopier.create(object.getClass(),TopicUnhide.class, false); 
+				
+				for(int j = 0;j< topicUnhide_List.size(); j++) {  
+					Object obj = topicUnhide_List.get(j);
+					TopicUnhide topicUnhide = new TopicUnhide();
+					copier.copy(obj,topicUnhide, null);
+					return topicUnhide;
+				}
+				
+				
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+			//	e.printStackTrace();
+				if (logger.isErrorEnabled()) {
+		            logger.error("根据Id查询'话题取消隐藏'",e);
+		        }
+			} catch (InstantiationException e) {
+				// TODO Auto-generated catch block
+				//e.printStackTrace();
+				if (logger.isErrorEnabled()) {
+		            logger.error("根据Id查询'话题取消隐藏'",e);
+		        }
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+			//	e.printStackTrace();
+				if (logger.isErrorEnabled()) {
+		            logger.error("根据Id查询'话题取消隐藏'",e);
+		        }
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * 根据话题Id查询话题取消隐藏用户列表
+	 * @param firstIndex 索引开始,即从哪条记录开始
+	 * @param maxResult 获取多少条数据
+	 * @param topicId 话题Id
+	 * @return
+	 */
+	@Transactional(readOnly=true, propagation=Propagation.NOT_SUPPORTED)
+	public QueryResult<TopicUnhide> findTopicUnhidePageByTopicId(int firstIndex, int maxResult,Long topicId){
+		QueryResult<TopicUnhide> qr = new QueryResult<TopicUnhide>();
+		Query query  = null;
+		
+		//表编号
+		int tableNumber = topicUnhideConfig.topicIdRemainder(topicId);
+		if(tableNumber == 0){//默认对象
+			query = em.createQuery("select o from TopicUnhide o where o.topicId=?1 ORDER BY o.cancelTime desc");
+			query.setParameter(1, topicId);
+
+			//索引开始,即从哪条记录开始
+			query.setFirstResult(firstIndex);
+			//获取多少条数据
+			query.setMaxResults(maxResult);
+			List<TopicUnhide> topicUnhideList= query.getResultList();
+			
+			qr.setResultlist(topicUnhideList);
+			
+			query = em.createQuery("select count(o) from TopicUnhide o where o.topicId=?1");
+			query.setParameter(1, topicId);
+			qr.setTotalrecord((Long)query.getSingleResult());
+			
+		}else{//带下划线对象
+			
+			query = em.createQuery("select o from TopicUnhide_"+tableNumber+" o where o.topicId=?1 ORDER BY o.cancelTime desc");
+			query.setParameter(1, topicId);
+
+			//索引开始,即从哪条记录开始
+			query.setFirstResult(firstIndex);
+			//获取多少条数据
+			query.setMaxResults(maxResult);
+			List<?> topicUnhide_List= query.getResultList();
+			
+			
+			
+			try {
+				//带下划线对象
+				Class<?> c = Class.forName("cms.bean.topic.TopicUnhide_"+tableNumber);
+				Object object  = c.newInstance();
+				BeanCopier copier = BeanCopier.create(object.getClass(),TopicUnhide.class, false); 
+				List<TopicUnhide> topicUnhideList= new ArrayList<TopicUnhide>();
+				for(int j = 0;j< topicUnhide_List.size(); j++) {  
+					Object obj = topicUnhide_List.get(j);
+					TopicUnhide topicUnhide = new TopicUnhide();
+					copier.copy(obj,topicUnhide, null);
+					topicUnhideList.add(topicUnhide);
+				}
+				qr.setResultlist(topicUnhideList);
+				
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+			//	e.printStackTrace();
+				if (logger.isErrorEnabled()) {
+		            logger.error("根据话题Id查询收藏夹分页",e);
+		        }
+			} catch (InstantiationException e) {
+				// TODO Auto-generated catch block
+			//	e.printStackTrace();
+				if (logger.isErrorEnabled()) {
+		            logger.error("根据话题Id查询收藏夹分页",e);
+		        }
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+			//	e.printStackTrace();
+				if (logger.isErrorEnabled()) {
+		            logger.error("根据话题Id查询收藏夹分页",e);
+		        }
+			}
+			
+			
+			
+			query = em.createQuery("select count(o) from TopicUnhide_"+tableNumber+" o where o.topicId=?1");
+			query.setParameter(1, topicId);
+			qr.setTotalrecord((Long)query.getSingleResult());
+		}
+		return qr;
 	}
 }

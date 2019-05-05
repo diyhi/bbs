@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Resource;
-import javax.persistence.Transient;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -29,7 +28,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import cms.bean.ErrorView;
-import cms.bean.message.PrivateMessage;
 import cms.bean.message.Remind;
 import cms.bean.setting.EditorTag;
 import cms.bean.setting.SystemSetting;
@@ -145,16 +143,17 @@ public class CommentFormAction {
 			if(captchaKey != null && !"".equals(captchaKey.trim())){
 				//增加验证码重试次数
 				//统计每分钟原来提交次数
-				int quantity = settingManage.submitQuantity_add("captcha", captchaKey.trim(), 0);
-				//删除每分钟原来提交次数
-				settingManage.submitQuantity_delete("captcha", captchaKey.trim());
-				//刷新每分钟原来提交次数
-				settingManage.submitQuantity_add("captcha", captchaKey.trim(), quantity+1);
+				Integer original = settingManage.getSubmitQuantity("captcha", captchaKey.trim());
+	    		if(original != null){
+	    			settingManage.addSubmitQuantity("captcha", captchaKey.trim(),original+1);//刷新每分钟原来提交次数
+	    		}else{
+	    			settingManage.addSubmitQuantity("captcha", captchaKey.trim(),1);//刷新每分钟原来提交次数
+	    		}
 				
 				String _captcha = captchaManage.captcha_generate(captchaKey.trim(),"");
 				if(captchaValue != null && !"".equals(captchaValue.trim())){
 					if(_captcha != null && !"".equals(_captcha.trim())){
-						if(!_captcha.equals(captchaValue)){
+						if(!_captcha.equalsIgnoreCase(captchaValue)){
 							error.put("captchaValue",ErrorView._15.name());//验证码错误
 						}
 					}else{
@@ -272,7 +271,7 @@ public class CommentFormAction {
 			//删除缓存
 			userManage.delete_cache_findUserById(accessUser.getUserId());
 			userManage.delete_cache_findUserByUserName(accessUser.getUserName());
-			
+			topicManage.delete_cache_findTopicUnhideById(comment.getTopicId(),accessUser.getUserName());
 			
 			//修改话题最后回复时间
 			topicService.updateTopicReplyTime(topicId,new Date());
@@ -320,11 +319,12 @@ public class CommentFormAction {
 				}
 			}	
 			//统计每分钟原来提交次数
-			int quantity = settingManage.submitQuantity_add("comment", accessUser.getUserName(), 0);
-			//删除每分钟原来提交次数
-			settingManage.submitQuantity_delete("comment", accessUser.getUserName());
-			//刷新每分钟原来提交次数
-			settingManage.submitQuantity_add("comment", accessUser.getUserName(), quantity+1);
+			Integer original = settingManage.getSubmitQuantity("comment", accessUser.getUserName());
+    		if(original != null){
+    			settingManage.addSubmitQuantity("comment", accessUser.getUserName(),original+1);//刷新每分钟原来提交次数
+    		}else{
+    			settingManage.addSubmitQuantity("comment", accessUser.getUserName(),1);//刷新每分钟原来提交次数
+    		}
 			
 		}
 
@@ -541,16 +541,17 @@ public class CommentFormAction {
 			if(captchaKey != null && !"".equals(captchaKey.trim())){
 				//增加验证码重试次数
 				//统计每分钟原来提交次数
-				int quantity = settingManage.submitQuantity_add("captcha", captchaKey.trim(), 0);
-				//删除每分钟原来提交次数
-				settingManage.submitQuantity_delete("captcha", captchaKey.trim());
-				//刷新每分钟原来提交次数
-				settingManage.submitQuantity_add("captcha", captchaKey.trim(), quantity+1);
+				Integer original = settingManage.getSubmitQuantity("captcha", captchaKey.trim());
+	    		if(original != null){
+	    			settingManage.addSubmitQuantity("captcha", captchaKey.trim(),original+1);//刷新每分钟原来提交次数
+	    		}else{
+	    			settingManage.addSubmitQuantity("captcha", captchaKey.trim(),1);//刷新每分钟原来提交次数
+	    		}
 				
 				String _captcha = captchaManage.captcha_generate(captchaKey.trim(),"");
 				if(captchaValue != null && !"".equals(captchaValue.trim())){
 					if(_captcha != null && !"".equals(_captcha.trim())){
-						if(!_captcha.equals(captchaValue)){
+						if(!_captcha.equalsIgnoreCase(captchaValue)){
 							error.put("captchaValue",ErrorView._15.name());//验证码错误
 						}
 					}else{
@@ -778,11 +779,12 @@ public class CommentFormAction {
 			}
 			
 			//统计每分钟原来提交次数
-			int quantity = settingManage.submitQuantity_add("comment", accessUser.getUserName(), 0);
-			//删除每分钟原来提交次数
-			settingManage.submitQuantity_delete("comment", accessUser.getUserName());
-			//刷新每分钟原来提交次数
-			settingManage.submitQuantity_add("comment", accessUser.getUserName(), quantity+1);
+			Integer original = settingManage.getSubmitQuantity("comment", accessUser.getUserName());
+    		if(original != null){
+    			settingManage.addSubmitQuantity("comment", accessUser.getUserName(),original+1);//刷新每分钟原来提交次数
+    		}else{
+    			settingManage.addSubmitQuantity("comment", accessUser.getUserName(),1);//刷新每分钟原来提交次数
+    		}
 		}
 		
 		
@@ -896,16 +898,17 @@ public class CommentFormAction {
 			if(captchaKey != null && !"".equals(captchaKey.trim())){
 				//增加验证码重试次数
 				//统计每分钟原来提交次数
-				int quantity = settingManage.submitQuantity_add("captcha", captchaKey.trim(), 0);
-				//删除每分钟原来提交次数
-				settingManage.submitQuantity_delete("captcha", captchaKey.trim());
-				//刷新每分钟原来提交次数
-				settingManage.submitQuantity_add("captcha", captchaKey.trim(), quantity+1);
+				Integer original = settingManage.getSubmitQuantity("captcha", captchaKey.trim());
+	    		if(original != null){
+	    			settingManage.addSubmitQuantity("captcha", captchaKey.trim(),original+1);//刷新每分钟原来提交次数
+	    		}else{
+	    			settingManage.addSubmitQuantity("captcha", captchaKey.trim(),1);//刷新每分钟原来提交次数
+	    		}
 				
 				String _captcha = captchaManage.captcha_generate(captchaKey.trim(),"");
 				if(captchaValue != null && !"".equals(captchaValue.trim())){
 					if(_captcha != null && !"".equals(_captcha.trim())){
-						if(!_captcha.equals(captchaValue)){
+						if(!_captcha.equalsIgnoreCase(captchaValue)){
 							error.put("captchaValue",ErrorView._15.name());//验证码错误
 						}
 					}else{
@@ -1152,11 +1155,12 @@ public class CommentFormAction {
 			
 			
 			//统计每分钟原来提交次数
-			int quantity = settingManage.submitQuantity_add("comment", accessUser.getUserName(), 0);
-			//删除每分钟原来提交次数
-			settingManage.submitQuantity_delete("comment", accessUser.getUserName());
-			//刷新每分钟原来提交次数
-			settingManage.submitQuantity_add("comment", accessUser.getUserName(), quantity+1);
+			Integer original = settingManage.getSubmitQuantity("comment", accessUser.getUserName());
+    		if(original != null){
+    			settingManage.addSubmitQuantity("comment", accessUser.getUserName(),original+1);//刷新每分钟原来提交次数
+    		}else{
+    			settingManage.addSubmitQuantity("comment", accessUser.getUserName(),1);//刷新每分钟原来提交次数
+    		}
 		}
 		
 		

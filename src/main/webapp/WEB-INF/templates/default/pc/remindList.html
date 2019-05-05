@@ -106,7 +106,15 @@
 									<a href="thread?topicId=${remind.topicId}&commentId=${remind.friendTopicCommentId}">${remind.topicTitle}</a>
 								</cite> 
 								回复了我回复过的评论
-								
+							<#elseif remind.typeCode == 60>
+								<cite>
+									<a href="user/control/home?userName=${remind.senderUserName}">${remind.senderUserName}</a>
+								</cite> 
+								在
+								<cite>
+									<a href="thread?topicId=${remind.topicId}">${remind.topicTitle}</a>
+								</cite> 
+								解锁了我的话题
 							</#if>
 							
 							

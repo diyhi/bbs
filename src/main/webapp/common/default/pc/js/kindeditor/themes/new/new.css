@@ -764,4 +764,9 @@
 	width: 30%;
 	text-align: center;
 }
-
+/* 隐藏标签 */
+.ke-icon-hide {
+    background-image: url(hide.png);
+    width: 16px;
+    height: 16px;
+}

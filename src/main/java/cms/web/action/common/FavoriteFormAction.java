@@ -128,7 +128,7 @@ public class FavoriteFormAction {
 			topicFavorite.setUserName(accessUser.getUserName());
 			topicFavorite.setPostUserName(topic.getUserName());
 			try {
-				//保存评论
+				//保存收藏
 				favoriteService.saveFavorite(favoriteManage.createFavoriteObject(favorites),favoriteManage.createTopicFavoriteObject(topicFavorite));
 				
 				//删除收藏缓存

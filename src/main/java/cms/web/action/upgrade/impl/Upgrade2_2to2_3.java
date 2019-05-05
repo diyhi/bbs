@@ -171,10 +171,13 @@ public class Upgrade2_2to2_3 {
 	 * @param upgradeService
 	 */
     private static void updateSQL_sysresources(UpgradeService upgradeService){
-    	
+    	//('77b55fcc33184a009e1376e20e294eca','模板管理','查询商品分页',6,NULL,'/control/product/manage.htm?method=ajax_searchProductInfoPage&*','ef3e2b9c32634f4088f4066880c70677',1)
+
     	String sql_1 = "UPDATE sysresources SET url = '/control/tag/manage.htm?method=allTag&*',name='查询话题标签' WHERE id = '77b55fcc33184a009e1376e20e294eca';";
     	upgradeService.insertNativeSQL(sql_1);
     	
+    	
+    	//('ec17504e564f4c958cb679377a39715d','模板管理','查询商品分页',7,NULL,'/control/product/manage.htm?method=ajax_searchProductInfoPage&*','922f6908c5a1434aba4b0f6f8f008c1c',1)   
     	String sql_2 = "UPDATE sysresources SET url = '/control/tag/manage.htm?method=allTag&*',name='查询话题标签' WHERE id = 'ec17504e564f4c958cb679377a39715d';";
     	upgradeService.insertNativeSQL(sql_2);
 

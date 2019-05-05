@@ -20,19 +20,19 @@
 								<#-- 引入标签选择 -->
 								<@include action="${quote_1}"/>
 							</select>
-							<span id="${identificationNumber}_tagId_error" class="error">${(error['tagId'])!}</span>
+							<span id="${identificationNumber}_tagId_error" class="error" name="error">${(error['tagId'])!}</span>
 						</div>
 						<div style="float:left;">
 							
 							<input type="text" id="title" name="title" class="formText" size="90" value="${topic.title}" alt="标题" title="标题"/>
-							<span id="${identificationNumber}_title_error" class="error">${(error['title'])!}</span>
+							<span id="${identificationNumber}_title_error" class="error" name="error">${(error['title'])!}</span>
 						</div>
 					</div>
 	
 					<p><textarea class="textarea" onfocus="" id="topicContent" name="content" >${topic.content}</textarea></p>
 					
-					<span id="${identificationNumber}_content_error" class="error">${(error['content'])!}</span> 
-					<span id="${identificationNumber}_topic_error" class="error">${error['topic']}</span>
+					<span id="${identificationNumber}_content_error" class="error" name="error">${(error['content'])!}</span> 
+					<span id="${identificationNumber}_topic_error" class="error" name="error">${error['topic']}</span>
 					<div class="form-action">
 						<#-- 获取令牌 -->
 						<input type="hidden" id="token" name="token" value="${token!}">
@@ -62,7 +62,7 @@
 							<p class="tips">
 								
 								<#-- 验证码错误 -->
-								<span id="${identificationNumber}_captchaValue_error">${(error['captchaValue'])!}</span>
+								<span id="${identificationNumber}_captchaValue_error" name="error">${(error['captchaValue'])!}</span>
 								
 							</p>
 						</div>
@@ -133,8 +133,16 @@
 						} 
 						//Ajax方式提交
 						function ajax_sureSubmit(identificationNumber){
-						
+							//清空所有错误提示
+							var error_tag = getElementsByName_pseudo("span", "error");
+							for(var i = 0;i < error_tag.length; i++) {
+								error_tag[i].innerHTML="";
+							
+							}
+							
+							
 							if(verificationCode() == true){
+							
 								var parameter = "";
 	
 								//获取令牌
@@ -227,9 +235,76 @@
 						
 						
 						
+						KindEditor.lang({
+					        hide : '隐藏'
+					    });
+					    
+						// 指定编辑器iframe document的CSS数据，用于设置可视化区域的样式。 单冒号(:)用于CSS3伪类，双冒号(::)用于CSS3伪元素。伪元素由双冒号和伪元素名称组成。双冒号是在当前规范中引入的，用于区分伪类和伪元素。但是伪类兼容现存样式，浏览器需要同时支持旧的伪类，比如:first-line、:first-letter、:before、:after等
+					    KindEditor.options.cssData = ".ke-content hide {"+
+							"border: 0;"+
+							"border-left: 3px solid #06b5ff;"+
+							"margin-left: 10px;"+
+							"padding: 0.5em;"+
+							"min-height:26px;"+
+							"display: block;"+
+							"margin: 30px 0px 0px 0px;"+
+						"}"+
+						".ke-content .inputValue_10:before {"+
+							"content: '密码: ' attr(input-value) '';"+
+							" color: #06b5ff;"+
+							"font-size:14px;"+
+							"position: absolute;"+
+							"margin-top: -30px;"+
+							"line-height: 30px;"+
+						"}"+
+						".ke-content .inputValue_20:before {"+
+							"content: '回复话题可见';"+
+							" color: #06b5ff;"+
+							"font-size:14px;"+
+							"position: absolute;"+
+							"margin-top: -30px;"+
+							"line-height: 30px;"+
+						"}"+
+						".ke-content .inputValue_30:before {"+
+							"content: '超过积分 ' attr(input-value) ' 可见';"+
+							" color: #06b5ff;"+
+							"font-size:14px;"+
+							"position: absolute;"+
+							"margin-top: -30px;"+
+							"line-height: 30px;"+
+						"}"+
+						".ke-content .inputValue_40:before {"+
+							"content: '需要支付 ' attr(input-value) ' 积分可见';"+
+							" color: #06b5ff;"+
+							"font-size:14px;"+
+							"position: absolute;"+
+							"margin-top: -30px;"+
+							"line-height: 30px;"+
+						"}"+
+						".ke-content .inputValue_50:before {"+
+							"content: '需要支付 ' attr(input-value) ' 元费用可见';"+
+							" color: #06b5ff;"+
+							"font-size:14px;"+
+							"position: absolute;"+
+							"margin-top: -30px;"+
+							"line-height: 30px;"+
+						"}"+//突出编辑框的代码
+						".ke-content .prettyprint {"+
+							"background:#f8f8f8;"+
+							"border:1px solid #ddd;"+
+							"padding:5px;"+
+						"}";
+					
+					    //指定要保留的HTML标记和属性。Object的key为HTML标签名，value为HTML属性数组，”.”开始的属性表示style属性。 注意属性要全部小写
+					    KindEditor.options.htmlTags['hide'] = ['hide-type','input-value','class'];
 	
 						var editor;
 						KindEditor.ready(function(K) {
+							
+						
+						
+						
+						
 							editor = K.create('textarea[id="topicContent"]', {
 								themeType : 'new',//新外观
 								basePath : '${commonPath}js/kindeditor/',//指定编辑器的根目录路径
@@ -243,7 +318,7 @@
 								items : ['source', 'fontsize', 'forecolor', 'hilitecolor', 'bold',
 							        'italic', 'underline',  '|', 'image', 'multiimage',
 							        'justifyleft','justifycenter','justifyright', 'insertorderedlist', 'insertunorderedlist',   'emoticons',
-							         'link', 'unlink','removeformat'],
+							         'link', 'unlink','removeformat','hide'],
 								afterChange : function() {
 									this.sync();
 								}

@@ -501,6 +501,36 @@ public enum ErrorView {
 		public String getContent(){
 			return "本收藏不属于当前用户";
 		}
+	},
+	_1600{
+		public String getContent(){
+			return "话题重复取消隐藏";
+		}
+	},
+	_1610{
+		public String getContent(){
+			return "当前话题已经取消隐藏";
+		}
+	},
+	_1620{
+		public String getContent(){
+			return "隐藏标签不存在";
+		}
+	},
+	_1630{
+		public String getContent(){
+			return "密码错误";
+		}
+	},
+	_1640{
+		public String getContent(){
+			return "提交过于频繁，请稍后再提交";
+		}
+	},
+	_1650{
+		public String getContent(){
+			return "密码不能为空";
+		}
 	};
 	
 	

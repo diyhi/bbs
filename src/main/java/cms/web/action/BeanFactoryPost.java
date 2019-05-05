@@ -152,5 +152,21 @@ public class BeanFactoryPost implements BeanFactoryPostProcessor{
 				}	
 			}
 		}
+		
+		BeanDefinition topicUnhide_bd = beanFactory.getBeanDefinition("topicUnhideConfig");
+		if(topicUnhide_bd != null){
+			MutablePropertyValues mutablePropertyValues = topicUnhide_bd.getPropertyValues();
+			TypedStringValue typedStringValue = (TypedStringValue)mutablePropertyValues.getPropertyValue("tableQuantity").getValue();
+
+			//话题取消隐藏分表数量
+			Integer tableQuantity = Integer.parseInt(typedStringValue.getValue());
+			if(tableQuantity >1){
+				for(int i =1; i<tableQuantity; i++){
+					
+					//初始化话题取消隐藏bean
+					CreateBean.createTopicUnhideBean(i);
+				}	
+			}
+		}
 	}
 }

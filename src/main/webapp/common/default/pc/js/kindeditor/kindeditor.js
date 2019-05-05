@@ -1,11 +1,11 @@
 /*******************************************************************************
 * KindEditor - WYSIWYG HTML Editor for Internet
-* Copyright (C) 2006-2016 kindsoft.net
+* Copyright (C) 2006-2019 kindsoft.net
 *
 * @author Roddy <luolonghao@gmail.com>
 * @website http://www.kindsoft.net/
 * @licence http://www.kindsoft.net/license.php
-* @version 4.1.11 (2016-03-31)
+* @version 4.1.12 (2019-03-07)
 *******************************************************************************/
 (function (window, undefined) {
 	if (window.KindEditor) {
@@ -19,7 +19,7 @@ if (!window.console) {
 if (!console.log) {
 	console.log = function () {};
 }
-var _VERSION = '4.1.11 (2016-03-31)',
+var _VERSION = '4.1.12 (2019-03-07)',
 	_ua = navigator.userAgent.toLowerCase(),
 	_IE = _ua.indexOf('msie') > -1 && _ua.indexOf('opera') == -1,
 	_NEWIE = _ua.indexOf('msie') == -1 && _ua.indexOf('trident') > -1,
@@ -321,6 +321,7 @@ K.options = {
 		pre : ['id', 'class'],
 		hr : ['id', 'class', '.page-break-after'],
 		'br,tbody,tr,strong,b,sub,sup,em,i,u,strike,s,del' : ['id', 'class'],
+
 		iframe : ['id', 'class', 'src', 'frameborder', 'width', 'height', '.width', '.height']
 	},
 	layout : '<div class="container"><div class="toolbar"></div><div class="edit"></div><div class="statusbar"></div></div>'
@@ -627,6 +628,7 @@ K.ctrl = _ctrl;
 K.ready = _ready;
 
 function _getCssList(css) {
+	css = css.replace(/&quot;/g, '"');
 	var list = {},
 		reg = /\s*([\w\-]+)\s*:([^;]*)(;|$)/g,
 		match;
@@ -3175,6 +3177,7 @@ _extend(KCmd, {
 			return self;
 		}
 		function pasteHtml(range, val) {
+
 			val = '<img id="__kindeditor_temp_tag__" width="0" height="0" style="display:none;" />' + val;
 			var rng = range.get();
 			if (rng.item) {
@@ -3497,7 +3500,7 @@ _extend(KWidget, {
 		return self;
 	},
 	autoPos : function(width, height) {
-		var self = this,
+		var x, y, self = this,
 			w = _removeUnit(width) || 0,
 			h = _removeUnit(height) || 0,
 			scrollPos = _getScrollPos();
@@ -3575,6 +3578,16 @@ function _getInitHtml(themesPath, bodyClass, cssPath, cssData) {
 		(_direction === '' ? '<html>' : '<html dir="' + _direction + '">'),
 		'<head><meta charset="utf-8" /><title></title>',
 		(K.pageBasePath === '' ? '' : '<base href="' + K.pageBasePath + '">'),
+		'<!--[if (IE 6)|(IE 7)|(IE 8)]>',
+		'<script type="text/javascript">',
+		'(function() {',
+		'var a = ["hide"];',
+		'for (var i = 0, j = a.length; i < j; i++) {',
+		'document.createElement(a[i]);',
+		'}',
+		'})();',
+		'</script>',
+		'<![endif]-->',
 		'<style>',
 		'html {margin:0;padding:0;}',
 		'body {margin:0;padding:5px;}',
@@ -3625,11 +3638,6 @@ function _getInitHtml(themesPath, bodyClass, cssPath, cssData) {
 		'	font-size:0;',
 		'	height:2px;',
 		'}',
-		'.ke-content .prettyprint {',
-		'	background:#f8f8f8;',
-		'	border:1px solid #ddd;',
-		'	padding:5px;',
-		'}',	
 		'</style>'
 	];
 	if (!_isArray(cssPath)) {
@@ -4712,6 +4720,8 @@ function _bindNewlineEvent() {
 		if (tagName == 'marquee' || tagName == 'select') {
 			return;
 		}
+
+		
 		if (newlineTag === 'br' && !brSkipTagMap[tagName]) {
 			e.preventDefault();
 			self.insertHtml('<br />' + (_IE && _V < 9 ? '' : '\u200B'));
@@ -4739,26 +4749,26 @@ function _bindNewlineEvent() {
 			return;
 		}
 		self.cmd.selection();
+
 		var tagName = getAncestorTagName(self.cmd.range);
 		if (tagName == 'marquee' || tagName == 'select') {
 			return;
 		}
+
+		
+		//处理回车跳不出标签
+		if(tagName == 'hide'){
+			var hide = self.cmd.commonAncestor('hide');
+			hide.remove(true);
+		}
+		//处理回车跳不出标签
+		if(tagName == 'pre'){
+			var pre = self.cmd.commonAncestor('pre');
+			pre.remove(true);
+		}
+		
 		if (!pSkipTagMap[tagName]) {
 			_nativeCommand(doc, 'formatblock', '<p>');
-		}
-		var div = self.cmd.commonAncestor('div');
-		if (div) {
-			var p = K('<p></p>'),
-				child = div[0].firstChild;
-			while (child) {
-				var next = child.nextSibling;
-				p.append(child);
-				child = next;
-			}
-			div.before(p);
-			div.remove();
-			self.cmd.range.selectNodeContents(p[0]);
-			self.cmd.select();
 		}
 	});
 }
@@ -5233,7 +5243,7 @@ KEditor.prototype = {
 		}
 		if (height) {
 			height = _removeUnit(height);
-			editHeight = _removeUnit(height) - self.toolbar.div.height() - self.statusbar.height();
+			var editHeight = _removeUnit(height) - self.toolbar.div.height() - self.statusbar.height();
 			editHeight = editHeight < self.minHeight ? self.minHeight : editHeight;
 			self.edit.setHeight(editHeight);
 			if (updateProp) {
@@ -5291,6 +5301,7 @@ KEditor.prototype = {
 		return 0;
 	},
 	exec : function(key) {
+		
 		key = key.toLowerCase();
 		var self = this, cmd = self.cmd,
 			changeFlag = _inArray(key, 'selectall,copy,paste,print'.split(',')) < 0;
@@ -5298,6 +5309,7 @@ KEditor.prototype = {
 			self.addBookmark(false);
 		}
 		cmd[key].apply(cmd, _toArray(arguments, 1));
+
 		if (changeFlag) {
 			self.updateState();
 			self.addBookmark(false);
@@ -5308,6 +5320,7 @@ KEditor.prototype = {
 		return self;
 	},
 	insertHtml : function(val, quickMode) {
+		
 		if (!this.isCreated) {
 			return this;
 		}
@@ -5487,7 +5500,7 @@ KEditor.prototype = {
 function _editor(options) {
 	return new KEditor(options);
 }
-_instances = [];
+var _instances = [];
 function _create(expr, options) {
 	options = options || {};
 	options.basePath = _undef(options.basePath, K.basePath);
@@ -5804,6 +5817,30 @@ _plugin('core', function(K) {
 				title : self.lang(val + uName),
 				click : function() {
 					self.loadPlugin(name, function() {
+						self.plugin[name][val]();
+						self.hideMenu();
+					});
+				},
+				cond : self.plugin['getSelected' + uName],
+				width : 150,
+				iconClass : val == 'edit' ? 'ke-icon-' + name : undefined
+			});
+		});
+		self.addContextmenu({ title : '-' });
+	});
+	
+	self.plugin.getSelectedHide = function() {
+		return self.cmd.commonAncestor('hide');
+	};
+	//隐藏可见 右键
+	_each('hide'.split(','), function(i, name) {
+		var uName = name.charAt(0).toUpperCase() + name.substr(1);
+		_each('edit,delete'.split(','), function(j, val) {
+			self.addContextmenu({
+				title : self.lang(val + uName),
+				click : function() {
+					self.loadPlugin(name, function() {
+						
 						self.plugin[name][val]();
 						self.hideMenu();
 					});
@@ -6164,6 +6201,8 @@ KindEditor.lang({
 	ajaxLoading : '加载中，请稍候 ...',
 	uploadLoading : '上传中，请稍候 ...',
 	uploadError : '上传错误',
+	editHide : '隐藏标签属性',
+	deleteHide : '删除隐藏标签',
 	'plainpaste.comment' : '请使用快捷键(Ctrl+V)把内容粘贴到下面的方框里。',
 	'wordpaste.comment' : '请使用快捷键(Ctrl+V)把内容粘贴到下面的方框里。',
 	'code.pleaseInput' : '请输入程序代码。',
@@ -6357,6 +6396,9 @@ KindEditor.plugin('autoheight', function(K) {
 		body.style.overflowY = 'hidden';
 	}
 	function resetHeight() {
+		if(self.fullscreenMode){
+			return;
+		}
 		var edit = self.edit;
 		var body = edit.doc.body;
 		edit.iframe.height(minHeight);
@@ -6365,7 +6407,9 @@ KindEditor.plugin('autoheight', function(K) {
 	function init() {
 		minHeight = K.removeUnit(self.height);
 		self.edit.afterChange(resetHeight);
-		hideScroll();
+		if(!self.fullscreenMode){
+			hideScroll();
+		}
 		resetHeight();
 	}
 	if (self.isCreated) {
@@ -8211,6 +8255,7 @@ SWFUpload.completeURL = function(url) {
 	}
 	var currentURL = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ":" + window.location.port : "");
 	var indexSlash = window.location.pathname.lastIndexOf("/");
+	var path;
 	if (indexSlash <= 0) {
 		path = "/";
 	} else {

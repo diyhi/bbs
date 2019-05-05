@@ -65,8 +65,8 @@ public class CaptchaAction {
 
         if(captchaKey != null && !"".equals(captchaKey.trim())){
         	//统计每分钟原来提交次数
-			int quantity = settingManage.submitQuantity_add("captcha", captchaKey.trim(), 0);
-        	if(quantity >60){//如果每分钟提交超过60次，则不再生成验证码
+			Integer quantity = settingManage.getSubmitQuantity("captcha", captchaKey.trim());
+        	if(quantity != null && quantity >60){//如果每分钟提交超过60次，则不再生成验证码
         		capText = "";
         	}
         	
@@ -109,11 +109,12 @@ public class CaptchaAction {
 		if(captchaKey != null && !"".equals(captchaKey.trim()) && captchaValue != null && !"".equals(captchaValue.trim())){
 			//增加验证码重试次数
 			//统计每分钟原来提交次数
-			int quantity = settingManage.submitQuantity_add("captcha", captchaKey.trim(), 0);
-			//删除每分钟原来提交次数
-			settingManage.submitQuantity_delete("captcha", captchaKey.trim());
-			//刷新每分钟原来提交次数
-			settingManage.submitQuantity_add("captcha", captchaKey.trim(), quantity+1);
+			Integer original = settingManage.getSubmitQuantity("captcha", captchaKey.trim());
+    		if(original != null){
+    			settingManage.addSubmitQuantity("captcha", captchaKey.trim(),original+1);//刷新每分钟原来提交次数
+    		}else{
+    			settingManage.addSubmitQuantity("captcha", captchaKey.trim(),1);//刷新每分钟原来提交次数
+    		}
 			
 			String _captcha = captchaManage.captcha_generate(captchaKey.trim(),"");
 			if(_captcha != null && _captcha.equals(captchaValue)){

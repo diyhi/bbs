@@ -13,6 +13,7 @@ import cms.utils.JsonUtils;
 import cms.web.action.lucene.TopicIndexManage;
 import cms.web.action.user.UserLoginLogManage;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -31,27 +32,37 @@ public class SettingManage {
 	@Resource UserService userService;
 	@Resource PageViewService pageViewService;
 	
+	
 	/**
-	 * 用户每分钟提交次数
+	 * 增加 用户每分钟提交次数
 	 * @param module 模块
 	 * @param userName 用户名称
 	 * @param count 次数
 	 * @return
 	 */
-	@Cacheable(value="settingManage_cache_submitQuantity",key="#module + '_' + #userName")
-	public Integer submitQuantity_add(String module,String userName,Integer count){
+	@CachePut(value="settingManage_cache_submitQuantity",key="#module + '_' + #userName")
+	public Integer addSubmitQuantity(String module,String userName,Integer count){
 		return count;
 	}
 	/**
-	 * 删除用户每分钟提交次数
+	 * 查询 用户每分钟提交次数
 	 * @param module 模块
 	 * @param userName 用户名称
 	 * @return
 	 */
-	@CacheEvict(value="settingManage_cache_submitQuantity",key="#module + '_' + #userName")
-	public void submitQuantity_delete(String module,String userName){
+	@Cacheable(value="settingManage_cache_submitQuantity",key="#module + '_' + #userName")
+	public Integer getSubmitQuantity(String module,String userName){
+		return null;
 	}
-	
+	/**
+	 * 删除 用户每分钟提交次数
+	 * @param module 模块
+	 * @param userName 用户名称
+	 * @return
+	*/
+	@CacheEvict(value="settingManage_cache_submitQuantity",key="#module + '_' + #userName")
+	public void deleteSubmitQuantity(String module,String userName){
+	}
 	
 	/**
 	 * 添加全部话题索引(异步)

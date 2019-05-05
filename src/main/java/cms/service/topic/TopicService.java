@@ -4,7 +4,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import cms.bean.QueryResult;
 import cms.bean.topic.Topic;
+import cms.bean.topic.TopicUnhide;
 import cms.service.besa.DAO;
 
 /**
@@ -115,4 +117,25 @@ public interface TopicService extends DAO<Topic>{
 	 * @return
 	 */
 	public int subtractCommentTotal(Long topicId,Long quantity);
+	
+	/**
+	 * 保存'话题取消隐藏'
+	 * @param topicUnhide
+	 */
+	public void saveTopicUnhide(Object topicUnhide);
+	
+	/**
+	 * 根据Id查询'话题取消隐藏'
+	 * @param topicUnhideId 话题取消隐藏Id
+	 * @return
+	 */
+	public TopicUnhide findTopicUnhideById(String topicUnhideId);
+	/**
+	 * 根据话题Id查询话题取消隐藏用户列表
+	 * @param firstIndex 索引开始,即从哪条记录开始
+	 * @param maxResult 获取多少条数据
+	 * @param topicId 话题Id
+	 * @return
+	 */
+	public QueryResult<TopicUnhide> findTopicUnhidePageByTopicId(int firstIndex, int maxResult,Long topicId);
 }

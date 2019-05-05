@@ -861,9 +861,10 @@ CREATE TABLE `topic` (
   `status` int(11) DEFAULT NULL,
   `summary` longtext,
   `sort` int(11) DEFAULT NULL,
+  `lastUpdateTime` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `topic_idx` (`tagId`,`status`),
-  KEY `topic_2_idx` (`sort`,`postTime`,`status`)
+  KEY `topic_2_idx` (`postTime`,`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 #
@@ -931,6 +932,74 @@ CREATE TABLE `topicindex` (
   `dataId` varchar(32) DEFAULT NULL,
   `indexState` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "topicunhide_0"
+#
+
+CREATE TABLE `topicunhide_0` (
+  `id` varchar(43) NOT NULL,
+  `amount` decimal(19,2) DEFAULT NULL,
+  `cancelTime` datetime DEFAULT NULL,
+  `hideTagType` int(11) DEFAULT NULL,
+  `point` bigint(20) DEFAULT NULL,
+  `postUserName` varchar(30) DEFAULT NULL,
+  `topicId` bigint(20) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `topicUnhide_1_idx` (`topicId`,`cancelTime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "topicunhide_1"
+#
+
+CREATE TABLE `topicunhide_1` (
+  `id` varchar(43) NOT NULL,
+  `amount` decimal(19,2) DEFAULT NULL,
+  `cancelTime` datetime DEFAULT NULL,
+  `hideTagType` int(11) DEFAULT NULL,
+  `point` bigint(20) DEFAULT NULL,
+  `postUserName` varchar(30) DEFAULT NULL,
+  `topicId` bigint(20) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `topicunhide_1_idx` (`topicId`,`cancelTime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "topicunhide_2"
+#
+
+CREATE TABLE `topicunhide_2` (
+  `id` varchar(43) NOT NULL,
+  `amount` decimal(19,2) DEFAULT NULL,
+  `cancelTime` datetime DEFAULT NULL,
+  `hideTagType` int(11) DEFAULT NULL,
+  `point` bigint(20) DEFAULT NULL,
+  `postUserName` varchar(30) DEFAULT NULL,
+  `topicId` bigint(20) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `topicunhide_1_idx` (`topicId`,`cancelTime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "topicunhide_3"
+#
+
+CREATE TABLE `topicunhide_3` (
+  `id` varchar(43) NOT NULL,
+  `amount` decimal(19,2) DEFAULT NULL,
+  `cancelTime` datetime DEFAULT NULL,
+  `hideTagType` int(11) DEFAULT NULL,
+  `point` bigint(20) DEFAULT NULL,
+  `postUserName` varchar(30) DEFAULT NULL,
+  `topicId` bigint(20) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `topicunhide_1_idx` (`topicId`,`cancelTime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 #

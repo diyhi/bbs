@@ -70,7 +70,7 @@ public class SearchAction {
 		List<Topic> new_topicList = new ArrayList<Topic>();
 		QueryResult<Topic> _qr = new QueryResult<Topic>();
 		if(error.size() == 0){
-			QueryResult<Topic> qr  = topicLuceneManage.findIndexByCondition(pageView.getCurrentpage(),pageView.getMaxresult(), keyword.trim(), null, null, null, null, 20, 1);
+			QueryResult<Topic> qr  = topicLuceneManage.findIndexByCondition(pageView.getCurrentpage(),pageView.getMaxresult(), keyword.trim(), null, null, null, null, 20, 1,false);
 			
 			
 			if(qr.getResultlist() != null && qr.getResultlist().size() >0){

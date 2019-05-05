@@ -241,4 +241,25 @@
 		overflowToDisk="true"
 		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
 		memoryStoreEvictionPolicy="LFU" />		
+		
+	<!-- 查询'话题取消隐藏' -->
+	<cache name="topicManage_cache_findTopicUnhideById" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" />	
+	<!-- 查询用户是否评论话题 -->
+	<cache name="topicManage_cache_findWhetherCommentTopic" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" />		
+	<!-- 解析隐藏标签 -->
+	<cache name="topicManage_cache_analysisHiddenTag" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" />		
+	<!-- 处理隐藏标签 -->
+	<cache name="topicManage_cache_processHiddenTag" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="1800" 
+		memoryStoreEvictionPolicy="LFU" />		
 </ehcache>

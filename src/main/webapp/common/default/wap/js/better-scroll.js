@@ -1,6 +1,6 @@
 /*!
- * better-normal-scroll v1.12.0
- * (c) 2016-2018 ustbhuangyi
+ * better-normal-scroll v1.15.0
+ * (c) 2016-2019 ustbhuangyi
  * Released under the MIT License.
  *  * 滚动结构
 <div class="shop_box" ref="shopBox">
@@ -22,6 +22,16 @@
 	typeof define === 'function' && define.amd ? define(factory) :
 	(global.BScroll = factory());
 }(this, (function () { 'use strict';
+
+// As of V8 6.6, depending on the size of the array, this is anywhere
+// between 1.5-10x faster than the two-arg version of Array#splice()
+function spliceOne(list, index) {
+  for (; index + 1 < list.length; index++) {
+    list[index] = list[index + 1];
+  }
+
+  list.pop();
+}
 
 var slicedToArray = function () {
   function sliceIterator(arr, i) {
@@ -117,7 +127,7 @@ function eventMixin(BScroll) {
     var count = _events.length;
     while (count--) {
       if (_events[count][0] === fn || _events[count][0] && _events[count][0].fn === fn) {
-        _events[count][0] = undefined;
+        spliceOne(_events, count);
       }
     }
   };
@@ -182,12 +192,13 @@ var vendor = function () {
   if (!inBrowser) {
     return false;
   }
+  // first pick up standard to fix #743
   var transformNames = {
+    standard: 'transform',
     webkit: 'webkitTransform',
     Moz: 'MozTransform',
     O: 'OTransform',
-    ms: 'msTransform',
-    standard: 'transform'
+    ms: 'msTransform'
   };
 
   for (var key in transformNames) {
@@ -247,16 +258,20 @@ function offsetToBody(el) {
   };
 }
 
+var cssVendor = vendor && vendor !== 'standard' ? '-' + vendor.toLowerCase() + '-' : '';
+
 var transform = prefixStyle('transform');
+var transition = prefixStyle('transition');
 
 var hasPerspective = inBrowser && prefixStyle('perspective') in elementStyle;
 // fix issue #361
 var hasTouch = inBrowser && ('ontouchstart' in window || isWeChatDevTools);
 var hasTransform = transform !== false;
-var hasTransition = inBrowser && prefixStyle('transition') in elementStyle;
+var hasTransition = inBrowser && transition in elementStyle;
 
 var style = {
   transform: transform,
+  transition: transition,
   transitionTimingFunction: prefixStyle('transitionTimingFunction'),
   transitionDuration: prefixStyle('transitionDuration'),
   transitionDelay: prefixStyle('transitionDelay'),
@@ -410,7 +425,7 @@ var DEFAULT_OPTIONS = {
   probeType: 0,
   preventDefault: true,
   preventDefaultException: {
-    tagName: /^(INPUT|TEXTAREA|BUTTON|SELECT)$/
+    tagName: /^(INPUT|TEXTAREA|BUTTON|SELECT|AUDIO)$/
   },
   HWCompositing: true,
   useTransition: true,
@@ -514,7 +529,7 @@ var DEFAULT_OPTIONS = {
 };
 
 function initMixin(BScroll) {
-  BScroll.prototype._init = function (el, options) {
+  BScroll.prototype._init = function (options) {
     this._handleOptions(options);
 
     // init private custom events
@@ -647,7 +662,7 @@ function initMixin(BScroll) {
     }
     var me = this;
     var isInTransition = false;
-    var key = this.useTransition ? 'isInTransition' : 'isAnimating';
+    var key = this.options.useTransition ? 'isInTransition' : 'isAnimating';
     Object.defineProperty(this, key, {
       get: function get() {
         return isInTransition;
@@ -817,6 +832,7 @@ function initMixin(BScroll) {
   };
 
   BScroll.prototype.refresh = function () {
+    var isWrapperStatic = window.getComputedStyle(this.wrapper, null).position === 'static';
     var wrapperRect = getRect(this.wrapper);
     this.wrapperWidth = wrapperRect.width;
     this.wrapperHeight = wrapperRect.height;
@@ -828,17 +844,25 @@ function initMixin(BScroll) {
     this.relativeX = scrollerRect.left;
     this.relativeY = scrollerRect.top;
 
+    if (isWrapperStatic) {
+      this.relativeX -= wrapperRect.left;
+      this.relativeY -= wrapperRect.top;
+    }
+
     this.minScrollX = 0;
     this.minScrollY = 0;
 
     var wheel = this.options.wheel;
     if (wheel) {
       this.items = this.scroller.children;
+      // check whether there are all disable items or not when refresh
+      this._checkWheelAllDisabled();
       this.options.itemHeight = this.itemHeight = this.items.length ? this.scrollerHeight / this.items.length : 0;
       if (this.selectedIndex === undefined) {
         this.selectedIndex = wheel.selectedIndex || 0;
       }
       this.options.startY = -this.selectedIndex * this.itemHeight;
+
       this.maxScrollX = 0;
       this.maxScrollY = -this.itemHeight * (this.items.length - 1);
     } else {
@@ -918,7 +942,7 @@ var ease = {
   }
 };
 
-function momentum(current, start, time, lowerMargin, upperMargin, wrapperSize, options) {
+function momentum(current, start, time, lowerMargin, upperMargin, wrapperSize, options, scroll) {
   var distance = current - start;
   var speed = Math.abs(distance) / time;
 
@@ -934,7 +958,7 @@ function momentum(current, start, time, lowerMargin, upperMargin, wrapperSize, o
   var destination = current + speed / deceleration * (distance < 0 ? -1 : 1);
 
   if (wheel && itemHeight) {
-    destination = Math.round(destination / itemHeight) * itemHeight;
+    destination = scroll._findNearestValidWheel(destination).y;
   }
 
   if (destination < lowerMargin) {
@@ -1074,7 +1098,7 @@ function coreMixin(BScroll) {
     var timestamp = getNow();
 
     // We need to move at least momentumLimitDistance pixels for the scrolling to initiate
-    if (timestamp - this.endTime > this.options.momentumLimitTime && absDistY < this.options.momentumLimitDistance && absDistX < this.options.momentumLimitDistance) {
+    if (timestamp - this.endTime > this.options.momentumLimitTime && !this.moved && absDistY < this.options.momentumLimitDistance && absDistX < this.options.momentumLimitDistance) {
       return;
     }
 
@@ -1225,7 +1249,7 @@ function coreMixin(BScroll) {
       return;
     }
 
-    this.scrollTo(newX, newY);
+    this._translate(newX, newY);
 
     this.endTime = getNow();
     var duration = this.endTime - this.startTime;
@@ -1254,15 +1278,15 @@ function coreMixin(BScroll) {
       }
       var wrapperWidth = this.directionX === DIRECTION_RIGHT && left || this.directionX === DIRECTION_LEFT && right ? this.wrapperWidth : 0;
       var wrapperHeight = this.directionY === DIRECTION_DOWN && top || this.directionY === DIRECTION_UP && bottom ? this.wrapperHeight : 0;
-      var momentumX = this.hasHorizontalScroll ? momentum(this.x, this.startX, duration, this.maxScrollX, this.minScrollX, wrapperWidth, this.options) : { destination: newX, duration: 0 };
-      var momentumY = this.hasVerticalScroll ? momentum(this.y, this.startY, duration, this.maxScrollY, this.minScrollY, wrapperHeight, this.options) : { destination: newY, duration: 0 };
+      var momentumX = this.hasHorizontalScroll ? momentum(this.x, this.startX, duration, this.maxScrollX, this.minScrollX, wrapperWidth, this.options, this) : { destination: newX, duration: 0 };
+      var momentumY = this.hasVerticalScroll ? momentum(this.y, this.startY, duration, this.maxScrollY, this.minScrollY, wrapperHeight, this.options, this) : { destination: newY, duration: 0 };
       newX = momentumX.destination;
       newY = momentumY.destination;
       time = Math.max(momentumX.duration, momentumY.duration);
       this.isInTransition = true;
     } else {
       if (this.options.wheel) {
-        newY = Math.round(newY / this.itemHeight) * this.itemHeight;
+        newY = this._findNearestValidWheel(newY).y;
         time = this.options.wheel.adjustTime || 400;
       }
     }
@@ -1290,8 +1314,9 @@ function coreMixin(BScroll) {
     }
 
     if (this.options.wheel) {
-      this.selectedIndex = Math.round(Math.abs(this.y / this.itemHeight));
+      this.selectedIndex = this._findNearestValidWheel(this.y).index;
     }
+
     this.trigger('scrollEnd', {
       x: this.x,
       y: this.y
@@ -1307,11 +1332,19 @@ function coreMixin(BScroll) {
     if (!this.moved) {
       if (this.options.wheel) {
         if (this.target && this.target.className === this.options.wheel.wheelWrapperClass) {
-          var index = Math.abs(Math.round(this.y / this.itemHeight));
+          var index = this._findNearestValidWheel(this.y).index;
           var _offset = Math.round((this.pointY + offsetToBody(this.wrapper).top - this.wrapperHeight / 2) / this.itemHeight);
           this.target = this.items[index + _offset];
         }
-        this.scrollToElement(this.target, this.options.wheel.adjustTime || 400, true, true, ease.swipe);
+        var top = offset(this.target).top;
+        var left = offset(this.target).left;
+        top -= this.wrapperOffset.top;
+        top -= Math.round(this.target.offsetHeight / 2 - this.wrapper.offsetHeight / 2) || 0;
+        left -= this.wrapperOffset.left;
+        left -= Math.round(this.target.offsetWidth / 2 - this.wrapper.offsetWidth / 2) || 0;
+
+        top = this._findNearestValidWheel(top).y;
+        this.scrollTo(left, top, this.options.wheel.adjustTime || 400, ease.swipe);
         return true;
       } else {
         if (!preventClick) {
@@ -1478,6 +1511,11 @@ function coreMixin(BScroll) {
         me.isAnimating = false;
         me._translate(destX, destY, destScale);
 
+        me.trigger('scroll', {
+          x: me.x,
+          y: me.y
+        });
+
         if (!me.pulling && !me.resetPosition(me.options.bounceTime)) {
           me.trigger('scrollEnd', {
             x: me.x,
@@ -1525,7 +1563,10 @@ function coreMixin(BScroll) {
     var time = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
     var easing = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : ease.bounce;
 
-    this.isInTransition = this.options.useTransition && time > 0 && (x !== this.x || y !== this.y);
+    if (this.options.wheel) {
+      y = this._findNearestValidWheel(y).y;
+    }
+    this.isInTransition = this.options.useTransition && time > 0 && (this.x !== x || this.y !== y);
 
     if (!time || this.options.useTransition) {
       this._transitionTimingFunction(easing.style);
@@ -1535,15 +1576,25 @@ function coreMixin(BScroll) {
       if (time && this.options.probeType === PROBE_REALTIME) {
         this._startProbe();
       }
+      if (!time) {
+        // don't trigger resetPosition when zoom feature is open, fix #748
+        if (this.options.zoom) return;
+        this.trigger('scroll', {
+          x: x,
+          y: y
+        });
+        // force reflow to put everything in position
+        this._reflow = document.body.offsetHeight;
+        if (!this.resetPosition(this.options.bounceTime, ease.bounce)) {
+          this.trigger('scrollEnd', {
+            x: x,
+            y: y
+          });
+        }
+      }
 
       if (this.options.wheel) {
-        if (y > this.minScrollY) {
-          this.selectedIndex = 0;
-        } else if (y < this.maxScrollY) {
-          this.selectedIndex = this.items.length - 1;
-        } else {
-          this.selectedIndex = Math.round(Math.abs(y / this.itemHeight));
-        }
+        this.selectedIndex = this._findNearestValidWheel(y).index;
       }
     } else {
       this._animate(x, y, time, easing.fn);
@@ -1556,7 +1607,7 @@ function coreMixin(BScroll) {
     }
     el = el.nodeType ? el : this.scroller.querySelector(el);
 
-    if (this.options.wheel && el.className !== this.options.wheel.wheelItemClass) {
+    if (this.options.wheel && !el.classList.contains(this.options.wheel.wheelItemClass)) {
       return;
     }
 
@@ -1578,7 +1629,7 @@ function coreMixin(BScroll) {
     pos.top = pos.top > this.minScrollY ? this.minScrollY : pos.top < this.maxScrollY ? this.maxScrollY : pos.top;
 
     if (this.options.wheel) {
-      pos.top = Math.round(pos.top / this.itemHeight) * this.itemHeight;
+      pos.top = this._findNearestValidWheel(pos.top).y;
     }
 
     this.scrollTo(pos.left, pos.top, time, easing);
@@ -1640,7 +1691,7 @@ function coreMixin(BScroll) {
       var pos = this.getComputedPosition();
       this._translate(pos.x, pos.y);
       if (this.options.wheel) {
-        this.target = this.items[Math.round(-pos.y / this.itemHeight)];
+        this.target = this.items[this._findNearestValidWheel(pos.y).index];
       } else {
         this.trigger('scrollEnd', {
           x: this.x,
@@ -2059,8 +2110,8 @@ function wheelMixin(BScroll) {
     var index = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
     if (this.options.wheel) {
-      this.y = -index * this.itemHeight;
-      this.scrollTo(0, this.y);
+      var y = -index * this.itemHeight;
+      this.scrollTo(0, y);
     }
   };
 
@@ -2076,9 +2127,61 @@ function wheelMixin(BScroll) {
     if (!wheel.wheelItemClass) {
       wheel.wheelItemClass = 'wheel-item';
     }
+    if (!wheel.wheelDisabledItemClass) {
+      wheel.wheelDisabledItemClass = 'wheel-disabled-item';
+    }
     if (wheel.selectedIndex === undefined) {
       wheel.selectedIndex = 0;
-      warn('wheel option selectedIndex is required!');
+    }
+  };
+
+  BScroll.prototype._findNearestValidWheel = function (y) {
+    y = y > 0 ? 0 : y < this.maxScrollY ? this.maxScrollY : y;
+    var wheel = this.options.wheel;
+    var currentIndex = Math.abs(Math.round(-y / this.itemHeight));
+    var cacheIndex = currentIndex;
+    var items = this.items;
+    // Impersonation web native select
+    // first, check whether there is a enable item whose index is smaller than currentIndex
+    // then, check whether there is a enable item whose index is bigger than currentIndex
+    // otherwise, there are all disabled items, just keep currentIndex unchange
+    while (currentIndex >= 0) {
+      if (items[currentIndex].className.indexOf(wheel.wheelDisabledItemClass) === -1) {
+        break;
+      }
+      currentIndex--;
+    }
+
+    if (currentIndex < 0) {
+      currentIndex = cacheIndex;
+      while (currentIndex <= items.length - 1) {
+        if (items[currentIndex].className.indexOf(wheel.wheelDisabledItemClass) === -1) {
+          break;
+        }
+        currentIndex++;
+      }
+    }
+
+    // keep it unchange when all the items are disabled
+    if (currentIndex === items.length) {
+      currentIndex = cacheIndex;
+    }
+    // when all the items are disabled, this.selectedIndex should always be -1
+    return {
+      index: this.wheelItemsAllDisabled ? -1 : currentIndex,
+      y: -currentIndex * this.itemHeight
+    };
+  };
+
+  BScroll.prototype._checkWheelAllDisabled = function () {
+    var wheel = this.options.wheel;
+    var items = this.items;
+    this.wheelItemsAllDisabled = true;
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].className.indexOf(wheel.wheelDisabledItemClass) === -1) {
+        this.wheelItemsAllDisabled = false;
+        break;
+      }
     }
   };
 }
@@ -2539,6 +2642,24 @@ function pullDownMixin(BScroll) {
   BScroll.prototype.closePullDown = function () {
     this.options.pullDownRefresh = false;
   };
+
+  BScroll.prototype.autoPullDownRefresh = function () {
+    var _options$pullDownRefr4 = this.options.pullDownRefresh,
+        _options$pullDownRefr5 = _options$pullDownRefr4.threshold,
+        threshold = _options$pullDownRefr5 === undefined ? 90 : _options$pullDownRefr5,
+        _options$pullDownRefr6 = _options$pullDownRefr4.stop,
+        stop = _options$pullDownRefr6 === undefined ? 40 : _options$pullDownRefr6;
+
+
+    if (this.pulling) {
+      return;
+    }
+    this.pulling = true;
+
+    this.scrollTo(this.x, threshold);
+    this.trigger('pullingDown');
+    this.scrollTo(this.x, stop, this.options.bounceTime, ease.bounce);
+  };
 }
 
 function pullUpMixin(BScroll) {
@@ -2611,6 +2732,7 @@ function mouseWheelMixin(BScroll) {
 
     this.on('destroy', function () {
       clearTimeout(_this.mouseWheelTimer);
+      clearTimeout(_this.mouseWheelEndTimer);
       _this._handleMouseWheelEvent(removeEvent);
     });
 
@@ -2736,11 +2858,21 @@ function mouseWheelMixin(BScroll) {
       newY = this.maxScrollY;
     }
 
+    var needTriggerEnd = this.y === newY;
     this.scrollTo(newX, newY, easeTime, ease.swipe);
     this.trigger('scroll', {
       x: this.x,
       y: this.y
     });
+    clearTimeout(this.mouseWheelEndTimer);
+    if (needTriggerEnd) {
+      this.mouseWheelEndTimer = setTimeout(function () {
+        _this2.trigger('scrollEnd', {
+          x: _this2.x,
+          y: _this2.y
+        });
+      }, easeTime);
+    }
   };
 }
 
@@ -2944,6 +3076,7 @@ function InfiniteScroller(scroller, options) {
   this.tombstoneHeight = 0;
   this.tombstoneWidth = 0;
   this.tombstones = [];
+  this.tombstonesAnimationHandlers = [];
 
   this.items = [];
   this.loadedItems = 0;
@@ -2953,15 +3086,47 @@ function InfiniteScroller(scroller, options) {
   this.scroller = scroller;
   this.wrapperEl = this.scroller.wrapper;
   this.scrollerEl = this.scroller.scroller;
-  this.scroller.on('scroll', function () {
-    _this.onScroll();
-  });
+
   this.scroller.on('resize', function () {
     _this.onResize();
   });
+  this.scroller.on('destroy', function () {
+    _this.destroy();
+  });
 
-  this.onResize();
+  // wait scroll core init
+  this._onResizeHandler = setTimeout(function () {
+    _this.onResize();
+
+    // must wait tombstoneHeight has size
+    _this.scroller.on('scroll', function () {
+      _this.onScroll();
+    });
+  });
 }
+
+InfiniteScroller.prototype.destroy = function () {
+  var _this2 = this;
+
+  // In extreme scene, destroy is triggered before _onResizeHandler
+  clearTimeout(this._onResizeHandler);
+  this.tombstonesAnimationHandlers.forEach(function (handler) {
+    clearTimeout(handler);
+  });
+  this.tombstonesAnimationHandlers = null;
+  this.items.forEach(function (item) {
+    if (item.node) {
+      _this2.scrollerEl.removeChild(item.node);
+      item.node = null;
+    }
+  });
+  this.scroller.infiniteScroller = null;
+  this.scroller = null;
+  this.wrapperEl = null;
+  this.scrollerEl = null;
+  this.items = null;
+  this.tombstones = null;
+};
 
 InfiniteScroller.prototype.onScroll = function () {
   var scrollTop = -this.scroller.y;
@@ -2976,7 +3141,7 @@ InfiniteScroller.prototype.onScroll = function () {
   }
 
   this.anchorScrollTop = scrollTop;
-  var lastScreenItem = this._calculateAnchoredItem(this.anchorItem, this.wrapperEl.offsetHeight);
+  var lastScreenItem = this._calculateAnchoredItem(this.anchorItem, this.scroller.wrapperHeight);
 
   var start = this.anchorItem.index;
   var end = lastScreenItem.index;
@@ -3017,7 +3182,7 @@ InfiniteScroller.prototype.fill = function (start, end) {
 };
 
 InfiniteScroller.prototype.maybeRequestContent = function () {
-  var _this2 = this;
+  var _this3 = this;
 
   if (this.requestInProgress || !this.hasMore) {
     return;
@@ -3028,30 +3193,30 @@ InfiniteScroller.prototype.maybeRequestContent = function () {
   }
   this.requestInProgress = true;
   this.options.fetch(itemsNeeded).then(function (items) {
+    _this3.requestInProgress = false;
     if (items) {
-      _this2.addContent(items);
+      _this3.addContent(items);
     } else {
-      _this2.hasMore = false;
-      var tombstoneLen = _this2._removeTombstones();
+      _this3.hasMore = false;
+      var tombstoneLen = _this3._removeTombstones();
       var curPos = 0;
-      if (_this2.anchorItem.index <= _this2.items.length) {
-        curPos = _this2._fixScrollPosition();
-        _this2._setupAnimations({}, curPos);
-        _this2.scroller.resetPosition(_this2.scroller.options.bounceTime);
+      if (_this3.anchorItem.index <= _this3.items.length) {
+        curPos = _this3._fixScrollPosition();
+        _this3._setupAnimations({}, curPos);
+        _this3.scroller.resetPosition(_this3.scroller.options.bounceTime);
       } else {
-        _this2.anchorItem.index -= tombstoneLen;
-        curPos = _this2._fixScrollPosition();
-        _this2._setupAnimations({}, curPos);
-        _this2.scroller.stop();
-        _this2.scroller.resetPosition();
-        _this2.onScroll();
+        _this3.anchorItem.index -= tombstoneLen;
+        curPos = _this3._fixScrollPosition();
+        _this3._setupAnimations({}, curPos);
+        _this3.scroller.stop();
+        _this3.scroller.resetPosition();
+        _this3.onScroll();
       }
     }
   });
 };
 
 InfiniteScroller.prototype.addContent = function (items) {
-  this.requestInProgress = false;
   for (var i = 0; i < items.length; i++) {
     if (this.items.length <= this.loadedItems) {
       this._addItem();
@@ -3071,6 +3236,10 @@ InfiniteScroller.prototype.attachContent = function () {
   this._setupAnimations(tombstoneAnimations, curPos);
 };
 
+InfiniteScroller.prototype.resetMore = function () {
+  this.hasMore = true;
+};
+
 InfiniteScroller.prototype._removeTombstones = function () {
   var markIndex = void 0;
   var tombstoneLen = 0;
@@ -3079,7 +3248,8 @@ InfiniteScroller.prototype._removeTombstones = function () {
     var currentNode = this.items[i].node;
     var currentData = this.items[i].data;
     if ((!currentNode || isTombstoneNode(currentNode)) && !currentData) {
-      if (!markIndex) {
+      // 0 should be excluded
+      if (markIndex === void 0) {
         markIndex = i;
       }
       if (currentNode) {
@@ -3150,10 +3320,12 @@ InfiniteScroller.prototype._cleanupUnusedNodes = function (unusedNodes) {
 
 InfiniteScroller.prototype._cacheNodeSize = function () {
   for (var i = this.firstAttachedItem; i < this.lastAttachedItem; i++) {
+    var item = this.items[i];
     // Only cache the height if we have the real contents, not a placeholder.
-    if (this.items[i].data && !this.items[i].height) {
-      this.items[i].height = this.items[i].node.offsetHeight;
-      this.items[i].width = this.items[i].node.offsetWidth;
+    if (item.data && !item.height) {
+      var isTombstone = isTombstoneNode(item.node);
+      item.height = isTombstone ? this.tombstoneHeight : item.node.offsetHeight;
+      item.width = isTombstone ? this.tombstoneWidth : item.node.offsetWidth;
     }
   }
 };
@@ -3177,46 +3349,48 @@ InfiniteScroller.prototype._fixScrollPosition = function () {
 };
 
 InfiniteScroller.prototype._setupAnimations = function (tombstoneAnimations, curPos) {
-  var _this3 = this;
+  var _this4 = this;
 
   for (var i in tombstoneAnimations) {
     var animation = tombstoneAnimations[i];
-    this.items[i].node.style.transform = 'translateY(' + (this.anchorScrollTop + animation[1]) + 'px) scale(' + this.tombstoneWidth / this.items[i].width + ', ' + this.tombstoneHeight / this.items[i].height + ')';
+    this.items[i].node.style[style.transform] = 'translateY(' + (this.anchorScrollTop + animation[1]) + 'px) scale(' + this.tombstoneWidth / this.items[i].width + ', ' + this.tombstoneHeight / this.items[i].height + ')';
     // Call offsetTop on the nodes to be animated to force them to apply current transforms.
     /* eslint-disable no-unused-expressions */
     this.items[i].node.offsetTop;
     animation[0].offsetTop;
-    this.items[i].node.style.transition = 'transform ' + ANIMATION_DURATION_MS + 'ms';
+    this.items[i].node.style[style.transition] = cssVendor + 'transform ' + ANIMATION_DURATION_MS + 'ms';
   }
 
   for (var _i2 = this.firstAttachedItem; _i2 < this.lastAttachedItem; _i2++) {
     var _animation = tombstoneAnimations[_i2];
     if (_animation) {
       var tombstoneNode = _animation[0];
-      tombstoneNode.style.transition = 'transform ' + ANIMATION_DURATION_MS + 'ms, opacity ' + ANIMATION_DURATION_MS + 'ms';
-      tombstoneNode.style.transform = 'translateY(' + curPos + 'px) scale(' + this.items[_i2].width / this.tombstoneWidth + ', ' + this.items[_i2].height / this.tombstoneHeight + ')';
+      tombstoneNode.style[style.transition] = cssVendor + 'transform ' + ANIMATION_DURATION_MS + 'ms, opacity ' + ANIMATION_DURATION_MS + 'ms';
+      tombstoneNode.style[style.transform] = 'translateY(' + curPos + 'px) scale(' + this.items[_i2].width / this.tombstoneWidth + ', ' + this.items[_i2].height / this.tombstoneHeight + ')';
       tombstoneNode.style.opacity = 0;
     }
     if (curPos !== this.items[_i2].top) {
       if (!_animation) {
-        this.items[_i2].node.style.transition = '';
+        this.items[_i2].node.style[style.transition] = '';
       }
-      this.items[_i2].node.style.transform = 'translateY(' + curPos + 'px)';
+      this.items[_i2].node.style[style.transform] = 'translateY(' + curPos + 'px)';
     }
     this.items[_i2].top = curPos;
     curPos += this.items[_i2].height || this.tombstoneHeight;
   }
 
-  this.scroller.maxScrollY = -(curPos - this.wrapperEl.offsetHeight + (this.hasMore ? DEFAULT_SCROLL_RUNWAY : 0));
+  this.scroller.maxScrollY = -(curPos - this.scroller.wrapperHeight + (this.hasMore ? DEFAULT_SCROLL_RUNWAY : 0));
 
-  setTimeout(function () {
+  var tombstoneAnimationsHandler = setTimeout(function () {
     for (var _i3 in tombstoneAnimations) {
       var _animation2 = tombstoneAnimations[_i3];
       _animation2[0].style.display = 'none';
       // Tombstone can be recycled now.
-      _this3.tombstones.push(_animation2[0]);
+      _this4.tombstones.push(_animation2[0]);
     }
   }, ANIMATION_DURATION_MS);
+
+  this.tombstonesAnimationHandlers.push(tombstoneAnimationsHandler);
 };
 
 InfiniteScroller.prototype._getTombStone = function () {
@@ -3224,8 +3398,8 @@ InfiniteScroller.prototype._getTombStone = function () {
   if (tombstone) {
     tombstone.style.display = '';
     tombstone.style.opacity = 1;
-    tombstone.style.transform = '';
-    tombstone.style.transition = '';
+    tombstone.style[style.transform] = '';
+    tombstone.style[style.transition] = '';
     return tombstone;
   }
   return this.options.createTombstone();
@@ -3285,7 +3459,7 @@ function BScroll(el, options) {
   // cache style for better performance
   this.scrollerStyle = this.scroller.style;
 
-  this._init(el, options);
+  this._init(options);
 }
 
 initMixin(BScroll);
@@ -3300,7 +3474,7 @@ mouseWheelMixin(BScroll);
 zoomMixin(BScroll);
 infiniteMixin(BScroll);
 
-BScroll.Version = '1.12.0';
+BScroll.Version = '1.15.0';
 
 return BScroll;
 

@@ -11,14 +11,25 @@
 <LINK href="backstage/css/list.css" type="text/css" rel="stylesheet">
 <LINK href="backstage/css/table.css" type="text/css" rel="stylesheet">
 <link href="backstage/kindeditor/themes/default/default.css" rel="stylesheet"/>
-<script charset="utf-8" src="backstage/kindeditor/kindeditor-min.js"></script>
+<link href="backstage/kindeditor/plugins/hide/hide.css" rel="stylesheet"/>
+<script charset="utf-8" src="backstage/kindeditor/kindeditor.js"></script>
 <script charset="utf-8" src="backstage/kindeditor/lang/zh-CN.js"></script>
 <script type="text/javascript" src="backstage/js/ajax.js" language="javascript" ></script>
 <script type="text/javascript" src="backstage/js/Tool.js" charset="UTF-8"></script>
 <script language="JavaScript" src="backstage/jquery/jquery.min.js"></script>
 <link rel="stylesheet" href="backstage/layer/skin/layer.css"  type="text/css" />
 
-
+<!--[if (IE 6)|(IE 7)|(IE 8)]>
+<script type="text/javascript">
+	//让ie6/ie7/ie8支持自定义标签。这段代码必须放在页面头部<head>标签内
+	(function() {
+		var a = ['hide'/* 其他HTML5元素 */];
+		for (var i = 0, j = a.length; i < j; i++) {
+			document.createElement(a[i]);
+		}	
+	})();
+</script>
+<![endif]-->
 
 <script language="javascript" type="text/javascript">
 //弹出查看标签层
@@ -216,8 +227,71 @@ function sureSubmit(){
 <script>
 var editor;
 function initKindEditor(){
+	KindEditor.lang({
+        hide : '隐藏'
+    });
+    
+	// 指定编辑器iframe document的CSS数据，用于设置可视化区域的样式。 单冒号(:)用于CSS3伪类，双冒号(::)用于CSS3伪元素。伪元素由双冒号和伪元素名称组成。双冒号是在当前规范中引入的，用于区分伪类和伪元素。但是伪类兼容现存样式，浏览器需要同时支持旧的伪类，比如:first-line、:first-letter、:before、:after等
+    KindEditor.options.cssData = ".ke-content hide {"+
+		"border: 0;"+
+		"border-left: 3px solid #06b5ff;"+
+		"margin-left: 10px;"+
+		"padding: 0.5em;"+
+		"min-height:26px;"+
+		"display: block;"+
+		"margin: 30px 0px 0px 0px;"+
+	"}"+
+	".ke-content .inputValue_10:before {"+
+		"content: '密码: ' attr(input-value) '';"+
+		" color: #06b5ff;"+
+		"font-size:14px;"+
+		"position: absolute;"+
+		"margin-top: -30px;"+
+		"line-height: 30px;"+
+	"}"+
+	".ke-content .inputValue_20:before {"+
+		"content: '回复话题可见';"+
+		" color: #06b5ff;"+
+		"font-size:14px;"+
+		"position: absolute;"+
+		"margin-top: -30px;"+
+		"line-height: 30px;"+
+	"}"+
+	".ke-content .inputValue_30:before {"+
+		"content: '超过积分 ' attr(input-value) ' 可见';"+
+		" color: #06b5ff;"+
+		"font-size:14px;"+
+		"position: absolute;"+
+		"margin-top: -30px;"+
+		"line-height: 30px;"+
+	"}"+
+	".ke-content .inputValue_40:before {"+
+		"content: '需要支付 ' attr(input-value) ' 积分可见';"+
+		" color: #06b5ff;"+
+		"font-size:14px;"+
+		"position: absolute;"+
+		"margin-top: -30px;"+
+		"line-height: 30px;"+
+	"}"+
+	".ke-content .inputValue_50:before {"+
+		"content: '需要支付 ' attr(input-value) ' 元费用可见';"+
+		" color: #06b5ff;"+
+		"font-size:14px;"+
+		"position: absolute;"+
+		"margin-top: -30px;"+
+		"line-height: 30px;"+
+	"}"+//突出编辑框的代码
+	".ke-content .prettyprint {"+
+		"background:#f8f8f8;"+
+		"border:1px solid #ddd;"+
+		"padding:5px;"+
+	"}";
+
+    //指定要保留的HTML标记和属性。Object的key为HTML标签名，value为HTML属性数组，”.”开始的属性表示style属性。 注意属性要全部小写
+    KindEditor.options.htmlTags['hide'] = ['hide-type','input-value','class'];
+    
+
 	KindEditor.ready(function(K) {
-		
 		editor = K.create('textarea[name="content"]', {
 			basePath : '${config:url(pageContext.request)}backstage/kindeditor/',//指定编辑器的根目录路径
 		//	autoHeightMode : true,//值为true，并引入autoheight.js插件时自动调整高度
@@ -235,7 +309,7 @@ function initKindEditor(){
         'formatblock', 'fontname', 'fontsize', '/', 'forecolor', 'hilitecolor', 'bold',
         'italic', 'underline', 'strikethrough', 'lineheight', 'removeformat', '|', 'image', 'multiimage',
         'flash', 'media', 'insertfile','emoticons','baidumap', 'table', 'hr',   'pagebreak',
-         'link', 'unlink'],
+         'link', 'unlink','hide'],
 			afterChange : function() {
 				this.sync();
 			}

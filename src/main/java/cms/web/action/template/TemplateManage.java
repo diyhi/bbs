@@ -356,6 +356,17 @@ public class TemplateManage {
 		layout_dynamicImageFavoriteList.setReferenceCode("user/control/topicFavoriteList");
 		layoutList.add(layout_dynamicImageFavoriteList);
 		
+		//话题取消隐藏用户列表
+		Layout layout_topicUnhideList = new Layout();
+		layout_topicUnhideList.setId(UUIDUtil.getUUID32());
+		layout_topicUnhideList.setName("话题取消隐藏用户列表");
+		layout_topicUnhideList.setDirName(dirName);
+		layout_topicUnhideList.setLayoutFile("topicUnhideList.html");
+		layout_topicUnhideList.setType(1);//默认页
+		layout_topicUnhideList.setSort(800);//排序
+		layout_topicUnhideList.setReferenceCode("user/control/topicUnhideList");
+		layoutList.add(layout_topicUnhideList);
+		
 		return layoutList;
 	}
 	

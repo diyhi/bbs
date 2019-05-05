@@ -260,16 +260,17 @@ public class UserFormManageAction {
 				if(captchaKey != null && !"".equals(captchaKey.trim())){
 					//增加验证码重试次数
 					//统计每分钟原来提交次数
-					int quantity = settingManage.submitQuantity_add("captcha", captchaKey.trim(), 0);
-					//删除每分钟原来提交次数
-					settingManage.submitQuantity_delete("captcha", captchaKey.trim());
-					//刷新每分钟原来提交次数
-					settingManage.submitQuantity_add("captcha", captchaKey.trim(), quantity+1);
+					Integer original = settingManage.getSubmitQuantity("captcha", captchaKey.trim());
+		    		if(original != null){
+		    			settingManage.addSubmitQuantity("captcha", captchaKey.trim(),original+1);//刷新每分钟原来提交次数
+		    		}else{
+		    			settingManage.addSubmitQuantity("captcha", captchaKey.trim(),1);//刷新每分钟原来提交次数
+		    		}
 					
 					String _captcha = captchaManage.captcha_generate(captchaKey.trim(),"");
 					if(captchaValue != null && !"".equals(captchaValue.trim())){
 						if(_captcha != null && !"".equals(_captcha.trim())){
-							if(!_captcha.equals(captchaValue)){
+							if(!_captcha.equalsIgnoreCase(captchaValue)){
 								error.put("captchaValue",ErrorView._15.name());//验证码错误
 							}
 						}else{
@@ -704,14 +705,15 @@ public class UserFormManageAction {
 		if(captchaKey != null && !"".equals(captchaKey.trim()) && captchaValue != null && !"".equals(captchaValue.trim())){
 			//增加验证码重试次数
 			//统计每分钟原来提交次数
-			int quantity = settingManage.submitQuantity_add("captcha", captchaKey.trim(), 0);
-			//删除每分钟原来提交次数
-			settingManage.submitQuantity_delete("captcha", captchaKey.trim());
-			//刷新每分钟原来提交次数
-			settingManage.submitQuantity_add("captcha", captchaKey.trim(), quantity+1);
+			Integer original = settingManage.getSubmitQuantity("captcha", captchaKey.trim());
+    		if(original != null){
+    			settingManage.addSubmitQuantity("captcha", captchaKey.trim(),original+1);//刷新每分钟原来提交次数
+    		}else{
+    			settingManage.addSubmitQuantity("captcha", captchaKey.trim(),1);//刷新每分钟原来提交次数
+    		}
 			
 			String _captcha = captchaManage.captcha_generate(captchaKey.trim(),"");
-			if(_captcha != null && _captcha.equals(captchaValue)){
+			if(_captcha != null && _captcha.equalsIgnoreCase(captchaValue)){
 				return "true";
 			}
 		}
@@ -879,16 +881,17 @@ public class UserFormManageAction {
 				if(captchaKey != null && !"".equals(captchaKey.trim())){
 					//增加验证码重试次数
 					//统计每分钟原来提交次数
-					int quantity = settingManage.submitQuantity_add("captcha", captchaKey.trim(), 0);
-					//删除每分钟原来提交次数
-					settingManage.submitQuantity_delete("captcha", captchaKey.trim());
-					//刷新每分钟原来提交次数
-					settingManage.submitQuantity_add("captcha", captchaKey.trim(), quantity+1);
+					Integer original = settingManage.getSubmitQuantity("captcha", captchaKey.trim());
+		    		if(original != null){
+		    			settingManage.addSubmitQuantity("captcha", captchaKey.trim(),original+1);//刷新每分钟原来提交次数
+		    		}else{
+		    			settingManage.addSubmitQuantity("captcha", captchaKey.trim(),1);//刷新每分钟原来提交次数
+		    		}
 					String _captcha = captchaManage.captcha_generate(captchaKey.trim(),"");
 					if(captchaValue != null && !"".equals(captchaValue.trim())){
 		
 						if(_captcha != null && !"".equals(_captcha.trim())){
-							if(!_captcha.equals(captchaValue)){
+							if(!_captcha.equalsIgnoreCase(captchaValue)){
 								error.put("captchaValue",ErrorView._15.name());//验证码错误
 							}
 						}else{
@@ -979,17 +982,18 @@ public class UserFormManageAction {
 		//登录失败处理
 		if(error.size() >0){
 			//统计每分钟原来提交次数
-			int quantity = settingManage.submitQuantity_add("login", userName, 0);
-			//删除每分钟原来提交次数
-			settingManage.submitQuantity_delete("login", userName);
-			//刷新每分钟原来提交次数
-			settingManage.submitQuantity_add("login", userName, quantity+1);
+			Integer original = settingManage.getSubmitQuantity("login", userName);
+    		if(original != null){
+    			settingManage.addSubmitQuantity("login", userName,original+1);//刷新每分钟原来提交次数
+    		}else{
+    			settingManage.addSubmitQuantity("login", userName,1);//刷新每分钟原来提交次数
+    		}
 
 			//添加用户名到Cookie
 			WebUtil.addCookie(response, "cms_userName", userName, 60);
 		}else{
 			//删除每分钟原来提交次数
-			settingManage.submitQuantity_delete("login", userName);
+			settingManage.deleteSubmitQuantity("login", userName);
 			WebUtil.deleteCookie(response, "cms_userName");
 		}
 		
@@ -1279,16 +1283,17 @@ public class UserFormManageAction {
 		if(captchaKey != null && !"".equals(captchaKey.trim())){
 			//增加验证码重试次数
 			//统计每分钟原来提交次数
-			int quantity = settingManage.submitQuantity_add("captcha", captchaKey.trim(), 0);
-			//删除每分钟原来提交次数
-			settingManage.submitQuantity_delete("captcha", captchaKey.trim());
-			//刷新每分钟原来提交次数
-			settingManage.submitQuantity_add("captcha", captchaKey.trim(), quantity+1);
+			Integer original = settingManage.getSubmitQuantity("captcha", captchaKey.trim());
+    		if(original != null){
+    			settingManage.addSubmitQuantity("captcha", captchaKey.trim(),original+1);//刷新每分钟原来提交次数
+    		}else{
+    			settingManage.addSubmitQuantity("captcha", captchaKey.trim(),1);//刷新每分钟原来提交次数
+    		}
 			
 			String _captcha = captchaManage.captcha_generate(captchaKey.trim(),"");
 			if(captchaValue != null && !"".equals(captchaValue.trim())){
 				if(_captcha != null && !"".equals(_captcha.trim())){
-					if(!_captcha.equals(captchaValue)){
+					if(!_captcha.equalsIgnoreCase(captchaValue)){
 						error.put("captchaValue",ErrorView._15.name());//验证码错误
 					}
 				}else{
@@ -1482,16 +1487,17 @@ public class UserFormManageAction {
 		if(captchaKey != null && !"".equals(captchaKey.trim())){
 			//增加验证码重试次数
 			//统计每分钟原来提交次数
-			int quantity = settingManage.submitQuantity_add("captcha", captchaKey.trim(), 0);
-			//删除每分钟原来提交次数
-			settingManage.submitQuantity_delete("captcha", captchaKey.trim());
-			//刷新每分钟原来提交次数
-			settingManage.submitQuantity_add("captcha", captchaKey.trim(), quantity+1);
+			Integer original = settingManage.getSubmitQuantity("captcha", captchaKey.trim());
+    		if(original != null){
+    			settingManage.addSubmitQuantity("captcha", captchaKey.trim(),original+1);//刷新每分钟原来提交次数
+    		}else{
+    			settingManage.addSubmitQuantity("captcha", captchaKey.trim(),1);//刷新每分钟原来提交次数
+    		}
 			
 			String _captcha = captchaManage.captcha_generate(captchaKey.trim(),"");
 			if(captchaValue != null && !"".equals(captchaValue.trim())){
 				if(_captcha != null && !"".equals(_captcha.trim())){
-					if(!_captcha.equals(captchaValue)){
+					if(!_captcha.equalsIgnoreCase(captchaValue)){
 						error.put("captchaValue",ErrorView._15.name());//验证码错误
 					}
 				}else{

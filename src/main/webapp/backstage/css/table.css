@@ -105,6 +105,59 @@
 	color:#666666;font-size:12px;
 }
 
+
+.comment hide {
+	border: 0;
+	border-left: 3px solid #06b5ff;
+	margin-left: 10px;
+	padding: 0.5em;
+	min-height:26px;
+	display: block;
+	margin: 30px 0px 0px 0px;
+}
+.comment .inputValue_10:before {
+	content: '密码: ' attr(input-value) '';
+	color: #06b5ff;
+	font-size:14px;
+	position: absolute;
+	margin-top: -30px;
+	line-height: 30px;
+}
+.comment .inputValue_20:before {
+	content: '回复话题可见';
+	color: #06b5ff;
+	font-size:14px;
+	position: absolute;
+	margin-top: -30px;
+	line-height: 30px;
+}
+.comment .inputValue_30:before {
+	content: '超过积分 ' attr(input-value) ' 可见';
+	color: #06b5ff;
+	font-size:14px;
+	position: absolute;
+	margin-top: -30px;
+	line-height: 30px;
+}
+.comment .inputValue_40:before {
+	content: '需要支付 ' attr(input-value) ' 积分可见';
+	color: #06b5ff;
+	font-size:14px;
+	position: absolute;
+	margin-top: -30px;
+	line-height: 30px;
+}
+.comment .inputValue_50:before {
+	content: '需要支付 ' attr(input-value) ' 元费用可见';
+	color: #06b5ff;
+	font-size:14px;
+	position: absolute;
+	margin-top: -30px;
+	line-height: 30px;
+}
+
+
+
 /* 提示模块 */
 .tipModule{width:800px; margin:0px auto; margin-top: 50px;border: 1px solid #BFE3FF;border-radius: 5px;background-color: #F9FCFF;}
 .tipModule_head{ height:25px;width:99%;margin-left: auto; margin-right: auto;font-size:14px; line-height:32px;color:#444;font-weight: bold;border-bottom: #BFE3FF 1px dotted;}
@@ -335,10 +388,14 @@ filter:alpha(opacity: 0);
     border-top: 1px solid #ccc;
     line-height: 20px;
 }
+.exampleTable tr {
+    background-color: #fff;
+    border-top: 1px solid #ccc;
+    line-height: 20px;
+}
 .exampleTable .mask{
 	width: 10px;height: 32px; background: #fff; margin-left: -20px;margin-top:-16px; position: absolute;
 }
-
 
 
 /*用户登录**/

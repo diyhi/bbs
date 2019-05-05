@@ -22,11 +22,13 @@ import cms.bean.template.Forum_CommentRelated_Comment;
 import cms.bean.template.Forum_TopicRelated_LikeTopic;
 import cms.bean.template.Forum_TopicRelated_Topic;
 import cms.bean.topic.Comment;
+import cms.bean.topic.HideTagType;
 import cms.bean.topic.ImageInfo;
 import cms.bean.topic.Quote;
 import cms.bean.topic.Reply;
 import cms.bean.topic.Tag;
 import cms.bean.topic.Topic;
+import cms.bean.topic.TopicUnhide;
 import cms.bean.user.AccessUser;
 import cms.bean.user.User;
 import cms.service.setting.SettingService;
@@ -196,7 +198,7 @@ public class Topic_TemplateManage {
 			if(tagList != null && tagList.size() >0){
 				for(Topic topic : qr.getResultlist()){
 					topic.setIpAddress(null);//IP地址不显示
-					
+					topic.setContent(null);//话题内容不显示
 					for(Tag tag: tagList){
 						if(topic.getTagId().equals(tag.getId())){
 							topic.setTagName(tag.getName());
@@ -335,25 +337,92 @@ public class Topic_TemplateManage {
 						}
 					}	
 				}
-				
 				topic.setIpAddress(null);//IP地址不显示
-				Tag tag = tagService.findById(topic.getTagId());
-				if(tag != null){
-					topic.setTagName(tag.getName());
+				List<Tag> tagList = tagService.findAllTag_cache();
+				if(tagList != null && tagList.size() >0){
+					for(Tag tag :tagList){
+						if(topic.getTagId().equals(tag.getId())){
+							topic.setTagName(tag.getName());
+							break;
+						}
+						
+					}
 				}
+				User user = null;
 				if(topic.getIsStaff() == false){//会员
-					User user = userManage.query_cache_findUserByUserName(topic.getUserName());
-					
-					topic.setAvatarPath(user.getAvatarPath());
-					topic.setAvatarName(user.getAvatarName());
+					user = userManage.query_cache_findUserByUserName(topic.getUserName());
+					if(user != null){
+						topic.setAvatarPath(user.getAvatarPath());
+						topic.setAvatarName(user.getAvatarName());
+					}
 				}
 				
+				//处理隐藏标签
+				if(topic.getContent() != null && !"".equals(topic.getContent().trim())){
+					//允许可见的隐藏标签
+					List<Integer> visibleTagList = new ArrayList<Integer>();
+					if(accessUser != null){
+						//如果话题由当前用户发表，则显示全部隐藏内容
+						if(topic.getIsStaff() == false && topic.getUserName().equals(accessUser.getUserName())){
+							visibleTagList.add(HideTagType.PASSWORD.getName());
+							visibleTagList.add(HideTagType.COMMENT.getName());
+							visibleTagList.add(HideTagType.GRADE.getName());
+							visibleTagList.add(HideTagType.POINT.getName());
+							visibleTagList.add(HideTagType.AMOUNT.getName());
+						}else{
+							//解析隐藏标签
+							Map<Integer,Object> analysisHiddenTagMap = topicManage.query_cache_analysisHiddenTag(topic.getContent(),topic.getId());
+							for (Map.Entry<Integer,Object> entry : analysisHiddenTagMap.entrySet()) {
+								
+								if(entry.getKey().equals(HideTagType.PASSWORD.getName())){//输入密码可见
+									//话题取消隐藏Id
+								  	String topicUnhideId = topicManage.createTopicUnhideId(accessUser.getUserId(), HideTagType.PASSWORD.getName(), topicId);
+								  
+									TopicUnhide topicUnhide = topicManage.query_cache_findTopicUnhideById(topicUnhideId);
+							  		
+							  		if(topicUnhide != null){
+							  			visibleTagList.add(HideTagType.PASSWORD.getName());//当前话题已经取消隐藏
+								  	}
+								}else if(entry.getKey().equals(HideTagType.COMMENT.getName())){//评论话题可见
+									Boolean isUnhide = topicManage.query_cache_findTopicUnhideById(topicId,accessUser.getUserName());
+									if(isUnhide){
+										visibleTagList.add(HideTagType.COMMENT.getName());//当前话题已经取消隐藏
+									}
+								}else if(entry.getKey().equals(HideTagType.GRADE.getName())){//超过等级可见
+									
+								}else if(entry.getKey().equals(HideTagType.POINT.getName())){//积分购买可见
+									
+								}else if(entry.getKey().equals(HideTagType.AMOUNT.getName())){//余额购买可见
+									
+								}
+								
+							}
+						}
+					}
+					//生成处理'隐藏标签'Id
+					String processHideTagId = topicManage.createProcessHideTagId(topicId,topic.getLastUpdateTime(), visibleTagList);
+					//处理隐藏标签
+					String content = topicManage.query_cache_processHiddenTag(topic.getContent(),visibleTagList,processHideTagId);
+					//String content = textFilterManage.processHiddenTag(topic.getContent(),visibleTagList);
+					topic.setContent(content);
+				}
 				
 				return topic;
 			}
 			
 		}
 		return null;
+	}
+	
+	/**
+	 * 话题  -- 取消隐藏
+	 * @param forum
+	 */
+	public Map<String,Object> topicUnhide_collection(Forum forum,Map<String,Object> parameter,Map<String,Object> runtimeParameter){
+		Map<String,Object> value = new HashMap<String,Object>();
+		
+
+		return value;
 	}
 	
 	/**

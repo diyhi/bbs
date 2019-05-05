@@ -167,6 +167,9 @@
 .w-e-icon-text-heigh:before {
   content: "\ea5f";
 }
+.w-e-icon-hide:before {
+  content: "\e98f";
+}
 
 .w-e-toolbar {
   display: -webkit-box;
@@ -409,3 +412,19 @@
 .w-e-text img:hover {
   box-shadow: 0 0 5px #333;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

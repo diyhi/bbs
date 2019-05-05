@@ -1,0 +1,248 @@
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">页面访问</th>
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td  width="30%">请求路径</td> 
+			<td  width="70%" colspan="2">user/control/topicUnhideList.htm</td>
+		</tr>
+		<tr> 
+			<td>请求方式</td> 
+			<td colspan="2">GET</td>
+		</tr>
+		<tr> 
+			<td>请求参数</td> 
+			<td colspan="2"><a style="color: #317ee7" onclick="anchorJump('#anchor_600'); return false;">参数表</a></td> 
+		</tr>
+		<tr> 
+			<td rowspan="7">请求返回</td> 
+			<td>话题取消隐藏分页</td> 
+			<td width="30%" >
+				变量：pageView<br>
+				类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_10'); return false;">PageView</a>
+			</td>
+		</tr> 
+	</tbody> 
+</table>
+
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">页面访问 - AJAX方式</th>
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td  width="30%">请求路径</td> 
+			<td  width="70%" colspan="2">user/control/topicUnhideList.htm</td>
+		</tr>
+		<tr> 
+			<td>请求方式</td> 
+			<td colspan="2">GET</td>
+		</tr>
+		<tr> 
+			<td>自定义请求头</td> 
+			<td colspan="2">协议头：X-Requested-With  值：XMLHttpRequest</td>
+		</tr>
+		<tr> 
+			<td>请求参数</td> 
+			<td colspan="2"><a style="color: #317ee7" onclick="anchorJump('#anchor_600'); return false;">参数表</a></td> 
+		</tr>
+		<tr> 
+			<td>请求返回</td> 
+			<td>JSON格式值 类型:<a style="color: #317ee7" onclick="anchorJump('#anchor_10'); return false;">PageView</a></td>
+		</tr>
+	</tbody> 
+</table>
+
+<table id="anchor_10" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">分页 PageView</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>records</td> 
+			<td>List&lt<a style="color: #317ee7" onclick="anchorJump('#anchor_20'); return false;">TopicUnhide</a>></td>
+			<td>数据展示列表</td>
+		</tr>
+		<tr> 
+			<td>pageIndex</td> 
+			<td><a style="color: #317ee7" onclick="anchorJump('#anchor_30'); return false;">PageIndex</a></td>
+			<td>页码索引</td>
+		</tr>
+		<tr> 
+			<td>totalpage</td> 
+			<td>long</td>
+			<td>总页数</td>
+		</tr>
+		<tr> 
+			<td>maxresult</td> 
+			<td>long</td>
+			<td>每页显示记录数</td>
+		</tr>
+		<tr> 
+			<td>currentpage</td> 
+			<td>long</td>
+			<td>当前页</td>
+		</tr>
+		<tr> 
+			<td>pagecount</td> 
+			<td>long</td>
+			<td>页码显示总数</td>
+		</tr>
+		<tr> 
+			<td>onUrl</td> 
+			<td>String</td>
+			<td>上一页URL</td>
+		</tr>
+		<tr> 
+			<td>nextUrl</td> 
+			<td>String</td>
+			<td>下一页URL</td>
+		</tr>
+	</tbody> 
+</table>
+<table id="anchor_30" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">分页索引 PageIndex</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>startindex</td> 
+			<td>long</td>
+			<td>分页开始索引</td>
+		</tr>
+		<tr> 
+			<td>endindex</td> 
+			<td>long</td>
+			<td>分页结束索引</td>
+		</tr>
+	</tbody> 
+</table>
+<table id="anchor_20" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="4">话题取消隐藏 TopicUnhide</th>
+		</tr> 
+		<tr> 
+			<th width="30%" colspan="2">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td colspan="2">id</td> 
+			<td>String</td>
+			<td>话题取消隐藏Id</td>
+		</tr>
+		<tr> 
+			<td colspan="2">userName</td> 
+			<td>String</td>
+			<td>取消隐藏的用户名称</td>
+		</tr>
+		<tr> 
+			<td colspan="2">cancelTime</td> 
+			<td>Date</td>
+			<td>取消隐藏时间</td>
+		</tr>
+		<tr> 
+			<td colspan="2">hideTagType</td> 
+			<td>Integer</td>
+			<td>隐藏标签类型 10:输入密码可见   </td>
+		</tr>
+		
+		
+		<tr> 
+			<td rowspan="2">hideTagType</td> 
+			<td><div class="mask"></div></td>
+			<td>Integer</td>
+			<td>隐藏标签类型  40:积分购买可见</td>
+		</tr>
+		<tr> 
+			<td>point</td> 
+			<td>Long</td>
+			<td>消费积分</td>
+		</tr>
+		
+
+		<tr> 
+			<td rowspan="2">hideTagType</td> 
+			<td><div class="mask"></div></td>
+			<td>Integer</td>
+			<td>隐藏标签类型 50:余额购买可见</td>
+		</tr>
+		<tr> 
+			<td>amount</td> 
+			<td>BigDecimal</td>
+			<td>消费余额</td>
+		</tr>
+		
+		
+		<tr> 
+			<td colspan="2">topicId</td> 
+			<td>Long</td>
+			<td>话题Id</td>
+		</tr>
+	</tbody> 
+</table>
+
+<table id="anchor_600" class="exampleTable" > 
+	<thead>
+		<tr> 
+			<th colspan="5">请求参数</th>
+		</tr>
+		<tr> 
+			<th width="30%">参数</th> 
+			<th width="20%">类型</th> 
+			<th width="10%">是否必填</th> 
+			<th width="40%" colspan="2">说明</th> 
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td>topicId</td> 
+			<td>Long</td>
+			<td>是</td>
+			<td>话题Id</td> 
+		</tr>	
+	 	<tr> 
+			<td>page</td> 
+			<td>Integer</td>
+			<td>否</td>
+			<td>页码</td> 
+		</tr>	
+	</tbody> 
+</table>
+
+<h2 style="margin:0;padding:0; margin-top: 10px;">示例</h2>
+<textarea name="exampleCode">
+
+<#-- 话题取消隐藏分页 -->
+<#if pageView.records?exists && pageView.records?size gt 0 >    
+	<#list pageView.records as topicUnhide>
+		<a href="user/control/home?userName=${topicUnhide.userName}" >
+			${topicUnhide.userName}
+		</a>
+	</#list>
+</#if>
+
+</textarea>
+

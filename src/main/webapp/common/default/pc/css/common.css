@@ -12,7 +12,7 @@ body {
 }
 
 body,select {
-	font: 12px/1.5 STHeiti,Microsoft YaHei,Tahoma,Helvetica,'SimSun',sans-serif;
+	font: 13px/1.5 STHeiti,Microsoft YaHei,Tahoma,Helvetica,'SimSun',sans-serif;
 	color: #444;
 }
 
@@ -141,7 +141,7 @@ html,body{
 * html .clearfix {
 	height: 1%;
 }
-.wrap{width:950px;margin:0 auto;}
+.wrap{width:1210px;margin:0 auto;}
 
 
 /*分页*/
@@ -210,14 +210,14 @@ html,body{
 .headerModule {
 	background-color: #F2F2F2;
 	border-bottom: 1px solid #e9e8e8;
-	min-width: 960px;
+	min-width: 1210px;
 }
 
 .headerModule .box {
 	*zoom: 1;
 	height: 50px;
 	line-height: 51px;
-	width: 960px;
+	width: 1210px;
 	margin: 0 auto
 }
 
@@ -280,6 +280,7 @@ html,body{
 .headerModule .box .menu ul li a:hover {
 	color:#878787
 }
+
 .headerModule .box .menu ul li .author{position:relative;color:#999}
 .headerModule .box .menu ul li .author img{
 	width:32px;
@@ -294,6 +295,9 @@ html,body{
 	behavior: url(common/default/pc/js/css3pie/PIE.htc);  /*通知IE浏览器调用脚本作用于当前类*/
 }
 
+
+
+
 .headerModule .box .head-search {
 	float: left;
 	margin-left: 20px;
@@ -302,7 +306,7 @@ html,body{
 }
 
 .headerModule .box .head-search form {
-	width: 200px;
+	width: 220px;
 	height: 29px;
 	background: #ededed;
 	border: 1px solid #e5e5e5;
@@ -312,7 +316,7 @@ html,body{
 	position: relative
 }
 .headerModule .box .head-search form input {
-	width: 160px;
+	width: 180px;
 	height: 20px;
 	*height: 50px;
 	line-height: 20px;
@@ -341,7 +345,7 @@ html,body{
 
 /* 左边栏 */
 .leftColumn{ 
-	width: 950px; 
+	width: 1210px; 
 	float: left;
 	padding:0px;
 	background:transparent;
@@ -351,7 +355,7 @@ html,body{
 /* 标签 */
 .tabModule {
     padding: 10px;
-    font-size: 12px;
+    font-size: 13px;
     line-height: 150%;
     text-align: left;
     background-color: #fff; 
@@ -360,8 +364,8 @@ html,body{
 }
 .tabModule .tab:link,.tabModule .tab:visited,.tabModule .tab:active {
     display: inline-block;
-    font-size: 13px;
-    line-height: 13px;
+    font-size: 14px;
+    line-height: 14px;
     padding: 5px 8px 5px 8px;
     margin-right: 5px;
     border-radius: 3px;
@@ -378,8 +382,8 @@ html,body{
 
 .tabModule .tab_current:link,.tabModule .tab_current:visited,.tabModule .tab_current:active {
     display: inline-block;
-    font-size: 13px;
-    line-height: 13px;
+    font-size: 14px;
+    line-height: 14px;
     padding: 5px 8px 5px 8px;
     margin-right: 5px;
     border-radius: 3px;
@@ -475,7 +479,7 @@ html,body{
 .topicModule .content {
 	position: relative;
 	margin-left: 82px;
-	width: 840px;
+	width: 1100px;
 	overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
 .topicModule .highlight B{
@@ -504,6 +508,7 @@ html,body{
 	border-radius: 2px;
 	
 }
+
 /* 标题 #555*/
 .topicModule .content .title {
 	font-family: STHeiti,Microsoft YaHei,Tahoma,Helvetica,'SimSun',sans-serif;
@@ -620,7 +625,7 @@ html,body{
 
 /* 左边栏 */
 .leftColumn_article{ 
-	width: 700px; 
+	width: 910px; 
 	float: left;
 	padding:0px;
 	background: #fff;
@@ -664,6 +669,43 @@ html,body{
 .articleModule .articleBox .articleContent p{font-size:16px;word-wrap:break-word}
 .articleModule .articleBox .articleContent img{max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;display:block}
 
+/* 隐藏标签 IE8以下浏览器不支持自定义标签，需要在页头<head>标签内执行document.createElement('hide') */
+.articleModule .articleBox .articleContent hide{
+	display:block;
+	background: #f5f5f5;
+	min-height:100px;
+	margin-left: 10px;
+	margin-right: 10px;
+	margin-top: 17px;
+	margin-bottom: 15px;
+	border: 3px dashed #e6e6e6;
+	border-radius: 5px;
+	
+}
+
+.articleModule .articleBox .articleContent hide .hide-box{
+	margin: 5px;position: relative;text-align: center;
+}
+.articleModule .articleBox .articleContent hide .background-image{
+	margin: auto;
+	margin-top:12px;
+	background:url(../images/lock.png) no-repeat;width: 48px;height: 48px;
+	opacity:0.25;
+	filter:alpha(opacity=25); 
+}
+.articleModule .articleBox .articleContent hide .background-prompt{
+	margin-top: 2px; color: #999999;font-size: 16px;
+}/*border:#a9a9a9 solid 2px;  边框#b2b5bc #777777*/
+.articleModule .articleBox .articleContent hide .input-box{margin: auto; margin-top: 10px;margin-bottom:18px; border:#b2b5bc solid 2px; width:226px; height:26px; overflow:hidden; border-radius: 2px;}
+.articleModule .articleBox .articleContent hide .input-box .text{ width:145px; height:26px; line-height:26px; border:0; float:left; font-size:14px; color:#4f4f4f; text-indent: 6px; vertical-align:middle;outline:none; background: #f7f8fa;}
+.articleModule .articleBox .articleContent hide .input-box .button{ width:79px;*width:76px; height:26px; line-height:28px; border:0; background:#b2b5bc; font-size:16px; color:#fff; float:right; font-weight:bold; cursor:pointer;text-decoration: none; outline: none}
+.articleModule .articleBox .articleContent hide .input-box .button:hover{background:#787f81;}/*background:#606060;*/
+
+.articleModule .articleBox .articleContent hide .submit-box{margin: auto; margin-top: 10px;margin-bottom:18px; border:#b8bbbf solid 2px; width:96px; height:26px; overflow:hidden; border-radius: 2px;}
+.articleModule .articleBox .articleContent hide .submit-box .button{ width:96px; height:26px; line-height:28px; border:0; background:#b2b5bc; font-size:16px; color:#fff; float:right; font-weight:bold; cursor:pointer;text-decoration: none; outline: none}
+.articleModule .articleBox .articleContent hide .submit-box .button:hover{background:#787f81;}
+
+
 /* 评论 */
 .commentModule{
 	padding: 0px 10px 10px 10px;
@@ -687,13 +729,13 @@ html,body{
 .commentModule .commentlist cite{font-style:normal;}
 .commentModule .commentlist .commentTime{margin-bottom:5px;color:#999}
 .commentModule .commentlist .commentTime a{color:#999;}
-.commentModule .commentlist .comment .commentContent{padding:0px;word-wrap:break-word;color:#666;}
+.commentModule .commentlist .comment .commentContent{padding:0px;word-wrap:break-word;color:#666;font-size: 14px;}
 /* 评论图片尺寸 */
 .commentModule .commentlist .comment .commentContent img {max-width:99.5%;height:auto;}
 
 
 .commentModule .commentlist .quote{
-	width: 600px; padding:5px 8px;border-bottom:none;text-align: left;margin-left: 5px;color: 666;
+	width: 800px; padding:5px 8px;border-bottom:none;text-align: left;margin-left: 5px;color: 666;
 }
 .commentModule .commentlist .quote div{
 	background:#fafafa;padding:3px;border:1px solid #ddd;line-height:140%;margin-bottom:5px;
@@ -703,20 +745,20 @@ html,body{
 }
 .commentModule .commentlist .content {
 	float: left;
-	width: 600px;
+	width: 800px;
 	padding-bottom: 10px;
-	font-size: 13px;
+	font-size: 14px;
 	min-height: 22px;
 	margin-left: 45px;
 	word-break: break-word;
 }
 .commentModule .commentlist .content img {
-	max-width: 650px;
-	max-height:500px\9; width:expression(document.body.clientHeight>500?"500px":"auto"); overflow:hidden;
+	max-width: 850px;
+	max-height:700px\9; width:expression(document.body.clientHeight>700?"700px":"auto"); overflow:hidden;
 	
 }
 .commentModule .commentlist .reply {
-	margin: 15px 0 10px 50px;background: #fcfcfc;font-size: 13px;
+	margin: 15px 0 10px 50px;background: #fcfcfc;font-size: 14px;
 }
 .commentModule .commentlist .reply .replyCount{
 	font-weight: 400;color:#666;
@@ -747,12 +789,12 @@ html,body{
 }
 .commentModule .commentlist .reply .reply-table td .replyContent{
 	margin-left: 10px;
-	font-size: 13px;
+	font-size: 14px;
 }
 .commentModule .commentlist .reply .reply-table td .replyTime{
 	position: relative;
 	color: #999;
-	font-size: 9pt;
+	font-size: 10pt;
 	margin: 3px 0 0 3px;
 	-webkit-text-size-adjust: none;
 	white-space: nowrap;
@@ -911,7 +953,7 @@ html,body{
 }
 /* 话题信息 */
 .articleInfoModule{ 
-	width: 249px; 
+	width: 299px; 
 	float: right;
 }
 .articleInfoModule .user{ 
@@ -938,7 +980,7 @@ html,body{
 	position:absolute;
 	border-top: 1px solid #EDEDE3;
 	margin-top:80px;
-	width: 200px;
+	width: 250px;
 }
 .articleInfoModule .user .userInfo span{
 	display:block;
@@ -950,7 +992,7 @@ html,body{
 
 /* 相关话题 */
 .likeTopic {
-	width: 249px;float: right;
+	width: 299px;float: right;
 }
 .likeTopic ul{
     margin-bottom: -8px;
@@ -963,25 +1005,25 @@ html,body{
 }
 .likeTopic .head {
     background: #f5f5f5;
-    height: 32px;
-    line-height: 32px;
+    height: 36px;
+    line-height: 36px;
     padding-left: 12px;
     color: #333;
-    font-size: 14px;
+    font-size: 15px;
 }
 
 .likeTopic .content {
     padding: 15px 8px 17px;
     word-break: break-all;
-    font-size: 13px;
+    font-size: 14px;
 }
 
 .likeTopic .content li a {
-    width: 170px;
+    width: 220px;
     text-overflow: ellipsis;
     color: #666;
 }
-
+.likeTopic .content li a:hover{color:#999;}
 
 /** 收藏夹表单模块 **/
 .favorite-formModule {
@@ -1008,12 +1050,40 @@ html,body{
 }
 
 /** 在线留言 **/
-.addFeedbackModule .box{margin-top:20px !important;padding:10px;}
-.addFeedbackModule .box h2{height: 40px;border-bottom: 1px solid #f1f1f1; text-align:center; font-size: 16px;}
-.addFeedbackModule .box .item{margin:0 auto;width: 650px;}
+.addFeedbackModule .box{padding:10px;}
+.addFeedbackModule .box h2{height: 46px; line-height:38px; border-bottom: 1px solid #f1f1f1; text-align:center; font-size: 18px;}
+.addFeedbackModule .box .item{margin:0 auto;width: 900px;}
 .addFeedbackModule .box .item a{color:#35b5ff;}
 .addFeedbackModule .box .item .required{color: red;}
 .addFeedbackModule .box .item th{width:10em;text-align:right;vertical-align:top;line-height:24px;padding:10px 2px;color: #777; font-weight: normal; font-size: 13px;}
+.addFeedbackModule .box .item textarea{
+	 line-height: 1.33em;
+	-webkit-box-shadow: none;
+    box-shadow: none;
+    border-radius: 2px;
+    border: 1px solid #e0e0e0;
+	vertical-align: top;
+	
+	margin: 0em;
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: rgba(255,255,255,0);
+    padding: 0.78em 1em;
+    background: #ffffff;
+    border: 1px solid rgba(39,41,43,0.15);
+    outline: none;
+    color: rgba(0,0,0,0.8);
+    border-radius: 0.2rem;
+    -webkit-box-shadow: 0em 0em 0em 0em transparent inset;
+    box-shadow: 0em 0em 0em 0em transparent inset;
+    -webkit-transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    -webkit-transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, -webkit-box-shadow 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, -webkit-box-shadow 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, -webkit-box-shadow 0.2s ease;
+    font-size: 1.2em;
+   
+    resize: vertical;
+}
 .addFeedbackModule .box .item .error {color: red;margin-left: 5px;}
 .addFeedbackModule .box .item .help {color: #747474;margin-left: 5px;}
 
@@ -1087,7 +1157,7 @@ html,body{
 	padding: 10px 0 0 2px;
 	color: #9f9f9f;
 	font-weight: bold;
-	font-size: 14px;
+	font-size: 15px;
 	line-height: 38px;
 	border-bottom: 1px dashed #eee;
 }
@@ -1096,7 +1166,7 @@ html,body{
 	padding: 10px 5px 0px 5px;
 }
 .linkModule .links-logo li {
-	width: 150px;
+	width: 170px;
 	height: 50px;
 	float: left;
 	line-height: 30px
@@ -1106,7 +1176,7 @@ html,body{
 	padding: 0px 5px 0px 5px;
 }
 .linkModule .links-text li {
-	width: 150px;
+	width: 170px;
 	float: left;
 	line-height: 30px
 }
@@ -1119,6 +1189,7 @@ html,body{
 	margin-top:50px;
 	text-align:center;
 	background: #fff;
+	font-size: 15px;
 }
 .messageModule h1{
 	margin-top:50px;
@@ -1126,12 +1197,12 @@ html,body{
 }
 
 /** 注册 **/
-.registerModule{margin-top:20px !important;padding:10px;}
-.registerModule h2{height: 40px;border-bottom: 1px solid #f1f1f1; text-align:center; font-size: 16px;}
+.registerModule{padding:10px;}
+.registerModule h2{height: 46px;border-bottom: 1px solid #f1f1f1; text-align:center; font-size: 16px;line-height: 38px;}
 .registerModule .item{margin:0 auto;width: 650px;}
 .registerModule .item a{color:#35b5ff;}
 .registerModule .item .required{color: red;}
-.registerModule .item th{width:10em;text-align:right;vertical-align:top;line-height:24px;padding:10px 2px;color: #777; font-weight: normal; font-size: 13px;}
+.registerModule .item th{width:10em;text-align:right;vertical-align:top;line-height:24px;padding:10px 2px;color: #777; font-weight: normal; font-size: 14px;}
 .registerModule .item .error {color: red;margin-left: 5px;}
 .registerModule .item .help {color: #747474;margin-left: 5px;}
 .registerModule .item .inputBox{
@@ -1195,6 +1266,7 @@ html,body{
 	border: 1px solid #e6e6e6;
 	min-height: 140px;
 	*height: 140px;
+	border-radius: 2px;
 }
 
 
@@ -1317,26 +1389,27 @@ html,body{
 /* 服务*/
 .selfService{
 	margin-left:8px;
-	margin-right:8px;
+	margin-right:10px;
 	margin-bottom:30px;
 	*margin-top:10px; 
-	width:934px;
+	width:1191px;
 	float:right; 
 	
 }
 .selfService .box{
 	border-right:solid 1px #e6e6e6;
-	border-top:solid 1px #e6e6e6
+	border-top:solid 1px #e6e6e6;
+	border-radius: 3px;
 }
 .selfService h1{
 	font-size:18px;
 	margin-left:4px;
-	line-height:46px;
+	line-height:40px;
 	color:#404040
 }
 .selfService .box a{
 	float:left;
-	width:232px;
+	width:237px;
 	height:100px;
 	border-bottom:solid 1px #e6e6e6;
 	border-left:solid 1px #e6e6e6;
@@ -1387,7 +1460,7 @@ html,body{
 
 
 /* 实名认证 */
-.realNameAuthenticationModule{padding-left: 2px; padding-right: 0px; padding-top:6px; float: left; width: 100%; }
+.realNameAuthenticationModule{padding-left: 300px; padding-right: 0px; padding-top:6px; float: left; width: 100%; }
 .realNameAuthenticationModule h3 {
 	font-size: 15px;font-weight:500; float: left; margin-bottom: 4px; padding-top:5px; width: 100%; border-bottom: #cccccc 1px dashed; position: relative;padding-bottom: 3px;
 }
@@ -1405,6 +1478,7 @@ html,body{
 
 
 /* 绑定手机 */
+.phoneBindingModule{padding-left: 350px;margin-top: 20px;}
 .phoneBindingModule .successInfo{color: green;}
 
 
@@ -1480,7 +1554,7 @@ html,body{
 	font-size: 14px;
 	color: #969696;
 	left: 50%;
-	margin-left: -468px;
+	margin-left: -585px;
 }
 
 .privateMessageChatTop .back-to-list:hover{
@@ -1518,9 +1592,10 @@ html,body{
 }
 .privateMessageChatForm{
 	margin-top: 8px;
-	margin-left: 8px;
+	margin-left: 150px;
 	margin-right: 8px;
 	margin-bottom: 8px;
+
 }
 .privateMessageChatForm textarea{
 	width:908px;
@@ -1654,6 +1729,7 @@ html,body{
 .systemNotifyModule .systemNotifyPage {
 	margin-top: 10px; float: right; color: #999; line-height: 22px; margin-right: 0px;*margin-right: 8px;
 }
+
 
 /* 提醒 */
 .remindTitle{
@@ -1809,7 +1885,11 @@ html,body{
     text-decoration: none;
 }
 
-
+/** 修改用户 **/
+.editUserModule{
+	margin-left: 150px;
+	width: 900px;
+}
 
 /** 修改用户头像 **/
 .updateAvatar {
@@ -1914,6 +1994,7 @@ html,body{
 	min-width: 0;
 	*height: 2px;
 }
+
 
 
 

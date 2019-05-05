@@ -35,6 +35,81 @@ kindeditor不支持输入emoji表情结尾,必须加空格结尾才可以完整�
 		'	border:1px solid #ddd;',
 		'	padding:5px;',
 		'}',
+		
+		
 突出编辑框的代码
 
 ----------------------------------------------------------------------------------
+
+隐藏功能右键标签
+kindeditor.js
+6246行增加 editHide : '隐藏标签属性',
+		  deleteHide : '删除隐藏标签',
+
+
+5871行增加
+self.plugin.getSelectedHide = function() {
+		return self.cmd.commonAncestor('hide');
+	};
+	//隐藏可见 右键
+	_each('hide'.split(','), function(i, name) {
+		
+		var uName = name.charAt(0).toUpperCase() + name.substr(1);
+
+		_each('edit,delete'.split(','), function(j, val) {
+			console.log("getSelected" + uName);
+			self.addContextmenu({
+				title : self.lang(val + uName),
+				click : function() {
+					self.loadPlugin(name, function() {
+						
+						self.plugin[name][val]();
+						self.hideMenu();
+					});
+				},
+				cond : self.plugin['getSelected' + uName],
+				width : 150,
+				iconClass : val == 'edit' ? 'ke-icon-' + name : undefined
+			});
+		});
+		self.addContextmenu({ title : '-' });
+	});
+
+
+
+
+
+
+
+
+----------------------------------------------------------------------------------
+
+4798行增加
+//处理回车跳不出标签
+		if(tagName == 'hide'){
+			var hide = self.cmd.commonAncestor('hide');
+			hide.remove(true);
+		}
+		//处理回车跳不出标签
+		if(tagName == 'pre'){
+			var pre = self.cmd.commonAncestor('pre');
+			pre.remove(true);
+		}
+
+
+
+
+---------------------------------------------
+3618行增加
+//处理IE8以下CSS不支持自定义标签问题
+'<!--[if (IE 6)|(IE 7)|(IE 8)]>',
+		'<script type="text/javascript">',
+		'(function() {',
+		'var a = ["hide"];',
+		'for (var i = 0, j = a.length; i < j; i++) {',
+		'document.createElement(a[i]);',
+		'}',
+		'})();',
+		'</script>',
+		'<![endif]-->',
+

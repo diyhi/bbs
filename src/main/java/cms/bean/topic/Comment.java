@@ -25,7 +25,7 @@ import javax.persistence.Transient;
 @Entity
 @Table(name="comment",indexes = {@Index(name="comment_1_idx", columnList="topicId,status"),@Index(name="comment_2_idx", columnList="quoteIdGroup"),@Index(name="comment_3_idx", columnList="userName,isStaff")})
 public class Comment implements Serializable{
-	private static final long serialVersionUID = 3905583625920219121L;
+	private static final long serialVersionUID = -7576354708273189356L;
 	
 	/** Id **/
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)

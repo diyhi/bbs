@@ -52,13 +52,21 @@
 		<tr> 
 			<td>content</td> 
 			<td>String</td>
-			<td colspan="2">话题内容；本字段在存入数据库时已进行安全过滤，可以加上&lt#noescape>&lt/#noescape>标签关闭转义，以输出html标签</td>
+			<td colspan="2">
+				话题内容；本字段在存入数据库时已进行安全过滤，可以加上&lt#noescape>&lt/#noescape>标签关闭转义，以输出html标签。<br>
+				如果富文本含有隐藏标签，建议使用JavaScript代码在&lthide>标签内添加展示界面。<br><br>
+				输入密码可见：<br>
+				&lthide class="inputValue_10" hide-type="10">&lt/hide><br>
+				评论话题可见：<br>
+				&lthide class="inputValue_20" hide-type="20">&lt/hide>
+
+			</td>
 		</tr>
 		
 		<tr> 
 			<td>summary</td> 
 			<td>String</td>
-			<td colspan="2">内容摘要</td>
+			<td colspan="2">内容摘要(不含隐藏标签内的内容)</td>
 		</tr>
 		<tr> 
 			<td>postTime</td> 

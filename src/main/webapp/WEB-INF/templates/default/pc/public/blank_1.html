@@ -4,7 +4,8 @@
 <head>
 <base href="${baseURL}" />
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-
+<#-- 获取令牌 -->
+<meta name="csrfToken" content="${token}"/>
 
 <@object action="${topicRelated_topicContent_1}" topicId="${url_topicId}"> 
 	<#assign topic = topicRelated_topicContent_entityBean>
@@ -12,7 +13,7 @@
 
 <title><#if topic != null && topic?? >${topic.title}</#if> - ${title}</title>
 <link rel="shortcut icon" type="image/x-icon" href="${baseURL}${commonPath}images/favicon.ico" media="screen" />
-<link href="${commonPath}css/common.css?12" rel="stylesheet" type="text/css" />
+<link href="${commonPath}css/common.css?12d" rel="stylesheet" type="text/css" />
 <!--[if (IE 6)|(IE 7)|(IE 8)]>
 <script type="text/javascript" src="${commonPath}js/css3pie/PIE_IE678.js"></script> 
 <![endif]-->
@@ -32,6 +33,19 @@
 <script language="javascript" src="${commonPath}js/syntaxhighlighter/scripts/shBrushCss.js" type="text/javascript"></script>
 <script language="javascript" src="${commonPath}js/syntaxhighlighter/scripts/shBrushJava.js" type="text/javascript"></script>
 
+
+<!--[if (IE 6)|(IE 7)|(IE 8)]>
+<script type="text/javascript">
+	//让ie6/ie7/ie8支持自定义标签。这段代码必须放在页面头部<head>标签内
+	(function() {
+		var a = ['hide'/* 其他HTML5元素 */];
+		for (var i = 0, j = a.length; i < j; i++) {
+			document.createElement(a[i]);
+		}	
+	})();
+</script>
+<![endif]-->
+
 </head>
 <body>
 <#-- 引入页头 -->
@@ -40,6 +54,7 @@
 	<div class="leftColumn_article">
 		<#if topic != null && topic?? >
 			<div class="articleModule" >
+			
 				<div class="tab">
 					<a href="?tagId=${topic.tagId}"class="tab">${topic.tagName}</a>
 				</div>
@@ -49,13 +64,55 @@
 								
 					<div class="articleContent">
 						<#noescape>${topic.content}</#noescape>
+						
+						
+						<!-- 
+							<div class="hide-box">	
+								<div class="background-image"></div>
+								
+								<div class="background-prompt">此处内容已被隐藏，输入密码可见</div>			
+								<div class="input-box">
+									<input type="password" id="hide_password" class="text" maxlength="30"  placeholder="密码" value="">
+									<input type="button" value="提交" class="button" onclick="search();return false">
+								</div>
+								-->
+								<!-- 
+								<div class="background-prompt">此处内容已被隐藏，评论话题可见</div>
+								-->
+								<!--  
+								<div class="background-prompt">此处内容已被隐藏，达到‘新手上路’等级可见</div>			
+								-->
+								<!--  
+								<div class="background-prompt">此处内容已被隐藏，需要 50 积分购买可见</div>			
+								<div class="submit-box">
+									<input type="button" value="立即购买" class="button" onclick="search();return false">
+								</div>
+								-->
+								<!--  
+								<div class="background-prompt">此处内容已被隐藏，需要 50 人民币购买可见</div>			
+								<div class="submit-box">
+									<input type="button" value="立即购买" class="button" onclick="search();return false">
+								</div>
+								-->
+								
+								<!-- 
+							</div>-->
+							
+							
+							
+					
 					</div>
 					<#--加入收藏夹-->
 					<@include action="${favoriteRelated_addFavorite_1}"/>
+					
 					<h2></h2>
 					
 				</div>
 			</div>
+			
+			<#-- 引入话题取消隐藏 -->
+			<@include action="${topicRelated_topicUnhide_1}"/> 
+			
 			
 			<#-- 引入评论列表 -->
 			<@include action="${topicRelated_comment_2}"/> 

@@ -1,5 +1,6 @@
 package cms.web.action;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,6 +13,8 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 
 import cms.bean.setting.EditorTag;
+import cms.bean.topic.HideTagType;
+import cms.utils.Verification;
 import cms.web.taglib.Configuration;
 
 import org.apache.commons.lang3.StringUtils;
@@ -21,6 +24,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.safety.Whitelist;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
+
 /**
  * 文本过滤管理
  *
@@ -48,6 +52,13 @@ public class TextFilterManage {
 				.addAttributes("table","cellpadding")
 				.addAttributes("table","border")
 				.addAttributes("td","style");
+		}
+		//隐藏标签
+		if(editorTag == null){
+			whitelist.addTags("hide")
+				.addAttributes("hide","class")
+				.addAttributes("hide","hide-type")
+				.addAttributes("hide","input-value");
 		}
 		
 		if(editorTag == null || editorTag.isJustifyleft()){//左对齐
@@ -303,7 +314,19 @@ public class TextFilterManage {
 		 return Jsoup.clean(html, Whitelist.none()); //只保留文本，其他所有的html内容均被删除
 		 
 	}
-	
+	/**
+	 * 过滤标签并删除<hide>标签所有内容,只返回文本
+	 * @param html
+	 * @return
+	 */
+	public String filterHideText(String html) {  
+		if(StringUtils.isBlank(html)) return ""; 
+		String newHtml = this.deleteHiddenTag(html);
+		if(StringUtils.isBlank(newHtml)) return ""; 
+		
+		return Jsoup.clean(newHtml, Whitelist.none()); //只保留文本，其他所有的html内容均被删除
+		 
+	}
 	
 	/**
 	 * 富文本过滤html
@@ -801,6 +824,7 @@ public class TextFilterManage {
 			for (Element element : image_elements) {
 				 String imageUrl = element.attr("src"); 
 				 if(StringUtils.startsWithIgnoreCase(imageUrl, "file/"+item+"/")){
+					 
 					 imageNameList.add(imageUrl);
 	             }
 			}
@@ -853,4 +877,302 @@ public class TextFilterManage {
 	    result.add(section);  
 	    return result;  
 	}  
+	
+	
+	
+	/**
+	 * 校正隐藏标签(缺少参数或参数不正确的隐藏标签替换成<p>)
+	 * @param html 富文本内容
+	 * @return
+	 */
+	public String correctionHiddenTag(String html){
+		if(!StringUtils.isBlank(html)){
+			//隐藏类型
+			List<Integer> hideTypeList = new ArrayList<Integer>();
+			hideTypeList.add(HideTagType.PASSWORD.getName());//输入密码可见
+			hideTypeList.add(HideTagType.COMMENT.getName());//评论话题可见
+			hideTypeList.add(HideTagType.GRADE.getName());//达到等级可见
+			hideTypeList.add(HideTagType.POINT.getName());//积分购买可见
+			hideTypeList.add(HideTagType.AMOUNT.getName());//余额购买可见
+			//密码输入值
+			String password_inputValue = "";
+			//达到等级输入值
+			String grade_inputValue = "";
+			//积分购买输入值
+			String point_inputValue = "";
+			//余额购买输入值
+			String amount_inputValue = "";
+			
+			Document doc = Jsoup.parseBodyFragment(html);
+			Elements elements = doc.select("hide");  
+			for (Element element : elements) {
+				//隐藏标签类型
+				String hide_type = element.attr("hide-type"); 
+				//隐藏标签输入值
+				String input_value = element.attr("input-value"); 
+				//是否有效标签
+				boolean isValidTag = true;
+				
+				if(hide_type != null && !"".equals(hide_type.trim())){
+					if(hide_type.trim().length()>8){//不能超过8位数字
+						isValidTag = false;
+					}else{
+						boolean verification = Verification.isPositiveInteger(hide_type.trim());//正整数
+						if(verification){
+							if(!hideTypeList.contains(Integer.parseInt(hide_type.trim()))){//不是有效的隐藏类型
+								isValidTag = false;
+							}
+							
+						}else{//不是正整数
+							isValidTag = false;
+						}
+					}
+				}else{
+					isValidTag = false;
+				}
+				if(isValidTag == false){
+					//移除匹配的元素但保留他们的内容
+					element.unwrap();  
+					/**
+					//替换当前标签为<p>标签
+					element.removeAttr("class"); 
+					element.removeAttr("hide-type");
+					element.removeAttr("input-value");
+					element.tagName("p");**/
+					continue;
+				}
+				
+				//处理输入值
+				if(input_value != null && !"".equals(input_value.trim())){
+					if(hide_type.trim().equals(HideTagType.PASSWORD.getName().toString())){//输入密码可见
+						if(input_value.length() >50){//密码超出50个字符
+							isValidTag = false;
+						}else{
+							if(password_inputValue == null || "".equals(password_inputValue.trim())){
+								password_inputValue = input_value.trim();
+							}else{
+								//替换不是和第一个输入值相同的标签
+								if(!password_inputValue.equals(input_value.trim())){
+									element.attr("input-value",password_inputValue); 
+								}
+							}
+							
+							
+						}
+					}
+					if(hide_type.trim().equals(HideTagType.GRADE.getName().toString())){//达到等级可见
+						if(input_value.trim().length()>8){//不能超过8位数字
+							isValidTag = false;
+						}else{
+							boolean verification = Verification.isPositiveInteger(input_value.trim());//正整数
+							if(!verification){//不是正整数
+								isValidTag = false;
+							}else{
+								if(grade_inputValue == null || "".equals(grade_inputValue.trim())){
+									grade_inputValue = input_value.trim();
+								}else{
+									//替换不是和第一个输入值相同的标签
+									if(!grade_inputValue.equals(input_value.trim())){
+										element.attr("input-value",grade_inputValue); 
+									}
+								}
+								
+							}
+						}
+					}
+					if(hide_type.trim().equals(HideTagType.POINT.getName().toString())){//积分购买可见
+						if(input_value.trim().length()>8){//不能超过8位数字
+							isValidTag = false;
+						}else{
+							boolean verification = Verification.isPositiveInteger(input_value.trim());//正整数
+							if(!verification){//不是正整数
+								isValidTag = false;
+							}else{
+								if(point_inputValue == null || "".equals(point_inputValue.trim())){
+									point_inputValue = input_value.trim();
+								}else{
+									//替换不是和第一个输入值相同的标签
+									if(!point_inputValue.equals(input_value.trim())){
+										element.attr("input-value",point_inputValue); 
+									}
+								}
+								
+							}
+						}
+					}
+					if(hide_type.trim().equals(HideTagType.AMOUNT.getName().toString())){//余额购买可见
+						if(input_value.trim().length()>12){//不能超过12位数字
+							isValidTag = false;
+						}else{
+							boolean verification = Verification.isAmount(input_value.trim());//金额
+							if(verification){
+								if(new BigDecimal(input_value.trim()).compareTo(new BigDecimal("0")) <=0){
+									isValidTag = false;//不是金额
+								}else{
+									if(amount_inputValue == null || "".equals(amount_inputValue.trim())){
+										amount_inputValue = input_value.trim();
+									}else{
+										//替换不是和第一个输入值相同的标签
+										if(!amount_inputValue.equals(input_value.trim())){
+											element.attr("input-value",amount_inputValue); 
+										}
+									}
+									
+								}
+							}else{
+								isValidTag = false;//不是金额
+							}
+						}
+					}
+				}else{
+					if(!hide_type.trim().equals(HideTagType.COMMENT.getName().toString())){//如是不是评论话题可见
+						isValidTag = false;
+					}
+					
+				}
+				if(hide_type.trim().equals(HideTagType.COMMENT.getName().toString())){//评论话题可见
+					if(input_value != null && !"".equals(input_value.trim())){
+						element.removeAttr("input-value");
+					}
+				}
+				
+				if(isValidTag == false){
+					//移除匹配的元素但保留他们的内容
+					element.unwrap();  
+					/**
+					//替换当前标签为<p>标签
+					element.removeAttr("class"); 
+					element.removeAttr("hide-type");
+					element.removeAttr("input-value");
+					element.tagName("p");**/
+					continue;
+				}
+				//处理class值
+				element.attr("class","inputValue_"+hide_type.trim()); 
+				
+			}
+			html = doc.body().html();
+		}
+		return html;
+	}
+	
+	
+	/**
+	 * 解析隐藏标签
+	 * @param html 富文本内容
+	 * @return 每种隐藏类型只取第一个值
+	 */
+	public Map<Integer,Object> analysisHiddenTag(String html){
+		//隐藏标签输入值 key 隐藏标签类型 value:输入值
+		Map<Integer,Object> inputValueMap = new HashMap<Integer,Object>();
+		if(!StringUtils.isBlank(html)){
+			Document doc = Jsoup.parseBodyFragment(html);
+			Elements elements = doc.select("hide");  
+			for (Element element : elements) {
+				//隐藏标签类型
+				String hide_type = element.attr("hide-type"); 
+				//隐藏标签输入值
+				String input_value = element.attr("input-value"); 
+				
+				if(hide_type != null && !"".equals(hide_type.trim())){
+					if(hide_type.trim().equals(HideTagType.PASSWORD.getName().toString())){//输入密码可见
+						if(input_value != null && !"".equals(input_value.trim())){
+							if(inputValueMap.get(HideTagType.PASSWORD.getName()) == null){
+								inputValueMap.put(HideTagType.PASSWORD.getName(), input_value.trim());
+							}
+						}
+					}
+					if(hide_type.trim().equals(HideTagType.COMMENT.getName().toString())){//评论话题可见
+						if(inputValueMap.get(HideTagType.COMMENT.getName()) == null){
+							inputValueMap.put(HideTagType.COMMENT.getName(), true);
+						}
+					}
+					if(hide_type.trim().equals(HideTagType.GRADE.getName().toString())){//达到等级可见
+						if(input_value != null && !"".equals(input_value.trim())){
+							if(inputValueMap.get(HideTagType.GRADE.getName()) == null){
+								inputValueMap.put(HideTagType.GRADE.getName(), Integer.parseInt(input_value.trim()));
+							}
+						}
+					}
+					if(hide_type.trim().equals(HideTagType.POINT.getName().toString())){//积分购买可见
+						if(input_value != null && !"".equals(input_value.trim())){
+							if(inputValueMap.get(HideTagType.POINT.getName()) == null){
+								inputValueMap.put(HideTagType.POINT.getName(), Integer.parseInt(input_value.trim()));
+							}
+						}
+					}
+					if(hide_type.trim().equals(HideTagType.AMOUNT.getName().toString())){//余额购买可见
+						if(input_value != null && !"".equals(input_value.trim())){
+							if(inputValueMap.get(HideTagType.AMOUNT.getName()) == null){
+								inputValueMap.put(HideTagType.AMOUNT.getName(), new BigDecimal(input_value.trim()));
+							}
+						}
+					}
+				}
+			}
+		}
+		return inputValueMap;
+	}
+	
+	/**
+	 * 处理隐藏标签
+	 * @param html 富文本内容
+	 * @param visibleTagList 允许可见的隐藏标签
+	 * @return
+	 */
+	public String processHiddenTag(String html,List<Integer> visibleTagList){
+		
+		if(!StringUtils.isBlank(html)){
+			Document doc = Jsoup.parseBodyFragment(html);
+			Elements elements = doc.select("hide");  
+			for (Element element : elements) {
+				//隐藏标签类型
+				String hide_type = element.attr("hide-type"); 
+				//隐藏标签输入值
+			//	String input_value = element.attr("input-value"); 
+				
+				if(visibleTagList.contains(Integer.parseInt(hide_type.trim()))){//如果允许可见
+					/**
+					//替换当前标签为<p>标签
+					element.removeAttr("class"); 
+					element.removeAttr("hide-type");
+					element.removeAttr("input-value");
+					element.tagName("p");**/
+					//移除匹配的元素但保留他们的内容
+					element.unwrap();  
+					
+				}else{
+					if(hide_type.trim().equals(HideTagType.PASSWORD.getName().toString())){//输入密码可见
+						element.removeAttr("input-value");
+					}
+					//清空元素的内容
+					element.empty();	
+				}
+			}
+			html = doc.body().html();
+		}
+		return html;
+	}
+	
+	/**
+	 * 删除隐藏标签(包括隐藏标签的内容和子标签)
+	 * @param html 富文本内容
+	 * @return
+	 */
+	public String deleteHiddenTag(String html){
+		if(!StringUtils.isBlank(html)){
+			Document doc = Jsoup.parseBodyFragment(html);
+			Elements elements = doc.select("hide");  
+			for (Element element : elements) {
+				element.remove();
+			}
+			html = doc.body().html();
+		}
+		return html;
+		
+		
+	}
+
+	
+	
 }

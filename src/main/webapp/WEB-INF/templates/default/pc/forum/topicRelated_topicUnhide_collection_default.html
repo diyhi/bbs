@@ -1,0 +1,175 @@
+<#--  话题取消隐藏 -->
+<#--  本代码配合话题内容使用 -->
+<@function>
+	<#--  返回Map<String,Object>类型 -->
+	<#assign returnValue = topicRelated_topicUnhide_collection>
+	
+	<!-- 是否登录 -->
+	<input type="hidden" id="unhide_isLogin" value="<#if systemUser != null>true<#else>false</#if>">
+		
+	
+	
+	
+	<script type="text/javascript">
+		// 获取随机数
+		function getRandom(m) {
+			//生成的随机数截取m位，生成的随机数最大不超过13位，能保证首位不为0
+		    m = m > 13 ? 13 : m;
+	    	var num = Math.random().toString();
+	    	if(num.substr(num.length - m, 1) === '0') {           
+	    		return getRandom(m);
+	    	}
+			return num.substring(num.length - m);
+		}
+		//设置隐藏标签界面
+		function setHideTagUI(){
+			//获取<hide>标签属性
+			$(".articleContent").find("hide").each(function(){
+
+				var random = getRandom(13);
+	
+				//等级名称
+				var gradeName = $(this).attr("gradeName");
+	
+	
+				var hideType = $(this).attr("hide-type");
+				if(hideType == '10'){
+					var html = "";
+					html += '<div class="hide-box">';
+					html += 	'<div class="background-image"></div>';
+					html += 	'<div class="background-prompt">此处内容已被隐藏，输入密码可见</div>';
+					html += 	'<div class="input-box">';
+					html += 		'<input type="password" id="hide_password_'+random+'" class="text" maxlength="30"  placeholder="密码" value="">';
+					html += 		'<input type="button" value="提交" class="button" onclick="topicUnhide(10,'+random+');">';
+					
+					html += 	'</div>';
+					html += '</div>';
+ 					$(this).html(html);
+				}else if(hideType == '20'){
+					var html = "";
+					html += '<div class="hide-box">';
+					html += 	'<div class="background-image"></div>';
+					html += 	'<div class="background-prompt">此处内容已被隐藏，评论话题可见</div>';
+					html += '</div>';
+ 					$(this).html(html);
+				}else if(hideType == '30'){
+					var html = "";
+					html += '<div class="hide-box">';
+					html += 	'<div class="background-image"></div>';
+					html += 	'<div class="background-prompt">此处内容已被隐藏，达到‘'+gradeName+'’等级可见</div>';
+					html += '</div>';
+ 					$(this).html(html);
+				}
+			})
+		
+		}
+		//话题取消隐藏
+		function topicUnhide(hideType,random){
+		
+			//判断是否已登录
+			var isLogin = document.getElementById("unhide_isLogin").value;
+			if(isLogin == "false"){
+				layer.open({
+				    type: 1, 
+				    title:"提示",
+				    content: "<div style='line-height: 36px; font-size: 15px;text-align:center; margin-left: 8px;margin-right: 8px;'>请先登录</div>", 
+				    area: ['260px', '120px'],//宽高
+					success: function(layero, index){
+						 
+					}
+				});
+				return false;
+			}
+	
+		
+		
+		
+			var parameter = "";
+			parameter += "&topicId="+getUrlParam("topicId");//获取URL参数
+			
+			parameter += "&hideType="+hideType;//获取URL参数
+		
+			if(hideType == 10){//输入密码可见
+				
+				var password = $.trim($('#hide_password_'+random).val());
+				if(password == ""){
+					layer.open({
+					    type: 1, 
+					    title:"提示",
+					    content: "<div style='line-height: 36px; font-size: 15px;text-align:center; margin-left: 8px;margin-right: 8px;'>密码不能为空</div>", 
+					    area: ['260px', '120px'],//宽高
+						end: function(layero, index){
+							
+						}
+					});
+					return;
+				}
+				parameter += "&password="+encodeURIComponent(password);//获取URL参数
+			
+			}
+			
+			//从meta标签获取令牌
+			parameter += "&token="+getCsrf();
+			//删除第一个&号,防止因为多了&号而出现警告: Parameters: Invalid chunk ignored.信息
+			if(parameter.indexOf("&") == 0){
+				parameter = parameter.substring(1,parameter.length);
+			}
+		   	post_request(function(value){
+				var data = JSON.parse(value);
+				for(var returnValue in data){
+					
+					if(returnValue == "success"){
+	        			if(data[returnValue] == "true"){
+	        				//需引入layer
+	        				layer.msg('话题取消隐藏成功，5秒后自动刷新页面', 
+								{
+								  time: 5000 //3秒关闭（如果不配置，默认是3秒）
+								},function(){
+									//关闭后的操作
+									//刷新页面
+						        	document.location.reload();
+								}
+							);
+	        				
+	        				
+	        			}
+	        		}else if(returnValue == "error"){
+	        			
+	        			var errorValue = data[returnValue];
+						var htmlValue = "";
+						var i = 0;
+						for(var error in errorValue){
+							if(error != ""){	
+								i++;
+								htmlValue += "&nbsp;&nbsp;"+i+"、"+errorValue[error]+"<br>";
+							}
+						}
+						
+						layer.open({
+						  type: 1,
+						  title: '错误', 
+						  skin: 'layui-layer-rim', //加上边框
+						  area: ['300px', '150px'], //宽高
+						  content: "<div style='line-height: 36px; font-size: 15px;text-align:left; margin-left: 8px;margin-right: 8px;'>"+htmlValue+"</div>"
+						});
+	        		}
+	        	}
+			},
+				"user/control/topic/unhide?timestamp=" + new Date().getTime(), true,parameter);
+
+		}
+			
+		
+		
+		$(document).ready(function () {
+			setHideTagUI();
+		});
+	
+
+		
+	</script>
+		
+	
+</@function>
+
+

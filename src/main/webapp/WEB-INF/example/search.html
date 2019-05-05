@@ -189,13 +189,13 @@
 		<tr> 
 			<td>content</td> 
 			<td>String</td>
-			<td colspan="2">话题内容；本字段高亮字符用&ltB>&lt/B>标签包裹，字段在搜索时已进行安全过滤，可以加上<#noescape></#noescape>标签关闭转义，以输出html标签</td>
+			<td colspan="2">话题内容；本字段高亮字符用&ltB>&lt/B>标签包裹，字段在搜索时已进行安全过滤，可以加上<#noescape></#noescape>标签关闭转义，以输出html标签。搜索结果不显示隐藏标签内的内容</td>
 		</tr>
 		
 		<tr> 
 			<td>summary</td> 
 			<td>String</td>
-			<td colspan="2">内容摘要</td>
+			<td colspan="2">内容摘要(不含隐藏标签内的内容)</td>
 		</tr>
 		<tr> 
 			<td>postTime</td> 
