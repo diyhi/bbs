@@ -574,17 +574,23 @@
     </TD>
     </TR> 
     <TR>
-    <TD class="t-label t-label-h" width="12%">等级：</TD>
-    <TD class="t-content" width="63%" colSpan="2">
-    	${user.gradeName}
-    </TD>
-  </TR>
-  <TR>
-    <TD class="t-label t-label-h" width="12%">Email地址：</TD>
-    <TD class="t-content" width="63%" colSpan="2">
-    	${user.email}
-    </TD>
-  </TR>
+	    <TD class="t-label t-label-h" width="12%">呢称：</TD>
+	    <TD class="t-content" width="63%" colSpan="2">
+	    	${user.nickname}
+	    </TD>
+	</TR>
+	<TR>
+	    <TD class="t-label t-label-h" width="12%">等级：</TD>
+	    <TD class="t-content" width="63%" colSpan="2">
+	    	${user.gradeName}
+	    </TD>
+	</TR>
+	<TR>
+	    <TD class="t-label t-label-h" width="12%">Email地址：</TD>
+	    <TD class="t-content" width="63%" colSpan="2">
+	    	${user.email}
+	    </TD>
+	</TR>
   <TR>
     <TD class="t-label t-label-h" width="12%">密码提示问题：</TD>
     <TD class="t-content" width="63%" colSpan="2">
@@ -601,7 +607,7 @@
   </TR>
   <TR>
     <TD class="t-label t-label-h" width="12%">当前积分：</TD>
-    <TD class="t-content" width="88%" colSpan="2">
+    <TD class="t-content" width="88%" colSpan="3">
     	${user.point}
     </TD></TR>
 	<TR>

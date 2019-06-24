@@ -179,8 +179,8 @@ html,body{
 .indexModule .head .button{
 	float: right;
 }
-.indexModule .topicList {margin-top: 3px;}
-.indexModule .topicList .item {position: relative;}
+.indexModule .topicList {margin-top: 1px;}
+.indexModule .topicList .item {position: relative;margin-top: 2px;}
 .indexModule .topicList .item .avatarBox{
 	position:absolute;display:inline-block;border-radius:100%;
 	left: 6px;top:2px;
@@ -215,7 +215,7 @@ html,body{
 	-webkit-line-clamp: 2;
 	overflow: hidden;
 }
-.indexModule .topicList .item .detailInfo{line-height:26px;padding:0px 10px 0px 50px;}
+.indexModule .topicList .item .detailInfo{position:relative;line-height:24px;padding:5px 10px 0px 50px;height: 24px;border-bottom:1px solid #eee;}
 .indexModule .topicList .item .detailInfo .bLeft{float:left!important;color:#aaa;display:inline-block;height:25px;font-size:14px;}
 .indexModule .topicList .item .detailInfo .bLeft .userName{float:left!important;}
 .indexModule .topicList .item .detailInfo .time{font-style:normal;}
@@ -236,7 +236,7 @@ html,body{
 	width:100%;
 }
 
-.indexModule .topicList .item .picInfo{position:relative;padding:0px 0px 5px 50px;border-bottom:1px solid #eee;display:inline-block;width: 100%; -webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box; }
+.indexModule .topicList .item .picInfo{position:relative;padding:0px 0px 0px 50px;display:inline-block;width: 100%; -webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box; }
 .indexModule .topicList .item .picInfo .imageBox{display:block;color:gray;width:20%;margin-right:2%; float:left!important;}
 .indexModule .topicList .item .picInfo .imageBox .img{
     padding-bottom: 100%;
@@ -335,7 +335,7 @@ html,body{
 .topicContentModule .topicDetail .main {
 	margin: 10px 0px 10px 0px;
 	min-height: 80px;
-	font-size: 14px;
+	font-size: 15px;
 	line-height: 1.8;
 	color: #222;
 }
@@ -343,7 +343,7 @@ html,body{
 	font-style: italic;
 }
 .topicContentModule .topicDetail .main img{
-	display: block; max-width: 100%;
+	max-width:100%;height:auto;border:none;background:none;padding:0;
 }
 .topicContentModule .topicDetail .main hide{
 	display:block;
@@ -441,6 +441,7 @@ html,body{
 }
 .topicContentModule .commentList .item .head .floor {
 	float: right;
+	margin-right:5px;
 	font-size: 12px;
 	color:#aaa;
 }
@@ -452,18 +453,20 @@ html,body{
 }
 .topicContentModule .commentList .item .main .commentContent {
 	margin-bottom: 10px;
-	color:#222;
+	color:#222;font-size: 15px;
 }
 .topicContentModule .commentList .item .main .commentContent img {
+	max-width:100%;height:auto;border:none;background:none;padding:0;
+	/**
 	display: block;
 	max-width: 100%;
-	margin: 5px auto 0
+	margin: 5px auto 0**/
 }
 .topicContentModule .commentList .item .main .quote{
 	 padding:5px 8px;border-bottom:none;text-align: left;margin-left: 5px;color: 878787;
 }
 .topicContentModule .commentList .item .main .quote div{
-	background:#fafafa;padding:3px;border:1px solid #ddd;line-height:140%;margin-bottom:5px;
+	background:#fafafa;padding:3px;border:1px solid #ddd;line-height:140%;margin-bottom:5px;font-size: 15px;
 }
 .topicContentModule .commentList .item .main .quote div span{
 	color:#aaa;font-size:12px;
@@ -531,7 +534,7 @@ html,body{
 	float: right;
 	color:#aaa;
 	font-size: 12px;
-	margin-right: 10px;
+	margin-right: 2px;
 	margin-top:-5px;
 }
 .topicContentModule .commentList .replyList .box li .replyContent{
@@ -554,7 +557,7 @@ html,body{
 }
 .topicContentModule .commentList .item .bottomInfo .toolbar {
 	height: 100%;
-	margin-right:15px;
+	margin-right:4px;
 }
 .topicContentModule .commentList .item .bottomInfo .toolbar .quote-btn{
 	color: #999;
@@ -782,10 +785,11 @@ html,body{
 }
 
 
-.homeModule .homeHeader .user .userName{line-height:26px;margin:5px 0; font-size:16px;}
-.homeModule .homeHeader .user .grade{line-height:20px;background-repeat:no-repeat;background-position:left center;background-size:auto 100%;font-size:12px;height:20px;width:60px;display:inline-block;background-color:#56b7ff;border-radius:20px;text-align:center;}
+.homeModule .homeHeader .user .userName{line-height:20px;margin:3px 0; font-size:16px;}
+.homeModule .homeHeader .user .nickname{line-height:20px;margin:5px 0; font-size:17px;}
+.homeModule .homeHeader .user .grade{line-height:25px;background-repeat:no-repeat;background-position:left center;background-size:auto 100%;font-size:12px;height:23px;min-width:40px;display:inline-block;background-color:#56b7ff;border-radius:20px;text-align:center;padding-left: 10px;padding-right: 10px;}
 .homeModule .homeHeader .privateMessageBox{
-	margin-left: 30px;
+	position: absolute;right: 5px;bottom: 5px;
 }
 .privateMessageButton{
 	color: #fff;

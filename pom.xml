@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>bbs</groupId>
 	<artifactId>bbs</artifactId>
-	<version>3.0</version>
+	<version>3.1</version>
 	<packaging>war</packaging>
 	<name>bbs</name>
 	<description/>
@@ -1040,11 +1040,14 @@
 							<!-- 不进行变量替换 -->
 							<filtering>false</filtering>
 							<includes>
-									<!-- 只导入所有以jar为后缀的文件 -->
+								<!-- 只导入所有以jar为后缀的文件 -->
 							    <include>**/*.jar</include>
-							</includes>
-						</resource>			
+							</includes> 
+						</resource>
 					</webResources>
+					
+					<!-- 排除.gitkeep文件 -->
+					<excludes>**/.gitkeep</excludes>
 		        </configuration>
 			</plugin>
 	    </plugins>

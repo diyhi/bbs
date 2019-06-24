@@ -26,6 +26,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import cms.bean.ErrorView;
 import cms.bean.message.Remind;
+import cms.bean.setting.EditorTag;
 import cms.bean.setting.SystemSetting;
 import cms.bean.thumbnail.Thumbnail;
 import cms.bean.topic.HideTagName;
@@ -38,6 +39,7 @@ import cms.bean.topic.TopicUnhide;
 import cms.bean.user.AccessUser;
 import cms.bean.user.PointLog;
 import cms.bean.user.User;
+import cms.bean.user.UserGrade;
 import cms.service.message.RemindService;
 import cms.service.setting.SettingService;
 import cms.service.template.TemplateService;
@@ -46,6 +48,7 @@ import cms.service.topic.CommentService;
 import cms.service.topic.TagService;
 import cms.service.topic.TopicIndexService;
 import cms.service.topic.TopicService;
+import cms.service.user.UserGradeService;
 import cms.service.user.UserService;
 import cms.utils.Base64;
 import cms.utils.IpAddress;
@@ -100,6 +103,8 @@ public class TopicFormAction {
 	
 	@Resource RemindService remindService;
 	@Resource RemindManage remindManage;
+	
+	@Resource UserGradeService userGradeService;
 	
 	/**
 	 * 话题  添加
@@ -271,10 +276,10 @@ public class TopicFormAction {
 			
 		//	content = "<div style=\"color:express/**/ion(eval('\\x69\\x66\\x28\\x77\\x69\\x6e\\x64\\x6f\\x77\\x2e\\x61\\x21\\x3d\\x31\\x29\\x7b\\x61\\x6c\\x65\\x72\\x74\\x28\\x2f\\x73\\x74\\x79\\x6c\\x65\\x5f\\x38\\x2f\\x29\\x3b\\x77\\x69\\x6e\\x64\\x6f\\x77\\x2e\\x61\\x3d\\x31\\x3b\\x7d'))\">";
 			
-			
+			EditorTag editorTag = settingManage.readTopicEditorTag();
 			//过滤标签
-			content = textFilterManage.filterTag(request,content);
-			Object[] object = textFilterManage.filterHtml(request,content,"topic",settingManage.readEditorTag());
+			content = textFilterManage.filterTag(request,content,editorTag);
+			Object[] object = textFilterManage.filterHtml(request,content,"topic",editorTag);
 			String value = (String)object[0];
 			imageNameList = (List<String>)object[1];
 			isImage = (Boolean)object[2];//是否含有图片
@@ -286,17 +291,33 @@ public class TopicFormAction {
 			isFile = (Boolean)object[8];//是否含有文件
 			isMap = (Boolean)object[9];//是否含有地图
 			
+			List<UserGrade> userGradeList = userGradeService.findAllGrade_cache();
 			//校正隐藏标签
-			String validValue =  textFilterManage.correctionHiddenTag(value);
+			String validValue =  textFilterManage.correctionHiddenTag(value,userGradeList);
 			
 			//允许使用的隐藏标签
 			List<Integer> allowHiddenTagList = new ArrayList<Integer>();
-			//输入密码可见
-			allowHiddenTagList.add(HideTagType.PASSWORD.getName());
-			//评论话题可见
-			allowHiddenTagList.add(HideTagType.COMMENT.getName());
-			
-			
+			if(editorTag.isHidePassword()){
+				//输入密码可见
+				allowHiddenTagList.add(HideTagType.PASSWORD.getName());
+			}
+			if(editorTag.isHideComment()){
+				//评论话题可见
+				allowHiddenTagList.add(HideTagType.COMMENT.getName());
+			}
+			if(editorTag.isHideGrade()){
+				//达到等级可见
+				allowHiddenTagList.add(HideTagType.GRADE.getName());	
+			}
+			if(editorTag.isHidePoint()){
+				//积分购买可见
+				allowHiddenTagList.add(HideTagType.POINT.getName());	
+			}
+			if(editorTag.isHideAmount()){
+				//余额购买可见
+				allowHiddenTagList.add(HideTagType.AMOUNT.getName());	
+			}
+
 			//解析隐藏标签
 			Map<Integer,Object> analysisHiddenTagMap = textFilterManage.analysisHiddenTag(validValue);
 			for (Map.Entry<Integer,Object> entry : analysisHiddenTagMap.entrySet()) {
@@ -587,59 +608,61 @@ public class TopicFormAction {
 			String date = dateTime.toString("yyyy-MM-dd");
 			
 			if(imgFile != null && !imgFile.isEmpty()){
-				//上传文件编号
-				String fileNumber = "b"+accessUser.getUserId();
-				
-				//当前文件名称
-				String fileName = imgFile.getOriginalFilename();
-				
-				//文件大小
-				Long size = imgFile.getSize();
-				//取得文件后缀
-				String suffix = fileManage.getExtension(fileName).toLowerCase();
-
-				
-				//允许上传图片格式
-				List<String> formatList = new ArrayList<String>();
-				formatList.add("gif");
-				formatList.add("jpg");
-				formatList.add("jpeg");
-				formatList.add("bmp");
-				formatList.add("png");
-				
-				//允许上传图片大小
-				long imageSize = 200000L;
-
-				//验证文件类型
-				boolean authentication = fileManage.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
-				
-				if(authentication ){
-					if(size/1024 <= imageSize){
-						//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
-						String pathDir = "file"+File.separator+"topic"+File.separator + date +File.separator +"image"+ File.separator;
-						//文件锁目录
-						String lockPathDir = "file"+File.separator+"topic"+File.separator+"lock"+File.separator;
-						//构建文件名称
-						String newFileName = UUIDUtil.getUUID32()+ fileNumber+"." + suffix;
+				EditorTag editorSiteObject = settingManage.readTopicEditorTag();
+				if(editorSiteObject != null){
+					if(editorSiteObject.isImage()){//允许上传图片
+						//上传文件编号
+						String fileNumber = "b"+accessUser.getUserId();
 						
-						//生成文件保存目录
-						fileManage.createFolder(pathDir);
-						//生成锁文件保存目录
-						fileManage.createFolder(lockPathDir);
-						//生成锁文件
-						fileManage.newFile(lockPathDir+date +"_image_"+newFileName);
-						//保存文件
-						fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
-						//上传成功
-						returnJson.put("error", 0);//0成功  1错误
-						returnJson.put("url", "file/topic/"+date+"/image/"+newFileName);
-						return JsonUtils.toJSONString(returnJson);
+						//当前文件名称
+						String fileName = imgFile.getOriginalFilename();
+						
+						//文件大小
+						Long size = imgFile.getSize();
+						//取得文件后缀
+						String suffix = fileManage.getExtension(fileName).toLowerCase();
+						
+						//允许上传图片格式
+						List<String> imageFormat = editorSiteObject.getImageFormat();
+						//允许上传图片大小
+						long imageSize = editorSiteObject.getImageSize();
+						
+						//验证文件类型
+						boolean authentication = fileManage.validateFileSuffix(imgFile.getOriginalFilename(),imageFormat);
+						
+						if(authentication ){
+							if(size/1024 <= imageSize){
+								//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
+								String pathDir = "file"+File.separator+"topic"+File.separator + date +File.separator +"image"+ File.separator;
+								//文件锁目录
+								String lockPathDir = "file"+File.separator+"topic"+File.separator+"lock"+File.separator;
+								//构建文件名称
+								String newFileName = UUIDUtil.getUUID32()+ fileNumber+"." + suffix;
+								
+								//生成文件保存目录
+								fileManage.createFolder(pathDir);
+								//生成锁文件保存目录
+								fileManage.createFolder(lockPathDir);
+								//生成锁文件
+								fileManage.newFile(lockPathDir+date +"_image_"+newFileName);
+								//保存文件
+								fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
+								//上传成功
+								returnJson.put("error", 0);//0成功  1错误
+								returnJson.put("url", "file/topic/"+date+"/image/"+newFileName);
+								return JsonUtils.toJSONString(returnJson);
+							}else{
+								errorMessage = "文件超出允许上传大小";
+							}
+						}else{
+							errorMessage = "当前文件类型不允许上传";
+						}
 					}else{
-						errorMessage = "文件超出允许上传大小";
+						errorMessage = "不允许上传文件";
 					}
 				}else{
-					errorMessage = "当前文件类型不允许上传";
-				}
+					errorMessage = "读取话题编辑器允许使用标签失败";
+				}	
 			}else{
 				errorMessage = "文件内容不能为空";
 			}
@@ -714,6 +737,10 @@ public class TopicFormAction {
     	  		error.put("topicUnhide", ErrorView._103.name());//话题Id不能为空
     	  	}
     		
+    		if(topic.getUserName().equals(accessUser.getUserName())){
+    			error.put("topicUnhide", ErrorView._1690.name());//不允许解锁自已发表的话题
+    		}
+    		
     	  	if(topic != null){
     	  		//话题取消隐藏Id
     		  	String topicUnhideId = topicManage.createTopicUnhideId(accessUser.getUserId(), hideType, topicId);
@@ -728,22 +755,25 @@ public class TopicFormAction {
     		}
     	}
 		
-		
+    	//消费积分
+		Long point = null;
 	  	
 		List<Integer> hideTypeList = new ArrayList<Integer>();
 		hideTypeList.add(HideTagType.PASSWORD.getName());
-		hideTypeList.add(HideTagType.GRADE.getName());
 		hideTypeList.add(HideTagType.POINT.getName());
 		hideTypeList.add(HideTagType.AMOUNT.getName());
 		
 		if(!hideTypeList.contains(hideType)){
 			error.put("topicUnhide", ErrorView._1620.name());//隐藏标签不存在
 		}
-		
 			
 		if(error.size() == 0){
 			//解析隐藏标签
 			Map<Integer,Object> analysisHiddenTagMap = textFilterManage.analysisHiddenTag(topic.getContent());
+			if(!analysisHiddenTagMap.containsKey(hideType)){
+				error.put("topicUnhide", ErrorView._1660.name());//话题内容不含当前标签
+			}
+			
 			for (Map.Entry<Integer,Object> entry : analysisHiddenTagMap.entrySet()) {
 				if(entry.getKey().equals(HideTagType.PASSWORD.getName()) && HideTagType.PASSWORD.getName().equals(hideType)){//输入密码可见
 					if(password == null || "".equals(password.trim())){
@@ -758,7 +788,20 @@ public class TopicFormAction {
 					break;
 				}
 				
-				
+				if(entry.getKey().equals(HideTagType.POINT.getName()) && HideTagType.POINT.getName().equals(hideType)){//积分购买可见
+					//获取登录用户
+			  		User _user = userService.findUserByUserName(accessUser.getUserName());
+			  		if(_user != null){
+			  			if(_user.getPoint() < (Long)entry.getValue()){
+			  				error.put("topicUnhide", ErrorView._1680.name());//用户积分不足
+			  			}else{
+			  				point = (Long)entry.getValue();
+			  			}
+			  		}else{
+			  			error.put("topicUnhide", ErrorView._1670.name());//用户不存在
+			  		}
+			  		
+				}
 				
 			}
 		}
@@ -785,13 +828,59 @@ public class TopicFormAction {
 			topicUnhide.setPostUserName(topic.getUserName());//发布话题的用户名称
 			topicUnhide.setTopicId(topicId);
 			
+			//用户消费积分日志
+			Object consumption_pointLogObject = null;
+			//用户收入积分日志
+			Object income_pointLogObject = null;
+			if(point != null){
+				topicUnhide.setPoint(point);
+				
+				PointLog pointLog = new PointLog();
+				pointLog.setId(pointManage.createPointLogId(accessUser.getUserId()));
+				pointLog.setModule(400);//400.积分购买隐藏话题
+				pointLog.setParameterId(topic.getId());//参数Id 
+				pointLog.setOperationUserType(2);//操作用户类型  0:系统  1: 员工  2:会员
+				pointLog.setOperationUserName(accessUser.getUserName());//操作用户名称
+				pointLog.setPointState(2);//2:账户支出
+				pointLog.setPoint(point);//积分
+				pointLog.setUserName(accessUser.getUserName());//用户名称
+				pointLog.setRemark("");
+				consumption_pointLogObject = pointManage.createPointLogObject(pointLog);
+				
+				if(!topic.getIsStaff()){//如果是用户
+					User _user = userManage.query_cache_findUserByUserName(topic.getUserName());
+					PointLog income_pointLog = new PointLog();
+					income_pointLog.setId(pointManage.createPointLogId(_user.getId()));
+					income_pointLog.setModule(400);//400.积分购买隐藏话题
+					income_pointLog.setParameterId(topic.getId());//参数Id 
+					income_pointLog.setOperationUserType(2);//操作用户类型  0:系统  1: 员工  2:会员
+					income_pointLog.setOperationUserName(accessUser.getUserName());//操作用户名称
+					income_pointLog.setPointState(1);//1:账户存入
+					income_pointLog.setPoint(point);//积分
+					income_pointLog.setUserName(topic.getUserName());//用户名称
+					income_pointLog.setRemark("");
+					income_pointLogObject = pointManage.createPointLogObject(income_pointLog);
+					
+					//删除用户缓存
+					userManage.delete_cache_findUserById(_user.getId());
+					userManage.delete_cache_findUserByUserName(topic.getUserName());
+					
+				}
+				
+			}
+			
+			
 			
 			try {
 				//保存'话题取消隐藏'
-				topicService.saveTopicUnhide(topicManage.createTopicUnhideObject(topicUnhide));
+				topicService.saveTopicUnhide(topicManage.createTopicUnhideObject(topicUnhide),point,accessUser.getUserName(),consumption_pointLogObject,topic.getUserName(),income_pointLogObject);
 				
 				//删除'话题取消隐藏'缓存;
 				topicManage.delete_cache_findTopicUnhideById(topicUnhideId);
+				
+				//删除用户缓存
+				userManage.delete_cache_findUserById(accessUser.getUserId());
+				userManage.delete_cache_findUserByUserName(accessUser.getUserName());
 				
 				
 				

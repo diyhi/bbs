@@ -29,10 +29,11 @@
 				var random = getRandom(13);
 	
 				//等级名称
-				var gradeName = $(this).attr("gradeName");
+				var gradeName = $(this).attr("description");
 	
 	
 				var hideType = $(this).attr("hide-type");
+				var inputValue = $(this).attr("input-value");
 				if(hideType == '10'){
 					var html = "";
 					html += '<div class="hide-box">';
@@ -56,8 +57,18 @@
 					var html = "";
 					html += '<div class="hide-box">';
 					html += 	'<div class="background-image"></div>';
-					html += 	'<div class="background-prompt">此处内容已被隐藏，达到‘'+gradeName+'’等级可见</div>';
+					html += 	'<div class="background-prompt">此处内容已被隐藏，等级达到‘'+gradeName+'’可见</div>';
 					html += '</div>';
+ 					$(this).html(html);
+				}else if(hideType == '40'){
+					var html = "";
+					html += '<div class="hide-box">';
+					html += 	'<div class="background-image"></div>';
+					html += 	'<div class="background-prompt">此处内容已被隐藏，支付 '+inputValue+' 积分可见</div>';
+					html += 	'<div class="submit-box">';
+					html += 		'<input type="button" value="立即购买" class="button" onclick="topicUnhide(40,'+random+');">';
+					
+					html += 	'</div>';
  					$(this).html(html);
 				}
 			})

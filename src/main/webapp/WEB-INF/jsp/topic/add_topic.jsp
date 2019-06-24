@@ -10,7 +10,7 @@
 <LINK href="backstage/css/table.css" type="text/css" rel="stylesheet">
 <link href="backstage/kindeditor/themes/default/default.css" rel="stylesheet"/>
 <link href="backstage/kindeditor/plugins/hide/hide.css" rel="stylesheet"/>
-<script charset="utf-8" src="backstage/kindeditor/kindeditor.js?ss"></script>
+<script charset="utf-8" src="backstage/kindeditor/kindeditor-min.js"></script>
 <script charset="utf-8" src="backstage/kindeditor/lang/zh-CN.js"></script>
 
 <script type="text/javascript" src="backstage/js/ajax.js" language="javascript" ></script>
@@ -96,6 +96,9 @@ hide {
 <script type="text/javascript" src="backstage/spin/spin.min.js" ></script>
 <script language="JavaScript" src="backstage/layer/layer.js" ></script>
 <form:form>
+<enhance:out escapeXml="false">
+<input type="hidden" id="userGradeList" value="<c:out value="${userGradeList}"></c:out>">
+</enhance:out>
 <DIV class="d-box">
 <div class="d-button">
 	<input class="functionButton" type="button" onClick="javascript:window.location.href='${config:url(pageContext.request)}control/topic/list${config:suffix()}'" value="返回">
@@ -198,7 +201,7 @@ function initKindEditor(){
 		"line-height: 30px;"+
 	"}"+
 	".ke-content .inputValue_30:before {"+
-		"content: '超过积分 ' attr(input-value) ' 可见';"+
+		"content: '达到等级 ' attr(description) ' 可见';"+
 		" color: #06b5ff;"+
 		"font-size:14px;"+
 		"position: absolute;"+
@@ -228,10 +231,14 @@ function initKindEditor(){
 	"}";
 
     //指定要保留的HTML标记和属性。Object的key为HTML标签名，value为HTML属性数组，”.”开始的属性表示style属性。 注意属性要全部小写
-    KindEditor.options.htmlTags['hide'] = ['hide-type','input-value','class'];
+    KindEditor.options.htmlTags['hide'] = ['hide-type','input-value','class','description'];
     
-    
-    
+    //等级
+	var userGradeList = document.getElementById("userGradeList").value;
+	var userGradeList_obj = null;//['source', '|','fontname','fontsize','emoticons'];
+	if(userGradeList != ""){
+		userGradeList_obj = JSON.parse(userGradeList);//JSON转为对象
+	}
     
 	KindEditor.ready(function(K) {
 		
@@ -252,7 +259,8 @@ function initKindEditor(){
         'formatblock', 'fontname', 'fontsize', '/', 'forecolor', 'hilitecolor', 'bold',
         'italic', 'underline', 'strikethrough', 'lineheight', 'removeformat', '|', 'image', 'multiimage',
         'flash', 'media', 'insertfile','emoticons','baidumap', 'table', 'hr',   'pagebreak',
-         'link', 'unlink','hide'],
+         'link', 'unlink','hide','hidePassword','hideComment','hideGrade','hidePoint'],
+         	userGradeList:userGradeList_obj,
 			afterChange : function() {
 				this.sync();
 			}

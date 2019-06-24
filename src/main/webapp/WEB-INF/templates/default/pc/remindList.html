@@ -62,7 +62,9 @@
 						<div class="content" >
 							<#if remind.typeCode == 10>
 								<cite>
-									<a href="user/control/home?userName=${remind.senderUserName}">${remind.senderUserName}</a>
+									<a href="user/control/home?userName=${remind.senderUserName}">
+										${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
+									</a>
 								</cite> 
 								在
 								<cite>
@@ -72,7 +74,9 @@
 								
 							<#elseif remind.typeCode == 20>
 								<cite>
-									<a href="user/control/home?userName=${remind.senderUserName}">${remind.senderUserName}</a>
+									<a href="user/control/home?userName=${remind.senderUserName}">
+										${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
+									</a>
 								</cite> 
 								在
 								<cite>
@@ -81,7 +85,9 @@
 								回复了我的话题
 							<#elseif remind.typeCode == 30>
 								<cite>
-									<a href="user/control/home?userName=${remind.senderUserName}">${remind.senderUserName}</a>
+									<a href="user/control/home?userName=${remind.senderUserName}">
+										${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
+									</a>
 								</cite> 
 								在
 								<cite>
@@ -90,7 +96,9 @@
 								引用了我的评论
 							<#elseif remind.typeCode == 40>
 								<cite>
-									<a href="user/control/home?userName=${remind.senderUserName}">${remind.senderUserName}</a>
+									<a href="user/control/home?userName=${remind.senderUserName}">
+										${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
+									</a>
 								</cite> 
 								在
 								<cite>
@@ -99,7 +107,9 @@
 								回复了我的评论
 							<#elseif remind.typeCode == 50>
 								<cite>
-									<a href="user/control/home?userName=${remind.senderUserName}">${remind.senderUserName}</a>
+									<a href="user/control/home?userName=${remind.senderUserName}">
+										${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
+									</a>
 								</cite> 
 								在
 								<cite>
@@ -108,17 +118,18 @@
 								回复了我回复过的评论
 							<#elseif remind.typeCode == 60>
 								<cite>
-									<a href="user/control/home?userName=${remind.senderUserName}">${remind.senderUserName}</a>
+									<a href="user/control/home?userName=${remind.senderUserName}">
+										${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
+									</a>
 								</cite> 
 								在
 								<cite>
 									<a href="thread?topicId=${remind.topicId}">${remind.topicTitle}</a>
 								</cite> 
 								解锁了我的话题
+								
+								
 							</#if>
-							
-							
-						
 						</div>
 						<div class="clearfix"></div>
 					</div>

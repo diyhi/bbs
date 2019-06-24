@@ -41,7 +41,16 @@ public class UserValidator implements Validator{
 		}else{
 			errors.rejectValue("userName","errors.required", new String[]{"请填写用户名"},"");
 		}
-		
+		if(user.getNickname() != null && !"".equals(user.getNickname().trim())){
+			if(user.getNickname().length()>15){
+				errors.rejectValue("nickname","errors.required", new String[]{"呢称不能超过15个字符"},"");
+			}
+			User u = userService.findUserByNickname(user.getNickname().trim());
+			if(u != null){
+				errors.rejectValue("nickname","errors.required", new String[]{"该呢称已存在"},"");
+			}
+			
+		}
 		
 		
 		if(user.getPassword() == null || "".equals(user.getPassword().trim())){

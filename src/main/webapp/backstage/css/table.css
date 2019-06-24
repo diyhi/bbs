@@ -132,7 +132,7 @@
 	line-height: 30px;
 }
 .comment .inputValue_30:before {
-	content: '超过积分 ' attr(input-value) ' 可见';
+	content: '达到等级 ' attr(description) ' 可见';
 	color: #06b5ff;
 	font-size:14px;
 	position: absolute;

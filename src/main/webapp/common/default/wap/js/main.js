@@ -42,7 +42,7 @@ $.ajaxSettings = $.extend($.ajaxSettings, {
 		
 		setTimeout(function () {
 			Vue.$indicator.close(); //关闭旋转进度条
-		}, 10);
+		}, 20);
 		
 	}
 });
@@ -134,7 +134,9 @@ var index_component = Vue.extend({
 			next: '',//下一页
 			tagId :'',//标签Id
 			tagName :'',//标签名称
-			popup_topic :false,//发表话题弹出层
+			//popup_topic :false,//发表话题弹出层
+			show_topic:true,//显示话题页
+			show_editor:false,//显示话题富文本编辑器
 			popup_tag : false, //'标签选择'弹出层
 			topicTitle:'',//发表话题标题
 			topicTagId:'',//发表话题标签Id
@@ -172,12 +174,19 @@ var index_component = Vue.extend({
 		this.init();
 
 	},
-	beforeDestroy : function() {
-		//销毁滚动条
-		if (this.scroll != null) {
-			this.scroll.destroy();
-			this.scroll = null;
+	mounted : function mounted(){
+		//挂载完成后，判断浏览器是否支持popstate
+		if (window.history && window.history.pushState) {//监听浏览器前进后退按钮
+			
+			window.addEventListener('popstate', this.goBack, false);
 		}
+	},
+	destroyed : function destroyed() {//离开当前页面
+		//页面销毁时，取消监听
+		window.removeEventListener('popstate', this.goBack, false);
+	},
+	deactivated: function() {//keep-alive组件停用时调用 (keepAlive缓存机制才会触发的钩子函数)
+		this.showTopicList(false);
 	},
 	//在当前路由改变，但是该组件被复用时调用
 	beforeRouteUpdate : function beforeRouteUpdate(to, from, next) {
@@ -188,7 +197,25 @@ var index_component = Vue.extend({
 		this.init();
 	},
 	methods : {
-
+		//显示话题列表
+		showTopicList : function(back){
+		    this.show_topic = true;//显示话题页
+		    this.show_editor = false;//隐藏话题富文本编辑器
+		    //判断浏览器是否支持popstate
+			if (window.history && window.history.pushState && back) {
+				if(back){
+					//后退
+					history.go(-1);
+				}
+			}
+		},
+		
+		//页面前进后退
+		goBack : function(){
+		    if(this.show_topic == false){
+		    	this.showTopicList(false);
+		    }
+		},
 		//查询话题列表
 		queryTopicList : function() {
 			var _self = this;
@@ -261,20 +288,85 @@ var index_component = Vue.extend({
 		},
 		//发表话题界面
 		addTopicUI : function() {
-			this.popup_topic = true;
-
+			var _self = this;
+			_self.show_topic = false;//隐藏话题页
+			_self.show_editor = true;//显示话题富文本编辑器
+			//判断浏览器是否支持popstate
+			if (window.history && window.history.pushState) {
+				// 向历史记录中插入了当前页
+		        history.pushState(null, null, document.URL);
+			}
 			//查询添加话题页
-			this.queryAddTopic();
+			_self.queryAddTopic(function (returnValue){
+				//等级
+				var userGradeList = null;
+				
+				//编辑器图标
+				var editorIconList = new Array();
+				for (var key in returnValue) {
+					if (key == "availableTag") {//话题编辑器允许使用标签
+						var availableTagList = $.parseJSON(returnValue[key]);
+						for(var i=0; i<availableTagList.length; i++){
+							var _availableTag = availableTagList[i];
+							
+							if(_availableTag == "forecolor"){//文字颜色
+							//	editorIconList.push("foreColor");
+							}else if(_availableTag == "hilitecolor"){//文字背景
+							//	editorIconList.push("backColor");
+							}else if(_availableTag == "bold"){//粗体
+								editorIconList.push("bold");
+							}else if(_availableTag == "italic"){//斜体
+								editorIconList.push("italic");
+							}else if(_availableTag == "underline"){//下划线
+								editorIconList.push("underline");
+							}else if(_availableTag == "link"){//插入链接
+								editorIconList.push("link");
+							}else if(_availableTag == "emoticons"){//插入表情
+								editorIconList.push("emoticon");
+							}else if(_availableTag == "image"){//图片
+								editorIconList.push("image");
+							}else if(_availableTag == "hidePassword"){//输入密码可见
+								editorIconList.push("hidePassword");
+							}else if(_availableTag == "hideComment"){//评论话题可见
+								editorIconList.push("hideComment");
+							}else if(_availableTag == "hideGrade"){//达到等级可见
+								editorIconList.push("hideGrade");
+							}else if(_availableTag == "hidePoint"){//积分购买可见
+								editorIconList.push("hidePoint");
+							}else if(_availableTag == "hideAmount"){//余额购买可见
+								editorIconList.push("hideAmount");
+							}
+						}
+						
+						
+						
+					}else if(key == "userGradeList"){//会员等级
+						userGradeList = $.parseJSON(returnValue[key]);
+					}
+				}
+				
+				for(var i=0; i< editorIconList.length; i++){
+					var editorIcon = editorIconList[i];
+					if(editorIcon == "hidePassword" || editorIcon == "hideComment" ||
+							editorIcon == "hideGrade" || editorIcon == "hidePoint" || editorIcon == "hideAmount"){
+						editorIconList.splice(i, 0, 'hide');//在指定索引处插入元素
+						break;
+					}
+				}
+				_self.$refs.topicContentEditorToolbar.innerHTML = "";
+				_self.$refs.topicContentEditorText.innerHTML = "";
+				//创建编辑器
+				_self.topicEditor = createEditor(_self.$refs.topicContentEditorToolbar,_self.$refs.topicContentEditorText,_self.$store.state.commonPath,editorIconList,userGradeList,'user/control/topic/upload',_self,"topicContent");
+		
+			});
 			
-			this.$refs.topicContentEditorToolbar.innerHTML = "";
-			this.$refs.topicContentEditorText.innerHTML = "";
-			//创建编辑器
-			this.topicEditor = createEditor(this.$refs.topicContentEditorToolbar,this.$refs.topicContentEditorText,'user/control/topic/upload',this,"topicContent");
-	
+			
+			
+			
 	
 		},
 		//查询添加话题页
-		queryAddTopic : function() {
+		queryAddTopic : function(callback) {
 			var _self = this;
 
 			//清空表单
@@ -311,7 +403,7 @@ var index_component = Vue.extend({
 							for (var key in returnValue) {
 								if (key == "allowTopic") {
 									if(returnValue[key] == false){
-										_self.popup_topic = false;
+										_self.showTopicList(true);//显示话题列表
 										_self.$toast({
 											message : "发表话题功能未开放",
 											duration : 3000,
@@ -327,12 +419,14 @@ var index_component = Vue.extend({
 									_self.replaceCaptcha();
 								}
 							}
+							//回调
+							callback(returnValue);
 						}
 						
-						//滚动
-						_self.$nextTick(function() {
-							_self.initScroll(_self.$refs.addTopicFormScroll);
-						});
+					//	//滚动
+					//	_self.$nextTick(function() {
+					//		_self.initScroll(_self.$refs.addTopicFormScroll);
+					//	});
 					}
 				}
 			});
@@ -356,9 +450,11 @@ var index_component = Vue.extend({
 			if (_self.topicTitle != null && _self.topicTitle != "") {
 				parameter += "&title=" + encodeURIComponent(_self.topicTitle);
 			}
-			if (_self.topicContent != null && _self.topicContent != "") {
-				parameter += "&content=" + encodeURIComponent(_self.topicContent);
-			}
+			//if (_self.topicContent != null && _self.topicContent != "") {
+			//	parameter += "&content=" + encodeURIComponent(_self.topicContent);
+			//}
+			parameter += "&content=" + encodeURIComponent(_self.topicEditor.txt.html());
+			
 			
 			//验证码Key
 			parameter += "&captchaKey=" + encodeURIComponent(_self.captchaKey);
@@ -400,7 +496,7 @@ var index_component = Vue.extend({
 								message : "提交成功",
 								duration : 3000,
 							});
-							_self.popup_topic = false;
+							_self.showTopicList(true);//显示话题列表
 
 							//清空分页数据
 							_self.topicList = []; //话题列表
@@ -536,18 +632,6 @@ var index_component = Vue.extend({
 			this.queryTopicList();
 
 		},
-		//初始化BScroll滚动插件//this.$refs.addTopicFormScroll
-		initScroll : function initScroll(ref) {
-			this.scroll = new BScroll(ref, {
-				scrollY : true, //滚动方向为 Y 轴
-				click : true, //是否派发click事件
-				autoBlur:false,//默认值：true 在滚动之前会让当前激活的元素（input、textarea）自动失去焦点
-				preventDefault : true, //是否阻止默认事件
-				preventDefaultException:{ tagName: /^(INPUT|TEXTAREA|BUTTON|SELECT|HIDE)$/ ,className:/(^|\s)(editor-toolbar|w-e-menu|editor-text|w-e-text)(\s|$)/},//列出哪些元素不屏蔽默认事件 className必须是最里层的元素
-				eventPassthrough :'horizontal',//解决文本无法复制
-				HWCompositing : true, //是否启用硬件加速
-			});
-		},
 	}
 });
 				
@@ -569,8 +653,10 @@ var thread_component = Vue.extend({
 			quoteData : [],//引用数据 map格式 key:评论Id value:引用html数据
 			replyExpandOrShrink : [], //回复展开/收缩 map格式 key:评论Id value:是否展开
 			
-			popup_comment :false,//发表评论弹出层
-			popup_quote :false,//引用评论弹出层
+			show_topic:true,//话题内容显示/隐藏
+			show_commentEditor:false,//添加评论富文本编辑器显示/隐藏
+			show_quoteEditor:false,//引用评论富文本编辑器显示/隐藏
+			
 			popup_reply : false, //发表回复弹出层
 			commentContent:'',//发表评论内容
 			quoteCommentId:'',//引用评论Id
@@ -605,8 +691,17 @@ var thread_component = Vue.extend({
 		//初始化
 		this.init();
 	},
-	mounted: function() {
-
+	mounted : function mounted(){
+		//挂载完成后，判断浏览器是否支持popstate
+		if (window.history && window.history.pushState) {//监听浏览器前进后退按钮
+			
+			window.addEventListener('popstate', this.goBack, false);
+		}
+	},
+	destroyed : function destroyed() {//离开当前页面
+		this.showTopic(false);
+		//页面销毁时，取消监听
+		window.removeEventListener('popstate', this.goBack, false);
 	},
 	//在当前路由改变，但是该组件被复用时调用
 	beforeRouteUpdate : function beforeRouteUpdate(to, from, next) {
@@ -656,16 +751,18 @@ var thread_component = Vue.extend({
 				        	var parameter = "&topicId=" + getUrlParam("topicId");
 				        	parameter += "&hideType="+hideType;//获取URL参数
 				        	
-				        	var hide_password = _self.hide_passwordList[hidePasswordIndex];
-				        	if(hide_password != undefined && hide_password != ""){
-				        		parameter += "&password="+encodeURIComponent(hide_password);//获取URL参数
-				        	}else{
-				        		_self.$toast({
-									message : "密码不能为空",
-									duration : 3000,
-									className : "mint-ui-toast",
-								});
-				        		return;
+				        	if(hideType == 10){
+				        		var hide_password = _self.hide_passwordList[hidePasswordIndex];
+					        	if(hide_password != undefined && hide_password != ""){
+					        		parameter += "&password="+encodeURIComponent(hide_password);//获取URL参数
+					        	}else{
+					        		_self.$toast({
+										message : "密码不能为空",
+										duration : 3000,
+										className : "mint-ui-toast",
+									});
+					        		return;
+					        	}
 				        	}
 				        	
 							//令牌
@@ -734,7 +831,23 @@ var thread_component = Vue.extend({
 	},
 	
 	methods : {
-		
+		//显示话题内容界面
+		showTopic : function(back){
+		    this.show_topic = true;//显示话题页
+		    this.show_commentEditor = false;//隐藏话题富文本编辑器
+		    this.show_quoteEditor = false;//隐藏引用评论富文本编辑器
+		    //判断浏览器是否支持popstate
+			if (window.history && window.history.pushState && back) {
+				//后退
+				history.go(-1);
+			}
+		},
+		//页面前进后退
+		goBack : function(){
+		    if(this.show_topic == false){
+		    	this.showTopic(false);
+		    }
+		},
 		//查询话题
 		queryTopic : function() {
 			var _self = this;
@@ -795,6 +908,23 @@ var thread_component = Vue.extend({
 	            			nodeHtml += '<div class="hide-box">';
 	            			nodeHtml += 	'<div class="background-image cms-lock1"></div>';
 	            			nodeHtml += 	'<div class="background-prompt">此处内容已被隐藏，评论话题可见</div>';
+	            			nodeHtml += '</div>';
+	            			childNode.innerHTML = nodeHtml;
+	    				}else if(childNode.getAttribute("hide-type") == "30"){
+	            			var nodeHtml = "";
+	            			nodeHtml += '<div class="hide-box">';
+	            			nodeHtml += 	'<div class="background-image cms-lock1"></div>';
+	            			nodeHtml += 	'<div class="background-prompt">此处内容已被隐藏，等级达到‘'+childNode.getAttribute("description")+'’可见</div>';
+	            			nodeHtml += '</div>';
+	            			childNode.innerHTML = nodeHtml;
+	    				}else if(childNode.getAttribute("hide-type") == "40"){
+	            			var nodeHtml = "";
+	            			nodeHtml += '<div class="hide-box">';
+	            			nodeHtml += 	'<div class="background-image cms-lock1"></div>';
+	            			nodeHtml += 	'<div class="background-prompt">此处内容已被隐藏，支付‘'+childNode.getAttribute("input-value")+'’积分可见</div>';
+	            			nodeHtml += 	'<div class="submit-box">';
+	    					nodeHtml += 		'<input type="button" value="提交" class="button" @click="topicUnhide(40);">';
+	    					nodeHtml += 	'</div>';
 	            			nodeHtml += '</div>';
 	            			childNode.innerHTML = nodeHtml;
 	    				}
@@ -952,7 +1082,8 @@ var thread_component = Vue.extend({
 									var quoteContent = "";
 									for (var j = 0; j <comment.quoteList.length; j++) {
 										var quote = comment.quoteList[j];
-										quoteContent = "<div>"+quoteContent+"<span><router-link tag=\"span\" :to=\"{path: '/user/control/home', query: {userName: '"+quote.userName+"'}}\">"+quote.userName+"</router-link>&nbsp;的评论：</span><br/>"+quote.content+"</div>";
+										quoteContent = "<div>"+quoteContent+"<span><router-link tag=\"span\" :to=\"{path: '/user/control/home', query: {userName: '"+quote.userName+"'}}\">"+(quote.nickname != null && quote.nickname != '' ? quote.nickname : quote.userName)+"</router-link>&nbsp;的评论：</span><br/>"+quote.content+"</div>";
+										
 									}
 									
 									
@@ -1011,20 +1142,61 @@ var thread_component = Vue.extend({
 		//发表评论界面
 		addCommentUI : function() {
 			var _self = this;
-			this.popup_comment = true;
-
-			//查询添加评论页
-			this.queryAddComment();
 			
-			this.$refs.commentContentEditorToolbar.innerHTML = "";
-			this.$refs.commentContentEditorText.innerHTML = "";
-			//创建编辑器
-			this.commentEditor = createEditor(this.$refs.commentContentEditorToolbar,this.$refs.commentContentEditorText,'user/control/comment/uploadImage?topicId='+this.topicId,_self,"commentContent");
+			_self.show_topic = false;//隐藏话题页
+			_self.show_commentEditor = true;//显示话题富文本编辑器
+			_self.show_quoteEditor = false;//隐藏引用评论富文本编辑器
+			//判断浏览器是否支持popstate
+			if (window.history && window.history.pushState) {
+				// 向历史记录中插入了当前页
+		        history.pushState(null, null, document.URL);
+			}
+			
+			//查询添加评论页
+			_self.queryAddComment(function (returnValue){
+				
+				//编辑器图标
+				var editorIconList = new Array();
+				for (var key in returnValue) {
+					if (key == "availableTag") {//话题编辑器允许使用标签
+						var availableTagList = $.parseJSON(returnValue[key]);
+						for(var i=0; i<availableTagList.length; i++){
+							var _availableTag = availableTagList[i];
+							
+							if(_availableTag == "forecolor"){//文字颜色
+							//	editorIconList.push("foreColor");
+							}else if(_availableTag == "hilitecolor"){//文字背景
+							//	editorIconList.push("backColor");
+							}else if(_availableTag == "bold"){//粗体
+								editorIconList.push("bold");
+							}else if(_availableTag == "italic"){//斜体
+								editorIconList.push("italic");
+							}else if(_availableTag == "underline"){//下划线
+								editorIconList.push("underline");
+							}else if(_availableTag == "link"){//插入链接
+								editorIconList.push("link");
+							}else if(_availableTag == "emoticons"){//插入表情
+								editorIconList.push("emoticon");
+							}else if(_availableTag == "image"){//图片
+								editorIconList.push("image");
+							}
+						}
+					}
+				}
+				
+				_self.$refs.commentContentEditorToolbar.innerHTML = "";
+				_self.$refs.commentContentEditorText.innerHTML = "";
+				//创建编辑器
+				_self.commentEditor = createEditor(_self.$refs.commentContentEditorToolbar,_self.$refs.commentContentEditorText,_self.$store.state.commonPath,editorIconList,null,'user/control/comment/uploadImage?topicId='+_self.topicId,_self,"commentContent");
+				
+				
+			});
+			
 			
 		},
 		
 		//查询添加评论页
-		queryAddComment : function() {
+		queryAddComment : function(callback) {
 			var _self = this;
 
 			//清空表单
@@ -1052,7 +1224,7 @@ var thread_component = Vue.extend({
 							for (var key in returnValue) {
 								if (key == "allowComment") {
 									if(returnValue[key] == false){
-										_self.popup_comment = false;
+										_self.showTopic(true);//显示话题内容界面
 										_self.$toast({
 											message : "发表评论功能未开放",
 											duration : 3000,
@@ -1068,13 +1240,15 @@ var thread_component = Vue.extend({
 									_self.replaceCaptcha();
 								}
 							}
+							//回调
+							callback(returnValue);
 						}
 						
 						//滚动
-						_self.$nextTick(function() {
-							_self.initScroll(_self.$refs.addCommentFormScroll);
+					//	_self.$nextTick(function() {
+					//		_self.initScroll(_self.$refs.addCommentFormScroll);
 
-						});
+					//	});
 					}
 				}
 			});
@@ -1086,6 +1260,9 @@ var thread_component = Vue.extend({
 		//		return;
 		//	}
 			var _self = this;
+			
+		
+			
 			//清空所有错误
 			_self.error.commentContent = "";
 			_self.error.comment = "";
@@ -1093,10 +1270,10 @@ var thread_component = Vue.extend({
 
 			
 			var parameter = "&topicId=" + _self.topicId; //提交参数
-			if (_self.commentContent != null && _self.commentContent != "") {
-				parameter += "&content=" + encodeURIComponent(_self.commentContent);
-			}
-			
+		//	if (_self.commentContent != null && _self.commentContent != ""){	
+			//	parameter += "&content=" + encodeURIComponent(_self.commentContent);
+		//	}
+			parameter += "&content=" + encodeURIComponent(_self.commentEditor.txt.html());
 			//验证码Key
 			parameter += "&captchaKey=" + encodeURIComponent(_self.captchaKey);
 
@@ -1137,7 +1314,7 @@ var thread_component = Vue.extend({
 								message : "提交成功",
 								duration : 3000,
 							});
-							_self.popup_comment = false;
+							_self.showTopic(true);//显示话题内容界面
 
 							
 							//清空分页数据
@@ -1193,19 +1370,57 @@ var thread_component = Vue.extend({
 		
 		//引用评论界面
 		addQuoteUI : function(commentId) {
-			this.popup_quote = true;
-
+			var _self = this;
+			_self.show_topic = false;//隐藏话题页
+			_self.show_commentEditor = false;//隐藏话题富文本编辑器
+			_self.show_quoteEditor = true;//显示引用评论富文本编辑器
+			//判断浏览器是否支持popstate
+			if (window.history && window.history.pushState) {
+				// 向历史记录中插入了当前页
+		        history.pushState(null, null, document.URL);
+			}
 			//查询引用评论页
-			this.queryAddQuote(commentId);
+			_self.queryAddQuote(commentId,function (returnValue){
+				
+				//编辑器图标
+				var editorIconList = new Array();
+				for (var key in returnValue) {
+					if (key == "availableTag") {//话题编辑器允许使用标签
+						var availableTagList = $.parseJSON(returnValue[key]);
+						for(var i=0; i<availableTagList.length; i++){
+							var _availableTag = availableTagList[i];
+							
+							if(_availableTag == "forecolor"){//文字颜色
+							//	editorIconList.push("foreColor");
+							}else if(_availableTag == "hilitecolor"){//文字背景
+							//	editorIconList.push("backColor");
+							}else if(_availableTag == "bold"){//粗体
+								editorIconList.push("bold");
+							}else if(_availableTag == "italic"){//斜体
+								editorIconList.push("italic");
+							}else if(_availableTag == "underline"){//下划线
+								editorIconList.push("underline");
+							}else if(_availableTag == "link"){//插入链接
+								editorIconList.push("link");
+							}else if(_availableTag == "emoticons"){//插入表情
+								editorIconList.push("emoticon");
+							}else if(_availableTag == "image"){//图片
+								editorIconList.push("image");
+							}
+						}
+					}
+				}
+				_self.$refs.quoteContentEditorToolbar.innerHTML = "";
+				_self.$refs.quoteContentEditorText.innerHTML = "";
+				//创建编辑器
+				_self.quoteEditor = createEditor(_self.$refs.quoteContentEditorToolbar,_self.$refs.quoteContentEditorText,_self.$store.state.commonPath,editorIconList,null,'user/control/comment/uploadImage?topicId='+_self.topicId,_self,"quoteContent");
+				
+			});
 			
-			this.$refs.quoteContentEditorToolbar.innerHTML = "";
-			this.$refs.quoteContentEditorText.innerHTML = "";
-			//创建编辑器
-			this.quoteEditor = createEditor(this.$refs.quoteContentEditorToolbar,this.$refs.quoteContentEditorText,'user/control/comment/uploadImage?topicId='+this.topicId,this,"quoteContent");
 			
 		},
 		//查询引用评论页
-		queryAddQuote : function(commentId) {
+		queryAddQuote : function(commentId,callback) {
 			var _self = this;
 
 			//清空表单
@@ -1243,7 +1458,7 @@ var thread_component = Vue.extend({
 									_self.quoteCommentContent =  returnValue[key];
 								}if (key == "allowComment") {
 									if(returnValue[key] == false){
-										_self.popup_quote = false;
+										_self.showTopic(true);//显示话题内容界面
 										_self.$toast({
 											message : "发表评论功能未开放",
 											duration : 3000,
@@ -1259,13 +1474,15 @@ var thread_component = Vue.extend({
 									_self.replaceCaptcha();
 								}
 							}
+							//回调
+							callback(returnValue);
 						}
 						
 						//滚动
-						_self.$nextTick(function() {
-							_self.initScroll(_self.$refs.addQuoteFormScroll);
+					//	_self.$nextTick(function() {
+					//		_self.initScroll(_self.$refs.addQuoteFormScroll);
 
-						});
+					//	});
 					}
 				}
 			});
@@ -1284,10 +1501,10 @@ var thread_component = Vue.extend({
 
 			
 			var parameter = "&commentId=" + _self.quoteCommentId; //提交参数
-			if (_self.quoteContent != null && _self.quoteContent != "") {
-				parameter += "&content=" + encodeURIComponent(_self.quoteContent);
-			}
-			
+			//if (_self.quoteContent != null && _self.quoteContent != "") {
+			//	parameter += "&content=" + encodeURIComponent(_self.quoteContent);	
+			//}
+			parameter += "&content=" + encodeURIComponent(_self.quoteEditor.txt.html());
 			//验证码Key
 			parameter += "&captchaKey=" + encodeURIComponent(_self.captchaKey);
 
@@ -1329,7 +1546,7 @@ var thread_component = Vue.extend({
 								message : "提交成功",
 								duration : 3000,
 							});
-							_self.popup_quote = false;
+							_self.showTopic(true);//显示话题内容界面
 
 							
 							//清空分页数据
@@ -2141,7 +2358,7 @@ var register_component = Vue.extend({
 		//验证用户名
 		verificationUserName : function() {
 			var _self = this;
-			var parameter = "&userName=" + _self.userName;
+			var parameter = "&userName=" + encodeURIComponent(_self.userName);
 			_self.error.userName = "";
 
 			$.ajax({
@@ -3564,6 +3781,8 @@ var editUser_component = Vue.extend({
 	template : '#editUser-template',
 	data : function data() {
 		return {
+			nickname : '',
+			allowNickname:true,//是否禁用修改呢称输入框
 			oldPassword : '',
 			password : '',
 			confirmPassword : '',
@@ -3571,6 +3790,7 @@ var editUser_component = Vue.extend({
 			userCustomList : [], //用户自定义注册功能项
 			userBoundField : [], //用户自定义注册功能项绑定
 			error : {
+				nickname : '',
 				oldPassword : '',
 				password : '',
 				confirmPassword : '',
@@ -3598,6 +3818,11 @@ var editUser_component = Vue.extend({
 						var returnValue = $.parseJSON(result);
 						if (returnValue != null) {
 							_self.user = returnValue['user'];
+							_self.nickname = _self.user.nickname;
+							if(_self.nickname == null || _self.nickname == ''){
+								_self.allowNickname = false;
+							}
+							
 							_self.userCustomList = returnValue['userCustomList'];
 							if (_self.userCustomList != null && _self.userCustomList.length > 0) {
 								for (var i = 0; i < _self.userCustomList.length; i++) {
@@ -3713,8 +3938,13 @@ var editUser_component = Vue.extend({
 				_self.$messagebox('提示', '请填好资料再提交');
 				return;
 			}
+			
+			
 
 			var parameter = "";
+			
+			parameter += "&nickname=" +  encodeURIComponent(_self.nickname.trim());
+			
 			//密码需SHA256加密
 			var password = _self.password.trim();
 			var oldPassword = _self.oldPassword.trim();
@@ -3723,7 +3953,6 @@ var editUser_component = Vue.extend({
 				//旧密码
 				parameter += "&oldPassword=" + CryptoJS.SHA256(oldPassword);
 			}
-
 
 			//自定义表单
 			if (_self.userCustomList != null && _self.userCustomList.length > 0) {
@@ -3766,7 +3995,6 @@ var editUser_component = Vue.extend({
 				url : "user/control/editUser",
 				data : parameter,
 				success : function success(result) {
-					//	alert(result);
 					if (result != "") {
 						var returnValue = $.parseJSON(result);
 
@@ -3809,7 +4037,14 @@ var editUser_component = Vue.extend({
 							for (var error in key_error) {
 								var errorValue = key_error[error];
 								var number = error.split("_")[1];
-
+								if (error == "nickname") {
+									_self.error.nickname = errorValue;
+								}else if(error == "oldPassword"){
+									_self.error.oldPassword = errorValue;
+								}else if(error == "password"){
+									_self.error.password = errorValue;
+								}
+								
 								for (var i = 0; i < _self.userCustomList.length; i++) {
 									var userCustom = _self.userCustomList[i];
 									if (userCustom.id == number) {
@@ -5134,6 +5369,11 @@ var privateMessageChat_component = Vue.extend({
 							if (new_privateMessageChatList != null && new_privateMessageChatList.length > 0) {
 								_self.privateMessageChatList.push.apply(_self.privateMessageChatList, new_privateMessageChatList); //合并两个数组
 							}
+							if(chatUser != null){
+								_self.friendUserNameTitle = "与 "+chatUser.userName+" ("+chatUser.nickname+") 的对话";
+							}
+							
+							
 							_self.currentpage = pageView.currentpage;
 							_self.totalpage = pageView.totalpage;
 						}
@@ -6455,9 +6695,10 @@ function getObjectURL(file) {
 
 
 //创建富文本编辑器
-function createEditor(editorToolbar,editorText,imgPath,self,param) {
+function createEditor(editorToolbar,editorText,commonPath,menus,userGradeList,imgPath,self,param) {
 	var E = window.wangEditor;
     var editor = new E(editorToolbar,editorText);
+    /**
     editor.customConfig.menus = [
 							  //   'head',  // 标题
 							     'bold',  // 粗体
@@ -6478,14 +6719,62 @@ function createEditor(editorToolbar,editorText,imgPath,self,param) {
 							  //   'undo',  // 撤销
 							 //   'redo'  // 重复
 							     'hide',  // 插入隐藏栏
-							     ];
+							     ];**/
+    editor.customConfig.menus = menus;
     editor.customConfig.uploadImgServer = imgPath;
     editor.customConfig.onchange = function (html) {
 		Vue.set(self, param, html);
     };
+    //等级
+    editor.customConfig.userGradeList=userGradeList;
+    
+    // 编辑区域的 z-index
+    editor.customConfig.zIndex= 0;
 //    editor.customConfig.uploadImgHeaders = {
  //   	'X-Requested-With': 'XMLHttpRequest'
  //   };
+    
+    //使用kindeditor表情目录下的文件
+    var new_commonPath = commonPath.substring(0, commonPath.length - 4);
+    
+    
+    var emoticonList_1 = new Array();
+    for(var i=0; i<50; i++){
+    	var o=new Object();
+    	o.alt = '';
+    	o.src = new_commonPath+'pc/js/kindeditor/plugins/emoticons/images/'+i+'.gif';
+    	emoticonList_1.push(o);
+    }
+    var emoticonList_2 = new Array();
+    for(var i=50; i<90; i++){
+    	var o=new Object();
+    	o.alt = '';
+    	o.src = new_commonPath+'pc/js/kindeditor/plugins/emoticons/images/'+i+'.gif';
+    	emoticonList_2.push(o);
+    }
+    
+    // 表情面板可以有多个 tab ，因此要配置成一个数组。数组每个元素代表一个 tab 的配置
+    editor.customConfig.emotions = [
+        {
+            // tab 的标题
+            title: '表情1',
+            // type -> 'emoji' / 'image'
+            type: 'image',
+            // content -> 数组
+            content: emoticonList_1
+        },
+        {
+            // tab 的标题
+            title: '表情2',
+            // type -> 'emoji' / 'image'
+            type: 'image',
+            // content -> 数组
+            content: emoticonList_2
+        }
+    ]
+    
+    
+    
     //后台代码接收文件的字段名称
     editor.customConfig.uploadFileName = "imgFile";
     

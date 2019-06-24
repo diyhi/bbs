@@ -159,6 +159,9 @@ function sureSubmit(){
 <script type="text/javascript" src="backstage/spin/spin.min.js" ></script>
 <script language="JavaScript" src="backstage/layer/layer.js" ></script>
 <form:form>
+<enhance:out escapeXml="false">
+<input type="hidden" id="userGradeList" value="<c:out value="${userGradeList}"></c:out>">
+</enhance:out>
 <DIV class="d-box">
 
 <TABLE class="t-table" cellSpacing="1" cellPadding="2" width="100%" border="0">
@@ -258,7 +261,7 @@ function initKindEditor(){
 		"line-height: 30px;"+
 	"}"+
 	".ke-content .inputValue_30:before {"+
-		"content: '超过积分 ' attr(input-value) ' 可见';"+
+		"content: '达到等级 ' attr(description) ' 可见';"+
 		" color: #06b5ff;"+
 		"font-size:14px;"+
 		"position: absolute;"+
@@ -287,8 +290,15 @@ function initKindEditor(){
 		"padding:5px;"+
 	"}";
 
-    //指定要保留的HTML标记和属性。Object的key为HTML标签名，value为HTML属性数组，”.”开始的属性表示style属性。 注意属性要全部小写
-    KindEditor.options.htmlTags['hide'] = ['hide-type','input-value','class'];
+   //指定要保留的HTML标记和属性。Object的key为HTML标签名，value为HTML属性数组，”.”开始的属性表示style属性。 注意属性要全部小写
+    KindEditor.options.htmlTags['hide'] = ['hide-type','input-value','class','description'];
+    
+    //等级
+	var userGradeList = document.getElementById("userGradeList").value;
+	var userGradeList_obj = null;//['source', '|','fontname','fontsize','emoticons'];
+	if(userGradeList != ""){
+		userGradeList_obj = JSON.parse(userGradeList);//JSON转为对象
+	}
     
 
 	KindEditor.ready(function(K) {
@@ -309,7 +319,8 @@ function initKindEditor(){
         'formatblock', 'fontname', 'fontsize', '/', 'forecolor', 'hilitecolor', 'bold',
         'italic', 'underline', 'strikethrough', 'lineheight', 'removeformat', '|', 'image', 'multiimage',
         'flash', 'media', 'insertfile','emoticons','baidumap', 'table', 'hr',   'pagebreak',
-         'link', 'unlink','hide'],
+         'link', 'unlink','hide','hidePassword','hideComment','hideGrade','hidePoint'],
+         	userGradeList:userGradeList_obj,
 			afterChange : function() {
 				this.sync();
 			}

@@ -271,7 +271,7 @@ public class CommentFormAction {
 			//删除缓存
 			userManage.delete_cache_findUserById(accessUser.getUserId());
 			userManage.delete_cache_findUserByUserName(accessUser.getUserName());
-			topicManage.delete_cache_findTopicUnhideById(comment.getTopicId(),accessUser.getUserName());
+			topicManage.delete_cache_findWhetherCommentTopic(comment.getTopicId(),accessUser.getUserName());
 			
 			//修改话题最后回复时间
 			topicService.updateTopicReplyTime(topicId,new Date());

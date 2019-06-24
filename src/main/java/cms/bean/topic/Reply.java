@@ -32,6 +32,9 @@ public class Reply implements Serializable{
 	/** 用户名称 **/
 	@Column(length=30)
 	private String userName;
+	/** 呢称 **/
+	@Transient
+	private String nickname;
 	/** 头像路径 **/
 	@Transient
 	private String avatarPath;
@@ -138,6 +141,12 @@ public class Reply implements Serializable{
 	}
 	public void setAvatarName(String avatarName) {
 		this.avatarName = avatarName;
+	}
+	public String getNickname() {
+		return nickname;
+	}
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
 	}
 	
 	

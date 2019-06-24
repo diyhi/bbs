@@ -667,7 +667,7 @@ html,body{
 .articleModule .articleBox h2{color:#404040;font-size:18px;border:none;margin-top:0;font-weight:normal;margin-top: 20px;border-bottom:1px dotted #eee;}
 .articleModule .articleBox .articleContent{border-top:1px dotted #eee;margin-top:20px;padding:20px 5px;color:#666666;font-size:14px;font-size:16px;word-wrap:break-word}
 .articleModule .articleBox .articleContent p{font-size:16px;word-wrap:break-word}
-.articleModule .articleBox .articleContent img{max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;display:block}
+.articleModule .articleBox .articleContent img{max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;}
 
 /* 隐藏标签 IE8以下浏览器不支持自定义标签，需要在页头<head>标签内执行document.createElement('hide') */
 .articleModule .articleBox .articleContent hide{
@@ -729,7 +729,7 @@ html,body{
 .commentModule .commentlist cite{font-style:normal;}
 .commentModule .commentlist .commentTime{margin-bottom:5px;color:#999}
 .commentModule .commentlist .commentTime a{color:#999;}
-.commentModule .commentlist .comment .commentContent{padding:0px;word-wrap:break-word;color:#666;font-size: 14px;}
+.commentModule .commentlist .comment .commentContent{padding:0px;word-wrap:break-word;color:#666;font-size: 14px;margin-top: 20px;}
 /* 评论图片尺寸 */
 .commentModule .commentlist .comment .commentContent img {max-width:99.5%;height:auto;}
 
@@ -1330,12 +1330,31 @@ html,body{
 	text-overflow: ellipsis;
 	max-width: 145px;
 }
+/* 用户呢称 */
+.selfInfo .detailInfo .box .nickname {
+	font-size: 18px;
+	font-weight: 400;
+	color: #666;
+	margin-right: 6px;
+	max-width: 216px;
+	overflow: hidden;
+	display: block;
+	float: left;
+	height: 26px;
+	line-height: 32px;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	max-width: 145px;
+}
 /* 用户等级 */
 .selfInfo .detailInfo .box .grade {
-	vertical-align: super;
-	margin-left: 11px;
-	position: relative;
-	top: 5px
+	background-color: #f0f0f0;
+	border-radius: 4px;
+	color: #999;
+	font-size: 13px;
+	padding: 3px 8px 3px 8px;
+	vertical-align: middle;
+	line-height: 32px;
 }
 
 .selfInfo .detailInfo .box .privateMessageBox{

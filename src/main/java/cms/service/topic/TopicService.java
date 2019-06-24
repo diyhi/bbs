@@ -121,8 +121,13 @@ public interface TopicService extends DAO<Topic>{
 	/**
 	 * 保存'话题取消隐藏'
 	 * @param topicUnhide
+	 * @param point 积分
+	 * @param consumption_userName 消费用户名称
+	 * @param consumption_pointLogObject 消费积分日志
+	 * @param income_userName 收入用户名称
+	 * @param income_pointLogObject 收入积分日志
 	 */
-	public void saveTopicUnhide(Object topicUnhide);
+	public void saveTopicUnhide(Object topicUnhide,Long point,String consumption_userName,Object consumption_pointLogObject,String income_userName,Object income_pointLogObject);
 	
 	/**
 	 * 根据Id查询'话题取消隐藏'

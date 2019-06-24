@@ -67,7 +67,7 @@ public class UserAction {
 	@RequestMapping("/control/user/list") 
 	public String execute(User formbean,PageForm pageForm,Boolean queryState,ModelMap model,
 			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {		
+			throws Exception {	
 	
 		
 		//调用分页算法代码

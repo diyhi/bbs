@@ -25,7 +25,7 @@ public class PointLogEntity implements Serializable{
 	/** Id  Id的后4位为用户Id的后4位**/
 	@Id @Column(length=36)
 	private String id;
-	/** 模块 100.话题  200.评论  300.回复 **/
+	/** 模块 100.话题  200.评论  300.回复 400.积分购买隐藏话题 **/
 	private Integer module;
 	/** 参数Id    话题Id ,评论Id,回复Id **/
 	private Long parameterId;

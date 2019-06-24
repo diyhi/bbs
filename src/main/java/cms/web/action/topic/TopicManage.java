@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.util.concurrent.AtomicLongMap;
 
+import cms.bean.setting.EditorTag;
 import cms.bean.staff.SysUsers;
 import cms.bean.thumbnail.Thumbnail;
 import cms.bean.topic.HideTagType;
@@ -31,10 +32,12 @@ import cms.service.thumbnail.ThumbnailService;
 import cms.service.topic.CommentService;
 import cms.service.topic.TopicService;
 import cms.service.user.UserService;
+import cms.utils.JsonUtils;
 import cms.utils.Verification;
 import cms.web.action.FileManage;
 import cms.web.action.TextFilterManage;
 import cms.web.action.cache.CacheManage;
+import cms.web.action.setting.SettingManage;
 import cms.web.action.thumbnail.ThumbnailManage;
 import net.sf.cglib.beans.BeanCopier;
 /**
@@ -57,7 +60,7 @@ public class TopicManage {
 	@Resource CacheManage cacheManage;
 	
 	@Resource TopicUnhideConfig topicUnhideConfig;
-	
+	@Resource SettingManage settingManage;
 	
 	//key: 话题Id value:展示次数
     private AtomicLongMap<Long> countMap = AtomicLongMap.create();
@@ -361,7 +364,123 @@ public class TopicManage {
 		cacheManage.deleteCache("topicManage_cache_topic",String.valueOf(topicId));
 	}
 	
-	
+	/**
+	 * 话题编辑器允许使用标签
+	 * @return List<String> 类型json格式
+	*/
+	public String availableTag(){
+		List<String> tag = new ArrayList<String>();
+		EditorTag editor = settingManage.readTopicEditorTag();
+		if(editor != null){
+			//标签区域1
+			boolean area_1 = false;
+			//标签区域2
+			boolean area_2 = false;
+			//标签区域3
+			boolean area_3 = false;
+			
+			tag.add("source");
+			tag.add("|");
+			if(editor.isFontname()){//字体
+				tag.add("fontname");
+				area_1 = true;
+			}
+			if(editor.isFontsize()){//文字大小
+				tag.add("fontsize");
+				area_1 = true;
+			}
+			if(area_1 == true){
+				tag.add("|");
+			}
+			
+			if(editor.isForecolor()){//文字颜色
+				tag.add("forecolor");
+				area_2 = true;
+			}
+			if(editor.isHilitecolor()){//文字背景
+				tag.add("hilitecolor");
+				area_2 = true;
+			}
+			if(editor.isBold()){//粗体
+				tag.add("bold");
+				area_2 = true;
+			}
+			if(editor.isItalic()){//斜体
+				tag.add("italic");
+				area_2 = true;
+			}
+			if(editor.isUnderline()){//下划线
+				tag.add("underline");
+				area_2 = true;
+			}
+			if(editor.isRemoveformat()){//删除格式
+				tag.add("removeformat");
+				area_2 = true;
+			}
+			if(editor.isLink()){//超级链接
+				tag.add("link");
+				area_2 = true;
+			}
+			if(editor.isUnlink()){//取消超级链接
+				tag.add("unlink");
+				area_2 = true;
+			}
+			if(area_2 == true){
+				tag.add("|");
+			}
+			
+			if(editor.isJustifyleft()){//左对齐
+				tag.add("justifyleft");
+				area_3 = true;
+			}
+			if(editor.isJustifycenter()){//居中
+				tag.add("justifycenter");
+				area_3 = true;
+			}
+			if(editor.isJustifyright()){//右对齐
+				tag.add("justifyright");
+				area_3 = true;
+			}
+			if(editor.isInsertorderedlist()){//编号
+				tag.add("insertorderedlist");
+				area_3 = true;
+			}
+			if(editor.isInsertunorderedlist()){//项目符号
+				tag.add("insertunorderedlist");
+				area_3 = true;
+			}
+			if(area_3 == true){
+				tag.add("|");
+			}
+			
+			if(editor.isEmoticons()){//插入表情
+				tag.add("emoticons");
+			}
+			if(editor.isImage()){//图片
+				tag.add("image");
+			}
+			
+			
+			if(editor.isHidePassword()){//输入密码可见
+				tag.add("hidePassword");
+			}
+			if(editor.isHideComment()){//评论话题可见
+				tag.add("hideComment");		
+			}
+			if(editor.isHideGrade()){//达到等级可见
+				tag.add("hideGrade");	
+			}
+			if(editor.isHidePoint()){//积分购买可见
+				tag.add("hidePoint");	
+			}
+			if(editor.isHideAmount()){//余额购买可见
+				tag.add("hideAmount");
+			}
+
+			
+		}
+		return JsonUtils.toJSONString(tag);
+	}
 	
 	
 	/**--------------------------------------------- 话题取消隐藏 -----------------------------------------------**/
@@ -528,7 +647,7 @@ public class TopicManage {
 	 * @return
 	 */
 	@Cacheable(value="topicManage_cache_findWhetherCommentTopic",key="#topicId+'_'+#userName")
-	public Boolean query_cache_findTopicUnhideById(Long topicId,String userName){
+	public Boolean query_cache_findWhetherCommentTopic(Long topicId,String userName){
 		return commentService.findWhetherCommentTopic(topicId, userName);
 	}
 	/**
@@ -538,7 +657,7 @@ public class TopicManage {
 	 * @return
 	 */
 	@CacheEvict(value="topicManage_cache_findWhetherCommentTopic",key="#topicId+'_'+#userName")
-	public void delete_cache_findTopicUnhideById(Long topicId,String userName){
+	public void delete_cache_findWhetherCommentTopic(Long topicId,String userName){
 	}
 	
 	/**

@@ -55,7 +55,7 @@
 										<em>  
 						                	<a href="#" >
 							           			<span style="display:inline-block;margin-left: 7px;">
-							                    	${topic.userName}
+							                    	${(topic.nickname != null && topic.nickname??) ?string(topic.nickname , topic.userName)}
 							                    </span>
 						                    </a>
 						                </em>

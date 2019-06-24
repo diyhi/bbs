@@ -34,6 +34,9 @@ public class RemindEntity implements Serializable{
 	/** 提醒发送用户名称 **/
 	@Transient
 	protected String senderUserName;
+	/** 提醒发送用户呢称 **/
+	@Transient
+	protected String senderNickname;
 	/** 提醒发送用户头像路径 **/
 	@Transient
 	protected String senderAvatarPath;
@@ -45,6 +48,12 @@ public class RemindEntity implements Serializable{
 	/** 提醒类型代码编号  10:别人评论了我的话题  20:别人回复了我的话题 30:别人引用了我的评论 40:别人回复了我的评论 50:别人回复了我回复过的评论 60:别人解锁了我的话题 **/
 	protected Integer typeCode;
 
+	/** 关联数据
+	@Lob
+	protected String associativeData;**/
+	/** 关联数据模块
+	@Transient
+	protected Object associativeDataModule;**/
 	
 	/** 提醒状态 10:未读  20:已读  110:未读删除  120:已读删除 **/ 
 	protected Integer status = 10;
@@ -190,6 +199,12 @@ public class RemindEntity implements Serializable{
 	}
 	public void setFriendTopicReplyId(Long friendTopicReplyId) {
 		this.friendTopicReplyId = friendTopicReplyId;
+	}
+	public String getSenderNickname() {
+		return senderNickname;
+	}
+	public void setSenderNickname(String senderNickname) {
+		this.senderNickname = senderNickname;
 	}
 
 	

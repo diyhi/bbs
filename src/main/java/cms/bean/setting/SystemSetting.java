@@ -94,6 +94,12 @@ public class SystemSetting implements Serializable{
 
 	/** 每用户每24小时内发送短信次数 **/
 	private Integer userSentSmsCount = 10;
+	/** 话题编辑器标签  json **/
+	@Lob
+	private String topicEditorTag;
+	@Transient
+	private EditorTag topicEditorTagObject = new EditorTag();
+	
 	/** 评论编辑器标签  json **/
 	@Lob
 	private String editorTag;
@@ -367,5 +373,20 @@ public class SystemSetting implements Serializable{
 		this.privateMessage_submitQuantity = privateMessage_submitQuantity;
 	}
 
+	public String getTopicEditorTag() {
+		return topicEditorTag;
+	}
+
+	public void setTopicEditorTag(String topicEditorTag) {
+		this.topicEditorTag = topicEditorTag;
+	}
+
+	public EditorTag getTopicEditorTagObject() {
+		return topicEditorTagObject;
+	}
+
+	public void setTopicEditorTagObject(EditorTag topicEditorTagObject) {
+		this.topicEditorTagObject = topicEditorTagObject;
+	}
 	
 }

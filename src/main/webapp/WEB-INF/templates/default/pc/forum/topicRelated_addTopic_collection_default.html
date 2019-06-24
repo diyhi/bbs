@@ -7,6 +7,11 @@
 		
 		<#--  全局允许提交话题 -->
 		<#if returnValue['allowTopic'] == true>
+			<!-- 话题编辑器允许使用标签 -->
+			<input type="hidden" id="topicAvailableTag"  value="${returnValue['availableTag']}">
+			<!-- 用户等级 -->
+			<input type="hidden" id="userGradeList"  value="${returnValue['userGradeList']}">
+			
 			<div class="topic-formModule">
 				<form id="addTopicForm" action="user/control/topic/add?page=${url_page}" method="post">
 					
@@ -266,7 +271,7 @@
 							"line-height: 30px;"+
 						"}"+
 						".ke-content .inputValue_30:before {"+
-							"content: '超过积分 ' attr(input-value) ' 可见';"+
+							"content: '等级达到 ' attr(description) ' 可见';"+
 							" color: #06b5ff;"+
 							"font-size:14px;"+
 							"position: absolute;"+
@@ -296,8 +301,31 @@
 						"}";
 					
 					    //指定要保留的HTML标记和属性。Object的key为HTML标签名，value为HTML属性数组，”.”开始的属性表示style属性。 注意属性要全部小写
-					    KindEditor.options.htmlTags['hide'] = ['hide-type','input-value','class'];
+					    KindEditor.options.htmlTags['hide'] = ['hide-type','input-value','class','description'];
 	
+						var topicAvailableTag = document.getElementById("topicAvailableTag").value;
+						var topicAvailableTag_obj = null;//['source', '|','fontname','fontsize','emoticons'];
+						if(topicAvailableTag != ""){
+							var flag = false;
+							topicAvailableTag_obj = JSON.parse(topicAvailableTag);//JSON转为对象
+							if(topicAvailableTag_obj != null && topicAvailableTag_obj.length >0){
+								for(var i=0; i< topicAvailableTag_obj.length; i++){
+									var availableTag = topicAvailableTag_obj[i];
+									if(availableTag == "hidePassword" || availableTag == "hideComment" ||
+									availableTag == "hideGrade" || availableTag == "hidePoint" || availableTag == "hideAmount"){
+										topicAvailableTag_obj.splice(i, 0, 'hide');//在指定索引处插入元素
+										break;
+									}
+								}
+							}
+						}
+	
+						 //等级
+						var userGradeList = document.getElementById("userGradeList").value;
+						var userGradeList_obj = null;
+						if(userGradeList != ""){
+							userGradeList_obj = JSON.parse(userGradeList);//JSON转为对象
+						}
 						var editor;
 						KindEditor.ready(function(K) {
 							
@@ -315,10 +343,13 @@
 								
 								uploadJson :'user/control/topic/upload.htm?method=upload',//指定浏览远程图片的服务器端程序
 								
-								items : ['source', 'fontsize', 'forecolor', 'hilitecolor', 'bold',
+								items : topicAvailableTag_obj,
+								
+								/**['source', 'fontsize', 'forecolor', 'hilitecolor', 'bold',
 							        'italic', 'underline',  '|', 'image', 'multiimage',
 							        'justifyleft','justifycenter','justifyright', 'insertorderedlist', 'insertunorderedlist',   'emoticons',
-							         'link', 'unlink','removeformat','hide'],
+							         'link', 'unlink','removeformat','hide'],**/
+							    userGradeList:userGradeList_obj,
 								afterChange : function() {
 									this.sync();
 								}

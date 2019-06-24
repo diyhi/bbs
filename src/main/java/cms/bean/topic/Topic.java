@@ -24,7 +24,7 @@ import javax.persistence.Transient;
 @Entity
 @Table(indexes = {@Index(name="topic_idx", columnList="tagId,status"),@Index(name="topic_2_idx", columnList="sort,postTime,status"),})
 public class Topic implements Serializable{
-	private static final long serialVersionUID = -2216815430532068900L;
+	private static final long serialVersionUID = -684257451052921859L;
 	
 	/** Id **/
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -82,6 +82,9 @@ public class Topic implements Serializable{
 	/** 用户名称 **/
 	@Column(length=30)
 	private String userName;
+	/** 呢称 **/
+	@Transient
+	private String nickname;
 	/** 头像路径 **/
 	@Transient
 	private String avatarPath;
@@ -228,6 +231,12 @@ public class Topic implements Serializable{
 	}
 	public void setLastUpdateTime(Date lastUpdateTime) {
 		this.lastUpdateTime = lastUpdateTime;
+	}
+	public String getNickname() {
+		return nickname;
+	}
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
 	}
 	
 }

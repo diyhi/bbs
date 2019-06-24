@@ -31,6 +31,9 @@ public class PrivateMessageEntity implements Serializable{
 	/** 私信对方用户名称 **/
 	@Transient
 	protected String friendUserName;
+	/** 私信对方呢称 **/
+	@Transient
+	protected String friendNickname;
 	/** 私信对方头像路径 **/
 	@Transient
 	protected String friendAvatarPath;
@@ -49,6 +52,9 @@ public class PrivateMessageEntity implements Serializable{
 	/** 发送者用户名称  **/
 	@Transient
 	protected String senderUserName;
+	/** 发送者呢称  **/
+	@Transient
+	protected String senderNickname;
 	/** 发送者头像路径 **/
 	@Transient
 	protected String senderAvatarPath;
@@ -176,6 +182,18 @@ public class PrivateMessageEntity implements Serializable{
 	}
 	public void setSenderAvatarName(String senderAvatarName) {
 		this.senderAvatarName = senderAvatarName;
+	}
+	public String getFriendNickname() {
+		return friendNickname;
+	}
+	public void setFriendNickname(String friendNickname) {
+		this.friendNickname = friendNickname;
+	}
+	public String getSenderNickname() {
+		return senderNickname;
+	}
+	public void setSenderNickname(String senderNickname) {
+		this.senderNickname = senderNickname;
 	}
 
 }

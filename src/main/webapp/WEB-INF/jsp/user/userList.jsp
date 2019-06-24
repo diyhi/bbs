@@ -178,6 +178,7 @@ function reductionUser(){
   <TR>
   	<TH width="3%"><INPUT name="all" <c:if test="${fn:length(pageView.records)<1}">disabled="disabled"</c:if> onclick="javascript:allSelect(this, 'userId')"  type="checkbox" ></TH>
     <TH>用户名称</TH>
+    <TH>呢称</TH>
     <TH>当前积分</TH>
     <TH>会员等级</TH>
     <TH>注册日期</TH>
@@ -188,9 +189,10 @@ function reductionUser(){
    <c:forEach items="${pageView.records}" var="entry">
 	  <TR >
 	  	<TD width="3%"><INPUT type="checkbox" value="${entry.id }" name="userId" onclick="javascript:chooseSelectBox(this);"></TD>
-	    <TD width="22%">${entry.userName }</TD>
+	    <TD width="15%">${entry.userName }</TD>
+	    <TD width="12%">${entry.nickname}</TD>
 	    <TD width="10%">${entry.point}</TD>
-	    <TD width="20%">${entry.gradeName}</TD>
+	    <TD width="15%">${entry.gradeName}</TD>
 	    <TD width="15%"><fmt:formatDate value="${entry.registrationDate}"  pattern="yyyy-MM-dd HH:mm:ss"/></TD>
 	    <TD width="10%">
 			<c:if test="${entry.state == 1 || entry.state == 11}">

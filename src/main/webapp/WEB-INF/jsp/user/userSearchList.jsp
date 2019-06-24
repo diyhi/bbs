@@ -286,7 +286,8 @@ function deleteUser(userId,state){
 <TABLE class="t-list-table" cellSpacing="1" cellPadding="0" width="100%" border="0">
   <THEAD class="t-list-thead">
   <TR>
-    <TH width="40%">用户名</TH>
+    <TH width="25%">用户名</TH>
+    <TH width="15%">呢称</TH>
     <TH width="15%">积分</TH>
     <TH width="15%">注册日期</TH>
     <TH width="10%">用户状态</TH>
@@ -296,6 +297,7 @@ function deleteUser(userId,state){
    <c:forEach items="${pageView.records}" var="entry">
 	  <TR >
 	    <TD>${entry.userName}</TD>
+	    <TD>${entry.nickname}</TD>
 		<TD>${entry.point}</TD>
 	    <TD><fmt:formatDate value="${entry.registrationDate}"  pattern="yyyy-MM-dd HH:mm:ss"/></TD>
 	    <TD>

@@ -84,7 +84,12 @@ public class SystemSettingManageAction {
 				systemSite.setEditorTagObject(editorTag);
 			}
 		}
-		
+		if(systemSite.getTopicEditorTag() != null && !"".equals(systemSite.getTopicEditorTag().trim())){
+			EditorTag editorTag = JsonUtils.toObject(systemSite.getTopicEditorTag(), EditorTag.class);
+			if(editorTag != null){
+				systemSite.setTopicEditorTagObject(editorTag);
+			}
+		}
 		model.addAttribute("systemSetting",systemSite);
 		return "jsp/setting/edit_systemSetting";
 	}
@@ -99,6 +104,7 @@ public class SystemSettingManageAction {
 		if (result.hasErrors()) {  
 			return "jsp/setting/edit_systemSetting";
 		}
+		formbean.setTopicEditorTag(JsonUtils.toJSONString(formbean.getTopicEditorTagObject()));
 		formbean.setEditorTag(JsonUtils.toJSONString(formbean.getEditorTagObject()));
 		
 		

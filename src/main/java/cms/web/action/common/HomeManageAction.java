@@ -23,6 +23,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.util.AntPathMatcher;
+import org.springframework.util.PathMatcher;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -47,6 +49,7 @@ import cms.bean.topic.Tag;
 import cms.bean.topic.Topic;
 import cms.bean.topic.TopicUnhide;
 import cms.bean.user.AccessUser;
+import cms.bean.user.DisableUserName;
 import cms.bean.user.FormCaptcha;
 import cms.bean.user.PointLog;
 import cms.bean.user.User;
@@ -143,6 +146,11 @@ public class HomeManageAction {
 	
 	@Resource FavoriteManage favoriteManage;
 	
+	//?  匹配任何单字符
+	//*  匹配0或者任意数量的字符
+	//** 匹配0或者更多的目录
+	private PathMatcher matcher = new AntPathMatcher(); 
+	
 	/**--------------------------------- 首页 -----------------------------------**/
 	/**
 	 * 用户中心页
@@ -200,6 +208,7 @@ public class HomeManageAction {
     			User viewUser = new User();
     			viewUser.setId(new_user.getId());
     			viewUser.setUserName(new_user.getUserName());//会员用户名
+    			viewUser.setNickname(new_user.getNickname());//呢称
     			viewUser.setState(new_user.getState());//用户状态
     			viewUser.setEmail(new_user.getEmail());//邮箱地址
     			viewUser.setIssue(new_user.getIssue());//密码提示问题
@@ -218,6 +227,7 @@ public class HomeManageAction {
       			User other_user = new User();
       			other_user.setId(new_user.getId());//Id
       			other_user.setUserName(new_user.getUserName());//会员用户名
+      			other_user.setNickname(new_user.getNickname());//呢称
       			other_user.setState(new_user.getState());//用户状态
       			other_user.setGradeId(new_user.getGradeId());//等级Id
       			other_user.setGradeName(new_user.getGradeName());//等级名称
@@ -522,6 +532,7 @@ public class HomeManageAction {
 			User viewUser = new User();
 			viewUser.setId(user.getId());
 			viewUser.setUserName(user.getUserName());//会员用户名
+			viewUser.setNickname(user.getNickname());//呢称
 			viewUser.setEmail(user.getEmail());//邮箱地址
 			viewUser.setIssue(user.getIssue());//密码提示问题
 			viewUser.setRegistrationDate(user.getRegistrationDate());//注册日期
@@ -632,6 +643,7 @@ public class HomeManageAction {
 		User viewUser = new User();
 		viewUser.setId(user.getId());
 		viewUser.setUserName(user.getUserName());//会员用户名
+		viewUser.setNickname(user.getNickname());//呢称
 		viewUser.setEmail(user.getEmail());//邮箱地址
 		viewUser.setIssue(user.getIssue());//密码提示问题
 		viewUser.setRegistrationDate(user.getRegistrationDate());//注册日期
@@ -894,18 +906,54 @@ public class HomeManageAction {
 			}else{
 				error.put("oldPassword", ErrorView._803.name());//旧密码不能为空
 			}
-			
-			
-			
 		}else{
 			new_user.setPassword(user.getPassword());
 			new_user.setSecurityDigest(user.getSecurityDigest());
 		}
 		
+		if(formbean.getNickname() != null && !"".equals(formbean.getNickname().trim())){
+			if(user.getNickname() == null || "".equals(user.getNickname().trim())){
+				if(formbean.getNickname().length()>15){
+					error.put("nickname", ErrorView._829.name());//呢称不能超过15个字符
+				}
+				User u = userService.findUserByNickname(formbean.getNickname().trim());
+				if(u != null){
+					error.put("nickname", ErrorView._830.name());//该呢称已存在
+				}
+			}else{
+				error.put("nickname", ErrorView._831.name());//不允许修改呢称
+			}
+			
+			User u1 = userService.findUserByUserName(formbean.getNickname().trim());
+			if(u1 != null){
+				error.put("nickname", ErrorView._833.name());//呢称不能和其他用户名相同
+			}
+			
+			List<DisableUserName> disableUserNameList = userService.findAllDisableUserName_cache();
+			if(disableUserNameList != null && disableUserNameList.size() >0){
+				for(DisableUserName disableUserName : disableUserNameList){
+					boolean flag = matcher.match(disableUserName.getName(), formbean.getNickname().trim());  //参数一: ant匹配风格   参数二:输入URL
+					if(flag){
+						error.put("nickname", ErrorView._832.name());//该呢称不允许使用
+					}
+				}
+			}
+
+			User u = userService.findUserByNickname(formbean.getNickname().trim());
+			if(u != null){
+				if(user.getNickname() == null || "".equals(user.getNickname()) || !formbean.getNickname().trim().equals(user.getNickname())){
+					error.put("nickname",ErrorView._830.name());//该呢称已存在
+				}
+				
+			}
+			new_user.setNickname(formbean.getNickname().trim());
+		}
 		
 		new_user.setId(user.getId());
 		new_user.setUserName(user.getUserName());
-		
+		if(new_user.getNickname() == null || "".equals(new_user.getNickname().trim())){
+			new_user.setNickname(user.getNickname());
+		}
 		new_user.setUserVersion(user.getUserVersion());
 		
 		
@@ -969,6 +1017,11 @@ public class HomeManageAction {
 			userManage.delete_cache_findUserById(new_user.getId());
 			userManage.delete_cache_findUserByUserName(new_user.getUserName());
 			
+			String accessToken = WebUtil.getCookieByName(request, "cms_accessToken");
+			if(accessToken != null && !"".equals(accessToken.trim())){
+				//删除访问令牌
+    			oAuthManage.deleteAccessToken(accessToken.trim());
+			}
 			
 			if(i == 0){
 				error.put("user", ErrorView._810.name());//修改用户失败
@@ -1006,7 +1059,6 @@ public class HomeManageAction {
 				
 				redirectAttrs.addFlashAttribute("error", returnError);//重定向传参
 				redirectAttrs.addFlashAttribute("userCustomList", userCustomList);
-				
 				String referer = request.getHeader("referer");	
 
 				referer = StringUtils.removeStartIgnoreCase(referer,Configuration.getUrl(request));//移除开始部分的相同的字符,不区分大小写
@@ -1328,6 +1380,7 @@ public class HomeManageAction {
 			User viewUser = new User();
 			viewUser.setId(user.getId());
 			viewUser.setUserName(user.getUserName());//会员用户名
+			viewUser.setNickname(user.getNickname());//呢称
 			viewUser.setMobile(user.getMobile());
 			viewUser.setRealNameAuthentication(user.isRealNameAuthentication());
 	    	
@@ -2128,6 +2181,7 @@ public class HomeManageAction {
 					User friend_user = userMap.get(privateMessage.getFriendUserId());
 					if(friend_user != null){
 						privateMessage.setFriendUserName(friend_user.getUserName());//私信对方用户名称
+						privateMessage.setFriendNickname(friend_user.getNickname());
 						if(friend_user.getAvatarName() != null && !"".equals(friend_user.getAvatarName().trim())){
 							privateMessage.setFriendAvatarPath(friend_user.getAvatarPath());//私信对方头像路径
 							privateMessage.setFriendAvatarName(friend_user.getAvatarName());//私信对方头像名称
@@ -2136,6 +2190,7 @@ public class HomeManageAction {
 					User sender_user = userMap.get(privateMessage.getSenderUserId());
 					if(sender_user != null){
 						privateMessage.setSenderUserName(sender_user.getUserName());//私信发送者用户名称
+						privateMessage.setSenderNickname(sender_user.getNickname());
 						if(sender_user.getAvatarName() != null && !"".equals(sender_user.getAvatarName().trim())){
 							privateMessage.setSenderAvatarPath(sender_user.getAvatarPath());//发送者头像路径
 							privateMessage.setSenderAvatarName(sender_user.getAvatarName());//发送者头像名称
@@ -2236,6 +2291,7 @@ public class HomeManageAction {
 							User friend_user = userMap.get(privateMessage.getFriendUserId());
 							if(friend_user != null){
 								privateMessage.setFriendUserName(friend_user.getUserName());//私信对方用户名称
+								privateMessage.setFriendNickname(friend_user.getNickname());
 								if(friend_user.getAvatarName() != null && !"".equals(friend_user.getAvatarName().trim())){
 									privateMessage.setFriendAvatarPath(friend_user.getAvatarPath());//私信对方头像路径
 									privateMessage.setFriendAvatarName(friend_user.getAvatarName());//私信对方头像名称
@@ -2244,6 +2300,7 @@ public class HomeManageAction {
 							User sender_user = userMap.get(privateMessage.getSenderUserId());
 							if(sender_user != null){
 								privateMessage.setSenderUserName(sender_user.getUserName());//私信发送者用户名称
+								privateMessage.setSenderNickname(sender_user.getNickname());
 								if(sender_user.getAvatarName() != null && !"".equals(sender_user.getAvatarName().trim())){
 									privateMessage.setSenderAvatarPath(sender_user.getAvatarPath());//发送者头像路径
 									privateMessage.setSenderAvatarName(sender_user.getAvatarName());//发送者头像名称
@@ -2276,6 +2333,7 @@ public class HomeManageAction {
 			User viewUser = new User();
 			viewUser.setId(chatUser.getId());
 			viewUser.setUserName(chatUser.getUserName());//会员用户名
+			viewUser.setNickname(chatUser.getNickname());//呢称
 			viewUser.setRegistrationDate(chatUser.getRegistrationDate());//注册日期
 
 			List<UserGrade> userGradeList = userGradeService.findAllGrade_cache();//取得用户所有等级
@@ -3082,6 +3140,7 @@ public class HomeManageAction {
 						User sender_user = userMap.get(remind.getSenderUserId());
 						if(sender_user != null){
 							remind.setSenderUserName(sender_user.getUserName());//发送者用户名称
+							remind.setSenderNickname(sender_user.getNickname());
 							if(sender_user.getAvatarName() != null && !"".equals(sender_user.getAvatarName().trim())){
 								remind.setSenderAvatarPath(sender_user.getAvatarPath());//发送者头像路径
 								remind.setSenderAvatarName(sender_user.getAvatarName());//发送者头像名称

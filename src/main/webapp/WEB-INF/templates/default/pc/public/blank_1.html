@@ -110,7 +110,7 @@
 				</div>
 			</div>
 			
-			<#-- 引入话题取消隐藏 -->
+			<#-- 引入话题取消隐藏 本方法处理话题隐藏内容 -->
 			<@include action="${topicRelated_topicUnhide_1}"/> 
 			
 			
@@ -146,7 +146,11 @@
 							<img src="${commonPath}images/min_avata.png" >
 						</#if> 
 					</a>
-					<span><a href="user/control/home?userName=${topic.userName}">${topic.userName}</a></span>
+					<span>
+						<a href="user/control/home?userName=${topic.userName}">
+							${(topic.nickname != null && topic.nickname??) ?string(topic.nickname , topic.userName)}
+						</a>
+					</span>
 				</div>
 				<div class="userInfo">
 					<span>${topic.postTime}</span>

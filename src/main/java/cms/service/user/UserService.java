@@ -62,7 +62,12 @@ public interface UserService extends DAO<User> {
 	 * @return
 	*/
 	public User findUserByUserName(String userName);
-	
+	/**
+	 * 根据呢称查询当前用户
+	 * @param nickname 呢称
+	 * @return
+	 */
+	public User findUserByNickname(String nickname);
 	
 	/**
 	 * 保存用户

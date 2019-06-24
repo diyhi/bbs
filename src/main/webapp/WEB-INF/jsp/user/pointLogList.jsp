@@ -35,6 +35,7 @@
 	    	<c:if test="${entry.module == 100}">发表话题</c:if>
 	    	<c:if test="${entry.module == 200}">发表评论</c:if>
 	    	<c:if test="${entry.module == 300}">发表回复</c:if>
+	    	<c:if test="${entry.module == 400}">积分购买话题</c:if>
 	    </TD>
 	    <TD width="15%">
 	    	${entry.userName}

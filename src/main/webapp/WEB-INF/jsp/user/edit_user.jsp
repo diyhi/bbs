@@ -38,6 +38,12 @@ function sureSubmit(objForm){
     <TD class="t-content" width="88%" colSpan="3">
     	${user.userName }
     </TD></TR>
+    <TR>
+    <TD class="t-label t-label-h" width="12%">呢称：</TD>
+    <TD class="t-content" width="88%" colSpan="3">
+    	<input name="nickname" size="50" maxlength="60" value="${user.nickname}"/>
+    	&nbsp;&nbsp;<span class="span-text">${error['nickname']}</span>
+    </TD></TR>
   <TR>
     <TD class="t-label t-label-h" width="12%"><SPAN class="span-text">*</SPAN>密码：</TD>
     <TD class="t-content" width="88%" colSpan="3">

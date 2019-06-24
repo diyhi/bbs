@@ -1,9 +1,11 @@
 KindEditor.plugin('hide', function(K) {
 	//self为编辑器(Editor) API
 	var self = this, name = 'hide',
-	
+	userGradeList = K.undef(self.userGradeList, []),
+	items = K.undef(self.items, []),
 	tabIndex = K.undef(0, 0);
-
+	
+	
 	/**
 	 * 替换标签
 	 * html html内容
@@ -11,11 +13,11 @@ KindEditor.plugin('hide', function(K) {
 	 * className css样式名称
 	 * inputValue 替换标签值
 	 */
-	function replaceTab(html,tag,className,inputValue){
+	function replaceTab(html,tag,className,inputValue,description){
 		var node = document.createElement("div");
 		node.innerHTML = html;
 		
-		getChildNode(node,tag,className,inputValue);
+		getChildNode(node,tag,className,inputValue,description);
 		return node.innerHTML;
 	}
 	
@@ -25,9 +27,10 @@ KindEditor.plugin('hide', function(K) {
 	 * tag 标签名称
 	 * className css样式名称
 	 * inputValue 替换标签值
+	 * description 描述
 	 * 
 	 */
-	function getChildNode(node,tag,className,inputValue){
+	function getChildNode(node,tag,className,inputValue,description){
         //先找到子节点
         var nodeList = node.childNodes;
         for(var i = 0;i < nodeList.length;i++){
@@ -40,9 +43,11 @@ KindEditor.plugin('hide', function(K) {
             	if(childNode.nodeName.toLowerCase() == tag.toLowerCase() && 
             			childNode.getAttribute("class") == className){
             		childNode.setAttribute("input-value",inputValue);
-            		 
+            		if(description != null && description != ""){
+            			childNode.setAttribute("description",description);
+            		}
             	}
-                getChildNode(childNode,tag,className,inputValue);
+                getChildNode(childNode,tag,className,inputValue,description);
             }
         }
     }
@@ -50,9 +55,23 @@ KindEditor.plugin('hide', function(K) {
 
     // 点击图标时执行
 	self.plugin.hideDialog = function(options) {
+		var userGradeHtml = "";
+		if(userGradeList != null && userGradeList.length >0){
+			userGradeHtml += '<select id="inputValue_30" name="inputValue_30" >';
+			for(var i=0; i<userGradeList.length; i++){
+				var userGrade = userGradeList[i];
+					
+				userGradeHtml += '<option value="'+userGrade.needPoint+'" '+ (options.hideGrade == userGrade.needPoint ? 'selected="selected"' : "")	+'>'+userGrade.name+'</option>';
+			}
+			userGradeHtml += '</select> 以上可见';
+		}
 		
 		var lang = self.lang(name + '.'),
 		selectedNode = options.selectedNode,
+		
+		
+		
+		
 		
 		html = [
 				'<div style="padding:20px;height:130px;">',
@@ -73,10 +92,10 @@ KindEditor.plugin('hide', function(K) {
 					
 					//选项3
 					'<div class="tab3" style="display:none;">',
-						//超过积分
+						//达到等级
 						'<div class="ke-dialog-row">',
-						'<label for="inputValue_30" style="width:60px;">积分超过</label>',
-						'<input type="text" id="inputValue_30" class="ke-input-text ke-input-number" name="inputValue_30" value="'+options.hideMinPoint+'" maxlength="8" style="width:130px;" /> 以上可见 ',
+						'<label for="inputValue_30" style="width:60px;">达到等级</label>',
+						userGradeHtml,
 						'</div>',
 					'</div>',
 					//选项4
@@ -116,9 +135,25 @@ KindEditor.plugin('hide', function(K) {
 					
 					html = "";
 					var password = K.trim(passwordBox.val()),
-					minPoint = K.trim(minPointBox.val()),
+					grade = K.trim(gradeBox.val()),
 					point = K.trim(pointBox.val()),
 					amount = K.trim(amountBox.val());
+					//等级标签
+					var gradeTag = "";
+					if(userGradeList != null && userGradeList.length >0){
+						for(var i=0; i<userGradeList.length; i++){
+							var userGrade = userGradeList[i];
+							if(userGrade.needPoint == grade){
+								gradeTag = userGrade.name;
+							}
+						}
+					}
+					
+					
+				//	console.log(gradeTag);
+				//	console.log(gradeBox.text());
+				//	console.log(gradeBox.find("option:selected").text());
+					
 					
 					if(tabIndexBox == 0){//输入密码可见
 						if (password == "") {
@@ -128,10 +163,12 @@ KindEditor.plugin('hide', function(K) {
 						}
 					}else if(tabIndexBox == 1){//回复话题可见
 						
-					}else if(tabIndexBox == 2){//超过积分可见
-						if (minPoint == "" || !/^[0-9]*[1-9][0-9]*$/.test(minPoint)) {//正整数
-							alert("请输入大于0的数字");
-							minPointBox[0].focus();
+					}else if(tabIndexBox == 2){//达到等级可见
+						if (grade == "" || !/^[0-9]*[1-9][0-9]*$/.test(grade)) {//正整数
+							alert("请选择等级");
+							if(gradeBox[0] != null){
+								gradeBox[0].focus();
+							}
 							return;
 						}
 					}else if(tabIndexBox == 3){//积分购买可见
@@ -158,10 +195,11 @@ KindEditor.plugin('hide', function(K) {
 							selectedNode.attr('class','inputValue_20');
 							selectedNode.attr('hide-type',20);
 							selectedNode.attr('input-value','');
-						}else if(tabIndexBox == 2){//超过积分可见
+						}else if(tabIndexBox == 2){//达到等级可见
 							selectedNode.attr('class','inputValue_30');
 							selectedNode.attr('hide-type',30);
-							selectedNode.attr('input-value',minPoint);
+							selectedNode.attr('input-value',grade);
+							selectedNode.attr('description',gradeTag);
 						}else if(tabIndexBox == 3){//积分购买可见
 							selectedNode.attr('class','inputValue_40');
 							selectedNode.attr('hide-type',40);
@@ -178,7 +216,7 @@ KindEditor.plugin('hide', function(K) {
 						}else if(tabIndexBox == 1){//评论话题可见
 							html = "<hide class='inputValue_20' hide-type='20' ></hide>";
 						}else if(tabIndexBox == 2){//达到等级可见
-							html = "<hide class='inputValue_30' hide-type='30' input-value='"+minPoint+"'></hide>";
+							html = "<hide class='inputValue_30' hide-type='30' input-value='"+grade+"' description='"+gradeTag+"'></hide>";
 						}else if(tabIndexBox == 3){//积分购买可见
 							html = "<hide class='inputValue_40' hide-type='40' input-value='"+point+"'></hide>";
 						}else if(tabIndexBox == 4){//余额购买可见
@@ -194,9 +232,9 @@ KindEditor.plugin('hide', function(K) {
 						self.html(htmlValue);
 					}else if(tabIndexBox == 1){//回复话题可见
 						
-					}else if(tabIndexBox == 2){//超过积分可见
+					}else if(tabIndexBox == 2){//达到等级可见
 						//替换标签
-						var htmlValue = replaceTab(self.html(),"hide","inputValue_30",""+minPoint+"");
+						var htmlValue = replaceTab(self.html(),"hide","inputValue_30",""+grade+"",""+gradeTag+"");
 						self.html(htmlValue);
 					}else if(tabIndexBox == 3){//积分购买可见
 						var htmlValue = replaceTab(self.html(),"hide","inputValue_40",""+point+""); 
@@ -210,7 +248,7 @@ KindEditor.plugin('hide', function(K) {
 				},
 				beforeRemove : function() {
 					passwordBox.unbind();//移除所有事件函数
-					minPointBox.unbind();
+					gradeBox.unbind();
 					pointBox.unbind();
 					amountBox.unbind();
 					
@@ -221,7 +259,7 @@ KindEditor.plugin('hide', function(K) {
 		
 		
 		passwordBox = K('[name="inputValue_10"]', div),//密码
-		minPointBox = K('[name="inputValue_30"]', div),//需要积分
+		gradeBox = K('[name="inputValue_30"]', div),//达到等级
 		pointBox = K('[name="inputValue_40"]', div),//积分
 		amountBox = K('[name="inputValue_50"]', div);//金额
 		tabIndexBox = 0;
@@ -231,7 +269,7 @@ KindEditor.plugin('hide', function(K) {
 			tabIndex = 0;
 		}else if(options.hideVisibleType == 20){//回复话题可见
 			tabIndex = 1;
-		}else if(options.hideVisibleType == 30){//超过积分可见
+		}else if(options.hideVisibleType == 30){//达到等级可见
 			tabIndex = 2;
 		}else if(options.hideVisibleType == 40){//积分购买可见
 			tabIndex = 3;
@@ -247,27 +285,53 @@ KindEditor.plugin('hide', function(K) {
 				tabIndexBox = i;
 			}
 		});
+		
+		
+		var tabTitle1 = "";
+		var tabTitle2 = "";
+		var tabTitle3 = "";
+		var tabTitle4 = "";
+		var tabTitle5 = "";
+		for(var i = 0;i < items.length;i++){
+			var item = items[i];
+			if(item == "hidePassword"){
+				tabTitle1 = "输入密码可见";
+			}
+			if(item == "hideComment"){
+				tabTitle2 = "回复话题可见";
+			}
+			if(item == "hideGrade"){
+				tabTitle3 = "达到等级可见";
+			}	
+			if(item == "hidePoint"){
+				tabTitle4 = "积分购买可见";
+			}
+			if(item == "hideAmount"){
+				tabTitle5 = "余额购买可见";
+			}
+		}
+
 		tabs.add({
-			title : '输入密码可见',
+			title : tabTitle1,//输入密码可见
 			panel : K('.tab1', div)
 		});
 		tabs.add({
-			title : '回复话题可见',
+			title : tabTitle2,//回复话题可见
 			panel : K('.tab2', div)
 		});
-		/**
 		tabs.add({
-			title : '超过积分可见',
+			title : tabTitle3,//达到等级可见
 			panel : K('.tab3', div)
 		});
 		tabs.add({
-			title : '积分购买可见',
+			title : tabTitle4,//积分购买可见
 			panel : K('.tab4', div)
 		});
 		tabs.add({
-			title : '余额购买可见',
+			title : tabTitle5,//余额购买可见
 			panel : K('.tab5', div)
-		});**/
+		});
+		
 		tabs.select(tabIndex);
 
 		K('.tab'+(tabIndex+1), div).show();
@@ -283,7 +347,7 @@ KindEditor.plugin('hide', function(K) {
 				hideInputValue : hide ? hide.attr('input-value') : '',
 				hideVisibleType : hide ? hide.attr('hide-type') : '',
 				hidePassword : (hide && hide.attr('hide-type') == 10 )? hide.attr('input-value') : '',	
-				hideMinPoint : (hide && hide.attr('hide-type') == 30 )? hide.attr('input-value') : '',	
+				hideGrade : (hide && hide.attr('hide-type') == 30 )? hide.attr('input-value') : '',	
 				hidePoint : (hide && hide.attr('hide-type') == 40 )? hide.attr('input-value') : '',
 				hideAmount : (hide && hide.attr('hide-type') == 50 )? hide.attr('input-value') : '',		
 						
@@ -305,7 +369,7 @@ KindEditor.plugin('hide', function(K) {
 			hideInputValue : '',
 			hideVisibleType : '',
 			hidePassword : '',	
-			hideMinPoint : '',	
+			hideGrade : '',	
 			hidePoint : '',
 			hideAmount : ''	
 		});

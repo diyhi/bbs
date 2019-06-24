@@ -113,3 +113,17 @@ self.plugin.getSelectedHide = function() {
 		'</script>',
 		'<![endif]-->',
 
+---------------------------------------------
+4496行修改
+if(tab.title != ''){
+			var li = K('<li class="ke-tabs-li">' + tab.title + '</li>');
+			li.data('tab', tab);
+			liList.push(li);
+			ul.append(li);
+			
+		}else{//如果标题为空，则不使用样式
+			var li = K('<li class="">' + tab.title + '</li>');
+			li.data('tab', tab);
+			liList.push(li);
+			ul.append(li);
+		}

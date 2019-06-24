@@ -18,7 +18,7 @@ public class CommentManage {
 	/**
 	 * 评论编辑器允许使用标签
 	 * @return List<String> 类型json格式
-	 */
+	*/
 	public String availableTag(){
 		List<String> tag = new ArrayList<String>();
 		EditorTag editor = settingManage.readEditorTag();

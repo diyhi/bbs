@@ -108,9 +108,7 @@ public class FavoriteFormAction {
 		  		error.put("topicFavorite", ErrorView._1520.name());//当前话题已经收藏
 		  	}
 		}
-	  	
-	  	
-
+	  
 		if(error.size() == 0){
 			Date time = new Date();
 			Favorites favorites = new Favorites();

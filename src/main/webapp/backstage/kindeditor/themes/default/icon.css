@@ -1,0 +1,102 @@
+.toolbar-icon-url {
+	background-image: url(default.png);
+	display:inline-block;
+	vertical-align:top;
+
+}
+.icon-new {
+	background-position: 0px -1200px;
+	width: 16px;
+	height: 16px;
+}
+.icon-fontname {
+	background-position: 0px -352px;
+	width: 21px;
+	height: 16px;
+}
+.icon-fontsize {
+	background-position: 0px -368px;
+	width: 23px;
+	height: 16px;
+}
+.icon-forecolor {
+	background-position: 0px -384px;
+	width: 20px;
+	height: 16px;
+}
+.icon-hilitecolor {
+	background-position: 0px -400px;
+	width: 23px;
+	height: 16px;
+}
+.icon-bold {
+	background-position: 0px -416px;
+	width: 16px;
+	height: 16px;
+}
+.icon-italic {
+	background-position: 0px -432px;
+	width: 16px;
+	height: 16px;
+}
+.icon-underline {
+	background-position: 0px -448px;
+	width: 16px;
+	height: 16px;
+}
+.icon-removeformat {
+	background-position: 0px -480px;
+	width: 16px;
+	height: 16px;
+}
+.icon-link {
+	background-position: 0px -624px;
+	width: 16px;
+	height: 16px;
+}
+.icon-unlink {
+	background-position: 0px -640px;
+	width: 16px;
+	height: 16px;
+}
+.icon-justifyleft {
+	background-position: 0px -144px;
+	width: 16px;
+	height: 16px;
+}
+.icon-justifycenter {
+	background-position: 0px -160px;
+	width: 16px;
+	height: 16px;
+}
+.icon-justifyright {
+	background-position: 0px -176px;
+	width: 16px;
+	height: 16px;
+}
+.icon-insertorderedlist {
+	background-position: 0px -208px;
+	width: 16px;
+	height: 16px;
+}
+.icon-insertunorderedlist {
+	background-position: 0px -224px;
+	width: 16px;
+	height: 16px;
+}
+.icon-emoticons {
+	background-position: 0px -608px;
+	width: 16px;
+	height: 16px;
+}
+.icon-image {
+	background-position: 0px -496px;
+	width: 16px;
+	height: 16px;
+}
+.icon-hide {
+	background-image: url(../../plugins/hide/hide.png);
+	display:inline-block;
+	vertical-align:top;
+}
+

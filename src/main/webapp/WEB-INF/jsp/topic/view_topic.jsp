@@ -284,6 +284,8 @@ $(function() {
 <enhance:out escapeXml="false">
 <input type="hidden" id="availableTag" value="<c:out value="${availableTag}"></c:out>">
 </enhance:out>
+
+
 <DIV class="d-box">
 <div class="d-button">
 	<c:if test="${param.origin == null || param.origin == '' || param.origin ==1}">
@@ -494,6 +496,9 @@ var availableTag = ['source', '|'];
 		if(availableTag != ""){
 			var availableTag_obj = JSON.parse(availableTag);//JSON转为对象
 		}
+		
+		
+		
 		var topicId = "${param.topicId}";
 		
 	
@@ -506,6 +511,7 @@ var availableTag = ['source', '|'];
 			allowImageUpload : true,//true时显示图片上传按钮
 			uploadJson :'${config:url(pageContext.request)}control/comment/manage.htm?method=uploadImage&topicId='+topicId+"&userName=${userName}&isStaff=true&${_csrf.parameterName}=${_csrf.token}",//指定浏览远程图片的服务器端程序
 			items : availableTag_obj,
+			
 			afterChange : function() {
 				this.sync();
 			}

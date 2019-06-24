@@ -117,7 +117,7 @@ public class CaptchaAction {
     		}
 			
 			String _captcha = captchaManage.captcha_generate(captchaKey.trim(),"");
-			if(_captcha != null && _captcha.equals(captchaValue)){
+			if(_captcha != null && _captcha.equalsIgnoreCase(captchaValue)){
 				return "true";
 			}
 		}

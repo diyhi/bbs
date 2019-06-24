@@ -296,6 +296,32 @@ public enum ErrorView {
 			return "找回密码错误";
 		}
 	},
+	_829{
+		public String getContent(){
+			return "呢称不能超过15个字符";
+		}
+	},
+	_830{
+		public String getContent(){
+			return "该呢称已存在";
+		}
+	},
+	_831{
+		public String getContent(){
+			return "不允许修改呢称";
+		}
+	},
+	_832{
+		public String getContent(){
+			return "该呢称不允许使用";
+		}
+	},
+	_833{
+		public String getContent(){
+			return "呢称不能和其他用户名相同";
+		}
+	},
+	
 	_850{
 		public String getContent(){
 			return "手机验证码错误";
@@ -531,7 +557,29 @@ public enum ErrorView {
 		public String getContent(){
 			return "密码不能为空";
 		}
+	},
+	_1660{
+		public String getContent(){
+			return "话题内容不含当前标签";
+		}
+	},
+	_1670{
+		public String getContent(){
+			return "用户不存在";
+		}
+	},
+	_1680{
+		public String getContent(){
+			return "用户积分不足";
+		}
+	},
+	_1690{
+		public String getContent(){
+			return "不允许解锁自已发表的话题";
+		}
 	};
+	
+	
 	
 	
 	

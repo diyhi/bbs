@@ -37,6 +37,10 @@ public class User implements Serializable{
 	/** 会员用户名 **/
 	@Column(length=30)
 	private String userName;
+	/** 呢称 **/
+	@Column(length=50)
+	private String nickname;
+	
 	/** 密码 密码结构: sha256(sha256(密码)+[盐值])  **/
 	@Column(length=160)
 	private String password;
@@ -215,6 +219,12 @@ public class User implements Serializable{
 	}
 	public void setAvatarName(String avatarName) {
 		this.avatarName = avatarName;
+	}
+	public String getNickname() {
+		return nickname;
+	}
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
 	}
 
 }

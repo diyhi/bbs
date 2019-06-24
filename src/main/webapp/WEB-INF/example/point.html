@@ -177,7 +177,7 @@
 		<tr> 
 			<td>module</td> 
 			<td>Integer</td>
-			<td>模块 100.话题  200.评论  300.回复</td>
+			<td>模块 100.话题  200.评论  300.回复 400.积分购买话题</td>
 		</tr>
 		<tr> 
 			<td>parameterId</td> 
@@ -244,6 +244,11 @@
 			<td>会员用户名</td>
 		</tr>
 		<tr> 
+			<td>nickname</td> 
+			<td>String</td>
+			<td>呢称</td>
+		</tr>
+		<tr> 
 			<td>email</td> 
 			<td>String</td>
 			<td>邮箱地址</td>
@@ -291,7 +296,9 @@
 			发表评论
 		<#elseif pointLog.module == 300>
 			发表回复
-		</#if>				
+		<#elseif pointLog.module == 400>
+			积分购买话题
+		</#if>					
 		
 		<#-- 收入/支出 -->
 		<#if pointLog.pointState == 1>

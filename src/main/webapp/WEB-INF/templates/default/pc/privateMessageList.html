@@ -48,7 +48,9 @@
 								</#if>
 							</a>
 							<cite>
-								<a href="user/control/home?userName=${privateMessage.friendUserName}">${privateMessage.friendUserName}</a>
+								<a href="user/control/home?userName=${privateMessage.friendUserName}">
+								${(privateMessage.friendNickname != null && privateMessage.friendNickname??) ?string(privateMessage.friendNickname , privateMessage.friendUserName)}
+								</a>
 							</cite> 
 							<div class="tipBottom">
 								<span class="a-toolbar">

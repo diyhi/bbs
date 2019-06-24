@@ -32,7 +32,15 @@ function sureSubmit(objForm){
     <TD class="t-content" width="88%" colSpan="3">
     	<input name="userName" size="30" maxlength="30" value="${user.userName }"/>&nbsp;&nbsp;
     	<form:errors path="userName" class="span-text"/>
-   		<SPAN class="span-help">会员用户名只能输入由数字、26个英文字母或者下划线组成</SPAN></TD></TR>
+   		<SPAN class="span-help">会员用户名只能输入由数字、26个英文字母或者下划线组成</SPAN>
+   	</TD>
+  </TR>
+  <TR>
+    <TD class="t-label t-label-h" width="12%">呢称：</TD>
+    <TD class="t-content" width="88%" colSpan="3">
+    	<input name="nickname" size="30" maxlength="30" value="${user.nickname}"/>&nbsp;&nbsp;
+    	<form:errors path="nickname" class="span-text"/>
+   	</TD></TR>
   <TR>
     <TD class="t-label t-label-h" width="12%"><SPAN class="span-text">*</SPAN>密码：</TD>
     <TD class="t-content" width="88%" colSpan="3">

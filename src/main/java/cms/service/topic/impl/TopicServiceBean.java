@@ -22,6 +22,7 @@ import cms.service.besa.DaoSupport;
 import cms.service.favorite.FavoriteService;
 import cms.service.message.RemindService;
 import cms.service.topic.TopicService;
+import cms.service.user.UserService;
 import cms.utils.ObjectConversion;
 import cms.web.action.topic.TopicUnhideConfig;
 import net.sf.cglib.beans.BeanCopier;
@@ -38,7 +39,7 @@ public class TopicServiceBean extends DaoSupport<Topic> implements TopicService{
 	@Resource RemindService remindService;
 	@Resource FavoriteService favoriteService;
 	@Resource TopicUnhideConfig topicUnhideConfig;
-	
+	@Resource UserService userService;
 	/**
 	 * 根据Id查询话题
 	 * @param topicId 话题Id
@@ -395,9 +396,24 @@ public class TopicServiceBean extends DaoSupport<Topic> implements TopicService{
 	/**
 	 * 保存'话题取消隐藏'
 	 * @param topicUnhide
+	 * @param point 积分
+	 * @param consumption_userName 消费用户名称
+	 * @param consumption_pointLogObject 消费积分日志
+	 * @param income_userName 收入用户名称
+	 * @param income_pointLogObject 收入积分日志
 	 */
-	public void saveTopicUnhide(Object topicUnhide){
-		this.save(topicUnhide);
+	public void saveTopicUnhide(Object topicUnhide,Long point,String consumption_userName,Object consumption_pointLogObject,String income_userName,Object income_pointLogObject){
+		if(point != null && point >0L){
+			//扣减用户积分
+			int i = userService.subtractUserPoint(consumption_userName,point, consumption_pointLogObject);
+			if(i >0){
+				this.save(topicUnhide);
+				if(income_pointLogObject != null){
+					//增加用户积分
+					userService.addUserPoint(income_userName,point,income_pointLogObject);
+				}
+			}
+		}
 	}
 	
 	/**

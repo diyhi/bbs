@@ -21,6 +21,8 @@ public class Quote implements Serializable{
 	private String ipAddress;
 	/** 用户名称 **/
 	private String userName;
+	/** 呢称 **/
+	private String nickname;
 	/** 评论内容 **/
 	private String content;
 	public Long getCommentId() {
@@ -58,6 +60,12 @@ public class Quote implements Serializable{
 	}
 	public void setIpAddress(String ipAddress) {
 		this.ipAddress = ipAddress;
+	}
+	public String getNickname() {
+		return nickname;
+	}
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
 	}
 	
 	

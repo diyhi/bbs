@@ -668,71 +668,73 @@ public class TemplateManageAction {
 		// 迭代输出
 		for (Iterator<File> iterator = files.iterator(); iterator.hasNext();) {
 		    File file = iterator.next();
-		   
-		    //读取压缩文件
-		    ZipFile zip = null;
-			try {
-				zip = new ZipFile(file);
-				Templates templates = new Templates();
-				
-				templates.setFileName(file.getName());
-				Enumeration<ZipArchiveEntry> entry = zip.getEntries();
-				A:while(entry.hasMoreElements()){//依次访问各条目
-					ZipArchiveEntry ze = entry.nextElement();  
-					String fileName = fileManage.getName(ze.getName());//文件名称
+		  //允许上传图片格式
+			List<String> formatList = new ArrayList<String>();
+			formatList.add("zip");
+			
+			//验证文件后缀
+			boolean fileSuffix = fileManage.validateFileSuffix(file.getName(),formatList);
+			if(fileSuffix){
+				//读取压缩文件
+			    ZipFile zip = null;
+				try {
+					zip = new ZipFile(file);
+					Templates templates = new Templates();
 					
-					if(templates.getDirName() == null || "".equals(templates.getDirName())){		
-						//截取到等于第二个参数的字符串为止
-						templates.setDirName(StringUtils.substringBefore(ze.getName(), "/"));	
+					templates.setFileName(file.getName());
+					Enumeration<ZipArchiveEntry> entry = zip.getEntries();
+					A:while(entry.hasMoreElements()){//依次访问各条目
+						ZipArchiveEntry ze = entry.nextElement();  
+						String fileName = fileManage.getName(ze.getName());//文件名称
+						
+						if(templates.getDirName() == null || "".equals(templates.getDirName())){		
+							//截取到等于第二个参数的字符串为止
+							templates.setDirName(StringUtils.substringBefore(ze.getName(), "/"));	
+						}
+						
+						 //读取配置文件
+					    if("templateData.data".equals(fileName)){
+					    		
+							InputStream in = zip.getInputStream(ze);
+							ByteArrayOutputStream baos = new ByteArrayOutputStream();  
+				    			int i;  
+				    			while ((i = in.read()) != -1) {  
+				    			    baos.write(i);  
+				    			}  
+				    			String str = baos.toString("utf-8"); 
+				    			if(str != null && !"".equals(str)){
+				    				
+				    				
+				    				
+				    				TemplateData templateData = JsonUtils.toGenericObject(str, new TypeReference<TemplateData>(){});
+				    				if(templateData != null){
+				    					if(templateData.getTemplates() != null){
+				    						templates.setName(templateData.getTemplates().getName());
+				    		    			templates.setIntroduction(templateData.getTemplates().getIntroduction());
+				    					}
+				    				}
+				    			
+				    			}	
+								
+							break A;
+					    }
+					}
+					templatesList.add(templates);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+				//	e.printStackTrace();
+					if (logger.isErrorEnabled()) {
+			            logger.error("导入模板列表",e);
+			        }
+				}finally{
+					if(zip != null){
+						zip.close();
 					}
 					
-					 //读取配置文件
-				    if("templateData.data".equals(fileName)){
-				    		
-						InputStream in = zip.getInputStream(ze);
-						ByteArrayOutputStream baos = new ByteArrayOutputStream();  
-			    			int i;  
-			    			while ((i = in.read()) != -1) {  
-			    			    baos.write(i);  
-			    			}  
-			    			String str = baos.toString("utf-8"); 
-			    			if(str != null && !"".equals(str)){
-			    				
-			    				
-			    				
-			    				TemplateData templateData = JsonUtils.toGenericObject(str, new TypeReference<TemplateData>(){});
-			    				if(templateData != null){
-			    					if(templateData.getTemplates() != null){
-			    						templates.setName(templateData.getTemplates().getName());
-			    		    			templates.setIntroduction(templateData.getTemplates().getIntroduction());
-			    					}
-			    				}
-			    			
-			    			}	
-							
-						break A;
-				    }
 				}
-				templatesList.add(templates);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-			//	e.printStackTrace();
-				if (logger.isErrorEnabled()) {
-		            logger.error("导入模板列表",e);
-		        }
-			}finally{
-				if(zip != null){
-					zip.close();
-				}
-				
 			}
-			
 		}
-		
-		
-		
-		
-		
+
 		model.addAttribute("templatesList",templatesList);
 		return "jsp/template/importTemplateList";
 	}

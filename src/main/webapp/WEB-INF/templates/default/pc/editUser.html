@@ -840,6 +840,20 @@
 			    		<td align="left">${user.userName}</td>
 					</tr>
 					<tr>
+						<td width="120px" align="right">呢称： </td>
+						<td align="left">
+							<#if user.nickname != null && user.nickname??>
+								${user.nickname}
+							
+							<#else>
+								<input type="text" id="nickname" name="nickname" class="formText" autocomplete="off" size="25" maxlength="20" />
+								<span id="nickname_error" class="error">${(error['nickname'])!}</span>
+								<span class="help">不设置请留空</span> 
+							</#if>
+							
+						</td>
+					</tr>
+					<tr>
 						<td width="120px" align="right">旧密码： </td>
 						<td align="left">
 							<input type="password" id="oldPassword" name="oldPassword" class="formText" autocomplete="off" size="25" maxlength="20" onBlur="verification(this.id)"/>

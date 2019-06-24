@@ -102,6 +102,7 @@ public class UserManageAction {
 	
 	@Resource TopicLuceneManage topicLuceneManage;
 	
+	
 	/**
 	 * 用户管理 查看
 	 */
@@ -404,6 +405,10 @@ public class UserManageAction {
 		User user = new User();
 		user.setSalt(UUIDUtil.getUUID32());
 		user.setUserName(formbean.getUserName().trim());
+		if(formbean.getNickname() != null && !"".equals(formbean.getNickname().trim())){
+			user.setNickname(formbean.getNickname().trim());
+		}
+		
 		//密码
 		user.setPassword(SHA.sha256Hex(SHA.sha256Hex(formbean.getPassword().trim())+"["+user.getSalt()+"]"));
 		user.setEmail(formbean.getEmail().trim());
@@ -690,6 +695,23 @@ public class UserManageAction {
 		
 		
 		//验证数据
+		if(formbean.getNickname() != null && !"".equals(formbean.getNickname().trim())){
+			if(formbean.getNickname().length()>15){
+				error.put("nickname", "呢称不能超过15个字符");
+			}
+			
+			
+			User u = userService.findUserByNickname(formbean.getNickname().trim());
+			if(u != null){
+				if(user.getNickname() == null || "".equals(user.getNickname()) || !formbean.getNickname().trim().equals(user.getNickname())){
+					error.put("nickname", "该呢称已存在");
+				}
+				
+			}
+			new_user.setNickname(formbean.getNickname().trim());
+		}else{
+			new_user.setNickname(null);
+		}
 		if(formbean.getPassword() != null && !"".equals(formbean.getPassword().trim())){//密码
 			if(formbean.getPassword().length()>30){
 				error.put("password", "密码不能超过30个字符");

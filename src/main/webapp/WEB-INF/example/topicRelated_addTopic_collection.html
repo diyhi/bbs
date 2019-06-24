@@ -12,14 +12,23 @@
 	</thead> 
 	 <tbody> 
 		<tr> 
-			<td rowspan="2">topicRelated_addTopic_collection</td> 
-			<td rowspan="2">Map&ltString,Object></td>
-			<td>键参数：allowTopic<br>值内容说明：是否允许提交话题<br>值类型：boolean</td>
-			<td rowspan="2">添加话题界面显示返回值</td> 
+		<tr> 
+			<td rowspan="4">topicRelated_addTopic_collection</td> 
+			<td rowspan="4">Map&ltString,Object></td>
+			<td>键参数：availableTag<br>值内容说明：话题编辑器允许使用标签(配合KindEditor编辑器使用)<br>值类型：JSON格式List&ltString></td>
+			<td rowspan="4">添加话题界面显示返回值</td> 
 		</tr>
 		<tr> 
 			<td>键参数：captchaKey<br>值内容说明：验证码编号 (根据'全站设置 - 基本设置 - 发表话题每分钟提交超过'参数计算是否含有值)<br>值类型：String </td>
 		</tr>
+		<tr> 
+			<td>键参数：allowTopic<br>值内容说明：是否允许提交话题<br>值类型：boolean</td>
+		</tr>
+		<tr> 
+			<td>键参数：userGradeList<br>值内容说明：用户等级集合<br>值类型：JSON格式List&lt<a style="color: #317ee7" onclick="anchorJump('#anchor_230'); return false;">UserGrade</a>></td>
+		</tr>
+		
+		
 	</tbody> 
 </table>
 
@@ -244,6 +253,36 @@
 			<td>content</td> 
 			<td>String</td>
 			<td>话题内容</td>
+		</tr>
+	</tbody> 
+</table>
+
+<table id="anchor_230" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">用户等级 UserGrade</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	 <tbody> 
+		<tr> 
+			<td>id</td> 
+			<td>Integer</td>
+			<td>Id</td>
+		</tr>
+		<tr> 
+			<td>name</td> 
+			<td>String</td>
+			<td>等级名称</td>
+		</tr>
+		<tr> 
+			<td>needPoint</td> 
+			<td>Long</td>
+			<td>需要积分</td>
 		</tr>
 	</tbody> 
 </table>

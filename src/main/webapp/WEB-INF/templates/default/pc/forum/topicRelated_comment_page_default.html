@@ -19,7 +19,9 @@
 							<img src="${commonPath}images/min_avata.png" >
 						</#if> 
 						<cite>
-							<a href="user/control/home?userName=${comment.userName}">${comment.userName}</a>
+							<a href="user/control/home?userName=${comment.userName}">
+								${(comment.nickname != null && comment.nickname??) ?string(comment.nickname , comment.userName)}
+							</a>
 						</cite> 
 					</div>
 					<div class="commentTime">${comment.postTime}</div>
@@ -27,7 +29,7 @@
 					<div class="quote">
 						<#assign quoteContent = ""> 
 						<#list comment.quoteList as quote>
-							<#assign quoteContent = "<div>"+quoteContent+"<span>"+quote.userName+"&nbsp;的评论：</span><br/>"+quote.content+"</div>"> 
+							<#assign quoteContent = "<div>"+quoteContent+"<span>"+(quote.nickname != null && quote.nickname??) ?string(quote.nickname , quote.userName)+"&nbsp;的评论：</span><br/>"+quote.content+"</div>"> 
 						</#list>
 						<#noescape>${quoteContent}</#noescape>
 					</div>
@@ -53,7 +55,13 @@
 												</a>
 												</div>
 							    			</td>
-											<td width="60" ><div class="userName"><a href="user/control/home?userName=${reply.userName}">${reply.userName}</a></div></td>
+											<td width="60" >
+												<div class="userName">
+												<a href="user/control/home?userName=${reply.userName}">
+													${(reply.nickname != null && reply.nickname??) ?string(reply.nickname , reply.userName)}
+												</a>
+												</div>
+											</td>
 											<td><span class="replyContent">${reply.content}</span></td>
 											<td width="60" ><span class="replyTime">${reply.postTime}</span></td>
 										</tr>
@@ -64,8 +72,8 @@
 					</#if> 
 					<div class="tipBottom">
 						<span class="a-toolbar">
-							<a href="javascript:" onclick="replyLayer('${comment.id}','${comment.userName}');">回复</a>&nbsp;|&nbsp;
-							<a href="javascript:" onclick="quoteLayer('${comment.id}','${comment.userName}')">引用</a>
+							<a href="javascript:" onclick="replyLayer('${comment.id}','${(comment.nickname != null && comment.nickname??) ?string(comment.nickname , comment.userName)}');">回复</a>&nbsp;|&nbsp;
+							<a href="javascript:" onclick="quoteLayer('${comment.id}','${(comment.nickname != null && comment.nickname??) ?string(comment.nickname , comment.userName)}')">引用</a>
 							<!-- 是否登录 -->
 							<input type="hidden" id="isLogin" value="<#if systemUser != null>true<#else>false</#if>">
 							

@@ -32,7 +32,6 @@ public class SettingManage {
 	@Resource UserService userService;
 	@Resource PageViewService pageViewService;
 	
-	
 	/**
 	 * 增加 用户每分钟提交次数
 	 * @param module 模块
@@ -64,6 +63,7 @@ public class SettingManage {
 	public void deleteSubmitQuantity(String module,String userName){
 	}
 	
+	
 	/**
 	 * 添加全部话题索引(异步)
 	 */
@@ -89,9 +89,20 @@ public class SettingManage {
 		userService.deleteUserLoginLog(endTime);
 	}
 	
+	/**
+	 * 读取话题编辑器允许使用标签
+	 * @return
+	 */
+	public EditorTag readTopicEditorTag(){
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.getTopicEditorTag() != null && !"".equals(systemSetting.getTopicEditorTag().trim())){
+			return JsonUtils.toObject(systemSetting.getTopicEditorTag(), EditorTag.class);
+		}
+		return null;
+	}
 	
 	/**
-	 * 读取自定义评论编辑器允许使用标签
+	 * 读取评论编辑器允许使用标签
 	 * @return
 	 */
 	public EditorTag readEditorTag(){
@@ -102,7 +113,7 @@ public class SettingManage {
 		return null;
 	}
 	
-
+	
 
 	
 	/**  

@@ -44,6 +44,11 @@
 				<span class="userName" >
 					${user.userName}
 				</span> 
+				<#if user.nickname != null && user.nickname??>
+					<span class="nickname" >
+						${user.nickname}
+					</span> 
+				</#if>
 				
 				<span class="grade" >
 					${user.gradeName}&nbsp;

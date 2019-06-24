@@ -53,7 +53,6 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 
 	@Resource PrivateMessageService privateMessageService;
 	@Resource SystemNotifyService systemNotifyService;
-	
 	@Resource RemindService remindService;
 	@Resource FavoriteService favoriteService;
 	/**
@@ -106,7 +105,7 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 		}
 		
 		//mysql强制使用索引:force index(索引名或者主键PRI)
-		String sql ="select t2.id, t2.userName, t2.email, t2.registrationDate, t2.point, t2.state from(select o.id from user o force index(user_idx) "+(param != null && !"".equals(param.trim()) ? " where "+param:" ")+orderBy+" limit ?,?)t1,user t2 where t1.id=t2.id";
+		String sql ="select t2.id, t2.userName,t2.nickname, t2.email, t2.registrationDate, t2.point, t2.state from(select o.id from user o force index(user_idx) "+(param != null && !"".equals(param.trim()) ? " where "+param:" ")+orderBy+" limit ?,?)t1,user t2 where t1.id=t2.id";
 
 		Query query =  em.createNativeQuery(sql);
 		int placeholder = 1;//占位符参数
@@ -131,10 +130,11 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 				User user = new User();
 				user.setId(ObjectConversion.conversion(object[0], ObjectConversion.LONG));
 				user.setUserName(ObjectConversion.conversion(object[1], ObjectConversion.STRING));
-				user.setEmail(ObjectConversion.conversion(object[2], ObjectConversion.STRING));
-				user.setRegistrationDate(ObjectConversion.conversion(object[3], ObjectConversion.TIMESTAMP));
-				user.setPoint(ObjectConversion.conversion(object[4], ObjectConversion.LONG));
-				user.setState(ObjectConversion.conversion(object[5], ObjectConversion.INTEGER));
+				user.setNickname(ObjectConversion.conversion(object[2], ObjectConversion.STRING));
+				user.setEmail(ObjectConversion.conversion(object[3], ObjectConversion.STRING));
+				user.setRegistrationDate(ObjectConversion.conversion(object[4], ObjectConversion.TIMESTAMP));
+				user.setPoint(ObjectConversion.conversion(object[5], ObjectConversion.LONG));
+				user.setState(ObjectConversion.conversion(object[6], ObjectConversion.INTEGER));
 				userList.add(user);
 			}
 		}
@@ -190,7 +190,7 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 
 
 		//mysql强制使用索引:force index(索引名或者主键PRI)
-		String sql ="select t2.id,t2.userName,t2.email,t2.registrationDate,t2.point,t2.state from(select u.userId from  user o, userinputvalue u where "+customParam+param+" group by u.userId having count(u.userId)>=? "+orderBy+" limit ?,?)t1,user t2 where t1.userId=t2.id";
+		String sql ="select t2.id,t2.userName,t2.nickname,t2.email,t2.registrationDate,t2.point,t2.state from(select u.userId from  user o, userinputvalue u where "+customParam+param+" group by u.userId having count(u.userId)>=? "+orderBy+" limit ?,?)t1,user t2 where t1.userId=t2.id";
 
 		Query query =  em.createNativeQuery(sql);
 
@@ -214,10 +214,11 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 				User user = new User();
 				user.setId(ObjectConversion.conversion(object[0], ObjectConversion.LONG));
 				user.setUserName(ObjectConversion.conversion(object[1], ObjectConversion.STRING));
-				user.setEmail(ObjectConversion.conversion(object[2], ObjectConversion.STRING));
-				user.setRegistrationDate(ObjectConversion.conversion(object[3], ObjectConversion.TIMESTAMP));
-				user.setPoint(ObjectConversion.conversion(object[4], ObjectConversion.LONG));
-				user.setState(ObjectConversion.conversion(object[5], ObjectConversion.INTEGER));
+				user.setNickname(ObjectConversion.conversion(object[2], ObjectConversion.STRING));
+				user.setEmail(ObjectConversion.conversion(object[3], ObjectConversion.STRING));
+				user.setRegistrationDate(ObjectConversion.conversion(object[4], ObjectConversion.TIMESTAMP));
+				user.setPoint(ObjectConversion.conversion(object[5], ObjectConversion.LONG));
+				user.setState(ObjectConversion.conversion(object[6], ObjectConversion.INTEGER));
 				userList.add(user);
 	
 			}
@@ -326,7 +327,23 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 		return null;
 		
 	}
-
+	/**
+	 * 根据呢称查询当前用户
+	 * @param nickname 呢称
+	 * @return
+	 */
+	@Transactional(readOnly=true,propagation=Propagation.NOT_SUPPORTED)
+	public User findUserByNickname(String nickname){
+		Query query =  em.createQuery("select o from User o where o.nickname=?1");
+		//设置参数 
+		query.setParameter(1, nickname);
+		List<User> userList = query.getResultList();
+		for(User user : userList){	
+			return user;
+		}
+		return null;
+		
+	}
 	
 	/**
 	 * 保存用户
@@ -354,11 +371,12 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 	public Integer updateUser2(User user, List<UserInputValue> add_userInputValue,List<Long> delete_userInputValueIdList){
 	
 		Query query = em.createQuery("update User o set " +
-				" o.password=?1,o.securityDigest=?2, o.userVersion=o.userVersion+1 where o.id=?3 and o.userVersion=?4")
-		.setParameter(1, user.getPassword())//密码
-		.setParameter(2, user.getSecurityDigest())//安全摘要
-		.setParameter(3, user.getId())//Id
-		.setParameter(4, user.getUserVersion());//版本号
+				" o.nickname=?1, o.password=?2,o.securityDigest=?3, o.userVersion=o.userVersion+1 where o.id=?4 and o.userVersion=?5")
+		.setParameter(1, user.getNickname())//呢称
+		.setParameter(2, user.getPassword())//密码
+		.setParameter(3, user.getSecurityDigest())//安全摘要
+		.setParameter(4, user.getId())//Id
+		.setParameter(5, user.getUserVersion());//版本号
 		
 		
 		
@@ -390,20 +408,21 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 	public Integer updateUser(User user, List<UserInputValue> add_userInputValue,List<Long> delete_userInputValueIdList){
 	
 		Query query = em.createQuery("update User o set " +
-				" o.password=?1,o.email=?2, o.issue=?3," +
-				" o.answer=?4,  o.state=?5, " +
-				" o.remarks=?6,o.mobile=?7,o.realNameAuthentication=?8,o.securityDigest=?9, o.userVersion=o.userVersion+1 where o.id=?10 and o.userVersion=?11")
-		.setParameter(1, user.getPassword())//密码
-		.setParameter(2, user.getEmail())//Email地址
-		.setParameter(3, user.getIssue())//密码提示问题
-		.setParameter(4, user.getAnswer())//密码提示答案
-		.setParameter(5, user.getState())//用户状态
-		.setParameter(6, user.getRemarks())//备注
-		.setParameter(7, user.getMobile())//手机
-		.setParameter(8, user.isRealNameAuthentication())//实名认证
-		.setParameter(9, user.getSecurityDigest())//安全摘要
-		.setParameter(10, user.getId())//Id
-		.setParameter(11, user.getUserVersion());//版本号
+				" o.nickname=?1, o.password=?2,o.email=?3, o.issue=?4," +
+				" o.answer=?5,  o.state=?6, " +
+				" o.remarks=?7,o.mobile=?8,o.realNameAuthentication=?9,o.securityDigest=?10, o.userVersion=o.userVersion+1 where o.id=?11 and o.userVersion=?12")
+		.setParameter(1, user.getNickname())//呢称
+		.setParameter(2, user.getPassword())//密码
+		.setParameter(3, user.getEmail())//Email地址
+		.setParameter(4, user.getIssue())//密码提示问题
+		.setParameter(5, user.getAnswer())//密码提示答案
+		.setParameter(6, user.getState())//用户状态
+		.setParameter(7, user.getRemarks())//备注
+		.setParameter(8, user.getMobile())//手机
+		.setParameter(9, user.isRealNameAuthentication())//实名认证
+		.setParameter(10, user.getSecurityDigest())//安全摘要
+		.setParameter(11, user.getId())//Id
+		.setParameter(12, user.getUserVersion());//版本号
 		
 		
 		
@@ -552,6 +571,7 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 		//删除用户所有订阅系统通知
 		systemNotifyService.deleteUserSubscriptionSystemNotify(idList);
 		
+		
 		//删除用户提醒
 		remindService.deleteRemindByUserId(idList);
 		
@@ -560,6 +580,7 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 		
 		//根据发布动态图片的用户名称删除收藏
 		favoriteService.deleteFavoriteByPostUserName(userNameList);
+		
 		return j;
 	}
 	/**

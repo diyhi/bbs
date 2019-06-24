@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -42,12 +41,14 @@ import cms.bean.topic.Reply;
 import cms.bean.topic.Tag;
 import cms.bean.topic.Topic;
 import cms.bean.topic.TopicIndex;
+import cms.bean.user.UserGrade;
 import cms.service.setting.SettingService;
 import cms.service.thumbnail.ThumbnailService;
 import cms.service.topic.CommentService;
 import cms.service.topic.TagService;
 import cms.service.topic.TopicIndexService;
 import cms.service.topic.TopicService;
+import cms.service.user.UserGradeService;
 import cms.utils.FileType;
 import cms.utils.IpAddress;
 import cms.utils.JsonUtils;
@@ -78,6 +79,8 @@ public class TopicManageAction {
 	@Resource TopicManage topicManage;
 	
 	@Resource TopicIndexService topicIndexService;
+	
+	@Resource UserGradeService userGradeService;
 	
 	@Resource ThumbnailService thumbnailService;
 	@Resource ThumbnailManage thumbnailManage;
@@ -270,7 +273,8 @@ public class TopicManageAction {
 			username =((UserDetails)obj).getUsername();	
 		}
 		model.addAttribute("userName", username);
-		
+		List<UserGrade> userGradeList = userGradeService.findAllGrade();
+		model.addAttribute("userGradeList", JsonUtils.toJSONString(userGradeList));
 		return "jsp/topic/add_topic";
 	}
 	
@@ -302,6 +306,8 @@ public class TopicManageAction {
 			username =((SysUsers)obj).getUserAccount();
 		}
 		
+		List<UserGrade> userGradeList = userGradeService.findAllGrade();
+		
 		//前3张图片地址
 		List<ImageInfo> beforeImageList = new ArrayList<ImageInfo>();
 		
@@ -309,6 +315,7 @@ public class TopicManageAction {
 		topic.setTagName(tagName);
 		topic.setAllow(allow);
 		topic.setStatus(status);
+	
 		if(tagId == null || tagId <=0L){
 			error.put("tagId", "标签不能为空");
 		}else{
@@ -336,9 +343,9 @@ public class TopicManageAction {
 				isFile = (Boolean)object[8];//是否含有文件
 				isMap = (Boolean)object[9];//是否含有地图
 			
-				//校正隐藏标签
-				String validValue =  textFilterManage.correctionHiddenTag(value);
 				
+				//校正隐藏标签
+				String validValue =  textFilterManage.correctionHiddenTag(value,userGradeList);
 				
 				//解析隐藏标签
 				Map<Integer,Object> analysisHiddenTagMap = textFilterManage.analysisHiddenTag(validValue);
@@ -515,6 +522,7 @@ public class TopicManageAction {
 		topic.setContent(content);
 		model.addAttribute("topic",topic);
 		model.addAttribute("userName", username);
+		model.addAttribute("userGradeList", JsonUtils.toJSONString(userGradeList));
 		return "jsp/topic/add_topic";
 	}
 	
@@ -761,6 +769,9 @@ public class TopicManageAction {
 				throw new SystemException("话题不存在");
 			}	
 			model.addAttribute("topic", topic);
+			
+			List<UserGrade> userGradeList = userGradeService.findAllGrade();
+			model.addAttribute("userGradeList", JsonUtils.toJSONString(userGradeList));
 		}
 		return "jsp/topic/edit_topic";
 	}
@@ -843,8 +854,9 @@ public class TopicManageAction {
 					isFile = (Boolean)object[8];//是否含有文件
 					isMap = (Boolean)object[9];//是否含有地图
 					
+					List<UserGrade> userGradeList = userGradeService.findAllGrade();
 					//校正隐藏标签
-					String validValue =  textFilterManage.correctionHiddenTag(value);
+					String validValue =  textFilterManage.correctionHiddenTag(value,userGradeList);
 					
 					if(topic.getIsStaff()){//如果是员工
 						//解析隐藏标签

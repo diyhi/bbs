@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import cms.bean.setting.EditorTag;
 import cms.bean.topic.HideTagType;
+import cms.bean.user.UserGrade;
 import cms.utils.Verification;
 import cms.web.taglib.Configuration;
 
@@ -54,11 +55,12 @@ public class TextFilterManage {
 				.addAttributes("td","style");
 		}
 		//隐藏标签
-		if(editorTag == null){
+		if(editorTag == null || editorTag.isHidePassword() || editorTag.isHideComment() || editorTag.isHideGrade() || editorTag.isHidePoint() || editorTag.isHideAmount()){
 			whitelist.addTags("hide")
 				.addAttributes("hide","class")
 				.addAttributes("hide","hide-type")
-				.addAttributes("hide","input-value");
+				.addAttributes("hide","input-value")
+				.addAttributes("hide","description");
 		}
 		
 		if(editorTag == null || editorTag.isJustifyleft()){//左对齐
@@ -290,7 +292,7 @@ public class TextFilterManage {
 	 * 富文本过滤标签
 	 * @param request
 	 * @param html 内容
-	 * @param editorTag 自定义评论编辑器标签
+	 * @param editorTag 评论编辑器标签
 	 * @return
 	 */
 	public String filterTag(HttpServletRequest request,String html,EditorTag editorTag) {  
@@ -883,9 +885,10 @@ public class TextFilterManage {
 	/**
 	 * 校正隐藏标签(缺少参数或参数不正确的隐藏标签替换成<p>)
 	 * @param html 富文本内容
+	 * @param userGradeList 用户等级
 	 * @return
 	 */
-	public String correctionHiddenTag(String html){
+	public String correctionHiddenTag(String html,List<UserGrade> userGradeList){
 		if(!StringUtils.isBlank(html)){
 			//隐藏类型
 			List<Integer> hideTypeList = new ArrayList<Integer>();
@@ -910,6 +913,10 @@ public class TextFilterManage {
 				String hide_type = element.attr("hide-type"); 
 				//隐藏标签输入值
 				String input_value = element.attr("input-value"); 
+				
+				//描述
+				String description = element.attr("description"); 
+				
 				//是否有效标签
 				boolean isValidTag = true;
 				
@@ -950,6 +957,7 @@ public class TextFilterManage {
 						}else{
 							if(password_inputValue == null || "".equals(password_inputValue.trim())){
 								password_inputValue = input_value.trim();
+								
 							}else{
 								//替换不是和第一个输入值相同的标签
 								if(!password_inputValue.equals(input_value.trim())){
@@ -961,24 +969,48 @@ public class TextFilterManage {
 						}
 					}
 					if(hide_type.trim().equals(HideTagType.GRADE.getName().toString())){//达到等级可见
-						if(input_value.trim().length()>8){//不能超过8位数字
-							isValidTag = false;
-						}else{
-							boolean verification = Verification.isPositiveInteger(input_value.trim());//正整数
-							if(!verification){//不是正整数
+						if(description != null && !"".equals(description.trim())){
+							if(input_value.trim().length()>8){//不能超过8位数字
 								isValidTag = false;
 							}else{
-								if(grade_inputValue == null || "".equals(grade_inputValue.trim())){
-									grade_inputValue = input_value.trim();
+								boolean verification = Verification.isPositiveInteger(input_value.trim());//正整数
+								if(!verification){//不是正整数
+									isValidTag = false;
 								}else{
-									//替换不是和第一个输入值相同的标签
-									if(!grade_inputValue.equals(input_value.trim())){
-										element.attr("input-value",grade_inputValue); 
+									if(grade_inputValue == null || "".equals(grade_inputValue.trim())){
+										grade_inputValue = input_value.trim();
+									}else{
+										//替换不是和第一个输入值相同的标签
+										if(!grade_inputValue.equals(input_value.trim())){
+											element.attr("input-value",grade_inputValue); 
+										}
+										
 									}
+									
+									if(userGradeList != null && userGradeList.size() >0){
+										boolean flag = false;
+										for(UserGrade userGrade : userGradeList){
+											if(userGrade.getNeedPoint().equals(Long.parseLong(grade_inputValue))){//如果会员等级包含当前值
+												flag = true;
+												description = userGrade.getName();
+												break;
+											}
+											
+										}
+										if(!flag){
+											isValidTag = false;
+										}
+									}else{
+										isValidTag = false;
+									}
+									
+									element.attr("description",description);
 								}
-								
 							}
+						}else{
+							isValidTag = false;
 						}
+						
 					}
 					if(hide_type.trim().equals(HideTagType.POINT.getName().toString())){//积分购买可见
 						if(input_value.trim().length()>8){//不能超过8位数字
@@ -996,6 +1028,7 @@ public class TextFilterManage {
 										element.attr("input-value",point_inputValue); 
 									}
 								}
+								
 								
 							}
 						}
@@ -1090,14 +1123,14 @@ public class TextFilterManage {
 					if(hide_type.trim().equals(HideTagType.GRADE.getName().toString())){//达到等级可见
 						if(input_value != null && !"".equals(input_value.trim())){
 							if(inputValueMap.get(HideTagType.GRADE.getName()) == null){
-								inputValueMap.put(HideTagType.GRADE.getName(), Integer.parseInt(input_value.trim()));
+								inputValueMap.put(HideTagType.GRADE.getName(), Long.parseLong(input_value.trim()));
 							}
 						}
 					}
 					if(hide_type.trim().equals(HideTagType.POINT.getName().toString())){//积分购买可见
 						if(input_value != null && !"".equals(input_value.trim())){
 							if(inputValueMap.get(HideTagType.POINT.getName()) == null){
-								inputValueMap.put(HideTagType.POINT.getName(), Integer.parseInt(input_value.trim()));
+								inputValueMap.put(HideTagType.POINT.getName(), Long.parseLong(input_value.trim()));
 							}
 						}
 					}
@@ -1176,3 +1209,5 @@ public class TextFilterManage {
 	
 	
 }
+
+

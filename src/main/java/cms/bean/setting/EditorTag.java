@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 自定义评论编辑器标签
+ * 评论编辑器标签
  *
  */
 public class EditorTag implements Serializable{
@@ -51,6 +51,17 @@ public class EditorTag implements Serializable{
 	private List<String> imageFormat = new ArrayList<String>();
 	/** 允许上传图片大小 **/
 	private Long imageSize;
+	
+	/** 输入密码可见 **/
+	private boolean hidePassword = false;
+	/** 评论话题可见 **/
+	private boolean hideComment = false;
+	/** 达到等级可见 **/
+	private boolean hideGrade = false;
+	/** 积分购买可见 **/
+	private boolean hidePoint = false;
+	/** 余额购买可见 **/
+	private boolean hideAmount = false;
 	
 	/**
 	 * 添加图片格式
@@ -178,6 +189,46 @@ public class EditorTag implements Serializable{
 	}
 	public void setImageSize(Long imageSize) {
 		this.imageSize = imageSize;
+	}
+
+	public boolean isHidePassword() {
+		return hidePassword;
+	}
+
+	public void setHidePassword(boolean hidePassword) {
+		this.hidePassword = hidePassword;
+	}
+
+	public boolean isHideComment() {
+		return hideComment;
+	}
+
+	public void setHideComment(boolean hideComment) {
+		this.hideComment = hideComment;
+	}
+
+	public boolean isHideGrade() {
+		return hideGrade;
+	}
+
+	public void setHideGrade(boolean hideGrade) {
+		this.hideGrade = hideGrade;
+	}
+
+	public boolean isHidePoint() {
+		return hidePoint;
+	}
+
+	public void setHidePoint(boolean hidePoint) {
+		this.hidePoint = hidePoint;
+	}
+
+	public boolean isHideAmount() {
+		return hideAmount;
+	}
+
+	public void setHideAmount(boolean hideAmount) {
+		this.hideAmount = hideAmount;
 	}
 
 }

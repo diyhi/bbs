@@ -95,7 +95,7 @@ public class SearchAction {
 									pi.setIp(null);//IP不显示
 									if(pi.getIsStaff() == false){//会员
 										User user = userManage.query_cache_findUserByUserName(pi.getUserName());
-										
+										pi.setNickname(user.getNickname());
 										pi.setAvatarPath(user.getAvatarPath());
 										pi.setAvatarName(user.getAvatarName());
 										

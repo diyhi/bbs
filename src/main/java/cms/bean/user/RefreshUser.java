@@ -16,6 +16,8 @@ public class RefreshUser implements Serializable{
 	private Long userId;
 	/** 会员用户名 **/
 	private String userName;
+	/** 呢称 **/
+	private String nickname;
 	/** 头像路径 **/
 	private String avatarPath;
 	/** 头像名称 **/
@@ -25,18 +27,19 @@ public class RefreshUser implements Serializable{
 	/** 记住密码 **/
 	private boolean rememberMe = false;
 	
+	
 	public RefreshUser() {}
-	public RefreshUser(String accessToken, Long userId, String userName, String avatarPath, String avatarName,
-			Long securityDigest, boolean rememberMe) {
+	public RefreshUser(String accessToken, Long userId, String userName, String nickname, String avatarPath,
+			String avatarName, Long securityDigest, boolean rememberMe) {
 		this.accessToken = accessToken;
 		this.userId = userId;
 		this.userName = userName;
+		this.nickname = nickname;
 		this.avatarPath = avatarPath;
 		this.avatarName = avatarName;
 		this.securityDigest = securityDigest;
 		this.rememberMe = rememberMe;
 	}
-
 	public Long getUserId() {
 		return userId;
 	}
@@ -67,17 +70,27 @@ public class RefreshUser implements Serializable{
 	public void setRememberMe(boolean rememberMe) {
 		this.rememberMe = rememberMe;
 	}
+
 	public String getAvatarPath() {
 		return avatarPath;
 	}
+
 	public void setAvatarPath(String avatarPath) {
 		this.avatarPath = avatarPath;
 	}
+
 	public String getAvatarName() {
 		return avatarName;
 	}
+
 	public void setAvatarName(String avatarName) {
 		this.avatarName = avatarName;
+	}
+	public String getNickname() {
+		return nickname;
+	}
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
 	}
 	
 }
