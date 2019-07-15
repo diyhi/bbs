@@ -403,7 +403,7 @@ function add_help_row(tableName,id,name){ //读取最后一行的行号，存放
 	//添加列:序号 
 	var newNameTD=newTR.insertCell(0);
 	newNameTD.width="10%"; 
-	newNameTD.height="25px";
+	newNameTD.height="26px";
 	newNameTD.align = "center";
 	newNameTD.style.cssText="BORDER-RIGHT: #BFE3FF 1px dotted;border-bottom: #BFE3FF 1px dotted;";
 	//添加列内容 
@@ -1253,6 +1253,7 @@ init();
 
 <script language="JavaScript" type="text/javascript">
 	var editor;
+	KindEditor.options.cssData = 'body { font-size: 14px; }';
 	KindEditor.ready(function(K) {
 		editor = K.create('textarea[name="entityBean_customForum_htmlContent"]', {
 			basePath : '${config:url(pageContext.request)}backstage/kindeditor/',//指定编辑器的根目录路径

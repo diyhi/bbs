@@ -19,6 +19,7 @@ import cms.bean.QueryResult;
 import cms.bean.user.DisableUserName;
 import cms.bean.user.PointLog;
 import cms.bean.user.User;
+import cms.bean.user.UserDynamic;
 import cms.bean.user.UserGrade;
 import cms.bean.user.UserInputValue;
 import cms.bean.user.UserLoginLog;
@@ -31,6 +32,7 @@ import cms.service.user.UserGradeService;
 import cms.service.user.UserService;
 import cms.utils.ObjectConversion;
 import cms.web.action.user.PointLogConfig;
+import cms.web.action.user.UserDynamicConfig;
 import cms.web.action.user.UserLoginLogConfig;
 import net.sf.cglib.beans.BeanCopier;
 /**
@@ -55,6 +57,8 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 	@Resource SystemNotifyService systemNotifyService;
 	@Resource RemindService remindService;
 	@Resource FavoriteService favoriteService;
+	@Resource UserDynamicConfig userDynamicConfig;
+	
 	/**
 	 * 根据条件分页查询用户名称
 	 * @param jpql SQL
@@ -371,12 +375,13 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 	public Integer updateUser2(User user, List<UserInputValue> add_userInputValue,List<Long> delete_userInputValueIdList){
 	
 		Query query = em.createQuery("update User o set " +
-				" o.nickname=?1, o.password=?2,o.securityDigest=?3, o.userVersion=o.userVersion+1 where o.id=?4 and o.userVersion=?5")
+				" o.nickname=?1, o.allowUserDynamic=?2, o.password=?3,o.securityDigest=?4, o.userVersion=o.userVersion+1 where o.id=?5 and o.userVersion=?6")
 		.setParameter(1, user.getNickname())//呢称
-		.setParameter(2, user.getPassword())//密码
-		.setParameter(3, user.getSecurityDigest())//安全摘要
-		.setParameter(4, user.getId())//Id
-		.setParameter(5, user.getUserVersion());//版本号
+		.setParameter(2, user.getAllowUserDynamic())//允许显示用户动态 
+		.setParameter(3, user.getPassword())//密码
+		.setParameter(4, user.getSecurityDigest())//安全摘要
+		.setParameter(5, user.getId())//Id
+		.setParameter(6, user.getUserVersion());//版本号
 		
 		
 		
@@ -408,21 +413,22 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 	public Integer updateUser(User user, List<UserInputValue> add_userInputValue,List<Long> delete_userInputValueIdList){
 	
 		Query query = em.createQuery("update User o set " +
-				" o.nickname=?1, o.password=?2,o.email=?3, o.issue=?4," +
-				" o.answer=?5,  o.state=?6, " +
-				" o.remarks=?7,o.mobile=?8,o.realNameAuthentication=?9,o.securityDigest=?10, o.userVersion=o.userVersion+1 where o.id=?11 and o.userVersion=?12")
+				" o.nickname=?1, o.allowUserDynamic=?2, o.password=?3,o.email=?4, o.issue=?5," +
+				" o.answer=?6,  o.state=?7, " +
+				" o.remarks=?8,o.mobile=?9,o.realNameAuthentication=?10,o.securityDigest=?11, o.userVersion=o.userVersion+1 where o.id=?12 and o.userVersion=?13")
 		.setParameter(1, user.getNickname())//呢称
-		.setParameter(2, user.getPassword())//密码
-		.setParameter(3, user.getEmail())//Email地址
-		.setParameter(4, user.getIssue())//密码提示问题
-		.setParameter(5, user.getAnswer())//密码提示答案
-		.setParameter(6, user.getState())//用户状态
-		.setParameter(7, user.getRemarks())//备注
-		.setParameter(8, user.getMobile())//手机
-		.setParameter(9, user.isRealNameAuthentication())//实名认证
-		.setParameter(10, user.getSecurityDigest())//安全摘要
-		.setParameter(11, user.getId())//Id
-		.setParameter(12, user.getUserVersion());//版本号
+		.setParameter(2, user.getAllowUserDynamic())//允许显示用户动态 
+		.setParameter(3, user.getPassword())//密码
+		.setParameter(4, user.getEmail())//Email地址
+		.setParameter(5, user.getIssue())//密码提示问题
+		.setParameter(6, user.getAnswer())//密码提示答案
+		.setParameter(7, user.getState())//用户状态
+		.setParameter(8, user.getRemarks())//备注
+		.setParameter(9, user.getMobile())//手机
+		.setParameter(10, user.isRealNameAuthentication())//实名认证
+		.setParameter(11, user.getSecurityDigest())//安全摘要
+		.setParameter(12, user.getId())//Id
+		.setParameter(13, user.getUserVersion());//版本号
 		
 		
 		
@@ -580,6 +586,9 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 		
 		//根据发布动态图片的用户名称删除收藏
 		favoriteService.deleteFavoriteByPostUserName(userNameList);
+		
+		//删除用户动态
+		this.deleteUserDynamic(userNameList);
 		
 		return j;
 	}
@@ -1075,5 +1084,343 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 		Query delete = em.createQuery("delete from DisableUserName o where o.id=?1")
 				.setParameter(1, id);
 		return	delete.executeUpdate();
+	}
+	
+/**----------------------------------- 用户动态 -------------------------------------**/
+	
+	
+	/**
+	 * 保存用户动态
+	 * 先由userDynamicManage.createUserDynamicObject();方法生成对象再保存
+	 * @param userDynamic 用户动态
+	 */
+	public void saveUserDynamic(Object userDynamic){
+		this.save(userDynamic);	
+	}
+	
+	/**
+	 * 修改话题状态
+	 * @param userId 用户Id
+	 * @param userName 用户名称
+	 * @param topicId 话题Id
+	 * @param status 状态
+	 */
+	public Integer updateUserDynamicTopicStatus(Long userId,String userName,Long topicId,Integer status){
+		int i = 0;
+		//表编号
+		int tableNumber = userDynamicConfig.userIdRemainder(userId);
+		if(tableNumber == 0){//默认对象
+			Query query = em.createQuery("update UserDynamic o set o.status=?1 where o.topicId=?2 and o.userName=?3 and o.module=?4")
+					.setParameter(1, status)
+					.setParameter(2, topicId)
+					.setParameter(3, userName)
+					.setParameter(4, 100);
+			i += query.executeUpdate();
+			
+		}else{//带下划线对象
+			Query query = em.createQuery("update UserDynamic_"+tableNumber+" o set o.status=?1 where o.topicId=?2 and o.userName=?3 and o.module=?4")
+					.setParameter(1, status)
+					.setParameter(2, topicId)
+					.setParameter(3, userName)
+					.setParameter(4, 100);
+			i += query.executeUpdate();	
+		}
+		return i;
+	}
+	/**
+	 * 修改评论状态
+	 * @param userId 用户Id
+	 * @param userName 用户名称
+	 * @param commentId 评论Id
+	 * @param status 状态
+	 */
+	public Integer updateUserDynamicCommentStatus(Long userId,String userName,Long commentId,Integer status){
+		int i = 0;
+		//表编号
+		int tableNumber = userDynamicConfig.userIdRemainder(userId);
+		if(tableNumber == 0){//默认对象
+			Query query = em.createQuery("update UserDynamic o set o.status=?1 where o.commentId=?2 and o.userName=?3 and o.module>=?4 and o.module<=?5")
+					.setParameter(1, status)
+					.setParameter(2, commentId)
+					.setParameter(3, userName)
+					.setParameter(4, 200)
+					.setParameter(5, 300);
+			i += query.executeUpdate();
+			
+		}else{//带下划线对象
+			Query query = em.createQuery("update UserDynamic_"+tableNumber+" o set o.status=?1 where o.commentId=?2 and o.userName=?3 and o.module>=?4 and o.module<=?5")
+					.setParameter(1, status)
+					.setParameter(2, commentId)
+					.setParameter(3, userName)
+					.setParameter(4, 200)
+					.setParameter(5, 300);
+			i += query.executeUpdate();	
+		}
+		return i;
+	}
+	/**
+	 * 修改回复状态
+	 * @param userId 用户Id
+	 * @param userName 用户名称
+	 * @param replyId 回复Id
+	 * @param status 状态
+	 */
+	public Integer updateUserDynamicReplyStatus(Long userId,String userName,Long replyId,Integer status){
+		int i = 0;
+		//表编号
+		int tableNumber = userDynamicConfig.userIdRemainder(userId);
+		if(tableNumber == 0){//默认对象
+			Query query = em.createQuery("update UserDynamic o set o.status=?1 where o.replyId=?2 and o.userName=?3  and o.module=?4")
+					.setParameter(1, status)
+					.setParameter(2, replyId)
+					.setParameter(3, userName)
+					.setParameter(4, 400);
+			i += query.executeUpdate();
+			
+		}else{//带下划线对象
+			Query query = em.createQuery("update UserDynamic_"+tableNumber+" o set o.status=?1 where o.replyId=?2 and o.userName=?3  and o.module=?4")
+					.setParameter(1, status)
+					.setParameter(2, replyId)
+					.setParameter(3, userName)
+					.setParameter(4, 400);
+			i += query.executeUpdate();	
+		}
+		return i;
+	}
+	
+	/**
+	 * 根据话题Id软删除用户动态
+	 * @param userId 用户Id
+	 * @param userName 用户名称
+	 * @param topicId 话题Id
+	 */
+	public Integer softDeleteUserDynamicByTopicId(Long userId,String userName,Long topicId){
+		int i = 0;
+		//表编号
+		int tableNumber = userDynamicConfig.userIdRemainder(userId);
+		if(tableNumber == 0){//默认对象
+			Query query = em.createQuery("update UserDynamic o set o.status=o.status+100 where o.topicId=?1 and o.userName=?2 and o.module=?3 and o.status <100")
+					.setParameter(1, topicId)
+					.setParameter(2, userName)
+					.setParameter(3, 100);
+			i += query.executeUpdate();
+			
+		}else{//带下划线对象
+			Query query = em.createQuery("update UserDynamic_"+tableNumber+" o set o.status=o.status+100 where o.topicId=?1 and o.userName=?2 and o.module=?3 and o.status <100")
+					.setParameter(1, topicId)
+					.setParameter(2, userName)
+					.setParameter(3, 100);
+			i += query.executeUpdate();	
+		}
+		return i;
+		
+	}
+	
+	/**
+	 * 根据话题Id还原用户动态
+	 * @param userId 用户Id
+	 * @param userName 用户名称
+	 * @param topicId 话题Id
+	 */
+	public Integer reductionUserDynamicByTopicId(Long userId,String userName,Long topicId){
+		int i = 0;
+		//表编号
+		int tableNumber = userDynamicConfig.userIdRemainder(userId);
+		if(tableNumber == 0){//默认对象
+			Query query = em.createQuery("update UserDynamic o set o.status=o.status-100 where o.topicId=?1 and o.userName=?2 and o.module=?3 and o.status >100")
+					.setParameter(1, topicId)
+					.setParameter(2, userName)
+					.setParameter(3, 100);
+			i += query.executeUpdate();
+			
+		}else{//带下划线对象
+			Query query = em.createQuery("update UserDynamic_"+tableNumber+" o set o.status=o.status-100 where o.topicId=?1 and o.userName=?2 and o.module=?3 and o.status >100")
+					.setParameter(1, topicId)
+					.setParameter(2, userName)
+					.setParameter(3, 100);
+			i += query.executeUpdate();	
+		}
+		return i;
+		
+	}
+	
+	
+	
+	
+	/**
+	 * 根据话题Id删除用户动态(话题下的评论和回复也同时删除)
+	 * @param topicId 话题Id
+	 */
+	public Integer deleteUserDynamicByTopicId(Long topicId){
+		int j = 0;
+		//表数量
+		int tableQuantity = userLoginLogConfig.getTableQuantity();
+		for(int i =0; i<tableQuantity; i++){
+			
+			if(i == 0){//默认对象
+				Query query = em.createQuery("delete from UserDynamic o where o.topicId=?1")
+						.setParameter(1, topicId);
+				j += query.executeUpdate();
+			}else{
+				Query query = em.createQuery("delete from UserDynamic_"+i+" o where o.topicId=?1")
+						.setParameter(1, topicId);
+				j += query.executeUpdate();	
+			}
+		}
+		return j;
+	}
+	
+	/**
+	 * 根据评论Id删除用户动态(评论下的回复也同时删除)
+	 * @param commentId 评论Id
+	 */
+	public Integer deleteUserDynamicByCommentId(Long commentId){
+		int j = 0;
+		//表数量
+		int tableQuantity = userLoginLogConfig.getTableQuantity();
+		for(int i =0; i<tableQuantity; i++){
+			
+			if(i == 0){//默认对象
+				Query query = em.createQuery("delete from UserDynamic o where o.commentId=?1")
+						.setParameter(1, commentId);
+				j += query.executeUpdate();
+			}else{
+				Query query = em.createQuery("delete from UserDynamic_"+i+" o where o.commentId=?1")
+						.setParameter(1, commentId);
+				j += query.executeUpdate();	
+			}
+		}
+		return j;
+	}
+	/**
+	 * 根据回复Id删除用户动态
+	 * @param userId 用户Id
+	 * @param commentId 评论Id
+	 */
+	public Integer deleteUserDynamicByReplyId(Long userId,Long replyId){
+		int i = 0;
+		//表编号
+		int tableNumber = userDynamicConfig.userIdRemainder(userId);
+		if(tableNumber == 0){//默认对象
+			Query query = em.createQuery("delete from UserDynamic o where o.replyId=?1")
+					.setParameter(1, replyId);
+			i += query.executeUpdate();
+
+		}else{//带下划线对象
+			Query query = em.createQuery("delete from UserDynamic_"+tableNumber+" o where o.replyId=?1")
+					.setParameter(1, replyId);
+			i += query.executeUpdate();	
+		}
+		return i;
+	}
+	
+	/**
+	 * 根据用户名称删除用户动态
+	 * @param userNameList 用户名称集合
+	 */
+	private Integer deleteUserDynamic(List<String> userNameList){
+		int j = 0;
+		int tableNumber = userDynamicConfig.getTableQuantity();
+		for(int i = 0; i<tableNumber; i++){
+			if(i == 0){//默认对象
+				//删除
+				Query query = em.createQuery("delete from UserDynamic o where o.userName in(:userName)")
+						.setParameter("userName", userNameList);
+				j += query.executeUpdate();
+			}else{//带下划线对象
+				Query query = em.createQuery("delete from UserDynamic_"+i+" o where o.userName in(:userName)")
+						.setParameter("userName", userNameList);
+				j += query.executeUpdate();
+			}
+		}
+		return j;
+	}
+	
+	
+	
+	/**
+	 * 用户动态分页
+	 * @param userId 用户Id
+	 * @param userName 用户名称
+	 * @param firstIndex 索引开始,即从哪条记录开始
+	 * @param maxResult 获取多少条数据
+	 */
+	@Transactional(readOnly=true,propagation=Propagation.NOT_SUPPORTED)
+	public QueryResult<UserDynamic> findUserDynamicPage(Long userId,String userName,int firstIndex, int maxResult){
+		
+		QueryResult<UserDynamic> qr = new QueryResult<UserDynamic>();
+		Query query  = null;
+		
+		
+		//表编号
+		int tableNumber = userDynamicConfig.userIdRemainder(userId);
+		if(tableNumber == 0){//默认对象
+			query = em.createQuery("select o from UserDynamic o where o.userName=?1 and o.status=?2 ORDER BY o.postTime desc")
+			.setParameter(1, userName)
+			.setParameter(2, 20);
+			//索引开始,即从哪条记录开始
+			query.setFirstResult(firstIndex);
+			//获取多少条数据
+			query.setMaxResults(maxResult);
+			List<UserDynamic> userDynamicList= query.getResultList();
+			qr.setResultlist(userDynamicList);
+			
+			query = em.createQuery("select count(o) from UserDynamic o where o.userName=?1 and o.status=?2")
+					.setParameter(1, userName)
+					.setParameter(2, 20);
+			qr.setTotalrecord((Long)query.getSingleResult());
+		}else{//带下划线对象
+			query = em.createQuery("select o from UserDynamic_"+tableNumber+" o where o.userName=?1 and o.status=?2 ORDER BY o.postTime desc")
+			.setParameter(1, userName)
+			.setParameter(2, 20);
+			//索引开始,即从哪条记录开始
+			query.setFirstResult(firstIndex);
+			//获取多少条数据
+			query.setMaxResults(maxResult);
+			List<?> userDynamic_List= query.getResultList();
+			
+			
+			
+			try {
+				//带下划线对象
+				Class<?> c = Class.forName("cms.bean.user.UserDynamic_"+tableNumber);
+				Object object  = c.newInstance();
+				BeanCopier copier = BeanCopier.create(object.getClass(),UserDynamic.class, false); 
+				List<UserDynamic> userDynamicList= new ArrayList<UserDynamic>();
+				for(int j = 0;j< userDynamic_List.size(); j++) {  
+					Object obj = userDynamic_List.get(j);
+					UserDynamic userDynamic = new UserDynamic();
+					copier.copy(obj,userDynamic, null);
+					userDynamicList.add(userDynamic);
+				}
+				qr.setResultlist(userDynamicList);
+				
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+			//	e.printStackTrace();
+				if (logger.isErrorEnabled()) {
+		            logger.error("用户动态分页",e);
+		        }
+			} catch (InstantiationException e) {
+				// TODO Auto-generated catch block
+			//	e.printStackTrace();
+				if (logger.isErrorEnabled()) {
+		            logger.error("用户动态分页",e);
+		        }
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+			//	e.printStackTrace();
+				if (logger.isErrorEnabled()) {
+		            logger.error("用户动态分页",e);
+		        }
+			}
+			
+			query = em.createQuery("select count(o) from UserDynamic_"+tableNumber+" o where o.userName=?1 and o.status=?2")
+					.setParameter(1, userName)
+					.setParameter(2, 20);
+			qr.setTotalrecord((Long)query.getSingleResult());
+		}
+		
+		return qr;
 	}
 }

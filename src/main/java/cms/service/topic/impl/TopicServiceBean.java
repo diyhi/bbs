@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import cms.bean.QueryResult;
+import cms.bean.topic.HideTagType;
 import cms.bean.topic.Topic;
 import cms.bean.topic.TopicUnhide;
 import cms.service.besa.DaoSupport;
@@ -396,14 +397,19 @@ public class TopicServiceBean extends DaoSupport<Topic> implements TopicService{
 	/**
 	 * 保存'话题取消隐藏'
 	 * @param topicUnhide
+	 * @param hideTagType 隐藏标签类型
 	 * @param point 积分
 	 * @param consumption_userName 消费用户名称
 	 * @param consumption_pointLogObject 消费积分日志
 	 * @param income_userName 收入用户名称
 	 * @param income_pointLogObject 收入积分日志
 	 */
-	public void saveTopicUnhide(Object topicUnhide,Long point,String consumption_userName,Object consumption_pointLogObject,String income_userName,Object income_pointLogObject){
-		if(point != null && point >0L){
+	public void saveTopicUnhide(Object topicUnhide,Integer hideTagType,Long point,String consumption_userName,Object consumption_pointLogObject,String income_userName,Object income_pointLogObject){
+		//输入密码
+		if(hideTagType.equals(HideTagType.PASSWORD.getName())){
+			this.save(topicUnhide);
+		}	
+		if(hideTagType.equals(HideTagType.POINT.getName()) && point != null && point >0L){//积分购买
 			//扣减用户积分
 			int i = userService.subtractUserPoint(consumption_userName,point, consumption_pointLogObject);
 			if(i >0){

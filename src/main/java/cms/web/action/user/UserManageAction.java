@@ -422,6 +422,8 @@ public class UserManageAction {
 		
 		user.setMobile(formbean.getMobile().trim());
 		user.setRealNameAuthentication(formbean.isRealNameAuthentication());
+		//允许显示用户动态
+		user.setAllowUserDynamic(formbean.getAllowUserDynamic());
 		user.setSecurityDigest(new Date().getTime());
 		
 		//用户自定义注册功能项用户输入值集合
@@ -764,6 +766,8 @@ public class UserManageAction {
 	    }
 		//实名认证
 		new_user.setRealNameAuthentication(formbean.isRealNameAuthentication());
+		//允许显示用户动态
+		new_user.setAllowUserDynamic(formbean.getAllowUserDynamic());
 
 		//用户状态
 		if(formbean.getState() == null){

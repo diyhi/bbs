@@ -24,15 +24,16 @@
 		//设置隐藏标签界面
 		function setHideTagUI(){
 			//获取<hide>标签属性
-			$(".articleContent").find("hide").each(function(){
-
+			$(".topicContent").find("hide").each(function(){
 				var random = getRandom(13);
 	
 				//等级名称
 				var gradeName = $(this).attr("description");
-	
-	
 				var hideType = $(this).attr("hide-type");
+				
+				//话题Id
+				var topicId = $(this).parents(".topicContent").attr("topicId");//找到父级元素属性
+				
 				var inputValue = $(this).attr("input-value");
 				if(hideType == '10'){
 					var html = "";
@@ -41,7 +42,7 @@
 					html += 	'<div class="background-prompt">此处内容已被隐藏，输入密码可见</div>';
 					html += 	'<div class="input-box">';
 					html += 		'<input type="password" id="hide_password_'+random+'" class="text" maxlength="30"  placeholder="密码" value="">';
-					html += 		'<input type="button" value="提交" class="button" onclick="topicUnhide(10,'+random+');">';
+					html += 		'<input type="button" value="提交" class="button" onclick="topicUnhide(10,'+random+','+topicId+');">';
 					
 					html += 	'</div>';
 					html += '</div>';
@@ -66,7 +67,7 @@
 					html += 	'<div class="background-image"></div>';
 					html += 	'<div class="background-prompt">此处内容已被隐藏，支付 '+inputValue+' 积分可见</div>';
 					html += 	'<div class="submit-box">';
-					html += 		'<input type="button" value="立即购买" class="button" onclick="topicUnhide(40,'+random+');">';
+					html += 		'<input type="button" value="立即购买" class="button" onclick="topicUnhide(40,'+random+','+topicId+');">';
 					
 					html += 	'</div>';
  					$(this).html(html);
@@ -75,7 +76,7 @@
 		
 		}
 		//话题取消隐藏
-		function topicUnhide(hideType,random){
+		function topicUnhide(hideType,random,topicId){
 		
 			//判断是否已登录
 			var isLogin = document.getElementById("unhide_isLogin").value;
@@ -96,9 +97,9 @@
 		
 		
 			var parameter = "";
-			parameter += "&topicId="+getUrlParam("topicId");//获取URL参数
+			parameter += "&topicId="+topicId;//话题Id
 			
-			parameter += "&hideType="+hideType;//获取URL参数
+			parameter += "&hideType="+hideType;//隐藏类型
 		
 			if(hideType == 10){//输入密码可见
 				
@@ -118,7 +119,6 @@
 				parameter += "&password="+encodeURIComponent(password);//获取URL参数
 			
 			}
-			
 			//从meta标签获取令牌
 			parameter += "&token="+getCsrf();
 			//删除第一个&号,防止因为多了&号而出现警告: Parameters: Invalid chunk ignored.信息

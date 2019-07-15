@@ -893,7 +893,7 @@ var thread_component = Vue.extend({
 	            		if(childNode.getAttribute("hide-type") == "10"){//输入密码可见
 	            			var nodeHtml = "";
 	    					nodeHtml += '<div class="hide-box">';
-	    					nodeHtml += 	'<div class="background-image cms-lock1"></div>';
+	    					nodeHtml += 	'<div class="background-image cms-lock"></div>';
 	    					nodeHtml += 	'<div class="background-prompt">此处内容已被隐藏，输入密码可见</div>';
 	    					nodeHtml += 	'<div class="input-box">';
 	    					nodeHtml += 		'<input type="password" v-model.trim="hide_passwordList['+this.hidePasswordIndex+']" class="text" maxlength="30"  placeholder="密码" value="">';
@@ -906,21 +906,21 @@ var thread_component = Vue.extend({
 	            		}else if(childNode.getAttribute("hide-type") == "20"){
 	            			var nodeHtml = "";
 	            			nodeHtml += '<div class="hide-box">';
-	            			nodeHtml += 	'<div class="background-image cms-lock1"></div>';
+	            			nodeHtml += 	'<div class="background-image cms-lock"></div>';
 	            			nodeHtml += 	'<div class="background-prompt">此处内容已被隐藏，评论话题可见</div>';
 	            			nodeHtml += '</div>';
 	            			childNode.innerHTML = nodeHtml;
 	    				}else if(childNode.getAttribute("hide-type") == "30"){
 	            			var nodeHtml = "";
 	            			nodeHtml += '<div class="hide-box">';
-	            			nodeHtml += 	'<div class="background-image cms-lock1"></div>';
+	            			nodeHtml += 	'<div class="background-image cms-lock"></div>';
 	            			nodeHtml += 	'<div class="background-prompt">此处内容已被隐藏，等级达到‘'+childNode.getAttribute("description")+'’可见</div>';
 	            			nodeHtml += '</div>';
 	            			childNode.innerHTML = nodeHtml;
 	    				}else if(childNode.getAttribute("hide-type") == "40"){
 	            			var nodeHtml = "";
 	            			nodeHtml += '<div class="hide-box">';
-	            			nodeHtml += 	'<div class="background-image cms-lock1"></div>';
+	            			nodeHtml += 	'<div class="background-image cms-lock"></div>';
 	            			nodeHtml += 	'<div class="background-prompt">此处内容已被隐藏，支付‘'+childNode.getAttribute("input-value")+'’积分可见</div>';
 	            			nodeHtml += 	'<div class="submit-box">';
 	    					nodeHtml += 		'<input type="button" value="提交" class="button" @click="topicUnhide(40);">';
@@ -3260,7 +3260,14 @@ var home_component = Vue.extend({
 				centerBox: false,//截图框是否被限制在图片里面
 				high: false,//是否按照设备的dpr 输出等比例图片
 				maxImgSize: 4000 //限制图片最大宽度和高度
-			}
+			},
+		
+			userDynamicList : [], //用户动态集合
+			loading : false, //加载中
+			currentpage : 0, //当前页码
+			totalpage : 1, //总页数
+			hidePasswordIndex:0,//隐藏标签密码框索引
+			favoriteCountGroup:[],//话题收藏总数组
 		}
 	},
 	created : function created() {
@@ -3272,6 +3279,117 @@ var home_component = Vue.extend({
 	}, 
 	components: {
 	    'vue-cropper': window['vue-cropper'].default
+	},
+	computed: {
+		//动态解析评论引用模板数据
+		quoteDataComponent: function quoteDataComponent() {
+			return function (quoteContentData) {
+				return {
+					template: quoteContentData, // use content as template for this component
+					props: this.$options.props, // re-use current props definitions
+					
+				};
+			};	
+		},
+		
+		//动态解析隐藏标签模板数据
+		hideTagComponent: function hideTagComponent() {
+			return function (html) {
+				return {
+					template: "<div>"+ html +"</div>", // use content as template for this component 必须用<div>标签包裹，否则会有部分内容不显示
+					
+					data : function data() {
+						return {
+							hide_passwordList :[],//话题隐藏密码
+						};
+					},
+					props: this.$options.props, // re-use current props definitions
+					methods: {
+				        //模板中将点击事件绑定到本函数，作用域只限在这个子组件中
+				        topicUnhide : function(hideType,hidePasswordIndex,topicId){
+				        	var _self = this;
+				        	
+				        	var parameter = "&topicId=" +topicId;
+				        	parameter += "&hideType="+hideType;//获取URL参数
+				        	
+				        	if(hideType == 10){
+				        		var hide_password = _self.hide_passwordList[hidePasswordIndex];
+					        	if(hide_password != undefined && hide_password != ""){
+					        		parameter += "&password="+encodeURIComponent(hide_password);//获取URL参数
+					        	}else{
+					        		_self.$toast({
+										message : "密码不能为空",
+										duration : 3000,
+										className : "mint-ui-toast",
+									});
+					        		return;
+					        	}
+				        	}
+				        	
+							//令牌
+							parameter += "&token=" + _self.$store.state.token;
+							$.ajax({
+								type : "POST",
+								cache : false,
+								async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+								url : "user/control/topic/unhide",
+								data : parameter,
+								success : function success(result) {
+									if (result != "") {
+
+										var returnValue = $.parseJSON(result);
+
+										var value_success = "";
+										var value_error = null;
+
+										for (var key in returnValue) {
+											if (key == "success") {
+												value_success = returnValue[key];
+											} else if (key == "error") {
+												value_error = returnValue[key];
+											}
+										}
+
+										//加入成功
+										if (value_success == "true") {
+											_self.$toast({
+												message : "话题取消隐藏成功，3秒后自动刷新页面",
+												duration : 3000,
+												className : "mint-ui-toast",
+											});
+
+											setTimeout(function() {
+												//刷新动态列表
+												_self.$parent.refreshUserDynamicList();//调用父组件方法
+												
+											}, 3000);
+											
+										} else {
+											//显示错误
+											if (value_error != null) {
+
+
+												var htmlContent = "";
+												var count = 0;
+												for (var errorKey in value_error) {
+													var errorValue = value_error[errorKey];
+													count++;
+													htmlContent += count + ". " + errorValue + "<br>";
+												}
+												_self.$messagebox('提示', htmlContent);
+
+											}
+										}
+									}
+								}
+							});
+				        	
+				        }, 
+				        
+				    }
+				};
+			};	
+		},
 	},
 	methods : {
 		//选择剪裁图片
@@ -3416,6 +3534,164 @@ var home_component = Vue.extend({
 				}
 			});
 		},
+		
+		//刷新动态列表
+		refreshUserDynamicList : function() {
+			this.userDynamicList =[]; //用户动态集合
+			this.loading = false; //加载中
+			this.currentpage = 0; //当前页码
+			this.totalpage= 1; //总页数
+			this.hidePasswordIndex=0;//隐藏标签密码框索引	
+			this.favoriteCountGroup = [];//话题收藏总数组
+			//查询动态列表
+			this.queryUserDynamicList();
+		},
+		
+		//查询动态列表
+		queryUserDynamicList : function() {
+			var _self = this;
+			
+			if (_self.currentpage < _self.totalpage) {
+				//先改总页数为0，避免请求为空时死循环
+				_self.totalpage = 0;
+				_self.loading = true;
+				var data = "page=" + (_self.currentpage + 1); //提交参数
+				var userName = getUrlParam("userName");//用户名称
+				if(userName != null){
+					data += "&userName=" + userName;
+				}
+				$.ajax({
+					type : "GET",
+					cache : false,
+					async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+					url : "user/control/userDynamicList",
+					data : data,
+					success : function success(result) {
+						if (result != "") {	
+							var pageView = $.parseJSON(result);
+							var new_userDynamicList = pageView.records;
+							if (new_userDynamicList != null && new_userDynamicList.length > 0) {
+								
+								for(var i=0; i< new_userDynamicList.length;i++){
+									var userDynamic =  new_userDynamicList[i];
+									_self.favoriteCountGroup.push(0);
+									if(userDynamic.module == 100){
+										//处理隐藏标签
+										var contentNode = document.createElement("div");
+										contentNode.innerHTML = userDynamic.topicContent;
+										_self.hidePasswordIndex = 0;
+										_self.getChildNode(contentNode,userDynamic.topicId);
+										userDynamic.topicContent = contentNode.innerHTML;
+										
+										//收藏数量
+										_self.queryFavoriteCount(userDynamic.topicId,_self.favoriteCountGroup.length-1,function(index,count) {
+											if(count != null && count != ''){
+												_self.$set(_self.favoriteCountGroup, index, parseInt(count));
+											}
+											
+										});
+										
+									}
+								}
+								
+								_self.userDynamicList.push.apply(_self.userDynamicList, new_userDynamicList); //合并两个数组
+							}
+							
+							_self.currentpage = pageView.currentpage;
+							_self.totalpage = pageView.totalpage;
+							
+							
+						}
+					},
+					complete : function complete(XMLHttpRequest, textStatus) {
+						_self.loading = false;
+						//需手动调用设置的全局complete
+						$.ajaxSettings.complete(XMLHttpRequest, textStatus);
+					}
+				});
+			}	
+		},
+		//递归获取所有的子节点
+		getChildNode : function(node,topicId) {
+			//先找到子节点
+	        var nodeList = node.childNodes;
+	        for(var i = 0;i < nodeList.length;i++){
+	            //childNode获取到到的节点包含了各种类型的节点
+	            //但是我们只需要元素节点  通过nodeType去判断当前的这个节点是不是元素节点
+	            var childNode = nodeList[i];
+	            var random = Math.random().toString().slice(2);
+	            //判断是否是元素节点。如果节点是元素(Element)节点，则 nodeType 属性将返回 1。如果节点是属性(Attr)节点，则 nodeType 属性将返回 2。
+	            if(childNode.nodeType == 1){
+	            	if(childNode.nodeName.toLowerCase() == "hide" ){
+	            		if(childNode.getAttribute("hide-type") == "10"){//输入密码可见
+	            			var nodeHtml = "";
+	    					nodeHtml += '<div class="hide-box">';
+	    					nodeHtml += 	'<div class="background-image cms-lock"></div>';
+	    					nodeHtml += 	'<div class="background-prompt">此处内容已被隐藏，输入密码可见</div>';
+	    					nodeHtml += 	'<div class="input-box">';
+	    					nodeHtml += 		'<input type="password" v-model.trim="hide_passwordList['+this.hidePasswordIndex+']" class="text" maxlength="30"  placeholder="密码" value="">';
+	    					nodeHtml += 		'<input type="button" value="提交" class="button" @click="topicUnhide(10,'+this.hidePasswordIndex+','+topicId+');">';
+	    					nodeHtml += 	'</div>';
+	    					nodeHtml += '</div>';
+	    					childNode.innerHTML = nodeHtml;
+	    					
+	    					this.hidePasswordIndex++;
+	            		}else if(childNode.getAttribute("hide-type") == "20"){
+	            			var nodeHtml = "";
+	            			nodeHtml += '<div class="hide-box">';
+	            			nodeHtml += 	'<div class="background-image cms-lock"></div>';
+	            			nodeHtml += 	'<div class="background-prompt">此处内容已被隐藏，评论话题可见</div>';
+	            			nodeHtml += '</div>';
+	            			childNode.innerHTML = nodeHtml;
+	    				}else if(childNode.getAttribute("hide-type") == "30"){
+	            			var nodeHtml = "";
+	            			nodeHtml += '<div class="hide-box">';
+	            			nodeHtml += 	'<div class="background-image cms-lock"></div>';
+	            			nodeHtml += 	'<div class="background-prompt">此处内容已被隐藏，等级达到‘'+childNode.getAttribute("description")+'’可见</div>';
+	            			nodeHtml += '</div>';
+	            			childNode.innerHTML = nodeHtml;
+	    				}else if(childNode.getAttribute("hide-type") == "40"){
+	            			var nodeHtml = "";
+	            			nodeHtml += '<div class="hide-box">';
+	            			nodeHtml += 	'<div class="background-image cms-lock"></div>';
+	            			nodeHtml += 	'<div class="background-prompt">此处内容已被隐藏，支付‘'+childNode.getAttribute("input-value")+'’积分可见</div>';
+	            			nodeHtml += 	'<div class="submit-box">';
+	    					nodeHtml += 		'<input type="button" value="提交" class="button" @click="topicUnhide(40,'+null+','+topicId+');">';
+	    					nodeHtml += 	'</div>';
+	            			nodeHtml += '</div>';
+	            			childNode.innerHTML = nodeHtml;
+	    				}
+	            	}
+	               
+	            	this.getChildNode(childNode,topicId);
+	            }
+	        }
+	    },
+		//查询话题用户收藏总数
+		queryFavoriteCount : function(topicId,index,callback) {
+			var _self = this;
+			var data = "topicId=" + topicId; //提交参数
+			
+			$.ajax({
+				type : "GET",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "queryFavoriteCount",
+				data : data,
+				success : function success(result) {
+					if (result != "") {
+						var count = $.parseJSON(result);
+						if (count != null) {
+							
+							callback(index,count);
+						//	_self.favoriteCount = count;
+						}
+					}
+				}
+			});
+		},
+
+		
 		//显示'用户设置'			
 		displayUserSetting : function() {
 			this.popup_userSetting = true;
@@ -3783,6 +4059,7 @@ var editUser_component = Vue.extend({
 		return {
 			nickname : '',
 			allowNickname:true,//是否禁用修改呢称输入框
+			allowUserDynamic:true,//是否允许显示用户动态
 			oldPassword : '',
 			password : '',
 			confirmPassword : '',
@@ -3791,6 +4068,7 @@ var editUser_component = Vue.extend({
 			userBoundField : [], //用户自定义注册功能项绑定
 			error : {
 				nickname : '',
+				allowUserDynamic : '',
 				oldPassword : '',
 				password : '',
 				confirmPassword : '',
@@ -3822,6 +4100,8 @@ var editUser_component = Vue.extend({
 							if(_self.nickname == null || _self.nickname == ''){
 								_self.allowNickname = false;
 							}
+							
+							_self.allowUserDynamic = _self.user.allowUserDynamic;//是否允许显示用户动态
 							
 							_self.userCustomList = returnValue['userCustomList'];
 							if (_self.userCustomList != null && _self.userCustomList.length > 0) {
@@ -3942,8 +4222,10 @@ var editUser_component = Vue.extend({
 			
 
 			var parameter = "";
-			
-			parameter += "&nickname=" +  encodeURIComponent(_self.nickname.trim());
+			if(_self.nickname != null && _self.nickname != ""){
+				parameter += "&nickname=" +  encodeURIComponent(_self.nickname);
+			}
+			parameter += "&allowUserDynamic=" +  _self.allowUserDynamic;
 			
 			//密码需SHA256加密
 			var password = _self.password.trim();
@@ -4039,6 +4321,8 @@ var editUser_component = Vue.extend({
 								var number = error.split("_")[1];
 								if (error == "nickname") {
 									_self.error.nickname = errorValue;
+								}else if(error == "allowUserDynamic"){
+									_self.error.allowUserDynamic = errorValue;
 								}else if(error == "oldPassword"){
 									_self.error.oldPassword = errorValue;
 								}else if(error == "password"){

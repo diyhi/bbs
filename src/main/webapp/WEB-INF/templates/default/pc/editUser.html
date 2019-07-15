@@ -95,6 +95,17 @@
 		//令牌标记
 		var token = document.getElementById("token").value;
 		parameter += "&token="+token;
+		
+		var nickname = document.getElementById("nickname");
+		if(nickname != null){
+			parameter += "&nickname="+nickname.value;
+		}
+		var allowUserDynamic_radio = document.getElementsByName("allowUserDynamic");
+		for(var i=0; i<allowUserDynamic_radio.length; i++) {
+			if (allowUserDynamic_radio[i].checked) {
+				parameter += "&allowUserDynamic="+allowUserDynamic_radio[i].value;
+			}
+		}
 
 		//密码需SHA256加密
 		var password = document.getElementById("password").value;
@@ -854,6 +865,14 @@
 						</td>
 					</tr>
 					<tr>
+			    		<td width="120px" align="right">允许显示用户动态：</td>
+			    		<td align="left">
+			    			<label><input type="radio" name="allowUserDynamic" value="true" <#if user.allowUserDynamic ==true> checked='checked'</#if>>显示</label>&nbsp;&nbsp;
+							<label><input type="radio" name="allowUserDynamic" value="false" <#if user.allowUserDynamic ==false> checked='checked'</#if>>关闭</label>
+							<span id="allowUserDynamic_error" class="error">${(error['allowUserDynamic'])!}</span>
+			    		</td>
+					</tr>
+					<tr>
 						<td width="120px" align="right">旧密码： </td>
 						<td align="left">
 							<input type="password" id="oldPassword" name="oldPassword" class="formText" autocomplete="off" size="25" maxlength="20" onBlur="verification(this.id)"/>
@@ -951,7 +970,7 @@
 							
 							<!-- 
 							<span class="submitButton"><INPUT type="button" value="ajax提交" onClick="javascript:ajaxSubmit();"></span>
-							 -->
+							  -->
 							<span id="token_error" class="error">${error['token']}</span> 
 						</td>
 					</tr>

@@ -30,9 +30,11 @@ import cms.bean.staff.SysUsers;
 import cms.bean.topic.Comment;
 import cms.bean.topic.Quote;
 import cms.bean.topic.Reply;
+import cms.bean.user.User;
 import cms.service.setting.SettingService;
 import cms.service.topic.CommentService;
 import cms.service.topic.TopicService;
+import cms.service.user.UserService;
 import cms.utils.IpAddress;
 import cms.utils.JsonUtils;
 import cms.utils.UUIDUtil;
@@ -40,6 +42,7 @@ import cms.web.action.FileManage;
 import cms.web.action.TextFilterManage;
 import cms.web.action.filterWord.SensitiveWordFilterManage;
 import cms.web.action.setting.SettingManage;
+import cms.web.action.user.UserManage;
 
 /**
  * 评论
@@ -61,6 +64,11 @@ public class CommentManageAction {
 	@Resource SettingService settingService;
 	@Resource TopicManage topicManage;
 	@Resource TopicService topicService;
+	
+	@Resource UserService userService;
+	@Resource UserManage userManage;
+	
+	
 	/**
 	 * 评论  添加
 	 */
@@ -181,6 +189,7 @@ public class CommentManageAction {
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		Comment comment = null;
+		Integer old_status = -1;
 		Map<String,String> error = new HashMap<String,String>();
 		if(commentId == null || commentId <=0){
 			error.put("commentId", "引用评论不能为空");
@@ -189,7 +198,7 @@ public class CommentManageAction {
 		}
 		if(content != null && !"".equals(content.trim())){
 			if(comment != null){
-				
+				old_status = comment.getStatus();
 				comment.setStatus(status);
 				
 				
@@ -212,11 +221,26 @@ public class CommentManageAction {
 					String username = comment.getUserName();//用户名称
 					
 					//修改评论
-					commentService.updateComment(comment.getId(),value,status,lowerQuoteIdGroup,username);
+					int i = commentService.updateComment(comment.getId(),value,status,lowerQuoteIdGroup,username);
+					
+					
+					if(i >0 && !old_status.equals(status)){
+						User user = userManage.query_cache_findUserByUserName(comment.getUserName());
+						if(user != null){
+							//修改评论状态
+							userService.updateUserDynamicCommentStatus(user.getId(),comment.getUserName(),comment.getId(),comment.getStatus());
+						}
+						
+					}
+					
+					
+					
+					//删除缓存
+					commentManage.delete_cache_findByCommentId(comment.getId());
 					
 					//上传文件编号
 					String fileNumber = topicManage.generateFileNumber(comment.getUserName(), comment.getIsStaff());
-					
+
 						
 					if(imageNameList != null && imageNameList.size() >0){
 						for(String imageName :imageNameList){
@@ -309,6 +333,13 @@ public class CommentManageAction {
 				
 				int i = commentService.deleteComment(comment.getTopicId(),commentId);
 				if(i >0){
+					//根据评论Id删除用户动态(评论下的回复也同时删除)
+					userService.deleteUserDynamicByCommentId(commentId);
+					
+					
+					//删除缓存
+					commentManage.delete_cache_findByCommentId(comment.getId());
+					
 					String fileNumber = topicManage.generateFileNumber(comment.getUserName(), comment.getIsStaff());
 					
 					//删除图片
@@ -575,7 +606,19 @@ public class CommentManageAction {
 	public String auditComment(ModelMap model,Long commentId,
 			HttpServletResponse response) throws Exception {
 		if(commentId != null && commentId>0L){
-			commentService.updateCommentStatus(commentId, 20);
+			int i = commentService.updateCommentStatus(commentId, 20);
+			
+			Comment comment = commentManage.query_cache_findByCommentId(commentId);
+			if(i >0 && comment != null){
+				User user = userManage.query_cache_findUserByUserName(comment.getUserName());
+				if(user != null){
+					//修改话题状态
+					userService.updateUserDynamicCommentStatus(user.getId(),comment.getUserName(),comment.getId(),20);
+				}
+			}
+			
+			//删除缓存
+			commentManage.delete_cache_findByCommentId(commentId);
 			return "1";
 		}
 		return "0";
@@ -698,6 +741,7 @@ public class CommentManageAction {
 	public String editReply(ModelMap model,Long replyId,String content,Integer status,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Reply reply = null;
+		Integer old_status = -1;
 		Map<String,String> error = new HashMap<String,String>();
 		if(replyId != null && replyId >0){
 			reply = commentService.findReplyByReplyId(replyId);
@@ -708,6 +752,7 @@ public class CommentManageAction {
 
 		if(content != null && !"".equals(content.trim())){
 			if(reply != null){
+				old_status = reply.getStatus();
 				reply.setStatus(status);
 				
 				//不含标签内容
@@ -718,8 +763,20 @@ public class CommentManageAction {
 				if((!"".equals(text.trim()) && !"".equals(trimSpace))){
 					String username = reply.getUserName();//用户名称
 					//修改回复
-					commentService.updateReply(replyId,text,username,status);
-
+					int i = commentService.updateReply(replyId,text,username,status);
+					
+					if(i >0 && !old_status.equals(status)){
+						User user = userManage.query_cache_findUserByUserName(reply.getUserName());
+						if(user != null){
+							//修改话题状态
+							userService.updateUserDynamicReplyStatus(user.getId(),reply.getUserName(),reply.getId(),reply.getStatus());
+						}
+						
+					}
+					
+					
+					//删除缓存
+					commentManage.delete_cache_findReplyByReplyId(replyId);
 				}else{	
 					error.put("content", "回复内容不能为空");
 					
@@ -753,7 +810,18 @@ public class CommentManageAction {
 	public String deleteReply(ModelMap model,Long replyId,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		if(replyId != null && replyId >0){
+			
+			Reply reply = commentManage.query_cache_findReplyByReplyId(replyId);
 			int i = commentService.deleteReply(replyId);
+			if(i >0 && reply != null){
+				User user = userManage.query_cache_findUserByUserName(reply.getUserName());
+				if(user != null){
+					userService.deleteUserDynamicByReplyId(user.getId(),replyId);
+				}
+			}
+
+			//删除缓存
+			commentManage.delete_cache_findReplyByReplyId(replyId);
 			if(i >0){
 				return "1";
 			}
@@ -773,7 +841,19 @@ public class CommentManageAction {
 			HttpServletResponse response) throws Exception {
 		
 		if(replyId != null && replyId>0L){
-			commentService.updateReplyStatus(replyId, 20);
+			int i = commentService.updateReplyStatus(replyId, 20);
+			
+			Reply reply = commentManage.query_cache_findReplyByReplyId(replyId);
+			if(reply != null){
+				User user = userManage.query_cache_findUserByUserName(reply.getUserName());
+				if(i >0 && user != null){
+					//修改话题状态
+					userService.updateUserDynamicReplyStatus(user.getId(),reply.getUserName(),reply.getId(),20);
+				}
+			}
+			
+			//删除缓存
+			commentManage.delete_cache_findReplyByReplyId(replyId);
 			return "1";
 		}
 		return "0";

@@ -61,8 +61,8 @@
 			
 				<div class="articleBox">
 					<h1>${topic.title}</h1>
-								
-					<div class="articleContent">
+					<!-- topicId属性用来支持JS获取隐藏内容 -->
+					<div class="topicContent" topicId="${topic.id}">
 						<#noescape>${topic.content}</#noescape>
 						
 						

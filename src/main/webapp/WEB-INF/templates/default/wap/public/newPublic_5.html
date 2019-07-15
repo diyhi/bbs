@@ -873,6 +873,75 @@
 		        </li>
 			</ul>
 		</div>
+		
+		<!-- 动态内容 -->
+		<div class="userDynamicList" v-if="user.userName != $store.state.user.userName" v-infinite-scroll="queryUserDynamicList" infinite-scroll-disabled="loading" infinite-scroll-distance="10">
+			<div class="item" v-for="(userDynamic,index) in userDynamicList" >
+				<div class="head">
+					<!-- router-link渲染成<div>标签-->
+			    	<router-link class="avatarBox"  tag="div" :to="{path: '/user/control/home', query: {userName: userDynamic.userName}}">
+			        	<img :src="userDynamic.avatarPath+'100x100/'+userDynamic.avatarName" v-if="userDynamic.avatarName != null">
+			            <img :src="$store.state.commonPath+'images/min_avata.png'" v-if="userDynamic.avatarName == null || userDynamic.avatarName == ''">
+			        </router-link>
+					<span class="info" >
+						<!-- router-link渲染成<h2>标签-->
+				    	<router-link tag="h2" :to="{path: '/user/control/home', query: {userName: userDynamic.userName}}">
+				           {{userDynamic.nickname != null && userDynamic.nickname != '' ? userDynamic.nickname : userDynamic.userName}}
+				        </router-link> 
+	                    <p class="time">{{userDynamic.postTime}}</p>
+	                </span>                    
+	            </div>
+	            <div class="main">
+	            	
+					
+					<div class="title">
+						<span class="description" v-if="userDynamic.module == 100">发表了话题</span>
+				
+						<span class="description" v-if="userDynamic.module == 200">评论了话题</span>
+				
+						<span class="description" v-if="userDynamic.module == 300">引用了话题</span>
+				
+						<span class="description" v-if="userDynamic.module == 400">回复了话题</span>
+						<!-- router-link渲染成<span>标签-->
+						<router-link tag="span" :to="{path: '/thread', query: {topicId: userDynamic.topicId}}" >
+							{{userDynamic.topicTitle}}
+						</router-link>
+					</div>	
+					<!-- 内容 -->
+					<v-readmore>
+						<div class="topicContent" v-if="userDynamic.module == 100" ><component v-bind:is ="hideTagComponent(userDynamic.topicContent)" v-bind="$props" /></div>
+	            	</v-readmore>
+	            	<v-readmore>
+	            		<div class="commentContent" v-if="userDynamic.module == 200" v-html="userDynamic.commentContent"></div>
+	            	</v-readmore>
+	            	<v-readmore>
+	            	<div v-if="userDynamic.module == 300" >
+						<div class="commentContent" v-html="userDynamic.commentContent"></div>
+                       	<div class="quoteContent">
+                           <div class="text" >
+                               {{userDynamic.quoteCommentContent}}
+                           </div>
+                    	</div>
+					</div>
+					</v-readmore>
+	            	<v-readmore>
+	            		<div class="replyContent" v-if="userDynamic.module == 400" >{{userDynamic.replyContent}}</div> 
+	            	</v-readmore>                     
+				</div>
+				
+				<div class="bottomInfo">
+					<div class="toolbar">
+						<router-link class="btn" tag="span" :to="{path: '/thread', query: {topicId: userDynamic.topicId}}" v-if="userDynamic.module == 100">查看原文</router-link>
+						<span class="btn" v-if="userDynamic.module == 100">{{userDynamic.topicViewTotal}}次阅读</span>
+						<span class="btn" v-if="userDynamic.module == 100">{{userDynamic.topicCommentTotal}}个评论</span>
+						<span class="btn" v-if="userDynamic.module == 100">{{favoriteCountGroup[index]}}人收藏</span>
+					
+						<router-link class="btn" tag="span"  :to="{path: '/thread', query: {topicId: userDynamic.topicId,commentId: userDynamic.commentId}}" v-if="userDynamic.module == 200 || userDynamic.module == 300 || userDynamic.module == 400">查看原文</router-link>
+					</div>
+				</div>
+			</div>
+		</div>
+		
 		<!-- 用户设置 弹出框 -->
 		<mt-popup v-model="popup_userSetting" position="right" style="width: 100%;height: 100%" :modal="false">
 			<mt-header fixed title="用户设置" style="background: #fafafa; color: #000000;font-size: 14px">
@@ -967,7 +1036,7 @@
 			            </span>
 			            <p class="bRight">
 			            	<span class="status" v-if="topic.status == 10">[待审核]</span>
-			            	<router-link class="fast cms-lock1"  tag="span" :to="{path: '/user/control/topicUnhideList', query: {topicId: topic.id}}" ></router-link>
+			            	<router-link class="fast cms-lock"  tag="span" :to="{path: '/user/control/topicUnhideList', query: {topicId: topic.id}}" ></router-link>
 			            	<router-link class="fast cms-favorites"  tag="span" :to="{path: '/user/control/topicFavoriteList', query: {topicId: topic.id}}" ></router-link>
 			            	<i class="time">{{topic.postTime}}</i>
 			            </p> 
@@ -1106,6 +1175,13 @@
 			    	<span>{{error.nickname}}</span>
 			    </p>
 	        </li>
+	        <li>
+		        <mt-cell title="允许显示用户动态">
+		        	<mt-switch v-model="allowUserDynamic"></mt-switch>
+		        </mt-cell>
+		        <p class="tips">
+			    	<span>{{error.allowUserDynamic}}</span>
+			    </p>
 	        <li>
 	        	<mt-field v-model.trim="oldPassword" label="旧密码" placeholder="不修改密码请留空" type="password"></mt-field>
 	        	<p class="tips">
@@ -1755,7 +1831,7 @@
 <script src="${commonPath}js/better-scroll.min.js?2d" type="text/javascript"></script> 
  
 <script src="${commonPath}js/vue-cropper.js" type="text/javascript"></script>
- 
+ <script src="${commonPath}js/v-readmore.min.js" type="text/javascript"></script>
 <script src="${commonPath}js/wangeditor/wangEditor.min.js?3" type="text/javascript"></script>
 
 <script src="${commonPath}js/main.js?10d" type="text/javascript"></script>

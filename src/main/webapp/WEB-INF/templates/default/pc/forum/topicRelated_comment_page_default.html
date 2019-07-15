@@ -29,7 +29,7 @@
 					<div class="quote">
 						<#assign quoteContent = ""> 
 						<#list comment.quoteList as quote>
-							<#assign quoteContent = "<div>"+quoteContent+"<span>"+(quote.nickname != null && quote.nickname??) ?string(quote.nickname , quote.userName)+"&nbsp;的评论：</span><br/>"+quote.content+"</div>"> 
+							<#assign quoteContent = "<div>"+quoteContent+"<span>"+"<a href='user/control/home?userName="+quote.userName+"'>"+(quote.nickname != null && quote.nickname??) ?string(quote.nickname , quote.userName)+"</a>"+"&nbsp;的评论：</span><br/>"+quote.content+"</div>"> 
 						</#list>
 						<#noescape>${quoteContent}</#noescape>
 					</div>

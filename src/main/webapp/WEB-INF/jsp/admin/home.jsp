@@ -30,7 +30,7 @@
 		    <TD class="t-label t-label-h" width="15%">最后5次登录日志：</TD>
 		    <TD class="t-content" width="85%" colSpan="3">
 	    		<table style="width:100%;" >
-	    			<thead>
+	    			<thead style="color: #555;">
 		    			<tr>
 		    				<th width="20%" height="26px" align="left">登录IP</th>
 		    				<th width="30%" align="left">IP归属地</th>
@@ -39,13 +39,13 @@
 	    			</thead>
 				    <c:forEach items="${staffLoginLogList}" var="entry" > 
 					    <tr>
-					  		<td style="border-top:1px dashed #BFE3FF; border-right:1px dashed #BFE3FF; line-height:24px;color: #999; text-align:left;">
+					  		<td style="border-top:1px dashed #BFE3FF; border-right:1px dashed #BFE3FF; line-height:26px;color: #999; text-align:left;">
 					  			${entry.ip}
 					    	</td>
-					    	<td style="border-top:1px dashed #BFE3FF; line-height:24px;color: #999; text-align:left;">
+					    	<td style="border-top:1px dashed #BFE3FF; line-height:26px;color: #999; text-align:left;">
 					    		${entry.ipAddress}
 					    	</td>
-					    	<td style="border-top:1px dashed #BFE3FF; line-height:24px;color: #999; text-align:left;">
+					    	<td style="border-top:1px dashed #BFE3FF; line-height:26px;color: #999; text-align:left;">
 					    		<fmt:formatDate value="${entry.logonTime}"  pattern="yyyy-MM-dd HH:mm:ss"/>
 					    	</td>
 					    </tr>

@@ -168,5 +168,21 @@ public class BeanFactoryPost implements BeanFactoryPostProcessor{
 				}	
 			}
 		}
+		
+		BeanDefinition userDynamic_bd = beanFactory.getBeanDefinition("userDynamicConfig");
+		if(userDynamic_bd != null){
+			MutablePropertyValues mutablePropertyValues = userDynamic_bd.getPropertyValues();
+			TypedStringValue typedStringValue = (TypedStringValue)mutablePropertyValues.getPropertyValue("tableQuantity").getValue();
+
+			//用户动态分表数量
+			Integer tableQuantity = Integer.parseInt(typedStringValue.getValue());
+			if(tableQuantity >1){
+				for(int i =1; i<tableQuantity; i++){
+					
+					//初始化用户动态bean
+					CreateBean.createUserDynamicBean(i);
+				}	
+			}
+		}
 	}
 }

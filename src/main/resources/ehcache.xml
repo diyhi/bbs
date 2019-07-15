@@ -150,6 +150,16 @@
 		overflowToDisk="true"
 		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="600" 
 		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
+	<!-- 评论 - 评论缓存 -->		
+	<cache name="commentManage_cache_findByCommentId" maxElementsInMemory="99999999" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
+	<!-- 回复 - 回复缓存 -->		
+	<cache name="commentManage_cache_findReplyByReplyId" maxElementsInMemory="99999999" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
 	<!-- 标签 - 查询所有标签 -->	
 	<cache name="findAllTag_cache" maxElementsInMemory="1" 
 		overflowToDisk="true"
@@ -224,13 +234,13 @@
 	<cache name="systemNotifyManage_cache_findById" maxElementsInMemory="900000" 
 		overflowToDisk="true"
 		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
-		memoryStoreEvictionPolicy="LFU" />		
+		memoryStoreEvictionPolicy="LFU" />	
 	<!-- 根据用户Id查询未读提醒数量 -->
 	<cache name="remindManage_cache_findUnreadRemindByUserId" maxElementsInMemory="900000" 
 		overflowToDisk="true"
 		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
-		memoryStoreEvictionPolicy="LFU" />	
-		
+		memoryStoreEvictionPolicy="LFU" />
+			
 	<!-- 根据Id查询话题收藏 -->
 	<cache name="favoriteManage_cache_findTopicFavoriteById" maxElementsInMemory="900000" 
 		overflowToDisk="true"

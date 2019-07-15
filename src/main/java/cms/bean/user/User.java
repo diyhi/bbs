@@ -29,7 +29,7 @@ import org.joda.time.DateTime;
    )},indexes = {@Index(name="user_idx", columnList="state")}
 )//给user字段添加唯一性约束
 public class User implements Serializable{
-	private static final long serialVersionUID = 3692366870616346904L;
+	private static final long serialVersionUID = 2001664193065966153L;
 	
 	/** ID **/
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,7 +40,6 @@ public class User implements Serializable{
 	/** 呢称 **/
 	@Column(length=50)
 	private String nickname;
-	
 	/** 密码 密码结构: sha256(sha256(密码)+[盐值])  **/
 	@Column(length=160)
 	private String password;
@@ -51,6 +50,9 @@ public class User implements Serializable{
 	
 	/** 安全摘要 需要用户重新登录时改变此值**/
 	private Long securityDigest;
+	
+	/** 是否允许显示用户动态 **/
+	private Boolean allowUserDynamic = true;
 	
 	/** 邮箱地址 **/
 	@Column(length=60)
@@ -225,6 +227,12 @@ public class User implements Serializable{
 	}
 	public void setNickname(String nickname) {
 		this.nickname = nickname;
+	}
+	public Boolean getAllowUserDynamic() {
+		return allowUserDynamic;
+	}
+	public void setAllowUserDynamic(Boolean allowUserDynamic) {
+		this.allowUserDynamic = allowUserDynamic;
 	}
 
 }

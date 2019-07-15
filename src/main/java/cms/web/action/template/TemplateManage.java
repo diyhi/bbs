@@ -367,6 +367,17 @@ public class TemplateManage {
 		layout_topicUnhideList.setReferenceCode("user/control/topicUnhideList");
 		layoutList.add(layout_topicUnhideList);
 		
+		//用户动态列表
+		Layout layout_userDynamicList = new Layout();
+		layout_userDynamicList.setId(UUIDUtil.getUUID32());
+		layout_userDynamicList.setName("用户动态列表");
+		layout_userDynamicList.setDirName(dirName);
+		layout_userDynamicList.setLayoutFile("userDynamicList.html");
+		layout_userDynamicList.setType(1);//默认页
+		layout_userDynamicList.setSort(900);//排序
+		layout_userDynamicList.setReferenceCode("user/control/userDynamicList");
+		layoutList.add(layout_userDynamicList);
+		
 		return layoutList;
 	}
 	

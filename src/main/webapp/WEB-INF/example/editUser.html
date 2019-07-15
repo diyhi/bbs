@@ -90,6 +90,11 @@
 			<td colspan="2">呢称</td>
 		</tr>
 		<tr> 
+			<td>allowUserDynamic</td> 
+			<td>Boolean</td>
+			<td colspan="2">是否允许显示用户动态</td>
+		</tr>
+		<tr> 
 			<td>email</td> 
 			<td>String</td>
 			<td colspan="2">邮箱地址</td>
@@ -338,14 +343,19 @@
 			<td>用户自定义注册功能项参数值错误</td>
 		</tr>
 		<tr> 
-			<td>password</td> 
-			<td>String</td>
-			<td>新密码错误</td>
-		</tr>
-		<tr> 
 			<td>nickname</td> 
 			<td>String</td>
 			<td>呢称错误</td>
+		</tr>
+		<tr> 
+			<td>allowUserDynamic</td> 
+			<td>String</td>
+			<td>允许显示用户动态错误</td>
+		</tr>
+		<tr> 
+			<td>password</td> 
+			<td>String</td>
+			<td>新密码错误</td>
 		</tr>
 		<tr> 
 			<td>oldPassword</td> 
@@ -382,6 +392,12 @@
 			<td>String</td>
 			<td>按需填写</td>
 			<td>呢称 设置后不允许再修改</td> 
+		</tr>
+		<tr> 
+			<td>allowUserDynamic</td> 
+			<td>Boolean</td>
+			<td>是</td>
+			<td>是否允许显示用户动态</td> 
 		</tr>
 	 	<tr> 
 			<td>password</td> 
@@ -555,6 +571,12 @@
 	<#-- 用户名 -->
 	${user.userName}
 	
+	<#-- 允许显示用户动态 -->
+	<input type="radio" name="allowUserDynamic" value="true" <#if user.allowUserDynamic ==true> checked='checked'</#if>>显示
+	<input type="radio" name="allowUserDynamic" value="false" <#if user.allowUserDynamic ==false> checked='checked'</#if>>关闭
+	<#-- 允许显示用户动态错误 -->
+	${(error['allowUserDynamic'])!}
+	
 	<#-- 旧密码 -->
 	<input type="password" id="oldPassword" name="oldPassword" autocomplete="off" size="25" maxlength="20" />
 	<#-- 旧密码错误 -->
@@ -671,6 +693,17 @@
 		//令牌标记
 		var token = document.getElementById("token").value;
 		parameter += "&token="+token;
+		
+		var nickname = document.getElementById("nickname");
+		if(nickname != null){
+			parameter += "&nickname="+nickname.value;
+		}
+		var allowUserDynamic_radio = document.getElementsByName("allowUserDynamic");
+		for(var i=0; i<allowUserDynamic_radio.length; i++) {
+			if (allowUserDynamic_radio[i].checked) {
+				parameter += "&allowUserDynamic="+allowUserDynamic_radio[i].value;
+			}
+		}
 
 		//密码需SHA256加密
 		var password = document.getElementById("password").value;

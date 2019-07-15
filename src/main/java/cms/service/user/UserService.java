@@ -7,6 +7,7 @@ import cms.bean.QueryResult;
 import cms.bean.user.DisableUserName;
 import cms.bean.user.PointLog;
 import cms.bean.user.User;
+import cms.bean.user.UserDynamic;
 import cms.bean.user.UserInputValue;
 import cms.bean.user.UserLoginLog;
 import cms.service.besa.DAO;
@@ -239,4 +240,74 @@ public interface UserService extends DAO<User> {
 	 * @return
 	 */
 	public Integer deleteDisableUserName(Integer id);
+	
+	/**
+	 * 保存用户动态
+	 * 先由userDynamicManage.createUserDynamicObject();方法生成对象再保存
+	 * @param userDynamic 用户动态
+	 */
+	public void saveUserDynamic(Object userDynamic);
+	/**
+	 * 修改话题状态
+	 * @param userId 用户Id
+	 * @param userName 用户名称
+	 * @param topicId 话题Id
+	 * @param status 状态
+	 */
+	public Integer updateUserDynamicTopicStatus(Long userId,String userName,Long topicId,Integer status);
+	/**
+	 * 修改评论状态
+	 * @param userId 用户Id
+	 * @param userName 用户名称
+	 * @param commentId 评论Id
+	 * @param status 状态
+	 */
+	public Integer updateUserDynamicCommentStatus(Long userId,String userName,Long commentId,Integer status);
+	/**
+	 * 修改回复状态
+	 * @param userId 用户Id
+	 * @param userName 用户名称
+	 * @param replyId 回复Id
+	 * @param status 状态
+	 */
+	public Integer updateUserDynamicReplyStatus(Long userId,String userName,Long replyId,Integer status);
+	/**
+	 * 根据话题Id软删除用户动态
+	 * @param userId 用户Id
+	 * @param userName 用户名称
+	 * @param topicId 话题Id
+	 */
+	public Integer softDeleteUserDynamicByTopicId(Long userId,String userName,Long topicId);
+	/**
+	 * 根据话题Id还原用户动态
+	 * @param userId 用户Id
+	 * @param userName 用户名称
+	 * @param topicId 话题Id
+	 */
+	public Integer reductionUserDynamicByTopicId(Long userId,String userName,Long topicId);
+	/**
+	 * 根据话题Id删除用户动态(话题下的评论和回复也同时删除)
+	 * @param topicId 话题Id
+	 */
+	public Integer deleteUserDynamicByTopicId(Long topicId);
+	/**
+	 * 根据评论Id删除用户动态(评论下的回复也同时删除)
+	 * @param commentId 评论Id
+	 */
+	public Integer deleteUserDynamicByCommentId(Long commentId);
+	/**
+	 * 根据回复Id删除用户动态
+	 * @param userId 用户Id
+	 * @param userName 用户名称
+	 * @param commentId 评论Id
+	 */
+	public Integer deleteUserDynamicByReplyId(Long userId,Long replyId);
+	/**
+	 * 用户动态分页
+	 * @param userId 用户Id
+	 * @param userName 用户名称
+	 * @param firstIndex 索引开始,即从哪条记录开始
+	 * @param maxResult 获取多少条数据
+	 */
+	public QueryResult<UserDynamic> findUserDynamicPage(Long userId,String userName,int firstIndex, int maxResult);
 }

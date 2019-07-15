@@ -5,9 +5,14 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 import cms.bean.setting.EditorTag;
+import cms.bean.topic.Comment;
+import cms.bean.topic.Reply;
+import cms.service.topic.CommentService;
 import cms.utils.JsonUtils;
 import cms.web.action.setting.SettingManage;
 
@@ -15,6 +20,9 @@ import cms.web.action.setting.SettingManage;
 @Component("commentManage")
 public class CommentManage {
 	@Resource SettingManage settingManage;
+	@Resource CommentService commentService;
+	
+	
 	/**
 	 * 评论编辑器允许使用标签
 	 * @return List<String> 类型json格式
@@ -112,5 +120,39 @@ public class CommentManage {
 			}
 		}
 		return JsonUtils.toJSONString(tag);
+	}
+	
+	
+	/**
+	 * 查询评论缓存
+	 * @param commentId 评论Id
+	 */
+	@Cacheable(value="commentManage_cache_findByCommentId",key="#commentId")
+	public Comment query_cache_findByCommentId(Long commentId){
+		return commentService.findByCommentId(commentId);
+	}
+	/**
+	 * 删除评论缓存
+	 * @param commentId 评论Id
+	 */
+	@CacheEvict(value="commentManage_cache_findByCommentId",key="#commentId")
+	public void delete_cache_findByCommentId(Long commentId){
+
+	}
+	
+	/**
+	 * 查询回复缓存
+	 * @param replyId 回复Id
+	 */
+	@Cacheable(value="commentManage_cache_findReplyByReplyId",key="#replyId")
+	public Reply query_cache_findReplyByReplyId(Long replyId){
+		return commentService.findReplyByReplyId(replyId);
+	}
+	/**
+	 * 删除回复缓存
+	 * @param replyId 回复Id
+	 */
+	@CacheEvict(value="commentManage_cache_findReplyByReplyId",key="#replyId")
+	public void delete_cache_findReplyByReplyId(Long replyId){
 	}
 }

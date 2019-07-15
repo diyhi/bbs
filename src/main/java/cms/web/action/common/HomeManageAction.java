@@ -44,6 +44,7 @@ import cms.bean.message.SubscriptionSystemNotify;
 import cms.bean.message.SystemNotify;
 import cms.bean.message.UnreadMessage;
 import cms.bean.topic.Comment;
+import cms.bean.topic.HideTagType;
 import cms.bean.topic.Reply;
 import cms.bean.topic.Tag;
 import cms.bean.topic.Topic;
@@ -54,6 +55,7 @@ import cms.bean.user.FormCaptcha;
 import cms.bean.user.PointLog;
 import cms.bean.user.User;
 import cms.bean.user.UserCustom;
+import cms.bean.user.UserDynamic;
 import cms.bean.user.UserGrade;
 import cms.bean.user.UserInputValue;
 import cms.bean.user.UserLoginLog;
@@ -92,6 +94,7 @@ import cms.web.action.message.SystemNotifyManage;
 import cms.web.action.setting.SettingManage;
 import cms.web.action.sms.SmsManage;
 import cms.web.action.thumbnail.ThumbnailManage;
+import cms.web.action.topic.CommentManage;
 import cms.web.action.topic.TopicManage;
 import cms.web.action.user.UserManage;
 import cms.web.taglib.Configuration;
@@ -145,6 +148,8 @@ public class HomeManageAction {
 	@Resource FavoriteService favoriteService;
 	
 	@Resource FavoriteManage favoriteManage;
+	
+	@Resource CommentManage commentManage;
 	
 	//?  匹配任何单字符
 	//*  匹配0或者任意数量的字符
@@ -229,6 +234,7 @@ public class HomeManageAction {
       			other_user.setUserName(new_user.getUserName());//会员用户名
       			other_user.setNickname(new_user.getNickname());//呢称
       			other_user.setState(new_user.getState());//用户状态
+      			other_user.setPoint(new_user.getPoint());//当前积分
       			other_user.setGradeId(new_user.getGradeId());//等级Id
       			other_user.setGradeName(new_user.getGradeName());//等级名称
       			other_user.setAvatarPath(new_user.getAvatarPath());//头像路径
@@ -644,6 +650,7 @@ public class HomeManageAction {
 		viewUser.setId(user.getId());
 		viewUser.setUserName(user.getUserName());//会员用户名
 		viewUser.setNickname(user.getNickname());//呢称
+		viewUser.setAllowUserDynamic(user.getAllowUserDynamic());//是否允许显示用户动态
 		viewUser.setEmail(user.getEmail());//邮箱地址
 		viewUser.setIssue(user.getIssue());//密码提示问题
 		viewUser.setRegistrationDate(user.getRegistrationDate());//注册日期
@@ -948,12 +955,17 @@ public class HomeManageAction {
 			}
 			new_user.setNickname(formbean.getNickname().trim());
 		}
-		
+
 		new_user.setId(user.getId());
 		new_user.setUserName(user.getUserName());
 		if(new_user.getNickname() == null || "".equals(new_user.getNickname().trim())){
 			new_user.setNickname(user.getNickname());
 		}
+		if(formbean.getAllowUserDynamic() != null){
+			new_user.setAllowUserDynamic(formbean.getAllowUserDynamic());//允许显示用户动态 
+		}
+		
+		
 		new_user.setUserVersion(user.getUserVersion());
 		
 		
@@ -3549,6 +3561,192 @@ public class HomeManageAction {
 		}else{
 			model.addAttribute("pageView", pageView);
 			return "templates/"+dirName+"/"+accessPath+"/topicUnhideList";	
+		}
+	}
+	
+	/**
+	 * 用户动态列表
+	 * @param model
+	 * @param pageForm
+	 * @param topicId 话题Id
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/user/control/userDynamicList",method=RequestMethod.GET) 
+	public String userDynamicList(ModelMap model,PageForm pageForm,String userName,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		
+		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+		
+		String dirName = templateService.findTemplateDir_cache();
+		
+		
+		String accessPath = accessSourceDeviceManage.accessDevices(request);
+	   
+		
+		
+		
+		//调用分页算法代码
+		PageView<UserDynamic> pageView = new PageView<UserDynamic>(settingService.findSystemSetting_cache().getForestagePageNumber(),pageForm.getPage(),10,request.getRequestURI(),request.getQueryString());
+		
+		//获取登录用户
+	  	AccessUser accessUser = AccessUserThreadLocal.get();
+	  	
+	  	
+	  	Long _userId = null;
+	  	String _userName = null;
+	  	if(userName != null && !"".equals(userName.trim())){
+	  		if(userName.equals(accessUser.getUserName())){//自身
+	  			_userId = accessUser.getUserId();
+	  			_userName = accessUser.getUserName();
+	  		}else{//其它用户
+	  			User user = userManage.query_cache_findUserByUserName(userName);
+	  			if(user != null && user.getAllowUserDynamic() != null && user.getAllowUserDynamic()){//允许显示
+	  				_userId = user.getId();
+	  				_userName = user.getUserName();
+	  			}
+	  		}
+	  	}else{
+	  		_userId = accessUser.getUserId();
+	  		_userName = accessUser.getUserName();
+	  	}
+
+	  	if(_userId != null){
+	  		//当前页
+  			int firstIndex = (pageForm.getPage()-1)*pageView.getMaxresult();
+	  		QueryResult<UserDynamic> qr = userService.findUserDynamicPage(_userId,_userName,firstIndex,pageView.getMaxresult());
+	  		
+	  		if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
+				for(UserDynamic userDynamic : qr.getResultlist()){
+					User user = userManage.query_cache_findUserByUserName(userDynamic.getUserName());
+					if(user != null){
+						userDynamic.setNickname(user.getNickname());
+						userDynamic.setAvatarPath(user.getAvatarPath());
+						userDynamic.setAvatarName(user.getAvatarName());
+					}
+					
+					
+					Topic topicInfo = topicManage.queryTopicCache(userDynamic.getTopicId());//查询缓存
+					if(topicInfo != null){
+						userDynamic.setTopicTitle(topicInfo.getTitle());
+						userDynamic.setTopicViewTotal(topicInfo.getViewTotal());
+						userDynamic.setTopicCommentTotal(topicInfo.getCommentTotal());
+						//处理隐藏标签
+						if(userDynamic.getModule().equals(100) && topicInfo.getContent() != null && !"".equals(topicInfo.getContent().trim())){
+							//允许可见的隐藏标签
+							List<Integer> visibleTagList = new ArrayList<Integer>();
+							if(accessUser != null){
+								//如果话题由当前用户发表，则显示全部隐藏内容
+								if(topicInfo.getIsStaff() == false && topicInfo.getUserName().equals(accessUser.getUserName())){
+									visibleTagList.add(HideTagType.PASSWORD.getName());
+									visibleTagList.add(HideTagType.COMMENT.getName());
+									visibleTagList.add(HideTagType.GRADE.getName());
+									visibleTagList.add(HideTagType.POINT.getName());
+									visibleTagList.add(HideTagType.AMOUNT.getName());
+								}else{
+									//解析隐藏标签
+									Map<Integer,Object> analysisHiddenTagMap = topicManage.query_cache_analysisHiddenTag(topicInfo.getContent(),topicInfo.getId());
+									for (Map.Entry<Integer,Object> entry : analysisHiddenTagMap.entrySet()) {
+										
+										if(entry.getKey().equals(HideTagType.PASSWORD.getName())){//输入密码可见
+											//话题取消隐藏Id
+										  	String topicUnhideId = topicManage.createTopicUnhideId(accessUser.getUserId(), HideTagType.PASSWORD.getName(), userDynamic.getTopicId());
+										  
+											TopicUnhide topicUnhide = topicManage.query_cache_findTopicUnhideById(topicUnhideId);
+									  		
+									  		if(topicUnhide != null){
+									  			visibleTagList.add(HideTagType.PASSWORD.getName());//当前话题已经取消隐藏
+										  	}
+										}else if(entry.getKey().equals(HideTagType.COMMENT.getName())){//评论话题可见
+											Boolean isUnhide = topicManage.query_cache_findWhetherCommentTopic(userDynamic.getTopicId(),accessUser.getUserName());
+											if(isUnhide){
+												visibleTagList.add(HideTagType.COMMENT.getName());//当前话题已经取消隐藏
+											}
+										}else if(entry.getKey().equals(HideTagType.GRADE.getName())){//超过等级可见
+											User _user = userManage.query_cache_findUserByUserName(accessUser.getUserName());
+											if(_user != null){
+												List<UserGrade> userGradeList = userGradeService.findAllGrade_cache();//取得用户所有等级
+												if(userGradeList != null && userGradeList.size() >0){
+													for(UserGrade userGrade : userGradeList){
+														if(_user.getPoint() >= userGrade.getNeedPoint() && (Long)entry.getValue() <=userGrade.getNeedPoint()){
+															visibleTagList.add(HideTagType.GRADE.getName());//当前话题已经取消隐藏
+															
+															break;
+														}
+													} 
+														
+													
+												}
+											}
+											
+										}else if(entry.getKey().equals(HideTagType.POINT.getName())){//积分购买可见
+											//话题取消隐藏Id
+										  	String topicUnhideId = topicManage.createTopicUnhideId(accessUser.getUserId(), HideTagType.POINT.getName(), userDynamic.getTopicId());
+										  
+											TopicUnhide topicUnhide = topicManage.query_cache_findTopicUnhideById(topicUnhideId);
+									  		
+									  		if(topicUnhide != null){
+									  			visibleTagList.add(HideTagType.POINT.getName());//当前话题已经取消隐藏
+										  	}
+										}else if(entry.getKey().equals(HideTagType.AMOUNT.getName())){//余额购买可见
+											
+										}
+										
+									}
+								}
+							}
+							//生成处理'隐藏标签'Id
+							String processHideTagId = topicManage.createProcessHideTagId(userDynamic.getTopicId(),topicInfo.getLastUpdateTime(), visibleTagList);
+							
+							//处理隐藏标签
+							String content = topicManage.query_cache_processHiddenTag(topicInfo.getContent(),visibleTagList,processHideTagId);
+
+							userDynamic.setTopicContent(content);
+						}
+						
+						
+					}
+
+					if(userDynamic.getModule().equals(200)){//评论
+						Comment comment = commentManage.query_cache_findByCommentId(userDynamic.getCommentId());
+						if(comment != null){
+							userDynamic.setCommentContent(comment.getContent());
+						}
+						
+					}
+					if(userDynamic.getModule().equals(300)){//引用评论
+						Comment comment = commentManage.query_cache_findByCommentId(userDynamic.getCommentId());
+						if(comment != null){
+							userDynamic.setCommentContent(comment.getContent());
+						}
+						Comment quoteComment = commentManage.query_cache_findByCommentId(userDynamic.getQuoteCommentId());
+						if(quoteComment != null && quoteComment.getStatus().equals(20)){
+							userDynamic.setQuoteCommentContent(textFilterManage.filterText(quoteComment.getContent()));
+						}
+					}
+					if(userDynamic.getModule().equals(400)){//回复
+						Reply reply = commentManage.query_cache_findReplyByReplyId(userDynamic.getReplyId());
+						if(reply != null){
+							userDynamic.setReplyContent(reply.getContent());
+						}
+					}
+				}
+			}
+
+	  		//将查询结果集传给分页List
+  			pageView.setQueryResult(qr);
+	  		
+	  	}
+		
+		if(isAjax){
+			WebUtil.writeToWeb(JsonUtils.toJSONString(pageView), "json", response);
+			return null;
+		}else{
+			model.addAttribute("pageView", pageView);
+			return "templates/"+dirName+"/"+accessPath+"/userDynamicList";	
 		}
 	}
 }

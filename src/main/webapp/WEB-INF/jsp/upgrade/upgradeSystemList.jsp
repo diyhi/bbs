@@ -235,7 +235,7 @@ function queryCurrentUpgrade(id,timing){
 				var upgradeLog = upgradeLogList[i];
 				//刷新升级日志
 				html += "<TR>";
-				html += "<TD style='BORDER-RIGHT: #BFE3FF 1px dotted;border-bottom : #BFE3FF 1px dotted;' width='20%' height='25px' align='center'>"+upgradeLog.time+"</TD>";
+				html += "<TD style='BORDER-RIGHT: #BFE3FF 1px dotted;border-bottom : #BFE3FF 1px dotted;' width='20%' height='26px' align='center'>"+upgradeLog.time+"</TD>";
 				var color = "";
 				if(upgradeLog.grade == 2){
 					color = " color: red;";
@@ -589,7 +589,7 @@ function uploadChangeIcon(){
 				<TBODY id="current_upgradeLog">	
 		    	<c:forEach items="${notCompletedUpgrade.upgradeLogList}" var="upgradeLog">
 					<TR>
-						 <TD style="BORDER-RIGHT: #BFE3FF 1px dotted;border-bottom : #BFE3FF 1px dotted;" width="20%" height="25px" align="center"><fmt:formatDate value="${upgradeLog.time}"  pattern="yyyy-MM-dd HH:mm:ss"/></TD>
+						 <TD style="BORDER-RIGHT: #BFE3FF 1px dotted;border-bottom : #BFE3FF 1px dotted;" width="20%" height="26px" align="center"><fmt:formatDate value="${upgradeLog.time}"  pattern="yyyy-MM-dd HH:mm:ss"/></TD>
 						 <TD style="border-bottom: #BFE3FF 1px dotted; <c:if test="${upgradeLog.grade == 2}"> color: red;</c:if>" width="80%" align="left" >&nbsp;${upgradeLog.content }</TD>
 					</TR>
 				</c:forEach>

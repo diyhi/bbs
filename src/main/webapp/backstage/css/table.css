@@ -12,7 +12,7 @@
 	padding-right: 3px; background-color: #F9FCFF; text-align: center;
 }
 .t-label-h {
-	height: 27px
+	height: 28px
 }
 .t-content {
 	padding-left: 5px; background-color: #ffffff;
@@ -39,7 +39,7 @@
 }
 
 .span-prompt {
-	color: gray;font-size: 12px;font-weight:normal
+	color: gray;font-size: 13px;font-weight:normal
 }
 .span-highlight{
 	color: green;  
@@ -47,21 +47,21 @@
 .span-help{padding-right: 0px; padding-left: 0px; padding-bottom: 3px; color: #747474; padding-top: 3px}
 	
 .t-list-thead {
-	
+	color: #555;
 }
 .t-list-thead TH {
-	background-image: url(../images/blue_skin_bg.png); height: 27px;
+	background-image: url(../images/blue_skin_bg.png); height: 30px;
 }
 
 .t-list-thead-dotted TH{
-	border-bottom: #EEEEEE 1px solid;height: 25px;
+	border-bottom: #EEEEEE 1px solid;height: 28px;
 }
 .t-list-tbody {
 	background-color: #ffffff; table-layout:fixed; word-break : break-all; word-wrap : break-word ;
 }
 .t-list-tbody TR {
-	height: 25px;
-	line-height: 18px;
+	height: 28px;
+	line-height: 20px;
 	onmouseover: expression(onmouseover=function (){this.style.borderColor ='blue'; this.style.backgroundColor ='#ECF7FE'});
 	onmouseout: expression(onmouseout=function (){this.style.borderColor='';this.style.backgroundColor =''});
 }
@@ -74,10 +74,10 @@
 }
 
 .td-header {
-	background-color: #ffffff; text-align: center;font-weight:bold;font-size: 13px;height:25px;   
+	background-color: #ffffff; text-align: center;font-weight:bold;font-size: 13px;height:28px;   
 }
 .td-header-line {
-	background-color: #ffffff; text-align: center;font-weight:bold;font-size: 13px;height:25px; 
+	background-color: #ffffff; text-align: center;font-weight:bold;font-size: 13px;height:28px; 
 	border-bottom: #EEEEEE 2px solid;  
 }
 .td-label-align {
@@ -102,7 +102,7 @@
 	background:#ffe;padding:3px;border:1px solid #aaa;line-height:140%;margin-bottom:5px;
 }
 .quote div span{
-	color:#666666;font-size:12px;
+	color:#666666;font-size:13px;
 }
 
 
@@ -170,24 +170,31 @@
 
 /* 功能按钮 */
 .functionButton { 
-font: 12px Tahoma, Verdana; 
-padding: 0 5px; 
-color: #333333;
-background-image: url("../images/button.gif"); 
-background-repeat: repeat-x; 
-background-position: 0 50%; 
-outline: 1px solid #FFFFFF; 
-height: 24px !important; 
-border: 1px solid #6DC1FF;
-height: 25px; 
-line-height: 17px;
-width:auto;
-overflow:visible;
-vertical-align:middle ;
-margin-left:2px;
-margin-top:2px;
+	position:relative;
+	display:inline-block;
+	height:28px;
+	line-height:24px;
+	border: 1px solid #42a5f5;
+	background:#ecf7fe;/*e8f8ff*/
+	color:#42a5f5;
+	text-align:center;
+	font-size:14px;
+	border-radius:3px;
+	cursor:pointer;
+	margin-right:5px;
+	padding-left: 12px;
+	padding-right: 12px;	
+	margin-top: 4px;
 } 
-
+.functionButton:disabled{  
+	border: 1px solid #42a5f5;
+	background:#ecf7fe;/*e8f8ff*/
+	color:#42a5f5;
+    border-radius:2px;
+    cursor:not-allowed;
+	filter: alpha(opacity=35);
+    opacity: .35;    
+} 
 
 
 /* 功能按钮 */
@@ -203,9 +210,9 @@ margin-top:2px;
   padding: 0 10px;
   *padding: 1px 10px;
   width: auto;
-  height: 21px;
-  line-height: 21px;
-  font-size: 12px;
+  height: 23px;
+  line-height: 23px;
+  font-size: 13px;
   font-weight: bold;
   cursor: pointer;
   border-bottom-color: #bbb !important;
@@ -220,7 +227,7 @@ margin-top:2px;
 .functionButton5,
 .functionButton5:hover,
 .functionButton5:visited {
-  color: #333 !important;
+  color: #555 !important;
 }
 
 .functionButton5:hover {
@@ -244,11 +251,10 @@ margin-top:2px;
 }
 
 
-
 /*提交按钮*/
-.submitButton{ display:inline-block; vertical-align:middle; padding:1px 0; margin:0 1px; background:#0098ef;}
+.submitButton{ display:inline-block; vertical-align:middle; padding:1px 0; margin:0 1px; background:#1e9fff;}
 .submitButton span,
-.submitButton input{ float:left; display:inline; margin:0 -1px; height:30px; line-height:30px; padding:0 18px; font-size:18px; border:0; overflow:visible; background:#0098ef; color:#fff; cursor:pointer; font-family:Microsoft Yahei,simsun,sans-serif;}
+.submitButton input{ float:left; display:inline; margin:0 -1px; height:30px; line-height:30px; padding:0 18px; font-size:18px; border:0; overflow:visible; background:#1e9fff; color:#fff; cursor:pointer; font-family:Microsoft Yahei,simsun,sans-serif;}
 .submitButton:hover,
 .submitButton:hover span,
 .submitButton:hover input{background:#0191e4;}
@@ -262,14 +268,20 @@ margin-top:2px;
 } 
 
 /*提交按钮*/
-.submitButton2{ display:inline-block; vertical-align:middle; padding:1px 0; margin:0 1px; background:#0098ef;}
+.submitButton2{ display:inline-block; vertical-align:middle; padding:1px 0; margin:0 1px; background:#1e9fff;}
 .submitButton2 span,
-.submitButton2 input{ float:left; display:inline; margin:0 -1px; height:23px; line-height:23px; padding:0 14px; font-size:14px; border:0; overflow:visible; background:#0098ef; color:#fff; cursor:pointer;font-family:Microsoft Yahei,simsun,sans-serif;}
+.submitButton2 input{ float:left; display:inline; margin:0 -1px; height:23px; line-height:23px; padding:0 14px; font-size:14px; border:0; overflow:visible; background:#1e9fff; color:#fff; cursor:pointer;font-family:Microsoft Yahei,simsun,sans-serif;}
 .submitButton2:hover,
 .submitButton2:hover span,
 .submitButton2:hover input{background:#0191e4;}
-
-
+.submitButton2 input:disabled{  
+    border: 1px solid #e6e6e6;  
+    background-color: #fbfbfb;  
+    color:#c9c9c9;
+    margin-top: -1px;
+    margin-bottom: -1px;
+    border-radius:2px;
+} 
 
 
 .functionButton2 {
@@ -318,7 +330,7 @@ margin-top:2px;
 .functionButton2-small {
 	line-height: normal!important;
 	padding: 4px 8px;
-	font-size: 12px
+	font-size: 13px
 }
 
 
@@ -407,12 +419,12 @@ filter:alpha(opacity: 0);
 box-shadow:0 3px 13px rgba(0,0,0,.4);
 }
 .loginForm .head{width: 700px; height: 40px;text-align: center;color: #424242;margin-bottom: 10px;}
-.loginForm .head h2{font-size: 30px;}
+.loginForm .head h2{font-size: 24px;font-weight:normal;}
 .loginForm .formField{ clear:both; width:320px; margin:0 auto; padding-top:5px; zoom:1\9;}
 .loginForm .formField input{ width:306px; height:28px; border:1px solid #d8d8d8; border-radius:4px; font-size:14px; color:#666; line-height:28px; padding:6px 0 6px 12px; box-shadow:0 0 5px #fff; outline:none; transition:box-shadow 0.25s linear 0s; -webkit-transition:box-shadow 0.25s linear 0s;}
 .loginForm .formField input:focus{ border:1px solid #26a2ff; box-shadow:0 0 5px #26a2ff; outline:none; transition:box-shadow 0.25s linear 0s; -webkit-transition:box-shadow 0.25s linear 0s;}
 
-.loginForm .err-tip{ clear:both; padding:5px 0 3px 10px; width:300px; font-size:12px; color:#ff3c00;  text-align:left; }
+.loginForm .err-tip{ clear:both; padding:5px 0 3px 10px; width:300px; font-size:13px; color:#ff3c00;  text-align:left; }
 
 .loginForm .formField input.captchaInput{ width:174px; margin-right:10px;  float:left;}
 .loginForm .captchaImage{ width:120px; height:40px; line-height:40px; display:inline-block;text-align:center; border:1px solid #dfdfdf; border-radius:4px; background:#f2f2f2; background:-moz-linear-gradient(top,#fff,#f2f2f2); background:-webkit-gradient(linear,0 0,0 100%,from(#fff),to(#f2f2f2)); color:#333; vertical-align:top; float:right; overflow:hidden;}
@@ -424,7 +436,7 @@ box-shadow:0 3px 13px rgba(0,0,0,.4);
 .loginForm .loginButton input.disabled{ background-color:#999; color:#fff; cursor:pointer;}
 
 .loginForm .connect{ clear:both; overflow:hidden; margin-top:30px;}
-.loginForm .connect .prompt{ padding:15px 0 20px 24px; font-size:12px; color:#999; border-top:1px solid #ebebeb;}
+.loginForm .connect .prompt{ padding:15px 0 20px 24px; font-size:13px; color:#999; border-top:1px solid #ebebeb;}
 
 
 

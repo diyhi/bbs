@@ -6,16 +6,10 @@
 <base href="${config:url(pageContext.request)}"></base>
 <title>管理中心</title>
 <meta http-equiv=content-type content="text/html; charset=utf-8"/>
-<style type=text/css>
-html,body{
-	height:100%;overflow-x:hidden; overflow-y:hidden;margin:0 auto;
-}
-table{
-	height: 100%;
-}
-</style>
+
 <link rel="shortcut icon" type="image/x-icon" href="${config:url(pageContext.request)}backstage/images/favicon.ico" media="screen" />
 <link href="backstage/css/admin.css" rel="stylesheet">
+<link href="backstage/fontAwesome/style.css" rel="stylesheet">
 <script src="backstage/jquery/jquery.min.js"></script>
 <script language="javascript" src="backstage/jquery/jquery.ba-resize.js" type="text/javascript" ></script>
 <script language="javascript" src="backstage/js/Tool.js" type="text/javascript" ></script>
@@ -77,41 +71,110 @@ function callbackTopic(){
 	<tr > 
 		<td colspan="3" class="top">
 			<div class="box" >
-				<div class="bodyLeft"><div class=logo></div></div>
-				<div class="bodyRight">
-					
-					<div class="link">
-						<span class="user">&nbsp;<strong>${sysUsers.fullName}</strong>&nbsp;您好!&nbsp;&nbsp;职位：${sysUsers.userDuty} </span>
-						<a class="home" hidefocus="true" href="" onclick="createWindow('home','首页','control/center/home${config:suffix()}');return false;" >&nbsp;后台首页</a>
-						<a class="userInformation" hidefocus="true" onclick="createWindow('A_11_0','员工列表','control/staff/manage${config:suffix()}?method=editStaff&userId=${sysUsers.userId }&page=');return false;" >&nbsp;个人资料</a>
-						<a class="contact" hidefocus="true" href="http://www.diyhi.com" target=_blank>&nbsp;联系我们</a> 
-						<a class="logout" hidefocus="true" href="#" onClick="javascript:submitLogout();return false;" target=_top>&nbsp;退出</a> 
-					</div>
-					
-					<div class="navigation" id="navigationMenu">
-						<ul>
-						  <li><a id="nav_1" hidefocus="true" onClick="editBackground(this.id,'内容管理'); return false" ondragstart= "return false">内容管理</a> </li>
-						  <li><a id="nav_4" hidefocus="true" onClick="editBackground(this.id,'会员管理'); return false" ondragstart= "return false">会员管理</a> </li>
-						  <li><a id="nav_5" hidefocus="true" onClick="editBackground(this.id,'页面管理'); return false" ondragstart= "return false">页面管理</a> </li>
-						  <li><a id="nav_6" hidefocus="true" onClick="editBackground(this.id,'运营管理'); return false" ondragstart= "return false">运营管理</a> </li>
-						  <li><a id="nav_7" hidefocus="true" onClick="editBackground(this.id,'系统设置'); return false" ondragstart= "return false">系统设置</a> </li>
-						  <li class="home"><a hidefocus="true"  href="#" target="_blank">网站首页</a> </li>
-						</ul>
-					</div>
-					 
+				<div class="logo-wrap"><div class=logo></div></div>
+				<div class="nav-wrap">
+				    <div class="nav-ul">
+				        <ul id="navigationMenu">
+				            <li id="nav_1" class="nav-list-item on" onClick="editBackground(this.id,'内容管理');">
+				                <div class="pos-rel" ><span class="nav-list-title">内容管理</span></div>
+				            </li>
+				            <li id="nav_2" class="nav-list-item" onClick="editBackground(this.id,'会员管理');">
+				                <div class="pos-rel" ><span class="nav-list-title">会员管理</span></div>
+				            </li>
+				            <li id="nav_3" class="nav-list-item" onClick="editBackground(this.id,'页面管理');">
+				                <div class="pos-rel" ><span class="nav-list-title">页面管理</span></div>
+				            </li>
+				            <li id="nav_4" class="nav-list-item" onClick="editBackground(this.id,'运营管理');">
+				                <div class="pos-rel" ><span class="nav-list-title">运营管理</span></div>
+				            </li>
+				            <li id="nav_5" class="nav-list-item" onClick="editBackground(this.id,'系统设置');">
+				                <div class="pos-rel" ><span class="nav-list-title">系统设置</span></div>
+				            </li>
+				            
+				            <li class="nav-list-item ">
+				                <div class="pos-rel" >
+				                	<div class="nav-list-title2">
+				                		<div class="browserButton" onclick ="retreat()" title="后退">
+				                      		<div class="circle"><i class="fa fa-arrow-left" ></i></div>
+				                      	</div>
+				                	</div>
+				                </div>
+				            </li>
+				            <li class="nav-list-item ">
+				                <div class="pos-rel" >
+				                	<div class="nav-list-title2" onclick ="advance()" title="前进">
+				                		<div class="browserButton">
+				                      		<div class="circle"><i class="fa fa-arrow-right" ></i></div>
+				                      	</div>
+				                	</div>
+				                </div>
+				            </li>
+				            <li class="nav-list-item ">
+				                <div class="pos-rel" >
+				                	<div class="nav-list-title2">
+				                		<div class="browserButton" onclick ="refreshs()" title="刷新">
+				                      		<div class="circle"><i class="fa fa-redo-alt" ></i></div>
+				                      	</div>
+				                	</div>
+				                </div>
+				            </li>
+				        </ul>
+				    </div>
+				    <div class="fr">
+			            <ul>
+			            	<li class="nav-list-item">
+			                	<div class="pos-rel" title="网站首页">
+			                		<div class="nav-list-title2" >
+			                			<a class="link-icon" hidefocus="true"  href="" target="_blank"><i class="fa fa-home2" style="color:#ff9e00;"></i></a>
+			                    	</div>
+			                    </div>
+			                </li>
+			                <li class="nav-list-item">
+			                	<div class="pos-rel" title="后台首页">
+			                		<div class="nav-list-title2" >
+			                			<div class="link-icon"  onclick="createWindow('home','首页','control/center/home${config:suffix()}');return false;" ><i class="fa fa-home"></i></div>	
+			                    	</div>
+			                    </div>
+			                </li>
+			                <li class="nav-list-item">
+			                	<div class="pos-rel" title="联系我们">
+			                		<div class="nav-list-title2">	
+			                			<a class="link-icon" hidefocus="true" href="http://www.diyhi.com" target=_blank><i class="fa fa-phone" ></i></a> 
+			                    	</div>
+			                    </div>
+			                </li>
+			                <li class="nav-list-item hide">
+			                    <div class="pos-rel">
+			                      	<div class="nav-list-title3">
+			                      		<div class="avatarImg">
+			                      			<div class="circle"><i class="fa fa-user" ></i></div>
+			                      		</div>
+			                      		<div class="user-info">
+											<span class="name">${sysUsers.fullName}</span>
+											<span class="role">${sysUsers.userDuty}</span>
+										</div>
+										<div class="more"><i class="fa fa-angle-down"></i></div>
+										
+			                      	</div>
+			                    </div>
+			                    <div class="nav-pop-list" >
+			                        <ul class="ul-navlist">
+			                            <li onclick="createWindow('A_5_0','员工列表','control/staff/manage${config:suffix()}?method=editStaff&userId=${sysUsers.userId }&page=');return false;"><i class="fa fa-user-cog"></i>个人设置</li>
+			                            <li onClick="javascript:submitLogout();return false;"><i class="fa fa-sign-out-alt" style="font-size: 13px;margin-right: 5px;"></i>退出登录</li>
+			                        </ul>
+			                    </div>
+			                    <form:form id="logout" action="${config:url(pageContext.request)}admin/logout" method="post" ></form:form>
+			                </li>
+			            </ul>
+			        </div>
 				</div>
-				<div class="bodyICO" >
-					<img src="backstage/images/retreat.png" class="png" alt="后退" onclick ="retreat()"/>
-					<img src="backstage/images/advance.png" class="png" alt="前进" onclick ="advance()"/>
-					<img src="backstage/images/refresh.png" class="png" alt="刷新" onclick ="refreshs()"/>
-				</div>
-				<form:form id="logout" action="${config:url(pageContext.request)}admin/logout" method="post" ></form:form>
 			</div>
 		</td>
 	</tr>
+	
 	<tr> 
 		<!-- 左侧导航栏 -->
-    	<td id="leftFrame_td"  width="146px" valign="top" class="left ">
+    	<td id="leftFrame_td"  width="172px" valign="top" class="left ">
     		<div id="main_nav" ></div>
     	</td> 
     	
@@ -191,7 +254,7 @@ function getLeftTree(menuTypeName){
 	for(i=0;i<config.titlelist.length;i++){
 		if(config.titlelist[i].isdefault==1&&config.titlelist[i].menuTypeName==menuTypeName){
 			output+="<DL id=sub_DL_"+i+">";
-			output+="<DT onclick=\"hideorshow('sub_DL_"+i+"')\"><SPAN >"+config.titlelist[i].title+"</SPAN> </DT>";
+			output+="<DT onclick=\"hideorshow('sub_DL_"+i+"')\"><SPAN >"+config.titlelist[i].title+"</SPAN><i id=sub_I_"+i+" class='fa fa-angle-up' style='font-size: 12px;position: absolute;right: 10px;top: 10px; '></i></DT>";
 			
 			for(j=0;j<config.itemlist[i].length;j++){
 				//如果内容为空,则输出空行
@@ -205,7 +268,6 @@ function getLeftTree(menuTypeName){
 				output+="<DD id=sub_DD_"+i+'_'+j+">";
 			//	output+="<A id='A_"+i+'_'+j+"' href='#' ondragstart= 'return false' onclick=\"hyperlink('"+config.itemlist[i][j].key+"','A_"+i+'_'+j+"')\; return false\"  hidefocus='true'>"+config.itemlist[i][j].title+"</A> ";
 				output+="<A id='A_"+i+'_'+j+"' href='#' ondragstart= 'return false' onclick=\"hyperlink('"+config.itemlist[i][j].key+"','A_"+i+'_'+j+"','"+config.itemlist[i][j].title+"')\; return false\"  hidefocus='true'>"+config.itemlist[i][j].title+"</A> ";
-					
 							
 				output+="</DD>";
 			}
@@ -234,15 +296,22 @@ function hyperlink(url,id,name){
 
 
 }
-
 //显示隐藏左边框导航分类
 function hideorshow(divid){
 	var sub_detail = document.getElementById(divid).getElementsByTagName("DD");
-	for(i=0;i<sub_detail.length;i++){  
+	for(i=0;i<sub_detail.length;i++){ 
+		var array = new Array();
+		array = sub_detail[i].id.split("_");
+		var firstNumber = array[2]; //第一层编号
+		
 		if(document.getElementById(sub_detail[i].id).style.display=="none"){
 			document.getElementById(sub_detail[i].id).style.display="block";
+			//alert(sub_detail[i].id);
+			document.getElementById("sub_I_"+firstNumber).className="fa fa-angle-up";
 		}else{
 			document.getElementById(sub_detail[i].id).style.display="none";
+			document.getElementById("sub_I_"+firstNumber).className="fa fa-angle-down";
+			
 		}	 
 	}
 	
@@ -288,6 +357,7 @@ function initConfig(){
 	config.additem('员工列表',t,'${config:url(pageContext.request)}control/staff/list${config:suffix()}');
 	config.additem('角色列表',t,'${config:url(pageContext.request)}control/roles/list${config:suffix()}');
 	
+	
 	t=config.addtitle('在线帮助管理','页面管理',1);
 	config.additem('在线帮助分类',t,'${config:url(pageContext.request)}control/helpType/list${config:suffix()}');
 	config.additem('在线帮助列表',t,'${config:url(pageContext.request)}control/help/list${config:suffix()}?visible=true');
@@ -313,7 +383,7 @@ function initConfig(){
 	t=config.addtitle('短信管理','系统设置',1);
 	config.additem('短信接口列表',t,'${config:url(pageContext.request)}control/smsInterface/list${config:suffix()}');
 	config.additem('短信发送错误日志',t,'${config:url(pageContext.request)}control/sendSmsLog/list${config:suffix()}');
-
+	
 	t=config.addtitle('缩略图管理','系统设置',1);
 	config.additem('缩略图列表',t,'${config:url(pageContext.request)}control/thumbnail/list${config:suffix()}');
 
@@ -328,18 +398,17 @@ initinav('内容管理');
 
 //改变顶部导航字体背景
 function editBackground(id,sortname){
-  	//清空所有的导航背景
-	var navigationMenus = document.getElementById("navigationMenu").getElementsByTagName("a");
-	for (var i=0;i<navigationMenus.length;i++){
-	//	navigationMenus[i].className="";//有兼容问题
-		navigationMenus[i].style.cssText="";		
-	}
+	var navigationMenus = document.getElementById("navigationMenu");
+	var childs = navigationMenus.childNodes;    
+  for(var i = childs.length - 1; i >= 0; i--) {  
+		childs[i].className = "nav-list-item";
+     
+  }  
 	//设置当前选中的导航的背景
-//	document.getElementById(id).className="current";//有兼容问题
-	document.getElementById(id).style.cssText="FONT-WEIGHT: normal; BACKGROUND: url(backstage/images/top_text_select.png) no-repeat; COLOR: #ffffff";
+	document.getElementById(id).className="nav-list-item on";
 	//显示左侧导航栏菜单
 	config.getLeftTree(sortname);
-}	
+}		
 //退出登录
 function submitLogout() {
 	var form = document.getElementById("logout")

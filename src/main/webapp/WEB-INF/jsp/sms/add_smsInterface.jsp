@@ -192,10 +192,10 @@ function selectInterfaceProduct(){
 					    <table style="width:100%;" >
 						    <c:forEach items="${sendService.alidayu_variable}" var="entry" > 
 						    <tr>
-						  		<td style="border-bottom:1px dashed #BFE3FF; border-right:1px dashed #BFE3FF; line-height:24px;color: #999; text-align:left;width: 100px;">
+						  		<td style="border-bottom:1px dashed #BFE3FF; border-right:1px dashed #BFE3FF; line-height:26px;color: #999; text-align:left;width: 100px;">
 						  			${entry.key}
 						    	</td>
-						    	<td style="border-bottom:1px dashed #BFE3FF; line-height:24px;color: #999; text-align:left;">
+						    	<td style="border-bottom:1px dashed #BFE3FF; line-height:26px;color: #999; text-align:left;">
 						    		${entry.value}
 						    	</td>
 						    	</tr>

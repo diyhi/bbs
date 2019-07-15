@@ -1,6 +1,6 @@
 BODY {
-	padding-right: 0px; padding-left: 0px; font-size: 12px; padding-bottom: 0px; margin: 0px; color: #333333; padding-top: 0px; background-color: #ffffff;
-	font-size:12px;font-family: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
+	margin: 0px; color: #333333;  background-color: #ffffff;
+	font-size:14px;font-family: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
 }
 html {overflow-y:auto!important;*overflow-y:scroll;}
 IMG {
@@ -45,7 +45,7 @@ input::-moz-focus-inner{ border: 0;padding: 0;}
 	clear: both
 }
 .d-button {
-	border:1px solid #BFE3FF; margin-top: 2px; height: 30px; 
+	border:1px solid #BFE3FF; margin-top: 2px; height: 36px; padding-left: 5px;
 }
 .d-checkBoxNoSel{  
     background: url("../images/checkboxNoSel.jpg") no-repeat center center;  
@@ -139,10 +139,10 @@ ul.rating li.five a:hover {background-position:0 -160px}
 	margin-top: 3px;
 }
 .pg {
-	float: right;line-height: 26px; 
+	float: right;line-height: 30px; 
 }
 .pg A {
-	border-bottom: #c2d5e3 1px solid; border-left: #c2d5e3 1px solid; padding-bottom: 0px; background-color: #fff; padding-left: 8px; padding-right: 8px; display: inline; background-repeat: no-repeat; float: left; height: 26px; color: #333; margin-left: 4px; overflow: hidden; border-top: #c2d5e3 1px solid; border-right: #c2d5e3 1px solid; text-decoration: none; padding-top: 0px;border-bottom-color: #BFE3FF; border-top-color: #BFE3FF; border-right-color: #BFE3FF; border-left-color: #BFE3FF
+	border-bottom: #c2d5e3 1px solid; border-left: #c2d5e3 1px solid; padding-bottom: 0px; background-color: #fff; padding-left: 10px; padding-right: 10px; display: inline; background-repeat: no-repeat; float: left; height: 30px; color: #333; margin-left: 4px; overflow: hidden; border-top: #c2d5e3 1px solid; border-right: #c2d5e3 1px solid; text-decoration: none; padding-top: 0px;border-bottom-color: #BFE3FF; border-top-color: #BFE3FF; border-right-color: #BFE3FF; border-left-color: #BFE3FF
 }
 .pg A.prev {
 	padding-bottom: 0px; padding-left: 10px; padding-right: 10px; padding-top: 0px; 
@@ -154,17 +154,18 @@ ul.rating li.five a:hover {background-position:0 -160px}
 	border-bottom-color: #3198e7; border-top-color: #3198e7; color: #3198e7; border-right-color: #3198e7; border-left-color: #3198e7;     
 }
 .pg LABEL {
-	border-bottom: #BFE3FF 1px solid; border-left: #BFE3FF 1px solid; padding-bottom: 0px; background-color: #fff; padding-left: 8px; padding-right: 8px; display: inline; background-repeat: no-repeat; float: left; height: 26px; color: #333; margin-left: 4px; overflow: hidden; border-top: #BFE3FF 1px solid; border-right: #BFE3FF 1px solid; text-decoration: none; padding-top: 0px
+	border-bottom: #BFE3FF 1px solid; border-left: #BFE3FF 1px solid; padding-bottom: 0px; background-color: #fff; padding-left: 10px; padding-right: 10px; display: inline; background-repeat: no-repeat; float: left; height: 30px; color: #333; margin-left: 4px; overflow: hidden; border-top: #BFE3FF 1px solid; border-right: #BFE3FF 1px solid; text-decoration: none; padding-top: 0px
 }
 .pg LABEL .pg_input {
 	padding:0;width:25px;height:15px;line-height:15px;margin-bottom: 3px;*margin-bottom: 0px; 
 }
 .pg STRONG {
-	border-bottom: #c2d5e3 1px solid; border-left: #c2d5e3 1px solid; padding-bottom: 0px; background-color: #fff; padding-left: 8px; padding-right: 8px; display: inline; background-repeat: no-repeat; float: left; height: 26px; color: #333; margin-left: 4px; overflow: hidden; border-top: #c2d5e3 1px solid; border-right: #c2d5e3 1px solid; text-decoration: none; padding-top: 0px;border-bottom-color: #BFE3FF; border-top-color: #BFE3FF; border-right-color: #BFE3FF; border-left-color: #BFE3FF;background-color: #BFE3FF
+	border-bottom: #c2d5e3 1px solid; border-left: #c2d5e3 1px solid; padding-bottom: 0px; background-color: #fff; padding-left: 10px; padding-right: 10px; display: inline; background-repeat: no-repeat; float: left; height: 30px; color: #333; margin-left: 4px; overflow: hidden; border-top: #c2d5e3 1px solid; border-right: #c2d5e3 1px solid; text-decoration: none; padding-top: 0px;border-bottom-color: #BFE3FF; border-top-color: #BFE3FF; border-right-color: #BFE3FF; border-left-color: #BFE3FF;background-color: #BFE3FF
 }
 .pg span.count {
-	border-bottom: #c2d5e3 1px solid; border-left: #c2d5e3 1px solid; padding-bottom: 0px; background-color: #fff; padding-left: 8px; padding-right: 8px; display: inline; background-repeat: no-repeat; float: left; height: 26px; color: #333; margin-left: 4px; overflow: hidden; border-top: #c2d5e3 1px solid; border-right: #c2d5e3 1px solid; text-decoration: none; padding-top: 0px;border-bottom-color: #BFE3FF; border-top-color: #BFE3FF; border-right-color: #BFE3FF; border-left-color: #BFE3FF;
+	border-bottom: #c2d5e3 1px solid; border-left: #c2d5e3 1px solid; padding-bottom: 0px; background-color: #fff; padding-left: 10px; padding-right: 10px; display: inline; background-repeat: no-repeat; float: left; height: 30px; color: #333; margin-left: 4px; overflow: hidden; border-top: #c2d5e3 1px solid; border-right: #c2d5e3 1px solid; text-decoration: none; padding-top: 0px;border-bottom-color: #BFE3FF; border-top-color: #BFE3FF; border-right-color: #BFE3FF; border-left-color: #BFE3FF;
 }
+
 
 
 /** 头像 **/

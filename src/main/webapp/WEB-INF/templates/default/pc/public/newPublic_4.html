@@ -1,6 +1,7 @@
 <#-- 服务导航 公共页(生成新引用页) -->
 <div>
 	<ul class="serviceNav">
+		<li class="title <#if baseURI == 'user/control/userDynamicList'> selected</#if>"><a href="user/control/userDynamicList">动态</a></li>
 	    <li class="title <#if baseURI == 'user/control/topicList'> selected</#if> || baseURI == 'user/control/topicFavoriteList'"><a href="user/control/topicList">我的话题</a></li>
 	    <li class="title <#if baseURI == 'user/control/commentList'> selected</#if>"><a href="user/control/commentList">我的评论</a></li>
 	    <li class="title <#if baseURI == 'user/control/replyList'> selected</#if>"><a href="user/control/replyList">我的回复</a></li>

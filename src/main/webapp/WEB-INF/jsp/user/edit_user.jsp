@@ -98,7 +98,14 @@ function sureSubmit(objForm){
     
     </TD>
   </TR>
-
+	<TR>
+    <TD class="t-label t-label-h" width="12%">显示用户动态：</TD>
+    <TD class="t-content" width="88%" colSpan="3">
+    	<label><INPUT type="radio" value="true" name="allowUserDynamic" <c:if test="${ user.allowUserDynamic == true}">checked="checked"</c:if>>显示</label>
+		<label><INPUT type="radio" value="false" name="allowUserDynamic" <c:if test="${ user.allowUserDynamic == false}">checked="checked"</c:if> >关闭</label>
+    
+    </TD>
+  </TR>
 	<TR>
     <TD class="t-label t-label-h" width="12%">备注：</TD>
     <TD class="t-content" width="88%" colSpan="3">

@@ -23,7 +23,8 @@
 </HEAD>
 
 <script>
-var availableTag = ['source', '|'];
+	KindEditor.options.cssData = 'body { font-size: 14px; }';
+	var availableTag = ['source', '|'];
 	var editor;
 	KindEditor.ready(function(K) {
 		var availableTag = document.getElementById("availableTag").value;

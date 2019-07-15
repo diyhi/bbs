@@ -288,6 +288,9 @@ function initKindEditor(){
 		"background:#f8f8f8;"+
 		"border:1px solid #ddd;"+
 		"padding:5px;"+
+	"}"+//默认字体大小
+	"body {"+
+		"font-size: 14px;"+
 	"}";
 
    //指定要保留的HTML标记和属性。Object的key为HTML标签名，value为HTML属性数组，”.”开始的属性表示style属性。 注意属性要全部小写

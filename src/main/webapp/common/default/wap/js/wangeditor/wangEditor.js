@@ -2902,10 +2902,11 @@ Hide.prototype = {
 	_createPanel: function _createPanel(visibleType,inputValue) {
 	    var _this = this;
 	    var editor = this.editor;
-	     
+	    var config = editor.config;
+        
 	    // panel 中需要用到的id
 	    var inputPasswordId = getRandom('input-inputValue_10');//密码
-	    var inputMinPointId = getRandom('input-inputValue_30');//超过积分
+	    var inputGradeId = getRandom('input-inputValue_30');//达到等级
 	    var inputPointId = getRandom('input-inputValue_40');//积分购买
 	    var inputAmountId = getRandom('input-inputValue_50');//余额购买
 	    
@@ -2965,7 +2966,7 @@ Hide.prototype = {
 	    
 	    
 	    var inputValue_password = "";
-	    var inputValue_minPoint = "";
+	    var inputValue_grade = "";
 	    var inputValue_point = "";
 	    var inputValue_amount = "";
 	    if(visibleType == 10){
@@ -2973,41 +2974,61 @@ Hide.prototype = {
 	    }else if(visibleType == 20){
 	    	
 	    }else if(visibleType == 30){
-	    	inputValue_minPoint = inputValue;
+	    	inputValue_grade = inputValue;
 	    }else if(visibleType == 40){
 	    	inputValue_point = inputValue;
 	    }else if(visibleType == 50){
 	    	inputValue_amount = inputValue;
 	    }
 	    
-	    
+	    //等级
+	    var userGradeHtml = "";
+	    var userGradeList = config.userGradeList;
+		if(userGradeList != null && userGradeList.length >0){
+			userGradeHtml += '<select id="'+inputGradeId+'">';
+			for(var i=0; i<userGradeList.length; i++){
+				var userGrade = userGradeList[i];
+					
+				userGradeHtml += '<option value="'+userGrade.needPoint+'" '+ (inputValue_grade == userGrade.needPoint ? 'selected="selected"' : "")	+'>'+userGrade.name+'</option>';
+			}
+			userGradeHtml += '</select>';
+		}
 	    
 	    
 	    var template = "<div>";
-	    	template += 	"<label>";
-	    	template += 		"<div class='radio-box'><input type='radio' id='"+visibleType_10+"' name='"+visibleTypeName+"' class='radio-input' value='10' "+visibleType_checked_html_10+"> <span class='radio-core'></span><span class='radio-title'>输入密码可见</span></div>";
-	    	template += 	"</label>";
-	    	template += 	"<label>";
-	    	template += 		"<div class='radio-box'><input type='radio' id='"+visibleType_20+"' name='"+visibleTypeName+"' class='radio-input' value='20' "+visibleType_checked_html_20+"> <span class='radio-core'></span><span class='radio-title'>回复话题可见</span></div>";
-	    	template += 	"</label>";
-	    	
-	    	/**
-	    	template += 	"<label>";
-	    	template += 		"<div class='radio-box'><input type='radio' id='"+visibleType_30+"' name='"+visibleTypeName+"' class='radio-input' value='30' "+visibleType_checked_html_30+"> <span class='radio-core'></span><span class='radio-title'>超过积分可见</span></div>";
-	    	template += 	"</label>";
-	    	template += 	"<label>";
-	    	template += 		"<div class='radio-box'><input type='radio' id='"+visibleType_40+"' name='"+visibleTypeName+"' class='radio-input' value='40' "+visibleType_checked_html_40+"> <span class='radio-core'></span><span class='radio-title'>积分购买可见</span></div>";
-	    	template += 	"</label>";
-	    	template += 	"<label>";
-	    	template += 		"<div class='radio-box'><input type='radio' id='"+visibleType_50+"' name='"+visibleTypeName+"' class='radio-input' value='50' "+visibleType_checked_html_50+"> <span class='radio-core'></span><span class='radio-title'>余额购买可见</span></div>";
-	    	template += 	"</label>";
-	    	**/
-	    	
-	    	
+	    
+	    for(var i=0; i< config.menus.length; i++){
+			var menu = config.menus[i];
+			if(menu == "hidePassword"){
+				template += 	"<label>";
+		    	template += 		"<div class='radio-box'><input type='radio' id='"+visibleType_10+"' name='"+visibleTypeName+"' class='radio-input' value='10' "+visibleType_checked_html_10+"> <span class='radio-core'></span><span class='radio-title'>输入密码可见</span></div>";
+		    	template += 	"</label>";
+			}else if(menu == "hideComment"){
+				template += 	"<label>";
+		    	template += 		"<div class='radio-box'><input type='radio' id='"+visibleType_20+"' name='"+visibleTypeName+"' class='radio-input' value='20' "+visibleType_checked_html_20+"> <span class='radio-core'></span><span class='radio-title'>回复话题可见</span></div>";
+		    	template += 	"</label>";
+			}else if(menu == "hideGrade"){
+				template += 	"<label>";
+		    	template += 		"<div class='radio-box'><input type='radio' id='"+visibleType_30+"' name='"+visibleTypeName+"' class='radio-input' value='30' "+visibleType_checked_html_30+"> <span class='radio-core'></span><span class='radio-title'>达到等级可见</span></div>";
+		    	template += 	"</label>";
+			}else if(menu == "hidePoint"){
+				template += 	"<label>";
+		    	template += 		"<div class='radio-box'><input type='radio' id='"+visibleType_40+"' name='"+visibleTypeName+"' class='radio-input' value='40' "+visibleType_checked_html_40+"> <span class='radio-core'></span><span class='radio-title'>积分购买可见</span></div>";
+		    	template += 	"</label>";
+			}else if(menu == "hideAmount"){
+				/** 
+		    	template += 	"<label>";
+		    	template += 		"<div class='radio-box'><input type='radio' id='"+visibleType_50+"' name='"+visibleTypeName+"' class='radio-input' value='50' "+visibleType_checked_html_50+"> <span class='radio-core'></span><span class='radio-title'>余额购买可见</span></div>";
+		    	template += 	"</label>";
+		    	**/
+			}
+		}
+
 	    	template += 	"</td>";
 	    	
 	    	template += 		"<span id='"+inputValueBox_10+"' style='display:none;'><input id='"+inputPasswordId+"'  type='text' class='block' value='"+inputValue_password+"' placeholder='密码' maxlength='20' /></span>";
-	    	template += 		"<span id='"+inputValueBox_30+"' style='display:none;'>积分超过 <input id='"+inputMinPointId+"' style='width:40px;text-align:center;' type='text' value='"+inputValue_minPoint+"' maxlength='8'/> 以上可见</span>";
+	    	template += 		"<span id='"+inputValueBox_30+"' style='display:none;'>等级达到 "+userGradeHtml+" 以上可见</span>";
+	    	
 	    	template += 		"<span id='"+inputValueBox_40+"' style='display:none;'>需要支付 <input id='"+inputPointId+"' style='width:40px;text-align:center;' type='text' value='"+inputValue_point+"' maxlength='8'/> 积分可见</span>";
 	    	template += 		"<span id='"+inputValueBox_50+"' style='display:none;'>需要支付 <input id='"+inputAmountId+"' style='width:40px;text-align:center;' type='text' value='"+inputValue_amount+"' maxlength='9'/> 元费用可见</span>";
 	    	template += 	"</td>";
@@ -3102,9 +3123,9 @@ Hide.prototype = {
 	                	}else if(_visibleTypeName == 20){
 	                		 
 	                	}else if(_visibleTypeName == 30){
-	                		_inputValue = $('#' + inputMinPointId).val();//超过积分
+	                		_inputValue = $('#' + inputGradeId).val();//达到等级
 	                		if (_inputValue == "" || !/^[0-9]*[1-9][0-9]*$/.test(_inputValue)) {
-	                			alert("请输入大于0的数字");
+	                			alert("请选择等级");
 	                			return false;
 	                		}
 	                	}else if(_visibleTypeName == 40){
@@ -3121,13 +3142,24 @@ Hide.prototype = {
 	                		}
 	                	}
 	                	
+	                	//等级标签
+						var gradeTag = "";
+						if(userGradeList != null && userGradeList.length >0){
+							for(var i=0; i<userGradeList.length; i++){
+								var userGrade = userGradeList[i];
+								if(userGrade.needPoint == _inputValue){
+									gradeTag = userGrade.name;
+								}
+							}
+						}
+	                	
 	                	var html = "";
 	                	if(_visibleTypeName == 10){//输入密码可见
 							html = "<hide class='inputValue_10' hide-type='10' input-value='"+_inputValue+"'></hide>";
 						}else if(_visibleTypeName == 20){//回复话题可见
 							html = "<hide class='inputValue_20' hide-type='20' ></hide>";
-						}else if(_visibleTypeName == 30){//超过积分可见
-							html = "<hide class='inputValue_30' hide-type='30' input-value='"+_inputValue+"'></hide>";
+						}else if(_visibleTypeName == 30){//达到等级可见
+							html = "<hide class='inputValue_30' hide-type='30' input-value='"+_inputValue+"' description='"+gradeTag+"'></hide>";
 						}else if(_visibleTypeName == 40){//积分购买可见
 							html = "<hide class='inputValue_40' hide-type='40' input-value='"+_inputValue+"'></hide>";
 						}else if(_visibleTypeName == 50){//余额购买可见
@@ -3137,7 +3169,7 @@ Hide.prototype = {
 	                	_this._insertHide(html);
 	                	
 	                	// 设置同类型标签为相同的值
-	        	        _this._setSameTypeTab(editor.txt.html(),_visibleTypeName,_inputValue);
+	        	        _this._setSameTypeTab(editor.txt.html(),_visibleTypeName,_inputValue,gradeTag);
 	        	        
 	                    // 返回 true，表示该事件执行完之后，panel 要关闭。否则 panel 不会关闭
 	                    return true;
@@ -3160,9 +3192,9 @@ Hide.prototype = {
 	                	}else if(_visibleTypeName == 20){
 	                		 
 	                	}else if(_visibleTypeName == 30){
-	                		_inputValue = $('#' + inputMinPointId).val();//超过积分
+	                		_inputValue = $('#' + inputGradeId).val();//达到等级
 	                		if (_inputValue == "" || !/^\d*$/.test(_inputValue)) {
-	                			alert("请输入数字类型");
+	                			alert("请选择等级");
 	                			return false;
 	                		}
 	                	}else if(_visibleTypeName == 40){
@@ -3179,6 +3211,17 @@ Hide.prototype = {
 	                		}
 	                	}
 	                	
+	                	//等级标签
+						var gradeTag = "";
+						if(userGradeList != null && userGradeList.length >0){
+							for(var i=0; i<userGradeList.length; i++){
+								var userGrade = userGradeList[i];
+								if(userGrade.needPoint == _inputValue){
+									gradeTag = userGrade.name;
+								}
+							}
+						}
+	                	
 	                	var $hide = editor.selection.getSelectionContainerElem().parentUntil('HIDE');
 	        	        if ($hide != null){
 	        	 	       if(_visibleTypeName == 10){//输入密码可见
@@ -3189,10 +3232,11 @@ Hide.prototype = {
 								$hide.attr('class','inputValue_20');
 								$hide.attr('hide-type',20);
 								$hide.attr('input-value','');
-							}else if(_visibleTypeName == 30){//超过积分可见
+							}else if(_visibleTypeName == 30){//达到等级可见
 								$hide.attr('class','inputValue_30');
 								$hide.attr('hide-type',30);
 								$hide.attr('input-value',_inputValue);
+								$hide.attr('description',gradeTag);
 							}else if(_visibleTypeName == 40){//积分购买可见
 								$hide.attr('class','inputValue_40');
 								$hide.attr('hide-type',40);
@@ -3213,11 +3257,12 @@ Hide.prototype = {
 		                		$selectionELem.attr('class','inputValue_20');
 		            	        $selectionELem.attr('hide-type',20);
 		            	        $selectionELem.attr('input-value','');
-							}else if(_visibleTypeName == 30){//超过积分可见
+							}else if(_visibleTypeName == 30){//达到等级可见
 								var $selectionELem = editor.selection.getSelectionContainerElem();
 		                		$selectionELem.attr('class','inputValue_30');
 		            	        $selectionELem.attr('hide-type',30);
 		            	        $selectionELem.attr('input-value',_inputValue);
+		            	        $selectionELem.attr('description',gradeTag);
 							}else if(_visibleTypeName == 40){//积分购买可见
 								var $selectionELem = editor.selection.getSelectionContainerElem();
 		                		$selectionELem.attr('class','inputValue_40');
@@ -3232,7 +3277,7 @@ Hide.prototype = {
 	        	        	
 	        	        }
 	        	        // 设置同类型标签为相同的值
-	        	        _this._setSameTypeTab(editor.txt.html(),_visibleTypeName,_inputValue);
+	        	        _this._setSameTypeTab(editor.txt.html(),_visibleTypeName,_inputValue,gradeTag);
 	                	
 	                    // 返回 true，表示该事件执行完之后，panel 要关闭。否则 panel 不会关闭
 	                	return true;
@@ -3319,7 +3364,7 @@ Hide.prototype = {
 	
 	
 	// 设置同类型标签为相同的值
-	_setSameTypeTab: function _setSameTypeTab(oldHtml,visibleType,inputValue) {
+	_setSameTypeTab: function _setSameTypeTab(oldHtml,visibleType,inputValue,description) {
 		var _this = this;
 		if(visibleType == 10){//输入密码可见
 			//替换标签
@@ -3327,9 +3372,9 @@ Hide.prototype = {
 			_this.editor.txt.html(htmlValue);
 		}else if(visibleType == 20){//回复话题可见
 			
-		}else if(visibleType == 30){//超过积分可见
+		}else if(visibleType == 30){//达到等级可见
 			//替换标签
-			var htmlValue =  _this.replaceTab(oldHtml,"hide","inputValue_30",""+inputValue+"");
+			var htmlValue =  _this.replaceTab(oldHtml,"hide","inputValue_30",""+inputValue+"",""+description+"");
 			_this.editor.txt.html(htmlValue);
 		}else if(visibleType == 40){//积分购买可见
 			var htmlValue =  _this.replaceTab(oldHtml,"hide","inputValue_40",""+inputValue+""); 
@@ -3346,13 +3391,14 @@ Hide.prototype = {
 	 * tag 标签名称
 	 * className css样式名称
 	 * inputValue 替换标签值
+	 * description 描述
 	 */
-	replaceTab: function replaceTab(html,tag,className,inputValue) {
+	replaceTab: function replaceTab(html,tag,className,inputValue,description) {
 		var _this = this;
 		var node = document.createElement("div");
 		node.innerHTML = html;
 		
-		_this.getChildNode(node,tag,className,inputValue);
+		_this.getChildNode(node,tag,className,inputValue,description);
 		return node.innerHTML;
 	},
 	
@@ -3362,9 +3408,9 @@ Hide.prototype = {
 	 * tag 标签名称
 	 * className css样式名称
 	 * inputValue 替换标签值
-	 * 
+	 * description 描述
 	 */
-	getChildNode: function getChildNode(node,tag,className,inputValue) {
+	getChildNode: function getChildNode(node,tag,className,inputValue,description) {
         //先找到子节点
         var nodeList = node.childNodes;
         for(var i = 0;i < nodeList.length;i++){
@@ -3377,9 +3423,11 @@ Hide.prototype = {
             	if(childNode.nodeName.toLowerCase() == tag.toLowerCase() && 
             			childNode.getAttribute("class") == className){
             		childNode.setAttribute("input-value",inputValue);
-            		 
+            		if(description != null && description != ""){
+            			childNode.setAttribute("description",description);
+            		}
             	}
-                getChildNode(childNode,tag,className,inputValue);
+                getChildNode(childNode,tag,className,inputValue,description);
             }
         }
     },
@@ -5285,7 +5333,7 @@ polyfill();
   inlinecss += '.editor-text hide {  border: 0;  border-left: 3px solid #06b5ff;  margin-left: 10px;  padding: 0.5em;  display: block;  min-height:26px;  margin: 30px 0px 0px 0px;}';
   inlinecss += ".editor-text .inputValue_10::before {  content: '密码: ' attr(input-value) '';  color: #06b5ff;  font-size:14px;  position: absolute;  margin-top: -30px;  line-height: 30px;}";
   inlinecss += ".editor-text .inputValue_20::before {  content: '回复话题可见';  color: #06b5ff;  font-size:14px;  position: absolute;  margin-top: -30px;  line-height: 30px;}";
-  inlinecss += ".editor-text .inputValue_30::before {  content: '超过积分 ' attr(input-value) ' 可见';  color: #06b5ff;  font-size:14px;  position: absolute;  margin-top: -30px;  line-height: 30px;}";
+  inlinecss += ".editor-text .inputValue_30::before {  content: '达到等级 ' attr(description) ' 可见';  color: #06b5ff;  font-size:14px;  position: absolute;  margin-top: -30px;  line-height: 30px;}";
   inlinecss += ".editor-text .inputValue_40::before {  content: '需要支付 ' attr(input-value) ' 积分可见';  color: #06b5ff;  font-size:14px;  position: absolute;  margin-top: -30px;  line-height: 30px;}";
   inlinecss += ".editor-text .inputValue_50::before {  content: '需要支付 ' attr(input-value) ' 元费用可见';  color: #06b5ff;  font-size:14px;  position: absolute;  margin-top: -30px;  line-height: 30px;}";
    

@@ -39,6 +39,7 @@ import cms.bean.topic.TopicUnhide;
 import cms.bean.user.AccessUser;
 import cms.bean.user.PointLog;
 import cms.bean.user.User;
+import cms.bean.user.UserDynamic;
 import cms.bean.user.UserGrade;
 import cms.service.message.RemindService;
 import cms.service.setting.SettingService;
@@ -67,6 +68,7 @@ import cms.web.action.setting.SettingManage;
 import cms.web.action.thumbnail.ThumbnailManage;
 import cms.web.action.topic.TopicManage;
 import cms.web.action.user.PointManage;
+import cms.web.action.user.UserDynamicManage;
 import cms.web.action.user.UserManage;
 import cms.web.taglib.Configuration;
 
@@ -105,6 +107,7 @@ public class TopicFormAction {
 	@Resource RemindManage remindManage;
 	
 	@Resource UserGradeService userGradeService;
+	@Resource UserDynamicManage userDynamicManage;
 	
 	/**
 	 * 话题  添加
@@ -414,9 +417,23 @@ public class TopicFormAction {
 			pointLog.setPoint(systemSetting.getTopic_rewardPoint());//积分
 			pointLog.setUserName(accessUser.getUserName());//用户名称
 			pointLog.setRemark("");
-			
 			//增加用户积分
 			userService.addUserPoint(accessUser.getUserName(),systemSetting.getTopic_rewardPoint(), pointManage.createPointLogObject(pointLog));
+			
+			
+			//用户动态
+			UserDynamic userDynamic = new UserDynamic();
+			userDynamic.setId(userDynamicManage.createUserDynamicId(accessUser.getUserId()));
+			userDynamic.setUserName(accessUser.getUserName());
+			userDynamic.setModule(100);//模块 100.话题
+			userDynamic.setTopicId(topic.getId());
+			userDynamic.setPostTime(topic.getPostTime());
+			userDynamic.setStatus(topic.getStatus());
+			
+			Object new_userDynamic = userDynamicManage.createUserDynamicObject(userDynamic);
+			userService.saveUserDynamic(new_userDynamic);
+
+			
 			//删除缓存
 			userManage.delete_cache_findUserById(accessUser.getUserId());
 			userManage.delete_cache_findUserByUserName(accessUser.getUserName());
@@ -766,6 +783,7 @@ public class TopicFormAction {
 		if(!hideTypeList.contains(hideType)){
 			error.put("topicUnhide", ErrorView._1620.name());//隐藏标签不存在
 		}
+		
 			
 		if(error.size() == 0){
 			//解析隐藏标签
@@ -869,11 +887,9 @@ public class TopicFormAction {
 				
 			}
 			
-			
-			
 			try {
 				//保存'话题取消隐藏'
-				topicService.saveTopicUnhide(topicManage.createTopicUnhideObject(topicUnhide),point,accessUser.getUserName(),consumption_pointLogObject,topic.getUserName(),income_pointLogObject);
+				topicService.saveTopicUnhide(topicManage.createTopicUnhideObject(topicUnhide),hideType,point,accessUser.getUserName(),consumption_pointLogObject,topic.getUserName(),income_pointLogObject);
 				
 				//删除'话题取消隐藏'缓存;
 				topicManage.delete_cache_findTopicUnhideById(topicUnhideId);

@@ -994,7 +994,7 @@ public class CreateBean {
 			ctClass.addInterface(pool.get("java.io.Serializable"));
 			
 			// 添加属性   
-			 ctClass.addField(CtField.make("private static final long serialVersionUID = 16000000000000000"+ tableNumber+"L;", ctClass));
+			ctClass.addField(CtField.make("private static final long serialVersionUID = 16000000000000000"+ tableNumber+"L;", ctClass));
 
 			//写入注解(Annotation) 
 			ClassFile cf = ctClass.getClassFile();  
@@ -1083,5 +1083,139 @@ public class CreateBean {
 				}  
 			}
 		} 
+	}
+	
+	/**
+	 * 创建用户动态bean
+	 * @param number 表号
+	 */
+	public static void createUserDynamicBean(Integer tableNumber){
+		
+		//ClassPool：CtClass对象的容器   
+	    ClassPool pool = ClassPool.getDefault(); 
+	//    ClassClassPath classPath = new ClassClassPath(this.getClass());
+	    ClassClassPath classPath = new ClassClassPath(CreateBean.class);
+	    pool.insertClassPath(classPath);
+
+	      
+	    //通过ClassPool生成一个public新类HistoryOrder.java   
+	    CtClass ctClass = pool.makeClass("cms.bean.user.UserDynamic_"+tableNumber); 
+
+        try {
+        	// 父类
+        	ctClass.setSuperclass(pool.get("cms.bean.user.UserDynamicEntity"));
+        	// 添加接口
+			ctClass.addInterface(pool.get("java.io.Serializable"));
+			
+			// 添加属性   
+			ctClass.addField(CtField.make("private static final long serialVersionUID = 17000000000000000"+ tableNumber+"L;", ctClass));
+
+			//写入注解(Annotation) 
+			ClassFile cf = ctClass.getClassFile();  
+	        ConstPool cp = cf.getConstPool();
+ 
+	        //@Table(name="historyorder_0",indexes = {@Index(name="historyorder_idx", columnList="state,visible")})
+	        AnnotationsAttribute attr = new AnnotationsAttribute(cp, AnnotationsAttribute.visibleTag);
+	        
+	        //@Entity注解
+	        Annotation entity_a = new Annotation("javax.persistence.Entity", cp);
+	  	  	attr.addAnnotation(entity_a);
+	  	  	
+	        //@Table注解
+	        Annotation a = new Annotation("javax.persistence.Table", cp);
+	        a.addMemberValue("name", new StringMemberValue("userDynamic_"+tableNumber, cp));
+	       
+	        Annotation index_a = new Annotation("javax.persistence.Index", cp);
+	        index_a.addMemberValue("name", new StringMemberValue("userDynamic_1_idx", cp));
+	        index_a.addMemberValue("columnList", new StringMemberValue("userName,status,postTime", cp));
+	        AnnotationMemberValue annotationMemberValue = new AnnotationMemberValue(cp);
+	        annotationMemberValue.setValue(index_a);
+	        
+	        Annotation index_b = new Annotation("javax.persistence.Index", cp);
+	        index_b.addMemberValue("name", new StringMemberValue("userDynamic_2_idx", cp));
+	        index_b.addMemberValue("columnList", new StringMemberValue("topicId,userName,module", cp));
+	        AnnotationMemberValue annotationMemberValue_b = new AnnotationMemberValue(cp);
+	        annotationMemberValue_b.setValue(index_b);
+	        
+	        Annotation index_c = new Annotation("javax.persistence.Index", cp);
+	        index_c.addMemberValue("name", new StringMemberValue("userDynamic_3_idx", cp));
+	        index_c.addMemberValue("columnList", new StringMemberValue("commentId,userName,module", cp));
+	        AnnotationMemberValue annotationMemberValue_c = new AnnotationMemberValue(cp);
+	        annotationMemberValue_c.setValue(index_c);
+	        
+	        Annotation index_d = new Annotation("javax.persistence.Index", cp);
+	        index_d.addMemberValue("name", new StringMemberValue("userDynamic_4_idx", cp));
+	        index_d.addMemberValue("columnList", new StringMemberValue("replyId,userName,module", cp));
+	        AnnotationMemberValue annotationMemberValue_d = new AnnotationMemberValue(cp);
+	        annotationMemberValue_d.setValue(index_d);
+	        
+
+	        MemberValue[] vals = new MemberValue[]{annotationMemberValue,annotationMemberValue_b,annotationMemberValue_c,annotationMemberValue_d};
+
+
+	        ArrayMemberValue arrayMemberValue=new ArrayMemberValue(cp);//数组类型
+	        arrayMemberValue.setValue(vals);
+	      
+	        a.addMemberValue("indexes", arrayMemberValue);//数组类型
+	        attr.addAnnotation(a);
+	        cf.addAttribute(attr);
+	        cf.setVersionToJava5();
+
+	        
+		} catch (NotFoundException e) {
+			// TODO Auto-generated catch block
+		//	e.printStackTrace();
+			if (logger.isErrorEnabled()) {
+	            logger.error("创建用户动态bean",e);
+	        }
+		}   catch (CannotCompileException e) {
+			// TODO Auto-generated catch block
+		//	e.printStackTrace();
+			if (logger.isErrorEnabled()) {
+	            logger.error("创建用户动态bean",e);
+	        }
+		}   
+       
+        
+      //把生成的class文件写入文件   
+        byte[] byteArr;
+        FileOutputStream fos = null;
+		try {
+			File file = new File(PathUtil.path()+File.separator+"WEB-INF"+File.separator+"classes"+File.separator+"cms"+File.separator+"bean"+File.separator+"user"+File.separator+"UserDynamic_"+tableNumber+".class");
+			
+			if(!file.exists()){
+				byteArr = ctClass.toBytecode();
+				//	fos = new FileOutputStream(new File("C://HistoryOrder_5.class"));
+				fos = new FileOutputStream(file);
+				fos.write(byteArr);
+			}
+			
+			
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+		//	e.printStackTrace();
+			if (logger.isErrorEnabled()) {
+	            logger.error("创建用户动态bean",e);
+	        }
+		} catch (CannotCompileException e) {
+			// TODO Auto-generated catch block
+		//	e.printStackTrace();
+			if (logger.isErrorEnabled()) {
+	            logger.error("创建用户动态bean",e);
+	        }
+		} finally {
+			if(fos != null){
+				try {
+					fos.close();
+				} catch (IOException e) {
+					if (logger.isErrorEnabled()) {
+			            logger.error("创建用户动态bean",e);
+			        }
+				}  
+			}
+		}
+
+
 	}
 }

@@ -38,6 +38,7 @@ import cms.bean.topic.Topic;
 import cms.bean.user.AccessUser;
 import cms.bean.user.PointLog;
 import cms.bean.user.User;
+import cms.bean.user.UserDynamic;
 import cms.service.message.RemindService;
 import cms.service.setting.SettingService;
 import cms.service.template.TemplateService;
@@ -60,6 +61,7 @@ import cms.web.action.message.RemindManage;
 import cms.web.action.setting.SettingManage;
 import cms.web.action.topic.TopicManage;
 import cms.web.action.user.PointManage;
+import cms.web.action.user.UserDynamicManage;
 import cms.web.action.user.UserManage;
 import cms.web.taglib.Configuration;
 
@@ -92,7 +94,7 @@ public class CommentFormAction {
 	
 	@Resource RemindManage remindManage;
 	@Resource RemindService remindService;
-	
+	@Resource UserDynamicManage userDynamicManage;
 	
 	
 	/**
@@ -268,6 +270,21 @@ public class CommentFormAction {
 			
 			//增加用户积分
 			userService.addUserPoint(accessUser.getUserName(),systemSetting.getComment_rewardPoint(), pointManage.createPointLogObject(pointLog));
+			
+			//用户动态
+			UserDynamic userDynamic = new UserDynamic();
+			userDynamic.setId(userDynamicManage.createUserDynamicId(accessUser.getUserId()));
+			userDynamic.setUserName(accessUser.getUserName());
+			userDynamic.setModule(200);//模块 200.评论
+			userDynamic.setTopicId(topic.getId());
+			userDynamic.setCommentId(comment.getId());
+			userDynamic.setPostTime(comment.getPostTime());
+			userDynamic.setStatus(comment.getStatus());
+			
+			Object new_userDynamic = userDynamicManage.createUserDynamicObject(userDynamic);
+			userService.saveUserDynamic(new_userDynamic);
+
+			
 			//删除缓存
 			userManage.delete_cache_findUserById(accessUser.getUserId());
 			userManage.delete_cache_findUserByUserName(accessUser.getUserName());
@@ -704,6 +721,26 @@ public class CommentFormAction {
 			
 			//增加用户积分
 			userService.addUserPoint(accessUser.getUserName(),systemSetting.getComment_rewardPoint(), pointManage.createPointLogObject(pointLog));
+			
+			
+			//用户动态
+			UserDynamic userDynamic = new UserDynamic();
+			userDynamic.setId(userDynamicManage.createUserDynamicId(accessUser.getUserId()));
+			userDynamic.setUserName(accessUser.getUserName());
+			userDynamic.setModule(300);//模块 300.引用评论
+			userDynamic.setTopicId(topic.getId());
+			userDynamic.setCommentId(newComment.getId());
+			userDynamic.setQuoteCommentId(comment.getId());
+			userDynamic.setPostTime(newComment.getPostTime());
+			userDynamic.setStatus(newComment.getStatus());
+			
+			Object new_userDynamic = userDynamicManage.createUserDynamicObject(userDynamic);
+			userService.saveUserDynamic(new_userDynamic);
+			
+			
+			
+			
+			
 			//删除缓存
 			userManage.delete_cache_findUserById(accessUser.getUserId());
 			userManage.delete_cache_findUserByUserName(accessUser.getUserName());
@@ -1039,6 +1076,22 @@ public class CommentFormAction {
 			
 			//增加用户积分
 			userService.addUserPoint(accessUser.getUserName(),systemSetting.getReply_rewardPoint(), pointManage.createPointLogObject(pointLog));
+			
+			
+			//用户动态
+			UserDynamic userDynamic = new UserDynamic();
+			userDynamic.setId(userDynamicManage.createUserDynamicId(accessUser.getUserId()));
+			userDynamic.setUserName(accessUser.getUserName());
+			userDynamic.setModule(400);//模块 400.回复
+			userDynamic.setTopicId(reply.getTopicId());
+			userDynamic.setCommentId(reply.getCommentId());
+			userDynamic.setReplyId(reply.getId());
+			userDynamic.setPostTime(reply.getPostTime());
+			userDynamic.setStatus(reply.getStatus());
+			
+			Object new_userDynamic = userDynamicManage.createUserDynamicObject(userDynamic);
+			userService.saveUserDynamic(new_userDynamic);
+			
 			//删除缓存
 			userManage.delete_cache_findUserById(accessUser.getUserId());
 			userManage.delete_cache_findUserByUserName(accessUser.getUserName());

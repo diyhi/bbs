@@ -412,6 +412,11 @@ http://www.springframework.org/schema/task http://www.springframework.org/schema
         <!-- 话题取消隐藏分表数量 -->
         <property name="tableQuantity" value="4" />    
     </bean>
+    <!-- 创建用户动态配置 -->
+    <bean id="userDynamicConfig" class="cms.web.action.user.UserDynamicConfig" >
+        <!-- 用户动态分表数量 -->
+        <property name="tableQuantity" value="4" />    
+    </bean>
     
    	<!-- 让普通的java类获取spring 的bean配置 -->
    	<bean id="SpringConfigTool" class="cms.utils.SpringConfigTool"></bean>

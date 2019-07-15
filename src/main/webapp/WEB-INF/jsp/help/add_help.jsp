@@ -109,6 +109,7 @@ function sureSubmit(objForm){
 <script>
 var editor;
 function initKindEditor(id){
+	KindEditor.options.cssData = 'body { font-size: 14px; }';
 	KindEditor.ready(function(K) {
 		
 		editor = K.create('textarea[name="content"]', {

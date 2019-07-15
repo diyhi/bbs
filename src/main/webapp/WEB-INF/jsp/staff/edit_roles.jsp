@@ -79,13 +79,13 @@ function sureSubmit(objForm){
     	<TABLE cellSpacing="2" cellPadding="0" width="99%"  border="0">
 	   		 <c:forEach items="${permissionObjectMap}" var="entry" varStatus="status">
 		    	<TR>
-					<TD width="100%"  height="20px" align="left" colspan="2">
+					<TD width="100%"  height="22px" align="left" colspan="2">
 						<label><input type="checkbox" id="permissionGroup_${status.index}" name="permissionGroup" value="${status.index}" onclick="selectAllPermission(this);"/>${entry.key}</label>
 					</TD>
 				</TR>
 				<TR>
-					<TD width="5%" height="25px" style="BORDER-BOTTOM: #bfe3ff 1px dotted;" >&nbsp;</TD>
-					<TD width="95%" style="BORDER-BOTTOM: #bfe3ff 1px dotted;line-height: 20px" align="left">
+					<TD width="5%" height="26px" style="BORDER-BOTTOM: #bfe3ff 1px dotted;" >&nbsp;</TD>
+					<TD width="95%" style="BORDER-BOTTOM: #bfe3ff 1px dotted;line-height: 22px" align="left">
 					<c:forEach items="${entry.value}" var="entryValue">
 						<input type="hidden" name="permissionId_${status.index}" value="${entryValue.permissionId}">
 						<label><input type="checkbox" id="sysPermissionId_${status.index}_${entryValue.permissionId}" name="sysPermissionId" value="${entryValue.permissionId}" <c:if test="${!entryValue.logonUserPermission}"> disabled="disabled"</c:if> <c:if test="${entryValue.selected}"> checked="checked"</c:if> onclick="selectPermission(this);" index="${status.index}"/>${entryValue.remarks}</label>

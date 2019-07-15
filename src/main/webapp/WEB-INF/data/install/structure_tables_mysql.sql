@@ -1026,6 +1026,7 @@ CREATE TABLE `upgradesystem` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+
 #
 # Structure for table "user"
 #
@@ -1048,10 +1049,13 @@ CREATE TABLE `user` (
   `securityDigest` bigint(20) DEFAULT NULL,
   `avatarName` varchar(50) DEFAULT NULL,
   `nickname` varchar(50) DEFAULT NULL,
+  `allowUserDynamic` bit(1) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `UK4bakctviobmdk6ddh2nwg08c2` (`userName`),
   KEY `user_idx` (`state`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
 
 #
 # Structure for table "usercustom"
@@ -1077,6 +1081,93 @@ CREATE TABLE `usercustom` (
   `visible` bit(1) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+
+#
+# Structure for table "userdynamic_0"
+#
+
+CREATE TABLE `userdynamic_0` (
+  `id` varchar(36) NOT NULL,
+  `commentId` bigint(20) DEFAULT NULL,
+  `module` int(11) DEFAULT NULL,
+  `postTime` datetime DEFAULT NULL,
+  `quoteCommentId` bigint(20) DEFAULT NULL,
+  `replyId` bigint(20) DEFAULT NULL,
+  `status` int(11) DEFAULT NULL,
+  `topicId` bigint(20) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `userDynamic_1_idx` (`userName`,`status`,`postTime`),
+  KEY `userDynamic_2_idx` (`topicId`,`userName`,`module`),
+  KEY `userDynamic_3_idx` (`commentId`,`userName`,`module`),
+  KEY `userDynamic_4_idx` (`replyId`,`userName`,`module`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "userdynamic_1"
+#
+
+CREATE TABLE `userdynamic_1` (
+  `id` varchar(36) NOT NULL,
+  `commentId` bigint(20) DEFAULT NULL,
+  `module` int(11) DEFAULT NULL,
+  `postTime` datetime DEFAULT NULL,
+  `quoteCommentId` bigint(20) DEFAULT NULL,
+  `replyId` bigint(20) DEFAULT NULL,
+  `status` int(11) DEFAULT NULL,
+  `topicId` bigint(20) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `userDynamic_1_idx` (`userName`,`status`,`postTime`),
+  KEY `userDynamic_2_idx` (`topicId`,`userName`,`module`),
+  KEY `userDynamic_3_idx` (`commentId`,`userName`,`module`),
+  KEY `userDynamic_4_idx` (`replyId`,`userName`,`module`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "userdynamic_2"
+#
+
+CREATE TABLE `userdynamic_2` (
+  `id` varchar(36) NOT NULL,
+  `commentId` bigint(20) DEFAULT NULL,
+  `module` int(11) DEFAULT NULL,
+  `postTime` datetime DEFAULT NULL,
+  `quoteCommentId` bigint(20) DEFAULT NULL,
+  `replyId` bigint(20) DEFAULT NULL,
+  `status` int(11) DEFAULT NULL,
+  `topicId` bigint(20) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `userDynamic_1_idx` (`userName`,`status`,`postTime`),
+  KEY `userDynamic_2_idx` (`topicId`,`userName`,`module`),
+  KEY `userDynamic_3_idx` (`commentId`,`userName`,`module`),
+  KEY `userDynamic_4_idx` (`replyId`,`userName`,`module`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "userdynamic_3"
+#
+
+CREATE TABLE `userdynamic_3` (
+  `id` varchar(36) NOT NULL,
+  `commentId` bigint(20) DEFAULT NULL,
+  `module` int(11) DEFAULT NULL,
+  `postTime` datetime DEFAULT NULL,
+  `quoteCommentId` bigint(20) DEFAULT NULL,
+  `replyId` bigint(20) DEFAULT NULL,
+  `status` int(11) DEFAULT NULL,
+  `topicId` bigint(20) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `userDynamic_1_idx` (`userName`,`status`,`postTime`),
+  KEY `userDynamic_2_idx` (`topicId`,`userName`,`module`),
+  KEY `userDynamic_3_idx` (`commentId`,`userName`,`module`),
+  KEY `userDynamic_4_idx` (`replyId`,`userName`,`module`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 
 #
 # Structure for table "usergrade"

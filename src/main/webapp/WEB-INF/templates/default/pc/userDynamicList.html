@@ -1,0 +1,180 @@
+<#-- 默认用户动态列表 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<base href="${baseURL}">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>用户动态 - ${title}</title>
+	<meta name="keywords" content="${keywords}"/>
+	<meta name="description" content="${description}"/>
+	<#-- 获取令牌 -->
+	<meta name="csrfToken" content="${token}"/>
+	<link rel="shortcut icon" type="image/x-icon" href="${baseURL}${commonPath}images/favicon.ico" media="screen" />
+	<link href="${commonPath}css/common.css" type="text/css" rel="stylesheet" >
+	<script language="javascript" src="${commonPath}js/tool.js" type="text/javascript"></script>
+	<script language="javascript" src="${commonPath}js/ajax.js" type="text/javascript"></script>
+	<script language="javascript" src="${commonPath}js/json2.js" type="text/javascript"></script>
+	<script type="text/javascript" src="${commonPath}js/jquery/jquery.min.js" language="javascript"></script>
+	<script type="text/javascript" src="${commonPath}js/jquery/readmore.min.js" language="javascript"></script>
+	<link href="${commonPath}js/layer/skin/default/layer.css"  type="text/css" rel="stylesheet"/>
+	<script type="text/javascript" src="${commonPath}js/layer/layer.js" language="javascript"></script>
+	<link rel="stylesheet" href="${commonPath}js/syntaxhighlighter/styles/shCoreDefault.css"  type="text/css" />
+	<script language="JavaScript" src="${commonPath}js/syntaxhighlighter/scripts/shCore.js" type="text/javascript"></script>
+	<script language="javascript" src="${commonPath}js/syntaxhighlighter/scripts/shBrushXml.js" type="text/javascript" ></script>
+	<script language="javascript" src="${commonPath}js/syntaxhighlighter/scripts/shBrushJScript.js" type="text/javascript" ></script>
+	<script language="javascript" src="${commonPath}js/syntaxhighlighter/scripts/shBrushCss.js" type="text/javascript"></script>
+	<script language="javascript" src="${commonPath}js/syntaxhighlighter/scripts/shBrushJava.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript" language="javascript"> 
+	
+	
+</script>
+<body>
+<#-- 引入页头 -->
+<@include action="${newPublic_2}"/>
+<div class="fixedBottom wrap clearfix">
+
+	<#-- 引入服务导航 -->
+	<@include action="${newPublic_4}"/>
+	
+	
+	
+	
+	<#if pageView.records?exists && pageView.records?size gt 0 > 
+	
+	<div class="userDynamicModule" >
+		<ol class="userDynamicList">
+			<#list pageView.records as userDynamic>
+				<div class="userDynamic">
+					<div class="userDynamic-author">
+						<a href="user/control/home?userName=${userDynamic.userName}">
+						<#if userDynamic.avatarName != null>
+							<img src="${userDynamic.avatarPath}100x100/${userDynamic.avatarName}" >
+						<#else>
+							<img src="${commonPath}images/min_avata.png" >
+						</#if> 
+						<cite>
+							<a class="userName" href="user/control/home?userName=${userDynamic.userName}">
+								${(userDynamic.nickname != null && userDynamic.nickname??) ?string(userDynamic.nickname , userDynamic.userName)}
+							</a>
+						</cite> 
+					</div>
+					<div class="userDynamicTime">${userDynamic.postTime}</div> 
+					
+					<div class="topicTitle">
+						<#if userDynamic.module == 100>
+							<span>发表了话题</span>
+						<#elseif userDynamic.module == 200>
+							<span>评论了话题</span>
+						<#elseif userDynamic.module == 300>
+							<span>引用了话题</span>
+						<#elseif userDynamic.module == 400>
+							<span>回复了话题</span>
+						</#if> 
+						<a href="thread?topicId=${userDynamic.topicId}">${userDynamic.topicTitle}</a>
+						
+					</div>
+					
+					<#if userDynamic.module == 100>
+						<!-- topicId属性用来支持JS获取隐藏内容 -->
+						<div class="topicContent" topicId="${userDynamic.topicId}" ><#noescape>${userDynamic.topicContent}</#noescape></div>
+					</#if> 
+					<#if userDynamic.module == 200>
+						<div class="topicContent" ><#noescape>${userDynamic.commentContent}</#noescape></div>
+					</#if> 
+					<#if userDynamic.module == 300>
+						<div id="quoteModuleContent" >
+							<div class="commentContent" ><#noescape>${userDynamic.commentContent}</#noescape></div>
+                        	<div class="quoteContent">
+                                <div class="text" >
+                                    ${userDynamic.quoteCommentContent}
+                                </div>
+                            </div>
+						</div>
+					</#if> 
+					<#if userDynamic.module == 400>
+						<div class="replyContent" >${userDynamic.replyContent}</div>
+					</#if> 
+					
+					<div class="clearfix"></div>
+					<div class="tipBottom">
+						<span class="a-toolbar">
+							<#if userDynamic.module == 100>
+								<a href="thread?topicId=${userDynamic.topicId}" target="_blank" >查看原文</a>
+								<span >${userDynamic.topicViewTotal}次阅读</span>
+								<span >${userDynamic.topicCommentTotal}个评论</span>
+								<span id="favoriteCount_${userDynamic.topicId}">0人收藏</span>
+								<script type="text/javascript">
+									//查询话题用户收藏总数
+									function queryFavoriteCount(){	
+										//获取话题Id
+										var topicId = ${userDynamic.topicId};
+										get_request(function(value){
+											if(value != ""){
+												var data = JSON.parse(value);
+									        	document.getElementById("favoriteCount_"+topicId).innerHTML = data+"人收藏";
+									        }
+										},
+											"queryFavoriteCount?topicId="+topicId+"&timestamp=" + new Date().getTime(), true);
+														           
+									}
+									queryFavoriteCount();
+								</script>
+							<#elseif userDynamic.module == 200>
+								<a href="thread?topicId=${userDynamic.topicId}&commentId=${userDynamic.commentId}"  target="_blank" >查看原文</a>
+							<#elseif userDynamic.module == 300>
+								<a href="thread?topicId=${userDynamic.topicId}&commentId=${userDynamic.commentId}"  target="_blank" >查看原文</a>
+							<#elseif userDynamic.module == 400>
+								<a href="thread?topicId=${userDynamic.topicId}&commentId=${userDynamic.commentId}"  target="_blank" >查看原文</a>
+							</#if> 
+							
+							
+						</span>
+					</div>
+				</div>
+			</#list>
+		</ol>
+	</div>
+	<div style="background: red;"></div>
+	</#if>	
+	<div class="userDynamicPage">
+	   	<#-- 分页 公共页(生成新引用页)-->
+		<@include action="${newPublic_1}"/>
+	</div>
+
+
+	<#-- 引入话题取消隐藏 -->
+	<@include action="${topicRelated_topicUnhide_2}"/>
+
+
+	<script type="text/javascript">
+	$(document).ready(function () {
+		//隐藏高度超过100px的内容
+		$('.topicContent,#quoteModuleContent').readmore({
+			speed: 100,//速度
+			collapsedHeight: 200,//默认高度
+			moreLink: '<a href="" class="readMore">展开阅读</a>',
+			lessLink: '<a href="" class="readMore">收起</a>',
+			afterToggle: function(trigger, element, expanded) {
+				if(expanded){//收缩
+					element.next().addClass('shrinkMore');
+					element.next().removeClass('readMore');
+				}else{//展开
+					element.next().addClass('readMore');
+					element.next().removeClass('shrinkMore');
+				}
+			}
+		});
+		
+		
+	});
+	</script>
+	<div style="clear:both;"></div>
+	<div class="push"><!-- 把div#footer推下去 --></div>
+
+</div>
+<#--引入页脚-->
+<@include action="${newPublic_3}"/>
+</body>
+
+</html>
