@@ -57,6 +57,7 @@ import cms.web.action.CSRFTokenManage;
 import cms.web.action.FileManage;
 import cms.web.action.TextFilterManage;
 import cms.web.action.filterWord.SensitiveWordFilterManage;
+import cms.web.action.follow.FollowManage;
 import cms.web.action.message.RemindManage;
 import cms.web.action.setting.SettingManage;
 import cms.web.action.topic.TopicManage;
@@ -95,7 +96,7 @@ public class CommentFormAction {
 	@Resource RemindManage remindManage;
 	@Resource RemindService remindService;
 	@Resource UserDynamicManage userDynamicManage;
-	
+	@Resource FollowManage followManage;
 	
 	/**
 	 * 评论   添加
@@ -173,6 +174,8 @@ public class CommentFormAction {
 		}
 		
 		Comment comment = new Comment();
+		Date postTime = new Date();
+		comment.setPostTime(postTime);
 		List<String> imageNameList = null;
 		
 		SystemSetting systemSetting = settingService.findSystemSetting_cache();
@@ -278,7 +281,7 @@ public class CommentFormAction {
 			userDynamic.setModule(200);//模块 200.评论
 			userDynamic.setTopicId(topic.getId());
 			userDynamic.setCommentId(comment.getId());
-			userDynamic.setPostTime(comment.getPostTime());
+			userDynamic.setPostTime(postTime);
 			userDynamic.setStatus(comment.getStatus());
 			
 			Object new_userDynamic = userDynamicManage.createUserDynamicObject(userDynamic);
@@ -289,6 +292,8 @@ public class CommentFormAction {
 			userManage.delete_cache_findUserById(accessUser.getUserId());
 			userManage.delete_cache_findUserByUserName(accessUser.getUserName());
 			topicManage.delete_cache_findWhetherCommentTopic(comment.getTopicId(),accessUser.getUserName());
+			
+			followManage.delete_cache_userUpdateFlag(accessUser.getUserName());
 			
 			//修改话题最后回复时间
 			topicService.updateTopicReplyTime(topicId,new Date());
@@ -304,7 +309,7 @@ public class CommentFormAction {
 					remind.setReceiverUserId(_user.getId());//接收提醒用户Id
 					remind.setSenderUserId(accessUser.getUserId());//发送用户Id
 					remind.setTypeCode(10);//10:别人评论了我的话题
-					remind.setSendTimeFormat(new Date().getTime());//发送时间格式化
+					remind.setSendTimeFormat(postTime.getTime());//发送时间格式化
 					remind.setTopicId(topic.getId());//话题Id
 					remind.setFriendTopicCommentId(comment.getId());//对方的话题评论Id
 					
@@ -629,6 +634,8 @@ public class CommentFormAction {
 		}
 		
 		Comment newComment = new Comment();
+		Date postTime = new Date();
+		newComment.setPostTime(postTime);
 		List<String> imageNameList = null;
 		
 		
@@ -745,6 +752,8 @@ public class CommentFormAction {
 			userManage.delete_cache_findUserById(accessUser.getUserId());
 			userManage.delete_cache_findUserByUserName(accessUser.getUserName());
 			
+			followManage.delete_cache_userUpdateFlag(accessUser.getUserName());
+			
 			//修改话题最后回复时间
 			topicService.updateTopicReplyTime(newComment.getTopicId(),new Date());
 			
@@ -760,7 +769,7 @@ public class CommentFormAction {
 					remind.setReceiverUserId(_user.getId());//接收提醒用户Id
 					remind.setSenderUserId(accessUser.getUserId());//发送用户Id
 					remind.setTypeCode(10);//10:别人评论了我的话题
-					remind.setSendTimeFormat(new Date().getTime());//发送时间格式化
+					remind.setSendTimeFormat(postTime.getTime());//发送时间格式化
 					remind.setTopicId(comment.getTopicId());//话题Id
 					remind.setFriendTopicCommentId(newComment.getId());//对方的话题评论Id
 					
@@ -784,7 +793,7 @@ public class CommentFormAction {
 				remind.setReceiverUserId(_user.getId());//接收提醒用户Id
 				remind.setSenderUserId(accessUser.getUserId());//发送用户Id
 				remind.setTypeCode(30);//30:别人引用了我的评论
-				remind.setSendTimeFormat(new Date().getTime());//发送时间格式化
+				remind.setSendTimeFormat(postTime.getTime());//发送时间格式化
 				remind.setTopicId(comment.getTopicId());//话题Id
 				remind.setTopicCommentId(comment.getId());//我的话题评论Id
 				remind.setFriendTopicCommentId(newComment.getId());//对方的话题评论Id
@@ -1008,7 +1017,8 @@ public class CommentFormAction {
 
 		//回复
 		Reply reply = new Reply();
-		
+		Date postTime = new Date();
+		reply.setPostTime(postTime);
 		//前台发表回复默认状态
 		if(systemSetting.getReply_defaultState() != null){
 			if(systemSetting.getReply_defaultState().equals(10)){
@@ -1095,6 +1105,7 @@ public class CommentFormAction {
 			//删除缓存
 			userManage.delete_cache_findUserById(accessUser.getUserId());
 			userManage.delete_cache_findUserByUserName(accessUser.getUserName());
+			followManage.delete_cache_userUpdateFlag(accessUser.getUserName());
 			
 			//修改话题最后回复时间
 			topicService.updateTopicReplyTime(comment.getTopicId(),new Date());
@@ -1112,7 +1123,7 @@ public class CommentFormAction {
 						remind.setReceiverUserId(_user.getId());//接收提醒用户Id
 						remind.setSenderUserId(accessUser.getUserId());//发送用户Id
 						remind.setTypeCode(20);//20:别人回复了我的话题
-						remind.setSendTimeFormat(new Date().getTime());//发送时间格式化
+						remind.setSendTimeFormat(postTime.getTime());//发送时间格式化
 						remind.setTopicId(comment.getTopicId());//话题Id
 						remind.setFriendTopicCommentId(comment.getId());//对方的话题评论Id
 						remind.setFriendTopicReplyId(reply.getId());//对方的话题回复Id
@@ -1136,7 +1147,7 @@ public class CommentFormAction {
 				remind.setReceiverUserId(_user.getId());//接收提醒用户Id
 				remind.setSenderUserId(accessUser.getUserId());//发送用户Id
 				remind.setTypeCode(40);//40:别人回复了我的评论
-				remind.setSendTimeFormat(new Date().getTime());//发送时间格式化
+				remind.setSendTimeFormat(postTime.getTime());//发送时间格式化
 				remind.setTopicId(comment.getTopicId());//话题Id
 				remind.setTopicCommentId(comment.getId());//我的话题评论Id
 				remind.setFriendTopicReplyId(reply.getId());//对方的话题回复Id
@@ -1187,7 +1198,7 @@ public class CommentFormAction {
 					remind.setReceiverUserId(_user.getId());//接收提醒用户Id
 					remind.setSenderUserId(accessUser.getUserId());//发送用户Id
 					remind.setTypeCode(50);//50:别人回复了我回复过的评论
-					remind.setSendTimeFormat(new Date().getTime());//发送时间格式化
+					remind.setSendTimeFormat(postTime.getTime());//发送时间格式化
 					remind.setTopicId(_reply.getTopicId());//话题Id
 					remind.setTopicReplyId(_reply.getId());//我的话题回复Id
 					

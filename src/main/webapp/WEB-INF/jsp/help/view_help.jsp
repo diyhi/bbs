@@ -23,7 +23,7 @@
   </TR></THEAD>
   <TBODY class="t-list-tbody">
     <TR>
-    <TD class="t-content" height="25px">
+    <TD class="t-content" height="28px">
     <enhance:out escapeXml="false">
     	${help.content}
     </enhance:out>    	

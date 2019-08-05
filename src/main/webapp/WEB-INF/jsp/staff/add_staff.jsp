@@ -38,7 +38,7 @@ function sureSubmit(objForm){
   <TR>
     <TD class="t-label t-label-h" width="12%"><SPAN class="span-text">*</SPAN>账号：</TD>
     <TD class="t-content" width="88%" colSpan="3">
-    <input name="userAccount" size="20" maxlength="20" value="${sysUsers.userAccount}"/>
+    <input class="form-text" name="userAccount" size="20" maxlength="20" value="${sysUsers.userAccount}"/>
     <span class="span-text">${error["userAccount"]}</span>	
     
    </TD>
@@ -46,19 +46,19 @@ function sureSubmit(objForm){
   <TR>
     <TD class="t-label t-label-h" width="12%"><SPAN class="span-text">*</SPAN>姓名：</TD>
     <TD class="t-content" width="88%" colSpan="3">
-    <input name="fullName" size="20" maxlength="20" value="${sysUsers.fullName}"/>
+    <input class="form-text" name="fullName" size="20" maxlength="20" value="${sysUsers.fullName}"/>
    </TD>
    </TR>
   <TR>
     <TD class="t-label t-label-h" width="12%"><SPAN class="span-text">*</SPAN>密码：</TD>
     <TD class="t-content" width="88%" colSpan="3">
-    <input name="userPassword" type="password" size="20" maxlength="20" />
+    <input name="userPassword" type="password" class="form-text" size="20" maxlength="20" />
     <span class="span-text">${error["userPassword"]}</span>	
    	</TD></TR>
    <TR>
     <TD class="t-label t-label-h" width="12%"><SPAN class="span-text">*</SPAN>重复密码：</TD>
     <TD class="t-content" width="88%" colSpan="3">
-    <input name="repeatPassword" type="password" size="20" maxlength="20" />
+    <input name="repeatPassword" type="password" class="form-text" size="20" maxlength="20" />
    	</TD></TR>
    	<c:if test="${isSysAdmin }">
 	   	<TR>
@@ -72,12 +72,12 @@ function sureSubmit(objForm){
 	<TR>
     <TD class="t-label t-label-h" width="12%">备注：</TD>
     <TD class="t-content" width="88%" colSpan="3">
-    <input name="userDesc" size="50" maxlength="50"  value="${sysUsers.userDesc}"/>
+    <input class="form-text" name="userDesc" size="50" maxlength="50"  value="${sysUsers.userDesc}"/>
    	</TD></TR>
    	<TR>
     <TD class="t-label t-label-h" width="12%">职位：</TD>
     <TD class="t-content" width="88%" colSpan="3">
-    <input name="userDuty" size="30" maxlength="30" value="${sysUsers.userDuty}"/>
+    <input class="form-text" name="userDuty" size="30" maxlength="30" value="${sysUsers.userDuty}"/>
    	</TD></TR>
    	<TR>
     <TD class="t-label t-label-h" width="12%">是否使用：</TD>

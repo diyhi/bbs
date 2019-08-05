@@ -20,13 +20,13 @@
   <TBODY>
   <TR>
     <TD class="t-label t-label-h" width="12%"><SPAN class="span-text">*</SPAN>标签名称：</TD>
-    <TD class=t-content width="88%" colSpan=3><form:input path="name" maxlength="255" size="50" />
+    <TD class=t-content width="88%" colSpan=3><form:input class="form-text" path="name" maxlength="255" size="50" />
 	    &nbsp;<web:errors path="name" cssClass="span-text"/>
     </TD></TR>
   <TR>
     <TD class="t-label t-label-h" width="12%">排序：</TD>
     <TD class="t-content" width="88%" colSpan="3">
-    	<form:input path="sort" maxlength="20" size="10" />
+    	<form:input class="form-text" path="sort" maxlength="20" size="10" />
     	&nbsp;<web:errors path="sort" cssClass="span-text"/>
     	<SPAN class="span-help">数字越大越在前</SPAN>
     </TD>

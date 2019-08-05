@@ -151,7 +151,7 @@ function cancelTag(){
 		<TR>
 			<TD class="t-label t-label-h" width="12%">关键词：</TD>
 			<TD class="t-content" width="88%" colSpan="3">
-				<input id="keyword" type="text" size="30" value="${keyword}">
+				<input id="keyword" type="text" class="form-text" size="30" value="${keyword}">
 				<span class="span-text" >${error['keyword']}</span>
 			</TD>
 		</TR>
@@ -159,7 +159,7 @@ function cancelTag(){
 			<TD class="t-label t-label-h" width="12%">标签：</TD>
 			<TD class="t-content" width="88%" colSpan="3">
 				<input type="hidden" id="tagId" name="tagId" value="${tagId}"/>
-    			<input type="text" id="tagName" name="tagName" disabled="true" size="20" value="${tagName}"/> 
+    			<input type="text" class="form-text" id="tagName" name="tagName" disabled="true" size="20" value="${tagName}"/> 
     			<input type="button" class="functionButton5" value="选择..." onClick="javaScript:showTagDiv();">
 				<input type="button" class="functionButton5" value="取消" onClick="javaScript:cancelTag();">
 				
@@ -171,7 +171,7 @@ function cancelTag(){
 		<TR>
 			<TD class="t-label t-label-h" width="12%">用户名称：</TD>
 			<TD class="t-content" width="88%" colSpan="3">
-    			<input type="text" id="userName" name="userName" size="20" value="${userName}"/> 
+    			<input type="text" class="form-text" id="userName" name="userName" size="20" value="${userName}"/> 
 				<span class="span-text" >${error['userName']}</span>
 				&nbsp;<span class="span-help">不限制请留空</span>
 			</TD>

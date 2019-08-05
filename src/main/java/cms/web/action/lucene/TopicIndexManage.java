@@ -65,7 +65,8 @@ public class TopicIndexManage {
 				Set<Long> update_topicIdList = new LinkedHashSet<Long>();
 				//删除话题Id
 				Set<Long> delete_topicIdList = new LinkedHashSet<Long>();
-			
+				//删除用户名称
+				Set<String> delete_userNameList = new LinkedHashSet<String>();
 				
 				List<Long> indexIdList = new ArrayList<Long>();
 				for(TopicIndex p : topicIndexList){
@@ -82,6 +83,8 @@ public class TopicIndexManage {
 						//删除添加和修改Id
 						add_topicIdList.remove(id);
 						update_topicIdList.remove(id);
+					}else if(p.getIndexState().equals(4)){//4:删除用户发表的话题
+						delete_userNameList.add(p.getDataId());
 					}
 				}
 
@@ -103,6 +106,12 @@ public class TopicIndexManage {
 				if(topicIdIndexList != null && topicIdIndexList.size() >0){
 					//删除当前Id索引
 					topicLuceneManage.deleteIndex(new ArrayList<Long>(topicIdIndexList));
+				}
+				
+				//根据用户名称删除话题集合
+				if(delete_userNameList != null && delete_userNameList.size() >0){
+					//删除用户名称下的索引
+					topicLuceneManage.deleteUserNameIndex(new ArrayList<String>(delete_userNameList));
 				}
 
 				if(topicIdList !=null && topicIdList.size() >0){	
@@ -141,6 +150,9 @@ public class TopicIndexManage {
 
 		boolean allow = TopicLuceneInit.INSTANCE.allowCreateIndexWriter();//是否允许创建IndexWriter
 		if(allow){
+			//删除所有话题索引变化标记
+			topicIndexService.deleteAllIndex();
+			
 			try {
 				TopicLuceneInit.INSTANCE.createIndexWriter();//创建IndexWriter
 				

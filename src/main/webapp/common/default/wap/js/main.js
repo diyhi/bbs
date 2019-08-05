@@ -683,6 +683,8 @@ var thread_component = Vue.extend({
 
 			alreadyCollected :false,//用户是否已经收藏话题
 			favoriteCount : 0,//话题用户收藏总数
+			alreadyLiked:false,//用户是否已经点赞该话题
+			likeCount : 0,//话题用户点赞总数
 			hidePasswordIndex:0,//隐藏标签密码框索引
 		};
 	},
@@ -1021,6 +1023,116 @@ var thread_component = Vue.extend({
 									
 									//刷新话题用户收藏总数
 									_self.queryFavoriteCount();
+								}, 3000);
+								
+							} else {
+								//显示错误
+								if (value_error != null) {
+
+
+									var htmlContent = "";
+									var count = 0;
+									for (var errorKey in value_error) {
+										var errorValue = value_error[errorKey];
+										count++;
+										htmlContent += count + ". " + errorValue + "<br>";
+									}
+									_self.$messagebox('提示', htmlContent);
+
+								}
+							}
+						}
+					}
+				});
+			}).catch(function (err){//不捕获 Promise 的异常,若用户点击了取消按钮,会出现警告
+			    console.log(err);
+			});
+		},
+		
+		//查询用户是否已经点赞该话题
+		queryAlreadyLiked : function() {
+			var _self = this;
+			var data = "topicId=" + _self.topicId; //提交参数
+			$.ajax({
+				type : "GET",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "queryAlreadyLiked",
+				data : data,
+				success : function success(result) {
+					if (result != "") {
+						var alreadyLiked = $.parseJSON(result);
+						if (alreadyLiked != null) {
+							_self.alreadyLiked = alreadyLiked;
+						}
+					}
+				}
+			});
+		},
+		//查询话题点赞总数
+		queryLikeCount : function() {
+			var _self = this;
+			var data = "topicId=" + _self.topicId; //提交参数
+			$.ajax({
+				type : "GET",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "queryLikeCount",
+				data : data,
+				success : function success(result) {
+					if (result != "") {
+						var count = $.parseJSON(result);
+						if (count != null) {
+							_self.likeCount = count;
+						}
+					}
+				}
+			});
+		},
+		//给话题点赞
+		addLike : function(id) {
+			var _self = this;
+			_self.$messagebox.confirm('确定点赞?').then(function (action) {
+				var parameter = "&topicId=" + id;
+
+				//	alert(parameter);
+				//令牌
+				parameter += "&token=" + _self.$store.state.token;
+				$.ajax({
+					type : "POST",
+					cache : false,
+					async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+					url : "user/control/like/add",
+					data : parameter,
+					success : function success(result) {
+						if (result != "") {
+
+							var returnValue = $.parseJSON(result);
+
+							var value_success = "";
+							var value_error = null;
+
+							for (var key in returnValue) {
+								if (key == "success") {
+									value_success = returnValue[key];
+								} else if (key == "error") {
+									value_error = returnValue[key];
+								}
+							}
+
+							//加入成功
+							if (value_success == "true") {
+								_self.$toast({
+									message : "点赞成功",
+									duration : 3000,
+									className : "mint-ui-toast",
+								});
+
+								setTimeout(function() {
+									//刷新用户是否已经点赞该话题
+									_self.queryAlreadyLiked();
+									//刷新话题点赞总数
+									_self.queryLikeCount();
 								}, 3000);
 								
 							} else {
@@ -1856,6 +1968,10 @@ var thread_component = Vue.extend({
 			this.queryAlreadyCollected();
 			//查询话题用户收藏总数
 			this.queryFavoriteCount();
+			//查询用户是否已经点赞该话题
+			this.queryAlreadyLiked();
+			//查询话题点赞总数
+			this.queryLikeCount();
 		},
 		//初始化BScroll滚动插件//this.$refs.addCommentFormScroll
 		initScroll : function initScroll(ref) {
@@ -3268,6 +3384,7 @@ var home_component = Vue.extend({
 			totalpage : 1, //总页数
 			hidePasswordIndex:0,//隐藏标签密码框索引
 			favoriteCountGroup:[],//话题收藏总数组
+			following:false//是否已经关注该用户
 		}
 	},
 	created : function created() {
@@ -3502,6 +3619,102 @@ var home_component = Vue.extend({
 			
 			
 		},
+		
+		//查询是否已经关注该用户
+		queryFollowing : function() {
+			var _self = this;
+			if(_self.user != ''){
+				var data = "userName=" + _self.user.userName; //提交参数
+				$.ajax({
+					type : "GET",
+					cache : false,
+					async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+					url : "queryFollowing",
+					data : data,
+					success : function success(result) {
+						if (result != "") {
+							var following = $.parseJSON(result);
+							if (following != null) {
+								_self.following = following;
+							}
+						}
+					}
+				});
+				
+			}
+		},
+
+		//添加关注
+		addFollow : function(userName) {
+			var _self = this;
+			if(_self.following == false){
+				_self.$messagebox.confirm('确定关注?').then(function (action) {
+					var parameter = "&userName=" + userName;
+
+					//	alert(parameter);
+					//令牌
+					parameter += "&token=" + _self.$store.state.token;
+					$.ajax({
+						type : "POST",
+						cache : false,
+						async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+						url : "user/control/follow/add",
+						data : parameter,
+						success : function success(result) {
+							if (result != "") {
+
+								var returnValue = $.parseJSON(result);
+
+								var value_success = "";
+								var value_error = null;
+
+								for (var key in returnValue) {
+									if (key == "success") {
+										value_success = returnValue[key];
+									} else if (key == "error") {
+										value_error = returnValue[key];
+									}
+								}
+
+								//加入成功
+								if (value_success == "true") {
+									_self.$toast({
+										message : "关注成功",
+										duration : 3000,
+										className : "mint-ui-toast",
+									});
+
+									setTimeout(function() {
+										//查询是否已经关注该用户
+										_self.queryFollowing();
+									}, 3000);
+									
+								} else {
+									//显示错误
+									if (value_error != null) {
+
+
+										var htmlContent = "";
+										var count = 0;
+										for (var errorKey in value_error) {
+											var errorValue = value_error[errorKey];
+											count++;
+											htmlContent += count + ". " + errorValue + "<br>";
+										}
+										_self.$messagebox('提示', htmlContent);
+
+									}
+								}
+							}
+						}
+					});
+				}).catch(function (err){//不捕获 Promise 的异常,若用户点击了取消按钮,会出现警告
+				    console.log(err);
+				});
+				
+			}
+		},
+		
 		//加载用户中心页
 		loadHome : function() {
 			var _self = this;
@@ -3526,7 +3739,7 @@ var home_component = Vue.extend({
 								_self.user = returnValue[key];
 								
 								_self.avatarUrl = _self.user.avatarPath+""+_self.user.avatarName+"?"+Math.random().toString().slice(-6);
-								
+								_self.queryFollowing();//查询是否已经关注该用户
 							}
 						}
 
@@ -6354,6 +6567,369 @@ var topicFavorite_component = Vue.extend({
 	}
 });
 
+//点赞
+var like_component = Vue.extend({
+	template : '#like-template',
+	data : function data() {
+		return {
+			likeList : [], //点赞集合
+			loading : false, //加载中
+			currentpage : 0, //当前页码
+			totalpage : 1, //总页数
+		}
+	},
+	created : function created() {
+		this.queryLike();
+	},
+	methods : {
+		//查询点赞分页
+		queryLike : function() {
+			var _self = this;
+			
+			if (_self.currentpage < _self.totalpage) {
+				
+				//先改总页数为0，避免请求为空时死循环
+				_self.totalpage = 0;
+				_self.loading = true;
+				var data = "page=" + (_self.currentpage + 1); //提交参数
+				$.ajax({
+					type : "GET",
+					cache : false,
+					async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+					url : "user/control/likeList",
+					data : data,
+					success : function success(result) {
+						if (result != "") {
+							var pageView = $.parseJSON(result);
+							var new_likeList = pageView.records;
+							if (new_likeList != null && new_likeList.length > 0) {
+								_self.likeList.push.apply(_self.likeList, new_likeList); //合并两个数组
+							}
+							_self.currentpage = pageView.currentpage;
+							_self.totalpage = pageView.totalpage;
+						}
+					},
+					complete : function complete(XMLHttpRequest, textStatus) {
+						_self.loading = false;
+						//需手动调用设置的全局complete
+						$.ajaxSettings.complete(XMLHttpRequest, textStatus);
+					}
+				});
+			}
+		},
+		//删除点赞
+		deleteLike : function(id) {
+			var _self = this;
+			_self.$messagebox.confirm('确定删除点赞?').then(function (action) {
+				var parameter = "&likeId=" + id;
+
+				//	alert(parameter);
+				//令牌
+				parameter += "&token=" + _self.$store.state.token;
+				$.ajax({
+					type : "POST",
+					cache : false,
+					async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+					url : "user/control/deleteLike",
+					data : parameter,
+					success : function success(result) {
+						if (result != "") {
+
+							var returnValue = $.parseJSON(result);
+
+							var value_success = "";
+							var value_error = null;
+
+							for (var key in returnValue) {
+								if (key == "success") {
+									value_success = returnValue[key];
+								} else if (key == "error") {
+									value_error = returnValue[key];
+								}
+							}
+
+							//删除成功
+							if (value_success == "true") {
+								_self.$toast({
+									message : "删除成功",
+									duration : 3000,
+									className : "mint-ui-toast",
+								});
+
+								setTimeout(function() {
+									_self.likeList = [];
+									_self.currentpage = 0;
+									_self.totalpage = 1;
+									//刷新
+									_self.queryLike();
+								}, 3000);
+								
+							} else {
+								//显示错误
+								if (value_error != null) {
+
+
+									var htmlContent = "";
+									var count = 0;
+									for (var errorKey in value_error) {
+										var errorValue = value_error[errorKey];
+										count++;
+										htmlContent += count + ". " + errorValue + "<br>";
+									}
+									_self.$messagebox('提示', htmlContent);
+
+								}
+							}
+						}
+					}
+				});
+			}).catch(function (err){//不捕获 Promise 的异常,若用户点击了取消按钮,会出现警告
+			    console.log(err);
+			});
+		}
+	}
+});
+
+//话题点赞列表
+var topicLike_component = Vue.extend({
+	template : '#topicLike-template',
+	data : function data() {
+		return {
+			likeList : [], //点赞集合
+			loading : false, //加载中
+			currentpage : 0, //当前页码
+			totalpage : 1, //总页数
+		}
+	},
+	created : function created() {
+		this.queryTopicLike();
+	},
+	methods : {
+		//查询点赞分页
+		queryTopicLike : function() {
+			var _self = this;
+			
+			if (_self.currentpage < _self.totalpage) {
+				
+				//先改总页数为0，避免请求为空时死循环
+				_self.totalpage = 0;
+				_self.loading = true;
+				var data = "page=" + (_self.currentpage + 1); //提交参数
+				data += "&topicId="+getUrlParam("topicId");
+				$.ajax({
+					type : "GET",
+					cache : false,
+					async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+					url : "user/control/topicLikeList",
+					data : data,
+					success : function success(result) {
+						if (result != "") {
+							var pageView = $.parseJSON(result);
+							var new_likeList = pageView.records;
+							if (new_likeList != null && new_likeList.length > 0) {
+								_self.likeList.push.apply(_self.likeList, new_likeList); //合并两个数组
+							}
+							_self.currentpage = pageView.currentpage;
+							_self.totalpage = pageView.totalpage;
+						}
+					},
+					complete : function complete(XMLHttpRequest, textStatus) {
+						_self.loading = false;
+						//需手动调用设置的全局complete
+						$.ajaxSettings.complete(XMLHttpRequest, textStatus);
+					}
+				});
+			}
+		},
+		
+		//跳转到用户
+		toUser : function(userName) {
+			this.$router.push({
+				path : '/user/control/home',
+				query : {
+					userName : userName
+				}
+			});
+		}
+	}
+});
+
+//关注
+var follow_component = Vue.extend({
+	template : '#follow-template',
+	data : function data() {
+		return {
+			followList : [], //关注集合
+			loading : false, //加载中
+			currentpage : 0, //当前页码
+			totalpage : 1, //总页数
+		}
+	},
+	created : function created() {
+		this.queryFollow();
+	},
+	methods : {
+		//查询关注分页
+		queryFollow : function() {
+			var _self = this;
+			
+			if (_self.currentpage < _self.totalpage) {
+				
+				//先改总页数为0，避免请求为空时死循环
+				_self.totalpage = 0;
+				_self.loading = true;
+				var data = "page=" + (_self.currentpage + 1); //提交参数
+				$.ajax({
+					type : "GET",
+					cache : false,
+					async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+					url : "user/control/followList",
+					data : data,
+					success : function success(result) {
+						if (result != "") {
+							var pageView = $.parseJSON(result);
+							var new_followList = pageView.records;
+							if (new_followList != null && new_followList.length > 0) {
+								_self.followList.push.apply(_self.followList, new_followList); //合并两个数组
+							}
+							_self.currentpage = pageView.currentpage;
+							_self.totalpage = pageView.totalpage;
+						}
+					},
+					complete : function complete(XMLHttpRequest, textStatus) {
+						_self.loading = false;
+						//需手动调用设置的全局complete
+						$.ajaxSettings.complete(XMLHttpRequest, textStatus);
+					}
+				});
+			}
+		},
+		//删除关注
+		deleteFollow : function(id) {
+			var _self = this;
+			_self.$messagebox.confirm('确定删除关注?').then(function (action) {
+				var parameter = "&followId=" + id;
+
+				//	alert(parameter);
+				//令牌
+				parameter += "&token=" + _self.$store.state.token;
+				$.ajax({
+					type : "POST",
+					cache : false,
+					async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+					url : "user/control/deleteFollow",
+					data : parameter,
+					success : function success(result) {
+						if (result != "") {
+
+							var returnValue = $.parseJSON(result);
+
+							var value_success = "";
+							var value_error = null;
+
+							for (var key in returnValue) {
+								if (key == "success") {
+									value_success = returnValue[key];
+								} else if (key == "error") {
+									value_error = returnValue[key];
+								}
+							}
+
+							//删除成功
+							if (value_success == "true") {
+								_self.$toast({
+									message : "删除成功",
+									duration : 3000,
+									className : "mint-ui-toast",
+								});
+
+								setTimeout(function() {
+									_self.followList = [];
+									_self.currentpage = 0;
+									_self.totalpage = 1;
+									//刷新
+									_self.queryFollow();
+								}, 3000);
+								
+							} else {
+								//显示错误
+								if (value_error != null) {
+
+
+									var htmlContent = "";
+									var count = 0;
+									for (var errorKey in value_error) {
+										var errorValue = value_error[errorKey];
+										count++;
+										htmlContent += count + ". " + errorValue + "<br>";
+									}
+									_self.$messagebox('提示', htmlContent);
+
+								}
+							}
+						}
+					}
+				});
+			}).catch(function (err){//不捕获 Promise 的异常,若用户点击了取消按钮,会出现警告
+			    console.log(err);
+			});
+		}
+	}
+});
+
+//粉丝
+var follower_component = Vue.extend({
+	template : '#follower-template',
+	data : function data() {
+		return {
+			followerList : [], //粉丝集合
+			loading : false, //加载中
+			currentpage : 0, //当前页码
+			totalpage : 1, //总页数
+		}
+	},
+	created : function created() {
+		this.queryFollower();
+	},
+	methods : {
+		//查询粉丝分页
+		queryFollower : function() {
+			var _self = this;
+			
+			if (_self.currentpage < _self.totalpage) {
+				
+				//先改总页数为0，避免请求为空时死循环
+				_self.totalpage = 0;
+				_self.loading = true;
+				var data = "page=" + (_self.currentpage + 1); //提交参数
+				$.ajax({
+					type : "GET",
+					cache : false,
+					async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+					url : "user/control/followerList",
+					data : data,
+					success : function success(result) {
+						if (result != "") {
+							var pageView = $.parseJSON(result);
+							var new_followerList = pageView.records;
+							if (new_followerList != null && new_followerList.length > 0) {
+								_self.followerList.push.apply(_self.followerList, new_followerList); //合并两个数组
+							}
+							_self.currentpage = pageView.currentpage;
+							_self.totalpage = pageView.totalpage;
+						}
+					},
+					complete : function complete(XMLHttpRequest, textStatus) {
+						_self.loading = false;
+						//需手动调用设置的全局complete
+						$.ajaxSettings.complete(XMLHttpRequest, textStatus);
+					}
+				});
+			}
+		},
+	}
+});
+
 //话题取消隐藏用户列表
 var topicUnhide_component = Vue.extend({
 	template : '#topicUnhide-template',
@@ -6567,6 +7143,10 @@ var routes = [
 	{path : '/user/control/remindList',component : remind_component}, //提醒
 	{path : '/user/control/favoriteList',component : favorite_component}, //收藏夹
 	{path : '/user/control/topicFavoriteList',component : topicFavorite_component}, //话题收藏列表
+	{path : '/user/control/likeList',component : like_component}, //点赞
+	{path : '/user/control/topicLikeList',component : topicLike_component}, //话题点赞列表
+	{path : '/user/control/followList',component : follow_component}, //关注
+	{path : '/user/control/followerList',component : follower_component}, //粉丝
 	{path : '/user/control/topicUnhideList',component : topicUnhide_component}, //话题取消隐藏用户列表
 	{path : '*',redirect : '/index'} //其余路由重定向至首页
 ];

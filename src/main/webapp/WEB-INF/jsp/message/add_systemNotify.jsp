@@ -32,7 +32,7 @@
 		<TR>
 		    <TD class="t-label t-label-h" width="12%"><SPAN class="span-text">*</SPAN>通知内容：</TD>
 		    <TD class=t-content width="88%" colSpan=3>
-		    	<textarea name="content" rows="10" cols="80">${systemNotify.content}</textarea>
+		    	<textarea class="form-textarea" name="content" rows="10" cols="80">${systemNotify.content}</textarea>
 			    &nbsp;<web:errors path="content" cssClass="span-text"/>
 		    </TD>
 	    </TR>

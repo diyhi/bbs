@@ -112,7 +112,7 @@ a {
 
 a:hover {
 	text-decoration: none;
-	color: #626366;
+	color: #2196F3;
 }
 ul {
 	list-style: none;
@@ -149,7 +149,8 @@ html,body{
 	float: right;line-height: 30px;font-size: 13px;
 }
 .pg A {
-	border-radius: 2px; border-bottom: #c2d5e3 1px solid; border-left: #c2d5e3 1px solid; padding-bottom: 0px; background-color: #fff; padding-left: 10px; padding-right: 10px; display: inline; background-repeat: no-repeat; float: left; height: 30px; color: #333; margin-left: 4px; overflow: hidden; border-top: #c2d5e3 1px solid; border-right: #c2d5e3 1px solid; text-decoration: none; padding-top: 0px;border-bottom-color: #dfdfdf; border-top-color: #dfdfdf; border-right-color: #dfdfdf; border-left-color: #dfdfdf;
+	border: #dfdfdf 1px solid;
+	border-radius: 2px;  padding-bottom: 0px; background-color: #fff; padding-left: 10px; padding-right: 10px; display: inline; background-repeat: no-repeat; float: left; height: 30px; color: #333; margin-left: 4px; overflow: hidden; text-decoration: none; padding-top: 0px;
 	
 }
 .pg A.prev {
@@ -159,21 +160,23 @@ html,body{
 	padding-bottom: 0px; padding-left: 10px; padding-right: 10px; padding-top: 0px
 }
 .pg A:hover {
-	
-	border-bottom-color: #c9c9c9; border-top-color: #c9c9c9; color: #000000; border-right-color: #c9c9c9; border-left-color: #c9c9c9
+	border: #c9c9c9 1px solid;
+	color: #000000;
 }
-.pg LABEL {border-radius: 2px;
-	border-bottom: #dfdfdf 1px solid; border-left: #dfdfdf 1px solid; padding-bottom: 0px; background-color: #fff; padding-left: 10px; padding-right: 10px; display: inline; background-repeat: no-repeat; float: left; height: 30px; color: #333; margin-left: 4px; overflow: hidden; border-top: #dfdfdf 1px solid; border-right: #dfdfdf 1px solid; text-decoration: none; padding-top: 0px;
+.pg LABEL {
+	border-radius: 2px;
+	border: #dfdfdf 1px solid;
+	padding-bottom: 0px; background-color: #fff; padding-left: 10px; padding-right: 10px; display: inline; background-repeat: no-repeat; float: left; height: 30px; color: #333; margin-left: 4px; overflow: hidden; text-decoration: none; padding-top: 0px;
 	
 }
 .pg LABEL .pg_input {
 	padding:0;width:25px;height:15px;line-height:15px;margin-bottom: 3px;*margin-bottom: 0px;
 }
 .pg STRONG {
-	border-radius: 2px; border-bottom: #c2d5e3 1px solid; border-left: #c2d5e3 1px solid; padding-bottom: 0px; background-color: #fff; padding-left: 10px; padding-right: 10px; display: inline; background-repeat: no-repeat; float: left; height: 30px; color: #333; margin-left: 4px; overflow: hidden; border-top: #c2d5e3 1px solid; border-right: #c2d5e3 1px solid; text-decoration: none; padding-top: 0px;border-bottom-color: #dfdfdf; border-top-color: #dfdfdf; border-right-color: #dfdfdf; border-left-color: #dfdfdf;background-color: #f5f5f5;
+	border-radius: 2px; border: #dfdfdf 1px solid; padding-bottom: 0px; background-color: #fff; padding-left: 10px; padding-right: 10px; display: inline; background-repeat: no-repeat; float: left; height: 30px; color: #333; margin-left: 4px; overflow: hidden;  text-decoration: none; padding-top: 0px;background-color: #f5f5f5;
 }
 .pg span.count {
-	border-radius: 2px; border-bottom: #c2d5e3 1px solid; border-left: #c2d5e3 1px solid; padding-bottom: 0px; background-color: #fff; padding-left: 10px; padding-right: 10px; display: inline; background-repeat: no-repeat; float: left; height: 30px; color: #333; margin-left: 4px; overflow: hidden; border-top: #c2d5e3 1px solid; border-right: #c2d5e3 1px solid; text-decoration: none; padding-top: 0px;border-bottom-color: #dfdfdf; border-top-color: #dfdfdf; border-right-color: #dfdfdf; border-left-color: #dfdfdf;
+	border-radius: 2px; border: #dfdfdf 1px solid; padding-bottom: 0px; background-color: #fff; padding-left: 10px; padding-right: 10px; display: inline; background-repeat: no-repeat; float: left; height: 30px; color: #333; margin-left: 4px; overflow: hidden;  text-decoration: none; padding-top: 0px;
 }
 
 /*功能按钮  F7F7F7 */
@@ -185,12 +188,12 @@ html,body{
 .functionButton:hover input{background:#f6f6f6;outline: none;}
 
 /*提交按钮*/
-.submitButton{ display:inline-block; vertical-align:middle; padding:1px 0; margin:0 1px; background:#1e9fff;}
+.submitButton{ display:inline-block; vertical-align:middle; padding:1px 0; margin:0 1px; background:#30aff7;}
 .submitButton span,
-.submitButton input{ float:left; display:inline; margin:0 -1px; height:30px; line-height:30px; padding:0 18px; font-size:18px; border:0; overflow:visible; background:#1e9fff; color:#fff; cursor:pointer; }
+.submitButton input{ float:left; display:inline; margin:0 -1px; height:32px; line-height:32px; padding:0 24px; font-size:18px; border:0; overflow:visible; background:#30aff7; color:#fff; cursor:pointer; }
 .submitButton:hover,
 .submitButton:hover span,
-.submitButton:hover input{background:#0191e4;}
+.submitButton:hover input{background:#45b6f7;}
 .submitButton input:disabled{  
     border: 1px solid #e6e6e6;  
     background-color: #fbfbfb;  
@@ -250,7 +253,7 @@ html,body{
 }
 
 .headerModule .box .nav ul li a:hover {
-	color:#878787
+	color:#2196F3
 }
 .logged-out-wrapper {
 	color: #7d7d7d;
@@ -278,7 +281,7 @@ html,body{
 }
 
 .headerModule .box .menu ul li a:hover {
-	color:#878787
+	color:#2196F3
 }
 
 .headerModule .box .menu ul li .author{position:relative;color:#999}
@@ -355,7 +358,7 @@ html,body{
 /* 标签 */
 .tabModule {
     padding: 10px;
-    font-size: 13px;
+    font-size: 14px;
     line-height: 150%;
     text-align: left;
     background-color: #fff; 
@@ -366,7 +369,7 @@ html,body{
     display: inline-block;
     font-size: 14px;
     line-height: 14px;
-    padding: 5px 8px 5px 8px;
+    padding: 6px 8px 6px 8px;
     margin-right: 5px;
     border-radius: 3px;
     color: #555;
@@ -521,6 +524,11 @@ html,body{
 	font-size: 16px;
 	display: block;
 }
+
+.topicModule .content .title :hover{
+	color: #2196F3;
+}
+
 /* 查看数量 */
 .topicModule .view {
 	line-height: 22px;
@@ -641,7 +649,7 @@ html,body{
 }
 .articleModule .tab{
 	padding: 10px;
-    font-size: 12px;
+    font-size: 14px;
     line-height: 150%;
     text-align: left;
     background-color: #fff; 
@@ -650,9 +658,9 @@ html,body{
 }
 .articleModule .tab a{
 	display: inline-block;
-    font-size: 13px;
+    font-size: 14px;
     line-height: 13px;
-    padding: 5px 8px 5px 8px;
+    padding: 6px 8px 6px 8px;
     margin-right: 5px;
     border-radius: 3px;
     position:relative;
@@ -672,13 +680,13 @@ html,body{
 /* 隐藏标签 IE8以下浏览器不支持自定义标签，需要在页头<head>标签内执行document.createElement('hide') */
 .articleModule .articleBox .topicContent hide{
 	display:block;
-	background: #f5f5f5;
+	background: #fbfbfb;
 	min-height:100px;
 	margin-left: 10px;
 	margin-right: 10px;
 	margin-top: 17px;
 	margin-bottom: 15px;
-	border: 3px dashed #e6e6e6;
+	border: 3px dashed #eeeeee;
 	border-radius: 5px;
 	
 }
@@ -696,14 +704,14 @@ html,body{
 .articleModule .articleBox .topicContent hide .background-prompt{
 	margin-top: 2px; color: #999999;font-size: 16px;
 }/*border:#a9a9a9 solid 2px;  边框#b2b5bc #777777*/
-.articleModule .articleBox .topicContent hide .input-box{margin: auto; margin-top: 10px;margin-bottom:18px; border:#b2b5bc solid 2px; width:226px; height:26px; overflow:hidden; border-radius: 2px;}
+.articleModule .articleBox .topicContent hide .input-box{margin: auto; margin-top: 10px;margin-bottom:18px; border:#888888 solid 2px; width:226px; height:26px; overflow:hidden; border-radius: 2px;}
 .articleModule .articleBox .topicContent hide .input-box .text{ width:145px; height:26px; line-height:26px; border:0; float:left; font-size:14px; color:#4f4f4f; text-indent: 6px; vertical-align:middle;outline:none; background: #f7f8fa;}
-.articleModule .articleBox .topicContent hide .input-box .button{ width:79px;*width:76px; height:26px; line-height:28px; border:0; background:#b2b5bc; font-size:16px; color:#fff; float:right; font-weight:bold; cursor:pointer;text-decoration: none; outline: none}
-.articleModule .articleBox .topicContent hide .input-box .button:hover{background:#787f81;}/*background:#606060;*/
+.articleModule .articleBox .topicContent hide .input-box .button{ width:79px;*width:76px; height:26px; line-height:28px; border:0; background:#888888; font-size:16px; color:#fff; float:right; font-weight:bold; cursor:pointer;text-decoration: none; outline: none}
+.articleModule .articleBox .topicContent hide .input-box .button:hover{background:#808080;}/*background:#606060;*/
 
-.articleModule .articleBox .topicContent hide .submit-box{margin: auto; margin-top: 10px;margin-bottom:18px; border:#b8bbbf solid 2px; width:96px; height:26px; overflow:hidden; border-radius: 2px;}
-.articleModule .articleBox .topicContent hide .submit-box .button{ width:96px; height:26px; line-height:28px; border:0; background:#b2b5bc; font-size:16px; color:#fff; float:right; font-weight:bold; cursor:pointer;text-decoration: none; outline: none}
-.articleModule .articleBox .topicContent hide .submit-box .button:hover{background:#787f81;}
+.articleModule .articleBox .topicContent hide .submit-box{margin: auto; margin-top: 10px;margin-bottom:18px; border:#888888 solid 2px; width:96px; height:26px; overflow:hidden; border-radius: 2px;}
+.articleModule .articleBox .topicContent hide .submit-box .button{ width:96px; height:26px; line-height:28px; border:0; background:#888888; font-size:16px; color:#fff; float:right; font-weight:bold; cursor:pointer;text-decoration: none; outline: none}
+.articleModule .articleBox .topicContent hide .submit-box .button:hover{background:#808080;}
 
 
 /* 评论 */
@@ -1029,25 +1037,49 @@ html,body{
 .favorite-formModule {
    margin-top: 30px;text-align: center;
 }
-.favorite-formModule .favoriteButton{
+/** 带数字按钮 **/
+.numberButton{
+	margin-right: 10px;
+}
+.numberButton .button{
 	position: relative;
-	color: rgba(0,0,0,.6);
-    border-color: rgba(34,36,38,.15);
+	color: #fff;
+    background: #30aff7;
+    border:1px solid #30aff7;
     outline: none;
     display: inline-block;
-   	padding-bottom:2px;
-    padding-left: 12px;
-    padding-right:12px; 
+    padding-left: 25px;
+    padding-right:25px; 
     font-size: 18px;
-    line-height: 34px;
+    line-height: 32px;
     text-align: center;
     cursor: pointer;
-    background: none;
-    border: 1px solid;
-    border-radius: 3px;
+    border-radius: 3px 0px 0px 3px;
     margin: 0;
 	text-decoration: none;
 }
+.numberButton .button:hover{background:#45b6f7;}
+.numberButton .number{
+	position: relative;
+	color: #45b6f7;
+    background: none;
+    border-top:1px solid #30aff7;
+    border-bottom:1px solid #30aff7;
+    border-right:1px solid #30aff7;
+    outline: none;
+    display: inline-block;
+   	padding-bottom:0px;
+    padding-left: 12px;
+    padding-right:12px; 
+    font-size: 18px;
+    line-height: 32px;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 0px 3px 3px 0px;
+    margin: 0px 0px 0px -5px;
+	text-decoration: none;
+}
+
 
 /** 在线留言 **/
 .addFeedbackModule .box{padding:10px;}
@@ -1373,7 +1405,7 @@ html,body{
 	top: 20px
 }
 .user-home-header .action-button .privateMessageBox{
-	margin-left: 20px;
+
 }
 .user-home-header .action-button .privateMessageBox .privateMessageButton{
 	color: #0592fe;
@@ -1393,6 +1425,30 @@ html,body{
 }
 .user-home-header .action-button .privateMessageBox .privateMessageButton:hover {  
     background: #e2f2ff;  
+} 
+
+
+.action-followBox{
+	margin-right: 10px;
+}
+.action-followBox .followButton{
+	color: #fff;
+    border-color: #0592fe;
+    outline: none;
+    display: inline-block;
+    padding: 1px 16px;
+    font-size: 14px;
+    line-height: 32px;
+    text-align: center;
+    cursor: pointer;
+    background: #0592fe;
+    border: 1px solid;
+    border-radius: 3px;
+    margin: 0;
+	
+}
+.action-followBox .followButton:hover {  
+    background: #068cf2;  
 } 
 
 
@@ -1977,13 +2033,13 @@ html,body{
 /* 隐藏标签 IE8以下浏览器不支持自定义标签，需要在页头<head>标签内执行document.createElement('hide') */
 .userDynamicModule .userDynamicList .userDynamic .topicContent hide{
 	display:block;
-	background: #f5f5f5;
+	background: #fbfbfb;
 	min-height:100px;
 	margin-left: 10px;
 	margin-right: 10px;
 	margin-top: 17px;
 	margin-bottom: 15px;
-	border: 3px dashed #e6e6e6;
+	border: 3px dashed #eeeeee;
 	border-radius: 5px;
 	
 }
@@ -2001,14 +2057,14 @@ html,body{
 .userDynamicModule .userDynamicList .userDynamic .topicContent hide .background-prompt{
 	margin-top: 2px; color: #999999;font-size: 16px;
 }/*border:#a9a9a9 solid 2px;  边框#b2b5bc #777777*/
-.userDynamicModule .userDynamicList .userDynamic .topicContent hide .input-box{margin: auto; margin-top: 10px;margin-bottom:18px; border:#b2b5bc solid 2px; width:226px; height:26px; overflow:hidden; border-radius: 2px;}
+.userDynamicModule .userDynamicList .userDynamic .topicContent hide .input-box{margin: auto; margin-top: 10px;margin-bottom:18px; border:#888888 solid 2px; width:226px; height:26px; overflow:hidden; border-radius: 2px;}
 .userDynamicModule .userDynamicList .userDynamic .topicContent hide .input-box .text{ width:145px; height:26px; line-height:26px; border:0; float:left; font-size:14px; color:#4f4f4f; text-indent: 6px; vertical-align:middle;outline:none; background: #f7f8fa;}
-.userDynamicModule .userDynamicList .userDynamic .topicContent hide .input-box .button{ width:79px;*width:76px; height:26px; line-height:28px; border:0; background:#b2b5bc; font-size:16px; color:#fff; float:right; font-weight:bold; cursor:pointer;text-decoration: none; outline: none}
-.userDynamicModule .userDynamicList .userDynamic .topicContent hide .input-box .button:hover{background:#787f81;}/*background:#606060;*/
+.userDynamicModule .userDynamicList .userDynamic .topicContent hide .input-box .button{ width:79px;*width:76px; height:26px; line-height:28px; border:0; background:#888888; font-size:16px; color:#fff; float:right; font-weight:bold; cursor:pointer;text-decoration: none; outline: none}
+.userDynamicModule .userDynamicList .userDynamic .topicContent hide .input-box .button:hover{background:#808080;}/*background:#606060;*/
 
-.userDynamicModule .userDynamicList .userDynamic .topicContent hide .submit-box{margin: auto; margin-top: 10px;margin-bottom:18px; border:#b8bbbf solid 2px; width:96px; height:26px; overflow:hidden; border-radius: 2px;}
-.userDynamicModule .userDynamicList .userDynamic .topicContent hide .submit-box .button{ width:96px; height:26px; line-height:28px; border:0; background:#b2b5bc; font-size:16px; color:#fff; float:right; font-weight:bold; cursor:pointer;text-decoration: none; outline: none}
-.userDynamicModule .userDynamicList .userDynamic .topicContent hide .submit-box .button:hover{background:#787f81;}
+.userDynamicModule .userDynamicList .userDynamic .topicContent hide .submit-box{margin: auto; margin-top: 10px;margin-bottom:18px; border:#888888 solid 2px; width:96px; height:26px; overflow:hidden; border-radius: 2px;}
+.userDynamicModule .userDynamicList .userDynamic .topicContent hide .submit-box .button{ width:96px; height:26px; line-height:28px; border:0; background:#888888; font-size:16px; color:#fff; float:right; font-weight:bold; cursor:pointer;text-decoration: none; outline: none}
+.userDynamicModule .userDynamicList .userDynamic .topicContent hide .submit-box .button:hover{background:#808080;}
 .userDynamicModule .userDynamicList .userDynamic .readMore{
 	position: relative;
 	display: block;
@@ -2155,7 +2211,6 @@ html,body{
 	min-width: 0;
 	*height: 2px;
 }
-
 
 
 

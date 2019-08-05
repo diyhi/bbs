@@ -14,12 +14,12 @@
 
 <TABLE class="t-table" cellSpacing="1" cellPadding="2" width="100%" border="0" >
 		<TR>
-	    <TD class="t-content" colSpan="5" height="25px">
+	    <TD class="t-content" colSpan="5">
 
 	        <span style="font-weight:bold;float:left;">
-	        	<input id="searchName" type="text" size="20" value="${searchName}" style="margin-top: 2px;">
+	        	<input id="searchName" type="text" class="form-text" size="20" value="${searchName}" style="margin-top: 2px;">
 	        </span>
-	        <span style="font-weight:bold;float:left;margin-left:2px; margin-top: 1px;">
+	        <span style="font-weight:bold;float:left;margin-left:2px;">
 	        	
 				<input type="button" class="functionButton5" onclick="helpPage(1,'${tableName}');" value="查询" >
 			</span>

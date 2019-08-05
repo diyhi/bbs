@@ -169,7 +169,7 @@ function sureSubmit(){
   <TR>
   	<TD class="t-label t-label-h" width="12%">标题：</TD>
     <TD class="t-content" width="88%">
-    	<input type="text" id="title" size="50" value="${topic.title}">
+    	<input type="text" class="form-text" id="title" size="50" value="${topic.title}">
 		<span id="title_error" name="error" class="span-text"></span>
     </TD>
    </TR>
@@ -177,7 +177,7 @@ function sureSubmit(){
 	  	<TD class="t-label t-label-h" width="12%">标签：</TD>
 	    <TD class="t-content" width="88%">
 	    	<input type="hidden" id="tagId" name="tagId" value="${topic.tagId}"/>
-	    	<input type="text" id="_tagName" disabled="true" size="20" value="${topic.tagName}"/> 
+	    	<input type="text" class="form-text" id="_tagName" disabled="true" size="20" value="${topic.tagName}"/> 
 	    	<input type="hidden" id="tagName" name="tagName" value="${topic.tagName}">
 	    	<input type="button" class="functionButton5" value="选择..." onClick="javaScript:showTagDiv();">
 	    	&nbsp;<span id="tagId_error" name="error" class="span-text"></span>
@@ -186,7 +186,7 @@ function sureSubmit(){
 	<TR>
   	<TD class="t-label t-label-h" width="12%">排序：</TD>
     <TD class="t-content" width="88%">
-    	<input type="text" id="sort" name="sort" size="8" maxlength="8" value="${topic.sort}">
+    	<input type="text" class="form-text" id="sort" name="sort" size="8" maxlength="8" value="${topic.sort}">
     	<span id="sort_error" name="error" class="span-text"></span>
 		<SPAN class="span-help">数字越大越在前</SPAN>
     </TD>

@@ -10,7 +10,7 @@
 			
 			<#-- 提交后跳转参数  参数必须经过encodeBase64URL编码后才能提交 不填写时默认跳转回当前页 -->
 			<input type="hidden" id="jumpUrl" name="jumpUrl" value="">
-			<p class="reply-textarea-box"><textarea class="reply-textarea" onfocus="" id="replyCommentContent" name="content">${reply.content}</textarea></p>
+			<p class="reply-textarea-box"><textarea class="reply-textarea" onfocus="" id="replyCommentContent" name="content" >${reply.content}</textarea></p>
 			
 			<span id="${identificationNumber}_content_error" class="error">${(error['content'])!}</span> 
 			<span id="${identificationNumber}_reply_error" class="error">${error['reply']}</span>

@@ -63,6 +63,7 @@ import cms.web.action.CSRFTokenManage;
 import cms.web.action.FileManage;
 import cms.web.action.TextFilterManage;
 import cms.web.action.filterWord.SensitiveWordFilterManage;
+import cms.web.action.follow.FollowManage;
 import cms.web.action.message.RemindManage;
 import cms.web.action.setting.SettingManage;
 import cms.web.action.thumbnail.ThumbnailManage;
@@ -108,6 +109,7 @@ public class TopicFormAction {
 	
 	@Resource UserGradeService userGradeService;
 	@Resource UserDynamicManage userDynamicManage;
+	@Resource FollowManage followManage;
 	
 	/**
 	 * 话题  添加
@@ -437,6 +439,7 @@ public class TopicFormAction {
 			//删除缓存
 			userManage.delete_cache_findUserById(accessUser.getUserId());
 			userManage.delete_cache_findUserByUserName(accessUser.getUserName());
+			followManage.delete_cache_userUpdateFlag(accessUser.getUserName());
 			
 			String fileNumber = "b"+ accessUser.getUserId();
 			
@@ -771,7 +774,7 @@ public class TopicFormAction {
     	  		
     		}
     	}
-		
+    	
     	//消费积分
 		Long point = null;
 	  	

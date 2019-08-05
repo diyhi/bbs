@@ -50,6 +50,8 @@ function sureSubmit(objForm){
 	//按钮设置 disabled="disabled"
 	document.getElementById("submitForm").disabled=true;
 	objForm.submit();
+
+	
 } 
 </script> 
 </HEAD>
@@ -67,7 +69,7 @@ function sureSubmit(objForm){
   <TR>
   	<TD class="t-label t-label-h" width="12%">名称：</TD>
     <TD class="t-content" width="88%">
-    	<input type="text" name="name" size="50" value="${help.name}">
+    	<input type="text" class="form-text" name="name" size="50" value="${help.name}">
 		<SPAN class="span-text">${error["name"]}</SPAN>
     </TD>
    </TR>
@@ -76,7 +78,7 @@ function sureSubmit(objForm){
 		  	<TD class="t-label t-label-h" width="12%">分类：</TD>
 		    <TD class="t-content" width="88%">
 		    	<input type="hidden" id="helpTypeId" name="helpTypeId" value="${help.helpTypeId}"/>
-		    	<input type="text" id="_helpTypeName" disabled="true" size="20" value="${help.helpTypeName}"/> 
+		    	<input type="text" class="form-text" id="_helpTypeName" disabled="true" size="20" value="${help.helpTypeName}"/> 
 		    	<input type="hidden" id="helpTypeName" name="helpTypeName" value="${help.helpTypeName}">
 		    	<input type="button" class="functionButton5" value="选择..." onClick="javaScript:showHelpTypePageDiv();">
 		    	&nbsp;<SPAN class="span-text">${error["helpTypeId"]}</SPAN>

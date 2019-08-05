@@ -224,6 +224,58 @@ public class TopicServiceBean extends DaoSupport<Topic> implements TopicService{
 		}
 		return topicList;
 	}
+	/**
+	 * 分页查询话题
+	 * @param userName用户名称
+	 * @param postTime 话题发表时间
+	 * @param firstIndex 开始索引
+	 * @param maxResult 需要获取的记录数
+	 * @return
+	 */
+	@Transactional(readOnly=true,propagation=Propagation.NOT_SUPPORTED)
+	public List<Topic> findTopicByPage(String userName,Date postTime,int firstIndex, int maxResult){
+		List<Topic> topicList = new ArrayList<Topic>();
+		
+		String sql = "select o.id,o.title,o.tagId,o.content," +
+				"o.postTime,o.userName,o.isStaff,o.status " +
+				" from Topic o where o.userName=?1 and o.postTime>?2";
+
+		Query query = em.createQuery(sql);	
+		query.setParameter(1, userName);
+		query.setParameter(2, postTime);
+		//索引开始,即从哪条记录开始
+		query.setFirstResult(firstIndex);
+		//获取多少条数据
+		query.setMaxResults(maxResult);
+			
+		List<Object[]> objectList = query.getResultList();
+		if(objectList != null && objectList.size() >0){
+			for(int i = 0; i<objectList.size(); i++){
+				Object[] obj = (Object[])objectList.get(i);
+				Long id = (Long)obj[0];
+				String title = (String)obj[1];
+				Long tagId = (Long)obj[2];
+				String content = (String)obj[3];
+				Date _postTime = (Date)obj[4];
+				String _userName = (String)obj[5];
+				Boolean isStaff = (Boolean)obj[6];
+				Integer status = (Integer)obj[7];
+
+				Topic topic = new Topic();
+				topic.setId(id);
+				topic.setTitle(title);
+				topic.setTagId(tagId);
+				topic.setContent(content);
+				topic.setPostTime(_postTime);
+				topic.setUserName(_userName);
+				topic.setIsStaff(isStaff);
+				topic.setStatus(status);
+				topicList.add(topic);
+				
+			}
+		}
+		return topicList;
+	}
 	
 	
 	/**

@@ -108,7 +108,7 @@ hide {
   <TR>
   	<TD class="t-label t-label-h" width="12%">标题：</TD>
     <TD class="t-content" width="88%">
-    	<input type="text" name="title" size="50" value="${topic.title}">
+    	<input type="text" class="form-text" name="title" size="50" value="${topic.title}">
 		<SPAN class="span-text">${error["title"]}</SPAN>
     </TD>
    </TR>
@@ -116,7 +116,7 @@ hide {
 	  	<TD class="t-label t-label-h" width="12%">标签：</TD>
 	    <TD class="t-content" width="88%">
 	    	<input type="hidden" id="tagId" name="tagId" value="${topic.tagId}"/>
-	    	<input type="text" id="_tagName" disabled="true" size="20" value="${topic.tagName}"/> 
+	    	<input type="text" class="form-text" id="_tagName" disabled="true" size="20" value="${topic.tagName}"/> 
 	    	<input type="hidden" id="tagName" name="tagName" value="${topic.tagName}">
 	    	<input type="button" class="functionButton5" value="选择..." onClick="javaScript:showTagDiv();">
 	    	&nbsp;<SPAN class="span-text">${error["tagId"]}</SPAN>
@@ -125,7 +125,7 @@ hide {
 	<TR>
   	<TD class="t-label t-label-h" width="12%">排序：</TD>
     <TD class="t-content" width="88%">
-    	<input type="text" name="sort" size="8" maxlength="8" value="${topic.sort}" >
+    	<input type="text" class="form-text" name="sort" size="8" maxlength="8" value="${topic.sort}" >
 		&nbsp;<SPAN class="span-text">${error["sort"]}</SPAN>
 		<SPAN class="span-help">数字越大越在前</SPAN>
     </TD>
@@ -173,7 +173,7 @@ function initKindEditor(){
 	KindEditor.lang({
         hide : '隐藏'
     });
-    
+   
 	// 指定编辑器iframe document的CSS数据，用于设置可视化区域的样式。 单冒号(:)用于CSS3伪类，双冒号(::)用于CSS3伪元素。伪元素由双冒号和伪元素名称组成。双冒号是在当前规范中引入的，用于区分伪类和伪元素。但是伪类兼容现存样式，浏览器需要同时支持旧的伪类，比如:first-line、:first-letter、:before、:after等
     KindEditor.options.cssData = ".ke-content hide {"+
 		"border: 0;"+
@@ -232,6 +232,7 @@ function initKindEditor(){
 	"body {"+
 		"font-size: 14px;"+
 	"}";
+
 
     //指定要保留的HTML标记和属性。Object的key为HTML标签名，value为HTML属性数组，”.”开始的属性表示style属性。 注意属性要全部小写
     KindEditor.options.htmlTags['hide'] = ['hide-type','input-value','class','description'];

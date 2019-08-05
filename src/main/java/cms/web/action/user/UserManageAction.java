@@ -2,12 +2,8 @@ package cms.web.action.user;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.math.BigDecimal;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -20,9 +16,6 @@ import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -42,6 +35,7 @@ import cms.bean.topic.Comment;
 import cms.bean.topic.Reply;
 import cms.bean.topic.Tag;
 import cms.bean.topic.Topic;
+import cms.bean.topic.TopicIndex;
 import cms.bean.user.User;
 import cms.bean.user.UserCustom;
 import cms.bean.user.UserGrade;
@@ -49,6 +43,7 @@ import cms.bean.user.UserInputValue;
 import cms.service.setting.SettingService;
 import cms.service.topic.CommentService;
 import cms.service.topic.TagService;
+import cms.service.topic.TopicIndexService;
 import cms.service.topic.TopicService;
 import cms.service.user.UserCustomService;
 import cms.service.user.UserGradeService;
@@ -62,7 +57,6 @@ import cms.utils.Verification;
 import cms.web.action.FileManage;
 import cms.web.action.SystemException;
 import cms.web.action.TextFilterManage;
-import cms.web.action.lucene.TopicLuceneInit;
 import cms.web.action.lucene.TopicLuceneManage;
 import cms.web.action.thumbnail.ThumbnailManage;
 import cms.web.action.topic.TopicManage;
@@ -74,7 +68,6 @@ import cms.web.action.topic.TopicManage;
 @Controller
 @RequestMapping("/control/user/manage") 
 public class UserManageAction {
-	private static final Logger logger = LogManager.getLogger(UserManageAction.class);
 	
 	@Resource(name="userServiceBean")
 	private UserService userService;
@@ -101,7 +94,7 @@ public class UserManageAction {
 	@Resource ThumbnailManage thumbnailManage;
 	
 	@Resource TopicLuceneManage topicLuceneManage;
-	
+	@Resource TopicIndexService topicIndexService;
 	
 	/**
 	 * 用户管理 查看
@@ -928,25 +921,17 @@ public class UserManageAction {
 						int i = userService.delete(idList,userNameList);
 						
 						for(User user : userList){
+							//添加删除索引标记
+							topicIndexService.addTopicIndex(new TopicIndex(user.getUserName(),4));
+							
+							
 							//删除缓存用户状态
 							userManage.delete_userState(user.getUserName());
 							//删除缓存
 							userManage.delete_cache_findUserById(user.getId());
 							userManage.delete_cache_findUserByUserName(user.getUserName());
 							
-							TopicLuceneInit.INSTANCE.createIndexWriter();//创建IndexWriter
-							try {
-								//删除用户名称下的索引
-								topicLuceneManage.deleteIndex(user.getUserName());
-							} catch (Exception e) {
-								// TODO Auto-generated catch block
-							//	e.printStackTrace();
-								if (logger.isErrorEnabled()) {
-						            logger.error("删除用户名称下的索引",e);
-						        }
-							}finally {
-								TopicLuceneInit.INSTANCE.closeIndexWriter();//关闭IndexWriter
-							}	
+							
 						}
 
 						
@@ -1013,183 +998,8 @@ public class UserManageAction {
 		}
 		return "0";
 	}
-	/**
-	 * 搜索用户列表
-	 * @param pageForm
-	 * @param model
-	 * @param queryType 查询类型
-	 * @param userName 用户名称
-	 * @param start_buyTotalAmount 起始已购买商品总金额
-	 * @param end_buyTotalAmount 结束已购买商品总金额
-	 * @param start_registrationDate 起始注册日期
-	 * @param end_registrationDate 结束注册日期
-	 * @param request
-	 * @param response
-	 * @return
-	 * @throws Exception
-	 */
-	@RequestMapping(params="method=searchUser",method=RequestMethod.GET)
-	public String searchUser(ModelMap model,PageForm pageForm,
-			Integer searchType,String userName,
-			String start_buyTotalAmount,String end_buyTotalAmount,
-			String start_registrationDate,String end_registrationDate,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		
-		if(searchType == null){//如果查询类型为空，则默认为用户名查询
-			searchType = 1;
-		}
-		//错误
-		Map<String,String> error = new HashMap<String,String>();
+	
 
-		String _userName = null;
-		BigDecimal _start_buyTotalAmount = null;//已购买商品总金额
-		BigDecimal _end_buyTotalAmount = null;//已购买商品总金额
-		Date _start_registrationDate = null;//注册日期
-		Date _end_registrationDate= null;//注册日期
-		
-		//验证参数
-		if(searchType.equals(1)){//用户名
-			if(userName != null && !"".equals(userName.trim())){
-				boolean userNmaeVerification = Verification.isNumericLettersUnderscore(userName.trim());
-				if(userNmaeVerification){
-					_userName = userName.trim();
-					
-				}else{
-					error.put("userName", "会员用户名只能输入由数字、26个英文字母或者下划线组成");
-				}
-			}else{
-				error.put("userName", "请填写用户名");
-			}	
-		}
-		if(searchType.equals(2)){//筛选条件
-			if(start_buyTotalAmount != null && !"".equals(start_buyTotalAmount.trim())){
-				boolean start_buyTotalAmountVerification = Verification.isAmount(start_buyTotalAmount.trim());
-				if(start_buyTotalAmountVerification){
-					_start_buyTotalAmount = new BigDecimal(start_buyTotalAmount.trim());
-				}else{
-					error.put("start_buyTotalAmount", "请填写正确的金额");
-				}
-			}
-			if(end_buyTotalAmount != null && !"".equals(end_buyTotalAmount.trim())){
-				boolean end_buyTotalAmountVerification = Verification.isAmount(end_buyTotalAmount.trim());
-				if(end_buyTotalAmountVerification){
-					_end_buyTotalAmount = new BigDecimal(end_buyTotalAmount.trim());
-				}else{
-					error.put("end_buyTotalAmount", "请填写正确的金额");
-				}
-			}
-			//比较已购买商品总金额
-			if(_start_buyTotalAmount != null && _end_buyTotalAmount != null){
-				if(_start_buyTotalAmount.compareTo(_end_buyTotalAmount) >0){
-					error.put("start_buyTotalAmount", "起始金额不能大于结束金额");
-				}
-			}
-			
-			
-			
-			if(start_registrationDate != null && !"".equals(start_registrationDate.trim())){
-				boolean start_registrationDateVerification = Verification.isTime_minute(start_registrationDate.trim());
-				if(start_registrationDateVerification){
-					DateFormat dd = new SimpleDateFormat("yyyy-MM-dd HH:mm");		
-					_start_registrationDate = dd.parse(start_registrationDate.trim());
-				}else{
-					error.put("start_registrationDate", "请填写正确的日期");
-				}
-			}
-			if(end_registrationDate != null && !"".equals(end_registrationDate.trim())){
-				boolean end_registrationDateVerification = Verification.isTime_minute(end_registrationDate.trim());
-				if(end_registrationDateVerification){
-					DateFormat dd = new SimpleDateFormat("yyyy-MM-dd HH:mm");		
-					_end_registrationDate = dd.parse(end_registrationDate.trim());
-				}else{
-					error.put("end_registrationDate", "请填写正确的日期");
-				}
-			}
-			//比较时间
-			Calendar start=Calendar.getInstance();//时间 起始  
-	        Calendar end=Calendar.getInstance();//时间 结束
-	        if(_start_registrationDate != null){
-	        	start.setTime(_start_registrationDate);   
-	        }
-	        if(_end_registrationDate != null){
-	        	end.setTime(_end_registrationDate);   
-	        }
-			if(_start_registrationDate != null && _end_registrationDate != null){
-	        	int result =start.compareTo(end);//起始时间与结束时间比较
-	        	if(result > 0 ){//起始时间比结束时间大
-	        		error.put("start_registrationDate", "起始时间不能比结束时间大");
-	        	}
-			}
-		}
-		
-		//调用分页算法代码
-		PageView<User> pageView = new PageView<User>(settingService.findSystemSetting_cache().getBackstagePageNumber(),pageForm.getPage(),10);
-		//当前页
-		int firstIndex = (pageForm.getPage()-1)*pageView.getMaxresult();
-		
-		if(error.size() == 0){
-			if(searchType.equals(1)){//用户名
-				User user = userService.findUserByUserName(_userName);
-				
-				if(user != null){
-					QueryResult<User> qr = new QueryResult<User>();
-					List<User> userList = new ArrayList<User>();
-					userList.add(user);
-					qr.setResultlist(userList);
-					qr.setTotalrecord(1L);
-					pageView.setQueryResult(qr);
-				}
-				
-			}else if(searchType.equals(2)){//筛选条件
-				String param = "";//sql参数
-				List<Object> paramValue = new ArrayList<Object>();//sql参数值
-						
-				
-				if(_start_buyTotalAmount != null){//起始已购买商品总金额
-					param += " and o.buyTotalAmount >= ? ";
-					paramValue.add(_start_buyTotalAmount);
-				}
-				if(_end_buyTotalAmount != null){//结束已购买商品总金额
-					param += " and o.buyTotalAmount <= ? ";
-					paramValue.add(_end_buyTotalAmount);
-				}
-				
-				if(_start_registrationDate != null){//起始时间
-					param += " and o.registrationDate >= ? ";
-					paramValue.add(_start_registrationDate);
-				}
-				if(_end_registrationDate != null){//结束时间
-					param += " and o.registrationDate <= ? ";
-					paramValue.add(_end_registrationDate);
-				}
-				
-				//删除第一个and
-				param = StringUtils.difference(" and", param);
-				QueryResult<User> qr = userService.findUserByCondition(param,paramValue,firstIndex, pageView.getMaxresult(),false);
-				//将查询结果集传给分页List
-				pageView.setQueryResult(qr);
-				
-			}
-		}
-		model.addAttribute("searchType", searchType);
-
-		model.addAttribute("pageView", pageView);
-		model.addAttribute("error", error);
-		
-		model.addAttribute("userName", userName);
-		model.addAttribute("start_buyTotalAmount", start_buyTotalAmount);
-		model.addAttribute("end_buyTotalAmount", end_buyTotalAmount);
-		model.addAttribute("start_registrationDate", start_registrationDate);
-		model.addAttribute("end_registrationDate", end_registrationDate);
-		return "jsp/user/ajax_searchUser";
-	}
-	
-	
-	
-	
-	
-	
 	
 	/**
 	 * 发表的话题

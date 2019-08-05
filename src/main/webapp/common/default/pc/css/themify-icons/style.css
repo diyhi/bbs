@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'themify';
-  src:  url('fonts/themify.eot?jhy8rj');
-  src:  url('fonts/themify.eot?jhy8rj#iefix') format('embedded-opentype'),
-    url('fonts/themify.ttf?jhy8rj') format('truetype'),
-    url('fonts/themify.woff?jhy8rj') format('woff'),
-    url('fonts/themify.svg?jhy8rj#themify') format('svg');
+  src:  url('fonts/themify.eot?7ck9ip');
+  src:  url('fonts/themify.eot?7ck9ip#iefix') format('embedded-opentype'),
+    url('fonts/themify.ttf?7ck9ip') format('truetype'),
+    url('fonts/themify.woff?7ck9ip') format('woff'),
+    url('fonts/themify.svg?7ck9ip#themify') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -32,6 +32,18 @@
 }
 .cms-lock:before {
   content: "\e62b";
+}
+.cms-heart:before {
+  content: "\e634";
+}
+.cms-heart-broken:before {
+  content: "\e635";
+}
+.cms-thumb-up:before {
+  content: "\e670";
+}
+.cms-thumb-down:before {
+  content: "\e671";
 }
 .cms-pulse:before {
   content: "\e680";

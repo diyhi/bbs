@@ -30,7 +30,7 @@ function sureSubmit(objForm){
   <TR>
     <TD class="t-label t-label-h" width="12%"><SPAN class="span-text">*</SPAN>禁止的用户名称：</TD>
     <TD class="t-content" width="88%" colSpan="3">
-    	<input name="name" size="30" maxlength="30" value="${disableUserName.name}"/>
+    	<input class="form-text" name="name" size="30" maxlength="30" value="${disableUserName.name}"/>
     	&nbsp;<SPAN class="span-text" >${error['name']}</SPAN>
     	&nbsp;<span class="span-help">可使用通配符 *和?  &nbsp;  星号匹配0或者任意数量的字符；问号匹配任何单字符   &nbsp;&nbsp;例如：*admin* 表示不能含有字符admin</span>
        </TD>

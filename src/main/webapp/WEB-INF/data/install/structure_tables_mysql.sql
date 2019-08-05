@@ -123,6 +123,111 @@ CREATE TABLE `feedback` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 #
+# Structure for table "follow_0"
+#
+
+CREATE TABLE `follow_0` (
+  `id` varchar(40) NOT NULL,
+  `addtime` datetime DEFAULT NULL,
+  `friendUserName` varchar(30) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `follow_1_idx` (`userName`,`addtime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "follow_1"
+#
+
+CREATE TABLE `follow_1` (
+  `id` varchar(40) NOT NULL,
+  `addtime` datetime DEFAULT NULL,
+  `friendUserName` varchar(30) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `follow_1_idx` (`userName`,`addtime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "follow_2"
+#
+
+CREATE TABLE `follow_2` (
+  `id` varchar(40) NOT NULL,
+  `addtime` datetime DEFAULT NULL,
+  `friendUserName` varchar(30) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `follow_1_idx` (`userName`,`addtime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "follow_3"
+#
+
+CREATE TABLE `follow_3` (
+  `id` varchar(40) NOT NULL,
+  `addtime` datetime DEFAULT NULL,
+  `friendUserName` varchar(30) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `follow_1_idx` (`userName`,`addtime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "follower_0"
+#
+
+CREATE TABLE `follower_0` (
+  `id` varchar(40) NOT NULL,
+  `addtime` datetime DEFAULT NULL,
+  `friendUserName` varchar(30) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `follower_1_idx` (`userName`,`addtime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "follower_1"
+#
+
+CREATE TABLE `follower_1` (
+  `id` varchar(40) NOT NULL,
+  `addtime` datetime DEFAULT NULL,
+  `friendUserName` varchar(30) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `follower_1_idx` (`userName`,`addtime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "follower_2"
+#
+
+CREATE TABLE `follower_2` (
+  `id` varchar(40) NOT NULL,
+  `addtime` datetime DEFAULT NULL,
+  `friendUserName` varchar(30) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `follower_1_idx` (`userName`,`addtime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "follower_3"
+#
+
+CREATE TABLE `follower_3` (
+  `id` varchar(40) NOT NULL,
+  `addtime` datetime DEFAULT NULL,
+  `friendUserName` varchar(30) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `follower_1_idx` (`userName`,`addtime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+#
 # Structure for table "forum"
 #
 
@@ -195,6 +300,63 @@ CREATE TABLE `layout` (
   `type` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "like_0"
+#
+
+CREATE TABLE `like_0` (
+  `id` varchar(36) NOT NULL,
+  `addtime` datetime DEFAULT NULL,
+  `postUserName` varchar(30) DEFAULT NULL,
+  `topicId` bigint(20) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `like_1_idx` (`userName`,`addtime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "like_1"
+#
+
+CREATE TABLE `like_1` (
+  `id` varchar(36) NOT NULL,
+  `addtime` datetime DEFAULT NULL,
+  `postUserName` varchar(30) DEFAULT NULL,
+  `topicId` bigint(20) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `like_1_idx` (`userName`,`addtime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "like_2"
+#
+
+CREATE TABLE `like_2` (
+  `id` varchar(36) NOT NULL,
+  `addtime` datetime DEFAULT NULL,
+  `postUserName` varchar(30) DEFAULT NULL,
+  `topicId` bigint(20) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `like_1_idx` (`userName`,`addtime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "like_3"
+#
+
+CREATE TABLE `like_3` (
+  `id` varchar(36) NOT NULL,
+  `addtime` datetime DEFAULT NULL,
+  `postUserName` varchar(30) DEFAULT NULL,
+  `topicId` bigint(20) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `like_1_idx` (`userName`,`addtime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 
 #
 # Structure for table "links"
@@ -396,7 +558,8 @@ CREATE TABLE `remind_0` (
   `typeCode` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `remind_1_idx` (`receiverUserId`,`status`,`sendTimeFormat`),
-  KEY `remind_2_idx` (`topicId`)
+  KEY `remind_2_idx` (`topicId`),
+  KEY `remind_3_idx` (`receiverUserId`,`typeCode`,`sendTimeFormat`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 #
@@ -418,7 +581,8 @@ CREATE TABLE `remind_1` (
   `typeCode` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `remind_1_idx` (`receiverUserId`,`status`,`sendTimeFormat`),
-  KEY `remind_2_idx` (`topicId`)
+  KEY `remind_2_idx` (`topicId`),
+  KEY `remind_3_idx` (`receiverUserId`,`typeCode`,`sendTimeFormat`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 #
@@ -440,7 +604,8 @@ CREATE TABLE `remind_2` (
   `typeCode` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `remind_1_idx` (`receiverUserId`,`status`,`sendTimeFormat`),
-  KEY `remind_2_idx` (`topicId`)
+  KEY `remind_2_idx` (`topicId`),
+  KEY `remind_3_idx` (`receiverUserId`,`typeCode`,`sendTimeFormat`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 #
@@ -462,8 +627,10 @@ CREATE TABLE `remind_3` (
   `typeCode` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `remind_1_idx` (`receiverUserId`,`status`,`sendTimeFormat`),
-  KEY `remind_2_idx` (`topicId`)
+  KEY `remind_2_idx` (`topicId`),
+  KEY `remind_3_idx` (`receiverUserId`,`typeCode`,`sendTimeFormat`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 
 #
 # Structure for table "reply"
@@ -866,8 +1033,10 @@ CREATE TABLE `topic` (
   `lastUpdateTime` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `topic_idx` (`tagId`,`status`),
-  KEY `topic_2_idx` (`postTime`,`status`)
+  KEY `topic_3_idx` (`userName`,`postTime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
 
 #
 # Structure for table "topicfavorite_0"
@@ -935,6 +1104,63 @@ CREATE TABLE `topicindex` (
   `indexState` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "topiclike_0"
+#
+
+CREATE TABLE `topiclike_0` (
+  `id` varchar(40) NOT NULL,
+  `addtime` datetime DEFAULT NULL,
+  `postUserName` varchar(30) DEFAULT NULL,
+  `topicId` bigint(20) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `topicLike_1_idx` (`topicId`,`addtime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "topiclike_1"
+#
+
+CREATE TABLE `topiclike_1` (
+  `id` varchar(40) NOT NULL,
+  `addtime` datetime DEFAULT NULL,
+  `postUserName` varchar(30) DEFAULT NULL,
+  `topicId` bigint(20) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `topicLike_1_idx` (`topicId`,`addtime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "topiclike_2"
+#
+
+CREATE TABLE `topiclike_2` (
+  `id` varchar(40) NOT NULL,
+  `addtime` datetime DEFAULT NULL,
+  `postUserName` varchar(30) DEFAULT NULL,
+  `topicId` bigint(20) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `topicLike_1_idx` (`topicId`,`addtime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "topiclike_3"
+#
+
+CREATE TABLE `topiclike_3` (
+  `id` varchar(40) NOT NULL,
+  `addtime` datetime DEFAULT NULL,
+  `postUserName` varchar(30) DEFAULT NULL,
+  `topicId` bigint(20) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `topicLike_1_idx` (`topicId`,`addtime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 
 #
 # Structure for table "topicunhide_0"

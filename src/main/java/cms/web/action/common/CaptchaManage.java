@@ -86,7 +86,6 @@ public class CaptchaManage {
 			if(quantity != null && quantity >= systemSetting.getTopic_submitQuantity()){
 				isCaptcha = true;
 			}
-			
 		}
 		return isCaptcha;
 	}
@@ -137,6 +136,7 @@ public class CaptchaManage {
 		if(quantity != null && quantity >= settingService.findSystemSetting_cache().getLogin_submitQuantity()){
 			isCaptcha = true;
 		}
+		
 		return isCaptcha;
 	}
 	
@@ -161,6 +161,7 @@ public class CaptchaManage {
 			if(quantity != null && quantity >= systemSetting.getPrivateMessage_submitQuantity()){
 				isCaptcha = true;
 			}
+
 			
 		}
 		return isCaptcha;

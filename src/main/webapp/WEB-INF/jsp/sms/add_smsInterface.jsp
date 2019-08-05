@@ -73,14 +73,14 @@ function selectInterfaceProduct(){
   	<TR>
 	    <TD class="t-label t-label-h" width="12%"><SPAN class="span-text">*</SPAN>名称：</TD>
 	    <TD class="t-content" width="88%" colSpan="3">
-	    	<input name="name" size="40" maxlength="80" value="${smsInterface.name}">
+	    	<input class="form-text" name="name" size="40" maxlength="80" value="${smsInterface.name}">
 	    	&nbsp;<web:errors path="name" cssClass="span-text"/>
 	    </TD>
 	  </TR>
 	  <TR>
 	    <TD class="t-label t-label-h" width="15%" >接口产品 ：</TD>
 	    <TD class="t-content" width="85%" colSpan="3">
-	    	<select id="interfaceProduct" name="interfaceProduct" onChange="selectInterfaceProduct()">
+	    	<select class="form-select" id="interfaceProduct" name="interfaceProduct" onChange="selectInterfaceProduct()">
 	    		<option value="0" >选择</option>
 	    		<c:forEach items="${smsInterfaceProductList}" var="smsInterfaceProduct">
 	    			<c:set var="smsInterfaceProductValue" value=""></c:set>
@@ -107,7 +107,7 @@ function selectInterfaceProduct(){
 			    <TD class="t-label t-label-h" width="15%" > <SPAN class="span-text">*</SPAN>用户密钥Id(accessKeyId)：</TD>
 			    <TD class="t-content" width="85%" colSpan="3">
 			    	
-			    	<input name="alidayu_accessKeyId"  type="text" size="50" maxlength="200" value="${alidayu.accessKeyId}" />
+			    	<input class="form-text" name="alidayu_accessKeyId"  type="text" size="50" maxlength="200" value="${alidayu.accessKeyId}" />
 			    	&nbsp;
 			    	<a href="backstage/images/help/alidayu_accessKey.jpg" target="_blank">获取方法演示</a>
 			    	&nbsp;<span  class="span-text" >${error['alidayu_accessKeyId']}</span>
@@ -117,7 +117,7 @@ function selectInterfaceProduct(){
 			<TR>
 			    <TD class="t-label t-label-h" width="15%" ><SPAN class="span-text">*</SPAN>用户密钥(accessKeySecret)：</TD>
 			    <TD class="t-content" width="85%" colSpan="3">
-			    	<input name="alidayu_accessKeySecret"  type="text" size="50" maxlength="200" value="${alidayu.accessKeySecret}" />
+			    	<input class="form-text" name="alidayu_accessKeySecret"  type="text" size="50" maxlength="200" value="${alidayu.accessKeySecret}" />
 			    	&nbsp;
 			    	<a href="backstage/images/help/alidayu_accessKey.jpg" target="_blank">获取方法演示</a>
 			    	&nbsp;<span  class="span-text" >${error['alidayu_accessKeySecret']}</span>
@@ -152,7 +152,7 @@ function selectInterfaceProduct(){
  	<TR>
 	    <TD class="t-label t-label-h" width="12%"><SPAN class="span-text">*</SPAN>排序：</TD>
 	    <TD class="t-content" width="88%" colSpan="3">
-	    	<input name="sort" size="8" maxlength="8" value="${smsInterface.sort}">
+	    	<input class="form-text" name="sort" size="8" maxlength="8" value="${smsInterface.sort}">
 	    	&nbsp;<web:errors path="sort" cssClass="span-text"/>
 	    </TD>
 	  </TR>
@@ -171,7 +171,7 @@ function selectInterfaceProduct(){
 				<TR>
 			    	<TD class="t-label t-label-h" width="12%">短信签名：</TD>
 			    	<TD class="t-content" width="88%" colSpan="3">
-			    		<input name="alidayu_signName_${sendService.interfaceProduct}_${sendService.serviceId}" size="40" value="${sendService.alidayu_signName}">
+			    		<input class="form-text" name="alidayu_signName_${sendService.interfaceProduct}_${sendService.serviceId}" size="40" value="${sendService.alidayu_signName}">
 			    		&nbsp;<span class="span-help">阿里云管理控制台审核通过的短信签名</span>
 			    		<c:set value="alidayu_signName_${sendService.interfaceProduct}_${sendService.serviceId}" var="alidayu_signName_error"></c:set>
 						&nbsp;<SPAN class="span-text" >${error[alidayu_signName_error]}</SPAN>
@@ -180,7 +180,7 @@ function selectInterfaceProduct(){
 				<TR>
 				    <TD class="t-label t-label-h" width="15%" >短信模板代码 ：</TD>
 				    <TD class="t-content" width="85%" colSpan="3">
-				    	<input name="alidayu_templateCode_${sendService.interfaceProduct}_${sendService.serviceId}" size="40" value="${sendService.alidayu_templateCode}">
+				    	<input class="form-text" name="alidayu_templateCode_${sendService.interfaceProduct}_${sendService.serviceId}" size="40" value="${sendService.alidayu_templateCode}">
 				    	&nbsp;<span class="span-help">例如：SMS_1000000</span>
 				    	<c:set value="alidayu_templateCode_${sendService.interfaceProduct}_${sendService.serviceId}" var="alidayu_templateCode_error"></c:set>
 						&nbsp;<SPAN class="span-text" >${error[alidayu_templateCode_error]}</SPAN>

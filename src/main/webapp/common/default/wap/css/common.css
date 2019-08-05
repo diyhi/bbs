@@ -347,13 +347,13 @@ html,body{
 }
 .topicContentModule .topicDetail .main hide{
 	display:block;
-	background: #f5f5f5;
+	background: #fbfbfb;
 	min-height:100px;
 	margin-left: 10px;
 	margin-right: 10px;
 	margin-top: 17px;
 	margin-bottom: 15px;
-	border: 2px dashed #e6e6e6;
+	border: 2px dashed #eeeeee;
 	border-radius: 5px;
 	
 }
@@ -371,14 +371,14 @@ html,body{
 .topicContentModule .topicDetail .main hide .background-prompt{
 	margin-top: 2px; color: #999999;font-size: 16px;
 }/*border:#a9a9a9 solid 2px;  边框#b2b5bc #777777*/
-.topicContentModule .topicDetail .main hide .input-box{margin: auto; margin-top: 10px;margin-bottom:18px; border:#b2b5bc solid 2px; width:226px; height:26px; overflow:hidden; border-radius: 2px;}
+.topicContentModule .topicDetail .main hide .input-box{margin: auto; margin-top: 10px;margin-bottom:18px; border:#888888 solid 2px; width:226px; height:26px; overflow:hidden; border-radius: 2px;}
 .topicContentModule .topicDetail .main hide .input-box .text{ width:145px; height:26px; line-height:26px; border:0; float:left; font-size:14px; color:#4f4f4f; text-indent: 6px; vertical-align:middle;outline:none; background: #f7f8fa;}
-.topicContentModule .topicDetail .main hide .input-box .button{ width:79px;*width:76px; height:26px; line-height:28px; border:0; background:#b2b5bc; font-size:16px; color:#fff; float:right; font-weight:bold; cursor:pointer;text-decoration: none; outline: none}
-.topicContentModule .topicDetail .main hide .input-box .button:hover{background:#787f81;}/*background:#606060;*/
+.topicContentModule .topicDetail .main hide .input-box .button{ width:79px;*width:76px; height:26px; line-height:28px; border:0; background:#888888; font-size:16px; color:#fff; float:right; font-weight:bold; cursor:pointer;text-decoration: none; outline: none}
+.topicContentModule .topicDetail .main hide .input-box .button:hover{background:#808080;}/*background:#606060;*/
 
-.topicContentModule .topicDetail .main hide .submit-box{margin: auto; margin-top: 10px;margin-bottom:18px; border:#b8bbbf solid 2px; width:96px; height:26px; overflow:hidden; border-radius: 2px;}
-.topicContentModule .topicDetail .main hide .submit-box .button{ width:96px; height:26px; line-height:28px; border:0; background:#b2b5bc; font-size:16px; color:#fff; float:right; font-weight:bold; cursor:pointer;text-decoration: none; outline: none}
-.topicContentModule .topicDetail .main hide .submit-box .button:hover{background:#787f81;}
+.topicContentModule .topicDetail .main hide .submit-box{margin: auto; margin-top: 10px;margin-bottom:18px; border:#888888 solid 2px; width:96px; height:26px; overflow:hidden; border-radius: 2px;}
+.topicContentModule .topicDetail .main hide .submit-box .button{ width:96px; height:26px; line-height:28px; border:0; background:#888888; font-size:16px; color:#fff; float:right; font-weight:bold; cursor:pointer;text-decoration: none; outline: none}
+.topicContentModule .topicDetail .main hide .submit-box .button:hover{background:#808080;}
 
 .topicContentModule .operating {
 	display:inline-block;text-align: center;width: 100%;
@@ -809,7 +809,29 @@ html,body{
 }
 .privateMessageButton:hover {  
     background: #0b90f6;  
+} 
+.followButton:hover {  
+    background: #0b90f6;  
 }  
+.followButton{
+	color: #fff;
+    border-color: #fff;
+    outline: none;
+    display: inline-block;
+    padding: 0 16px;
+    font-size: 14px;
+    line-height: 32px;
+    text-align: center;
+    cursor: pointer;
+    background: none;
+    border: 1px solid;
+    border-radius: 3px;
+    margin: 0;
+	
+}
+
+
+
 .homeModule .userDynamicList {
 	width: 100%;margin-top: 5px;
 }
@@ -893,13 +915,13 @@ html,body{
 }
 .homeModule .userDynamicList .item .main .topicContent hide{
 	display:block;
-	background: #f5f5f5;
+	background: #fbfbfb;
 	min-height:100px;
 	margin-left: 10px;
 	margin-right: 10px;
 	margin-top: 17px;
 	margin-bottom: 15px;
-	border: 2px dashed #e6e6e6;
+	border: 2px dashed #eeeeee;
 	border-radius: 5px;
 	
 }
@@ -910,21 +932,20 @@ html,body{
 	margin: auto;
 	margin-top:12px;
 	font-size:40px;
-	
 	opacity:0.4;
 	filter:alpha(opacity=40); 
 }
 .homeModule .userDynamicList .item .main .topicContent hide .background-prompt{
 	margin-top: 2px; color: #999999;font-size: 16px;
 }/*border:#a9a9a9 solid 2px;  边框#b2b5bc #777777*/
-.homeModule .userDynamicList .item .main .topicContent hide .input-box{margin: auto; margin-top: 10px;margin-bottom:18px; border:#b2b5bc solid 2px; width:226px; height:26px; overflow:hidden; border-radius: 2px;}
+.homeModule .userDynamicList .item .main .topicContent hide .input-box{margin: auto; margin-top: 10px;margin-bottom:18px; border:#888888 solid 2px; width:226px; height:26px; overflow:hidden; border-radius: 2px;}
 .homeModule .userDynamicList .item .main .topicContent hide .input-box .text{ width:145px; height:26px; line-height:26px; border:0; float:left; font-size:14px; color:#4f4f4f; text-indent: 6px; vertical-align:middle;outline:none; background: #f7f8fa;}
-.homeModule .userDynamicList .item .main .topicContent hide .input-box .button{ width:79px;*width:76px; height:26px; line-height:28px; border:0; background:#b2b5bc; font-size:16px; color:#fff; float:right; font-weight:bold; cursor:pointer;text-decoration: none; outline: none}
-.homeModule .userDynamicList .item .main .topicContent hide .input-box .button:hover{background:#787f81;}/*background:#606060;*/
+.homeModule .userDynamicList .item .main .topicContent hide .input-box .button{ width:79px;*width:76px; height:26px; line-height:28px; border:0; background:#888888; font-size:16px; color:#fff; float:right; font-weight:bold; cursor:pointer;text-decoration: none; outline: none}
+.homeModule .userDynamicList .item .main .topicContent hide .input-box .button:hover{background:#808080;}/*background:#606060;*/
 
-.homeModule .userDynamicList .item .main .topicContent hide .submit-box{margin: auto; margin-top: 10px;margin-bottom:18px; border:#b8bbbf solid 2px; width:96px; height:26px; overflow:hidden; border-radius: 2px;}
-.homeModule .userDynamicList .item .main .topicContent hide .submit-box .button{ width:96px; height:26px; line-height:28px; border:0; background:#b2b5bc; font-size:16px; color:#fff; float:right; font-weight:bold; cursor:pointer;text-decoration: none; outline: none}
-.homeModule .userDynamicList .item .main .topicContent hide .submit-box .button:hover{background:#787f81;}
+.homeModule .userDynamicList .item .main .topicContent hide .submit-box{margin: auto; margin-top: 10px;margin-bottom:18px; border:#888888 solid 2px; width:96px; height:26px; overflow:hidden; border-radius: 2px;}
+.homeModule .userDynamicList .item .main .topicContent hide .submit-box .button{ width:96px; height:26px; line-height:28px; border:0; background:#888888; font-size:16px; color:#fff; float:right; font-weight:bold; cursor:pointer;text-decoration: none; outline: none}
+.homeModule .userDynamicList .item .main .topicContent hide .submit-box .button:hover{background:#808080;}
 
 
 .homeModule .userDynamicList .item .main .commentContent {
@@ -1655,6 +1676,151 @@ html,body{
 	margin: 0 0 10px
 }
 .favoriteModule .favoriteList .item .main .content {
+	margin-bottom: 10px;
+	color:#222;
+}
+
+
+/** 点赞 **/
+.likeModule{
+	padding-top: 40px;padding-bottom: 2px;
+}
+.likeModule .likeList {
+	width: 100%;
+	overflow-x: hidden
+}
+.likeModule .likeList .item {
+	border-bottom: 1px solid #eee;
+	margin-left: 8px; 
+	margin-right: 8px;
+}
+.likeModule .likeList .item .head {
+	min-height: 25px;
+	padding: 8px 3px 0;
+	margin: 0;
+	overflow: hidden;
+}
+.likeModule .likeList .item .head .info {
+	display: block;
+	float: left
+}
+.likeModule .likeList .item .head .info h2 {
+	color:#aaa;
+	font-size:14px;
+	line-height: 16px
+}
+.likeModule .likeList .item .head .operating {
+	float: right;
+	font-size: 12px;
+	color:#aaa;
+}
+.likeModule .likeList .item .head .operating .delete-btn{
+	color: #999;
+	font-size: 14px;
+}
+.likeModule .likeList .item .main {
+	padding: 0 8px 0 8px;
+	font-size: 16px;
+	line-height: 26px;
+	margin: 0 0 10px
+}
+.likeModule .likeList .item .main .content {
+	margin-bottom: 10px;
+	color:#222;
+}
+
+/** 关注 **/
+.followModule{
+	padding-top: 40px;padding-bottom: 2px;
+}
+.followModule .followList {
+	width: 100%;
+	overflow-x: hidden
+}
+.followModule .followList .item {
+	border-bottom: 1px solid #eee;
+	margin-left: 8px; 
+	margin-right: 8px;
+}
+.followModule .followList .item .head {
+	min-height: 25px;
+	padding: 8px 3px 0;
+	margin: 0;
+	overflow: hidden;
+}
+.followModule .followList .item .head .info {
+	display: block;
+	float: left
+}
+.followModule .followList .item .head .info h2 {
+	color:#aaa;
+	font-size:14px;
+	line-height: 16px
+}
+.followModule .followList .item .head .operating {
+	float: right;
+	font-size: 12px;
+	color:#aaa;
+}
+.followModule .followList .item .head .operating .delete-btn{
+	color: #999;
+	font-size: 14px;
+}
+.followModule .followList .item .main {
+	padding: 0 8px 0 8px;
+	font-size: 16px;
+	line-height: 26px;
+	margin: 0 0 10px
+}
+.followModule .followList .item .main .content {
+	margin-bottom: 10px;
+	color:#222;
+}
+
+/** 粉丝 **/
+.followerModule{
+	padding-top: 40px;padding-bottom: 2px;
+}
+.followerModule .followerList {
+	width: 100%;
+	overflow-x: hidden
+}
+.followerModule .followerList .item {
+	border-bottom: 1px solid #eee;
+	margin-left: 8px; 
+	margin-right: 8px;
+}
+.followerModule .followerList .item .head {
+	min-height: 25px;
+	padding: 8px 3px 0;
+	margin: 0;
+	overflow: hidden;
+}
+.followerModule .followerList .item .head .info {
+	display: block;
+	float: left
+}
+.followerModule .followerList .item .head .info h2 {
+	color:#aaa;
+	font-size:14px;
+	line-height: 16px
+}
+.followerModule .followerList .item .head .operating {
+	float: right;
+	font-size: 12px;
+	color:#aaa;
+}
+.followerModule .followerList .item .head .operating .delete-btn{
+	color: #999;
+	font-size: 14px;
+}
+.followerModule .followerList .item .main {
+	padding: 0 8px 0 8px;
+	font-size: 16px;
+	line-height: 26px;
+	margin: 0 0 10px
+}
+.followerModule .followerList .item .main .content {
 	margin-bottom: 10px;
 	color:#222;
 }

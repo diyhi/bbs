@@ -56,9 +56,9 @@ function reductionSubscriptionSystemNotify(id,userId){
 <TABLE class="t-table" cellSpacing="1" cellPadding="2" width="100%" border="0">
 	<TBODY>
 		<TR>
-		    <TD class="t-content" colSpan="5" height="25px">
+		    <TD class="t-content" colSpan="5" height="28px">
 		        <span style="font-weight:bold;float:left;">&nbsp;系统通知导航：</span>
-				<span style="float:left;">&nbsp;<a href="${config:url(pageContext.request)}control/user/manage${config:suffix()}?method=show&id=${param.id}&userName=${param.userName}&queryState=${param.queryState}&jumpStatus=${param.jumpStatus}&userPage=${param.userPage}">${param.userName}</a></span>
+				<span style="float:left;margin-top: 2px;">&nbsp;<a href="${config:url(pageContext.request)}control/user/manage${config:suffix()}?method=show&id=${param.id}&userName=${param.userName}&queryState=${param.queryState}&jumpStatus=${param.jumpStatus}&userPage=${param.userPage}">${param.userName}</a></span>
 			</TD>
 		</TR>
 	</TBODY>

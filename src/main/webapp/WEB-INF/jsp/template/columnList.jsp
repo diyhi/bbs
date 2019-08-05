@@ -136,7 +136,7 @@ function addColumnUI(nodeId,columnId){
 	html += 		"栏目名称：";
 	html += 	"</td>";
 	html += 	"<td class=\"t-content\" width=\"80%\">";
-	html += 		"<input id=\"name\" size=\"30\" value=\"\"/>&nbsp;<span id=\"error_name_"+nodeId+"\" name=\"error\" class=\"span-text\"></span>";
+	html += 		"<input id=\"name\" class=\"form-text\" size=\"30\" value=\"\"/>&nbsp;<span id=\"error_name_"+nodeId+"\" name=\"error\" class=\"span-text\"></span>";
 	html += 	"</td>";
 	html += "</tr>";
 	html += "<tr>";
@@ -144,7 +144,7 @@ function addColumnUI(nodeId,columnId){
 	html += 		"排序：";
 	html += 	"</td>";
 	html += 	"<td class=\"t-content\" width=\"80%\">";
-	html += 		"<input id=\"sort\" size=\"8\" maxlength=\"8\" value=\"\"/>&nbsp;<span class=\"span-help\">数字越大越在前</span><span id=\"error_sort_"+nodeId+"\" name=\"error\" class=\"span-text\"></span>";
+	html += 		"<input class=\"form-text\" id=\"sort\" size=\"8\" maxlength=\"8\" value=\"\"/>&nbsp;<span class=\"span-help\">数字越大越在前</span><span id=\"error_sort_"+nodeId+"\" name=\"error\" class=\"span-text\"></span>";
 	html += 	"</td>";
 	html += "</tr>";
 	html += "<tr>";
@@ -163,7 +163,7 @@ function addColumnUI(nodeId,columnId){
 	html += 		"<span id=\"url_name\"></span>：";
 	html += 	"</td>";
 	html += 	"<td class=\"t-content\" width=\"80%\">";
-	html += 		"<input id=\"url\" size=\"50\" value=\"\"/><br><span id=\"url_tip\" class=\"span-help\"></span><span id=\"error_url_"+nodeId+"\" name=\"error\" class=\"span-text\"></span>";
+	html += 		"<input class=\"form-text\" id=\"url\" size=\"50\" value=\"\"/><br><span id=\"url_tip\" class=\"span-help\"></span><span id=\"error_url_"+nodeId+"\" name=\"error\" class=\"span-text\"></span>";
 	html += 	"</td>";
 	html += "</tr>";
 
@@ -176,7 +176,7 @@ function addColumnUI(nodeId,columnId){
 	html += "</tbody>";
 	html += "</table>";
 	
-	systemLayerShow("添加栏目",html,600,210);//显示层
+	systemLayerShow("添加栏目",html,600,250);//显示层
 }
 //添加栏目
 function addColumnSubmit(nodeId,columnId) {
@@ -260,7 +260,7 @@ function updateColumnUI(nodeId,columnId,columnName,columnSort,columnLinkMode,col
 	html += 		"栏目名称：";
 	html += 	"</td>";
 	html += 	"<td class=\"t-content\" width=\"80%\">";
-	html += 		"<input id=\"name\" size=\"30\" value=\""+columnName+"\"/>&nbsp;<span id=\"error_name_"+nodeId+"\" name=\"error\" class=\"span-text\"></span>";
+	html += 		"<input class=\"form-text\" id=\"name\" size=\"30\" value=\""+columnName+"\"/>&nbsp;<span id=\"error_name_"+nodeId+"\" name=\"error\" class=\"span-text\"></span>";
 	html += 	"</td>";
 	html += "</tr>";
 	html += "<tr>";
@@ -268,7 +268,7 @@ function updateColumnUI(nodeId,columnId,columnName,columnSort,columnLinkMode,col
 	html += 		"排序：";
 	html += 	"</td>";
 	html += 	"<td class=\"t-content\" width=\"80%\">";
-	html += 		"<input id=\"sort\" size=\"8\" maxlength=\"8\" value=\""+columnSort+"\"/>&nbsp;<span class=\"span-help\">数字越大越在前</span><span id=\"error_sort_"+nodeId+"\" name=\"error\" class=\"span-text\"></span>";
+	html += 		"<input class=\"form-text\" id=\"sort\" size=\"8\" maxlength=\"8\" value=\""+columnSort+"\"/>&nbsp;<span class=\"span-help\">数字越大越在前</span><span id=\"error_sort_"+nodeId+"\" name=\"error\" class=\"span-text\"></span>";
 	html += 	"</td>";
 	html += "</tr>";
 	html += "<tr>";
@@ -309,7 +309,7 @@ function updateColumnUI(nodeId,columnId,columnName,columnSort,columnLinkMode,col
 	html += 		""+url_name+"：";
 	html += 	"</td>";
 	html += 	"<td class=\"t-content\" width=\"80%\">";
-	html += 		"<input id=\"url\" size=\"50\" value=\""+columnURL+"\"/><br><span id=\"url_tip\" class=\"span-help\">"+tip+"</span><span id=\"error_url_"+nodeId+"\" name=\"error\" class=\"span-text\"></span>";
+	html += 		"<input class=\"form-text\" id=\"url\" size=\"50\" value=\""+columnURL+"\"/><br><span id=\"url_tip\" class=\"span-help\">"+tip+"</span><span id=\"error_url_"+nodeId+"\" name=\"error\" class=\"span-text\"></span>";
 	html += 	"</td>";
 	html += "</tr>";
 
@@ -321,7 +321,7 @@ function updateColumnUI(nodeId,columnId,columnName,columnSort,columnLinkMode,col
 	html += "</tbody>";
 	html += "</table>";
 	
-	systemLayerShow("修改栏目",html,600,210);//显示层
+	systemLayerShow("修改栏目",html,600,250);//显示层
 }
 //修改栏目
 function updateColumnSubmit(nodeId,columnId) {
@@ -461,7 +461,7 @@ function siteUrl_div(obj){
 <!-- 导航 -->
 <TABLE class="t-table" cellSpacing="1" cellPadding="2" width="100%" border="0">
 	<TR>
-	    <TD class="t-content" colSpan="5" height="25px">
+	    <TD class="t-content" colSpan="5" height="28px">
 	        <span style="font-weight:bold;float:left;">&nbsp;模板：</span>
 	        <span style="float:left;">&nbsp;<a href="${config:url(pageContext.request)}control/template/list${config:suffix()}">全部模板</a></span>
 			<span style="float:left">

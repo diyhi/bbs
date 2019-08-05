@@ -223,7 +223,7 @@ function upload(nodeId,resourceId) {
 	html += "</tbody>";
 	html += "</table>";
 	
-	systemLayerShow("上传文件",html,600,158);//显示层
+	systemLayerShow("上传文件",html,600,168);//显示层
 }
 //上传文件
 function uploadSubmit(nodeId,resourceId) {
@@ -305,7 +305,7 @@ function newFolder(nodeId,resourceId) {
 	html += 		"新文件夹名称：";
 	html += 	"</td>";
 	html += 	"<td class=\"t-content\" width=\"80%\">";
-	html += 		"<input id=\"folderName\" size=\"40\" value=\"\"/><span id=\"error_folderName_"+nodeId+"\" name=\"error\" class=\"span-text\"></span><span class=\"span-help\">不能含有\\&nbsp;/:*?\"<>|%..字符</span>";
+	html += 		"<input class=\"form-text\" id=\"folderName\" size=\"35\" value=\"\"/><span id=\"error_folderName_"+nodeId+"\" name=\"error\" class=\"span-text\"></span><span class=\"span-help\">不能含有\\&nbsp;/:*?\"<>|%..字符</span>";
 	html += 	"</td>";
 	html += "</tr>";
 	html += "<tr>";
@@ -316,7 +316,7 @@ function newFolder(nodeId,resourceId) {
 	html += "</tbody>";
 	html += "</table>";
 	
-	systemLayerShow("新建文件夹",html,600,158);//显示层
+	systemLayerShow("新建文件夹",html,600,168);//显示层
 }
 //新建文件夹
 function newFolderSubmit(nodeId,resourceId) {
@@ -394,7 +394,7 @@ function rename(nodeId,resourceId,oldName) {
 	html += 		"新名称：";
 	html += 	"</td>";
 	html += 	"<td class=\"t-content\" width=\"80%\">";
-	html += 		"<input id=\"rename\" size=\"40\" value=\"\"/><span id=\"error_rename_"+nodeId+"\" name=\"error\" class=\"span-text\"></span><span class=\"span-help\">不能含有\\&nbsp;/:*?\"<>|%..字符</span>";
+	html += 		"<input class=\"form-text\" id=\"rename\" size=\"35\" value=\"\"/><span id=\"error_rename_"+nodeId+"\" name=\"error\" class=\"span-text\"></span><span class=\"span-help\">不能含有\\&nbsp;/:*?\"<>|%..字符</span>";
 	html += 	"</td>";
 	html += "</tr>";
 	html += "<tr>";
@@ -405,7 +405,7 @@ function rename(nodeId,resourceId,oldName) {
 	html += "</tbody>";
 	html += "</table>";
 	
-	systemLayerShow("重命名",html,600,158);//显示层
+	systemLayerShow("重命名",html,600,168);//显示层
 	
 
 }
@@ -530,7 +530,7 @@ function deleteNode(nodeId,resourceId) {
 <!-- 导航 -->
 <TABLE class="t-table" cellSpacing="1" cellPadding="2" width="100%" border="0">
 		<TR>
-	    <TD class="t-content" colSpan="5" height="25px">
+	    <TD class="t-content" colSpan="5" height="28px">
 	        <span style="font-weight:bold;float:left;">&nbsp;模板：</span>
 	        <span style="float:left;">&nbsp;<a href="${config:url(pageContext.request)}control/template/list${config:suffix()}">全部模板</a></span>
 			<span style="float:left">

@@ -331,6 +331,7 @@ function clearError(){
 function queryUpgradePackageList(){
 	get_request(function(value){
 		if(value != ""){
+			
 			var upgradePackageList = JSON.parse(value);//JSON转为对象
 			
 			var html = "<TABLE class='t-list-table' cellSpacing='1' cellPadding='0' width='100%' border='0'>";
@@ -636,7 +637,7 @@ function uploadChangeIcon(){
 	  		
 	  		<TABLE cellSpacing="2" cellPadding="0" width="99%"  border="0" align="center" rules="none">
 				<TBODY>	
-					<TR align="center" height="25px">
+					<TR align="center" height="28px">
 				  		<TD colspan="2">升级日志</TD>
 				    </TR>  	
 					<c:forEach items="${entry.upgradeLogList}" var="upgradeLog">

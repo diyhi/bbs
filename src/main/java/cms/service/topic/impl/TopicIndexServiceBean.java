@@ -53,5 +53,13 @@ public class TopicIndexServiceBean extends DaoSupport<TopicIndex> implements Top
 		.setParameter("id",indexIdList);
 		query.executeUpdate();
 	}
-	
+	/**
+	 * 删除所有话题索引变化标记
+	 */
+	public Integer deleteAllIndex(){
+		Query query = em.createNativeQuery("truncate table topicindex");
+		
+		return query.executeUpdate();
+		
+	}
 }

@@ -41,13 +41,13 @@ function sureSubmit(objForm){
   <TR>
     <TD class="t-label t-label-h" width="12%"><SPAN class="span-text">*</SPAN>姓名：</TD>
     <TD class="t-content" width="88%" colSpan="3">
-    <input name="fullName" size="20" maxlength="20"  value="${sysUsers.fullName}" <c:if test="${!sysUsers.logonUserPermission}">disabled="disabled"</c:if> />
+    <input class="form-text" name="fullName" size="20" maxlength="20"  value="${sysUsers.fullName}" <c:if test="${!sysUsers.logonUserPermission}">disabled="disabled"</c:if> />
    </TD>
    </TR>
   <TR>
     <TD class="t-label t-label-h" width="12%"><SPAN class="span-text">*</SPAN>密码：</TD>
     <TD class="t-content" width="88%" colSpan="3">
-    <input name="userPassword" type="password" size="20" maxlength="20"  <c:if test="${!sysUsers.logonUserPermission}">disabled="disabled"</c:if>/>
+    <input name="userPassword" type="password" class="form-text" size="20" maxlength="20"  <c:if test="${!sysUsers.logonUserPermission}">disabled="disabled"</c:if>/>
     &nbsp;
     <span class="span-text">${error["userPassword"]}</span>	
     <SPAN class="span-help">不修改请留空 </SPAN>
@@ -55,7 +55,7 @@ function sureSubmit(objForm){
    <TR>
     <TD class="t-label t-label-h" width="12%"><SPAN class="span-text">*</SPAN>重复密码：</TD>
     <TD class="t-content" width="88%" colSpan="3">
-    <input name="repeatPassword" type="password" size="20" maxlength="20" <c:if test="${!sysUsers.logonUserPermission}">disabled="disabled"</c:if>/>
+    <input name="repeatPassword" type="password" class="form-text" size="20" maxlength="20" <c:if test="${!sysUsers.logonUserPermission}">disabled="disabled"</c:if>/>
     &nbsp;<SPAN class="span-help">不修改请留空 </SPAN>
    	</TD></TR>
    	<TR>
@@ -68,12 +68,12 @@ function sureSubmit(objForm){
 	<TR>
     <TD class="t-label t-label-h" width="12%">备注：</TD>
     <TD class="t-content" width="88%" colSpan="3">
-    <input name="userDesc" size="50" maxlength="50"  value="${sysUsers.userDesc }" <c:if test="${!sysUsers.logonUserPermission}">disabled="disabled"</c:if>/>
+    <input class="form-text" name="userDesc" size="50" maxlength="50"  value="${sysUsers.userDesc }" <c:if test="${!sysUsers.logonUserPermission}">disabled="disabled"</c:if>/>
    	</TD></TR>
    	<TR>
     <TD class="t-label t-label-h" width="12%">职位：</TD>
     <TD class="t-content" width="88%" colSpan="3">
-    <input name="userDuty" size="50" maxlength="50"  value="${sysUsers.userDuty }" <c:if test="${!sysUsers.logonUserPermission}">disabled="disabled"</c:if>/>
+    <input class="form-text" name="userDuty" size="50" maxlength="50"  value="${sysUsers.userDuty }" <c:if test="${!sysUsers.logonUserPermission}">disabled="disabled"</c:if>/>
    	</TD></TR>
    	<TR>
     <TD class="t-label t-label-h" width="12%">是否使用：</TD>

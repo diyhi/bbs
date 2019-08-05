@@ -577,6 +577,83 @@ public enum ErrorView {
 		public String getContent(){
 			return "不允许解锁自已发表的话题";
 		}
+	},
+	_1700{
+		public String getContent(){
+			return "重复点赞";
+		}
+	}
+	,
+	_1710{
+		public String getContent(){
+			return "话题点赞Id不能为空";
+		}
+	},
+	_1720{
+		public String getContent(){
+			return "当前话题已经点赞";
+		}
+	},
+	_1730{
+		public String getContent(){
+			return "点赞Id不存在";
+		}
+	},
+	_1740{
+		public String getContent(){
+			return "删除点赞失败";
+		}
+	},
+	_1750{
+		public String getContent(){
+			return "点赞不存在";
+		}
+	},
+	_1760{
+		public String getContent(){
+			return "本点赞不属于当前用户";
+		}
+	},
+	_1800{
+		public String getContent(){
+			return "重复关注";
+		}
+	}
+	,
+	_1810{
+		public String getContent(){
+			return "关注Id不能为空";
+		}
+	},
+	_1820{
+		public String getContent(){
+			return "当前用户已关注对方";
+		}
+	},
+	_1830{
+		public String getContent(){
+			return "关注Id不存在";
+		}
+	},
+	_1840{
+		public String getContent(){
+			return "删除关注失败";
+		}
+	},
+	_1850{
+		public String getContent(){
+			return "关注不存在";
+		}
+	},
+	_1860{
+		public String getContent(){
+			return "本关注不属于当前用户";
+		}
+	},
+	_1870{
+		public String getContent(){
+			return "不能关注自身";
+		}
 	};
 	
 	

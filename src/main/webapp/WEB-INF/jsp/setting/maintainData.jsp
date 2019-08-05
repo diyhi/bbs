@@ -62,7 +62,7 @@ function updateDatabasePasswordUI(){
 	html += 		"<span class=\"span-text\">*</span>旧密码：";
 	html += 	"</td>";
 	html += 	"<td class=\"t-content\" width=\"80%\">";
-	html += 		"<input type=\"password\" id=\"oldPassword\" size=\"40\" value=\"\"/>&nbsp;<span id=\"oldPassword_error\" name=\"errorTag\" class=\"span-text\"></span>";
+	html += 		"<input type=\"password\" class=\"form-text\" id=\"oldPassword\" size=\"40\" value=\"\"/>&nbsp;<span id=\"oldPassword_error\" name=\"errorTag\" class=\"span-text\"></span>";
 	html += 	"</td>";
 	html += "</tr>";
 	html += "<tr>";
@@ -70,7 +70,7 @@ function updateDatabasePasswordUI(){
 	html += 		"<span class=\"span-text\">*</span>新密码：";
 	html += 	"</td>";
 	html += 	"<td class=\"t-content\" width=\"80%\">";
-	html += 		"<input type=\"password\" id=\"newPassword\" size=\"40\" value=\"\"/>&nbsp;<span id=\"newPassword_error\" name=\"errorTag\" class=\"span-text\"></span>";
+	html += 		"<input type=\"password\" class=\"form-text\" id=\"newPassword\" size=\"40\" value=\"\"/>&nbsp;<span id=\"newPassword_error\" name=\"errorTag\" class=\"span-text\"></span>";
 	html += 	"</td>";
 	html += "</tr>";
 	html += "<tr>";
@@ -78,7 +78,7 @@ function updateDatabasePasswordUI(){
 	html += 		"<span class=\"span-text\">*</span>重复密码：";
 	html += 	"</td>";
 	html += 	"<td class=\"t-content\" width=\"80%\">";
-	html += 		"<input type=\"password\" id=\"repeatPassword\" size=\"40\" value=\"\"/>&nbsp;<span id=\"repeatPassword_error\" name=\"errorTag\" class=\"span-text\"></span>";
+	html += 		"<input type=\"password\" class=\"form-text\" id=\"repeatPassword\" size=\"40\" value=\"\"/>&nbsp;<span id=\"repeatPassword_error\" name=\"errorTag\" class=\"span-text\"></span>";
 	html += 	"</td>";
 	html += "</tr>";
 	html += "<tr>";

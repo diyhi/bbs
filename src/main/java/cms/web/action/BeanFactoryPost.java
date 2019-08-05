@@ -184,5 +184,69 @@ public class BeanFactoryPost implements BeanFactoryPostProcessor{
 				}	
 			}
 		}
+		
+		BeanDefinition like_bd = beanFactory.getBeanDefinition("likeConfig");
+		if(like_bd != null){
+			MutablePropertyValues mutablePropertyValues = like_bd.getPropertyValues();
+			TypedStringValue typedStringValue = (TypedStringValue)mutablePropertyValues.getPropertyValue("tableQuantity").getValue();
+
+			//点赞分表数量
+			Integer tableQuantity = Integer.parseInt(typedStringValue.getValue());
+			if(tableQuantity >1){
+				for(int i =1; i<tableQuantity; i++){
+					
+					//初始化点赞bean
+					CreateBean.createLikeBean(i);
+				}	
+			}
+		}
+		
+		BeanDefinition topicLike_bd = beanFactory.getBeanDefinition("topicLikeConfig");
+		if(topicLike_bd != null){
+			MutablePropertyValues mutablePropertyValues = topicLike_bd.getPropertyValues();
+			TypedStringValue typedStringValue = (TypedStringValue)mutablePropertyValues.getPropertyValue("tableQuantity").getValue();
+
+			//话题点赞分表数量
+			Integer tableQuantity = Integer.parseInt(typedStringValue.getValue());
+			if(tableQuantity >1){
+				for(int i =1; i<tableQuantity; i++){
+					
+					//初始化话题点赞bean
+					CreateBean.createTopicLikeBean(i);
+				}	
+			}
+		}
+		
+		BeanDefinition follow_bd = beanFactory.getBeanDefinition("followConfig");
+		if(follow_bd != null){
+			MutablePropertyValues mutablePropertyValues = follow_bd.getPropertyValues();
+			TypedStringValue typedStringValue = (TypedStringValue)mutablePropertyValues.getPropertyValue("tableQuantity").getValue();
+
+			//关注分表数量
+			Integer tableQuantity = Integer.parseInt(typedStringValue.getValue());
+			if(tableQuantity >1){
+				for(int i =1; i<tableQuantity; i++){
+					
+					//初始化关注bean
+					CreateBean.createFollowBean(i);
+				}	
+			}
+		}
+		
+		BeanDefinition follower_bd = beanFactory.getBeanDefinition("followerConfig");
+		if(follower_bd != null){
+			MutablePropertyValues mutablePropertyValues = follower_bd.getPropertyValues();
+			TypedStringValue typedStringValue = (TypedStringValue)mutablePropertyValues.getPropertyValue("tableQuantity").getValue();
+
+			//粉丝分表数量
+			Integer tableQuantity = Integer.parseInt(typedStringValue.getValue());
+			if(tableQuantity >1){
+				for(int i =1; i<tableQuantity; i++){
+					
+					//初始化粉丝bean
+					CreateBean.createFollowerBean(i);
+				}	
+			}
+		}
 	}
 }

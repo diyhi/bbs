@@ -1,5 +1,6 @@
 package cms.service.topic;
 
+import java.util.Date;
 import java.util.List;
 
 
@@ -49,6 +50,15 @@ public interface CommentService  extends DAO<Comment>{
 	 * @return
 	 */
 	public List<String> findCommentContentByPage(int firstIndex, int maxResult,String userName,boolean isStaff);
+	/**
+	 * 分页查询评论
+	 * @param userName 用户名称
+	 * @param postTime 评论发表时间
+	 * @param firstIndex
+	 * @param maxResult
+	 * @return
+	 */
+	public List<Comment> findCommentByPage(String userName,Date postTime,int firstIndex, int maxResult);
 	/**
 	 * 查询用户是否评论话题
 	 * @param topicId 话题Id
@@ -110,6 +120,15 @@ public interface CommentService  extends DAO<Comment>{
 	 * @return
 	*/
 	public List<Reply> findReplyByCommentId(List<Long> commentIdList,Integer status);
+	/**
+	 * 分页查询回复
+	 * @param userName 用户名称
+	 * @param postTime 回复发表时间
+	 * @param firstIndex
+	 * @param maxResult
+	 * @return
+	 */
+	public List<Reply> findReplyByPage(String userName,Date postTime,int firstIndex, int maxResult);
 	/**
 	 * 根据回复Id查询评论回复
 	 * @param replyId 回复Id

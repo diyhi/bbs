@@ -26,4 +26,8 @@ public interface TopicIndexService extends DAO<TopicIndex>{
 	 * @param indexIdList 索引变化标记Id集合
 	 */
 	public void deleteTopicIndex(List<Long> indexIdList);
+	/**
+	 * 删除所有话题索引变化标记
+	 */
+	public Integer deleteAllIndex();
 }

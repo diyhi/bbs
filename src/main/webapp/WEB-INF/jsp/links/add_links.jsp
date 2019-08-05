@@ -60,21 +60,21 @@ $(document).ready(function(){
 		<TR>
 		    <TD class="t-label t-label-h" width="12%"><SPAN class="span-text">*</SPAN>名称：</TD>
 		    <TD class=t-content width="88%" colSpan=3>
-		    	<input name="name" size="50" value="${links.name}"/>
+		    	<input class="form-text" name="name" size="50" value="${links.name}"/>
 			    &nbsp;<web:errors path="name" cssClass="span-text"/>
 		    </TD>
 	    </TR>
 	    <TR>
 		    <TD class="t-label t-label-h" width="15%"><SPAN class="span-text">*</SPAN>网址：</TD>
 		    <TD class="t-content" width="85%" colSpan="3">
-		    	<input name="website" size="50" value="${links.website}"/>
+		    	<input class="form-text" name="website" size="50" value="${links.website}"/>
 		      	&nbsp;<web:errors path="website" cssClass="span-text"/>
 		    </TD>
 		</TR>
     	<TR>
 		    <TD class="t-label t-label-h" width="15%"><SPAN class="span-text">*</SPAN>排序：</TD>
 		    <TD class="t-content" width="85%" colSpan="3">
-		    	<INPUT name="sort" size="5" value="${links.sort}">
+		    	<INPUT class="form-text" name="sort" size="5" value="${links.sort}">
 		      	&nbsp;<web:errors path="sort" cssClass="span-text"/>
 		    </TD>
 		</TR>
@@ -84,7 +84,7 @@ $(document).ready(function(){
 		    
 		    	<TABLE cellSpacing=0 cellPadding=0 width="200px" border=0>
 		    		<tr align="left">
-		    			<td width="40px"  height="40px"><div id="preview_1"><img id="imghead_1" width='40px' border='0' src='${imagePath}<c:if test="${imagePath == null || imagePath ==''}">backstage/images/null.gif</c:if>' ></div></td>
+		    			<td width="46px"  height="46px"><div id="preview_1"><img id="imghead_1" width='40px' border='0' src='${imagePath}<c:if test="${imagePath == null || imagePath ==''}">backstage/images/null.gif</c:if>' ></div></td>
 		    			<td width="80px">
 		    				<a href="javascript:void(0);" class="fileButtonPic"><span><em>+</em>浏览...</span><input id="images" name="images" type="file" class="fileButton" size="12" onchange="previewImage(this,'imghead_1', 'preview_1')"/><input type="hidden" id="imagePath" name="imagePath" value='${imagePath}'/></a>
 		    			</td>

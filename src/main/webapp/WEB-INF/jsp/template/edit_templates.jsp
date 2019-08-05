@@ -47,7 +47,7 @@ $(document).ready(function(){
 <!-- 导航 -->
 <TABLE class="t-table" cellSpacing="1" cellPadding="2" width="100%" border="0">
 	<TR>
-	    <TD class="t-content" colSpan="5" height="25px">
+	    <TD class="t-content" colSpan="5" height="28px">
 	        <span style="font-weight:bold;float:left;">&nbsp;模板：</span>
 	        <span style="float:left;">&nbsp;<a href="${config:url(pageContext.request)}control/template/list${config:suffix()}">全部模板</a></span>
 			<span style="float:left">
@@ -63,7 +63,7 @@ $(document).ready(function(){
   <TR>
     <TD class="t-label t-label-h" width="12%"><SPAN class="span-text">*</SPAN>模板名称：</TD>
 	    <TD class="t-content" width="88%" colSpan="3">
-	    	<input name="name" maxlength="100" size="40" value="${templates.name}"/>
+	    	<input class="form-text" name="name" maxlength="100" size="40" value="${templates.name}"/>
 	    	&nbsp;<web:errors path="name" cssClass="span-text"/>
 	    </TD>
     </TR>
@@ -92,7 +92,7 @@ $(document).ready(function(){
    <TR>
     <TD class="t-label t-label-h" width="12%">模板简介：</TD>
     <TD class="t-content" width="88%" colSpan="3">
-    	<textarea name="introduction" rows="10" cols="80">${templates.introduction}</textarea>
+    	<textarea class="form-textarea" name="introduction" rows="10" cols="80">${templates.introduction}</textarea>
     </TD></TR>
 	<tr>
     <TD class="t-button" colSpan="4">

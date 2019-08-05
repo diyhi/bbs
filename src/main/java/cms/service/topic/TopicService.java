@@ -4,6 +4,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
 import cms.bean.QueryResult;
 import cms.bean.topic.Topic;
 import cms.bean.topic.TopicUnhide;
@@ -54,6 +57,15 @@ public interface TopicService extends DAO<Topic>{
 	 * @return
 	 */
 	public List<Topic> findTopicByPage(int firstIndex, int maxResult);
+	/**
+	 * 分页查询话题
+	 * @param userName用户名称
+	 * @param postTime 话题发表时间
+	 * @param firstIndex 开始索引
+	 * @param maxResult 需要获取的记录数
+	 * @return
+	 */
+	public List<Topic> findTopicByPage(String userName,Date postTime,int firstIndex, int maxResult);
 	/**
 	 * 保存话题
 	 * @param topic

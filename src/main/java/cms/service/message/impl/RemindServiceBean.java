@@ -294,6 +294,83 @@ public class RemindServiceBean extends DaoSupport<Remind> implements RemindServi
 		
 		return qr;
 	}
+	
+	/**
+	 * 根据用户Id和提醒类型代码编号查询最新一条提醒
+	 * @param userId 用户Id
+	 * @param typeCode 提醒类型代码编号
+	 * @return
+	 */
+	@Transactional(readOnly=true, propagation=Propagation.NOT_SUPPORTED)
+	public Remind findNewRemindByUserId(Long userId,Integer typeCode){
+		//表编号
+		int tableNumber = remindConfig.userIdRemainder(userId);
+		Query query  = null;
+		
+		if(tableNumber == 0){//默认对象
+			query = em.createQuery("select o from Remind o where o.receiverUserId=?1 and o.typeCode=?2 ORDER BY o.sendTimeFormat desc");
+			query.setParameter(1, userId);
+			query.setParameter(2, typeCode);
+			//索引开始,即从哪条记录开始
+			query.setFirstResult(0);
+			//获取多少条数据
+			query.setMaxResults(1);
+			List<Remind> remindList= query.getResultList();
+			if(remindList != null && remindList.size() >0){
+				for(Remind remind : remindList){
+					return remind;
+				}
+			}
+
+		}else{//带下划线对象
+			
+			query = em.createQuery("select o from Remind_"+tableNumber+" o where o.receiverUserId=?1 and o.typeCode=?2 ORDER BY o.sendTimeFormat desc");
+			query.setParameter(1, userId);
+			query.setParameter(2, typeCode);
+			//索引开始,即从哪条记录开始
+			query.setFirstResult(0);
+			//获取多少条数据
+			query.setMaxResults(1);
+			List<?> remind_List= query.getResultList();
+
+			try {
+				//带下划线对象
+				Class<?> c = Class.forName("cms.bean.message.Remind_"+tableNumber);
+				Object object  = c.newInstance();
+				BeanCopier copier = BeanCopier.create(object.getClass(),Remind.class, false); 
+				for(int j = 0;j< remind_List.size(); j++) {  
+					Object obj = remind_List.get(j);
+					Remind remind = new Remind();
+					copier.copy(obj,remind, null);
+					
+					return remind;
+				}
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+			//	e.printStackTrace();
+				if (logger.isErrorEnabled()) {
+		            logger.error("根据用户Id和提醒类型代码编号查询最新一条提醒",e);
+		        }
+			} catch (InstantiationException e) {
+				// TODO Auto-generated catch block
+			//	e.printStackTrace();
+				if (logger.isErrorEnabled()) {
+		            logger.error("根据用户Id和提醒类型代码编号查询最新一条提醒",e);
+		        }
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+			//	e.printStackTrace();
+				if (logger.isErrorEnabled()) {
+		            logger.error("根据用户Id和提醒类型代码编号查询最新一条提醒",e);
+		        }
+			}
+
+			
+		}
+		
+		return null;
+	}
+	
 	/**
 	 * 根据用户Id查询未读提醒数量
 	 * @param userId 用户Id

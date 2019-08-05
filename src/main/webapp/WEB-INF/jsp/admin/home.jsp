@@ -11,53 +11,44 @@
 <LINK href="backstage/css/table.css" type="text/css" rel="stylesheet">
 </HEAD>
 
-<script language="javascript" type="text/javascript">
+<style type="text/css">
+body { margin:0 0 0 0;background:#f9fcff;}
+html,body{
+	height: 100%;
+	margin:0;
+	padding:0;
+}
 
-</script> 
+</style>
 <BODY>
 
-<DIV class="d-box">
-
-<TABLE class="t-table" cellSpacing="1" cellPadding="2" width="100%" border="0">
-	<TBODY>
-		<TR>
-		    <TD class="t-label t-label-h" width="15%">职位：</TD>
-		    <TD class="t-content" width="85%" colSpan="3">
-		    	${sysUsers.userDuty }
-		    </TD>
-	    </TR>
-		<TR>
-		    <TD class="t-label t-label-h" width="15%">最后5次登录日志：</TD>
-		    <TD class="t-content" width="85%" colSpan="3">
-	    		<table style="width:100%;" >
-	    			<thead style="color: #555;">
-		    			<tr>
-		    				<th width="20%" height="26px" align="left">登录IP</th>
-		    				<th width="30%" align="left">IP归属地</th>
-		    				<th align="left">登录时间</th>
-		    			</tr>
-	    			</thead>
-				    <c:forEach items="${staffLoginLogList}" var="entry" > 
-					    <tr>
-					  		<td style="border-top:1px dashed #BFE3FF; border-right:1px dashed #BFE3FF; line-height:26px;color: #999; text-align:left;">
-					  			${entry.ip}
-					    	</td>
-					    	<td style="border-top:1px dashed #BFE3FF; line-height:26px;color: #999; text-align:left;">
-					    		${entry.ipAddress}
-					    	</td>
-					    	<td style="border-top:1px dashed #BFE3FF; line-height:26px;color: #999; text-align:left;">
-					    		<fmt:formatDate value="${entry.logonTime}"  pattern="yyyy-MM-dd HH:mm:ss"/>
-					    	</td>
-					    </tr>
-				    
-				    
-				   
-					</c:forEach>
-				</table>
-		    </TD>
-		</TR>
-  		
-	</TBODY>
-</TABLE>
-</DIV>
+<div style="padding: 6px 7px 0px 7px;">
+	<div style="background: #fff;border-radius: 2px;box-shadow: 0 1px 3px 0 rgba(0,0,0,.02),0 4px 8px 0 rgba(0,0,0,.02) ">
+		<div style="margin-left: 10px;margin-right: 10px;padding-top: 4px; padding-bottom: 10px;" >
+		<h2 style="font-size: 15px;color: #42a5f5;height: 20px;">最后5次登录日志</h2>
+		<table cellSpacing="0" cellPadding="0" width="100%" border="0">
+   			<thead style="color: #42a5f5; background-color: #ecf7fe; border-bottom: #BFE3FF 1px solid;">
+    			<tr>
+    				<th width="20%" height="32px" align="center">登录IP</th>
+    				<th width="30%" align="center" >IP归属地</th>
+    				<th width="50%" align="left" ><span style="margin-left: 36px;">登录时间</span></th>
+    			</tr>
+   			</thead>
+		    <c:forEach items="${staffLoginLogList}" var="entry" > 
+			    <tr>
+			  		<td style="border-bottom:1px dashed #BFE3FF; line-height:30px;color: #999; text-align:center;">
+			  			${entry.ip}
+			    	</td>
+			    	<td style="border-bottom:1px dashed #BFE3FF; line-height:30px;color: #999; text-align:center;">
+			    		${entry.ipAddress}
+			    	</td>
+			    	<td style="border-bottom:1px dashed #BFE3FF; line-height:30px;color: #999; text-align:left;">
+			    		<fmt:formatDate value="${entry.logonTime}"  pattern="yyyy-MM-dd HH:mm:ss"/>
+			    	</td>
+			    </tr>
+			</c:forEach>
+		</table>
+		</div>
+	</div>
+</div>
 </BODY></HTML>

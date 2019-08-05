@@ -226,6 +226,7 @@
 					<div class="operating">
 						<div class="bottomInfo">
 							<mt-button type="default" plain @click.native="addFavorite(topic.id);"  :disabled="alreadyCollected">{{alreadyCollected == true ? '已收藏':'收藏'}} ({{favoriteCount}})</mt-button>
+							<mt-button type="default" plain @click.native="addLike(topic.id);"  :disabled="alreadyLiked">{{alreadyLiked == true ? '已点赞':'赞'}} ({{likeCount}})</mt-button>
 						</div>
 					</div>
 				</div>
@@ -816,6 +817,9 @@
 		        <p class="nickname" v-if="user.nickname != null && user.nickname != ''">{{user.nickname}}</p>
 		        <p class="grade" >{{user.gradeName}}</p>
 		        <span class="privateMessageBox" v-if="user.userName != $store.state.user.userName">
+		        	<div class="followButton" @click="addFollow(user.userName)">{{following == true ? '已关注':'关注'}}</div>
+		        	
+		        
 		         	<!-- router-link渲染成<div>标签-->
 			    	<router-link class="privateMessageButton" tag="div" :to="{path: '/user/control/privateMessageChatList', query: {friendUserName: user.userName}}">
 			           发私信
@@ -860,16 +864,30 @@
 		        </li>
 			</ul>
 			<ul>
-		        <li class="bottomLine rightLine">
+		        <li class="rightLine">
 		        	<router-link to="/user/control/systemNotifyList" class="menuLink"><i class="cms-announcement"></i><span class="name">系统通知</span><span class="badge" style="position: absolute;" v-show="$store.state.systemNotify_badge"></span></router-link>
 		        </li>
-		        <li class="bottomLine rightLine">
+		        <li class="rightLine">
 		        	<router-link to="/user/control/remindList" class="menuLink"><i class="cms-bell"></i><span class="name">提醒</span><span class="badge" style="position: absolute;" v-show="$store.state.remind_badge"></span></router-link>
 		        </li>
-		        <li class="bottomLine rightLine">
+		        <li class="rightLine">
 		        	<router-link to="/user/control/favoriteList" class="menuLink"><i class="cms-favorites"></i><span class="name">收藏夹</span></router-link>
 		        </li>
+		        <li>
+		        	<router-link to="/user/control/likeList" class="menuLink"><i class="cms-thumb-up"></i><span class="name">点赞</span></router-link>
+		        </li>
+			</ul>
+			<ul>
+		        <li class="bottomLine rightLine">
+		        	<router-link to="/user/control/followList" class="menuLink"><i class="cms-heart"></i><span class="name">关注</span></router-link>
+		        </li>
+		        <li class="bottomLine rightLine">
+		        	<router-link to="/user/control/followerList" class="menuLink"><i class="cms-follower"></i><span class="name">粉丝</span></router-link>
+		        </li>
+		        <li class="bottomLine rightLine">
+		        </li>
 		        <li class="bottomLine">
+		        	
 		        </li>
 			</ul>
 		</div>
@@ -1038,6 +1056,7 @@
 			            	<span class="status" v-if="topic.status == 10">[待审核]</span>
 			            	<router-link class="fast cms-lock"  tag="span" :to="{path: '/user/control/topicUnhideList', query: {topicId: topic.id}}" ></router-link>
 			            	<router-link class="fast cms-favorites"  tag="span" :to="{path: '/user/control/topicFavoriteList', query: {topicId: topic.id}}" ></router-link>
+			            	<router-link class="fast cms-thumb-up"  tag="span" :to="{path: '/user/control/topicLikeList', query: {topicId: topic.id}}" ></router-link>
 			            	<i class="time">{{topic.postTime}}</i>
 			            </p> 
 			        </div>
@@ -1681,6 +1700,54 @@
 							        </router-link>
 									解锁了我的话题
 								</div>
+								<div v-if="remind.typeCode == 70">
+									<router-link class="link" :to="{path: '/user/control/home', query: {userName: remind.senderUserName}}">
+							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderUserName}}
+							        </router-link>
+									在
+									<router-link class="link" :to="{path: '/thread', query: {topicId: remind.topicId}}">
+							            {{remind.topicTitle}}
+							        </router-link>
+									赞了我的话题
+								</div>
+								<div v-if="remind.typeCode == 80">
+									<router-link class="link" :to="{path: '/user/control/home', query: {userName: remind.senderUserName}}">
+							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderUserName}}
+							        </router-link>
+									关注了我
+								</div>
+								<div v-if="remind.typeCode == 90">
+									我关注的
+									<router-link class="link" :to="{path: '/user/control/home', query: {userName: remind.senderUserName}}">
+							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderUserName}}
+							        </router-link>
+									发表了话题
+									<router-link class="link" :to="{path: '/thread', query: {topicId: remind.topicId}}">
+							            {{remind.topicTitle}}
+							        </router-link>
+								</div>
+								<div v-if="remind.typeCode == 100">
+									我关注的
+									<router-link class="link" :to="{path: '/user/control/home', query: {userName: remind.senderUserName}}">
+							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderUserName}}
+							        </router-link>
+									在
+									<router-link class="link" :to="{path: '/thread', query: {topicId: remind.topicId, commentId:remind.friendTopicCommentId}}">
+							            {{remind.topicTitle}}
+							        </router-link>
+									发表了评论
+								</div>
+								<div v-if="remind.typeCode == 110">
+									我关注的
+									<router-link class="link" :to="{path: '/user/control/home', query: {userName: remind.senderUserName}}">
+							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderUserName}}
+							        </router-link>
+									在
+									<router-link class="link" :to="{path: '/thread', query: {topicId: remind.topicId, commentId:remind.friendTopicCommentId}}">
+							            {{remind.topicTitle}}
+							        </router-link>
+									发表了回复
+								</div>
 							</div>               
 						</div>
 					</div>
@@ -1745,6 +1812,60 @@
 	</div>
 </template>
 
+<!-- 点赞 -->
+<template id="like-template">
+	<div>
+		<mt-header fixed title="点赞" style="background: #fafafa; color: #000000;font-size: 14px">
+	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
+	    	<router-link to="/index" slot="right">
+			    <span class="cms-home" style="font-size: 18px;"></span>
+			</router-link>
+		</mt-header>
+		<div class="likeModule" >
+			<div class="likeList">
+				<div v-infinite-scroll="queryLike" infinite-scroll-disabled="loading" infinite-scroll-distance="10">
+					<div class="item" v-for="like in likeList">
+			            <div class="head">
+							<span class="info" >
+			                    <h2>{{like.addtime}}</h2>
+			                </span>
+			                <span class="operating"><span class="delete-btn"  @click="deleteLike(like.id)"><span class="cms-trash" style="font-size: 11px;margin-right: 1px;"></span>删除</span></span>                     
+			            </div>
+			            <div class="main">
+			            	<!-- router-link渲染成<p>标签-->
+			            	<router-link tag="p" class="content" :to="{path: '/thread', query: {topicId: like.topicId}}" >
+								{{like.topicTitle}}
+							</router-link>                        
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>
+
+<!-- 话题点赞列表 -->
+<template id="topicLike-template">
+	<div>
+		<mt-header fixed title="话题点赞" style="background: #fafafa; color: #000000;font-size: 14px">
+	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
+	    	<router-link to="/index" slot="right">
+			    <span class="cms-home" style="font-size: 18px;"></span>
+			</router-link>
+		</mt-header>
+		<div class="userLoginLogModule">
+			<div v-infinite-scroll="queryTopicLike" infinite-scroll-disabled="loading" infinite-scroll-distance="10">
+				<ul>
+					<li v-for="like in likeList">
+						<mt-cell :title="like.userName" :label="like.addtime" @click.native="toUser(like.userName)" is-link></mt-cell>
+					</li>
+				
+				</ul>
+			</div>
+		</div>
+	</div>
+</template>
+
 <!-- 话题取消隐藏用户列表 -->
 <template id="topicUnhide-template">
 	<div>
@@ -1767,6 +1888,71 @@
 		</div>
 	</div>
 </template>
+
+<!-- 关注 -->
+<template id="follow-template">
+	<div>
+		<mt-header fixed title="关注" style="background: #fafafa; color: #000000;font-size: 14px">
+	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
+	    	<router-link to="/index" slot="right">
+			    <span class="cms-home" style="font-size: 18px;"></span>
+			</router-link>
+		</mt-header>
+		<div class="followModule" >
+			<div class="followList">
+				<div v-infinite-scroll="queryFollow" infinite-scroll-disabled="loading" infinite-scroll-distance="10">
+					<div class="item" v-for="follow in followList">
+			            <div class="head">
+							<span class="info" >
+			                    <h2>{{follow.addtime}}</h2>
+			                </span>
+			                <span class="operating"><span class="delete-btn"  @click="deleteFollow(follow.id)"><span class="cms-trash" style="font-size: 11px;margin-right: 1px;"></span>删除</span></span>                     
+			            </div>
+			            <div class="main">
+			            	<!-- router-link渲染成<p>标签-->
+			            	<router-link tag="p" class="content" :to="{path: '/user/control/home', query: {userName: follow.friendUserName}}">
+								{{follow.friendUserName}}<span v-if="follow.friendNickname != null && follow.friendNickname != ''">({{follow.friendNickname}})</span>
+							</router-link>                        
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>
+
+<!-- 粉丝 -->
+<template id="follower-template">
+	<div>
+		<mt-header fixed title="粉丝" style="background: #fafafa; color: #000000;font-size: 14px">
+	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
+	    	<router-link to="/index" slot="right">
+			    <span class="cms-home" style="font-size: 18px;"></span>
+			</router-link>
+		</mt-header>
+		<div class="followerModule" >
+			<div class="followerList">
+				<div v-infinite-scroll="queryFollower" infinite-scroll-disabled="loading" infinite-scroll-distance="10">
+					<div class="item" v-for="follower in followerList">
+			            <div class="head">
+							<span class="info" >
+			                    <h2>{{follower.addtime}}</h2>
+			                </span>
+			            </div>
+			            <div class="main">
+			            	<!-- router-link渲染成<p>标签-->
+			            	<router-link tag="p" class="content" :to="{path: '/user/control/home', query: {userName: follower.friendUserName}}">
+								{{follower.friendUserName}}<span v-if="follower.friendNickname != null && follower.friendNickname != ''">({{follower.friendNickname}})</span>
+							</router-link>                        
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>
+
+
 
 <!-- 公共模块 -->
 <template id="bottomTab-template">

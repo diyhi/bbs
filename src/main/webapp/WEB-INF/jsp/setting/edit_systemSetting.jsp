@@ -69,7 +69,7 @@ function add_Row(){ //读取最后一行的行号，存放在txtTRLastIndex文�
 	newNameTD.align = "center";
 	newNameTD.style.cssText="BORDER-RIGHT: #BFE3FF 1px dotted;border-bottom: #BFE3FF 1px dotted;";
 	//添加列内容 
-	newNameTD.innerHTML = "<input type='text' name='supportBank' value='' size='80'/>"; 
+	newNameTD.innerHTML = "<input type='text' class='form-text' name='supportBank' value='' size='80'/>"; 
 	//添加列:删除按钮 
 	var newDeleteTD=newTR.insertCell(1); 
 	newDeleteTD.width="20%";
@@ -158,21 +158,21 @@ function setAllowFilterWord(obj){
 			<TR>
 			    <TD class="t-label t-label-h" width="20%">站点名称：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">
-			    	<input name="title" maxlength="200" size="60" value="${systemSetting.title}"/>
+			    	<input class="form-text" name="title" maxlength="200" size="60" value="${systemSetting.title}"/>
 			    	<web:errors path="title" cssStyle="color: red;"/>
 			    </TD>
 			</TR>
 			<TR>
 			    <TD class="t-label t-label-h" width="20%">站点关键词(keywords)：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">
-			    	<input name="keywords" maxlength="200" size="60" value="${systemSetting.keywords}"/>
+			    	<input class="form-text" name="keywords" maxlength="200" size="60" value="${systemSetting.keywords}"/>
 			    	<web:errors path="keywords" cssStyle="color: red;"/>
 			    </TD>
 			</TR>
 			<TR>
 			    <TD class="t-label t-label-h" width="20%">站点描述(description)：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">
-			    	<input name="description" maxlength="200" size="60" value="${systemSetting.description}"/>
+			    	<input class="form-text" name="description" maxlength="200" size="60" value="${systemSetting.description}"/>
 			    	<web:errors path="description" cssStyle="color: red;"/>
 			    </TD>
 			</TR>
@@ -191,7 +191,7 @@ function setAllowFilterWord(obj){
 			<TR id="td_closeSitePrompt" <c:if test="${systemSetting.closeSite == 1}"> style='display: none;'</c:if>>
 			    <TD class="t-label t-label-h" width="20%">关闭站点提示信息：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">
-			    	<textarea name="closeSitePrompt" rows="8" cols="80">${systemSetting.closeSitePrompt}</textarea>
+			    	<textarea class="form-textarea" name="closeSitePrompt" rows="8" cols="80">${systemSetting.closeSitePrompt}</textarea>
 			    	<web:errors path="closeSitePrompt" cssStyle="color: red;"/>
 			    </TD>
 			</TR>
@@ -237,7 +237,7 @@ function setAllowFilterWord(obj){
 			<TR>
 			    <TD class="t-label t-label-h" width="20%">登录密码每分钟连续错误：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">
-			    	<input name="login_submitQuantity" maxlength="10" size="10" value="${systemSetting.login_submitQuantity}"/>&nbsp;次以上出现验证码
+			    	<input class="form-text" name="login_submitQuantity" maxlength="10" size="10" value="${systemSetting.login_submitQuantity}"/>&nbsp;次以上出现验证码
 			    	<span class="span-help">0为每次都出现验证码</span>
 			    	
 			    	<web:errors path="login_submitQuantity" cssStyle="color: red;"/>
@@ -246,7 +246,7 @@ function setAllowFilterWord(obj){
 			<TR>
 			    <TD class="t-label t-label-h" width="20%">发表话题每分钟提交超过：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">
-			    	<input name="topic_submitQuantity" maxlength="10" size="10" value="${systemSetting.topic_submitQuantity}"/>&nbsp;次以上出现验证码
+			    	<input class="form-text" name="topic_submitQuantity" maxlength="10" size="10" value="${systemSetting.topic_submitQuantity}"/>&nbsp;次以上出现验证码
 			    	<span class="span-help">0为每次都出现验证码</span>
 			    	<web:errors path="topic_submitQuantity" cssStyle="color: red;"/>
 			    </TD>
@@ -254,7 +254,7 @@ function setAllowFilterWord(obj){
 			<TR>
 			    <TD class="t-label t-label-h" width="20%">发表评论每分钟提交超过：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">
-			    	<input name="comment_submitQuantity" maxlength="10" size="10" value="${systemSetting.comment_submitQuantity}"/>&nbsp;次以上出现验证码
+			    	<input class="form-text" name="comment_submitQuantity" maxlength="10" size="10" value="${systemSetting.comment_submitQuantity}"/>&nbsp;次以上出现验证码
 			    	<span class="span-help">0为每次都出现验证码</span>
 			    	<web:errors path="comment_submitQuantity" cssStyle="color: red;"/>
 			    </TD>
@@ -262,7 +262,7 @@ function setAllowFilterWord(obj){
 			<TR>
 			    <TD class="t-label t-label-h" width="20%">发表私信每分钟提交超过：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">
-			    	<input name="privateMessage_submitQuantity" maxlength="10" size="10" value="${systemSetting.privateMessage_submitQuantity}"/>&nbsp;次以上出现验证码
+			    	<input class="form-text" name="privateMessage_submitQuantity" maxlength="10" size="10" value="${systemSetting.privateMessage_submitQuantity}"/>&nbsp;次以上出现验证码
 			    	<span class="span-help">0为每次都出现验证码</span>
 			    	<web:errors path="privateMessage_submitQuantity" cssStyle="color: red;"/>
 			    </TD>
@@ -270,21 +270,21 @@ function setAllowFilterWord(obj){
 			<TR>
 			    <TD class="t-label t-label-h" width="20%">发表话题奖励积分：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">
-			    	<input name="topic_rewardPoint" maxlength="10" size="10" value="${systemSetting.topic_rewardPoint}"/>
+			    	<input class="form-text" name="topic_rewardPoint" maxlength="10" size="10" value="${systemSetting.topic_rewardPoint}"/>
 			    	<web:errors path="topic_rewardPoint" cssStyle="color: red;"/>
 			    </TD>
 			</TR>
 			<TR>
 			    <TD class="t-label t-label-h" width="20%">发表评论奖励积分：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">
-			    	<input name="comment_rewardPoint" maxlength="10" size="10" value="${systemSetting.comment_rewardPoint}"/>
+			    	<input class="form-text" name="comment_rewardPoint" maxlength="10" size="10" value="${systemSetting.comment_rewardPoint}"/>
 			    	<web:errors path="comment_rewardPoint" cssStyle="color: red;"/>
 			    </TD>
 			</TR>
 			<TR>
 			    <TD class="t-label t-label-h" width="20%">发表回复奖励积分：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">
-			    	<input name="reply_rewardPoint" maxlength="10" size="10" value="${systemSetting.reply_rewardPoint}"/>
+			    	<input class="form-text" name="reply_rewardPoint" maxlength="10" size="10" value="${systemSetting.reply_rewardPoint}"/>
 			    	<web:errors path="reply_rewardPoint" cssStyle="color: red;"/>
 			    </TD>
 			</TR>
@@ -405,7 +405,7 @@ function setAllowFilterWord(obj){
 			<TR id="td_allowFilterWord" <c:if test="${systemSetting.allowFilterWord == false}"> style='display: none;'</c:if>>
 			    <TD class="t-label t-label-h" width="20%">敏感词替换为：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">
-			    	<input type="text" name="filterWordReplace" value="${systemSetting.filterWordReplace}">
+			    	<input type="text" class="form-text" name="filterWordReplace" value="${systemSetting.filterWordReplace}">
 			    	<web:errors path="filterWordReplace" cssStyle="color: red;"/>
 			    </TD>
 			</TR>
@@ -414,7 +414,7 @@ function setAllowFilterWord(obj){
 			<TR>
 			    <TD class="t-label t-label-h" width="20%">前台分页数量：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">
-			    	<form:input path="forestagePageNumber" maxlength="8" size="5" />
+			    	<form:input class="form-text" path="forestagePageNumber" maxlength="8" size="5" />
 			    	<web:errors path="forestagePageNumber" cssStyle="color: red;"/>
 			    	<span class="span-help">空为默认20条</span>
 			    </TD>
@@ -422,7 +422,7 @@ function setAllowFilterWord(obj){
 			<TR>
 			    <TD class="t-label t-label-h" width="20%">后台分页数量：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">
-			    	<form:input path="backstagePageNumber" maxlength="8" size="5" />
+			    	<form:input class="form-text" path="backstagePageNumber" maxlength="8" size="5" />
 			    	<web:errors path="backstagePageNumber" cssStyle="color: red;"/>
 			    	<span class="span-help">空为默认20条</span>
 			    </TD>
@@ -430,14 +430,14 @@ function setAllowFilterWord(obj){
 			<TR>
 			    <TD class="t-label t-label-h" width="20%">上传临时文件有效期：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">
-			    	文件上传&nbsp;<form:input path="temporaryFileValidPeriod" maxlength="8" size="5" />&nbsp;分钟内未提交表单由定时任务自动删除
+			    	文件上传&nbsp;<form:input class="form-text" path="temporaryFileValidPeriod" maxlength="8" size="5" />&nbsp;分钟内未提交表单由定时任务自动删除
 			    	<web:errors path="temporaryFileValidPeriod" cssStyle="color: red;"/>
 			    </TD>
 			</TR>
 			<TR>
 			    <TD class="t-label t-label-h" width="20%">每用户每24小时内发送短信最大限制次数：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">
-			    	<form:input path="userSentSmsCount" maxlength="8" size="5" />
+			    	<form:input class="form-text" path="userSentSmsCount" maxlength="8" size="5" />
 			    	<web:errors path="userSentSmsCount" cssStyle="color: red;"/>
 			    	<span class="span-help">空为无限制 &nbsp;短信发送最大数量受短信服务商限制</span>
 			    </TD>
@@ -617,7 +617,7 @@ function setAllowFilterWord(obj){
 			<TR id="topicImageSize_tr" <c:if test="${systemSetting.topicEditorTagObject.image == false}"> style="display: none;"</c:if>>
 			    <TD class="t-label t-label-h" width="20%">允许上传图片大小：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">
-			    	<form:input path="topicEditorTagObject.imageSize" size="10"/>&nbsp;K
+			    	<form:input class="form-text" path="topicEditorTagObject.imageSize" size="10"/>&nbsp;K
 			    	
 			    </TD>
 			</TR>
@@ -762,7 +762,7 @@ function setAllowFilterWord(obj){
 			<TR id="commentImageSize_tr" <c:if test="${systemSetting.editorTagObject.image == false}"> style="display: none;"</c:if>>
 			    <TD class="t-label t-label-h" width="20%">允许上传图片大小：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">
-			    	<form:input path="editorTagObject.imageSize" size="10"/>&nbsp;K
+			    	<form:input class="form-text" path="editorTagObject.imageSize" size="10"/>&nbsp;K
 			    	
 			    </TD>
 			</TR>

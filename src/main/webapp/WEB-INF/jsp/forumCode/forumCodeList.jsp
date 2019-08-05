@@ -253,7 +253,7 @@ function addForumCodeUI(nodeId,forumCode_displayType_str){
 	html += 		"模板名称：";
 	html += 	"</td>";
 	html += 	"<td class=\"t-content\" width=\"80%\">";
-	html += 		"<input id=\"name\" size=\"30\" value=\"\"/>&nbsp;<span id=\"error_name_"+nodeId+"\" name=\"error\" class=\"span-text\"></span>";
+	html += 		"<input class=\"form-text\" id=\"name\" size=\"30\" value=\"\"/>&nbsp;<span id=\"error_name_"+nodeId+"\" name=\"error\" class=\"span-text\"></span>";
 	html += 	"</td>";
 	html += "</tr>";
 	html += "<tr>";
@@ -261,7 +261,7 @@ function addForumCodeUI(nodeId,forumCode_displayType_str){
 	html += 		"模板显示类型：";
 	html += 	"</td>";
 	html += 	"<td class=\"t-content\" width=\"80%\">";
-	html += 		"<select id=\"displayType\">";
+	html += 		"<select class=\"form-select\" id=\"displayType\">";
 	
 	var forumCode_displayType_arr = forumCode_displayType_str.split(",");
 	for(var i = 0 ; i < forumCode_displayType_arr.length; i++){
@@ -276,7 +276,7 @@ function addForumCodeUI(nodeId,forumCode_displayType_str){
 	html += 		"备注：";
 	html += 	"</td>";
 	html += 	"<td class=\"t-content\" width=\"80%\">";
-	html += 		"<input id=\"remark\" size=\"50\" value=\"\"/>";
+	html += 		"<input class=\"form-text\" id=\"remark\" size=\"50\" value=\"\"/>";
 	html += 	"</td>";
 	html += "</tr>";
 	html += "<tr>";
@@ -287,7 +287,7 @@ function addForumCodeUI(nodeId,forumCode_displayType_str){
 	html += "</tbody>";
 	html += "</table>";
 	
-	systemLayerShow("添加版块代码",html,600,170);//显示层
+	systemLayerShow("添加版块代码",html,600,200);//显示层
 }
 
 //添加版块代码
@@ -388,7 +388,7 @@ function updateForumCodeUI(nodeId,parentId,name,remark,parent_displayType){
 		displayTypeValue = "集合";
 	}
 	
-	html += 		"<input id=\"name\" size=\"30\" value=\""+name_arr[name_arr_length-1]+"\"/>&nbsp;<span id=\"error_name_"+nodeId+"\" name=\"error\" class=\"span-text\"></span>";
+	html += 		"<input class=\"form-text\" id=\"name\" size=\"30\" value=\""+name_arr[name_arr_length-1]+"\"/>&nbsp;<span id=\"error_name_"+nodeId+"\" name=\"error\" class=\"span-text\"></span>";
 	html += 	"</td>";
 	html += "</tr>";
 	html += "<tr>";
@@ -396,7 +396,7 @@ function updateForumCodeUI(nodeId,parentId,name,remark,parent_displayType){
 	html += 		"模板显示类型：";
 	html += 	"</td>";
 	html += 	"<td class=\"t-content\" width=\"80%\">";
-	html += 		"<select id=\"displayType\">";
+	html += 		"<select class=\"form-select\" id=\"displayType\">";
 	
 	var forumCode_displayType_arr = parent_displayType.split(",");
 	for(var i = 0 ; i < forumCode_displayType_arr.length; i++){
@@ -415,7 +415,7 @@ function updateForumCodeUI(nodeId,parentId,name,remark,parent_displayType){
 	html += 		"备注：";
 	html += 	"</td>";
 	html += 	"<td class=\"t-content\" width=\"80%\">";
-	html += 		"<input id=\"remark\" size=\"50\" value=\""+remark+"\"/>";
+	html += 		"<input class=\"form-text\" id=\"remark\" size=\"50\" value=\""+remark+"\"/>";
 	html += 	"</td>";
 	html += "</tr>";
 	html += "<tr>";
@@ -426,7 +426,7 @@ function updateForumCodeUI(nodeId,parentId,name,remark,parent_displayType){
 	html += "</tbody>";
 	html += "</table>";
 	
-	systemLayerShow("修改版块代码",html,600,170);//显示层
+	systemLayerShow("修改版块代码",html,600,200);//显示层
 }
 //修改版块代码
 function updateForumCodeSubmit(nodeId,parentId,oldFileName) {

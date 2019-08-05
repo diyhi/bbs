@@ -30,7 +30,7 @@ function sureSubmit(objForm){
   <TR>
     <TD class="t-label t-label-h" width="12%"><SPAN class="span-text">*</SPAN>等级名称：</TD>
     <TD class="t-content" width="88%" colSpan="3">
-    	<input name="name" size="30" maxlength="45" value="${userGrade.name}"/>&nbsp;&nbsp;
+    	<input class="form-text" name="name" size="30" maxlength="45" value="${userGrade.name}"/>&nbsp;&nbsp;
     	<span class="span-text">${error['name']}</span>
     	
     	<form:errors path="name" class="span-text"/>
@@ -38,7 +38,7 @@ function sureSubmit(objForm){
   <TR>
     <TD class="t-label t-label-h" width="12%"><SPAN class="span-text">*</SPAN>需要积分：</TD>
     <TD class="t-content" width="88%" colSpan="3">
-    	<input name="needPoint" size="10" maxlength="10" value="${userGrade.needPoint}"/>
+    	<input class="form-text" name="needPoint" size="10" maxlength="10" value="${userGrade.needPoint}"/>
     	&nbsp;&nbsp;<span class="span-text">${error['needPoint']}</span>
     	</TD>
   </TR>

@@ -57,6 +57,13 @@ public interface RemindService extends DAO<Remind>{
 	 */
 	public QueryResult<Remind> findRemindByUserId(Long userId,Integer status,int firstIndex, int maxResult);
 	/**
+	 * 根据用户Id和提醒类型代码编号查询最新一条提醒
+	 * @param userId 用户Id
+	 * @param typeCode 提醒类型代码编号
+	 * @return
+	 */
+	public Remind findNewRemindByUserId(Long userId,Integer typeCode);
+	/**
 	 * 根据用户Id查询未读提醒数量
 	 * @param userId 用户Id
 	 * @return

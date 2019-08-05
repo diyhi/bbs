@@ -67,7 +67,7 @@ JDK 1.8及以上 + Tomcat 8.0及以上 + MySQL 5.5.3及以上
 
 （3）友情链接管理(友情链接列表)
 
-（4）会员管理(会员列表、会员等级、会员注册项、会员注册禁止用户名称、会员搜索、登录日志、更换头像、私信、系统通知、提醒、收藏夹)
+（4）会员管理(会员列表、会员等级、会员注册项、会员注册禁止用户名称、会员搜索、登录日志、更换头像、私信、系统通知、提醒、收藏夹、点赞、关注、粉丝)
 
 （5）员工管理(员工列表、角色列表、登录日志)
 
@@ -91,29 +91,29 @@ JDK 1.8及以上 + Tomcat 8.0及以上 + MySQL 5.5.3及以上
 
 <br><br>
 #### 前端界面(电脑版)
-![输入图片说明](https://raw.githubusercontent.com/diyhi/bbs/master/image/1.png "1.png")
+![输入图片说明](https://raw.githubusercontent.com/diyhi/bbs/master/image/1.jpg "1.jpg")
 <br><br>
 
-![输入图片说明](https://raw.githubusercontent.com/diyhi/bbs/master/image/2.png "2.png")
+![输入图片说明](https://raw.githubusercontent.com/diyhi/bbs/master/image/2.jpg "2.jpg")
 
 <br><br>
-![输入图片说明](https://raw.githubusercontent.com/diyhi/bbs/master/image/3.png "3.png")
+![输入图片说明](https://raw.githubusercontent.com/diyhi/bbs/master/image/3.jpg "3.jpg")
 
 <br><br>
 ![输入图片说明](https://raw.githubusercontent.com/diyhi/bbs/master/image/4.jpg "4.jpg")
 
 <br><br>
-![输入图片说明](https://raw.githubusercontent.com/diyhi/bbs/master/image/5.jpg "4.jpg")
+![输入图片说明](https://raw.githubusercontent.com/diyhi/bbs/master/image/5.jpg "5.jpg")
 
 <br><br>
 #### 前端界面(手机版)
-![输入图片说明](https://raw.githubusercontent.com/diyhi/bbs/master/image/m1.png "m1.png")
+![输入图片说明](https://raw.githubusercontent.com/diyhi/bbs/master/image/m1.jpg "m1.jpg")
 
 <br><br>
-![输入图片说明](https://raw.githubusercontent.com/diyhi/bbs/master/image/m2.png "m2.png")
+![输入图片说明](https://raw.githubusercontent.com/diyhi/bbs/master/image/m2.jpg "m2.jpg")
 
 <br><br>
-![输入图片说明](https://raw.githubusercontent.com/diyhi/bbs/master/image/m3.png "m3.png")
+![输入图片说明](https://raw.githubusercontent.com/diyhi/bbs/master/image/m3.jpg "m3.jpg")
 
 <br><br>
 #### 安装界面

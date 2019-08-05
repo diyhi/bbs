@@ -251,6 +251,39 @@
 		overflowToDisk="true"
 		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
 		memoryStoreEvictionPolicy="LFU" />		
+	<!-- 根据Id查询话题点赞 -->
+	<cache name="likeManage_cache_findTopicLikeById" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" />	
+	<!-- 根据话题Id查询被点赞数量 -->
+	<cache name="likeManage_cache_findLikeCountByTopicId" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" />		
+		
+	<!-- 根据Id查询关注 -->
+	<cache name="followManage_cache_findById" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" />	
+	<!-- 根据Id查询粉丝总数 -->
+	<cache name="followerManage_cache_followerCount" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" />	
+	<!-- 我关注的用户的更新标记 -->
+	<cache name="followManage_cache_userUpdateFlag" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="86400" 
+		memoryStoreEvictionPolicy="LFU" />		
+	<!-- 根据用户名称查询所有关注 -->
+	<cache name="followManage_cache_findAllFollow" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" />		
+		
+		
 		
 	<!-- 查询'话题取消隐藏' -->
 	<cache name="topicManage_cache_findTopicUnhideById" maxElementsInMemory="900000" 

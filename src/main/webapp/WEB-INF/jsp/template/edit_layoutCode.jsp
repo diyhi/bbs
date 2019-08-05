@@ -64,7 +64,7 @@ background:url(backstage/images/tab_3.gif) no-repeat;color:#000;display:block;fo
 <!-- 导航 -->
 <TABLE class="t-table" cellSpacing="1" cellPadding="2" width="100%" border="0">
 		<TR>
-	    <TD class="t-content" colSpan="5" height="25px">
+	    <TD class="t-content" colSpan="5" height="28px">
 	        <span style="font-weight:bold;float:left;">&nbsp;模板：</span>
 	        <span style="float:left;">&nbsp;<a href="${config:url(pageContext.request)}control/template/list${config:suffix()}">全部模板</a></span>
 			<span style="float:left">

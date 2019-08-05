@@ -235,7 +235,7 @@ tableTxt+="</TR>";
 tableTxt+="<TR>";
 tableTxt+=    "<TD class=\"t-label t-label-h\" width=\"16%\">图片名称：</TD>";
 tableTxt+=    "<TD class=\"t-content\" width=\"34%\"> ";
-tableTxt+=    	"<input type=\"text\" name=\"collection_image_name\" size=\"40\" value=\""+(forum_AdvertisingRelated_Image != null && forum_AdvertisingRelated_Image.image_name != null ? forum_AdvertisingRelated_Image.image_name :"")+"\"/>\&nbsp;\&nbsp;";
+tableTxt+=    	"<input type=\"text\" class=\"form-text\" name=\"collection_image_name\" size=\"40\" value=\""+(forum_AdvertisingRelated_Image != null && forum_AdvertisingRelated_Image.image_name != null ? forum_AdvertisingRelated_Image.image_name :"")+"\"/>\&nbsp;\&nbsp;";
 tableTxt+=	  "<span class=\"span-text\">"+(error_map != null && error_map.get("collection_image_name_"+(rowID-1)) !=null ? error_map.get("collection_image_name_"+(rowID-1)) :"")+"</span>";
 tableTxt+=	  "</TD>";
 tableTxt+=    "<TD class=\"t-label t-label-h\" width=\"16%\">图片：</TD>";
@@ -254,7 +254,7 @@ tableTxt+="</TR>";
 tableTxt+="<TR>";
 tableTxt+=    "<TD class=\"t-label t-label-h\" width=\"16%\">图片链接：</TD>";
 tableTxt+=    "<TD class=\"t-content\" width=\"84%\" colSpan=\"3\"> ";
-tableTxt+=    	"<input type=\"text\" name=\"collection_image_link\" size=\"80\" value=\""+(forum_AdvertisingRelated_Image != null && forum_AdvertisingRelated_Image.image_link != null ? forum_AdvertisingRelated_Image.image_link :"")+"\"/>\&nbsp;\&nbsp;";
+tableTxt+=    	"<input type=\"text\" class=\"form-text\" name=\"collection_image_link\" size=\"80\" value=\""+(forum_AdvertisingRelated_Image != null && forum_AdvertisingRelated_Image.image_link != null ? forum_AdvertisingRelated_Image.image_link :"")+"\"/>\&nbsp;\&nbsp;";
 tableTxt+=	  "<span class=\"span-text\">"+(error_map != null && error_map.get("collection_image_link_"+(rowID-1)) !=null ? error_map.get("collection_image_link_"+(rowID-1)) :"")+"</span>";
 tableTxt+=	  "</TD>";
 tableTxt+="</TR>";
@@ -470,7 +470,7 @@ function add_searchWord_row(word){
 	newNameTD.width="70%";
 	newNameTD.className ="t-content";
 	//添加列内容 
-	newNameTD.innerHTML = "<input name='collection_searchWord' type='text' size='22' value='"+word+"'/>"; 
+	newNameTD.innerHTML = "<input name='collection_searchWord' type='text' class='form-text' size='22' value='"+word+"'/>"; 
 	
 	 
 	//添加列:删除按钮 
@@ -527,7 +527,7 @@ function delete_searchWord_row(rowId){
 <!-- 导航 -->
 <TABLE class="t-table" cellSpacing="1" cellPadding="2" width="100%" border="0">
 		<TR>
-	    <TD class="t-content" colSpan="5" height="25px">
+	    <TD class="t-content" colSpan="5" height="28px">
 	        <span style="font-weight:bold;float:left;">&nbsp;模板：</span>
 	        <span style="float:left;">&nbsp;<a href="${config:url(pageContext.request)}control/template/list${config:suffix()}">全部模板</a></span>
 			<span style="float:left">
@@ -546,11 +546,11 @@ function delete_searchWord_row(rowId){
 	<DIV class="d-head">
 	<DIV class="d-location">
 	    选择版块类型：
-	    <SELECT>
-	    	<OPTION>${forum.forumType}</OPTION>
+	    <SELECT class="form-select" disabled="disabled">
+	    	<OPTION >${forum.forumType}</OPTION>
 	    </SELECT>
-	    <SELECT>
-	    	<OPTION>${forum.forumChildType}</OPTION>
+	    <SELECT class="form-select" disabled="disabled">
+	    	<OPTION >${forum.forumChildType}</OPTION>
 	    </SELECT> 
 	    <input type="hidden" id="forumChildType" name="forumChildType" value="${forum.forumChildType}"/>
 	</DIV>
@@ -562,7 +562,7 @@ function delete_searchWord_row(rowId){
 	 	<TR>
 	 		<TD class="t-label t-label-h" width="16%"><SPAN class="span-text">*</SPAN>版块标题：</TD>
 		    <TD class="t-content" width="84%" colSpan="5">
-		    	<input name="name" type="text" size="30" maxlength="30" value="${forum.name}"/>&nbsp;&nbsp;<web:errors path="name" cssClass="span-text"/>
+		    	<input name="name" type="text" class="form-text" size="30" maxlength="30" value="${forum.name}"/>&nbsp;&nbsp;<web:errors path="name" cssClass="span-text"/>
 			</TD>
 		</TR>
 		<TR>
@@ -604,16 +604,16 @@ function delete_searchWord_row(rowId){
 					<TD class="t-label t-label-h" width="16%">选择标签：</TD>
 					<TD class=t-content width="84%" colSpan=3>
 						<input type="hidden" id="page_topic_tag_tagId" name="page_topic_tagId" value=""/>
-	    				<input type="text" id="page_topic_tag_tagName" disabled="true" size="20" value=""/> 
-	    				<input type="button" id="page_topic_tag_select"  value="选择..." onClick="showTagPageDiv('page_topic_tag');">
-						<input type="button" id="page_topic_tag_cancel" onclick="cancelTag('page_topic_tag');" value="取消标签" >
+	    				<input type="text" class="form-text" id="page_topic_tag_tagName" disabled="true" size="20" value=""/> 
+	    				<input type="button" class="functionButton5" id="page_topic_tag_select"  value="选择..." onClick="showTagPageDiv('page_topic_tag');">
+						<input type="button" class="functionButton5" id="page_topic_tag_cancel" onclick="cancelTag('page_topic_tag');" value="取消标签" >
 						<label><input type="checkbox" id="page_topic_tag_transferPrameter" name="page_topic_tag_transferPrameter" onclick="transferPrameterTagSite('page_topic_tag');" value="true" >传递标签参数</label>
 					</TD>
 				</TR>
 				<TR>
 					<TD class="t-label t-label-h" width="16%">排序：</TD>
 					<TD class=t-content width="84%" colSpan=3>
-						<SELECT id=page_topic_sort name=page_topic_sort>
+						<SELECT class="form-select" id=page_topic_sort name=page_topic_sort>
 						<OPTION value="1" >按发表时间 新-&gt;旧</OPTION>
 						<OPTION value="2" >按发表时间 旧-&gt;新</OPTION>
 						</SELECT>
@@ -621,7 +621,7 @@ function delete_searchWord_row(rowId){
 				</TR>
 				<TR>
 					<TD class="t-label t-label-h" width="16%">每页显示记录数：</TD>
-					<TD class=t-content width="84%" colSpan=3><INPUT maxLength=9 size=9 id=page_topic_maxResult name=page_topic_maxResult value="">
+					<TD class=t-content width="84%" colSpan=3><INPUT class="form-text" maxLength=9 size=9 id=page_topic_maxResult name=page_topic_maxResult value="">
 					&nbsp;&nbsp;
 					<SPAN id= "error_page_topic_maxResult" class="span-text"></SPAN>&nbsp;&nbsp;
 					</TD>
@@ -629,7 +629,7 @@ function delete_searchWord_row(rowId){
 				<TR>
 					<TD class="t-label t-label-h" width="16%">页码显示总数：</TD>
 					<TD class=t-content width="84%" colSpan=3>
-					<INPUT maxLength=9 size=9 id=page_topic_pageCount name=page_topic_pageCount value="">
+					<INPUT class="form-text" maxLength=9 size=9 id=page_topic_pageCount name=page_topic_pageCount value="">
 					&nbsp;&nbsp;
 					<SPAN id="error_page_topic_pageCount" class="span-text"></SPAN>
 					</TD>
@@ -648,7 +648,7 @@ function delete_searchWord_row(rowId){
 		 	<TBODY>
 				<TR>
 					<TD class="t-label t-label-h" width="16%">显示记录数：</TD>
-					<TD class=t-content width="84%" colSpan=3><INPUT maxLength=9 size=9 id=collection_likeTopic_maxResult name=collection_likeTopic_maxResult value="">
+					<TD class=t-content width="84%" colSpan=3><INPUT class="form-text" maxLength=9 size=9 id=collection_likeTopic_maxResult name=collection_likeTopic_maxResult value="">
 					&nbsp;&nbsp;
 					<SPAN id= "error_collection_likeTopic_maxResult" class="span-text"></SPAN>&nbsp;&nbsp;
 					</TD>
@@ -667,7 +667,7 @@ function delete_searchWord_row(rowId){
 			<TR>
 				<TD class="t-label t-label-h" width="16%">排序：</TD>
 				<TD class=t-content width="84%" colSpan=3>
-					<SELECT id=page_comment_sort name=page_comment_sort>
+					<SELECT class="form-select" id=page_comment_sort name=page_comment_sort>
 					<OPTION value="1" >按发布时间 新-&gt;旧</OPTION>
 					<OPTION value="2" >按发布时间 旧-&gt;新</OPTION>
 					</SELECT>
@@ -675,7 +675,7 @@ function delete_searchWord_row(rowId){
 			</TR>
 			<TR>
 				<TD class="t-label t-label-h" width="16%">每页显示记录数：</TD>
-				<TD class=t-content width="84%" colSpan=3><INPUT maxLength=9 size=9 id=page_comment_maxResult name=page_comment_maxResult value="">
+				<TD class=t-content width="84%" colSpan=3><INPUT class="form-text" maxLength=9 size=9 id=page_comment_maxResult name=page_comment_maxResult value="">
 				&nbsp;&nbsp;
 				<SPAN id= "error_page_comment_maxResult" class="span-text"></SPAN>&nbsp;&nbsp;
 				</TD>
@@ -683,7 +683,7 @@ function delete_searchWord_row(rowId){
 			<TR>
 				<TD class="t-label t-label-h" width="16%">页码显示总数：</TD>
 				<TD class=t-content width="84%" colSpan=3>
-				<INPUT maxLength=9 size=9 id=page_comment_pageCount name=page_comment_pageCount value="">
+				<INPUT class="form-text" maxLength=9 size=9 id=page_comment_pageCount name=page_comment_pageCount value="">
 				&nbsp;&nbsp;
 				<SPAN id="error_page_comment_pageCount" class="span-text"></SPAN>
 				</TD>
@@ -702,7 +702,7 @@ function delete_searchWord_row(rowId){
 			<TR>
 				<TD class="t-label t-label-h" width="16%">图片：</TD>
 			    <TD class="t-content" width="84%" colSpan="5">	
-			    	<input type="button" value="添加一个图片" onClick="add_image_Div(null,null)" />
+			    	<input type="button" class="functionButton5" value="添加一个图片" onClick="add_image_Div(null,null)" />
 				</TD>
 			</TR>
 			</TBODY>
@@ -725,15 +725,15 @@ function delete_searchWord_row(rowId){
 				<TD class="t-label t-label-h" width="16%">选择在线帮助分类：</TD>
 				<TD class=t-content width="84%" colSpan=3>
 					<input type="hidden" id="monolayer_help_helpType_helpTypeId" name="monolayer_help_helpTypeId" value=""/>
-    				<input type="text" id="monolayer_help_helpType_helpTypeName" disabled="true" size="20" value=""/> 
-    				<input type="button" id="monolayer_help_helpType_select"  value="选择..." onClick="showHelpTypePageDiv('monolayer_help_helpType');">
-					<input type="button" id="monolayer_help_helpType_cancel" onclick="cancelHelpType('monolayer_help_helpType');" value="取消在线帮助分类" >
+    				<input type="text" class="form-text" id="monolayer_help_helpType_helpTypeName" disabled="true" size="20" value=""/> 
+    				<input type="button" class="functionButton5" id="monolayer_help_helpType_select"  value="选择..." onClick="showHelpTypePageDiv('monolayer_help_helpType');">
+					<input type="button" class="functionButton5" id="monolayer_help_helpType_cancel" onclick="cancelHelpType('monolayer_help_helpType');" value="取消在线帮助分类" >
 					<label><input type="checkbox" id="monolayer_help_helpType_transferPrameter" name="monolayer_help_helpType_transferPrameter" onclick="transferPrameterHelpTypeSite('monolayer_help_helpType');" value="true" >传递在线帮助分类参数</label>
 				</TD>
 			</TR>
 			<TR>
-				<TD class="t-label t-label-h" width="16%">商品展示数量：</TD>
-				<TD class=t-content width="84%" colSpan=3><INPUT maxLength=9 size=9 id=monolayer_help_quantity name=monolayer_help_quantity value="">
+				<TD class="t-label t-label-h" width="16%">展示数量：</TD>
+				<TD class=t-content width="84%" colSpan=3><INPUT class="form-text" maxLength=9 size=9 id=monolayer_help_quantity name=monolayer_help_quantity value="">
 				&nbsp;&nbsp;
 				<SPAN id= "error_monolayer_help_quantity" class="span-text"></SPAN>
 				</TD>
@@ -741,12 +741,12 @@ function delete_searchWord_row(rowId){
 			<TR>
 				<TD class="t-label t-label-h" width="16%">更多：</TD>
 				<TD class=t-content width="84%" colSpan=3>
-					<select id="monolayer_help_more" name="monolayer_help_more"></select>
+					<select class="form-select" id="monolayer_help_more" name="monolayer_help_more"></select>
 					
-					&nbsp;&nbsp;每页显示记录数：<INPUT maxLength=9 size=9 id=monolayer_help_maxResult name=monolayer_help_maxResult value="">
+					&nbsp;&nbsp;每页显示记录数：<INPUT class="form-text" maxLength=9 size=9 id=monolayer_help_maxResult name=monolayer_help_maxResult value="">
 					&nbsp;&nbsp;
 					<SPAN id= "error_monolayer_help_maxResult" class="span-text"></SPAN>&nbsp;&nbsp;
-					页码显示总数：<INPUT maxLength=9 size=9 id=monolayer_help_pageCount name=monolayer_help_pageCount value="">
+					页码显示总数：<INPUT class="form-text" maxLength=9 size=9 id=monolayer_help_pageCount name=monolayer_help_pageCount value="">
 					&nbsp;&nbsp;
 					<SPAN id="error_monolayer_help_pageCount" class="span-text"></SPAN>
 				</TD>
@@ -754,7 +754,7 @@ function delete_searchWord_row(rowId){
 			<TR>
 				<TD class="t-label t-label-h" width="16%">排序：</TD>
 				<TD class=t-content width="84%" colSpan=3>
-					<SELECT id=monolayer_help_sort name=monolayer_help_sort>
+					<SELECT class="form-select" id=monolayer_help_sort name=monolayer_help_sort>
 					<OPTION value="1" >按发布时间 新-&gt;旧</OPTION>
 					<OPTION value="2" >按发布时间 旧-&gt;新</OPTION>
 					</SELECT>
@@ -774,16 +774,16 @@ function delete_searchWord_row(rowId){
 					<TD class="t-label t-label-h" width="16%">选择在线帮助分类：</TD>
 					<TD class=t-content width="84%" colSpan=3>
 						<input type="hidden" id="page_help_helpType_helpTypeId" name="page_help_helpTypeId" value=""/>
-	    				<input type="text" id="page_help_helpType_helpTypeName" disabled="true" size="20" value=""/> 
-	    				<input type="button" id="page_help_helpType_select"  value="选择..." onClick="showHelpTypePageDiv('page_help_helpType');">
-						<input type="button" id="page_help_helpType_cancel" onclick="cancelHelpType('page_help_helpType');" value="取消在线帮助分类" >
+	    				<input type="text" class="form-text" id="page_help_helpType_helpTypeName" disabled="true" size="20" value=""/> 
+	    				<input type="button" class="functionButton5" id="page_help_helpType_select"  value="选择..." onClick="showHelpTypePageDiv('page_help_helpType');">
+						<input type="button" class="functionButton5" id="page_help_helpType_cancel" onclick="cancelHelpType('page_help_helpType');" value="取消在线帮助分类" >
 						<label><input type="checkbox" id="page_help_helpType_transferPrameter" name="page_help_helpType_transferPrameter" onclick="transferPrameterHelpTypeSite('page_help_helpType');" value="true" >传递在线帮助分类参数</label>
 					</TD>
 				</TR>
 				<TR>
 					<TD class="t-label t-label-h" width="16%">排序：</TD>
 					<TD class=t-content width="84%" colSpan=3>
-						<SELECT id=page_help_sort name=page_help_sort>
+						<SELECT class="form-select" id=page_help_sort name=page_help_sort>
 						<OPTION value="1" >按发布时间 新-&gt;旧</OPTION>
 						<OPTION value="2" >按发布时间 旧-&gt;新</OPTION>
 						</SELECT>
@@ -791,7 +791,7 @@ function delete_searchWord_row(rowId){
 				</TR>
 				<TR>
 					<TD class="t-label t-label-h" width="16%">每页显示记录数：</TD>
-					<TD class=t-content width="84%" colSpan=3><INPUT maxLength=9 size=9 id=page_help_maxResult name=page_help_maxResult value="">
+					<TD class=t-content width="84%" colSpan=3><INPUT class="form-text" maxLength=9 size=9 id=page_help_maxResult name=page_help_maxResult value="">
 					&nbsp;&nbsp;
 					<SPAN id= "error_page_help_maxResult" class="span-text"></SPAN>&nbsp;&nbsp;
 					</TD>
@@ -799,7 +799,7 @@ function delete_searchWord_row(rowId){
 				<TR>
 					<TD class="t-label t-label-h" width="16%">页码显示总数：</TD>
 					<TD class=t-content width="84%" colSpan=3>
-					<INPUT maxLength=9 size=9 id=page_help_pageCount name=page_help_pageCount value="">
+					<INPUT class="form-text" maxLength=9 size=9 id=page_help_pageCount name=page_help_pageCount value="">
 					&nbsp;&nbsp;
 					<SPAN id="error_page_help_pageCount" class="span-text"></SPAN>
 					</TD>
@@ -818,7 +818,7 @@ function delete_searchWord_row(rowId){
 			<TR>
 				<TD class="t-label t-label-h" width="16%">选择推荐在线帮助：</TD>
 				<TD class="t-content" width="84%" colSpan="3">
-			    	<INPUT type="button" value="添加在线帮助" onclick="showHelpPageDiv('collection_recommendHelp')">
+			    	<INPUT type="button" class="functionButton5" value="添加在线帮助" onclick="showHelpPageDiv('collection_recommendHelp')">
 			    	<TABLE id="collection_recommendHelp_table" cellSpacing="2" cellPadding="0" width="99%"  border="0" align="left">
 					</TABLE>
 		    		<input type='hidden' id='collection_recommendHelp_LastIndex' value="1" /> 
@@ -857,7 +857,7 @@ function delete_searchWord_row(rowId){
 			<TR>
 				<TD class="t-label t-label-h" width="16%">搜索词：</TD>
 				<TD class="t-content" width="84%" colSpan="3">
-			    	<INPUT type="button" value="添加行" onclick="add_searchWord_row('');">
+			    	<INPUT type="button" class="functionButton5" value="添加行" onclick="add_searchWord_row('');">
 			    	<input type="hidden" id="searchWordLastIndex" value="1"/>
 			    	<table id="searchWordParameter" width="300px" border="0" cellpadding="2" cellspacing="1" align="left">
 			    	

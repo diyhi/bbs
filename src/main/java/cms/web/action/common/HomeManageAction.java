@@ -38,6 +38,9 @@ import cms.bean.PageForm;
 import cms.bean.PageView;
 import cms.bean.QueryResult;
 import cms.bean.favorite.Favorites;
+import cms.bean.follow.Follow;
+import cms.bean.follow.Follower;
+import cms.bean.like.Like;
 import cms.bean.message.PrivateMessage;
 import cms.bean.message.Remind;
 import cms.bean.message.SubscriptionSystemNotify;
@@ -60,6 +63,8 @@ import cms.bean.user.UserGrade;
 import cms.bean.user.UserInputValue;
 import cms.bean.user.UserLoginLog;
 import cms.service.favorite.FavoriteService;
+import cms.service.follow.FollowService;
+import cms.service.like.LikeService;
 import cms.service.message.PrivateMessageService;
 import cms.service.message.RemindService;
 import cms.service.message.SystemNotifyService;
@@ -87,6 +92,9 @@ import cms.web.action.CSRFTokenManage;
 import cms.web.action.FileManage;
 import cms.web.action.TextFilterManage;
 import cms.web.action.favorite.FavoriteManage;
+import cms.web.action.follow.FollowManage;
+import cms.web.action.follow.FollowerManage;
+import cms.web.action.like.LikeManage;
 import cms.web.action.message.PrivateMessageManage;
 import cms.web.action.message.RemindManage;
 import cms.web.action.message.SubscriptionSystemNotifyManage;
@@ -150,6 +158,13 @@ public class HomeManageAction {
 	@Resource FavoriteManage favoriteManage;
 	
 	@Resource CommentManage commentManage;
+	
+	@Resource LikeService likeService;
+	@Resource LikeManage likeManage;
+	
+	@Resource FollowService followService;
+	@Resource FollowManage followManage;
+	@Resource FollowerManage followerManage;
 	
 	//?  匹配任何单字符
 	//*  匹配0或者任意数量的字符
@@ -3027,6 +3042,9 @@ public class HomeManageAction {
 		//获取登录用户
 	  	AccessUser accessUser = AccessUserThreadLocal.get();
 	  	
+	  	//拉取关注的用户消息
+	  	followManage.pullFollow(accessUser.getUserId(),accessUser.getUserName());
+	  	
 	  	UnreadMessage unreadMessage = new UnreadMessage();
 	  	
 	  	//查询未读私信数量
@@ -3070,6 +3088,9 @@ public class HomeManageAction {
 	  	Long unreadRemindCount = remindManage.query_cache_findUnreadRemindByUserId(accessUser.getUserId());
 	  	unreadMessage.setRemindCount(unreadRemindCount);
 	  	
+	  	
+
+		
 	  	
 	  	return JsonUtils.toJSONString(unreadMessage);
 	}
@@ -3401,7 +3422,7 @@ public class HomeManageAction {
 	 * @param model
 	 * @param jumpUrl 跳转地址   页面post方式提交有效
 	 * @param token 令牌标记
-	 * @param remindId 提醒Id
+	 * @param remindId 收藏Id
 	 */
 	@RequestMapping(value="/user/control/deleteFavorite", method=RequestMethod.POST)
 	public String deleteFavorite(ModelMap model,String jumpUrl,String token,String favoriteId,
@@ -3588,7 +3609,6 @@ public class HomeManageAction {
 	   
 		
 		
-		
 		//调用分页算法代码
 		PageView<UserDynamic> pageView = new PageView<UserDynamic>(settingService.findSystemSetting_cache().getForestagePageNumber(),pageForm.getPage(),10,request.getRequestURI(),request.getQueryString());
 		
@@ -3748,5 +3768,459 @@ public class HomeManageAction {
 			model.addAttribute("pageView", pageView);
 			return "templates/"+dirName+"/"+accessPath+"/userDynamicList";	
 		}
+	}
+	
+	/**
+	 * 话题点赞列表
+	 * @param model
+	 * @param pageForm
+	 * @param topicId 话题Id
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/user/control/topicLikeList",method=RequestMethod.GET) 
+	public String topicLikeList(ModelMap model,PageForm pageForm,Long topicId,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+		
+		String dirName = templateService.findTemplateDir_cache();
+		
+		
+		String accessPath = accessSourceDeviceManage.accessDevices(request);
+	   
+		//调用分页算法代码
+		PageView<Like> pageView = new PageView<Like>(settingService.findSystemSetting_cache().getForestagePageNumber(),pageForm.getPage(),10,request.getRequestURI(),request.getQueryString());
+		
+		//获取登录用户
+	  	AccessUser accessUser = AccessUserThreadLocal.get();
+	  	if(topicId != null && topicId > 0L){
+	  		Topic topicInfo = topicManage.queryTopicCache(topicId);//查询缓存
+	  		if(topicInfo != null && topicInfo.getUserName().equals(accessUser.getUserName())){
+	  			//当前页
+	  			int firstIndex = (pageForm.getPage()-1)*pageView.getMaxresult();
+	  			
+	  			
+	  			QueryResult<Like> qr = likeService.findLikePageByTopicId(firstIndex,pageView.getMaxresult(),topicId);
+	  			if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
+	  				for(Like like : qr.getResultlist()){
+	  					Topic topic = topicManage.queryTopicCache(like.getTopicId());//查询缓存
+	  					if(topic != null){
+	  						like.setTopicTitle(topic.getTitle());
+	  					}
+	  				}
+	  			}
+	  			//将查询结果集传给分页List
+	  			pageView.setQueryResult(qr);
+	  		}
+	  	}
+	  	
+	  	
+		
+		
+		if(isAjax){
+			WebUtil.writeToWeb(JsonUtils.toJSONString(pageView), "json", response);
+			return null;
+		}else{
+			model.addAttribute("pageView", pageView);
+			return "templates/"+dirName+"/"+accessPath+"/topicLikeList";	
+		}
+	}
+	
+	
+	/**
+	 * 点赞列表
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/user/control/likeList",method=RequestMethod.GET) 
+	public String likeList(ModelMap model,PageForm pageForm,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+		
+		String dirName = templateService.findTemplateDir_cache();
+		
+		
+		String accessPath = accessSourceDeviceManage.accessDevices(request);
+	   
+		
+		//获取登录用户
+	  	AccessUser accessUser = AccessUserThreadLocal.get();
+	  	
+	  	
+		//调用分页算法代码
+		PageView<Like> pageView = new PageView<Like>(settingService.findSystemSetting_cache().getForestagePageNumber(),pageForm.getPage(),10,request.getRequestURI(),request.getQueryString());
+		//当前页
+		int firstIndex = (pageForm.getPage()-1)*pageView.getMaxresult();
+		
+		QueryResult<Like> qr = likeService.findLikeByUserId(accessUser.getUserId(),accessUser.getUserName(),firstIndex,pageView.getMaxresult());
+		if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
+			for(Like like : qr.getResultlist()){
+				Topic topic = topicManage.queryTopicCache(like.getTopicId());//查询缓存
+				if(topic != null){
+					like.setTopicTitle(topic.getTitle());
+				}
+			}
+		}
+		//将查询结果集传给分页List
+		pageView.setQueryResult(qr);
+		
+		if(isAjax){
+			WebUtil.writeToWeb(JsonUtils.toJSONString(pageView), "json", response);
+			return null;
+		}else{
+			model.addAttribute("pageView", pageView);
+			return "templates/"+dirName+"/"+accessPath+"/likeList";	
+		}
+	}
+	
+	
+	/**
+	 * 删除点赞
+	 * @param model
+	 * @param jumpUrl 跳转地址   页面post方式提交有效
+	 * @param token 令牌标记
+	 * @param likeId 点赞Id
+	 */
+	@RequestMapping(value="/user/control/deleteLike", method=RequestMethod.POST)
+	public String deleteLike(ModelMap model,String jumpUrl,String token,String likeId,
+			RedirectAttributes redirectAttrs,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		
+		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+		Map<String,String> error = new HashMap<String,String>();//错误
+		
+		
+		//判断令牌
+		if(token != null && !"".equals(token.trim())){	
+			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌
+			if(token_sessionid != null && !"".equals(token_sessionid.trim())){
+				if(!token_sessionid.equals(token)){
+					error.put("token", ErrorView._13.name());
+				}
+			}else{
+				error.put("token", ErrorView._12.name());
+			}
+		}else{
+			error.put("token", ErrorView._11.name());
+		}
+		
+		//获取登录用户
+	  	AccessUser accessUser = AccessUserThreadLocal.get();
+	  	Like like = null;
+	  	//话题点赞Id
+	  	String topicLikeId = null;
+  		if(likeId == null || "".equals(likeId.trim())){
+  			error.put("like", ErrorView._1730.name());//点赞Id不存在
+  		}else{
+  			like  = likeService.findById(likeId.trim());
+  			if(like != null){
+  				if(like.getUserName().equals(accessUser.getUserName())){
+  					topicLikeId = likeManage.createTopicLikeId(like.getTopicId(), accessUser.getUserId());
+  				}else{
+  					error.put("like", ErrorView._1760.name());//本点赞不属于当前用户
+  				}
+  			}else{
+  				error.put("like", ErrorView._1750.name());//点赞不存在
+  			}
+  		}
+  		
+		if(error.size() == 0){
+			int i = likeService.deleteLike(likeId.trim(),topicLikeId);
+			if(i == 0){
+				error.put("like", ErrorView._1740.name());//删除点赞失败
+			}
+			//删除点赞缓存
+			likeManage.delete_cache_findTopicLikeById(topicLikeId);
+			likeManage.delete_cache_findLikeCountByTopicId(like.getTopicId());
+		}
+		
+		Map<String,String> returnError = new HashMap<String,String>();//错误
+		if(error.size() >0){
+			//将枚举数据转为错误提示字符
+    		for (Map.Entry<String,String> entry : error.entrySet()) {
+    			if(ErrorView.get(entry.getValue()) != null){
+    				returnError.put(entry.getKey(),  ErrorView.get(entry.getValue()));
+    			}else{
+    				returnError.put(entry.getKey(),  entry.getValue());
+    			}
+    			
+			}
+		}
+		
+		if(isAjax == true){
+    		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
+    		
+    		if(error != null && error.size() >0){
+    			returnValue.put("success", "false");
+    			returnValue.put("error", returnError);
+    		}else{
+    			returnValue.put("success", "true");
+    			
+    		}
+
+    		WebUtil.writeToWeb(JsonUtils.toJSONString(returnValue), "json", response);
+			return null;
+		}else{
+			String dirName = templateService.findTemplateDir_cache();
+			String accessPath = accessSourceDeviceManage.accessDevices(request);
+			if(error != null && error.size() >0){//如果有错误
+				
+				for (Map.Entry<String,String> entry : returnError.entrySet()) {		 
+					model.addAttribute("message",entry.getValue());//提示
+		  			return "templates/"+dirName+"/"+accessPath+"/message";
+				}
+					
+			}
+			
+			
+			if(jumpUrl != null && !"".equals(jumpUrl.trim())){
+				String url = Base64.decodeBase64URL(jumpUrl.trim());
+				return "redirect:"+url;
+			}else{//默认跳转
+				model.addAttribute("message", "删除点赞成功");
+				String referer = request.getHeader("referer");
+				if(RefererCompare.compare(request, "login")){//如果是登录页面则跳转到首页
+					referer = Configuration.getUrl(request);
+				}
+				model.addAttribute("urlAddress", referer);
+				
+				return "templates/"+dirName+"/"+accessPath+"/jump";	
+			}
+		}
+		
+	}
+	/**
+	 * 关注列表
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/user/control/followList",method=RequestMethod.GET) 
+	public String followList(ModelMap model,PageForm pageForm,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		
+		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+		
+		String dirName = templateService.findTemplateDir_cache();
+		
+		
+		String accessPath = accessSourceDeviceManage.accessDevices(request);
+	   
+		
+		//获取登录用户
+	  	AccessUser accessUser = AccessUserThreadLocal.get();
+	  	
+	  	
+		//调用分页算法代码
+		PageView<Follow> pageView = new PageView<Follow>(settingService.findSystemSetting_cache().getForestagePageNumber(),pageForm.getPage(),10,request.getRequestURI(),request.getQueryString());
+		//当前页
+		int firstIndex = (pageForm.getPage()-1)*pageView.getMaxresult();
+		
+		QueryResult<Follow> qr = followService.findFollowByUserName(accessUser.getUserId(),accessUser.getUserName(),firstIndex,pageView.getMaxresult());
+		if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
+			for(Follow follow : qr.getResultlist()){
+				User user = userManage.query_cache_findUserByUserName(follow.getFriendUserName());//查询缓存
+				if(user != null){
+					follow.setFriendNickname(user.getNickname());
+					if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
+						follow.setFriendAvatarPath(user.getAvatarPath());
+						follow.setFriendAvatarName(user.getAvatarName());
+					}		
+				}
+			}
+		}
+		//将查询结果集传给分页List
+		pageView.setQueryResult(qr);
+		
+		if(isAjax){
+			WebUtil.writeToWeb(JsonUtils.toJSONString(pageView), "json", response);
+			return null;
+		}else{
+			model.addAttribute("pageView", pageView);
+			return "templates/"+dirName+"/"+accessPath+"/followList";	
+		}
+	}
+	
+	
+	/**
+	 * 粉丝列表
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/user/control/followerList",method=RequestMethod.GET) 
+	public String followerList(ModelMap model,PageForm pageForm,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		
+		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+		
+		String dirName = templateService.findTemplateDir_cache();
+		
+		
+		String accessPath = accessSourceDeviceManage.accessDevices(request);
+	   
+		
+		//获取登录用户
+	  	AccessUser accessUser = AccessUserThreadLocal.get();
+	  	
+	  	
+		//调用分页算法代码
+		PageView<Follower> pageView = new PageView<Follower>(settingService.findSystemSetting_cache().getForestagePageNumber(),pageForm.getPage(),10,request.getRequestURI(),request.getQueryString());
+		//当前页
+		int firstIndex = (pageForm.getPage()-1)*pageView.getMaxresult();
+		
+		QueryResult<Follower> qr = followService.findFollowerByUserName(accessUser.getUserId(),accessUser.getUserName(),firstIndex,pageView.getMaxresult());
+		if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
+			for(Follower follower : qr.getResultlist()){
+				User user = userManage.query_cache_findUserByUserName(follower.getFriendUserName());//查询缓存
+				if(user != null){
+					follower.setFriendNickname(user.getNickname());
+					if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
+						follower.setFriendAvatarPath(user.getAvatarPath());
+						follower.setFriendAvatarName(user.getAvatarName());
+					}		
+				}
+			}
+		}
+		//将查询结果集传给分页List
+		pageView.setQueryResult(qr);
+		
+		if(isAjax){
+			WebUtil.writeToWeb(JsonUtils.toJSONString(pageView), "json", response);
+			return null;
+		}else{
+			model.addAttribute("pageView", pageView);
+			return "templates/"+dirName+"/"+accessPath+"/followerList";	
+		}
+	}
+	
+	/**
+	 * 删除关注
+	 * @param model
+	 * @param jumpUrl 跳转地址   页面post方式提交有效
+	 * @param token 令牌标记
+	 * @param followId 关注Id
+	 */
+	@RequestMapping(value="/user/control/deleteFollow", method=RequestMethod.POST)
+	public String deleteFollow(ModelMap model,String jumpUrl,String token,String followId,
+			RedirectAttributes redirectAttrs,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		
+		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+		Map<String,String> error = new HashMap<String,String>();//错误
+		
+		
+		//判断令牌
+		if(token != null && !"".equals(token.trim())){	
+			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌
+			if(token_sessionid != null && !"".equals(token_sessionid.trim())){
+				if(!token_sessionid.equals(token)){
+					error.put("token", ErrorView._13.name());
+				}
+			}else{
+				error.put("token", ErrorView._12.name());
+			}
+		}else{
+			error.put("token", ErrorView._11.name());
+		}
+		
+		//获取登录用户
+	  	AccessUser accessUser = AccessUserThreadLocal.get();
+	  	Follow follow = null;
+	  	
+	  	
+	  	
+  		if(followId == null || "".equals(followId.trim())){
+  			error.put("followId", ErrorView._1830.name());//关注Id不存在
+  		}else{
+  			follow  = followService.findById(followId.trim());
+  			if(follow != null){
+  				if(!follow.getUserName().equals(accessUser.getUserName())){
+  					error.put("follow", ErrorView._1860.name());//本关注不属于当前用户
+  				}
+  			}else{
+  				error.put("follow", ErrorView._1850.name());//关注不存在
+  			}
+  		}
+  		
+		if(error.size() == 0){
+			String[] idGroup = followId.trim().split("-");
+			//粉丝Id
+		  	String followerId = idGroup[1]+"-"+idGroup[0];
+			
+			int i = followService.deleteFollow(followId.trim(),followerId);
+			if(i == 0){
+				error.put("follow", ErrorView._1840.name());//删除关注失败
+			}
+			//删除关注缓存
+			followManage.delete_cache_findById(followId.trim());
+			followerManage.delete_cache_followerCount(follow.getFriendUserName());
+			
+			followManage.delete_cache_findAllFollow(accessUser.getUserName());
+		}
+		
+		Map<String,String> returnError = new HashMap<String,String>();//错误
+		if(error.size() >0){
+			//将枚举数据转为错误提示字符
+    		for (Map.Entry<String,String> entry : error.entrySet()) {
+    			if(ErrorView.get(entry.getValue()) != null){
+    				returnError.put(entry.getKey(),  ErrorView.get(entry.getValue()));
+    			}else{
+    				returnError.put(entry.getKey(),  entry.getValue());
+    			}
+    			
+			}
+		}
+		
+		if(isAjax == true){
+    		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
+    		
+    		if(error != null && error.size() >0){
+    			returnValue.put("success", "false");
+    			returnValue.put("error", returnError);
+    		}else{
+    			returnValue.put("success", "true");
+    			
+    		}
+
+    		WebUtil.writeToWeb(JsonUtils.toJSONString(returnValue), "json", response);
+			return null;
+		}else{
+			String dirName = templateService.findTemplateDir_cache();
+			String accessPath = accessSourceDeviceManage.accessDevices(request);
+			if(error != null && error.size() >0){//如果有错误
+				
+				for (Map.Entry<String,String> entry : returnError.entrySet()) {		 
+					model.addAttribute("message",entry.getValue());//提示
+		  			return "templates/"+dirName+"/"+accessPath+"/message";
+				}
+					
+			}
+			
+			
+			if(jumpUrl != null && !"".equals(jumpUrl.trim())){
+				String url = Base64.decodeBase64URL(jumpUrl.trim());
+				return "redirect:"+url;
+			}else{//默认跳转
+				model.addAttribute("message", "删除关注成功");
+				String referer = request.getHeader("referer");
+				if(RefererCompare.compare(request, "login")){//如果是登录页面则跳转到首页
+					referer = Configuration.getUrl(request);
+				}
+				model.addAttribute("urlAddress", referer);
+				
+				return "templates/"+dirName+"/"+accessPath+"/jump";	
+			}
+		}
+		
 	}
 }

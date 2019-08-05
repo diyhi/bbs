@@ -42,7 +42,7 @@
 <!-- 导航 -->
 <TABLE class="t-table" cellSpacing="1" cellPadding="2" width="100%" border="0">
 	<TR>
-	    <TD class="t-content" height="25px">
+	    <TD class="t-content" height="28px">
 	        <span style="font-weight:bold;float:left;">&nbsp;模板：</span>
 	        <span style="float:left;">&nbsp;<a href="${config:url(pageContext.request)}control/template/list${config:suffix()}">全部模板</a></span>
 			<span style="float:left">
@@ -71,7 +71,7 @@
   <TR>
     <TD class="t-label t-label-h" width="12%"><SPAN class="span-text">*</SPAN>布局名称：</TD>
     <TD class="t-content" width="88%" colSpan="3">
-    	<input name="name" type="text" maxlength="80" size="50" value="${layout.name}">
+    	<input name="name" type="text" class="form-text" maxlength="80" size="50" value="${layout.name}">
     	<span class="span-text">${error['name']}</span>
     </TD>
     </TR>
@@ -109,7 +109,7 @@
         <TR>
         	<TD class="t-label t-label-h" width="12%"><SPAN class="span-text">*</SPAN>URL名称：</TD>
         	<TD class="t-content" width="88%" colSpan="3">
-        		<INPUT name="referenceCode" maxlength="40" size="40" value="${layout.referenceCode}" onBlur="checkUrlName(this.value)"/>
+        		<INPUT class="form-text" name="referenceCode" maxlength="40" size="40" value="${layout.referenceCode}" onBlur="checkUrlName(this.value)"/>
 				&nbsp;<span id="error_referenceCode" class="span-text">${error['referenceCode']}</span>
         	</TD>
  		</TR>

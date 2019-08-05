@@ -1,6 +1,7 @@
 package cms.service.topic.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.annotation.Resource;
 import javax.persistence.Query;
@@ -136,6 +137,28 @@ public class CommentServiceBean extends DaoSupport<Comment> implements CommentSe
 		return topicContentList;
 	}
 	
+	/**
+	 * 分页查询评论
+	 * @param userName 用户名称
+	 * @param postTime 评论发表时间
+	 * @param firstIndex
+	 * @param maxResult
+	 * @return
+	 */
+	@Transactional(readOnly=true,propagation=Propagation.NOT_SUPPORTED)
+	public List<Comment> findCommentByPage(String userName,Date postTime,int firstIndex, int maxResult){
+		String sql = "select o from Comment o where o.userName=?1 and o.postTime>?2";
+		Query query = em.createQuery(sql);	
+		query.setParameter(1, userName);
+		query.setParameter(2, postTime);
+		//索引开始,即从哪条记录开始
+		query.setFirstResult(firstIndex);
+		//获取多少条数据
+		query.setMaxResults(maxResult);
+		
+		List<Comment> commentList = query.getResultList();
+		return commentList;
+	}
 	
 	/**
 	 * 查询用户是否评论话题
@@ -308,6 +331,30 @@ public class CommentServiceBean extends DaoSupport<Comment> implements CommentSe
 		}
 		return null;
 	}
+	
+	/**
+	 * 分页查询回复
+	 * @param userName 用户名称
+	 * @param postTime 回复发表时间
+	 * @param firstIndex
+	 * @param maxResult
+	 * @return
+	 */
+	@Transactional(readOnly=true,propagation=Propagation.NOT_SUPPORTED)
+	public List<Reply> findReplyByPage(String userName,Date postTime,int firstIndex, int maxResult){
+		String sql = "select o from Reply o where o.userName=?1 and o.postTime>?2";
+		Query query = em.createQuery(sql);	
+		query.setParameter(1, userName);
+		query.setParameter(2, postTime);
+		//索引开始,即从哪条记录开始
+		query.setFirstResult(firstIndex);
+		//获取多少条数据
+		query.setMaxResults(maxResult);
+		
+		List<Reply> replyList = query.getResultList();
+		return replyList;
+	}
+	
 	/**
 	 * 修改回复
 	 * @param replyId 回复Id

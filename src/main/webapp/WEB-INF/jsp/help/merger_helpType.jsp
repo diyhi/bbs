@@ -45,7 +45,7 @@ function addType(id,name,tableName){
 <script language="JavaScript" src="backstage/layer/layer.js" ></script>
 <form:form modelAttribute="helpType" method="post" >
 <DIV class="d-box">
-<div class="d-button" style="height:28px;margin-left: auto; margin-right: auto;line-height: 28px;overflow: hidden ">
+<div class="d-button" style="height:30px;margin-left: auto; margin-right: auto;line-height: 30px;overflow: hidden ">
 	<span style="font-weight:bold;float:left;">&nbsp;分类导航:</span>
 	<span style="float:left;">&nbsp;<a href="${config:url(pageContext.request)}control/helpType/list${config:suffix()}?parentId=0">全部分类</a></span>
 	<span style="float:left">
@@ -65,8 +65,8 @@ function addType(id,name,tableName){
     <TD class="t-label t-label-h" width="18%">选择分类合并到主分类：</TD>
     <TD class="t-content" width="82%" colSpan="3">
     	<input type="hidden" id="mergerTypeId" name="mergerTypeId" value="">
-    	<input type="text" id="typeName" disabled="true" size="20"/> 
-    	&nbsp;<INPUT type="button" value="选择" onClick="javaScript:showHelpTypePageDiv();"> 
+    	<input type="text" class="form-text" id="typeName" disabled="true" size="20"/> 
+    	&nbsp;<INPUT type="button" class="functionButton5" value="选择" onClick="javaScript:showHelpTypePageDiv();"> 
     	&nbsp;<SPAN class="span-text">选择其他分类合并到主分类不能选择主分类的父类或子类进行合并</SPAN>
     </TD>
   </TR>

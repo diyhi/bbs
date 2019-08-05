@@ -98,6 +98,8 @@ public class FavoriteFormAction {
 	  		error.put("topicFavorite", ErrorView._1510.name());//话题收藏Id不能为空
 	  	}
 	  	
+	  	
+	  	
 	  	if(topic != null){
 	  		//话题收藏Id
 		  	String topicFavoriteId = favoriteManage.createTopicFavoriteId(topicId, accessUser.getUserId());
@@ -108,7 +110,9 @@ public class FavoriteFormAction {
 		  		error.put("topicFavorite", ErrorView._1520.name());//当前话题已经收藏
 		  	}
 		}
-	  
+	  	
+	  	
+
 		if(error.size() == 0){
 			Date time = new Date();
 			Favorites favorites = new Favorites();

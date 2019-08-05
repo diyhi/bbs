@@ -13,7 +13,7 @@
 
 <form:form modelAttribute="helpType" method="post" >
 <DIV class="d-box">
-<div class="d-button" style="height:28px;margin-left: auto; margin-right: auto;line-height: 28px;overflow: hidden ">
+<div class="d-button" style="height:30px;margin-left: auto; margin-right: auto;line-height: 30px;overflow: hidden ">
 	<span style="font-weight:bold;float:left;">&nbsp;分类导航:</span>
 	<span style="float:left;">&nbsp;<a href="${config:url(pageContext.request)}control/helpType/list${config:suffix()}?parentId=0">全部分类</a></span>
 	<span style="float:left">
@@ -33,14 +33,14 @@
   </TR>
   <TR>
     <TD class="t-label t-label-h" width="12%"><SPAN class="span-text">*</SPAN>分类名称：</TD>
-    <TD class=t-content width="88%" colSpan=3><form:input path="name" maxlength="255" size="50" />
-	    &nbsp;<web:errors path="name" cssClass="span-text"/>
+    <TD class=t-content width="88%" colSpan=3><form:input class="form-text" path="name" maxlength="255" size="50" />
+	    &nbsp;<shop:errors path="name" cssClass="span-text"/>
     </TD></TR>
   <TR>
     <TD class="t-label t-label-h" width="12%">排序：</TD>
     <TD class="t-content" width="88%" colSpan="3">
-    	<form:input path="sort" maxlength="20" size="10" />
-    	&nbsp;<web:errors path="sort" cssClass="span-text"/>
+    	<form:input class="form-text" path="sort" maxlength="20" size="10" />
+    	&nbsp;<shop:errors path="sort" cssClass="span-text"/>
     	<SPAN class="span-help">数字越大越在前</SPAN>
     </TD>
   </TR>

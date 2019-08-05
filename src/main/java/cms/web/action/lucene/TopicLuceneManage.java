@@ -298,8 +298,6 @@ public class TopicLuceneManage {
 			    	Topic topic = new Topic();
 					Document targetDoc = searcher.doc(scoreDocs[i].doc); //根据文档编号取出相应的文档   
 					topic.setId(Long.parseLong(targetDoc.get("id")));
-					
-					
 					String _title = targetDoc.get("title");
 					if (_title != null && !"".equals(_title)) {   
 						//执行转义
@@ -469,31 +467,37 @@ public class TopicLuceneManage {
 	 * 删除用户名称下的索引
 	 * @param userName 用户名称
 	 */
-	public void deleteIndex(String userName){
+	public void deleteUserNameIndex(List<String> userNameList){
 		IndexWriter iw = TopicLuceneInit.INSTANCE.getIndexWriter();
 		try { 
-			//精确查询
-			Query q = new TermQuery(new Term("userName", userName));
-			if(q != null){
-				iw.deleteDocuments(q);//删除指定ID的Document   
-				iw.forceMergeDeletes();
-				iw.commit();//提交   
+			// BooleanClause.Occur[]数组,它表示多个条件之间的关系,     
+			// BooleanClause.Occur.MUST表示 and,     
+			// BooleanClause.Occur.MUST_NOT表示not,     
+			// BooleanClause.Occur.SHOULD表示or. 
+			BooleanQuery.Builder query = new BooleanQuery.Builder();//组合查询
+			for(String userName : userNameList){
+				TermQuery userName_query = new TermQuery(new Term("userName", userName));//精确查询
+				query.add(userName_query,BooleanClause.Occur.SHOULD);
 			}
+
+			iw.deleteDocuments(query.build());//删除指定ID的Document   
+			iw.forceMergeDeletes();
+			iw.commit();//提交   
 		} catch (CorruptIndexException e) {
 			// TODO Auto-generated catch block
-		//	e.printStackTrace();
+			e.printStackTrace();
 			if (logger.isErrorEnabled()) {
 	            logger.error("删除用户名称下索引",e);
 	        }
 		} catch (LockObtainFailedException e) {
 			// TODO Auto-generated catch block
-		//	e.printStackTrace();
+			e.printStackTrace();
 			if (logger.isErrorEnabled()) {
 	            logger.error("删除用户名称下索引",e);
 	        }
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-		//	e.printStackTrace();
+			e.printStackTrace();
 			if (logger.isErrorEnabled()) {
 	            logger.error("删除用户名称下索引",e);
 	        }

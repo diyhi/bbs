@@ -41,13 +41,13 @@ function sureSubmit(objForm){
     <TR>
     <TD class="t-label t-label-h" width="12%">呢称：</TD>
     <TD class="t-content" width="88%" colSpan="3">
-    	<input name="nickname" size="50" maxlength="60" value="${user.nickname}"/>
+    	<input class="form-text" name="nickname" size="50" maxlength="60" value="${user.nickname}"/>
     	&nbsp;&nbsp;<span class="span-text">${error['nickname']}</span>
     </TD></TR>
   <TR>
     <TD class="t-label t-label-h" width="12%"><SPAN class="span-text">*</SPAN>密码：</TD>
     <TD class="t-content" width="88%" colSpan="3">
-    <input type="password" name="password" size="30" maxlength="30" value="${user.password }"/>
+    <input type="password" class="form-text" name="password" size="30" maxlength="30" value="${user.password }"/>
     &nbsp;&nbsp;<span class="span-text">${error['password']}</span>
     <SPAN class="span-help">不修改请留空</SPAN>
 	</TD></TR>
@@ -55,21 +55,21 @@ function sureSubmit(objForm){
   <TR>
     <TD class="t-label t-label-h" width="12%">Email地址：</TD>
     <TD class="t-content" width="88%" colSpan="3">
-    	<input name="email" size="50" maxlength="60" value="${user.email}"/>
+    	<input class="form-text" name="email" size="50" maxlength="60" value="${user.email}"/>
     	&nbsp;&nbsp;<span class="span-text">${error['email']}</span>
     	</TD>
   </TR>
   <TR>
     <TD class="t-label t-label-h" width="12%"><SPAN class="span-text">*</SPAN>密码提示问题：</TD>
     <TD class="t-content" width="88%" colSpan="3">
-    	<input name="issue" size="50" maxlength="40" value="${user.issue}"/>
+    	<input class="form-text" name="issue" size="50" maxlength="40" value="${user.issue}"/>
     	&nbsp;&nbsp;<span class="span-text">${error['issue']}</span>
     </TD>
   </TR>
   <TR>
     <TD class="t-label t-label-h" width="12%"><SPAN class="span-text">*</SPAN>密码提示答案：</TD>
     <TD class="t-content" width="88%" colSpan="3">
-    	<input name="answer" size="50" maxlength="40" value="${user.answer}"/>
+    	<input class="form-text" name="answer" size="50" maxlength="40" value="${user.answer}"/>
     	&nbsp;&nbsp;<span class="span-text">${error['answer']}</span>
     	<SPAN class="span-help">不修改请留空</SPAN>
     </TD>
@@ -77,7 +77,7 @@ function sureSubmit(objForm){
 	<TR>
 	    <TD class="t-label t-label-h" width="12%">手机：</TD>
 	    <TD class="t-content" width="88%" colSpan="3">
-	    	<input name="mobile" size="50" maxlength="60" value="${user.mobile}"/>
+	    	<input class="form-text" name="mobile" size="50" maxlength="60" value="${user.mobile}"/>
 	    	&nbsp;&nbsp;<span class="span-text">${error['mobile']}</span>
     	</TD>
 	</TR>
@@ -109,7 +109,7 @@ function sureSubmit(objForm){
 	<TR>
     <TD class="t-label t-label-h" width="12%">备注：</TD>
     <TD class="t-content" width="88%" colSpan="3">
-    	<textarea name="remarks" cols="80" rows="5" >${user.remarks }</textarea>
+    	<textarea class="form-textarea" name="remarks" cols="80" rows="5" >${user.remarks }</textarea>
     </TD>
   </TR>
 	<!-- 用户自定义注册功能项 -->
@@ -118,7 +118,7 @@ function sureSubmit(objForm){
 	    <TD class="t-label t-label-h" width="12%"><c:if test="${entry.required == true}"><SPAN class="span-text">*</SPAN></c:if>${entry.name}：</TD>
 	    <TD class="t-content" width="88%" colSpan="3">
 			<c:if test="${entry.chooseType ==1}">
-				<input type="text" name="userCustom_${entry.id}" value="<c:forEach items='${entry.userInputValueList}' var='userInputValue'>${userInputValue.content}</c:forEach>" size="${entry.size}" maxlength="${entry.maxlength}">
+				<input type="text" class="form-text" name="userCustom_${entry.id}" value="<c:forEach items='${entry.userInputValueList}' var='userInputValue'>${userInputValue.content}</c:forEach>" size="${entry.size}" maxlength="${entry.maxlength}">
 				<SPAN class="span-help">${entry.tip}</SPAN>
 			</c:if>
 			<c:if test="${entry.chooseType ==2}">
@@ -153,7 +153,7 @@ function sureSubmit(objForm){
 			</c:if>
 			<c:if test="${entry.chooseType ==4}">
 			
-				<select name="userCustom_${entry.id}" <c:if test="${entry.multiple == true}"> multiple='multiple'</c:if> <c:if test="${entry.selete_size != null}"> size='${entry.selete_size}'</c:if>>
+				<select class="form-select" name="userCustom_${entry.id}" <c:if test="${entry.multiple == true}"> multiple='multiple'</c:if> <c:if test="${entry.selete_size != null}"> size='${entry.selete_size}'</c:if>>
 					<c:forEach items="${entry.itemValue}" var="itemValue">
 						<c:set var="_selected" value=""></c:set>
 						<c:forEach items='${entry.userInputValueList}' var='userInputValue'>
@@ -168,7 +168,7 @@ function sureSubmit(objForm){
 				<SPAN class="span-help">${entry.tip}</SPAN>
 			</c:if>
 			<c:if test="${entry.chooseType ==5}">
-				<textarea name="userCustom_${entry.id}" rows="${entry.rows}" cols="${entry.cols}"><c:forEach items='${entry.userInputValueList}' var='userInputValue'>${userInputValue.content}</c:forEach></textarea>			
+				<textarea class="form-textarea" name="userCustom_${entry.id}" rows="${entry.rows}" cols="${entry.cols}"><c:forEach items='${entry.userInputValueList}' var='userInputValue'>${userInputValue.content}</c:forEach></textarea>			
 				<SPAN class="span-help">${entry.tip}</SPAN>
 			</c:if>
 			<c:set var="userCustom_id" value="userCustom_${entry.id}"></c:set>

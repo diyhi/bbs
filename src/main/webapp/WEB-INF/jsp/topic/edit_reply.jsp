@@ -108,7 +108,7 @@ function sureSubmit(){
    </TR>
     <TR>
     <TD class="t-content" >
-    	<textarea id="content" name="content" style="width:99%;height:300px;">${reply.content}</textarea>
+    	<textarea class="form-textarea" id="content" name="content" style="width:99%;height:300px;">${reply.content}</textarea>
     </TD>
    </TR>
    

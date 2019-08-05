@@ -25,6 +25,8 @@ import cms.bean.user.UserInputValue;
 import cms.bean.user.UserLoginLog;
 import cms.service.besa.DaoSupport;
 import cms.service.favorite.FavoriteService;
+import cms.service.follow.FollowService;
+import cms.service.like.LikeService;
 import cms.service.message.PrivateMessageService;
 import cms.service.message.RemindService;
 import cms.service.message.SystemNotifyService;
@@ -59,6 +61,8 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 	@Resource FavoriteService favoriteService;
 	@Resource UserDynamicConfig userDynamicConfig;
 	
+	@Resource LikeService likeService;
+	@Resource FollowService followService;
 	/**
 	 * 根据条件分页查询用户名称
 	 * @param jpql SQL
@@ -584,9 +588,16 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 		//删除收藏夹
 		favoriteService.deleteFavoriteByUserName(userNameList);
 		
+		//删除点赞
+		likeService.deleteLikeByUserName(userNameList);
+		
+
+		//删除关注
+		followService.deleteFollowByUserName(userNameList);
+		
 		//根据发布动态图片的用户名称删除收藏
 		favoriteService.deleteFavoriteByPostUserName(userNameList);
-		
+
 		//删除用户动态
 		this.deleteUserDynamic(userNameList);
 		

@@ -49,9 +49,26 @@
 						<div class="sub">积分</div>
 					</div>
 					<div class="follows">
-						<div class="num">0</div>
-						<div class="sub">关注</div>
+						<div id="followerCount" class="num">0</div>
+						<div class="sub" >粉丝</div>
+						<input type="hidden" id="_userName" value="${user.userName}"/>
 					</div>
+					<script language="javascript" type="text/javascript">
+						//查询粉丝总数
+						function queryFollowerCount(){
+							//获取用户名称
+							var userName = document.getElementById("_userName").value;
+							get_request(function(value){
+								if(value != ""){
+									var data = JSON.parse(value);
+							        document.getElementById("followerCount").innerHTML = data;
+						        }
+							},
+								"queryFollowerCount.htm?userName="+userName+"&timestamp=" + new Date().getTime(), true);
+						}
+						queryFollowerCount();
+					</script>
+					
 				</div>
 			</div>
 			<div class="head-line">
@@ -66,6 +83,9 @@
 			<div class="clearfix"></div>
 			<div class="action-button">
 				<#if user.userName != systemUser.userName>
+					<#-- 引入关注用户 -->
+					<@include action="${followRelated_addFollow_1}"/>
+					
 					<span class="privateMessageBox" >
 						<button type="button" class="privateMessageButton" onClick="javascript:window.location.href='${baseURL}user/control/privateMessageChatList?friendUserName=${user.userName}'">发私信</button>
 					</span>
@@ -148,6 +168,30 @@
 					</a>
     				<h4 class="title">
     					<a class="a-title" href="user/control/favoriteList" >收藏夹</a>
+    				</h4>
+				</li>
+				<li class="item">
+					<a class="a-pic" href="user/control/likeList" >
+						<div class="img cms-thumb-up" ></div> 	
+					</a>
+    				<h4 class="title">
+    					<a class="a-title" href="user/control/likeList" >点赞</a>
+    				</h4>
+				</li>
+				<li class="item">
+					<a class="a-pic" href="user/control/followList" >
+						<div class="img cms-heart" ></div> 	
+					</a>
+    				<h4 class="title">
+    					<a class="a-title" href="user/control/followList" >关注</a>
+    				</h4>
+				</li>
+				<li class="item">
+					<a class="a-pic" href="user/control/followerList" >
+						<div class="img cms-follower" ></div> 	
+					</a>
+    				<h4 class="title">
+    					<a class="a-title" href="user/control/followerList" >粉丝</a>
     				</h4>
 				</li>
 				<li class="item">

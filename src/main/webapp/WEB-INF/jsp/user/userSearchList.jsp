@@ -180,7 +180,7 @@ function deleteUser(userId,state){
 		<TR>
 			<TD class="t-label t-label-h" width="12%">搜索类型：</TD>
 			<TD class="t-content" width="88%" colSpan="3">
-				<select id="searchType" onchange="siteQuery(this);">
+				<select class="form-select" id="searchType" onchange="siteQuery(this);">
 					<option value="1" <c:if test="${searchType eq '1'}"> selected="selected"</c:if>>用户名</option>
 					<option value="2" <c:if test="${searchType eq '2'}"> selected="selected"</c:if>>筛选条件</option>
 				</select>
@@ -189,17 +189,17 @@ function deleteUser(userId,state){
 		<TR id="searchParameter_1" <c:if test="${searchType eq 2 }"> style="DISPLAY: none"</c:if>>
 			<TD class="t-label t-label-h" width="12%">用户名：</TD>
 			<TD class="t-content" width="88%" colSpan="3">
-				<input id="userName" type="text" size="30" value="${userName}">
+				<input id="userName" type="text" class="form-text" size="30" value="${userName}">
 				<span class="span-text" >${error['userName']}</span>
 			</TD>
 		</TR>
 		<TR id="searchParameter_3" <c:if test="${searchType eq 1}"> style="DISPLAY: none"</c:if>>
 			<TD class="t-label t-label-h" width="12%">积分：</TD>
 			<TD class="t-content" width="88%" colSpan="3">
-				<input id="start_point" type="text" size="20" value="${start_point}">
+				<input id="start_point" type="text" class="form-text" size="20" value="${start_point}">
 				<span class="span-text" >${error['start_point']}</span>
 				&nbsp;&lt;=积分&lt;=&nbsp;
-				<input id="end_point" type="text" size="20" value="${end_point}">&nbsp;<span class="span-help">不限制请留空</span>
+				<input id="end_point" type="text" class="form-text" size="20" value="${end_point}">&nbsp;<span class="span-help">不限制请留空</span>
 				<span class="span-text" >${error['end_point']}</span>
 			</TD>
 		</TR>
@@ -251,7 +251,7 @@ function deleteUser(userId,state){
 		</c:if>
 		<c:if test="${entry.chooseType ==4}">
 		
-			<select id="userCustom_${entry.id}" <c:if test="${entry.multiple == true}"> multiple='multiple'</c:if> <c:if test="${entry.selete_size != null}"> size='${entry.selete_size}'</c:if>>
+			<select class="form-select" id="userCustom_${entry.id}" <c:if test="${entry.multiple == true}"> multiple='multiple'</c:if> <c:if test="${entry.selete_size != null}"> size='${entry.selete_size}'</c:if>>
 				<option value="0">请选择</option>	
 				<c:forEach items="${entry.itemValue}" var="itemValue">
 					<c:set var="_selected" value=""></c:set>

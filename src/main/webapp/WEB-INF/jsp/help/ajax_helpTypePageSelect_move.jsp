@@ -14,7 +14,7 @@
 <DIV class="d-box">
 <TABLE class="t-table" cellSpacing="1" cellPadding="2" width="100%" border="0">
 		<TR>
-	    <TD class="t-content" colSpan="5" height="25px">
+	    <TD class="t-content" colSpan="5" height="28px">
 	        <span style="font-weight:bold;float:left;">&nbsp;分类导航:</span>
 	        <span style="float:left;">&nbsp;<a href="javascript:helpTypePage(1,0,'${tableName}')">全部分类</a></span>
 			<span style="float:left">

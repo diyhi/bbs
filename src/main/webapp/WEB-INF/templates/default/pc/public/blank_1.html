@@ -102,9 +102,15 @@
 							
 					
 					</div>
-					<#--加入收藏夹-->
-					<@include action="${favoriteRelated_addFavorite_1}"/>
 					
+					<div class="favorite-formModule">
+						<#--加入收藏夹-->
+						<@include action="${favoriteRelated_addFavorite_1}"/>
+						
+						<#--给话题点赞-->
+						<@include action="${likeRelated_addLike_1}"/>
+
+					</div>
 					<h2></h2>
 					
 				</div>

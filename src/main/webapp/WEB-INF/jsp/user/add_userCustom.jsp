@@ -77,12 +77,12 @@ function addRow(){ //读取最后一行的行号，存放在txtLastIndex文本�
 	//添加行 
 	var newTR = input_table.insertRow(input_table.rows.length); 
 	newTR.id = "item" + rowId; 
-	newTR.height="25px";
+	newTR.height="28px";
  
 	//添加列
 	var newColumn=newTR.insertCell(0); 
 	//添加列内容 
-	newColumn.innerHTML = "<input name='_itemValue' type='text' size='20' />"; 
+	newColumn.innerHTML = "<input name='_itemValue' type='text' class='form-text' size='20' />"; 
 	 
 	var html = "";
 	html += "<span style=\"float:right; margin-left: 0px;\" onclick=\"deleteRow('item" + rowId + "')\"><img src=\"backstage/images/x.gif\" width=\"18\" height=\"18\" alt=\"删除\" title=\"删除\" /></span>";
@@ -180,7 +180,7 @@ function swapNode(node1, node2) {
   <TR>
     <TD class="t-label t-label-h" width="12%"><SPAN class="span-text">*</SPAN>注册项名称：</TD>
     <TD class="t-content" width="88%" colSpan="3">
-    	<input name="name" size="50" maxlength="40" value="${userCustom.name}"/>&nbsp;&nbsp;
+    	<input class="form-text" name="name" size="50" maxlength="40" value="${userCustom.name}"/>&nbsp;&nbsp;
     	<span class="span-text">${error['name']}</span>
     </TD></TR>
   <TR>
@@ -211,21 +211,21 @@ function swapNode(node1, node2) {
   <TR>
     <TD class="t-label t-label-h" width="12%"><SPAN class="span-text">*</SPAN>注册项排序：</TD>
     <TD class="t-content" width="88%" colSpan="3">
-    	<input name="_sort" size="10" maxlength="10" value="${userCustom.sort}" />&nbsp;&nbsp;
+    	<input class="form-text" name="_sort" size="10" maxlength="10" value="${userCustom.sort}" />&nbsp;&nbsp;
     	<span class="span-text">${error['sort']}</span>
     	<SPAN class="span-help">最大排在最前面</SPAN>
     </TD></TR>
     <TR>
     <TD class="t-label t-label-h" width="12%">提示：</TD>
     <TD class="t-content" width="88%" colSpan="3">
-    	<input name="tip" size="60" maxlength="250" value="${userCustom.tip}" />&nbsp;&nbsp;
+    	<input class="form-text" name="tip" size="60" maxlength="250" value="${userCustom.tip}" />&nbsp;&nbsp;
     	<span class="span-text">${error['tip']}</span>
     </TD></TR>
    </TBODY>
   <TR>
     <TD class="t-label t-label-h" width="12%"><SPAN class="span-text">*</SPAN>选择类型：</TD>
     <TD class="t-content" width="88%" colSpan="3">
-	    <select id="chooseType" name="chooseType" onChange="selectType(this);" >
+	    <select class="form-select" id="chooseType" name="chooseType" onChange="selectType(this);" >
 	   		 <option value="1" <c:if test="${userCustom.chooseType eq '1'}"> selected="selected"</c:if>>输入框</option>
 	   		 <option value="2" <c:if test="${userCustom.chooseType eq '2'}"> selected="selected"</c:if>>单选按钮</option>
 	   		 <option value="3" <c:if test="${userCustom.chooseType eq '3'}"> selected="selected"</c:if>>多选按钮</option>
@@ -237,21 +237,21 @@ function swapNode(node1, node2) {
 	   <TR>
 	    <TD class="t-label t-label-h" width="15%" >输入框的宽度：</TD>
 	    <TD class="t-content" width="85%" colSpan="3">
-	    	<input name="_size" size="10" maxlength="10" value="${userCustom.size}"/>
+	    	<input class="form-text" name="_size" size="10" maxlength="10" value="${userCustom.size}"/>
 	    	&nbsp;<span class="span-text">${error['size']}</span>
 	    </TD>
 	  </TR>
 	   <TR>
 	    <TD class="t-label t-label-h" width="15%" >输入框字符的最大长度：</TD>
 	    <TD class="t-content" width="85%" colSpan="3">
-	    	<input name="_maxlength" size="10" maxlength="10" value="${userCustom.maxlength}"/>
+	    	<input class="form-text" name="_maxlength" size="10" maxlength="10" value="${userCustom.maxlength}"/>
 	    	&nbsp;<span class="span-text">${error['maxlength']}</span>
 	    </TD>
 	  </TR>
 	   <TR>
 	    <TD class="t-label t-label-h" width="15%" >字段值过滤：</TD>
 	    <TD class="t-content" width="85%" colSpan="3">
-	    	<select id="fieldFilter" name="fieldFilter" onChange="selectfieldFilter(this);" >
+	    	<select class="form-select" id="fieldFilter" name="fieldFilter" onChange="selectfieldFilter(this);" >
 		   		 <option value="0" <c:if test="${userCustom.fieldFilter eq '0'}"> selected="selected"</c:if>>无</option>
 		   		 <option value="1" <c:if test="${userCustom.fieldFilter eq '1'}"> selected="selected"</c:if>>只允许输入数字</option>
 		   		 <option value="2" <c:if test="${userCustom.fieldFilter eq '2'}"> selected="selected"</c:if>>只允许输入字母</option>
@@ -264,7 +264,7 @@ function swapNode(node1, node2) {
 	  <TR id="regularExpression" <c:if test="${userCustom.fieldFilter ne '5'}"> style="DISPLAY: none"</c:if>>
 	    <TD class="t-label t-label-h" width="15%" >正则表达式：</TD>
 	    <TD class="t-content" width="85%" colSpan="3">
-	    	<input name="regular" size="80"  value="${userCustom.regular}"/>&nbsp;&nbsp;
+	    	<input class="form-text" name="regular" size="80"  value="${userCustom.regular}"/>&nbsp;&nbsp;
     		<span class="span-text">${error['regular']}</span>
 	    </TD>
 	  </TR>
@@ -275,12 +275,12 @@ function swapNode(node1, node2) {
 	    <TD class="t-label t-label-h" width="15%" >选项：</TD>
 	    <TD class="t-content" width="85%" colSpan="3">
 	    	<input type="button" class="functionButton5" value="添加项" onClick="addRow()" />
-	    	<table width="220px" border="0" cellpadding="0" cellspacing="0" id="input_table" >  
+	    	<table width="250px" border="0" cellpadding="0" cellspacing="0" id="input_table" >  
 	   		<TBODY>
 	   			<c:set var="itemValue_count" value="0"></c:set>
 	   			<c:forEach items="${itemValue_map}" var="itemValue" varStatus="status">
-   					<TR id="item${status.count}" height=25>
-						<TD><INPUT size=20 type=text name=_itemValue value="${itemValue.value}"><input type="hidden" name="itemKey" value="${itemValue.key}"></TD>
+   					<TR id="item${status.count}" height=28>
+						<TD><INPUT class="form-text" size=20 type=text name=_itemValue value="${itemValue.value}"><input type="hidden" name="itemKey" value="${itemValue.key}"></TD>
 						<TD>
 							<SPAN style="FLOAT: right; MARGIN-LEFT: 0px" onclick="deleteRow('item${status.count}')"><IMG title=删除 alt=删除 src="backstage/images/x.gif" width=18 height=18></SPAN>
 							<SPAN style="FLOAT: right; MARGIN-LEFT: 0px" onclick="moveDown('input_table','item${status.count}')"><IMG title=下移 alt=下移 src="backstage/images/down_arrows.gif" width=18 height=18></SPAN>
@@ -307,7 +307,7 @@ function swapNode(node1, node2) {
 	  <TR>
 	    <TD class="t-label t-label-h" width="15%" >下拉列表中可见选项的数目：</TD>
 	    <TD class="t-content" width="85%" colSpan="3">
-	    	<input name="_selete_size" size="10" maxlength="10" value="${userCustom.selete_size}"/>
+	    	<input class="form-text" name="_selete_size" size="10" maxlength="10" value="${userCustom.selete_size}"/>
 	    	&nbsp;<span class="span-text">${error['selete_size']}</span>
 	    </TD>
 	  </TR>
@@ -316,14 +316,14 @@ function swapNode(node1, node2) {
 	   <TR>
 	    <TD class="t-label t-label-h" width="15%" >文本域内的可见行数：</TD>
 	    <TD class="t-content" width="85%" colSpan="3">
-	    	<input name="_rows" size="10" maxlength="10" value="${userCustom.rows}"/>
+	    	<input class="form-text" name="_rows" size="10" maxlength="10" value="${userCustom.rows}"/>
 	    	&nbsp;<span class="span-text">${error['rows']}</span>
 	    </TD>
 	  </TR>
 	  <TR>
 	    <TD class="t-label t-label-h" width="15%" >文本域内的可见宽度：</TD>
 	    <TD class="t-content" width="85%" colSpan="3">
-	    	<input name="_cols" size="10" maxlength="10" value="${userCustom.cols}"/>
+	    	<input class="form-text" name="_cols" size="10" maxlength="10" value="${userCustom.cols}"/>
 	    	&nbsp;<span class="span-text">${error['cols']}</span>
 	    </TD>
 	  </TR>

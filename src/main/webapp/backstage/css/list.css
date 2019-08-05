@@ -29,8 +29,51 @@ A:active {
 input::-moz-focus-inner{ border: 0;padding: 0;}
 
 
-.date-input{border:1px solid #ddd;background:url(../images/dateSelect.gif) center right no-repeat #f7f7f7;cursor:pointer;font:12px tahoma,arial;height:18px;width:150px;}
+/* 表单 */
+.date-input{outline: none;border:1px solid #ddd;background:url(../images/dateSelect.gif) center right no-repeat #f7f7f7;cursor:pointer;font:13px tahoma,arial;height:22px;width:150px;padding-bottom: 2px;margin-top: 2px;margin-bottom: 2px;}
 
+.form-text{
+	outline: none; height:22px; line-height:22px; padding:2px 4px;border:1px solid;border-color:#cdcdcd #cdcdcd #cdcdcd #cdcdcd;background:#fff;border-radius:2px;margin-top: 2px;margin-bottom: 2px;
+}
+.form-text:disabled{  
+    border: 1px solid #e6e6e6;  
+    background-color: #fbfbfb;  
+    color:#c9c9c9;
+    border-radius:2px;
+} 
+
+.form-select{
+	outline: none; height:28px; line-height:28px; padding:2px 4px;border:1px solid;border-color:#cdcdcd #cdcdcd #cdcdcd #cdcdcd;background:#fff;border-radius:2px;margin-top: 2px;margin-bottom: 2px; color: #444;margin-right: 1px;
+}
+.form-select:disabled{  
+    border: 1px solid #e6e6e6;  
+    background-color: #fbfbfb;  
+    color:#c9c9c9;
+    border-radius:2px;
+} 
+.form-textarea{
+	line-height: 24px;
+    border-radius: 2px;
+    border: 1px solid #cdcdcd;
+	vertical-align: top;
+	font-size: 14px;
+    resize: vertical;
+	margin: 0em;
+	padding: 3px 3px;
+    background: #ffffff;
+    outline: none;
+    color: rgba(0,0,0,0.8);
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: rgba(255,255,255,0);
+    -webkit-box-shadow: 0em 0em 0em 0em transparent inset;
+    box-shadow: 0em 0em 0em 0em transparent inset;
+    -webkit-transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    -webkit-transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, -webkit-box-shadow 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, -webkit-box-shadow 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, -webkit-box-shadow 0.2s ease;
+    
+}
 
 .d-box {
 	margin: 0px auto; width: 99%;   
@@ -45,7 +88,7 @@ input::-moz-focus-inner{ border: 0;padding: 0;}
 	clear: both
 }
 .d-button {
-	border:1px solid #BFE3FF; margin-top: 2px; height: 36px; padding-left: 5px;
+	border:1px solid #BFE3FF; margin-top: 2px; line-height:36px; padding-left: 5px;
 }
 .d-checkBoxNoSel{  
     background: url("../images/checkboxNoSel.jpg") no-repeat center center;  
@@ -142,7 +185,7 @@ ul.rating li.five a:hover {background-position:0 -160px}
 	float: right;line-height: 30px; 
 }
 .pg A {
-	border-bottom: #c2d5e3 1px solid; border-left: #c2d5e3 1px solid; padding-bottom: 0px; background-color: #fff; padding-left: 10px; padding-right: 10px; display: inline; background-repeat: no-repeat; float: left; height: 30px; color: #333; margin-left: 4px; overflow: hidden; border-top: #c2d5e3 1px solid; border-right: #c2d5e3 1px solid; text-decoration: none; padding-top: 0px;border-bottom-color: #BFE3FF; border-top-color: #BFE3FF; border-right-color: #BFE3FF; border-left-color: #BFE3FF
+	border: #BFE3FF 1px solid; padding-bottom: 0px; background-color: #fff; padding-left: 10px; padding-right: 10px; display: inline; background-repeat: no-repeat; float: left; height: 30px; color: #333; margin-left: 4px; overflow: hidden; text-decoration: none; padding-top: 0px;
 }
 .pg A.prev {
 	padding-bottom: 0px; padding-left: 10px; padding-right: 10px; padding-top: 0px; 
@@ -151,19 +194,20 @@ ul.rating li.five a:hover {background-position:0 -160px}
 	padding-bottom: 0px; padding-left: 10px; padding-right: 10px; padding-top: 0px;  
 }
 .pg A:hover {
-	border-bottom-color: #3198e7; border-top-color: #3198e7; color: #3198e7; border-right-color: #3198e7; border-left-color: #3198e7;     
+	border: #3198e7 1px solid;
+	color: #3198e7;    
 }
 .pg LABEL {
-	border-bottom: #BFE3FF 1px solid; border-left: #BFE3FF 1px solid; padding-bottom: 0px; background-color: #fff; padding-left: 10px; padding-right: 10px; display: inline; background-repeat: no-repeat; float: left; height: 30px; color: #333; margin-left: 4px; overflow: hidden; border-top: #BFE3FF 1px solid; border-right: #BFE3FF 1px solid; text-decoration: none; padding-top: 0px
+	border: #BFE3FF 1px solid; padding-bottom: 0px; background-color: #fff; padding-left: 10px; padding-right: 10px; display: inline; background-repeat: no-repeat; float: left; height: 30px; color: #333; margin-left: 4px; overflow: hidden; text-decoration: none; padding-top: 0px
 }
 .pg LABEL .pg_input {
 	padding:0;width:25px;height:15px;line-height:15px;margin-bottom: 3px;*margin-bottom: 0px; 
 }
 .pg STRONG {
-	border-bottom: #c2d5e3 1px solid; border-left: #c2d5e3 1px solid; padding-bottom: 0px; background-color: #fff; padding-left: 10px; padding-right: 10px; display: inline; background-repeat: no-repeat; float: left; height: 30px; color: #333; margin-left: 4px; overflow: hidden; border-top: #c2d5e3 1px solid; border-right: #c2d5e3 1px solid; text-decoration: none; padding-top: 0px;border-bottom-color: #BFE3FF; border-top-color: #BFE3FF; border-right-color: #BFE3FF; border-left-color: #BFE3FF;background-color: #BFE3FF
+	border: #BFE3FF 1px solid; padding-bottom: 0px; background-color: #fff; padding-left: 10px; padding-right: 10px; display: inline; background-repeat: no-repeat; float: left; height: 30px; color: #555; margin-left: 4px; overflow: hidden; text-decoration: none; padding-top: 0px; background-color: #BFE3FF
 }
 .pg span.count {
-	border-bottom: #c2d5e3 1px solid; border-left: #c2d5e3 1px solid; padding-bottom: 0px; background-color: #fff; padding-left: 10px; padding-right: 10px; display: inline; background-repeat: no-repeat; float: left; height: 30px; color: #333; margin-left: 4px; overflow: hidden; border-top: #c2d5e3 1px solid; border-right: #c2d5e3 1px solid; text-decoration: none; padding-top: 0px;border-bottom-color: #BFE3FF; border-top-color: #BFE3FF; border-right-color: #BFE3FF; border-left-color: #BFE3FF;
+	border: #BFE3FF 1px solid; padding-bottom: 0px; background-color: #fff; padding-left: 10px; padding-right: 10px; display: inline; background-repeat: no-repeat; float: left; height: 30px; color: #333; margin-left: 4px; overflow: hidden;  text-decoration: none; padding-top: 0px;
 }
 
 

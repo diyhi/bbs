@@ -55,6 +55,7 @@ public class ForumCodeManage {
 		childNode.add(new ForumCodeNode(1008,"回复评论","topicRelated_replyComment_",Arrays.asList(new String[]{"集合"})));
 		childNode.add(new ForumCodeNode(1009,"相拟话题","topicRelated_likeTopic_",Arrays.asList(new String[]{"集合"})));
 		childNode.add(new ForumCodeNode(1010,"话题取消隐藏","topicRelated_topicUnhide_",Arrays.asList(new String[]{"集合"})));
+		
 		forumCodeNodeList.add(new ForumCodeNode(100,"话题",childNode));//添加一级节点
 		
 		//收藏夹
@@ -63,6 +64,21 @@ public class ForumCodeManage {
 		childNode13.add(new ForumCodeNode(13002,"话题会员收藏总数","favoriteRelated_favoriteCount_",Arrays.asList(new String[]{"实体对象"})));
 		childNode13.add(new ForumCodeNode(13003,"用户是否已经收藏话题","favoriteRelated_alreadyCollected_",Arrays.asList(new String[]{"实体对象"})));
 		forumCodeNodeList.add(new ForumCodeNode(130,"收藏夹",childNode13));//添加一级节点
+		
+		//点赞
+		List<ForumCodeNode> childNode14 =  new ArrayList<ForumCodeNode>();//添加二级节点	
+		childNode14.add(new ForumCodeNode(14001,"给话题点赞","likeRelated_addLike_",Arrays.asList(new String[]{"集合"})));
+		childNode14.add(new ForumCodeNode(14002,"话题点赞总数","likeRelated_likeCount_",Arrays.asList(new String[]{"实体对象"})));
+		childNode14.add(new ForumCodeNode(14003,"用户是否已经点赞该话题","likeRelated_alreadyLiked_",Arrays.asList(new String[]{"实体对象"})));
+		forumCodeNodeList.add(new ForumCodeNode(140,"点赞",childNode14));//添加一级节点
+		
+		//关注
+		List<ForumCodeNode> childNode15 =  new ArrayList<ForumCodeNode>();//添加二级节点	
+		childNode15.add(new ForumCodeNode(15001,"关注用户","followRelated_addFollow_",Arrays.asList(new String[]{"集合"})));
+		childNode15.add(new ForumCodeNode(15002,"粉丝总数","followRelated_followerCount_",Arrays.asList(new String[]{"实体对象"})));
+		childNode15.add(new ForumCodeNode(15003,"是否已经关注该用户","followRelated_following_",Arrays.asList(new String[]{"实体对象"})));
+		forumCodeNodeList.add(new ForumCodeNode(150,"关注",childNode15));//添加一级节点
+		
 		
 		//在线留言
 		List<ForumCodeNode> childNode3 =  new ArrayList<ForumCodeNode>();//添加二级节点	

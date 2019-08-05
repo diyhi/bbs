@@ -52,7 +52,7 @@ function deleteHelpType(id){
 </div>
 
 <form:form>
-<div class="d-button" style="height:28px;margin-left: auto; margin-right: auto;line-height: 28px;overflow: hidden ">
+<div class="d-button" style="height:30px;margin-left: auto; margin-right: auto;line-height: 30px;overflow: hidden ">
 	<span style="font-weight:bold;float:left;">&nbsp;分类导航:</span>
 	<span style="float:left;">&nbsp;<a href="${config:url(pageContext.request)}control/helpType/list${config:suffix()}?parentId=0">全部分类</a></span>
 	<span style="float:left">

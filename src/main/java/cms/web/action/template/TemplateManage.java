@@ -322,7 +322,7 @@ public class TemplateManage {
 		layout_systemNotifyList.setSort(500);//排序
 		layout_systemNotifyList.setReferenceCode("user/control/systemNotifyList");
 		layoutList.add(layout_systemNotifyList);
-		
+	
 		//提醒列表
 		Layout layout_remindList = new Layout();
 		layout_remindList.setId(UUIDUtil.getUUID32());
@@ -333,7 +333,7 @@ public class TemplateManage {
 		layout_remindList.setSort(550);//排序
 		layout_remindList.setReferenceCode("user/control/remindList");
 		layoutList.add(layout_remindList);
-
+		
 		//收藏夹列表
 		Layout layout_favoriteList = new Layout();
 		layout_favoriteList.setId(UUIDUtil.getUUID32());
@@ -346,15 +346,15 @@ public class TemplateManage {
 		layoutList.add(layout_favoriteList);
 		
 		//话题收藏列表
-		Layout layout_dynamicImageFavoriteList = new Layout();
-		layout_dynamicImageFavoriteList.setId(UUIDUtil.getUUID32());
-		layout_dynamicImageFavoriteList.setName("话题收藏列表");
-		layout_dynamicImageFavoriteList.setDirName(dirName);
-		layout_dynamicImageFavoriteList.setLayoutFile("topicFavoriteList.html");
-		layout_dynamicImageFavoriteList.setType(1);//默认页
-		layout_dynamicImageFavoriteList.setSort(700);//排序
-		layout_dynamicImageFavoriteList.setReferenceCode("user/control/topicFavoriteList");
-		layoutList.add(layout_dynamicImageFavoriteList);
+		Layout layout_topicFavoriteList = new Layout();
+		layout_topicFavoriteList.setId(UUIDUtil.getUUID32());
+		layout_topicFavoriteList.setName("话题收藏列表");
+		layout_topicFavoriteList.setDirName(dirName);
+		layout_topicFavoriteList.setLayoutFile("topicFavoriteList.html");
+		layout_topicFavoriteList.setType(1);//默认页
+		layout_topicFavoriteList.setSort(700);//排序
+		layout_topicFavoriteList.setReferenceCode("user/control/topicFavoriteList");
+		layoutList.add(layout_topicFavoriteList);
 		
 		//话题取消隐藏用户列表
 		Layout layout_topicUnhideList = new Layout();
@@ -378,6 +378,50 @@ public class TemplateManage {
 		layout_userDynamicList.setReferenceCode("user/control/userDynamicList");
 		layoutList.add(layout_userDynamicList);
 		
+		//用户点赞列表
+		Layout layout_likeList = new Layout();
+		layout_likeList.setId(UUIDUtil.getUUID32());
+		layout_likeList.setName("点赞列表");
+		layout_likeList.setDirName(dirName);
+		layout_likeList.setLayoutFile("likeList.html");
+		layout_likeList.setType(1);//默认页
+		layout_likeList.setSort(1000);//排序
+		layout_likeList.setReferenceCode("user/control/likeList");
+		layoutList.add(layout_likeList);
+		/**
+		//话题点赞列表
+		Layout layout_topicLikeList = new Layout();
+		layout_topicLikeList.setId(UUIDUtil.getUUID32());
+		layout_topicLikeList.setName("话题点赞列表");
+		layout_topicLikeList.setDirName(dirName);
+		layout_topicLikeList.setLayoutFile("topicLikeList.html");
+		layout_topicLikeList.setType(1);//默认页
+		layout_topicLikeList.setSort(1100);//排序
+		layout_topicLikeList.setReferenceCode("user/control/topicLikeList");
+		layoutList.add(layout_topicLikeList);
+		**/
+		//关注列表
+		Layout layout_followList = new Layout();
+		layout_followList.setId(UUIDUtil.getUUID32());
+		layout_followList.setName("关注列表");
+		layout_followList.setDirName(dirName);
+		layout_followList.setLayoutFile("followList.html");
+		layout_followList.setType(1);//默认页
+		layout_followList.setSort(1200);//排序
+		layout_followList.setReferenceCode("user/control/followList");
+		layoutList.add(layout_followList);
+		
+		//粉丝列表
+		Layout layout_followerList = new Layout();
+		layout_followerList.setId(UUIDUtil.getUUID32());
+		layout_followerList.setName("粉丝列表");
+		layout_followerList.setDirName(dirName);
+		layout_followerList.setLayoutFile("followerList.html");
+		layout_followerList.setType(1);//默认页
+		layout_followerList.setSort(1300);//排序
+		layout_followerList.setReferenceCode("user/control/followerList");
+		layoutList.add(layout_followerList);
+				
 		return layoutList;
 	}
 	

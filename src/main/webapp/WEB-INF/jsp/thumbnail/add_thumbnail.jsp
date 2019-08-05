@@ -30,20 +30,20 @@ function SureSubmit(objForm){
   <TR>
     <TD class="t-label t-label-h" width="12%"><SPAN class="span-text">*</SPAN>名称：</TD>
     <TD class="t-content" width="88%" colSpan="3">
-    	<input name="name" size="30" maxlength="30" value="${thumbnail.name }"/>&nbsp;&nbsp;
+    	<input name="name" class="form-text" size="30" maxlength="30" value="${thumbnail.name }"/>&nbsp;&nbsp;
     	<form:errors path="name" class="span-text"/>
    		</TD></TR>
   <TR>
     <TD class="t-label t-label-h" width="12%">宽：</TD>
     <TD class="t-content" width="88%" colSpan="3">
-    <input type="text" name="width" size="10" maxlength="10" value="${thumbnail.width}"/>
+    <input type="text" class="form-text" name="width" size="10" maxlength="10" value="${thumbnail.width}"/>
     &nbsp;&nbsp;<form:errors path="width" class="span-text"/>
 	</TD></TR>
 
   <TR>
     <TD class="t-label t-label-h" width="12%">高：</TD>
     <TD class="t-content" width="88%" colSpan="3">
-    	<input name="high" size="10" maxlength="10" value="${thumbnail.high}"/>
+    	<input class="form-text" name="high" size="10" maxlength="10" value="${thumbnail.high}"/>
     	&nbsp;&nbsp;<form:errors path="high" class="span-text"/>
     	</TD>
   </TR>

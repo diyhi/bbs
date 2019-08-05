@@ -127,8 +127,59 @@
 									<a href="thread?topicId=${remind.topicId}">${remind.topicTitle}</a>
 								</cite> 
 								解锁了我的话题
-								
-								
+							<#elseif remind.typeCode == 70>
+								<cite>
+									<a href="user/control/home?userName=${remind.senderUserName}">
+										${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
+									</a>
+								</cite> 
+								在
+								<cite>
+									<a href="thread?topicId=${remind.topicId}">${remind.topicTitle}</a>
+								</cite> 
+								赞了我的话题
+							<#elseif remind.typeCode == 80>
+								<cite>
+									<a href="user/control/home?userName=${remind.senderUserName}">
+										${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
+									</a>
+								</cite>
+								关注了我
+							<#elseif remind.typeCode == 90>
+								我关注的
+								<cite>
+									<a href="user/control/home?userName=${remind.senderUserName}">
+										${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
+									</a>
+								</cite> 
+								发表了话题
+								<cite>
+									<a href="thread?topicId=${remind.topicId}">${remind.topicTitle}</a>
+								</cite>
+							<#elseif remind.typeCode == 100>
+								我关注的
+								<cite>
+									<a href="user/control/home?userName=${remind.senderUserName}">
+										${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
+									</a>
+								</cite> 
+								在
+								<cite>
+									<a href="thread?topicId=${remind.topicId}&commentId=${remind.friendTopicCommentId}">${remind.topicTitle}</a>
+								</cite>
+								发表了评论
+							<#elseif remind.typeCode == 110>
+								我关注的
+								<cite>
+									<a href="user/control/home?userName=${remind.senderUserName}">
+										${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
+									</a>
+								</cite> 
+								在
+								<cite>
+									<a href="thread?topicId=${remind.topicId}&commentId=${remind.friendTopicCommentId}">${remind.topicTitle}</a>
+								</cite>
+								发表了回复
 							</#if>
 						</div>
 						<div class="clearfix"></div>

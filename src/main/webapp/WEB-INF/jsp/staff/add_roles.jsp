@@ -64,14 +64,14 @@ function sureSubmit(objForm){
   <TR>
     <TD class="t-label t-label-h" width="12%"><SPAN class="span-text">*</SPAN>角色名：</TD>
     <TD class="t-content" width="88%" colSpan="3">
-    <input name="name" size="40" maxlength="50" value="${sysRoles.name }"/>
+    <input class="form-text" name="name" size="40" maxlength="50" value="${sysRoles.name }"/>
     <span class="span-text">${error["name"]}</span>	
    </TD>
    </TR>
   <TR>
     <TD class="t-label t-label-h" width="12%">备注：</TD>
     <TD class="t-content" width="88%" colSpan="3">
-    <input name="remarks" size="50" maxlength="50" value="${sysRoles.remarks}"/>
+    <input class="form-text" name="remarks" size="50" maxlength="50" value="${sysRoles.remarks}"/>
    	</TD></TR>
    	
 	<TR>

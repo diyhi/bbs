@@ -63,14 +63,14 @@ function sureSubmit(objForm){
   <TR>
     <TD class="t-label t-label-h" width="12%"><SPAN class="span-text">*</SPAN>角色名：</TD>
     <TD class="t-content" width="88%" colSpan="3">
-    <input name="name" size="40" maxlength="50" value="${roles.name }" <c:if test="${!roles.logonUserPermission}">disabled="disabled"</c:if>/>
+    <input class="form-text" name="name" size="40" maxlength="50" value="${roles.name }" <c:if test="${!roles.logonUserPermission}">disabled="disabled"</c:if>/>
    	<span class="span-text">${error["name"]}</span>	
    </TD>
    </TR>
   <TR>
     <TD class="t-label t-label-h" width="12%">备注：</TD>
     <TD class="t-content" width="88%" colSpan="3">
-    <input name="remarks" size="50" maxlength="50" value="${roles.remarks }" <c:if test="${!roles.logonUserPermission}">disabled="disabled"</c:if>/>
+    <input class="form-text" name="remarks" size="50" maxlength="50" value="${roles.remarks }" <c:if test="${!roles.logonUserPermission}">disabled="disabled"</c:if>/>
    	</TD></TR>
    	
 	<TR>
