@@ -237,24 +237,30 @@ public class PrivateMessageServiceBean extends DaoSupport<PrivateMessage> implem
 	 * @param status 状态
 	 * @param firstIndex 索引开始,即从哪条记录开始
 	 * @param maxResult 获取多少条数据
+	 * @param sort 排序 1.aes 2.desc
 	 * @return
 	 */
 	@Transactional(readOnly=true, propagation=Propagation.NOT_SUPPORTED)
-	public QueryResult<PrivateMessage> findPrivateMessageChatByUserId(Long userId,Long friendUserId,Integer status,int firstIndex, int maxResult){
+	public QueryResult<PrivateMessage> findPrivateMessageChatByUserId(Long userId,Long friendUserId,Integer status,int firstIndex, int maxResult,Integer sort){
 		QueryResult<PrivateMessage> qr = new QueryResult<PrivateMessage>();
 		
 		String status_sql = "";
 		if(status != null){
 			status_sql = " and o.status <?3 ";
 		}
-		
+		String sort_sql = "";
+		if(sort.equals(1)){
+			sort_sql = "asc";
+		}else{
+			sort_sql = "desc";
+		}
 		//表编号
 		int tableNumber = privateMessageConfig.userIdRemainder(userId);
 		Query query  = null;
 		
 		if(tableNumber == 0){//默认对象
 			
-			query = em.createQuery("select o from PrivateMessage o where o.userId=?1 and o.friendUserId=?2 "+status_sql+" ORDER BY o.sendTimeFormat desc");
+			query = em.createQuery("select o from PrivateMessage o where o.userId=?1 and o.friendUserId=?2 "+status_sql+" ORDER BY o.sendTimeFormat "+sort_sql);
 			query.setParameter(1, userId);
 			query.setParameter(2, friendUserId);
 			if(status != null){
@@ -276,7 +282,7 @@ public class PrivateMessageServiceBean extends DaoSupport<PrivateMessage> implem
 			}
 			qr.setTotalrecord((Long)query.getSingleResult());
 		}else{//带下划线对象
-			query = em.createQuery("select o from PrivateMessage_"+tableNumber+" o where o.userId=?1 and o.friendUserId=?2 "+status_sql+" ORDER BY o.sendTimeFormat desc");
+			query = em.createQuery("select o from PrivateMessage_"+tableNumber+" o where o.userId=?1 and o.friendUserId=?2 "+status_sql+" ORDER BY o.sendTimeFormat "+sort_sql);
 			query.setParameter(1, userId);
 			query.setParameter(2, friendUserId);
 			if(status != null){
@@ -335,7 +341,42 @@ public class PrivateMessageServiceBean extends DaoSupport<PrivateMessage> implem
 		
 		return qr;
 	}
-	
+	/**
+	 * 根据用户Id查询私信对话分页总数
+	 * @param userId 用户Id
+	 * @param friendUserId 对方用户Id
+	 * @param status 状态
+	 * @return
+	 */
+	@Transactional(readOnly=true, propagation=Propagation.NOT_SUPPORTED)
+	public Long findPrivateMessageChatCountByUserId(Long userId,Long friendUserId,Integer status){
+		String status_sql = "";
+		if(status != null){
+			status_sql = " and o.status <?3 ";
+		}
+		
+		//表编号
+		int tableNumber = privateMessageConfig.userIdRemainder(userId);
+		Query query  = null;
+		
+		if(tableNumber == 0){//默认对象	
+			query = em.createQuery("select count(o) from PrivateMessage o where o.userId=?1 and o.friendUserId=?2 "+status_sql+"");
+			query.setParameter(1, userId);
+			query.setParameter(2, friendUserId);
+			if(status != null){
+				query.setParameter(3, 100);
+			}
+			return (Long)query.getSingleResult();
+		}else{//带下划线对象
+			query = em.createQuery("select count(o) from PrivateMessage_"+tableNumber+" o where o.userId=?1 and o.friendUserId=?2 "+status_sql+"");
+			query.setParameter(1, userId);
+			query.setParameter(2, friendUserId);
+			if(status != null){
+				query.setParameter(3, 100);
+			}
+			return (Long)query.getSingleResult();
+		}
+	}
 	
 	/**
 	 * 根据用户Id查询未读私信数量

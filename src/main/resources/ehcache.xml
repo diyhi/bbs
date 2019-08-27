@@ -71,6 +71,11 @@
 		overflowToDisk="true"
 		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
 		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
+	<!-- 会员角色 (更新一个全部刷新) -->	
+	<cache name="userRoleServiceBean_cache" maxElementsInMemory="1" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
 	<!-- 会员注册项 (更新一个全部刷新) -->	
 	<cache name="userCustomServiceBean_cache" maxElementsInMemory="1" 
 		overflowToDisk="true"
@@ -202,7 +207,11 @@
 		overflowToDisk="true"
 		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
 		memoryStoreEvictionPolicy="LFU" />	
-	
+	<!-- 根据用户名称查询角色组 -->
+	<cache name="userRoleManage_cache_findRoleGroupByUserName" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" />		
 	
 	<!-- 查询未读私信数量 -->
 	<cache name="privateMessageManage_cache_findUnreadPrivateMessageByUserId" maxElementsInMemory="900000" 

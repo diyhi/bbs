@@ -10,6 +10,7 @@ import cms.bean.user.User;
 import cms.bean.user.UserDynamic;
 import cms.bean.user.UserInputValue;
 import cms.bean.user.UserLoginLog;
+import cms.bean.user.UserRoleGroup;
 import cms.service.besa.DAO;
 /**
  * 用户管理接口
@@ -74,8 +75,9 @@ public interface UserService extends DAO<User> {
 	 * 保存用户
 	 * @param user 用户
 	 * @param userInputValueList 用户自定义注册功能项用户输入值
+	 * @param userRoleGroupList 用户角色组集合
 	 */
-	public void saveUser(User user,List<UserInputValue> userInputValueList);
+	public void saveUser(User user,List<UserInputValue> userInputValueList, List<UserRoleGroup> userRoleGroupList);
 	/**
 	 * 前台修改用户
 	 * @param user 用户
@@ -88,8 +90,9 @@ public interface UserService extends DAO<User> {
 	 * @param user 用户
 	 * @param add_userInputValue 添加注册功能项用户输入值集合
 	 * @param delete_userInputValueIdList 删除注册功能项用户输入值Id集合
+	 * @param userRoleGroupList 用户角色组集合
 	*/
-	public Integer updateUser(User user, List<UserInputValue> add_userInputValue,List<Long> delete_userInputValueIdList);
+	public Integer updateUser(User user, List<UserInputValue> add_userInputValue,List<Long> delete_userInputValueIdList,List<UserRoleGroup> userRoleGroupList);
 	/**
 	 * 修改密码
 	 * @param userName 用户名称

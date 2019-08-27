@@ -92,7 +92,6 @@ public class FeedbackFormAction {
 			error.put("token", ErrorView._11.name());//令牌为空
 		}
 		
-		
 		//验证验证码
 		if(captchaKey != null && !"".equals(captchaKey.trim())){
 			//增加验证码重试次数

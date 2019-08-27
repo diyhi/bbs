@@ -418,6 +418,7 @@ function systemLayerClose(){
 
 
 
+
 //使表格行上移，接收参数为链接对象
 function moveUp(table,tr) {
 	//获得表格对象
@@ -427,7 +428,7 @@ function moveUp(table,tr) {
 	
 	//如果不是第一行 交换顺序
 	if (_row.previousSibling)
-	swapNode(_row, _row.previousSibling);
+	swapNode(_row, previousElementSibling(_row));
 }
 
 //使表格行下移 接收参数为链接对象
@@ -441,7 +442,7 @@ function moveDown(table,tr) {
 
 	//如果不是最后一行 则与下一行交换顺序
 	if (_row.nextSibling)
-	swapNode(_row, _row.nextSibling);
+	swapNode(_row, nextElementSibling(_row));
 }
 
 ///移动行
@@ -474,7 +475,28 @@ function swapNode(node1, node2) {
 	else
 		_parent.appendChild(node1);
 }
-
+//让previousElementSibling兼容IE9以下浏览器
+var previousElementSibling = function( el ) {	
+if( el.previousElementSibling ) {
+    return el.previousElementSibling;
+} else {
+	
+    while( el = el.previousSibling ) {
+        if( el.nodeType === 1 ) return el;
+    }
+}
+}
+//让nextElementSibling兼容IE9以下浏览器
+var nextElementSibling = function( el ) {	
+if( el.nextElementSibling ) {
+    return el.nextElementSibling;
+} else {
+	
+    while( el = el.nextSibling ) {
+        if( el.nodeType === 1 ) return el;
+    }
+}
+}
 
 //回调页面
 function callbackWeb(jumpStatus){ 

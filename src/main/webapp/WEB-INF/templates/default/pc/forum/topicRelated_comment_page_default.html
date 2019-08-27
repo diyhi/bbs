@@ -22,6 +22,10 @@
 							<a href="user/control/home?userName=${comment.userName}">
 								${(comment.nickname != null && comment.nickname??) ?string(comment.nickname , comment.userName)}
 							</a>
+							<#list comment.userRoleNameList as roleName>
+								<span class="userRoleName">${roleName}</span>
+										
+							</#list>
 						</cite> 
 					</div>
 					<div class="commentTime">${comment.postTime}</div>

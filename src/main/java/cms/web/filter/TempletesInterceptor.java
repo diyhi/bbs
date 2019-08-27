@@ -2,6 +2,7 @@ package cms.web.filter;
 
 
 
+import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -29,13 +30,16 @@ import cms.web.action.CSRFTokenManage;
 import cms.web.action.common.OAuthManage;
 import cms.web.action.statistic.PageViewManage;
 import cms.web.action.template.TemplateMain;
+import cms.web.action.user.RoleAnnotation;
 import cms.web.action.user.UserManage;
+import cms.web.action.user.UserRoleManage;
 import cms.web.taglib.Configuration;
 
 import org.apache.commons.lang3.StringUtils;
 import org.queryString.util.MultiMap;
 import org.queryString.util.UrlEncoded;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -58,6 +62,9 @@ public class TempletesInterceptor extends HandlerInterceptorAdapter {
 	
 	@Resource UserService userService;
 	@Resource UserManage userManage;
+	
+	@Resource UserRoleManage userRoleManage;
+	
 	//?  匹配任何单字符
 	//*  匹配0或者任意数量的字符
 	//** 匹配0或者更多的目录
@@ -78,6 +85,21 @@ public class TempletesInterceptor extends HandlerInterceptorAdapter {
 	public boolean preHandle(HttpServletRequest request,HttpServletResponse response, 
 			Object handler) throws Exception { 
 	//System.out.println(request.getRequestURI()+" -- "+request.getQueryString());
+		
+		//拦截用户角色处理 注解参考： @RoleAnnotation(resourceCode=ResourceEnum._2001000)
+		if(handler instanceof HandlerMethod){
+			HandlerMethod  handlerMethod= (HandlerMethod) handler;
+	        Method method=handlerMethod.getMethod();
+	        RoleAnnotation roleAnnotation = method.getAnnotation(RoleAnnotation.class);
+	        if(roleAnnotation != null){
+	        	boolean flag = userRoleManage.checkPermission(roleAnnotation.resourceCode(),null);
+	        	if(!flag){
+	        		 return false;
+	        	}
+	        }
+		}
+		
+		
 		
 		
 		//设置自定义标签的URL

@@ -50,129 +50,134 @@
 <body>
 <#-- 引入页头 -->
 <@include action="${newPublic_2}"/>
-<div class="fixedBottom wrap main_bg clearfix">
-	<div class="leftColumn_article">
-		<#if topic != null && topic?? >
-			<div class="articleModule" >
-			
-				<div class="tab">
-					<a href="?tagId=${topic.tagId}"class="tab">${topic.tagName}</a>
+<div class="skeleton">
+	<div class="main wrap backgroundModule" >
+		<div class="leftColumn_article">
+			<#if topic != null && topic?? >
+				<div class="articleModule" >
+				
+					<div class="tab">
+						<a href="?tagId=${topic.tagId}"class="tab">${topic.tagName}</a>
+					</div>
+				
+					<div class="articleBox">
+						<h1>${topic.title}</h1>
+						<!-- topicId属性用来支持JS获取隐藏内容 -->
+						<div class="topicContent" topicId="${topic.id}">
+							<#noescape>${topic.content}</#noescape>
+							
+							
+							<!-- 
+								<div class="hide-box">	
+									<div class="background-image"></div>
+									
+									<div class="background-prompt">此处内容已被隐藏，输入密码可见</div>			
+									<div class="input-box">
+										<input type="password" id="hide_password" class="text" maxlength="30"  placeholder="密码" value="">
+										<input type="button" value="提交" class="button" onclick="search();return false">
+									</div>
+									-->
+									<!-- 
+									<div class="background-prompt">此处内容已被隐藏，评论话题可见</div>
+									-->
+									<!--  
+									<div class="background-prompt">此处内容已被隐藏，达到‘新手上路’等级可见</div>			
+									-->
+									<!--  
+									<div class="background-prompt">此处内容已被隐藏，需要 50 积分购买可见</div>			
+									<div class="submit-box">
+										<input type="button" value="立即购买" class="button" onclick="search();return false">
+									</div>
+									-->
+									<!--  
+									<div class="background-prompt">此处内容已被隐藏，需要 50 人民币购买可见</div>			
+									<div class="submit-box">
+										<input type="button" value="立即购买" class="button" onclick="search();return false">
+									</div>
+									-->
+									
+									<!-- 
+								</div>-->
+								
+								
+								
+						
+						</div>
+						
+						<div class="favorite-formModule">
+							<#--加入收藏夹-->
+							<@include action="${favoriteRelated_addFavorite_1}"/>
+							
+							<#--给话题点赞-->
+							<@include action="${likeRelated_addLike_1}"/>
+	
+						</div>
+						<h2></h2>
+						
+					</div>
 				</div>
-			
-				<div class="articleBox">
-					<h1>${topic.title}</h1>
-					<!-- topicId属性用来支持JS获取隐藏内容 -->
-					<div class="topicContent" topicId="${topic.id}">
-						<#noescape>${topic.content}</#noescape>
-						
-						
-						<!-- 
-							<div class="hide-box">	
-								<div class="background-image"></div>
-								
-								<div class="background-prompt">此处内容已被隐藏，输入密码可见</div>			
-								<div class="input-box">
-									<input type="password" id="hide_password" class="text" maxlength="30"  placeholder="密码" value="">
-									<input type="button" value="提交" class="button" onclick="search();return false">
-								</div>
-								-->
-								<!-- 
-								<div class="background-prompt">此处内容已被隐藏，评论话题可见</div>
-								-->
-								<!--  
-								<div class="background-prompt">此处内容已被隐藏，达到‘新手上路’等级可见</div>			
-								-->
-								<!--  
-								<div class="background-prompt">此处内容已被隐藏，需要 50 积分购买可见</div>			
-								<div class="submit-box">
-									<input type="button" value="立即购买" class="button" onclick="search();return false">
-								</div>
-								-->
-								<!--  
-								<div class="background-prompt">此处内容已被隐藏，需要 50 人民币购买可见</div>			
-								<div class="submit-box">
-									<input type="button" value="立即购买" class="button" onclick="search();return false">
-								</div>
-								-->
-								
-								<!-- 
-							</div>-->
-							
-							
-							
-					
+				
+				<#-- 引入话题取消隐藏 本方法处理话题隐藏内容 -->
+				<@include action="${topicRelated_topicUnhide_1}"/> 
+				
+				
+				<#-- 引入评论列表 -->
+				<@include action="${topicRelated_comment_2}"/> 
+				 
+				 
+				<#if topic.allow == true><#-- 允许评论 -->
+					<#-- 引入添加评论 -->
+					<@include action="${topicRelated_addComment_1}"/> 
+				<#else><#-- 不允许评论 -->
+					<div class="addCommentModule" >
+						<div class="respond">
+							<p style="font-size:13px;padding:8px;text-align:center;background:#eee;overflow:hidden">
+								评论已关闭
+							</p>
+						</div>
 					</div>
-					
-					<div class="favorite-formModule">
-						<#--加入收藏夹-->
-						<@include action="${favoriteRelated_addFavorite_1}"/>
-						
-						<#--给话题点赞-->
-						<@include action="${likeRelated_addLike_1}"/>
-
+				</#if>
+				 
+				
+				
+			</#if>
+		</div>
+		<#if topic != null && topic?? >
+			<div class="articleInfoModule">
+				<div class="user">
+					<div class="author">
+						<a href="user/control/home?userName=${topic.userName}" >
+							<#if topic.avatarName != null>
+								<img src="${topic.avatarPath}${topic.avatarName}" >
+							<#else>
+								<img src="${commonPath}images/min_avata.png" >
+							</#if> 
+						</a>
+						<span>
+							<a href="user/control/home?userName=${topic.userName}">
+								${(topic.nickname != null && topic.nickname??) ?string(topic.nickname , topic.userName)}
+							</a>
+						</span>
+						<div class="role">
+						<#list topic.userRoleNameList as roleName>
+							<i class="userRoleName">${roleName}</i>				
+						</#list>
+						</div>
 					</div>
-					<h2></h2>
-					
+					<div class="userInfo">
+						<span>${topic.postTime}</span>
+						<span>${topic.viewTotal} 次浏览</span>
+						<span>${topic.commentTotal} 个评论</span>
+					</div>
 				</div>
 			</div>
 			
-			<#-- 引入话题取消隐藏 本方法处理话题隐藏内容 -->
-			<@include action="${topicRelated_topicUnhide_1}"/> 
-			
-			
-			<#-- 引入评论列表 -->
-			<@include action="${topicRelated_comment_2}"/> 
-			 
-			 
-			<#if topic.allow == true><#-- 允许评论 -->
-				<#-- 引入添加评论 -->
-				<@include action="${topicRelated_addComment_1}"/> 
-			<#else><#-- 不允许评论 -->
-				<div class="addCommentModule" >
-					<div class="respond">
-						<p style="font-size:13px;padding:8px;text-align:center;background:#eee;overflow:hidden">
-							评论已关闭
-						</p>
-					</div>
-				</div>
-			</#if>
-			 
-			
+			<!-- 相拟话题 -->
+			<@include action="${topicRelated_likeTopic_1}" topicId="${topic.id}"/>
 			
 		</#if>
-	</div>
-	<#if topic != null && topic?? >
-		<div class="articleInfoModule">
-			<div class="user">
-				<div class="author">
-					<a href="user/control/home?userName=${topic.userName}" >
-						<#if topic.avatarName != null>
-							<img src="${topic.avatarPath}${topic.avatarName}" >
-						<#else>
-							<img src="${commonPath}images/min_avata.png" >
-						</#if> 
-					</a>
-					<span>
-						<a href="user/control/home?userName=${topic.userName}">
-							${(topic.nickname != null && topic.nickname??) ?string(topic.nickname , topic.userName)}
-						</a>
-					</span>
-				</div>
-				<div class="userInfo">
-					<span>${topic.postTime}</span>
-					<span>${topic.viewTotal} 次浏览</span>
-					<span>${topic.commentTotal} 个评论</span>
-				</div>
-			</div>
-		</div>
-		
-		<!-- 相拟话题 -->
-		<@include action="${topicRelated_likeTopic_1}" topicId="${topic.id}"/>
-		
-	</#if>
 	
-	<div class="clear"></div>
-	<div class="push"><!-- 把div#footer推下去 --></div>
+	</div>
 </div>
 <#-- 引入页脚 -->
 <@include action="${newPublic_3}"/>

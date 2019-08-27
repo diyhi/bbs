@@ -37,6 +37,7 @@ import cms.bean.topic.Reply;
 import cms.bean.topic.Topic;
 import cms.bean.user.AccessUser;
 import cms.bean.user.PointLog;
+import cms.bean.user.ResourceEnum;
 import cms.bean.user.User;
 import cms.bean.user.UserDynamic;
 import cms.service.message.RemindService;
@@ -64,6 +65,7 @@ import cms.web.action.topic.TopicManage;
 import cms.web.action.user.PointManage;
 import cms.web.action.user.UserDynamicManage;
 import cms.web.action.user.UserManage;
+import cms.web.action.user.UserRoleManage;
 import cms.web.taglib.Configuration;
 
 /**
@@ -98,6 +100,8 @@ public class CommentFormAction {
 	@Resource UserDynamicManage userDynamicManage;
 	@Resource FollowManage followManage;
 	
+	@Resource UserRoleManage userRoleManage;
+	
 	/**
 	 * 评论   添加
 	 * @param model
@@ -120,6 +124,7 @@ public class CommentFormAction {
 		
 		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
 		
+
 		
 		Map<String,String> error = new HashMap<String,String>();
 		
@@ -179,19 +184,11 @@ public class CommentFormAction {
 		List<String> imageNameList = null;
 		
 		SystemSetting systemSetting = settingService.findSystemSetting_cache();
-		
-		//前台发表评论默认状态
-		if(systemSetting.getComment_defaultState() != null){
-			if(systemSetting.getComment_defaultState().equals(10)){
-				comment.setStatus(10);
-			}else if(systemSetting.getComment_defaultState().equals(20)){
-				comment.setStatus(20);
-			}
-		}
+
 		
 		Topic topic = null;
 		if(topicId != null && topicId >0L){
-			topic = topicService.findById(topicId);
+			topic = topicManage.queryTopicCache(topicId);
 			if(topic != null){
 				comment.setTopicId(topicId);
 				//是否全局允许评论
@@ -211,6 +208,51 @@ public class CommentFormAction {
 		}else{
 			error.put("comment",ErrorView._103.name());//话题Id不能为空
 		}
+		
+		
+		
+		
+		
+		if(topic != null){
+			//前台发表评论审核状态
+			if(systemSetting.getComment_review().equals(10)){//10.全部审核 20.特权会员未触发敏感词免审核(未实现) 30.特权会员免审核 40.触发敏感词需审核(未实现) 50.无需审核
+				comment.setStatus(10);//10.待审核 	
+			}else if(systemSetting.getComment_review().equals(30)){
+				if(topic != null){
+					//是否有当前功能操作权限
+					boolean flag_permission = userRoleManage.isPermission(ResourceEnum._1012000,topic.getTagId());
+					if(flag_permission){
+						comment.setStatus(20);//20.已发布
+					}else{
+						comment.setStatus(10);//10.待审核 
+					}
+				}
+			}else{
+				comment.setStatus(20);//20.已发布
+			}
+			
+			
+			
+			
+			//是否有当前功能操作权限
+			boolean flag_permission = userRoleManage.isPermission(ResourceEnum._1007000,topic.getTagId());
+			if(flag_permission == false){
+				if(isAjax == true){
+					response.setStatus(403);//设置状态码
+		    		
+					WebUtil.writeToWeb("", "json", response);
+					return null;
+				}else{ 
+					String dirName = templateService.findTemplateDir_cache();
+						
+					String accessPath = accessSourceDeviceManage.accessDevices(request);	
+					request.setAttribute("message","权限不足"); 	
+					return "templates/"+dirName+"/"+accessPath+"/message";
+				}
+			}
+		}
+		
+		
 		
 		
 		//如果实名用户才允许评论
@@ -439,83 +481,89 @@ public class CommentFormAction {
 		Map<String,Object> returnJson = new HashMap<String,Object>();
 		String errorMessage  = "";
 		
-		//文件上传
-		if(imgFile != null && !imgFile.isEmpty()){
-			if(topicId != null && topicId >0L){
-				SystemSetting systemSetting = settingService.findSystemSetting_cache();
-				
-				EditorTag editorSiteObject = settingManage.readEditorTag();
-				if(editorSiteObject != null && systemSetting.isAllowComment()){//是否全局允许评论
-					if(editorSiteObject.isImage()){//允许上传图片
-						//获取登录用户
-					  	AccessUser accessUser = AccessUserThreadLocal.get();
-						
-						//上传文件编号
-						String fileNumber = "b"+accessUser.getUserId();
-						
-						
-						//当前图片文件名称
-						String fileName = imgFile.getOriginalFilename();
-						//当前图片类型
-					//	String imgType = file.getContentType();
-						//文件大小
-						Long size = imgFile.getSize();
-						//取得文件后缀
-						String suffix = fileName.substring(fileName.lastIndexOf('.')+1).toLowerCase();
-						
-						
-						//允许上传图片格式
-						List<String> imageFormat = editorSiteObject.getImageFormat();
-						//允许上传图片大小
-						long imageSize = editorSiteObject.getImageSize();
-
-						//验证文件类型
-						boolean authentication = fileManage.validateFileSuffix(imgFile.getOriginalFilename(),imageFormat);
-						
-						if(authentication ){
-							if(size/1024 <= imageSize){
-								//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
-								String pathDir = "file"+File.separator+"comment"+File.separator + topicId + File.separator;
-								//文件锁目录
-								String lockPathDir = "file"+File.separator+"comment"+File.separator+"lock"+File.separator;
-								//构建文件名称
-								String newFileName = UUIDUtil.getUUID32()+fileNumber+ "." + suffix;
-								
-								//生成文件保存目录
-								fileManage.createFolder(pathDir);
-								//生成锁文件保存目录
-								fileManage.createFolder(lockPathDir);
-								//生成锁文件
-								fileManage.newFile(lockPathDir+topicId+"_"+newFileName);
-								//保存文件
-								fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
-								
-								//上传成功
-								returnJson.put("error", 0);//0成功  1错误
-								returnJson.put("url", "file/comment/"+topicId+"/"+newFileName);
-								
-								return JsonUtils.toJSONString(returnJson);
-							}else{
-								errorMessage = "文件超出允许上传大小";
-							}
+		//是否有当前功能操作权限
+		boolean flag_permission = userRoleManage.isPermission(ResourceEnum._2002000,null);
+		if(flag_permission == false){
+			errorMessage = "权限不足";
+		}else{
+			//文件上传
+			if(flag_permission && imgFile != null && !imgFile.isEmpty()){
+				if(topicId != null && topicId >0L){
+					
+					SystemSetting systemSetting = settingService.findSystemSetting_cache();
+					
+					EditorTag editorSiteObject = settingManage.readEditorTag();
+					if(editorSiteObject != null && systemSetting.isAllowComment()){//是否全局允许评论
+						if(editorSiteObject.isImage()){//允许上传图片
+							//获取登录用户
+						  	AccessUser accessUser = AccessUserThreadLocal.get();
 							
+							//上传文件编号
+							String fileNumber = "b"+accessUser.getUserId();
+							
+							
+							//当前图片文件名称
+							String fileName = imgFile.getOriginalFilename();
+							//当前图片类型
+						//	String imgType = file.getContentType();
+							//文件大小
+							Long size = imgFile.getSize();
+							//取得文件后缀
+							String suffix = fileName.substring(fileName.lastIndexOf('.')+1).toLowerCase();
+							
+							
+							//允许上传图片格式
+							List<String> imageFormat = editorSiteObject.getImageFormat();
+							//允许上传图片大小
+							long imageSize = editorSiteObject.getImageSize();
+
+							//验证文件类型
+							boolean authentication = fileManage.validateFileSuffix(imgFile.getOriginalFilename(),imageFormat);
+							
+							if(authentication ){
+								if(size/1024 <= imageSize){
+									//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
+									String pathDir = "file"+File.separator+"comment"+File.separator + topicId + File.separator;
+									//文件锁目录
+									String lockPathDir = "file"+File.separator+"comment"+File.separator+"lock"+File.separator;
+									//构建文件名称
+									String newFileName = UUIDUtil.getUUID32()+fileNumber+ "." + suffix;
+									
+									//生成文件保存目录
+									fileManage.createFolder(pathDir);
+									//生成锁文件保存目录
+									fileManage.createFolder(lockPathDir);
+									//生成锁文件
+									fileManage.newFile(lockPathDir+topicId+"_"+newFileName);
+									//保存文件
+									fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
+									
+									//上传成功
+									returnJson.put("error", 0);//0成功  1错误
+									returnJson.put("url", "file/comment/"+topicId+"/"+newFileName);
+									
+									return JsonUtils.toJSONString(returnJson);
+								}else{
+									errorMessage = "文件超出允许上传大小";
+								}
+								
+							}else{
+								errorMessage = "当前文件类型不允许上传";
+							}
 						}else{
-							errorMessage = "当前文件类型不允许上传";
+							errorMessage = "不允许上传图片";
 						}
 					}else{
-						errorMessage = "不允许上传图片";
+						errorMessage = "不允许评论";
 					}
 				}else{
-					errorMessage = "不允许评论";
+					errorMessage = "话题Id不能为空";
 				}
 			}else{
-				errorMessage = "话题Id不能为空";
+				errorMessage = "文件内容不能为空";
 			}
-		}else{
-			errorMessage = "文件内容不能为空";
 		}
-		
-		
+
 		//上传失败
 		returnJson.put("error", 1);
 		returnJson.put("message", errorMessage);
@@ -622,6 +670,29 @@ public class CommentFormAction {
 		}else{
 			error.put("comment", ErrorView._14.name());//引用评论不能为空
 		}
+		
+		
+		if(topic != null){
+			//是否有当前功能操作权限
+			boolean flag_permission = userRoleManage.isPermission(ResourceEnum._1007000,topic.getTagId());
+			if(flag_permission == false){
+				if(isAjax == true){
+					response.setStatus(403);//设置状态码
+		    		
+					WebUtil.writeToWeb("", "json", response);
+					return null;
+				}else{ 
+					String dirName = templateService.findTemplateDir_cache();
+						
+					String accessPath = accessSourceDeviceManage.accessDevices(request);	
+					request.setAttribute("message","权限不足"); 	
+					return "templates/"+dirName+"/"+accessPath+"/message";
+				}
+			}
+		}
+		
+		
+		
 		SystemSetting systemSetting = settingService.findSystemSetting_cache();
 		
 		//如果实名用户才允许评论
@@ -639,14 +710,23 @@ public class CommentFormAction {
 		List<String> imageNameList = null;
 		
 		
-		//前台发表评论默认状态
-		if(systemSetting.getComment_defaultState() != null){
-			if(systemSetting.getComment_defaultState().equals(10)){
-				newComment.setStatus(10);
-			}else if(systemSetting.getComment_defaultState().equals(20)){
-				newComment.setStatus(20);
+		//前台发表评论审核状态
+		if(systemSetting.getComment_review().equals(10)){//10.全部审核 20.特权会员未触发敏感词免审核(未实现) 30.特权会员免审核 40.触发敏感词需审核(未实现) 50.无需审核
+			newComment.setStatus(10);//10.待审核 	
+		}else if(systemSetting.getComment_review().equals(30)){
+			if(topic != null){
+				//是否有当前功能操作权限
+				boolean flag_permission = userRoleManage.isPermission(ResourceEnum._1012000,topic.getTagId());
+				if(flag_permission){
+					newComment.setStatus(20);//20.已发布
+				}else{
+					newComment.setStatus(10);//10.待审核 
+				}
 			}
+		}else{
+			newComment.setStatus(20);//20.已发布
 		}
+		
 		
 		if(content != null && !"".equals(content.trim())){ 
 			if(comment != null){
@@ -972,7 +1052,7 @@ public class CommentFormAction {
 		}
 		
 		Comment comment = null;
-		
+		Topic topic = null;
 		if(commentId == null || commentId <=0){
 			error.put("reply", ErrorView._105.name());//评论不存在
 		}else{
@@ -980,7 +1060,7 @@ public class CommentFormAction {
 			
 			if(comment != null){
 				
-				Topic topic = topicService.findById(comment.getTopicId());
+				topic = topicService.findById(comment.getTopicId());
 				if(topic != null){
 					SystemSetting systemSetting = settingService.findSystemSetting_cache();
 					//是否全局允许评论
@@ -1004,6 +1084,26 @@ public class CommentFormAction {
 			
 		}
 		
+		if(topic != null){
+			//是否有当前功能操作权限
+			boolean flag_permission = userRoleManage.isPermission(ResourceEnum._1013000,topic.getTagId());
+			if(flag_permission == false){
+				if(isAjax == true){
+					response.setStatus(403);//设置状态码
+		    		
+					WebUtil.writeToWeb("", "json", response);
+					return null;
+				}else{ 
+					String dirName = templateService.findTemplateDir_cache();
+						
+					String accessPath = accessSourceDeviceManage.accessDevices(request);	
+					request.setAttribute("message","权限不足"); 	
+					return "templates/"+dirName+"/"+accessPath+"/message";
+				}
+			}
+		}
+		
+		
 		SystemSetting systemSetting = settingService.findSystemSetting_cache();
 		
 		//如果实名用户才允许评论
@@ -1019,13 +1119,22 @@ public class CommentFormAction {
 		Reply reply = new Reply();
 		Date postTime = new Date();
 		reply.setPostTime(postTime);
-		//前台发表回复默认状态
-		if(systemSetting.getReply_defaultState() != null){
-			if(systemSetting.getReply_defaultState().equals(10)){
-				reply.setStatus(10);
-			}else if(systemSetting.getReply_defaultState().equals(20)){
-				reply.setStatus(20);
+		
+		//前台发表评论审核状态
+		if(systemSetting.getReply_review().equals(10)){//10.全部审核 20.特权会员未触发敏感词免审核(未实现) 30.特权会员免审核 40.触发敏感词需审核(未实现) 50.无需审核
+			reply.setStatus(10);//10.待审核 	
+		}else if(systemSetting.getReply_review().equals(30)){
+			if(topic != null){
+				//是否有当前功能操作权限
+				boolean flag_permission = userRoleManage.isPermission(ResourceEnum._1016000,topic.getTagId());
+				if(flag_permission){
+					reply.setStatus(20);//20.已发布
+				}else{
+					reply.setStatus(10);//10.待审核 
+				}
 			}
+		}else{
+			reply.setStatus(20);//20.已发布
 		}
 		
 		
@@ -1110,8 +1219,6 @@ public class CommentFormAction {
 			//修改话题最后回复时间
 			topicService.updateTopicReplyTime(comment.getTopicId(),new Date());
 			
-			
-			Topic topic = topicManage.queryTopicCache(comment.getTopicId());//查询缓存
 			if(topic != null && !topic.getIsStaff()){
 				User _user = userManage.query_cache_findUserByUserName(topic.getUserName());
 				//别人回复了我的话题

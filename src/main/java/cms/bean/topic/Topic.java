@@ -92,6 +92,14 @@ public class Topic implements Serializable{
 	@Transient
 	private String avatarName;
 	
+	/** 用户角色名称集合 **/
+	@Transient
+	private List<String> userRoleNameList = new ArrayList<String>();
+	
+	/** 话题允许查看的角色名称集合(默认角色除外) **/
+	@Transient
+	private List<String> allowRoleViewList = new ArrayList<String>();
+	
 	/** 是否为员工 true:员工  false:会员 **/
 	private Boolean isStaff = false;
 	/** 排序  **/
@@ -237,6 +245,18 @@ public class Topic implements Serializable{
 	}
 	public void setNickname(String nickname) {
 		this.nickname = nickname;
+	}
+	public List<String> getUserRoleNameList() {
+		return userRoleNameList;
+	}
+	public void setUserRoleNameList(List<String> userRoleNameList) {
+		this.userRoleNameList = userRoleNameList;
+	}
+	public List<String> getAllowRoleViewList() {
+		return allowRoleViewList;
+	}
+	public void setAllowRoleViewList(List<String> allowRoleViewList) {
+		this.allowRoleViewList = allowRoleViewList;
 	}
 	
 }

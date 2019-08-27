@@ -22,6 +22,10 @@
 				            <a href="thread?topicId=${topic.id}" class="title">
 					          	<span>${topic.title}</span>
 							</a>
+							<#list topic.allowRoleViewList as roleName>
+								<span class="topicRoleName">${roleName}</span>
+								
+							</#list>
 							<div class="clear"></div>
 							<div class="info clearfix">
 				
@@ -40,7 +44,13 @@
 					                    	${(topic.nickname != null && topic.nickname??) ?string(topic.nickname , topic.userName)}
 					                    </span>
 				                    </a>
+				                    <#list topic.userRoleNameList as roleName>
+										<span class="userRoleName">${roleName}</span>
+										
+									</#list>
 				                </em>
+				                
+				                
 				                <em>发表时间：${topic.postTime}</em>
 				                <#if topic.lastReplyTime != null>
 				                	<em>最新回复：${topic.lastReplyTime}</em>

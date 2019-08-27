@@ -152,7 +152,7 @@ public class PrivateMessageManageAction {
 			}
 			
 			
-			QueryResult<PrivateMessage> qr = privateMessageService.findPrivateMessageChatByUserId(id,friendUserId,null,firstIndex,pageView.getMaxresult());
+			QueryResult<PrivateMessage> qr = privateMessageService.findPrivateMessageChatByUserId(id,friendUserId,null,firstIndex,pageView.getMaxresult(),2);
 			if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
 				for(PrivateMessage privateMessage : qr.getResultlist()){
 					userIdList.add(privateMessage.getSenderUserId());//发送者用户Id 

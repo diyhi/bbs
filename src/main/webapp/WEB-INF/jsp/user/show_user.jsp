@@ -42,28 +42,29 @@
 		avatarDiv += "        </div>";
 		avatarDiv += "</div>";
 
-    //头像表单
-//	var avatarForm = "<form id='uploadImageForm' enctype='multipart/form-data'>";
-	var avatarForm = "    <div class='avatarModule'>";
+
+
+
+
+
+	//头像表单
+	var avatarForm = "    <div class='avatarModule '>";
 		avatarForm +=          avatarDiv;
+		
 		avatarForm += "        <div class='bottomInfo'>";
-		avatarForm += "            <div class='avatar-submit-button'>";
-		avatarForm += "                <span class='submitButton'><INPUT type='button' id='uploadSubmit' value='上传' onClick='javascript:uploadImageSubmit();'></span>";
-		avatarForm += "            </div>";
-		avatarForm += "            <div class='avatar-upload-button'>";
-		avatarForm += "                <span id='progressBar'></span>&nbsp;&nbsp;";
-		avatarForm += "                <span class='uploadButton' >选择文件";
-		avatarForm += "                    <input type='file' id='imgFile' name='imgFile' onchange='imgForm(this)'/>";
-		avatarForm += "                </span>&nbsp;&nbsp;";
+		avatarForm += "            <div class='button-box'>";
+		avatarForm += "                <i id='progressBar' class='progressBar'></i>&nbsp;&nbsp;";
+		avatarForm += "                <span>选择图片<input type='file' style='width: 104px;' id='imgFile' name='imgFile' onchange='imgForm(this)'/></span>";
+		avatarForm += "                <span class='on' id='uploadSubmit' onClick='javascript:uploadImageSubmit();'>上传</span>";
 		avatarForm += "            </div>";
 		avatarForm += "        </div>";
 		avatarForm += "   </div>";
-//    	avatarForm += "</form>";
-    
+
+ 
     
     //更换头像弹出层
 	function avatarLayer(){
-		systemLayerShow("更换头像",avatarForm,666,520);//显示层
+		systemLayerShow("更换头像",avatarForm,666,504);//显示层
 	}
     
     

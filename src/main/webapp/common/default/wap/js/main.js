@@ -30,6 +30,11 @@ $.ajaxSettings = $.extend($.ajaxSettings, {
 			//弹出提示内容
 			Vue.$messagebox('系统维护', XMLHttpRequest.responseText);
 		}
+		//关闭网站提示参数
+		if(XMLHttpRequest.status == 403){
+			//弹出提示内容
+			Vue.$messagebox('权限不足', '您没有当前功能的操作权限');
+		}
 		
 		//请求完成后回调函数 (请求成功或失败时均调用)
 		if (XMLHttpRequest.getResponseHeader("jumpPath") != null && XMLHttpRequest.getResponseHeader("jumpPath") != "") {
@@ -3357,6 +3362,7 @@ var home_component = Vue.extend({
 		return {
 			user : '', //用户
 			avatarUrl: '',//头像URL
+			followerCount:0,//用户粉丝总数
 			
 			popup_userSetting : false, //'用户设置'弹出层
 			popup_updateAvatar : false, //'更换头像'弹出层
@@ -3740,9 +3746,39 @@ var home_component = Vue.extend({
 								
 								_self.avatarUrl = _self.user.avatarPath+""+_self.user.avatarName+"?"+Math.random().toString().slice(-6);
 								_self.queryFollowing();//查询是否已经关注该用户
+								//查询用户粉丝总数
+								_self.queryFollowerCount();
 							}
 						}
 
+					}
+				}
+			});
+		},
+		
+		//查询用户粉丝总数
+		queryFollowerCount : function() {
+			var _self = this;
+			var data = "";
+			var userName = getUrlParam("userName");//用户名称
+			if(userName != null){
+				data = "&userName=" + userName;
+			}else{
+				data = "userName=" + _self.user.userName; //提交参数
+			}
+			
+			$.ajax({
+				type : "GET",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "queryFollowerCount",
+				data : data,
+				success : function success(result) {
+					if (result != "") {
+						var count = $.parseJSON(result);
+						if (count != null) {
+							_self.followerCount = count;
+						}
 					}
 				}
 			});
@@ -3903,7 +3939,6 @@ var home_component = Vue.extend({
 				}
 			});
 		},
-
 		
 		//显示'用户设置'			
 		displayUserSetting : function() {
@@ -5804,8 +5839,8 @@ var privateMessageChat_component = Vue.extend({
 			friendUserName:'',//对方用户名称
 			friendUserNameTitle:'',//对方用户名称标题
 			loading : false, //加载中
-			currentpage : 0, //当前页码
-			totalpage : 1, //总页数
+			currentpage : null, //当前页码
+			topText:'下拉加载更多',//下拉显示文本信息
 			
 			popup_privateMessage :false,//发私信弹出层
 			messageContent:'',//发私信内容
@@ -5823,7 +5858,7 @@ var privateMessageChat_component = Vue.extend({
 	},
 	created : function created() {
 		//初始化
-		this.init();
+	//	this.init();
 	},
 	beforeDestroy : function() {
 		//销毁滚动条
@@ -5836,11 +5871,13 @@ var privateMessageChat_component = Vue.extend({
 		//查询私信对话列表
 		queryPrivateMessageChat : function() {
 			var _self = this;
-			if (_self.currentpage < _self.totalpage) {
-				//先改总页数为0，避免请求为空时死循环
-				_self.totalpage = 0;
+			if (_self.currentpage ==null || _self.currentpage >0) {
 				_self.loading = true;
-				var data = "page=" + (_self.currentpage + 1); //提交参数
+				var data = "";
+				if(_self.currentpage >1){
+					data = "page=" + (_self.currentpage - 1); //提交参数
+				}
+				
 				data += "&friendUserName=" + _self.friendUserName;
 				$.ajax({
 					type : "GET",
@@ -5862,25 +5899,48 @@ var privateMessageChat_component = Vue.extend({
 									pageView = returnValue[key];
 								}
 							}
-							var new_privateMessageChatList = pageView.records;
-							if (new_privateMessageChatList != null && new_privateMessageChatList.length > 0) {
-								_self.privateMessageChatList.push.apply(_self.privateMessageChatList, new_privateMessageChatList); //合并两个数组
-							}
-							if(chatUser != null){
+							if(chatUser != null && chatUser.nickname != null && chatUser.nickname != ''){
 								_self.friendUserNameTitle = "与 "+chatUser.userName+" ("+chatUser.nickname+") 的对话";
 							}
 							
+							//第一个Id
+							var lastId = "";
+							var new_privateMessageChatList = pageView.records;
+							if (new_privateMessageChatList != null && new_privateMessageChatList.length > 0) {
+								_self.privateMessageChatList.unshift.apply(_self.privateMessageChatList, new_privateMessageChatList); //合并两个数组
+								
+								for(var i=0; i<new_privateMessageChatList.length; i++){
+									var privateMessageChat = new_privateMessageChatList[i];
+									lastId = privateMessageChat.id;
+								}
+							}
 							
 							_self.currentpage = pageView.currentpage;
-							_self.totalpage = pageView.totalpage;
+							if(pageView.currentpage ==1){//如果为第一页，则下次不再查询
+								_self.currentpage = 0;
+							}
+							
+							_self.$nextTick(function() {
+								//跳转到锚点
+								if(lastId != null && lastId != ""){
+									var anchor = _self.$el.querySelector("#anchor_"+lastId);
+									if(anchor != null){
+										document.body.scrollTop = anchor.offsetTop; // chrome
+								        document.documentElement.scrollTop = anchor.offsetTop; // firefox
+									}
+								}
+							});
 						}
 					},
 					complete : function complete(XMLHttpRequest, textStatus) {
 						_self.loading = false;
+						_self.$refs.loadmore.onTopLoaded();//查询完要调用一次，用于重新定位
 						//需手动调用设置的全局complete
 						$.ajaxSettings.complete(XMLHttpRequest, textStatus);
 					}
 				});
+			}else{
+				_self.$refs.loadmore.onTopLoaded();//查询完要调用一次，用于重新定位
 			}
 		},
 		//添加私信UI
@@ -5953,8 +6013,7 @@ var privateMessageChat_component = Vue.extend({
 							
 							//清空分页数据
 							_self.privateMessageChatList = []; //私信对话列表
-							_self.currentpage = 0; //当前页码
-							_self.totalpage = 1; //总页数
+							_self.currentpage = null; //当前页码
 							_self.messageContent = '';//发私信内容
 							//查询私信对话列表
 							_self.queryPrivateMessageChat();

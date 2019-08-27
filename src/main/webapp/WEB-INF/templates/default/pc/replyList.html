@@ -20,56 +20,54 @@
 <body>
 <#-- 引入页头 -->
 <@include action="${newPublic_2}"/>
-<div class="fixedBottom wrap clearfix">
+<div class="skeleton ">
+	<div class="main wrap backgroundModule" >
 
-	<#-- 引入服务导航 -->
-	<@include action="${newPublic_4}"/>
-
-	<div class="dataTable">
-		<TABLE class="dataList" width="100%">
-			<THEAD>
-				<TR class="dataThead">
-					<TH width="50%">回复</TH>	
-					<TH width="30%">回复的话题</TH>	
-					<TH width="20%">发表时间</TH>
-				</TR>
-			</THEAD>
-			<TBODY>
-	    		<#if pageView.records?exists && pageView.records?size gt 0 >    
-				<#list pageView.records as reply>
-				<TR>
-					<TD class="dataTD">
-						<#if reply.status == 20 >
-							<a href="thread?topicId=${reply.topicId}&commentId=${reply.commentId}" target="_blank" class="link">${reply.content}</a>	
-						<#elseif reply.status == 10 >
-							${reply.content}
-						</#if>
-					</TD>
-					<TD class="dataTD">
-						<a href="thread?topicId=${reply.topicId}" target="_blank" class="link">${reply.topicTitle}</a>		
-					</TD>
-					<TD class="dataTD">
-						${reply.postTime}
-					</TD>
-	    		</TR>
-	    		</#list>
-	    		</#if> 
-	    		<#if !pageView.records?exists || pageView.totalrecord == 0 > 
-	    			<TR>
-						<TD colSpan="3" align="center" height="28px">还没有回复记录</TD>
-	    			</TR>
-	    		</#if> 
-	    	</TBODY>
-		</TABLE>
-		<DIV class=pageList>
-			<@include action="${newPublic_1}"/>
-		</DIV>
+		<#-- 引入服务导航 -->
+		<@include action="${newPublic_4}"/>
+	
+		<div class="dataTable">
+			<TABLE class="dataList" width="100%">
+				<THEAD>
+					<TR class="dataThead">
+						<TH width="50%">回复</TH>	
+						<TH width="30%">回复的话题</TH>	
+						<TH width="20%">发表时间</TH>
+					</TR>
+				</THEAD>
+				<TBODY>
+		    		<#if pageView.records?exists && pageView.records?size gt 0 >    
+					<#list pageView.records as reply>
+					<TR>
+						<TD class="dataTD">
+							<#if reply.status == 20 >
+								<a href="thread?topicId=${reply.topicId}&commentId=${reply.commentId}" target="_blank" class="link">${reply.content}</a>	
+							<#elseif reply.status == 10 >
+								${reply.content}
+							</#if>
+						</TD>
+						<TD class="dataTD">
+							<a href="thread?topicId=${reply.topicId}" target="_blank" class="link">${reply.topicTitle}</a>		
+						</TD>
+						<TD class="dataTD">
+							${reply.postTime}
+						</TD>
+		    		</TR>
+		    		</#list>
+		    		</#if> 
+		    		<#if !pageView.records?exists || pageView.totalrecord == 0 > 
+		    			<TR>
+							<TD colSpan="3"  class="empty">还没有回复记录</TD>
+		    			</TR>
+		    		</#if> 
+		    	</TBODY>
+			</TABLE>
+			<DIV class=pageList>
+				<@include action="${newPublic_1}"/>
+			</DIV>
+		</div>
+	
 	</div>
-
-	<div style="clear:both;"></div>
-	<div class="push"><!-- 把div#footer推下去 --></div>
-
-
 </div>
 <#--引入页脚-->
 <@include action="${newPublic_3}"/>

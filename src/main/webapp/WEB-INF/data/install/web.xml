@@ -15,6 +15,11 @@
 	  <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
 	</listener> 
 	
+	<!-- 任何地方获取到request和response对象 -->
+	<listener>
+	  <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
+	</listener> 
+	
 	<!-- 读取Spring配置文件  /WEB-INF/beans.xml -->
 	<context-param>
 	  <param-name>contextConfigLocation</param-name>

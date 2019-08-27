@@ -79,6 +79,7 @@
 				    	<!-- router-link渲染成<h2>标签-->
 				        <router-link class="title"  tag="div" :to="{path: '/thread', query: {topicId: topic.id}}" >
 				            <span>{{topic.title}}</span>
+				            <i class="topicRoleName" v-for="(roleName,index) in topic.allowRoleViewList" >{{roleName}}</i>
 				        </router-link>
 				        
 				        <div class="summary" v-if="topic.imageInfoList.length ==0">
@@ -240,12 +241,15 @@
 					        </router-link>
 							<span class="info" >
 								<!-- router-link渲染成<h2>标签-->
-						    	<router-link tag="h2" :to="{path: '/user/control/home', query: {userName: comment.userName}}">
-						           {{comment.nickname != null && comment.nickname != '' ? comment.nickname : comment.userName}}
-						           <span class="badge" v-if="comment.userName == topic.userName && comment.isStaff == topic.isStaff">楼主</span>
+						    	<router-link tag="h2" class="clearfix" :to="{path: '/user/control/home', query: {userName: comment.userName}}">
+						        	<div class="userName">{{comment.nickname != null && comment.nickname != '' ? comment.nickname : comment.userName}}</div>
+						        	<div class="userTag">
+								        <span class="badge" v-if="comment.userName == topic.userName && comment.isStaff == topic.isStaff">楼主</span>
+								        <i class="userRoleName" v-for="roleName in comment.userRoleNameList" >{{roleName}}</i>
+							        </div>
 						        </router-link>
-	                        
-	                          	<p class="time">{{comment.postTime}}</p>
+	                        	
+	                          	<div class="time clearfix">{{comment.postTime}}</div>
 	                        </span>
 	                        <span class="floor">{{index+1}}楼</span>                     
 	                    </div>
@@ -490,6 +494,7 @@
 			    	<!-- router-link渲染成<div>标签-->
 			    	<router-link class="title"  tag="div" :to="{path: '/thread', query: {topicId: topic.id}}">
 			           <span v-html="topic.title"></span>
+			            <i class="topicRoleName" v-for="(roleName,index) in topic.allowRoleViewList" >{{roleName}}</i>
 			        </router-link>
 			       
 			        <div class="content">
@@ -813,9 +818,12 @@
 		    	
 		        <i class="avatar cms-user2" v-if="user.avatarName == null || user.avatarName == ''"></i>
 		        <i class="avatarImg" v-if="user.avatarName != null && user.avatarName != ''"><img :src="avatarUrl"></i>
-		        <p class="userName">{{user.userName}}</p>
+		        <p class="userName">{{user.userName}} <i class="userRoleName" v-for="(roleName,index) in user.userRoleNameList" >{{roleName}}</i></p>
 		        <p class="nickname" v-if="user.nickname != null && user.nickname != ''">{{user.nickname}}</p>
 		        <p class="grade" >{{user.gradeName}}</p>
+		        
+		       
+		      
 		        <span class="privateMessageBox" v-if="user.userName != $store.state.user.userName">
 		        	<div class="followButton" @click="addFollow(user.userName)">{{following == true ? '已关注':'关注'}}</div>
 		        	
@@ -832,7 +840,10 @@
 	    </div>
 	    <div class="quickTag" v-if="user.userName == $store.state.user.userName">
 	        <span class="item"><i class="total">{{user.point}}</i>积分</span>
+	        <span class="item"><i class="total">{{followerCount}}</i>粉丝</span>
 	    </div>
+	   
+	    
 	
 		<div class="homeMenuTable" v-if="user.userName == $store.state.user.userName">
 			<ul>
@@ -1490,6 +1501,7 @@
 	</div>
 </template>
 
+
 <!-- 私信对话 -->
 <template id="privateMessageChat-template">
 	<div>
@@ -1507,6 +1519,44 @@
 				<div class="button"><mt-button type="primary"  @click.native="addPrivateMessageUI();" style="height: 28px;font-size: 16px;">发私信</mt-button></div>
 				
 			</div>
+			<mt-loadmore :top-method="queryPrivateMessageChat" :bottom-all-loaded="loading"  ref="loadmore" :top-pull-text='topText'>    
+
+			<div v-for="privateMessage in privateMessageChatList"  :id="'anchor_'+privateMessage.id">
+				<div class="friend" v-if="privateMessage.friendUserId == privateMessage.senderUserId">
+					<!-- router-link渲染成<a>标签-->
+			    	<router-link tag="a" :to="{path: '/user/control/home', query: {userName: privateMessage.senderUserName}}">
+			        	<img :src="privateMessage.senderAvatarPath+'100x100/'+privateMessage.senderAvatarName" v-if="privateMessage.senderAvatarName != null">
+				        <img :src="$store.state.commonPath+'images/min_avata.png'" v-if="privateMessage.senderAvatarName == null || privateMessage.senderAvatarName == ''">     
+			        </router-link>
+					<div>
+			            <span>
+			            	<div class="time">{{privateMessage.sendTime}}</div>
+			            	<i></i>
+			            	<em v-html="privateMessage.messageContent"></em>
+			            	<!-- 
+			            	<a class="msg-del"></a> -->
+						</span>
+					</div>
+				</div>
+				<div class="self" v-if="privateMessage.friendUserId != privateMessage.senderUserId">
+					<!-- router-link渲染成<a>标签-->
+			    	<router-link tag="a" :to="{path: '/user/control/home', query: {userName: privateMessage.senderUserName}}">
+			        	<img :src="privateMessage.senderAvatarPath+'100x100/'+privateMessage.senderAvatarName" v-if="privateMessage.senderAvatarName != null">
+				        <img :src="$store.state.commonPath+'images/min_avata.png'" v-if="privateMessage.senderAvatarName == null || privateMessage.senderAvatarName == ''">     
+			        </router-link>
+					<div>
+			            <span>
+			            	<div class="time">{{privateMessage.sendTime}}</div>
+			            	<i></i>
+			            	<em v-html="privateMessage.messageContent"></em>
+			            	<!-- 
+			            	<a class="msg-del"></a> -->
+						</span>
+					</div>
+				</div>
+			</div>
+			</mt-loadmore>
+			<!-- 
 			<div class="privateMessageChatList">
 				<div v-infinite-scroll="queryPrivateMessageChat" infinite-scroll-disabled="loading" infinite-scroll-distance="10">
 					<div class="item" v-for="privateMessage in privateMessageChatList">
@@ -1516,7 +1566,7 @@
 				        </div>
 						<div class="head">
 							<span class="info" >
-			                    <h2>{{privateMessage.senderNickname != null && privateMessage.senderNickname != '' ? privateMessage.senderNickname : privateMessage.senderUserName}}<span class="badge" v-if="privateMessage.status == 10">未读</span></h2>
+			                    <h2>{{privateMessage.senderUserName}}<span class="badge" v-if="privateMessage.status == 10">未读</span></h2>
 			                        	
 			                    <p class="time">{{privateMessage.sendTime}}</p>
 			                </span>
@@ -1527,7 +1577,10 @@
 					</div>
 				</div>
 			</div>
-			
+			 -->
+			 
+			 
+			 
 			<!-- 发私信 -->
 			<mt-popup v-model="popup_privateMessage" position="right" style="width: 100%;height: 100%;">
 			

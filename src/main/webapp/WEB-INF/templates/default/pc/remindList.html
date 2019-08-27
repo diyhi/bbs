@@ -25,177 +25,176 @@
 <body>
 <#-- 引入页头 -->
 <@include action="${newPublic_2}"/>
-<div class="fixedBottom wrap clearfix">
-
-	<#-- 引入服务导航 -->
-	<@include action="${newPublic_4}"/>
-	
-	
-	<div class="remindTitle">全部提醒</div>
-	
-	
-	<#if pageView.records?exists> 
-		<div class="remindModule" >
-			<ol class="remindList">
-				<#list pageView.records as remind>
-					<div class="remind">
-						<div class="author">
-							<a href="user/control/home?userName=${remind.senderUserName}">
-								<#if remind.senderAvatarName != null>
-									<img src="${remind.senderAvatarPath}${remind.senderAvatarName}" class='avatar' height='48' width='48'>
-								<#else>
-									<img src="${commonPath}images/min_avata.png" class='avatar' height='48' width='48'>
-								</#if>
-							</a>
-							
-							<div class="tipBottom">
-								<span class="a-toolbar">
-									<#if remind.status == 10><span>未读</span></#if>
-									<#if remind.status == 20><span style="color: green;">已读</span></#if>
-									&nbsp;|&nbsp;
-									<a href="javascript:" onclick="deleteRemind('${remind.id}')">删除</a>
-									
-								</span>
-							</div>
-						</div>
-						<div class="time">${remind.sendTime}</div>
-						<div class="content" >
-							<#if remind.typeCode == 10>
-								<cite>
-									<a href="user/control/home?userName=${remind.senderUserName}">
-										${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
-									</a>
-								</cite> 
-								在
-								<cite>
-									<a href="thread?topicId=${remind.topicId}&commentId=${remind.friendTopicCommentId}">${remind.topicTitle}</a>
-								</cite> 
-								评论了我的话题
-								
-							<#elseif remind.typeCode == 20>
-								<cite>
-									<a href="user/control/home?userName=${remind.senderUserName}">
-										${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
-									</a>
-								</cite> 
-								在
-								<cite>
-									<a href="thread?topicId=${remind.topicId}&commentId=${remind.friendTopicCommentId}">${remind.topicTitle}</a>
-								</cite> 
-								回复了我的话题
-							<#elseif remind.typeCode == 30>
-								<cite>
-									<a href="user/control/home?userName=${remind.senderUserName}">
-										${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
-									</a>
-								</cite> 
-								在
-								<cite>
-									<a href="thread?topicId=${remind.topicId}&commentId=${remind.friendTopicCommentId}">${remind.topicTitle}</a>
-								</cite> 
-								引用了我的评论
-							<#elseif remind.typeCode == 40>
-								<cite>
-									<a href="user/control/home?userName=${remind.senderUserName}">
-										${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
-									</a>
-								</cite> 
-								在
-								<cite>
-									<a href="thread?topicId=${remind.topicId}&commentId=${remind.topicCommentId}">${remind.topicTitle}</a>
-								</cite> 
-								回复了我的评论
-							<#elseif remind.typeCode == 50>
-								<cite>
-									<a href="user/control/home?userName=${remind.senderUserName}">
-										${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
-									</a>
-								</cite> 
-								在
-								<cite>
-									<a href="thread?topicId=${remind.topicId}&commentId=${remind.friendTopicCommentId}">${remind.topicTitle}</a>
-								</cite> 
-								回复了我回复过的评论
-							<#elseif remind.typeCode == 60>
-								<cite>
-									<a href="user/control/home?userName=${remind.senderUserName}">
-										${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
-									</a>
-								</cite> 
-								在
-								<cite>
-									<a href="thread?topicId=${remind.topicId}">${remind.topicTitle}</a>
-								</cite> 
-								解锁了我的话题
-							<#elseif remind.typeCode == 70>
-								<cite>
-									<a href="user/control/home?userName=${remind.senderUserName}">
-										${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
-									</a>
-								</cite> 
-								在
-								<cite>
-									<a href="thread?topicId=${remind.topicId}">${remind.topicTitle}</a>
-								</cite> 
-								赞了我的话题
-							<#elseif remind.typeCode == 80>
-								<cite>
-									<a href="user/control/home?userName=${remind.senderUserName}">
-										${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
-									</a>
-								</cite>
-								关注了我
-							<#elseif remind.typeCode == 90>
-								我关注的
-								<cite>
-									<a href="user/control/home?userName=${remind.senderUserName}">
-										${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
-									</a>
-								</cite> 
-								发表了话题
-								<cite>
-									<a href="thread?topicId=${remind.topicId}">${remind.topicTitle}</a>
-								</cite>
-							<#elseif remind.typeCode == 100>
-								我关注的
-								<cite>
-									<a href="user/control/home?userName=${remind.senderUserName}">
-										${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
-									</a>
-								</cite> 
-								在
-								<cite>
-									<a href="thread?topicId=${remind.topicId}&commentId=${remind.friendTopicCommentId}">${remind.topicTitle}</a>
-								</cite>
-								发表了评论
-							<#elseif remind.typeCode == 110>
-								我关注的
-								<cite>
-									<a href="user/control/home?userName=${remind.senderUserName}">
-										${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
-									</a>
-								</cite> 
-								在
-								<cite>
-									<a href="thread?topicId=${remind.topicId}&commentId=${remind.friendTopicCommentId}">${remind.topicTitle}</a>
-								</cite>
-								发表了回复
-							</#if>
-						</div>
-						<div class="clearfix"></div>
-					</div>
-				</#list>
-			</ol>
-			<div class="remindPage">
-				<@include action="${newPublic_1}"/>
-			</div>
-		</div>
+<div class="skeleton">
+	<div class="main wrap backgroundModule" >
+		<#-- 引入服务导航 -->
+		<@include action="${newPublic_4}"/>
 		
-	</#if>
+		
+		<div class="remindTitle"><h2>全部提醒</h2></div>
+		
+		
+		<#if pageView.records?exists> 
+			<div class="remindModule" >
+				<ol class="remindList">
+					<#list pageView.records as remind>
+						<div class="remind">
+							<div class="author">
+								<a href="user/control/home?userName=${remind.senderUserName}">
+									<#if remind.senderAvatarName != null>
+										<img src="${remind.senderAvatarPath}${remind.senderAvatarName}" class='avatar' height='64px' width='64px'>
+									<#else>
+										<img src="${commonPath}images/min_avata.png" class='avatar' height='64px' width='64px'>
+									</#if>
+								</a>
+								
+								<div class="tipBottom">
+									<span class="a-toolbar">
+										<#if remind.status == 10><span>未读</span></#if>
+										<#if remind.status == 20><span style="color: green;">已读</span></#if>
+										&nbsp;|&nbsp;
+										<a href="javascript:" onclick="deleteRemind('${remind.id}')">删除</a>
+										
+									</span>
+								</div>
+							</div>
+							<div class="time">${remind.sendTime}</div>
+							<div class="content" >
+								<#if remind.typeCode == 10>
+									<cite>
+										<a href="user/control/home?userName=${remind.senderUserName}">
+											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
+										</a>
+									</cite> 
+									在
+									<cite>
+										<a href="thread?topicId=${remind.topicId}&commentId=${remind.friendTopicCommentId}">${remind.topicTitle}</a>
+									</cite> 
+									评论了我的话题
+									
+								<#elseif remind.typeCode == 20>
+									<cite>
+										<a href="user/control/home?userName=${remind.senderUserName}">
+											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
+										</a>
+									</cite> 
+									在
+									<cite>
+										<a href="thread?topicId=${remind.topicId}&commentId=${remind.friendTopicCommentId}">${remind.topicTitle}</a>
+									</cite> 
+									回复了我的话题
+								<#elseif remind.typeCode == 30>
+									<cite>
+										<a href="user/control/home?userName=${remind.senderUserName}">
+											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
+										</a>
+									</cite> 
+									在
+									<cite>
+										<a href="thread?topicId=${remind.topicId}&commentId=${remind.friendTopicCommentId}">${remind.topicTitle}</a>
+									</cite> 
+									引用了我的评论
+								<#elseif remind.typeCode == 40>
+									<cite>
+										<a href="user/control/home?userName=${remind.senderUserName}">
+											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
+										</a>
+									</cite> 
+									在
+									<cite>
+										<a href="thread?topicId=${remind.topicId}&commentId=${remind.topicCommentId}">${remind.topicTitle}</a>
+									</cite> 
+									回复了我的评论
+								<#elseif remind.typeCode == 50>
+									<cite>
+										<a href="user/control/home?userName=${remind.senderUserName}">
+											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
+										</a>
+									</cite> 
+									在
+									<cite>
+										<a href="thread?topicId=${remind.topicId}&commentId=${remind.friendTopicCommentId}">${remind.topicTitle}</a>
+									</cite> 
+									回复了我回复过的评论
+								<#elseif remind.typeCode == 60>
+									<cite>
+										<a href="user/control/home?userName=${remind.senderUserName}">
+											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
+										</a>
+									</cite> 
+									在
+									<cite>
+										<a href="thread?topicId=${remind.topicId}">${remind.topicTitle}</a>
+									</cite> 
+									解锁了我的话题
+								<#elseif remind.typeCode == 70>
+									<cite>
+										<a href="user/control/home?userName=${remind.senderUserName}">
+											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
+										</a>
+									</cite> 
+									在
+									<cite>
+										<a href="thread?topicId=${remind.topicId}">${remind.topicTitle}</a>
+									</cite> 
+									赞了我的话题
+								<#elseif remind.typeCode == 80>
+									<cite>
+										<a href="user/control/home?userName=${remind.senderUserName}">
+											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
+										</a>
+									</cite>
+									关注了我
+								<#elseif remind.typeCode == 90>
+									我关注的
+									<cite>
+										<a href="user/control/home?userName=${remind.senderUserName}">
+											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
+										</a>
+									</cite> 
+									发表了话题
+									<cite>
+										<a href="thread?topicId=${remind.topicId}">${remind.topicTitle}</a>
+									</cite>
+								<#elseif remind.typeCode == 100>
+									我关注的
+									<cite>
+										<a href="user/control/home?userName=${remind.senderUserName}">
+											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
+										</a>
+									</cite> 
+									在
+									<cite>
+										<a href="thread?topicId=${remind.topicId}&commentId=${remind.friendTopicCommentId}">${remind.topicTitle}</a>
+									</cite>
+									发表了评论
+								<#elseif remind.typeCode == 110>
+									我关注的
+									<cite>
+										<a href="user/control/home?userName=${remind.senderUserName}">
+											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
+										</a>
+									</cite> 
+									在
+									<cite>
+										<a href="thread?topicId=${remind.topicId}&commentId=${remind.friendTopicCommentId}">${remind.topicTitle}</a>
+									</cite>
+									发表了回复
+								</#if>
+							</div>
+							<div class="clearfix"></div>
+						</div>
+					</#list>
+				</ol>
+				<div class="remindPage">
+					<@include action="${newPublic_1}"/>
+				</div>
+			</div>
+			
+		</#if>
 	
 	
-	<div style="clear:both;"></div>
-	<div class="push"><!-- 把div#footer推下去 --></div>
+	</div>
 
 
 </div>

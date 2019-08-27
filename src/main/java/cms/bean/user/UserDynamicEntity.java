@@ -1,7 +1,9 @@
 package cms.bean.user;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Id;
@@ -20,7 +22,7 @@ import javax.persistence.Transient;
 @MappedSuperclass
 @Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
 public class UserDynamicEntity implements Serializable{
-	private static final long serialVersionUID = 7922158419619674156L;
+	private static final long serialVersionUID = 1121098848019423561L;
 	
 	/** Id  Id的后4位为用户Id的后4位**/
 	@Id @Column(length=36)
@@ -61,6 +63,9 @@ public class UserDynamicEntity implements Serializable{
 	/** 话题评论总数 **/
 	@Transient
 	protected Long topicCommentTotal = 0L;
+	/** 话题允许查看的角色名称集合(默认角色除外) **/
+	@Transient
+	private List<String> allowRoleViewList = new ArrayList<String>();
 	/** 评论内容 **/
 	@Transient
 	protected String commentContent;
@@ -227,6 +232,14 @@ public class UserDynamicEntity implements Serializable{
 
 	public void setTopicCommentTotal(Long topicCommentTotal) {
 		this.topicCommentTotal = topicCommentTotal;
+	}
+
+	public List<String> getAllowRoleViewList() {
+		return allowRoleViewList;
+	}
+
+	public void setAllowRoleViewList(List<String> allowRoleViewList) {
+		this.allowRoleViewList = allowRoleViewList;
 	}
 	
 }

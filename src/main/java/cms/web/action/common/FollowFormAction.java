@@ -22,6 +22,7 @@ import cms.bean.follow.Follow;
 import cms.bean.follow.Follower;
 import cms.bean.message.Remind;
 import cms.bean.user.AccessUser;
+import cms.bean.user.ResourceEnum;
 import cms.bean.user.User;
 import cms.service.follow.FollowService;
 import cms.service.message.RemindService;
@@ -36,6 +37,7 @@ import cms.web.action.CSRFTokenManage;
 import cms.web.action.follow.FollowManage;
 import cms.web.action.follow.FollowerManage;
 import cms.web.action.message.RemindManage;
+import cms.web.action.user.RoleAnnotation;
 import cms.web.action.user.UserManage;
 import cms.web.taglib.Configuration;
 
@@ -66,6 +68,7 @@ public class FollowFormAction {
 	 * @throws Exception
 	 */
 	@RequestMapping(value="/add", method=RequestMethod.POST)
+	@RoleAnnotation(resourceCode=ResourceEnum._5001000)
 	public String add(ModelMap model,String userName,String token,String jumpUrl,
 			RedirectAttributes redirectAttrs,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -118,8 +121,6 @@ public class FollowFormAction {
 		}else{
 			error.put("follow", ErrorView._859.name());//用户不存在
 		}
-	  	
-	  	
 	  	
 		if(error.size() == 0){
 			Date time = new Date();

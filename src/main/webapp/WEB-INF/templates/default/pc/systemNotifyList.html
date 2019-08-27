@@ -24,48 +24,47 @@
 <body>
 <#-- 引入页头 -->
 <@include action="${newPublic_2}"/>
-<div class="fixedBottom wrap clearfix">
+<div class="skeleton ">
+	<div class="main wrap backgroundModule" >
 
-	<#-- 引入服务导航 -->
-	<@include action="${newPublic_4}"/>
-	
-	
-	<div class="systemNotifyTitle">全部系统通知</div>
-	
-	
-	<#if pageView.records?exists> 
-		<div class="systemNotifyModule" >
-			<ol class="systemNotifyList">
-				<#list pageView.records as subscriptionSystemNotify>
-					<div class="systemNotify">
-						<div class="author">
-							<div class="tipBottom">
-								<span class="a-toolbar">
-									<#if subscriptionSystemNotify.status == 10><span>未读</span></#if>
-									<#if subscriptionSystemNotify.status == 20><span style="color: green;">已读</span></#if>
-									&nbsp;|&nbsp;
-									<a href="javascript:" onclick="deleteSystemNotify('${subscriptionSystemNotify.id}')">删除</a>
-									
-								</span>
-							</div>
-						</div>
-						<div class="time">${subscriptionSystemNotify.sendTime}</div>
-						<p class="content" ><#noescape>${subscriptionSystemNotify.content}</#noescape></p>
-						<div class="clearfix"></div>
-					</div>
-				</#list>
-			</ol>
-			<div class="systemNotifyPage">
-				<@include action="${newPublic_1}"/>
-			</div>
-		</div>
+		<#-- 引入服务导航 -->
+		<@include action="${newPublic_4}"/>
 		
-	</#if>
-	
-	
-	<div style="clear:both;"></div>
-	<div class="push"><!-- 把div#footer推下去 --></div>
-
+		
+		<div class="systemNotifyTitle"><h2>全部系统通知</h2></div>
+		
+		
+		<#if pageView.records?exists> 
+			<div class="systemNotifyModule" >
+				<ol class="systemNotifyList">
+					<#list pageView.records as subscriptionSystemNotify>
+						<div class="systemNotify">
+							<div class="author">
+								<div class="tipBottom">
+									<span class="a-toolbar">
+										<#if subscriptionSystemNotify.status == 10><span>未读</span></#if>
+										<#if subscriptionSystemNotify.status == 20><span style="color: green;">已读</span></#if>
+										&nbsp;|&nbsp;
+										<a href="javascript:" onclick="deleteSystemNotify('${subscriptionSystemNotify.id}')">删除</a>
+										
+									</span>
+								</div>
+							</div>
+							<div class="time">${subscriptionSystemNotify.sendTime}</div>
+							<p class="content" ><#noescape>${subscriptionSystemNotify.content}</#noescape></p>
+							<div class="clearfix"></div>
+						</div>
+					</#list>
+				</ol>
+				<div class="systemNotifyPage">
+					<@include action="${newPublic_1}"/>
+				</div>
+			</div>
+			
+		</#if>
+		
+		
+	</div>
 
 </div>
 

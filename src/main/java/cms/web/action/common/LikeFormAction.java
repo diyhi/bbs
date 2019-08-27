@@ -23,6 +23,7 @@ import cms.bean.like.TopicLike;
 import cms.bean.message.Remind;
 import cms.bean.topic.Topic;
 import cms.bean.user.AccessUser;
+import cms.bean.user.ResourceEnum;
 import cms.bean.user.User;
 import cms.service.like.LikeService;
 import cms.service.message.RemindService;
@@ -37,6 +38,7 @@ import cms.web.action.CSRFTokenManage;
 import cms.web.action.like.LikeManage;
 import cms.web.action.message.RemindManage;
 import cms.web.action.topic.TopicManage;
+import cms.web.action.user.RoleAnnotation;
 import cms.web.action.user.UserManage;
 import cms.web.taglib.Configuration;
 
@@ -68,6 +70,7 @@ public class LikeFormAction {
 	 * @throws Exception
 	 */
 	@RequestMapping(value="/add", method=RequestMethod.POST)
+	@RoleAnnotation(resourceCode=ResourceEnum._4001000)
 	public String add(ModelMap model,Long topicId,String token,String jumpUrl,
 			RedirectAttributes redirectAttrs,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {

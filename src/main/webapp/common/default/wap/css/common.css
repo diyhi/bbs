@@ -215,6 +215,16 @@ html,body{
 	-webkit-line-clamp: 2;
 	overflow: hidden;
 }
+.indexModule .topicList .item .topicRoleName{
+	font-style:normal;
+	margin-left:5px;
+	white-space:nowrap; 
+	color:#fff;
+	background-color:#ffb800;
+	border-radius:4px;
+	padding:0 5px;
+	font-size: 14px;
+}
 .indexModule .topicList .item .detailInfo{position:relative;line-height:24px;padding:5px 10px 0px 50px;height: 24px;border-bottom:1px solid #eee;}
 .indexModule .topicList .item .detailInfo .bLeft{float:left!important;color:#aaa;display:inline-block;height:25px;font-size:14px;}
 .indexModule .topicList .item .detailInfo .bLeft .userName{float:left!important;}
@@ -392,14 +402,14 @@ html,body{
 	overflow-x: hidden;
 }
 .topicContentModule .commentList .badge {
-	font-size: 10px;
-	color: #fff;
-	vertical-align: top;
-	background-color: #26a2ff;
-	-webkit-border-radius: 4px;
-	border-radius: 4px;
-	padding: 0 3px;
-	margin-left: 3px
+	white-space:nowrap; 
+	font-style:normal;
+	margin-left:5px;
+	color:#fff;
+	background-color:#26a2ff;
+	border-radius:4px;
+	padding:0px 5px;
+	font-size: 12px;
 }
 .topicContentModule .commentList .item {
 	border-bottom: 1px solid #eee;
@@ -431,7 +441,23 @@ html,body{
 .topicContentModule .commentList .item .head .info h2 {
 	color:#aaa;
 	font-size:14px;
-	line-height: 16px
+	line-height: 16px;
+}
+.topicContentModule .commentList .item .head .info h2 .userName{
+	float: left;
+}
+.topicContentModule .commentList .item .head .userTag{
+	float: left;margin-top: -1px;
+}
+.topicContentModule .commentList .item .head .userTag .userRoleName{
+	white-space:nowrap; 
+	font-style:normal;
+	margin-left:5px;
+	color:#fff;
+	background-color:#ffcc00;
+	border-radius:4px;
+	padding:0 5px;
+	font-size: 12px;
 }
 .topicContentModule .commentList .item .head .time {
 	font-size: 12px;
@@ -656,6 +682,16 @@ html,body{
 	-webkit-line-clamp: 2;
 	overflow: hidden;
 }
+.searchModule .topicList .item .topicRoleName{
+	font-style:normal;
+	margin-left:5px;
+	white-space:nowrap; 
+	color:#fff;
+	background-color:#ffb800;
+	border-radius:4px;
+	padding:0 5px;
+	font-size: 14px;
+}
 .searchModule .topicList .item .content{
 	position:relative;
 	color: #aaa;padding:0px 10px 5px 50px;font-size:14px;
@@ -787,6 +823,16 @@ html,body{
 
 .homeModule .homeHeader .user .userName{line-height:20px;margin:3px 0; font-size:16px;}
 .homeModule .homeHeader .user .nickname{line-height:20px;margin:5px 0; font-size:17px;}
+.homeModule .homeHeader .user .userRoleName{
+	font-style:normal;
+	margin-left:5px;
+	white-space:nowrap; 
+	color:#fff;
+	background-color:#ffcc00;
+	border-radius:4px;
+	padding:0 5px;
+	font-size: 14px;
+}
 .homeModule .homeHeader .user .grade{line-height:25px;background-repeat:no-repeat;background-position:left center;background-size:auto 100%;font-size:12px;height:23px;min-width:40px;display:inline-block;background-color:#56b7ff;border-radius:20px;text-align:center;padding-left: 10px;padding-right: 10px;}
 .homeModule .homeHeader .privateMessageBox{
 	position: absolute;right: 5px;bottom: 5px;
@@ -1380,10 +1426,10 @@ html,body{
 
 
 
-
 /** 私信对话 **/
 .privateMessageChatModule{
-	padding-top: 40px;padding-bottom: 2px;
+	padding-top: 40px;padding-bottom: 2px;padding-bottom: 20px;
+
 }
 
 .privateMessageChatModule .headInfo{margin-top: 10px; margin-left:8px; margin-right:8px; border-bottom:1px solid #eee; height: 38px; }
@@ -1398,67 +1444,199 @@ html,body{
 	float: right;
 }
 
+.privateMessageChatModule .friend{
+	margin: 26px 52px 0 10px;
+	position: relative;
 
-.privateMessageChatModule .privateMessageChatList {
-	width: 100%;
-	overflow-x: hidden
 }
-.privateMessageChatModule .privateMessageChatList .item {
-	border-bottom: 1px solid #eee;
-	margin-left: 8px; 
-	margin-right: 8px;
+.privateMessageChatModule .friend:after{
+	content: "";
+	display: block;
+	height: 0;
+	clear: both;
+	visibility: hidden;
+}
+.privateMessageChatModule .friend img{
+	position: absolute;
+	width: 42px;
+	height: 42px;
+	left: 0;
+	top: 0;
+	background: #fff;
+	-webkit-border-radius:50%;
+	-moz-border-radius:50%;
+	border-radius:50%;
+}
+.privateMessageChatModule .friend div{
+	position: relative;
+	margin-left: 35px;
+	margin-right: 10px;
+	text-align: initial;
+}
+.privateMessageChatModule .friend .time{
+	position:absolute;
+	width:130px;
+	line-height: 36px;
+	display: inline-block;
+	color: #a5a5a5;
+	font-size: 12px;
+	top: -28px;
+	left: -30px;
+}
+.privateMessageChatModule .friend div i{
+	position: absolute;
+	width: 24px;
+	height: 24px;
+	left: -24px;
+	top: 10px;
+}
+.privateMessageChatModule .friend div i:after{
+    content: "";
+    position: absolute;
+    border-style: solid;
+    border-color:  transparent #fafafa transparent transparent;
+    border-width: 10px;
+    left:5px;
+}
+.privateMessageChatModule .friend div span{
+	float: left;
+	min-height: 40px;
+	min-width: 96px;
+	margin-left: 24px;
+	margin-top:18px;
+	font-size: 15px;
+	border: 1px #fff solid;
+	background: #fafafa;
+	border-radius: 10px;
+	position: relative;
+	max-width: 94%;
+}
+.privateMessageChatModule .friend .msg-del{
+    background: #ececec;
+    color: #919191;
+    border-radius: 12px;
+    line-height: 20px;
+    text-align: center;
+    height: 20px;
+    width: 20px;
+    font-size: 15px;
+    padding: 1px;
+    top: -10px;
+    right: -10px;
+    position: absolute;
+}
+.privateMessageChatModule .friend .msg-del::before {
+    content: "\2716";
+}
+.privateMessageChatModule .friend .msg-del:hover {
+	color: #1e9fff;
+}
+
+.privateMessageChatModule .self{
+	margin: 26px 10px 0 46px;
 	position: relative;
 }
-.privateMessageChatModule .privateMessageChatList .badge {
-	font-size: 10px;
-	color: #fff;
-	vertical-align: top;
-	background-color: #26a2ff;
-	-webkit-border-radius: 4px;
-	border-radius: 4px;
-	padding: 0 3px;
-	margin-left: 3px
+.privateMessageChatModule .self:after{
+	content: "";
+	display: block;
+	height: 0;
+	clear: both;
+	visibility: hidden;
+
 }
-.privateMessageChatModule .privateMessageChatList .avatarBox{
-	position:absolute;display:inline-block;border-radius:100%;
-	left: 0px;top:8px;
+.privateMessageChatModule .self img{
+	position: absolute;
+	width: 42px;
+	height: 42px;
+	left: 0;
+	top: 0;
+	background: #fff;
+	left: auto;
+	right: 0;
+	-webkit-border-radius:50%;
+	-moz-border-radius:50%;
+	border-radius:50%;
+}
+.privateMessageChatModule .self div{
+	position: relative;
+	text-align: initial;
+	margin-left: 20px;
+	margin-right: 50px;
+}
+.privateMessageChatModule .self .time{
+	position:absolute;
+	width:130px;
+	line-height: 36px;
+	display: inline-block;
+	color: #a5a5a5;
+	font-size: 12px;
+	top: -28px;
+	right: -66px;
+}
+.privateMessageChatModule .self div i{
+	position: absolute;
+	width: 24px;
+	height: 24px;
+	top: 10px;
+	left: auto;
+	right: -20px;
+}
+.privateMessageChatModule .self div i:after{
+    content: "";
+    position: absolute;
+    border-style: solid;
+    border-color:  transparent transparent transparent #d4e9f9;
+    border-width: 10px;
+    left:5px;
+}
+.privateMessageChatModule .self div span{
+	min-height: 40px;
+	min-width: 96px;
+	font-size: 15px;
+	border: 1px #fff solid;
+	border-radius: 10px;
+	position: relative;
+	max-width: 94%;
+	background: #d4e9f9;
+	border-color: #d4e9f9;
+	float: right;
+	margin-top:18px;
+	margin-left: 0;
+	margin-right: 10px;
 	
 }
-.privateMessageChatModule .privateMessageChatList .avatarBox img{
-	border-radius:100%;
-	width: 32px;
+.privateMessageChatModule .self .msg-del{
+    background: #ececec;
+    color: #919191;
+    border-radius: 12px;
+    line-height: 20px;
+    text-align: center;
+    height: 20px;
+    width: 20px;
+    font-size: 15px;
+    padding: 1px;
+    top: -10px;
+    left: -10px;
+    position: absolute;
 }
-.privateMessageChatModule .privateMessageChatList .item .head {
-	min-height: 45px;
-	padding: 8px 0px 0px 40px;
-	margin: 0;
-	overflow: hidden;
+.privateMessageChatModule .self .msg-del::before {
+    content: "\2716";
 }
-.privateMessageChatModule .privateMessageChatList .item .head .info {
+.privateMessageChatModule .self .msg-del:hover {
+	color: #1e9fff;
+}
+.privateMessageChatModule .friend div span em,
+.privateMessageChatModule .self div span em {
+	font-style: normal;
+	padding: 10px;
 	display: block;
-	float: left
+	white-space:normal; word-break:break-all;
 }
-.privateMessageChatModule .privateMessageChatList .item .head .info h2 {
-	color:#aaa;
-	font-size:14px;
-	line-height: 16px
+.privateMessageChatModule .friend div span em a,
+.privateMessageChatModule .self div span em a{
+	font-size: 15px;
 }
-.privateMessageChatModule .privateMessageChatList .item .head .time {
-	font-size: 12px;
-	color:#aaa;
-	margin-top: 6px;
-	line-height: 12px
-}
-.privateMessageChatModule .privateMessageChatList .item .main {
-	padding: 0 8px 0 8px;
-	font-size: 16px;
-	line-height: 26px;
-	margin: 0 0 10px
-}
-.privateMessageChatModule .privateMessageChatList .item .main .content {
-	margin-bottom: 10px;
-	color:#222;
-}
+
 .privateMessageChatModule .addPrivateMessageScroll {
     width: 100%;
     height: 100%;

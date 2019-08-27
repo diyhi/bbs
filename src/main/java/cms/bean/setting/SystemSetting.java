@@ -57,12 +57,13 @@ public class SystemSetting implements Serializable{
 	private Long comment_rewardPoint = 0L;
 	/** 发表回复奖励积分 **/
 	private Long reply_rewardPoint = 0L;
-	/** 前台发表话题默认状态  10.待审核  20.已发布  **/
-	private Integer topic_defaultState = 10;
-	/** 前台发表评论默认状态  10.待审核  20.已发布  **/
-	private Integer comment_defaultState = 10;
-	/** 前台发表回复默认状态  10.待审核  20.已发布  **/
-	private Integer reply_defaultState = 10;
+	
+	/** 前台发表话题审核   10.全部审核 20.特权会员未触发敏感词免审核 30.特权会员免审核 40.触发敏感词需审核 50.无需审核 **/
+	private Integer topic_review = 10;
+	/** 前台发表评论审核   10.全部审核 20.特权会员未触发敏感词免审核 30.特权会员免审核 40.触发敏感词需审核 50.无需审核 **/
+	private Integer comment_review = 10;
+	/** 前台发表回复审核   10.全部审核 20.特权会员未触发敏感词免审核 30.特权会员免审核 40.触发敏感词需审核 50.无需审核 **/
+	private Integer reply_review = 10;
 	
 	/** 允许提交在线留言 **/
 	private boolean allowFeedback = false;
@@ -309,29 +310,6 @@ public class SystemSetting implements Serializable{
 		this.allowTopic = allowTopic;
 	}
 
-	public Integer getTopic_defaultState() {
-		return topic_defaultState;
-	}
-
-	public void setTopic_defaultState(Integer topic_defaultState) {
-		this.topic_defaultState = topic_defaultState;
-	}
-
-	public Integer getComment_defaultState() {
-		return comment_defaultState;
-	}
-
-	public void setComment_defaultState(Integer comment_defaultState) {
-		this.comment_defaultState = comment_defaultState;
-	}
-
-	public Integer getReply_defaultState() {
-		return reply_defaultState;
-	}
-
-	public void setReply_defaultState(Integer reply_defaultState) {
-		this.reply_defaultState = reply_defaultState;
-	}
 
 	public boolean isAllowFeedback() {
 		return allowFeedback;
@@ -387,6 +365,30 @@ public class SystemSetting implements Serializable{
 
 	public void setTopicEditorTagObject(EditorTag topicEditorTagObject) {
 		this.topicEditorTagObject = topicEditorTagObject;
+	}
+
+	public Integer getTopic_review() {
+		return topic_review;
+	}
+
+	public void setTopic_review(Integer topic_review) {
+		this.topic_review = topic_review;
+	}
+
+	public Integer getComment_review() {
+		return comment_review;
+	}
+
+	public void setComment_review(Integer comment_review) {
+		this.comment_review = comment_review;
+	}
+
+	public Integer getReply_review() {
+		return reply_review;
+	}
+
+	public void setReply_review(Integer reply_review) {
+		this.reply_review = reply_review;
 	}
 	
 }

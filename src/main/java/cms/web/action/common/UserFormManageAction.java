@@ -540,7 +540,7 @@ public class UserFormManageAction {
 			}
 			user.setSecurityDigest(new Date().getTime());
 			try {
-				userService.saveUser(user,all_userInputValueList);
+				userService.saveUser(user,all_userInputValueList,null);
 			} catch (Exception e) {
 				error.put("register", ErrorView._823.name());//注册会员出错
 				// TODO Auto-generated catch block

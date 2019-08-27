@@ -29,6 +29,10 @@ function get_request(callback, urladdress, async){
  				    		alert("请求错误");
  				    		return;
  				    	}
+ 				    	if(xmlhttp.status == 403){//权限不足
+ 				    		alert("权限不足");
+ 				    		return;
+ 				    	}
  				    	
 				    	if(xmlhttp.status == 200){
 							callback(xmlhttp.responseText);	
@@ -69,6 +73,10 @@ function post_request(callback, urladdress, async,params){
  				 //   		alert("ss"+getBasePath()+xmlhttp.getResponseHeader("jumpPath"));
  				    		//收到未登陆标记，执行登陆页面跳转
  				    		window.location.href= getBasePath()+xmlhttp.getResponseHeader("jumpPath");
+ 				    		return;
+ 				    	}
+ 				    	if(xmlhttp.status == 403){//权限不足
+ 				    		alert("权限不足");
  				    		return;
  				    	}
  				    	if(xmlhttp.status == 400){//请求错误

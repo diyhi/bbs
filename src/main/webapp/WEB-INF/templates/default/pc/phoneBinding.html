@@ -268,70 +268,69 @@
 <body>
 <#-- 引入页头 -->
 <@include action="${newPublic_2}"/>
-<div class="fixedBottom  wrap clearfix">
+<div class="skeleton">
+	<div class="main wrap backgroundModule" >
 
-	<#-- 引入服务导航 -->
-	<@include action="${newPublic_4}"/>
-
-	<form method="post" autocomplete="off" action="user/control/phoneBinding">
-	<#-- 提交后跳转参数  参数必须经过encodeBase64URL编码后才能提交 不填写时默认跳转回当前页 -->		
-	<input type="hidden" id="jumpUrl" name="jumpUrl" value="${encodeBase64URL('/user/control/realNameAuthentication')}">
+		<#-- 引入服务导航 -->
+		<@include action="${newPublic_4}"/>
 	
-	<!-- 令牌标记 -->
-	<input type="hidden" id="token" name="token" value="${token}">
-	<div class="phoneBindingModule">
-		<div class="blankTableModule">
-			<table class="blankTable" border="0" cellSpacing="2" cellPadding="0" >
-				<tbody>
-					<tr>
-			    		<td width="120px" align="right">手机号： </td>
-			    		<td align="left" colspan="2">
-			    			<input type="text" id="mobile" name="mobile" class="formText" size="25" maxlength="20" value=""/>
-			    			<span id="mobile_error" name="errorTag" class="error">${(error['mobile'])!}</span>
-			    		</td>
-					</tr>
-					<tr>
-			    		<td width="120px" align="right">手机校验码： </td>
-			    		<td align="left" colspan="2">
-			    			<input type="text" id="smsCode" name="smsCode" class="formText" size="7" maxlength="7" value=""/>
-			    			<span class="functionButton"><INPUT id="smsCodeButton" type="button" value="获取短信校验码" onClick="javascript:getSmsCode();"></span>
-			    			<span id="successInfo" class="successInfo"></span>
-			    			<span id="smsCode_error" name="errorTag" class="error">${(error['smsCode'])!}</span>
-			    		</td>
-					</tr>
-					
-					
-					<tr>
-						<td width="120px" align="right">验证码： </td>
-						<td width="40px">
-							<!-- 验证码Key -->
-							<input type="hidden" id="captchaKey" name="captchaKey" value="${captchaKey}">
-							<input id="captchaValue" name="captchaValue" type="text" class="formText"  size="7" maxlength="7" autocomplete="off" onBlur="verification(this.id)"/>		
-						</td>
-						<td align="left">
-							<img id="captcha" src="captcha/${captchaKey!}.jpg" onClick="replaceCaptcha()"/>
-							<span id="captchaValue_error" name="errorTag" class="error">${(error['captchaValue'])!}</span> 
+		<form method="post" autocomplete="off" action="user/control/phoneBinding">
+		<#-- 提交后跳转参数  参数必须经过encodeBase64URL编码后才能提交 不填写时默认跳转回当前页 -->		
+		<input type="hidden" id="jumpUrl" name="jumpUrl" value="${encodeBase64URL('/user/control/realNameAuthentication')}">
+		
+		<!-- 令牌标记 -->
+		<input type="hidden" id="token" name="token" value="${token}">
+		<div class="phoneBindingModule">
+			<div class="blankTableModule">
+				<table class="blankTable" border="0" cellSpacing="2" cellPadding="0" >
+					<tbody>
+						<tr>
+				    		<td width="120px" align="right">手机号： </td>
+				    		<td align="left" colspan="2">
+				    			<input type="text" id="mobile" name="mobile" class="formText" size="25" maxlength="20" value=""/>
+				    			<span id="mobile_error" name="errorTag" class="error">${(error['mobile'])!}</span>
+				    		</td>
+						</tr>
+						<tr>
+				    		<td width="120px" align="right">手机校验码： </td>
+				    		<td align="left" colspan="2">
+				    			<input type="text" id="smsCode" name="smsCode" class="formText" size="7" maxlength="7" value=""/>
+				    			<span class="functionButton"><INPUT id="smsCodeButton" type="button" value="获取短信校验码" onClick="javascript:getSmsCode();"></span>
+				    			<span id="successInfo" class="successInfo"></span>
+				    			<span id="smsCode_error" name="errorTag" class="error">${(error['smsCode'])!}</span>
+				    		</td>
+						</tr>
 						
-						</td>
-					</tr>
-					<tr>
-						<td></td>
-						<td colspan="2">
-							<span class="submitButton"><INPUT type="button" value="提交" onClick="javascript:sureSubmit(this.form);"></span>
-							<!-- 
-							<span class="submitButton"><INPUT type="button" value="ajax提交" onClick="javascript:ajaxSubmit();"></span>
-							  -->
-							<span id="token_error" class="error">${error['token']}</span>  
-						</td>
-					</tr>
-				</tbody>
-			</table>
+						
+						<tr>
+							<td width="120px" align="right">验证码： </td>
+							<td width="40px">
+								<!-- 验证码Key -->
+								<input type="hidden" id="captchaKey" name="captchaKey" value="${captchaKey}">
+								<input id="captchaValue" name="captchaValue" type="text" class="formText"  size="7" maxlength="7" autocomplete="off" onBlur="verification(this.id)"/>		
+							</td>
+							<td align="left">
+								<img id="captcha" src="captcha/${captchaKey!}.jpg" onClick="replaceCaptcha()"/>
+								<span id="captchaValue_error" name="errorTag" class="error">${(error['captchaValue'])!}</span> 
+							
+							</td>
+						</tr>
+						<tr>
+							<td></td>
+							<td colspan="2">
+								<span class="submitButton"><INPUT type="button" value="提交" onClick="javascript:sureSubmit(this.form);"></span>
+								<!-- 
+								<span class="submitButton"><INPUT type="button" value="ajax提交" onClick="javascript:ajaxSubmit();"></span>
+								  -->
+								<span id="token_error" class="error">${error['token']}</span>  
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
 		</div>
-	</div>
-</form>
-<div style="clear:both;"></div>
-<div class="push"><!-- 把div#footer推下去 --></div>
-
+	</form>
+</div>
 
 </div>
 <#--引入页脚-->

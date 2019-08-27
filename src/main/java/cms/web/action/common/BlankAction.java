@@ -16,6 +16,7 @@ import org.queryString.util.UrlEncoded;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import cms.bean.template.Forum;
 import cms.bean.template.Layout;
@@ -42,7 +43,8 @@ public class BlankAction {
 	@Resource AccessSourceDeviceManage accessSourceDeviceManage;
 	
 	@RequestMapping("/**")
-	public String execute(ModelMap model,HttpServletRequest request,HttpServletResponse response)throws Exception {
+	public String execute(ModelMap model,
+			HttpServletRequest request,HttpServletResponse response)throws Exception {
 		  // 判断Url并分发到不同的Action，并统一控制转向   
 		    String currentURI=request.getRequestURI();//获取当前的全部URI
 		    String dirName = templateService.findTemplateDir_cache();
@@ -107,7 +109,13 @@ public class BlankAction {
 		        	}	
 		        } 	
 		    }
-		    model.addAttribute("message","页面不存在");//返回消息  
+		   
+		   
+		    //UserRoleManage类在检查权限时可能会返回message内容
+		    Object parameter = request.getAttribute("message");
+		    if(parameter == null){ //如果上一环节没有传递参数
+		    	model.addAttribute("message","页面不存在");//返回消息  
+		    }
 		    return "templates/"+dirName+"/"+accessPath+"/message";
 	}
 	

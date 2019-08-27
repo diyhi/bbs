@@ -20,57 +20,56 @@
 <body>
 <#-- 引入页头 -->
 <@include action="${newPublic_2}"/>
-<div class="fixedBottom wrap clearfix">
+<div class="skeleton ">
+	<div class="main wrap backgroundModule" >
 
-	<#-- 引入服务导航 -->
-	<@include action="${newPublic_4}"/>
-
-	<div class="dataTable">
-		<TABLE class="dataList" width="100%">
-			<THEAD>
-				<TR class="dataThead">
-					<TH width="30%">标题</TH>	
-					<TH width="30%">标签</TH>	
-					<TH width="20%">发表时间</TH>
-					<TH width="20%">操作</TH>
-				</TR>
-			</THEAD>
-			<TBODY>
-	    		<#if pageView.records?exists && pageView.records?size gt 0 >    
-				<#list pageView.records as topic>
-				<TR>
-					<TD class="dataTD">
-						<a href="thread?topicId=${topic.id}" target="_blank" class="link">${topic.title}</a>
-					</TD>
-					<TD class="dataTD">
-						${topic.tagName}				
-					</TD>
-					<TD class="dataTD">
-						${topic.postTime}
-					</TD>
-					<TD class="dataTD">
-						<a href="user/control/topicUnhideList?topicId=${topic.id}" class="link">取消隐藏用户</a>
-						<a href="user/control/topicFavoriteList?topicId=${topic.id}" class="link">收藏用户</a>
-						<a href="user/control/topicLikeList?topicId=${topic.id}" class="link">点赞用户</a>
-					</TD>
-	    		</TR>
-	    		</#list>
-	    		</#if> 
-	    		<#if !pageView.records?exists || pageView.totalrecord == 0 > 
-	    			<TR>
-						<TD colSpan="3" align="center" height="28px">还没有话题记录</TD>
-	    			</TR>
-	    		</#if> 
-	    	</TBODY>
-		</TABLE>
-		<DIV class=pageList>
-			<@include action="${newPublic_1}"/>
-		</DIV>
+		<#-- 引入服务导航 -->
+		<@include action="${newPublic_4}"/>
+	
+		<div class="dataTable">
+			<TABLE class="dataList" width="100%">
+				<THEAD>
+					<TR class="dataThead">
+						<TH width="30%">标题</TH>	
+						<TH width="30%">标签</TH>	
+						<TH width="20%">发表时间</TH>
+						<TH width="20%">操作</TH>
+					</TR>
+				</THEAD>
+				<TBODY>
+		    		<#if pageView.records?exists && pageView.records?size gt 0 >    
+					<#list pageView.records as topic>
+					<TR>
+						<TD class="dataTD">
+							<a href="thread?topicId=${topic.id}" target="_blank" class="link">${topic.title}</a>
+						</TD>
+						<TD class="dataTD">
+							${topic.tagName}				
+						</TD>
+						<TD class="dataTD">
+							${topic.postTime}
+						</TD>
+						<TD class="dataTD">
+							<a href="user/control/topicUnhideList?topicId=${topic.id}" class="link">取消隐藏用户</a>
+							<a href="user/control/topicFavoriteList?topicId=${topic.id}" class="link">收藏用户</a>
+							<a href="user/control/topicLikeList?topicId=${topic.id}" class="link">点赞用户</a>
+						</TD>
+		    		</TR>
+		    		</#list>
+		    		</#if> 
+		    		<#if !pageView.records?exists || pageView.totalrecord == 0 > 
+		    			<TR>
+							<TD colSpan="4"  class="empty">还没有话题记录</TD>
+		    			</TR>
+		    		</#if> 
+		    	</TBODY>
+			</TABLE>
+			<DIV class=pageList>
+				<@include action="${newPublic_1}"/>
+			</DIV>
+		</div>
+	
 	</div>
-
-	<div style="clear:both;"></div>
-	<div class="push"><!-- 把div#footer推下去 --></div>
-
 
 </div>
 <#--引入页脚-->

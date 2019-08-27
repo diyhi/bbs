@@ -458,188 +458,190 @@
 <body >
 <#-- 引入页头 -->
 <@include action="${newPublic_2}"/>
-<div class="fixedBottom wrap clearfix">
-<form method="post" action="register?jumpUrl=${jumpUrl}" class="pure-form">
-	<!-- 令牌标记 -->
-	<input type="hidden" id="token" name="token" value="${token}">
-
-
-	<div class="registerModule">
-		<h2>会员注册</h2>
-	
-		<div class="item">
-			<table>
-				<tr>
-					<th><span class="required">*</span><label>用户名：</label></th>
-					<td><input type="text" id="userName" name="userName" class="inputBox formText" autocomplete="off" size="25" maxlength="20" value="<#if user??>${user.userName}</#if>" onBlur="verification(this.id)"/></td>
-					<td>
-						<span id="userName_error" class="error">${(error['userName'])!}</span> 
-					</td>
-				</tr>
-			</table>
-		</div>
-		<div class="item">
-			<table>
-				<tr>
-					<th><span class="required">*</span><label>密码：</label></th>
-					<td><input type="password" id="password" name="password" class="inputBox formText" autocomplete="off" size="25" maxlength="20" onBlur="verification(this.id)"/></td>
-					<td>
-						<span id="password_error" class="error">${(error['password'])!}</span>  
-					</td>
-				</tr>
-			</table>
-		</div>
-		<div class="item">
-			<table>
-				<tr>
-					<th><span class="required">*</span><label>确认密码：</label></th>
-					<td><input type="password" id="confirmPassword" class="inputBox formText" autocomplete="off" size="25" maxlength="20" onBlur="verification(this.id)"/></td>
-					<td>
-						<span id="confirmPassword_error" class="error"></span>  
-					</td>
-				</tr>
-			</table>
-		</div>
-		<div class="item">
-			<table>
-				<tr>
-					<th><span class="required">*</span><label>密码提示问题：</label></th>
-					<td><input type="text" id="issue" name="issue" class="inputBox formText" autocomplete="off" size="25" maxlength="20" value="<#if user??>${user.issue}</#if>" onBlur="verification(this.id)"/></td>
-					<td>
-						<span id="issue_error" class="error">${(error['issue'])!}</span> 
-					</td>
-				</tr>
-			</table>
-		</div>
-		<div class="item">
-			<table>
-				<tr>
-					<th><span class="required">*</span><label>密码提示答案：</label></th>
-					<td><input type="text" id="answer" name="answer" class="inputBox formText" autocomplete="off" size="25" maxlength="20" onBlur="verification(this.id)"/></td>
-					<td>
-						<span id="answer_error" class="error">${(error['answer'])!}</span> 
-					</td>
-				</tr>
-			</table>
-		</div>
-		<div class="item">
-			<table>
-				<tr>
-					<th><label>邮箱：</label></th>
-					<td><input type="text" id="email" name="email" class="inputBox formText" autocomplete="off" size="25" maxlength="20" value="<#if user??>${user.email}</#if>" onBlur="verification(this.id)"/></td>
-					<td>
-						<span id="email_error" class="error">${(error['email'])!}</span> 
-					</td>
-				</tr>
-			</table>
-		</div>
+<div class="skeleton backgroundModule">
+	<div class="main wrap backgroundModule" >
+		<form method="post" action="register?jumpUrl=${jumpUrl}" class="pure-form">
+			<!-- 令牌标记 -->
+			<input type="hidden" id="token" name="token" value="${token}">
 		
-		<!-- 用户自定义注册功能项 -->
-		<#list userCustomList as userCustom>
-		<div class="item">
-			<table>
-				<tr>
-					<th><#if userCustom.required == true><span class="required">*</span></#if><label>${userCustom.name}：</label></th>
-					<td>
-						<#if userCustom.chooseType ==1>
-							<input type="text" class="inputBox formText" name="userCustom_${userCustom.id}" value="<#list userCustom.userInputValueList as userInputValue>${userInputValue.content}</#list>" size="${userCustom.size}" maxlength="${userCustom.maxlength}">
-						</#if>
-						<#if userCustom.chooseType ==2>
-							<#if userCustom.itemValue?has_content>
-								<#list userCustom.itemValue?keys as itemValue>
-								<#-- 选中项 -->
-								<#assign _checked = "">
-								<#list userCustom.userInputValueList as userInputValue>
-									<#if userInputValue.options == itemValue>
-										<#assign _checked=" checked='checked'">
-									</#if>
-								</#list>
-								
-								<#-- 默认选第一项 -->
-								<#if itemValue_index == 0  && userCustom.userInputValueList?exists && userCustom.userInputValueList?size == 0> 
-								<#assign _checked = " checked='checked'">
+		
+			<div class="registerModule">
+				<h2>会员注册</h2>
+			
+				<div class="item">
+					<table>
+						<tr>
+							<th><span class="required">*</span><label>用户名：</label></th>
+							<td><input type="text" id="userName" name="userName" class="inputBox formText" autocomplete="off" size="25" maxlength="20" value="<#if user??>${user.userName}</#if>" onBlur="verification(this.id)"/></td>
+							<td>
+								<span id="userName_error" class="error">${(error['userName'])!}</span> 
+							</td>
+						</tr>
+					</table>
+				</div>
+				<div class="item">
+					<table>
+						<tr>
+							<th><span class="required">*</span><label>密码：</label></th>
+							<td><input type="password" id="password" name="password" class="inputBox formText" autocomplete="off" size="25" maxlength="20" onBlur="verification(this.id)"/></td>
+							<td>
+								<span id="password_error" class="error">${(error['password'])!}</span>  
+							</td>
+						</tr>
+					</table>
+				</div>
+				<div class="item">
+					<table>
+						<tr>
+							<th><span class="required">*</span><label>确认密码：</label></th>
+							<td><input type="password" id="confirmPassword" class="inputBox formText" autocomplete="off" size="25" maxlength="20" onBlur="verification(this.id)"/></td>
+							<td>
+								<span id="confirmPassword_error" class="error"></span>  
+							</td>
+						</tr>
+					</table>
+				</div>
+				<div class="item">
+					<table>
+						<tr>
+							<th><span class="required">*</span><label>密码提示问题：</label></th>
+							<td><input type="text" id="issue" name="issue" class="inputBox formText" autocomplete="off" size="25" maxlength="20" value="<#if user??>${user.issue}</#if>" onBlur="verification(this.id)"/></td>
+							<td>
+								<span id="issue_error" class="error">${(error['issue'])!}</span> 
+							</td>
+						</tr>
+					</table>
+				</div>
+				<div class="item">
+					<table>
+						<tr>
+							<th><span class="required">*</span><label>密码提示答案：</label></th>
+							<td><input type="text" id="answer" name="answer" class="inputBox formText" autocomplete="off" size="25" maxlength="20" onBlur="verification(this.id)"/></td>
+							<td>
+								<span id="answer_error" class="error">${(error['answer'])!}</span> 
+							</td>
+						</tr>
+					</table>
+				</div>
+				<div class="item">
+					<table>
+						<tr>
+							<th><label>邮箱：</label></th>
+							<td><input type="text" id="email" name="email" class="inputBox formText" autocomplete="off" size="25" maxlength="20" value="<#if user??>${user.email}</#if>" onBlur="verification(this.id)"/></td>
+							<td>
+								<span id="email_error" class="error">${(error['email'])!}</span> 
+							</td>
+						</tr>
+					</table>
+				</div>
+				
+				<!-- 用户自定义注册功能项 -->
+				<#list userCustomList as userCustom>
+				<div class="item">
+					<table>
+						<tr>
+							<th><#if userCustom.required == true><span class="required">*</span></#if><label>${userCustom.name}：</label></th>
+							<td>
+								<#if userCustom.chooseType ==1>
+									<input type="text" class="inputBox formText" name="userCustom_${userCustom.id}" value="<#list userCustom.userInputValueList as userInputValue>${userInputValue.content}</#list>" size="${userCustom.size}" maxlength="${userCustom.maxlength}">
 								</#if>
-								<input type="radio" name="userCustom_${userCustom.id}" value="${itemValue}" ${_checked} >${userCustom.itemValue[itemValue]}
-								</#list>
-							</#if>
-						</#if>
-						<#if userCustom.chooseType ==3>
-							<#if userCustom.itemValue?has_content>
-								<#list userCustom.itemValue?keys as itemValue>
-									<#-- 选中项 -->
-									<#assign _checked = "">
-									<#list userCustom.userInputValueList as userInputValue>
-										<#if userInputValue.options == itemValue>
-											<#assign _checked=" checked='checked'">
+								<#if userCustom.chooseType ==2>
+									<#if userCustom.itemValue?has_content>
+										<#list userCustom.itemValue?keys as itemValue>
+										<#-- 选中项 -->
+										<#assign _checked = "">
+										<#list userCustom.userInputValueList as userInputValue>
+											<#if userInputValue.options == itemValue>
+												<#assign _checked=" checked='checked'">
+											</#if>
+										</#list>
+										
+										<#-- 默认选第一项 -->
+										<#if itemValue_index == 0  && userCustom.userInputValueList?exists && userCustom.userInputValueList?size == 0> 
+										<#assign _checked = " checked='checked'">
 										</#if>
-									</#list>
-									<input type="checkbox" name="userCustom_${userCustom.id}" value="${itemValue}" ${_checked}>${userCustom.itemValue[itemValue]}
-								</#list>
-							</#if>
-						</#if>
-						<#if userCustom.chooseType ==4>
-							<select name="userCustom_${userCustom.id}" <#if userCustom.multiple == true> multiple='multiple'</#if> <#if userCustom.selete_size != null> size='${userCustom.selete_size}'</#if>>
-								<#if userCustom.itemValue?has_content>
-								<#list userCustom.itemValue?keys as itemValue>
-									<#assign _selected = "">
-									<#list userCustom.userInputValueList as userInputValue>
-										<#if userInputValue.options == itemValue>
-											<#assign _selected=" selected='selected'">
-										</#if>
-									</#list>			
-									<option value="${itemValue}" ${_selected}>${userCustom.itemValue[itemValue]}</option>		
-								</#list>
-								</#if>	
-							</select>
-						</#if>
-						<#if userCustom.chooseType ==5>
-							<textarea name="userCustom_${userCustom.id}" rows="${userCustom.rows}" cols="${userCustom.cols}"><#list userCustom.userInputValueList as userInputValue>${userInputValue.content}</#list></textarea>
-						</#if>
-					</td>
-					<td>
-						<span class="help">${userCustom.tip}</span>
-						<#assign userCustom_id = "userCustom_"+userCustom.id>
-						<span id="userCustom_${userCustom.id}_error" class="error">${error[userCustom_id]}</span>
-					</td>
-				</tr>
-			</table>
-		</div>
-		</#list>
-
-		<#-- 验证码 -->
-		<#if captchaKey != ''>
-			<div class="item">
-				<table>
-					<tr>
-						<th><label><span class="required">*</span>验证码：</label></th>
-						<td >
-							<!-- 验证码Key -->
-							<input type="hidden" id="captchaKey" name="captchaKey" value="${captchaKey}">
-							<input id="captchaValue" name="captchaValue" type="text" class="inputBox_captcha formText" size="7" maxlength="7" autocomplete="off" onBlur="verification(this.id)"/>
-						</td>
-						<td>
-							<img id="captcha" src="captcha/${captchaKey!}.jpg" onClick="replaceCaptcha()"/>
-							<span id="captchaValue_error" class="error">${(error['captchaValue'])!}</span> 
-						</td>
-					</tr>
-				</table>
+										<input type="radio" name="userCustom_${userCustom.id}" value="${itemValue}" ${_checked} >${userCustom.itemValue[itemValue]}
+										</#list>
+									</#if>
+								</#if>
+								<#if userCustom.chooseType ==3>
+									<#if userCustom.itemValue?has_content>
+										<#list userCustom.itemValue?keys as itemValue>
+											<#-- 选中项 -->
+											<#assign _checked = "">
+											<#list userCustom.userInputValueList as userInputValue>
+												<#if userInputValue.options == itemValue>
+													<#assign _checked=" checked='checked'">
+												</#if>
+											</#list>
+											<input type="checkbox" name="userCustom_${userCustom.id}" value="${itemValue}" ${_checked}>${userCustom.itemValue[itemValue]}
+										</#list>
+									</#if>
+								</#if>
+								<#if userCustom.chooseType ==4>
+									<select name="userCustom_${userCustom.id}" <#if userCustom.multiple == true> multiple='multiple'</#if> <#if userCustom.selete_size != null> size='${userCustom.selete_size}'</#if>>
+										<#if userCustom.itemValue?has_content>
+										<#list userCustom.itemValue?keys as itemValue>
+											<#assign _selected = "">
+											<#list userCustom.userInputValueList as userInputValue>
+												<#if userInputValue.options == itemValue>
+													<#assign _selected=" selected='selected'">
+												</#if>
+											</#list>			
+											<option value="${itemValue}" ${_selected}>${userCustom.itemValue[itemValue]}</option>		
+										</#list>
+										</#if>	
+									</select>
+								</#if>
+								<#if userCustom.chooseType ==5>
+									<textarea name="userCustom_${userCustom.id}" rows="${userCustom.rows}" cols="${userCustom.cols}"><#list userCustom.userInputValueList as userInputValue>${userInputValue.content}</#list></textarea>
+								</#if>
+							</td>
+							<td>
+								<span class="help">${userCustom.tip}</span>
+								<#assign userCustom_id = "userCustom_"+userCustom.id>
+								<span id="userCustom_${userCustom.id}_error" class="error">${error[userCustom_id]}</span>
+							</td>
+						</tr>
+					</table>
+				</div>
+				</#list>
+		
+				<#-- 验证码 -->
+				<#if captchaKey != ''>
+					<div class="item">
+						<table>
+							<tr>
+								<th><label><span class="required">*</span>验证码：</label></th>
+								<td >
+									<!-- 验证码Key -->
+									<input type="hidden" id="captchaKey" name="captchaKey" value="${captchaKey}">
+									<input id="captchaValue" name="captchaValue" type="text" class="inputBox_captcha formText" size="7" maxlength="7" autocomplete="off" onBlur="verification(this.id)"/>
+								</td>
+								<td>
+									<img id="captcha" src="captcha/${captchaKey!}.jpg" onClick="replaceCaptcha()"/>
+									<span id="captchaValue_error" class="error">${(error['captchaValue'])!}</span> 
+								</td>
+							</tr>
+						</table>
+					</div>
+				</#if>
+				<div class="item">
+					<div class="registerSubmit">
+						<span class="submitButton"><INPUT type="button" value="提交" onClick="javascript:sureSubmit(this.form);"></span>
+						<span id="register_error" class="error">${(error['register'])!}</span> 
+						<!-- 
+						<span class="submitButton"><INPUT type="button" value="ajax提交" onClick="javascript:ajaxSubmit();"></span>
+						 -->
+						<input type="checkbox" name="agreebbrule"  checked="checked" /> <label for="agreebbrule">同意<a href="agreement.htm" target="_blank">网站服务条款</a></label>
+						<span id="token_error" class="error">${error['token']}</span>  
+					</div>
+				</div>
 			</div>
-		</#if>
-		<div class="item">
-			<div class="registerSubmit">
-				<span class="submitButton"><INPUT type="button" value="提交" onClick="javascript:sureSubmit(this.form);"></span>
-				<span id="register_error" class="error">${(error['register'])!}</span> 
-				<!-- 
-				<span class="submitButton"><INPUT type="button" value="ajax提交" onClick="javascript:ajaxSubmit();"></span>
-				 -->
-				<input type="checkbox" name="agreebbrule"  checked="checked" /> <label for="agreebbrule">同意<a href="agreement.htm" target="_blank">网站服务条款</a></label>
-				<span id="token_error" class="error">${error['token']}</span>  
-			</div>
+			
+		</form>
 		</div>
 	</div>
-	<div class="push"><!-- 把div#footer推下去 --></div>
-</form>
-</div>
 <#--引入页脚-->
 <@include action="${newPublic_3}"/>
 

@@ -76,52 +76,49 @@ function deleteFavorite(favoriteId){
 <body>
 <#-- 引入页头 -->
 <@include action="${newPublic_2}"/>
-<div class="fixedBottom wrap clearfix">
-
-	<#-- 引入服务导航 -->
-	<@include action="${newPublic_4}"/>
-
-	<div class="dataTable">
-		<TABLE class="dataList" width="100%">
-			<THEAD>
-				<TR class="dataThead">
-					<TH width="50%">标题</TH>	
-					<TH width="30%">收藏时间</TH>	
-					<TH width="20%">操作</TH>
-				</TR>
-			</THEAD>
-			<TBODY>
-	    		<#if pageView.records?exists && pageView.records?size gt 0 >    
-				<#list pageView.records as favorites>
-				<TR>
-					<TD class="dataTD">
-						<a href="thread?topicId=${favorites.topicId}" target="_blank" class="link">${favorites.topicTitle}</a>
-					</TD>
-					<TD class="dataTD">
-						${favorites.addtime}	
-					</TD>
-					<TD class="dataTD">
-						<a href="javascript:" onclick="deleteFavorite('${favorites.id}')">删除</a>
-					</TD>
-	    		</TR>
-	    		</#list>
-	    		</#if> 
-	    		<#if !pageView.records?exists || pageView.totalrecord == 0 > 
-	    			<TR>
-						<TD colSpan="3" align="center" height="28px">还没有收藏话题</TD>
-	    			</TR>
-	    		</#if> 
-	    	</TBODY>
-		</TABLE>
-		<DIV class=pageList>
-			<@include action="${newPublic_1}"/>
-		</DIV>
+<div class="skeleton">
+	<div class="main wrap backgroundModule" >
+		<#-- 引入服务导航 -->
+		<@include action="${newPublic_4}"/>
+	
+		<div class="dataTable">
+			<TABLE class="dataList" width="100%">
+				<THEAD>
+					<TR class="dataThead">
+						<TH width="50%">标题</TH>	
+						<TH width="30%">收藏时间</TH>	
+						<TH width="20%">操作</TH>
+					</TR>
+				</THEAD>
+				<TBODY>
+		    		<#if pageView.records?exists && pageView.records?size gt 0 >    
+					<#list pageView.records as favorites>
+					<TR>
+						<TD class="dataTD">
+							<a href="thread?topicId=${favorites.topicId}" target="_blank" class="link">${favorites.topicTitle}</a>
+						</TD>
+						<TD class="dataTD">
+							${favorites.addtime}	
+						</TD>
+						<TD class="dataTD">
+							<a href="javascript:" onclick="deleteFavorite('${favorites.id}')">删除</a>
+						</TD>
+		    		</TR>
+		    		</#list>
+		    		</#if> 
+		    		<#if !pageView.records?exists || pageView.totalrecord == 0 > 
+		    			<TR>
+							<TD colSpan="3"  class="empty">还没有收藏话题</TD>
+		    			</TR>
+		    		</#if> 
+		    	</TBODY>
+			</TABLE>
+			<DIV class=pageList>
+				<@include action="${newPublic_1}"/>
+			</DIV>
+		</div>
+	
 	</div>
-
-	<div style="clear:both;"></div>
-	<div class="push"><!-- 把div#footer推下去 --></div>
-
-
 </div>
 <#--引入页脚-->
 <@include action="${newPublic_3}"/>

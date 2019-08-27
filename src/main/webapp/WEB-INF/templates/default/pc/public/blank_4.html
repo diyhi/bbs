@@ -23,14 +23,14 @@
 <body>
 <#-- 引入页头 -->
 <@include action="${newPublic_2}"/>
-<div class="fixedBottom wrap clearfix">
+<div class="skeleton">
+	<div class="main wrap backgroundModule" >
+		<#-- 引入在线留言 -->
+		<@include action="${feedbackRelated_addFeedback_1}"/> 
 	
-	<#-- 引入在线留言 -->
-	<@include action="${feedbackRelated_addFeedback_1}"/> 
-
-	
-    <div class="clear"></div>
-	<div class="push"><!-- 把div#footer推下去 --></div>
+		
+	    <div class="clear"></div>
+	</div>
 </div>
 <#-- 引入页脚 -->
 <@include action="${newPublic_3}"/>

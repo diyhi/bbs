@@ -349,6 +349,7 @@ function initConfig(){
 	t=config.addtitle('会员管理','会员管理',1);
 	config.additem('会员搜索',t,'${config:url(pageContext.request)}control/user/search${config:suffix()}');
 	config.additem('会员列表',t,'${config:url(pageContext.request)}control/user/list${config:suffix()}');
+	config.additem('会员角色',t,'${config:url(pageContext.request)}control/userRole/list${config:suffix()}');
 	config.additem('会员等级',t,'${config:url(pageContext.request)}control/userGrade/list${config:suffix()}');
 	config.additem('会员注册项',t,'${config:url(pageContext.request)}control/userCustom/list${config:suffix()}');
 	config.additem('会员注册禁止用户名称',t,'${config:url(pageContext.request)}control/disableUserName/list${config:suffix()}');

@@ -20,68 +20,67 @@
 <body>
 <#-- 引入页头 -->
 <@include action="${newPublic_2}"/>
-<div class="fixedBottom wrap clearfix">
+<div class="skeleton">
+	<div class="main wrap backgroundModule" >
 
-	<#-- 引入服务导航 -->
-	<@include action="${newPublic_4}"/>
-	<!-- 支付日志 -->
-	<div class="dataTable">
-		<TABLE class="dataList" width="100%">
-			<THEAD>
-				<TR class="dataThead">
-					<TH width="35%">模块</TH>	
-					<TH width="20%">收入/支出</TH>
-					<TH width="20%">时间</TH>
-					<TH width="25%">备注</TH>
-
-				</TR>
-			</THEAD>
-			<TBODY>
-	    		<#if pageView.records?exists && pageView.records?size gt 0 >    
-				<#list pageView.records as pointLog>
-				<TR>
-					<TD class="dataTD">
-						<#if pointLog.module == 100>
-							发表话题
-						<#elseif pointLog.module == 200>
-							发表评论
-						<#elseif pointLog.module == 300>
-							发表回复
-						<#elseif pointLog.module == 400>
-							积分购买话题
-						</#if>	
-											
-					</TD>
-					<TD class="dataTD">
-						<#if pointLog.pointState == 1>
-							+
-						<#elseif pointLog.pointState == 2>
-							-
-						</#if>
-						${pointLog.point}
-					</TD>
-					<TD class="dataTD">${pointLog.times}</TD>
-					<TD class="dataTD">${pointLog.remark}</TD>
-	    		</TR>
-	    		</#list>
-	    		</#if> 
-	    		<#if !pageView.records?exists || pageView.totalrecord == 0 > 
-	    			<TR>
-						<TD colSpan="4" align="center" height="25px">还没有积分日志</TD>
-	    			</TR>
-	    		</#if> 
-	    	</TBODY>
-		</TABLE>
-		<DIV class=pageList>
-			<@include action="${newPublic_1}"/>
-		</DIV>
+		<#-- 引入服务导航 -->
+		<@include action="${newPublic_4}"/>
+		<!-- 支付日志 -->
+		<div class="dataTable">
+			<TABLE class="dataList" width="100%">
+				<THEAD>
+					<TR class="dataThead">
+						<TH width="35%">模块</TH>	
+						<TH width="20%">收入/支出</TH>
+						<TH width="20%">时间</TH>
+						<TH width="25%">备注</TH>
+	
+					</TR>
+				</THEAD>
+				<TBODY>
+		    		<#if pageView.records?exists && pageView.records?size gt 0 >    
+					<#list pageView.records as pointLog>
+					<TR>
+						<TD class="dataTD">
+							<#if pointLog.module == 100>
+								发表话题
+							<#elseif pointLog.module == 200>
+								发表评论
+							<#elseif pointLog.module == 300>
+								发表回复
+							<#elseif pointLog.module == 400>
+								积分购买话题
+							</#if>	
+												
+						</TD>
+						<TD class="dataTD">
+							<#if pointLog.pointState == 1>
+								+
+							<#elseif pointLog.pointState == 2>
+								-
+							</#if>
+							${pointLog.point}
+						</TD>
+						<TD class="dataTD">${pointLog.times}</TD>
+						<TD class="dataTD">${pointLog.remark}</TD>
+		    		</TR>
+		    		</#list>
+		    		</#if> 
+		    		<#if !pageView.records?exists || pageView.totalrecord == 0 > 
+		    			<TR>
+							<TD colSpan="4"  class="empty">还没有积分日志</TD>
+		    			</TR>
+		    		</#if> 
+		    	</TBODY>
+			</TABLE>
+			<DIV class=pageList>
+				<@include action="${newPublic_1}"/>
+			</DIV>
+		</div>
+		</div>
 	</div>
-	<div style="clear:both;"></div>
-	<div class="push"><!-- 把div#footer推下去 --></div>
-
-</div>
-<#--引入页脚-->
-<@include action="${newPublic_3}"/>
+	<#--引入页脚-->
+	<@include action="${newPublic_3}"/>
 </body>
 
 </html>

@@ -76,6 +76,9 @@ public class Comment implements Serializable{
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date postTime = new Date();
 	
+	/** 用户角色名称集合 **/
+	@Transient
+	private List<String> userRoleNameList = new ArrayList<String>();
 	/** 总回复数 **/
 	@Transient
 	private Integer totalReply = 0;
@@ -280,6 +283,16 @@ public class Comment implements Serializable{
 
 	public void setNickname(String nickname) {
 		this.nickname = nickname;
+	}
+
+
+	public List<String> getUserRoleNameList() {
+		return userRoleNameList;
+	}
+
+
+	public void setUserRoleNameList(List<String> userRoleNameList) {
+		this.userRoleNameList = userRoleNameList;
 	}
 	
 }

@@ -30,6 +30,7 @@ import cms.bean.topic.Tag;
 import cms.bean.topic.Topic;
 import cms.bean.topic.TopicUnhide;
 import cms.bean.user.AccessUser;
+import cms.bean.user.ResourceEnum;
 import cms.bean.user.User;
 import cms.bean.user.UserGrade;
 import cms.service.setting.SettingService;
@@ -47,6 +48,7 @@ import cms.web.action.setting.SettingManage;
 import cms.web.action.topic.CommentManage;
 import cms.web.action.topic.TopicManage;
 import cms.web.action.user.UserManage;
+import cms.web.action.user.UserRoleManage;
 
 /**
  * 话题 -- 模板方法实现
@@ -70,6 +72,7 @@ public class Topic_TemplateManage {
 	
 	@Resource UserManage userManage;
 	@Resource UserGradeService userGradeService;
+	@Resource UserRoleManage userRoleManage;
 	
 	/**
 	 * 话题列表  -- 分页
@@ -197,13 +200,23 @@ public class Topic_TemplateManage {
 		if(qr.getResultlist() != null && qr.getResultlist().size() >0){
 			//查询标签名称
 			List<Tag> tagList = tagService.findAllTag_cache();
+			Map<Long,List<String>> tagRoleNameMap = new HashMap<Long,List<String>>();//标签角色名称 key:标签Id value:角色名称集合
+			Map<String,List<String>> userRoleNameMap = new HashMap<String,List<String>>();//用户角色名称 key:用户名称Id value:角色名称集合
+			Map<Long,Boolean> userViewPermissionMap = new HashMap<Long,Boolean>();//用户如果对话题项是否有查看权限  key:标签Id value:是否有查看权限
+			
 			if(tagList != null && tagList.size() >0){
 				for(Topic topic : qr.getResultlist()){
 					topic.setIpAddress(null);//IP地址不显示
 					topic.setContent(null);//话题内容不显示
+					if(topic.getIsStaff() == false){//会员
+						userRoleNameMap.put(topic.getUserName(), null);
+					}
 					for(Tag tag: tagList){
 						if(topic.getTagId().equals(tag.getId())){
 							topic.setTagName(tag.getName());
+							tagRoleNameMap.put(tag.getId(), null);
+							userViewPermissionMap.put(tag.getId(), null);
+							
 							break;
 						}
 					}
@@ -218,6 +231,27 @@ public class Topic_TemplateManage {
 				}
 			}
 			
+			if(tagRoleNameMap != null && tagRoleNameMap.size() >0){
+				for (Map.Entry<Long, List<String>> entry : tagRoleNameMap.entrySet()) {
+					List<String> roleNameList = userRoleManage.queryAllowViewTopicRoleName(entry.getKey());
+					entry.setValue(roleNameList);
+				}
+			}
+			
+			if(userRoleNameMap != null && userRoleNameMap.size() >0){
+				for (Map.Entry<String, List<String>> entry : userRoleNameMap.entrySet()) {
+					List<String> roleNameList = userRoleManage.queryUserRoleName(entry.getKey());
+					entry.setValue(roleNameList);
+				}
+			}
+			if(userViewPermissionMap != null && userViewPermissionMap.size()>0){
+				for (Map.Entry<Long,Boolean> entry : userViewPermissionMap.entrySet()) {
+					//是否有当前功能操作权限
+					boolean flag = userRoleManage.isPermission(ResourceEnum._1001000,entry.getKey());
+					entry.setValue(flag);
+				}
+			}
+			
 			for(Topic topic : qr.getResultlist()){
 				if(topic.getIsStaff() == false){//会员
 					User user = userManage.query_cache_findUserByUserName(topic.getUserName());
@@ -225,8 +259,46 @@ public class Topic_TemplateManage {
 					topic.setAvatarPath(user.getAvatarPath());
 					topic.setAvatarName(user.getAvatarName());
 				}
+				//话题允许查看的角色名称集合
+				for (Map.Entry<Long, List<String>> entry : tagRoleNameMap.entrySet()) {
+					if(entry.getKey().equals(topic.getTagId())){
+						List<String> roleNameList = entry.getValue();
+						if(roleNameList != null && roleNameList.size() >0){
+							topic.setAllowRoleViewList(roleNameList);
+						}
+						break;
+					}
+					
+				}
+				//用户角色名称集合
+				for (Map.Entry<String, List<String>> entry : userRoleNameMap.entrySet()) {
+					if(entry.getKey().equals(topic.getUserName())){
+						List<String> roleNameList = entry.getValue();
+						if(roleNameList != null && roleNameList.size() >0){
+							topic.setUserRoleNameList(roleNameList);
+						}
+						break;
+					}
+				}
+				
+				//用户如果对话题项无查看权限，则不显示摘要和图片
+				for (Map.Entry<Long,Boolean> entry : userViewPermissionMap.entrySet()) {
+					if(entry.getKey().equals(topic.getTagId())){
+						if(entry.getValue() != null && entry.getValue() == false){
+							topic.setImage(null);
+							topic.setImageInfoList(new ArrayList<ImageInfo>());
+							topic.setSummary("");
+						}
+						break;
+					}
+					
+				}
+				
 				
 			}
+			
+			
+			
 			
 		}
 		
@@ -284,6 +356,7 @@ public class Topic_TemplateManage {
 	 */
 	public Topic content_entityBean(Forum forum,Map<String,Object> parameter,Map<String,Object> runtimeParameter){
 		
+		
 		Long topicId = null;
 		String ip = null;
 		
@@ -321,6 +394,12 @@ public class Topic_TemplateManage {
 			Topic topic = topicManage.queryTopicCache(topicId);//查询缓存
 			
 			if(topic != null){
+				//检查权限
+				userRoleManage.checkPermission(ResourceEnum._1001000,topic.getTagId());
+				
+				
+				
+				
 				if(ip != null){
 					topicManage.addView(topicId, ip);
 				}
@@ -357,8 +436,21 @@ public class Topic_TemplateManage {
 						topic.setNickname(user.getNickname());
 						topic.setAvatarPath(user.getAvatarPath());
 						topic.setAvatarName(user.getAvatarName());
+						
+						List<String> userRoleNameList = userRoleManage.queryUserRoleName(user.getUserName());
+						if(userRoleNameList != null && userRoleNameList.size() >0){
+							topic.setUserRoleNameList(userRoleNameList);//用户角色名称集合
+						}
 					}
+					
 				}
+				
+				List<String> topicRoleNameList = userRoleManage.queryAllowViewTopicRoleName(topic.getTagId());
+				if(topicRoleNameList != null && topicRoleNameList.size() >0){
+					topic.setAllowRoleViewList(topicRoleNameList);//话题允许查看的角色名称集合
+				}
+				
+
 				
 				//处理隐藏标签
 				if(topic.getContent() != null && !"".equals(topic.getContent().trim())){
@@ -646,6 +738,7 @@ public class Topic_TemplateManage {
 		//新引用集合
 		Map<Long,String> new_quoteList = new HashMap<Long,String>();//key:自定义评论Id value:自定义评论内容(文本)
 		
+		Map<String,List<String>> userRoleNameMap = new HashMap<String,List<String>>();//用户角色名称 key:用户名称Id 角色名称集合
 		if(commentList != null && commentList.size() >0){
 			for(Comment comment : commentList){
 				comment.setIpAddress(null);//IP地址不显示
@@ -654,8 +747,8 @@ public class Topic_TemplateManage {
 					comment.setNickname(user.getNickname());
 					comment.setAvatarPath(user.getAvatarPath());
 					comment.setAvatarName(user.getAvatarName());
+					userRoleNameMap.put(comment.getUserName(), null);
 				}
-				
 				
 				if(comment.getQuoteUpdateId() != null && comment.getQuoteUpdateId().length() >1){
 					String[] quoteUpdateId_arr = comment.getQuoteUpdateId().split(",");
@@ -683,7 +776,12 @@ public class Topic_TemplateManage {
 			}
 		}
 		
-		
+		if(userRoleNameMap != null && userRoleNameMap.size() >0){
+			for (Map.Entry<String, List<String>> entry : userRoleNameMap.entrySet()) {
+				List<String> roleNameList = userRoleManage.queryUserRoleName(entry.getKey());
+				entry.setValue(roleNameList);
+			}
+		}
 		
 		
 		if(query_quoteUpdateIdList != null && query_quoteUpdateIdList.size() >0){
@@ -716,6 +814,17 @@ public class Topic_TemplateManage {
 						}
 					}
 					comment.setQuoteList(quoteList);
+				}
+				
+				//用户角色名称集合
+				for (Map.Entry<String, List<String>> entry : userRoleNameMap.entrySet()) {
+					if(entry.getKey().equals(comment.getUserName())){
+						List<String> roleNameList = entry.getValue();
+						if(roleNameList != null && roleNameList.size() >0){
+							comment.setUserRoleNameList(roleNameList);
+						}
+						break;
+					}
 				}
 			}
 		}

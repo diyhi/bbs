@@ -910,15 +910,15 @@ CREATE TABLE `systemsetting` (
   `reply_rewardPoint` bigint(20) DEFAULT NULL,
   `topic_rewardPoint` bigint(20) DEFAULT NULL,
   `allowTopic` bit(1) NOT NULL,
-  `comment_defaultState` int(11) DEFAULT NULL,
-  `reply_defaultState` int(11) DEFAULT NULL,
-  `topic_defaultState` int(11) DEFAULT NULL,
   `allowFeedback` bit(1) NOT NULL,
   `allowComment` bit(1) NOT NULL,
   `allowFilterWord` bit(1) NOT NULL,
   `filterWordReplace` varchar(255) DEFAULT NULL,
   `privateMessage_submitQuantity` int(11) DEFAULT NULL,
   `topicEditorTag` longtext,
+  `comment_review` int(11) DEFAULT NULL,
+  `reply_review` int(11) DEFAULT NULL,
+  `topic_review` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -1474,4 +1474,32 @@ CREATE TABLE `userloginlog_3` (
   `typeNumber` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `userLoginLog_idx` (`userId`,`logonTime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "userrole"
+#
+
+CREATE TABLE `userrole` (
+  `id` varchar(32) NOT NULL,
+  `defaultRole` bit(1) DEFAULT NULL,
+  `name` varchar(50) DEFAULT NULL,
+  `remark` longtext,
+  `sort` int(11) DEFAULT NULL,
+  `userResourceFormat` longtext,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "userrolegroup"
+#
+
+CREATE TABLE `userrolegroup` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `userName` varchar(30) DEFAULT NULL,
+  `userRoleId` varchar(32) DEFAULT NULL,
+  `validPeriodEnd` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `userRoleGroup_1_idx` (`userName`,`validPeriodEnd`),
+  KEY `userRoleGroup_2_idx` (`userRoleId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

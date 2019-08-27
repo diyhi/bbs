@@ -52,6 +52,12 @@ public interface UpgradeService extends DAO<UpgradeSystem> {
 	 */
 	public Integer addLog(String upgradeId ,String upgradeLog);
 	/**
+	 * 查询原生SQL
+	 * @param sql
+	 * @return
+	 */
+	public List<Object[]> queryNativeSQL(String sql);
+	/**
 	 * 插入原生SQL
 	 * @param sql
 	 * @return

@@ -76,56 +76,55 @@ function deleteFollow(followId){
 <body>
 <#-- 引入页头 -->
 <@include action="${newPublic_2}"/>
-<div class="fixedBottom wrap clearfix">
+<div class="skeleton">
+	<div class="main wrap backgroundModule" >
 
-	<#-- 引入服务导航 -->
-	<@include action="${newPublic_4}"/>
+		<#-- 引入服务导航 -->
+		<@include action="${newPublic_4}"/>
+	
+		<div class="dataTable">
+			<TABLE class="dataList" width="100%">
+				<THEAD>
+					<TR class="dataThead">
+						<TH width="50%">用户</TH>	
+						<TH width="30%">关注时间</TH>	
+						<TH width="20%">操作</TH>
+					</TR>
+				</THEAD>
+				<TBODY>
+		    		<#if pageView.records?exists && pageView.records?size gt 0 >    
+					<#list pageView.records as follow>
+					<TR>
+						<TD class="dataTD">
+							<a href="user/control/home?userName=${follow.friendUserName}" target="_blank" class="link">
+								${follow.friendUserName}
+								<#if follow.friendNickname != null && follow.friendNickname??>    
+									(${follow.friendNickname})
+								</#if> 
+							</a>
+						</TD>
+						<TD class="dataTD">
+							${follow.addtime}	
+						</TD>
+						<TD class="dataTD">
+							<a href="javascript:" onclick="deleteFollow('${follow.id}')">删除</a>
+						</TD>
+		    		</TR>
+		    		</#list>
+		    		</#if> 
+		    		<#if !pageView.records?exists || pageView.totalrecord == 0 > 
+		    			<TR>
+							<TD colSpan="3"  class="empty">还没有关注用户</TD>
+		    			</TR>
+		    		</#if> 
+		    	</TBODY>
+			</TABLE>
+			<DIV class=pageList>
+				<@include action="${newPublic_1}"/>
+			</DIV>
+		</div>
 
-	<div class="dataTable">
-		<TABLE class="dataList" width="100%">
-			<THEAD>
-				<TR class="dataThead">
-					<TH width="50%">用户</TH>	
-					<TH width="30%">关注时间</TH>	
-					<TH width="20%">操作</TH>
-				</TR>
-			</THEAD>
-			<TBODY>
-	    		<#if pageView.records?exists && pageView.records?size gt 0 >    
-				<#list pageView.records as follow>
-				<TR>
-					<TD class="dataTD">
-						<a href="user/control/home?userName=${follow.friendUserName}" target="_blank" class="link">
-							${follow.friendUserName}
-							<#if follow.friendNickname != null && follow.friendNickname??>    
-								(${follow.friendNickname})
-							</#if> 
-						</a>
-					</TD>
-					<TD class="dataTD">
-						${follow.addtime}	
-					</TD>
-					<TD class="dataTD">
-						<a href="javascript:" onclick="deleteFollow('${follow.id}')">删除</a>
-					</TD>
-	    		</TR>
-	    		</#list>
-	    		</#if> 
-	    		<#if !pageView.records?exists || pageView.totalrecord == 0 > 
-	    			<TR>
-						<TD colSpan="3" align="center" height="28px">还没有关注用户</TD>
-	    			</TR>
-	    		</#if> 
-	    	</TBODY>
-		</TABLE>
-		<DIV class=pageList>
-			<@include action="${newPublic_1}"/>
-		</DIV>
 	</div>
-
-	<div style="clear:both;"></div>
-	<div class="push"><!-- 把div#footer推下去 --></div>
-
 
 </div>
 <#--引入页脚-->

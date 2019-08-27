@@ -18,75 +18,77 @@
     <body>
     <#-- 引入页头 -->
     <@include action="${newPublic_2}"/>
-   	<div class="fixedBottom  wrap clearfix">
-   		<div style="background: #fff; height: 1px;"></div>
-        <form id="loginForm" name="login" method="post" autocomplete="off" action="login?jumpUrl=${url_jumpUrl}" onkeydown="keydown(event);">
-			<!-- 令牌标记 -->
-			<input type="hidden" id="token" name="token" value="${token}">
-           	
-           	<div class="loginModule clearfix">
-           		<div class="head">
-					<p>用户登录</p>
-				</div>
-				<div class="box">
-					<!-- 用户名 -->
-					<div class="username">
-		            	<span></span>
-		            	<input id="userName" name="userName" type="text" autocomplete="off" maxLength="40" value="" tabindex="1" onfocus="inputBoxTip_click(this);" onblur="inputBoxTip_leave(this);" onkeyup="showClearUserNameBox(this);"/>
-		            	<a class="clearUserName" id="clearUserName" href="javascript:void(0);" style="display:none;" onClick="javascript:clearUserName();" ></a>
-		            	<label class="promptTag" id="userNameBoxTip" for="userName" style="display:block">用户名</label>
-		            </div>
-					<p class="tips">
-		            	<span id="userName_error">${(error['userName'])!}</span>
-		            </p>
-		            <!-- 密码 -->
-					<div class="password">
-						<span></span>
-						<input id="password" name="password" type="password" maxLength="20" autocomplete="off" tabindex="2" onfocus="inputBoxTip_click(this);" onblur="inputBoxTip_leave(this);"/>
-						<label class="promptTag" id="passwordBoxTip" style="display: block;" for="password">密码</label>
+   	<div class="skeleton backgroundModule">
+		<div class="main wrap backgroundModule" >
+	   		<div style="background: #fff; height: 1px;"></div>
+	        <form id="loginForm" name="login" method="post" autocomplete="off" action="login?jumpUrl=${url_jumpUrl}" onkeydown="keydown(event);">
+				<!-- 令牌标记 -->
+				<input type="hidden" id="token" name="token" value="${token}">
+	           	
+	           	<div class="loginModule clearfix">
+	           		<div class="head">
+						<p>用户登录</p>
 					</div>
-					<p class="tips">
-						<span id="password_error" >${(error['password'])!}</span>
-					</p>
-					<!-- 验证码 -->
-					<div class="captcha_div" id="captcha_div" <#if formCaptcha.showCaptcha?c == 'false'>style='display: none;'</#if>>
-						<div class="captchaBox">
+					<div class="box">
+						<!-- 用户名 -->
+						<div class="username">
+			            	<span></span>
+			            	<input id="userName" name="userName" type="text" autocomplete="off" maxLength="40" value="" tabindex="1" onfocus="inputBoxTip_click(this);" onblur="inputBoxTip_leave(this);" onkeyup="showClearUserNameBox(this);"/>
+			            	<a class="clearUserName" id="clearUserName" href="javascript:void(0);" style="display:none;" onClick="javascript:clearUserName();" ></a>
+			            	<label class="promptTag" id="userNameBoxTip" for="userName" style="display:block">用户名</label>
+			            </div>
+						<p class="tips">
+			            	<span id="userName_error">${(error['userName'])!}</span>
+			            </p>
+			            <!-- 密码 -->
+						<div class="password">
 							<span></span>
-							<input type="hidden" id="captchaKey" name="captchaKey" value="${formCaptcha.captchaKey}">
-							<input id="captchaValue" name="captchaValue" type="text" maxLength="4" autocomplete="off" tabindex="3" onfocus="inputBoxTip_click(this);" onblur="inputBoxTip_leave(this);"/>
-							<label class="promptTag" id="captchaValueBoxTip" style="display: block;" for="captchaValue">验证码</label>
+							<input id="password" name="password" type="password" maxLength="20" autocomplete="off" tabindex="2" onfocus="inputBoxTip_click(this);" onblur="inputBoxTip_leave(this);"/>
+							<label class="promptTag" id="passwordBoxTip" style="display: block;" for="password">密码</label>
 						</div>
-						<a class="captchaImage" href="javascript:void(0);" >
-							<img id="captcha" src="captcha/${formCaptcha.captchaKey}.jpg" onClick="replaceCaptcha();" tabindex="4" />
-						</a>
-						<a  href="javascript:void(0);" onClick="replaceCaptcha();" tabindex="5">换一幅</a>
-					</div>
-					<p class="tips">
-						<span id="captchaValue_error">${(error['captchaValue'])!}</span>
-					</p>
-					
-					<span id="token_error" style="color: red;">${(error['token'])!}</span>
-					<!-- 忘记密码及自动登录  -->
-					<p class="otherInfo">
-						<a href="findPassWord/step1" tabindex="8">找回密码？</a>
+						<p class="tips">
+							<span id="password_error" >${(error['password'])!}</span>
+						</p>
+						<!-- 验证码 -->
+						<div class="captcha_div" id="captcha_div" <#if formCaptcha.showCaptcha?c == 'false'>style='display: none;'</#if>>
+							<div class="captchaBox">
+								<span></span>
+								<input type="hidden" id="captchaKey" name="captchaKey" value="${formCaptcha.captchaKey}">
+								<input id="captchaValue" name="captchaValue" type="text" maxLength="4" autocomplete="off" tabindex="3" onfocus="inputBoxTip_click(this);" onblur="inputBoxTip_leave(this);"/>
+								<label class="promptTag" id="captchaValueBoxTip" style="display: block;" for="captchaValue">验证码</label>
+							</div>
+							<a class="captchaImage" href="javascript:void(0);" >
+								<img id="captcha" src="captcha/${formCaptcha.captchaKey}.jpg" onClick="replaceCaptcha();" tabindex="4" />
+							</a>
+							<a  href="javascript:void(0);" onClick="replaceCaptcha();" tabindex="5">换一幅</a>
+						</div>
+						<p class="tips">
+							<span id="captchaValue_error">${(error['captchaValue'])!}</span>
+						</p>
 						
-						<label>
-							<input id="rememberMe" name="rememberMe" type="checkbox" value="true"/>
-							<span>自动登录</span>
-						</label>
-					</p>
-					
-					
-					<!-- 登录  -->
-					<p class="loginButton">
-						<a href="javascript:void(0);" onClick="javascript:ajaxSubmit()" tabindex="6">登&nbsp;录</a>
-					</p>
+						<span id="token_error" style="color: red;">${(error['token'])!}</span>
+						<!-- 忘记密码及自动登录  -->
+						<p class="otherInfo">
+							<a href="findPassWord/step1" tabindex="8">找回密码？</a>
+							
+							<label>
+								<input id="rememberMe" name="rememberMe" type="checkbox" value="true"/>
+								<span>自动登录</span>
+							</label>
+						</p>
+						
+						
+						<!-- 登录  -->
+						<p class="loginButton">
+							<a href="javascript:void(0);" onClick="javascript:ajaxSubmit()" tabindex="6">登&nbsp;录</a>
+						</p>
+					</div>
+					 
 				</div>
-				 
+				<div class="push"><!-- 将页脚固定在页面底部 --></div>
+				
+	        </form>
 			</div>
-			<div class="push"><!-- 将页脚固定在页面底部 --></div>
-			
-        </form>
 		</div>
 		<#-- 引入页脚 -->
 		<@include action="${newPublic_3}"/>

@@ -23,6 +23,7 @@ import cms.bean.user.UserDynamic;
 import cms.bean.user.UserGrade;
 import cms.bean.user.UserInputValue;
 import cms.bean.user.UserLoginLog;
+import cms.bean.user.UserRoleGroup;
 import cms.service.besa.DaoSupport;
 import cms.service.favorite.FavoriteService;
 import cms.service.follow.FollowService;
@@ -31,6 +32,7 @@ import cms.service.message.PrivateMessageService;
 import cms.service.message.RemindService;
 import cms.service.message.SystemNotifyService;
 import cms.service.user.UserGradeService;
+import cms.service.user.UserRoleService;
 import cms.service.user.UserService;
 import cms.utils.ObjectConversion;
 import cms.web.action.user.PointLogConfig;
@@ -63,6 +65,8 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 	
 	@Resource LikeService likeService;
 	@Resource FollowService followService;
+	@Resource UserRoleService userRoleService;
+	
 	/**
 	 * 根据条件分页查询用户名称
 	 * @param jpql SQL
@@ -357,8 +361,9 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 	 * 保存用户
 	 * @param user 用户
 	 * @param userInputValueList 用户自定义注册功能项用户输入值
+	 * @param userRoleGroupList 用户角色组集合
 	 */
-	public void saveUser(User user,List<UserInputValue> userInputValueList){
+	public void saveUser(User user,List<UserInputValue> userInputValueList, List<UserRoleGroup> userRoleGroupList){
 		this.save(user);
 
 		if(userInputValueList != null && userInputValueList.size() >0){	
@@ -367,7 +372,9 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 				this.save(userInputValue);
 			}
 		}
-		
+		if(userRoleGroupList != null && userRoleGroupList.size() >0){
+			userRoleService.saveUserRoleGroup(userRoleGroupList);
+		}
 	}
 	
 	/**
@@ -413,8 +420,9 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 	 * @param user 用户
 	 * @param add_userInputValue 添加注册功能项用户输入值集合
 	 * @param delete_userInputValueIdList 删除注册功能项用户输入值Id集合
+	 * @param userRoleGroupList 用户角色组集合
 	 */
-	public Integer updateUser(User user, List<UserInputValue> add_userInputValue,List<Long> delete_userInputValueIdList){
+	public Integer updateUser(User user, List<UserInputValue> add_userInputValue,List<Long> delete_userInputValueIdList, List<UserRoleGroup> userRoleGroupList){
 	
 		Query query = em.createQuery("update User o set " +
 				" o.nickname=?1, o.allowUserDynamic=?2, o.password=?3,o.email=?4, o.issue=?5," +
@@ -450,6 +458,8 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 					.setParameter("id", delete_userInputValueIdList);
 					delete.executeUpdate();
 		}
+		
+		userRoleService.updateUserRoleGroup(user.getUserName(), userRoleGroupList);
 		
 		
 		return i;
@@ -601,6 +611,10 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 		//删除用户动态
 		this.deleteUserDynamic(userNameList);
 		
+		//删除用户角色组
+		userRoleService.deleteUserRoleGroup(userNameList);
+		
+
 		return j;
 	}
 	/**

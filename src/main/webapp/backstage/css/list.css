@@ -211,12 +211,11 @@ ul.rating li.five a:hover {background-position:0 -160px}
 }
 
 
-
 /** 头像 **/
 .avatarModule {
 	padding-left: 8px;padding-right: 8px;
 	padding-top: 8px;
-	padding-bottom: 8px;
+	padding-bottom: 12px;
 	background: #fcfcfc;
 }
 .avatarModule .original-box{
@@ -270,36 +269,48 @@ ul.rating li.five a:hover {background-position:0 -160px}
 	float: left;
 }
 
-.avatarModule .bottomInfo{
-	margin-top: 10px;line-height:34px; border-top: 1px solid #d9dadb;
-}
-.avatarModule .bottomInfo .avatar-upload-button{
-	padding-top: 12px;float: right;line-height: 36px; 
-}
-.avatarModule .bottomInfo .avatar-submit-button{
-	padding-top: 15px; padding-top:13px\0; *padding-top:12px;   float: right;line-height: 36px;
-}
 
-.avatarModule .bottomInfo .uploadButton{
+
+.avatarModule .bottomInfo{
+	margin-top: 8px;line-height:34px; 
+	border-top: 1px solid #d9dadb;
 	position: relative;
-	color: #0592fe;
-    border-color: #0592fe;
-    outline: none;
-    display: inline-block;
-   	padding-bottom:2px;
-    padding-left: 12px;
-    padding-right:12px; 
-    font-size: 14px;
-    line-height: 28px;
-    text-align: center;
-    cursor: pointer;
-    background: none;
-    border: 1px solid;
-    border-radius: 3px;
-    margin: 0;
-	text-decoration: none;
+	padding-top: 6px;
 }
-.avatarModule .bottomInfo .uploadButton input {
+.avatarModule .bottomInfo .progressBar{
+	position: absolute;
+	left: -220px;
+	font-style:normal;
+}
+.avatarModule .bottomInfo .button-box{
+	margin-top:5px;
+	height:34px;
+	width:100%;
+	text-align:right;
+}
+.avatarModule .bottomInfo .button-box span{
+	position:relative;
+	display:inline-block;
+	height:32px;
+	line-height:32px;
+	border: 1px solid #26a2ff;
+	text-align:center;
+	font-size:18px;
+	color:#26a2ff;
+	border-radius:3px;
+	cursor:pointer;
+	margin:0 5px;
+	padding-left: 15px;
+	padding-right: 15px;
+}
+.avatarModule .bottomInfo .button-box span.on,.avatarModule .bottomInfo .button-box span:hover{
+	background:#26a2ff;
+	
+	box-shadow:inset 0 1px 2px #26a2ff;
+	color:#fff;
+	text-shadow:#26a2ff 0 -1px 0;
+}
+.avatarModule .bottomInfo .button-box span input {
     position: absolute;
     font-size: 20px;
     right: 0;
@@ -307,11 +318,6 @@ ul.rating li.five a:hover {background-position:0 -160px}
     opacity: 0;
     filter:alpha(opacity=0);
 }
-.avatarModule .bottomInfo .uploadButton:hover {
-    background: #f1f9ff;  
-    text-decoration: none;
-}
-
 
 
 

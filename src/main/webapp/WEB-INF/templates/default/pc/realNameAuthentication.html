@@ -19,41 +19,39 @@
 <body>
 <#-- 引入页头 -->
 <@include action="${newPublic_2}"/>
-<div class="fixedBottom wrap clearfix">
-	<#-- 引入服务导航 -->
-	<@include action="${newPublic_4}"/>
-	<!-- 令牌标记 -->
-	<input type="hidden" id="token" name="token" value="${token}">
-	<div class="realNameAuthenticationModule">
-		<table class="realNameAuthenticationTable" border="0" cellSpacing="2" cellPadding="0" >
-			<tbody>
-				<tr>
-		    		<td width="120px" align="center"><h2 class="projectName">手机绑定</h2></td>
-		    		<td align="left" width="300px">
-		    			<#if user.mobile != null && user.mobile != ''>
-		    				您绑定的手机号：${user.mobile}
-		    			<#else>
-		    				你还没绑定手机
-		    			</#if>
-		    		
-		    			
-		    		</td>
-		    		<td align="left" >
-		    			<#if user.mobile != null && user.mobile != ''>
-		    				<a href="user/control/updatePhoneBinding/step1" class="operating">修改</a>
-		    			<#else>
-		    				<a href="user/control/phoneBinding" class="operating">立即绑定</a>
-		    			</#if>
-		    		</td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
+<div class="skeleton">
+	<div class="main wrap backgroundModule" >
+		<#-- 引入服务导航 -->
+		<@include action="${newPublic_4}"/>
+		<!-- 令牌标记 -->
+		<input type="hidden" id="token" name="token" value="${token}">
+		<div class="realNameAuthenticationModule">
+			<table class="realNameAuthenticationTable" border="0" cellSpacing="2" cellPadding="0" >
+				<tbody>
+					<tr>
+			    		<td width="120px" align="center"><h2 class="projectName">手机绑定</h2></td>
+			    		<td align="left" width="300px">
+			    			<#if user.mobile != null && user.mobile != ''>
+			    				您绑定的手机号：${user.mobile}
+			    			<#else>
+			    				你还没绑定手机
+			    			</#if>
+			    		
+			    			
+			    		</td>
+			    		<td align="left" >
+			    			<#if user.mobile != null && user.mobile != ''>
+			    				<a href="user/control/updatePhoneBinding/step1" class="operating">修改</a>
+			    			<#else>
+			    				<a href="user/control/phoneBinding" class="operating">立即绑定</a>
+			    			</#if>
+			    		</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
 	
-	<div style="clear:both;"></div>
-	<div class="push"><!-- 把div#footer推下去 --></div>
-
-
+	</div>
 </div>
 <#--引入页脚-->
 <@include action="${newPublic_3}"/>

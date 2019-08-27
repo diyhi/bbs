@@ -56,6 +56,8 @@ import cms.bean.user.AccessUser;
 import cms.bean.user.DisableUserName;
 import cms.bean.user.FormCaptcha;
 import cms.bean.user.PointLog;
+import cms.bean.user.RefreshUser;
+import cms.bean.user.ResourceEnum;
 import cms.bean.user.User;
 import cms.bean.user.UserCustom;
 import cms.bean.user.UserDynamic;
@@ -104,7 +106,9 @@ import cms.web.action.sms.SmsManage;
 import cms.web.action.thumbnail.ThumbnailManage;
 import cms.web.action.topic.CommentManage;
 import cms.web.action.topic.TopicManage;
+import cms.web.action.user.RoleAnnotation;
 import cms.web.action.user.UserManage;
+import cms.web.action.user.UserRoleManage;
 import cms.web.taglib.Configuration;
 
 /**
@@ -166,10 +170,13 @@ public class HomeManageAction {
 	@Resource FollowManage followManage;
 	@Resource FollowerManage followerManage;
 	
+	@Resource UserRoleManage userRoleManage;
+	
 	//?  匹配任何单字符
 	//*  匹配0或者任意数量的字符
 	//** 匹配0或者更多的目录
 	private PathMatcher matcher = new AntPathMatcher(); 
+	
 	
 	/**--------------------------------- 首页 -----------------------------------**/
 	/**
@@ -182,11 +189,10 @@ public class HomeManageAction {
 	public String homeUI(ModelMap model,String userName,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-			
+
 		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
 		
-		
-		
+
 	    Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
 	    
 	    //获取登录用户
@@ -221,6 +227,7 @@ public class HomeManageAction {
 				
 			}
 			
+			List<String> userRoleNameList = userRoleManage.queryUserRoleName(new_user.getUserName());
 			
 			
       		if(flag){
@@ -241,6 +248,10 @@ public class HomeManageAction {
     			viewUser.setAvatarPath(new_user.getAvatarPath());//头像路径
     			viewUser.setAvatarName(new_user.getAvatarName());//头像名称
     			
+    			if(userRoleNameList != null && userRoleNameList.size() >0){
+    				viewUser.setUserRoleNameList(userRoleNameList);//话题允许查看的角色名称集合
+    			}
+    			
       			model.addAttribute("user", viewUser);
           		returnValue.put("user", viewUser);
       		}else{//如果不是登录会员自身，则仅显示指定字段
@@ -254,6 +265,9 @@ public class HomeManageAction {
       			other_user.setGradeName(new_user.getGradeName());//等级名称
       			other_user.setAvatarPath(new_user.getAvatarPath());//头像路径
       			other_user.setAvatarName(new_user.getAvatarName());//头像名称
+      			if(userRoleNameList != null && userRoleNameList.size() >0){
+      				other_user.setUserRoleNameList(userRoleNameList);//话题允许查看的角色名称集合
+    			}
       			model.addAttribute("user", other_user);
           		returnValue.put("user", other_user);
       		}
@@ -1043,15 +1057,52 @@ public class HomeManageAction {
 			//删除缓存
 			userManage.delete_cache_findUserById(new_user.getId());
 			userManage.delete_cache_findUserByUserName(new_user.getUserName());
-			
-			String accessToken = WebUtil.getCookieByName(request, "cms_accessToken");
-			if(accessToken != null && !"".equals(accessToken.trim())){
-				//删除访问令牌
-    			oAuthManage.deleteAccessToken(accessToken.trim());
-			}
-			
+
 			if(i == 0){
 				error.put("user", ErrorView._810.name());//修改用户失败
+			}else{
+				//有修改密码的情况要执行更新OAuth令牌操作
+				if((formbean.getPassword() != null && !"".equals(formbean.getPassword().trim())) ||
+						(formbean.getNickname() != null && !"".equals(formbean.getNickname().trim()))){
+
+					User _user = userService.findUserByUserName(accessUser.getUserName());
+					
+					String _accessToken = WebUtil.getCookieByName(request, "cms_accessToken");
+					if(_accessToken != null && !"".equals(_accessToken.trim())){
+						//删除访问令牌
+		    			oAuthManage.deleteAccessToken(_accessToken.trim());
+					}
+					String _refreshToken = WebUtil.getCookieByName(request, "cms_refreshToken");
+					if(_refreshToken != null && !"".equals(_refreshToken.trim())){
+						//删除刷新令牌
+		    			oAuthManage.deleteRefreshToken(_refreshToken);
+					}
+					
+					//访问令牌
+					String accessToken = UUIDUtil.getUUID32();
+					//刷新令牌
+					String refreshToken = UUIDUtil.getUUID32();
+
+					//获取cookie的存活时间
+					int maxAge = WebUtil.getCookieMaxAge(request, "cms_accessToken"); //存放时间 单位/秒
+					boolean rememberMe = maxAge >0 ? true :false;
+					
+					
+					oAuthManage.addAccessToken(accessToken, new AccessUser(_user.getId(),_user.getUserName(),_user.getNickname(),_user.getAvatarPath(),_user.getAvatarName(),_user.getSecurityDigest(),rememberMe));
+					oAuthManage.addRefreshToken(refreshToken, new RefreshUser(accessToken,_user.getId(),_user.getUserName(),_user.getNickname(),_user.getAvatarPath(),_user.getAvatarName(),_user.getSecurityDigest(),rememberMe));
+					
+					
+					
+					//将访问令牌添加到Cookie
+					WebUtil.addCookie(response, "cms_accessToken", accessToken, maxAge);
+					//将刷新令牌添加到Cookie
+					WebUtil.addCookie(response, "cms_refreshToken", refreshToken, maxAge);
+					AccessUserThreadLocal.set(new AccessUser(_user.getId(),_user.getUserName(),_user.getNickname(),_user.getAvatarPath(),_user.getAvatarName(),_user.getSecurityDigest(),rememberMe));
+					
+					
+					
+					
+				}
 			}
 		}
 		
@@ -1133,6 +1184,7 @@ public class HomeManageAction {
 	 */
 	@RequestMapping(value="/user/control/updateAvatar",method=RequestMethod.POST)
 	@ResponseBody//方式来做ajax,直接返回字符串
+	@RoleAnnotation(resourceCode=ResourceEnum._2001000)
 	public String updateAvatar(ModelMap model,MultipartFile imgFile,
 			HttpServletRequest request,HttpServletResponse response)
 			throws Exception {	
@@ -2250,7 +2302,7 @@ public class HomeManageAction {
 	/**
 	 * 私信对话列表
 	 * @param model
-	 * @param pageForm
+	 * @param page 页码
 	 * @param friendUserName 对方用户名称
 	 * @param request
 	 * @param response
@@ -2258,7 +2310,7 @@ public class HomeManageAction {
 	 * @throws Exception
 	 */
 	@RequestMapping(value="/user/control/privateMessageChatList",method=RequestMethod.GET) 
-	public String privateMessageChatList(ModelMap model,PageForm pageForm,String friendUserName,
+	public String privateMessageChatList(ModelMap model,Integer page,String friendUserName,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
@@ -2268,10 +2320,13 @@ public class HomeManageAction {
 		//获取登录用户
 	  	AccessUser accessUser = AccessUserThreadLocal.get();
 		String accessPath = accessSourceDeviceManage.accessDevices(request);
+		PageForm pageForm = new PageForm();
+		pageForm.setPage(page);
+
 		//调用分页算法代码
 		PageView<PrivateMessage> pageView = new PageView<PrivateMessage>(settingService.findSystemSetting_cache().getForestagePageNumber(),pageForm.getPage(),10,request.getRequestURI(),request.getQueryString());
-		//当前页
-		int firstIndex = (pageForm.getPage()-1)*pageView.getMaxresult();
+		
+		
 		//对话用户
 		User chatUser = null;
 		
@@ -2286,8 +2341,19 @@ public class HomeManageAction {
 		if(friendUserName != null && !"".equals(friendUserName.trim())){
 			chatUser = userManage.query_cache_findUserByUserName(friendUserName.trim());
 			if(chatUser != null){
-
-				QueryResult<PrivateMessage> qr = privateMessageService.findPrivateMessageChatByUserId(accessUser.getUserId(),chatUser.getId(),100,firstIndex,pageView.getMaxresult());
+				if(page == null){//页数为空时显示最后一页数据
+					//根据用户Id查询私信对话分页总数
+					Long count = privateMessageService .findPrivateMessageChatCountByUserId(accessUser.getUserId(),chatUser.getId(),100);
+					//计算总页数
+					pageView.setTotalrecord(count);
+					pageForm.setPage((int)pageView.getTotalpage());
+					pageView = new PageView<PrivateMessage>(settingService.findSystemSetting_cache().getForestagePageNumber(),pageForm.getPage(),10,request.getRequestURI(),request.getQueryString());
+					
+				}
+				//当前页
+				int firstIndex = (pageForm.getPage()-1)*pageView.getMaxresult();
+				
+				QueryResult<PrivateMessage> qr = privateMessageService.findPrivateMessageChatByUserId(accessUser.getUserId(),chatUser.getId(),100,firstIndex,pageView.getMaxresult(),1);
 				if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
 					for(PrivateMessage privateMessage : qr.getResultlist()){
 						userIdList.add(privateMessage.getSenderUserId());//发送者用户Id 
@@ -2452,6 +2518,7 @@ public class HomeManageAction {
 	 * @throws Exception
 	 */
 	@RequestMapping(value="/user/control/addPrivateMessage", method=RequestMethod.POST)
+	@RoleAnnotation(resourceCode=ResourceEnum._6001000)
 	public String addPrivateMessage(ModelMap model,String friendUserName,String messageContent,
 			String token,String captchaKey,String captchaValue,String jumpUrl,
 			RedirectAttributes redirectAttrs,
@@ -2675,6 +2742,7 @@ public class HomeManageAction {
 	 * @param friendUserName 对方用户名称
 	 */
 	@RequestMapping(value="/user/control/deletePrivateMessage", method=RequestMethod.POST)
+	@RoleAnnotation(resourceCode=ResourceEnum._6002000)
 	public String deletePrivateMessage(ModelMap model,String jumpUrl,String token,String friendUserName,
 			RedirectAttributes redirectAttrs,
 			HttpServletRequest request, HttpServletResponse response)
@@ -3425,6 +3493,7 @@ public class HomeManageAction {
 	 * @param remindId 收藏Id
 	 */
 	@RequestMapping(value="/user/control/deleteFavorite", method=RequestMethod.POST)
+	@RoleAnnotation(resourceCode=ResourceEnum._3002000)
 	public String deleteFavorite(ModelMap model,String jumpUrl,String token,String favoriteId,
 			RedirectAttributes redirectAttrs,
 			HttpServletRequest request, HttpServletResponse response)
@@ -3654,6 +3723,22 @@ public class HomeManageAction {
 						userDynamic.setTopicTitle(topicInfo.getTitle());
 						userDynamic.setTopicViewTotal(topicInfo.getViewTotal());
 						userDynamic.setTopicCommentTotal(topicInfo.getCommentTotal());
+						
+						
+
+						List<String> topicRoleNameList = userRoleManage.queryAllowViewTopicRoleName(topicInfo.getTagId());
+						if(topicRoleNameList != null && topicRoleNameList.size() >0){
+							userDynamic.setAllowRoleViewList(topicRoleNameList);//话题允许查看的角色名称集合
+						}
+						
+						
+						
+						
+						
+						
+						
+						
+						
 						//处理隐藏标签
 						if(userDynamic.getModule().equals(100) && topicInfo.getContent() != null && !"".equals(topicInfo.getContent().trim())){
 							//允许可见的隐藏标签
@@ -3718,13 +3803,24 @@ public class HomeManageAction {
 									}
 								}
 							}
+							
+							
 							//生成处理'隐藏标签'Id
 							String processHideTagId = topicManage.createProcessHideTagId(userDynamic.getTopicId(),topicInfo.getLastUpdateTime(), visibleTagList);
 							
 							//处理隐藏标签
 							String content = topicManage.query_cache_processHiddenTag(topicInfo.getContent(),visibleTagList,processHideTagId);
-
 							userDynamic.setTopicContent(content);
+							
+							//如果话题不是当前用户发表的，则检查用户对话题的查看权限
+							if(topicInfo.getIsStaff() == false && !topicInfo.getUserName().equals(accessUser.getUserName())){
+								//是否有当前功能操作权限
+								boolean flag = userRoleManage.isPermission(ResourceEnum._1001000,topicInfo.getTagId());
+								if(!flag){//如果没有查看权限
+									userDynamic.setTopicContent("");
+								}
+							}
+							
 						}
 						
 						
@@ -3887,6 +3983,7 @@ public class HomeManageAction {
 	 * @param likeId 点赞Id
 	 */
 	@RequestMapping(value="/user/control/deleteLike", method=RequestMethod.POST)
+	@RoleAnnotation(resourceCode=ResourceEnum._4002000)
 	public String deleteLike(ModelMap model,String jumpUrl,String token,String likeId,
 			RedirectAttributes redirectAttrs,
 			HttpServletRequest request, HttpServletResponse response)
@@ -4110,6 +4207,7 @@ public class HomeManageAction {
 	 * @param followId 关注Id
 	 */
 	@RequestMapping(value="/user/control/deleteFollow", method=RequestMethod.POST)
+	@RoleAnnotation(resourceCode=ResourceEnum._5002000)
 	public String deleteFollow(ModelMap model,String jumpUrl,String token,String followId,
 			RedirectAttributes redirectAttrs,
 			HttpServletRequest request, HttpServletResponse response)

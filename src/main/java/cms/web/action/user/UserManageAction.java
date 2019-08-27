@@ -2,6 +2,8 @@ package cms.web.action.user;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -17,6 +19,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -40,6 +44,8 @@ import cms.bean.user.User;
 import cms.bean.user.UserCustom;
 import cms.bean.user.UserGrade;
 import cms.bean.user.UserInputValue;
+import cms.bean.user.UserRole;
+import cms.bean.user.UserRoleGroup;
 import cms.service.setting.SettingService;
 import cms.service.topic.CommentService;
 import cms.service.topic.TagService;
@@ -47,6 +53,7 @@ import cms.service.topic.TopicIndexService;
 import cms.service.topic.TopicService;
 import cms.service.user.UserCustomService;
 import cms.service.user.UserGradeService;
+import cms.service.user.UserRoleService;
 import cms.service.user.UserService;
 import cms.utils.JsonUtils;
 import cms.utils.PathUtil;
@@ -95,6 +102,10 @@ public class UserManageAction {
 	
 	@Resource TopicLuceneManage topicLuceneManage;
 	@Resource TopicIndexService topicIndexService;
+	
+	@Resource UserRoleService userRoleService;
+	@Resource UserRoleManage userRoleManage;
+	
 	
 	/**
 	 * 用户管理 查看
@@ -186,17 +197,42 @@ public class UserManageAction {
 				
 			}
 		}
-		model.addAttribute("userCustomList", userCustomList);
 		
+		
+		//查询所有角色
+		List<UserRole> userRoleList = userRoleService.findAllRole();
+		if(userRoleList != null && userRoleList.size() >0){
+			for(UserRole userRole : userRoleList){
+				if(userRole.getDefaultRole()){//如果是默认角色
+					userRole.setSelected(true);
+				}else{
+					//默认时间  年,月,日,时,分,秒,毫秒    
+	                DateTime defaultTime = new DateTime(2999, 1, 1, 0, 0);// 2999年1月1日0点0分
+	                Date validPeriodEnd = defaultTime.toDate();
+					userRole.setValidPeriodEnd(validPeriodEnd);
+				}
+			}
+		}
+		
+		model.addAttribute("userCustomList", userCustomList);
+		model.addAttribute("userRoleList", userRoleList);
 		return "jsp/user/add_user";
 	}
 	
 	
 	/**
 	 * 用户管理 添加用户(服务端生成参数)
+	 * @param formbean
+	 * @param userRolesId 角色Id
+	 * @param result
+	 * @param model
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
 	 */
 	@RequestMapping(params="method=add",method=RequestMethod.POST)
-	public String add(User formbean,BindingResult result,ModelMap model,
+	public String add(User formbean,String[] userRolesId,BindingResult result,ModelMap model,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		//错误
@@ -368,6 +404,50 @@ public class UserManageAction {
 			}
 		}
 
+		List<UserRoleGroup> userRoleGroupList = new ArrayList<UserRoleGroup>();
+		List<UserRole> userRoleList = userRoleService.findAllRole();
+		if(userRolesId != null && userRolesId.length >0){
+			
+			if(userRoleList != null && userRoleList.size() >0){
+				for(String rolesId : userRolesId){
+					if(rolesId != null && !"".equals(rolesId.trim())){
+						for(UserRole userRole : userRoleList){
+							userRole.setSelected(true);//错误回显需要
+							if(!userRole.getDefaultRole() && userRole.getId().equals(rolesId.trim())){//默认角色不保存
+								//默认时间  年,月,日,时,分,秒,毫秒    
+				                DateTime defaultTime = new DateTime(2999, 1, 1, 0, 0);// 2999年1月1日0点0分
+				                Date validPeriodEnd = defaultTime.toDate();
+				                
+				                String validPeriodEnd_str = request.getParameter("validPeriodEnd_"+userRole.getId());
+								
+								if(validPeriodEnd_str != null && !"".equals(validPeriodEnd_str.trim())){
+									boolean verification = Verification.isTime_minute(validPeriodEnd_str.trim());
+									if(verification){
+										DateTimeFormatter format = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm");  
+						                //时间解析    
+						                DateTime dateTime = DateTime.parse(validPeriodEnd_str.trim(), format);
+						                validPeriodEnd = dateTime.toDate();
+									}else{
+										validPeriodEnd = null;
+										error.put("validPeriodEnd_"+userRole.getId(), "请填写正确的日期");
+									}
+								}
+								
+								userRole.setValidPeriodEnd(validPeriodEnd);//错误回显需要
+								UserRoleGroup userRoleGroup = new UserRoleGroup();
+								userRoleGroup.setUserName(formbean.getUserName() != null ?formbean.getUserName().trim() :formbean.getUserName());
+								userRoleGroup.setUserRoleId(userRole.getId());
+								userRoleGroup.setValidPeriodEnd(validPeriodEnd);
+								userRoleGroupList.add(userRoleGroup);
+							}
+						}
+					}
+				}
+				
+				
+			}
+		}
+		
 		
 		//数据校验
 		this.validator.validate(formbean, result); 
@@ -388,6 +468,8 @@ public class UserManageAction {
 					
 				}
 			}
+			
+			model.addAttribute("userRoleList", userRoleList);
 		
 			model.addAttribute("userCustomList", userCustomList);
 			model.addAttribute("error", error);
@@ -429,7 +511,7 @@ public class UserManageAction {
 		}
 
 		try {
-			userService.saveUser(user,all_userInputValueList);
+			userService.saveUser(user,all_userInputValueList,userRoleGroupList);
 		} catch (Exception e) {
 			throw new SystemException("添加用户错误");
 		//	e.printStackTrace();
@@ -437,7 +519,7 @@ public class UserManageAction {
 		//删除缓存
 		userManage.delete_cache_findUserById(user.getId());
 		userManage.delete_cache_findUserByUserName(user.getUserName());
-		
+		userRoleManage.delete_cache_findRoleGroupByUserName(user.getUserName());
 		
 		request.setAttribute("message", "添加用户成功");
 		request.setAttribute("urladdress", RedirectPath.readUrl("control.user.list"));
@@ -486,7 +568,33 @@ public class UserManageAction {
 				}
 			}
 		}
-		
+		//查询所有角色
+		List<UserRole> userRoleList = userRoleService.findAllRole();
+		if(userRoleList != null && userRoleList.size() >0){
+			List<UserRoleGroup> userRoleGroupList = userRoleService.findRoleGroupByUserName(user.getUserName());
+			
+			
+			for(UserRole userRole : userRoleList){
+				if(userRole.getDefaultRole()){//如果是默认角色
+					userRole.setSelected(true);
+				}else{
+					//默认时间  年,月,日,时,分,秒,毫秒    
+	                DateTime defaultTime = new DateTime(2999, 1, 1, 0, 0);// 2999年1月1日0点0分
+	                Date validPeriodEnd = defaultTime.toDate();
+					userRole.setValidPeriodEnd(validPeriodEnd);
+				}
+				
+				if(userRoleGroupList != null && userRoleGroupList.size() >0){
+					for(UserRoleGroup userRoleGroup : userRoleGroupList){
+						if(userRole.getId().equals(userRoleGroup.getUserRoleId())){
+							userRole.setSelected(true);
+							userRole.setValidPeriodEnd(userRoleGroup.getValidPeriodEnd());
+						}
+					}
+				}
+			}
+		}
+		model.addAttribute("userRoleList", userRoleList);
 		
 		model.addAttribute("userCustomList", userCustomList);
 	
@@ -499,6 +607,7 @@ public class UserManageAction {
 	/**
 	 * 用户管理 修改
 	 * @param formbean
+	 * @param userRolesId 角色Id
 	 * @param model
 	 * @param pageForm
 	 * @param jumpStatus 跳转流程  如果值小于或等于-10，则返回空串(页面判断用[-10：不刷新  -12:刷新上一页]) -1：来自退款页面跳转
@@ -508,7 +617,7 @@ public class UserManageAction {
 	 * @throws Exception
 	 */
 	@RequestMapping(params="method=edit",method=RequestMethod.POST)
-	public String edit(User formbean,ModelMap model,PageForm pageForm,Integer jumpStatus,
+	public String edit(User formbean,String[] userRolesId,ModelMap model,PageForm pageForm,Integer jumpStatus,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		if(formbean.getId() == null){
 			throw new SystemException("参数错误");
@@ -771,6 +880,55 @@ public class UserManageAction {
 			}
 			new_user.setState(formbean.getState());
 		}
+		
+		
+		List<UserRoleGroup> userRoleGroupList = new ArrayList<UserRoleGroup>();
+		List<UserRole> userRoleList = userRoleService.findAllRole();
+		if(userRolesId != null && userRolesId.length >0){
+			
+			if(userRoleList != null && userRoleList.size() >0){
+				for(String rolesId : userRolesId){
+					if(rolesId != null && !"".equals(rolesId.trim())){
+						for(UserRole userRole : userRoleList){
+							userRole.setSelected(true);//错误回显需要
+							if(!userRole.getDefaultRole() && userRole.getId().equals(rolesId.trim())){//默认角色不保存
+								//默认时间  年,月,日,时,分,秒,毫秒    
+				                DateTime defaultTime = new DateTime(2999, 1, 1, 0, 0);// 2999年1月1日0点0分
+				                Date validPeriodEnd = defaultTime.toDate();
+				                
+				                String validPeriodEnd_str = request.getParameter("validPeriodEnd_"+userRole.getId());
+								
+								if(validPeriodEnd_str != null && !"".equals(validPeriodEnd_str.trim())){
+									boolean verification = Verification.isTime_minute(validPeriodEnd_str.trim());
+									if(verification){
+										DateTimeFormatter format = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm");  
+						                //时间解析    
+						                DateTime dateTime = DateTime.parse(validPeriodEnd_str.trim(), format);
+						                validPeriodEnd = dateTime.toDate();
+									}else{
+										validPeriodEnd = null;
+										error.put("validPeriodEnd_"+userRole.getId(), "请填写正确的日期");
+									}
+								}
+								
+								userRole.setValidPeriodEnd(validPeriodEnd);//错误回显需要
+								UserRoleGroup userRoleGroup = new UserRoleGroup();
+								userRoleGroup.setUserName(user.getUserName());
+								userRoleGroup.setUserRoleId(userRole.getId());
+								userRoleGroup.setValidPeriodEnd(validPeriodEnd);
+								userRoleGroupList.add(userRoleGroup);
+							}
+						}
+					}
+				}
+				
+				
+			}
+		}
+		
+		
+		
+		
 		new_user.setId(user.getId());
 		new_user.setUserName(user.getUserName());
 		//备注
@@ -798,6 +956,7 @@ public class UserManageAction {
 					
 				}
 			}
+			model.addAttribute("userRoleList", userRoleList);
 			model.addAttribute("userCustomList", userCustomList);
 			return "jsp/user/edit_user";	
 		}
@@ -850,14 +1009,14 @@ public class UserManageAction {
 			}
 		}
 		
-		userService.updateUser(new_user,add_userInputValue,delete_userInputValueIdList);
+		userService.updateUser(new_user,add_userInputValue,delete_userInputValueIdList,userRoleGroupList);
 
 		userManage.delete_userState(new_user.getUserName());
 		
 		//删除缓存
 		userManage.delete_cache_findUserById(user.getId());
 		userManage.delete_cache_findUserByUserName(user.getUserName());
-
+		userRoleManage.delete_cache_findRoleGroupByUserName(user.getUserName());
 		
 		if(jumpStatus != null && jumpStatus<= -10){
 			model.addAttribute("jumpStatus",jumpStatus);//返回消息
@@ -930,7 +1089,7 @@ public class UserManageAction {
 							//删除缓存
 							userManage.delete_cache_findUserById(user.getId());
 							userManage.delete_cache_findUserByUserName(user.getUserName());
-							
+							userRoleManage.delete_cache_findRoleGroupByUserName(user.getUserName());
 							
 						}
 
@@ -946,6 +1105,7 @@ public class UserManageAction {
 							//删除缓存
 							userManage.delete_cache_findUserById(user.getId());
 							userManage.delete_cache_findUserByUserName(user.getUserName());
+							userRoleManage.delete_cache_findRoleGroupByUserName(user.getUserName());
 						}
 						if(i >0){
 							return "1";
@@ -990,6 +1150,7 @@ public class UserManageAction {
 					//删除缓存
 					userManage.delete_cache_findUserById(user.getId());
 					userManage.delete_cache_findUserByUserName(user.getUserName());
+					userRoleManage.delete_cache_findRoleGroupByUserName(user.getUserName());
 				}
 				
 				

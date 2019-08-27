@@ -52,8 +52,6 @@ public class UserAction {
 	@Resource UserCustomService userCustomService;
 	
 	@Resource SettingService settingService;
-
-
 	
 	/**
 	 * 用户列表

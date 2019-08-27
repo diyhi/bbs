@@ -22,6 +22,7 @@ import cms.bean.favorite.Favorites;
 import cms.bean.favorite.TopicFavorite;
 import cms.bean.topic.Topic;
 import cms.bean.user.AccessUser;
+import cms.bean.user.ResourceEnum;
 import cms.service.favorite.FavoriteService;
 import cms.service.template.TemplateService;
 import cms.utils.Base64;
@@ -33,6 +34,8 @@ import cms.web.action.AccessSourceDeviceManage;
 import cms.web.action.CSRFTokenManage;
 import cms.web.action.favorite.FavoriteManage;
 import cms.web.action.topic.TopicManage;
+import cms.web.action.user.RoleAnnotation;
+import cms.web.action.user.UserRoleManage;
 import cms.web.taglib.Configuration;
 
 /**
@@ -51,6 +54,7 @@ public class FavoriteFormAction {
 	
 	@Resource CSRFTokenManage csrfTokenManage;
 	@Resource TopicManage topicManage;
+	
 	/**
 	 * 收藏夹   添加
 	 * @param model
@@ -61,12 +65,14 @@ public class FavoriteFormAction {
 	 * @throws Exception
 	 */
 	@RequestMapping(value="/add", method=RequestMethod.POST)
+	@RoleAnnotation(resourceCode=ResourceEnum._3001000)
 	public String add(ModelMap model,Long topicId,String token,String jumpUrl,
 			RedirectAttributes redirectAttrs,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
-			
-		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+	
 		
+		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+
 		
 		Map<String,String> error = new HashMap<String,String>();
 		
@@ -97,8 +103,6 @@ public class FavoriteFormAction {
 	  	}else{
 	  		error.put("topicFavorite", ErrorView._1510.name());//话题收藏Id不能为空
 	  	}
-	  	
-	  	
 	  	
 	  	if(topic != null){
 	  		//话题收藏Id

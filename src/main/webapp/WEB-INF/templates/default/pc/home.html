@@ -31,580 +31,600 @@
 
 <#-- 引入页头 -->
 <@include action="${newPublic_2}"/>
-<div class="fixedBottom wrap clearfix" style="background: transparent;">
-	<div class="user-home-header" style="width: 1205px;">
-		<div class="avatarRing"></div>
-		<div class="inner clearfix">
-			<div class="avatar">
-				<div class="img-box">
-					<#if user.avatarName != null>
-						<img src="${user.avatarPath}${user.avatarName}">
-					<#else>
-						<img src="${commonPath}images/max_avata.png">
+<div class="skeleton">
+	<div class="main wrap" >
+		<div class="user-home-header" style="width: 1205px;">
+			<div class="avatarRing"></div>
+			<div class="inner clearfix">
+				<div class="avatar">
+					<div class="img-box">
+						<#if user.avatarName != null>
+							<img src="${user.avatarPath}${user.avatarName}">
+						<#else>
+							<img src="${commonPath}images/max_avata.png">
+						</#if>
+					</div>
+					<div class="counts clearfix">
+						<div class="point">
+							<div class="num">
+								<#if user.point != null>
+									${user.point}
+								<#else>
+									0
+								</#if>
+							</div>
+							<div class="sub">积分</div>
+						</div>
+						<div class="follows">
+							<div id="followerCount" class="num">0</div>
+							<div class="sub" >粉丝</div>
+							<input type="hidden" id="_userName" value="${user.userName}"/>
+						</div>
+						<script language="javascript" type="text/javascript">
+							//查询粉丝总数
+							function queryFollowerCount(){
+								//获取用户名称
+								var userName = document.getElementById("_userName").value;
+								get_request(function(value){
+									if(value != ""){
+										var data = JSON.parse(value);
+								        document.getElementById("followerCount").innerHTML = data;
+							        }
+								},
+									"queryFollowerCount.htm?userName="+userName+"&timestamp=" + new Date().getTime(), true);
+							}
+							queryFollowerCount();
+						</script>
+						
+					</div>
+				</div>
+				<div class="head-line">
+					<div class="name">${user.userName}</div>
+					<#if user.gradeName != null>
+						<div class="grade" >${user.gradeName}</div> 
 					</#if>
 				</div>
-				<div class="counts clearfix">
-					<div class="point">
-						<div class="num">${user.point}</div>
-						<div class="sub">积分</div>
-					</div>
-					<div class="follows">
-						<div id="followerCount" class="num">0</div>
-						<div class="sub" >粉丝</div>
-						<input type="hidden" id="_userName" value="${user.userName}"/>
-					</div>
-					<script language="javascript" type="text/javascript">
-						//查询粉丝总数
-						function queryFollowerCount(){
-							//获取用户名称
-							var userName = document.getElementById("_userName").value;
-							get_request(function(value){
-								if(value != ""){
-									var data = JSON.parse(value);
-							        document.getElementById("followerCount").innerHTML = data;
-						        }
-							},
-								"queryFollowerCount.htm?userName="+userName+"&timestamp=" + new Date().getTime(), true);
-						}
-						queryFollowerCount();
-					</script>
-					
-				</div>
-			</div>
-			<div class="head-line">
-				<div class="name">${user.userName}</div>
-				<div class="grade" >${user.gradeName}</div> 
-			</div>
-			<#if user.nickname != null && user.nickname??>
-				<div class="nickname" >
-					呢称：${user.nickname}
-				</div> 
-			</#if>
-			<div class="clearfix"></div>
-			<div class="action-button">
-				<#if user.userName != systemUser.userName>
-					<#-- 引入关注用户 -->
-					<@include action="${followRelated_addFollow_1}"/>
-					
-					<span class="privateMessageBox" >
-						<button type="button" class="privateMessageButton" onClick="javascript:window.location.href='${baseURL}user/control/privateMessageChatList?friendUserName=${user.userName}'">发私信</button>
-					</span>
+				<#if user.nickname != null && user.nickname??>
+					<div class="nickname" >
+						呢称：${user.nickname}
+					</div> 
 				</#if>
-			</div>
-		</div>						
-	</div>
-	
-	<#if user.userName == systemUser.userName>
-	<div class="selfService clearfix">
-		<div class="box">
-			<ul class="ul">
-				<li class="item">
-					<a class="a-pic" href="user/control/userDynamicList" >
-						<div class="img cms-pulse" ></div> 	
-					</a>
-    				<h4 class="title">
-    					<a class="a-title" href="user/control/userDynamicList" >我的动态</a>
-    				</h4>
-				</li>
-				<li class="item">
-					<a class="a-pic" href="user/control/topicList" >
-						<div class="img cms-topic" ></div> 	
-					</a>
-    				<h4 class="title">
-    					<a class="a-title" href="user/control/topicList" >我的话题</a>
-    				</h4>
-				</li>
-	            <li class="item">
-					<a class="a-pic" href="user/control/commentList" >
-						<div class="img cms-comment" ></div> 	
-					</a>
-    				<h4 class="title">
-    					<a class="a-title" href="user/control/commentList" >我的评论</a>
-    				</h4>
-				</li>
-				<li class="item" >
-					<a class="a-pic" href="user/control/replyList" >
-						<div class="img cms-reply " ></div> 	
-					</a>
-    				<h4 class="title">
-    					<a class="a-title" href="user/control/replyList" >我的回复</a>
-    				</h4>
-				</li>
-	            <li class="item">
-					<a class="a-pic" href="user/control/editUser" >
-						<div class="img cms-pencil-alt" ></div> 	
-					</a>
-    				<h4 class="title">
-    					<a class="a-title" href="user/control/editUser" >修改个人资料</a>
-    				</h4>
-				</li>
-				<li class="item">
-					<a class="a-pic" href="user/control/realNameAuthentication" >
-						<div class="img cms-realNameAuthentication" ></div> 	
-					</a>
-    				<h4 class="title">
-    					<a class="a-title" href="user/control/realNameAuthentication" >实名认证</a>
-    				</h4>
-				</li>
-	            <li class="item">
-					<a class="a-pic" href="user/control/point" >
-						<div class="img cms-point" ></div> 	
-					</a>
-    				<h4 class="title">
-    					<a class="a-title" href="user/control/point" >积分日志</a>
-    				</h4>
-				</li>
-				<li class="item">
-					<a class="a-pic" href="user/control/userLoginLogList" >
-						<div class="img cms-log" ></div> 	
-					</a>
-    				<h4 class="title">
-    					<a class="a-title" href="user/control/userLoginLogList" >登录日志</a>
-    				</h4>
-				</li>
-				<li class="item">
-					<a class="a-pic" href="user/control/favoriteList" >
-						<div class="img cms-favorites" ></div> 	
-					</a>
-    				<h4 class="title">
-    					<a class="a-title" href="user/control/favoriteList" >收藏夹</a>
-    				</h4>
-				</li>
-				<li class="item">
-					<a class="a-pic" href="user/control/likeList" >
-						<div class="img cms-thumb-up" ></div> 	
-					</a>
-    				<h4 class="title">
-    					<a class="a-title" href="user/control/likeList" >点赞</a>
-    				</h4>
-				</li>
-				<li class="item">
-					<a class="a-pic" href="user/control/followList" >
-						<div class="img cms-heart" ></div> 	
-					</a>
-    				<h4 class="title">
-    					<a class="a-title" href="user/control/followList" >关注</a>
-    				</h4>
-				</li>
-				<li class="item">
-					<a class="a-pic" href="user/control/followerList" >
-						<div class="img cms-follower" ></div> 	
-					</a>
-    				<h4 class="title">
-    					<a class="a-title" href="user/control/followerList" >粉丝</a>
-    				</h4>
-				</li>
-				<li class="item">
-					<a class="a-pic" href="user/control/privateMessageList" >
-						<div class="img cms-email" ></div> 	
-					</a>
-    				<h4 class="title">
-    					<a class="a-title" href="user/control/privateMessageList" >
-    						私信<span id="privateMessage-badge" class="badge" style="position: absolute; margin-top: -1px; display: none;"></span>
-    					</a>
-    				</h4>
-				</li>
-				<li class="item">
-					<a class="a-pic" href="user/control/remindList" >
-						<div class="img cms-bell" ></div> 	
-					</a>
-    				<h4 class="title">
-    					<a class="a-title" href="user/control/remindList" >
-    						提醒<span id="remind-badge" class="badge" style="position: absolute; margin-top: -1px; display: none;"></span>
-    					</a>
-    				</h4>
-				</li>
-				<li class="item">
-					<a class="a-pic" href="user/control/systemNotifyList" >
-						<div class="img cms-announcement" ></div> 	
-					</a>
-    				<h4 class="title">
-    					<a class="a-title" href="user/control/systemNotifyList" >
-    						系统通知<span id="systemNotify-badge" class="badge" style="position: absolute; margin-top: -1px; display: none;"></span>
-    					</a>
-    				</h4>
-				</li>
-				
-			</ul>
+				<div class="role">
+					<#list user.userRoleNameList as roleName>
+						<i class="userRoleName">${roleName}</i>				
+					</#list>
+				</div>
+				<div class="clearfix"></div>
+				<div class="action-button">
+					<#if user.userName != systemUser.userName>
+						<#-- 引入关注用户 -->
+						<@include action="${followRelated_addFollow_1}"/>
+						
+						<span class="privateMessageBox" >
+							<button type="button" class="privateMessageButton" onClick="javascript:window.location.href='${baseURL}user/control/privateMessageChatList?friendUserName=${user.userName}'">发私信</button>
+						</span>
+					</#if>
+				</div>
+			</div>						
 		</div>
-	</div>
-	</#if>
-	
-	<#if user.userName != systemUser.userName>
-	<!-- 动态 -->
-	<div id="home-userDynamic" class="home-userDynamic" style="width: 1205px;">
-	
-	</div>
-	<!-- 动态内容加载中 -->
-	<div id="load" class="loader" style="display: none;">加载中，请稍后...</div>
-	</#if>
-	<input type="hidden" id="commonPath" value="${commonPath}"/>
-	<!-- 是否登录 -->
-	<input type="hidden" id="unhide_isLogin" value="<#if systemUser != null>true<#else>false</#if>">
 		
-	
-	<script type="text/javascript">
-		//创建动态列表
-		function createUserDynamicList(pageView){
-			var html = "";
-			var commonPath = document.getElementById("commonPath").value;
-			
-			if( pageView.records != null && pageView.records.length >0){
-				html += "<div class='userDynamicModule' >";
-				html += 	"<ol class='userDynamicList'>";
-				for(var i = 0; i<pageView.records.length; i++){
-					var userDynamic =pageView.records[i];
+		<#if user.userName == systemUser.userName>
+		<div class="selfService clearfix">
+			<div class="box">
+				<ul class="ul">
+					<li class="item">
+						<a class="a-pic" href="user/control/userDynamicList" >
+							<div class="img cms-pulse" ></div> 	
+						</a>
+	    				<h4 class="title">
+	    					<a class="a-title" href="user/control/userDynamicList" >我的动态</a>
+	    				</h4>
+					</li>
+					<li class="item">
+						<a class="a-pic" href="user/control/topicList" >
+							<div class="img cms-topic" ></div> 	
+						</a>
+	    				<h4 class="title">
+	    					<a class="a-title" href="user/control/topicList" >我的话题</a>
+	    				</h4>
+					</li>
+		            <li class="item">
+						<a class="a-pic" href="user/control/commentList" >
+							<div class="img cms-comment" ></div> 	
+						</a>
+	    				<h4 class="title">
+	    					<a class="a-title" href="user/control/commentList" >我的评论</a>
+	    				</h4>
+					</li>
+					<li class="item" >
+						<a class="a-pic" href="user/control/replyList" >
+							<div class="img cms-reply " ></div> 	
+						</a>
+	    				<h4 class="title">
+	    					<a class="a-title" href="user/control/replyList" >我的回复</a>
+	    				</h4>
+					</li>
+		            <li class="item">
+						<a class="a-pic" href="user/control/editUser" >
+							<div class="img cms-pencil-alt" ></div> 	
+						</a>
+	    				<h4 class="title">
+	    					<a class="a-title" href="user/control/editUser" >修改个人资料</a>
+	    				</h4>
+					</li>
+					<li class="item">
+						<a class="a-pic" href="user/control/realNameAuthentication" >
+							<div class="img cms-realNameAuthentication" ></div> 	
+						</a>
+	    				<h4 class="title">
+	    					<a class="a-title" href="user/control/realNameAuthentication" >实名认证</a>
+	    				</h4>
+					</li>
+		            <li class="item">
+						<a class="a-pic" href="user/control/point" >
+							<div class="img cms-point" ></div> 	
+						</a>
+	    				<h4 class="title">
+	    					<a class="a-title" href="user/control/point" >积分日志</a>
+	    				</h4>
+					</li>
+					<li class="item">
+						<a class="a-pic" href="user/control/userLoginLogList" >
+							<div class="img cms-log" ></div> 	
+						</a>
+	    				<h4 class="title">
+	    					<a class="a-title" href="user/control/userLoginLogList" >登录日志</a>
+	    				</h4>
+					</li>
+					<li class="item">
+						<a class="a-pic" href="user/control/favoriteList" >
+							<div class="img cms-favorites" ></div> 	
+						</a>
+	    				<h4 class="title">
+	    					<a class="a-title" href="user/control/favoriteList" >收藏夹</a>
+	    				</h4>
+					</li>
+					<li class="item">
+						<a class="a-pic" href="user/control/likeList" >
+							<div class="img cms-thumb-up" ></div> 	
+						</a>
+	    				<h4 class="title">
+	    					<a class="a-title" href="user/control/likeList" >点赞</a>
+	    				</h4>
+					</li>
+					<li class="item">
+						<a class="a-pic" href="user/control/followList" >
+							<div class="img cms-heart" ></div> 	
+						</a>
+	    				<h4 class="title">
+	    					<a class="a-title" href="user/control/followList" >关注</a>
+	    				</h4>
+					</li>
+					<li class="item">
+						<a class="a-pic" href="user/control/followerList" >
+							<div class="img cms-follower" ></div> 	
+						</a>
+	    				<h4 class="title">
+	    					<a class="a-title" href="user/control/followerList" >粉丝</a>
+	    				</h4>
+					</li>
+					<li class="item">
+						<a class="a-pic" href="user/control/privateMessageList" >
+							<div class="img cms-email" ></div> 	
+						</a>
+	    				<h4 class="title">
+	    					<a class="a-title" href="user/control/privateMessageList" >
+	    						私信<span id="privateMessage-badge" class="badge" style="position: absolute; margin-top: -1px; display: none;"></span>
+	    					</a>
+	    				</h4>
+					</li>
+					<li class="item">
+						<a class="a-pic" href="user/control/remindList" >
+							<div class="img cms-bell" ></div> 	
+						</a>
+	    				<h4 class="title">
+	    					<a class="a-title" href="user/control/remindList" >
+	    						提醒<span id="remind-badge" class="badge" style="position: absolute; margin-top: -1px; display: none;"></span>
+	    					</a>
+	    				</h4>
+					</li>
+					<li class="item">
+						<a class="a-pic" href="user/control/systemNotifyList" >
+							<div class="img cms-announcement" ></div> 	
+						</a>
+	    				<h4 class="title">
+	    					<a class="a-title" href="user/control/systemNotifyList" >
+	    						系统通知<span id="systemNotify-badge" class="badge" style="position: absolute; margin-top: -1px; display: none;"></span>
+	    					</a>
+	    				</h4>
+					</li>
 					
-					html += "<div class='userDynamic'>";
-					html += 	"<div class='userDynamic-author'>";
-					html += 		"<a href='user/control/home?userName="+userDynamic.userName+"'>";
-					if(userDynamic.avatarName != null && userDynamic.avatarName != ''){
-						html += "<img src='"+userDynamic.avatarPath+"100x100/"+userDynamic.avatarName+"' >";
-					}else{
-						html += "<img src='"+commonPath+"images/min_avata.png' >";
-					}
-					html += "";
-					html += "";
-					html += 		"<cite>";
-					html += 			"<a class='userName' href='user/control/home?userName="+userDynamic.userName+"'>";
-					if(userDynamic.nickname != null && userDynamic.nickname != ''){
-						html += userDynamic.nickname;
-					}else{
-						html += userDynamic.userName;
-					}
-					html += 			"</a>";
-					html += 		"</cite> ";
-					html += 	"</div>";		
-					html += 	"<div class='userDynamicTime'>"+userDynamic.postTime+"</div>";			
-					html += 	"<div class='topicTitle'>";
-					if(userDynamic.module == 100){
-						html += "<span>发表了话题</span>";	
-					}else if(userDynamic.module == 200){
-						html += "<span>评论了话题</span>";	
-					}else if(userDynamic.module == 300){
-						html += "<span>引用了话题</span>";	
-					}else if(userDynamic.module == 400){
-						html += "<span>回复了话题</span>";	
-					}
-					html += 		"<a href='thread?topicId="+userDynamic.topicId+"'> "+userDynamic.topicTitle+"</a>";
-					html += 	"</div>";	
-					if(userDynamic.module == 100){
-						html += "<div class='topicContent' topicId='"+userDynamic.topicId+"' >"+userDynamic.topicContent+"</div>";
-					}
-					if(userDynamic.module == 200){
-						html += "<div class='topicContent' >"+userDynamic.commentContent+"</div>";
-					}
-					if(userDynamic.module == 300){
-						html += "<div id='quoteModuleContent' >";	
-						html += 	"<div class='commentContent' >"+userDynamic.commentContent+"</div>";	
-						html += 	"<div class='quoteContent'>";
-						html += 		"<div class='text'>";
-						html += 			userDynamic.quoteCommentContent;
-						html += 		"</div>";	
-						html += 	"</div>";		
-						html += "</div>";	
-					}
-					if(userDynamic.module == 400){
-						html += "<div class='replyContent' >"+userDynamic.replyContent+"</div>";	
-					}
-					html += "<div class='clearfix'></div>";
-					html += "<div class='tipBottom'>";	
-					html += 	"<span class='a-toolbar'>";
-					if(userDynamic.module == 100){
-						html += "<a href='thread?topicId="+userDynamic.topicId+"' target='_blank' >查看原文</a>";	
-						html += "<span >"+userDynamic.topicViewTotal+"次阅读</span>";	
-						html += "<span >"+userDynamic.topicCommentTotal+"个评论</span>";	
-						html += "<span id='favoriteCount_"+userDynamic.topicId+"'>0人收藏</span>";	
-					}else if(userDynamic.module == 200){
-						html += "<a href='thread?topicId="+userDynamic.topicId+"&commentId="+userDynamic.commentId+"'  target='_blank' >查看原文</a>";	
-					}else if(userDynamic.module == 300){
-						html += "<a href='thread?topicId="+userDynamic.topicId+"&commentId="+userDynamic.commentId+"'  target='_blank' >查看原文</a>";	
-					}else if(userDynamic.module == 400){
-						html += "<a href='thread?topicId="+userDynamic.topicId+"&commentId="+userDynamic.commentId+"'  target='_blank' >查看原文</a>";	
-					}
-					html += 	"</span>";
-					html += "</div>";	
-					html += "</div>";
-					
-				}
-				html += 	"</ol>";
-				html += "</div>";
-			}
-			//document.getElementById("home-userDynamic").innerHTML = html;
-			$("#home-userDynamic").append(html);
+				</ul>
+			</div>
+		</div>
+		</#if>
+		
+		<#if user.userName != systemUser.userName>
+		<!-- 动态 -->
+		<div id="home-userDynamic" class="home-userDynamic" style="width: 1205px;">
+		
+		</div>
+		<!-- 动态内容加载中 -->
+		<div id="load" class="loader" style="display: none;">加载中，请稍后...</div>
+		</#if>
+		<input type="hidden" id="commonPath" value="${commonPath}"/>
+		<!-- 是否登录 -->
+		<input type="hidden" id="unhide_isLogin" value="<#if systemUser != null>true<#else>false</#if>">
 			
-			setTimeout(function () {
-				if(pageView.records != null && pageView.records.length >0){
+		
+		<script type="text/javascript">
+			//创建动态列表
+			function createUserDynamicList(pageView){
+				var html = "";
+				var commonPath = document.getElementById("commonPath").value;
+				
+				if( pageView.records != null && pageView.records.length >0){
+					html += "<div class='userDynamicModule' >";
+					html += 	"<ol class='userDynamicList'>";
 					for(var i = 0; i<pageView.records.length; i++){
 						var userDynamic =pageView.records[i];
+						
+						html += "<div class='userDynamic'>";
+						html += 	"<div class='userDynamic-author'>";
+						html += 		"<a href='user/control/home?userName="+userDynamic.userName+"'>";
+						if(userDynamic.avatarName != null && userDynamic.avatarName != ''){
+							html += "<img src='"+userDynamic.avatarPath+"100x100/"+userDynamic.avatarName+"' >";
+						}else{
+							html += "<img src='"+commonPath+"images/min_avata.png' >";
+						}
+						html += "";
+						html += "";
+						html += 		"<cite>";
+						html += 			"<a class='userName' href='user/control/home?userName="+userDynamic.userName+"'>";
+						if(userDynamic.nickname != null && userDynamic.nickname != ''){
+							html += userDynamic.nickname;
+						}else{
+							html += userDynamic.userName;
+						}
+						html += 			"</a>";
+						html += 		"</cite> ";
+						html += 	"</div>";		
+						html += 	"<div class='userDynamicTime'>"+userDynamic.postTime+"</div>";			
+						html += 	"<div class='topicTitle'>";
 						if(userDynamic.module == 100){
-							queryFavoriteCount(userDynamic.topicId);
+							html += "<span>发表了话题</span>";	
+						}else if(userDynamic.module == 200){
+							html += "<span>评论了话题</span>";	
+						}else if(userDynamic.module == 300){
+							html += "<span>引用了话题</span>";	
+						}else if(userDynamic.module == 400){
+							html += "<span>回复了话题</span>";	
+						}
+						html += 		"<a href='thread?topicId="+userDynamic.topicId+"'> "+userDynamic.topicTitle+"</a>";
+						
+						for(var j = 0; j<userDynamic.allowRoleViewList.length; j++){
+							var roleName = userDynamic.allowRoleViewList[j];
+							html += 	"<i class='topicRoleName'>"+roleName+"</i>";
+						
 						}
 						
+						html += 	"</div>";	
+						if(userDynamic.module == 100){
+							html += "<div class='topicContent' topicId='"+userDynamic.topicId+"' >"+userDynamic.topicContent+"</div>";
+						}
+						if(userDynamic.module == 200){
+							html += "<div class='topicContent' >"+userDynamic.commentContent+"</div>";
+						}
+						if(userDynamic.module == 300){
+							html += "<div id='quoteModuleContent' >";	
+							html += 	"<div class='commentContent' >"+userDynamic.commentContent+"</div>";	
+							html += 	"<div class='quoteContent'>";
+							html += 		"<div class='text'>";
+							html += 			userDynamic.quoteCommentContent;
+							html += 		"</div>";	
+							html += 	"</div>";		
+							html += "</div>";	
+						}
+						if(userDynamic.module == 400){
+							html += "<div class='replyContent' >"+userDynamic.replyContent+"</div>";	
+						}
+						html += "<div class='clearfix'></div>";
+						html += "<div class='tipBottom'>";	
+						html += 	"<span class='a-toolbar'>";
+						if(userDynamic.module == 100){
+							html += "<a href='thread?topicId="+userDynamic.topicId+"' target='_blank' >查看原文</a>";	
+							html += "<span >"+userDynamic.topicViewTotal+"次阅读</span>";	
+							html += "<span >"+userDynamic.topicCommentTotal+"个评论</span>";	
+							html += "<span id='favoriteCount_"+userDynamic.topicId+"'>0人收藏</span>";	
+						}else if(userDynamic.module == 200){
+							html += "<a href='thread?topicId="+userDynamic.topicId+"&commentId="+userDynamic.commentId+"'  target='_blank' >查看原文</a>";	
+						}else if(userDynamic.module == 300){
+							html += "<a href='thread?topicId="+userDynamic.topicId+"&commentId="+userDynamic.commentId+"'  target='_blank' >查看原文</a>";	
+						}else if(userDynamic.module == 400){
+							html += "<a href='thread?topicId="+userDynamic.topicId+"&commentId="+userDynamic.commentId+"'  target='_blank' >查看原文</a>";	
+						}
+						html += 	"</span>";
+						html += "</div>";	
+						html += "</div>";
+						
 					}
+					html += 	"</ol>";
+					html += "</div>";
 				}
-			}, 100);
+				//document.getElementById("home-userDynamic").innerHTML = html;
+				$("#home-userDynamic").append(html);
 				
-			
-		}
-
-		//查询话题用户收藏总数
-		function queryFavoriteCount(topicId){	
-			get_request(function(value){
-				if(value != ""){
-					var data = JSON.parse(value);
-		        	document.getElementById("favoriteCount_"+topicId).innerHTML = data+"人收藏";
-		        }
-			},
-				"queryFavoriteCount?topicId="+topicId+"&timestamp=" + new Date().getTime(), true);
-							           
-		}
-		// 获取随机数
-		function getRandom(m) {
-			//生成的随机数截取m位，生成的随机数最大不超过13位，能保证首位不为0
-		    m = m > 13 ? 13 : m;
-	    	var num = Math.random().toString();
-	    	if(num.substr(num.length - m, 1) === '0') {           
-	    		return getRandom(m);
-	    	}
-			return num.substring(num.length - m);
-		}
-		//设置隐藏标签界面
-		function setHideTagUI(){
-			//获取<hide>标签属性
-			$(".topicContent").find("hide").each(function(){
-				var random = getRandom(13);
-	
-				//等级名称
-				var gradeName = $(this).attr("description");
-				var hideType = $(this).attr("hide-type");
-				
-				//话题Id
-				var topicId = $(this).parents(".topicContent").attr("topicId");//找到父级元素属性
-				
-				var inputValue = $(this).attr("input-value");
-				if(hideType == '10'){
-					var html = "";
-					html += '<div class="hide-box">';
-					html += 	'<div class="background-image"></div>';
-					html += 	'<div class="background-prompt">此处内容已被隐藏，输入密码可见</div>';
-					html += 	'<div class="input-box">';
-					html += 		'<input type="password" id="hide_password_'+random+'" class="text" maxlength="30"  placeholder="密码" value="">';
-					html += 		'<input type="button" value="提交" class="button" onclick="topicUnhide(10,'+random+','+topicId+');">';
-					
-					html += 	'</div>';
-					html += '</div>';
- 					$(this).html(html);
-				}else if(hideType == '20'){
-					var html = "";
-					html += '<div class="hide-box">';
-					html += 	'<div class="background-image"></div>';
-					html += 	'<div class="background-prompt">此处内容已被隐藏，评论话题可见</div>';
-					html += '</div>';
- 					$(this).html(html);
-				}else if(hideType == '30'){
-					var html = "";
-					html += '<div class="hide-box">';
-					html += 	'<div class="background-image"></div>';
-					html += 	'<div class="background-prompt">此处内容已被隐藏，等级达到‘'+gradeName+'’可见</div>';
-					html += '</div>';
- 					$(this).html(html);
-				}else if(hideType == '40'){
-					var html = "";
-					html += '<div class="hide-box">';
-					html += 	'<div class="background-image"></div>';
-					html += 	'<div class="background-prompt">此处内容已被隐藏，支付 '+inputValue+' 积分可见</div>';
-					html += 	'<div class="submit-box">';
-					html += 		'<input type="button" value="立即购买" class="button" onclick="topicUnhide(40,'+random+','+topicId+');">';
-					
-					html += 	'</div>';
- 					$(this).html(html);
-				}
-			})
-		
-		}
-		//话题取消隐藏
-		function topicUnhide(hideType,random,topicId){
-		
-			//判断是否已登录
-			var isLogin = document.getElementById("unhide_isLogin").value;
-			if(isLogin == "false"){
-				layer.open({
-				    type: 1, 
-				    title:"提示",
-				    content: "<div style='line-height: 36px; font-size: 15px;text-align:center; margin-left: 8px;margin-right: 8px;'>请先登录</div>", 
-				    area: ['260px', '120px'],//宽高
-					success: function(layero, index){
-						 
+				setTimeout(function () {
+					if(pageView.records != null && pageView.records.length >0){
+						for(var i = 0; i<pageView.records.length; i++){
+							var userDynamic =pageView.records[i];
+							if(userDynamic.module == 100){
+								queryFavoriteCount(userDynamic.topicId);
+							}
+							
+						}
 					}
-				});
-				return false;
+				}, 100);
+					
+				
 			}
 	
+			//查询话题用户收藏总数
+			function queryFavoriteCount(topicId){	
+				get_request(function(value){
+					if(value != ""){
+						var data = JSON.parse(value);
+			        	document.getElementById("favoriteCount_"+topicId).innerHTML = data+"人收藏";
+			        }
+				},
+					"queryFavoriteCount?topicId="+topicId+"&timestamp=" + new Date().getTime(), true);
+								           
+			}
+			// 获取随机数
+			function getRandom(m) {
+				//生成的随机数截取m位，生成的随机数最大不超过13位，能保证首位不为0
+			    m = m > 13 ? 13 : m;
+		    	var num = Math.random().toString();
+		    	if(num.substr(num.length - m, 1) === '0') {           
+		    		return getRandom(m);
+		    	}
+				return num.substring(num.length - m);
+			}
+			//设置隐藏标签界面
+			function setHideTagUI(){
+				//获取<hide>标签属性
+				$(".topicContent").find("hide").each(function(){
+					var random = getRandom(13);
 		
-		
-		
-			var parameter = "";
-			parameter += "&topicId="+topicId;//话题Id
+					//等级名称
+					var gradeName = $(this).attr("description");
+					var hideType = $(this).attr("hide-type");
+					
+					//话题Id
+					var topicId = $(this).parents(".topicContent").attr("topicId");//找到父级元素属性
+					
+					var inputValue = $(this).attr("input-value");
+					if(hideType == '10'){
+						var html = "";
+						html += '<div class="hide-box">';
+						html += 	'<div class="background-image"></div>';
+						html += 	'<div class="background-prompt">此处内容已被隐藏，输入密码可见</div>';
+						html += 	'<div class="input-box">';
+						html += 		'<input type="password" id="hide_password_'+random+'" class="text" maxlength="30"  placeholder="密码" value="">';
+						html += 		'<input type="button" value="提交" class="button" onclick="topicUnhide(10,'+random+','+topicId+');">';
+						
+						html += 	'</div>';
+						html += '</div>';
+	 					$(this).html(html);
+					}else if(hideType == '20'){
+						var html = "";
+						html += '<div class="hide-box">';
+						html += 	'<div class="background-image"></div>';
+						html += 	'<div class="background-prompt">此处内容已被隐藏，评论话题可见</div>';
+						html += '</div>';
+	 					$(this).html(html);
+					}else if(hideType == '30'){
+						var html = "";
+						html += '<div class="hide-box">';
+						html += 	'<div class="background-image"></div>';
+						html += 	'<div class="background-prompt">此处内容已被隐藏，等级达到‘'+gradeName+'’可见</div>';
+						html += '</div>';
+	 					$(this).html(html);
+					}else if(hideType == '40'){
+						var html = "";
+						html += '<div class="hide-box">';
+						html += 	'<div class="background-image"></div>';
+						html += 	'<div class="background-prompt">此处内容已被隐藏，支付 '+inputValue+' 积分可见</div>';
+						html += 	'<div class="submit-box">';
+						html += 		'<input type="button" value="立即购买" class="button" onclick="topicUnhide(40,'+random+','+topicId+');">';
+						
+						html += 	'</div>';
+	 					$(this).html(html);
+					}
+				})
 			
-			parameter += "&hideType="+hideType;//隐藏类型
-		
-			if(hideType == 10){//输入密码可见
-				
-				var password = $.trim($('#hide_password_'+random).val());
-				if(password == ""){
+			}
+			//话题取消隐藏
+			function topicUnhide(hideType,random,topicId){
+			
+				//判断是否已登录
+				var isLogin = document.getElementById("unhide_isLogin").value;
+				if(isLogin == "false"){
 					layer.open({
 					    type: 1, 
 					    title:"提示",
-					    content: "<div style='line-height: 36px; font-size: 15px;text-align:center; margin-left: 8px;margin-right: 8px;'>密码不能为空</div>", 
+					    content: "<div style='line-height: 36px; font-size: 15px;text-align:center; margin-left: 8px;margin-right: 8px;'>请先登录</div>", 
 					    area: ['260px', '120px'],//宽高
-						end: function(layero, index){
-							
+						success: function(layero, index){
+							 
 						}
 					});
-					return;
+					return false;
 				}
-				parameter += "&password="+encodeURIComponent(password);//获取URL参数
+		
+			
+			
+			
+				var parameter = "";
+				parameter += "&topicId="+topicId;//话题Id
+				
+				parameter += "&hideType="+hideType;//隐藏类型
+			
+				if(hideType == 10){//输入密码可见
+					
+					var password = $.trim($('#hide_password_'+random).val());
+					if(password == ""){
+						layer.open({
+						    type: 1, 
+						    title:"提示",
+						    content: "<div style='line-height: 36px; font-size: 15px;text-align:center; margin-left: 8px;margin-right: 8px;'>密码不能为空</div>", 
+						    area: ['260px', '120px'],//宽高
+							end: function(layero, index){
+								
+							}
+						});
+						return;
+					}
+					parameter += "&password="+encodeURIComponent(password);//获取URL参数
+				
+				}
+				//从meta标签获取令牌
+				parameter += "&token="+getCsrf();
+				//删除第一个&号,防止因为多了&号而出现警告: Parameters: Invalid chunk ignored.信息
+				if(parameter.indexOf("&") == 0){
+					parameter = parameter.substring(1,parameter.length);
+				}
+			   	post_request(function(value){
+					var data = JSON.parse(value);
+					for(var returnValue in data){
+						
+						if(returnValue == "success"){
+		        			if(data[returnValue] == "true"){
+		        				//需引入layer
+		        				layer.msg('话题取消隐藏成功，5秒后自动刷新页面', 
+									{
+									  time: 5000 //3秒关闭（如果不配置，默认是3秒）
+									},function(){
+										//关闭后的操作
+										//刷新页面
+							        	document.location.reload();
+									}
+								);
+		        				
+		        				
+		        			}
+		        		}else if(returnValue == "error"){
+		        			
+		        			var errorValue = data[returnValue];
+							var htmlValue = "";
+							var i = 0;
+							for(var error in errorValue){
+								if(error != ""){	
+									i++;
+									htmlValue += "&nbsp;&nbsp;"+i+"、"+errorValue[error]+"<br>";
+								}
+							}
+							
+							layer.open({
+							  type: 1,
+							  title: '错误', 
+							  skin: 'layui-layer-rim', //加上边框
+							  area: ['300px', '150px'], //宽高
+							  content: "<div style='line-height: 36px; font-size: 15px;text-align:left; margin-left: 8px;margin-right: 8px;'>"+htmlValue+"</div>"
+							});
+		        		}
+		        	}
+				},
+					"user/control/topic/unhide?timestamp=" + new Date().getTime(), true,parameter);
+	
+			}
+			
+			
+			//查询动态列表
+			function queryUserDynamicList(callback,page){	
+				var userName = getUrlParam("userName");//从URL中获取
+				if(userName != ""){
+					//查询用户动态
+			        $.ajax({
+						type:"GET",
+						cache:false,
+						async: true,//默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+						url : "user/control/userDynamicList?userName="+userName+"&page="+page,
+						//data: data, 
+						success:function(result) {
+							if(result.records != null && result.records.length >0){
+								//创建动态内容
+								createUserDynamicList(result);
+								
+								setTimeout(function () {	
+									setHideTagUI();
+								
+									
+									//隐藏高度超过100px的内容
+									$('.topicContent,#quoteModuleContent').readmore({
+										speed: 100,//速度
+										collapsedHeight: 200,//默认高度
+										moreLink: '<a href="" class="readMore">阅读全文</a>',
+										lessLink: '<a href="" class="readMore">收起</a>',
+										afterToggle: function(trigger, element, expanded) {
+											console.log();
+											if(expanded){//收缩
+												element.next().addClass('shrinkMore');
+												element.next().removeClass('readMore');
+											}else{//展开
+												element.next().addClass('readMore');
+												element.next().removeClass('shrinkMore');
+											}
+										}
+									});
+								}, 100);
+								
+								//回调
+								callback(); 
+							}
+							
+						},
+						beforeSend: function(request){
+					    	$("#load").show();
+					    },
+					    complete: function(XMLHttpRequest, textStatus){
+					    	$("#load").hide();
+					    }
+					});
+				}	
 			
 			}
-			//从meta标签获取令牌
-			parameter += "&token="+getCsrf();
-			//删除第一个&号,防止因为多了&号而出现警告: Parameters: Invalid chunk ignored.信息
-			if(parameter.indexOf("&") == 0){
-				parameter = parameter.substring(1,parameter.length);
-			}
-		   	post_request(function(value){
-				var data = JSON.parse(value);
-				for(var returnValue in data){
+			
+			
+			$(document).ready(function () {
+				if(document.getElementById("home-userDynamic") != null){
+					//页码
+					var page = 1;
+					//滚动到底部触发翻页
+					var stop = false;//触发开关，防止多次调用事件  
 					
-					if(returnValue == "success"){
-	        			if(data[returnValue] == "true"){
-	        				//需引入layer
-	        				layer.msg('话题取消隐藏成功，5秒后自动刷新页面', 
-								{
-								  time: 5000 //3秒关闭（如果不配置，默认是3秒）
-								},function(){
-									//关闭后的操作
-									//刷新页面
-						        	document.location.reload();
-								}
-							);
-	        				
-	        				
-	        			}
-	        		}else if(returnValue == "error"){
-	        			
-	        			var errorValue = data[returnValue];
-						var htmlValue = "";
-						var i = 0;
-						for(var error in errorValue){
-							if(error != ""){	
-								i++;
-								htmlValue += "&nbsp;&nbsp;"+i+"、"+errorValue[error]+"<br>";
-							}
-						}
-						
-						layer.open({
-						  type: 1,
-						  title: '错误', 
-						  skin: 'layui-layer-rim', //加上边框
-						  area: ['300px', '150px'], //宽高
-						  content: "<div style='line-height: 36px; font-size: 15px;text-align:left; margin-left: 8px;margin-right: 8px;'>"+htmlValue+"</div>"
-						});
-	        		}
-	        	}
-			},
-				"user/control/topic/unhide?timestamp=" + new Date().getTime(), true,parameter);
-
-		}
-		
-		
-		//查询动态列表
-		function queryUserDynamicList(callback,page){	
-			var userName = getUrlParam("userName");//从URL中获取
-			if(userName != ""){
-				//查询用户动态
-		        $.ajax({
-					type:"GET",
-					cache:false,
-					async: true,//默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
-					url : "user/control/userDynamicList?userName="+userName+"&page="+page,
-					//data: data, 
-					success:function(result) {
-						if(result.records != null && result.records.length >0){
-							//创建动态内容
-							createUserDynamicList(result);
-							
-							setTimeout(function () {	
-								setHideTagUI();
-							
-								
-								//隐藏高度超过100px的内容
-								$('.topicContent,#quoteModuleContent').readmore({
-									speed: 100,//速度
-									collapsedHeight: 200,//默认高度
-									moreLink: '<a href="" class="readMore">阅读全文</a>',
-									lessLink: '<a href="" class="readMore">收起</a>',
-									afterToggle: function(trigger, element, expanded) {
-										console.log();
-										if(expanded){//收缩
-											element.next().addClass('shrinkMore');
-											element.next().removeClass('readMore');
-										}else{//展开
-											element.next().addClass('readMore');
-											element.next().removeClass('shrinkMore');
-										}
-									}
-								});
-							}, 100);
-							
-							//回调
-							callback(); 
-						}
-						
-					},
-					beforeSend: function(request){
-				    	$("#load").show();
-				    },
-				    complete: function(XMLHttpRequest, textStatus){
-				    	$("#load").hide();
-				    }
-				});
-			}	
-		
-		}
-		
-		
-		$(document).ready(function () {
-			if(document.getElementById("home-userDynamic") != null){
-				//页码
-				var page = 1;
-				//滚动到底部触发翻页
-				var stop = false;//触发开关，防止多次调用事件  
-				
-				
-				queryUserDynamicList(function(){
-					stop = true;  
-				},page);
-				
-				
-				$(window).scroll(function() {    
-					//当内容滚动到底部时加载新的内容 100为当距离最底部100个像素时开始加载.  
-					if ($(this).scrollTop() + $(window).height() + 100 >= $(document).height() && $(this).scrollTop() > 100) {   
-						if(stop == true){ 
-							stop = false;
-							page++;//当前要加载的页码 
-							queryUserDynamicList(function(){
-								stop = true;  
-							},page);
-					    }  
-					}    
-				}); 
-			}
-		});
-	</script>
-	<div style="clear:both;"></div>
-	<div class="push"><!-- 把div#footer推下去 --></div>
+					
+					queryUserDynamicList(function(){
+						stop = true;  
+					},page);
+					
+					
+					$(window).scroll(function() {    
+						//当内容滚动到底部时加载新的内容 100为当距离最底部100个像素时开始加载.  
+						if ($(this).scrollTop() + $(window).height() + 100 >= $(document).height() && $(this).scrollTop() > 100) {   
+							if(stop == true){ 
+								stop = false;
+								page++;//当前要加载的页码 
+								queryUserDynamicList(function(){
+									stop = true;  
+								},page);
+						    }  
+						}    
+					}); 
+				}
+			});
+		</script>
+	</div>
 </div>
 
 

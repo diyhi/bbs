@@ -25,273 +25,374 @@
 <body>
 <#-- 引入页头 -->
 <@include action="${newPublic_2}"/>
-<div class="fixedBottom wrap clearfix">
-
-	<#-- 引入服务导航 -->
-	<@include action="${newPublic_4}"/>
-	
-	
-	<div class="privateMessageChatTop">
-		<a href="user/control/privateMessageList" class="back-to-list">&lt&lt返回私信列表</a> 
-		<b>与<a href="user/control/home?userName=${chatUser.userName}" target="_blank"> 
-			${chatUser.userName} 
-			<#if chatUser.nickname != null && chatUser.nickname??>
-				(${chatUser.nickname})
-			</#if> 
-			</a>的对话</b>
-	</div>
-	
-	
-	
-	
-	
-	<div id = "privateMessageChatForm" class="privateMessageChatForm" style="display: none;">
-		<textarea id="privateMessageContent" maxlength="500" placeholder="请在这里输入内容"></textarea>
+<div class="skeleton">
+	<div class="main wrap clearfix" >
+		<#-- 引入服务导航 -->
+		<@include action="${newPublic_4}"/>
 		
-		<span id="messageContent_error" name="error" class="error" >${(error['messageContent'])!}</span> 
-		<span id="privateMessage_error" name="error" class="error">${error['privateMessage']}</span>
-		<#-- 令牌错误 -->
-		<span id="token_error" name="error" class="error">${(error['token'])!}</span>
-		<div class="form-action">
-			<div class="chatSubmit">
-	        	<span class="submitButton"><INPUT type="button" value="提交" onClick="javascript:ajax_submit()"></span>
-	        </div>
-			
-			
-			<#-- identificationNumber:识别号：用来区别每次请求 -->
-			<#-- 验证码 -->
-			<div id="captchaModule" class="captchaModule" style="display: none;">
-				<div class="captcha_div">
-					<div class="captchaBox">
-						<input type="hidden" id="identificationNumber" value="${identificationNumber}">
-						<input type="hidden" id="${identificationNumber}_captchaKey" name="captchaKey" value="${(returnValue['captchaKey'])!}">
-						<input id="${identificationNumber}_captchaValue" name="captchaValue" type="text" maxLength="5" autocomplete="off" tabindex="3" onfocus="inputBoxTip_click(this);" onblur="inputBoxTip_leave('${identificationNumber}',this);"/>
-						<label class="promptTag" id="${identificationNumber}_captchaValueBoxTip"  for="captchaValue">验证码</label>
-					</div>
-					<a class="captchaImage" href="javascript:void(0);" >
-						<img id="${identificationNumber}_captcha" src="captcha/${(returnValue['captchaKey'])!}.jpg" onClick="replaceCaptcha('${identificationNumber}');" tabindex="4" />
-					</a>
-					<a  href="javascript:void(0);" onClick="replaceCaptcha('${identificationNumber}');" tabindex="5">换一幅</a>
-				</div>
-				<p class="tips">
-					
-					<#-- 验证码错误 -->
-					<span id="${identificationNumber}_captchaValue_error">${(error['captchaValue'])!}</span>
-					
-				</p>
+		<div class="privateMessageChatTop">
+			<a href="user/control/privateMessageList" class="back-to-list">&lt&lt返回私信列表</a> 
+			<div class="chatInfo">
+				<b>与 <a href="user/control/home?userName=${chatUser.userName}" target="_blank">
+					${chatUser.userName} 
+					<#if chatUser.nickname != null && chatUser.nickname??>
+						(${chatUser.nickname})
+					</#if> 
+				</a> 的对话</b>
 			</div>
 		</div>
-	</div>
-	
-	<script language="javascript" type="text/javascript">
-		//添加私信页
-		function addPrivateMessageUI(){
-			//从URL获取对方用户名称
-			var friendUserName = getUrlParam("friendUserName");
-			get_request(function(value){
-           		if(value != ""){
-            		var data = JSON.parse(value);
-            		for(var returnValue in data){
-					
-						if(returnValue == "formCaptcha"){
-							var formCaptcha = data[returnValue];
-		        			if(formCaptcha.showCaptcha == true){//如果显示验证码
-		        				document.getElementById("captchaModule").style.display = "";//显示
-		        				var identificationNumber = document.getElementById("identificationNumber").value;
-		        				document.getElementById(identificationNumber+"_captchaKey").value = formCaptcha.captchaKey;
-		        				replaceCaptcha(identificationNumber);	
-		        			}
-		        		}else if(returnValue == "allowSendPrivateMessage"){
-		        			if(data[returnValue] == true){//如果允许发私信
-		        				document.getElementById("privateMessageChatForm").style.display = "";//显示
-		        			}
-		        		}	
-	        		}
-           		}
-           	},
-	 			"user/control/addPrivateMessage?friendUserName="+friendUserName+"&timestamp=" + new Date().getTime(), true);
-		}
-		//打开页面时执行
-		addPrivateMessageUI();
+		<div class="recentlyChatUserModule">
+			<div class="title"><h3>最近对话用户</h3></div>
+			<ol class="recentlyChatUserList">
+				<div id="recentlyChatUserList"></div>
+				<input type="hidden" id="commonPath" value="${commonPath}"/>
+				<!-- 
+				<div class="recentlyChatUser">
+					<div class="author">
+						<a href="user/control/home?userName=test3">
+							<img src="common/default/pc/images/min_avata.png" class="avatar" height="48" width="48">
+						</a>
+						<div class="info">
+							<a class="userName" href="user/control/privateMessageChatList?friendUserName=test3">test3</a>
+						</div> 
+					</div>
+				</div>
+				
+				<div class="recentlyChatUser">
+					<div class="author">
+						<a href="user/control/home?userName=test2">
+							<img src="common/default/pc/images/min_avata.png" class="avatar" height="48" width="48">
+						</a>
+						<div class="info">
+							<a class="userName" href="user/control/home?userName=test2">test2</a>
+						</div> 
+					</div>
+				</div>
+				 -->
+			</ol>
+		</div>
 		
-		//点击输入框提示 
-		function inputBoxTip_click(obj){
-			document.getElementById(obj.id+"BoxTip").style.display="none";
-		
-		}
-		//离开输入框提示
-		function inputBoxTip_leave(identificationNumber,obj){
-			if(obj.value != ""){
-				document.getElementById(obj.id+"BoxTip").style.display="none";
-			}else{
-				document.getElementById(obj.id+"BoxTip").style.display="";
+		<script language="javascript" type="text/javascript">
+			//查询最近对话用户
+			function queryRecentlyChatUser(){
+				get_request(function(value){
+	           		if(value != ""){
+	            		var pageView = JSON.parse(value);
+	            		var html = "";
+	            		var commonPath = document.getElementById("commonPath").value;
+	            		
+	            		if(pageView.records != null && pageView.records.length >0){
+							
+							for(var i = 0; i<pageView.records.length; i++){
+								html += "<div class='recentlyChatUser'>";
+								html += 	"<div class='author'>";
+								var privateMessage =pageView.records[i];
+								html += 		"<a href='user/control/privateMessageChatList?friendUserName="+privateMessage.friendUserName+"'>";
+								if(privateMessage.friendAvatarName != null){
+									html += 		"<img src='"+privateMessage.friendAvatarPath+""+privateMessage.friendAvatarName+"' class='avatar' height='48' width='48'>";
+								}else{
+									html += 		"<img src='"+commonPath+"images/min_avata.png' class='avatar' height='48' width='48'>";
+								}
+								html += 		"</a>";
+								html += 		"<div class='info'>";
+								
+								if (privateMessage.friendNickname != null && privateMessage.friendNickname){//如果有呢称则显示呢称
+									html += 			"<a class='userName' href='user/control/privateMessageChatList?friendUserName="+privateMessage.friendUserName+"'>"+privateMessage.friendNickname+"</a>";
+								}else{
+									html += 			"<a class='userName' href='user/control/privateMessageChatList?friendUserName="+privateMessage.friendUserName+"'>"+privateMessage.friendUserName+"</a>";
+								}
+								
+								html += 		"</div>";
+								html += 	"</div>";
+								html += "</div>";
+							}
+							
+	            		}
+	            		document.getElementById("recentlyChatUserList").innerHTML = html;
+	           		}
+	           	},
+		 			"user/control/privateMessageList?timestamp=" + new Date().getTime(), true);
 			}
-			verificationCode(identificationNumber);
-		}
-		//校对验证码 identificationNumber:识别号：用来区别每次请求
-		function verificationCode(identificationNumber){
-			var flag = true;
-			if( document.getElementById(identificationNumber+"_"+"captchaKey") != null){
+			//打开页面时执行
+			queryRecentlyChatUser();
+		</script>
+		
+		
+		<div class="privateMessageChatRight">
+			<#if pageView.records?exists> 
+				<div class="privateMessageChatModule">
+					<div class="clearfix"></div>
+					<#list pageView.records as privateMessage>
+						<#if privateMessage.friendUserId == privateMessage.senderUserId><#--如果私信对方用户Id和发送者用户Id相同，则说明消息由对方所发 -->
+							<div class="friend">
+								<a href="user/control/home?userName=${privateMessage.senderUserName}">
+									<#if privateMessage.senderAvatarName != null>
+										<img src="${privateMessage.senderAvatarPath}${privateMessage.senderAvatarName}" >
+									<#else>
+											<img src="${commonPath}images/min_avata.png" >
+									</#if>	
+								</a>
+								<div>
+						            <span>
+						            	<div class="time">${privateMessage.sendTime}</div>
+						            	<i></i>
+						            	<em><#noescape>${privateMessage.messageContent}</#noescape></em>
+						            	<!-- 
+						            	<a class="msg-del"></a> -->
+									</span>
+								</div>
+							</div>
+						
+						<#else><#-- 自己发的消息-->
+							<div class="self">
+								<a href="user/control/home?userName=${privateMessage.senderUserName}">
+									<#if privateMessage.senderAvatarName != null>
+										<img src="${privateMessage.senderAvatarPath}${privateMessage.senderAvatarName}" >
+									<#else>
+											<img src="${commonPath}images/min_avata.png" >
+									</#if>	
+								</a>
+								<div>
+						        	<span>
+						        		<div class="time">${privateMessage.sendTime}</div>
+						            	<i></i>
+						            	<em><#noescape>${privateMessage.messageContent}</#noescape></em>
+						            	<!-- 
+						            	<a class="msg-del"></a> -->
+						            </span>
+								</div>
+							</div>
+						</#if>
+					</#list>
+					<div class="privateMessageChatPage">
+						<@include action="${newPublic_1}"/>
+					</div>	
+				</div>
 				
-				var captchaKey = document.getElementById(identificationNumber+"_"+"captchaKey").value;
-				var parameter = document.getElementById(identificationNumber+"_"+"captchaValue").value;
-				if(parameter != ""){
+			</#if>
+			
+			
+			
+			<div id = "privateMessageChatForm" class="privateMessageChatForm" style="display: none;">
 				
-					var parameter_trim = trim(parameter);
-					if(parameter_trim != ""){
-						//ajax使用同步提交
-						get_request(function(value){
-			            	if(value == "false"){
-			            	
-				            	document.getElementById(identificationNumber+"_"+"captchaValue_error").innerHTML = "验证码错误";
-				            	flag = false;
-			            	}
-			            },
-					 		"checkCaptcha.htm?captchaKey="+captchaKey+"&captchaValue="+parameter_trim+"&timestamp=" + new Date().getTime(), false);
-			            	
+				<textarea id="privateMessageContent" maxlength="500" placeholder="请在这里输入内容"></textarea>
+				
+				<span id="messageContent_error" name="error" class="error" >${(error['messageContent'])!}</span> 
+				<span id="privateMessage_error" name="error" class="error">${error['privateMessage']}</span>
+				<#-- 令牌错误 -->
+				<span id="token_error" name="error" class="error">${(error['token'])!}</span>
+				<div class="form-action">
+					<div class="chatSubmit">
+			        	<span class="submitButton"><INPUT type="button" value="提交" onClick="javascript:ajax_submit()"></span>
+			        </div>
+					
+					
+					<#-- identificationNumber:识别号：用来区别每次请求 -->
+					<#-- 验证码 -->
+					<div id="captchaModule" class="captchaModule" style="display: none;">
+						<div class="captcha_div">
+							<div class="captchaBox">
+								<input type="hidden" id="identificationNumber" value="${identificationNumber}">
+								<input type="hidden" id="${identificationNumber}_captchaKey" name="captchaKey" value="${(returnValue['captchaKey'])!}">
+								<input id="${identificationNumber}_captchaValue" name="captchaValue" type="text" maxLength="5" autocomplete="off" tabindex="3" onfocus="inputBoxTip_click(this);" onblur="inputBoxTip_leave('${identificationNumber}',this);"/>
+								<label class="promptTag" id="${identificationNumber}_captchaValueBoxTip"  for="captchaValue">验证码</label>
+							</div>
+							<a class="captchaImage" href="javascript:void(0);" >
+								<img id="${identificationNumber}_captcha" src="captcha/${(returnValue['captchaKey'])!}.jpg" onClick="replaceCaptcha('${identificationNumber}');" tabindex="4" />
+							</a>
+							<a  href="javascript:void(0);" onClick="replaceCaptcha('${identificationNumber}');" tabindex="5">换一幅</a>
+						</div>
+						<p class="tips">
+							
+							<#-- 验证码错误 -->
+							<span id="${identificationNumber}_captchaValue_error">${(error['captchaValue'])!}</span>
+							
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<script language="javascript" type="text/javascript">
+			//添加私信页
+			function addPrivateMessageUI(){
+				//从URL获取对方用户名称
+				var friendUserName = getUrlParam("friendUserName");
+				get_request(function(value){
+	           		if(value != ""){
+	            		var data = JSON.parse(value);
+	            		for(var returnValue in data){
+						
+							if(returnValue == "formCaptcha"){
+								var formCaptcha = data[returnValue];
+			        			if(formCaptcha.showCaptcha == true){//如果显示验证码
+			        				document.getElementById("captchaModule").style.display = "";//显示
+			        				var identificationNumber = document.getElementById("identificationNumber").value;
+			        				document.getElementById(identificationNumber+"_captchaKey").value = formCaptcha.captchaKey;
+			        				replaceCaptcha(identificationNumber);	
+			        			}
+			        		}else if(returnValue == "allowSendPrivateMessage"){
+			        			if(data[returnValue] == true){//如果允许发私信
+			        				document.getElementById("privateMessageChatForm").style.display = "";//显示
+			        			}
+			        		}	
+		        		}
+	           		}
+	           	},
+		 			"user/control/addPrivateMessage?friendUserName="+friendUserName+"&timestamp=" + new Date().getTime(), true);
+			}
+			//打开页面时执行
+			addPrivateMessageUI();
+			
+			//点击输入框提示 
+			function inputBoxTip_click(obj){
+				document.getElementById(obj.id+"BoxTip").style.display="none";
+			
+			}
+			//离开输入框提示
+			function inputBoxTip_leave(identificationNumber,obj){
+				if(obj.value != ""){
+					document.getElementById(obj.id+"BoxTip").style.display="none";
+				}else{
+					document.getElementById(obj.id+"BoxTip").style.display="";
+				}
+				verificationCode(identificationNumber);
+			}
+			//校对验证码 identificationNumber:识别号：用来区别每次请求
+			function verificationCode(identificationNumber){
+				var flag = true;
+				if( document.getElementById(identificationNumber+"_"+"captchaKey") != null){
+					
+					var captchaKey = document.getElementById(identificationNumber+"_"+"captchaKey").value;
+					var parameter = document.getElementById(identificationNumber+"_"+"captchaValue").value;
+					if(parameter != ""){
+					
+						var parameter_trim = trim(parameter);
+						if(parameter_trim != ""){
+							//ajax使用同步提交
+							get_request(function(value){
+				            	if(value == "false"){
+				            	
+					            	document.getElementById(identificationNumber+"_"+"captchaValue_error").innerHTML = "验证码错误";
+					            	flag = false;
+				            	}
+				            },
+						 		"checkCaptcha.htm?captchaKey="+captchaKey+"&captchaValue="+parameter_trim+"&timestamp=" + new Date().getTime(), false);
+				            	
+						}else{
+							document.getElementById(identificationNumber+"_"+"captchaValue_error").innerHTML = "验证码不能为空";
+							flag = false;
+						}
 					}else{
 						document.getElementById(identificationNumber+"_"+"captchaValue_error").innerHTML = "验证码不能为空";
 						flag = false;
 					}
+					if(flag == true){
+						document.getElementById(identificationNumber+"_"+"captchaValue_error").innerHTML = "";
+					}
+				}
+			
+				return flag;
+			}
+			//更换验证码
+			function replaceCaptcha(identificationNumber){
+				var captchaKey = document.getElementById(identificationNumber+"_"+"captchaKey").value;
+				document.getElementById(identificationNumber+"_"+"captcha").src = "captcha/"+captchaKey+".jpg?" + Math.random(); 
+			}
+			
+			//ajax提交方式
+			function ajax_submit(){
+				//清空错误提示
+				var error_tag = getElementsByName_pseudo("span", "error");
+				for(var i = 0;i < error_tag.length; i++) {
+					error_tag[i].innerHTML="";
+				
+				}
+			
+			
+				var parameter = "";
+				//从URL获取对方用户名称
+				parameter += "&friendUserName="+getUrlParam("friendUserName");
+				//从meta标签获取令牌
+				parameter += "&token="+getCsrf();
+				
+				var identificationNumber = document.getElementById("identificationNumber").value;
+				var captchaKey = document.getElementById(identificationNumber+"_"+"captchaKey").value;
+				parameter += "&captchaKey="+encodeURIComponent(captchaKey);
+				
+				var captchaValue = document.getElementById(identificationNumber+"_"+"captchaValue").value;
+				parameter += "&captchaValue="+encodeURIComponent(captchaValue);
+				
+				
+				//私信内容
+				var privateMessageContent = document.getElementById("privateMessageContent").value;
+				if(trim(privateMessageContent) != ""){
+					parameter += "&messageContent="+encodeURIComponent(privateMessageContent);
 				}else{
-					document.getElementById(identificationNumber+"_"+"captchaValue_error").innerHTML = "验证码不能为空";
-					flag = false;
+					document.getElementById("messageContent_error").innerHTML = "私信内容不能为空";
+					return;
 				}
-				if(flag == true){
-					document.getElementById(identificationNumber+"_"+"captchaValue_error").innerHTML = "";
+				
+	
+			   	//删除第一个&号,防止因为多了&号而出现警告: Parameters: Invalid chunk ignored.信息
+				if(parameter.indexOf("&") == 0){
+					parameter = parameter.substring(1,parameter.length);
 				}
-			}
-		
-			return flag;
-		}
-		//更换验证码
-		function replaceCaptcha(identificationNumber){
-			var captchaKey = document.getElementById(identificationNumber+"_"+"captchaKey").value;
-			document.getElementById(identificationNumber+"_"+"captcha").src = "captcha/"+captchaKey+".jpg?" + Math.random(); 
-		}
-		
-		//ajax提交方式
-		function ajax_submit(){
-			//清空错误提示
-			var error_tag = getElementsByName_pseudo("span", "error");
-			for(var i = 0;i < error_tag.length; i++) {
-				error_tag[i].innerHTML="";
-			
-			}
-		
-		
-			var parameter = "";
-			//从URL获取对方用户名称
-			parameter += "&friendUserName="+getUrlParam("friendUserName");
-			//从meta标签获取令牌
-			parameter += "&token="+getCsrf();
-			
-			var identificationNumber = document.getElementById("identificationNumber").value;
-			var captchaKey = document.getElementById(identificationNumber+"_"+"captchaKey").value;
-			parameter += "&captchaKey="+encodeURIComponent(captchaKey);
-			
-			var captchaValue = document.getElementById(identificationNumber+"_"+"captchaValue").value;
-			parameter += "&captchaValue="+encodeURIComponent(captchaValue);
-			
-			
-			//私信内容
-			var privateMessageContent = document.getElementById("privateMessageContent").value;
-			if(trim(privateMessageContent) != ""){
-				parameter += "&messageContent="+encodeURIComponent(privateMessageContent);
-			}else{
-				document.getElementById("messageContent_error").innerHTML = "私信内容不能为空";
-				return;
-			}
-			
-
-		   	//删除第一个&号,防止因为多了&号而出现警告: Parameters: Invalid chunk ignored.信息
-			if(parameter.indexOf("&") == 0){
-				parameter = parameter.substring(1,parameter.length);
-			}
-		   	post_request(function(value){
-				var data = JSON.parse(value);
-				for(var returnValue in data){
-					
-					if(returnValue == "success"){
-	        			if(data[returnValue] == "true"){
-	        				layer.msg('发送私信成功,3秒后刷新页面', 
-								{
-								  time: 3000 //3秒关闭（如果不配置，默认是3秒）
-								},function(){
-									//关闭后的操作
-						        	document.location.reload();//刷新页面
-								}
-							);
-	        				
-	        			}
-	        		}else if(returnValue == "error"){
-	        			
-	        			var error = data[returnValue];
-	        			for(var key in error){
-	        				var error_html = document.getElementById(key+"_error");
-	        				if(error_html != null){
-	        					error_html.innerHTML = error[key];
-	        				}
-	        				
-	        			}
-	        			//如果需要验证码
-	        			if(document.getElementById("captchaModule").style.display == ""){
+			   	post_request(function(value){
+					var data = JSON.parse(value);
+					for(var returnValue in data){
+						
+						if(returnValue == "success"){
+		        			if(data[returnValue] == "true"){
+		        				layer.msg('发送私信成功,3秒后刷新页面', 
+									{
+									  time: 3000 //3秒关闭（如果不配置，默认是3秒）
+									},function(){//关闭后的操作		
+										var url = window.location.href;
+										//删除URL中的page参数
+										 window.location.href= deleteUrlParam(url,"page");
+									}
+								);
+		        				
+		        			}
+		        		}else if(returnValue == "error"){
+		        			
+		        			var error = data[returnValue];
+		        			for(var key in error){
+		        				var error_html = document.getElementById(key+"_error");
+		        				if(error_html != null){
+		        					error_html.innerHTML = error[key];
+		        				}
+		        				
+		        			}
+		        			//如果需要验证码
+		        			if(document.getElementById("captchaModule").style.display == ""){
+		        				replaceCaptcha(identificationNumber);	
+		        			}
+		        			
+		        			
+		        		}else if(returnValue == "captchaKey"){//如果需要验证码
+		        			document.getElementById("captchaModule").style.display = "";//显示
+	        				var identificationNumber = document.getElementById("identificationNumber").value;
+	        				document.getElementById(identificationNumber+"_captchaKey").value = data[returnValue];
 	        				replaceCaptcha(identificationNumber);	
-	        			}
-	        			
-	        			
-	        		}else if(returnValue == "captchaKey"){//如果需要验证码
-	        			document.getElementById("captchaModule").style.display = "";//显示
-        				var identificationNumber = document.getElementById("identificationNumber").value;
-        				document.getElementById(identificationNumber+"_captchaKey").value = data[returnValue];
-        				replaceCaptcha(identificationNumber);	
-	        		
-	        		}
-	        		
-	        		
-	        		
-	        	}
-			},
-				"user/control/addPrivateMessage?timestamp=" + new Date().getTime(), true,parameter);
+		        		
+		        		}
+		        		
+		        		
+		        		
+		        	}
+				},
+					"user/control/addPrivateMessage?timestamp=" + new Date().getTime(), true,parameter);
+			
+			}
 		
-		}
-	
-	</script>
-	
-	<#if pageView.records?exists> 
-		<div class="privateMessageChatModule" >
-			<ol class="privateMessageChatList">
-				<#list pageView.records as privateMessage>
-					<div class="privateMessageChat">
-						<div class="author">
-							<a href="user/control/home?userName=${privateMessage.senderUserName}">
-								<#if privateMessage.senderAvatarName != null>
-									<img src="${privateMessage.senderAvatarPath}${privateMessage.senderAvatarName}" class='avatar' height='48' width='48'>
-								<#else>
-									<img src="${commonPath}images/min_avata.png" class='avatar' height='48' width='48'>
-								</#if>
-							<cite>
-								<a href="user/control/home?userName=${privateMessage.senderUserName}">
-									${(privateMessage.senderNickname != null && privateMessage.senderNickname??) ?string(privateMessage.senderNickname , privateMessage.senderUserName)}
-								</a>
-							</cite> 
-						</div>
-						<div class="time">${privateMessage.sendTime}</div>
-						<p class="content"><#noescape>${privateMessage.messageContent}</#noescape></p>
-						<div class="clearfix"></div>
-					</div>
-				</#list>
-			</ol>
-			<div class="privateMessageChatPage">
-				<@include action="${newPublic_1}"/>
-			</div>
-		</div>
-		
-	</#if>
+		</script>
 	
 	
-	<div style="clear:both;"></div>
-	<div class="push"><!-- 把div#footer推下去 --></div>
+	
+	
+	</div>
 
 
 </div>

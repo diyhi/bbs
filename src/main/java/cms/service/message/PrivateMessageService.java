@@ -47,10 +47,18 @@ public interface PrivateMessageService extends DAO<PrivateMessage>{
 	 * @param status 状态
 	 * @param firstIndex 索引开始,即从哪条记录开始
 	 * @param maxResult 获取多少条数据
+	 * @param sort 排序 1.aes 2.desc
 	 * @return
 	 */
-	public QueryResult<PrivateMessage> findPrivateMessageChatByUserId(Long userId,Long friendUserId,Integer status,int firstIndex, int maxResult);
-	
+	public QueryResult<PrivateMessage> findPrivateMessageChatByUserId(Long userId,Long friendUserId,Integer status,int firstIndex, int maxResult,Integer sort);
+	/**
+	 * 根据用户Id查询私信对话分页总数
+	 * @param userId 用户Id
+	 * @param friendUserId 对方用户Id
+	 * @param status 状态
+	 * @return
+	 */
+	public Long findPrivateMessageChatCountByUserId(Long userId,Long friendUserId,Integer status);
 	/**
 	 * 根据用户Id查询未读私信数量
 	 * @param userId 用户Id

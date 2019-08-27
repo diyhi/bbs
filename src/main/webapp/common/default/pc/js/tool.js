@@ -12,6 +12,10 @@ function timeoutJump(XMLHttpRequest){
 	if(XMLHttpRequest.status == 508){//服务器处理请求时检测到一个无限循环
 		return;
 	}
+	if(XMLHttpRequest.status == 403){//权限不足
+		alert("权限不足");
+		return;
+	}
 	if(XMLHttpRequest.status == 400){//请求错误
 		alert("请求错误");
 		return;
@@ -35,7 +39,32 @@ function getUrlParam(name){
 	var r = window.location.search.substr(1).match(reg);  //匹配目标参数
 	if (r!=null) return unescape(r[2]); return null; //返回参数值
 } 
-
+/**
+ * 删除URL参数
+ */
+function deleteUrlParam(url,paramKey){
+  var urlParam = url.substr(url.indexOf("?")+1);
+  var beforeUrl = url.substr(0,url.indexOf("?"));
+  var nextUrl = "";
+   
+  var arr = new Array();
+  if(urlParam!=""){
+      var urlParamArr = urlParam.split("&");
+    
+      for(var i=0;i<urlParamArr.length;i++){
+          var paramArr = urlParamArr[i].split("=");
+          if(paramArr[0]!=paramKey){
+              arr.push(urlParamArr[i]);
+          }
+      }
+  }
+   
+  if(arr.length>0){
+      nextUrl = "?"+arr.join("&");
+  }
+  url = beforeUrl+nextUrl;
+  return url;
+}
 
 /**
  * 读取Csrf参数

@@ -289,39 +289,48 @@ function setAllowFilterWord(obj){
 			    </TD>
 			</TR>
 			<TR>
-			    <TD class="t-label t-label-h" width="20%">前台发表话题默认状态：</TD>
+			    <TD class="t-label t-label-h" width="20%">前台发表话题审核：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">
 			    	<label>
-			    		<form:radiobutton path="topic_defaultState" value="10"/>待审核
+			    		<form:radiobutton path="topic_review" value="10"/>全部审核
 			    	</label>
 			    	<label>
-			    		<form:radiobutton path="topic_defaultState" value="20"/>已发布
+			    		<form:radiobutton path="topic_review" value="30"/>特权会员免审核
 			    	</label>
-			    	<web:errors path="topic_defaultState" cssStyle="color: red;"/>
+			    	<label>
+			    		<form:radiobutton path="topic_review" value="50"/>无需审核
+			    	</label>
+			    	<web:errors path="topic_review" cssStyle="color: red;"/>
 			    </TD>
 			</TR>
 			<TR>
-			    <TD class="t-label t-label-h" width="20%">前台发表评论默认状态：</TD>
+			    <TD class="t-label t-label-h" width="20%">前台发表评论审核：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">
 			    	<label>
-			    		<form:radiobutton path="comment_defaultState" value="10"/>待审核
+			    		<form:radiobutton path="comment_review" value="10"/>全部审核
 			    	</label>
 			    	<label>
-			    		<form:radiobutton path="comment_defaultState" value="20"/>已发布
+			    		<form:radiobutton path="comment_review" value="30"/>特权会员免审核
 			    	</label>
-			    	<web:errors path="comment_defaultState" cssStyle="color: red;"/>
+			    	<label>
+			    		<form:radiobutton path="comment_review" value="50"/>无需审核
+			    	</label>
+			    	<web:errors path="comment_review" cssStyle="color: red;"/>
 			    </TD>
 			</TR>
 			<TR>
-			    <TD class="t-label t-label-h" width="20%">前台发表回复默认状态：</TD>
+			    <TD class="t-label t-label-h" width="20%">前台发表回复审核：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">
 			    	<label>
-			    		<form:radiobutton path="reply_defaultState" value="10"/>待审核
+			    		<form:radiobutton path="reply_review" value="10"/>全部审核
 			    	</label>
 			    	<label>
-			    		<form:radiobutton path="reply_defaultState" value="20"/>已发布
+			    		<form:radiobutton path="reply_review" value="30"/>特权会员免审核
 			    	</label>
-			    	<web:errors path="reply_defaultState" cssStyle="color: red;"/>
+			    	<label>
+			    		<form:radiobutton path="reply_review" value="50"/>无需审核
+			    	</label>
+			    	<web:errors path="reply_review" cssStyle="color: red;"/>
 			    </TD>
 			</TR>
 			<TR>

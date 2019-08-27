@@ -38,6 +38,7 @@ import cms.bean.topic.TopicIndex;
 import cms.bean.topic.TopicUnhide;
 import cms.bean.user.AccessUser;
 import cms.bean.user.PointLog;
+import cms.bean.user.ResourceEnum;
 import cms.bean.user.User;
 import cms.bean.user.UserDynamic;
 import cms.bean.user.UserGrade;
@@ -71,6 +72,7 @@ import cms.web.action.topic.TopicManage;
 import cms.web.action.user.PointManage;
 import cms.web.action.user.UserDynamicManage;
 import cms.web.action.user.UserManage;
+import cms.web.action.user.UserRoleManage;
 import cms.web.taglib.Configuration;
 
 /**
@@ -111,6 +113,8 @@ public class TopicFormAction {
 	@Resource UserDynamicManage userDynamicManage;
 	@Resource FollowManage followManage;
 	
+	@Resource UserRoleManage userRoleManage;
+	
 	/**
 	 * 话题  添加
 	 * @param model
@@ -134,6 +138,29 @@ public class TopicFormAction {
 	  	AccessUser accessUser = AccessUserThreadLocal.get();
 		
 		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+		
+		
+		if(tagId != null){
+			//是否有当前功能操作权限
+			boolean flag_permission = userRoleManage.isPermission(ResourceEnum._1002000,tagId);
+			if(flag_permission == false){
+				if(isAjax == true){
+					response.setStatus(403);//设置状态码
+		    		
+					WebUtil.writeToWeb("", "json", response);
+					return null;
+				}else{ 
+					String dirName = templateService.findTemplateDir_cache();
+						
+					String accessPath = accessSourceDeviceManage.accessDevices(request);	
+					request.setAttribute("message","权限不足"); 	
+					return "templates/"+dirName+"/"+accessPath+"/message";
+				}
+			}
+		}
+		
+		
+		
 		
 		
 		Map<String,String> error = new HashMap<String,String>();
@@ -222,14 +249,24 @@ public class TopicFormAction {
 		boolean isFile = false;//是否含有文件
 		boolean isMap = false;//是否含有地图
 		
-		//前台发表话题默认状态
-		if(systemSetting.getTopic_defaultState() != null){
-			if(systemSetting.getTopic_defaultState().equals(10)){
-				topic.setStatus(10);
-			}else if(systemSetting.getTopic_defaultState().equals(20)){
-				topic.setStatus(20);
+		
+		//前台发表话题审核状态
+		if(systemSetting.getTopic_review().equals(10)){//10.全部审核 20.特权会员未触发敏感词免审核(未实现) 30.特权会员免审核 40.触发敏感词需审核(未实现) 50.无需审核
+			topic.setStatus(10);//10.待审核 	
+		}else if(systemSetting.getTopic_review().equals(30)){
+			if(tagId != null && tagId >=0L){
+				//是否有当前功能操作权限
+				boolean flag_permission = userRoleManage.isPermission(ResourceEnum._1006000,tagId);
+				if(flag_permission){
+					topic.setStatus(20);//20.已发布
+				}else{
+					topic.setStatus(10);//10.待审核 
+				}
 			}
+		}else{
+			topic.setStatus(20);//20.已发布
 		}
+		
 		
 		if(tagId == null || tagId <=0L){
 			error.put("tagId", "标签不能为空");
@@ -303,24 +340,42 @@ public class TopicFormAction {
 			//允许使用的隐藏标签
 			List<Integer> allowHiddenTagList = new ArrayList<Integer>();
 			if(editorTag.isHidePassword()){
-				//输入密码可见
-				allowHiddenTagList.add(HideTagType.PASSWORD.getName());
+				//是否有当前功能操作权限
+				boolean flag_permission = userRoleManage.isPermission(ResourceEnum._1020000,topic.getTagId());
+				if(flag_permission){
+					//输入密码可见
+					allowHiddenTagList.add(HideTagType.PASSWORD.getName());
+				}
 			}
 			if(editorTag.isHideComment()){
-				//评论话题可见
-				allowHiddenTagList.add(HideTagType.COMMENT.getName());
+				//是否有当前功能操作权限
+				boolean flag_permission = userRoleManage.isPermission(ResourceEnum._1021000,topic.getTagId());
+				if(flag_permission){
+					//评论话题可见
+					allowHiddenTagList.add(HideTagType.COMMENT.getName());
+				}
 			}
 			if(editorTag.isHideGrade()){
-				//达到等级可见
-				allowHiddenTagList.add(HideTagType.GRADE.getName());	
+				//是否有当前功能操作权限
+				boolean flag_permission = userRoleManage.isPermission(ResourceEnum._1022000,topic.getTagId());
+				if(flag_permission){
+					//达到等级可见
+					allowHiddenTagList.add(HideTagType.GRADE.getName());	
+				}
 			}
 			if(editorTag.isHidePoint()){
-				//积分购买可见
-				allowHiddenTagList.add(HideTagType.POINT.getName());	
+				//是否有当前功能操作权限
+				boolean flag_permission = userRoleManage.isPermission(ResourceEnum._1023000,topic.getTagId());
+				if(flag_permission){
+					//积分购买可见
+					allowHiddenTagList.add(HideTagType.POINT.getName());	
+				}
 			}
 			if(editorTag.isHideAmount()){
+				
 				//余额购买可见
 				allowHiddenTagList.add(HideTagType.AMOUNT.getName());	
+				
 			}
 
 			//解析隐藏标签
@@ -402,6 +457,9 @@ public class TopicFormAction {
 		}else{
 			error.put("content", "话题内容不能为空");
 		}
+		
+		
+		
 			
 		if(error.size() == 0){
 			//保存评论
@@ -623,72 +681,79 @@ public class TopicFormAction {
 				flag = false;
 			}
 		}
-		if(flag){
-			DateTime dateTime = new DateTime();     
-			String date = dateTime.toString("yyyy-MM-dd");
-			
-			if(imgFile != null && !imgFile.isEmpty()){
-				EditorTag editorSiteObject = settingManage.readTopicEditorTag();
-				if(editorSiteObject != null){
-					if(editorSiteObject.isImage()){//允许上传图片
-						//上传文件编号
-						String fileNumber = "b"+accessUser.getUserId();
-						
-						//当前文件名称
-						String fileName = imgFile.getOriginalFilename();
-						
-						//文件大小
-						Long size = imgFile.getSize();
-						//取得文件后缀
-						String suffix = fileManage.getExtension(fileName).toLowerCase();
-						
-						//允许上传图片格式
-						List<String> imageFormat = editorSiteObject.getImageFormat();
-						//允许上传图片大小
-						long imageSize = editorSiteObject.getImageSize();
-						
-						//验证文件类型
-						boolean authentication = fileManage.validateFileSuffix(imgFile.getOriginalFilename(),imageFormat);
-						
-						if(authentication ){
-							if(size/1024 <= imageSize){
-								//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
-								String pathDir = "file"+File.separator+"topic"+File.separator + date +File.separator +"image"+ File.separator;
-								//文件锁目录
-								String lockPathDir = "file"+File.separator+"topic"+File.separator+"lock"+File.separator;
-								//构建文件名称
-								String newFileName = UUIDUtil.getUUID32()+ fileNumber+"." + suffix;
-								
-								//生成文件保存目录
-								fileManage.createFolder(pathDir);
-								//生成锁文件保存目录
-								fileManage.createFolder(lockPathDir);
-								//生成锁文件
-								fileManage.newFile(lockPathDir+date +"_image_"+newFileName);
-								//保存文件
-								fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
-								//上传成功
-								returnJson.put("error", 0);//0成功  1错误
-								returnJson.put("url", "file/topic/"+date+"/image/"+newFileName);
-								return JsonUtils.toJSONString(returnJson);
+		//是否有当前功能操作权限
+		boolean flag_permission = userRoleManage.isPermission(ResourceEnum._2002000,null);
+		if(flag_permission == false){
+			errorMessage = "权限不足";
+		}else{
+			if(flag){
+				DateTime dateTime = new DateTime();     
+				String date = dateTime.toString("yyyy-MM-dd");
+				
+				if(imgFile != null && !imgFile.isEmpty()){
+					EditorTag editorSiteObject = settingManage.readTopicEditorTag();
+					if(editorSiteObject != null){
+						if(editorSiteObject.isImage()){//允许上传图片
+							//上传文件编号
+							String fileNumber = "b"+accessUser.getUserId();
+							
+							//当前文件名称
+							String fileName = imgFile.getOriginalFilename();
+							
+							//文件大小
+							Long size = imgFile.getSize();
+							//取得文件后缀
+							String suffix = fileManage.getExtension(fileName).toLowerCase();
+							
+							//允许上传图片格式
+							List<String> imageFormat = editorSiteObject.getImageFormat();
+							//允许上传图片大小
+							long imageSize = editorSiteObject.getImageSize();
+							
+							//验证文件类型
+							boolean authentication = fileManage.validateFileSuffix(imgFile.getOriginalFilename(),imageFormat);
+							
+							if(authentication ){
+								if(size/1024 <= imageSize){
+									//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
+									String pathDir = "file"+File.separator+"topic"+File.separator + date +File.separator +"image"+ File.separator;
+									//文件锁目录
+									String lockPathDir = "file"+File.separator+"topic"+File.separator+"lock"+File.separator;
+									//构建文件名称
+									String newFileName = UUIDUtil.getUUID32()+ fileNumber+"." + suffix;
+									
+									//生成文件保存目录
+									fileManage.createFolder(pathDir);
+									//生成锁文件保存目录
+									fileManage.createFolder(lockPathDir);
+									//生成锁文件
+									fileManage.newFile(lockPathDir+date +"_image_"+newFileName);
+									//保存文件
+									fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
+									//上传成功
+									returnJson.put("error", 0);//0成功  1错误
+									returnJson.put("url", "file/topic/"+date+"/image/"+newFileName);
+									return JsonUtils.toJSONString(returnJson);
+								}else{
+									errorMessage = "文件超出允许上传大小";
+								}
 							}else{
-								errorMessage = "文件超出允许上传大小";
+								errorMessage = "当前文件类型不允许上传";
 							}
 						}else{
-							errorMessage = "当前文件类型不允许上传";
+							errorMessage = "不允许上传文件";
 						}
 					}else{
-						errorMessage = "不允许上传文件";
-					}
+						errorMessage = "读取话题编辑器允许使用标签失败";
+					}	
 				}else{
-					errorMessage = "读取话题编辑器允许使用标签失败";
-				}	
+					errorMessage = "文件内容不能为空";
+				}
 			}else{
-				errorMessage = "文件内容不能为空";
+				errorMessage = "不允许发表话题";
 			}
-		}else{
-			errorMessage = "不允许发表话题";
 		}
+
 		
 		//上传失败
 		returnJson.put("error", 1);
@@ -774,7 +839,7 @@ public class TopicFormAction {
     	  		
     		}
     	}
-    	
+		
     	//消费积分
 		Long point = null;
 	  	

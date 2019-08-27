@@ -2,7 +2,10 @@ package cms.bean.user;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -29,7 +32,7 @@ import org.joda.time.DateTime;
    )},indexes = {@Index(name="user_idx", columnList="state")}
 )//给user字段添加唯一性约束
 public class User implements Serializable{
-	private static final long serialVersionUID = 2001664193065966153L;
+	private static final long serialVersionUID = 3692366870616346904L;
 	
 	/** ID **/
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -84,7 +87,9 @@ public class User implements Serializable{
 	/** 用户版本号 **/
 	private Integer userVersion = 0;
 	
-
+	/** 用户角色名称集合 **/
+	@Transient
+	private List<String> userRoleNameList = new ArrayList<String>();
 	/** 当前等级ID  只用于统计显示,不写入数据库**/
 	@Transient
 	private Integer gradeId;
@@ -233,6 +238,12 @@ public class User implements Serializable{
 	}
 	public void setAllowUserDynamic(Boolean allowUserDynamic) {
 		this.allowUserDynamic = allowUserDynamic;
+	}
+	public List<String> getUserRoleNameList() {
+		return userRoleNameList;
+	}
+	public void setUserRoleNameList(List<String> userRoleNameList) {
+		this.userRoleNameList = userRoleNameList;
 	}
 
 }

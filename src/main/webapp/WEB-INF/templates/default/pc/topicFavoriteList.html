@@ -21,48 +21,46 @@
 <body>
 <#-- 引入页头 -->
 <@include action="${newPublic_2}"/>
-<div class="fixedBottom wrap clearfix">
+<div class="skeleton ">
+	<div class="main wrap backgroundModule" >
 
-	<#-- 引入服务导航 -->
-	<@include action="${newPublic_4}"/>
+		<#-- 引入服务导航 -->
+		<@include action="${newPublic_4}"/>
+	
+		<div class="dataTable">
+			<TABLE class="dataList" width="100%">
+				<THEAD>
+					<TR class="dataThead">
+						<TH width="50%">用户</TH>	
+						<TH width="30%">收藏时间</TH>
+					</TR>
+				</THEAD>
+				<TBODY>
+		    		<#if pageView.records?exists && pageView.records?size gt 0 >    
+					<#list pageView.records as favorites>
+					<TR>
+						<TD class="dataTD">
+							<a href="user/control/home?userName=${favorites.userName}" target="_blank" class="link">${favorites.userName}</a>
+						</TD>
+						<TD class="dataTD">
+							${favorites.addtime}	
+						</TD>
+		    		</TR>
+		    		</#list>
+		    		</#if> 
+		    		<#if !pageView.records?exists || pageView.totalrecord == 0 > 
+		    			<TR>
+							<TD colSpan="2"  class="empty">还没有收藏用户</TD>
+		    			</TR>
+		    		</#if> 
+		    	</TBODY>
+			</TABLE>
+			<DIV class=pageList>
+				<@include action="${newPublic_1}"/>
+			</DIV>
+		</div>
 
-	<div class="dataTable">
-		<TABLE class="dataList" width="100%">
-			<THEAD>
-				<TR class="dataThead">
-					<TH width="50%">用户</TH>	
-					<TH width="30%">收藏时间</TH>
-				</TR>
-			</THEAD>
-			<TBODY>
-	    		<#if pageView.records?exists && pageView.records?size gt 0 >    
-				<#list pageView.records as favorites>
-				<TR>
-					<TD class="dataTD">
-						<a href="user/control/home?userName=${favorites.userName}" target="_blank" class="link">${favorites.userName}</a>
-					</TD>
-					<TD class="dataTD">
-						${favorites.addtime}	
-					</TD>
-	    		</TR>
-	    		</#list>
-	    		</#if> 
-	    		<#if !pageView.records?exists || pageView.totalrecord == 0 > 
-	    			<TR>
-						<TD colSpan="2" align="center" height="28px">还没有收藏用户</TD>
-	    			</TR>
-	    		</#if> 
-	    	</TBODY>
-		</TABLE>
-		<DIV class=pageList>
-			<@include action="${newPublic_1}"/>
-		</DIV>
 	</div>
-
-	<div style="clear:both;"></div>
-	<div class="push"><!-- 把div#footer推下去 --></div>
-
-
 </div>
 <#--引入页脚-->
 <@include action="${newPublic_3}"/>

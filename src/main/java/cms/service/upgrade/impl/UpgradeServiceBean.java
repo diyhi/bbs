@@ -101,6 +101,17 @@ public class UpgradeServiceBean extends DaoSupport<UpgradeSystem> implements Upg
 	}
 	
 	/**
+	 * 查询原生SQL
+	 * @param sql
+	 * @return
+	 */
+	public List<Object[]> queryNativeSQL(String sql){
+		Query query = em.createNativeQuery(sql);
+		
+		return query.getResultList();
+	}
+	
+	/**
 	 * 插入原生SQL
 	 * @param sql
 	 * @return

@@ -16,16 +16,17 @@
 <body>
 <#-- 引入页头 -->
 <@include action="${newPublic_2}"/>
-<div class="fixedBottom wrap">
-	<div style="background: #fff; height: 1px;"></div>
-	<div class="messageModule">
-		<h1>${message}</h1>
-		<div style="margin-top: 30px;">
-			<span class="submitButton"><INPUT type="button" value="跳转" onclick="javascript:window.location.href='${urlAddress}'"></span>
+<div class="skeleton">
+	<div class="main wrap backgroundModule" >
+		<div style="background: #fff; height: 1px;"></div>
+		<div class="messageModule">
+			<h1>${message}</h1>
+			<div style="margin-top: 30px;">
+				<span class="submitButton"><INPUT type="button" value="跳转" onclick="javascript:window.location.href='${urlAddress}'"></span>
+			</div>
+			
 		</div>
-		<div class="push"><!-- 把div#footer推下去 --></div>
 	</div>
-	
 </div>
 <#--引入页脚-->
 <@include action="${newPublic_3}"/>

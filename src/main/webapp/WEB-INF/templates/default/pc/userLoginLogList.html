@@ -20,60 +20,59 @@
 <body>
 <#-- 引入页头 -->
 <@include action="${newPublic_2}"/>
-<div class="fixedBottom wrap clearfix">
+<div class="skeleton ">
+	<div class="main wrap backgroundModule" >
 
-	<#-- 引入服务导航 -->
-	<@include action="${newPublic_4}"/>
-	<!-- 用户登录日志列表 -->
-	<div class="dataTable">
-		<TABLE class="dataList" width="100%">
-			<THEAD>
-				<TR class="dataThead">
-					<TH width="20%">登录IP</TH>	
-					<TH width="30%">IP归属地</TH>	
-					<TH width="20%">类型</TH>	
-					<TH width="30%">登录时间</TH>
-				</TR>
-			</THEAD>
-			<TBODY>
-	    		<#if pageView.records?exists && pageView.records?size gt 0 >    
-				<#list pageView.records as userLoginLog>
-				<TR>
-					<TD class="dataTD">
-						${userLoginLog.ip}				
-					</TD>
-					<TD class="dataTD">
-						${userLoginLog.ipAddress}				
-					</TD>
-					<TD class="dataTD">
-						<#if userLoginLog.typeNumber == 10 >   
-							登录
-						</#if>  
-						<#if userLoginLog.typeNumber == 20 >   
-							续期
-						</#if> 	
-					</TD>
-					<TD class="dataTD">
-						${userLoginLog.logonTime}
-					</TD>
-	    		</TR>
-	    		</#list>
-	    		</#if> 
-	    		<#if !pageView.records?exists || pageView.totalrecord == 0 > 
-	    			<TR>
-						<TD colSpan="3" align="center" height="25px">还没有日志记录</TD>
-	    			</TR>
-	    		</#if> 
-	    	</TBODY>
-		</TABLE>
-		<DIV class=pageList>
-			<@include action="${newPublic_1}"/>
-		</DIV>
+		<#-- 引入服务导航 -->
+		<@include action="${newPublic_4}"/>
+		<!-- 用户登录日志列表 -->
+		<div class="dataTable">
+			<TABLE class="dataList" width="100%">
+				<THEAD>
+					<TR class="dataThead">
+						<TH width="20%">登录IP</TH>	
+						<TH width="30%">IP归属地</TH>	
+						<TH width="20%">类型</TH>	
+						<TH width="30%">登录时间</TH>
+					</TR>
+				</THEAD>
+				<TBODY>
+		    		<#if pageView.records?exists && pageView.records?size gt 0 >    
+					<#list pageView.records as userLoginLog>
+					<TR>
+						<TD class="dataTD">
+							${userLoginLog.ip}				
+						</TD>
+						<TD class="dataTD">
+							${userLoginLog.ipAddress}				
+						</TD>
+						<TD class="dataTD">
+							<#if userLoginLog.typeNumber == 10 >   
+								登录
+							</#if>  
+							<#if userLoginLog.typeNumber == 20 >   
+								续期
+							</#if> 	
+						</TD>
+						<TD class="dataTD">
+							${userLoginLog.logonTime}
+						</TD>
+		    		</TR>
+		    		</#list>
+		    		</#if> 
+		    		<#if !pageView.records?exists || pageView.totalrecord == 0 > 
+		    			<TR>
+							<TD colSpan="3"  class="empty">还没有日志记录</TD>
+		    			</TR>
+		    		</#if> 
+		    	</TBODY>
+			</TABLE>
+			<DIV class=pageList>
+				<@include action="${newPublic_1}"/>
+			</DIV>
+		</div>
+	
 	</div>
-
-	<div style="clear:both;"></div>
-	<div class="push"><!-- 把div#footer推下去 --></div>
-
 
 </div>
 <#--引入页脚-->

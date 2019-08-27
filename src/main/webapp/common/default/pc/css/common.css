@@ -141,7 +141,35 @@ html,body{
 * html .clearfix {
 	height: 1%;
 }
-.wrap{width:1210px;margin:0 auto;}
+/* 高度百分百骨架 */
+.skeleton{
+	width: 100%;
+	min-height: 100%;
+	
+	height: auto;
+	display: -webkit-box;
+	display: box;
+	display: -moz-box;
+	display: -ms-flexbox;
+	display: -o-box;
+
+	-webkit-box-pack: center;
+	-moz-box-pack: center;
+	-o-box-pack: center;
+	box-pack: center;
+	-ms-flex-pack: center
+}
+/* 正文 */
+.main{
+	margin:0 auto;
+	margin-top:51px;
+	margin-bottom: 90px;
+}
+/* 背景 */
+.backgroundModule{
+	background: #fff; 
+}
+.wrap{width:1210px;}
 
 
 /*分页*/
@@ -149,34 +177,37 @@ html,body{
 	float: right;line-height: 30px;font-size: 13px;
 }
 .pg A {
-	border: #dfdfdf 1px solid;
-	border-radius: 2px;  padding-bottom: 0px; background-color: #fff; padding-left: 10px; padding-right: 10px; display: inline; background-repeat: no-repeat; float: left; height: 30px; color: #333; margin-left: 4px; overflow: hidden; text-decoration: none; padding-top: 0px;
+	border: #ebebeb 1px solid; border-radius: 2px; padding-bottom: 0px; background-color: #fff; padding-left: 10px; padding-right: 10px; display: inline; background-repeat: no-repeat; float: left; height: 30px; color: #333; margin-left: 4px; overflow: hidden; text-decoration: none; padding-top: 0px;
 	
 }
 .pg A.prev {
 	border-radius: 2px; padding-bottom: 0px; padding-left: 10px; padding-right: 10px; padding-top: 0px
 }
-.pg A.nxt {border-radius: 2px;
+.pg A.nxt {
+	border-radius: 2px;
 	padding-bottom: 0px; padding-left: 10px; padding-right: 10px; padding-top: 0px
 }
 .pg A:hover {
-	border: #c9c9c9 1px solid;
+	border: #c9c9c9 1px solid; 
 	color: #000000;
 }
-.pg LABEL {
-	border-radius: 2px;
-	border: #dfdfdf 1px solid;
+.pg LABEL {border-radius: 2px;
+	border: #ebebeb 1px solid; 
 	padding-bottom: 0px; background-color: #fff; padding-left: 10px; padding-right: 10px; display: inline; background-repeat: no-repeat; float: left; height: 30px; color: #333; margin-left: 4px; overflow: hidden; text-decoration: none; padding-top: 0px;
 	
 }
 .pg LABEL .pg_input {
-	padding:0;width:25px;height:15px;line-height:15px;margin-bottom: 3px;*margin-bottom: 0px;
+	padding:0;width:25px;height:15px;line-height:15px;margin-bottom: 3px;*margin-bottom: 0px;border: #dfdfdf 1px solid;
 }
 .pg STRONG {
-	border-radius: 2px; border: #dfdfdf 1px solid; padding-bottom: 0px; background-color: #fff; padding-left: 10px; padding-right: 10px; display: inline; background-repeat: no-repeat; float: left; height: 30px; color: #333; margin-left: 4px; overflow: hidden;  text-decoration: none; padding-top: 0px;background-color: #f5f5f5;
+	border: #ebebeb 1px solid; 
+	border-radius: 2px; padding-bottom: 0px; background-color: #fff; padding-left: 10px; padding-right: 10px; display: inline; background-repeat: no-repeat; float: left; height: 30px; color: #666; margin-left: 4px; overflow: hidden; 
+	background-color: #f5f5f5;text-decoration: none; padding-top: 0px;
 }
 .pg span.count {
-	border-radius: 2px; border: #dfdfdf 1px solid; padding-bottom: 0px; background-color: #fff; padding-left: 10px; padding-right: 10px; display: inline; background-repeat: no-repeat; float: left; height: 30px; color: #333; margin-left: 4px; overflow: hidden;  text-decoration: none; padding-top: 0px;
+	border: #ebebeb 1px solid; 
+	border-radius: 2px; padding-bottom: 0px; background-color: #fff; padding-left: 10px; padding-right: 10px; display: inline; background-repeat: no-repeat; float: left; height: 30px; color: #333; margin-left: 4px; overflow: hidden; 
+	text-decoration: none; padding-top: 0px;
 }
 
 /*功能按钮  F7F7F7 */
@@ -213,7 +244,9 @@ html,body{
 .headerModule {
 	background-color: #F2F2F2;
 	border-bottom: 1px solid #e9e8e8;
-	min-width: 1210px;
+	position: absolute;
+	height: 50px;
+	left: 0; top: 0; right: 0; 
 }
 
 .headerModule .box {
@@ -477,6 +510,14 @@ html,body{
 	position:relative;
 	behavior: url(common/default/pc/js/css3pie/PIE.htc);  /*通知IE浏览器调用脚本作用于当前类*/
 }
+.topicModule .userRoleName{
+	white-space:nowrap;
+	color:#fff;
+	background-color:#ffcc00;
+	border-radius:4px;
+	padding:0 5px;
+	font-size: 12px;
+}
 
 /* 列表内容 */
 .topicModule .content {
@@ -528,7 +569,16 @@ html,body{
 .topicModule .content .title :hover{
 	color: #2196F3;
 }
-
+.topicModule .topicRoleName{
+	white-space:nowrap;
+	color:#fff;
+	background-color:#ffb800;
+	border-radius:4px;
+	padding:0 5px;
+	font-size: 14px;
+}
+								
+								
 /* 查看数量 */
 .topicModule .view {
 	line-height: 22px;
@@ -585,7 +635,8 @@ html,body{
 	float: left;
 	margin-right: 10px;
 	position: relative;
-	z-index: 2
+	z-index: 2;
+	margin-top: 5px;
 }
 .topic-formModule .captchaModule .captcha_div{
 	height: 38px;line-height:38px;
@@ -637,7 +688,7 @@ html,body{
 	float: left;
 	padding:0px;
 	background: #fff;
-	border-right: 1px solid #EDEDE3;
+	border-right: 1px solid #f1f1f1;
 	border-radius:4px 0px 0px 4px;
 }
 
@@ -721,7 +772,7 @@ html,body{
 	padding-bottom:0;
 }
 .commentModule .commentlist{list-style:none;font-size: 14px;}
-.commentModule .commentlist .comment{padding:10px 0 5px 72px;border-bottom:1px solid #EDEDE3;}
+.commentModule .commentlist .comment{padding:10px 0 5px 72px;border-bottom:1px solid #f1f1f1;}
 .commentModule .commentlist .comment-author{position:relative;color:#999}
 .commentModule .commentlist .comment-author img{
 	width:60px;
@@ -735,6 +786,14 @@ html,body{
 	behavior: url(common/default/pc/js/css3pie/PIE.htc);  /*通知IE浏览器调用脚本作用于当前类*/
 }
 .commentModule .commentlist cite{font-style:normal;}
+.commentModule .commentlist .userRoleName{
+	white-space:nowrap; 
+	color:#fff;
+	background-color:#ffcc00;
+	border-radius:4px;
+	padding:0 5px;
+	font-size: 12px;
+}
 .commentModule .commentlist .commentTime{margin-bottom:5px;color:#999;font-size: 13px;}
 .commentModule .commentlist .commentTime a{color:#999;}
 .commentModule .commentlist .comment .commentContent{padding:0px;word-wrap:break-word;color:#666;font-size: 14px;margin-top: 20px;line-height: 26px;}
@@ -969,6 +1028,7 @@ html,body{
 	padding:10px 0 20px 25px;
 	font-size: 13px;
 }
+
 .articleInfoModule .user .author img{
 	width:70px;
 	height:70px;
@@ -981,12 +1041,27 @@ html,body{
 }
 .articleInfoModule .user .author span{
 	position:absolute;
-	margin-top:22px;
+	margin-top:16px;
 	margin-left:85px;
+	font-size: 15px;
+}
+.articleInfoModule .user .author .role{
+	position:absolute;
+	margin-top:40px;
+	margin-left:85px;
+	width: 180px;
+}
+.articleInfoModule .user .author .role .userRoleName{
+	white-space:nowrap; 
+	color:#fff;
+	background-color:#ffcc00;
+	border-radius:4px;
+	padding:0 5px;
+	font-size: 12px;
 }
 .articleInfoModule .user .userInfo{
 	position:absolute;
-	border-top: 1px solid #EDEDE3;
+	border-top: 1px solid #f1f1f1;
 	margin-top:80px;
 	width: 250px;
 }
@@ -996,6 +1071,7 @@ html,body{
 	color:#999999;
 	
 }
+
 
 
 /* 相关话题 */
@@ -1083,7 +1159,7 @@ html,body{
 
 /** 在线留言 **/
 .addFeedbackModule .box{padding:10px;}
-.addFeedbackModule .box h2{height: 46px; line-height:38px; border-bottom: 1px solid #f1f1f1; text-align:center; font-size: 18px;}
+.addFeedbackModule .box h2{height: 46px; line-height:38px; border-bottom: 1px solid #f1f1f1; text-align:center; font-size: 18px;margin-bottom: 20px;}
 .addFeedbackModule .box .item{margin:0 auto;width: 900px;}
 .addFeedbackModule .box .item a{color:#35b5ff;}
 .addFeedbackModule .box .item .required{color: red;}
@@ -1230,7 +1306,7 @@ html,body{
 
 /** 注册 **/
 .registerModule{padding:10px;}
-.registerModule h2{height: 46px;border-bottom: 1px solid #f1f1f1; text-align:center; font-size: 16px;line-height: 38px;}
+.registerModule h2{height: 46px;border-bottom: 1px solid #f1f1f1; text-align:center; font-size: 16px;line-height: 38px;margin-bottom: 20px;}
 .registerModule .item{margin:0 auto;width: 650px;}
 .registerModule .item a{color:#35b5ff;}
 .registerModule .item .required{color: red;}
@@ -1272,10 +1348,10 @@ html,body{
 .loginModule .box .captcha_div .captchaImage{width:100px;height:38px;float: left;margin:0 15px 0 5px;}
 .loginModule .box .captcha_div .captchaImage img{width:100px;height:40px;outline:none;}
 .loginModule .box .otherInfo{width:310px;height:27px;line-height:22px;padding-top:7px;overflow:hidden;}
-.loginModule .box .otherInfo a{float:right; color: #317ee7;}
+.loginModule .box .otherInfo a{float:right; color: #2196F3;}
 .loginModule .box .otherInfo input{vertical-align: middle;margin-top:-1px;}
-.loginModule .box .loginButton a{width:100%;border-radius:5px;color:#fff;display: inline-block;height:44px;text-align: center;font-weight:normal; font-size:20px;line-height:44px;  background:#0098ef;}
-.loginModule .box .loginButton a:hover{background:#0191e4;text-decoration:none;}
+.loginModule .box .loginButton a{width:100%;border-radius:5px;color:#fff;display: inline-block;height:44px;text-align: center;font-weight:normal; font-size:20px;line-height:44px;  background:#30aff7;}
+.loginModule .box .loginButton a:hover{background:#45b6f7;text-decoration:none;}
 .loginModule .box .username.focus,.loginModule .box .password.focus,.loginModule .box .captchaBox.focus{border-color:#969696;}
 .loginModule .box .username.blur,.loginModule .box .password.blur,.loginModule .box .captchaBox.blur{border-color:#e6e6e6; color:#a0a0a0;}
 
@@ -1287,6 +1363,7 @@ html,body{
 .findPassWordModule h2{height: 40px;border-bottom: 1px solid #f1f1f1; text-align:center;font-size: 16px; }
 .findPassWordModule table{
 	margin:0 auto;
+	margin-top:20px;
 }
 
 
@@ -1399,6 +1476,18 @@ html,body{
 	color: #444;
 	display: inline-block;
 }
+.user-home-header .role{
+	margin-top:10px;
+}
+.user-home-header .role .userRoleName{
+	white-space:nowrap; 
+	color:#fff;
+	background-color:#ffcc00;
+	border-radius:4px;
+	padding:0 5px;
+	font-size: 14px;
+}
+
 .user-home-header .action-button {
 	position: absolute;
 	right: 20px;
@@ -1408,8 +1497,8 @@ html,body{
 
 }
 .user-home-header .action-button .privateMessageBox .privateMessageButton{
-	color: #0592fe;
-    border-color: #0592fe;
+	color: #30aff7;
+    border-color: #30aff7;
     outline: none;
     display: inline-block;
     padding: 0 16px;
@@ -1433,7 +1522,7 @@ html,body{
 }
 .action-followBox .followButton{
 	color: #fff;
-    border-color: #0592fe;
+    border-color: #30aff7;
     outline: none;
     display: inline-block;
     padding: 1px 16px;
@@ -1441,14 +1530,14 @@ html,body{
     line-height: 32px;
     text-align: center;
     cursor: pointer;
-    background: #0592fe;
+    background: #30aff7;
     border: 1px solid;
     border-radius: 3px;
     margin: 0;
 	
 }
 .action-followBox .followButton:hover {  
-    background: #068cf2;  
+    background: #45b6f7;  
 } 
 
 
@@ -1488,36 +1577,34 @@ html,body{
 	height: 44px;
 	background-color: #fcfcfc;
 	font-size: 14px;
-	color: #333
+	color: #333;
 }
-
 .serviceNav .title {
 	float: left;
 	padding: 0 15px;
 	height: 44px;
 	line-height: 44px;
-	cursor: pointer
+	cursor: pointer;
 }
 
 .serviceNav .title a {
 }
 
 .serviceNav .title a:hover {
-	color: #f4931a;
+	color: #2196F3;
 }
 
 .serviceNav .selected {
-	color: red;
 	background-color: white;
 	cursor: default;
+	box-shadow:4px 0 3px -4px rgba(0,0,0,.06),-4px 0 3px -4px rgba(0,0,0,.06);
 }
 .serviceNav .selected a{
 	color: #333;
 }
 
-
 /* 实名认证 */
-.realNameAuthenticationModule{padding-left: 300px; padding-right: 0px; padding-top:6px; float: left; width: 100%; }
+.realNameAuthenticationModule{padding-left: 300px; padding-right: 0px; padding-top:6px; float: left; }
 .realNameAuthenticationModule h3 {
 	font-size: 15px;font-weight:500; float: left; margin-bottom: 4px; padding-top:5px; width: 100%; border-bottom: #cccccc 1px dashed; position: relative;padding-bottom: 3px;
 }
@@ -1535,11 +1622,8 @@ html,body{
 
 
 /* 绑定手机 */
-.phoneBindingModule{padding-left: 350px;margin-top: 20px;}
+.phoneBindingModule{margin-left: 350px;margin-top: 20px;}
 .phoneBindingModule .successInfo{color: green;}
-
-
-
 
 
 
@@ -1547,45 +1631,48 @@ html,body{
 
 /* 私信 */
 .privateMessageTitle{
+    border-bottom:1px dotted #eee;
+    color: #666;
+}
+.privateMessageTitle h2{
 	line-height:46px;
-	margin-left:8px;
-	margin-right:8px;
     font-size: 14px;
     font-weight: 700;
-    border-bottom:1px dotted #eee;
-}
-    
+    margin-left: 10px;
+    color: #666;
+}  
 
 .privateMessageModule{
 	padding: 0px 10px 10px 10px;
 	position: relative;
-	padding-bottom:0;
+	padding-bottom:70px;
 }
 .privateMessageModule .privateMessageList{list-style:none;}
-.privateMessageModule .privateMessageList .privateMessage{padding:10px 0 5px 60px;border-bottom:1px solid #EDEDE3;}
+.privateMessageModule .privateMessageList .privateMessage{padding:12px 0 7px 76px;border-bottom:1px solid #f1f1f1;}
 .privateMessageModule .privateMessageList .author{position:relative;color:#999}
 .privateMessageModule .privateMessageList .author img{
 	position:absolute;
-	left:-60px;
+	left:-76px;
 	-webkit-border-radius:50%;
 	-moz-border-radius:50%;
 	border-radius:50%;
 	display:block;
 	behavior: url(common/default/pc/js/css3pie/PIE.htc);  /*通知IE浏览器调用脚本作用于当前类*/
 }
-.privateMessageModule .privateMessageList cite{font-style:normal;font-size: 13px;}
+.privateMessageModule .privateMessageList cite{font-style:normal;font-size: 14px;}
 .privateMessageModule .privateMessageList .time{margin-bottom:5px;color:#999;line-height: 20px;}
 .privateMessageModule .privateMessageList .time a{color:#999}
-.privateMessageModule .privateMessageList .privateMessage .content{padding:0px;word-wrap:break-word;color:#666;line-height: 24px;font-size: 13px;margin-right: 120px;}
+.privateMessageModule .privateMessageList .privateMessage .content{padding:0px;word-wrap:break-word;color:#666;line-height: 26px;font-size: 14px;margin-right: 120px;}
 .privateMessageModule .privateMessageList .privateMessage .content:hover{
 	color: #333;
 }
 
 .privateMessageModule .privateMessageList .tipBottom {
-	font-size: 9pt;
+	font-size: 14px;
 	color: #aaa;
 	margin-top: 5px;
 	float:right;
+	
 }
 .privateMessageModule .privateMessageList .tipBottom .a-toolbar {
 	display: block;
@@ -1597,81 +1684,288 @@ html,body{
 .privateMessageModule .privateMessagePage {
 	margin-top: 10px; float: right; color: #999; line-height: 22px; margin-right: 0px;*margin-right: 8px;
 }
+
 /* 私信对话 */
 .privateMessageChatTop{
 	z-index: 1;
 	line-height:46px;
-	margin-left:8px;
-	margin-right:8px;
 	text-align: center;
-	border-bottom:1px dotted #eee;
+	background: #fff;
+	box-shadow: 0 1px 3px 0 rgba(0,0,0,.02),0 4px 8px 0 rgba(0,0,0,.02);
 }
 .privateMessageChatTop .back-to-list{
 	position: absolute;
 	font-size: 14px;
 	color: #969696;
 	left: 50%;
-	margin-left: -585px;
+	margin-left: -592px;
 }
 
 .privateMessageChatTop .back-to-list:hover{
-	color: #2f2f2f
+	color: #626366;
+}
+.privateMessageChatTop .chatInfo{
+	margin-left: 240px;
 }
 
 .privateMessageChatTop b{
 	display: inline-block;
-	font-size: 14px
+	font-size: 15px;
+	color: #666;
+}
+/* 最近对话用户 */
+.recentlyChatUserModule {
+	display: inline; float: left; margin:10px 0px 0px 0px;border-radius: 1px; width:280px; background: #fff;box-shadow: 0 1px 3px 0 rgba(0,0,0,.02),0 4px 8px 0 rgba(0,0,0,.02)
+}
+.recentlyChatUserModule .title {
+	border-bottom:1px solid #eee;height: 38px;line-height: 38px;
+}
+.recentlyChatUserModule .title h3{
+	margin-left: 10px;font-size: 15px;font-weight:700;color:#666;
+}
+.recentlyChatUserModule .title h3:before{
+	display:inline-block;
+	margin-right:8px;content:'';width:4px;
+	height:22px;vertical-align:-6px;
+	background-color:#30aff7;
 }
 
-.privateMessageChatModule{
-	padding: 0px 10px 10px 10px;
-	position: relative;
-	padding-bottom:0;
-}
-.privateMessageChatModule .privateMessageChatList{list-style:none;}
-.privateMessageChatModule .privateMessageChatList .privateMessageChat{padding:10px 0 5px 60px;border-bottom:1px solid #EDEDE3;}
-.privateMessageChatModule .privateMessageChatList .author{position:relative;color:#999}
-.privateMessageChatModule .privateMessageChatList .author img{
+.recentlyChatUserModule .recentlyChatUserList{list-style:none;}
+.recentlyChatUserModule .recentlyChatUserList .recentlyChatUser{padding:8px 0 6px 6px;border-bottom:1px solid #eee;min-height: 50px;}
+.recentlyChatUserModule .recentlyChatUserList .author{position:relative;color:#999;}
+.recentlyChatUserModule .recentlyChatUserList .author img{
 	position:absolute;
-	left:-60px;
+	left:10px;
 	-webkit-border-radius:50%;
 	-moz-border-radius:50%;
 	border-radius:50%;
 	display:block;
 	behavior: url(common/default/pc/js/css3pie/PIE.htc);  /*通知IE浏览器调用脚本作用于当前类*/
 }
-.privateMessageChatModule .privateMessageChatList cite{font-style:normal;font-size: 13px;}
-.privateMessageChatModule .privateMessageChatList .time{margin-bottom:5px;color:#999;line-height: 20px;}
-.privateMessageChatModule .privateMessageChatList .time a{color:#999}
-.privateMessageChatModule .privateMessageChatList .privateMessageChat .content{padding:0px;word-wrap:break-word;color:#666;line-height: 24px;font-size: 13px;}
-.privateMessageChatModule .privateMessageChatPage {
-	margin-top: 10px; float: right; color: #999; line-height: 22px; margin-right: 0px;*margin-right: 8px;
+.recentlyChatUserModule .recentlyChatUserList .info .userName{font-style:normal;font-size: 14px;margin-left: 70px;line-height: 50px;}
+/* 私信对话右边栏 */
+.privateMessageChatRight{
+	display: inline; float: right; margin-top: 10px;width: 920px;
 }
-.privateMessageChatForm{
-	margin-top: 8px;
-	margin-left: 150px;
-	margin-right: 8px;
-	margin-bottom: 8px;
+.privateMessageChatModule {
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+	background-position: center;
+	padding: 0px 10px 90px 10px;
+	background: #fff;
+	box-shadow: 0 1px 3px 0 rgba(0,0,0,.02),0 4px 8px 0 rgba(0,0,0,.02)
+}
+.privateMessageChatModule .friend{
+	margin: 26px 52px 0 10px;
+	position: relative;
 
 }
-.privateMessageChatForm textarea{
-	width:908px;
-	line-height: 1.33em;
-	-webkit-box-shadow: none;
-    box-shadow: none;
-    border-radius: 2px;
-    border: 1px solid #dce3e8;
-	vertical-align: top;
+.privateMessageChatModule .friend:after{
+	content: "";
+	display: block;
+	height: 0;
+	clear: both;
+	visibility: hidden;
+}
+.privateMessageChatModule .friend img{
+	position: absolute;
+	width: 64px;
+	height: 64px;
+	left: 0;
+	top: 0;
+	background: #fff;
+	-webkit-border-radius:50%;
+	-moz-border-radius:50%;
+	border-radius:50%;
+}
+.privateMessageChatModule .friend div{
+	position: relative;
+	margin-left: 64px;
+	margin-right: 50px;
+	text-align: initial;
+}
+.privateMessageChatModule .friend .time{
+	position:absolute;
+	width:150px;
+	line-height: 40px;
+	display: inline-block;
+	color: #a5a5a5;
+	font-size: 13px;
+	top: -32px;
+	left: -60px;
+}
+.privateMessageChatModule .friend div i{
+	position: absolute;
+	width: 24px;
+	height: 24px;
+	left: -24px;
+	top: 10px;
+}
+.privateMessageChatModule .friend div i:after{
+    content: "";
+    position: absolute;
+    border-style: solid;
+    border-color:  transparent #fafafa transparent transparent;
+    border-width: 10px;
+    left:5px;
+}
+.privateMessageChatModule .friend div span{
+	float: left;
+	min-height: 40px;
+	min-width: 96px;
+	margin-left: 24px;
+	margin-top:22px;
+	font-size: 15px;
+	border: 1px #fff solid;
+	background: #fafafa;
+	border-radius: 10px;
+	position: relative;
+	max-width: 94%;
+}
+.privateMessageChatModule .friend .msg-del{
+    background: #ececec;
+    color: #919191;
+    border-radius: 12px;
+    line-height: 20px;
+    text-align: center;
+    height: 20px;
+    width: 20px;
+    font-size: 15px;
+    padding: 1px;
+    top: -10px;
+    right: -10px;
+    position: absolute;
+}
+.privateMessageChatModule .friend .msg-del::before {
+    content: "\2716";
+}
+.privateMessageChatModule .friend .msg-del:hover {
+	color: #1e9fff;
+}
+
+.privateMessageChatModule .self{
+	margin: 26px 10px 0 46px;
+	position: relative;
+}
+.privateMessageChatModule .self:after{
+	content: "";
+	display: block;
+	height: 0;
+	clear: both;
+	visibility: hidden;
+
+}
+.privateMessageChatModule .self img{
+	position: absolute;
+	width: 64px;
+	height: 64px;
+	left: 0;
+	top: 0;
+	background: #fff;
+	left: auto;
+	right: 0;
+	-webkit-border-radius:50%;
+	-moz-border-radius:50%;
+	border-radius:50%;
+}
+.privateMessageChatModule .self div{
+	position: relative;
+	text-align: initial;
+	margin-left: 50px;
+	margin-right: 82px;
+}
+.privateMessageChatModule .self .time{
+	position:absolute;
+	width:150px;
+	line-height: 40px;
+	display: inline-block;
+	color: #a5a5a5;
+	font-size: 13px;
+	top: -32px;
+	right: -100px;
+}
+.privateMessageChatModule .self div i{
+	position: absolute;
+	width: 24px;
+	height: 24px;
+	top: 10px;
+	left: auto;
+	right: -20px;
+}
+.privateMessageChatModule .self div i:after{
+    content: "";
+    position: absolute;
+    border-style: solid;
+    border-color:  transparent transparent transparent #d4e9f9;
+    border-width: 10px;
+    left:5px;
+}
+.privateMessageChatModule .self div span{
+	min-height: 40px;
+	min-width: 96px;
+	font-size: 15px;
+	border: 1px #fff solid;
+	border-radius: 10px;
+	position: relative;
+	max-width: 94%;
+	background: #d4e9f9;
+	border-color: #d4e9f9;
+	float: right;
+	margin-top:22px;
+	margin-left: 0;
+	margin-right: 10px;
 	
-	margin: 0em;
-    -webkit-appearance: none;
-    -webkit-tap-highlight-color: rgba(255,255,255,0);
-    padding: 0.78em 1em;
+}
+.privateMessageChatModule .self .msg-del{
+    background: #ececec;
+    color: #919191;
+    border-radius: 12px;
+    line-height: 20px;
+    text-align: center;
+    height: 20px;
+    width: 20px;
+    font-size: 15px;
+    padding: 1px;
+    top: -10px;
+    left: -10px;
+    position: absolute;
+}
+.privateMessageChatModule .self .msg-del::before {
+    content: "\2716";
+}
+.privateMessageChatModule .self .msg-del:hover {
+	color: #1e9fff;
+}
+.privateMessageChatModule .friend div span em,
+.privateMessageChatModule .self div span em {
+	font-style: normal;
+	padding: 10px;
+	display: block;
+	white-space:normal; word-break:break-all;
+}
+.privateMessageChatModule .privateMessageChatPage {
+	margin-top: 50px; float: right; color: #999; line-height: 22px; margin-right: 0px;*margin-right: 8px;
+}
+.privateMessageChatForm{
+	margin-top: 10px;
+	margin-bottom:10px;
+	background: #fff;
+	padding-bottom: 1px;
+	box-shadow: 0 1px 3px 0 rgba(0,0,0,.02),0 4px 8px 0 rgba(0,0,0,.02)
+}
+.privateMessageChatForm textarea{
+	line-height: 24px;
+    border-radius: 2px;
+    border: 1px solid #e6e6e6;
+	vertical-align: top;
+	font-size: 14px;
+    resize: vertical;
+	padding: 3px 3px;
     background: #ffffff;
-    border: 1px solid rgba(39,41,43,0.15);
     outline: none;
     color: rgba(0,0,0,0.8);
-    border-radius: 0.28rem;
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: rgba(255,255,255,0);
     -webkit-box-shadow: 0em 0em 0em 0em transparent inset;
     box-shadow: 0em 0em 0em 0em transparent inset;
     -webkit-transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
@@ -1679,12 +1973,9 @@ html,body{
     transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, -webkit-box-shadow 0.2s ease;
     transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
     transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, -webkit-box-shadow 0.2s ease;
-    font-size: 1em;
-    height: 8em;
-    min-height: 8em;
-    max-height: 12em;
-    resize: vertical;
-	
+	height:150px;
+	margin: 10px 10px 0px 10px;
+	width: 892px;
 }
 
 .privateMessageChatForm .form-action {
@@ -1697,6 +1988,7 @@ html,body{
 	width: 70px;
 	height: 38px;
 	float: left;
+	margin-left:10px;
 	margin-right: 10px;
 	position: relative;
 	z-index: 2
@@ -1748,30 +2040,34 @@ html,body{
 
 /* 系统通知 */
 .systemNotifyTitle{
+    border-bottom:1px dotted #eee;
+    background: #fff;
+}
+.systemNotifyTitle h2{
 	line-height:46px;
-	margin-left:8px;
-	margin-right:8px;
     font-size: 14px;
     font-weight: 700;
-    border-bottom:1px dotted #eee;
+    margin-left: 10px;
+    color: #666;
 }
-    
+
 
 .systemNotifyModule{
 	padding: 0px 10px 10px 10px;
 	position: relative;
-	padding-bottom:0;
+	background: #fff;
+	padding-bottom: 70px;
 }
 .systemNotifyModule .systemNotifyList{list-style:none;}
-.systemNotifyModule .systemNotifyList .systemNotify{padding:10px 0 5px 0px;border-bottom:1px solid #EDEDE3;}
+.systemNotifyModule .systemNotifyList .systemNotify{padding:10px 0 5px 0px;border-bottom:1px solid #f1f1f1;}
 .systemNotifyModule .systemNotifyList .author{position:relative;color:#999}
 .systemNotifyModule .systemNotifyList .time{margin-bottom:5px;color:#999;line-height: 20px;}
 .systemNotifyModule .systemNotifyList .time a{color:#999}
-.systemNotifyModule .systemNotifyList .systemNotify .content{padding:0px;word-wrap:break-word;color:#666;line-height: 24px;font-size: 13px;margin-right: 120px;}
+.systemNotifyModule .systemNotifyList .systemNotify .content{padding:0px;word-wrap:break-word;color:#666;line-height: 24px;font-size: 14px;margin-right: 120px;}
 
 
 .systemNotifyModule .systemNotifyList .tipBottom {
-	font-size: 9pt;
+	font-size: 14px;
 	color: #aaa;
 	margin-top: 5px;
 	float:right;
@@ -1790,42 +2086,46 @@ html,body{
 
 /* 提醒 */
 .remindTitle{
+	
+    border-bottom:1px dotted #eee;
+    background: #fff;
+}
+.remindTitle h2{
 	line-height:46px;
-	margin-left:8px;
-	margin-right:8px;
     font-size: 14px;
     font-weight: 700;
-    border-bottom:1px dotted #eee;
+    margin-left: 10px;
+    color: #666;
 }
-    
 
 .remindModule{
 	padding: 0px 10px 10px 10px;
 	position: relative;
-	padding-bottom:0;
+	padding-bottom:70px;
+	background: #fff;
 }
 .remindModule .remindList{list-style:none;}
-.remindModule .remindList .remind{padding:10px 0 5px 60px;border-bottom:1px solid #EDEDE3;}
+.remindModule .remindList .remind{padding:10px 0 14px 76px;border-bottom:1px solid #f1f1f1;}
 .remindModule .remindList .author{position:relative;color:#999}
 .remindModule .remindList .author img{
 	position:absolute;
-	left:-60px;
+	left:-76px;
 	-webkit-border-radius:50%;
 	-moz-border-radius:50%;
 	border-radius:50%;
 	display:block;
 	behavior: url(common/default/pc/js/css3pie/PIE.htc);  /*通知IE浏览器调用脚本作用于当前类*/
 }
-.remindModule .remindList cite{font-style:normal;font-size: 13px;}
-.remindModule .remindList .time{margin-bottom:5px;color:#999;line-height: 20px;}
+.remindModule .remindList cite{font-style:normal;font-size: 14px;}
+.remindModule .remindList .time{margin-bottom:5px;margin-top:6px; color:#999;line-height: 20px;}
 .remindModule .remindList .time a{color:#999}
-.remindModule .remindList .remind .content{padding:0px;word-wrap:break-word;color:#666;line-height: 24px;font-size: 13px;margin-right: 120px;margin-top: 10px;}
+.remindModule .remindList .remind .content{padding:0px;word-wrap:break-word;color:#666;line-height: 24px;font-size: 14px;margin-right: 120px;margin-top: 10px;}
 .remindModule .remindList .remind .content:hover{
 	color: #333;
 }
 
 .remindModule .remindList .tipBottom {
-	font-size: 9pt;
+	font-size: 14px;
 	color: #aaa;
 	margin-top: 5px;
 	float:right;
@@ -1846,7 +2146,7 @@ html,body{
 .avatarModule {
 	padding-left: 8px;padding-right: 8px;
 	padding-top: 8px;
-	padding-bottom: 8px;
+	padding-bottom: 12px;
 	background: #fcfcfc;
 }
 .avatarModule .original-box{
@@ -1901,6 +2201,54 @@ html,body{
 }
 
 .avatarModule .bottomInfo{
+	margin-top: 8px;line-height:34px; 
+	border-top: 1px solid #d9dadb;
+	position: relative;
+	padding-top: 6px;
+}
+.avatarModule .bottomInfo .progressBar{
+	position: absolute;
+	left: -220px;
+	font-style:normal;
+}
+.avatarModule .bottomInfo .button-box{
+	margin-top:5px;
+	height:34px;
+	width:100%;
+	text-align:right;
+}
+.avatarModule .bottomInfo .button-box span{
+	position:relative;
+	display:inline-block;
+	height:32px;
+	line-height:32px;
+	border: 1px solid #30aff7;
+	text-align:center;
+	font-size:18px;
+	color:#30aff7;
+	border-radius:3px;
+	cursor:pointer;
+	margin:0 5px;
+	padding-left: 15px;
+	padding-right: 15px;
+}
+.avatarModule .bottomInfo .button-box span.on,.avatarModule .bottomInfo .button-box span:hover{
+	background:#30aff7;
+	
+	box-shadow:inset 0 1px 2px #30aff7;
+	color:#fff;
+	text-shadow:#30aff7 0 -1px 0;
+}
+.avatarModule .bottomInfo .button-box span input {
+    position: absolute;
+    font-size: 20px;
+    right: 0;
+    top: 0;
+    opacity: 0;
+    filter:alpha(opacity=0);
+}
+/**
+.avatarModule .bottomInfo{
 	margin-top: 10px;line-height:34px; border-top: 1px solid #d9dadb;
 }
 .avatarModule .bottomInfo .avatar-upload-button{
@@ -1940,7 +2288,7 @@ html,body{
 .avatarModule .bottomInfo .uploadButton:hover {
     background: #f1f9ff;  
     text-decoration: none;
-}
+}**/
 
 /** 修改用户 **/
 .editUserModule{
@@ -1995,7 +2343,7 @@ html,body{
 	padding-bottom:0;
 }
 .userDynamicModule .userDynamicList{list-style:none;font-size: 14px;}
-.userDynamicModule .userDynamicList .userDynamic{padding:10px 0 5px 100px;border-bottom:1px solid #EDEDE3; position: relative;}
+.userDynamicModule .userDynamicList .userDynamic{padding:10px 0 5px 100px;border-bottom:1px solid #f1f1f1; position: relative;}
 .userDynamicModule .userDynamicList .userDynamic-author{position:relative;color:#999}
 .userDynamicModule .userDynamicList .userDynamic-author img{
 	width:72px;
@@ -2025,6 +2373,15 @@ html,body{
 }
 .userDynamicModule .userDynamicList .userDynamic .topicTitle a{
 	color: #2196F3;
+}
+.userDynamicModule .userDynamicList .userDynamic .topicRoleName{
+	white-space:nowrap;
+	color:#fff;
+	background-color:#ffb800;
+	border-radius:4px;
+	padding:0 5px;
+	font-size: 14px;
+	margin-left: 5px;
 }
 .userDynamicModule .userDynamicList .userDynamic .topicContent{padding:0px;word-wrap:break-word;color:#666666;font-size:16px;margin-top:12px;}
 .userDynamicModule .userDynamicList .userDynamic .topicContent p{font-size:16px;word-wrap:break-word}
@@ -2147,51 +2504,47 @@ html,body{
 	margin-top: 8px;margin-right:8px;height: 40px;
 }
 
-
 /* 数据表格 */
 .dataTable {
-	padding-left: 8px; padding-right: 8px; padding-top: 8px;  padding-bottom: 8px;
-}
-.dataTable h3 {
-	font-size: 15px;font-weight:500; float: left; margin-bottom: 4px; padding-top:5px; width: 100%; border-bottom: #cccccc 1px dashed; position: relative;padding-bottom: 3px;
+	margin-bottom:50px; background: #fff;padding-right:8px;padding-left:8px;padding-top:8px;padding-bottom: 70px;
 }
 .dataTable .dataList{
-	border-left: #dadada 1px solid; border-right: #dadada 1px solid; border-top: #dadada 1px solid; border-bottom: #dadada 1px solid;  width: 100%; border-collapse: collapse
+  width: 100%; border-collapse: collapse;
 }
 .dataTable .dataList .dataThead TH{
-	padding-right: 3px; padding-left: 3px; font-weight: normal; background: url(../images/table_bg.gif) repeat-x left 0px; padding-bottom: 0px; margin: 0px; vertical-align: middle; text-align:center;  border-left: #dadada 1px dotted;  color: #333; padding-top: 0px; border-bottom: #dadada 1px solid; white-space: nowrap; height: 32px;
+ text-align:center;	padding-right: 3px; padding-left: 3px; font-weight: normal; padding-bottom: 0px; margin: 0px; vertical-align: middle; color: #666; padding-top: 0px; white-space: nowrap; height: 32px;background: #f5f5f5;border-left: #f1f1f1 1px solid; border-right: #f1f1f1 1px solid; border-top: #f1f1f1 1px solid; border-bottom: #f1f1f1 1px solid;
 }
 .dataTable .dataList .dataTD {
-	padding-right: 5px; padding-left: 5px; padding-bottom: 0px; margin: 0px; vertical-align: middle; border-left: #dadada 1px dotted; word-break: break-all; padding-top: 0px; border-bottom: #dadada 1px dotted; height: 28px;text-align: center! important;
+	padding-right: 5px; padding-left: 5px; padding-bottom: 0px; margin: 0px; vertical-align: middle;border-left: #f1f1f1 1px solid; border-right: #f1f1f1 1px solid; border-top: #f1f1f1 1px solid; border-bottom: #f1f1f1 1px solid; word-break: break-all; padding-top: 0px; height: 30px;line-height:24px; text-align: center! important;
 }
-.dataTable .dataList .dataTD .link {
-	color: #333
+/**
+.dataTable .dataList .dataTD:first-child{
+	border-left: 1px solid #fff
 }
-
-.dataTable .dataList .dataTD .link:hover {
-	color: #f4931a;
-}
+.dataTable .dataList .dataTD:last-child {
+	border-right: 1px solid #fff
+}**/
 .dataTable .dataList .error{
 	color: red;
 }
-.dataTable .pageList {
-	margin-top: 10px; float: right; color: #999; line-height: 22px; margin-right: 0px;*margin-right: 8px;
+.dataTable .dataList .empty{
+	text-align:center;height: 36px; line-height: 36px;color: #747474;
 }
-
+.dataTable .pageList {
+	margin-top: 10px; float: right; color: #999; line-height: 22px;
+}
 
 /** 空白表格 */
 .blankTableModule {
-	padding-left: 2px; padding-right: 0px; padding-top:6px; float: left; width: 100%; background: #fff;
-}
-.blankTableModule h3 {
-	font-size: 15px;font-weight:500; float: left; margin-bottom: 4px; padding-top:5px; width: 100%; border-bottom: #cccccc 1px dashed; position: relative;padding-bottom: 3px;
+	padding-left: 2px; padding-right: 0px; padding-top:6px;background: #fff;
 }
 .blankTableModule .blankTable td{
-	padding-bottom:5px; padding-left:0px; padding-right:5px; color:#666;padding-top: 5px;height: 30px;font-size: 13px;
+	padding-bottom:5px; padding-left:0px; padding-right:5px; color:#666;padding-top: 5px;height: 30px;font-size: 14px;
 }
 .blankTableModule .blankTable .required{color: red; }
 .blankTableModule .blankTable .error {color: red;margin-left: 2px;}
 .blankTableModule .blankTable .help {color: #9e9e9e; margin-left: 2px;}
+
 
 
 
@@ -2214,14 +2567,16 @@ html,body{
 
 
 
-
 /* 页脚 border-top: 1px solid #e1e1e1; */
-.footer { min-width: 990px; background: #f7f6f6; }
+.footer { min-width: 990px; 
+	background: #f7f6f6;
+	height: 90px;
+	margin-top: -90px }
 
 .footer .message { width: 990px; margin: 0 auto; height: 18px; font-size: 0; line-height: 0; text-align: center; }
 .footer .message a, .message em {  font-size: 12px; line-height: 18px; display: inline-block; color: #999;margin-top: 10px; }
 .footer .message em { margin: 0 14px; color: #ceced5; position: relative; top: -1px; }
-.footer .message a:hover {color:#317ee7; text-decoration:none;}
+.footer .message a:hover {color:#2196F3; text-decoration:none;}
 
 .footer .copyright { width: 990px; margin: 0 auto;  color: #999; text-align: center; margin-top: 18px; }
 .footer .copyright em { font-family: Tahoma; margin-left: 3px; }
@@ -2229,20 +2584,6 @@ html,body{
 .footer .copyright a { font-family: Tahoma; margin-left: 16px; color: #999;}
 .footer .copyright a:hover { text-decoration: underline; }
 .footer .copyright span { margin-left: 17px; }
-
-/* 将页脚固定在页面底部 在底部上一div中加入*/
-.fixedBottom{
-	
-	min-height:100%;   
-    _height:100%;   
-    margin-bottom:-71px;   /*假定页脚的高度为90px*/  
-    background: #fff;
-}
-.push,.footer{
-	height: 90px;
-	clear:both;
-}
-
 
 
 

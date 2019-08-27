@@ -61,6 +61,22 @@ public class WebUtil {
     }
     
     /**
+     * 获取cookie的存活时间
+     * @param request
+     * @param name cookie的名称
+     * @return
+     */
+    public static int getCookieMaxAge(HttpServletRequest request, String name) {
+    	Map<String, Cookie> cookieMap = WebUtil.readCookieMap(request);
+        if(cookieMap.containsKey(name)){//如果存在cookie键的名称
+            Cookie cookie = (Cookie)cookieMap.get(name);//取得cookie
+            return cookie.getMaxAge();
+        }else{
+            return 0;
+        }
+    }
+    
+    /**
      * 获取cookie的值
      * @param request
      * @param name cookie的名称

@@ -1590,7 +1590,7 @@ public class CreateBean {
 			ctClass.addInterface(pool.get("java.io.Serializable"));
 			
 			// 添加属性   
-			 ctClass.addField(CtField.make("private static final long serialVersionUID = 20000000000000000"+ tableNumber+"L;", ctClass));
+			 ctClass.addField(CtField.make("private static final long serialVersionUID = 21000000000000000"+ tableNumber+"L;", ctClass));
 
 			//写入注解(Annotation) 
 			ClassFile cf = ctClass.getClassFile();  
