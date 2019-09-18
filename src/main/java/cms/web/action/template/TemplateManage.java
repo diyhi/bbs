@@ -421,7 +421,55 @@ public class TemplateManage {
 		layout_followerList.setSort(1300);//排序
 		layout_followerList.setReferenceCode("user/control/followerList");
 		layoutList.add(layout_followerList);
+		
+		
+		
+		//账户余额
+		Layout layout_balance = new Layout();
+		layout_balance.setId(UUIDUtil.getUUID32());
+		layout_balance.setName("余额");
+		layout_balance.setDirName(dirName);
+		layout_balance.setLayoutFile("balance.html");
+		layout_balance.setType(1);//默认页
+		layout_balance.setSort(1400);//排序
+		layout_balance.setReferenceCode("user/control/balance");
+		layoutList.add(layout_balance);
 				
+		
+		//付款页面
+		Layout layout_payment = new Layout();
+		layout_payment.setId(UUIDUtil.getUUID32());
+		layout_payment.setName("付款页面");
+		layout_payment.setDirName(dirName);
+		layout_payment.setLayoutFile("payment.html");
+		layout_payment.setType(1);//默认页
+		layout_payment.setSort(1500);//排序
+		layout_payment.setReferenceCode("user/control/payment");
+		layoutList.add(layout_payment);
+		
+		//付款完成页面
+		Layout layout_paymentSuccess = new Layout();
+		layout_paymentSuccess.setId(UUIDUtil.getUUID32());
+		layout_paymentSuccess.setName("付款完成页面");
+		layout_paymentSuccess.setDirName(dirName);
+		layout_paymentSuccess.setLayoutFile("paymentCompleted.html");
+		layout_paymentSuccess.setType(1);//默认页
+		layout_paymentSuccess.setSort(1600);//排序
+		layout_paymentSuccess.setReferenceCode("paymentCompleted");
+		layoutList.add(layout_paymentSuccess);
+		
+		//会员卡订单列表
+		Layout layout_membershipCardOrder = new Layout();
+		layout_membershipCardOrder.setId(UUIDUtil.getUUID32());
+		layout_membershipCardOrder.setName("会员卡订单列表");
+		layout_membershipCardOrder.setDirName(dirName);
+		layout_membershipCardOrder.setLayoutFile("membershipCardOrderList.html");
+		layout_membershipCardOrder.setType(1);//默认页
+		layout_membershipCardOrder.setSort(1700);//排序
+		layout_membershipCardOrder.setReferenceCode("membershipCardOrderList");
+		layoutList.add(layout_membershipCardOrder);
+		
+		
 		return layoutList;
 	}
 	

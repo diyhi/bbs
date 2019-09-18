@@ -639,7 +639,7 @@ function delete_searchWord_row(rowId){
 		</TABLE>
 	</div>
 	
-	<!-- 话题部分--相拟话题  集合-->
+	<!-- 话题部分--相似话题  集合-->
 	<div id="related_liketopic_集合" name="forumType_div" style="DISPLAY: none">
 		<enhance:out escapeXml="false">
 		<input type="hidden" id="collection_Forum_TopicRelated_LikeTopic_Json" value="<c:out value="${collection_Forum_TopicRelated_LikeTopic}"></c:out>">
@@ -934,7 +934,7 @@ function echo_topic_page(error_map){
 	
 }
 
-//回显  话题部分--相拟话题--集合
+//回显  话题部分--相似话题--集合
 function echo_likeTopic_collection(error_map){
 	var collection_Forum_TopicRelated_LikeTopic_Json = document.getElementById("collection_Forum_TopicRelated_LikeTopic_Json").value;
 	if(collection_Forum_TopicRelated_LikeTopic_Json != ""){
@@ -1222,7 +1222,7 @@ function init(){
 	
 	//回显  话题部分--话题列表--分页
 	echo_topic_page(error_map);
-	//回显  话题部分--相拟话题--集合
+	//回显  话题部分--相似话题--集合
 	echo_likeTopic_collection(error_map);
 	//回显  评论 部分--评论 列表--分页
 	echo_comment_page(error_map);

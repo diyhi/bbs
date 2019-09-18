@@ -144,38 +144,6 @@
 	    					<a class="a-title" href="user/control/replyList" >我的回复</a>
 	    				</h4>
 					</li>
-		            <li class="item">
-						<a class="a-pic" href="user/control/editUser" >
-							<div class="img cms-pencil-alt" ></div> 	
-						</a>
-	    				<h4 class="title">
-	    					<a class="a-title" href="user/control/editUser" >修改个人资料</a>
-	    				</h4>
-					</li>
-					<li class="item">
-						<a class="a-pic" href="user/control/realNameAuthentication" >
-							<div class="img cms-realNameAuthentication" ></div> 	
-						</a>
-	    				<h4 class="title">
-	    					<a class="a-title" href="user/control/realNameAuthentication" >实名认证</a>
-	    				</h4>
-					</li>
-		            <li class="item">
-						<a class="a-pic" href="user/control/point" >
-							<div class="img cms-point" ></div> 	
-						</a>
-	    				<h4 class="title">
-	    					<a class="a-title" href="user/control/point" >积分日志</a>
-	    				</h4>
-					</li>
-					<li class="item">
-						<a class="a-pic" href="user/control/userLoginLogList" >
-							<div class="img cms-log" ></div> 	
-						</a>
-	    				<h4 class="title">
-	    					<a class="a-title" href="user/control/userLoginLogList" >登录日志</a>
-	    				</h4>
-					</li>
 					<li class="item">
 						<a class="a-pic" href="user/control/favoriteList" >
 							<div class="img cms-favorites" ></div> 	
@@ -238,7 +206,54 @@
 	    					</a>
 	    				</h4>
 					</li>
-					
+					<li class="item" onclick="">
+						<a class="a-pic" href="user/control/membershipCardOrderList" >
+							<div class="img cms-order" ></div> 	
+						</a>
+	    				<h4 class="title">
+	    					<a class="a-title" href="user/control/membershipCardOrderList" >会员卡订单</a>
+	    				</h4>
+					</li>
+					<li class="item">
+						<a class="a-pic" href="user/control/balance" >
+							<div class="img cms-deposit" ></div> 	
+						</a>
+	    				<h4 class="title">
+	    					<a class="a-title" href="user/control/balance" >余额</a>
+	    				</h4>
+					</li>
+		            <li class="item">
+						<a class="a-pic" href="user/control/editUser" >
+							<div class="img cms-pencil-alt" ></div> 	
+						</a>
+	    				<h4 class="title">
+	    					<a class="a-title" href="user/control/editUser" >修改个人资料</a>
+	    				</h4>
+					</li>
+					<li class="item">
+						<a class="a-pic" href="user/control/realNameAuthentication" >
+							<div class="img cms-realNameAuthentication" ></div> 	
+						</a>
+	    				<h4 class="title">
+	    					<a class="a-title" href="user/control/realNameAuthentication" >实名认证</a>
+	    				</h4>
+					</li>
+		            <li class="item">
+						<a class="a-pic" href="user/control/point" >
+							<div class="img cms-point" ></div> 	
+						</a>
+	    				<h4 class="title">
+	    					<a class="a-title" href="user/control/point" >积分日志</a>
+	    				</h4>
+					</li>
+					<li class="item">
+						<a class="a-pic" href="user/control/userLoginLogList" >
+							<div class="img cms-log" ></div> 	
+						</a>
+	    				<h4 class="title">
+	    					<a class="a-title" href="user/control/userLoginLogList" >登录日志</a>
+	    				</h4>
+					</li>
 				</ul>
 			</div>
 		</div>
@@ -437,6 +452,16 @@
 						html += 	'<div class="background-prompt">此处内容已被隐藏，支付 '+inputValue+' 积分可见</div>';
 						html += 	'<div class="submit-box">';
 						html += 		'<input type="button" value="立即购买" class="button" onclick="topicUnhide(40,'+random+','+topicId+');">';
+						
+						html += 	'</div>';
+	 					$(this).html(html);
+					}else if(hideType == '50'){
+						var html = "";
+						html += '<div class="hide-box">';
+						html += 	'<div class="background-image"></div>';
+						html += 	'<div class="background-prompt">此处内容已被隐藏，支付￥<span class="highlight">'+inputValue+' </span>元可见</div>';
+						html += 	'<div class="submit-box">';
+						html += 		'<input type="button" value="立即购买" class="button" onclick="topicUnhide(50,'+random+','+topicId+');">';
 						
 						html += 	'</div>';
 	 					$(this).html(html);

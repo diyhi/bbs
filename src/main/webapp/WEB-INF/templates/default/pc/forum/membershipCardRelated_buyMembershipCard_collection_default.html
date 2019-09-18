@@ -1,0 +1,98 @@
+<#--  购买会员卡 -->
+<#-- 需要先引入layer -->
+<@function>
+	<#-- 已登录 -->
+	<#if systemUser != null>
+		<#--  返回Map<String,Object>类型 -->
+		<#assign returnValue = membershipCardRelated_buyMembershipCard_collection>
+		
+		<script language="javascript" type="text/javascript">
+			//Ajax方式提交
+			function addMembershipCardOrder(obj,specificationId){
+			
+				var confirm_index = layer.confirm('是否确认购买？', {
+					btn: ['购买','取消'] //按钮
+				}, function(){//购买
+					var parameter = "";
+					//规格Id
+					parameter += "&specificationId="+specificationId;
+					//从meta标签获取令牌
+					parameter += "&token="+getCsrf();
+				   	//删除第一个&号,防止因为多了&号而出现警告: Parameters: Invalid chunk ignored.信息
+					if(parameter.indexOf("&") == 0){
+						parameter = parameter.substring(1,parameter.length);
+					}
+				
+					post_request(function(value){
+				   		if(value != ""){
+							var data = JSON.parse(value);
+							for(var returnValue in data){
+								
+								if(returnValue == "success"){
+				        			if(data[returnValue] == "true"){
+				        				layer.msg('购买会员卡成功', 
+											{
+											  time: 5000 //3秒关闭（如果不配置，默认是3秒）
+											},function(){
+												//关闭后的操作
+												obj.disabled = false;
+											}
+										);
+				        			}
+				        		}else if(returnValue == "error"){
+				        			
+				        			
+				        			var errorValue = data[returnValue];
+									var htmlValue = "";
+									var i = 0;
+									for(var error in errorValue){
+										if(error != ""){	
+											i++;
+											htmlValue += "&nbsp;&nbsp;"+i+"、"+errorValue[error]+"<br>";
+										}
+									}
+									
+									layer.open({
+									  type: 1,
+									  title: '错误', 
+									  skin: 'layui-layer-rim', //加上边框
+									  area: ['300px', '150px'], //宽高
+									  content: "<div style='line-height: 36px; font-size: 15px; margin-left: 8px;margin-right: 8px;'>"+htmlValue+"</div>",
+									  success: function(layero, index){
+									  	layer.close(confirm_index); //关闭层
+									  }
+									});
+									
+				        		}
+				        	}
+			        	}
+					},
+						"user/control/membershipCard/add?timestamp=" + new Date().getTime(), true,parameter);
+				}, function(){//取消
+					obj.disabled = false;
+				});
+			
+		
+				
+			   	
+			}
+		</script>
+		
+		
+		
+	<#else>
+		<#-- 需要先引入layer -->
+		<script language="javascript" type="text/javascript">
+			function addMembershipCardOrder(specificationId){
+				layer.open({
+				    type: 1, 
+				    title:"提示",
+				    content: "<div style='line-height: 36px; font-size: 15px;text-align:center; margin-left: 8px;margin-right: 8px;'>请先登录</div>", 
+				    area: ['260px', '120px'],//宽高
+					end: function(layero, index){
+					}
+				});
+			}
+		</script>
+	</#if>
+</@function>

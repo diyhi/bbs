@@ -374,7 +374,7 @@ public class TopicLuceneManage {
 	
 	
 	/**
-	 * 查询相拟话题
+	 * 查询相似话题
 	 * @param maxResult 需要获取的记录数
 	 * @param topicId 话题Id
 	 * @param status 状态
@@ -387,7 +387,7 @@ public class TopicLuceneManage {
 		IndexSearcher searcher =  TopicLuceneInit.INSTANCE.getSearcher();
 
 		if(searcher != null){
-			//相拟查询结果有可能包含自身，先查多一个
+			//相似查询结果有可能包含自身，先查多一个
 			maxResult++;	
 			try {
 				int docNum = -1;  

@@ -18,7 +18,7 @@ import javax.persistence.TemporalType;
  *
  */
 @Entity
-@Table(indexes = {@Index(name="userRoleGroup_1_idx", columnList="userName,validPeriodEnd"),@Index(name="userRoleGroup_2_idx", columnList="userRoleId")})
+@Table(indexes = {@Index(name="userRoleGroup_1_idx", columnList="userName,validPeriodEnd"),@Index(name="userRoleGroup_3_idx", columnList="userRoleId,userName")})
 public class UserRoleGroup implements Serializable{
 	private static final long serialVersionUID = -1406832022665184431L;
 

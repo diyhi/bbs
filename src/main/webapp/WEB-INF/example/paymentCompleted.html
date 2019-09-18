@@ -1,0 +1,111 @@
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">页面访问</th>
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td  width="30%">请求路径</td> 
+			<td  width="70%" colspan="2">/paymentCompleted/接口产品/支付模块.htm</td>
+		</tr>
+		<tr> 
+			<td>请求方式</td> 
+			<td colspan="2">GET</td>
+		</tr> 
+		<tr> 
+			<td rowspan="2">请求参数</td> 
+			<td>接口产品</td> 
+			<td>
+				变量：interfaceProduct<br>
+				类型：Integer<br>
+				是否必填：是<br>
+				说明：0:账户支付 
+			</td>
+		</tr>
+		<tr>
+			<td>支付模块</td> 
+			<td>
+				变量：paymentModule<br>
+				类型：Integer<br>
+				是否必填：是
+			</td>
+		</tr>
+		<tr> 
+			<td rowspan="4">返回值</td> 
+			<td>支付模块</td> 
+			<td width="30%" >
+				变量：paymentModule<br>
+				类型：Integer
+			</td>
+		</tr> 
+		<tr>
+			<td>用户Id</td> 
+			<td width="30%" >
+				变量：userId<br>
+				类型：Long<br>
+			</td>
+		</tr> 
+
+		
+	</tbody> 
+</table>
+
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">页面访问 - AJAX方式</th>
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td  width="30%">请求路径</td> 
+			<td  width="70%" colspan="2">/paymentCompleted/接口产品/支付模块.htm</td>
+		</tr>
+		<tr> 
+			<td>请求方式</td> 
+			<td colspan="2">GET</td>
+		</tr>
+		<tr> 
+			<td>自定义请求头</td> 
+			<td colspan="2">协议头：X-Requested-With  值：XMLHttpRequest</td>
+		</tr>
+		<tr> 
+			<td rowspan="2">请求参数</td> 
+			<td>接口产品</td> 
+			<td>
+				变量：interfaceProduct<br>
+				类型：Integer<br>
+				是否必填：是<br>
+				说明：0:账户支付 
+			</td>
+		</tr>
+		<tr>
+			<td>支付模块</td> 
+			<td>
+				变量：paymentModule<br>
+				类型：Integer<br>
+				是否必填：是
+			</td>
+		</tr>
+		<tr> 
+			<td width="30%" rowspan="4">请求成功返回</td> 
+			<td width="30%" rowspan="4">JSON格式值 类型:Map&ltString,Object></td>
+			<td width="40%">键参数：paymentModule<br>值内容说明：支付模块<br>值类型：Integer</td> 
+		</tr>
+		
+		<tr> 
+			<td>键参数：userId<br>值内容说明：用户Id<br>值类型：Long</td>
+		</tr>
+		
+	</tbody> 
+</table>
+
+
+
+<h2 style="margin:0;padding:0; margin-top: 10px;">示例</h2>
+<textarea name="exampleCode">
+    <#if paymentModule == 5>
+		充值记录:${userId}
+	</#if>
+</textarea>

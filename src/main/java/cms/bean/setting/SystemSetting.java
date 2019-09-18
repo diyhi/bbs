@@ -78,6 +78,11 @@ public class SystemSetting implements Serializable{
 	/** 实名用户才允许提交评论 **/
 	private boolean realNameUserAllowComment = false;
 
+	
+	/** 解锁话题隐藏内容平台分成比例 默认0% **/
+	private Integer topicUnhidePlatformShareProportion = 0;
+	
+	
 	/** 上传临时文件有效期 单位:分钟 **/
 	private Integer temporaryFileValidPeriod = 60;
 	
@@ -390,5 +395,14 @@ public class SystemSetting implements Serializable{
 	public void setReply_review(Integer reply_review) {
 		this.reply_review = reply_review;
 	}
-	
+
+	public Integer getTopicUnhidePlatformShareProportion() {
+		return topicUnhidePlatformShareProportion;
+	}
+
+	public void setTopicUnhidePlatformShareProportion(Integer topicUnhidePlatformShareProportion) {
+		this.topicUnhidePlatformShareProportion = topicUnhidePlatformShareProportion;
+	}
+
+
 }

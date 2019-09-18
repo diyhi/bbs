@@ -24,6 +24,7 @@ public class TopicIndex implements Serializable{
 	/** 索引状态  1:添加  2:修改  3:删除 4.删除用户发表的话题 **/
 	private Integer indexState = 1;
 	
+	
 	public TopicIndex(){}
 	public TopicIndex(String dataId,Integer indexState) {
 		this.dataId = dataId;

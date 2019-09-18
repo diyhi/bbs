@@ -22,6 +22,6 @@
 	<!-- 配置display-name,使log4j2能用${web:rootDir}参数 -->
 	<context-param>
 		<param-name>log4jContextName</param-name>
-		<param-value>cms</param-value>
+		<param-value>shop</param-value>
 	</context-param>
 </web-app>

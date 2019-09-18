@@ -2,6 +2,7 @@ package cms.service.user.impl;
 
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Query;
@@ -120,6 +121,27 @@ public class UserRoleServiceBean extends DaoSupport<UserRole> implements
 	
 	/**---------------------------------------------------- 角色组 -----------------------------------------------------**/
 	/**
+	 * 根据角色Id查询角色组
+	 * @param userRoleId 角色Id
+	 * @param userName 用户名称
+	 * @return
+	 */
+	@Transactional(readOnly=true,propagation=Propagation.NOT_SUPPORTED)
+	public UserRoleGroup findRoleGroupByUserRoleId(String userRoleId,String userName){
+		Query query =  em.createQuery("select o from UserRoleGroup o where o.userRoleId=?1 and o.userName=?2");
+		query.setParameter(1, userRoleId);
+		query.setParameter(2, userName);
+		List<UserRoleGroup> userRoleGroupList = query.getResultList();
+		if(userRoleGroupList != null && userRoleGroupList.size() >0){
+			for(UserRoleGroup userRoleGroup : userRoleGroupList){
+				return userRoleGroup;
+			}
+		}
+		return null;
+	}
+	
+	
+	/**
 	 * 根据用户名称查询角色组
 	 * @param userName 用户名称
 	 * @return
@@ -155,6 +177,20 @@ public class UserRoleServiceBean extends DaoSupport<UserRole> implements
 			this.saveUserRoleGroup(userRoleGroupList);
 		}
 		
+	}
+	
+	/**
+	 * 修改用户角色组
+	 * @param userRoleId 角色Id
+	 * @param userName 用户名称
+	 * @param validPeriodEnd 有效期结束
+	 */
+	public Integer updateUserRoleGroup(String userRoleId,String userName,Date validPeriodEnd){
+		Query query = em.createQuery("update UserRoleGroup o set o.validPeriodEnd=?1 where o.userRoleId=?2 and o.userName=?3")
+				.setParameter(1, validPeriodEnd)
+				.setParameter(2, userRoleId)
+				.setParameter(3, userName);
+		return query.executeUpdate();
 	}
 	
 	/**

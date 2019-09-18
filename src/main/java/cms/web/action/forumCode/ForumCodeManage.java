@@ -53,7 +53,7 @@ public class ForumCodeManage {
 		childNode.add(new ForumCodeNode(1006,"添加评论","topicRelated_addComment_",Arrays.asList(new String[]{"集合"})));
 		childNode.add(new ForumCodeNode(1007,"引用评论","topicRelated_quoteComment_",Arrays.asList(new String[]{"集合"})));
 		childNode.add(new ForumCodeNode(1008,"回复评论","topicRelated_replyComment_",Arrays.asList(new String[]{"集合"})));
-		childNode.add(new ForumCodeNode(1009,"相拟话题","topicRelated_likeTopic_",Arrays.asList(new String[]{"集合"})));
+		childNode.add(new ForumCodeNode(1009,"相似话题","topicRelated_likeTopic_",Arrays.asList(new String[]{"集合"})));
 		childNode.add(new ForumCodeNode(1010,"话题取消隐藏","topicRelated_topicUnhide_",Arrays.asList(new String[]{"集合"})));
 		
 		forumCodeNodeList.add(new ForumCodeNode(100,"话题",childNode));//添加一级节点
@@ -79,6 +79,12 @@ public class ForumCodeManage {
 		childNode15.add(new ForumCodeNode(15003,"是否已经关注该用户","followRelated_following_",Arrays.asList(new String[]{"实体对象"})));
 		forumCodeNodeList.add(new ForumCodeNode(150,"关注",childNode15));//添加一级节点
 		
+		//会员卡
+		List<ForumCodeNode> childNode20 =  new ArrayList<ForumCodeNode>();//添加二级节点	
+		childNode20.add(new ForumCodeNode(20001,"会员卡列表","membershipCardRelated_membershipCard_",Arrays.asList(new String[]{"集合"})));
+		childNode20.add(new ForumCodeNode(20002,"会员卡内容","membershipCardRelated_membershipCardContent_",Arrays.asList(new String[]{"实体对象"})));
+		childNode20.add(new ForumCodeNode(20003,"购买会员卡","membershipCardRelated_buyMembershipCard_",Arrays.asList(new String[]{"集合"})));
+		forumCodeNodeList.add(new ForumCodeNode(200,"会员卡",childNode20));//添加一级节点
 		
 		//在线留言
 		List<ForumCodeNode> childNode3 =  new ArrayList<ForumCodeNode>();//添加二级节点	

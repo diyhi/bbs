@@ -71,6 +71,16 @@
 					
 					html += 	'</div>';
  					$(this).html(html);
+				}else if(hideType == '50'){
+					var html = "";
+					html += '<div class="hide-box">';
+					html += 	'<div class="background-image"></div>';
+					html += 	'<div class="background-prompt">此处内容已被隐藏，支付￥<span class="highlight">'+inputValue+' </span>元可见</div>';
+					html += 	'<div class="submit-box">';
+					html += 		'<input type="button" value="立即购买" class="button" onclick="topicUnhide(50,'+random+','+topicId+');">';
+					
+					html += 	'</div>';
+ 					$(this).html(html);
 				}
 			})
 		

@@ -168,6 +168,8 @@
 .tipModule_bottom{width:99%;text-align: center;border-top: #BFE3FF 1px dotted;margin-left: auto; margin-right: auto;}
 .tipModule_bottom span{margin-top: 3px;margin-bottom: 3px;}
 
+
+
 /* 功能按钮 */
 .functionButton { 
 	position:relative;
@@ -195,7 +197,8 @@
     cursor:not-allowed;
 	filter: alpha(opacity=35);
     opacity: .35;    
-}
+} 
+
 
 /* 功能按钮 */
 .functionButton5 {
@@ -385,6 +388,7 @@ cursor: pointer;
 opacity: 0;
 filter:alpha(opacity: 0);
 }
+
 
 
 

@@ -1,0 +1,269 @@
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">页面访问</th>
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td  width="30%">请求路径</td> 
+			<td  width="70%" colspan="2">user/control/balance.htm</td>
+		</tr>
+		<tr> 
+			<td>请求方式</td> 
+			<td colspan="2">GET</td>
+		</tr> 
+		<tr> 
+			<td>请求参数</td> 
+			<td>页码</td> 
+			<td>
+				变量：page<br>
+				类型：Integer<br>
+				是否必填：否
+			</td>
+		</tr>
+		<tr> 
+			<td rowspan="2">返回值</td> 
+			<td>支付日志分页</td> 
+			<td width="30%" >
+				变量：pageView<br>
+				类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_10'); return false;">PageView</a>
+			</td>
+		</tr> 
+		<tr>
+			<td>预存款</td> 
+			<td width="30%" >
+				变量：deposit<br>
+				类型：BigDecimal
+			</td>
+		</tr> 
+	</tbody> 
+</table>
+
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">页面访问 - AJAX方式</th>
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td  width="30%">请求路径</td> 
+			<td  width="70%" colspan="2">user/control/balance.htm</td>
+		</tr>
+		<tr> 
+			<td>请求方式</td> 
+			<td colspan="2">GET</td>
+		</tr>
+		<tr> 
+			<td>自定义请求头</td> 
+			<td colspan="2">协议头：X-Requested-With  值：XMLHttpRequest</td>
+		</tr>
+		<tr> 
+			<td>请求参数</td> 
+			<td>页码</td> 
+			<td>
+				变量：page<br>
+				类型：Integer<br>
+				是否必填：否
+			</td>
+		</tr>
+		<tr> 
+			<td width="30%" rowspan="2">请求成功返回</td> 
+			<td width="30%" rowspan="2">JSON格式值 类型:Map&ltString,Object></td>
+			<td width="40%">键参数：pageView<br>值内容说明：支付日志分页<br>值类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_10'); return false;">PageView</a></td> 
+		</tr>
+		<tr> 
+			<td>键参数：deposit<br>值内容说明：预存款<br>值类型： BigDecimal</td>
+		</tr>	
+	</tbody> 
+</table>
+
+
+<table id="anchor_10" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">分页 PageView</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>records</td> 
+			<td>List&lt<a style="color: #317ee7" onclick="anchorJump('#anchor_20'); return false;">PaymentLog</a>></td>
+			<td>数据展示列表</td>
+		</tr>
+		<tr> 
+			<td>pageIndex</td> 
+			<td><a style="color: #317ee7" onclick="anchorJump('#anchor_30'); return false;">PageIndex</a></td>
+			<td>页码索引</td>
+		</tr>
+		<tr> 
+			<td>totalpage</td> 
+			<td>long</td>
+			<td>总页数</td>
+		</tr>
+		<tr> 
+			<td>maxresult</td> 
+			<td>long</td>
+			<td>每页显示记录数</td>
+		</tr>
+		<tr> 
+			<td>currentpage</td> 
+			<td>long</td>
+			<td>当前页</td>
+		</tr>
+		<tr> 
+			<td>pagecount</td> 
+			<td>long</td>
+			<td>页码显示总数</td>
+		</tr>
+		<tr> 
+			<td>onUrl</td> 
+			<td>String</td>
+			<td>上一页URL</td>
+		</tr>
+		<tr> 
+			<td>nextUrl</td> 
+			<td>String</td>
+			<td>下一页URL</td>
+		</tr>
+	</tbody> 
+</table>
+<table id="anchor_30" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">分页索引 PageIndex</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>startindex</td> 
+			<td>long</td>
+			<td>分页开始索引</td>
+		</tr>
+		<tr> 
+			<td>endindex</td> 
+			<td>long</td>
+			<td>分页结束索引</td>
+		</tr>
+	</tbody> 
+</table>
+<table id="anchor_20" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">支付日志 PaymentLog</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>paymentRunningNumber</td> 
+			<td>String</td>
+			<td>支付流水号</td>
+		</tr>
+		<tr> 
+			<td>paymentModule</td> 
+			<td>Integer</td>
+			<td>支付模块 1.订单支付  5.用户充值 </td>
+		</tr>
+		<tr> 
+			<td>parameterId</td> 
+			<td>Long</td>
+			<td>参数Id  订单Id/用户Id</td>
+		</tr>
+		<tr> 
+			<td>orderId</td> 
+			<td>Long</td>
+			<td>订单号</td>
+		</tr>
+		<tr> 
+			<td>interfaceProduct</td> 
+			<td>Integer</td>
+			<td>接口产品  -1:员工操作  0:预付款支付  1.支付宝即时到账  3.支付宝手机网站</td>
+		</tr>
+		<tr> 
+			<td>tradeNo</td> 
+			<td>String</td>
+			<td>交易号</td>
+		</tr>
+		<tr> 
+			<td>operationUserType</td> 
+			<td>Integer</td>
+			<td>操作用户类型  0:系统  1: 员工  2:会员</td>
+		</tr>
+		<tr> 
+			<td>operationUserName</td> 
+			<td>String</td>
+			<td>操作用户名称</td>
+		</tr>
+		<tr> 
+			<td>userName</td> 
+			<td>String</td>
+			<td>用户名称</td>
+		</tr>
+		<tr> 
+			<td>amountState</td> 
+			<td>int</td>
+			<td>金额状态  1:账户存入  2:账户支出</td>
+		</tr>
+		<tr> 
+			<td>amount</td> 
+			<td>BigDecimal</td>
+			<td>金额  精度为12位，小数点位数为2位</td>
+		</tr>
+		<tr> 
+			<td>times</td> 
+			<td>Date</td>
+			<td>时间</td>
+		</tr>
+		<tr> 
+			<td>remark</td> 
+			<td>String</td>
+			<td>备注</td>
+		</tr>
+	</tbody> 
+</table>
+
+
+
+<h2 style="margin:0;padding:0; margin-top: 10px;">示例</h2>
+<textarea name="exampleCode">
+<#-- 支付日志 -->
+<#if pageView.records?exists && pageView.records?size gt 0 >    
+	<#list pageView.records as paymentLog>
+		<#-- 支付流水号 -->
+		${paymentLog.paymentRunningNumber}
+		<#-- 金额 -->
+		<#if paymentLog.amountState == 1>
+			+
+		<#elseif paymentLog.amountState == 2>
+			-
+		</#if>
+		${paymentLog.amount}
+		<#-- 时间 -->
+		${paymentLog.times}
+		<#-- 备注 -->
+		${paymentLog.remark}
+	</#list>
+</#if> 
+<#if !pageView.records?exists || pageView.totalrecord == 0 > 
+	还没有日志
+</#if> 
+
+当前用户预存款：￥${deposit}
+
+</textarea>

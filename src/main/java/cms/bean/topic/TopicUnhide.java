@@ -17,5 +17,4 @@ public class TopicUnhide extends UnhideEntity implements Serializable{
 
 	private static final long serialVersionUID = 6455873305843959259L;
 
-	
 }

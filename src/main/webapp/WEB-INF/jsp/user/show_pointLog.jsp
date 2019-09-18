@@ -37,6 +37,8 @@ function SureSubmit(objForm){
 	    	<c:if test="${pointLog.module == 200}">发表评论</c:if>
 	    	<c:if test="${pointLog.module == 300}">发表回复</c:if>
 	    	<c:if test="${pointLog.module == 400}">积分购买话题</c:if>
+	    	<c:if test="${pointLog.module == 500}">会员卡订单支付</c:if>
+	    	<c:if test="${pointLog.module == 600}">充值</c:if>
 	    </TD>
 	  </TR>	
 	   <TR>
@@ -60,6 +62,8 @@ function SureSubmit(objForm){
 	    	<c:if test="${pointLog.module == 200}">评论Id：${pointLog.parameterId}</c:if>
 	    	<c:if test="${pointLog.module == 300}">回复Id：${pointLog.parameterId}</c:if>
 	    	<c:if test="${pointLog.module == 400}">话题Id：${pointLog.parameterId}</c:if>
+	    	<c:if test="${pointLog.module == 500}">订单号：${pointLog.parameterId}</c:if>
+	    	<c:if test="${pointLog.module == 600}">用户Id：${pointLog.parameterId}</c:if>
 	    </TD>
 	  </TR>
 	  <TR>

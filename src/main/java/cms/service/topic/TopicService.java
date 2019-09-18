@@ -1,13 +1,12 @@
 package cms.service.topic;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
 import cms.bean.QueryResult;
+import cms.bean.platformShare.TopicUnhidePlatformShare;
 import cms.bean.topic.Topic;
 import cms.bean.topic.TopicUnhide;
 import cms.service.besa.DAO;
@@ -139,9 +138,14 @@ public interface TopicService extends DAO<Topic>{
 	 * @param consumption_pointLogObject 消费积分日志
 	 * @param income_userName 收入用户名称
 	 * @param income_pointLogObject 收入积分日志
+	 * @param consumption_amount 消费金额
+	 * @param consumption_paymentLogObjec 用户消费金额日志
+	 * @param income_paymentLogObject 用户收入金额日志
+	 * @param userShare_amount 用户分成金额
+	 * @param topicUnhidePlatformShare 平台分成
 	 */
-	public void saveTopicUnhide(Object topicUnhide,Integer hideTagType,Long point,String consumption_userName,Object consumption_pointLogObject,String income_userName,Object income_pointLogObject);
-	
+	public void saveTopicUnhide(Object topicUnhide,Integer hideTagType,Long point,String consumption_userName,Object consumption_pointLogObject,String income_userName,Object income_pointLogObject,
+			BigDecimal consumption_amount,BigDecimal userShare_amount,Object consumption_paymentLogObject, Object income_paymentLogObject,TopicUnhidePlatformShare topicUnhidePlatformShare);
 	/**
 	 * 根据Id查询'话题取消隐藏'
 	 * @param topicUnhideId 话题取消隐藏Id

@@ -35,7 +35,9 @@
 	    	<c:if test="${entry.module == 100}">发表话题</c:if>
 	    	<c:if test="${entry.module == 200}">发表评论</c:if>
 	    	<c:if test="${entry.module == 300}">发表回复</c:if>
-	    	<c:if test="${entry.module == 400}">积分购买话题</c:if>
+	    	<c:if test="${entry.module == 400}">积分解锁话题隐藏内容</c:if>
+	    	<c:if test="${entry.module == 500}">会员卡订单支付</c:if>
+	    	<c:if test="${entry.module == 600}">充值</c:if>
 	    </TD>
 	    <TD width="15%">
 	    	${entry.userName}

@@ -1,5 +1,6 @@
 package cms.service.user;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -140,8 +141,31 @@ public interface UserService extends DAO<User> {
 	 * @return
 	 */
 	public Integer reductionUser(List<User> userList);
-	
-	
+	/**
+	 * 在线充值
+	 * @param paymentRunningNumber 支付流水号
+	 * @param userName 用户名称
+	 * @param deposit 预存款
+	 * @param paymentLog 支付日志
+	 * @return
+	 */
+	public Integer onlineRecharge(String paymentRunningNumber,String userName,BigDecimal deposit,Object paymentLog);
+	/**
+	 * 增加用户预存款
+	 * @param userName 用户名称
+	 * @param deposit 预存款
+	 * @param paymentLog 支付日志
+	 * @return
+	 */
+	public Integer addUserDeposit(String userName,BigDecimal deposit,Object paymentLog);
+	/**
+	 * 减少用户预存款
+	 * @param userName 用户名称
+	 * @param deposit 预存款
+	 * @param paymentLog 支付日志
+	 * @return
+	 */
+	public Integer subtractUserDeposit(String userName,BigDecimal deposit,Object paymentLog);
 	
 	/**
 	 * 增加用户积分

@@ -1,7 +1,7 @@
 package cms.service.user;
 
+import java.util.Date;
 import java.util.List;
-
 
 import cms.bean.user.UserRole;
 import cms.bean.user.UserRoleGroup;
@@ -49,6 +49,13 @@ public interface UserRoleService extends DAO<UserRole> {
 	 * @param userRoleId 用户角色Id
 	 */
 	public Integer setAsDefaultRole(String userRoleId);
+	/**
+	 * 根据角色Id查询角色组
+	 * @param userRoleId 角色Id
+	 * @param userName 用户名称
+	 * @return
+	 */
+	public UserRoleGroup findRoleGroupByUserRoleId(String userRoleId,String userName);
 	
 	/**
 	 * 根据用户名称查询角色组
@@ -69,6 +76,13 @@ public interface UserRoleService extends DAO<UserRole> {
 	 * @param userRoleGroupList 用户角色组集合
 	 */
 	public void updateUserRoleGroup(String userName,List<UserRoleGroup> userRoleGroupList);
+	/**
+	 * 修改用户角色组
+	 * @param userRoleId 角色Id
+	 * @param userName 用户名称
+	 * @param validPeriodEnd 有效期结束
+	 */
+	public Integer updateUserRoleGroup(String userRoleId,String userName,Date validPeriodEnd);
 	
 	/**
 	 * 删除用户角色组

@@ -1,0 +1,383 @@
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">页面访问</th>
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td  width="30%">请求路径</td> 
+			<td  width="70%" colspan="2">user/control/payment.htm</td>
+		</tr>
+		<tr> 
+			<td>请求方式</td> 
+			<td colspan="2">GET</td>
+		</tr>
+		<tr> 
+			<td>请求参数</td> 
+			<td>支付模块</td> 
+			<td>
+				变量：paymentModule<br>
+				类型：Integer<br>
+				是否必填：是<br>
+				说明：5.用户充值
+			</td>
+		</tr>
+		
+		<tr> 
+			<td>请求失败返回</td>
+			<td colspan="2">
+				跳转到message模板页显示错误
+			</td>
+		</tr>
+		<tr>
+			<td>请求成功返回</td> 
+			<td>在线支付接口列表</td> 
+			<td width="30%" >
+				变量：onlinePaymentInterfaceList<br>
+				类型：List&lt<a style="color: #317ee7" onclick="anchorJump('#anchor_130'); return false;">OnlinePaymentInterface</a>><br>
+			</td>
+		</tr>
+		
+	</tbody> 
+</table>
+
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">页面访问 - AJAX方式</th>
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td  width="30%">请求路径</td> 
+			<td  width="70%" colspan="2">user/control/payment.htm</td>
+		</tr>
+		<tr> 
+			<td>请求方式</td> 
+			<td colspan="2">GET</td>
+		</tr>
+		<tr> 
+			<td>自定义请求头</td> 
+			<td colspan="2">协议头：X-Requested-With  值：XMLHttpRequest</td>
+		</tr>
+		<tr> 
+			<td>请求参数</td> 
+			<td>支付模块</td> 
+			<td>
+				变量：paymentModule<br>
+				类型：Integer<br>
+				是否必填：是<br>
+				说明： 5.用户充值
+			</td>
+		</tr>
+		
+		<tr> 
+			<td width="30%" rowspan="3">请求返回</td> 
+			<td width="30%" rowspan="3">JSON格式值 类型:Map&ltString,Object></td>
+			<td width="40%">键参数：success<br>值内容说明：成功返回true 失败返回false<br>值类型：String</td> 
+		</tr>
+		<tr> 
+			<td>键参数：error<br>值内容说明：错误值集合<br>值类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_80'); return false;">Map&ltString,String></a></td> 
+		</tr>
+		<tr> 
+			<td>键参数：onlinePaymentInterfaceList<br>值内容说明：在线支付接口列表<br>值类型：List&lt<a style="color: #317ee7" onclick="anchorJump('#anchor_130'); return false;">OnlinePaymentInterface</a>></td>
+		</tr>
+	</tbody> 
+</table>
+
+<table id="anchor_80"  class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">页面访问 付款 错误值 error</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>rechargeAmount</td> 
+			<td>String</td>
+			<td>充值金额错误</td>
+		</tr>
+		<tr> 
+			<td>message</td> 
+			<td>String</td>
+			<td>付款错误</td>
+		</tr>
+	</tbody> 
+</table>
+
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="4">提交在线支付 - 默认方式</th>
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td width="30%" >请求路径</td> 
+			<td width="70%" colspan="3">user/control/payment.htm</td>
+		</tr>
+		<tr> 
+			<td>请求方式</td> 
+			<td colspan="3">POST</td>
+		</tr>
+		<tr> 
+			<td>请求参数</td> 
+			<td colspan="3"><a style="color: #317ee7" onclick="anchorJump('#anchor_600'); return false;">参数表</a></td>
+		</tr>
+		<tr> 
+			<td>提交成功返回</td> 
+			<td colspan="3">跳转到第三方支付机构页面</td>
+		</tr>
+		<tr> 
+			<td rowspan="15">提交失败返回</td> 
+			<td colspan="2">错误值</td> 
+			<td width="30%" >
+				变量：error<br>
+				类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_50'); return false;">Map&ltString,String></a><br>
+			</td>
+		</tr>
+		<tr>
+			<td rowspan="2">用户充值 paymentModule==5</td> 
+			<td>充值金额</td> 
+			<td width="30%" >
+				变量：rechargeAmount<br>
+				类型：BigDecimal
+			</td>
+		</tr>
+	</tbody> 
+</table>
+
+<table id="anchor_50"  class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">在线支付 错误值 error</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td>message</td> 
+			<td>String</td>
+			<td>包含多个请求错误</td>
+		</tr>
+	 	
+		<tr> 
+			<td>rechargeAmount</td> 
+			<td>String</td>
+			<td>充值金额</td>
+		</tr>
+		
+	 	<tr> 
+			<td>paymentBank</td> 
+			<td>String</td>
+			<td>支付银行错误</td>
+		</tr>
+	 	<tr> 
+			<td>token</td> 
+			<td>String</td>
+			<td>令牌错误</td>
+		</tr>
+	</tbody> 
+</table>
+
+<table id="anchor_130" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">在线支付接口 OnlinePaymentInterface</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>id</td> 
+			<td>Integer</td>
+			<td>Id</td>
+		</tr>
+		<tr> 
+			<td>name</td> 
+			<td>String</td>
+			<td>名称</td>
+		</tr>
+		<tr> 
+			<td>interfaceProduct</td> 
+			<td>Integer</td>
+			<td>接口产品 1.支付宝即时到账  3. 支付宝手机网站</td>
+		</tr>
+		<tr> 
+			<td>bankList</td> 
+			<td>List&lt<a style="color: #317ee7" onclick="anchorJump('#anchor_140'); return false;">Bank</a>></td>
+			<td>支持银行集合</td>
+		</tr>
+	</tbody>
+</table>
+<table id="anchor_140" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">银行 Bank</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>code</td> 
+			<td>String</td>
+			<td>银行简码</td>
+		</tr>
+		<tr> 
+			<td>name</td> 
+			<td>String</td>
+			<td>银行名称</td>
+		</tr>
+		<tr> 
+			<td>icon</td> 
+			<td>String</td>
+			<td>银行图标</td>
+		</tr>
+		<tr> 
+			<td>selected</td> 
+			<td>boolean</td>
+			<td>选中 true:选中  false:未选中</td>
+		</tr>
+	</tbody>
+</table>
+<table id="anchor_600" class="exampleTable" > 
+	<thead>
+		<tr> 
+			<th colspan="4">提交'在线支付'参数</th>
+		</tr>
+		<tr> 
+			<th width="30%">参数</th> 
+			<th width="20%">类型</th> 
+			<th width="10%">是否必填</th> 
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	 <tbody>
+	 	<tr> 
+			<td>paymentModule</td> 
+			<td>Integer</td>
+			<td>是</td>
+			<td>支付模块</td> 
+		</tr>
+		<tr> 
+			<td>paymentBank</td> 
+			<td>String</td>
+			<td>按需填写</td>
+			<td>支付银行(格式：接口产品_银行简码)${onlinePaymentInterface.interfaceProduct}_${bank.code}</td> 
+		</tr>
+		<tr> 
+			<td>rechargeAmount</td> 
+			<td>BigDecimal</td>
+			<td>按需填写</td>
+			<td>充值金额</td> 
+		</tr>
+		<tr> 
+			<td>token</td> 
+			<td>String</td>
+			<td>是</td>
+			<td>令牌</td> 
+		</tr>
+	</tbody> 
+</table>
+<h2 style="margin:0;padding:0; margin-top: 10px;">示例</h2>
+<textarea name="exampleCode">
+<form action="user/control/payment.htm?paymentModule=${url_paymentModule}&token=${token}" method="post" >
+	
+	<#if url_paymentModule == 5><#-- 充值 -->
+		充值金额：
+		<input type="text" id="rechargeAmount" name="rechargeAmount" value="${rechargeAmount}" />
+		<#-- 充值金额错误 -->
+		${error['rechargeAmount']}
+		
+	</#if>
+  
+    <#list onlinePaymentInterfaceList as onlinePaymentInterface>
+        <#-- 在线支付接口名称-->
+        ${onlinePaymentInterface.name
+        <#list onlinePaymentInterface.bankList as bank>
+   
+        	<input name="paymentBank" type="radio" value="${onlinePaymentInterface.interfaceProduct}_${bank.code}"  <#if bank.selected == true> checked='checked'</#if>/>
+          
+            <img src="${commonPath}images/bank/${bank.icon}" width="120" height="32" alt="${bank.name}"/>
+
+         </#list>
+	</#list>
+
+     <input type="submit" value="立即付款" />
+    <#-- 支付银行错误 -->
+    ${error['paymentBank']}
+</form>
+</textarea>
+
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">提交支付校验 - AJAX方式</th>
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td>请求路径</td> 
+			<td colspan="2">user/control/paymentVerification.htm</td>
+		</tr>
+		<tr> 
+			<td>请求方式</td> 
+			<td colspan="2">POST</td>
+		</tr> 
+		<tr> 
+			<td>自定义请求头</td> 
+			<td colspan="2">协议头：X-Requested-With  值：XMLHttpRequest</td>
+		</tr>
+		<tr> 
+			<td>请求参数</td> 
+			<td colspan="2"><a style="color: #317ee7" onclick="anchorJump('#anchor_600'); return false;">参数表</a></td>
+		</tr>
+		<tr> 
+			<td width="30%" rowspan="4">提交返回</td> 
+			<td width="30%" rowspan="4">JSON格式值 类型:Map&ltString,Object></td>
+			<td width="40%">键参数：success<br>值内容说明：成功返回true 失败返回false<br>值类型：String</td> 
+		</tr>
+		<tr> 
+			<td>键参数：error<br>值内容说明：错误值集合<br>值类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_50'); return false;">Map&ltString,String></a></td> 
+		</tr>
+	</tbody> 
+</table>
+<h2 style="margin:0;padding:0; margin-top: 10px;">'支付校验'示例</h2>
+<textarea name="exampleCode">
+<script language="javascript" type="text/javascript"> 
+	//AJAX方式获取的返回值
+	var value = ......
+	//将字符串转为JSON对象
+	var returnValue = JSON.parse(value);//返回JSON信息.Map<String,Object>格式
+	for(var key in returnValue){	
+		
+		var error = returnValue[key];
+		if(key == "error"){
+			for(var errorKey in error){
+				//错误
+				var err = error[errorKey];
+			
+			}
+		}
+	
+	}
+</script>
+</textarea>

@@ -1,5 +1,6 @@
 package cms.service.topic.impl;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import cms.bean.QueryResult;
+import cms.bean.platformShare.TopicUnhidePlatformShare;
 import cms.bean.topic.HideTagType;
 import cms.bean.topic.Topic;
 import cms.bean.topic.TopicUnhide;
@@ -455,8 +457,14 @@ public class TopicServiceBean extends DaoSupport<Topic> implements TopicService{
 	 * @param consumption_pointLogObject 消费积分日志
 	 * @param income_userName 收入用户名称
 	 * @param income_pointLogObject 收入积分日志
+	 * @param consumption_amount 消费金额
+	 * @param consumption_paymentLogObjec 用户消费金额日志
+	 * @param income_paymentLogObject 用户收入金额日志
+	 * @param userShare_amount 用户分成金额
+	 * @param topicUnhidePlatformShare 平台分成
 	 */
-	public void saveTopicUnhide(Object topicUnhide,Integer hideTagType,Long point,String consumption_userName,Object consumption_pointLogObject,String income_userName,Object income_pointLogObject){
+	public void saveTopicUnhide(Object topicUnhide,Integer hideTagType,Long point,String consumption_userName,Object consumption_pointLogObject,String income_userName,Object income_pointLogObject,
+			BigDecimal consumption_amount,BigDecimal userShare_amount,Object consumption_paymentLogObject, Object income_paymentLogObject,TopicUnhidePlatformShare topicUnhidePlatformShare){
 		//输入密码
 		if(hideTagType.equals(HideTagType.PASSWORD.getName())){
 			this.save(topicUnhide);
@@ -469,6 +477,19 @@ public class TopicServiceBean extends DaoSupport<Topic> implements TopicService{
 				if(income_pointLogObject != null){
 					//增加用户积分
 					userService.addUserPoint(income_userName,point,income_pointLogObject);
+				}
+			}
+		}
+		if(hideTagType.equals(HideTagType.AMOUNT.getName()) && consumption_amount != null && consumption_amount.compareTo(new BigDecimal("0")) >0){//余额购买
+			//扣减用户预存款
+			int i = userService.subtractUserDeposit(consumption_userName, consumption_amount, consumption_paymentLogObject);
+			if(i >0){
+				this.save(topicUnhide);
+				if(income_paymentLogObject != null){
+					userService.addUserDeposit(income_userName, userShare_amount, income_paymentLogObject);
+				}
+				if(topicUnhidePlatformShare != null){//平台分成
+					this.save(topicUnhidePlatformShare);
 				}
 			}
 		}

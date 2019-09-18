@@ -2,6 +2,7 @@ package cms.bean.user;
 
 import java.io.File;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -80,7 +81,9 @@ public class User implements Serializable{
 	private String remarks;
 	/** 当前积分**/
 	private Long point = 0L;
-	
+	/** 当前预存款 **/
+	@Column(precision=14, scale=4) 
+	private BigDecimal deposit = new BigDecimal("0");
 	
 	/** 用户状态    1:正常用户   2:禁止用户   11: 正常用户删除   12: 禁止用户删除 **/
 	private Integer state = 1;
@@ -244,6 +247,12 @@ public class User implements Serializable{
 	}
 	public void setUserRoleNameList(List<String> userRoleNameList) {
 		this.userRoleNameList = userRoleNameList;
+	}
+	public BigDecimal getDeposit() {
+		return deposit;
+	}
+	public void setDeposit(BigDecimal deposit) {
+		this.deposit = deposit;
 	}
 
 }

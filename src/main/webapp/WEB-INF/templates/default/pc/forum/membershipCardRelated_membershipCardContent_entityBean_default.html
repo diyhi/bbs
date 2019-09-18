@@ -1,0 +1,49 @@
+<#--  会员卡内容 -->
+<@function membershipCardId="${url_membershipCardId}"> 
+	<#assign membershipCard = membershipCardRelated_membershipCardContent_entityBean>
+	<#if membershipCard != null && membershipCard??>  
+		<div class="module-head">
+	        <div class="info">
+	            <h3>${membershipCard.name}</h3>
+	        </div>
+	    </div>
+	</#if>
+	<div class="membershipCardModule">
+		<#if membershipCard != null && membershipCard??>  
+			<#list membershipCard.specificationList as specification>
+				<div class="membershipCard-item">
+					<div class="title">${specification.specificationName}</div>
+					<div class="info">
+						<#if specification.sellingPrice != null && specification.sellingPrice gt 0>  
+							<div class="sellingPrice"><b>￥</b><strong>${specification.sellingPrice}</strong> 元</div>
+						</#if>
+						<#if specification.point != null && specification.point gt 0>  
+							<div class="sellingPrice"><strong>${specification.point}</strong> 积分</div>
+						</#if>
+						<#if specification.marketPrice != null && specification.marketPrice gt 0>  
+							<div class="marketPrice">原价￥<span>${specification.marketPrice}</span> 元</div>
+						</#if>
+						<div class="buy-box">
+							<!-- JS调用的addMembershipCardOrder()方法必须引入'购买会员卡'功能模块 -->
+							<button class="buyButton" <#if specification.stock lte 0> disabled='disabled'</#if>  onclick="this.disabled=true;addMembershipCardOrder(this,'${specification.id}');">立即购买</button>
+						</div>
+					</div>
+				</div>
+			</#list>
+			
+			<#-- 引入购买会员卡 -->
+			<@include action="${membershipCardRelated_buyMembershipCard_1}"/>
+			
+			<div class="clearfix"></div>
+			<div class="detail">
+	            <p class="title">详情</p>
+	            <div class="line-blue"></div>
+	            <div class="line-gray"></div>
+	            <div class="content"><#noescape>${membershipCard .introduction}</#noescape></div>
+	        </div>
+  
+        </div>
+			
+		</#if>
+	</div>
+</@function > 

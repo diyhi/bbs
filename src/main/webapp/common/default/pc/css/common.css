@@ -233,7 +233,29 @@ html,body{
     margin-bottom: -1px;
     border-radius:2px;
 } 
+/* 蓝色按钮*/
+.blue_btn_box{
+	border:1px solid #0191e4;
+	padding:1px;
+	display:inline-block;
+}
 
+.blue_btn{
+    background-color: #25affe;
+	color: #ffffff;
+	border: medium none;
+	
+	height:24px;
+	*line-height:27px;/* IE6/IE7 */
+	line-height:27px\0; /* IE8 */
+	outline:0 none !important; blr:expression(this.onFocus=this.blur()); /* 去除控件选中时的虚线框 */
+}
+.blue_btn:hover{
+    background-color: #0299f0;
+	width: 45px;
+	color: #ffffff;
+    height: 24px;
+}
 
 /* 表单 text */
 .formText{height:24px; line-height:24px; padding:2px 4px;border:1px solid;border-color:#e0e0e0 #e0e0e0 #e0e0e0 #e0e0e0;background:#fff;border-radius:3px;}
@@ -754,9 +776,12 @@ html,body{
 }
 .articleModule .articleBox .topicContent hide .background-prompt{
 	margin-top: 2px; color: #999999;font-size: 16px;
-}/*border:#a9a9a9 solid 2px;  边框#b2b5bc #777777*/
+}
+.articleModule .articleBox .topicContent hide .highlight{font-weight:bold;}
+/*border:#a9a9a9 solid 2px;  边框#b2b5bc #777777*/
 .articleModule .articleBox .topicContent hide .input-box{margin: auto; margin-top: 10px;margin-bottom:18px; border:#888888 solid 2px; width:226px; height:26px; overflow:hidden; border-radius: 2px;}
 .articleModule .articleBox .topicContent hide .input-box .text{ width:145px; height:26px; line-height:26px; border:0; float:left; font-size:14px; color:#4f4f4f; text-indent: 6px; vertical-align:middle;outline:none; background: #f7f8fa;}
+
 .articleModule .articleBox .topicContent hide .input-box .button{ width:79px;*width:76px; height:26px; line-height:28px; border:0; background:#888888; font-size:16px; color:#fff; float:right; font-weight:bold; cursor:pointer;text-decoration: none; outline: none}
 .articleModule .articleBox .topicContent hide .input-box .button:hover{background:#808080;}/*background:#606060;*/
 
@@ -1557,8 +1582,8 @@ html,body{
 	display: block;
 	margin-top: 15px;
 }
-.selfService .box .ul .item .title{width: 100%; line-height:40px;font-size: 16px;text-align: center;margin-top: 10px;}
-.selfService .box .ul .item .title .a-title{height:40px;overflow:hidden;font-weight:normal;display: block;}
+.selfService .box .ul .item .title{width: 100%; line-height:40px;font-size: 16px;text-align: center;}
+.selfService .box .ul .item .title .a-title{height:40px;overflow:hidden;font-weight:normal;display: block;padding-top: 10px;}
 
 /** 用户中心动态 **/
 .home-userDynamic{
@@ -2413,7 +2438,9 @@ html,body{
 }
 .userDynamicModule .userDynamicList .userDynamic .topicContent hide .background-prompt{
 	margin-top: 2px; color: #999999;font-size: 16px;
-}/*border:#a9a9a9 solid 2px;  边框#b2b5bc #777777*/
+}
+.userDynamicModule .userDynamicList .userDynamic .topicContent hide .highlight{font-weight:bold;}
+/*border:#a9a9a9 solid 2px;  边框#b2b5bc #777777*/
 .userDynamicModule .userDynamicList .userDynamic .topicContent hide .input-box{margin: auto; margin-top: 10px;margin-bottom:18px; border:#888888 solid 2px; width:226px; height:26px; overflow:hidden; border-radius: 2px;}
 .userDynamicModule .userDynamicList .userDynamic .topicContent hide .input-box .text{ width:145px; height:26px; line-height:26px; border:0; float:left; font-size:14px; color:#4f4f4f; text-indent: 6px; vertical-align:middle;outline:none; background: #f7f8fa;}
 .userDynamicModule .userDynamicList .userDynamic .topicContent hide .input-box .button{ width:79px;*width:76px; height:26px; line-height:28px; border:0; background:#888888; font-size:16px; color:#fff; float:right; font-weight:bold; cursor:pointer;text-decoration: none; outline: none}
@@ -2567,6 +2594,8 @@ html,body{
 
 
 
+
+
 /* 页脚 border-top: 1px solid #e1e1e1; */
 .footer { min-width: 990px; 
 	background: #f7f6f6;
@@ -2588,3 +2617,324 @@ html,body{
 
 
 
+
+
+.membershipCardListModule{
+	margin-bottom: 20px;
+	display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: -moz-box;
+    display: -moz-flex;
+    display: flex;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -moz-box-pack: center;
+    -moz-justify-content: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+}
+.membershipCardListModule ul{ margin-left: -16px;}
+.membershipCardListModule li{
+  
+	-moz-box-shadow: 0 1px 3px 0 rgba(0,0,0,.02),0 4px 8px 0 rgba(0,0,0,.02);
+	-webkit-box-shadow: 0 1px 3px 0 rgba(0,0,0,.02),0 4px 8px 0 rgba(0,0,0,.02);
+	box-shadow: 0 1px 3px 0 rgba(0,0,0,.02),0 4px 8px 0 rgba(0,0,0,.02);
+	float: left; width: 250px; background-color: #fff; padding: 25px 20px; color: #666; font-size: 12px; margin-left: 16px;margin-top:18px; position: relative;}
+.membershipCardListModule h5{ text-align: center; color: #333; font-size: 24px; line-height: 24px; font-weight: normal;}
+/**
+.membershipCardListModule .introduction-box{ padding-top: 25px; margin-top: 25px; border-top: 1px solid #f2f2f2;min-height: 120px;}
+.membershipCardListModule .introduction-box .introduction{
+    margin: 10px auto 0;
+    line-height: 24px;
+    font-size: 14px;
+    width: 260px;
+    color: #666;
+
+}**/
+
+
+
+.membershipCardListModule .descriptionTag-box {
+    margin: 0 auto;
+	padding-top: 25px; margin-top: 25px; 
+    border-top: 1px solid #f2f2f2;
+    min-height: 120px;
+    width: 100%;
+    overflow: hidden;
+}
+.membershipCardListModule .descriptionTag-box .descriptionTag {
+    margin-bottom: 18px;
+    line-height: 14px;
+    font-size: 15px;
+    color: #666;
+    text-align: center;
+}
+.membershipCardListModule .buyInfo{padding-top: 15px; }
+.membershipCardListModule .buyInfo .price{ text-align: center;margin-top: 10px;}
+.membershipCardListModule .buyInfo .price p{ line-height: 30px;font-size: 14px;}
+.membershipCardListModule .buyInfo .price span{ color: #f75d51; font-size: 36px; font-weight: bolder}
+.membershipCardListModule .buyInfo .price b{ font-size: 13px;color: #f75d51; font-size: 24px; font-weight: normal;}
+.membershipCardListModule .buyInfo .subtitle{ display: block; color: #ff6800; line-height: 22px;font-size: 14px;text-align: center;}
+.membershipCardListModule .buyInfo .buyButton{ color: #fff;border-radius:3px; font-size: 16px; display: block; width: 220px; line-height: 44px; text-align: center; background-color: #30aff7; margin: 10px auto auto auto;}
+.membershipCardListModule .buyInfo .buyButton:hover{ background-color: #45b6f7;}
+
+
+/* 模块头 */
+.module-head{
+	margin-top:20px;
+	background: #fff;
+	padding: 2px 20px 2px 20px;
+	box-shadow: 0 1px 3px 0 rgba(0,0,0,.02),0 4px 8px 0 rgba(0,0,0,.02);
+	position: relative;
+	height: 48px;
+}
+.module-head .info {
+	padding: 10px 0;
+	display: block;
+	text-align: center;
+}
+.module-head .info:after {
+	content: ".";
+	display: block;
+	height: 0;
+	clear: both;
+	visibility: hidden
+}
+.module-head .info h3 {
+	color: #333;
+	font-size: 20px;
+	line-height: 28px;
+	
+}
+.module-head .extra {
+	float: right;
+	text-align: right;
+	margin-top: 10px;
+}
+
+
+.membershipCardModule{
+    margin: auto;
+    overflow: auto;
+    text-align: center;
+}
+.membershipCardModule .membershipCard-item{
+	float: left;
+    width: 272px;
+    border-radius: 2px;
+    text-align: center;
+    margin: 30px 15px;
+    overflow: hidden;
+    background-color: #FFFFFF;
+    -moz-box-shadow: 0 1px 3px 0 rgba(0,0,0,.03),0 4px 8px 0 rgba(0,0,0,.03);
+	-webkit-box-shadow: 0 1px 3px 0 rgba(0,0,0,.03),0 4px 8px 0 rgba(0,0,0,.03);
+	box-shadow: 0 1px 3px 0 rgba(0,0,0,.03),0 4px 8px 0 rgba(0,0,0,.03);
+}
+.membershipCardModule .membershipCard-item .title {
+    height: 46px;
+    line-height: 46px;
+    background-color: #30aff7;
+    color: white;
+    font-size: 18px;
+}
+
+.membershipCardModule .membershipCard-item .info{
+	position: relative;
+    overflow: hidden;
+}
+.membershipCardModule .membershipCard-item .info .sellingPrice{
+	font-size: 14px;
+	margin-top: 20px;
+}
+.membershipCardModule .membershipCard-item .info .sellingPrice b{ color: #f75d51; font-size: 24px; font-weight: normal;}
+.membershipCardModule .membershipCard-item .info .sellingPrice strong{
+    font-size: 36px;
+    color: #f75d51; 
+}
+.membershipCardModule .membershipCard-item .info .marketPrice{
+	text-decoration: line-through;
+    font-size: 13px;
+    color: #666666;
+}
+.membershipCardModule .membershipCard-item > .info > * {
+    margin-bottom: 10px;
+}
+.membershipCardModule .membershipCard-item .info .buyButton{ color: #fff;border-radius:3px; font-size: 16px; border:none;display: block; width: 160px; line-height: 38px; text-align: center; background-color: #30aff7; margin: 15px auto auto auto;}
+.membershipCardModule .membershipCard-item .info .buyButton:hover{ background-color: #45b6f7;}
+.membershipCardModule .membershipCard-item .info .buyButton:disabled{
+	border:none;
+	background-color: #d9d9d9;
+	cursor: not-allowed;
+	text-decoration: none;
+}
+
+.membershipCardModule .detail{
+	margin: 0 auto;
+}
+.membershipCardModule .detail .title {
+	padding-top: 24px;
+	font-size: 28px;
+	color: #30aff7;
+	line-height: normal
+}
+
+.membershipCardModule .detail .line-blue {
+	margin: 12px auto 0;
+	width: 100px;
+	border-bottom: 4px solid #30aff7
+}
+
+.membershipCardModule .detail .line-gray {
+	margin: 0 auto;
+	width: 600px;
+	border-bottom: 1px solid #e3e3e3
+}
+
+.membershipCardModule .detail .content{margin-top:10px;padding:20px 5px;color:#666666;font-size:16px;word-wrap:break-word}
+.membershipCardModule .detail .content p{font-size:16px;word-wrap:break-word}
+.membershipCardModule .detail .content img{max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;}
+
+/* 余额 */
+.balanceModule{padding: 30px 0 30px 30px;background: #fff;position: relative;margin-bottom: 10px;
+	box-shadow: 0 1px 6px 0 rgba(0,0,0,.02),0 8px 12px 0 rgba(0,0,0,.02);
+}
+.balanceModule .deposit{font-size: 16px; }
+.balanceModule .button{margin-left: 200px; display: block;margin-top: -26px;}
+
+
+
+/* 付款页面 */
+.paymentModule {
+	padding-top: 15px;
+	margin-left:12px;
+}
+/* 支付银行 */
+.paymentModule .banks,.paymentModule .banks .head {
+	widows: 100%;
+	margin: 0 auto;
+	font-size: 14px;
+}
+.paymentModule .banks .head ul {
+	list-style: none;
+	margin: 0;
+	overflow: hidden
+}
+.paymentModule .banks .head li {
+	float: left;
+	height: 31px;
+	line-height: 31px;
+	text-align: center;
+	font-size: 15px;
+	font-weight: 700;
+	color: #4d4d4d;
+	display: block
+}
+.paymentModule .banks .head li.item1 {
+	width: 10%;
+	border-bottom: solid 1px #ebebeb;
+	height: 32px
+}
+
+.paymentModule .banks .head li.item2{
+	width: 15%;
+	border-left: solid 1px #ebebeb;
+	border-right: solid 1px #ebebeb;
+	border-top: solid 1px #ebebeb;
+	border-bottom: solid 1px #ebebeb;
+	background: #f5f5f5;
+	cursor: pointer
+}
+.paymentModule .banks .head li.item3{
+	width: 74%;
+	border-bottom: solid 1px #ebebeb;
+	height: 32px
+}
+.paymentModule .banks .head li.on {
+	background: #fff;
+	border-bottom: solid 1px #fff
+}
+
+/* 银行选择 */
+.paymentModule .bankSelect {
+	width: 866px;
+	padding-top: 10px;
+	overflow: hidden;
+	margin: 0 auto
+}
+.paymentModule .bankSelect .box{
+	width: 960px; float: left; _padding-bottom: 30px;
+}
+/* 银行名称 */
+.paymentModule .bankSelect .title {
+	width: 100%;
+	height: 34px;
+	line-height: 34px;
+	font-weight: 700;
+	color: #4d4d4d;
+	float: left
+}
+.paymentModule .bankSelect dl {
+	width: 142px;
+	height: 32px;
+	border: 1px solid #ebebeb;
+	margin-right: 30px;
+	margin-bottom: 10px;
+	float: left;
+	display: block
+}
+.paymentModule .bankSelect dl input {
+	margin: 10px 0 0 8px;
+	width: 13px;
+	height: 13px
+}
+.paymentModule .bankSelect dt {
+	width: 22px;
+	height: 32px;
+	float: left
+}
+.paymentModule .bankSelect dd {
+	width: 120px;
+	height: 32px;
+	float: left
+}
+.paymentModule .bankSelect dd img {
+	width: 120px;
+	height: 32px
+}
+.paymentModule .pay-table {
+	padding-left: 13px;
+	width: 85%;
+}
+.paymentModule .pay-table td {
+	line-height: 50px;	
+	border-bottom:1px solid #f0f0f0;
+	padding: 10px 8px;
+}
+.paymentModule .help{padding-right: 0px; padding-left: 0px; padding-bottom: 3px; color: #747474; padding-top: 3px}
+/* 立即支付 */
+.paymentModule .payNow {
+	width: 866px;
+	padding-top: 30px;
+	position: relative;
+	margin: 0 auto;
+	padding-bottom: 10px
+}
+/* 支付完成 */
+.paymentCompletedModule {
+	padding-top: 30px
+}
+.paymentCompletedModule .box {
+	position: relative;
+	height: auto;
+	padding: 13px 0 20px 500px;
+	background: #fafafa;
+}
+
+.paymentCompletedModule .title {
+	color: #575757;font-size: 26px; line-height: 52px; font-weight: 400;
+}
+.paymentCompletedModule .tip {
+	height: 36px;
+	line-height: 36px;font-size: 16px;
+}

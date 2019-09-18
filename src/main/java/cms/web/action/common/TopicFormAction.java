@@ -3,12 +3,16 @@ package cms.web.action.common;
 
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Resource;
+import javax.persistence.Column;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -26,6 +30,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import cms.bean.ErrorView;
 import cms.bean.message.Remind;
+import cms.bean.payment.PaymentLog;
+import cms.bean.platformShare.TopicUnhidePlatformShare;
 import cms.bean.setting.EditorTag;
 import cms.bean.setting.SystemSetting;
 import cms.bean.thumbnail.Thumbnail;
@@ -66,6 +72,7 @@ import cms.web.action.TextFilterManage;
 import cms.web.action.filterWord.SensitiveWordFilterManage;
 import cms.web.action.follow.FollowManage;
 import cms.web.action.message.RemindManage;
+import cms.web.action.payment.PaymentManage;
 import cms.web.action.setting.SettingManage;
 import cms.web.action.thumbnail.ThumbnailManage;
 import cms.web.action.topic.TopicManage;
@@ -114,6 +121,8 @@ public class TopicFormAction {
 	@Resource FollowManage followManage;
 	
 	@Resource UserRoleManage userRoleManage;
+	@Resource PaymentManage paymentManage;
+	
 	
 	/**
 	 * 话题  添加
@@ -372,9 +381,13 @@ public class TopicFormAction {
 				}
 			}
 			if(editorTag.isHideAmount()){
+				//是否有当前功能操作权限
+				boolean flag_permission = userRoleManage.isPermission(ResourceEnum._1024000,topic.getTagId());
+				if(flag_permission){
+					//余额购买可见
+					allowHiddenTagList.add(HideTagType.AMOUNT.getName());	
+				}
 				
-				//余额购买可见
-				allowHiddenTagList.add(HideTagType.AMOUNT.getName());	
 				
 			}
 
@@ -842,6 +855,8 @@ public class TopicFormAction {
 		
     	//消费积分
 		Long point = null;
+		//消费金额
+		BigDecimal amount = null;
 	  	
 		List<Integer> hideTypeList = new ArrayList<Integer>();
 		hideTypeList.add(HideTagType.PASSWORD.getName());
@@ -889,6 +904,22 @@ public class TopicFormAction {
 			  		
 				}
 				
+				if(entry.getKey().equals(HideTagType.AMOUNT.getName()) && HideTagType.AMOUNT.getName().equals(hideType)){//余额购买可见
+					//获取登录用户
+			  		User _user = userService.findUserByUserName(accessUser.getUserName());
+			  		if(_user != null){
+			  			if(_user.getDeposit().compareTo((BigDecimal)entry.getValue()) <0){
+			  				error.put("topicUnhide", ErrorView._1685.name());//用户余额不足
+			  			}else{
+			  				amount = (BigDecimal)entry.getValue();
+			  			}
+			  		}else{
+			  			error.put("topicUnhide", ErrorView._1670.name());//用户不存在
+			  		}
+					
+					
+				}
+				
 			}
 		}
 
@@ -904,7 +935,7 @@ public class TopicFormAction {
 		
 
 		if(error.size() == 0){
-			
+			Date time = new Date();
 			TopicUnhide topicUnhide = new TopicUnhide();
 			String topicUnhideId = topicManage.createTopicUnhideId(accessUser.getUserId(), hideType, topicId);
 			topicUnhide.setId(topicUnhideId);
@@ -931,6 +962,7 @@ public class TopicFormAction {
 				pointLog.setPoint(point);//积分
 				pointLog.setUserName(accessUser.getUserName());//用户名称
 				pointLog.setRemark("");
+				pointLog.setTimes(time);
 				consumption_pointLogObject = pointManage.createPointLogObject(pointLog);
 				
 				if(!topic.getIsStaff()){//如果是用户
@@ -945,6 +977,7 @@ public class TopicFormAction {
 					income_pointLog.setPoint(point);//积分
 					income_pointLog.setUserName(topic.getUserName());//用户名称
 					income_pointLog.setRemark("");
+					income_pointLog.setTimes(time);
 					income_pointLogObject = pointManage.createPointLogObject(income_pointLog);
 					
 					//删除用户缓存
@@ -955,9 +988,90 @@ public class TopicFormAction {
 				
 			}
 			
+			//用户消费金额日志
+			Object consumption_paymentLogObject = null;
+			//用户收入金额日志
+			Object income_paymentLogObject = null;
+			//平台分成
+			TopicUnhidePlatformShare topicUnhidePlatformShare = null;
+			
+			//发布话题用户分成金额
+			BigDecimal postUserNameShareAmount = new BigDecimal("0");
+			//平台分成金额
+			BigDecimal platformShareAmount = new BigDecimal("0");
+			if(amount != null){
+				topicUnhide.setAmount(amount);
+				
+				
+				
+				Integer topicUnhidePlatformShareProportion = settingService.findSystemSetting().getTopicUnhidePlatformShareProportion();//平台分成比例
+				
+				if(topicUnhidePlatformShareProportion >0){
+					//平台分成金额 = 总金额 * (平台分成比例 /100)
+					platformShareAmount = amount.multiply(new BigDecimal(String.valueOf(topicUnhidePlatformShareProportion)).divide(new BigDecimal("100")));
+					
+					postUserNameShareAmount = amount.subtract(platformShareAmount);
+				}else{
+					postUserNameShareAmount = amount;
+				}
+				
+				
+				PaymentLog paymentLog = new PaymentLog();
+				paymentLog.setPaymentRunningNumber(paymentManage.createRunningNumber(accessUser.getUserId()));//支付流水号
+				paymentLog.setPaymentModule(70);//支付模块 7.余额购买话题隐藏内容
+				paymentLog.setParameterId(topic.getId());//参数Id 
+				paymentLog.setOperationUserType(2);//操作用户类型  0:系统  1: 员工  2:会员
+				paymentLog.setOperationUserName(accessUser.getUserName());//操作用户名称  0:系统  1: 员工  2:会员
+				paymentLog.setAmountState(2);//金额状态  1:账户存入  2:账户支出 
+				paymentLog.setAmount(amount);//金额
+				paymentLog.setInterfaceProduct(0);//接口产品
+				paymentLog.setUserName(accessUser.getUserName());//用户名称
+				paymentLog.setTimes(time);
+				consumption_paymentLogObject = paymentManage.createPaymentLogObject(paymentLog);
+				
+				if(!topic.getIsStaff()){//如果是用户
+					User _user = userManage.query_cache_findUserByUserName(topic.getUserName());
+					String paymentRunningNumber = paymentManage.createRunningNumber(_user.getId());//支付流水号
+					PaymentLog income_paymentLog = new PaymentLog();
+					income_paymentLog.setPaymentRunningNumber(paymentRunningNumber);//支付流水号
+					income_paymentLog.setPaymentModule(80);//支付模块 80.余额购买话题隐藏内容分成收入
+					income_paymentLog.setParameterId(topic.getId());//参数Id 
+					income_paymentLog.setOperationUserType(2);//操作用户类型  0:系统  1: 员工  2:会员
+					income_paymentLog.setOperationUserName(accessUser.getUserName());//操作用户名称  0:系统  1: 员工  2:会员
+					income_paymentLog.setAmountState(1);//金额状态  1:账户存入  2:账户支出 
+					income_paymentLog.setAmount(postUserNameShareAmount);//金额
+					income_paymentLog.setInterfaceProduct(0);//接口产品
+					income_paymentLog.setUserName(topic.getUserName());//用户名称
+					income_paymentLog.setTimes(time);
+					income_paymentLogObject = paymentManage.createPaymentLogObject(income_paymentLog);
+					
+					if(topicUnhidePlatformShareProportion >0){
+						//平台分成
+						topicUnhidePlatformShare = new TopicUnhidePlatformShare();
+						topicUnhidePlatformShare.setTopicId(topic.getId());//话题Id
+						topicUnhidePlatformShare.setStaff(topic.getIsStaff());//分成用户是否为员工
+						topicUnhidePlatformShare.setPostUserName(topic.getUserName());//发布话题的用户名称
+						topicUnhidePlatformShare.setUnlockUserName(accessUser.getUserName());//解锁话题的用户名称
+						topicUnhidePlatformShare.setPlatformShareProportion(topicUnhidePlatformShareProportion);//平台分成比例
+						topicUnhidePlatformShare.setPostUserShareRunningNumber(paymentRunningNumber);//发布话题的用户分成流水号
+						topicUnhidePlatformShare.setTotalAmount(amount);//总金额
+						topicUnhidePlatformShare.setShareAmount(platformShareAmount);//平台分成金额
+						topicUnhidePlatformShare.setUnlockTime(time);//解锁时间
+					}
+					
+
+					
+					//删除用户缓存
+					userManage.delete_cache_findUserById(_user.getId());
+					userManage.delete_cache_findUserByUserName(topic.getUserName());
+				}
+			}
+			
 			try {
 				//保存'话题取消隐藏'
-				topicService.saveTopicUnhide(topicManage.createTopicUnhideObject(topicUnhide),hideType,point,accessUser.getUserName(),consumption_pointLogObject,topic.getUserName(),income_pointLogObject);
+				topicService.saveTopicUnhide(topicManage.createTopicUnhideObject(topicUnhide),hideType,
+						point,accessUser.getUserName(),consumption_pointLogObject,topic.getUserName(),income_pointLogObject,
+						amount,postUserNameShareAmount,consumption_paymentLogObject,income_paymentLogObject,topicUnhidePlatformShare);
 				
 				//删除'话题取消隐藏'缓存;
 				topicManage.delete_cache_findTopicUnhideById(topicUnhideId);

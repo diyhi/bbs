@@ -921,7 +921,7 @@
 										<#if itemValue_index == 0  && userCustom.userInputValueList?exists && userCustom.userInputValueList?size == 0> 
 										<#assign _checked = " checked='checked'">
 										</#if>
-										<input type="radio" name="userCustom_${userCustom.id}" value="${itemValue}" ${_checked} >${userCustom.itemValue[itemValue]}
+										<label><input type="radio" name="userCustom_${userCustom.id}" value="${itemValue}" ${_checked} >${userCustom.itemValue[itemValue]}</label>
 										</#list>
 									</#if>
 								</#if>
@@ -935,7 +935,7 @@
 													<#assign _checked=" checked='checked'">
 												</#if>
 											</#list>
-											<input type="checkbox" name="userCustom_${userCustom.id}" value="${itemValue}" ${_checked}>${userCustom.itemValue[itemValue]}
+											<label><input type="checkbox" name="userCustom_${userCustom.id}" value="${itemValue}" ${_checked}>${userCustom.itemValue[itemValue]}</label>
 										</#list>
 									</#if>
 								</#if>

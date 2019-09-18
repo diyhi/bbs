@@ -1,0 +1,35 @@
+<#--  会员卡列表 -->
+<@function > 	
+	<#if membershipCardRelated_membershipCard_collection?? && membershipCardRelated_membershipCard_collection?size gt 0 >  
+	
+	<div class="membershipCardListModule">
+		<ul class="clearfix">
+            <#list membershipCardRelated_membershipCard_collection as membershipCard>
+	            <li>
+					<h5>${membershipCard.name}</h5>
+					<div class="descriptionTag-box">
+						<#list membershipCard.descriptionTagList as descriptionTag>
+                        	<p class="descriptionTag">${descriptionTag}</p>
+                        </#list>
+                    </div>
+					
+					<div class="buyInfo">
+						<#if membershipCard.lowestPrice?? && membershipCard.lowestPrice gt 0 >  
+							<div class="price">
+								<p><b>￥</b><span>${membershipCard.lowestPrice}</span> 元起</p>
+							</div>
+						</#if>
+						<#if membershipCard.lowestPoint?? && membershipCard.lowestPoint gt 0 >  
+							<div class="price">
+								<p><span>${membershipCard.lowestPoint}</span> 积分起</p>
+							</div>
+						</#if>
+						<i class="subtitle">${membershipCard.subtitle}</i>
+						<a class="buyButton" href="membershipCard?membershipCardId=${membershipCard.id}" target="_blank">查看详情</a>
+					</div>
+				</li>
+			</#list>
+		</ul>
+	</div>
+	</#if>
+</@function>

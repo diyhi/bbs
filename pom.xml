@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>bbs</groupId>
 	<artifactId>bbs</artifactId>
-	<version>3.4</version>
+	<version>3.5</version>
 	<packaging>war</packaging>
 	<name>bbs</name>
 	<description/>
@@ -873,6 +873,18 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		<dependency>
+		    <groupId>com.alipay.sdk</groupId>
+		    <artifactId>alipay-sdk-java</artifactId>
+		    <version>4.5.0.ALL</version>
+		     <exclusions>
+				<exclusion>
+					<groupId>*</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		
 		
 		<!-- 本地JAR -->
 		<dependency>

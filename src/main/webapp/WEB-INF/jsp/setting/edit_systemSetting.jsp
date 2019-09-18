@@ -396,7 +396,14 @@ function setAllowFilterWord(obj){
 			    	<web:errors path="realNameUserAllowComment" cssStyle="color: red;"/>
 			    </TD>
 			</TR>
-			
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">解锁话题隐藏内容平台分成比例：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<input class="form-text" name="topicUnhidePlatformShareProportion" maxlength="3" size="3" value="${systemSetting.topicUnhidePlatformShareProportion}"/>&nbsp;%
+			    	<span class="span-help">0至100之间的整数</span>
+			    	<web:errors path="topicUnhidePlatformShareProportion" cssStyle="color: red;"/>
+			    </TD>
+			</TR>
 			
 			<TR>
 			    <TD class="t-label t-label-h" width="20%">敏感词过滤：</TD>

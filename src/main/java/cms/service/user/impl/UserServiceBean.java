@@ -1,5 +1,6 @@
 package cms.service.user.impl;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -31,6 +32,7 @@ import cms.service.like.LikeService;
 import cms.service.message.PrivateMessageService;
 import cms.service.message.RemindService;
 import cms.service.message.SystemNotifyService;
+import cms.service.payment.PaymentService;
 import cms.service.user.UserGradeService;
 import cms.service.user.UserRoleService;
 import cms.service.user.UserService;
@@ -66,6 +68,7 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 	@Resource LikeService likeService;
 	@Resource FollowService followService;
 	@Resource UserRoleService userRoleService;
+	@Resource PaymentService paymentService;
 	
 	/**
 	 * 根据条件分页查询用户名称
@@ -635,9 +638,70 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 		}
 		return i;
 	}
-
+	/**
+	 * 在线充值
+	 * @param paymentRunningNumber 支付流水号
+	 * @param userName 用户名称
+	 * @param deposit 预存款
+	 * @param paymentLog 支付日志
+	 * @return
+	 */
+	public Integer onlineRecharge(String paymentRunningNumber,String userName,BigDecimal deposit,Object paymentLog){
+		int j = 0;
+		//删除校验支付校验日志
+		int i = paymentService.deletePaymentVerificationLogById(paymentRunningNumber);
+		if(i >0){
+			
+			j = this.addUserDeposit(userName,deposit,paymentLog);
+		}
+		return j;
+	}
 	
-	
+	/**
+	 * 增加用户预存款
+	 * @param userName 用户名称
+	 * @param deposit 预存款
+	 * @param paymentLog 支付日志
+	 * @return
+	 */
+	public Integer addUserDeposit(String userName,BigDecimal deposit,Object paymentLog){
+		int i = 0;
+		Query query = em.createQuery("update User o set o.deposit=o.deposit+?1,o.userVersion=o.userVersion+1 where o.userName=?2")
+		.setParameter(1, deposit)
+		.setParameter(2, userName);
+		i = query.executeUpdate();
+		if(i >0){
+			//保存支付日志
+			if(paymentLog != null){
+				paymentService.savePaymentLog(paymentLog);
+			}
+		}
+		
+		return i;
+	}
+	/**
+	 * 减少用户预存款
+	 * @param userName 用户名称
+	 * @param deposit 预存款
+	 * @param paymentLog 支付日志
+	 * @return
+	 */
+	public Integer subtractUserDeposit(String userName,BigDecimal deposit,Object paymentLog){
+		int i = 0;
+		Query query = em.createQuery("update User o set o.deposit=o.deposit-?1,o.userVersion=o.userVersion+1 where o.userName=?2 and o.deposit>=?3")
+		.setParameter(1, deposit)
+		.setParameter(2, userName)
+		.setParameter(3, deposit);
+		i = query.executeUpdate();
+		if(i >0){
+			//保存支付日志
+			if(paymentLog != null){
+				paymentService.savePaymentLog(paymentLog);
+			}
+		}
+		
+		return i;
+	}
 	
 	
 	

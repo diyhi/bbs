@@ -510,7 +510,13 @@ public class Topic_TemplateManage {
 							  			visibleTagList.add(HideTagType.POINT.getName());//当前话题已经取消隐藏
 								  	}
 								}else if(entry.getKey().equals(HideTagType.AMOUNT.getName())){//余额购买可见
-									
+									//话题取消隐藏Id
+								  	String topicUnhideId = topicManage.createTopicUnhideId(accessUser.getUserId(), HideTagType.AMOUNT.getName(), topicId);
+								  	TopicUnhide topicUnhide = topicManage.query_cache_findTopicUnhideById(topicUnhideId);
+							  		
+							  		if(topicUnhide != null){
+							  			visibleTagList.add(HideTagType.AMOUNT.getName());//当前话题已经取消隐藏
+								  	}
 								}
 								
 							}

@@ -373,6 +373,169 @@ CREATE TABLE `links` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 #
+# Structure for table "membershipcard"
+#
+
+CREATE TABLE `membershipcard` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `createDate` datetime DEFAULT NULL,
+  `descriptionTagFormat` longtext,
+  `highestPoint` bigint(20) DEFAULT NULL,
+  `highestPrice` decimal(12,2) DEFAULT NULL,
+  `introduction` longtext,
+  `lowestPoint` bigint(20) DEFAULT NULL,
+  `lowestPrice` decimal(12,2) DEFAULT NULL,
+  `name` varchar(190) DEFAULT NULL,
+  `sort` int(11) DEFAULT NULL,
+  `state` int(11) DEFAULT NULL,
+  `subtitle` varchar(190) DEFAULT NULL,
+  `userRoleId` varchar(32) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `membershipCard_1_idx` (`createDate`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "membershipcardorder"
+#
+
+CREATE TABLE `membershipcardorder` (
+  `orderId` bigint(20) NOT NULL,
+  `accountPayable` decimal(12,2) NOT NULL,
+  `accountPoint` bigint(20) DEFAULT NULL,
+  `createDate` datetime DEFAULT NULL,
+  `duration` int(11) DEFAULT NULL,
+  `membershipCardId` bigint(20) DEFAULT NULL,
+  `paymentAmount` decimal(12,2) NOT NULL,
+  `paymentPoint` bigint(20) DEFAULT NULL,
+  `quantity` int(11) DEFAULT NULL,
+  `roleName` varchar(192) DEFAULT NULL,
+  `specificationId` bigint(20) DEFAULT NULL,
+  `specificationName` varchar(192) DEFAULT NULL,
+  `unit` int(11) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  `userRoleId` varchar(32) DEFAULT NULL,
+  `version` int(11) DEFAULT NULL,
+  PRIMARY KEY (`orderId`),
+  KEY `membershipCardOrder_1_idx` (`userName`,`createDate`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "onlinepaymentinterface"
+#
+
+CREATE TABLE `onlinepaymentinterface` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `dynamicParameter` longtext,
+  `enable` bit(1) NOT NULL,
+  `interfaceProduct` int(11) DEFAULT NULL,
+  `name` varchar(100) DEFAULT NULL,
+  `sort` int(11) DEFAULT NULL,
+  `supportEquipment` varchar(5) DEFAULT NULL,
+  `version` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "paymentlog_0"
+#
+
+CREATE TABLE `paymentlog_0` (
+  `paymentRunningNumber` varchar(32) NOT NULL,
+  `amount` decimal(14,4) NOT NULL,
+  `amountState` int(11) NOT NULL,
+  `interfaceProduct` int(11) DEFAULT NULL,
+  `operationUserName` varchar(50) DEFAULT NULL,
+  `operationUserType` int(11) DEFAULT NULL,
+  `parameterId` bigint(20) DEFAULT NULL,
+  `paymentModule` int(11) DEFAULT NULL,
+  `remark` longtext,
+  `times` datetime DEFAULT NULL,
+  `tradeNo` varchar(255) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`paymentRunningNumber`),
+  KEY `paymentlog_idx` (`userName`,`times`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "paymentlog_1"
+#
+
+CREATE TABLE `paymentlog_1` (
+  `paymentRunningNumber` varchar(32) NOT NULL,
+  `amount` decimal(14,4) NOT NULL,
+  `amountState` int(11) NOT NULL,
+  `interfaceProduct` int(11) DEFAULT NULL,
+  `operationUserName` varchar(50) DEFAULT NULL,
+  `operationUserType` int(11) DEFAULT NULL,
+  `parameterId` bigint(20) DEFAULT NULL,
+  `paymentModule` int(11) DEFAULT NULL,
+  `remark` longtext,
+  `times` datetime DEFAULT NULL,
+  `tradeNo` varchar(255) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`paymentRunningNumber`),
+  KEY `paymentlog_idx` (`userName`,`times`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "paymentlog_2"
+#
+
+CREATE TABLE `paymentlog_2` (
+  `paymentRunningNumber` varchar(32) NOT NULL,
+  `amount` decimal(14,4) NOT NULL,
+  `amountState` int(11) NOT NULL,
+  `interfaceProduct` int(11) DEFAULT NULL,
+  `operationUserName` varchar(50) DEFAULT NULL,
+  `operationUserType` int(11) DEFAULT NULL,
+  `parameterId` bigint(20) DEFAULT NULL,
+  `paymentModule` int(11) DEFAULT NULL,
+  `remark` longtext,
+  `times` datetime DEFAULT NULL,
+  `tradeNo` varchar(255) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`paymentRunningNumber`),
+  KEY `paymentlog_idx` (`userName`,`times`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "paymentlog_3"
+#
+
+CREATE TABLE `paymentlog_3` (
+  `paymentRunningNumber` varchar(32) NOT NULL,
+  `amount` decimal(14,4) NOT NULL,
+  `amountState` int(11) NOT NULL,
+  `interfaceProduct` int(11) DEFAULT NULL,
+  `operationUserName` varchar(50) DEFAULT NULL,
+  `operationUserType` int(11) DEFAULT NULL,
+  `parameterId` bigint(20) DEFAULT NULL,
+  `paymentModule` int(11) DEFAULT NULL,
+  `remark` longtext,
+  `times` datetime DEFAULT NULL,
+  `tradeNo` varchar(255) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`paymentRunningNumber`),
+  KEY `paymentlog_idx` (`userName`,`times`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "paymentverificationlog"
+#
+
+CREATE TABLE `paymentverificationlog` (
+  `id` varchar(32) NOT NULL,
+  `parameterId` bigint(20) DEFAULT NULL,
+  `paymentAmount` decimal(12,2) NOT NULL,
+  `paymentModule` int(11) DEFAULT NULL,
+  `times` datetime DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `userName_idx` (`parameterId`,`userName`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+#
 # Structure for table "pointlog_0"
 #
 
@@ -685,6 +848,27 @@ CREATE TABLE `smsinterface` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 #
+# Structure for table "specification"
+#
+
+CREATE TABLE `specification` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `duration` int(11) DEFAULT NULL,
+  `enable` bit(1) NOT NULL,
+  `marketPrice` decimal(12,2) DEFAULT NULL,
+  `membershipCardId` bigint(20) DEFAULT NULL,
+  `point` bigint(20) DEFAULT NULL,
+  `sellingPrice` decimal(12,2) DEFAULT NULL,
+  `sort` int(11) DEFAULT NULL,
+  `specificationName` varchar(100) DEFAULT NULL,
+  `stock` bigint(20) DEFAULT NULL,
+  `stockOccupy` bigint(20) DEFAULT NULL,
+  `unit` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `specification_1_idx` (`membershipCardId`,`sort`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
 # Structure for table "staffloginlog_0"
 #
 
@@ -884,7 +1068,6 @@ CREATE TABLE `systemnotify` (
 # Structure for table "systemsetting"
 #
 
-
 CREATE TABLE `systemsetting` (
   `id` int(11) NOT NULL,
   `allowRegister` bit(1) NOT NULL,
@@ -919,8 +1102,10 @@ CREATE TABLE `systemsetting` (
   `comment_review` int(11) DEFAULT NULL,
   `reply_review` int(11) DEFAULT NULL,
   `topic_review` int(11) DEFAULT NULL,
+  `topicUnhidePlatformShareProportion` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 
 #
 # Structure for table "sysusers"
@@ -1231,6 +1416,26 @@ CREATE TABLE `topicunhide_3` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 #
+# Structure for table "topicunhideplatformshare"
+#
+
+CREATE TABLE `topicunhideplatformshare` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `platformShareProportion` int(11) DEFAULT NULL,
+  `postUserName` varchar(80) DEFAULT NULL,
+  `shareAmount` decimal(14,4) NOT NULL,
+  `staff` bit(1) NOT NULL,
+  `topicId` bigint(20) DEFAULT NULL,
+  `totalAmount` decimal(12,2) NOT NULL,
+  `unlockTime` datetime DEFAULT NULL,
+  `unlockUserName` varchar(30) DEFAULT NULL,
+  `postUserShareRunningNumber` varchar(32) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `topicUnhidePlatformShare_1_idx` (`unlockTime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+#
 # Structure for table "upgradesystem"
 #
 
@@ -1276,6 +1481,7 @@ CREATE TABLE `user` (
   `avatarName` varchar(50) DEFAULT NULL,
   `nickname` varchar(50) DEFAULT NULL,
   `allowUserDynamic` bit(1) DEFAULT NULL,
+  `deposit` decimal(14,4) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `UK4bakctviobmdk6ddh2nwg08c2` (`userName`),
   KEY `user_idx` (`state`)
@@ -1490,6 +1696,8 @@ CREATE TABLE `userrole` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+
+
 #
 # Structure for table "userrolegroup"
 #
@@ -1501,5 +1709,5 @@ CREATE TABLE `userrolegroup` (
   `validPeriodEnd` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `userRoleGroup_1_idx` (`userName`,`validPeriodEnd`),
-  KEY `userRoleGroup_2_idx` (`userRoleId`)
+  KEY `userRoleGroup_3_idx` (`userRoleId`,`userName`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

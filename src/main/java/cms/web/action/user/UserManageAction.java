@@ -2,8 +2,9 @@ package cms.web.action.user;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -18,9 +19,13 @@ import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -29,6 +34,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+
+import cms.bean.payment.PaymentLog;
+import cms.bean.payment.PaymentVerificationLog;
+import cms.bean.user.PointLog;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
@@ -46,6 +55,7 @@ import cms.bean.user.UserGrade;
 import cms.bean.user.UserInputValue;
 import cms.bean.user.UserRole;
 import cms.bean.user.UserRoleGroup;
+import cms.service.payment.PaymentService;
 import cms.service.setting.SettingService;
 import cms.service.topic.CommentService;
 import cms.service.topic.TagService;
@@ -65,6 +75,7 @@ import cms.web.action.FileManage;
 import cms.web.action.SystemException;
 import cms.web.action.TextFilterManage;
 import cms.web.action.lucene.TopicLuceneManage;
+import cms.web.action.payment.PaymentManage;
 import cms.web.action.thumbnail.ThumbnailManage;
 import cms.web.action.topic.TopicManage;
 
@@ -75,6 +86,8 @@ import cms.web.action.topic.TopicManage;
 @Controller
 @RequestMapping("/control/user/manage") 
 public class UserManageAction {
+	private static final Logger logger = LogManager.getLogger(UserManageAction.class);
+	
 	
 	@Resource(name="userServiceBean")
 	private UserService userService;
@@ -105,7 +118,8 @@ public class UserManageAction {
 	
 	@Resource UserRoleService userRoleService;
 	@Resource UserRoleManage userRoleManage;
-	
+	@Resource PaymentService paymentService;
+	@Resource PaymentManage paymentManage;
 	
 	/**
 	 * 用户管理 查看
@@ -1573,4 +1587,288 @@ public class UserManageAction {
 		return JsonUtils.toJSONString(returnValue);
 	}
 	
+	
+	
+	/**
+	 * 用户管理 支付
+	 * @param model
+	 * @param id 用户Id
+	 * @param type 支付类型  1:支付流水号  2:预存款 3:积分
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(params="method=payment",method=RequestMethod.POST)
+	@ResponseBody//方式来做ajax,直接返回字符串
+	public String payment(ModelMap model,Long id,Integer type,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
+		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
+		Map<String,String> error = new HashMap<String,String>();//错误
+		
+		if(id == null){
+			error.put("payment", "参数错误");
+		}else{
+			User user = userService.findUserById(id);
+			if(user == null){
+				error.put("payment", "用户不存在");
+			}
+			String staffName = "";//员工名称	
+			Object obj  =  SecurityContextHolder.getContext().getAuthentication().getPrincipal(); 
+			if(obj instanceof UserDetails){
+				staffName =((UserDetails)obj).getUsername();
+			}
+			
+			if(type != null){
+				if(type.equals(1)){//1:支付流水号
+					BigDecimal paymentRunningNumber_amount = new BigDecimal("0");
+					String paymentRunningNumber = null;//支付流水号
+					String paymentRunningNumber_remark = "";//备注
+
+					String _paymentRunningNumberAmount = request.getParameter("paymentRunningNumberAmount");
+					String _paymentRunningNumber = request.getParameter("paymentRunningNumber");
+					String _paymentRunningNumber_remark = request.getParameter("paymentRunningNumber_remark");
+					
+					if(_paymentRunningNumberAmount != null && !"".equals(_paymentRunningNumberAmount.trim())){
+						if(_paymentRunningNumberAmount.trim().length() > 12){
+							error.put("paymentRunningNumberAmount", "金额不能超过12位数字");
+						}else{
+							boolean paymentRunningNumber_amountVerification = Verification.isAmount(_paymentRunningNumberAmount.trim());//金额
+							if(paymentRunningNumber_amountVerification){
+								paymentRunningNumber_amount = new BigDecimal(_paymentRunningNumberAmount.trim());
+								if(paymentRunningNumber_amount.compareTo(new BigDecimal("0")) <=0){
+									error.put("paymentRunningNumberAmount", "金额必须大于0");	
+								}
+							
+							}else{
+								error.put("paymentRunningNumberAmount", "请填写金额");	
+							}
+						}
+					}
+					if(_paymentRunningNumber_remark != null){
+						try {	
+							paymentRunningNumber_remark = URLDecoder.decode(_paymentRunningNumber_remark,"utf-8");
+						} catch (UnsupportedEncodingException e) {
+							// TODO Auto-generated catch block
+						//	e.printStackTrace();
+							if (logger.isErrorEnabled()) {
+					            logger.error("备注编码错误",e);
+					        }
+						}
+					}
+					if(_paymentRunningNumber != null && !"".equals(_paymentRunningNumber.trim())){
+						if(_paymentRunningNumber.trim().length() >64){
+							error.put("paymentRunningNumber", "流水号不能超过64位");
+						}else{
+							paymentRunningNumber = _paymentRunningNumber.trim();
+						}
+						
+						
+					}
+					
+					if(error.size() == 0&& paymentRunningNumber != null){
+						PaymentVerificationLog paymentVerificationLog = paymentService.findPaymentVerificationLogById(paymentRunningNumber);
+						if(paymentVerificationLog != null){
+							if(paymentVerificationLog.getPaymentModule().equals(5)){//5.用户充值
+								if(user.getUserName().equals(paymentVerificationLog.getUserName())){
+									
+									PaymentLog paymentLog = new PaymentLog();
+									paymentLog.setPaymentRunningNumber(paymentVerificationLog.getId());//支付流水号
+									paymentLog.setPaymentModule(paymentVerificationLog.getPaymentModule());//支付模块 5.用户充值
+									paymentLog.setParameterId(paymentVerificationLog.getParameterId());//参数Id 
+									paymentLog.setOperationUserType(1);//操作用户类型  0:系统  1: 员工  2:会员
+									paymentLog.setOperationUserName(staffName);
+									
+									paymentLog.setAmount(paymentRunningNumber_amount);//金额
+									paymentLog.setInterfaceProduct(-1);//接口产品
+									paymentLog.setTradeNo("");//交易号
+									paymentLog.setUserName(paymentVerificationLog.getUserName());//用户名称
+									paymentLog.setRemark(paymentRunningNumber_remark);//备注
+									paymentLog.setAmountState(1);//金额状态  1:账户存入  2:账户支出 
+									Object new_paymentLog = paymentManage.createPaymentLogObject(paymentLog);
+									
+									userService.onlineRecharge(paymentRunningNumber,paymentVerificationLog.getUserName(),paymentRunningNumber_amount,new_paymentLog);
+									
+									
+									
+									returnValue.put("success", "true");
+								}else{
+									error.put("paymentRunningNumber", "流水号不属于当前用户");
+								}
+							}else{
+								error.put("paymentRunningNumber", "流水号不属于充值模块");
+							}
+						}else{
+							error.put("paymentRunningNumber", "流水号不存在");
+						}
+					}
+
+					
+				}else if(type.equals(2)){//2:预存款
+					String deposit_symbol = null;//符号
+					BigDecimal deposit = new BigDecimal("0");//预存款
+					String deposit_remark = "";//备注
+
+					String _deposit_symbol = request.getParameter("deposit_symbol");
+					String _deposit = request.getParameter("deposit");
+					String _deposit_remark = request.getParameter("deposit_remark");
+					
+					if(_deposit_symbol != null){
+						try {
+							deposit_symbol = URLDecoder.decode(_deposit_symbol,"utf-8");
+						} catch (UnsupportedEncodingException e) {
+							// TODO Auto-generated catch block
+						//	e.printStackTrace();
+							if (logger.isErrorEnabled()) {
+					            logger.error("预存款符号编码错误",e);
+					        }
+						}
+						if("+".equals(deposit_symbol)){//增加
+							deposit_symbol = "+";
+						}else{//减少
+							deposit_symbol = "-";
+						}
+					}
+					if(_deposit_remark != null){
+						try {	
+							deposit_remark = URLDecoder.decode(_deposit_remark,"utf-8");
+						} catch (UnsupportedEncodingException e) {
+							// TODO Auto-generated catch block
+						//	e.printStackTrace();
+							if (logger.isErrorEnabled()) {
+					            logger.error("预存款编码错误",e);
+					        }
+						}
+					}
+					if(_deposit != null && !"".equals(_deposit.trim())){
+						if(_deposit.trim().length() >=10){
+							error.put("deposit", "不能超过10位数");
+						}
+						
+						
+						boolean deposit_verification = Verification.isAmount(_deposit.trim());
+						if(!deposit_verification){
+							error.put("deposit", "请填写正确的金额");
+						}else{
+							deposit = new BigDecimal(_deposit.trim());//预存款
+						}
+					}
+					
+					if(error.size() == 0&& deposit_symbol != null && deposit.compareTo(new BigDecimal("0")) > 0){
+							
+						PaymentLog paymentLog = new PaymentLog();
+						paymentLog.setPaymentRunningNumber(paymentManage.createRunningNumber(user.getId()));//支付流水号
+						paymentLog.setPaymentModule(5);//支付模块 5.用户充值
+						paymentLog.setParameterId(user.getId());//参数Id 
+						paymentLog.setOperationUserType(1);//操作用户类型  0:系统  1: 员工  2:会员
+						paymentLog.setOperationUserName(staffName);
+						
+						paymentLog.setAmount(deposit);//金额
+						paymentLog.setInterfaceProduct(-1);//接口产品
+						paymentLog.setTradeNo("");//交易号
+						paymentLog.setUserName(user.getUserName());//用户名称
+						paymentLog.setRemark(deposit_remark);//备注
+						
+						if("+".equals(deposit_symbol)){//增加预存款
+							paymentLog.setAmountState(1);//金额状态  1:账户存入  2:账户支出 
+							Object new_paymentLog = paymentManage.createPaymentLogObject(paymentLog);
+							userService.addUserDeposit(user.getUserName(),deposit,new_paymentLog);
+						}else{//减少预存款
+							paymentLog.setAmountState(2);//金额状态  1:账户存入  2:账户支出 
+							Object new_paymentLog = paymentManage.createPaymentLogObject(paymentLog);
+							userService.subtractUserDeposit(user.getUserName(),deposit,new_paymentLog);
+						}
+						
+						
+						returnValue.put("success", "true");
+					}
+					
+					
+				}else if(type.equals(3)){//3:积分
+					
+					String point_symbol = null;//符号
+					Long point = 0L;//积分
+					String point_remark = "";//备注
+
+					String _point_symbol = request.getParameter("point_symbol");
+					String _point = request.getParameter("point");
+					String _point_remark = request.getParameter("point_remark");
+					
+					if(_point_symbol != null){
+						try {
+							point_symbol = URLDecoder.decode(_point_symbol,"utf-8");
+						} catch (UnsupportedEncodingException e) {
+							// TODO Auto-generated catch block
+						//	e.printStackTrace();
+							if (logger.isErrorEnabled()) {
+					            logger.error("积分符号编码错误",e);
+					        }
+						}
+						if("+".equals(point_symbol)){//增加
+							point_symbol = "+";
+						}else{//减少
+							point_symbol = "-";
+						}
+					}
+					if(_point_remark != null){
+						try {	
+							point_remark = URLDecoder.decode(_point_remark,"utf-8");
+						} catch (UnsupportedEncodingException e) {
+							// TODO Auto-generated catch block
+						//	e.printStackTrace();
+							if (logger.isErrorEnabled()) {
+					            logger.error("积分备注编码错误",e);
+					        }
+						}
+					}
+					if(_point != null && !"".equals(_point.trim())){
+						if(_point.trim().length() >=10){
+							error.put("point", "不能超过10位数");
+						}
+						boolean point_verification = Verification.isPositiveInteger(_point.trim());//正整数
+						if(!point_verification){
+							error.put("point", "请填写正整数");
+						}else{
+							point = Long.parseLong(_point.trim());
+						}
+						
+					}
+					
+					if(error.size() == 0&& point_symbol != null && point > 0){
+						
+						PointLog pointLog = new PointLog();
+						pointLog.setId(pointManage.createPointLogId(user.getId()));
+						pointLog.setModule(600);//模块  600.账户充值
+						pointLog.setParameterId(user.getId());//参数Id 
+						pointLog.setOperationUserType(1);//操作用户类型  0:系统  1: 员工  2:会员
+						pointLog.setOperationUserName(staffName);//操作用户名称
+						
+						pointLog.setPoint(point);//积分
+						pointLog.setUserName(user.getUserName());//用户名称
+						pointLog.setRemark(point_remark);
+						
+						
+						if("+".equals(point_symbol)){//增加积分
+							pointLog.setPointState(1);//积分状态 1:账户存入 
+							Object new_pointLog = pointManage.createPointLogObject(pointLog);
+							userService.addUserPoint(user.getUserName(),point,new_pointLog);
+						}else{//减少积分
+							pointLog.setPointState(2);//积分状态  1:账户存入  2:账户支出 
+							Object new_pointLog = pointManage.createPointLogObject(pointLog);
+							userService.subtractUserPoint(user.getUserName(),point,new_pointLog);
+						}
+						
+						
+						returnValue.put("success", "true");
+					}
+				}
+			}
+		}
+		
+		
+		
+		returnValue.put("error", error);
+		return JsonUtils.toJSONString(returnValue);
+	}
 }

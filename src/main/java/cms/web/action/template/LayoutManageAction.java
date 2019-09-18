@@ -887,6 +887,7 @@ public class LayoutManageAction {
 			}
 		}
 		
+
 		return "jsp/template/edit_layoutCode";
 	}
 	
@@ -930,6 +931,13 @@ public class LayoutManageAction {
 		}else{
 			throw new SystemException("参数不能为空！");
 		}
+		
+		//在Chrome浏览器下和home.html页的下面两行js代码有冲突，会报错误manage.htm?method=editLayoutCode&layoutId=440b1b2f202d4de38f450226083ca174&dirName=default&page=:31 The XSS Auditor refused to execute a script in 'http://bbs.diyhi.com/control/layout/manage.htm?method=editLayoutCode&layoutId=440b1b2f202d4de38f450226083ca174&dirName=default&page=' because its source code was found within the request. The auditor was enabled as the server did not send an 'X-XSS-Protection' header.
+		//html += 		'<input type="button" value="提交" class="button" onclick="topicUnhide(10,'+random+','+topicId+');">';
+		//html += 		'<input type="button" value="立即购买" class="button" onclick="topicUnhide(40,'+random+','+topicId+');">';
+		//解决办法是设置Header头文件为X-XSS-Protection:0
+		//	response.addHeader("X-XSS-Protection", "0");
+		
 		
 		model.addAttribute("message","布局代码编辑成功");//返回消息
 		model.addAttribute("urladdress",RedirectPath.readUrl("control.layout.list")+"?&dirName="+dirName+"&page="+pageForm.getPage());//返回消息//返回转向地址

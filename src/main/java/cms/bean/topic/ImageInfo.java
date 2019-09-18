@@ -7,8 +7,7 @@ import java.io.Serializable;
  *
  */
 public class ImageInfo implements Serializable{
-	private static final long serialVersionUID = -1254588593772720711L;
-	
+	private static final long serialVersionUID = 5884756296465895791L;
 	/** 图片路径 **/
 	private String path;
 	/** 图片名称 **/

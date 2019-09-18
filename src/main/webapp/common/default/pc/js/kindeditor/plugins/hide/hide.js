@@ -306,10 +306,9 @@ KindEditor.plugin('hide', function(K) {
 			if(item == "hidePoint"){
 				tabTitle4 = "积分购买可见";
 			}
-			/**
 			if(item == "hideAmount"){
 				tabTitle5 = "余额购买可见";
-			}**/
+			}
 		}
 
 		tabs.add({
@@ -328,11 +327,10 @@ KindEditor.plugin('hide', function(K) {
 			title : tabTitle4,//积分购买可见
 			panel : K('.tab4', div)
 		});
-		/**
 		tabs.add({
 			title : tabTitle5,//余额购买可见
 			panel : K('.tab5', div)
-		});**/
+		});
 		
 		tabs.select(tabIndex);
 

@@ -856,51 +856,61 @@
 		        <li class="topLine rightLine">
 		        	<router-link to="/user/control/replyList" class="menuLink"><i class="cms-reply"></i><span class="name">我的回复</span></router-link>
 		        </li>
-		        <li class="topLine">
-		        	<router-link to="/user/control/point" class="menuLink"><i class="cms-point"></i><span class="name">积分记录</span></router-link>
+		         <li class="topLine">
+		        	<router-link to="/user/control/favoriteList" class="menuLink"><i class="cms-favorites"></i><span class="name">收藏夹</span></router-link>
 		        </li>
 			</ul>
 			<ul>
 		        <li class="rightLine">
-		        	<router-link to="/user/control/editUser" class="menuLink"><i class="cms-pencil-alt"></i><span class="name">修改个人信息</span></router-link>
+		        	<router-link to="/user/control/likeList" class="menuLink"><i class="cms-thumb-up"></i><span class="name">点赞</span></router-link>
 		        </li>
 		        <li class="rightLine">
-		        	<router-link to="/user/control/realNameAuthentication" class="menuLink"><i class="cms-realNameAuthentication"></i><span class="name">实名认证</span></router-link>
+		        	<router-link to="/user/control/followList" class="menuLink"><i class="cms-heart"></i><span class="name">关注</span></router-link>
 		        </li>
 		        <li class="rightLine">
-		        	<router-link to="/user/control/userLoginLogList" class="menuLink"><i class="cms-login"></i><span class="name">登录日志</span></router-link>
+		        	<router-link to="/user/control/followerList" class="menuLink"><i class="cms-follower"></i><span class="name">粉丝</span></router-link>
 		        </li>
 		        <li>
 		        	<router-link to="/user/control/privateMessageList" class="menuLink"><i class="cms-email"></i><span class="name">私信</span><span class="badge" style="position: absolute;" v-show="$store.state.privateMessage_badge"></span></router-link>
 		        </li>
+		        
+				
+		       
 			</ul>
 			<ul>
-		        <li class="rightLine">
-		        	<router-link to="/user/control/systemNotifyList" class="menuLink"><i class="cms-announcement"></i><span class="name">系统通知</span><span class="badge" style="position: absolute;" v-show="$store.state.systemNotify_badge"></span></router-link>
-		        </li>
 		        <li class="rightLine">
 		        	<router-link to="/user/control/remindList" class="menuLink"><i class="cms-bell"></i><span class="name">提醒</span><span class="badge" style="position: absolute;" v-show="$store.state.remind_badge"></span></router-link>
 		        </li>
 		        <li class="rightLine">
-		        	<router-link to="/user/control/favoriteList" class="menuLink"><i class="cms-favorites"></i><span class="name">收藏夹</span></router-link>
+		        	<router-link to="/user/control/systemNotifyList" class="menuLink"><i class="cms-announcement"></i><span class="name">系统通知</span><span class="badge" style="position: absolute;" v-show="$store.state.systemNotify_badge"></span></router-link>
+		        </li>
+		        <li class="rightLine">
+		        	<router-link to="/user/control/membershipCardOrderList" class="menuLink"><i class="cms-order"></i><span class="name">会员卡订单</span></router-link>
 		        </li>
 		        <li>
-		        	<router-link to="/user/control/likeList" class="menuLink"><i class="cms-thumb-up"></i><span class="name">点赞</span></router-link>
+		        	<router-link to="/user/control/balance" class="menuLink"><i class="cms-deposit"></i><span class="name">余额</span></router-link>
 		        </li>
 			</ul>
 			<ul>
 		        <li class="bottomLine rightLine">
-		        	<router-link to="/user/control/followList" class="menuLink"><i class="cms-heart"></i><span class="name">关注</span></router-link>
+		        	<router-link to="/user/control/editUser" class="menuLink"><i class="cms-pencil-alt"></i><span class="name">修改个人信息</span></router-link>
 		        </li>
 		        <li class="bottomLine rightLine">
-		        	<router-link to="/user/control/followerList" class="menuLink"><i class="cms-follower"></i><span class="name">粉丝</span></router-link>
+		        	<router-link to="/user/control/realNameAuthentication" class="menuLink"><i class="cms-realNameAuthentication"></i><span class="name">实名认证</span></router-link>
 		        </li>
 		        <li class="bottomLine rightLine">
+		        	<router-link to="/user/control/point" class="menuLink"><i class="cms-point"></i><span class="name">积分记录</span></router-link>
 		        </li>
+		       
 		        <li class="bottomLine">
-		        	
+		        	<router-link to="/user/control/userLoginLogList" class="menuLink"><i class="cms-login"></i><span class="name">登录日志</span></router-link>
 		        </li>
 			</ul>
+		</div>
+		<div class="membershipCard" v-if="user.userName == $store.state.user.userName">
+			<router-link to="/membershipCardList" class="link">
+				<div class="title">会员卡</div>
+			</router-link>
 		</div>
 		
 		<!-- 动态内容 -->
@@ -1178,6 +1188,9 @@
 						<mt-cell :title="pointLog.times" :value="(pointLog.pointState == 1? '+' :'-' ) +pointLog.point" v-if="pointLog.module == 200" :label="'发表评论 [评论Id: '+pointLog.parameterId+']'"></mt-cell>
 						<mt-cell :title="pointLog.times" :value="(pointLog.pointState == 1? '+' :'-' ) +pointLog.point" v-if="pointLog.module == 300" :label="'发表回复 [回复Id: '+pointLog.parameterId+']'"></mt-cell>				
 						<mt-cell :title="pointLog.times" :value="(pointLog.pointState == 1? '+' :'-' ) +pointLog.point" v-if="pointLog.module == 400" :label="'积分购买话题 [话题Id: '+pointLog.parameterId+']'"></mt-cell>				
+						<mt-cell :title="pointLog.times" :value="(pointLog.pointState == 1? '+' :'-' ) +pointLog.point" v-if="pointLog.module == 500" :label="'会员卡订单支付 [订单Id: '+pointLog.parameterId+']'"></mt-cell>				
+						<mt-cell :title="pointLog.times" :value="(pointLog.pointState == 1? '+' :'-' ) +pointLog.point" v-if="pointLog.module == 600" :label="'充值 [用户Id: '+pointLog.parameterId+']'"></mt-cell>				
+						
 						<div class="remark" v-if="pointLog.remark != ''">备注：{{pointLog.remark}}</div>
 					</li>
 				
@@ -2005,6 +2018,266 @@
 	</div>
 </template>
 
+<!-- 会员卡订单 -->
+<template id="membershipCardOrderList-template">
+	<div>
+		<mt-header fixed title="会员卡订单" style="background: #fafafa; color: #000000;font-size: 14px">
+	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
+	    	<router-link to="/index" slot="right">
+			    <span class="cms-home" style="font-size: 18px;"></span>
+			</router-link>
+		</mt-header>
+		<div class="membershipCardOrderListModule" >
+			<div class="membershipCardOrderList">
+				<div v-infinite-scroll="queryMembershipCardOrderList" infinite-scroll-disabled="loading" infinite-scroll-distance="10">
+					<div class="item" v-for="membershipCardOrder in membershipCardOrderList">
+			            <div class="head">
+							<span class="orderId" >
+			                    <h2>订单号：{{membershipCardOrder.orderId}}</h2>
+			                </span>
+			                <span class="duration">
+			                	{{membershipCardOrder.duration}}
+			                	<span v-if="membershipCardOrder.unit == 10">小时</span>
+			                	<span v-if="membershipCardOrder.unit == 20">日</span>
+			                	<span v-if="membershipCardOrder.unit == 30">月</span>
+			                	<span v-if="membershipCardOrder.unit == 40">年</span>
+			                	× {{membershipCardOrder.quantity}}
+			                </span>                     
+			            </div>
+			            
+			            
+			            
+			            <div class="main">
+			            	<p>{{membershipCardOrder.roleName}}</p>
+			            	<p>{{membershipCardOrder.specificationName}}</p>
+			            	                  
+						</div>
+						<div class="bottomInfo">
+						 	<span class="funds" >
+			                    <i class="cms-deposit"></i><span class="paymentAmount" >{{membershipCardOrder.paymentAmount}}元</span>
+			                    <i class="cms-point icon"></i><span class="paymentPoint" >{{membershipCardOrder.paymentPoint}}积分</span>
+			                </span>
+			                <span class="time" >
+			                	{{membershipCardOrder.createDate}}
+			                </span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>
+
+<!-- 余额 -->
+<template id="balance-template">
+	<div>
+		<mt-header fixed title="余额" style="background: #fafafa; color: #000000;font-size: 14px">
+	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
+	    	<router-link to="/index" slot="right">
+			    <span class="cms-home" style="font-size: 18px;"></span>
+			</router-link>
+		</mt-header>
+		
+		<div class="balanceModule" >
+			<div class="deposit" >
+				<span class="currency">¥</span><h2>{{deposit}}</h2><span class="unit">元</span>
+				<div class="button">
+					<mt-button type="primary" plain @click.native="jumpRecharge">充值</mt-button>
+				</div>
+			</div>
+			<div class="paymentLogList">
+				<div v-infinite-scroll="queryBalance" infinite-scroll-disabled="loading" infinite-scroll-distance="10">
+					<div class="item" v-for="paymentLog in paymentLogList">
+			            <div class="head">
+							<span class="runningNumber" >
+			                    <h2>支付流水号：{{paymentLog.paymentRunningNumber}}</h2>
+			                </span>                 
+			            </div>
+			            <div class="main">
+			            	<p v-if="paymentLog.amountState == 1">+{{paymentLog.amount}}元</p>
+			            	<p v-if="paymentLog.amountState == 2">-{{paymentLog.amount}}元</p>
+			            	<p>{{paymentLog.remark}}</p>          
+						</div>
+						<div class="bottomInfo">
+						 	<span class="module" >
+			                    <span class="payment" v-if="paymentLog.paymentModule == 1">会员卡订单支付</span>
+			                    <span class="payment" v-if="paymentLog.paymentModule == 5">冲值</span>
+			                    <span class="payment" v-if="paymentLog.paymentModule == 70">余额购买话题隐藏内容</span>
+			                    <span class="payment" v-if="paymentLog.paymentModule == 80">解锁话题隐藏内容分成</span>
+			                </span>
+			                <span class="time" >
+			                	{{paymentLog.times}}
+			                </span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>
+
+<!-- 支付页 -->
+<template id="payment-template">
+	<div>
+		<mt-header fixed title="支付" style="background: #fafafa; color: #000000;font-size: 14px">
+	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
+	    	<router-link to="/index" slot="right">
+		    	<span class="ti-home" style="font-size: 18px;"></span>
+			</router-link>
+		</mt-header>
+		<div class="paymentModule">
+			<div class="payment" v-if="paymentModule ==5">
+				<ul>
+					<li>
+						<mt-field label="充值金额" placeholder="必填" v-model="rechargeAmount" @change.native="paymentVerification"></mt-field>
+						<p class="tips">
+					    	<span>{{error.userName}}</span>
+					    </p>
+					</li>
+				</ul>
+			</div>
+			
+			<div class="onlinePaymentInterface">
+				<ul>
+					<li v-for="onlinePaymentInterface in onlinePaymentInterfaceList" class="item">
+						<div class="head">{{onlinePaymentInterface.name}}</div>
+						
+						<div class="bankSelect"  >
+							
+                        	<dl v-for="bank in onlinePaymentInterface.bankList" @click="selectPayment(onlinePaymentInterface.interfaceProduct,bank.code)">
+                            	<dt>
+                            		<div class="radioBox" >
+	                                	<span class="mint-radio" >
+								        	<input class="mint-radio-input" v-model="paymentBank_radio" :value="onlinePaymentInterface.interfaceProduct+'_'+bank.code" type="radio" >
+								        	<span class="mint-radio-core" style="width: 20px; height: 20px;"></span>
+								        </span>
+							        </div>
+                                </dt>
+                                <dd>
+                                    <img :src="$store.state.commonPath+'images/bank/'+bank.icon" width="120" height="32" />
+                                </dd>
+                                <dd>
+                                    <div class="bankName">{{bank.name}}</div>
+                                </dd>
+                            </dl>
+						</div>
+					</li>
+				</ul>
+			</div>
+			
+			<div class="payNow">
+				<ul>
+					<li><mt-button  type="primary" size="large" @click.native="pay">立即付款</mt-button></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</template>
+
+
+
+<!-- 支付完成通知 -->
+<template id="paymentCompleted-template">
+	<div>
+		<mt-header fixed title="支付完成" style="background: #fafafa; color: #000000;font-size: 14px">
+	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
+	    	<router-link to="/index" slot="right">
+		    	<span class="ti-home" style="font-size: 18px;"></span>
+			</router-link>
+		</mt-header>
+	    <div class="paymentCompletedModule">
+	        <div class="box">
+	            <h2 class="title">
+	                支付完成
+	            </h2>
+	            <div class="button">
+	            	<mt-button type="primary" @click.native="queryHome()" style="width: 150px;">前往用户中心</mt-button>
+	            </div>
+	        </div>
+	    </div>
+	
+	</div>
+</template>
+
+<!-- 会员卡列表 -->
+<template id="membershipCardList-template">
+	<div>
+		<mt-header fixed title="会员卡列表" style="background: #fafafa; color: #000000;font-size: 14px">
+	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
+	    	<router-link to="/index" slot="right">
+			    <span class="cms-home" style="font-size: 18px;"></span>
+			</router-link>
+		</mt-header>
+	    <div class="membershipCardListModule">
+	        <div class="membershipCardList">
+	        	<div class="line"><span class="title">会员套餐任你选</span></div>
+				<ul class="box" >
+					<li class="item" v-for="membershipCard in membershipCardList">
+						<div class="info">
+							<h5>{{membershipCard.name}}</h5>
+							<div class="descriptionTag-box">
+		                        <p v-for="descriptionTag in membershipCard.descriptionTagList" class="descriptionTag">{{descriptionTag}}</p>
+		                    </div>
+							<div class="buyInfo">
+								<div v-if="membershipCard.lowestPrice != null && membershipCard.lowestPrice > 0" class="price">
+									<p><b>￥</b><span>{{membershipCard.lowestPrice}}</span> 元起</p>
+								</div>
+								<div v-if="membershipCard.lowestPoint != null && membershipCard.lowestPoint > 0" class="price">
+									<p><span>{{membershipCard.lowestPoint}}</span> 积分起</p>
+								</div>
+								<i class="subtitle">{{membershipCard.subtitle}}</i>
+								<router-link class="buyButton"  :to="{path: '/membershipCard', query: {membershipCardId: membershipCard.id}}" >
+									查看详情
+								</router-link>
+							</div>
+						</div>
+					</li>	
+				</ul> 
+			</div> 
+		</div>
+	</div>
+</template>
+
+<!-- 会员卡 -->
+<template id="membershipCard-template">
+	<div>
+		<mt-header fixed title="会员卡" style="background: #fafafa; color: #000000;font-size: 14px">
+	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
+	    	<router-link to="/index" slot="right">
+			    <span class="cms-home" style="font-size: 18px;"></span>
+			</router-link>
+		</mt-header>
+	    <div class="membershipCardModule" v-if="membershipCard != null && membershipCard != ''">
+			
+			<div class="membershipCard-item" v-for="(specification,index) in membershipCard.specificationList">
+				<div class="title">{{specification.specificationName}}</div>
+				<div class="info">
+					<div class="sellingPrice" v-if="specification.sellingPrice != null && specification.sellingPrice > 0"><b>￥</b><strong>{{specification.sellingPrice}}</strong> 元</div>
+					
+					<div class="sellingPrice" v-if="specification.point != null && specification.point > 0"><strong>{{specification.point}}</strong> 积分</div>
+					
+					<div class="marketPrice" v-if="specification.marketPrice != null && specification.marketPrice > 0">原价￥<span>{{specification.marketPrice}}</span> 元</div>
+					
+					<div class="buy-box">
+						 <button class="buyButton"  :disabled="buttonDisabled[index]"  @click="addMembershipCardOrder(index,specification.id);">立即购买</button>
+						
+					</div>
+				</div>
+			</div>
+			<div class="clearfix"></div>
+			<div class="detail">
+	            <p class="title">详情</p>
+	            <div class="line-blue"></div>
+	            <div class="line-gray"></div>
+	            <div class="content" v-html="membershipCard .introduction"></div>
+	        </div>
+  
+        </div>
+	        
+	        
+		</div>
+	</div>
+</template>
 
 
 <!-- 公共模块 -->
@@ -2142,6 +2415,8 @@ image[lazy=loading] {
 	height: 200px;
     
 }
+
+/** wangEditor.js编辑器 **/
 /*原来#999*/
 .w-e-toolbar .w-e-menu i {
   color: #666;
@@ -2156,6 +2431,9 @@ image[lazy=loading] {
    display: table-cell; **/
    overflow-y: visible;
    display: table-cell;
+}
+.w-e-text-container{
+    height: 320px !important;/*原div是行内样式设置的高度300px*/
 }
 
 /** vue-cropper 圆形截图框 **/

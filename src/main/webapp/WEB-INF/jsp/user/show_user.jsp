@@ -22,6 +22,240 @@
 <script language="javascript" src="backstage/jcrop/js/jquery.Jcrop.min.js" type="text/javascript"></script>
 
 
+
+
+<script language="javascript" type="text/javascript">
+
+//支付校验日志
+function paymentVerificationLogPageDiv(userName,parameterId){
+	var div = "<div id='divMessage'></div>";
+	systemLayerShow("选择流水号",div,700,400);//显示层
+	//显示支付校验日志分页显示	
+	paymentVerificationLogPage(1,userName,parameterId);
+}
+
+//支付校验日志分页
+function paymentVerificationLogPage(pages,userName,parameterId){
+	var parameter = "";//URI参数
+	
+	//支付模块 1.订单支付 3.售后服务换货/返修支付 5.用户充值
+	parameter += "&paymentModule=5";
+	
+	parameter += "&parameterId="+parameterId;
+	
+	parameter += "&userName="+userName;
+
+	get_request(function(value){$("#divMessage").html(value);},
+		"${config:url(pageContext.request)}control/paymentLog/manage${config:suffix()}?method=ajax_paymentVerificationLogPage&page="+pages+parameter+"&timestamp=" + new Date().getTime(), true);
+}
+
+//添加支付流水号
+function addPaymentRunningNumber(id,paymentAmount){
+	//流水号
+	document.getElementById("paymentRunningNumber").value = id;
+	//金额
+	document.getElementById("paymentRunningNumberAmount").value = paymentAmount;
+	//关闭层
+	systemLayerClose();
+}
+
+
+
+//提交支付流水号
+function submitPaymentRunningNumber(type){
+var parameter = "";
+	
+	parameter += "&id="+getUrlParam("id");
+	
+	
+	//金额
+	parameter += "&paymentRunningNumberAmount="+encodeURIComponent(encodeURIComponent(document.getElementById("paymentRunningNumberAmount").value));
+	
+	//流水号
+	parameter += "&paymentRunningNumber="+encodeURIComponent(encodeURIComponent(document.getElementById("paymentRunningNumber").value));
+	//备注
+	var remark = document.getElementById("paymentRunningNumber_remark").value;
+	if(remark != "备注内容"){
+		parameter += "&paymentRunningNumber_remark="+encodeURIComponent(encodeURIComponent(remark));
+	}
+	
+	var csrf =  getCsrf();
+	parameter += "&_csrf_token="+csrf.token;
+	parameter += "&_csrf_header="+csrf.header;
+
+	//删除第一个&号,防止因为多了&号而出现警告: Parameters: Invalid chunk ignored.信息
+	if(parameter.indexOf("&") == 0){
+		parameter = parameter.substring(1,parameter.length);
+	}
+	post_request(function(value){
+		//清除所有错误显示
+		var errorTag_object = getElementsByName_pseudo("span", "errorTag");
+		for(i = 0; i < errorTag_object.length; i++) {	
+			if(errorTag_object[i].id != ""){
+				document.getElementById(errorTag_object[i].id).innerHTML = "";
+			}	
+		}
+		
+		if(value != ""){
+			var returnValue = JSON.parse(value);//返回JSON信息.Map<String,Object>格式
+			for(message in returnValue){	
+				if(message == "error"){
+					var error = returnValue[message];
+					for(e in error){
+						document.getElementById("error_"+e).innerHTML = error[e];
+					}
+			    }else if(message == "success"){
+			    	if(returnValue[message] == "true"){
+			    		document.getElementById("success_paymentRunningNumber").innerHTML = "提交成功,3秒后自动刷新本页";
+			    		refreshURL();
+			    	}
+			    	
+			    }
+			}
+		}
+	},
+		"${config:url(pageContext.request)}control/user/manage${config:suffix()}?method=payment&type="+type+"&timestamp=" + new Date().getTime(), true,parameter);
+
+} 
+
+//提交预存款
+function submitDeposit(type){
+	var parameter = "";
+	
+	parameter += "&id="+getUrlParam("id");
+	
+	//增加/减少预存款符号
+	parameter += "&deposit_symbol="+encodeURIComponent(encodeURIComponent(document.getElementById("deposit_symbol").value));
+	//预存款
+	parameter += "&deposit="+encodeURIComponent(encodeURIComponent(document.getElementById("deposit").value));
+	//备注
+	var remark = document.getElementById("deposit_remark").value;
+	if(remark != "备注内容"){
+		parameter += "&deposit_remark="+encodeURIComponent(encodeURIComponent(remark));
+	}
+	
+	var csrf =  getCsrf();
+	parameter += "&_csrf_token="+csrf.token;
+	parameter += "&_csrf_header="+csrf.header;
+
+	//删除第一个&号,防止因为多了&号而出现警告: Parameters: Invalid chunk ignored.信息
+	if(parameter.indexOf("&") == 0){
+		parameter = parameter.substring(1,parameter.length);
+	}
+	post_request(function(value){
+		//清除所有错误显示
+		var errorTag_object = getElementsByName_pseudo("span", "errorTag");
+		for(i = 0; i < errorTag_object.length; i++) {	
+			if(errorTag_object[i].id != ""){
+				document.getElementById(errorTag_object[i].id).innerHTML = "";
+			}	
+		}
+		
+		if(value != ""){
+			var returnValue = JSON.parse(value);//返回JSON信息.Map<String,Object>格式
+			for(message in returnValue){	
+				if(message == "error"){
+					var error = returnValue[message];
+					for(e in error){
+						document.getElementById("error_"+e).innerHTML = error[e];
+					}
+			    }else if(message == "success"){
+			    	if(returnValue[message] == "true"){
+			    		document.getElementById("success_deposit").innerHTML = "提交成功,3秒后自动刷新本页";
+			    		refreshURL();
+			    	}
+			    	
+			    }
+			}
+		}
+	},
+		"${config:url(pageContext.request)}control/user/manage${config:suffix()}?method=payment&type="+type+"&timestamp=" + new Date().getTime(), true,parameter);
+
+} 
+
+//提交积分
+function submitPoint(type){
+	var parameter = "";
+	
+	parameter += "&id="+getUrlParam("id");
+	
+	//增加/减少预存款符号
+	parameter += "&point_symbol="+encodeURIComponent(encodeURIComponent(document.getElementById("point_symbol").value));
+	//预存款
+	parameter += "&point="+encodeURIComponent(encodeURIComponent(document.getElementById("point").value));
+	//备注
+	var remark = document.getElementById("point_remark").value;
+	if(remark != "备注内容"){
+		parameter += "&point_remark="+encodeURIComponent(encodeURIComponent(remark));
+	}
+	var csrf =  getCsrf();
+	parameter += "&_csrf_token="+csrf.token;
+	parameter += "&_csrf_header="+csrf.header;
+	
+
+	//删除第一个&号,防止因为多了&号而出现警告: Parameters: Invalid chunk ignored.信息
+	if(parameter.indexOf("&") == 0){
+		parameter = parameter.substring(1,parameter.length);
+	}
+	post_request(function(value){
+		//清除所有错误显示
+		var errorTag_object = getElementsByName_pseudo("span", "errorTag");
+		for(i = 0; i < errorTag_object.length; i++) {	
+			if(errorTag_object[i].id != ""){
+				document.getElementById(errorTag_object[i].id).innerHTML = "";
+			}	
+		}
+		
+		if(value != ""){
+			var returnValue = JSON.parse(value);//返回JSON信息.Map<String,Object>格式
+			for(message in returnValue){	
+				if(message == "error"){
+					var error = returnValue[message];
+					for(e in error){
+						document.getElementById("error_"+e).innerHTML = error[e];
+					}
+			    }else if(message == "success"){
+			    	if(returnValue[message] == "true"){
+			    		document.getElementById("success_point").innerHTML = "提交成功,3秒后自动刷新本页";
+			    		refreshURL();
+			    	}
+			    	
+			    }
+			}
+		}
+	},
+		"${config:url(pageContext.request)}control/user/manage${config:suffix()}?method=payment&type="+type+"&timestamp=" + new Date().getTime(), true,parameter);
+
+} 
+
+//刷新URL   
+function refreshURL() { 
+	setTimeout(function(){
+		window.location.reload();
+	},3000);     
+} 
+
+
+
+//充值UI
+function showDelta(obj,popId){
+
+	var msg=document.getElementById(popId);
+	
+	if(msg.style.display != "none"){
+		msg.style.display = "none";
+		
+	}else{
+		msg.style.display = "";
+	}
+	
+}
+
+
+</script>
+
+
+
 <script type="text/javascript" language="javascript"> 
 	//空白图片
 	var blankImage = "backstage/images/null.gif";
@@ -558,11 +792,122 @@
 	<input class="functionButton" type="button" onClick="javascript:window.location.href='${config:url(pageContext.request)}control/like/list${config:suffix()}?userName=${user.userName}&id=${param.id}&queryState=${param.queryState}&jumpStatus=${param.jumpStatus}&userPage=${param.userPage}'" value="点赞">
 	<input class="functionButton" type="button" onClick="javascript:window.location.href='${config:url(pageContext.request)}control/follow/list${config:suffix()}?userName=${user.userName}&id=${param.id}&queryState=${param.queryState}&jumpStatus=${param.jumpStatus}&userPage=${param.userPage}'" value="关注">
 	<input class="functionButton" type="button" onClick="javascript:window.location.href='${config:url(pageContext.request)}control/follower/list${config:suffix()}?userName=${user.userName}&id=${param.id}&queryState=${param.queryState}&jumpStatus=${param.jumpStatus}&userPage=${param.userPage}'" value="粉丝">
+	<input class="functionButton" type="button" onClick="javascript:window.location.href='${config:url(pageContext.request)}control/membershipCard/manage${config:suffix()}?method=membershipCardOrderList&userName=${user.userName}&id=${param.id}&queryState=${param.queryState}&jumpStatus=${param.jumpStatus}&userPage=${param.userPage}'" value="会员卡订单">
 	<input class="functionButton" type="button" onClick="javascript:window.location.href='${config:url(pageContext.request)}control/pointLog/list${config:suffix()}?userName=${user.userName}&id=${param.id}&queryState=${param.queryState}&jumpStatus=${param.jumpStatus}&userPage=${param.userPage}'" value="积分日志">
+	<input class="functionButton" type="button" onClick="javascript:window.location.href='${config:url(pageContext.request)}control/paymentLog/list${config:suffix()}?userName=${user.userName}&id=${param.id}&queryState=${param.queryState}&jumpStatus=${param.jumpStatus}&userPage=${param.userPage}'" value="支付日志">
+	<INPUT type="button" class="functionButton" value="充值" onClick="showDelta(this,'table_delta');">
 	<input class="functionButton" type="button" onClick="javascript:window.location.href='${config:url(pageContext.request)}control/userLoginLog/list${config:suffix()}?userName=${user.userName}&id=${param.id}&queryState=${param.queryState}&jumpStatus=${param.jumpStatus}&userPage=${param.userPage}'" value="登录日志">
 	<input class="functionButton" type="button" onclick="javascript: avatarLayer(); return false;" value="更换头像">
 </div>
 
+
+<TABLE id="table_delta" style="display:none;" class="t-table" cellSpacing="1" cellPadding="2" width="100%" border="0">
+<TBODY>
+	<TR>
+	    <TD class="t-label t-label-h" width="12%" >支付流水号充值：</TD>
+	    <TD class="t-content" width="76%" colSpan="3">
+	    	<TABLE cellSpacing="2" cellPadding="0" width="100%"  border="0" align="left">
+				<TBODY>
+					<TR align="center" height="30px">
+						<TD style="border-bottom: #BFE3FF 1px dotted;" width="100%" align="left">
+							<input type="text" class="form-text" id="paymentRunningNumberAmount" value="填写支付金额" size="30" maxlength="23" onFocus="if(value==defaultValue){value='';this.style.color='#000'}" onBlur="if(!value){value=defaultValue;this.style.color='#999'}" style="color:#999999">
+							<span name="errorTag" id="error_paymentRunningNumberAmount" style="color: red;"></span>			
+							<span class="span-help">流水号支付金额</span>
+							<input type="button" class="functionButton5" value="流水号" onClick="paymentVerificationLogPageDiv('${user.userName}','${user.id}');" />
+							
+						</TD>
+						
+					</TR>
+					<TR align="center" height="30px">
+						<TD style="border-bottom: #BFE3FF 1px dotted;" width="100%" align="left">
+							<input type="text" class="form-text" id="paymentRunningNumber" value="填写支付流水号" size="30" maxlength="64" onFocus="if(value==defaultValue){value='';this.style.color='#000'}" onBlur="if(!value){value=defaultValue;this.style.color='#999'}" style="color:#999999">
+							<span name="errorTag" id="error_paymentRunningNumber" style="color: red;"></span>			
+							<span class="span-help">流水号有效期为发起支付7天内</span>
+						</TD>
+						
+					</TR>
+					<TR align="center" >
+						<TD  width="100%" align="left">
+							<textarea class="form-textarea" id="paymentRunningNumber_remark" rows="3" cols="40" onFocus="if(value==defaultValue){value='';this.style.color='#000'}" onBlur="if(!value){value=defaultValue;this.style.color='#999'}" style="color:#999999">备注内容</textarea>
+						</TD>	
+					</TR>
+				</TBODY>
+			</TABLE>	
+	    </TD>
+	    <TD class="t-button" width="12%">
+			<span class="submitButton"><INPUT type="button" value="提交" onClick="javascript:submitPaymentRunningNumber(1);return false;"></span>
+  			
+			<span name="errorTag" id="success_paymentRunningNumber" style="color: green;"></span>
+		</TD>
+	</TR>
+	<TR>
+	    <TD class="t-label t-label-h" width="12%">增减预存款：</TD>
+	    <TD class="t-content" width="76%" colSpan="3">
+	    	<TABLE cellSpacing="2" cellPadding="0" width="100%"  border="0" align="left">
+				<TBODY>
+					<TR align="center" height="30px">
+						<TD style="border-bottom: #BFE3FF 1px dotted;" width="100%" align="left">
+							<div style="float: left;">
+								<select class="form-select" id="deposit_symbol">
+									<option value="+">增加</option>
+									<option value="-">减少</option>
+								</select>
+							</div>
+							<input type="text" class="form-text" id="deposit" value="填写预存款" size="30" maxlength="23" onFocus="if(value==defaultValue){value='';this.style.color='#000'}" onBlur="if(!value){value=defaultValue;this.style.color='#999'}" style="color:#999999">
+							<span name="errorTag" id="error_deposit" style="color: red;"></span>
+						</TD>
+						
+					</TR>
+					<TR align="center" >
+						<TD  width="100%" align="left">
+							<textarea class="form-textarea" id="deposit_remark" rows="3" cols="40" onFocus="if(value==defaultValue){value='';this.style.color='#000'}" onBlur="if(!value){value=defaultValue;this.style.color='#999'}" style="color:#999999">备注内容</textarea>
+						</TD>	
+					</TR>
+				</TBODY>
+			</TABLE>
+	    </TD>
+	    <TD class="t-button" width="12%">
+	    	<span class="submitButton"><INPUT type="button" value="提交" onClick="javascript:submitDeposit(2);return false;"></span>
+  			
+	    	<span name="errorTag" id="success_deposit" style="color: green;"></span>
+	    </TD>
+	</TR>
+	<TR>
+	    <TD class="t-label t-label-h" width="12%">增减积分：</TD>
+	    <TD class="t-content" width="76%" colSpan="3">
+	    	<TABLE cellSpacing="2" cellPadding="0" width="100%"  border="0" align="left">
+				<TBODY>
+					<TR align="center" height="30px">
+						<TD style="border-bottom: #BFE3FF 1px dotted;" width="100%" align="left">
+							<div style="float: left;">
+								<select class="form-select" id="point_symbol">
+									<option value="+">增加</option>
+									<option value="-">减少</option>
+								</select>
+							</div>
+							<input type="text" class="form-text" id="point" value="填写积分" size="30" maxlength="23" onFocus="if(value==defaultValue){value='';this.style.color='#000'}" onBlur="if(!value){value=defaultValue;this.style.color='#999'}" style="color:#999999">
+							<span name="errorTag" id="error_point" style="color: red;"></span>
+						</TD>
+						
+					</TR>
+					<TR align="center" >
+						<TD  width="100%" align="left">
+							<textarea class="form-textarea" id="point_remark" rows="3" cols="40" onFocus="if(value==defaultValue){value='';this.style.color='#000'}" onBlur="if(!value){value=defaultValue;this.style.color='#999'}" style="color:#999999">备注内容</textarea>
+						</TD>	
+					</TR>
+				</TBODY>
+			</TABLE>		
+	    </TD>
+	    <TD class="t-button" width="12%">
+	    	<span class="submitButton"><INPUT type="button" value="提交" onClick="javascript:submitPoint(3);return false;"></span>
+	    	<span name="errorTag" id="success_point" style="color: green;"></span>
+	    </TD>
+	</TR>
+	
+</TBODY>
+</TABLE>
+
+<span name="errorTag" id="error_payment" style="color: red;"></span>
 
 <TABLE class="t-table" cellSpacing="1" cellPadding="2" width="100%" border="0">
   <TBODY>
@@ -609,6 +954,11 @@
 		<c:if test="${ user.state eq 2 || user.state eq 12}">禁止用户</c:if>
     </TD>
   </TR>
+  <TR>
+    <TD class="t-label t-label-h" width="12%">预存款：</TD>
+    <TD class="t-content" width="88%" colSpan="3">
+    	${user.deposit}
+    </TD></TR>
   <TR>
     <TD class="t-label t-label-h" width="12%">当前积分：</TD>
     <TD class="t-content" width="88%" colSpan="3">

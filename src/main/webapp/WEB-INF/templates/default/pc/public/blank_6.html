@@ -1,0 +1,37 @@
+<#-- 会员卡 空白页 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<base href="${baseURL}">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>会员卡 - ${title}</title>
+	<#-- 获取令牌 -->
+	<meta name="csrfToken" content="${token}"/>
+	<meta name="keywords" content="${keywords}"/>
+	<meta name="description" content="${description}"/>
+	<link rel="shortcut icon" type="image/x-icon" href="${baseURL}${commonPath}images/favicon.ico" media="screen" />
+	<link href="${commonPath}css/common.css" type="text/css" rel="stylesheet">	
+	<script language="javascript" src="${commonPath}js/tool.js" type="text/javascript"></script>
+	<script language="javascript" src="${commonPath}js/ajax.js" type="text/javascript"></script>
+	<script language="javascript" src="${commonPath}js/json2.js" type="text/javascript"></script>
+	<script type="text/javascript" src="${commonPath}js/jquery/jquery.min.js" language="javascript"></script>
+	<link href="${commonPath}js/layer/skin/default/layer.css"  type="text/css" rel="stylesheet"/>
+	<script type="text/javascript" src="${commonPath}js/layer/layer.js" language="javascript"></script>
+</head>
+
+<body >
+<#-- 引入页头 -->
+<@include action="${newPublic_2}"/>
+<div class="skeleton">
+	<div class="main wrap" >
+
+	    
+	    <#-- 引入会员卡内容 -->
+	    <@include action="${membershipCardRelated_membershipCardContent_1}"/>
+	
+	</div>
+</div>
+<#--引入页脚-->
+<@include action="${newPublic_3}"/>
+
+</body></html>

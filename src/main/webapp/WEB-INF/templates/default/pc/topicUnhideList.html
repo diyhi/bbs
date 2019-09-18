@@ -4,7 +4,7 @@
 <head>
 	<base href="${baseURL}">
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<title>话题取消隐藏用户列表 - ${title}</title>
+	<title>话题解锁隐藏标签用户列表 - ${title}</title>
 	<meta name="keywords" content="${keywords}"/>
 	<meta name="description" content="${description}"/>
 	<#-- 获取令牌 -->
@@ -60,7 +60,7 @@
 		    		</#if> 
 		    		<#if !pageView.records?exists || pageView.totalrecord == 0 > 
 		    			<TR>
-							<TD colSpan="3"  class="empty">还没有取消隐藏用户</TD>
+							<TD colSpan="3"  class="empty">还没有话题解锁隐藏标签用户</TD>
 		    			</TR>
 		    		</#if> 
 		    	</TBODY>

@@ -92,6 +92,19 @@ public class SystemSettingValidator implements Validator{
 			errors.rejectValue("reply_rewardPoint","errors.required", new String[]{"不能为空"},"");
 		}
 		
+		//解锁话题隐藏内容平台分成比例
+		if(systemSetting.getTopicUnhidePlatformShareProportion() != null){
+			if(systemSetting.getTopicUnhidePlatformShareProportion() <0){
+				errors.rejectValue("topicUnhidePlatformShareProportion","errors.required", new String[]{"必须大于或等于0"},"");
+			}
+			if(systemSetting.getTopicUnhidePlatformShareProportion() >100){
+				errors.rejectValue("topicUnhidePlatformShareProportion","errors.required", new String[]{"必须小于或等于100"},"");
+			}
+		}else{
+			errors.rejectValue("topicUnhidePlatformShareProportion","errors.required", new String[]{"不能为空"},"");
+		}
+		
+		
 		//前台分页数量
 		if(systemSetting.getForestagePageNumber() != null){
 			if(systemSetting.getForestagePageNumber() <=0){

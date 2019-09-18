@@ -23,10 +23,11 @@
 <script language="JavaScript" type="text/javascript">
      //定义了分类二维数组，里面的顺序跟分类的顺序是相同的。通过selectedIndex获得分类的下标值来得到相应的分类数组
      var type=[
-     ["话题列表","话题内容","评论列表","标签列表","添加话题","添加评论","引用评论","回复评论","相拟话题","话题取消隐藏"],
+     ["话题列表","话题内容","评论列表","标签列表","添加话题","添加评论","引用评论","回复评论","相似话题","话题取消隐藏"],
      ["加入收藏夹","话题会员收藏总数","用户是否已经收藏话题"],
      ["给话题点赞","话题点赞总数","用户是否已经点赞该话题"],
      ["关注用户","粉丝总数","是否已经关注该用户"],
+     ["会员卡列表","会员卡内容","购买会员卡"],
      ["添加在线留言"],
      ["友情链接列表"],
      ["图片广告"],
@@ -654,6 +655,7 @@ function delete_searchWord_row(rowId){
 			<OPTION VALUE="收藏夹">收藏夹</OPTION>
 			<OPTION VALUE="点赞">点赞</OPTION>
 			<OPTION VALUE="关注">关注</OPTION>
+			<OPTION VALUE="会员卡">会员卡</OPTION>
 			<OPTION VALUE="在线留言">在线留言</OPTION>
 			<OPTION VALUE="友情链接">友情链接</OPTION>
             <OPTION VALUE="广告">广告</OPTION>
@@ -755,7 +757,7 @@ function delete_searchWord_row(rowId){
 		</TABLE>
 	</div>
 	
-	<!-- 话题部分--相拟话题  集合-->
+	<!-- 话题部分--相似话题  集合-->
 	<div id="related_liketopic_集合" name="forumType_div" style="DISPLAY: none">
 		<enhance:out escapeXml="false">
 		<input type="hidden" id="collection_Forum_TopicRelated_LikeTopic_Json" value="<c:out value="${collection_Forum_TopicRelated_LikeTopic}"></c:out>">
@@ -1078,7 +1080,7 @@ function echo_topic_page(error_map){
 	
 }
 
-//回显  话题部分--相拟话题--集合
+//回显  话题部分--相似话题--集合
 function echo_likeTopic_collection(error_map){
 	var collection_Forum_TopicRelated_LikeTopic_Json = document.getElementById("collection_Forum_TopicRelated_LikeTopic_Json").value;
 	if(collection_Forum_TopicRelated_LikeTopic_Json != ""){
@@ -1373,7 +1375,7 @@ function init(){
 	}
 	//回显  话题部分--话题列表--分页
 	echo_topic_page(error_map);
-	//回显  话题部分--相拟话题--集合
+	//回显  话题部分--相似话题--集合
 	echo_likeTopic_collection(error_map);
 	
 	//回显  评论 部分--评论 列表--分页

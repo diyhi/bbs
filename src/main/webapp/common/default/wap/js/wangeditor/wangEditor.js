@@ -3016,11 +3016,9 @@ Hide.prototype = {
 		    	template += 		"<div class='radio-box'><input type='radio' id='"+visibleType_40+"' name='"+visibleTypeName+"' class='radio-input' value='40' "+visibleType_checked_html_40+"> <span class='radio-core'></span><span class='radio-title'>积分购买可见</span></div>";
 		    	template += 	"</label>";
 			}else if(menu == "hideAmount"){
-				/** 
 		    	template += 	"<label>";
 		    	template += 		"<div class='radio-box'><input type='radio' id='"+visibleType_50+"' name='"+visibleTypeName+"' class='radio-input' value='50' "+visibleType_checked_html_50+"> <span class='radio-core'></span><span class='radio-title'>余额购买可见</span></div>";
 		    	template += 	"</label>";
-		    	**/
 			}
 		}
 

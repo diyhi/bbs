@@ -934,6 +934,16 @@ var thread_component = Vue.extend({
 	    					nodeHtml += 	'</div>';
 	            			nodeHtml += '</div>';
 	            			childNode.innerHTML = nodeHtml;
+	    				}else if(childNode.getAttribute("hide-type") == "50"){
+	            			var nodeHtml = "";
+	            			nodeHtml += '<div class="hide-box">';
+	            			nodeHtml += 	'<div class="background-image cms-lock"></div>';
+	            			nodeHtml += 	'<div class="background-prompt">此处内容已被隐藏，支付 ￥<span class="highlight">'+childNode.getAttribute("input-value")+'</span> 元可见</div>';
+	            			nodeHtml += 	'<div class="submit-box">';
+	    					nodeHtml += 		'<input type="button" value="提交" class="button" @click="topicUnhide(50);">';
+	    					nodeHtml += 	'</div>';
+	            			nodeHtml += '</div>';
+	            			childNode.innerHTML = nodeHtml;
 	    				}
 	            	}
 	               
@@ -3906,6 +3916,16 @@ var home_component = Vue.extend({
 	            			nodeHtml += 	'<div class="background-prompt">此处内容已被隐藏，支付‘'+childNode.getAttribute("input-value")+'’积分可见</div>';
 	            			nodeHtml += 	'<div class="submit-box">';
 	    					nodeHtml += 		'<input type="button" value="提交" class="button" @click="topicUnhide(40,'+null+','+topicId+');">';
+	    					nodeHtml += 	'</div>';
+	            			nodeHtml += '</div>';
+	            			childNode.innerHTML = nodeHtml;
+	    				}else if(childNode.getAttribute("hide-type") == "50"){
+	            			var nodeHtml = "";
+	            			nodeHtml += '<div class="hide-box">';
+	            			nodeHtml += 	'<div class="background-image cms-lock"></div>';
+	            			nodeHtml += 	'<div class="background-prompt">此处内容已被隐藏，支付 ￥<span class="highlight">'+childNode.getAttribute("input-value")+'</span> 元可见</div>';
+	            			nodeHtml += 	'<div class="submit-box">';
+	    					nodeHtml += 		'<input type="button" value="提交" class="button" @click="topicUnhide(50,'+null+','+topicId+');">';
 	    					nodeHtml += 	'</div>';
 	            			nodeHtml += '</div>';
 	            			childNode.innerHTML = nodeHtml;
@@ -7053,6 +7073,579 @@ var topicUnhide_component = Vue.extend({
 	}
 });
 
+
+//会员卡订单
+var membershipCardOrderList_component = Vue.extend({
+	template : '#membershipCardOrderList-template',
+	data : function data() {
+		return {
+			membershipCardOrderList : [], //会员卡订单集合
+			loading : false, //加载中
+			currentpage : 0, //当前页码
+			totalpage : 1, //总页数
+		}
+	},
+	created : function created() {
+	},
+	methods : {
+		//查询余额
+		queryMembershipCardOrderList : function() {
+			var _self = this;
+			
+			if (_self.currentpage < _self.totalpage) {
+				//先改总页数为0，避免请求为空时死循环
+				_self.totalpage = 0;
+				_self.loading = true;
+				var data = "page=" + (_self.currentpage + 1); //提交参数
+				$.ajax({
+					type : "GET",
+					cache : false,
+					async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+					url : "user/control/membershipCardOrderList",
+					data : data,
+					success : function success(result) {
+						if (result != "") {
+							var pageView = $.parseJSON(result);
+							var new_membershipCardOrderList = pageView.records;
+							if (new_membershipCardOrderList != null && new_membershipCardOrderList.length > 0) {
+								_self.membershipCardOrderList.push.apply(_self.membershipCardOrderList, new_membershipCardOrderList); //合并两个数组
+							}
+							_self.currentpage = pageView.currentpage;
+							_self.totalpage = pageView.totalpage;
+						}
+					},
+					complete : function complete(XMLHttpRequest, textStatus) {
+						_self.loading = false;
+						//需手动调用设置的全局complete
+						$.ajaxSettings.complete(XMLHttpRequest, textStatus);
+					}
+				});
+			}
+		}
+		
+	}
+	
+	
+	
+	
+	
+});
+
+
+//余额
+var balance_component = Vue.extend({
+	template : '#balance-template',
+	data : function data() {
+		return {
+			paymentLogList : [], //支付日志集合
+			loading : false, //加载中
+			currentpage : 0, //当前页码
+			totalpage : 1, //总页数
+			deposit :0.0 //预存款
+		}
+	},
+	created : function created() {
+	},
+	methods : {
+		//查询会员卡订单分页
+		queryBalance : function() {
+			var _self = this;
+			
+			if (_self.currentpage < _self.totalpage) {
+				//先改总页数为0，避免请求为空时死循环
+				_self.totalpage = 0;
+				_self.loading = true;
+				var data = "page=" + (_self.currentpage + 1); //提交参数
+				$.ajax({
+					type : "GET",
+					cache : false,
+					async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+					url : "user/control/balance",
+					data : data,
+					success : function success(result) {
+						if (result != "") {
+							var returnValue = $.parseJSON(result);
+							//预存款
+							var deposit = null;
+							var pageView = null;
+							
+
+							for (var key in returnValue) {
+								if (key == "deposit") {
+									deposit = returnValue[key];
+								}else if (key == "pageView") {
+									pageView = returnValue[key];
+								}
+							}
+							
+							if(deposit != null){
+								_self.deposit = deposit;
+							}
+							if(pageView != null){
+								var new_paymentLogList = pageView.records;
+								if (new_paymentLogList != null && new_paymentLogList.length > 0) {
+									_self.paymentLogList.push.apply(_self.paymentLogList, new_paymentLogList); //合并两个数组
+								}
+								_self.currentpage = pageView.currentpage;
+								_self.totalpage = pageView.totalpage;
+								
+							}
+						}
+					},
+					complete : function complete(XMLHttpRequest, textStatus) {
+						_self.loading = false;
+						//需手动调用设置的全局complete
+						$.ajaxSettings.complete(XMLHttpRequest, textStatus);
+					}
+				});
+			}
+		},
+		//跳转充值页
+		jumpRecharge : function () {
+			// 跳转页面
+			this.$router.push({
+				path : '/user/control/payment',
+				query : {
+					paymentModule : 5
+				}
+			});
+		}
+		
+		
+	}
+});
+
+//支付组件
+var payment_component = Vue.extend({
+	template : '#payment-template',
+	data : function() {
+		return {
+			paymentModule : '', //支付模块
+			
+			onlinePaymentInterfaceList : [], //在线支付接口集合
+
+			rechargeAmount : '', //充值金额
+			paymentBank_radio : '', //选中银行(格式：接口产品_银行简码)
+
+			error : {
+				rechargeAmount : '', //充值金额
+			},
+		};
+	},
+	created : function() {
+		this.init();
+	},
+	methods : {
+		//查询支付页
+		queryPayment : function() {
+			var _self = this;
+
+			var parameter = "&paymentModule=" + _self.paymentModule;
+			$.ajax({
+				type : "GET",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "user/control/payment",
+				data : parameter,
+				success : function success(result) {
+					if (result != "") {
+						var returnValue = $.parseJSON(result);
+						var value_success = "";
+						var value_error = null;
+						var value_onlinePaymentInterfaceList = null;
+						for (var key in returnValue) {
+							if (key == "success") {
+								value_success = returnValue[key];
+							} else if (key == "error") {
+								value_error = returnValue[key];
+							}else if (key == "onlinePaymentInterfaceList") {
+								value_onlinePaymentInterfaceList = returnValue[key];
+							}
+						}
+						if (value_success == "true") { //成功
+							if (value_onlinePaymentInterfaceList != null) {
+								_self.onlinePaymentInterfaceList = value_onlinePaymentInterfaceList;
+							}
+
+
+						} else { //失败
+							//显示错误
+							if (value_error != null) {
+								var htmlContent = "";
+								var count = 0;
+								for (var errorKey in value_error) {
+									var errorValue = value_error[errorKey];
+
+									count++;
+									htmlContent += count + ". " + errorValue + "<br>";
+								}
+								_self.$messagebox('提示', htmlContent);
+							}
+
+						}
+					}
+
+				}
+			});
+		},
+
+		//选择支付银行
+		selectPayment : function(interfaceProduct, code) {
+			this.paymentBank_radio = interfaceProduct + "_" + code;
+		},
+		//支付校验
+		paymentVerification : function() {
+			var _self = this;
+			//清除所有错误
+			_self.clearError();
+
+			var parameter = "";
+			parameter += "&paymentModule=" + _self.paymentModule; //支付模块
+			parameter += "&rechargeAmount=" + _self.rechargeAmount; //充值金额
+			$.ajax({
+				type : "GET",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "user/control/paymentVerification",
+				data : parameter,
+				success : function success(result) {
+					if (result != "") {
+						var returnValue = $.parseJSON(result);
+						var value_success = "";
+						var value_error = null;
+						for (var key in returnValue) {
+							if (key == "success") {
+								value_success = returnValue[key];
+							} else if (key == "error") {
+								value_error = returnValue[key];
+							}
+						}
+						if (value_success == "false") { //失败
+							//显示错误
+							if (value_error != null) {
+
+								var htmlContent = "";
+								var count = 0;
+								for (var errorKey in value_error) {
+									var errorValue = value_error[errorKey];
+									count++;
+									htmlContent += count + ". " + errorValue + "<br>";
+								}
+								_self.$messagebox('提示', htmlContent);
+							}
+						}
+					}
+				}
+			});
+		},
+
+		//付款
+		pay : function() {
+			var _self = this;
+
+			//清除所有错误
+			_self.clearError();
+
+			var parameter = "";
+			parameter += "&paymentModule=" + _self.paymentModule; //支付模块
+			parameter += "&rechargeAmount=" + _self.rechargeAmount; //充值金额
+			if (_self.paymentBank_radio != null && _self.paymentBank_radio != "") {
+				parameter += "&paymentBank=" + _self.paymentBank_radio; //支付银行(格式：接口产品_银行简码)
+			}
+
+
+			//令牌
+			parameter += "&token=" + _self.$store.state.token;
+			$.ajax({
+				type : "POST",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "user/control/payment",
+				data : parameter,
+				success : function success(result) {
+					if (result != "") {
+						var returnValue = $.parseJSON(result);
+						var value_success = "";
+						var value_error = null;
+						
+						var value_onlinePaymentInterfaceList = null;
+
+						var value_redirect = null;
+						var value_callbackData = null;
+						for (var key in returnValue) {
+							if (key == "success") {
+								value_success = returnValue[key];
+							} else if (key == "error") {
+								value_error = returnValue[key];
+							} else if (key == "onlinePaymentInterfaceList") {
+								value_onlinePaymentInterfaceList = returnValue[key];
+							} else if (key == "redirect") { //支付完成后跳转成功页
+								value_redirect = returnValue[key];
+							} else if (key == "callbackData") { //跳转到第三方支付页回调数据
+								value_callbackData = returnValue[key];
+							}
+						}
+						if (value_success == "true") { //成功
+							if (value_redirect != null && value_redirect != "") {
+								//跳转到支付完成通知页
+								_self.$router.push({
+									path : '/' + value_redirect
+								});
+							}
+							if (value_callbackData != null && value_callbackData != "") {
+								//根据第三方支付返回的回调数据跳转到第三方支付
+								var div = document.createElement('div');
+								div.innerHTML = value_callbackData;
+								document.body.appendChild(div);
+								document.forms[0].submit();
+							}
+						} else { //失败
+
+							//显示错误
+							if (value_error != null) {
+
+								var htmlContent = "";
+								var count = 0;
+								for (var errorKey in value_error) {
+									var errorValue = value_error[errorKey];
+
+									count++;
+									htmlContent += count + ". " + errorValue + "<br>";
+								}
+								_self.$messagebox('提示', htmlContent);
+							}
+							
+							if (value_onlinePaymentInterfaceList != null) {
+								_self.onlinePaymentInterfaceList = value_onlinePaymentInterfaceList;
+							}
+						}
+					}
+				}
+			});
+		},
+
+
+		//清除所有错误
+		clearError : function() {
+			for (var e in this.error) {
+				this.error[e] = '';
+			}
+		},
+
+
+
+		//初始化数据
+		init : function() {
+			var paymentModule = getUrlParam("paymentModule");
+			if (paymentModule != null && paymentModule != "") {
+				this.paymentModule = paymentModule;
+			}
+			//查询支付页
+			this.queryPayment();
+		},
+	}
+});
+
+
+//支付完成通知组件
+var paymentCompleted_component = Vue.extend({
+	template : '#paymentCompleted-template',
+	data : function() {
+		return {
+			paymentModule : '', //支付模块
+		};
+	},
+	created : function() {
+		//获取URL中的参数组
+		var pathName = window.location.pathname;
+		var before = pathName.indexOf("/paymentCompleted/");
+		var point = pathName.indexOf(".");
+		if (point == -1) {
+			point = pathName.length;
+		}
+		var parameterGroup = pathName.substring(before + 18, point);
+		var parameter_arr = parameterGroup.split("/");
+		if (parameter_arr != null && parameter_arr.length == 3) {
+			var interfaceProduct = parameter_arr[0];
+			var paymentModule = parameter_arr[1];
+			var parameterId = parameter_arr[2];
+			this.paymentModule = parseInt(paymentModule);
+		}
+	},
+	methods : {
+		//前往用户中心
+		queryHome : function() {
+			this.$router.replace({
+				path : '/user/control/home'
+			});
+		}
+	}
+});
+
+//会员卡列表
+var membershipCardList_component = Vue.extend({
+	template : '#membershipCardList-template',
+	data : function data() {
+		return {
+			membershipCardList: '',//会员卡列表
+		};
+	},
+	created : function created() {
+		this.queryMembershipCardList();
+	},
+	methods : {
+		//查询会员卡列表
+		queryMembershipCardList : function() {
+			var _self = this;
+			$.ajax({
+				type : "GET",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "queryMembershipCardList",
+				success : function success(result) {
+					if (result != "") {
+						var returnValue = $.parseJSON(result);
+						if (returnValue != null && returnValue.length > 0) {
+							_self.membershipCardList = returnValue;
+						}
+					}
+				}
+			});
+		},
+	},
+});
+
+//会员卡
+var membershipCard_component = Vue.extend({
+	template : '#membershipCard-template',
+	data : function data() {
+		return {
+			membershipCardId :'',//会员卡Id
+			membershipCard: '',//会员卡
+			buttonDisabled:[],//提交按钮是否允许点击
+		};
+	},
+	created : function created() {
+		var membershipCardId = getUrlParam("membershipCardId");//会员卡Id
+		if(membershipCardId != null){
+			this.membershipCardId = membershipCardId;
+		}
+		this.queryMembershipCard();
+	},
+	methods : {
+		//查询会员卡
+		queryMembershipCard : function() {
+			var _self = this;
+			var data = "membershipCardId=" + _self.membershipCardId; //提交参数
+			$.ajax({
+				type : "GET",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "queryMembershipCard",
+				data : data,
+				success : function success(result) {
+					if (result != "") {
+						var returnValue = $.parseJSON(result);
+						if (returnValue != null) {
+							_self.membershipCard = returnValue;
+							if(_self.membershipCard != null){
+								for (var i = 0; i < _self.membershipCard.specificationList.length; i++) {
+									var specification = _self.membershipCard.specificationList[i];
+									if(specification.stock >=0){
+										_self.buttonDisabled.push(false);
+										
+									}else{
+										_self.buttonDisabled.push(true);
+									}
+								}
+							}
+							
+							
+						}
+					}
+				}
+			});
+		},
+		//购买会员卡
+		addMembershipCardOrder : function(index,specificationId) {
+			var _self = this;
+			_self.buttonDisabled.splice(index,1,true);//修改为不允许点击按钮
+			
+			_self.$messagebox.confirm('确定购买?').then(function (action) {
+				var parameter = "&specificationId=" + specificationId;
+
+				//	alert(parameter);
+				//令牌
+				parameter += "&token=" + _self.$store.state.token;
+				$.ajax({
+					type : "POST",
+					cache : false,
+					async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+					url : "user/control/membershipCard/add",
+					data : parameter,
+					success : function success(result) {
+						if (result != "") {
+
+							var returnValue = $.parseJSON(result);
+
+							var value_success = "";
+							var value_error = null;
+
+							for (var key in returnValue) {
+								if (key == "success") {
+									value_success = returnValue[key];
+								} else if (key == "error") {
+									value_error = returnValue[key];
+								}
+							}
+
+							//加入成功
+							if (value_success == "true") {
+								_self.$toast({
+									message : "购买会员卡成功",
+									duration : 3000,
+									className : "mint-ui-toast",
+								});
+								/**
+								setTimeout(function() {
+									//刷新用户是否已经点赞该话题
+									_self.queryAlreadyLiked();
+									//刷新话题点赞总数
+									_self.queryLikeCount();
+								}, 3000);**/
+								
+							} else {
+								//显示错误
+								if (value_error != null) {
+
+
+									var htmlContent = "";
+									var count = 0;
+									for (var errorKey in value_error) {
+										var errorValue = value_error[errorKey];
+										count++;
+										htmlContent += count + ". " + errorValue + "<br>";
+									}
+									_self.$messagebox('提示', htmlContent);
+
+								}
+							}
+						}
+					}
+				});
+			},function (action) {//取消回调
+				_self.buttonDisabled.splice(index,1,false);//修改为允许点击按钮
+			}).catch(function (err){//不捕获 Promise 的异常,若用户点击了取消按钮,会出现警告
+			    console.log(err);
+			});
+		}
+	},
+});
+
+
+
+
+
 /**------------------------------------------- 公共组件 ------------------------------------------------**/
 
 //底部选项卡
@@ -7068,7 +7661,6 @@ var bottomTab_component = Vue.extend({
 	},
 	created : function created() {
 		this.defaultSelected();
-		
 		
 		
 	},
@@ -7153,7 +7745,6 @@ var bottomTab_component = Vue.extend({
 			});
 		},
 		
-		
 		//初始化BScroll滚动插件
 		initScroll : function initScroll() {
 			this.scroll = new BScroll(this.$refs.tagScroll, {
@@ -7207,6 +7798,12 @@ var routes = [
 	{path : '/user/control/followList',component : follow_component}, //关注
 	{path : '/user/control/followerList',component : follower_component}, //粉丝
 	{path : '/user/control/topicUnhideList',component : topicUnhide_component}, //话题取消隐藏用户列表
+	{path : '/user/control/membershipCardOrderList',component : membershipCardOrderList_component}, //会员卡订单
+	{path : '/user/control/balance',component : balance_component}, //余额
+	{path : '/user/control/payment',component : payment_component}, //支付组件
+	{path : '/paymentCompleted/:interfaceProduct/:paymentModule/:parameterId',component : paymentCompleted_component}, //支付完成通知组件
+	{path : '/membershipCardList',component : membershipCardList_component}, //会员卡列表
+	{path : '/membershipCard',component : membershipCard_component}, //会员卡
 	{path : '*',redirect : '/index'} //其余路由重定向至首页
 ];
 
@@ -7383,7 +7980,10 @@ var vue = new Vue({
 			//	var param = location.search; //获取url中"?"符后的字串
 
 		//	alert(pathname+" -- "+param);
+			
 		},
+		
+		
 		//定时查询消息
 		timerUnreadMessage: function timerUnreadMessage() {
 			var _self = this;

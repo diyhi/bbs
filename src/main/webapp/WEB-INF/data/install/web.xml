@@ -4,12 +4,11 @@
 	xmlns="http://xmlns.jcp.org/xml/ns/javaee" 
 	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" 
 	version="3.1">
-	
 	<!-- Spring 刷新Introspector防止内存泄露 -->
     <listener>
         <listener-class>org.springframework.web.util.IntrospectorCleanupListener</listener-class>
     </listener>
-    
+	
 	<!-- 对Spring容器进行实例化-->
 	<listener>
 	  <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
@@ -29,7 +28,8 @@
 	<!-- 系统启动或关闭执行 -->
 	<listener>  
 		<listener-class>cms.web.filter.BasicConfig</listener-class>    
-    </listener>  
+    </listener>
+
 	
 	<!-- 所有页面间参数的传递设置统一的字符编码 -->
 	<filter>  
@@ -64,6 +64,7 @@
 	  <filter-name>springSecurityFilterChain</filter-name>
 	  <url-pattern>/*</url-pattern>
 	</filter-mapping>
+	
 
 	<!-- 启动Spring MVC -->
 	<servlet>  
@@ -97,8 +98,8 @@
  
   	
   	
-   
     
+
     
     <!-- Druid连接池监控界面使用配置 
     <servlet>
@@ -140,7 +141,7 @@
 	  	<filter-name>DisableUrlSessionFilter</filter-name>  
 	  	<url-pattern>/*</url-pattern>  
 	</filter-mapping>  
-	
+
 	<welcome-file-list>
     	<welcome-file>index.htm</welcome-file>
 	</welcome-file-list>

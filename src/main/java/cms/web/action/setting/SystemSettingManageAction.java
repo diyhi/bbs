@@ -362,6 +362,8 @@ public class SystemSettingManageAction {
 		model.addAttribute("systemNode",systemNode);
 		
 		
+		
+		
 		List<CacheStatus> cacheStatusList = new ArrayList<CacheStatus>();
 		DecimalFormat format = new DecimalFormat("0.0");
 		if("memcached".equals(selectCache.getCacheName())){//memcached服务器

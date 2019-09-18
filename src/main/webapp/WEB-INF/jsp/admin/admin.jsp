@@ -159,7 +159,7 @@ function callbackTopic(){
 			                    </div>
 			                    <div class="nav-pop-list" >
 			                        <ul class="ul-navlist">
-			                            <li onclick="createWindow('A_5_0','员工列表','control/staff/manage${config:suffix()}?method=editStaff&userId=${sysUsers.userId }&page=');return false;"><i class="fa fa-user-cog"></i>个人设置</li>
+			                            <li onclick="createWindow('A_6_0','员工列表','control/staff/manage${config:suffix()}?method=editStaff&userId=${sysUsers.userId }&page=');return false;"><i class="fa fa-user-cog"></i>个人设置</li>
 			                            <li onClick="javascript:submitLogout();return false;"><i class="fa fa-sign-out-alt" style="font-size: 13px;margin-right: 5px;"></i>退出登录</li>
 			                        </ul>
 			                    </div>
@@ -354,6 +354,11 @@ function initConfig(){
 	config.additem('会员注册项',t,'${config:url(pageContext.request)}control/userCustom/list${config:suffix()}');
 	config.additem('会员注册禁止用户名称',t,'${config:url(pageContext.request)}control/disableUserName/list${config:suffix()}');
 	
+	
+	t=config.addtitle('会员卡管理','会员管理',1);
+	config.additem('会员卡列表',t,'${config:url(pageContext.request)}control/membershipCard/list${config:suffix()}');
+	config.additem('会员卡订单列表',t,'${config:url(pageContext.request)}control/membershipCardOrder/list${config:suffix()}');
+
 	t=config.addtitle('员工管理','会员管理',1);
 	config.additem('员工列表',t,'${config:url(pageContext.request)}control/staff/list${config:suffix()}');
 	config.additem('角色列表',t,'${config:url(pageContext.request)}control/roles/list${config:suffix()}');
@@ -372,6 +377,12 @@ function initConfig(){
 	config.additem('压缩文件列表',t,'${config:url(pageContext.request)}control/filePackage/list${config:suffix()}');
 	t=config.addtitle('系统通知管理','运营管理',1);
 	config.additem('系统通知列表',t,'${config:url(pageContext.request)}control/systemNotify/list${config:suffix()}');
+	
+	
+	t=config.addtitle('平台收益管理','运营管理',1);
+	config.additem('解锁话题隐藏内容分成',t,'${config:url(pageContext.request)}control/topicUnhidePlatformShare/list${config:suffix()}');//解锁话题隐藏内容平台分成
+	
+
 
 	t=config.addtitle('全站设置','系统设置',1);
 	config.additem('基本设置',t,'${config:url(pageContext.request)}control/systemSetting/manage/edit${config:suffix()}');
@@ -380,6 +391,9 @@ function initConfig(){
 	config.additem('数据库备份/还原',t,'${config:url(pageContext.request)}control/dataBase/list${config:suffix()}');
 	config.additem('服务器节点参数',t,'${config:url(pageContext.request)}control/systemSetting/manage${config:suffix()}?method=nodeParameter');
 	config.additem('升级',t,'${config:url(pageContext.request)}control/upgrade/manage${config:suffix()}?method=upgradeSystemList');
+	
+	t=config.addtitle('支付管理','系统设置',1);
+	config.additem('在线支付接口',t,'${config:url(pageContext.request)}control/onlinePaymentInterface/list${config:suffix()}');
 	
 	t=config.addtitle('短信管理','系统设置',1);
 	config.additem('短信接口列表',t,'${config:url(pageContext.request)}control/smsInterface/list${config:suffix()}');

@@ -25,7 +25,6 @@ A:active {
 	color: #0099CC; 
 }
 
-
 input::-moz-focus-inner{ border: 0;padding: 0;}
 
 
@@ -318,6 +317,5 @@ ul.rating li.five a:hover {background-position:0 -160px}
     opacity: 0;
     filter:alpha(opacity=0);
 }
-
 
 

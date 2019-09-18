@@ -322,7 +322,7 @@ function initKindEditor(){
         'formatblock', 'fontname', 'fontsize', '/', 'forecolor', 'hilitecolor', 'bold',
         'italic', 'underline', 'strikethrough', 'lineheight', 'removeformat', '|', 'image', 'multiimage',
         'flash', 'media', 'insertfile','emoticons','baidumap', 'table', 'hr',   'pagebreak',
-         'link', 'unlink','hide','hidePassword','hideComment','hideGrade','hidePoint'],
+         'link', 'unlink','hide','hidePassword','hideComment','hideGrade','hidePoint','hideAmount'],
          	userGradeList:userGradeList_obj,
 			afterChange : function() {
 				this.sync();

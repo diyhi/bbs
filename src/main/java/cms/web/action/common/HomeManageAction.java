@@ -41,11 +41,13 @@ import cms.bean.favorite.Favorites;
 import cms.bean.follow.Follow;
 import cms.bean.follow.Follower;
 import cms.bean.like.Like;
+import cms.bean.membershipCard.MembershipCardOrder;
 import cms.bean.message.PrivateMessage;
 import cms.bean.message.Remind;
 import cms.bean.message.SubscriptionSystemNotify;
 import cms.bean.message.SystemNotify;
 import cms.bean.message.UnreadMessage;
+import cms.bean.payment.PaymentLog;
 import cms.bean.topic.Comment;
 import cms.bean.topic.HideTagType;
 import cms.bean.topic.Reply;
@@ -67,9 +69,11 @@ import cms.bean.user.UserLoginLog;
 import cms.service.favorite.FavoriteService;
 import cms.service.follow.FollowService;
 import cms.service.like.LikeService;
+import cms.service.membershipCard.MembershipCardService;
 import cms.service.message.PrivateMessageService;
 import cms.service.message.RemindService;
 import cms.service.message.SystemNotifyService;
+import cms.service.payment.PaymentService;
 import cms.service.setting.SettingService;
 import cms.service.template.TemplateService;
 import cms.service.topic.CommentService;
@@ -171,6 +175,8 @@ public class HomeManageAction {
 	@Resource FollowerManage followerManage;
 	
 	@Resource UserRoleManage userRoleManage;
+	@Resource PaymentService paymentService;
+	@Resource MembershipCardService membershipCardService;
 	
 	//?  匹配任何单字符
 	//*  匹配0或者任意数量的字符
@@ -3730,14 +3736,7 @@ public class HomeManageAction {
 						if(topicRoleNameList != null && topicRoleNameList.size() >0){
 							userDynamic.setAllowRoleViewList(topicRoleNameList);//话题允许查看的角色名称集合
 						}
-						
-						
-						
-						
-						
-						
-						
-						
+
 						
 						//处理隐藏标签
 						if(userDynamic.getModule().equals(100) && topicInfo.getContent() != null && !"".equals(topicInfo.getContent().trim())){
@@ -3797,7 +3796,13 @@ public class HomeManageAction {
 									  			visibleTagList.add(HideTagType.POINT.getName());//当前话题已经取消隐藏
 										  	}
 										}else if(entry.getKey().equals(HideTagType.AMOUNT.getName())){//余额购买可见
-											
+											//话题取消隐藏Id
+										  	String topicUnhideId = topicManage.createTopicUnhideId(accessUser.getUserId(), HideTagType.AMOUNT.getName(), userDynamic.getTopicId());
+										  	TopicUnhide topicUnhide = topicManage.query_cache_findTopicUnhideById(topicUnhideId);
+									  		
+									  		if(topicUnhide != null){
+									  			visibleTagList.add(HideTagType.AMOUNT.getName());//当前话题已经取消隐藏
+										  	}
 										}
 										
 									}
@@ -4319,6 +4324,104 @@ public class HomeManageAction {
 				return "templates/"+dirName+"/"+accessPath+"/jump";	
 			}
 		}
+		
+	}
+	
+	/**
+	 * 账户余额
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/user/control/balance",method=RequestMethod.GET) 
+	public String balanceUI(ModelMap model,PageForm pageForm,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+	
+		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
+		
+		
+		//获取登录用户
+	  	AccessUser accessUser = AccessUserThreadLocal.get();
+
+		
+		User user = userService.findUserByUserName(accessUser.getUserName());
+
+		model.addAttribute("deposit",user.getDeposit());//当前预存款
+		returnValue.put("deposit",user.getDeposit());
+		if(user != null){
+			//调用分页算法代码
+			PageView<PaymentLog> pageView = new PageView<PaymentLog>(settingService.findSystemSetting_cache().getForestagePageNumber(),pageForm.getPage(),10,request.getRequestURI(),request.getQueryString());
+			//当前页
+			int firstIndex = (pageForm.getPage()-1)*pageView.getMaxresult();
+			
+			if(user != null){
+				QueryResult<PaymentLog> qr =  paymentService.findPaymentLogPage(user.getId(),user.getUserName(),firstIndex, pageView.getMaxresult());
+				
+				//将查询结果集传给分页List
+				pageView.setQueryResult(qr);
+				model.addAttribute("pageView", pageView);
+				returnValue.put("pageView", pageView);
+			}
+		}
+		if(isAjax == true){
+			WebUtil.writeToWeb(JsonUtils.toJSONString(returnValue), "json", response);
+			return null;
+		}else{
+			String dirName = templateService.findTemplateDir_cache();
+			
+			String accessPath = accessSourceDeviceManage.accessDevices(request);
+		   
+			
+			return "templates/"+dirName+"/"+accessPath+"/balance";	
+		}
+		
+		
+	}
+	
+	/**
+	 * 会员卡订单列表
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/user/control/membershipCardOrderList",method=RequestMethod.GET) 
+	public String membershipCardOrderUI(ModelMap model,PageForm pageForm,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+	
+		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+			
+		//获取登录用户
+	  	AccessUser accessUser = AccessUserThreadLocal.get();
+
+	
+		//调用分页算法代码
+		PageView<MembershipCardOrder> pageView = new PageView<MembershipCardOrder>(settingService.findSystemSetting_cache().getForestagePageNumber(),pageForm.getPage(),10,request.getRequestURI(),request.getQueryString());
+		//当前页
+		int firstIndex = (pageForm.getPage()-1)*pageView.getMaxresult();
+		
+		
+		QueryResult<MembershipCardOrder> qr =  membershipCardService.findMembershipCardOrderByUserName(accessUser.getUserName(),firstIndex, pageView.getMaxresult());
+		
+		//将查询结果集传给分页List
+		pageView.setQueryResult(qr);
+		model.addAttribute("pageView", pageView);
+		
+		
+		if(isAjax == true){
+			WebUtil.writeToWeb(JsonUtils.toJSONString(pageView), "json", response);
+			return null;
+		}else{
+			String dirName = templateService.findTemplateDir_cache();
+			
+			String accessPath = accessSourceDeviceManage.accessDevices(request);
+		   
+			
+			return "templates/"+dirName+"/"+accessPath+"/membershipCardOrderList";	
+		}
+		
 		
 	}
 }

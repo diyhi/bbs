@@ -20,7 +20,7 @@ import javax.persistence.Transient;
 @MappedSuperclass
 @Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
 public class UnhideEntity implements Serializable{
-	private static final long serialVersionUID = 3669961673097315094L;
+	private static final long serialVersionUID = -5556786175535354645L;
 	
 	/** ID (结构：取消隐藏的用户Id_隐藏标签类型_话题Id)**/
 	@Id @Column(length=43)

@@ -380,7 +380,9 @@ html,body{
 }
 .topicContentModule .topicDetail .main hide .background-prompt{
 	margin-top: 2px; color: #999999;font-size: 16px;
-}/*border:#a9a9a9 solid 2px;  边框#b2b5bc #777777*/
+}
+.topicContentModule .topicDetail .main hide .highlight{font-weight:bold;}
+/*border:#a9a9a9 solid 2px;  边框#b2b5bc #777777*/
 .topicContentModule .topicDetail .main hide .input-box{margin: auto; margin-top: 10px;margin-bottom:18px; border:#888888 solid 2px; width:226px; height:26px; overflow:hidden; border-radius: 2px;}
 .topicContentModule .topicDetail .main hide .input-box .text{ width:145px; height:26px; line-height:26px; border:0; float:left; font-size:14px; color:#4f4f4f; text-indent: 6px; vertical-align:middle;outline:none; background: #f7f8fa;}
 .topicContentModule .topicDetail .main hide .input-box .button{ width:79px;*width:76px; height:26px; line-height:28px; border:0; background:#888888; font-size:16px; color:#fff; float:right; font-weight:bold; cursor:pointer;text-decoration: none; outline: none}
@@ -877,7 +879,7 @@ html,body{
 }
 
 
-
+/** 动态 **/
 .homeModule .userDynamicList {
 	width: 100%;margin-top: 5px;
 }
@@ -891,10 +893,11 @@ html,body{
 	padding: 8px 0px 0;
 	margin: 0;
 	overflow: hidden;
+	position: relative;
 }
 .homeModule .userDynamicList .item .head .avatarBox{
 	position:absolute;display:inline-block;border-radius:100%;
-	
+	left: 0px;
 	
 }
 .homeModule .userDynamicList .item .head .avatarBox img{
@@ -983,7 +986,9 @@ html,body{
 }
 .homeModule .userDynamicList .item .main .topicContent hide .background-prompt{
 	margin-top: 2px; color: #999999;font-size: 16px;
-}/*border:#a9a9a9 solid 2px;  边框#b2b5bc #777777*/
+}
+.homeModule .userDynamicList .item .main .topicContent hide .highlight{font-weight:bold;}
+/*border:#a9a9a9 solid 2px;  边框#b2b5bc #777777*/
 .homeModule .userDynamicList .item .main .topicContent hide .input-box{margin: auto; margin-top: 10px;margin-bottom:18px; border:#888888 solid 2px; width:226px; height:26px; overflow:hidden; border-radius: 2px;}
 .homeModule .userDynamicList .item .main .topicContent hide .input-box .text{ width:145px; height:26px; line-height:26px; border:0; float:left; font-size:14px; color:#4f4f4f; text-indent: 6px; vertical-align:middle;outline:none; background: #f7f8fa;}
 .homeModule .userDynamicList .item .main .topicContent hide .input-box .button{ width:79px;*width:76px; height:26px; line-height:28px; border:0; background:#888888; font-size:16px; color:#fff; float:right; font-weight:bold; cursor:pointer;text-decoration: none; outline: none}
@@ -1148,7 +1153,26 @@ html,body{
       	line-height:40px;
         overflow: visible;
       }
+/* 会员卡链接 */
+.homeModule .membershipCard{
+	margin: 10px;
+}
+.homeModule .membershipCard .link {
+	display: block;
+	color: #fff;
+	background: #f9f4ed;
+	height: 80px;
+	line-height: 80px;
+	border-radius: 8px;
+}
 
+.homeModule .membershipCard .title {
+	font-size: 26px;
+	letter-spacing: 0;
+	text-align: center;
+	font-weight: 700;
+	color: #bb8b51;
+}
 
 
 /** 我的话题 **/
@@ -1353,7 +1377,6 @@ html,body{
 }
 .privateMessageModule .privateMessageList {
 	width: 100%;
-	overflow-x: hidden
 }
 .privateMessageModule .privateMessageList .item {
 	border-bottom: 1px solid #eee;
@@ -1675,7 +1698,6 @@ html,body{
 }
 .systemNotifyModule .systemNotifyList {
 	width: 100%;
-	overflow-x: hidden
 }
 .systemNotifyModule .systemNotifyList .item {
 	border-bottom: 1px solid #eee;
@@ -1735,7 +1757,6 @@ html,body{
 }
 .remindModule .remindList {
 	width: 100%;
-	overflow-x: hidden
 }
 .remindModule .remindList .item {
 	border-bottom: 1px solid #eee;
@@ -1816,7 +1837,6 @@ html,body{
 }
 .favoriteModule .favoriteList {
 	width: 100%;
-	overflow-x: hidden
 }
 .favoriteModule .favoriteList .item {
 	border-bottom: 1px solid #eee;
@@ -1865,7 +1885,6 @@ html,body{
 }
 .likeModule .likeList {
 	width: 100%;
-	overflow-x: hidden
 }
 .likeModule .likeList .item {
 	border-bottom: 1px solid #eee;
@@ -1913,7 +1932,6 @@ html,body{
 }
 .followModule .followList {
 	width: 100%;
-	overflow-x: hidden
 }
 .followModule .followList .item {
 	border-bottom: 1px solid #eee;
@@ -1961,7 +1979,6 @@ html,body{
 }
 .followerModule .followerList {
 	width: 100%;
-	overflow-x: hidden
 }
 .followerModule .followerList .item {
 	border-bottom: 1px solid #eee;
@@ -2008,4 +2025,430 @@ html,body{
 	padding-top: 40px;padding-bottom: 2px;
 }
 
+/** 会员卡订单 **/
+.membershipCardOrderListModule{
+	padding-top: 40px;padding-bottom: 2px;
+}
+.membershipCardOrderListModule .membershipCardOrderList {
+	width: 100%;
+	
+}
+.membershipCardOrderListModule .membershipCardOrderList .item {
+	border-bottom: 1px solid #eee;
+	margin-left: 8px; 
+	margin-right: 8px;
+}
+.membershipCardOrderListModule .membershipCardOrderList .item .head {
+	min-height: 25px;
+	padding: 8px 3px 0;
+	margin: 0;
+	overflow: hidden;
+}
+.membershipCardOrderListModule .membershipCardOrderList .item .head .orderId {
+	display: block;
+	float: left
+}
+.membershipCardOrderListModule .membershipCardOrderList .item .head .orderId h2 {
+	color:#aaa;
+	font-size:14px;
+	line-height: 16px
+}
+.membershipCardOrderListModule .membershipCardOrderList .item .head .duration {
+	float: right;
+	font-size: 12px;
+	color:#aaa;
+	font-size: 14px;
+	margin-top: -2px;
+}
+.membershipCardOrderListModule .membershipCardOrderList .item .main {
+	padding: 0 8px 0 8px;
+	font-size: 15px;
+	line-height: 26px;
+	margin: 0 0 10px
+}
+.membershipCardOrderListModule .membershipCardOrderList .item .main .content {
+	margin-bottom: 10px;
+	color:#222;
+}
+.membershipCardOrderListModule .membershipCardOrderList .item .bottomInfo {
+	min-height: 24px;
+	padding: 0px 3px 0;
+	margin: 0;
+	overflow: hidden;
+	font-size: 14px;
+}
+.membershipCardOrderListModule .membershipCardOrderList .item .bottomInfo .funds {
+	display: block;
+	float: left;
+}
+.membershipCardOrderListModule .membershipCardOrderList .item .bottomInfo .funds .paymentAmount{
+	margin-left: 5px;
+	color:#999;
+}
+.membershipCardOrderListModule .membershipCardOrderList .item .bottomInfo .funds .icon{
+	margin-left: 5px;
+}
+.membershipCardOrderListModule .membershipCardOrderList .item .bottomInfo .funds .paymentPoint{
+	margin-left: 5px;
+	color:#999;
+}
+.membershipCardOrderListModule .membershipCardOrderList .item .bottomInfo .time {
+	display: block;
+	float: right;
+	color:#999;
+	margin-top: 3px;
+}
+
+
+
+
+/** 余额 **/
+.balanceModule{
+	padding-top: 40px;padding-bottom: 2px;
+}
+.balanceModule .deposit{
+	height: 80px;
+	margin-top:8px;
+	margin-left: 8px;
+	margin-right: 8px;
+	margin-bottom: 8px;
+	border-radius: 8px;
+	background: #f6f6f6;
+}
+.balanceModule .deposit .currency{
+	float:left;
+	margin-left: 30px;
+	margin-right:3px;
+	font-size: 13px;
+	line-height: 88px;
+}
+.balanceModule .deposit H2{
+	float:left;
+	margin-right:3px;
+	line-height: 80px;
+	font-size: 26px;
+	color: #333;
+}
+.balanceModule .deposit .unit{
+	font-size: 13px;
+	line-height: 88px;
+}
+.balanceModule .deposit .button{
+	float:right;
+	line-height: 84px;
+	margin-right: 30px;
+}
+.balanceModule .paymentLogList {
+	width: 100%;
+	
+}
+.balanceModule .paymentLogList .item {
+	border-bottom: 1px solid #eee;
+	margin-left: 8px; 
+	margin-right: 8px;
+}
+.balanceModule .paymentLogList .item .head {
+	min-height: 25px;
+	padding: 8px 3px 0;
+	margin: 0;
+	overflow: hidden;
+}
+.balanceModule .paymentLogList .item .head .runningNumber {
+	display: block;
+	float: left
+}
+.balanceModule .paymentLogList .item .head .runningNumber h2 {
+	color:#aaa;
+	font-size:14px;
+	line-height: 16px
+}
+.balanceModule .paymentLogList .item .main {
+	padding: 0 8px 0 8px;
+	font-size: 15px;
+	line-height: 26px;
+	margin: 0 0 10px
+}
+.balanceModule .paymentLogList .item .main .content {
+	margin-bottom: 10px;
+	color:#222;
+}
+.balanceModule .paymentLogList .item .bottomInfo {
+	min-height: 24px;
+	padding: 0px 3px 0;
+	margin: 0;
+	overflow: hidden;
+	font-size: 14px;
+}
+.balanceModule .paymentLogList .item .bottomInfo .module {
+	display: block;
+	float: left;
+}
+.balanceModule .paymentLogList .item .bottomInfo .module .payment{
+	color:#999;
+}
+.balanceModule .paymentLogList .item .bottomInfo .time {
+	display: block;
+	float: right;
+	color:#999;
+}
+
+/* 会员卡列表 */
+.membershipCardListModule{
+	padding-top: 40px;padding-bottom: 2px;
+}
+.membershipCardListModule .membershipCardList{
+	font-size: 0;
+	width: 100%;
+	background-color: #f5f5f5;
+	overflow: hidden;
+}
+.membershipCardListModule .membershipCardList .line {
+	position: relative;
+	display: -webkit-box;
+	margin: 12px 20px;
+	color: #878787;
+	font-size: 14px;
+	-webkit-box-pack: center;
+}
+.membershipCardListModule .membershipCardList .line:after {
+	content: "";
+	height: 1px;
+	width: 100%;
+	position: absolute;
+	top: 50%;
+	left: 0;
+	background-color: #cbcbcb;
+	-webkit-transform: scaleY(0.5)
+}
+
+.membershipCardListModule .membershipCardList .title {
+	display: block;
+	padding: 0 10px;
+	background-color: #f5f5f5;
+	z-index: 1;
+	position: relative;
+	
+}
+.membershipCardListModule .membershipCardList .box:after {
+	content: "";
+	display: block;
+	height: 0;
+	clear: both;
+	visibility: hidden;
+}
+.membershipCardListModule .membershipCardList .box .item {
+	float: left;
+	width: 50%;
+	box-sizing: border-box;
+	padding-bottom: 4px;
+	position: relative
+}
+
+.membershipCardListModule .membershipCardList .box .item:nth-child(2n+1) {
+	padding-right: 2px
+}
+
+.membershipCardListModule .membershipCardList .box .item:nth-child(2n) {
+	padding-left: 2px
+}
+.membershipCardListModule .membershipCardList .box .item .info {
+	background-color: white;
+	padding-top:20px;
+	padding-bottom: 20px;
+	font-size: 0
+}
+
+.membershipCardListModule .membershipCardList .box .item h5{ text-align: center; color: #333; font-size: 24px; line-height: 24px; font-weight: normal;}
+.membershipCardListModule .membershipCardList .box .item .descriptionTag-box {
+    margin: 0 auto;
+	padding-top: 20px; margin-top: 20px; 
+    border-top: 1px solid #f2f2f2;
+    min-height: 120px;
+    width: 90%;
+    overflow: hidden;
+}
+.membershipCardListModule .membershipCardList .box .item .descriptionTag-box .descriptionTag {
+    margin-bottom: 10px;
+    line-height: 20px;
+    font-size: 15px;
+    color: #666;
+    text-align: center;
+}
+.membershipCardListModule .membershipCardList .box .item .buyInfo{padding-top: 15px; }
+.membershipCardListModule .membershipCardList .box .item .buyInfo .price{ text-align: center;margin-top: 10px;}
+.membershipCardListModule .membershipCardList .box .item .buyInfo .price p{ line-height: 30px;font-size: 14px;}
+.membershipCardListModule .membershipCardList .box .item .buyInfo .price span{ color: #f75d51; font-size: 36px; font-weight: bolder}
+.membershipCardListModule .membershipCardList .box .item .buyInfo .price b{ font-size: 13px;color: #f75d51; font-size: 24px; font-weight: normal;}
+.membershipCardListModule .membershipCardList .box .item .buyInfo .subtitle{ display: block;font-style:normal; color: #ff6800; line-height: 22px;font-size: 14px;text-align: center;}
+.membershipCardListModule .membershipCardList .box .item .buyInfo .buyButton{ color: #fff;border-radius:3px; font-size: 16px; display: block; line-height: 40px; text-align: center; background-color: #30aff7; margin: 10px 10px auto 10px;}
+.membershipCardListModule .membershipCardList .box .item .buyInfo .buyButton:hover{ background-color: #45b6f7;}
+
+
+/** 会员卡 **/
+.membershipCardModule{
+	padding-top: 40px;padding-bottom: 2px;
+}
+.membershipCardModule .membershipCard-item{
+	float: left;
+    width: 41%;
+    border-radius: 2px;
+    text-align: center;
+    margin: 30px 15px;
+    overflow: hidden;
+    background-color: #FFFFFF;
+    -moz-box-shadow: 0 1px 3px 0 rgba(0,0,0,.03),0 4px 8px 0 rgba(0,0,0,.03);
+	-webkit-box-shadow: 0 1px 3px 0 rgba(0,0,0,.03),0 4px 8px 0 rgba(0,0,0,.03);
+	box-shadow: 0 1px 3px 0 rgba(0,0,0,.03),0 4px 8px 0 rgba(0,0,0,.03);
+}
+.membershipCardModule .membershipCard-item .title {
+    height: 46px;
+    line-height: 46px;
+    background-color: #30aff7;
+    color: white;
+    font-size: 18px;
+}
+
+.membershipCardModule .membershipCard-item .info{
+	position: relative;
+    overflow: hidden;
+}
+.membershipCardModule .membershipCard-item .info .sellingPrice{
+	font-size: 14px;
+	margin-top: 20px;
+}
+.membershipCardModule .membershipCard-item .info .sellingPrice b{ color: #f75d51; font-size: 24px; font-weight: normal;}
+.membershipCardModule .membershipCard-item .info .sellingPrice strong{
+    font-size: 36px;
+    color: #f75d51; 
+}
+.membershipCardModule .membershipCard-item .info .marketPrice{
+	text-decoration: line-through;
+    font-size: 13px;
+    color: #666666;
+}
+.membershipCardModule .membershipCard-item > .info > * {
+    margin-bottom: 10px;
+}
+.membershipCardModule .membershipCard-item .info .buyButton{ color: #fff;border-radius:3px; font-size: 16px; padding-left:15px;padding-right:15px; border:none;display: block; line-height: 38px; text-align: center; background-color: #30aff7; margin: 15px auto auto auto;}
+.membershipCardModule .membershipCard-item .info .buyButton:hover{ background-color: #45b6f7;}
+.membershipCardModule .membershipCard-item .info .buyButton:disabled{
+	border:none;
+	background-color: #d9d9d9;
+	cursor: not-allowed;
+	text-decoration: none;
+}
+
+.membershipCardModule .detail{
+	margin: 0 auto;
+}
+.membershipCardModule .detail .title {
+	padding-top: 24px;
+	font-size: 28px;
+	color: #30aff7;
+	line-height: normal;
+	text-align: center;
+}
+
+.membershipCardModule .detail .line-blue {
+	margin: 12px auto 0;
+	width: 100px;
+	border-bottom: 4px solid #30aff7
+}
+
+.membershipCardModule .detail .line-gray {
+	margin: 0 auto;
+	width: 90%;
+	border-bottom: 1px solid #e3e3e3
+}
+
+.membershipCardModule .detail .content{margin-top:10px;padding:20px 5px;color:#666666;font-size:16px;word-wrap:break-word}
+.membershipCardModule .detail .content p{font-size:16px;word-wrap:break-word}
+.membershipCardModule .detail .content img{max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;}
+
+
+/** 支付 **/
+.paymentModule{
+	padding-top: 40px;padding-bottom: 2px;
+}
+.paymentModule .payment .help{
+	line-height:20px; margin-left: 10px;color:#878787;font-size: 13px;
+}
+.paymentModule .payment .help .highlight{color: red;}
+.paymentModule .payment .tips{line-height:30px; margin-left: 115px}
+.paymentModule .payment .tips span{color: red;}
+
+
+.paymentModule .onlinePaymentInterface .item{
+	border-top: 1px solid #e3e5e9;position: relative;
+}
+.paymentModule .onlinePaymentInterface .item .head{
+	margin-left: 10px;line-height: 30px;font-size: 15px;
+}
+.paymentModule .onlinePaymentInterface .item .bankSelect{
+	padding-top: 5px;
+	overflow: hidden;
+	margin: 0 auto;
+	margin-left: 10px;margin-right: 10px;
+}
+
+.paymentModule .onlinePaymentInterface .item .bankSelect dl {
+	
+	border: 1px solid #ebebeb;
+	margin-right: 10px;
+	margin-bottom: 10px;
+	float: left;
+	display: block
+}
+.paymentModule .onlinePaymentInterface .item .bankSelect .radioBox{
+	position: absolute;margin-left: 10px;margin-top: 10px;margin-right: 5px;
+}
+.paymentModule .onlinePaymentInterface .item .bankSelect dt {
+	width: 40px;
+	height: 36px;
+	float: left
+}
+.paymentModule .onlinePaymentInterface .item .bankSelect dd {
+	margin-top:3px;margin-right:3px;
+	float: left
+}
+.paymentModule .onlinePaymentInterface .item .bankSelect dd img {
+	width:36px;
+	height: 36px
+}
+.paymentModule .onlinePaymentInterface .item .bankSelect .bankName{
+	margin-top: 10px;font-size: 15px;margin-right: 5px;color:#878787;
+}
+
+.paymentModule .payNow{
+	margin-left: 10px;margin-right: 10px;
+}
+
+/** 支付完成 **/
+.paymentCompletedModule {
+	padding-top:40px;
+}
+
+.paymentCompletedModule .box {
+	position: relative;
+	margin:10px;
+	border-radius: 8px;
+	padding-top:15px;
+	text-align:center;
+	background: #fafafa;
+	height: 200px;
+}
+
+.paymentCompletedModule .title {
+	color: #575757;font-size: 28px;font-weight:700;line-height: 40px;height: 40px;margin-top: 10px;margin-bottom: 30px;
+}
+.paymentCompletedModule .tip {
+	height: 35px;
+	line-height: 35px;
+	color:#878787;
+}
+.paymentCompletedModule .button {
+	margin-top:80px;
+	height: 40px;
+	line-height: 40px
+}
 

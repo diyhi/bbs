@@ -247,7 +247,7 @@ public class ForumManageAction{
 					}
 				}
 				
-				if(forum.getForumChildType().equals("相拟话题")){
+				if(forum.getForumChildType().equals("相似话题")){
 					if("collection".equals(forum.getDisplayType())){//集合
 						model.addAttribute("collection_Forum_TopicRelated_LikeTopic",forum.getFormValue());	
 					}
@@ -487,7 +487,7 @@ public class ForumManageAction{
 							model.addAttribute("page_Forum_TopicRelated_Topic",forum.getFormValue());	
 						}
 					}
-					if(forum.getForumChildType().equals("相拟话题")){
+					if(forum.getForumChildType().equals("相似话题")){
 						if("collection".equals(forum.getDisplayType())){//集合
 							model.addAttribute("collection_Forum_TopicRelated_LikeTopic",forum.getFormValue());	
 						}
@@ -657,7 +657,7 @@ public class ForumManageAction{
 						model.addAttribute("page_Forum_TopicRelated_Topic",new_forum.getFormValue());	
 					}
 				}
-				if(forum.getForumChildType().equals("相拟话题")){
+				if(forum.getForumChildType().equals("相似话题")){
 					if("collection".equals(forum.getDisplayType())){//集合
 						model.addAttribute("collection_Forum_TopicRelated_LikeTopic",new_forum.getFormValue());	
 					}
@@ -1213,7 +1213,7 @@ public class ForumManageAction{
 		}
 		
 		Forum_TopicRelated_LikeTopic collection_Forum_TopicRelated_LikeTopic = new Forum_TopicRelated_LikeTopic();
-		if(formbean.getForumChildType().equals("相拟话题")){
+		if(formbean.getForumChildType().equals("相似话题")){
 			if("collection".equals(displayType)){//集合
 				String collection_likeTopic_maxResult = request.getParameter("collection_likeTopic_maxResult");//显示记录数
 				

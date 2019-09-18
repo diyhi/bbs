@@ -248,5 +248,21 @@ public class BeanFactoryPost implements BeanFactoryPostProcessor{
 				}	
 			}
 		}
+		
+		BeanDefinition paymentLog_bd = beanFactory.getBeanDefinition("paymentLogConfig");
+		if(paymentLog_bd != null){
+			MutablePropertyValues mutablePropertyValues = paymentLog_bd.getPropertyValues();
+			TypedStringValue typedStringValue = (TypedStringValue)mutablePropertyValues.getPropertyValue("tableQuantity").getValue();
+
+			//支付日志分表数量
+			Integer tableQuantity = Integer.parseInt(typedStringValue.getValue());
+			if(tableQuantity >1){
+				for(int i =1; i<tableQuantity; i++){
+					
+					//初始化支付日志bean
+					CreateBean.createPaymentLogBean(i);
+				}	
+			}
+		}
 	}
 }

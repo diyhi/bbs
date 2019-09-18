@@ -33,8 +33,8 @@
 						</div>
 						<a href="user/control/home">${(systemUser.nickname != null && systemUser.nickname??) ?string(systemUser.nickname , systemUser.userName)}</a>
 					</li>
-					<li><a href="" onClick="javascript:document.getElementById('logout').submit();return false;">退出</a></li>
 					<li><a href="user/control/home">用户中心<span id="allMessage-badge" class="badge" style="position: absolute; margin-top: 14px; display: none;"></span></a></li>
+					<li><a href="" onClick="javascript:document.getElementById('logout').submit();return false;">退出</a></li>
 					<form id="logout" action="logout.htm?token=${token}" method="post" ></form>
 					<script language="javascript" type="text/javascript">
 						//查询未读消息
