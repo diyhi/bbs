@@ -447,19 +447,8 @@ public class HelpManageAction {
 					}
 				}else if(dir.equals("file")){
 					//允许上传文件格式
-					List<String> formatList = new ArrayList<String>();
-					formatList.add("mp4");
-					formatList.add("avi");
-					formatList.add("mkv");
-					formatList.add("wmv");
-					formatList.add("wav");
-					formatList.add("rm/rmvb");
-					formatList.add("mp3");
-					formatList.add("flac");
-					formatList.add("ape");
-					formatList.add("zip");
-					formatList.add("rar");
-					formatList.add("7z");
+					List<String> formatList = fileManage.readRichTextAllowFileUploadFormat();
+
 					
 					//验证文件后缀
 					boolean authentication = fileManage.validateFileSuffix(imgFile.getOriginalFilename(),formatList);

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 评论编辑器标签
+ * 编辑器标签
  *
  */
 public class EditorTag implements Serializable{
@@ -44,13 +44,20 @@ public class EditorTag implements Serializable{
 	private boolean insertunorderedlist = false;
 	/** 插入表情 **/
 	private boolean emoticons = false;
-	/** 图片 **/
+	/** 允许上传图片 **/
 	private boolean image = false;
 	
 	/** 允许上传图片格式 **/
 	private List<String> imageFormat = new ArrayList<String>();
 	/** 允许上传图片大小 **/
 	private Long imageSize;
+	
+	/** 允许上传文件 **/
+	private boolean file = false;
+	/** 允许上传文件格式 **/
+	private List<String> fileFormat = new ArrayList<String>();
+	/** 允许上传文件大小 **/
+	private Long fileSize;
 	
 	/** 输入密码可见 **/
 	private boolean hidePassword = false;
@@ -229,6 +236,30 @@ public class EditorTag implements Serializable{
 
 	public void setHideAmount(boolean hideAmount) {
 		this.hideAmount = hideAmount;
+	}
+
+	public List<String> getFileFormat() {
+		return fileFormat;
+	}
+
+	public void setFileFormat(List<String> fileFormat) {
+		this.fileFormat = fileFormat;
+	}
+
+	public Long getFileSize() {
+		return fileSize;
+	}
+
+	public void setFileSize(Long fileSize) {
+		this.fileSize = fileSize;
+	}
+
+	public boolean isFile() {
+		return file;
+	}
+
+	public void setFile(boolean file) {
+		this.file = file;
 	}
 
 }

@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.queryString.util.UrlEncoded;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -125,6 +126,13 @@ public class PageViewAction {
 			for(PV pv : qr.getResultlist()){
 				if(pv.getIp() != null && !"".equals(pv.getIp().trim())){
 					pv.setIpAddress(IpAddress.queryAddress(pv.getIp()));
+				}
+				
+				if(pv.getUrl() != null && !"".equals(pv.getUrl().trim())){
+					pv.setUrl(UrlEncoded.decodeString(pv.getUrl().trim()));
+				}
+				if(pv.getReferrer() != null && !"".equals(pv.getReferrer().trim())){
+					pv.setReferrer(UrlEncoded.decodeString(pv.getReferrer().trim()));
 				}
 			}
 		}

@@ -348,9 +348,11 @@
 						html += 	"<span class='a-toolbar'>";
 						if(userDynamic.module == 100){
 							html += "<a href='thread?topicId="+userDynamic.topicId+"' target='_blank' >查看原文</a>";	
+
 							html += "<span >"+userDynamic.topicViewTotal+"次阅读</span>";	
 							html += "<span >"+userDynamic.topicCommentTotal+"个评论</span>";	
 							html += "<span id='favoriteCount_"+userDynamic.topicId+"'>0人收藏</span>";	
+							html += "<span id='likeCount_"+userDynamic.topicId+"'>0人赞</span>";	
 						}else if(userDynamic.module == 200){
 							html += "<a href='thread?topicId="+userDynamic.topicId+"&commentId="+userDynamic.commentId+"'  target='_blank' >查看原文</a>";	
 						}else if(userDynamic.module == 300){
@@ -375,6 +377,7 @@
 							var userDynamic =pageView.records[i];
 							if(userDynamic.module == 100){
 								queryFavoriteCount(userDynamic.topicId);
+								queryLikeCount(userDynamic.topicId);
 							}
 							
 						}
@@ -393,6 +396,17 @@
 			        }
 				},
 					"queryFavoriteCount?topicId="+topicId+"&timestamp=" + new Date().getTime(), true);
+								           
+			}
+			//查询话题用户点赞总数
+			function queryLikeCount(topicId){	
+				get_request(function(value){
+					if(value != ""){
+						var data = JSON.parse(value);
+			        	document.getElementById("likeCount_"+topicId).innerHTML = data+"人赞";
+			        }
+				},
+					"queryLikeCount?topicId="+topicId+"&timestamp=" + new Date().getTime(), true);
 								           
 			}
 			// 获取随机数
@@ -488,80 +502,85 @@
 				}
 		
 			
-			
-			
-				var parameter = "";
-				parameter += "&topicId="+topicId;//话题Id
-				
-				parameter += "&hideType="+hideType;//隐藏类型
-			
-				if(hideType == 10){//输入密码可见
+				var confirm_index = layer.confirm('是否确认解锁？', {
+					btn: ['解锁','取消'] //按钮
+				}, function(){//解锁
+					layer.close(confirm_index); //关闭层
+					var parameter = "";
+					parameter += "&topicId="+topicId;//话题Id
 					
-					var password = $.trim($('#hide_password_'+random).val());
-					if(password == ""){
-						layer.open({
-						    type: 1, 
-						    title:"提示",
-						    content: "<div style='line-height: 36px; font-size: 15px;text-align:center; margin-left: 8px;margin-right: 8px;'>密码不能为空</div>", 
-						    area: ['260px', '120px'],//宽高
-							end: function(layero, index){
-								
-							}
-						});
-						return;
-					}
-					parameter += "&password="+encodeURIComponent(password);//获取URL参数
+					parameter += "&hideType="+hideType;//隐藏类型
 				
-				}
-				//从meta标签获取令牌
-				parameter += "&token="+getCsrf();
-				//删除第一个&号,防止因为多了&号而出现警告: Parameters: Invalid chunk ignored.信息
-				if(parameter.indexOf("&") == 0){
-					parameter = parameter.substring(1,parameter.length);
-				}
-			   	post_request(function(value){
-					var data = JSON.parse(value);
-					for(var returnValue in data){
+					if(hideType == 10){//输入密码可见
 						
-						if(returnValue == "success"){
-		        			if(data[returnValue] == "true"){
-		        				//需引入layer
-		        				layer.msg('话题取消隐藏成功，5秒后自动刷新页面', 
-									{
-									  time: 5000 //3秒关闭（如果不配置，默认是3秒）
-									},function(){
-										//关闭后的操作
-										//刷新页面
-							        	document.location.reload();
-									}
-								);
-		        				
-		        				
-		        			}
-		        		}else if(returnValue == "error"){
-		        			
-		        			var errorValue = data[returnValue];
-							var htmlValue = "";
-							var i = 0;
-							for(var error in errorValue){
-								if(error != ""){	
-									i++;
-									htmlValue += "&nbsp;&nbsp;"+i+"、"+errorValue[error]+"<br>";
-								}
-							}
-							
+						var password = $.trim($('#hide_password_'+random).val());
+						if(password == ""){
 							layer.open({
-							  type: 1,
-							  title: '错误', 
-							  skin: 'layui-layer-rim', //加上边框
-							  area: ['300px', '150px'], //宽高
-							  content: "<div style='line-height: 36px; font-size: 15px;text-align:left; margin-left: 8px;margin-right: 8px;'>"+htmlValue+"</div>"
+							    type: 1, 
+							    title:"提示",
+							    content: "<div style='line-height: 36px; font-size: 15px;text-align:center; margin-left: 8px;margin-right: 8px;'>密码不能为空</div>", 
+							    area: ['260px', '120px'],//宽高
+								end: function(layero, index){
+									
+								}
 							});
-		        		}
-		        	}
-				},
-					"user/control/topic/unhide?timestamp=" + new Date().getTime(), true,parameter);
-	
+							return;
+						}
+						parameter += "&password="+encodeURIComponent(password);//获取URL参数
+					
+					}
+					//从meta标签获取令牌
+					parameter += "&token="+getCsrf();
+					//删除第一个&号,防止因为多了&号而出现警告: Parameters: Invalid chunk ignored.信息
+					if(parameter.indexOf("&") == 0){
+						parameter = parameter.substring(1,parameter.length);
+					}
+				   	post_request(function(value){
+						var data = JSON.parse(value);
+						for(var returnValue in data){
+							
+							if(returnValue == "success"){
+			        			if(data[returnValue] == "true"){
+			        				//需引入layer
+			        				layer.msg('话题取消隐藏成功，5秒后自动刷新页面', 
+										{
+										  time: 5000 //3秒关闭（如果不配置，默认是3秒）
+										},function(){
+											//关闭后的操作
+											//刷新页面
+								        	document.location.reload();
+										}
+									);
+			        				
+			        				
+			        			}
+			        		}else if(returnValue == "error"){
+			        			
+			        			var errorValue = data[returnValue];
+								var htmlValue = "";
+								var i = 0;
+								for(var error in errorValue){
+									if(error != ""){	
+										i++;
+										htmlValue += "&nbsp;&nbsp;"+i+"、"+errorValue[error]+"<br>";
+									}
+								}
+								
+								layer.open({
+								  type: 1,
+								  title: '错误', 
+								  skin: 'layui-layer-rim', //加上边框
+								  area: ['300px', '150px'], //宽高
+								  content: "<div style='line-height: 36px; font-size: 15px;text-align:left; margin-left: 8px;margin-right: 8px;'>"+htmlValue+"</div>"
+								});
+			        		}
+			        	}
+					},
+						"user/control/topic/unhide?timestamp=" + new Date().getTime(), true,parameter);
+					
+				}, function(){//取消
+					
+				});
 			}
 			
 			

@@ -48,6 +48,7 @@ import cms.bean.message.SubscriptionSystemNotify;
 import cms.bean.message.SystemNotify;
 import cms.bean.message.UnreadMessage;
 import cms.bean.payment.PaymentLog;
+import cms.bean.setting.SystemSetting;
 import cms.bean.topic.Comment;
 import cms.bean.topic.HideTagType;
 import cms.bean.topic.Reply;
@@ -66,6 +67,8 @@ import cms.bean.user.UserDynamic;
 import cms.bean.user.UserGrade;
 import cms.bean.user.UserInputValue;
 import cms.bean.user.UserLoginLog;
+import cms.bean.user.UserRole;
+import cms.bean.user.UserRoleGroup;
 import cms.service.favorite.FavoriteService;
 import cms.service.follow.FollowService;
 import cms.service.like.LikeService;
@@ -81,6 +84,7 @@ import cms.service.topic.TagService;
 import cms.service.topic.TopicService;
 import cms.service.user.UserCustomService;
 import cms.service.user.UserGradeService;
+import cms.service.user.UserRoleService;
 import cms.service.user.UserService;
 import cms.utils.Base64;
 import cms.utils.HtmlEscape;
@@ -89,6 +93,7 @@ import cms.utils.JsonUtils;
 import cms.utils.PathUtil;
 import cms.utils.RefererCompare;
 import cms.utils.SHA;
+import cms.utils.SecureLink;
 import cms.utils.UUIDUtil;
 import cms.utils.Verification;
 import cms.utils.WebUtil;
@@ -177,6 +182,8 @@ public class HomeManageAction {
 	@Resource UserRoleManage userRoleManage;
 	@Resource PaymentService paymentService;
 	@Resource MembershipCardService membershipCardService;
+	
+	@Resource UserRoleService userRoleService;
 	
 	//?  匹配任何单字符
 	//*  匹配0或者任意数量的字符
@@ -697,10 +704,50 @@ public class HomeManageAction {
 		
 		model.addAttribute("user",viewUser);
 
+		
+		//有效的用户角色
+		List<UserRole> validUserRoleList = new ArrayList<UserRole>();
+		
+		//查询所有角色
+		List<UserRole> userRoleList = userRoleService.findAllRole_cache();
+		if(userRoleList != null && userRoleList.size() >0){
+			List<UserRoleGroup> userRoleGroupList = userRoleManage.query_cache_findRoleGroupByUserName(user.getUserName());
+			
+			
+			for(UserRole userRole : userRoleList){
+				if(userRole.getDefaultRole()){//如果是默认角色
+					continue;
+				}else{
+					//默认时间  年,月,日,时,分,秒,毫秒    
+	                DateTime defaultTime = new DateTime(2999, 1, 1, 0, 0);// 2999年1月1日0点0分
+	                Date validPeriodEnd = defaultTime.toDate();
+					userRole.setValidPeriodEnd(validPeriodEnd);
+				}
+				
+				if(userRoleGroupList != null && userRoleGroupList.size() >0){
+					for(UserRoleGroup userRoleGroup : userRoleGroupList){
+						if(userRole.getId().equals(userRoleGroup.getUserRoleId())){
+							UserRole validUserRole = new UserRole();
+							validUserRole.setId(userRole.getId());
+							validUserRole.setName(userRole.getName());
+							validUserRole.setValidPeriodEnd(userRoleGroup.getValidPeriodEnd());
+							validUserRoleList.add(validUserRole);
+						}
+					}
+				}
+			}
+		}
+		model.addAttribute("userRoleList", validUserRoleList);
+		
+		
+		
+		
+		
 		if(isAjax){
 			returnValue.put("user", viewUser);
 			returnValue.put("userCustomList", userCustomList);
-			
+			returnValue.put("userRoleList", validUserRoleList);
+
 			WebUtil.writeToWeb(JsonUtils.toJSONString(returnValue), "json", response);
 			return null;
 		}else{
@@ -3736,6 +3783,32 @@ public class HomeManageAction {
 						if(topicRoleNameList != null && topicRoleNameList.size() >0){
 							userDynamic.setAllowRoleViewList(topicRoleNameList);//话题允许查看的角色名称集合
 						}
+						SystemSetting systemSetting = settingService.findSystemSetting_cache();
+						//话题内容摘要MD5
+						String topicContentDigest = "";
+						//处理文件防盗链
+						if(topicInfo.getContent() != null && !"".equals(topicInfo.getContent().trim()) && systemSetting.getFileSecureLinkSecret() != null && !"".equals(systemSetting.getFileSecureLinkSecret().trim())){
+							//解析上传的文件完整路径名称
+							Map<String,String> analysisFullFileNameMap = topicManage.query_cache_analysisFullFileName(topicInfo.getContent(),topicInfo.getId());
+							if(analysisFullFileNameMap != null && analysisFullFileNameMap.size() >0){
+								
+								
+								Map<String,String> newFullFileNameMap = new HashMap<String,String>();//新的完整路径名称 key: 完整路径名称 value: 重定向接口
+								for (Map.Entry<String,String> entry : analysisFullFileNameMap.entrySet()) {
+
+									newFullFileNameMap.put(entry.getKey(), SecureLink.createRedirectLink(entry.getKey(),entry.getValue(),topicInfo.getTagId(),systemSetting.getFileSecureLinkSecret()));
+								}
+								
+								//生成处理'上传的文件完整路径名称'Id
+								String processFullFileNameId = topicManage.createProcessFullFileNameId(topicInfo.getId(),topicInfo.getLastUpdateTime(),newFullFileNameMap);
+								
+								topicInfo.setContent(topicManage.query_cache_processFullFileName(topicInfo.getContent(),"topic",newFullFileNameMap,processFullFileNameId));
+								
+								topicContentDigest = cms.utils.MD5.getMD5(processFullFileNameId);
+							}
+							
+							
+						}
 
 						
 						//处理隐藏标签
@@ -3814,7 +3887,7 @@ public class HomeManageAction {
 							String processHideTagId = topicManage.createProcessHideTagId(userDynamic.getTopicId(),topicInfo.getLastUpdateTime(), visibleTagList);
 							
 							//处理隐藏标签
-							String content = topicManage.query_cache_processHiddenTag(topicInfo.getContent(),visibleTagList,processHideTagId);
+							String content = topicManage.query_cache_processHiddenTag(topicInfo.getContent(),visibleTagList,processHideTagId+"|"+topicContentDigest);
 							userDynamic.setTopicContent(content);
 							
 							//如果话题不是当前用户发表的，则检查用户对话题的查看权限

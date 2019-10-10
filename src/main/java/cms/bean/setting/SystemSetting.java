@@ -2,6 +2,7 @@ package cms.bean.setting;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Lob;
@@ -82,6 +83,12 @@ public class SystemSetting implements Serializable{
 	/** 解锁话题隐藏内容平台分成比例 默认0% **/
 	private Integer topicUnhidePlatformShareProportion = 0;
 	
+	
+	/** 文件防盗链密钥 **/
+	@Column(length=190)
+	private String fileSecureLinkSecret;
+	/** 文件防盗链过期时间 单位:秒 **/
+	private Long fileSecureLinkExpire = 300L;
 	
 	/** 上传临时文件有效期 单位:分钟 **/
 	private Integer temporaryFileValidPeriod = 60;
@@ -403,6 +410,24 @@ public class SystemSetting implements Serializable{
 	public void setTopicUnhidePlatformShareProportion(Integer topicUnhidePlatformShareProportion) {
 		this.topicUnhidePlatformShareProportion = topicUnhidePlatformShareProportion;
 	}
+
+	public String getFileSecureLinkSecret() {
+		return fileSecureLinkSecret;
+	}
+
+	public void setFileSecureLinkSecret(String fileSecureLinkSecret) {
+		this.fileSecureLinkSecret = fileSecureLinkSecret;
+	}
+
+	public Long getFileSecureLinkExpire() {
+		return fileSecureLinkExpire;
+	}
+
+	public void setFileSecureLinkExpire(Long fileSecureLinkExpire) {
+		this.fileSecureLinkExpire = fileSecureLinkExpire;
+	}
+
+
 
 
 }

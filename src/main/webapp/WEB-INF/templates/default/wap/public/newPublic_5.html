@@ -76,12 +76,14 @@
 				            	<i class="cms-view " style="font-size: 12px;"></i><span style="margin-left: 2px;">{{topic.viewTotal}}</span>
 				            </p> 
 				        </div>
-				    	<!-- router-link渲染成<h2>标签-->
+				        <div class="clearfix"></div>
+				      
 				        <router-link class="title"  tag="div" :to="{path: '/thread', query: {topicId: topic.id}}" >
-				            <span>{{topic.title}}</span>
-				            <i class="topicRoleName" v-for="(roleName,index) in topic.allowRoleViewList" >{{roleName}}</i>
-				        </router-link>
-				        
+					    	<span>{{topic.title}}</span>
+					    	<i class="topicRoleName" v-for="(roleName,index) in topic.allowRoleViewList" >{{roleName}}</i>
+					    </router-link>
+				         
+				         
 				        <div class="summary" v-if="topic.imageInfoList.length ==0">
 							<span>{{topic.summary}}</span>
 						</div>
@@ -221,6 +223,7 @@
 				        </div>
 					</div>
 					<div class="main"> 
+						<div v-if="topic.lastUpdateTime != null" class="lastUpdateTime">最后修改时间：{{topic.lastUpdateTime}}</div>
 						<!-- 内容 -->
 						<component v-bind:is ="hideTagComponent(topic.content)" v-bind="$props" />
 					</div>
@@ -244,7 +247,7 @@
 						    	<router-link tag="h2" class="clearfix" :to="{path: '/user/control/home', query: {userName: comment.userName}}">
 						        	<div class="userName">{{comment.nickname != null && comment.nickname != '' ? comment.nickname : comment.userName}}</div>
 						        	<div class="userTag">
-								        <span class="badge" v-if="comment.userName == topic.userName && comment.isStaff == topic.isStaff">楼主</span>
+								        <i class="master" v-if="comment.userName == topic.userName && comment.isStaff == topic.isStaff">楼主</i>
 								        <i class="userRoleName" v-for="roleName in comment.userRoleNameList" >{{roleName}}</i>
 							        </div>
 						        </router-link>
@@ -279,7 +282,9 @@
 									    	<router-link class="userName" tag="span" :to="{path: '/user/control/home', query: {userName: reply.userName}}">
 									           {{reply.nickname != null && reply.nickname != '' ? reply.nickname : reply.userName}}
 									        </router-link>
-		                                    <span class="badge" v-if="reply.userName == topic.userName && reply.isStaff == topic.isStaff">楼主</span>   
+									        <div class="userTag">
+										        <i class="master" v-if="reply.userName == topic.userName && reply.isStaff == topic.isStaff">楼主</i>
+									        </div>  
 											<span class="time">{{reply.postTime}}</span>
 										</div>
 										<div style="clear:both; height: 0; line-height: 0; font-size: 0;"></div>
@@ -944,6 +949,7 @@
 						<!-- router-link渲染成<span>标签-->
 						<router-link tag="span" :to="{path: '/thread', query: {topicId: userDynamic.topicId}}" >
 							{{userDynamic.topicTitle}}
+							<i class="topicRoleName" v-for="(roleName,index) in userDynamic.allowRoleViewList" >{{roleName}}</i>
 						</router-link>
 					</div>	
 					<!-- 内容 -->
@@ -971,10 +977,10 @@
 				<div class="bottomInfo">
 					<div class="toolbar">
 						<router-link class="btn" tag="span" :to="{path: '/thread', query: {topicId: userDynamic.topicId}}" v-if="userDynamic.module == 100">查看原文</router-link>
-						<span class="btn" v-if="userDynamic.module == 100">{{userDynamic.topicViewTotal}}次阅读</span>
-						<span class="btn" v-if="userDynamic.module == 100">{{userDynamic.topicCommentTotal}}个评论</span>
-						<span class="btn" v-if="userDynamic.module == 100">{{favoriteCountGroup[index]}}人收藏</span>
-					
+						<span class="btn" v-if="userDynamic.module == 100"><i class="cms-view" style="font-size: 13px;"></i> {{userDynamic.topicViewTotal}}</span>
+						<span class="btn" v-if="userDynamic.module == 100"><i class="cms-comment" style="font-size: 12px;"></i> {{userDynamic.topicCommentTotal}}</span>
+						<span class="btn" v-if="userDynamic.module == 100"><i class="cms-favorites" style="font-size: 12px;"></i> {{favoriteCountGroup[index]}}</span>
+						<span class="btn" v-if="userDynamic.module == 100"><i class="cms-thumb-up" style="font-size: 13px;"></i> {{likeCountGroup[index]}}</span>
 						<router-link class="btn" tag="span"  :to="{path: '/thread', query: {topicId: userDynamic.topicId,commentId: userDynamic.commentId}}" v-if="userDynamic.module == 200 || userDynamic.module == 300 || userDynamic.module == 400">查看原文</router-link>
 					</div>
 				</div>
@@ -1078,6 +1084,7 @@
 			            	<router-link class="fast cms-lock"  tag="span" :to="{path: '/user/control/topicUnhideList', query: {topicId: topic.id}}" ></router-link>
 			            	<router-link class="fast cms-favorites"  tag="span" :to="{path: '/user/control/topicFavoriteList', query: {topicId: topic.id}}" ></router-link>
 			            	<router-link class="fast cms-thumb-up"  tag="span" :to="{path: '/user/control/topicLikeList', query: {topicId: topic.id}}" ></router-link>
+			            	<router-link class="fast cms-pencil-alt"  tag="span" :to="{path: '/user/editTopic', query: {topicId: topic.id}}" ></router-link>
 			            	<i class="time">{{topic.postTime}}</i>
 			            </p> 
 			        </div>
@@ -1225,6 +1232,11 @@
 		        <p class="tips">
 			    	<span>{{error.allowUserDynamic}}</span>
 			    </p>
+			</li>
+			<li v-for="(userRole,index) in userRoleList">
+				<mt-cell :title="userRole.name" :value="'到期时间: '+userRole.validPeriodEnd" ></mt-cell>				
+				
+			</li>
 	        <li>
 	        	<mt-field v-model.trim="oldPassword" label="旧密码" placeholder="不修改密码请留空" type="password"></mt-field>
 	        	<p class="tips">
@@ -2031,7 +2043,7 @@
 			<div class="membershipCardOrderList">
 				<div v-infinite-scroll="queryMembershipCardOrderList" infinite-scroll-disabled="loading" infinite-scroll-distance="10">
 					<div class="item" v-for="membershipCardOrder in membershipCardOrderList">
-			            <div class="head">
+			            <div class="head clearfix">
 							<span class="orderId" >
 			                    <h2>订单号：{{membershipCardOrder.orderId}}</h2>
 			                </span>
@@ -2279,6 +2291,66 @@
 	</div>
 </template>
 
+<!-- 修改话题 -->
+<template id="editTopic-template">
+	<div>
+		<mt-header fixed title="修改话题" style="background: #fafafa; color: #000000;font-size: 14px">
+	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
+	    	<router-link to="/index" slot="right">
+			    <span class="cms-home" style="font-size: 18px;"></span>
+			</router-link>
+		</mt-header>
+		<div class="editTopicModule">
+	    	<div class="topicScroll">
+				<div class="box" >
+					<div class="topicForm" >
+						<ul>
+							<li>
+								<mt-field v-model.trim="topicTitle" label="标题" placeholder="输入标题" type="textarea" rows="2" ></mt-field>
+								<p class="tips">
+							    	<span>{{error.topicTitle}}</span>	
+							    </p>
+							</li>
+					        
+							<li>
+								<div ref="topicContentEditorToolbar" class="editor-toolbar"></div>
+								<div ref="topicContentEditorText"  class="editor-text"></div>
+								<p class="tips">
+							    	<span>{{error.topicContent}}</span>	
+							    </p>
+							</li>
+							
+							<li v-if="showCaptcha" >
+					        	<input type="hidden" v-model="captchaKey">
+					        	<mt-field v-model.trim="captchaValue"  v-on:input="validation_captchaValue" label="验证码" placeholder="请输入验证码"  type="text">
+									
+								</mt-field>
+								<div style="position: absolute;right: 0px;margin-top: -45px; ">
+									<img :src="imgUrl" @click="replaceCaptcha" height="45px" width="120px" >
+								</div>
+								<p class="tips">
+							    	<span>{{error.captchaValue}}</span>	
+							    </p>
+					        </li>
+					      
+					        <li style="margin-left: 10px;margin-right: 10px; margin-top: 10px; padding-bottom: 10px;">
+								<mt-button  type="primary" size="large"  @click.native="editTopic">提交</mt-button>
+								<p class="tips">
+							    	<span>{{error.topic}}</span>	
+							    </p>
+								
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+	        
+	        
+		</div>
+	</div>
+</template>
+
+
 
 <!-- 公共模块 -->
 <template id="bottomTab-template">
@@ -2339,14 +2411,14 @@
 <link href="${baseURL}${commonPath}js/vue-photo-preview/skin.css" type="text/css" rel="stylesheet">
 <script src="${commonPath}js/vue-photo-preview/vue-photo-preview.js" type="text/javascript"></script> 
 
-<link href="${baseURL}${commonPath}css/common.css" type="text/css" rel="stylesheet">
+<link href="${baseURL}${commonPath}css/common.css?6" type="text/css" rel="stylesheet">
 <script src="${commonPath}js/better-scroll.min.js?2d" type="text/javascript"></script> 
  
 <script src="${commonPath}js/vue-cropper.js" type="text/javascript"></script>
  <script src="${commonPath}js/v-readmore.min.js" type="text/javascript"></script>
-<script src="${commonPath}js/wangeditor/wangEditor.min.js?3" type="text/javascript"></script>
+<script src="${commonPath}js/wangeditor/wangEditor.min.js?5" type="text/javascript"></script>
 
-<script src="${commonPath}js/main.js?10d" type="text/javascript"></script>
+<script src="${commonPath}js/main.js?6" type="text/javascript"></script>
 
 
 
@@ -2413,6 +2485,10 @@ image[lazy=loading] {
 	display: table;
 	width: 100%;
 	height: 200px;
+    
+}
+.editor-text img{
+   max-width:100%;
     
 }
 

@@ -46,8 +46,11 @@
 				                    </a>
 				                    <#list topic.userRoleNameList as roleName>
 										<span class="userRoleName">${roleName}</span>
-										
 									</#list>
+									<#if topic.isStaff>
+										<span class="staff">官方人员</span>
+									</#if>
+									
 				                </em>
 				                
 				                

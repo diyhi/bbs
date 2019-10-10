@@ -23,7 +23,7 @@
 <script language="JavaScript" type="text/javascript">
      //定义了分类二维数组，里面的顺序跟分类的顺序是相同的。通过selectedIndex获得分类的下标值来得到相应的分类数组
      var type=[
-     ["话题列表","话题内容","评论列表","标签列表","添加话题","添加评论","引用评论","回复评论","相似话题","话题取消隐藏"],
+     ["话题列表","话题内容","评论列表","标签列表","添加话题","添加评论","引用评论","回复评论","相似话题","话题取消隐藏","修改话题"],
      ["加入收藏夹","话题会员收藏总数","用户是否已经收藏话题"],
      ["给话题点赞","话题点赞总数","用户是否已经点赞该话题"],
      ["关注用户","粉丝总数","是否已经关注该用户"],
@@ -734,6 +734,8 @@ function delete_searchWord_row(rowId){
 						<SELECT class="form-select" id=page_topic_sort name=page_topic_sort>
 						<OPTION value="1" >按发表时间 新-&gt;旧</OPTION>
 						<OPTION value="2" >按发表时间 旧-&gt;新</OPTION>
+						<OPTION value="3" >按回复时间 新-&gt;旧</OPTION>
+						<OPTION value="4" >按回复时间 旧-&gt;新</OPTION>
 						</SELECT>
 					</TD>
 				</TR>

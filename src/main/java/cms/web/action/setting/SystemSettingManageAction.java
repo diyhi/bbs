@@ -26,6 +26,7 @@ import cms.utils.DruidTool;
 import cms.utils.JsonUtils;
 import cms.utils.RedirectPath;
 import cms.utils.Verification;
+import cms.web.action.FileManage;
 import cms.web.action.cache.CacheManage;
 import cms.web.action.cache.CacheStatus;
 import cms.web.action.cache.SelectCache;
@@ -68,6 +69,7 @@ public class SystemSettingManageAction {
 	private Validator validator; 
 	
 	@Resource TopicIndexManage topicIndexManage;
+	@Resource FileManage fileManage;
 	
 	/**
 	 * 系统设置 修改界面显示
@@ -84,12 +86,18 @@ public class SystemSettingManageAction {
 				systemSite.setEditorTagObject(editorTag);
 			}
 		}
+		
 		if(systemSite.getTopicEditorTag() != null && !"".equals(systemSite.getTopicEditorTag().trim())){
 			EditorTag editorTag = JsonUtils.toObject(systemSite.getTopicEditorTag(), EditorTag.class);
 			if(editorTag != null){
 				systemSite.setTopicEditorTagObject(editorTag);
 			}
 		}
+		//允许上传文件格式
+		List<String> formatList = fileManage.readRichTextAllowFileUploadFormat();
+		
+		model.addAttribute("fileUploadFormatList",formatList);
+		
 		model.addAttribute("systemSetting",systemSite);
 		return "jsp/setting/edit_systemSetting";
 	}
@@ -102,6 +110,10 @@ public class SystemSettingManageAction {
 		//数据校验
 		this.validator.validate(formbean, result); 
 		if (result.hasErrors()) {  
+			//允许上传文件格式
+			List<String> formatList = fileManage.readRichTextAllowFileUploadFormat();
+			
+			model.addAttribute("fileUploadFormatList",formatList);
 			return "jsp/setting/edit_systemSetting";
 		}
 		formbean.setTopicEditorTag(JsonUtils.toJSONString(formbean.getTopicEditorTagObject()));

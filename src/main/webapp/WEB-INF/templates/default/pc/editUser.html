@@ -866,6 +866,23 @@
 							</td>
 						</tr>
 						<tr>
+				    		<td align="right">角色：</td>
+				    		<td align="left">
+				    			<table cellSpacing="0" cellPadding="0" width="100%" border="0">
+								    <#list userRoleList as userRole>
+									    <tr>
+									  		<td style="text-align:left;width: 200px;">
+									  			${userRole.name}
+									    	</td>
+									    	<td style="text-align:left;">
+									    		${userRole.validPeriodEnd} 到期
+									    	</td>
+									    </tr>
+									</#list>
+							    </table>
+				    		</td>
+						</tr>
+						<tr>
 				    		<td align="right">允许显示用户动态：</td>
 				    		<td align="left">
 				    			<label><input type="radio" name="allowUserDynamic" value="true" <#if user.allowUserDynamic ==true> checked='checked'</#if>>显示</label>&nbsp;&nbsp;
@@ -898,6 +915,7 @@
 								<span class="help">不修改请留空</span>
 							</td>
 						<tr>
+						
 						<!-- 用户自定义注册功能项 -->
 						<#list userCustomList as userCustom>
 						<tr>

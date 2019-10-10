@@ -955,6 +955,23 @@ function showDelta(obj,popId){
     </TD>
   </TR>
   <TR>
+	    <TD class="t-label t-label-h" width="12%">角色：</TD>
+	    <TD class="t-content" width="63%" colSpan="3">
+	    	<table cellSpacing="0" cellPadding="0" width="100%" border="0">
+			    <c:forEach items="${userRoleList}" var="entry" > 
+				    <tr>
+				  		<td style="border-bottom:1px dashed #BFE3FF; line-height:30px;color: #999; text-align:left;width: 200px;">
+				  			${entry.name}
+				  		</td>
+				    	<td style="border-bottom:1px dashed #BFE3FF; line-height:30px;color: #999; text-align:left;">
+				    		<fmt:formatDate value="${entry.validPeriodEnd}"  pattern="yyyy-MM-dd HH:mm"/> 到期
+				    	</td>
+				    </tr>
+				</c:forEach>
+		    </table>
+	    </TD>
+	</TR>
+  <TR>
     <TD class="t-label t-label-h" width="12%">预存款：</TD>
     <TD class="t-content" width="88%" colSpan="3">
     	${user.deposit}
@@ -964,6 +981,7 @@ function showDelta(obj,popId){
     <TD class="t-content" width="88%" colSpan="3">
     	${user.point}
     </TD></TR>
+    
 	<TR>
     <TD class="t-label t-label-h" width="12%">备注：</TD>
     <TD class="t-content" width="88%" colSpan="3">

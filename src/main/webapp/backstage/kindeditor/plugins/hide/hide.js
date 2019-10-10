@@ -264,19 +264,6 @@ KindEditor.plugin('hide', function(K) {
 		amountBox = K('[name="inputValue_50"]', div);//金额
 		tabIndexBox = 0;
 		
-		
-		if(options.hideVisibleType == 10){//输入密码可见
-			tabIndex = 0;
-		}else if(options.hideVisibleType == 20){//回复话题可见
-			tabIndex = 1;
-		}else if(options.hideVisibleType == 30){//达到等级可见
-			tabIndex = 2;
-		}else if(options.hideVisibleType == 40){//积分购买可见
-			tabIndex = 3;
-		}else if(options.hideVisibleType == 50){//余额购买可见
-			tabIndex = 4;
-		}
-		
 
 		var tabs;
 		tabs = K.tabs({
@@ -331,6 +318,41 @@ KindEditor.plugin('hide', function(K) {
 			title : tabTitle5,//余额购买可见
 			panel : K('.tab5', div)
 		});
+		
+		//第一次打开时显示
+		if(options.hideVisibleType != ""){
+			if(options.hideVisibleType == 10){//输入密码可见
+				tabIndex = 0;
+			}else if(options.hideVisibleType == 20){//回复话题可见
+				tabIndex = 1;
+			}else if(options.hideVisibleType == 30){//达到等级可见
+				tabIndex = 2;
+			}else if(options.hideVisibleType == 40){//积分购买可见
+				tabIndex = 3;
+			}else if(options.hideVisibleType == 50){//余额购买可见
+				tabIndex = 4;
+			}
+			
+		}else{
+			//显示第一个标签项内容		
+			if(tabTitle5 !=""){
+				tabIndex = 4;
+			}
+			if(tabTitle4 !=""){
+				tabIndex = 3;
+			}
+			if(tabTitle3 !=""){
+				tabIndex = 2;
+			}
+			if(tabTitle2 !=""){
+				tabIndex = 1;
+			}
+			if(tabTitle1 !=""){
+				tabIndex = 0;
+			}
+			
+		}
+		
 		
 		tabs.select(tabIndex);
 

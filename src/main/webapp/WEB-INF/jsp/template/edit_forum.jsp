@@ -616,6 +616,8 @@ function delete_searchWord_row(rowId){
 						<SELECT class="form-select" id=page_topic_sort name=page_topic_sort>
 						<OPTION value="1" >按发表时间 新-&gt;旧</OPTION>
 						<OPTION value="2" >按发表时间 旧-&gt;新</OPTION>
+						<OPTION value="3" >按回复时间 新-&gt;旧</OPTION>
+						<OPTION value="4" >按回复时间 旧-&gt;新</OPTION>
 						</SELECT>
 					</TD>
 				</TR>

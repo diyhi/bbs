@@ -1206,7 +1206,58 @@ public class TextFilterManage {
 		
 	}
 
+	/**
+	 * 解析上传的文件完整路径名称
+	 * @param html 富文本内容
+	 * @param item 项目
+	 * @return 
+	 */
+	public Map<String,String> analysisFullFileName(String html,String item){
+		Map<String,String> fullFileNameMap = new HashMap<String,String>();//key:文件完整路径名称 value:文件名称
+		if(!StringUtils.isBlank(html)){
+			Document doc = Jsoup.parseBodyFragment(html);
+
+			Elements file_els = doc.select("a[href]");  
+			for (Element element : file_els) {  
+				String fileUrl = element.attr("href");
+				String fileName = element.text();
+				if(fileUrl != null && !"".equals(fileUrl.trim())){
+					if(StringUtils.startsWithIgnoreCase(fileUrl, "file/"+item+"/")){
+						fullFileNameMap.put(fileUrl.trim(),fileName);
+					}
+				}
+			}
+		}
+		
+		return fullFileNameMap;
+	}
 	
+	/**
+	 * 处理上传的文件完整路径名称
+	 * @param html 富文本内容
+	 * @param item 项目
+	 * @param newFullFileNameMap 新的完整路径名称 key: 完整路径名称 value: 重定向接口
+	 * @return
+	 */
+	public String processFullFileName(String html,String item,Map<String,String> newFullFileNameMap){
+		
+		if(!StringUtils.isBlank(html)){
+			Document doc = Jsoup.parseBodyFragment(html);
+
+			Elements file_els = doc.select("a[href]");  
+			for (Element element : file_els) {  
+				String fileUrl = element.attr("href");
+				if(fileUrl != null && !"".equals(fileUrl.trim())){
+					if(StringUtils.startsWithIgnoreCase(fileUrl, "file/"+item+"/") && newFullFileNameMap.get(fileUrl.trim()) != null){
+						element.attr("href",newFullFileNameMap.get(fileUrl.trim()));
+						
+					}
+				}
+			}
+			html = doc.body().html();
+		}
+		return html;
+	}
 	
 }
 

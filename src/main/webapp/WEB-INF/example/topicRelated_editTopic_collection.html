@@ -13,10 +13,10 @@
 	 <tbody> 
 		<tr> 
 		<tr> 
-			<td rowspan="4">topicRelated_addTopic_collection</td> 
-			<td rowspan="4">Map&ltString,Object></td>
+			<td rowspan="5">topicRelated_editTopic_collection</td> 
+			<td rowspan="5">Map&ltString,Object></td>
 			<td>键参数：availableTag<br>值内容说明：话题编辑器允许使用标签(配合KindEditor编辑器使用)<br>值类型：JSON格式List&ltString></td>
-			<td rowspan="4">添加话题界面显示返回值</td> 
+			<td rowspan="5">修改话题界面显示返回值</td> 
 		</tr>
 		<tr> 
 			<td>键参数：captchaKey<br>值内容说明：验证码编号 (根据'全站设置 - 基本设置 - 发表话题每分钟提交超过'参数计算是否含有值)<br>值类型：String </td>
@@ -27,7 +27,9 @@
 		<tr> 
 			<td>键参数：userGradeList<br>值内容说明：用户等级集合<br>值类型：JSON格式List&lt<a style="color: #317ee7" onclick="anchorJump('#anchor_230'); return false;">UserGrade</a>></td>
 		</tr>
-		
+		<tr> 
+			<td>键参数：topic<br>值内容说明：话题<br>值类型：List&lt<a style="color: #317ee7" onclick="anchorJump('#anchor_20'); return false;">Topic</a>></td>
+		</tr>
 		
 	</tbody> 
 </table>
@@ -41,7 +43,7 @@
 	 <tbody> 
 	 	<tr> 
 			<td width="30%" >请求路径</td> 
-			<td width="70%" colspan="2">user/control/topic/add.htm</td>
+			<td width="70%" colspan="2">user/control/topic/edit.htm</td>
 		</tr>
 		<tr> 
 			<td>请求方式</td> 
@@ -82,7 +84,7 @@
 	 <tbody> 
 	 	<tr> 
 			<td>请求路径</td> 
-			<td colspan="2">user/control/topic/add.htm</td>
+			<td colspan="2">user/control/topic/edit.htm</td>
 		</tr>
 		<tr> 
 			<td>请求方式</td> 
@@ -211,11 +213,6 @@
 			<td>话题错误</td>
 		</tr>
 		<tr> 
-			<td>tagId</td> 
-			<td>String</td>
-			<td>标签错误</td>
-		</tr>
-		<tr> 
 			<td>title</td> 
 			<td>String</td>
 			<td>标题错误</td>
@@ -307,10 +304,10 @@
 	</thead> 
 	 <tbody> 
 		<tr> 
-			<td>tagId</td> 
+			<td>topicId</td> 
 			<td>Long</td>
 			<td>是</td>
-			<td>标签Id</td> 
+			<td>话题Id</td> 
 		</tr>
 		<tr> 
 			<td>title</td> 
@@ -356,12 +353,18 @@
 <textarea name="exampleCode">
 <@function>
 	<#--  返回Map<String,Object>类型 -->
-	<#assign returnValue = topicRelated_addTopic_collection>
-	<form id="addTopicForm" action="user/control/topic/add?page=${url_page}" method="post">
+	<#assign returnValue = topicRelated_editTopic_collection>
+	
+	<#assign topicValue = returnValue['topic']>
+	<#-- 默认Form方式提交出错时会返回topic对象 -->
+	<#if topic != null && topic??>
+		<#assign topicValue = topic>
+	</#if>
+	<form id="editTopicForm" action="user/control/topic/edit?topicId=${url_topicId}" method="post">
 		
 		<#-- 提交后跳转参数  参数必须经过encodeBase64URL编码后才能提交 不填写时默认跳转回当前页 -->
 		<input type="hidden" id="jumpUrl" name="jumpUrl" value="">
-		&lttextarea class="textarea" onfocus="" id="topicContent" name="content" maxlength="100" >${topic.content}&lt/textarea>
+		&lttextarea class="textarea" onfocus="" id="topicContent" name="content" >${topic.content}&lt/textarea>
 		
 		内容错误提示：${(error['content'])!}
 		话题错误提示：${error['topic']}

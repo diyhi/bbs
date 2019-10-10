@@ -8,6 +8,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
@@ -44,6 +45,8 @@ public class FileManage {
 	
 	//读取配置文件类型
   	private static Properties fileFormat = new Properties();
+  	//读取富文本编辑器配置
+  	private static Properties richText = new Properties();
   	static{
 		try {
 			fileFormat.load(FileManage.class.getClassLoader().getResourceAsStream("fileFormat.properties"));
@@ -53,6 +56,15 @@ public class FileManage {
 	            logger.error("读取配置文件fileFormat.properties错误",e);
 	        }
 		}
+		try {
+			richText.load(FileManage.class.getClassLoader().getResourceAsStream("richText.properties"));
+		} catch (IOException e) {
+		//	e.printStackTrace();
+			if (logger.isErrorEnabled()) {
+	            logger.error("读取配置文件richText.properties错误",e);
+	        }
+		}
+		
 	}
 	
 	
@@ -707,6 +719,38 @@ public class FileManage {
 		
 		return false;
 	}
+	
+	/**
+	 * 读取富文本编辑器允许文件上传格式
+	 * @return
+	 */
+	public List<String> readRichTextAllowFileUploadFormat(){	
+		//富文本文件上传格式
+		List<String> fileUploadFormatList = new ArrayList<String>();
+		
+		for(Object key : richText.keySet()){
+			if(key != null){
+				if(String.valueOf(key).equals("fileUploadFormat")){
+					String value = (String)richText.get(key);
+					if(value != null && !"".equals(value.trim())){
+						String[] values = value.split(",");
+						if(values != null && values.length >0){
+							for(String format : values){
+								if(format != null && !"".equals(format.trim())){
+									fileUploadFormatList.add(format.trim());
+								}
+								
+							}
+						}
+					}
+				}
+			}
+		}
+		return fileUploadFormatList;
+	}
+	
+	
+	
 	 /**
 	 * 验证文件名
 	 * @param fileName 文件名称
@@ -735,7 +779,8 @@ public class FileManage {
     			this.lockRemoveFile("comment",maxDeleteTime);//评论文件
     			this.lockRemoveFile("help",maxDeleteTime);//删除帮助文件
     			this.lockRemoveFile("links",maxDeleteTime);//删除友情链接文件
-    		    
+    			this.lockRemoveFile("membershipCard",maxDeleteTime);//会员卡
+    			
     		}
     	}
     	

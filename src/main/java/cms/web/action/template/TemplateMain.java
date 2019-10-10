@@ -142,6 +142,11 @@ public class TemplateMain {
 				Map<String,Object> value = topic_TemplateManage.addTopic_collection(forum, submitParameter,runtimeParameter);
 				return value;
 			}
+		}else if(forum.getForumChildType().equals("修改话题")){
+			if(forum.getDisplayType().equals("collection")){//集合
+				Map<String,Object> value = topic_TemplateManage.editTopic_collection(forum, submitParameter,runtimeParameter);
+				return value;
+			}
 		}else if(forum.getForumChildType().equals("评论列表")){
 			if(forum.getDisplayType().equals("page")){//分页
 				PageView<Comment> value = topic_TemplateManage.comment_page(forum, submitParameter,runtimeParameter);

@@ -105,9 +105,11 @@
 							<span class="a-toolbar">
 								<#if userDynamic.module == 100>
 									<a href="thread?topicId=${userDynamic.topicId}" target="_blank" >查看原文</a>
+									<a href="user/editTopic?topicId=${userDynamic.topicId}" target="_blank" >编辑</a>
 									<span >${userDynamic.topicViewTotal}次阅读</span>
 									<span >${userDynamic.topicCommentTotal}个评论</span>
 									<span id="favoriteCount_${userDynamic.topicId}">0人收藏</span>
+									<span id="likeCount_${userDynamic.topicId}">0人赞</span>
 									<script type="text/javascript">
 										//查询话题用户收藏总数
 										function queryFavoriteCount(){	
@@ -123,6 +125,21 @@
 															           
 										}
 										queryFavoriteCount();
+										
+										//查询话题用户点赞总数
+										function queryLikeCount(){	
+											//获取话题Id
+											var topicId = ${userDynamic.topicId};
+											get_request(function(value){
+												if(value != ""){
+													var data = JSON.parse(value);
+										        	document.getElementById("likeCount_"+topicId).innerHTML = data+"人赞";
+										        }
+											},
+												"queryLikeCount?topicId="+topicId+"&timestamp=" + new Date().getTime(), true);
+															           
+										}
+										queryLikeCount();
 									</script>
 								<#elseif userDynamic.module == 200>
 									<a href="thread?topicId=${userDynamic.topicId}&commentId=${userDynamic.commentId}"  target="_blank" >查看原文</a>
@@ -132,6 +149,7 @@
 									<a href="thread?topicId=${userDynamic.topicId}&commentId=${userDynamic.commentId}"  target="_blank" >查看原文</a>
 								</#if> 
 								
+							
 								
 							</span>
 						</div>

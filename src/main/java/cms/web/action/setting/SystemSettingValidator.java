@@ -103,7 +103,20 @@ public class SystemSettingValidator implements Validator{
 		}else{
 			errors.rejectValue("topicUnhidePlatformShareProportion","errors.required", new String[]{"不能为空"},"");
 		}
-		
+		//文件防盗链密钥
+		if(systemSetting.getFileSecureLinkSecret() != null && !"".equals(systemSetting.getFileSecureLinkSecret().trim())){
+			if(systemSetting.getFileSecureLinkSecret().trim().length() != 16){
+				errors.rejectValue("fileSecureLinkSecret","errors.required", new String[]{"密钥必须为16个字符"},"");
+			}
+		}
+		//文件防盗链过期时间
+		if(systemSetting.getFileSecureLinkExpire() != null){
+			if(systemSetting.getFileSecureLinkExpire() <=0){
+				errors.rejectValue("fileSecureLinkExpire","errors.required", new String[]{"不能小于或等于0"},"");
+			}
+		}else{
+			errors.rejectValue("fileSecureLinkExpire","errors.required", new String[]{"不能为空"},"");
+		}
 		
 		//前台分页数量
 		if(systemSetting.getForestagePageNumber() != null){
@@ -135,8 +148,28 @@ public class SystemSettingValidator implements Validator{
 				errors.rejectValue("userSentSmsCount","errors.required", new String[]{"必须大于0"},"");
 			}
 		}
-		
-		
+		//话题编辑器标签
+		if(systemSetting.getTopicEditorTagObject() != null){
+			if(systemSetting.getTopicEditorTagObject().isImage()){//图片
+				if(systemSetting.getTopicEditorTagObject().getImageSize() == null || systemSetting.getTopicEditorTagObject().getImageSize() <=0){
+					errors.rejectValue("topicEditorTagObject.imageSize","errors.required", new String[]{"必须大于0"},"");
+				}
+			}
+			if(systemSetting.getTopicEditorTagObject().isFile()){//文件
+				if(systemSetting.getTopicEditorTagObject().getFileSize() == null || systemSetting.getTopicEditorTagObject().getFileSize() <=0){
+					errors.rejectValue("topicEditorTagObject.fileSize","errors.required", new String[]{"必须大于0"},"");
+				}
+			}
+			
+		}
+		//评论编辑器标签
+		if(systemSetting.getEditorTagObject() != null){
+			if(systemSetting.getEditorTagObject().isImage()){//图片
+				if(systemSetting.getEditorTagObject().getImageSize() == null || systemSetting.getEditorTagObject().getImageSize() <=0){
+					errors.rejectValue("editorTagObject.imageSize","errors.required", new String[]{"必须大于0"},"");
+				}
+			}
+		}
 		
 	}
 }

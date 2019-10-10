@@ -315,6 +315,16 @@
 		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="1800" 
 		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>		
 		
+	<!-- 解析解析上传的文件完整路径名称 -->
+	<cache name="topicManage_cache_analysisFullFileName" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>		
+	<!-- 处理处理上传的文件完整路径名称 -->
+	<cache name="topicManage_cache_processFullFileName" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="1800" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
 	<!-- 查询会员卡 -->
 	<cache name="membershipCardManage_cache_findById" maxElementsInMemory="900000" 
 		overflowToDisk="true"

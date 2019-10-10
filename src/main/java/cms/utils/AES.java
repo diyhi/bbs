@@ -14,6 +14,9 @@ import org.apache.logging.log4j.Logger;
 public class AES {
 	 private static final Logger logger = LogManager.getLogger(AES.class);
 	 
+	 //默认的初始化向量值
+	 private static final String IV_DEFAULT = "Q+\\~W4ER)b$=TYUI";
+	 
 	/**
 	 * 加密
 	 * @param data 数据
@@ -22,6 +25,11 @@ public class AES {
 	 * @return
 	 */
 	public static String encrypt(String data,String key,String iv) { 
+		if(iv == null || iv.length() != 16){//如果iv为空，则使用默认值
+			iv = IV_DEFAULT;
+		}
+		
+		
         try { 
             Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding"); 
             int blockSize = cipher.getBlockSize(); 
@@ -59,6 +67,10 @@ public class AES {
 	 * @return
 	 */
     public static String decrypt(String data,String key,String iv) { 
+    	if(iv == null || iv.length() != 16){//如果iv为空，则使用默认值
+			iv = IV_DEFAULT;
+		}
+    	
         try { 
             String text = Base64.decode(data.getBytes()); 
                

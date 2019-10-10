@@ -22,6 +22,13 @@
 			</td>
 		</tr>
 		<tr>  
+			<td>用户角色集合</td> 
+			<td>
+				变量：userRoleList<br>
+				类型：List&lt<a style="color: #317ee7" onclick="anchorJump('#anchor_80'); return false;">UserRole</a>>
+			</td>
+		</tr>
+		<tr>  
 			<td>用户自定义注册功能项</td> 
 			<td>
 				变量：userCustomList<br>
@@ -51,10 +58,15 @@
 			<td colspan="2">协议头：X-Requested-With  值：XMLHttpRequest</td>
 		</tr>
 		<tr> 
-			<td width="30%" rowspan="2">请求成功返回</td> 
-			<td width="30%" rowspan="2">JSON格式值 类型:Map&ltString,Object></td>
-			<td width="40%">键参数：userCustomList<br>值内容说明：用户自定义注册功能项<br>值类型：List&lt<a style="color: #317ee7" onclick="anchorJump('#anchor_50'); return false;">UserCustom</a>></td> 
+			<td width="30%" rowspan="3">请求成功返回</td> 
+			<td width="30%" rowspan="3">JSON格式值 类型:Map&ltString,Object></td>
+			<td width="40%">
+				键参数：userRoleList<br>值内容说明：用户角色集合<br>值类型：List&lt<a style="color: #317ee7" onclick="anchorJump('#anchor_80'); return false;">UserRole</a>>
+			</td>
 		</tr>
+		<tr> 
+			<td>键参数：userCustomList<br>值内容说明：用户自定义注册功能项<br>值类型：List&lt<a style="color: #317ee7" onclick="anchorJump('#anchor_50'); return false;">UserCustom</a>></td> 
+		</tr>	
 		<tr> 
 			<td>键参数：user<br>值内容说明：用户<br>值类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_40'); return false;">User</a></td>
 		</tr>	
@@ -246,7 +258,35 @@
 	</tbody>
 </table>
 
-
+<table id="anchor_80" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">用户角色 UserRoleList</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>id</td> 
+			<td>Long</td>
+			<td>Id</td>
+		</tr>
+		<tr> 
+			<td>name</td> 
+			<td>String</td>
+			<td>角色名称</td>
+		</tr>
+		<tr> 
+			<td>validPeriodEnd</td> 
+			<td>Date</td>
+			<td>有效期结束</td>
+		</tr>
+	</tbody>
+</table>
 
 <table class="exampleTable" > 
 	<thead> 

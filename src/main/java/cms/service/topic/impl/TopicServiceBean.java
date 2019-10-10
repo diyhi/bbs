@@ -309,6 +309,25 @@ public class TopicServiceBean extends DaoSupport<Topic> implements TopicService{
 	}
 	
 	/**
+	 * 前台用户修改话题
+	 * @param topic
+	 * @return
+	 */
+	public Integer updateTopic2(Topic topic){
+		Query query = em.createQuery("update Topic o set o.title=?1, o.content=?2,o.summary=?3,o.image=?4,o.status=?5,o.lastUpdateTime=?6 where o.id=?7 and o.status < ?8")
+		.setParameter(1, topic.getTitle())
+		.setParameter(2, topic.getContent())
+		.setParameter(3, topic.getSummary())
+		.setParameter(4, topic.getImage())
+		.setParameter(5, topic.getStatus())
+		.setParameter(6, topic.getLastUpdateTime())
+		.setParameter(7, topic.getId())
+		.setParameter(8, 100);
+		int i = query.executeUpdate();
+		return i;
+	}
+	
+	/**
 	 * 还原话题
 	 * @param topicList 话题集合
 	 * @return

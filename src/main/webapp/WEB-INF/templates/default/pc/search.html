@@ -67,6 +67,9 @@
 													<span class="userRoleName">${roleName}</span>
 													
 												</#list>
+												<#if topic.isStaff>
+													<span class="staff">官方人员</span>
+												</#if>
 							                </em>
 							                <em>发表时间：${topic.postTime}</em>
 							                <#if topic.lastReplyTime != null>

@@ -459,7 +459,9 @@ public class TopicManage {
 			if(editor.isImage()){//图片
 				tag.add("image");
 			}
-			
+			if(editor.isFile()){//文件
+				tag.add("insertfile");
+			}
 			
 			if(editor.isHidePassword()){//输入密码可见
 				tag.add("hidePassword");
@@ -620,7 +622,31 @@ public class TopicManage {
     	return id;
     }
    
-	
+    /**
+     * 生成处理'上传的文件完整路径名称'Id
+     * @param topicId 话题Id
+     * @param lastUpdateTime 最后修改时间
+     * @param fullFileNameMap 完整路径名称 key: 完整路径名称 value: 重定向接口
+     * @return
+     */
+    public String createProcessFullFileNameId(Long topicId,Date lastUpdateTime,Map<String,String> fullFileNameMap){
+    	String id = topicId+"|";
+
+    	StringBuffer sb = new StringBuffer("");
+    	for (Map.Entry<String,String> entry : fullFileNameMap.entrySet()) {
+    		sb.append(entry.getValue()).append("|");
+    		
+    	}
+    	id+= cms.utils.MD5.getMD5(sb.toString())+"|";
+    	if(lastUpdateTime != null){
+			id+="|"+lastUpdateTime.getTime();
+		}else{
+			id+="|";
+		}
+    	return id;
+    }
+    
+    
     
     /**
 	 * 查询缓存 查询'话题取消隐藏'
@@ -673,7 +699,6 @@ public class TopicManage {
 	/**
 	 * 删除缓存 解析隐藏标签
 	 * @param topicId 话题Id
-	 * @param userName 用户名称
 	 * @return
 	 */
 	@CacheEvict(value="topicManage_cache_analysisHiddenTag",key="#topicId")
@@ -694,5 +719,38 @@ public class TopicManage {
 		return textFilterManage.processHiddenTag(html,visibleTagList);
 	}
 
+
+	
+	/**
+	 * 查询缓存 解析上传的文件完整路径名称
+	 * @param html 富文本内容
+	 * @param topicId 话题Id
+	 * @return
+	 */
+	@Cacheable(value="topicManage_cache_analysisFullFileName",key="#topicId")
+	public Map<String,String> query_cache_analysisFullFileName(String html,Long topicId){
+		return textFilterManage.analysisFullFileName(html,"topic");
+	}
+	/**
+	 * 删除缓存 解析上传的文件完整路径名称
+	 * @param topicId 话题Id
+	 * @return
+	 */
+	@CacheEvict(value="topicManage_cache_analysisFullFileName",key="#topicId")
+	public void delete_cache_analysisFullFileName(Long topicId){
+	}
+	
+	/**
+	 * 查询缓存 处理上传的文件完整路径名称(缓存不做删除处理，到期自动失效，由话题'最后修改时间'做参数,确保查询为最新值)
+	 * @param html 富文本内容
+	 * @param item 项目
+	 * @param newFullFileNameMap 新的完整路径名称 key: 完整路径名称 value: 重定向接口
+	 * @param processFullFileNameId 处理'上传的文件完整路径名称'Id
+	 * @return
+	 */
+	@Cacheable(value="topicManage_cache_processFullFileName",key="#processFullFileNameId")
+	public String query_cache_processFullFileName(String html,String item,Map<String,String> newFullFileNameMap,String processFullFileNameId){
+		return textFilterManage.processFullFileName(html,item,newFullFileNameMap);
+	}
 
 }

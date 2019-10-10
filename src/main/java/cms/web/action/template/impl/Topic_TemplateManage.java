@@ -39,6 +39,7 @@ import cms.service.topic.TagService;
 import cms.service.topic.TopicService;
 import cms.service.user.UserGradeService;
 import cms.utils.JsonUtils;
+import cms.utils.SecureLink;
 import cms.utils.UUIDUtil;
 import cms.utils.Verification;
 import cms.web.action.TextFilterManage;
@@ -191,7 +192,14 @@ public class Topic_TemplateManage {
 			orderby.put("id", "desc");//发布时间排序   新-->旧
 		}else if(sort == 2){
 			orderby.put("id", "asc");//发布时间排序  旧-->新
-		}	
+		}else if(sort == 3){
+			orderby.put("lastReplyTime", "desc");//回复时间排序   新-->旧
+		}else if(sort == 4){
+			orderby.put("lastReplyTime", "asc");//回复时间排序  旧-->新
+		}
+		
+		
+		
 		//删除第一个and
 		String jpql_str = StringUtils.difference(" and", jpql.toString());
 		QueryResult<Topic> qr = topicService.getScrollData(Topic.class,firstIndex, maxResult, jpql_str, params.toArray(),orderby);
@@ -208,6 +216,10 @@ public class Topic_TemplateManage {
 				for(Topic topic : qr.getResultlist()){
 					topic.setIpAddress(null);//IP地址不显示
 					topic.setContent(null);//话题内容不显示
+					if(topic.getPostTime().equals(topic.getLastReplyTime())){//如果发贴时间等于回复时间，则不显示回复时间
+						topic.setLastReplyTime(null);
+					}
+					
 					if(topic.getIsStaff() == false){//会员
 						userRoleNameMap.put(topic.getUserName(), null);
 					}
@@ -450,6 +462,36 @@ public class Topic_TemplateManage {
 					topic.setAllowRoleViewList(topicRoleNameList);//话题允许查看的角色名称集合
 				}
 				
+				
+				SystemSetting systemSetting = settingService.findSystemSetting_cache();
+				
+				//话题内容摘要MD5
+				String topicContentDigest = "";
+				
+				
+				//处理文件防盗链
+				if(topic.getContent() != null && !"".equals(topic.getContent().trim()) && systemSetting.getFileSecureLinkSecret() != null && !"".equals(systemSetting.getFileSecureLinkSecret().trim())){
+					//解析上传的文件完整路径名称
+					Map<String,String> analysisFullFileNameMap = topicManage.query_cache_analysisFullFileName(topic.getContent(),topic.getId());
+					if(analysisFullFileNameMap != null && analysisFullFileNameMap.size() >0){
+						
+						
+						Map<String,String> newFullFileNameMap = new HashMap<String,String>();//新的完整路径名称 key: 完整路径名称 value: 重定向接口
+						for (Map.Entry<String,String> entry : analysisFullFileNameMap.entrySet()) {
+
+							newFullFileNameMap.put(entry.getKey(), SecureLink.createRedirectLink(entry.getKey(),entry.getValue(),topic.getTagId(),systemSetting.getFileSecureLinkSecret()));
+						}
+						
+						//生成处理'上传的文件完整路径名称'Id
+						String processFullFileNameId = topicManage.createProcessFullFileNameId(topicId,topic.getLastUpdateTime(),newFullFileNameMap);
+						
+						topic.setContent(topicManage.query_cache_processFullFileName(topic.getContent(),"topic",newFullFileNameMap,processFullFileNameId));
+						
+						topicContentDigest = cms.utils.MD5.getMD5(processFullFileNameId);
+					}
+					
+					
+				}
 
 				
 				//处理隐藏标签
@@ -526,7 +568,7 @@ public class Topic_TemplateManage {
 					String processHideTagId = topicManage.createProcessHideTagId(topicId,topic.getLastUpdateTime(), visibleTagList);
 					
 					//处理隐藏标签
-					String content = topicManage.query_cache_processHiddenTag(topic.getContent(),visibleTagList,processHideTagId);
+					String content = topicManage.query_cache_processHiddenTag(topic.getContent(),visibleTagList,processHideTagId+"|"+topicContentDigest);
 					
 					//String content = textFilterManage.processHiddenTag(topic.getContent(),visibleTagList);
 					topic.setContent(content);
@@ -573,6 +615,85 @@ public class Topic_TemplateManage {
 			}
 		}
 		
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		
+		//如果全局不允许提交话题
+		if(systemSetting.isAllowTopic() == false){
+			value.put("allowTopic",false);//不允许提交话题
+		}else{
+			value.put("allowTopic",true);//允许提交话题
+		}
+		value.put("availableTag", topicManage.availableTag());//话题编辑器允许使用标签
+		List<UserGrade> userGradeList = userGradeService.findAllGrade_cache();
+		value.put("userGradeList", JsonUtils.toJSONString(userGradeList));
+		return value;
+	}
+	
+	/**
+	 * 话题  -- 修改
+	 * @param forum
+	 */
+	public Map<String,Object> editTopic_collection(Forum forum,Map<String,Object> parameter,Map<String,Object> runtimeParameter){
+		Map<String,Object> value = new HashMap<String,Object>();
+		
+		Long topicId = null;
+		AccessUser accessUser = null;
+		//获取运行时参数
+		if(runtimeParameter != null && runtimeParameter.size() >0){		
+			for(Map.Entry<String,Object> paramIter : runtimeParameter.entrySet()) {
+				if("accessUser".equals(paramIter.getKey())){
+					accessUser = (AccessUser)paramIter.getValue();
+				}
+			}
+		}
+		if(accessUser != null){
+			boolean captchaKey = captchaManage.topic_isCaptcha(accessUser.getUserName());//验证码标记
+			if(captchaKey ==true){
+				value.put("captchaKey",UUIDUtil.getUUID32());//是否有验证码
+			}
+		}
+		
+		//获取参数
+		if(parameter != null && parameter.size() >0){		
+			for(Map.Entry<String,Object> paramIter : parameter.entrySet()) {
+				if("topicId".equals(paramIter.getKey())){
+					if(Verification.isNumeric(paramIter.getValue().toString())){
+						if(paramIter.getValue().toString().length() <=18){
+							topicId = Long.parseLong(paramIter.getValue().toString());	
+						}
+					}
+				}
+			}
+		}
+		
+		if(accessUser != null && topicId != null && topicId >0L){
+			Topic topic = topicManage.queryTopicCache(topicId);//查询缓存
+			if(topic != null && topic.getStatus() <100 && topic.getUserName().equals(accessUser.getUserName())){
+				topic.setIpAddress(null);//IP地址不显示
+				List<Tag> tagList = tagService.findAllTag_cache();
+				if(tagList != null && tagList.size() >0){
+					for(Tag tag :tagList){
+						if(topic.getTagId().equals(tag.getId())){
+							topic.setTagName(tag.getName());
+							break;
+						}
+						
+					}
+				}
+				
+				List<String> topicRoleNameList = userRoleManage.queryAllowViewTopicRoleName(topic.getTagId());
+				if(topicRoleNameList != null && topicRoleNameList.size() >0){
+					topic.setAllowRoleViewList(topicRoleNameList);//话题允许查看的角色名称集合
+				}
+				
+				
+				value.put("topic",topic);
+				
+				
+			}
+		}
+		
+
 		SystemSetting systemSetting = settingService.findSystemSetting_cache();
 		
 		//如果全局不允许提交话题

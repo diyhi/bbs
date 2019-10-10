@@ -95,8 +95,8 @@ function delete_Row(rowId){
 	//删除指定Index的行 
 	tables.deleteRow(rowIndex); 
 }
-//设置图片参数
-function siteImage(module,value){
+//选择图片参数
+function selectImage(module,value){
 	if(value == "true"){
 	
 		document.getElementById(module+"ImageFormat_tr").style.display = "";
@@ -105,6 +105,19 @@ function siteImage(module,value){
 	}else{
 		document.getElementById(module+"ImageFormat_tr").style.display = "none";
 		document.getElementById(module+"ImageSize_tr").style.display = "none";
+	}
+}
+
+//选择文件参数
+function selectFile(module,value){
+	if(value == "true"){
+	
+		document.getElementById(module+"FileFormat_tr").style.display = "";
+		document.getElementById(module+"FileSize_tr").style.display = "";
+		
+	}else{
+		document.getElementById(module+"FileFormat_tr").style.display = "none";
+		document.getElementById(module+"FileSize_tr").style.display = "none";
 	}
 }
 
@@ -425,7 +438,21 @@ function setAllowFilterWord(obj){
 			    	<web:errors path="filterWordReplace" cssStyle="color: red;"/>
 			    </TD>
 			</TR>
-			
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">文件防盗链密钥：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<input class="form-text" name="fileSecureLinkSecret" maxlength="16" size="16" value="${systemSetting.fileSecureLinkSecret}"/>
+			    	<web:errors path="fileSecureLinkSecret" cssStyle="color: red;"/>
+			    	<span class="span-help">必须和Nginx的Secure Link模块密钥一致，并且为16个字符</span>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">文件防盗链过期时间：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<input class="form-text" name="fileSecureLinkExpire" maxlength="10" size="10" value="${systemSetting.fileSecureLinkExpire}"/> 秒
+			    	<web:errors path="fileSecureLinkExpire" cssStyle="color: red;"/>
+			    </TD>
+			</TR>
 			
 			<TR>
 			    <TD class="t-label t-label-h" width="20%">前台分页数量：</TD>
@@ -616,11 +643,11 @@ function setAllowFilterWord(obj){
 			<TR>
 			    <TD class="t-label t-label-h" width="20%">图片<span class="toolbar-icon-url icon-image"></span>：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">
-			    	<label><form:radiobutton path="topicEditorTagObject.image" value="true" onclick="siteImage('topic',this.value);"/>打开</label>
-			    	<label><form:radiobutton path="topicEditorTagObject.image" value="false" onclick="siteImage('topic',this.value);"/>关闭</label>
+			    	<label><form:radiobutton path="topicEditorTagObject.image" value="true" onclick="selectImage('topic',this.value);"/>打开</label>
+			    	<label><form:radiobutton path="topicEditorTagObject.image" value="false" onclick="selectImage('topic',this.value);"/>关闭</label>
 			    </TD>
 			</TR>
-			<TR id="topicImageFormat_tr" <c:if test="${systemSetting.editorTagObject.image == false}"> style="display: none;"</c:if>>
+			<TR id="topicImageFormat_tr" <c:if test="${systemSetting.topicEditorTagObject.image == false}"> style="display: none;"</c:if>>
 			    <TD class="t-label t-label-h" width="20%">允许上传图片格式：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">
 			    	<label><form:checkbox path="topicEditorTagObject.imageFormat" value="JPG"/>JPG</label>
@@ -634,7 +661,32 @@ function setAllowFilterWord(obj){
 			    <TD class="t-label t-label-h" width="20%">允许上传图片大小：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">
 			    	<form:input class="form-text" path="topicEditorTagObject.imageSize" size="10"/>&nbsp;K
+			    	<web:errors path="topicEditorTagObject.imageSize" cssStyle="color: red;"/>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">文件<span class="toolbar-icon-url icon-insertfile"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="topicEditorTagObject.file" value="true" onclick="selectFile('topic',this.value);"/>打开</label>
+			    	<label><form:radiobutton path="topicEditorTagObject.file" value="false" onclick="selectFile('topic',this.value);"/>关闭</label>
+			    </TD>
+			</TR>
+			<TR id="topicFileFormat_tr" <c:if test="${systemSetting.topicEditorTagObject.file == false}"> style="display: none;"</c:if>>
+			    <TD class="t-label t-label-h" width="20%">允许上传文件格式：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
 			    	
+			    	<c:forEach items="${fileUploadFormatList}" var="fileUploadFormat">
+			    		<label><form:checkbox path="topicEditorTagObject.fileFormat" value="${fileUploadFormat}"/>${fileUploadFormat}</label>
+			    	
+			    	</c:forEach>
+			    	<web:errors path="topicEditorTagObject.fileFormat" cssStyle="color: red;"/>
+			    </TD>
+			</TR>
+			<TR id="topicFileSize_tr" <c:if test="${systemSetting.topicEditorTagObject.file == false}"> style="display: none;"</c:if>>
+			    <TD class="t-label t-label-h" width="20%">允许上传文件大小：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<form:input class="form-text" path="topicEditorTagObject.fileSize" size="10"/>&nbsp;K
+			    	<web:errors path="topicEditorTagObject.fileSize" cssStyle="color: red;"/>
 			    </TD>
 			</TR>
 		</TBODY>
@@ -761,8 +813,8 @@ function setAllowFilterWord(obj){
 			<TR>
 			    <TD class="t-label t-label-h" width="20%">图片<span class="toolbar-icon-url icon-image"></span>：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">
-			    	<label><form:radiobutton path="editorTagObject.image" value="true" onclick="siteImage('comment',this.value);"/>打开</label>
-			    	<label><form:radiobutton path="editorTagObject.image" value="false" onclick="siteImage('comment',this.value);"/>关闭</label>
+			    	<label><form:radiobutton path="editorTagObject.image" value="true" onclick="selectImage('comment',this.value);"/>打开</label>
+			    	<label><form:radiobutton path="editorTagObject.image" value="false" onclick="selectImage('comment',this.value);"/>关闭</label>
 			    </TD>
 			</TR>
 			<TR id="commentImageFormat_tr" <c:if test="${systemSetting.editorTagObject.image == false}"> style="display: none;"</c:if>>
@@ -779,7 +831,7 @@ function setAllowFilterWord(obj){
 			    <TD class="t-label t-label-h" width="20%">允许上传图片大小：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">
 			    	<form:input class="form-text" path="editorTagObject.imageSize" size="10"/>&nbsp;K
-			    	
+			    	<web:errors path="editorTagObject.imageSize" cssStyle="color: red;"/>
 			    </TD>
 			</TR>
 		</TBODY>

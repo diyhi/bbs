@@ -31,6 +31,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import cms.bean.PageForm;
 import cms.bean.PageView;
 import cms.bean.QueryResult;
+import cms.bean.setting.SystemSetting;
 import cms.bean.staff.SysUsers;
 import cms.bean.thumbnail.Thumbnail;
 import cms.bean.topic.Comment;
@@ -55,6 +56,7 @@ import cms.utils.FileType;
 import cms.utils.IpAddress;
 import cms.utils.JsonUtils;
 import cms.utils.RedirectPath;
+import cms.utils.SecureLink;
 import cms.utils.UUIDUtil;
 import cms.utils.Verification;
 import cms.web.action.FileManage;
@@ -114,6 +116,25 @@ public class TopicManageAction {
 				if(topic.getIp() != null && !"".equals(topic.getIp().trim())){
 					topic.setIpAddress(IpAddress.queryAddress(topic.getIp().trim()));
 				}
+				SystemSetting systemSetting = settingService.findSystemSetting_cache();
+				if(topic.getContent() != null && !"".equals(topic.getContent().trim()) && systemSetting.getFileSecureLinkSecret() != null && !"".equals(systemSetting.getFileSecureLinkSecret().trim())){
+					//解析上传的文件完整路径名称
+					Map<String,String> analysisFullFileNameMap = textFilterManage.analysisFullFileName(topic.getContent(),"topic");
+					if(analysisFullFileNameMap != null && analysisFullFileNameMap.size() >0){
+						
+						
+						Map<String,String> newFullFileNameMap = new HashMap<String,String>();//新的完整路径名称 key: 完整路径名称 value: 重定向接口
+						for (Map.Entry<String,String> entry : analysisFullFileNameMap.entrySet()) {
+
+							newFullFileNameMap.put(entry.getKey(), SecureLink.createRedirectLink(entry.getKey(),entry.getValue(),-1L,systemSetting.getFileSecureLinkSecret()));
+						}
+						
+						topic.setContent(textFilterManage.processFullFileName(topic.getContent(),"topic",newFullFileNameMap));
+						
+					}
+				}
+				
+				
 				
 				model.addAttribute("topic", topic);
 				
@@ -322,7 +343,9 @@ public class TopicManageAction {
 		topic.setTagName(tagName);
 		topic.setAllow(allow);
 		topic.setStatus(status);
-	
+		Date d = new Date();
+		topic.setPostTime(d);
+		topic.setLastReplyTime(d);
 		if(tagId == null || tagId <=0L){
 			error.put("tagId", "标签不能为空");
 		}else{
@@ -703,19 +726,7 @@ public class TopicManageAction {
 					}
 				}else if(dir.equals("file")){
 					//允许上传文件格式
-					List<String> formatList = new ArrayList<String>();
-					formatList.add("mp4");
-					formatList.add("avi");
-					formatList.add("mkv");
-					formatList.add("wmv");
-					formatList.add("wav");
-					formatList.add("rm/rmvb");
-					formatList.add("mp3");
-					formatList.add("flac");
-					formatList.add("ape");
-					formatList.add("zip");
-					formatList.add("rar");
-					formatList.add("7z");
+					List<String> formatList = fileManage.readRichTextAllowFileUploadFormat();
 					
 					//验证文件后缀
 					boolean authentication = fileManage.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
@@ -962,7 +973,7 @@ public class TopicManageAction {
 					if(i >0 && topic.getStatus() < 100 && !old_status.equals(status)){
 						User user = userManage.query_cache_findUserByUserName(topic.getUserName());
 						if(user != null){
-							//修改话题状态
+							//修改用户动态话题状态
 							userService.updateUserDynamicTopicStatus(user.getId(),topic.getUserName(),topic.getId(),topic.getStatus());
 						}
 						
@@ -972,7 +983,7 @@ public class TopicManageAction {
 					//删除缓存
 					topicManage.deleteTopicCache(topic.getId());//删除话题缓存
 					topicManage.delete_cache_analysisHiddenTag(topic.getId());//删除解析隐藏标签缓存
-					
+					topicManage.delete_cache_analysisFullFileName(topic.getId());//删除 解析上传的文件完整路径名称缓存
 					
 					Object[] obj = textFilterManage.readPathName(old_content,"topic");
 					if(obj != null && obj.length >0){

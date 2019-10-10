@@ -100,6 +100,9 @@ public class SearchAction {
 									pi.setTitle(old_t.getTitle());
 									pi.setContent(old_t.getContent());
 									pi.setIp(null);//IP不显示
+									if(pi.getPostTime().equals(pi.getLastReplyTime())){//如果发贴时间等于回复时间，则不显示回复时间
+										pi.setLastReplyTime(null);
+									}
 									if(pi.getIsStaff() == false){//会员
 										User user = userManage.query_cache_findUserByUserName(pi.getUserName());
 										pi.setNickname(user.getNickname());

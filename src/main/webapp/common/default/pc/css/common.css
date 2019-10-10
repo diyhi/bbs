@@ -540,6 +540,14 @@ html,body{
 	padding:0 5px;
 	font-size: 12px;
 }
+.topicModule .staff{
+	white-space:nowrap;
+	color:#fff;
+	background-color:#32aa66;
+	border-radius:4px;
+	padding:0 5px;
+	font-size: 12px;
+}
 
 /* 列表内容 */
 .topicModule .content {
@@ -644,7 +652,7 @@ html,body{
 	width:100%;height:300px;visibility:hidden;
 }
 .topic-formModule .form-action {
-	 padding-left: 0px; padding-right: 0px; padding-top: 3px;margin-bottom: 12px;
+	 padding-left: 0px; padding-right: 0px; padding-top: 8px;margin-bottom: 12px;
 }
 
 
@@ -658,7 +666,6 @@ html,body{
 	margin-right: 10px;
 	position: relative;
 	z-index: 2;
-	margin-top: 5px;
 }
 .topic-formModule .captchaModule .captcha_div{
 	height: 38px;line-height:38px;
@@ -669,6 +676,8 @@ html,body{
 	width:85px;
 	float: left;
 	border-radius:2px;
+	margin-left: 10px;
+	margin-top:1px;
 }
 .topic-formModule .captchaModule .captchaBox input{
 	position: relative;  
@@ -676,28 +685,28 @@ html,body{
 	background-color:transparent;
 	outline: none; 
 	float:left;
-	height:30px; 
+	height:32px; 
 	width:85px;
 	line-height:30px;
 	border:0;
 	color:#333;
-	padding:0;
+	padding:0 5px;
 	font-size:18px; 
 }
 .topic-formModule .captchaModule .promptTag {
 	float:left; 
-	font-size:13px; 
-	height:21px; 
-	line-height:21px; 
+	font-size:14px; 
+	height:22px; 
+	line-height:22px; 
 	cursor:text; 
 	margin-top:6px;
-	margin-left:-62px; 
+	margin-left:-74px; 
 	color:#B0B0B0;
 }
-.topic-formModule .captchaModule .captcha_div .captchaImage{width:100px;height:32px;float: left;margin:0 15px 0 5px;}
+.topic-formModule .captchaModule .captcha_div .captchaImage{width:100px;height:32px;float: left;margin:1px 15px 0 5px;}
 .topic-formModule .captchaModule .captcha_div .captchaImage img{width:100px;height:34px;outline:none;}
 .topic-formModule .captchaModule .tips{
-	padding-left:10px;height: 10px;line-height: 12px;
+	padding-left:10px;height: 18px;line-height: 18px;
 }
 .topic-formModule .captchaModule .tips span{
 	color: red;
@@ -743,10 +752,30 @@ html,body{
     
     behavior: url(common/default/pc/js/css3pie/PIE.htc);  /*通知IE浏览器调用脚本作用于当前类*/
 }
+.articleModule .editTopic{
+	position:absolute; 
+	right: 5px;
+	top: 20px;
+}
+.articleModule .editTopic i{
+	font-size: 13px;
+	margin-right: 2px;
+}
+.articleModule .editTopic a{
+	font-size: 14px;
+	margin-right: 8px;
+}
+
 .articleModule .articleBox{margin-top:2px;}
 .articleModule .articleBox h1{color:#404040;font-size:25px;border:none;margin-top:0;font-weight:normal;line-height:28px; text-align: center;}
 .articleModule .articleBox h2{color:#404040;font-size:18px;border:none;margin-top:0;font-weight:normal;margin-top: 20px;border-bottom:1px dotted #eee;}
 .articleModule .articleBox .topicContent{border-top:1px dotted #eee;margin-top:20px;padding:20px 5px;color:#666666;font-size:16px;word-wrap:break-word}
+.articleModule .articleBox .topicContent .lastUpdateTime{
+	text-align: center;line-height: 40px;padding-bottom: 30px;color: #939499;
+}
+.articleModule .articleBox .topicContent a{
+	color: #26a2ff;
+}
 .articleModule .articleBox .topicContent p{font-size:16px;word-wrap:break-word}
 .articleModule .articleBox .topicContent img{max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;}
 
@@ -815,6 +844,14 @@ html,body{
 	white-space:nowrap; 
 	color:#fff;
 	background-color:#ffcc00;
+	border-radius:4px;
+	padding:0 5px;
+	font-size: 12px;
+}
+.commentModule .commentlist .staff{
+	white-space:nowrap; 
+	color:#fff;
+	background-color:#32aa66;
 	border-radius:4px;
 	padding:0 5px;
 	font-size: 12px;
@@ -973,7 +1010,7 @@ html,body{
 	
 }
 .comment-formModule .form-action {
-	 padding-left: 0px; padding-right: 0px; padding-top: 3px;margin-bottom: 12px;
+	 padding-left: 0px; padding-right: 0px; padding-top: 8px;margin-bottom: 12px;
 }
 .comment-formModule .error {
 	color: red;
@@ -994,6 +1031,8 @@ html,body{
 	border:1px solid #e6e6e6;
 	width:85px;
 	float: left;
+	margin-left:10px;
+	margin-top:1px;
 	border-radius:2px;
 }
 .comment-formModule .captchaModule .captchaBox input{
@@ -1002,28 +1041,28 @@ html,body{
 	background-color:transparent;
 	outline: none; 
 	float:left;
-	height:30px; 
+	height:32px; 
 	width:85px;
 	line-height:30px;
 	border:0;
 	color:#333;
-	padding:0;
+	padding:0 5px;
 	font-size:18px; 
 }
 .comment-formModule .captchaModule .promptTag {
 	float:left; 
-	font-size:13px; 
-	height:21px; 
-	line-height:21px; 
+	font-size:14px; 
+	height:22px; 
+	line-height:22px; 
 	cursor:text; 
 	margin-top:6px;
-	margin-left:-62px; 
+	margin-left:-74px; 
 	color:#B0B0B0;
 }
 .comment-formModule .captchaModule .captcha_div .captchaImage{width:100px;height:32px;float: left;margin:0 15px 0 5px;}
 .comment-formModule .captchaModule .captcha_div .captchaImage img{width:100px;height:34px;outline:none;}
 .comment-formModule .captchaModule .tips{
-	padding-left:10px;height: 10px;line-height: 12px;
+	padding-left:10px;height: 18px;line-height: 18px;
 }
 .comment-formModule .captchaModule .tips span{
 	color: red;
@@ -1080,6 +1119,14 @@ html,body{
 	white-space:nowrap; 
 	color:#fff;
 	background-color:#ffcc00;
+	border-radius:4px;
+	padding:0 5px;
+	font-size: 12px;
+}
+.articleInfoModule .user .author .role .staff{
+	white-space:nowrap; 
+	color:#fff;
+	background-color:#32aa66;
 	border-radius:4px;
 	padding:0 5px;
 	font-size: 12px;
@@ -2531,94 +2578,6 @@ html,body{
 	margin-top: 8px;margin-right:8px;height: 40px;
 }
 
-/* 数据表格 */
-.dataTable {
-	margin-bottom:50px; background: #fff;padding-right:8px;padding-left:8px;padding-top:8px;padding-bottom: 70px;
-}
-.dataTable .dataList{
-  width: 100%; border-collapse: collapse;
-}
-.dataTable .dataList .dataThead TH{
- text-align:center;	padding-right: 3px; padding-left: 3px; font-weight: normal; padding-bottom: 0px; margin: 0px; vertical-align: middle; color: #666; padding-top: 0px; white-space: nowrap; height: 32px;background: #f5f5f5;border-left: #f1f1f1 1px solid; border-right: #f1f1f1 1px solid; border-top: #f1f1f1 1px solid; border-bottom: #f1f1f1 1px solid;
-}
-.dataTable .dataList .dataTD {
-	padding-right: 5px; padding-left: 5px; padding-bottom: 0px; margin: 0px; vertical-align: middle;border-left: #f1f1f1 1px solid; border-right: #f1f1f1 1px solid; border-top: #f1f1f1 1px solid; border-bottom: #f1f1f1 1px solid; word-break: break-all; padding-top: 0px; height: 30px;line-height:24px; text-align: center! important;
-}
-/**
-.dataTable .dataList .dataTD:first-child{
-	border-left: 1px solid #fff
-}
-.dataTable .dataList .dataTD:last-child {
-	border-right: 1px solid #fff
-}**/
-.dataTable .dataList .error{
-	color: red;
-}
-.dataTable .dataList .empty{
-	text-align:center;height: 36px; line-height: 36px;color: #747474;
-}
-.dataTable .pageList {
-	margin-top: 10px; float: right; color: #999; line-height: 22px;
-}
-
-/** 空白表格 */
-.blankTableModule {
-	padding-left: 2px; padding-right: 0px; padding-top:6px;background: #fff;
-}
-.blankTableModule .blankTable td{
-	padding-bottom:5px; padding-left:0px; padding-right:5px; color:#666;padding-top: 5px;height: 30px;font-size: 14px;
-}
-.blankTableModule .blankTable .required{color: red; }
-.blankTableModule .blankTable .error {color: red;margin-left: 2px;}
-.blankTableModule .blankTable .help {color: #9e9e9e; margin-left: 2px;}
-
-
-
-
-
-.badge{
-	display: inline-block;
-	padding: .15em .4em;
-	min-width: 8px;
-	border-radius: 18px;
-	background-color: #F43530;
-	color: #FFFFFF;
-	line-height: 1.2;
-	text-align: center;
-	font-size: 12px;
-	vertical-align: middle;
-	padding: .3em;
-	min-width: 0;
-	*height: 2px;
-}
-
-
-
-
-
-/* 页脚 border-top: 1px solid #e1e1e1; */
-.footer { min-width: 990px; 
-	background: #f7f6f6;
-	height: 90px;
-	margin-top: -90px }
-
-.footer .message { width: 990px; margin: 0 auto; height: 18px; font-size: 0; line-height: 0; text-align: center; }
-.footer .message a, .message em {  font-size: 12px; line-height: 18px; display: inline-block; color: #999;margin-top: 10px; }
-.footer .message em { margin: 0 14px; color: #ceced5; position: relative; top: -1px; }
-.footer .message a:hover {color:#2196F3; text-decoration:none;}
-
-.footer .copyright { width: 990px; margin: 0 auto;  color: #999; text-align: center; margin-top: 18px; }
-.footer .copyright em { font-family: Tahoma; margin-left: 3px; }
-.footer .copyright .link{ font-family: Tahoma; margin-left: 2px; color: #999; font-weight: bold;}
-.footer .copyright a { font-family: Tahoma; margin-left: 16px; color: #999;}
-.footer .copyright a:hover { text-decoration: underline; }
-.footer .copyright span { margin-left: 17px; }
-
-
-
-
-
-
 .membershipCardListModule{
 	margin-bottom: 20px;
 	display: -webkit-box;
@@ -2938,3 +2897,157 @@ html,body{
 	height: 36px;
 	line-height: 36px;font-size: 16px;
 }
+
+
+/*修改话题*/
+.editTopicModule{
+	margin-top: 10px;
+}
+.editTopicModule .topic-form {
+	position: relative;   margin-left: 10px;margin-right: 10px; 
+}
+.editTopicModule .topic-form .textarea{
+	width:100%;height:550px;visibility:hidden;
+}
+.editTopicModule .topic-form .form-action {
+	 padding-left: 0px; padding-right: 0px; padding-top: 8px;margin-bottom: 12px;
+}
+.editTopicModule .topic-form .error {
+	color: red;
+}
+.editTopicModule .topic-form .topicSubmit {
+	width: 70px;
+	height: 38px;
+	float: left;
+	margin-right: 10px;
+	position: relative;
+	z-index: 2;
+}
+.editTopicModule .topic-form .captchaModule .captcha_div{
+	height: 38px;line-height:38px;
+}
+.editTopicModule .topic-form .captchaModule .captchaBox{
+	height:32px;
+	border:1px solid #e6e6e6;
+	width:85px;
+	float: left;
+	border-radius:2px;
+	margin-left: 10px;
+	margin-top:1px;
+}
+.editTopicModule .topic-form .captchaModule .captchaBox input{
+	position: relative;  
+	background-image:url(../images/null.gif);
+	background-color:transparent;
+	outline: none; 
+	float:left;
+	height:32px; 
+	width:85px;
+	line-height:30px;
+	border:0;
+	color:#333;
+	padding:0 5px;
+	font-size:18px; 
+}
+.editTopicModule .topic-form .captchaModule .promptTag {
+	float:left; 
+	font-size:14px; 
+	height:22px; 
+	line-height:22px; 
+	cursor:text; 
+	margin-top:6px;
+	margin-left:-74px; 
+	color:#B0B0B0;
+}
+.editTopicModule .topic-form .captchaModule .captcha_div .captchaImage{width:100px;height:32px;float: left;margin:1px 15px 0 5px;}
+.editTopicModule .topic-form .captchaModule .captcha_div .captchaImage img{width:100px;height:34px;outline:none;}
+.editTopicModule .topic-form .captchaModule .tips{
+	padding-left:10px;height: 18px;line-height: 18px;
+}
+.editTopicModule .topic-form .captchaModule .tips span{
+	color: red;
+}
+
+/* 数据表格 */
+.dataTable {
+	margin-bottom:50px; background: #fff;padding-right:8px;padding-left:8px;padding-top:8px;padding-bottom: 70px;
+}
+.dataTable .dataList{
+  width: 100%; border-collapse: collapse;
+}
+.dataTable .dataList .dataThead TH{
+ text-align:center;	padding-right: 3px; padding-left: 3px; font-weight: normal; padding-bottom: 0px; margin: 0px; vertical-align: middle; color: #666; padding-top: 0px; white-space: nowrap; height: 32px;background: #f5f5f5;border-left: #f1f1f1 1px solid; border-right: #f1f1f1 1px solid; border-top: #f1f1f1 1px solid; border-bottom: #f1f1f1 1px solid;
+}
+.dataTable .dataList .dataTD {
+	padding-right: 5px; padding-left: 5px; padding-bottom: 0px; margin: 0px; vertical-align: middle;border-left: #f1f1f1 1px solid; border-right: #f1f1f1 1px solid; border-top: #f1f1f1 1px solid; border-bottom: #f1f1f1 1px solid; word-break: break-all; padding-top: 0px; height: 30px;line-height:24px; text-align: center! important;
+}
+/**
+.dataTable .dataList .dataTD:first-child{
+	border-left: 1px solid #fff
+}
+.dataTable .dataList .dataTD:last-child {
+	border-right: 1px solid #fff
+}**/
+.dataTable .dataList .error{
+	color: red;
+}
+.dataTable .dataList .empty{
+	text-align:center;height: 36px; line-height: 36px;color: #747474;
+}
+.dataTable .pageList {
+	margin-top: 10px; float: right; color: #999; line-height: 22px;
+}
+
+/** 空白表格 */
+.blankTableModule {
+	padding-left: 2px; padding-right: 0px; padding-top:6px;background: #fff;
+}
+.blankTableModule .blankTable td{
+	padding-bottom:5px; padding-left:0px; padding-right:5px; color:#666;padding-top: 5px;height: 30px;font-size: 14px;
+}
+.blankTableModule .blankTable .required{color: red; }
+.blankTableModule .blankTable .error {color: red;margin-left: 2px;}
+.blankTableModule .blankTable .help {color: #9e9e9e; margin-left: 2px;}
+
+
+
+
+
+.badge{
+	display: inline-block;
+	padding: .15em .4em;
+	min-width: 8px;
+	border-radius: 18px;
+	background-color: #F43530;
+	color: #FFFFFF;
+	line-height: 1.2;
+	text-align: center;
+	font-size: 12px;
+	vertical-align: middle;
+	padding: .3em;
+	min-width: 0;
+	*height: 2px;
+}
+
+
+
+
+/* 页脚 border-top: 1px solid #e1e1e1; */
+.footer { min-width: 990px; 
+	background: #f7f6f6;
+	height: 90px;
+	margin-top: -90px }
+
+.footer .message { width: 990px; margin: 0 auto; height: 18px; font-size: 0; line-height: 0; text-align: center; }
+.footer .message a, .message em {  font-size: 12px; line-height: 18px; display: inline-block; color: #999;margin-top: 10px; }
+.footer .message em { margin: 0 14px; color: #ceced5; position: relative; top: -1px; }
+.footer .message a:hover {color:#2196F3; text-decoration:none;}
+
+.footer .copyright { width: 990px; margin: 0 auto;  color: #999; text-align: center; margin-top: 18px; }
+.footer .copyright em { font-family: Tahoma; margin-left: 3px; }
+.footer .copyright .link{ font-family: Tahoma; margin-left: 2px; color: #999; font-weight: bold;}
+.footer .copyright a { font-family: Tahoma; margin-left: 16px; color: #999;}
+.footer .copyright a:hover { text-decoration: underline; }
+.footer .copyright span { margin-left: 17px; }
+
+

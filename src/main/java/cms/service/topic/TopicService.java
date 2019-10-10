@@ -77,6 +77,12 @@ public interface TopicService extends DAO<Topic>{
 	 */
 	public Integer updateTopic(Topic topic);
 	/**
+	 * 前台用户修改话题
+	 * @param topic
+	 * @return
+	 */
+	public Integer updateTopic2(Topic topic);
+	/**
 	 * 还原话题
 	 * @param topicList 话题集合
 	 * @return

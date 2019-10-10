@@ -14,6 +14,7 @@
 <title><#if topic != null && topic?? >${topic.title}</#if> - ${title}</title>
 <link rel="shortcut icon" type="image/x-icon" href="${baseURL}${commonPath}images/favicon.ico" media="screen" />
 <link href="${commonPath}css/common.css?12d" rel="stylesheet" type="text/css" />
+<link href="${commonPath}css/themify-icons/style.css" type="text/css" rel="stylesheet">
 <!--[if (IE 6)|(IE 7)|(IE 8)]>
 <script type="text/javascript" src="${commonPath}js/css3pie/PIE_IE678.js"></script> 
 <![endif]-->
@@ -32,6 +33,9 @@
 <script language="javascript" src="${commonPath}js/syntaxhighlighter/scripts/shBrushJScript.js" type="text/javascript" ></script>
 <script language="javascript" src="${commonPath}js/syntaxhighlighter/scripts/shBrushCss.js" type="text/javascript"></script>
 <script language="javascript" src="${commonPath}js/syntaxhighlighter/scripts/shBrushJava.js" type="text/javascript"></script>
+
+<link href="${commonPath}js/simplebox/css/simplebox.css"  type="text/css" rel="stylesheet"/>
+<script type="text/javascript" src="${commonPath}js/simplebox/js/simplebox.js" language="javascript"></script>
 
 
 <!--[if (IE 6)|(IE 7)|(IE 8)]>
@@ -59,11 +63,18 @@
 					<div class="tab">
 						<a href="?tagId=${topic.tagId}"class="tab">${topic.tagName}</a>
 					</div>
-				
+					<#if topic.userName == systemUser.userName>
+						<div class="editTopic" >
+							<a href="user/editTopic?topicId=${topic.id}" ><i class="cms-pencil-alt" ></i>编辑</a>
+						</div>
+					</#if>
 					<div class="articleBox">
 						<h1>${topic.title}</h1>
 						<!-- topicId属性用来支持JS获取隐藏内容 -->
 						<div class="topicContent" topicId="${topic.id}">
+							<#if topic.lastUpdateTime != null>
+								<div class="lastUpdateTime">最后修改时间：${topic.lastUpdateTime}</div>
+							</#if>
 							<#noescape>${topic.content}</#noescape>
 							
 							
@@ -163,6 +174,11 @@
 							<i class="userRoleName">${roleName}</i>				
 						</#list>
 						</div>
+						<#if topic.isStaff>
+							<div class="role">
+								<i class="staff">官方人员</i>	
+							</div>
+						</#if>
 					</div>
 					<div class="userInfo">
 						<span>${topic.postTime}</span>
@@ -203,4 +219,14 @@
 	SyntaxHighlighter.defaults['toolbar'] = false;//去掉右上角问号图标
 	
 </script>
+
+
+<!-- 图片点击放大 -->
+<script type="text/javascript">
+	$(function () {
+    	$("img").simplebox();
+	});
+</script>
+
+
 </html>

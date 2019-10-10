@@ -150,6 +150,39 @@ public class UserManageAction {
 			} 
 		}
 		
+		//有效的用户角色
+		List<UserRole> validUserRoleList = new ArrayList<UserRole>();
+		
+		//查询所有角色
+		List<UserRole> userRoleList = userRoleService.findAllRole();
+		if(userRoleList != null && userRoleList.size() >0){
+			List<UserRoleGroup> userRoleGroupList = userRoleService.findRoleGroupByUserName(user.getUserName());
+			
+			
+			for(UserRole userRole : userRoleList){
+				if(userRole.getDefaultRole()){//如果是默认角色
+					continue;
+				}else{
+					//默认时间  年,月,日,时,分,秒,毫秒    
+	                DateTime defaultTime = new DateTime(2999, 1, 1, 0, 0);// 2999年1月1日0点0分
+	                Date validPeriodEnd = defaultTime.toDate();
+					userRole.setValidPeriodEnd(validPeriodEnd);
+				}
+				
+				if(userRoleGroupList != null && userRoleGroupList.size() >0){
+					for(UserRoleGroup userRoleGroup : userRoleGroupList){
+						if(userRole.getId().equals(userRoleGroup.getUserRoleId())){
+							UserRole validUserRole = new UserRole();
+							validUserRole.setId(userRole.getId());
+							validUserRole.setName(userRole.getName());
+							validUserRole.setValidPeriodEnd(userRoleGroup.getValidPeriodEnd());
+							validUserRoleList.add(validUserRole);
+						}
+					}
+				}
+			}
+		}
+		
 		
 		List<UserCustom> userCustomList = userCustomService.findAllUserCustom();
 		if(userCustomList != null && userCustomList.size() >0){		
@@ -179,7 +212,7 @@ public class UserManageAction {
 			}
 		}
 		
-		
+		model.addAttribute("userRoleList", validUserRoleList);
 		model.addAttribute("userCustomList", userCustomList);
 		model.addAttribute("user",user);
 		

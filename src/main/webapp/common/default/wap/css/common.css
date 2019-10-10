@@ -190,41 +190,45 @@ html,body{
 	border-radius:100%;
 	width: 32px;
 }
-.indexModule .topicList .item .topInfo{height:24px;line-height:24px;padding:0px 10px 0px 50px;}
-.indexModule .topicList .item .topInfo .bLeft{float:left!important;display:inline-block;}
+.indexModule .topicList .item .topInfo{height:26px;line-height:26px;padding:0px 10px 0px 50px;}
+.indexModule .topicList .item .topInfo .bLeft{float:left!important;display:inline-block;margin-top: 1px;}
 .indexModule .topicList .item .topInfo .bLeft .tagName{
 	background-color: #f5f5f5;
     font-size: 12px;
     line-height: 12px;
     display: inline-block;
-    padding: 4px 4px 4px 4px;
+    padding: 4px 4px 3px 4px;
     -moz-border-radius: 2px;
     -webkit-border-radius: 2px;
     border-radius: 2px;
     text-decoration: none;
     color: #999;
+    
 }
 .indexModule .topicList .item .topInfo .bRight{float:right!important;font-size:14px;color:#aaa;}
+
 .indexModule .topicList .item .title{
 	position:relative;
-	color:#222;padding:0px 10px 0px 50px;font-size:16px;
-    line-height:24px;
+	color:#222;padding:2px 10px 4px 50px;
     max-height:48px;
+	font-size:16px;
+    line-height:24px;
     display: -webkit-box;
 	-webkit-box-orient: vertical;
 	-webkit-line-clamp: 2;
 	overflow: hidden;
 }
-.indexModule .topicList .item .topicRoleName{
+.indexModule .topicList .item .title .topicRoleName{
 	font-style:normal;
 	margin-left:5px;
 	white-space:nowrap; 
 	color:#fff;
 	background-color:#ffb800;
 	border-radius:4px;
-	padding:0 5px;
+	padding:2px 5px 0px;
 	font-size: 14px;
 }
+
 .indexModule .topicList .item .detailInfo{position:relative;line-height:24px;padding:5px 10px 0px 50px;height: 24px;border-bottom:1px solid #eee;}
 .indexModule .topicList .item .detailInfo .bLeft{float:left!important;color:#aaa;display:inline-block;height:25px;font-size:14px;}
 .indexModule .topicList .item .detailInfo .bLeft .userName{float:left!important;}
@@ -233,12 +237,12 @@ html,body{
 
 .indexModule .topicList .item .summary{
 	
-	position:relative;padding:0px 10px 0px 50px;
+	position:relative;padding:2px 10px 0px 50px;
 }
 .indexModule .topicList .item .summary span{
 	color: #aaa;
 	font-size:14px;
-	line-height:20px;
+	line-height:22px;
 	display: -webkit-box;
 	-webkit-box-orient: vertical;
 	-webkit-line-clamp: 2;
@@ -349,9 +353,18 @@ html,body{
 	line-height: 1.8;
 	color: #222;
 }
+.topicContentModule .topicDetail .main .lastUpdateTime{
+	text-align: center;line-height: 40px;padding-bottom: 30px;color: #939499;
+}
+.topicContentModule .topicDetail .main a{
+	font-size: 15px;
+	line-height: 1.8;
+	color: #26a2ff;
+}
 .topicContentModule .topicDetail .main i {
 	font-style: italic;
 }
+.topicContentModule .topicDetail .main p{word-wrap:break-word;}
 .topicContentModule .topicDetail .main img{
 	max-width:100%;height:auto;border:none;background:none;padding:0;
 }
@@ -423,10 +436,11 @@ html,body{
 	padding: 8px 0px 0;
 	margin: 0;
 	overflow: hidden;
+	position: relative;
 }
 .topicContentModule .commentList .item .head .avatarBox{
 	position:absolute;display:inline-block;border-radius:100%;
-	
+	left: 0px;top:6px;
 	
 }
 .topicContentModule .commentList .item .head .avatarBox img{
@@ -451,6 +465,16 @@ html,body{
 .topicContentModule .commentList .item .head .userTag{
 	float: left;margin-top: -1px;
 }
+.topicContentModule .commentList .item .head .userTag .master{
+	white-space:nowrap; 
+	font-style:normal;
+	margin-left:5px;
+	color:#fff;
+	background-color:#26a2ff;
+	border-radius:4px;
+	padding:1px 5px 0px;
+	font-size: 12px;
+}
 .topicContentModule .commentList .item .head .userTag .userRoleName{
 	white-space:nowrap; 
 	font-style:normal;
@@ -458,7 +482,7 @@ html,body{
 	color:#fff;
 	background-color:#ffcc00;
 	border-radius:4px;
-	padding:0 5px;
+	padding:1px 5px 0px;
 	font-size: 12px;
 }
 .topicContentModule .commentList .item .head .time {
@@ -479,9 +503,14 @@ html,body{
 	line-height: 26px;
 	margin: 0 0 10px
 }
+
 .topicContentModule .commentList .item .main .commentContent {
 	margin-bottom: 10px;
 	color:#222;font-size: 15px;
+}
+.topicContentModule .commentList .item .main .commentContent a{
+	font-size: 15px;
+	color: #26a2ff;
 }
 .topicContentModule .commentList .item .main .commentContent img {
 	max-width:100%;height:auto;border:none;background:none;padding:0;
@@ -558,6 +587,21 @@ html,body{
 
 	float: left;
 }
+.topicContentModule .commentList .replyList .box li .reply-top .userTag{
+	float: left;margin-top: -5px;
+}
+.topicContentModule .commentList .replyList .box li .reply-top .userTag .master{
+	white-space:nowrap; 
+	font-style:normal;
+	margin-left:5px;
+	color:#fff;
+	background-color:#26a2ff;
+	border-radius:4px;
+	padding:1px 5px 0px;
+	font-size: 12px;
+}
+
+
 .topicContentModule .commentList .replyList .box li .reply-top .time {
 	float: right;
 	color:#aaa;
@@ -691,7 +735,7 @@ html,body{
 	color:#fff;
 	background-color:#ffb800;
 	border-radius:4px;
-	padding:0 5px;
+	padding:2px 5px 0px;
 	font-size: 14px;
 }
 .searchModule .topicList .item .content{
@@ -832,7 +876,7 @@ html,body{
 	color:#fff;
 	background-color:#ffcc00;
 	border-radius:4px;
-	padding:0 5px;
+	padding:2px 5px 0px;
 	font-size: 14px;
 }
 .homeModule .homeHeader .user .grade{line-height:25px;background-repeat:no-repeat;background-position:left center;background-size:auto 100%;font-size:12px;height:23px;min-width:40px;display:inline-block;background-color:#56b7ff;border-radius:20px;text-align:center;padding-left: 10px;padding-right: 10px;}
@@ -944,9 +988,19 @@ html,body{
 	border-radius: 4px;
 	color: #999;
 	font-size: 13px;
-	padding: 3px 8px 3px 8px;
+	padding: 3px 8px 1px 8px;
 	vertical-align: middle;
 	line-height: 22px;
+}
+.homeModule .userDynamicList .item .main .topicRoleName{
+	font-style:normal;
+	margin-left:5px;
+	white-space:nowrap; 
+	color:#fff;
+	background-color:#ffb800;
+	border-radius:4px;
+	padding:2px 5px 0px;
+	font-size: 14px;
 }
 .homeModule .userDynamicList .item .main .topicContent{
 	margin: 10px 0px 10px 30px;
@@ -955,6 +1009,11 @@ html,body{
 	line-height: 1.8;
 	color: #222;
 	text-align: left;
+}
+.homeModule .userDynamicList .item .main .topicContent a{
+	font-size: 15px;
+	line-height: 1.8;
+	color: #26a2ff;
 }
 .homeModule .userDynamicList .item .main .topicContent i {
 	font-style: italic;
@@ -1060,6 +1119,7 @@ html,body{
 	overflow: hidden;
 	text-align: left;
 	margin-left: 38px;
+	
 }
 .homeModule .userDynamicList .item .bottomInfo .toolbar {
 	height: 100%;
@@ -1069,6 +1129,7 @@ html,body{
 	margin-right:10px;
 	color: #999;
 	font-size: 14px;
+	position: relative;
 }
 
 .homeModule .setting{position: absolute;right: 12px;top: 12px; font-size: 20px; color: #fff; }
@@ -2452,3 +2513,33 @@ html,body{
 	line-height: 40px
 }
 
+/** 修改话题 **/
+ .topicScroll{
+	padding-top: 40px;padding-bottom: 2px;
+}
+.editTopicModule .topicScroll {
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    right:0;
+    margin-bottom: 0;
+    border-bottom: none;
+    -webkit-overflow-scrolling: touch;
+    overflow-scrolling: touch;
+}
+.editTopicModule .topicScroll .box{
+}
+.editTopicModule .topicScroll .box .topicForm{margin-left:5px; margin-right: 5px;}
+.editTopicModule .topicScroll .box .topicForm .tips{line-height:30px; margin-left: 115px}
+.editTopicModule .topicScroll .box .topicForm .tips span{color: red;}
+.editTopicModule .topicScroll .box .topicForm .tag{
+	position: relative;min-height:40px;margin-top: 10px;
+}
+.editTopicModule .topicScroll .box .topicForm .tag .title{
+	font-size: 16px;line-height: 30px;margin-left: 10px;float: left; 
+}
+.editTopicModule .topicScroll .box .topicForm .tag .name{
+	font-size: 16px;line-height: 30px;margin-left: 70px; margin-right: 20px;
+}
+.editTopicModule .topicScroll .box .topicForm .sign{position:relative;display:inline-block;width: 100%;min-height: 34px;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box; }
+.editTopicModule .topicScroll .box .topicForm .sign:after{content:'';width:16px;height:16px;border-top:2px solid #e3e3e3;border-right:2px solid #e3e3e3;transform:translateY(-50%) rotate(45deg);-ms-transform:translateY(-50%) rotate(45deg);-webkit-transform:translateY(-50%) rotate(45deg);top:50%;right:15px;position:absolute;}

@@ -330,6 +330,8 @@ var index_component = Vue.extend({
 								editorIconList.push("emoticon");
 							}else if(_availableTag == "image"){//图片
 								editorIconList.push("image");
+							}else if(_availableTag == "insertfile"){//文件
+								editorIconList.push("file");
 							}else if(_availableTag == "hidePassword"){//输入密码可见
 								editorIconList.push("hidePassword");
 							}else if(_availableTag == "hideComment"){//评论话题可见
@@ -772,63 +774,71 @@ var thread_component = Vue.extend({
 					        	}
 				        	}
 				        	
-							//令牌
-							parameter += "&token=" + _self.$store.state.token;
-							$.ajax({
-								type : "POST",
-								cache : false,
-								async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
-								url : "user/control/topic/unhide",
-								data : parameter,
-								success : function success(result) {
-									if (result != "") {
+				        	
+				        	
+				        	_self.$messagebox.confirm('确定解锁?').then(function (action) {
+				        		//令牌
+								parameter += "&token=" + _self.$store.state.token;
+								$.ajax({
+									type : "POST",
+									cache : false,
+									async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+									url : "user/control/topic/unhide",
+									data : parameter,
+									success : function success(result) {
+										if (result != "") {
 
-										var returnValue = $.parseJSON(result);
+											var returnValue = $.parseJSON(result);
 
-										var value_success = "";
-										var value_error = null;
+											var value_success = "";
+											var value_error = null;
 
-										for (var key in returnValue) {
-											if (key == "success") {
-												value_success = returnValue[key];
-											} else if (key == "error") {
-												value_error = returnValue[key];
-											}
-										}
-
-										//加入成功
-										if (value_success == "true") {
-											_self.$toast({
-												message : "话题取消隐藏成功，3秒后自动刷新页面",
-												duration : 3000,
-												className : "mint-ui-toast",
-											});
-
-											setTimeout(function() {
-												//查询话题
-												_self.$parent.queryTopic();//调用父组件方法
-											}, 3000);
-											
-										} else {
-											//显示错误
-											if (value_error != null) {
-
-
-												var htmlContent = "";
-												var count = 0;
-												for (var errorKey in value_error) {
-													var errorValue = value_error[errorKey];
-													count++;
-													htmlContent += count + ". " + errorValue + "<br>";
+											for (var key in returnValue) {
+												if (key == "success") {
+													value_success = returnValue[key];
+												} else if (key == "error") {
+													value_error = returnValue[key];
 												}
-												_self.$messagebox('提示', htmlContent);
+											}
 
+											//加入成功
+											if (value_success == "true") {
+												_self.$toast({
+													message : "话题取消隐藏成功，3秒后自动刷新页面",
+													duration : 3000,
+													className : "mint-ui-toast",
+												});
+
+												setTimeout(function() {
+													//查询话题
+													_self.$parent.queryTopic();//调用父组件方法
+												}, 3000);
+												
+											} else {
+												//显示错误
+												if (value_error != null) {
+
+
+													var htmlContent = "";
+													var count = 0;
+													for (var errorKey in value_error) {
+														var errorValue = value_error[errorKey];
+														count++;
+														htmlContent += count + ". " + errorValue + "<br>";
+													}
+													_self.$messagebox('提示', htmlContent);
+
+												}
 											}
 										}
 									}
-								}
+								});
+							},function (action) {//取消回调
+								
+							}).catch(function (err){//不捕获 Promise 的异常,若用户点击了取消按钮,会出现警告
+							    console.log(err);
 							});
-				        	
+
 				        }, 
 				        
 				    }
@@ -1306,6 +1316,8 @@ var thread_component = Vue.extend({
 								editorIconList.push("emoticon");
 							}else if(_availableTag == "image"){//图片
 								editorIconList.push("image");
+							}else if(_availableTag == "insertfile"){//文件
+								editorIconList.push("file");
 							}
 						}
 					}
@@ -1533,6 +1545,8 @@ var thread_component = Vue.extend({
 								editorIconList.push("emoticon");
 							}else if(_availableTag == "image"){//图片
 								editorIconList.push("image");
+							}else if(_availableTag == "insertfile"){//文件
+								editorIconList.push("file");
 							}
 						}
 					}
@@ -3400,6 +3414,7 @@ var home_component = Vue.extend({
 			totalpage : 1, //总页数
 			hidePasswordIndex:0,//隐藏标签密码框索引
 			favoriteCountGroup:[],//话题收藏总数组
+			likeCountGroup:[],//话题点赞总数组
 			following:false//是否已经关注该用户
 		}
 	},
@@ -3459,63 +3474,72 @@ var home_component = Vue.extend({
 					        	}
 				        	}
 				        	
-							//令牌
-							parameter += "&token=" + _self.$store.state.token;
-							$.ajax({
-								type : "POST",
-								cache : false,
-								async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
-								url : "user/control/topic/unhide",
-								data : parameter,
-								success : function success(result) {
-									if (result != "") {
+				        	
+				        	_self.$messagebox.confirm('确定解锁?').then(function (action) {
+				        		//令牌
+								parameter += "&token=" + _self.$store.state.token;
+								$.ajax({
+									type : "POST",
+									cache : false,
+									async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+									url : "user/control/topic/unhide",
+									data : parameter,
+									success : function success(result) {
+										if (result != "") {
 
-										var returnValue = $.parseJSON(result);
+											var returnValue = $.parseJSON(result);
 
-										var value_success = "";
-										var value_error = null;
+											var value_success = "";
+											var value_error = null;
 
-										for (var key in returnValue) {
-											if (key == "success") {
-												value_success = returnValue[key];
-											} else if (key == "error") {
-												value_error = returnValue[key];
-											}
-										}
-
-										//加入成功
-										if (value_success == "true") {
-											_self.$toast({
-												message : "话题取消隐藏成功，3秒后自动刷新页面",
-												duration : 3000,
-												className : "mint-ui-toast",
-											});
-
-											setTimeout(function() {
-												//刷新动态列表
-												_self.$parent.refreshUserDynamicList();//调用父组件方法
-												
-											}, 3000);
-											
-										} else {
-											//显示错误
-											if (value_error != null) {
-
-
-												var htmlContent = "";
-												var count = 0;
-												for (var errorKey in value_error) {
-													var errorValue = value_error[errorKey];
-													count++;
-													htmlContent += count + ". " + errorValue + "<br>";
+											for (var key in returnValue) {
+												if (key == "success") {
+													value_success = returnValue[key];
+												} else if (key == "error") {
+													value_error = returnValue[key];
 												}
-												_self.$messagebox('提示', htmlContent);
+											}
 
+											//加入成功
+											if (value_success == "true") {
+												_self.$toast({
+													message : "话题取消隐藏成功，3秒后自动刷新页面",
+													duration : 3000,
+													className : "mint-ui-toast",
+												});
+
+												setTimeout(function() {
+													//刷新动态列表
+													_self.$parent.$parent.refreshUserDynamicList();//调用父组件方法
+													
+												}, 3000);
+												
+											} else {
+												//显示错误
+												if (value_error != null) {
+
+
+													var htmlContent = "";
+													var count = 0;
+													for (var errorKey in value_error) {
+														var errorValue = value_error[errorKey];
+														count++;
+														htmlContent += count + ". " + errorValue + "<br>";
+													}
+													_self.$messagebox('提示', htmlContent);
+
+												}
 											}
 										}
 									}
-								}
+								});
+							},function (action) {//取消回调
+								
+							}).catch(function (err){//不捕获 Promise 的异常,若用户点击了取消按钮,会出现警告
+							    console.log(err);
 							});
+				        	
+				        	
 				        	
 				        }, 
 				        
@@ -3802,6 +3826,7 @@ var home_component = Vue.extend({
 			this.totalpage= 1; //总页数
 			this.hidePasswordIndex=0;//隐藏标签密码框索引	
 			this.favoriteCountGroup = [];//话题收藏总数组
+			this.likeCountGroup = [];//话题点赞总数组
 			//查询动态列表
 			this.queryUserDynamicList();
 		},
@@ -3834,6 +3859,7 @@ var home_component = Vue.extend({
 								for(var i=0; i< new_userDynamicList.length;i++){
 									var userDynamic =  new_userDynamicList[i];
 									_self.favoriteCountGroup.push(0);
+									_self.likeCountGroup.push(0);
 									if(userDynamic.module == 100){
 										//处理隐藏标签
 										var contentNode = document.createElement("div");
@@ -3849,6 +3875,14 @@ var home_component = Vue.extend({
 											}
 											
 										});
+										//点赞数量
+										_self.queryLikeCount(userDynamic.topicId,_self.likeCountGroup.length-1,function(index,count) {
+											if(count != null && count != ''){
+												_self.$set(_self.likeCountGroup, index, parseInt(count));
+											}
+											
+										});
+										
 										
 									}
 								}
@@ -3946,6 +3980,30 @@ var home_component = Vue.extend({
 				cache : false,
 				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
 				url : "queryFavoriteCount",
+				data : data,
+				success : function success(result) {
+					if (result != "") {
+						var count = $.parseJSON(result);
+						if (count != null) {
+							
+							callback(index,count);
+						//	_self.favoriteCount = count;
+						}
+					}
+				}
+			});
+		},
+		
+		//查询话题用户点赞总数
+		queryLikeCount : function(topicId,index,callback) {
+			var _self = this;
+			var data = "topicId=" + topicId; //提交参数
+			
+			$.ajax({
+				type : "GET",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "queryLikeCount",
 				data : data,
 				success : function success(result) {
 					if (result != "") {
@@ -4332,6 +4390,7 @@ var editUser_component = Vue.extend({
 			password : '',
 			confirmPassword : '',
 			user : null,
+			userRoleList : [], //用户角色集合
 			userCustomList : [], //用户自定义注册功能项
 			userBoundField : [], //用户自定义注册功能项绑定
 			error : {
@@ -4380,6 +4439,9 @@ var editUser_component = Vue.extend({
 								}
 
 							}
+							
+							_self.userRoleList = returnValue['userRoleList'];
+							
 						}
 
 
@@ -7643,7 +7705,299 @@ var membershipCard_component = Vue.extend({
 });
 
 
+//修改话题
+var editTopic_component = Vue.extend({
+	template : '#editTopic-template',
+	data : function data() {
+		return {
+			topic: '',//话题
+			topicTitle:'',//发表话题标题
+			topicContent:'',//发表话题内容
+			showCaptcha : false, //发表话题是否显示验证码
+			imgUrl : '', //发表话题验证码图片
+			captchaKey : '', //发表话题验证码key
+			captchaValue : '', //发表话题验证码value
+			error : {
+				topicTitle : '',
+				topicContent: '',
+				captchaValue : '',
+				topic: '',
+			},
+			topicEditor:'',//富文本编辑器
+		};
+	},	
+	created : function created() {
+		this.queryEditTopic();
+	},
+	methods : {
+		//查询修改话题页
+		queryEditTopic : function() {
+			var _self = this;
+			var data = "";
+			var topicId = getUrlParam("topicId");//话题Id
+			data = "&topicId=" + topicId;
+			
+			
+			$.ajax({
+				type : "GET",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "queryEditTopic",
+				data : data,
+				success : function success(result) {
+					if (result != "") {
+						var returnValue = $.parseJSON(result);
+						if (returnValue != null) {
+							var availableTag_value = null;
+							var userGradeList_value = null;
+							
+							for (var key in returnValue) {
+								if (key == "allowTopic") {
+									if(returnValue[key] == false){
+										_self.$toast({
+											message : "修改话题功能未开放",
+											duration : 3000,
+										});
+									}	
+								}else if (key == "topic") {
+									_self.topic = returnValue[key];
+									if(_self.topic != ""){
+										_self.topicTitle = _self.topic.title;
+										_self.topicContent = _self.topic.content;
+									}
+									
+									
+								}else if (key == "availableTag") {
+									availableTag_value = returnValue[key];
+								}else if (key == "userGradeList") {
+									userGradeList_value = returnValue[key];
+								}else if (key == "captchaKey") {
+									//显示验证码
+									var value_captchaKey = returnValue[key];
+									_self.showCaptcha = true;
+									_self.captchaKey = value_captchaKey;
+									_self.imgUrl = "captcha/" + value_captchaKey + ".jpg";
+									//设置验证码图片
+									_self.replaceCaptcha();
+								}
+							}
+							
+							//等级
+							var userGradeList = null;
+							
+							//编辑器图标
+							var editorIconList = new Array();
+							
+							if(availableTag_value != null){//话题编辑器允许使用标签
+								var availableTagList = $.parseJSON(availableTag_value);
+								for(var i=0; i<availableTagList.length; i++){
+									var _availableTag = availableTagList[i];
+									
+									if(_availableTag == "forecolor"){//文字颜色
+									//	editorIconList.push("foreColor");
+									}else if(_availableTag == "hilitecolor"){//文字背景
+									//	editorIconList.push("backColor");
+									}else if(_availableTag == "bold"){//粗体
+										editorIconList.push("bold");
+									}else if(_availableTag == "italic"){//斜体
+										editorIconList.push("italic");
+									}else if(_availableTag == "underline"){//下划线
+										editorIconList.push("underline");
+									}else if(_availableTag == "link"){//插入链接
+										editorIconList.push("link");
+									}else if(_availableTag == "emoticons"){//插入表情
+										editorIconList.push("emoticon");
+									}else if(_availableTag == "image"){//图片
+										editorIconList.push("image");
+									}else if(_availableTag == "insertfile"){//文件
+										editorIconList.push("file");
+									}else if(_availableTag == "hidePassword"){//输入密码可见
+										editorIconList.push("hidePassword");
+									}else if(_availableTag == "hideComment"){//评论话题可见
+										editorIconList.push("hideComment");
+									}else if(_availableTag == "hideGrade"){//达到等级可见
+										editorIconList.push("hideGrade");
+									}else if(_availableTag == "hidePoint"){//积分购买可见
+										editorIconList.push("hidePoint");
+									}else if(_availableTag == "hideAmount"){//余额购买可见
+										editorIconList.push("hideAmount");
+									}
+								}
+							}
+							
+							for(var i=0; i< editorIconList.length; i++){
+								var editorIcon = editorIconList[i];
+								if(editorIcon == "hidePassword" || editorIcon == "hideComment" ||
+										editorIcon == "hideGrade" || editorIcon == "hidePoint" || editorIcon == "hideAmount"){
+									editorIconList.splice(i, 0, 'hide');//在指定索引处插入元素
+									break;
+								}
+							}
+							
+							if(userGradeList_value != null){//会员等级
+								userGradeList = $.parseJSON(userGradeList_value);
+							}
+							
+						//	_self.$refs.topicContentEditorToolbar.innerHTML = "";
+						//	_self.$refs.topicContentEditorText.innerHTML = _self.topicContent;
+							
+							
+							//创建编辑器
+							_self.topicEditor = createEditor(_self.$refs.topicContentEditorToolbar,_self.$refs.topicContentEditorText,_self.$store.state.commonPath,editorIconList,userGradeList,'user/control/topic/upload',_self,"topicContent");
+							_self.topicEditor.txt.html(_self.topicContent);//初始化内容
+							//_self.topicEditor.txt.clear();//清空
+							
+						}
+						
+					}
+				}
+			});
+		},
+		//修改话题
+		editTopic : function() {
+			var _self = this;
+			//清空所有错误
+			_self.error.topicTitle = "";
+			_self.error.topicContent = "";
+			_self.error.topic = "";
+			_self.error.captchaValue = "";
 
+			var parameter = "&topicId="+getUrlParam("topicId"); //提交参数
+			if (_self.topicTitle != null && _self.topicTitle != "") {
+				parameter += "&title=" + encodeURIComponent(_self.topicTitle);
+			}
+
+			parameter += "&content=" + encodeURIComponent(_self.topicEditor.txt.html());
+			
+			
+			//验证码Key
+			parameter += "&captchaKey=" + encodeURIComponent(_self.captchaKey);
+
+			//验证码值
+			parameter += "&captchaValue=" + encodeURIComponent(_self.captchaValue.trim());
+
+			//令牌
+			parameter += "&token=" + _self.$store.state.token;
+			$.ajax({
+				type : "POST",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "user/control/topic/edit",
+				data : parameter,
+				success : function success(result) {
+					if (result != "") {
+						var returnValue = $.parseJSON(result);
+
+						var value_success = "";
+						var value_error = null;
+						var value_captchaKey = null;
+
+						for (var key in returnValue) {
+							if (key == "success") {
+								value_success = returnValue[key];
+							} else if (key == "error") {
+								value_error = returnValue[key];
+							} else if (key == "captchaKey") {
+								//显示验证码
+								value_captchaKey = returnValue[key];
+							}
+						}
+
+						//提交成功
+						if (value_success == "true") {
+							_self.$toast({
+								message : "提交成功",
+								duration : 3000,
+							});
+						} else {
+							//显示错误
+							if (value_error != null) {
+								//有错误时清除验证码
+								_self.captchaValue = "";
+								var error_html = "";
+								for (var error in value_error) {
+									if (error != "") {
+										if (error == "title") {
+											_self.error.topicTitle = value_error[error];
+										}else if (error == "content") {
+											_self.error.topicContent = value_error[error];
+										} else if (error == "topic") {
+											_self.error.topic = value_error[error];
+										}  else if (error == "captchaValue") {
+											_self.error.captchaValue = value_error[error];
+										} else if (error == "token") {
+											//如果令牌错误
+											_self.$toast({
+												message : "页面已过期，3秒后自动刷新",
+												duration : 3000,
+											});
+											setTimeout(function() {
+												//刷新当前页面
+												window.location.reload();
+											}, 3000);
+										}
+									}
+								}
+							}
+
+							if (value_captchaKey != null) {
+								_self.showCaptcha = true;
+								_self.captchaKey = value_captchaKey;
+								_self.imgUrl = "captcha/" + value_captchaKey + ".jpg";
+								//设置验证码图片
+								_self.replaceCaptcha();
+							}
+						}
+					}
+				}
+			});
+		},
+		//更换验证码
+		replaceCaptcha : function(event) {
+			var _self = this;
+			_self.imgUrl = "captcha/" + _self.captchaKey + ".jpg?" + Math.random();
+		},
+		//验证验证码
+		validation_captchaValue : function() {
+			var _self = this;
+			var cv = this.captchaValue.trim();
+			if (cv.length < 4) {
+				_self.error.captchaValue = "请填写完整验证码";
+			}
+			if (cv.length >= 4) {
+				var parameter = "";
+				parameter += "&captchaKey=" + _self.captchaKey;
+				parameter += "&captchaValue=" + cv;
+
+				$.ajax({
+					type : "GET",
+					cache : false,
+					async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+					url : "userVerification",
+					data : parameter,
+					success : function success(result) {
+						if (result == "false") {
+							_self.error.captchaValue = "验证码错误";
+						}
+					},
+					beforeSend : function beforeSend(XMLHttpRequest) {
+						//发送请求前
+						_self.$indicator.open({
+							spinnerType : 'fading-circle'
+						}); //显示旋转进度条
+
+						//清除验证码错误
+						_self.error.captchaValue = "";
+					},
+					complete : function complete(XMLHttpRequest, textStatus) {
+						//请求完成后回调函数 (请求成功或失败时均调用)
+						_self.$indicator.close(); //关闭旋转进度条
+					}
+				});
+			}
+		},
+	},
+});
 
 
 /**------------------------------------------- 公共组件 ------------------------------------------------**/
@@ -7804,6 +8158,8 @@ var routes = [
 	{path : '/paymentCompleted/:interfaceProduct/:paymentModule/:parameterId',component : paymentCompleted_component}, //支付完成通知组件
 	{path : '/membershipCardList',component : membershipCardList_component}, //会员卡列表
 	{path : '/membershipCard',component : membershipCard_component}, //会员卡
+	{path : '/user/editTopic',component : editTopic_component}, //修改话题
+	
 	{path : '*',redirect : '/index'} //其余路由重定向至首页
 ];
 
@@ -7913,6 +8269,28 @@ var scrollBehavior = function scrollBehavior(to, from, savedPosition) {
 	}
 };
 
+
+//访问统计
+function statistic(url,referrer){
+	var data = ""; //提交参数
+	data += "&url="+encodeURIComponent(getMetaTag().baseURL+url.substr(1,url.length)); //删除第一个左斜杆
+	if(referrer != '' && referrer != '/'){
+		data += "&referrer="+encodeURIComponent(getMetaTag().baseURL+referrer.substr(1,referrer.length)); //提交参数
+	}
+	$.ajax({
+		type : "GET",
+		cache : false,
+		async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+		url : "statistic/add",
+		data : data,
+		success : function success(result) {
+		},
+		beforeSend : function beforeSend(XMLHttpRequest) {
+			//本空方法不要删除，用来覆盖全局回调默认的旋转进度条
+		},
+	});
+}
+
 //创建路由对象
 var router = new VueRouter({
 	mode : 'history', //html5模式 去掉锚点
@@ -7928,6 +8306,9 @@ var router = new VueRouter({
  ]**/
 });
 router.beforeEach(function(to, from, next) {
+    if (to.path) {
+    	statistic(to.fullPath,from.fullPath);
+    }
 	next(true);
 });
 
@@ -8220,6 +8601,7 @@ function getObjectURL(file) {
 //创建富文本编辑器
 function createEditor(editorToolbar,editorText,commonPath,menus,userGradeList,imgPath,self,param) {
 	var E = window.wangEditor;
+	
     var editor = new E(editorToolbar,editorText);
     /**
     editor.customConfig.menus = [
@@ -8299,7 +8681,7 @@ function createEditor(editorToolbar,editorText,commonPath,menus,userGradeList,im
     
     
     //后台代码接收文件的字段名称
-    editor.customConfig.uploadFileName = "imgFile";
+    editor.customConfig.uploadFileName = "file";
     
     //自定义 timeout 时间 默认的 timeout 时间是 10 秒钟
     editor.customConfig.uploadImgTimeout = 30000;
@@ -8318,11 +8700,20 @@ function createEditor(editorToolbar,editorText,commonPath,menus,userGradeList,im
     	
 		//令牌
 	//	formData.append("token", store.state.token);
+    	
+    	var uploadImgServer = editor.customConfig.uploadImgServer;
+    	if (uploadImgServer.indexOf('?') > 0) {
+            uploadImgServer += '&';
+        } else {
+            uploadImgServer += '?';
+        }
+        uploadImgServer +=  'dir=image';
+    	
 		$.ajax({
 			type : "POST",
 			cache : false,
 			async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
-			url : editor.customConfig.uploadImgServer,
+			url : uploadImgServer,
 			data : formData,
 			contentType : false, // 不设置内容类型
 			processData : false, // 不处理数据
@@ -8347,6 +8738,57 @@ function createEditor(editorToolbar,editorText,commonPath,menus,userGradeList,im
     	
     	
         
+    }
+    
+    //文件上传
+    editor.customConfig.customUploadFile = function (files, insert) {
+    	// files 是 input 中选中的文件列表
+        // insert 是获取图片 url 后，插入到编辑器的方法
+    	var formData = new FormData();
+    	Array.prototype.forEach.call(files, function(file) {
+    		formData.append(editor.customConfig.uploadFileName, file);
+    		
+    	});
+		//令牌
+	//	formData.append("token", store.state.token);
+    	
+    	var uploadImgServer = editor.customConfig.uploadImgServer;
+    	if (uploadImgServer.indexOf('?') > 0) {
+            uploadImgServer += '&';
+        } else {
+            uploadImgServer += '?';
+        }
+        uploadImgServer +=  'dir=file';
+    	
+    	
+		$.ajax({
+			type : "POST",
+			cache : false,
+			async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+			url : uploadImgServer,
+			data : formData,
+			contentType : false, // 不设置内容类型
+			processData : false, // 不处理数据
+			success : function success(result) {
+				if (result != "") {
+					var returnValue = $.parseJSON(result);
+					if(returnValue.error ==0){
+			    		// 举例：假如上传文件成功后，服务器端返回的是 {url:'....'} 这种格式，即可这样插入图片：
+				        var url = returnValue.url;
+				        var title = returnValue.title;
+				     // 上传代码返回结果之后，将文件插入到编辑器中
+				        insert(url,title);
+			    		// result 必须是一个 JSON 格式字符串！！！否则报错
+			    	}else{
+			    		//弹出提示内容
+						Vue.$messagebox('错误', returnValue.message);
+			    	} 
+					
+				}
+			}
+		});
+    	
+    	
     }
     
     /**

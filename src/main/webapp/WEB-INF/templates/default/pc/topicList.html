@@ -31,9 +31,9 @@
 				<THEAD>
 					<TR class="dataThead">
 						<TH width="30%">标题</TH>	
-						<TH width="30%">标签</TH>	
+						<TH width="28%">标签</TH>	
 						<TH width="18%">发表时间</TH>
-						<TH width="22%">操作</TH>
+						<TH width="24%">操作</TH>
 					</TR>
 				</THEAD>
 				<TBODY>
@@ -53,6 +53,7 @@
 							<a href="user/control/topicUnhideList?topicId=${topic.id}" class="link">解锁隐藏标签用户</a>
 							<a href="user/control/topicFavoriteList?topicId=${topic.id}" class="link">收藏用户</a>
 							<a href="user/control/topicLikeList?topicId=${topic.id}" class="link">点赞用户</a>
+							<a href="user/editTopic?topicId=${topic.id}" target="_blank" >编辑</a>
 						</TD>
 		    		</TR>
 		    		</#list>

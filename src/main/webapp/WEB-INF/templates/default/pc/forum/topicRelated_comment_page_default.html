@@ -26,6 +26,9 @@
 								<span class="userRoleName">${roleName}</span>
 										
 							</#list>
+							<#if comment.isStaff>
+								<span class="staff">官方人员</span>
+							</#if>
 						</cite> 
 					</div>
 					<div class="commentTime">${comment.postTime}</div>

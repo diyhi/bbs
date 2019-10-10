@@ -94,6 +94,11 @@
 	width: 16px;
 	height: 16px;
 }
+.icon-insertfile {
+	background-position: 0px -1040px;
+	width: 16px;
+	height: 16px;
+}
 .icon-hide {
 	background-image: url(../../plugins/hide/hide.png);
 	display:inline-block;

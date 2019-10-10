@@ -1103,6 +1103,8 @@ CREATE TABLE `systemsetting` (
   `reply_review` int(11) DEFAULT NULL,
   `topic_review` int(11) DEFAULT NULL,
   `topicUnhidePlatformShareProportion` int(11) DEFAULT NULL,
+  `fileSecureLinkExpire` bigint(20) DEFAULT NULL,
+  `fileSecureLinkSecret` varchar(190) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
