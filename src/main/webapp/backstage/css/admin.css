@@ -122,12 +122,12 @@ img.png {background-image: expression(this.runtimeStyle.backgroundImage = "none"
 }
 
 .top .nav-wrap .nav-list-item .nav-pop-list {
-	width:100%;
+	width:110px;
 	display:none;
 	background-color: #fff;
 	position: absolute;
 	top: 50px;
-	left: 0;
+	right:10px;
 	z-index: 999;
 	box-shadow: 0 3px 10px rgba(0,0,0,.1);
 	z-index: 9999;
@@ -141,7 +141,7 @@ img.png {background-image: expression(this.runtimeStyle.backgroundImage = "none"
 	display: inline-block;
 	font-size: 15px;
 	text-align: left;
-	padding: 8px 8px;
+	padding: 8px 0px 8px 0px;
     margin: 0;
 	color: #666;
 	width: 100%;
@@ -151,8 +151,11 @@ img.png {background-image: expression(this.runtimeStyle.backgroundImage = "none"
 	background: #eeeeee;
 	
 }
+.top .nav-wrap .nav-list-item .nav-pop-list .ul-navlist li span {
+	margin-left: 2px;
+}
 .top .nav-wrap .nav-list-item .nav-pop-list .ul-navlist li i {
-	font-size: 13px;margin-right: 5px;
+	font-size: 13px;margin-left: 10px; margin-right: 5px;
 }
 .top .nav-wrap .nav-list-item .nav-list-title2 .link-icon {
 	background: #FFF;

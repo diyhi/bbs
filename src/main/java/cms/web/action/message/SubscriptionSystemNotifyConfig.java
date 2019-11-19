@@ -21,7 +21,7 @@ public class SubscriptionSystemNotifyConfig {
 	
 	/**
 	  * 根据订阅系统通知Id查询分配到表编号
-	  * 根据订阅系统通知Id和私信分表数量求余
+	  * 根据订阅系统通知Id和订阅系统通知分表数量求余
 	  * @param subscriptionSystemNotifyId 订阅系统通知Id
 	  * 注意：私信Id要先判断是否36位并且最后4位是数字
 	  * subscriptionSystemNotifyManage.verificationSubscriptionSystemNotifyId(?)

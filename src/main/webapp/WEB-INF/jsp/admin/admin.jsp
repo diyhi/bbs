@@ -60,7 +60,26 @@ function callbackTopic(){
 	//刷新框架选中窗口
 	refreshs();
 }
-
+//加载修改问题页面
+function loadQuestion(title,url){
+	var dialog = $.dialog({ 
+		id:'loadQuestion_1',
+		title: title, 
+	    lock: true, 
+	    content: 'url: '+url, 
+	    icon: 'error.gif', 
+	    cancel: true,
+	    drag:false
+	    
+	});
+	dialog.max();
+}
+//修改问题页面回调
+function callbackQuestion(){
+	$.dialog({id:'loadQuestion_1'}).close();
+	//刷新框架选中窗口
+	refreshs();
+}
 </script>
 
 </head>
@@ -337,6 +356,15 @@ function initConfig(){
 	config.additem('全部待审核评论',t,'${config:url(pageContext.request)}control/topic/allAuditComment${config:suffix()}');
 	config.additem('全部待审核回复',t,'${config:url(pageContext.request)}control/topic/allAuditReply${config:suffix()}');
 	config.additem('话题搜索',t,'${config:url(pageContext.request)}control/topic/search${config:suffix()}');
+	
+	t=config.addtitle('问答管理','内容管理',1);
+	config.additem('问题列表',t,'${config:url(pageContext.request)}control/question/list${config:suffix()}');
+	config.additem('标签列表',t,'${config:url(pageContext.request)}control/questionTag/list${config:suffix()}');
+	config.additem('全部待审核问题',t,'${config:url(pageContext.request)}control/question/allAuditQuestion${config:suffix()}');
+	config.additem('全部待审核答案',t,'${config:url(pageContext.request)}control/question/allAuditAnswer${config:suffix()}');
+	config.additem('全部待审核回复',t,'${config:url(pageContext.request)}control/question/allAuditAnswerReply${config:suffix()}');
+	config.additem('问题搜索',t,'${config:url(pageContext.request)}control/question/search${config:suffix()}');
+	
 	//config.additem('批量操作',t,'');
 	t=config.addtitle('留言管理','内容管理',1);
 	config.additem('留言列表',t,'${config:url(pageContext.request)}control/feedback/list${config:suffix()}');

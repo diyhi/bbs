@@ -1,0 +1,177 @@
+<#--  答案列表 分页-->
+<#-- 本样式要引入 jquery.min.js   kindeditor  layer -->
+<#--可接收参数 questionId:问题Id  answerId:答案Id  page:分页-->
+<@function questionId="${url_questionId}" answerId="${url_answerId}" page="${url_page}" >
+<#assign pageView =  questionRelated_answer_page> 
+
+<#if pageView.records?exists && questionRelated_answer_page.records?size gt 0> 
+	
+	<div class="answerModule" >
+		<ol class="answerlist">
+			<#list pageView.records as answer>
+				<div class="answer <#if answer.adoption == true> active</#if>" id="anchor_${answer.id}">
+					<div class="answer-author">
+						<a href="user/control/home?userName=${answer.userName}">
+							<#if answer.avatarName != null>
+								<img src="${answer.avatarPath}100x100/${answer.avatarName}" >
+							<#else>
+								<img src="${commonPath}images/min_avata.png" >
+							</#if>
+						</a>
+						
+						<#if question.userName == systemUser.userName && question.adoptionAnswerId == 0>
+							<div class="adoption-post-box">
+								<#-- 执行的相关JS需调用本页的方法引入采纳答案页 -->
+								<div class="adoption-post" onClick="javascript:adoptionAnswer('${answer.id}');"> 
+					                <i class="cms-check-circle-solid" ></i><br>
+					                <span>采纳</span>
+					            </div>
+							</div>
+						</#if>
+						
+						<cite>
+							<a href="user/control/home?userName=${answer.userName}">
+								${(answer.nickname != null && answer.nickname??) ?string(answer.nickname , answer.userName)}
+							</a>
+							<#list answer.userRoleNameList as roleName>
+								<span class="userRoleName">${roleName}</span>
+										
+							</#list>
+							<#if answer.isStaff>
+								<span class="staff">官方人员</span>
+							</#if>
+						</cite> 
+					</div>
+					<div class="answerTime">${answer.postTime}</div>
+	
+					<div class="adoption">
+						<div class="ribbon-wrapper">
+							<div class="ribbon">最佳答案</div>
+						</div>
+						<!--  
+						<i class="cms-trophy-solid" ></i><span>最佳答案</span>-->
+					</div>
+					
+					<div class="answerContent"><#noescape>${answer.content}</#noescape></div>
+					<div class="clearfix"></div>
+					<#if answer.totalReply gt 0> 
+						<div class="replyList">
+							<ul class="box">
+								<#list answer.answerReplyList as reply>
+									<li>
+										
+								        <div class="reply-top" >
+									    	<a class="avatarBox" href="user/control/home?userName=${reply.userName}">
+												<#if reply.avatarName != null>
+													<img src="${reply.avatarPath}100x100/${reply.avatarName}" >
+												<#else>
+													<img src="${commonPath}images/min_avata.png" >
+												</#if>
+											</a>
+									    	<a class="userName" href="user/control/home?userName=${reply.userName}">
+												${(reply.nickname != null && reply.nickname??) ?string(reply.nickname , reply.userName)}
+											</a>
+											<#if reply.isStaff>
+												<div class="userTag">
+										        	<span class="staff">官方人员</span>
+									        	</div>
+											</#if>
+											<#if reply.userRoleNameList?size gt 0>
+												<div class="userTag">
+													<#list reply.userRoleNameList as roleName>
+														<span class="userRoleName">${roleName}</span>
+													</#list>
+												</div>
+											</#if>
+											<span class="time">${reply.postTime}</span>
+										</div>
+										<div style="clear:both; height: 0; line-height: 0; font-size: 0;"></div>
+										<div class="replyContent">${reply.content}</div>
+									</li>
+								</#list>
+							</ul>
+						</div> 
+					</#if> 
+					<div id="answerReply-post_${answer.id}" class="answerReply-post">
+					
+					</div>
+					
+					
+					<div class="tipBottom">
+						<span class="a-toolbar">
+							<a href="javascript:" onclick="replyLayer('${answer.id}','${(answer.nickname != null && answer.nickname??) ?string(answer.nickname , answer.userName)}');">回复</a>
+							<!-- 是否登录 -->
+							<input type="hidden" id="isLogin" value="<#if systemUser != null>true<#else>false</#if>">
+							
+							
+						</span>
+					</div>
+				</div>
+			</#list>
+		</ol>
+		<div class="answerPage">
+		   	<#-- 分页 公共页(生成新引用页)-->
+			<@include action="${newPublic_1}"/>
+		</div>
+	</div>
+	
+</#if>	
+</@function>
+
+
+
+<script type="text/javascript">
+
+
+//滚动到描点(当上级跳转来后台'我的答案' '我的答案回复'时)
+$(function() {
+	var answerId = getUrlParam("answerId");//URL中的答案Id
+	if(answerId != null && answerId != ""){
+		var anchor = $("#anchor_" + answerId); //获得锚点   
+		
+	    if (anchor.length > 0) {//判断对象是否存在   
+	        var pos = anchor.offset().top;  
+	      //  var poshigh = anchor.height();  
+	        $("html,body").animate({ scrollTop: pos }, 500);  
+	    }
+	}
+     
+ });  
+
+
+
+//回复展开层
+function replyLayer(answerId,userName){
+	//判断是否已登录
+	var isLogin = document.getElementById("isLogin").value;
+	if(isLogin == "false"){
+		layer.open({
+		    type: 1, 
+		    title:"提示",
+		    content: "<div style='line-height: 36px; font-size: 15px;text-align:center; margin-left: 8px;margin-right: 8px;'>请先登录</div>", 
+		    area: ['260px', '120px'],//宽高
+			success: function(layero, index){
+				 
+			}
+		});
+		return false;
+	}
+	
+	var parameter = "";//URI参数
+	parameter += "&answerId="+answerId;
+	
+	
+	//回复页面
+	get_request(function(value){
+		if(value != ""){
+			$("#answerReply-post_"+answerId).html(value);
+		}
+	},
+	getBasePath()+"answer_reply.htm?"+parameter+"&timestamp=" + new Date().getTime(), true);
+	
+}
+function cancelReply(answerId){
+	$("#answerReply-post_"+answerId).html("");
+}
+</script> 
+

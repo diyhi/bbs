@@ -3,6 +3,7 @@ package cms.web.action.quartz;
 import javax.annotation.Resource;
 
 import cms.web.action.FileManage;
+import cms.web.action.lucene.QuestionIndexManage;
 import cms.web.action.lucene.TopicIndexManage;
 import cms.web.action.thumbnail.ThumbnailManage;
 
@@ -19,13 +20,20 @@ public class Task {
 	
 	@Resource ThumbnailManage thumbnailManage;
 	@Resource TopicIndexManage topicIndexManage;
+	@Resource QuestionIndexManage questionIndexManage;
+	
 	/**
 	 * 话题全文索引
 	 */
 	public void topicIndex() {
 		topicIndexManage.updateTopicIndex();
 	}
-
+	/**
+	 * 问题全文索引
+	 */
+	public void questionIndex() {
+		questionIndexManage.updateQuestionIndex();
+	}
 	
 	/**
 	 * 处理缩略图

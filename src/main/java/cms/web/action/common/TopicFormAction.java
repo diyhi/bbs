@@ -506,7 +506,7 @@ public class TopicFormAction {
 			userDynamic.setTopicId(topic.getId());
 			userDynamic.setPostTime(topic.getPostTime());
 			userDynamic.setStatus(topic.getStatus());
-			
+			userDynamic.setFunctionIdGroup(","+topic.getId()+",");
 			Object new_userDynamic = userDynamicManage.createUserDynamicObject(userDynamic);
 			userService.saveUserDynamic(new_userDynamic);
 

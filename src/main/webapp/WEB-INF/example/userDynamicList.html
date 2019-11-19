@@ -196,7 +196,7 @@
 			<td colspan="2">状态 10.待审核 20.已发布 110.待审核删除 120.已发布删除</td>
 		</tr>
 		<tr> 
-			<td rowspan="6">module</td> 
+			<td rowspan="7">module</td> 
 			<td><div class="mask"></div></td>
 			<td>Integer</td>
 			<td colspan="2">模块 100.话题</td>
@@ -318,6 +318,89 @@
 			<td>replyContent</td> 
 			<td>String</td>
 			<td colspan="2">回复内容</td>
+		</tr>
+		<tr> 
+			<td rowspan="6">module</td> 
+			<td><div class="mask"></div></td>
+			<td>Integer</td>
+			<td colspan="2">模块 500.问题</td>
+		</tr>
+		<tr> 
+			<td>questionId</td> 
+			<td>Long</td>
+			<td colspan="2">问题Id</td>
+		</tr>
+		<tr> 
+			<td>questionTitle</td> 
+			<td>String</td>
+			<td colspan="2">问题标题</td>
+		</tr>
+		<tr> 
+			<td>questionContent</td> 
+			<td>String</td>
+			<td colspan="2">问题内容 本字段可以加上&lt#noescape>&lt/#noescape>标签关闭转义，以输出html标签</td>
+		</tr>
+		<tr> 
+			<td>questionViewTotal</td> 
+			<td>Long</td>
+			<td colspan="2">问题查看总数</td>
+		</tr>
+		<tr> 
+			<td>questionAnswerTotal</td> 
+			<td>Long</td>
+			<td colspan="2">问题答案总数</td>
+		</tr>
+		<tr> 
+			<td rowspan="5">module</td> 
+			<td><div class="mask"></div></td>
+			<td>Integer</td>
+			<td colspan="2">模块 600.答案</td>
+		</tr>
+		<tr> 
+			<td>questionId</td> 
+			<td>Long</td>
+			<td colspan="2">问题Id</td>
+		</tr>
+		<tr> 
+			<td>questionTitle</td> 
+			<td>String</td>
+			<td colspan="2">问题标题</td>
+		</tr>
+		<tr> 
+			<td>answerId</td> 
+			<td>Long</td>
+			<td colspan="2">答案Id</td>
+		</tr>
+		<tr> 
+			<td>answerContent</td> 
+			<td>String</td>
+			<td colspan="2">答案内容 本字段可以加上&lt#noescape>&lt/#noescape>标签关闭转义，以输出html标签</td>
+		</tr>
+		<tr> 
+			<td rowspan="5">module</td> 
+			<td><div class="mask"></div></td>
+			<td>Integer</td>
+			<td colspan="2">模块 700.答案回复</td>
+		</tr>
+		<tr> 
+			<td>questionId</td> 
+			<td>Long</td>
+			<td colspan="2">问题Id</td>
+		</tr>
+		<tr> 
+			<td>questionTitle</td> 
+			<td>String</td>
+			<td colspan="2">问题标题</td>
+		</tr>
+		<tr> 
+			<td>answerReplyId</td> 
+			<td>Long</td>
+			<td colspan="2">答案回复Id</td>
+		</tr>
+		<tr> 
+			<td>answerReplyContent</td> 
+			<td>String</td>
+			<td colspan="2">答案回复内容</td>
 		</tr>
 	</tbody> 
 </table>

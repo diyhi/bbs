@@ -390,7 +390,6 @@ public class CommentServiceBean extends DaoSupport<Comment> implements CommentSe
 	 * @return
 	 */
 	public Integer deleteReply(Long replyId){
-		//删除订单超卖产品
 		Query delete = em.createQuery("delete from Reply o where o.id=?1")
 		.setParameter(1, replyId);
 		return delete.executeUpdate();

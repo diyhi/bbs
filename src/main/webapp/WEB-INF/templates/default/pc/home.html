@@ -145,6 +145,30 @@
 	    				</h4>
 					</li>
 					<li class="item">
+						<a class="a-pic" href="user/control/questionList" >
+							<div class="img cms-help-alt" ></div> 	
+						</a>
+	    				<h4 class="title">
+	    					<a class="a-title" href="user/control/questionList" >我的问题</a>
+	    				</h4>
+					</li>
+		            <li class="item">
+						<a class="a-pic" href="user/control/answerList" >
+							<div class="img cms-info-alt" ></div> 	
+						</a>
+	    				<h4 class="title">
+	    					<a class="a-title" href="user/control/answerList" >我的答案</a>
+	    				</h4>
+					</li>
+					<li class="item" >
+						<a class="a-pic" href="user/control/answerReplyList" >
+							<div class="img cms-reply " ></div> 	
+						</a>
+	    				<h4 class="title">
+	    					<a class="a-title" href="user/control/answerReplyList" >我的答案回复</a>
+	    				</h4>
+					</li>
+					<li class="item">
 						<a class="a-pic" href="user/control/favoriteList" >
 							<div class="img cms-favorites" ></div> 	
 						</a>
@@ -308,14 +332,27 @@
 						html += 	"<div class='topicTitle'>";
 						if(userDynamic.module == 100){
 							html += "<span>发表了话题</span>";	
+							html += 		"<a href='thread?topicId="+userDynamic.topicId+"'> "+userDynamic.topicTitle+"</a>";
 						}else if(userDynamic.module == 200){
 							html += "<span>评论了话题</span>";	
+							html += 		"<a href='thread?topicId="+userDynamic.topicId+"'> "+userDynamic.topicTitle+"</a>";
 						}else if(userDynamic.module == 300){
-							html += "<span>引用了话题</span>";	
+							html += "<span>引用了话题</span>";
+							html += 		"<a href='thread?topicId="+userDynamic.topicId+"'> "+userDynamic.topicTitle+"</a>";	
 						}else if(userDynamic.module == 400){
-							html += "<span>回复了话题</span>";	
+							html += "<span>回复了话题</span>";
+							html += 		"<a href='thread?topicId="+userDynamic.topicId+"'> "+userDynamic.topicTitle+"</a>";	
+						}else if(userDynamic.module == 500){
+							html += "<span>提交了问题</span>";
+							html += 		"<a href='question?questionId="+userDynamic.questionId+"'> "+userDynamic.questionTitle+"</a>";	
+						}else if(userDynamic.module == 600){
+							html += "<span>回答了问题</span>";	
+							html += 		"<a href='question?questionId="+userDynamic.questionId+"'> "+userDynamic.questionTitle+"</a>";	
+						}else if(userDynamic.module == 700){
+							html += "<span>回复了问题</span>";	
+							html += 		"<a href='question?questionId="+userDynamic.questionId+"'> "+userDynamic.questionTitle+"</a>";	
 						}
-						html += 		"<a href='thread?topicId="+userDynamic.topicId+"'> "+userDynamic.topicTitle+"</a>";
+						
 						
 						for(var j = 0; j<userDynamic.allowRoleViewList.length; j++){
 							var roleName = userDynamic.allowRoleViewList[j];
@@ -343,9 +380,22 @@
 						if(userDynamic.module == 400){
 							html += "<div class='replyContent' >"+userDynamic.replyContent+"</div>";	
 						}
+						if(userDynamic.module == 500){
+							html += "<div class='topicContent' >"+userDynamic.questionContent+"</div>";
+						}
+						if(userDynamic.module == 600){
+							html += "<div class='topicContent' >"+userDynamic.answerContent+"</div>";
+						}
+						if(userDynamic.module == 700){
+							html += "<div class='replyContent' >"+userDynamic.answerReplyContent+"</div>";	
+						}
 						html += "<div class='clearfix'></div>";
 						html += "<div class='tipBottom'>";	
 						html += 	"<span class='a-toolbar'>";
+						
+						
+						
+						
 						if(userDynamic.module == 100){
 							html += "<a href='thread?topicId="+userDynamic.topicId+"' target='_blank' >查看原文</a>";	
 
@@ -359,6 +409,14 @@
 							html += "<a href='thread?topicId="+userDynamic.topicId+"&commentId="+userDynamic.commentId+"'  target='_blank' >查看原文</a>";	
 						}else if(userDynamic.module == 400){
 							html += "<a href='thread?topicId="+userDynamic.topicId+"&commentId="+userDynamic.commentId+"'  target='_blank' >查看原文</a>";	
+						}else if(userDynamic.module == 500){
+							html += "<a href='question?questionId="+userDynamic.questionId+"' target='_blank' >查看原文</a>";
+							html += "<span >"+userDynamic.questionViewTotal+"次阅读</span>";	
+							html += "<span >"+userDynamic.questionAnswerTotal+"个回答</span>";	
+						}else if(userDynamic.module == 600){
+							html += "<a href='question?questionId="+userDynamic.questionId+"&answerId="+userDynamic.answerId+"'  target='_blank' >查看原文</a>";	
+						}else if(userDynamic.module == 700){
+							html += "<a href='question?questionId="+userDynamic.questionId+"&answerId="+userDynamic.answerId+"'  target='_blank' >查看原文</a>";
 						}
 						html += 	"</span>";
 						html += "</div>";	

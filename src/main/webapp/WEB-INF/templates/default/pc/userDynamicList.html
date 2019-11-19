@@ -11,6 +11,7 @@
 	<meta name="csrfToken" content="${token}"/>
 	<link rel="shortcut icon" type="image/x-icon" href="${baseURL}${commonPath}images/favicon.ico" media="screen" />
 	<link href="${commonPath}css/common.css" type="text/css" rel="stylesheet" >
+	<link href="${commonPath}css/themify-icons/style.css" type="text/css" rel="stylesheet">
 	<script language="javascript" src="${commonPath}js/tool.js" type="text/javascript"></script>
 	<script language="javascript" src="${commonPath}js/ajax.js" type="text/javascript"></script>
 	<script language="javascript" src="${commonPath}js/json2.js" type="text/javascript"></script>
@@ -65,14 +66,27 @@
 						<div class="topicTitle">
 							<#if userDynamic.module == 100>
 								<span>发表了话题</span>
+								<a href="thread?topicId=${userDynamic.topicId}">${userDynamic.topicTitle}</a>
 							<#elseif userDynamic.module == 200>
 								<span>评论了话题</span>
+								<a href="thread?topicId=${userDynamic.topicId}">${userDynamic.topicTitle}</a>
 							<#elseif userDynamic.module == 300>
 								<span>引用了话题</span>
+								<a href="thread?topicId=${userDynamic.topicId}">${userDynamic.topicTitle}</a>
 							<#elseif userDynamic.module == 400>
 								<span>回复了话题</span>
+								<a href="thread?topicId=${userDynamic.topicId}">${userDynamic.topicTitle}</a>
+							<#elseif userDynamic.module == 500>
+								<span>提交了问题</span>
+								<a href="question?questionId=${userDynamic.questionId}">${userDynamic.questionTitle}</a>
+							<#elseif userDynamic.module == 600>
+								<span>回答了问题</span>
+								<a href="question?questionId=${userDynamic.questionId}">${userDynamic.questionTitle}</a>
+							<#elseif userDynamic.module == 700>
+								<span>回复了问题</span>
+								<a href="question?questionId=${userDynamic.questionId}">${userDynamic.questionTitle}</a>
 							</#if> 
-							<a href="thread?topicId=${userDynamic.topicId}">${userDynamic.topicTitle}</a>
+							
 							<#list userDynamic.allowRoleViewList as roleName>
 								<i class="topicRoleName">${roleName}</i>
 								
@@ -98,6 +112,15 @@
 						</#if> 
 						<#if userDynamic.module == 400>
 							<div class="replyContent" >${userDynamic.replyContent}</div>
+						</#if> 
+						<#if userDynamic.module == 500>
+							<div class="topicContent" ><#noescape>${userDynamic.questionContent}</#noescape></div>
+						</#if> 
+						<#if userDynamic.module == 600>
+							<div class="topicContent" ><#noescape>${userDynamic.answerContent}</#noescape></div>
+						</#if> 
+						<#if userDynamic.module == 700>
+							<div class="replyContent" >${userDynamic.answerReplyContent}</div>
 						</#if> 
 						
 						<div class="clearfix"></div>
@@ -147,6 +170,14 @@
 									<a href="thread?topicId=${userDynamic.topicId}&commentId=${userDynamic.commentId}"  target="_blank" >查看原文</a>
 								<#elseif userDynamic.module == 400>
 									<a href="thread?topicId=${userDynamic.topicId}&commentId=${userDynamic.commentId}"  target="_blank" >查看原文</a>
+								<#elseif userDynamic.module == 500>
+									<a href="question?questionId=${userDynamic.questionId}"" target="_blank" >查看原文</a>
+									<span >${userDynamic.questionViewTotal}次阅读</span>
+									<span >${userDynamic.questionAnswerTotal}个回答</span>
+								<#elseif userDynamic.module == 600>
+									<a href="question?questionId=${userDynamic.questionId}&answerId=${userDynamic.answerId}" target="_blank" >查看原文</a>
+								<#elseif userDynamic.module == 700>
+									<a href="question?questionId=${userDynamic.questionId}&answerId=${userDynamic.answerId}" target="_blank" >查看原文</a>
 								</#if> 
 								
 							

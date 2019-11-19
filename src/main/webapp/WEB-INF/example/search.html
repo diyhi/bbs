@@ -25,7 +25,7 @@
 			<td rowspan="7">请求成功返回</td> 
 			<td>话题分页</td> 
 			<td width="30%" >
-				变量：topicPage<br>
+				变量：searchResultPage<br>
 				类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_10'); return false;">PageView</a>
 			</td>
 		</tr> 
@@ -71,7 +71,7 @@
 			<td>键参数：error<br>值内容说明：错误值集合<br>值类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_80'); return false;">Map&ltString,String></a></td> 
 		</tr>
 		<tr> 
-			<td>键参数：topicPage<br>值内容说明：话题分页<br>值类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_10'); return false;">PageView</a></td>
+			<td>键参数：searchResultPage<br>值内容说明：话题分页<br>值类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_10'); return false;">PageView</a></td>
 		</tr>
 	</tbody> 
 </table>
@@ -90,7 +90,7 @@
 	<tbody> 
 		<tr> 
 			<td>records</td> 
-			<td>List&lt<a style="color: #317ee7" onclick="anchorJump('#anchor_20'); return false;">Topic</a>></td>
+			<td>List&lt<a style="color: #317ee7" onclick="anchorJump('#anchor_15'); return false;">SearchResult</a>></td>
 			<td>数据展示列表</td>
 		</tr>
 		<tr> 
@@ -151,6 +151,44 @@
 			<td>endindex</td> 
 			<td>long</td>
 			<td>分页结束索引</td>
+		</tr>
+	</tbody> 
+</table>
+
+
+<table id="anchor_15" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="5">搜索结果 SearchResult</th>
+		</tr> 
+		<tr> 
+			<th width="30%" colspan="2">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%" colspan="2">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td rowspan="2">indexModule</td> 
+			<td><div class="mask"></div></td>
+			<td>Integer</td>
+			<td colspan="2">索引模块 10:话题 </td>
+		</tr>
+		<tr> 
+			<td>topic</td> 
+			<td><a style="color: #317ee7" onclick="anchorJump('#anchor_20'); return false;">Topic</a></td>
+			<td colspan="2">话题</td>
+		</tr>
+		<tr> 
+			<td rowspan="2">indexModule</td> 
+			<td><div class="mask"></div></td>
+			<td>Integer</td>
+			<td colspan="2">索引模块 20：问题</td>
+		</tr>
+		<tr> 
+			<td>question</td> 
+			<td><a style="color: #317ee7" onclick="anchorJump('#anchor_40'); return false;">Question</a></td>
+			<td colspan="2">问题</td>
 		</tr>
 	</tbody> 
 </table>
@@ -261,7 +299,97 @@
 	</tbody> 
 </table>
 
-
+<table id="anchor_40" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="4">问题 Question</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%" colspan="2">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>id</td> 
+			<td>Long</td>
+			<td colspan="2">问题Id</td>
+		</tr>
+		<tr> 
+			<td>title</td> 
+			<td>String</td>
+			<td colspan="2">标题；本字段高亮字符用&ltB>&lt/B>标签包裹，字段在搜索时已进行安全过滤，可以加上<#noescape></#noescape>标签关闭转义，以输出html标签</td>
+		</tr>
+		
+		<tr> 
+			<td>content</td> 
+			<td>String</td>
+			<td colspan="2">话题内容；本字段高亮字符用&ltB>&lt/B>标签包裹，字段在搜索时已进行安全过滤，可以加上<#noescape></#noescape>标签关闭转义，以输出html标签。搜索结果不显示隐藏标签内的内容</td>
+		</tr>
+		<tr> 
+			<td>summary</td> 
+			<td>String</td>
+			<td colspan="2">内容摘要</td>
+		</tr>
+		<tr> 
+			<td>postTime</td> 
+			<td>Date</td>
+			<td colspan="2">发表时间</td>
+		</tr>
+		<tr> 
+			<td>lastAnswerTime</td> 
+			<td>Date</td>
+			<td colspan="2">最后回答时间</td>
+		</tr>
+		<tr> 
+			<td>answerTotal</td> 
+			<td>Long</td>
+			<td colspan="2">回答总数</td>
+		</tr>
+		<tr> 
+			<td>allow</td> 
+			<td>boolean</td>
+			<td colspan="2">允许回答</td>
+		</tr>
+		<tr> 
+			<td>viewTotal</td> 
+			<td>Long</td>
+			<td colspan="2">查看总数</td>
+		</tr>
+		<tr> 
+			<td>userName</td> 
+			<td>String</td>
+			<td colspan="2">用户名称</td>
+		</tr>
+		<tr> 
+			<td>userRoleNameList</td> 
+			<td>List&ltString></td>
+			<td colspan="2">用户角色名称集合</td>
+		</tr>
+		<tr> 
+			<td>nickname</td> 
+			<td>String</td>
+			<td colspan="2">呢称</td>
+		</tr>
+		<tr> 
+			<td>avatarPath</td> 
+			<td>String</td>
+			<td>头像路径</td>
+			<td width="15%" rowspan="2">页面上显示200*200头像示例${question.avatarPath}${question.avatarName}   &nbsp;&nbsp;显示100*100头像示例${question.avatarPath}100x100/${question.avatarName}</td> 
+		</tr>
+		<tr> 
+			<td>avatarName</td> 
+			<td>String</td>
+			<td>头像名称</td>
+		</tr>
+		<tr> 
+			<td>isStaff</td> 
+			<td>boolean</td>
+			<td colspan="2">是否为员工</td>
+		</tr>
+	</tbody> 
+</table>
 
 
 <table id="anchor_80"  class="exampleTable" > 
@@ -315,20 +443,32 @@
 <h2 style="margin:0;padding:0; margin-top: 10px;">示例</h2>
 <textarea name="exampleCode">
 
-<#-- 话题分页 -->
-<#if topicPage?exists && topicPage.records?exists && topicPage.records?size gt 0>
-	<#list topicPage.records as topic>
-		<a href="thread?topicId=${topic.id}" class="title">
-			【${topic.tagName}】<span><#noescape>${topic.title}</#noescape></span>
-		</a>
-		<#-- 话题内容 因为要高亮显示，所以不转义-->
-	    <#noescape>${topic.content}</#noescape>
+<#-- 搜索结果分页 -->
+<#if searchResultPage?exists && searchResultPage.records?exists && searchResultPage.records?size gt 0>
+	<#list searchResultPage.records as searchResult>
+		<#if searchResult.indexModule == 10>
+			<#assign topic = searchResult.topic>
+			<a href="thread?topicId=${topic.id}" class="title">
+				【${topic.tagName}】<span><#noescape>${topic.title}</#noescape></span>
+			</a>
+			<#-- 话题内容 因为要高亮显示，所以不转义-->
+		    <#noescape>${topic.content}</#noescape>
+		<#elseif searchResult.indexModule == 20>
+			<#assign question = searchResult.question>
+			<a href="question?questionId=${question.id}" class="title">
+				<span><#noescape>${question.title}</#noescape></span>
+			</a>
+			<#-- 问题内容 因为要高亮显示，所以不转义-->
+		    <#noescape>${question.content}</#noescape>
+			
+		</#if>
+		
 	</#list>
 </#if>
 
 
 
-<#-- 搜索话题 -->
+<#-- 搜索话题和问题 -->
 <input type="text" id="keyword" value="${keyword}" onkeydown="javascript:if(event.keyCode==13){ search();}">
 <input type="button" value="搜索" class="button" onclick="search();return false">
 <script type="text/javascript" language="javascript">

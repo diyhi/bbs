@@ -1,0 +1,78 @@
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">返回值</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="20%">类型</th> 
+			<th width="50%">说明</th> 
+		</tr>
+	</thead> 
+	 <tbody> 
+		<tr> 
+			<td>questionRelated_questionTag_collection</td> 
+			<td>List&lt<a style="color: #317ee7" onclick="anchorJump('#anchor_10'); return false;">QuestionTag</a>&gt</td>
+			<td>问题标签集合</td> 
+		</tr> 
+	</tbody> 
+</table>
+<table id="anchor_10" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">问题标签 QuestionTag</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>id</td> 
+			<td>Long</td>
+			<td>Id</td>
+		</tr>
+		<tr> 
+			<td>name</td> 
+			<td>String</td>
+			<td>标签名称</td>
+		</tr>
+		<tr> 
+			<td>sort</td> 
+			<td>Integer</td>
+			<td>排序，大于或等于0以上</td>
+		</tr>
+		<tr> 
+			<td>parentId</td> 
+			<td>Long</td>
+			<td>所属父类Id，0为根节点</td>
+		</tr>
+		<tr> 
+			<td>childNodeNumber</td> 
+			<td>Integer</td>
+			<td>子节点数量</td>
+		</tr>
+		<tr> 
+			<td>childTag</td> 
+			<td>List&lt<a style="color: #317ee7" onclick="anchorJump('#anchor_10'); return false;">QuestionTag</a>&gt</td>
+			<td>子标签</td>
+		</tr>
+	</tbody> 
+</table>
+
+<h2 style="margin:0;padding:0; margin-top: 10px;">示例</h2>
+<textarea name="exampleCode">
+<@function> 
+	<#list questionRelated_questionTag_collection as questionTag>	
+		${questionTag.name}
+		<#if questionTag.childNodeNumber >0>
+			<#list questionTag.childTag as childQuestionTag>	
+				${childQuestionTag.name}
+			</#list>
+		</#if>
+	</#list>	
+</@function>	
+
+</textarea>

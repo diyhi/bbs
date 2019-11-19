@@ -1,6 +1,45 @@
 /*!40101 SET NAMES utf8 */;
 
 #
+# Structure for table "answer"
+#
+
+CREATE TABLE `answer` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `content` longtext,
+  `ip` varchar(45) DEFAULT NULL,
+  `isStaff` bit(1) DEFAULT NULL,
+  `postTime` datetime DEFAULT NULL,
+  `questionId` bigint(20) DEFAULT NULL,
+  `status` int(11) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  `adoption` bit(1) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `answer_1_idx` (`questionId`,`status`,`adoption`),
+  KEY `answer_2_idx` (`userName`,`isStaff`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "answerreply"
+#
+
+CREATE TABLE `answerreply` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `answerId` bigint(20) DEFAULT NULL,
+  `content` longtext,
+  `ip` varchar(45) DEFAULT NULL,
+  `isStaff` bit(1) DEFAULT NULL,
+  `postTime` datetime DEFAULT NULL,
+  `questionId` bigint(20) DEFAULT NULL,
+  `status` int(11) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `answerReply_1_idx` (`answerId`,`status`),
+  KEY `answerReply_2_idx` (`questionId`),
+  KEY `answerReply_3_idx` (`userName`,`isStaff`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
 # Structure for table "comment"
 #
 
@@ -703,6 +742,74 @@ CREATE TABLE `pv` (
 
 
 #
+# Structure for table "question"
+#
+
+CREATE TABLE `question` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `allow` bit(1) NOT NULL,
+  `answerTotal` bigint(20) DEFAULT NULL,
+  `appendContent` longtext,
+  `content` longtext,
+  `ip` varchar(45) DEFAULT NULL,
+  `isStaff` bit(1) DEFAULT NULL,
+  `lastAnswerTime` datetime DEFAULT NULL,
+  `lastUpdateTime` datetime DEFAULT NULL,
+  `postTime` datetime DEFAULT NULL,
+  `sort` int(11) DEFAULT NULL,
+  `status` int(11) DEFAULT NULL,
+  `summary` longtext,
+  `title` varchar(190) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  `viewTotal` bigint(20) DEFAULT NULL,
+  `adoptionAnswerId` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `question_1_idx` (`userName`,`postTime`),
+  KEY `question_2_idx` (`status`,`sort`,`lastUpdateTime`),
+  KEY `question_3_idx` (`adoptionAnswerId`,`status`,`sort`,`lastUpdateTime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "questionindex"
+#
+
+CREATE TABLE `questionindex` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `dataId` varchar(32) DEFAULT NULL,
+  `indexState` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "questiontag"
+#
+
+CREATE TABLE `questiontag` (
+  `id` bigint(20) NOT NULL,
+  `childNodeNumber` int(11) DEFAULT NULL,
+  `name` varchar(190) DEFAULT NULL,
+  `parentId` bigint(20) DEFAULT NULL,
+  `parentIdGroup` varchar(190) DEFAULT NULL,
+  `sort` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `questionTag_1_idx` (`sort`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "questiontagassociation"
+#
+
+CREATE TABLE `questiontagassociation` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `questionId` bigint(20) DEFAULT NULL,
+  `questionTagId` bigint(20) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `questionTagAssociation_1_idx` (`questionId`),
+  KEY `questionTagAssociation_2_idx` (`questionTagId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
 # Structure for table "remind_0"
 #
 
@@ -719,10 +826,16 @@ CREATE TABLE `remind_0` (
   `topicId` bigint(20) DEFAULT NULL,
   `topicReplyId` bigint(20) DEFAULT NULL,
   `typeCode` int(11) DEFAULT NULL,
+  `friendQuestionAnswerId` bigint(20) DEFAULT NULL,
+  `friendQuestionReplyId` bigint(20) DEFAULT NULL,
+  `questionAnswerId` bigint(20) DEFAULT NULL,
+  `questionId` bigint(20) DEFAULT NULL,
+  `questionReplyId` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `remind_1_idx` (`receiverUserId`,`status`,`sendTimeFormat`),
   KEY `remind_2_idx` (`topicId`),
-  KEY `remind_3_idx` (`receiverUserId`,`typeCode`,`sendTimeFormat`)
+  KEY `remind_3_idx` (`receiverUserId`,`typeCode`,`sendTimeFormat`),
+  KEY `remind_4_idx` (`questionId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 #
@@ -742,10 +855,16 @@ CREATE TABLE `remind_1` (
   `topicId` bigint(20) DEFAULT NULL,
   `topicReplyId` bigint(20) DEFAULT NULL,
   `typeCode` int(11) DEFAULT NULL,
+  `friendQuestionAnswerId` bigint(20) DEFAULT NULL,
+  `friendQuestionReplyId` bigint(20) DEFAULT NULL,
+  `questionAnswerId` bigint(20) DEFAULT NULL,
+  `questionId` bigint(20) DEFAULT NULL,
+  `questionReplyId` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `remind_1_idx` (`receiverUserId`,`status`,`sendTimeFormat`),
   KEY `remind_2_idx` (`topicId`),
-  KEY `remind_3_idx` (`receiverUserId`,`typeCode`,`sendTimeFormat`)
+  KEY `remind_3_idx` (`receiverUserId`,`typeCode`,`sendTimeFormat`),
+  KEY `remind_4_idx` (`questionId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 #
@@ -765,10 +884,16 @@ CREATE TABLE `remind_2` (
   `topicId` bigint(20) DEFAULT NULL,
   `topicReplyId` bigint(20) DEFAULT NULL,
   `typeCode` int(11) DEFAULT NULL,
+  `friendQuestionAnswerId` bigint(20) DEFAULT NULL,
+  `friendQuestionReplyId` bigint(20) DEFAULT NULL,
+  `questionAnswerId` bigint(20) DEFAULT NULL,
+  `questionId` bigint(20) DEFAULT NULL,
+  `questionReplyId` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `remind_1_idx` (`receiverUserId`,`status`,`sendTimeFormat`),
   KEY `remind_2_idx` (`topicId`),
-  KEY `remind_3_idx` (`receiverUserId`,`typeCode`,`sendTimeFormat`)
+  KEY `remind_3_idx` (`receiverUserId`,`typeCode`,`sendTimeFormat`),
+  KEY `remind_4_idx` (`questionId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 #
@@ -788,10 +913,16 @@ CREATE TABLE `remind_3` (
   `topicId` bigint(20) DEFAULT NULL,
   `topicReplyId` bigint(20) DEFAULT NULL,
   `typeCode` int(11) DEFAULT NULL,
+  `friendQuestionAnswerId` bigint(20) DEFAULT NULL,
+  `friendQuestionReplyId` bigint(20) DEFAULT NULL,
+  `questionAnswerId` bigint(20) DEFAULT NULL,
+  `questionId` bigint(20) DEFAULT NULL,
+  `questionReplyId` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `remind_1_idx` (`receiverUserId`,`status`,`sendTimeFormat`),
   KEY `remind_2_idx` (`topicId`),
-  KEY `remind_3_idx` (`receiverUserId`,`typeCode`,`sendTimeFormat`)
+  KEY `remind_3_idx` (`receiverUserId`,`typeCode`,`sendTimeFormat`),
+  KEY `remind_4_idx` (`questionId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
@@ -1105,6 +1236,21 @@ CREATE TABLE `systemsetting` (
   `topicUnhidePlatformShareProportion` int(11) DEFAULT NULL,
   `fileSecureLinkExpire` bigint(20) DEFAULT NULL,
   `fileSecureLinkSecret` varchar(190) DEFAULT NULL,
+  `allowAnswer` bit(1) NOT NULL,
+  `allowQuestion` bit(1) NOT NULL,
+  `answerEditorTag` longtext,
+  `answerReply_review` int(11) DEFAULT NULL,
+  `answerReply_rewardPoint` bigint(20) DEFAULT NULL,
+  `answer_review` int(11) DEFAULT NULL,
+  `answer_rewardPoint` bigint(20) DEFAULT NULL,
+  `answer_submitQuantity` int(11) DEFAULT NULL,
+  `questionEditorTag` longtext,
+  `question_review` int(11) DEFAULT NULL,
+  `question_rewardPoint` bigint(20) DEFAULT NULL,
+  `question_submitQuantity` int(11) DEFAULT NULL,
+  `realNameUserAllowAnswer` bit(1) NOT NULL,
+  `realNameUserAllowQuestion` bit(1) NOT NULL,
+  `maxQuestionTagQuantity` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -1220,7 +1366,8 @@ CREATE TABLE `topic` (
   `lastUpdateTime` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `topic_idx` (`tagId`,`status`),
-  KEY `topic_3_idx` (`userName`,`postTime`)
+  KEY `topic_3_idx` (`userName`,`postTime`),
+  KEY `topic_4_idx` (`status`,`sort`,`lastUpdateTime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 #
@@ -1527,16 +1674,18 @@ CREATE TABLE `userdynamic_0` (
   `commentId` bigint(20) DEFAULT NULL,
   `module` int(11) DEFAULT NULL,
   `postTime` datetime DEFAULT NULL,
-  `quoteCommentId` bigint(20) DEFAULT NULL,
   `replyId` bigint(20) DEFAULT NULL,
   `status` int(11) DEFAULT NULL,
   `topicId` bigint(20) DEFAULT NULL,
   `userName` varchar(30) DEFAULT NULL,
+  `quoteCommentId` bigint(20) DEFAULT NULL,
+  `answerId` bigint(20) DEFAULT NULL,
+  `answerReplyId` bigint(20) DEFAULT NULL,
+  `questionId` bigint(20) DEFAULT NULL,
+  `functionIdGroup` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `userDynamic_1_idx` (`userName`,`status`,`postTime`),
-  KEY `userDynamic_2_idx` (`topicId`,`userName`,`module`),
-  KEY `userDynamic_3_idx` (`commentId`,`userName`,`module`),
-  KEY `userDynamic_4_idx` (`replyId`,`userName`,`module`)
+  KEY `userDynamic_5_idx` (`functionIdGroup`,`userName`,`module`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 #
@@ -1548,16 +1697,18 @@ CREATE TABLE `userdynamic_1` (
   `commentId` bigint(20) DEFAULT NULL,
   `module` int(11) DEFAULT NULL,
   `postTime` datetime DEFAULT NULL,
-  `quoteCommentId` bigint(20) DEFAULT NULL,
   `replyId` bigint(20) DEFAULT NULL,
   `status` int(11) DEFAULT NULL,
   `topicId` bigint(20) DEFAULT NULL,
   `userName` varchar(30) DEFAULT NULL,
+  `quoteCommentId` bigint(20) DEFAULT NULL,
+  `answerId` bigint(20) DEFAULT NULL,
+  `answerReplyId` bigint(20) DEFAULT NULL,
+  `questionId` bigint(20) DEFAULT NULL,
+  `functionIdGroup` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `userDynamic_1_idx` (`userName`,`status`,`postTime`),
-  KEY `userDynamic_2_idx` (`topicId`,`userName`,`module`),
-  KEY `userDynamic_3_idx` (`commentId`,`userName`,`module`),
-  KEY `userDynamic_4_idx` (`replyId`,`userName`,`module`)
+  KEY `userDynamic_5_idx` (`functionIdGroup`,`userName`,`module`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 #
@@ -1569,16 +1720,18 @@ CREATE TABLE `userdynamic_2` (
   `commentId` bigint(20) DEFAULT NULL,
   `module` int(11) DEFAULT NULL,
   `postTime` datetime DEFAULT NULL,
-  `quoteCommentId` bigint(20) DEFAULT NULL,
   `replyId` bigint(20) DEFAULT NULL,
   `status` int(11) DEFAULT NULL,
   `topicId` bigint(20) DEFAULT NULL,
   `userName` varchar(30) DEFAULT NULL,
+  `quoteCommentId` bigint(20) DEFAULT NULL,
+  `answerId` bigint(20) DEFAULT NULL,
+  `answerReplyId` bigint(20) DEFAULT NULL,
+  `questionId` bigint(20) DEFAULT NULL,
+  `functionIdGroup` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `userDynamic_1_idx` (`userName`,`status`,`postTime`),
-  KEY `userDynamic_2_idx` (`topicId`,`userName`,`module`),
-  KEY `userDynamic_3_idx` (`commentId`,`userName`,`module`),
-  KEY `userDynamic_4_idx` (`replyId`,`userName`,`module`)
+  KEY `userDynamic_5_idx` (`functionIdGroup`,`userName`,`module`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 #
@@ -1590,17 +1743,20 @@ CREATE TABLE `userdynamic_3` (
   `commentId` bigint(20) DEFAULT NULL,
   `module` int(11) DEFAULT NULL,
   `postTime` datetime DEFAULT NULL,
-  `quoteCommentId` bigint(20) DEFAULT NULL,
   `replyId` bigint(20) DEFAULT NULL,
   `status` int(11) DEFAULT NULL,
   `topicId` bigint(20) DEFAULT NULL,
   `userName` varchar(30) DEFAULT NULL,
+  `quoteCommentId` bigint(20) DEFAULT NULL,
+  `answerId` bigint(20) DEFAULT NULL,
+  `answerReplyId` bigint(20) DEFAULT NULL,
+  `questionId` bigint(20) DEFAULT NULL,
+  `functionIdGroup` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `userDynamic_1_idx` (`userName`,`status`,`postTime`),
-  KEY `userDynamic_2_idx` (`topicId`,`userName`,`module`),
-  KEY `userDynamic_3_idx` (`commentId`,`userName`,`module`),
-  KEY `userDynamic_4_idx` (`replyId`,`userName`,`module`)
+  KEY `userDynamic_5_idx` (`functionIdGroup`,`userName`,`module`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 
 
 #

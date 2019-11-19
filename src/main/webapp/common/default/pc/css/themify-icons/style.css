@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'themify';
-  src:  url('fonts/themify.eot?9ijxac');
-  src:  url('fonts/themify.eot?9ijxac#iefix') format('embedded-opentype'),
-    url('fonts/themify.ttf?9ijxac') format('truetype'),
-    url('fonts/themify.woff?9ijxac') format('woff'),
-    url('fonts/themify.svg?9ijxac#themify') format('svg');
+  src:  url('fonts/themify.eot?yboxlf');
+  src:  url('fonts/themify.eot?yboxlf#iefix') format('embedded-opentype'),
+    url('fonts/themify.ttf?yboxlf') format('truetype'),
+    url('fonts/themify.woff?yboxlf') format('woff'),
+    url('fonts/themify.svg?yboxlf#themify') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -25,8 +25,23 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.cms-order:before {
-  content: "\e900";
+.cms-chess-queen-solid:before {
+  content: "\e910";
+}
+.cms-trophy-solid:before {
+  content: "\e911";
+}
+.cms-check-circle-solid:before {
+  content: "\e90f";
+}
+.cms-angle-down:before {
+  content: "\e64b";
+}
+.cms-info-alt:before {
+  content: "\e717";
+}
+.cms-help-alt:before {
+  content: "\e718";
 }
 .cms-user:before {
   content: "\e602";
@@ -111,6 +126,9 @@
 }
 .cms-email:before {
   content: "\e75a";
+}
+.cms-order:before {
+  content: "\e900";
 }
 .cms-follower:before {
   content: "\e901";

@@ -1,0 +1,64 @@
+<#--  采纳答案 -->
+<#--  适用问题内容页的答案列表 -->
+<@function>
+	<#-- 已登录 -->
+	<#if systemUser != null>
+		<#--  返回Map<String,Object>类型 -->
+		<#assign returnValue = questionRelated_adoptionAnswer_collection>
+		
+		<script language="javascript" type="text/javascript">
+			//Ajax方式提交
+			function adoptionAnswer(answerId){
+				var parameter = "";
+				//答案Id
+				parameter += "&answerId="+answerId;
+				//获取令牌
+				parameter += "&token="+document.getElementById("token").value;
+			   	//删除第一个&号,防止因为多了&号而出现警告: Parameters: Invalid chunk ignored.信息
+				if(parameter.indexOf("&") == 0){
+					parameter = parameter.substring(1,parameter.length);
+				}
+			   	post_request(function(value){
+					var data = JSON.parse(value);
+					for(var returnValue in data){
+						
+						if(returnValue == "success"){
+		        			if(data[returnValue] == "true"){
+		        				layer.msg('采纳当前答案成功，3秒后自动刷新当前页面', 
+									{
+									  time: 3000 //3秒关闭（如果不配置，默认是3秒）
+									},function(){//关闭后的操作
+										//刷新页面
+							        	document.location.reload();
+									}
+								);
+		        			}
+		        		}else if(returnValue == "error"){
+		        			
+		        			
+		        			var errorValue = data[returnValue];
+							var htmlValue = "";
+							var i = 0;
+							for(var error in errorValue){
+								if(error != ""){	
+									i++;
+									htmlValue += "&nbsp;&nbsp;"+i+"、"+errorValue[error]+"<br>";
+								}
+							}
+							
+							layer.open({
+							  type: 1,
+							  title: '错误', 
+							  skin: 'layui-layer-rim', //加上边框
+							  area: ['300px', '150px'], //宽高
+							   content: "<div style='line-height: 36px; font-size: 15px; margin-left: 8px;margin-right: 8px;'>"+htmlValue+"</div>"
+							});
+		        		}
+		        	}
+				},
+					"user/control/question/adoptionAnswer?timestamp=" + new Date().getTime(), true,parameter);
+			}
+		</script>
+	</#if>
+	
+</@function>

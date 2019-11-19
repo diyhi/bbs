@@ -10,6 +10,7 @@ import cms.service.setting.SettingService;
 import cms.service.statistic.PageViewService;
 import cms.service.user.UserService;
 import cms.utils.JsonUtils;
+import cms.web.action.lucene.QuestionIndexManage;
 import cms.web.action.lucene.TopicIndexManage;
 import cms.web.action.user.UserLoginLogManage;
 
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Component;
 public class SettingManage {
 
 	@Resource TopicIndexManage topicIndexManage;
+	@Resource QuestionIndexManage questionIndexManage;
 	@Resource UserLoginLogManage userLoginLogManage;
 	@Resource SettingService settingService;
 	
@@ -73,6 +75,13 @@ public class SettingManage {
 		topicIndexManage.addAllTopicIndex();
 	}
 	/**
+	 * 添加全部问题索引(异步)
+	 */
+	@Async
+	public void addAllQuestionIndex(){
+		questionIndexManage.addAllQuestionIndex();
+	}
+	/**
 	 * 删除浏览量数据 (异步)
 	 * @param endTime 结束时间
 	 */
@@ -93,14 +102,14 @@ public class SettingManage {
 	/**
 	 * 读取话题编辑器允许使用标签
 	 * @return
-	 */
+	*/
 	public EditorTag readTopicEditorTag(){
 		SystemSetting systemSetting = settingService.findSystemSetting_cache();
 		if(systemSetting.getTopicEditorTag() != null && !"".equals(systemSetting.getTopicEditorTag().trim())){
 			return JsonUtils.toObject(systemSetting.getTopicEditorTag(), EditorTag.class);
 		}
 		return null;
-	}
+	} 
 	
 	/**
 	 * 读取评论编辑器允许使用标签
@@ -114,7 +123,29 @@ public class SettingManage {
 		return null;
 	}
 	
+	/**
+	 * 读取问题编辑器允许使用标签
+	 * @return
+	 */
+	public EditorTag readQuestionEditorTag(){
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.getQuestionEditorTag() != null && !"".equals(systemSetting.getQuestionEditorTag().trim())){
+			return JsonUtils.toObject(systemSetting.getQuestionEditorTag(), EditorTag.class);
+		}
+		return null;
+	}
 	
+	/**
+	 * 读取答案编辑器允许使用标签
+	 * @return
+	 */
+	public EditorTag readAnswerEditorTag(){
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.getAnswerEditorTag() != null && !"".equals(systemSetting.getAnswerEditorTag().trim())){
+			return JsonUtils.toObject(systemSetting.getAnswerEditorTag(), EditorTag.class);
+		}
+		return null;
+	}
 
 	
 	/**  

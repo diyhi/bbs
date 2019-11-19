@@ -1,0 +1,42 @@
+<#--  问题标签列表 -->
+<#--  适用问题列表 -->
+<#--  调用的页面需引入js/jquery/readmore2.js -->
+<@function>
+	<div class="questionTabModule">
+		<div class="questionTab-box" >
+			<div id="questionTabNavigation">
+				<a href="${baseURI}" <#if url_questionTagId == ''> class='tab_current'<#else> class='tab'</#if>>全部</a>
+				<#list questionRelated_questionTag_collection as questionTag>	
+					<#--  仅显示最后一级标签 -->
+					<#if questionTag.childTag?size == 0>
+						<a href="${baseURI}?questionTagId=${questionTag.id}"  <#if questionTag.id == url_questionTagId> class='tab_current'<#else> class='tab'</#if>>${questionTag.name}</a>
+					
+					<#else>
+						<#list questionTag.childTag as childQuestionTag>	
+							<a href="${baseURI}?questionTagId=${childQuestionTag.id}"  <#if childQuestionTag.id == url_questionTagId> class='tab_current'<#else> class='tab'</#if>>${childQuestionTag.name}</a>
+						</#list>	
+					</#if>
+					
+				</#list>		
+			</div>
+		</div>
+		<div id="questionTabNavigation_more" class="more"></div>
+	</div>	
+	<script type="text/javascript">
+	$(document).ready(function () {
+		//隐藏高度超过100px的内容
+		$('#questionTabNavigation').readmore({
+			speed: 100,//速度
+			collapsedHeight: 42,//默认高度
+			moreLink: '<div class="readMore">更多 <i class="cms-angle-down"></i></div>',
+			bindLink: '#questionTabNavigation_more',
+			rootElement: '.questionTabModule',
+			afterToggle: function(trigger, element, expanded) {
+
+			}
+		});
+		
+		
+	});
+	</script>
+</@function>	

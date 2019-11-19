@@ -6,6 +6,7 @@ package cms.bean.user;
  */
 public enum ResourceGroupEnum {
 	TAG("标签", 1000000,20), 
+	QUESTION("问答", 10000000,10), 
 	UPLOAD("上传",  2000000,10),
 	FAVORITE("收藏", 3000000,10),
 	LIKE("点赞", 4000000,10),

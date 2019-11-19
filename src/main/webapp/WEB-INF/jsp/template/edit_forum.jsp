@@ -196,6 +196,63 @@ function transferPrameterTagSite(parameter){
 </script>
 
 
+<!-- 问题标签 -->
+<script language="JavaScript" type="text/javascript">
+//弹出标签选择层
+function showQuestionTagPageDiv(tableName){
+	var div = "<div id='divMessage'></div>";
+	systemLayerShow("选择标签",div,700,400);//显示层
+	//显示标签
+	queryQuestionTagPage(1,-1,tableName);
+}
+
+//显示标签
+function queryQuestionTagPage(pages,parentId,tableName){
+	get_request(function(value){$("#divMessage").html(value);},
+		 "${config:url(pageContext.request)}control/questionTag/manage${config:suffix()}?method=questionTagPage&module=forum&page="+pages+"&parentId="+parentId+"&tableName="+tableName+"&timestamp=" + new Date().getTime(), true);
+}
+
+//添加标签
+function addQuestionTag(id,name,tableName){
+	document.getElementById(tableName+"_tagId").value= id; 
+	document.getElementById(tableName+"_tagName").value = name;
+	//关闭层
+	systemLayerClose();
+
+}
+//取消标签
+function cancelQuestionTag(tableName){
+	document.getElementById(tableName+"_tagId").value= ""; 
+	document.getElementById(tableName+"_tagName").value = "";
+	//关闭层
+	systemLayerClose();
+}
+
+//传递参数标签设置
+function transferPrameterQuestionTagSite(parameter){
+	var transferPrameter = document.getElementById(parameter+"_transferPrameter");
+	if(transferPrameter.checked){
+		document.getElementById(parameter+"_tagName").style.display='none';
+		document.getElementById(parameter+"_select").style.display='none';
+		document.getElementById(parameter+"_cancel").style.display='none';
+	}else{
+		document.getElementById(parameter+"_tagName").style.display='';
+		document.getElementById(parameter+"_select").style.display='';
+		document.getElementById(parameter+"_cancel").style.display='';
+	}
+}
+//传递过滤条件设置
+function transferPrameterFilterConditionSetting(parameter){
+	var transferPrameter = document.getElementById(parameter+"_transferPrameter");
+	if(transferPrameter.checked){
+		document.getElementById(parameter+"_select").style.display='none';
+	}else{
+		document.getElementById(parameter+"_select").style.display='';
+	}
+
+}
+</script>
+
 <!-- 广告部分 -->
 <script language="JavaScript" type="text/javascript">
 
@@ -694,6 +751,120 @@ function delete_searchWord_row(rowId){
 	</TABLE>
 	</div>
 	
+	<!-- 问题部分--问题列表  分页-->
+	<div id="related_question_分页" name="forumType_div" style="DISPLAY: none">
+		<enhance:out escapeXml="false">
+		<input type="hidden" id="page_Forum_QuestionRelated_Question_Json" value="<c:out value="${page_Forum_QuestionRelated_Question}"></c:out>">
+		</enhance:out>
+		<TABLE class="t-table" cellSpacing="1" cellPadding="2" width="100%" border="0">
+		 	<TBODY>
+		 		<TR>
+					<TD class="t-label t-label-h" width="16%">选择标签：</TD>
+					<TD class=t-content width="84%" colSpan=3>
+						<input type="hidden" id="page_question_tag_tagId" name="page_question_tagId" value=""/>
+	    				<input type="text" class="form-text" id="page_question_tag_tagName" disabled="true" size="20" value=""/> 
+	    				<input type="button" class="functionButton5" id="page_question_tag_select"  value="选择..." onClick="showQuestionTagPageDiv('page_question_tag');">
+						<input type="button" class="functionButton5" id="page_question_tag_cancel" onclick="cancelQuestionTag('page_question_tag');" value="取消标签" >
+						<label><input type="checkbox" id="page_question_tag_transferPrameter" name="page_question_tag_transferPrameter" onclick="transferPrameterQuestionTagSite('page_question_tag');" value="true" >传递标签参数</label>
+					</TD>
+				</TR>
+				<TR>
+					<TD class="t-label t-label-h" width="16%">过滤条件：</TD>
+					<TD class=t-content width="84%" colSpan=3>
+						<select class="form-select" id=page_question_filterCondition_select name=page_question_filterCondition>
+							<option value="10" >全部</option>
+							<option value="20" >未解决</option>
+							<option value="30" >已解决</option>
+							<option value="40" >积分悬赏</option>
+							<option value="50" >现金悬赏</option>
+						</select>
+						<label><input type="checkbox" id="page_question_filterCondition_transferPrameter" name="page_question_filterCondition_transferPrameter" onclick="transferPrameterFilterConditionSetting('page_question_filterCondition');" value="true" >传递过滤参数</label>
+						<SPAN class="span-help">选择'传递过滤参数'时接收参数字段为filterCondition，全部：值为空或10 &nbsp; 未解决：20 &nbsp; 已解决：30 &nbsp; 积分悬赏：40 &nbsp; 现金悬赏：50</SPAN>
+					</TD>
+				</TR>
+				<TR>
+					<TD class="t-label t-label-h" width="16%">排序：</TD>
+					<TD class=t-content width="84%" colSpan=3>
+						<SELECT class="form-select" id=page_question_sort name=page_question_sort>
+						<OPTION value="1" >按发表时间 新-&gt;旧</OPTION>
+						<OPTION value="2" >按发表时间 旧-&gt;新</OPTION>
+						<OPTION value="3" >按回答时间 新-&gt;旧</OPTION>
+						<OPTION value="4" >按回答时间 旧-&gt;新</OPTION>
+						</SELECT>
+					</TD>
+				</TR>
+				<TR>
+					<TD class="t-label t-label-h" width="16%">每页显示记录数：</TD>
+					<TD class=t-content width="84%" colSpan=3><INPUT class="form-text" maxLength=9 size=9 id=page_question_maxResult name=page_question_maxResult value="">
+					&nbsp;&nbsp;
+					<SPAN id= "error_page_question_maxResult" class="span-text"></SPAN>&nbsp;&nbsp;
+					</TD>
+				</TR>
+				<TR>
+					<TD class="t-label t-label-h" width="16%">页码显示总数：</TD>
+					<TD class=t-content width="84%" colSpan=3>
+					<INPUT class="form-text" maxLength=9 size=9 id=page_question_pageCount name=page_question_pageCount value="">
+					&nbsp;&nbsp;
+					<SPAN id="error_page_question_pageCount" class="span-text"></SPAN>
+					</TD>
+				</TR>
+				
+			</TBODY>
+		</TABLE>
+	</div>
+	<!-- 答案部分--答案列表  分页-->
+	<div id="related_answer_分页" name="forumType_div" style="DISPLAY: none">
+	<enhance:out escapeXml="false">
+	<input type="hidden" id="page_Forum_AnswerRelated_Answer_Json" value="<c:out value="${page_Forum_AnswerRelated_Answer}"></c:out>">
+	</enhance:out>
+	<TABLE class="t-table" cellSpacing="1" cellPadding="2" width="100%" border="0">
+	 	<TBODY>
+			<TR>
+				<TD class="t-label t-label-h" width="16%">排序：</TD>
+				<TD class=t-content width="84%" colSpan=3>
+					<SELECT class="form-select" id=page_answer_sort name=page_answer_sort>
+					<OPTION value="1" >按回答时间 新-&gt;旧</OPTION>
+					<OPTION value="2" >按回答时间 旧-&gt;新</OPTION>
+					</SELECT>
+				</TD>
+			</TR>
+			<TR>
+				<TD class="t-label t-label-h" width="16%">每页显示记录数：</TD>
+				<TD class=t-content width="84%" colSpan=3><INPUT class="form-text" maxLength=9 size=9 id=page_answer_maxResult name=page_answer_maxResult value="">
+				&nbsp;&nbsp;
+				<SPAN id= "error_page_answer_maxResult" class="span-text"></SPAN>&nbsp;&nbsp;
+				</TD>
+			</TR>
+			<TR>
+				<TD class="t-label t-label-h" width="16%">页码显示总数：</TD>
+				<TD class=t-content width="84%" colSpan=3>
+				<INPUT class="form-text" maxLength=9 size=9 id=page_answer_pageCount name=page_answer_pageCount value="">
+				&nbsp;&nbsp;
+				<SPAN id="error_page_answer_pageCount" class="span-text"></SPAN>
+				</TD>
+			</TR>
+		</TBODY>
+	</TABLE>
+	</div>
+	<!-- 问题部分--相似问题  集合-->
+	<div id="related_likequestion_集合" name="forumType_div" style="DISPLAY: none">
+		<enhance:out escapeXml="false">
+		<input type="hidden" id="collection_Forum_QuestionRelated_LikeQuestion_Json" value="<c:out value="${collection_Forum_QuestionRelated_LikeQuestion}"></c:out>">
+		</enhance:out>
+		<TABLE class="t-table" cellSpacing="1" cellPadding="2" width="100%" border="0">
+		 	<TBODY>
+				<TR>
+					<TD class="t-label t-label-h" width="16%">显示记录数：</TD>
+					<TD class=t-content width="84%" colSpan=3><INPUT class="form-text" maxLength=9 size=9 id=collection_likeQuestion_maxResult name=collection_likeQuestion_maxResult value="">
+					&nbsp;&nbsp;
+					<SPAN id= "error_collection_likeQuestion_maxResult" class="span-text"></SPAN>&nbsp;&nbsp;
+					</TD>
+				</TR>	
+			</TBODY>
+		</TABLE>
+	</div>
+	
+	
 	<!-- 广告部分--图片广告 -->
 	<div id="related_image_集合" name="forumType_div" style="DISPLAY: none">
 		<enhance:out escapeXml="false">
@@ -1001,6 +1172,137 @@ function echo_comment_page(error_map){
 	}
 	
 }
+
+//回显  问题部分--问题列表--分页
+function echo_question_page(error_map){
+	var page_Forum_QuestionRelated_Question_Json = document.getElementById("page_Forum_QuestionRelated_Question_Json").value;
+	if(page_Forum_QuestionRelated_Question_Json != ""){
+		var page_Forum_QuestionRelated_Question = JSON.parse(page_Forum_QuestionRelated_Question_Json);
+		if(page_Forum_QuestionRelated_Question != null){
+			//标签Id
+			if(page_Forum_QuestionRelated_Question.question_tagId != null){
+				document.getElementById("page_question_tag_tagId").value = page_Forum_QuestionRelated_Question.question_tagId;
+			}
+			//标签名称
+			if(page_Forum_QuestionRelated_Question.question_tagName != null){
+				document.getElementById("page_question_tag_tagName").value = page_Forum_QuestionRelated_Question.question_tagName;
+			}
+			
+			//是否传递标签参数
+			if(page_Forum_QuestionRelated_Question.question_tag_transferPrameter == true){
+				//选中
+				document.getElementById("page_question_tag_transferPrameter").checked = true;
+				transferPrameterTagSite('page_question_tag');
+			}
+			//过滤条件
+			var page_question_filterCondition = document.getElementById("page_question_filterCondition_select");
+			for(var i =0; i<page_question_filterCondition.length; i++){    
+				if(page_question_filterCondition[i].value == page_Forum_QuestionRelated_Question.question_filterCondition){
+					page_question_filterCondition[i].selected = true;
+				}   
+    		}
+			
+			//是否传递过滤条件参数
+			if(page_Forum_QuestionRelated_Question.question_filterCondition_transferPrameter == true){
+				//选中
+				document.getElementById("page_question_filterCondition_transferPrameter").checked = true;
+				transferPrameterFilterConditionSetting('page_question_filterCondition');
+			}
+
+			//每页显示记录数
+			if(page_Forum_QuestionRelated_Question.question_maxResult != null){
+				document.getElementById("page_question_maxResult").value = page_Forum_QuestionRelated_Question.question_maxResult;
+			}
+			//页码显示总数
+			if(page_Forum_QuestionRelated_Question.question_pageCount != null){
+				document.getElementById("page_question_pageCount").value = page_Forum_QuestionRelated_Question.question_pageCount;
+			}
+			
+			//排序
+			var page_question_sort = document.getElementById("page_question_sort");
+			for(var i =0; i<page_question_sort.length; i++){    
+				if(page_question_sort[i].value == page_Forum_QuestionRelated_Question.question_sort){
+					page_question_sort[i].selected = true;
+				}   
+    		}
+    		
+    		//显示错误提示
+			//每页显示记录数
+			if(error_map.get("page_question_maxResult") != null){
+				document.getElementById("error_page_question_maxResult").innerHTML = error_map.get("page_question_maxResult");
+			}
+			//页码显示总数
+			if(error_map.get("page_question_pageCount") != null){
+				document.getElementById("error_page_question_pageCount").innerHTML = error_map.get("page_question_pageCount");
+			}
+		}
+	}
+	
+}
+//回显  答案部分--答案列表--集合
+function echo_answer_page(error_map){
+	var page_Forum_AnswerRelated_Answer_Json = document.getElementById("page_Forum_AnswerRelated_Answer_Json").value;
+	
+	if(page_Forum_AnswerRelated_Answer_Json != ""){
+		
+		var page_Forum_AnswerRelated_Answer = JSON.parse(page_Forum_AnswerRelated_Answer_Json);
+		
+		if(page_Forum_AnswerRelated_Answer != null){
+
+			//每页显示记录数
+			if(page_Forum_AnswerRelated_Answer.answer_maxResult != null){
+				document.getElementById("page_answer_maxResult").value = page_Forum_AnswerRelated_Answer.answer_maxResult;
+			}
+			//页码显示总数
+			if(page_Forum_AnswerRelated_Answer.answer_pageCount != null){
+				document.getElementById("page_answer_pageCount").value = page_Forum_AnswerRelated_Answer.answer_pageCount;
+			}
+			
+			//排序
+			var page_answer_sort = document.getElementById("page_answer_sort");
+			for(var i =0; i<page_answer_sort.length; i++){    
+				if(page_answer_sort[i].value == page_Forum_AnswerRelated_Answer.answer_sort){
+					page_answer_sort[i].selected = true;
+				}   
+    		}
+    		
+    		//显示错误提示
+			//每页显示记录数
+			if(error_map.get("page_answer_maxResult") != null){
+				document.getElementById("error_page_answer_maxResult").innerHTML = error_map.get("page_answer_maxResult");
+			}
+			//页码显示总数
+			if(error_map.get("page_answer_pageCount") != null){
+				document.getElementById("error_page_answer_pageCount").innerHTML = error_map.get("page_answer_pageCount");
+			}
+		}
+	}
+	
+}
+//回显  问题部分--相似问题--集合
+function echo_likeQuestion_collection(error_map){
+	var collection_Forum_QuestionRelated_LikeQuestion_Json = document.getElementById("collection_Forum_QuestionRelated_LikeQuestion_Json").value;
+	if(collection_Forum_QuestionRelated_LikeQuestion_Json != ""){
+		var collection_Forum_QuestionRelated_LikeQuestion = JSON.parse(collection_Forum_QuestionRelated_LikeQuestion_Json);
+		if(collection_Forum_QuestionRelated_LikeQuestion != null){
+			
+			//显示记录数
+			if(collection_Forum_QuestionRelated_LikeQuestion.likeQuestion_maxResult != null){
+				document.getElementById("collection_likeQuestion_maxResult").value = collection_Forum_QuestionRelated_LikeQuestion.likeQuestion_maxResult;
+			}
+			
+    		
+    		//显示错误提示
+			//每页显示记录数
+			if(error_map.get("collection_likeQuestion_maxResult") != null){
+				document.getElementById("error_collection_likeQuestion_maxResult").innerHTML = error_map.get("collection_likeQuestion_maxResult");
+			}
+		}
+	}
+
+
+}
+
 //回显  广告部分--轮播广告--单层
 function echo_image_collection(error_map){
 	//读取回显参数
@@ -1229,6 +1531,12 @@ function init(){
 	//回显  评论 部分--评论 列表--分页
 	echo_comment_page(error_map);
 	
+	//回显  问题部分--问题列表--分页
+	echo_question_page(error_map);
+	//回显  答案部分--答案列表--分页
+	echo_answer_page(error_map);
+	//回显  问题部分--相似问题--集合
+	echo_likeQuestion_collection(error_map);
 	
 	//回显  广告部分--图片广告--集合
 	echo_image_collection(error_map);

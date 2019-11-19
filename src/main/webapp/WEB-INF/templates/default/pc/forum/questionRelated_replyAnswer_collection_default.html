@@ -1,0 +1,212 @@
+<#--  回复答案 -->
+<@function>
+	<#--  返回Map<String,Object>类型 -->
+	<#assign returnValue = questionRelated_replyAnswer_collection>
+	
+	<#--  全局允许提交回复 -->
+	<#if returnValue['allowReply'] == true>
+	<div class="answerReply-formModule">
+		<div class="addReply-wrap">
+			<form id="${identificationNumber}_addReplyAnswerForm" action="user/control/answer/addAnswerReply" method="post">
+				
+				<#-- 提交后跳转参数  参数必须经过encodeBase64URL编码后才能提交 不填写时默认跳转回当前页 -->
+				<input type="hidden" id="jumpUrl" name="jumpUrl" value="">
+				<textarea class="reply-textarea" onfocus="" id="${identificationNumber}_replyAnswerContent" name="content" placeholder="写下您的回复"></textarea>
+				
+				<span id="${identificationNumber}_content_error" class="error">${(error['content'])!}</span> 
+				<span id="${identificationNumber}_reply_error" class="error">${error['answerReply']}</span>
+				<div class="form-action">
+					<#-- 获取评论Id -->
+					<input type="hidden" id="${identificationNumber}_answerId" name="answerId" value="${url_answerId}">
+					<#-- 获取令牌 -->
+					<input type="hidden" id="token" name="token" value="${token!}">
+					
+					<div class="answerSubmit">
+						<span class="submitButton-box" >
+							<button type="button" class="submitButton" onClick="javascript:ajax_sureSubmit('${identificationNumber}')">提交</button>
+						</span>
+						<!-- 调用方法在questionRelated_answer_page页 -->
+						<span class="cancelButton-box" >
+							<button type="button" class="cancelButton" onClick="javascript:cancelReply('${url_answerId}')">取消</button>
+						</span>
+					</div>
+					<#-- identificationNumber:识别号：用来区别每次请求 -->
+					<#-- 验证码 -->
+					<#if returnValue['captchaKey'] != "">	
+					<div class="captchaModule">
+						<div class="captcha_div">
+							<div class="captchaBox">
+								<input type="hidden" id="${identificationNumber}_captchaKey" name="captchaKey" value="${(returnValue['captchaKey'])!}">
+								<input id="${identificationNumber}_captchaValue" name="captchaValue" type="text" maxLength="5" autocomplete="off" tabindex="3" onfocus="inputBoxTip_click(this);" onblur="inputBoxTip_leave('${identificationNumber}',this);"/>
+								<label class="promptTag" id="${identificationNumber}_captchaValueBoxTip"  for="captchaValue">验证码</label>
+							</div>
+							<a class="captchaImage" href="javascript:void(0);" >
+								<img id="${identificationNumber}_captcha" src="captcha/${(returnValue['captchaKey'])!}.jpg" onClick="replaceCaptcha('${identificationNumber}');" tabindex="4" />
+							</a>
+							<a  href="javascript:void(0);" onClick="replaceCaptcha('${identificationNumber}');" tabindex="5">换一幅</a>
+						</div>
+						<p class="tips">
+							
+							<#-- 验证码错误 -->
+							<span id="${identificationNumber}_captchaValue_error">${(error['captchaValue'])!}</span>
+							
+						</p>
+					</div>
+					</#if>
+				</div>	
+				
+				
+				
+				<script language="javascript" type="text/javascript">
+				
+					//点击输入框提示 
+					function inputBoxTip_click(obj){
+						document.getElementById(obj.id+"BoxTip").style.display="none";
+			
+					}
+					//离开输入框提示
+					function inputBoxTip_leave(identificationNumber,obj){
+						if(obj.value != ""){
+							document.getElementById(obj.id+"BoxTip").style.display="none";
+						}else{
+							document.getElementById(obj.id+"BoxTip").style.display="";
+						}
+						verificationCode(identificationNumber);
+					}
+				
+					//校对验证码 identificationNumber:识别号：用来区别每次请求
+					function verificationCode(identificationNumber){
+						var flag = true;
+						if( document.getElementById(identificationNumber+"_"+"captchaKey") != null){
+							
+							var captchaKey = document.getElementById(identificationNumber+"_"+"captchaKey").value;
+							var parameter = document.getElementById(identificationNumber+"_"+"captchaValue").value;
+							if(parameter != ""){
+							
+								var parameter_trim = trim(parameter);
+								if(parameter_trim != ""){
+									//ajax使用同步提交
+									get_request(function(value){
+						            	if(value == "false"){
+						            	
+							            	document.getElementById(identificationNumber+"_"+"captchaValue_error").innerHTML = "验证码错误";
+							            	flag = false;
+						            	}
+						            },
+								 		"checkCaptcha.htm?captchaKey="+captchaKey+"&captchaValue="+parameter_trim+"&timestamp=" + new Date().getTime(), false);
+						            	
+								}else{
+									document.getElementById(identificationNumber+"_"+"captchaValue_error").innerHTML = "验证码不能为空";
+									flag = false;
+								}
+							}else{
+								document.getElementById(identificationNumber+"_"+"captchaValue_error").innerHTML = "验证码不能为空";
+								flag = false;
+							}
+							if(flag == true){
+								document.getElementById(identificationNumber+"_"+"captchaValue_error").innerHTML = "";
+							}
+						}
+				
+						return flag;
+					}
+					//更换验证码
+					function replaceCaptcha(identificationNumber){
+						var captchaKey = document.getElementById(identificationNumber+"_"+"captchaKey").value;
+						document.getElementById(identificationNumber+"_"+"captcha").src = "captcha/"+captchaKey+".jpg?" + Math.random(); 
+					}
+				
+					//表单Form方式提交
+					function sureSubmit(obj){
+						obj.submit();
+					} 
+					//Ajax方式提交
+					function ajax_sureSubmit(identificationNumber){
+						if(verificationCode() == true){
+							var parameter = "";
+							//答案Id
+							parameter += "&answerId="+document.getElementById(identificationNumber+"_answerId").value;
+							//获取令牌
+							parameter += "&token="+document.getElementById("token").value;
+							
+							//获取验证码key
+							var captchaKey = document.getElementById(identificationNumber+"_captchaKey");
+							if(captchaKey != null){
+								parameter += "&captchaKey="+captchaKey.value;
+							}
+							
+							//获取验证码value
+							var captchaValue = document.getElementById(identificationNumber+"_captchaValue");
+							if(captchaValue != null){
+								parameter += "&captchaValue="+captchaValue.value;
+							}
+							
+							//获取内容
+							var content = document.getElementById(identificationNumber+"_replyAnswerContent").value;
+							parameter += "&content="+encodeURIComponent(content);
+						
+						   	//删除第一个&号,防止因为多了&号而出现警告: Parameters: Invalid chunk ignored.信息
+							if(parameter.indexOf("&") == 0){
+								parameter = parameter.substring(1,parameter.length);
+							}
+						   	post_request(function(value){
+								var data = JSON.parse(value);
+						
+								for(var returnValue in data){
+									
+									if(returnValue == "success"){
+					        			if(data[returnValue] == "true"){
+					        				//需引入layer
+					        				layer.msg('提交成功,3秒后自动刷新本页', 
+												{
+												  time: 3000 //3秒关闭（如果不配置，默认是3秒）
+												},function(){//关闭后的操作
+													//刷新页面
+					        						document.location.reload();
+												}
+											);
+					        			}
+					        		}else if(returnValue == "error"){
+					        			
+					        			var error = data[returnValue];
+					        			for(var key in error){
+					        				var error_html = document.getElementById(identificationNumber+"_"+key+"_error");
+	
+					        				if(error_html != null){
+					        					error_html.innerHTML = error[key];
+					        				}
+					        				
+					        			}
+					        		}else if(returnValue == "captchaKey"){//显示验证码
+			        					
+										var captchaKey = data[returnValue];
+										if(captchaKey != ""){
+											//设置验证码Key
+											if(document.getElementById(identificationNumber+"_"+"captchaKey")!= null){
+			
+												document.getElementById(identificationNumber+"_"+"captchaKey").value = captchaKey;
+												//设置验证码图片
+												replaceCaptcha(identificationNumber);
+											}	
+										}
+									}
+					        	}
+							},
+								"user/control/answer/addAnswerReply.htm?timestamp=" + new Date().getTime(), true,parameter);
+						}
+					} 
+				</script>
+			</form>
+		</div>
+	</div>
+	<#else>
+		<#-- 不允许回复答案 -->
+		<div class="answerReply-disableFormModule">
+			<div class="disableForm-wrap">
+				<div class="respond">
+					<p>不允许回复答案</p>
+				</div>
+			</div>
+		</div>
+	</#if>
+</@function>

@@ -439,5 +439,29 @@ public class FollowServiceBean extends DaoSupport<Follow> implements FollowServi
 		return count;
 	}
 	
-	
+	/**
+	 * 根据用户名称查询关注数量
+	 * @param userId 用户Id
+	 * @param userName 用户名称
+	 * @return
+	 */
+	@Transactional(readOnly=true, propagation=Propagation.NOT_SUPPORTED)
+	public Long findFollowCountByUserName(Long userId,String userName){
+		Long count = 0L;
+		//表编号
+		int tableNumber = followConfig.userIdRemainder(userId);
+		Query query  = null;
+		
+		if(tableNumber == 0){//默认对象
+			query = em.createQuery("select count(o) from Follow o where o.userName=?1");
+			query.setParameter(1, userName);
+			count = (Long)query.getSingleResult();
+			
+		}else{//带下划线对象
+			query = em.createQuery("select count(o) from Follow_"+tableNumber+" o where o.userName=?1");
+			query.setParameter(1, userName);
+			count = (Long)query.getSingleResult();
+		}
+		return count;
+	}
 }

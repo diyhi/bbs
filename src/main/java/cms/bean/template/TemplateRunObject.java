@@ -25,6 +25,11 @@ public class TemplateRunObject implements Serializable{
 	private Map<String,Object> runtimeParameter = new HashMap<String,Object>();
 	
 	
+	/** 分页参数 
+	private Integer page;**/
+	/** '更多'版块 
+	private Forum more_forum;**/
+	
 	/**
 	 * 添加布局文件名称
 	 * @param layoutFile 布局文件名称

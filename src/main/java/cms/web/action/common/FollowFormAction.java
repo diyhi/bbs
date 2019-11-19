@@ -143,6 +143,7 @@ public class FollowFormAction {
 				followManage.delete_cache_findById(follow.getId());
 				followerManage.delete_cache_followerCount(user.getUserName());
 				followManage.delete_cache_findAllFollow(accessUser.getUserName());
+				followManage.delete_cache_followCount(accessUser.getUserName());
 				
 				if(user != null && !user.getId().equals(accessUser.getUserId())){//会员关注自已不发提醒给自己
 					

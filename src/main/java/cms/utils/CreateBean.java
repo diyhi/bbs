@@ -681,8 +681,14 @@ public class CreateBean {
 	        AnnotationMemberValue annotationMemberValue_c = new AnnotationMemberValue(cp);
 	        annotationMemberValue_c.setValue(index_c);
 	        
+	        Annotation index_d = new Annotation("javax.persistence.Index", cp);
+	        index_d.addMemberValue("name", new StringMemberValue("remind_4_idx", cp));
+	        index_d.addMemberValue("columnList", new StringMemberValue("questionId", cp));
+	        AnnotationMemberValue annotationMemberValue_d = new AnnotationMemberValue(cp);
+	        annotationMemberValue_d.setValue(index_d);
+	        
 
-	        MemberValue[] vals = new MemberValue[]{annotationMemberValue,annotationMemberValue_b,annotationMemberValue_c};
+	        MemberValue[] vals = new MemberValue[]{annotationMemberValue,annotationMemberValue_b,annotationMemberValue_c,annotationMemberValue_d};
 
 	        ArrayMemberValue arrayMemberValue=new ArrayMemberValue(cp);//数组类型
 	        arrayMemberValue.setValue(vals);
@@ -1135,27 +1141,16 @@ public class CreateBean {
 	        index_a.addMemberValue("columnList", new StringMemberValue("userName,status,postTime", cp));
 	        AnnotationMemberValue annotationMemberValue = new AnnotationMemberValue(cp);
 	        annotationMemberValue.setValue(index_a);
+	       
+	        Annotation index_e = new Annotation("javax.persistence.Index", cp);
+	        index_e.addMemberValue("name", new StringMemberValue("userDynamic_5_idx", cp));
+	        index_e.addMemberValue("columnList", new StringMemberValue("functionIdGroup,userName,module", cp));
+	        AnnotationMemberValue annotationMemberValue_e = new AnnotationMemberValue(cp);
+	        annotationMemberValue_e.setValue(index_e);
 	        
-	        Annotation index_b = new Annotation("javax.persistence.Index", cp);
-	        index_b.addMemberValue("name", new StringMemberValue("userDynamic_2_idx", cp));
-	        index_b.addMemberValue("columnList", new StringMemberValue("topicId,userName,module", cp));
-	        AnnotationMemberValue annotationMemberValue_b = new AnnotationMemberValue(cp);
-	        annotationMemberValue_b.setValue(index_b);
-	        
-	        Annotation index_c = new Annotation("javax.persistence.Index", cp);
-	        index_c.addMemberValue("name", new StringMemberValue("userDynamic_3_idx", cp));
-	        index_c.addMemberValue("columnList", new StringMemberValue("commentId,userName,module", cp));
-	        AnnotationMemberValue annotationMemberValue_c = new AnnotationMemberValue(cp);
-	        annotationMemberValue_c.setValue(index_c);
-	        
-	        Annotation index_d = new Annotation("javax.persistence.Index", cp);
-	        index_d.addMemberValue("name", new StringMemberValue("userDynamic_4_idx", cp));
-	        index_d.addMemberValue("columnList", new StringMemberValue("replyId,userName,module", cp));
-	        AnnotationMemberValue annotationMemberValue_d = new AnnotationMemberValue(cp);
-	        annotationMemberValue_d.setValue(index_d);
-	        
+	      
 
-	        MemberValue[] vals = new MemberValue[]{annotationMemberValue,annotationMemberValue_b,annotationMemberValue_c,annotationMemberValue_d};
+	        MemberValue[] vals = new MemberValue[]{annotationMemberValue,annotationMemberValue_e};
 
 
 	        ArrayMemberValue arrayMemberValue=new ArrayMemberValue(cp);//数组类型

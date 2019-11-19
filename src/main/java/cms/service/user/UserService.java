@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
+
 import cms.bean.QueryResult;
 import cms.bean.user.DisableUserName;
 import cms.bean.user.PointLog;
@@ -286,18 +287,21 @@ public interface UserService extends DAO<User> {
 	 * 修改评论状态
 	 * @param userId 用户Id
 	 * @param userName 用户名称
+	 * @param topicId 话题Id
 	 * @param commentId 评论Id
 	 * @param status 状态
 	 */
-	public Integer updateUserDynamicCommentStatus(Long userId,String userName,Long commentId,Integer status);
+	public Integer updateUserDynamicCommentStatus(Long userId,String userName,Long topicId,Long commentId,Integer status);
 	/**
 	 * 修改回复状态
 	 * @param userId 用户Id
 	 * @param userName 用户名称
+	 * @param topicId 话题Id
+	 * @param commentId 评论Id
 	 * @param replyId 回复Id
 	 * @param status 状态
 	 */
-	public Integer updateUserDynamicReplyStatus(Long userId,String userName,Long replyId,Integer status);
+	public Integer updateUserDynamicReplyStatus(Long userId,String userName,Long topicId,Long commentId,Long replyId,Integer status);
 	/**
 	 * 根据话题Id软删除用户动态
 	 * @param userId 用户Id
@@ -319,16 +323,81 @@ public interface UserService extends DAO<User> {
 	public Integer deleteUserDynamicByTopicId(Long topicId);
 	/**
 	 * 根据评论Id删除用户动态(评论下的回复也同时删除)
+	 * @param topicId 话题Id
 	 * @param commentId 评论Id
 	 */
-	public Integer deleteUserDynamicByCommentId(Long commentId);
+	public Integer deleteUserDynamicByCommentId(Long topicId,Long commentId);
 	/**
 	 * 根据回复Id删除用户动态
 	 * @param userId 用户Id
-	 * @param userName 用户名称
+	 * @param topicId 话题Id
 	 * @param commentId 评论Id
+	 * @param replyId 回复Id
 	 */
-	public Integer deleteUserDynamicByReplyId(Long userId,Long replyId);
+	public Integer deleteUserDynamicByReplyId(Long userId,Long topicId,Long commentId,Long replyId);
+	
+	/**
+	 * 修改问题状态
+	 * @param userId 用户Id
+	 * @param userName 用户名称
+	 * @param questionId 问题Id
+	 * @param status 状态
+	 */
+	public Integer updateUserDynamicQuestionStatus(Long userId,String userName,Long questionId,Integer status);
+	/**
+	 * 修改答案状态
+	 * @param userId 用户Id
+	 * @param userName 用户名称
+	 * @param questionId 问题Id
+	 * @param commentId 评论Id
+	 * @param status 状态
+	 */
+	public Integer updateUserDynamicAnswerStatus(Long userId,String userName,Long questionId,Long answerId,Integer status);
+	/**
+	 * 修改答案回复状态
+	 * @param userId 用户Id
+	 * @param userName 用户名称
+	 * @param questionId 问题Id
+	 * @param answerId 答案Id
+	 * @param answerReplyId 答案回复Id
+	 * @param status 状态
+	 */
+	public Integer updateUserDynamicAnswerReplyStatus(Long userId,String userName,Long questionId,Long answerId,Long answerReplyId,Integer status);
+	/**
+	 * 根据问题Id软删除用户动态
+	 * @param userId 用户Id
+	 * @param userName 用户名称
+	 * @param questionId 问题Id
+	 */
+	public Integer softDeleteUserDynamicByQuestionId(Long userId,String userName,Long questionId);
+	
+	/**
+	 * 根据问题Id还原用户动态
+	 * @param userId 用户Id
+	 * @param userName 用户名称
+	 * @param questionId 问题Id
+	 */
+	public Integer reductionUserDynamicByQuestionId(Long userId,String userName,Long questionId);
+	/**
+	 * 根据问题Id删除用户动态(问题下的答案和回复也同时删除)
+	 * @param questionId 问题Id
+	 */
+	public Integer deleteUserDynamicByQuestionId(Long questionId);
+	
+	/**
+	 * 根据答案Id删除用户动态(答案下的回复也同时删除)
+	 * @param questionId 问题Id
+	 * @param answerId 答案Id
+	 */
+	public Integer deleteUserDynamicByAnswerId(Long questionId,Long answerId);
+	/**
+	 * 根据答案回复Id删除用户动态
+	 * @param userId 用户Id
+	 * @param questionId 问题Id
+	 * @param answerId 答案Id
+	 * @param answerReplyId 答案回复Id
+	 */
+	public Integer deleteUserDynamicByAnswerReplyId(Long userId,Long questionId,Long answerId,Long answerReplyId);
 	/**
 	 * 用户动态分页
 	 * @param userId 用户Id

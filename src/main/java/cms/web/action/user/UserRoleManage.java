@@ -173,7 +173,7 @@ public class UserRoleManage {
 	
 	/**
 	 * 查询用户角色名称(排除默认角色)
-	 * @param tagId 标签Id
+	 * @param userName 用户名称
 	 * @return
 	 */
 	public List<String> queryUserRoleName(String userName){

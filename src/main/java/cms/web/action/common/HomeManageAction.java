@@ -48,6 +48,11 @@ import cms.bean.message.SubscriptionSystemNotify;
 import cms.bean.message.SystemNotify;
 import cms.bean.message.UnreadMessage;
 import cms.bean.payment.PaymentLog;
+import cms.bean.question.Answer;
+import cms.bean.question.AnswerReply;
+import cms.bean.question.Question;
+import cms.bean.question.QuestionTag;
+import cms.bean.question.QuestionTagAssociation;
 import cms.bean.setting.SystemSetting;
 import cms.bean.topic.Comment;
 import cms.bean.topic.HideTagType;
@@ -77,6 +82,9 @@ import cms.service.message.PrivateMessageService;
 import cms.service.message.RemindService;
 import cms.service.message.SystemNotifyService;
 import cms.service.payment.PaymentService;
+import cms.service.question.AnswerService;
+import cms.service.question.QuestionService;
+import cms.service.question.QuestionTagService;
 import cms.service.setting.SettingService;
 import cms.service.template.TemplateService;
 import cms.service.topic.CommentService;
@@ -110,6 +118,8 @@ import cms.web.action.message.PrivateMessageManage;
 import cms.web.action.message.RemindManage;
 import cms.web.action.message.SubscriptionSystemNotifyManage;
 import cms.web.action.message.SystemNotifyManage;
+import cms.web.action.question.AnswerManage;
+import cms.web.action.question.QuestionManage;
 import cms.web.action.setting.SettingManage;
 import cms.web.action.sms.SmsManage;
 import cms.web.action.thumbnail.ThumbnailManage;
@@ -184,6 +194,13 @@ public class HomeManageAction {
 	@Resource MembershipCardService membershipCardService;
 	
 	@Resource UserRoleService userRoleService;
+	
+	@Resource QuestionManage questionManage;
+	@Resource AnswerManage answerManage;
+	
+	@Resource QuestionService questionService;
+	@Resource QuestionTagService questionTagService;
+	@Resource AnswerService answerService;
 	
 	//?  匹配任何单字符
 	//*  匹配0或者任意数量的字符
@@ -3274,7 +3291,13 @@ public class HomeManageAction {
 					}
 					
 				}
-				
+				if(remind.getQuestionId() != null && remind.getQuestionId() >0L){
+					Question question = questionManage.query_cache_findById(remind.getQuestionId());//查询缓存
+					if(question != null){
+						remind.setQuestionTitle(question.getTitle());
+					}
+					
+				}
 				
 				
 			}
@@ -3770,139 +3793,141 @@ public class HomeManageAction {
 						userDynamic.setAvatarName(user.getAvatarName());
 					}
 					
-					
-					Topic topicInfo = topicManage.queryTopicCache(userDynamic.getTopicId());//查询缓存
-					if(topicInfo != null){
-						userDynamic.setTopicTitle(topicInfo.getTitle());
-						userDynamic.setTopicViewTotal(topicInfo.getViewTotal());
-						userDynamic.setTopicCommentTotal(topicInfo.getCommentTotal());
-						
-						
+					if(userDynamic.getTopicId() >0L){
+						Topic topicInfo = topicManage.queryTopicCache(userDynamic.getTopicId());//查询缓存
+						if(topicInfo != null){
+							userDynamic.setTopicTitle(topicInfo.getTitle());
+							userDynamic.setTopicViewTotal(topicInfo.getViewTotal());
+							userDynamic.setTopicCommentTotal(topicInfo.getCommentTotal());
+							
+							
 
-						List<String> topicRoleNameList = userRoleManage.queryAllowViewTopicRoleName(topicInfo.getTagId());
-						if(topicRoleNameList != null && topicRoleNameList.size() >0){
-							userDynamic.setAllowRoleViewList(topicRoleNameList);//话题允许查看的角色名称集合
-						}
-						SystemSetting systemSetting = settingService.findSystemSetting_cache();
-						//话题内容摘要MD5
-						String topicContentDigest = "";
-						//处理文件防盗链
-						if(topicInfo.getContent() != null && !"".equals(topicInfo.getContent().trim()) && systemSetting.getFileSecureLinkSecret() != null && !"".equals(systemSetting.getFileSecureLinkSecret().trim())){
-							//解析上传的文件完整路径名称
-							Map<String,String> analysisFullFileNameMap = topicManage.query_cache_analysisFullFileName(topicInfo.getContent(),topicInfo.getId());
-							if(analysisFullFileNameMap != null && analysisFullFileNameMap.size() >0){
-								
-								
-								Map<String,String> newFullFileNameMap = new HashMap<String,String>();//新的完整路径名称 key: 完整路径名称 value: 重定向接口
-								for (Map.Entry<String,String> entry : analysisFullFileNameMap.entrySet()) {
-
-									newFullFileNameMap.put(entry.getKey(), SecureLink.createRedirectLink(entry.getKey(),entry.getValue(),topicInfo.getTagId(),systemSetting.getFileSecureLinkSecret()));
-								}
-								
-								//生成处理'上传的文件完整路径名称'Id
-								String processFullFileNameId = topicManage.createProcessFullFileNameId(topicInfo.getId(),topicInfo.getLastUpdateTime(),newFullFileNameMap);
-								
-								topicInfo.setContent(topicManage.query_cache_processFullFileName(topicInfo.getContent(),"topic",newFullFileNameMap,processFullFileNameId));
-								
-								topicContentDigest = cms.utils.MD5.getMD5(processFullFileNameId);
+							List<String> topicRoleNameList = userRoleManage.queryAllowViewTopicRoleName(topicInfo.getTagId());
+							if(topicRoleNameList != null && topicRoleNameList.size() >0){
+								userDynamic.setAllowRoleViewList(topicRoleNameList);//话题允许查看的角色名称集合
 							}
-							
-							
-						}
+							SystemSetting systemSetting = settingService.findSystemSetting_cache();
+							//话题内容摘要MD5
+							String topicContentDigest = "";
+							//处理文件防盗链
+							if(topicInfo.getContent() != null && !"".equals(topicInfo.getContent().trim()) && systemSetting.getFileSecureLinkSecret() != null && !"".equals(systemSetting.getFileSecureLinkSecret().trim())){
+								//解析上传的文件完整路径名称
+								Map<String,String> analysisFullFileNameMap = topicManage.query_cache_analysisFullFileName(topicInfo.getContent(),topicInfo.getId());
+								if(analysisFullFileNameMap != null && analysisFullFileNameMap.size() >0){
+									
+									
+									Map<String,String> newFullFileNameMap = new HashMap<String,String>();//新的完整路径名称 key: 完整路径名称 value: 重定向接口
+									for (Map.Entry<String,String> entry : analysisFullFileNameMap.entrySet()) {
 
-						
-						//处理隐藏标签
-						if(userDynamic.getModule().equals(100) && topicInfo.getContent() != null && !"".equals(topicInfo.getContent().trim())){
-							//允许可见的隐藏标签
-							List<Integer> visibleTagList = new ArrayList<Integer>();
-							if(accessUser != null){
-								//如果话题由当前用户发表，则显示全部隐藏内容
-								if(topicInfo.getIsStaff() == false && topicInfo.getUserName().equals(accessUser.getUserName())){
-									visibleTagList.add(HideTagType.PASSWORD.getName());
-									visibleTagList.add(HideTagType.COMMENT.getName());
-									visibleTagList.add(HideTagType.GRADE.getName());
-									visibleTagList.add(HideTagType.POINT.getName());
-									visibleTagList.add(HideTagType.AMOUNT.getName());
-								}else{
-									//解析隐藏标签
-									Map<Integer,Object> analysisHiddenTagMap = topicManage.query_cache_analysisHiddenTag(topicInfo.getContent(),topicInfo.getId());
-									for (Map.Entry<Integer,Object> entry : analysisHiddenTagMap.entrySet()) {
-										
-										if(entry.getKey().equals(HideTagType.PASSWORD.getName())){//输入密码可见
-											//话题取消隐藏Id
-										  	String topicUnhideId = topicManage.createTopicUnhideId(accessUser.getUserId(), HideTagType.PASSWORD.getName(), userDynamic.getTopicId());
-										  
-											TopicUnhide topicUnhide = topicManage.query_cache_findTopicUnhideById(topicUnhideId);
-									  		
-									  		if(topicUnhide != null){
-									  			visibleTagList.add(HideTagType.PASSWORD.getName());//当前话题已经取消隐藏
-										  	}
-										}else if(entry.getKey().equals(HideTagType.COMMENT.getName())){//评论话题可见
-											Boolean isUnhide = topicManage.query_cache_findWhetherCommentTopic(userDynamic.getTopicId(),accessUser.getUserName());
-											if(isUnhide){
-												visibleTagList.add(HideTagType.COMMENT.getName());//当前话题已经取消隐藏
-											}
-										}else if(entry.getKey().equals(HideTagType.GRADE.getName())){//超过等级可见
-											User _user = userManage.query_cache_findUserByUserName(accessUser.getUserName());
-											if(_user != null){
-												List<UserGrade> userGradeList = userGradeService.findAllGrade_cache();//取得用户所有等级
-												if(userGradeList != null && userGradeList.size() >0){
-													for(UserGrade userGrade : userGradeList){
-														if(_user.getPoint() >= userGrade.getNeedPoint() && (Long)entry.getValue() <=userGrade.getNeedPoint()){
-															visibleTagList.add(HideTagType.GRADE.getName());//当前话题已经取消隐藏
-															
-															break;
-														}
-													} 
-														
-													
-												}
-											}
-											
-										}else if(entry.getKey().equals(HideTagType.POINT.getName())){//积分购买可见
-											//话题取消隐藏Id
-										  	String topicUnhideId = topicManage.createTopicUnhideId(accessUser.getUserId(), HideTagType.POINT.getName(), userDynamic.getTopicId());
-										  
-											TopicUnhide topicUnhide = topicManage.query_cache_findTopicUnhideById(topicUnhideId);
-									  		
-									  		if(topicUnhide != null){
-									  			visibleTagList.add(HideTagType.POINT.getName());//当前话题已经取消隐藏
-										  	}
-										}else if(entry.getKey().equals(HideTagType.AMOUNT.getName())){//余额购买可见
-											//话题取消隐藏Id
-										  	String topicUnhideId = topicManage.createTopicUnhideId(accessUser.getUserId(), HideTagType.AMOUNT.getName(), userDynamic.getTopicId());
-										  	TopicUnhide topicUnhide = topicManage.query_cache_findTopicUnhideById(topicUnhideId);
-									  		
-									  		if(topicUnhide != null){
-									  			visibleTagList.add(HideTagType.AMOUNT.getName());//当前话题已经取消隐藏
-										  	}
-										}
-										
+										newFullFileNameMap.put(entry.getKey(), SecureLink.createRedirectLink(entry.getKey(),entry.getValue(),topicInfo.getTagId(),systemSetting.getFileSecureLinkSecret()));
 									}
+									
+									//生成处理'上传的文件完整路径名称'Id
+									String processFullFileNameId = topicManage.createProcessFullFileNameId(topicInfo.getId(),topicInfo.getLastUpdateTime(),newFullFileNameMap);
+									
+									topicInfo.setContent(topicManage.query_cache_processFullFileName(topicInfo.getContent(),"topic",newFullFileNameMap,processFullFileNameId));
+									
+									topicContentDigest = cms.utils.MD5.getMD5(processFullFileNameId);
 								}
+								
+								
 							}
-							
-							
-							//生成处理'隐藏标签'Id
-							String processHideTagId = topicManage.createProcessHideTagId(userDynamic.getTopicId(),topicInfo.getLastUpdateTime(), visibleTagList);
+
 							
 							//处理隐藏标签
-							String content = topicManage.query_cache_processHiddenTag(topicInfo.getContent(),visibleTagList,processHideTagId+"|"+topicContentDigest);
-							userDynamic.setTopicContent(content);
-							
-							//如果话题不是当前用户发表的，则检查用户对话题的查看权限
-							if(topicInfo.getIsStaff() == false && !topicInfo.getUserName().equals(accessUser.getUserName())){
-								//是否有当前功能操作权限
-								boolean flag = userRoleManage.isPermission(ResourceEnum._1001000,topicInfo.getTagId());
-								if(!flag){//如果没有查看权限
-									userDynamic.setTopicContent("");
+							if(userDynamic.getModule().equals(100) && topicInfo.getContent() != null && !"".equals(topicInfo.getContent().trim())){
+								//允许可见的隐藏标签
+								List<Integer> visibleTagList = new ArrayList<Integer>();
+								if(accessUser != null){
+									//如果话题由当前用户发表，则显示全部隐藏内容
+									if(topicInfo.getIsStaff() == false && topicInfo.getUserName().equals(accessUser.getUserName())){
+										visibleTagList.add(HideTagType.PASSWORD.getName());
+										visibleTagList.add(HideTagType.COMMENT.getName());
+										visibleTagList.add(HideTagType.GRADE.getName());
+										visibleTagList.add(HideTagType.POINT.getName());
+										visibleTagList.add(HideTagType.AMOUNT.getName());
+									}else{
+										//解析隐藏标签
+										Map<Integer,Object> analysisHiddenTagMap = topicManage.query_cache_analysisHiddenTag(topicInfo.getContent(),topicInfo.getId());
+										for (Map.Entry<Integer,Object> entry : analysisHiddenTagMap.entrySet()) {
+											
+											if(entry.getKey().equals(HideTagType.PASSWORD.getName())){//输入密码可见
+												//话题取消隐藏Id
+											  	String topicUnhideId = topicManage.createTopicUnhideId(accessUser.getUserId(), HideTagType.PASSWORD.getName(), userDynamic.getTopicId());
+											  
+												TopicUnhide topicUnhide = topicManage.query_cache_findTopicUnhideById(topicUnhideId);
+										  		
+										  		if(topicUnhide != null){
+										  			visibleTagList.add(HideTagType.PASSWORD.getName());//当前话题已经取消隐藏
+											  	}
+											}else if(entry.getKey().equals(HideTagType.COMMENT.getName())){//评论话题可见
+												Boolean isUnhide = topicManage.query_cache_findWhetherCommentTopic(userDynamic.getTopicId(),accessUser.getUserName());
+												if(isUnhide){
+													visibleTagList.add(HideTagType.COMMENT.getName());//当前话题已经取消隐藏
+												}
+											}else if(entry.getKey().equals(HideTagType.GRADE.getName())){//超过等级可见
+												User _user = userManage.query_cache_findUserByUserName(accessUser.getUserName());
+												if(_user != null){
+													List<UserGrade> userGradeList = userGradeService.findAllGrade_cache();//取得用户所有等级
+													if(userGradeList != null && userGradeList.size() >0){
+														for(UserGrade userGrade : userGradeList){
+															if(_user.getPoint() >= userGrade.getNeedPoint() && (Long)entry.getValue() <=userGrade.getNeedPoint()){
+																visibleTagList.add(HideTagType.GRADE.getName());//当前话题已经取消隐藏
+																
+																break;
+															}
+														} 
+															
+														
+													}
+												}
+												
+											}else if(entry.getKey().equals(HideTagType.POINT.getName())){//积分购买可见
+												//话题取消隐藏Id
+											  	String topicUnhideId = topicManage.createTopicUnhideId(accessUser.getUserId(), HideTagType.POINT.getName(), userDynamic.getTopicId());
+											  
+												TopicUnhide topicUnhide = topicManage.query_cache_findTopicUnhideById(topicUnhideId);
+										  		
+										  		if(topicUnhide != null){
+										  			visibleTagList.add(HideTagType.POINT.getName());//当前话题已经取消隐藏
+											  	}
+											}else if(entry.getKey().equals(HideTagType.AMOUNT.getName())){//余额购买可见
+												//话题取消隐藏Id
+											  	String topicUnhideId = topicManage.createTopicUnhideId(accessUser.getUserId(), HideTagType.AMOUNT.getName(), userDynamic.getTopicId());
+											  	TopicUnhide topicUnhide = topicManage.query_cache_findTopicUnhideById(topicUnhideId);
+										  		
+										  		if(topicUnhide != null){
+										  			visibleTagList.add(HideTagType.AMOUNT.getName());//当前话题已经取消隐藏
+											  	}
+											}
+											
+										}
+									}
 								}
+								
+								
+								//生成处理'隐藏标签'Id
+								String processHideTagId = topicManage.createProcessHideTagId(userDynamic.getTopicId(),topicInfo.getLastUpdateTime(), visibleTagList);
+								
+								//处理隐藏标签
+								String content = topicManage.query_cache_processHiddenTag(topicInfo.getContent(),visibleTagList,processHideTagId+"|"+topicContentDigest);
+								userDynamic.setTopicContent(content);
+								
+								//如果话题不是当前用户发表的，则检查用户对话题的查看权限
+								if(topicInfo.getIsStaff() == false && !topicInfo.getUserName().equals(accessUser.getUserName())){
+									//是否有当前功能操作权限
+									boolean flag = userRoleManage.isPermission(ResourceEnum._1001000,topicInfo.getTagId());
+									if(!flag){//如果没有查看权限
+										userDynamic.setTopicContent("");
+									}
+								}
+								
 							}
 							
+							
 						}
-						
-						
 					}
+					
 
 					if(userDynamic.getModule().equals(200)){//评论
 						Comment comment = commentManage.query_cache_findByCommentId(userDynamic.getCommentId());
@@ -3927,6 +3952,35 @@ public class HomeManageAction {
 							userDynamic.setReplyContent(reply.getContent());
 						}
 					}
+					
+					//问题
+					if(userDynamic.getQuestionId() >0L){
+						Question questionInfo = questionManage.query_cache_findById(userDynamic.getQuestionId());//查询缓存
+						if(questionInfo != null){
+							userDynamic.setQuestionTitle(questionInfo.getTitle());
+							userDynamic.setQuestionViewTotal(questionInfo.getViewTotal());
+							userDynamic.setQuestionAnswerTotal(questionInfo.getAnswerTotal());
+							userDynamic.setQuestionContent(questionInfo.getContent());
+						}
+						
+					}
+					if(userDynamic.getModule().equals(600)){//600.答案
+						Answer answer = answerManage.query_cache_findByAnswerId(userDynamic.getAnswerId());
+						if(answer != null){
+							userDynamic.setAnswerContent(answer.getContent());
+						}
+						
+					}
+					if(userDynamic.getModule().equals(700)){//700.答案回复
+						AnswerReply answerReply = answerManage.query_cache_findReplyByReplyId(userDynamic.getAnswerReplyId());
+						if(answerReply != null){
+							userDynamic.setAnswerReplyContent(answerReply.getContent());
+						}
+					}
+					
+					
+					
+					
 				}
 			}
 
@@ -4342,6 +4396,7 @@ public class HomeManageAction {
 			followerManage.delete_cache_followerCount(follow.getFriendUserName());
 			
 			followManage.delete_cache_findAllFollow(accessUser.getUserName());
+			followManage.delete_cache_followCount(accessUser.getUserName());
 		}
 		
 		Map<String,String> returnError = new HashMap<String,String>();//错误
@@ -4497,4 +4552,267 @@ public class HomeManageAction {
 		
 		
 	}
+	
+	
+	
+	
+	/**
+	 * 我的问题列表
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/user/control/questionList",method=RequestMethod.GET) 
+	public String questionListUI(ModelMap model,PageForm pageForm,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		
+		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+		
+		
+		//调用分页算法代码
+		PageView<Question> pageView = new PageView<Question>(settingService.findSystemSetting_cache().getForestagePageNumber(),pageForm.getPage(),10,request.getRequestURI(),request.getQueryString());
+		//当前页
+		int firstindex = (pageForm.getPage()-1)*pageView.getMaxresult();
+		
+		 //获取登录用户
+	  	AccessUser accessUser = AccessUserThreadLocal.get();
+    	
+    		
+		StringBuffer jpql = new StringBuffer("");
+		//存放参数值
+		List<Object> params = new ArrayList<Object>();
+		jpql.append(" and o.userName=?"+ (params.size()+1));
+		params.add(accessUser.getUserName());
+		
+		jpql.append(" and o.status<?"+ (params.size()+1));
+		params.add(100);
+		
+		jpql.append(" and o.isStaff=?"+ (params.size()+1));
+		params.add(false);
+		
+		//删除第一个and
+		String _jpql = org.apache.commons.lang3.StringUtils.difference(" and", jpql.toString());
+		
+		//排序
+		LinkedHashMap<String,String> orderby = new LinkedHashMap<String,String>();
+		
+		orderby.put("id", "desc");//根据id字段降序排序
+	
+		
+		QueryResult<Question> qr = questionService.getScrollData(Question.class, firstindex, pageView.getMaxresult(),_jpql, params.toArray(),orderby);
+		if(qr.getResultlist() != null && qr.getResultlist().size() >0){
+			for(Question o :qr.getResultlist()){
+    			o.setIpAddress(null);//IP地址不显示
+    		}
+			
+			List<QuestionTag> questionTagList = questionTagService.findAllQuestionTag_cache();
+			
+			if(questionTagList != null && questionTagList.size() >0){
+				for(Question question : qr.getResultlist()){
+					List<QuestionTagAssociation> questionTagAssociationList = questionManage.query_cache_findQuestionTagAssociationByQuestionId(question.getId());
+					if(questionTagAssociationList != null && questionTagAssociationList.size() >0){
+						for(QuestionTag questionTag : questionTagList){
+							for(QuestionTagAssociation questionTagAssociation : questionTagAssociationList){
+								if(questionTagAssociation.getQuestionTagId().equals(questionTag.getId())){
+									questionTagAssociation.setQuestionTagName(questionTag.getName());
+									question.addQuestionTagAssociation(questionTagAssociation);
+									break;
+								}
+							}
+						}
+					}
+				}
+			}
+			
+			
+			
+			
+		}
+		
+		//将查询结果集传给分页List
+		pageView.setQueryResult(qr);		
+    	
+		model.addAttribute("pageView", pageView);
+		
+		if(isAjax){
+			WebUtil.writeToWeb(JsonUtils.toJSONString(pageView), "json", response);
+			return null;
+		}else{
+			String dirName = templateService.findTemplateDir_cache();
+		    return "templates/"+dirName+"/"+accessSourceDeviceManage.accessDevices(request)+"/questionList";	
+		}
+	}
+	
+	
+	
+	
+	/**
+	 * 我的答案列表
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/user/control/answerList",method=RequestMethod.GET) 
+	public String answerListUI(ModelMap model,PageForm pageForm,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		
+		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+		
+		
+		//调用分页算法代码
+		PageView<Answer> pageView = new PageView<Answer>(settingService.findSystemSetting_cache().getForestagePageNumber(),pageForm.getPage(),10,request.getRequestURI(),request.getQueryString());
+		//当前页
+		int firstindex = (pageForm.getPage()-1)*pageView.getMaxresult();
+		
+		//获取登录用户
+	  	AccessUser accessUser = AccessUserThreadLocal.get();
+    		
+		StringBuffer jpql = new StringBuffer("");
+		//存放参数值
+		List<Object> params = new ArrayList<Object>();
+		jpql.append(" and o.userName=?"+ (params.size()+1));
+		params.add(accessUser.getUserName());
+		
+		jpql.append(" and o.isStaff=?"+ (params.size()+1));
+		params.add(false);
+		
+		//删除第一个and
+		String _jpql = org.apache.commons.lang3.StringUtils.difference(" and", jpql.toString());
+		
+		//排序
+		LinkedHashMap<String,String> orderby = new LinkedHashMap<String,String>();
+		
+		orderby.put("id", "desc");//根据id字段降序排序
+	
+		
+		QueryResult<Answer> qr = answerService.getScrollData(Answer.class, firstindex, pageView.getMaxresult(),_jpql, params.toArray(),orderby);
+		if(qr.getResultlist() != null && qr.getResultlist().size() >0){
+			List<Long> questionIdList = new ArrayList<Long>();
+			for(Answer o :qr.getResultlist()){
+    			o.setIpAddress(null);//IP地址不显示
+    			
+    			o.setContent(textFilterManage.filterText(o.getContent()));
+    			if(!questionIdList.contains(o.getQuestionId())){
+    				questionIdList.add(o.getQuestionId());
+    			}
+    		}
+			List<Question> questionList = questionService.findTitleByIdList(questionIdList);
+			if(questionList != null && questionList.size() >0){
+				for(Answer o :qr.getResultlist()){
+					for(Question question : questionList){
+						if(question.getId().equals(o.getQuestionId())){
+							o.setQuestionTitle(question.getTitle());
+							break;
+						}
+					}
+					
+				}
+			}	
+		}
+		
+		//将查询结果集传给分页List
+		pageView.setQueryResult(qr);		
+    	
+		model.addAttribute("pageView", pageView);
+		
+		if(isAjax){
+			WebUtil.writeToWeb(JsonUtils.toJSONString(pageView), "json", response);
+			return null;
+		}else{
+			String dirName = templateService.findTemplateDir_cache();
+		    return "templates/"+dirName+"/"+accessSourceDeviceManage.accessDevices(request)+"/answerList";	
+		}
+	}
+	
+	/**
+	 * 我的答案回复列表
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/user/control/answerReplyList",method=RequestMethod.GET) 
+	public String answerReplyListUI(ModelMap model,PageForm pageForm,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		
+		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+		
+		
+		//调用分页算法代码
+		PageView<AnswerReply> pageView = new PageView<AnswerReply>(settingService.findSystemSetting_cache().getForestagePageNumber(),pageForm.getPage(),10,request.getRequestURI(),request.getQueryString());
+		//当前页
+		int firstindex = (pageForm.getPage()-1)*pageView.getMaxresult();
+		
+		//获取登录用户
+	  	AccessUser accessUser = AccessUserThreadLocal.get();
+    		
+		StringBuffer jpql = new StringBuffer("");
+		//存放参数值
+		List<Object> params = new ArrayList<Object>();
+		jpql.append(" and o.userName=?"+ (params.size()+1));
+		params.add(accessUser.getUserName());
+		
+		jpql.append(" and o.isStaff=?"+ (params.size()+1));
+		params.add(false);
+		
+		//删除第一个and
+		String _jpql = org.apache.commons.lang3.StringUtils.difference(" and", jpql.toString());
+		
+		//排序
+		LinkedHashMap<String,String> orderby = new LinkedHashMap<String,String>();
+		
+		orderby.put("id", "desc");//根据id字段降序排序
+	
+		
+		QueryResult<AnswerReply> qr = questionService.getScrollData(AnswerReply.class, firstindex, pageView.getMaxresult(),_jpql, params.toArray(),orderby);
+		
+		if(qr.getResultlist() != null && qr.getResultlist().size() >0){
+			List<Long> questionIdList = new ArrayList<Long>();
+			for(AnswerReply o :qr.getResultlist()){
+    			o.setIpAddress(null);//IP地址不显示
+    			
+    			if(!questionIdList.contains(o.getQuestionId())){
+    				questionIdList.add(o.getQuestionId());
+    			}
+    		}
+			List<Question> questionList = questionService.findTitleByIdList(questionIdList);
+			if(questionList != null && questionList.size() >0){
+				for(AnswerReply o :qr.getResultlist()){
+					for(Question question : questionList){
+						if(question.getId().equals(o.getQuestionId())){
+							o.setQuestionTitle(question.getTitle());
+							break;
+						}
+					}
+					
+				}
+			}	
+		}
+		
+		//将查询结果集传给分页List
+		pageView.setQueryResult(qr);		
+    	
+		model.addAttribute("pageView", pageView);
+		
+		if(isAjax){
+			WebUtil.writeToWeb(JsonUtils.toJSONString(pageView), "json", response);
+			return null;
+		}else{
+			String dirName = templateService.findTemplateDir_cache();
+		    return "templates/"+dirName+"/"+accessSourceDeviceManage.accessDevices(request)+"/answerReplyList";	
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }

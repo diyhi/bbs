@@ -68,4 +68,11 @@ public interface FollowService extends DAO<Follow>{
 	 * @return
 	 */
 	public Long findFollowerCountByUserName(Long userId,String userName);
+	/**
+	 * 根据用户名称查询关注数量
+	 * @param userId 用户Id
+	 * @param userName 用户名称
+	 * @return
+	 */
+	public Long findFollowCountByUserName(Long userId,String userName);
 }

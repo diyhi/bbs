@@ -45,7 +45,7 @@ public class RemindEntity implements Serializable{
 	protected String senderAvatarName;
 	
 	
-	/** 提醒类型代码编号  10:别人评论了我的话题  20:别人回复了我的话题 30:别人引用了我的评论 40:别人回复了我的评论 50:别人回复了我回复过的评论 60:别人解锁了我的话题 70.别人点赞了我的话题 80.别人关注了我 90.我关注的人发表了话题 100.我关注的人发表了评论 110.我关注的人发表了回复 **/
+	/** 提醒类型代码编号  10:别人评论了我的话题  20:别人回复了我的话题 30:别人引用了我的评论 40:别人回复了我的评论 50:别人回复了我回复过的评论 60:别人解锁了我的话题 70.别人点赞了我的话题 80.别人关注了我 90.我关注的人发表了话题 100.我关注的人发表了评论 110.我关注的人发表了回复 120:别人回答了我的问题  130:别人回复了我的问题 140:别人回复了我的答案 150:别人回复了我回复过的答案 **/
 	protected Integer typeCode;
 
 	/** 关联数据
@@ -89,7 +89,20 @@ public class RemindEntity implements Serializable{
 	protected Long friendTopicReplyId;
 	
 	
+	/** 问题Id **/
+	protected Long questionId = -1L;
+	/** 问题标题 **/
+	@Transient
+	protected String questionTitle;
+	/** 我的问题答案Id **/
+	protected Long questionAnswerId;
+	/** 我的问题回复Id **/
+	protected Long questionReplyId;
 	
+	/** 对方的问题答案Id **/
+	protected Long friendQuestionAnswerId;
+	/** 对方的问题回复Id **/
+	protected Long friendQuestionReplyId;
 	
 	
 	public String getId() {
@@ -205,6 +218,42 @@ public class RemindEntity implements Serializable{
 	}
 	public void setSenderNickname(String senderNickname) {
 		this.senderNickname = senderNickname;
+	}
+	public Long getQuestionId() {
+		return questionId;
+	}
+	public void setQuestionId(Long questionId) {
+		this.questionId = questionId;
+	}
+	public String getQuestionTitle() {
+		return questionTitle;
+	}
+	public void setQuestionTitle(String questionTitle) {
+		this.questionTitle = questionTitle;
+	}
+	public Long getQuestionAnswerId() {
+		return questionAnswerId;
+	}
+	public void setQuestionAnswerId(Long questionAnswerId) {
+		this.questionAnswerId = questionAnswerId;
+	}
+	public Long getQuestionReplyId() {
+		return questionReplyId;
+	}
+	public void setQuestionReplyId(Long questionReplyId) {
+		this.questionReplyId = questionReplyId;
+	}
+	public Long getFriendQuestionAnswerId() {
+		return friendQuestionAnswerId;
+	}
+	public void setFriendQuestionAnswerId(Long friendQuestionAnswerId) {
+		this.friendQuestionAnswerId = friendQuestionAnswerId;
+	}
+	public Long getFriendQuestionReplyId() {
+		return friendQuestionReplyId;
+	}
+	public void setFriendQuestionReplyId(Long friendQuestionReplyId) {
+		this.friendQuestionReplyId = friendQuestionReplyId;
 	}
 
 	

@@ -39,6 +39,9 @@ function SureSubmit(objForm){
 	    	<c:if test="${pointLog.module == 400}">积分购买话题</c:if>
 	    	<c:if test="${pointLog.module == 500}">会员卡订单支付</c:if>
 	    	<c:if test="${pointLog.module == 600}">充值</c:if>
+	    	<c:if test="${pointLog.module == 700}">提交问题</c:if>
+	    	<c:if test="${pointLog.module == 800}">提交答案</c:if>
+	    	<c:if test="${pointLog.module == 900}">提交答案回复</c:if>
 	    </TD>
 	  </TR>	
 	   <TR>

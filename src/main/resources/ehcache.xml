@@ -137,6 +137,11 @@
 		overflowToDisk="true"
 		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="20"
 		memoryStoreEvictionPolicy="LFU" />
+	<!-- 问题全文索引定时索引管理 - 重建问题索引任务运行标记 -->
+	<cache name="questionIndexManage_cache_taskRunMark" maxElementsInMemory="1"
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="20"
+		memoryStoreEvictionPolicy="LFU" />
 	
 	<!--  MySQL备份/还原管理 任务运行标记 -->
 	<cache name="dataRunMarkManage_cache_taskRunMark" maxElementsInMemory="1"
@@ -180,6 +185,42 @@
 		overflowToDisk="true"
 		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="86400" 
 		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>
+	
+	<!-- 问题标签 - 查询所有问题标签 -->	
+	<cache name="findAllQuestionTag_cache" maxElementsInMemory="1" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>
+	<!-- 问题展示IP记录 -->	
+	<cache name="questionManage_cache_ipRecord" maxElementsInMemory="9999999" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="86400" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>
+	<!-- 问题 - 问题缓存 -->		
+	<cache name="questionManage_cache_findById" maxElementsInMemory="99999999" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
+	<!-- 答案 - 答案缓存 -->		
+	<cache name="answerManage_cache_findByAnswerId" maxElementsInMemory="99999999" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
+	<!-- 答案回复 - 答案回复缓存 -->		
+	<cache name="answerManage_cache_findReplyByReplyId" maxElementsInMemory="99999999" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
+	<!-- 根据问题Id查询问题标签关联 -->		
+	<cache name="questionManage_cache_findQuestionTagAssociationByQuestionId" maxElementsInMemory="99999999" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
+	<!-- 根据用户名称查询回答总数 -->
+	<cache name="answerManage_cache_answerCount" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
 	
 	
 	<!-- 查询员工安全摘要 -->
@@ -276,7 +317,12 @@
 		overflowToDisk="true"
 		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
 		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
-	<!-- 根据Id查询粉丝总数 -->
+	<!-- 根据用户名称查询关注总数 -->
+	<cache name="followManage_cache_followCount" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
+	<!-- 根据用户名称查询粉丝总数 -->
 	<cache name="followerManage_cache_followerCount" maxElementsInMemory="900000" 
 		overflowToDisk="true"
 		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 

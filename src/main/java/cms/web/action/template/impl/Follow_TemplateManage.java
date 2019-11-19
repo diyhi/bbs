@@ -26,6 +26,32 @@ public class Follow_TemplateManage {
 	@Resource FollowManage followManage;
 	@Resource FollowerManage followerManage;
 	@Resource UserManage userManage;
+	
+	
+	/**
+	 * 关注总数  -- 实体对象
+	 * @param forum 版块对象
+	 * @param parameter 参数
+	 */
+	public Long followCount_entityBean(Forum forum,Map<String,Object> parameter,Map<String,Object> runtimeParameter){	
+		String userName = null;
+		//获取参数
+		if(parameter != null && parameter.size() >0){		
+			for(Map.Entry<String,Object> paramIter : parameter.entrySet()) {
+				if("userName".equals(paramIter.getKey())){
+					userName = paramIter.getValue().toString();
+				}
+			}
+		}
+		if(userName != null && !"".equals(userName.trim())){
+			User user = userManage.query_cache_findUserByUserName(userName.trim());
+			if(user != null){
+				return followManage.query_cache_followCount(user.getId(), user.getUserName());
+			}
+		}
+		return 0L;
+	}
+	
 	/**
 	 * 粉丝总数  -- 实体对象
 	 * @param forum 版块对象
@@ -49,6 +75,8 @@ public class Follow_TemplateManage {
 		}
 		return 0L;
 	}
+	
+	
 	
 	/**
 	 * 是否已经关注该用户  -- 实体对象

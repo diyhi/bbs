@@ -1,0 +1,379 @@
+<table class="exampleTable" > 
+	<thead>
+		<tr> 
+			<th colspan="4">返回值</th>
+		</tr>
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="12%">类型</th> 
+			<th width="38%">集合内容</th> 
+			<th width="20%">说明</th> 
+		</tr> 
+	</thead> 
+	 <tbody> 
+		<tr> 
+		<tr> 
+			<td rowspan="4">questionRelated_addQuestion_collection</td> 
+			<td rowspan="4">Map&ltString,Object></td>
+			<td>键参数：availableTag<br>值内容说明：问题编辑器允许使用标签(配合KindEditor编辑器使用)<br>值类型：JSON格式List&ltString></td>
+			<td rowspan="4">添加问题界面显示返回值</td> 
+		</tr>
+		<tr> 
+			<td>键参数：captchaKey<br>值内容说明：验证码编号 (根据'全站设置 - 基本设置 - 担交问题每分钟提交超过'参数计算是否含有值)<br>值类型：String </td>
+		</tr>
+		<tr> 
+			<td>键参数：allowQuestion<br>值内容说明：是否允许提交问题<br>值类型：boolean</td>
+		</tr>
+		<tr> 
+			<td>键参数：maxQuestionTagQuantity<br>值内容说明：提交问题最多可选择标签数量<br>值类型：Integer</td>
+		</tr>
+		
+	</tbody> 
+</table>
+
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">提交表单 - 默认方式</th>
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td width="30%" >请求路径</td> 
+			<td width="70%" colspan="2">user/control/question/add.htm</td>
+		</tr>
+		<tr> 
+			<td>请求方式</td> 
+			<td colspan="2">POST</td>
+		</tr>
+		<tr> 
+			<td>请求参数</td> 
+			<td colspan="2"><a style="color: #317ee7" onclick="anchorJump('#anchor_600'); return false;">参数表</a></td>
+		</tr>
+		<tr> 
+			<td>提交成功返回</td> 
+			<td colspan="2">默认跳转到jump模板页显示提交成功信息；跳转路径参数jumpUrl有值时按参数值路径跳转</td>
+		</tr>
+		<tr> 
+			<td rowspan="2">提交失败返回</td> 
+			<td>错误值</td> 
+			<td width="30%" >
+				变量：error<br>
+				类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_10'); return false;">Map&ltString,String></a>
+			</td>
+		</tr>
+		<tr>
+			<td>问题</td> 
+			<td width="30%" >
+				变量：question<br>
+				类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_20'); return false;">Question</a>
+			</td>
+		</tr>
+	</tbody> 
+</table>
+
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">提交表单 - AJAX方式</th>
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td>请求路径</td> 
+			<td colspan="2">user/control/question/add.htm</td>
+		</tr>
+		<tr> 
+			<td>请求方式</td> 
+			<td colspan="2">POST</td>
+		</tr> 
+		<tr> 
+			<td>自定义请求头</td> 
+			<td colspan="2">协议头：X-Requested-With  值：XMLHttpRequest</td>
+		</tr>
+		<tr> 
+			<td>请求参数</td> 
+			<td colspan="2"><a style="color: #317ee7" onclick="anchorJump('#anchor_600'); return false;">参数表</a></td>
+		</tr>
+		<tr> 
+			<td width="30%" rowspan="3">提交返回</td> 
+			<td width="30%" rowspan="3">JSON格式值 类型:Map&ltString,Object></td>
+			<td width="40%">键参数：success<br>值内容说明：成功返回true 失败返回false<br>值类型：String</td> 
+		</tr>
+		<tr> 
+			<td>键参数：error<br>值内容说明：错误值集合<br>值类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_10'); return false;">Map&ltString,String></a></td> 
+		</tr>
+		<tr> 
+			<td>键参数：captchaKey<br>值内容说明：新验证码编号(当success参数返回false时并且根据'全站设置 - 基本设置 - 问题每分钟提交超过'参数计算是否含有值)<br>值类型：String</td> 
+		</tr>
+	</tbody> 
+</table>
+
+
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">提交表单 - 上传文件</th>
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td>请求路径</td> 
+			<td colspan="2">user/control/question/upload.htm</td>
+		</tr>
+		<tr> 
+			<td>请求方式</td> 
+			<td colspan="2">POST</td>
+		</tr> 
+		<tr> 
+			<td>参数</td> 
+			<td colspan="2">
+				file : 上传文件接收字段<br>
+				dir : 文件上传类型 分别为image、file 
+			</td>
+		</tr>
+		<tr> 
+			<td width="30%" rowspan="4">提交返回</td> 
+			<td width="30%" rowspan="4">JSON格式值 类型:Map&ltString,Object></td>
+			<td width="40%">键参数：error<br>值内容说明：成功返回0 失败返回1<br>值类型：Integer</td> 
+		</tr>
+		<tr> 
+			<td>键参数：url<br>值内容说明：上传图片路径 当error等于0时有值<br>值类型：String</td> 
+		</tr>
+		<tr> 
+			<td>键参数：message<br>值内容说明：上传返回信息 当error等于1时有值<br>值类型：String</td> 
+		</tr>
+		<tr> 
+			<td>键参数：title<br>值内容说明：旧文件名称 当参数dir等于file时有值<br>值类型：String</td> 
+		</tr>
+	</tbody> 
+</table>
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">校验验证码</th>
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td>请求路径</td> 
+			<td colspan="2">checkCaptcha.htm</td>
+		</tr>
+		<tr> 
+			<td>请求方式</td> 
+			<td colspan="2">GET</td>
+		</tr> 
+		<tr> 
+			<td>返回类型</td> 
+			<td colspan="2">JSON</td>
+		</tr> 
+		<tr> 
+			<td>必填参数</td> 
+			<td colspan="2">
+				captchaKey : 验证码编号<br>
+				captchaValue : 验证码值  同一编号验证码每分钟提交次数不能超过60次,超出时验证码图片返回空字符
+			</td>
+		</tr>
+		<tr> 
+			<td width="30%" >提交返回</td> 
+			<td width="30%" >字符串格式值 类型:String</td>
+			<td width="40%">值内容说明：成功返回true 失败返回false<br>值类型：String</td> 
+		</tr>
+	</tbody> 
+</table>
+
+<table id="anchor_10"  class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">错误值 error</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td>token</td> 
+			<td>String</td>
+			<td>令牌错误</td>
+		</tr>
+		<tr> 
+			<td>captchaValue</td> 
+			<td>String</td>
+			<td>验证码错误</td>
+		</tr>
+		<tr> 
+			<td>question</td> 
+			<td>String</td>
+			<td>问题错误</td>
+		</tr>
+		<tr> 
+			<td>tagId</td> 
+			<td>String</td>
+			<td>标签错误</td>
+		</tr>
+		<tr> 
+			<td>title</td> 
+			<td>String</td>
+			<td>标题错误</td>
+		</tr>
+		<tr> 
+			<td>content</td> 
+			<td>String</td>
+			<td>问题内容错误</td>
+		</tr>
+	</tbody> 
+</table>
+
+<table id="anchor_20" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">问题 Question</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	 <tbody> 
+		
+		<tr> 
+			<td>title</td> 
+			<td>String</td>
+			<td>标题</td>
+		</tr>
+		<tr> 
+			<td>content</td> 
+			<td>String</td>
+			<td>问题内容</td>
+		</tr>
+		<tr> 
+			<td>questionTagAssociationList</td> 
+			<td>List&lt<a style="color: #317ee7" onclick="anchorJump('#anchor_230'); return false;">QuestionTagAssociation</a>></td>
+			<td colspan="2">问题标签关联集合</td>
+		</tr>
+	</tbody> 
+</table>
+
+<table id="anchor_230" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">问题标签关联 QuestionTagAssociation</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>questionTagId</td> 
+			<td>Long</td>
+			<td>问题标签Id</td>
+		</tr>
+		<tr> 
+			<td>questionTagName</td> 
+			<td>String</td>
+			<td>问题标签名称</td>
+		</tr>
+	</tbody> 
+</table>
+
+<table id="anchor_600" class="exampleTable" > 
+	<thead>
+		<tr> 
+			<th colspan="4">提交问题参数</th>
+		</tr>
+		<tr> 
+			<th width="30%">参数</th> 
+			<th width="20%">类型</th> 
+			<th width="10%">是否必填</th> 
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	 <tbody> 
+		<tr> 
+			<td>tagId</td> 
+			<td>Long[]</td>
+			<td>是</td>
+			<td>标签Id</td> 
+		</tr>
+		<tr> 
+			<td>title</td> 
+			<td>String</td>
+			<td>是</td>
+			<td>标题</td> 
+		</tr>
+	  	<tr> 
+			<td>content</td> 
+			<td>String</td>
+			<td>是</td>
+			<td>问题内容</td> 
+		</tr>
+		<tr> 
+			<td>token</td> 
+			<td>String</td>
+			<td>是</td>
+			<td>令牌</td> 
+		</tr>
+		<tr> 
+			<td>captchaKey</td> 
+			<td>String</td>
+			<td>按需填写</td>
+			<td>验证码编号</td> 
+		</tr>
+		<tr> 
+			<td>captchaValue</td> 
+			<td>String</td>
+			<td>按需填写</td>
+			<td>验证码值 同一编号验证码每分钟提交次数不能超过60次,超出时验证码图片返回空字符</td> 
+		</tr>
+		<tr> 
+			<td>jumpUrl</td> 
+			<td>String</td>
+			<td>否</td>
+			<td>'提交表单 - 默认方式'提交成功后跳转路径,不填写默认跳转到表单提交页；参数必须经过encodeBase64URL编码后才能提交。例${encodeBase64URL('/index')}</td> 
+		</tr>
+		
+	</tbody> 
+</table>
+
+<h2 style="margin:0;padding:0; margin-top: 10px;">示例</h2>
+<textarea name="exampleCode">
+<@function>
+	<#--  返回Map<String,Object>类型 -->
+	<#assign returnValue = questionRelated_addQuestion_collection>
+	<form id="addQuestionForm" action="user/control/question/add?page=${url_page}" method="post">
+		
+		<#-- 提交后跳转参数  参数必须经过encodeBase64URL编码后才能提交 不填写时默认跳转回当前页 -->
+		<input type="hidden" id="jumpUrl" name="jumpUrl" value="">
+		&lttextarea class="textarea" onfocus="" id="questionContent" name="content" >${question.content}&lt/textarea>
+		
+		内容错误提示：${(error['content'])!}
+		问题错误提示：${error['question']}
+		
+		<#-- 获取令牌 -->
+		<input type="hidden" id="token" name="token" value="${token!}">
+		
+		
+			
+		<#if returnValue['captchaKey'] != "">		
+			<#-- 验证码编号 -->		
+			<input type="hidden"  name="captchaKey" value="${(returnValue['captchaKey'])!}">
+			<#-- 验证码值 -->		
+			<input name="captchaValue" type="text" value=""/>
+			<#-- 验证码图片 -->		
+			&ltimg src="captcha/${(returnValue['captchaKey'])!}.jpg" />		
+			<#-- 验证码错误 -->
+			${(error['captchaValue'])!}	
+		</#if>
+		
+		<#-- 提交表单 - 默认方式 -->
+		<INPUT type="submit" value="提交" />
+	</form>    	
+</@function>
+</textarea>

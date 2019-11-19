@@ -135,7 +135,7 @@ public class CommentManageAction {
 				}
 			}	
 		}else{
-			error.put("content", "评论内容不能不能为空");
+			error.put("content", "评论内容不能为空");
 		}
 		
 		
@@ -192,7 +192,7 @@ public class CommentManageAction {
 		Integer old_status = -1;
 		Map<String,String> error = new HashMap<String,String>();
 		if(commentId == null || commentId <=0){
-			error.put("commentId", "引用评论不能为空");
+			error.put("commentId", "评论Id不能为空");
 		}else{
 			comment = commentService.findByCommentId(commentId);
 		}
@@ -228,7 +228,7 @@ public class CommentManageAction {
 						User user = userManage.query_cache_findUserByUserName(comment.getUserName());
 						if(user != null){
 							//修改评论状态
-							userService.updateUserDynamicCommentStatus(user.getId(),comment.getUserName(),comment.getId(),comment.getStatus());
+							userService.updateUserDynamicCommentStatus(user.getId(),comment.getUserName(),comment.getTopicId(),comment.getId(),comment.getStatus());
 						}
 						
 					}
@@ -300,7 +300,7 @@ public class CommentManageAction {
 					error.put("content", "评论内容不能为空");
 				}	
 			}else{
-				error.put("commentId", "引用评论不能为空");
+				error.put("commentId", "评论不能为空");
 			}
 		}else{
 			error.put("content", "评论内容不能为空");
@@ -334,7 +334,7 @@ public class CommentManageAction {
 				int i = commentService.deleteComment(comment.getTopicId(),commentId);
 				if(i >0){
 					//根据评论Id删除用户动态(评论下的回复也同时删除)
-					userService.deleteUserDynamicByCommentId(commentId);
+					userService.deleteUserDynamicByCommentId(comment.getTopicId(),commentId);
 					
 					
 					//删除缓存
@@ -570,14 +570,14 @@ public class CommentManageAction {
 						}
 					}	
 				}else{	
-					error.put("content", "评论内容不能不能为空");
+					error.put("content", "评论内容不能为空");
 					
 				}	
 			}else{
 				error.put("commentId", "引用评论不能为空");
 			}
 		}else{
-			error.put("content", "评论内容不能不能为空");
+			error.put("content", "评论内容不能为空");
 		}
 		
 		
@@ -613,7 +613,7 @@ public class CommentManageAction {
 				User user = userManage.query_cache_findUserByUserName(comment.getUserName());
 				if(user != null){
 					//修改话题状态
-					userService.updateUserDynamicCommentStatus(user.getId(),comment.getUserName(),comment.getId(),20);
+					userService.updateUserDynamicCommentStatus(user.getId(),comment.getUserName(),comment.getTopicId(),comment.getId(),20);
 				}
 			}
 			
@@ -769,7 +769,7 @@ public class CommentManageAction {
 						User user = userManage.query_cache_findUserByUserName(reply.getUserName());
 						if(user != null){
 							//修改话题状态
-							userService.updateUserDynamicReplyStatus(user.getId(),reply.getUserName(),reply.getId(),reply.getStatus());
+							userService.updateUserDynamicReplyStatus(user.getId(),reply.getUserName(),reply.getTopicId(),reply.getCommentId(),reply.getId(),reply.getStatus());
 						}
 						
 					}
@@ -816,7 +816,7 @@ public class CommentManageAction {
 			if(i >0 && reply != null){
 				User user = userManage.query_cache_findUserByUserName(reply.getUserName());
 				if(user != null){
-					userService.deleteUserDynamicByReplyId(user.getId(),replyId);
+					userService.deleteUserDynamicByReplyId(user.getId(),reply.getTopicId(),reply.getCommentId(),replyId);
 				}
 			}
 
@@ -848,7 +848,7 @@ public class CommentManageAction {
 				User user = userManage.query_cache_findUserByUserName(reply.getUserName());
 				if(i >0 && user != null){
 					//修改话题状态
-					userService.updateUserDynamicReplyStatus(user.getId(),reply.getUserName(),reply.getId(),20);
+					userService.updateUserDynamicReplyStatus(user.getId(),reply.getUserName(),reply.getTopicId(),reply.getCommentId(),reply.getId(),20);
 				}
 			}
 			

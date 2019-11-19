@@ -58,6 +58,22 @@ public class SystemSettingValidator implements Validator{
 		}else{
 			errors.rejectValue("comment_submitQuantity","errors.required", new String[]{"不能为空"},"");
 		}
+		//发表问题每分钟提交超过
+		if(systemSetting.getQuestion_submitQuantity() != null){
+			if(systemSetting.getQuestion_submitQuantity() <0){
+				errors.rejectValue("question_submitQuantity","errors.required", new String[]{"不能小于0"},"");
+			}
+		}else{
+			errors.rejectValue("question_submitQuantity","errors.required", new String[]{"不能为空"},"");
+		}
+		//发表答案每分钟提交超过
+		if(systemSetting.getAnswer_submitQuantity() != null){
+			if(systemSetting.getAnswer_submitQuantity() <0){
+				errors.rejectValue("answer_submitQuantity","errors.required", new String[]{"不能小于0"},"");
+			}
+		}else{
+			errors.rejectValue("answer_submitQuantity","errors.required", new String[]{"不能为空"},"");
+		}
 		//发表私信每分钟提交超过
 		if(systemSetting.getPrivateMessage_submitQuantity() != null){
 			if(systemSetting.getPrivateMessage_submitQuantity() <0){
@@ -65,6 +81,15 @@ public class SystemSettingValidator implements Validator{
 			}
 		}else{
 			errors.rejectValue("privateMessage_submitQuantity","errors.required", new String[]{"不能为空"},"");
+		}
+		
+		//提交问题最多可选择标签数量
+		if(systemSetting.getMaxQuestionTagQuantity() != null){
+			if(systemSetting.getMaxQuestionTagQuantity() <0){
+				errors.rejectValue("maxQuestionTagQuantity","errors.required", new String[]{"不能小于0"},"");
+			}
+		}else{
+			errors.rejectValue("maxQuestionTagQuantity","errors.required", new String[]{"不能为空"},"");
 		}
 		
 		//发表话题奖励积分
@@ -90,6 +115,31 @@ public class SystemSettingValidator implements Validator{
 			}
 		}else{
 			errors.rejectValue("reply_rewardPoint","errors.required", new String[]{"不能为空"},"");
+		}
+		
+		//提交问题奖励积分
+		if(systemSetting.getQuestion_rewardPoint() != null){
+			if(systemSetting.getQuestion_rewardPoint() <0){
+				errors.rejectValue("question_rewardPoint","errors.required", new String[]{"必须大于或等于0"},"");
+			}
+		}else{
+			errors.rejectValue("question_rewardPoint","errors.required", new String[]{"不能为空"},"");
+		}
+		//提交答案奖励积分
+		if(systemSetting.getAnswer_rewardPoint() != null){
+			if(systemSetting.getAnswer_rewardPoint() <0){
+				errors.rejectValue("answer_rewardPoint","errors.required", new String[]{"必须大于或等于0"},"");
+			}
+		}else{
+			errors.rejectValue("answer_rewardPoint","errors.required", new String[]{"不能为空"},"");
+		}
+		//提交答案回复奖励积分
+		if(systemSetting.getAnswerReply_rewardPoint() != null){
+			if(systemSetting.getAnswerReply_rewardPoint() <0){
+				errors.rejectValue("answerReply_rewardPoint","errors.required", new String[]{"必须大于或等于0"},"");
+			}
+		}else{
+			errors.rejectValue("answerReply_rewardPoint","errors.required", new String[]{"不能为空"},"");
 		}
 		
 		//解锁话题隐藏内容平台分成比例
@@ -169,6 +219,24 @@ public class SystemSettingValidator implements Validator{
 					errors.rejectValue("editorTagObject.imageSize","errors.required", new String[]{"必须大于0"},"");
 				}
 			}
+		}
+		//问题编辑器标签
+		if(systemSetting.getQuestionEditorTagObject() != null){
+			if(systemSetting.getQuestionEditorTagObject().isImage()){//图片
+				if(systemSetting.getQuestionEditorTagObject().getImageSize() == null || systemSetting.getQuestionEditorTagObject().getImageSize() <=0){
+					errors.rejectValue("questionEditorTagObject.imageSize","errors.required", new String[]{"必须大于0"},"");
+				}
+			}
+			
+		}
+		//答案编辑器标签
+		if(systemSetting.getAnswerEditorTagObject() != null){
+			if(systemSetting.getAnswerEditorTagObject().isImage()){//图片
+				if(systemSetting.getAnswerEditorTagObject().getImageSize() == null || systemSetting.getAnswerEditorTagObject().getImageSize() <=0){
+					errors.rejectValue("answerEditorTagObject.imageSize","errors.required", new String[]{"必须大于0"},"");
+				}
+			}
+			
 		}
 		
 	}

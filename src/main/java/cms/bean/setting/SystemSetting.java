@@ -51,6 +51,9 @@ public class SystemSetting implements Serializable{
 	private Integer comment_submitQuantity = 5;
 	/** 发表私信每分钟提交超过N次出现验证码 **/
 	private Integer privateMessage_submitQuantity = 5;
+	/** 提交问题最多可选择标签数量 **/
+	private Integer maxQuestionTagQuantity = 5;
+	
 	
 	/** 发表话题奖励积分 **/
 	private Long topic_rewardPoint = 0L;
@@ -78,6 +81,34 @@ public class SystemSetting implements Serializable{
 	private boolean realNameUserAllowTopic = false;
 	/** 实名用户才允许提交评论 **/
 	private boolean realNameUserAllowComment = false;
+	
+	/** 提交问题每分钟提交超过N次出现验证码 **/
+	private Integer question_submitQuantity = 5;
+	/** 提交答案每分钟提交超过N次出现验证码 **/
+	private Integer answer_submitQuantity = 5;
+	/** 提交问题奖励积分 **/
+	private Long question_rewardPoint = 0L;
+	/** 提交答案奖励积分 **/
+	private Long answer_rewardPoint = 0L;
+	/** 提交答案回复奖励积分 **/
+	private Long answerReply_rewardPoint = 0L;
+	
+	/** 前台提交问题审核   10.全部审核 20.特权会员未触发敏感词免审核 30.特权会员免审核 40.触发敏感词需审核 50.无需审核 **/
+	private Integer question_review = 10;
+	/** 前台提交答案审核   10.全部审核 20.特权会员未触发敏感词免审核 30.特权会员免审核 40.触发敏感词需审核 50.无需审核 **/
+	private Integer answer_review = 10;
+	/** 前台提交答案回复审核   10.全部审核 20.特权会员未触发敏感词免审核 30.特权会员免审核 40.触发敏感词需审核 50.无需审核 **/
+	private Integer answerReply_review = 10;
+	
+	/** 允许提交问题 **/
+	private boolean allowQuestion = false;
+	/** 允许提交答案 **/
+	private boolean allowAnswer = false;
+	
+	/** 实名用户才允许提交问题 **/
+	private boolean realNameUserAllowQuestion = false;
+	/** 实名用户才允许提交答案 **/
+	private boolean realNameUserAllowAnswer = false;
 
 	
 	/** 解锁话题隐藏内容平台分成比例 默认0% **/
@@ -118,6 +149,20 @@ public class SystemSetting implements Serializable{
 	private String editorTag;
 	@Transient
 	private EditorTag editorTagObject = new EditorTag();
+	
+	
+	/** 问题编辑器标签  json **/
+	@Lob
+	private String questionEditorTag;
+	@Transient
+	private EditorTag questionEditorTagObject = new EditorTag();
+	/** 答案编辑器标签  json **/
+	@Lob
+	private String answerEditorTag;
+	@Transient
+	private EditorTag answerEditorTagObject = new EditorTag();
+	
+	
 	
 	/** 版本 **/
 	private Long version = 0L;
@@ -425,6 +470,142 @@ public class SystemSetting implements Serializable{
 
 	public void setFileSecureLinkExpire(Long fileSecureLinkExpire) {
 		this.fileSecureLinkExpire = fileSecureLinkExpire;
+	}
+
+	public Long getQuestion_rewardPoint() {
+		return question_rewardPoint;
+	}
+
+	public void setQuestion_rewardPoint(Long question_rewardPoint) {
+		this.question_rewardPoint = question_rewardPoint;
+	}
+
+	public Long getAnswer_rewardPoint() {
+		return answer_rewardPoint;
+	}
+
+	public void setAnswer_rewardPoint(Long answer_rewardPoint) {
+		this.answer_rewardPoint = answer_rewardPoint;
+	}
+
+	public Long getAnswerReply_rewardPoint() {
+		return answerReply_rewardPoint;
+	}
+
+	public void setAnswerReply_rewardPoint(Long answerReply_rewardPoint) {
+		this.answerReply_rewardPoint = answerReply_rewardPoint;
+	}
+
+	public Integer getQuestion_review() {
+		return question_review;
+	}
+
+	public void setQuestion_review(Integer question_review) {
+		this.question_review = question_review;
+	}
+
+	public Integer getAnswer_review() {
+		return answer_review;
+	}
+
+	public void setAnswer_review(Integer answer_review) {
+		this.answer_review = answer_review;
+	}
+
+	public Integer getAnswerReply_review() {
+		return answerReply_review;
+	}
+
+	public void setAnswerReply_review(Integer answerReply_review) {
+		this.answerReply_review = answerReply_review;
+	}
+
+	public boolean isAllowQuestion() {
+		return allowQuestion;
+	}
+
+	public void setAllowQuestion(boolean allowQuestion) {
+		this.allowQuestion = allowQuestion;
+	}
+
+	public boolean isAllowAnswer() {
+		return allowAnswer;
+	}
+
+	public void setAllowAnswer(boolean allowAnswer) {
+		this.allowAnswer = allowAnswer;
+	}
+
+	public boolean isRealNameUserAllowQuestion() {
+		return realNameUserAllowQuestion;
+	}
+
+	public void setRealNameUserAllowQuestion(boolean realNameUserAllowQuestion) {
+		this.realNameUserAllowQuestion = realNameUserAllowQuestion;
+	}
+
+	public boolean isRealNameUserAllowAnswer() {
+		return realNameUserAllowAnswer;
+	}
+
+	public void setRealNameUserAllowAnswer(boolean realNameUserAllowAnswer) {
+		this.realNameUserAllowAnswer = realNameUserAllowAnswer;
+	}
+
+	public String getQuestionEditorTag() {
+		return questionEditorTag;
+	}
+
+	public void setQuestionEditorTag(String questionEditorTag) {
+		this.questionEditorTag = questionEditorTag;
+	}
+
+	public EditorTag getQuestionEditorTagObject() {
+		return questionEditorTagObject;
+	}
+
+	public void setQuestionEditorTagObject(EditorTag questionEditorTagObject) {
+		this.questionEditorTagObject = questionEditorTagObject;
+	}
+
+	public String getAnswerEditorTag() {
+		return answerEditorTag;
+	}
+
+	public void setAnswerEditorTag(String answerEditorTag) {
+		this.answerEditorTag = answerEditorTag;
+	}
+
+	public EditorTag getAnswerEditorTagObject() {
+		return answerEditorTagObject;
+	}
+
+	public void setAnswerEditorTagObject(EditorTag answerEditorTagObject) {
+		this.answerEditorTagObject = answerEditorTagObject;
+	}
+
+	public Integer getQuestion_submitQuantity() {
+		return question_submitQuantity;
+	}
+
+	public void setQuestion_submitQuantity(Integer question_submitQuantity) {
+		this.question_submitQuantity = question_submitQuantity;
+	}
+
+	public Integer getAnswer_submitQuantity() {
+		return answer_submitQuantity;
+	}
+
+	public void setAnswer_submitQuantity(Integer answer_submitQuantity) {
+		this.answer_submitQuantity = answer_submitQuantity;
+	}
+
+	public Integer getMaxQuestionTagQuantity() {
+		return maxQuestionTagQuantity;
+	}
+
+	public void setMaxQuestionTagQuantity(Integer maxQuestionTagQuantity) {
+		this.maxQuestionTagQuantity = maxQuestionTagQuantity;
 	}
 
 

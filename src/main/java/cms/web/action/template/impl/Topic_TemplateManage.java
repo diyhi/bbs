@@ -107,11 +107,11 @@ public class Topic_TemplateManage {
 		int page = 1;//分页 当前页
 		int pageCount=10;// 页码显示总数
 		int sort = 1;//排序
-		Long tagId = null;//话题Id
+		Long tagId = null;//标签Id
 		
 		String requestURI = "";
 		String queryString = "";
-		//话题Id
+		//标签Id
 		if(forum_TopicRelated_Topic.getTopic_tagId() != null && forum_TopicRelated_Topic.getTopic_tagId() >0){
 			tagId = forum_TopicRelated_Topic.getTopic_tagId();
 		}
@@ -267,9 +267,12 @@ public class Topic_TemplateManage {
 			for(Topic topic : qr.getResultlist()){
 				if(topic.getIsStaff() == false){//会员
 					User user = userManage.query_cache_findUserByUserName(topic.getUserName());
-					topic.setNickname(user.getNickname());
-					topic.setAvatarPath(user.getAvatarPath());
-					topic.setAvatarName(user.getAvatarName());
+					if(user != null){
+						topic.setNickname(user.getNickname());
+						topic.setAvatarPath(user.getAvatarPath());
+						topic.setAvatarName(user.getAvatarName());
+					}
+					
 				}
 				//话题允许查看的角色名称集合
 				for (Map.Entry<Long, List<String>> entry : tagRoleNameMap.entrySet()) {
@@ -871,10 +874,13 @@ public class Topic_TemplateManage {
 				comment.setIpAddress(null);//IP地址不显示
 				if(comment.getIsStaff() == false){//会员
 					User user = userManage.query_cache_findUserByUserName(comment.getUserName());
-					comment.setNickname(user.getNickname());
-					comment.setAvatarPath(user.getAvatarPath());
-					comment.setAvatarName(user.getAvatarName());
-					userRoleNameMap.put(comment.getUserName(), null);
+					if(user != null){
+						comment.setNickname(user.getNickname());
+						comment.setAvatarPath(user.getAvatarPath());
+						comment.setAvatarName(user.getAvatarName());
+						userRoleNameMap.put(comment.getUserName(), null);
+					}
+					
 				}
 				
 				if(comment.getQuoteUpdateId() != null && comment.getQuoteUpdateId().length() >1){
@@ -965,9 +971,15 @@ public class Topic_TemplateManage {
 							reply.setIpAddress(null);//IP地址不显示
 							if(reply.getIsStaff() == false){//会员
 								User user = userManage.query_cache_findUserByUserName(reply.getUserName());
-								reply.setNickname(user.getNickname());
-								reply.setAvatarPath(user.getAvatarPath());
-								reply.setAvatarName(user.getAvatarName());
+								if(user != null){
+									reply.setNickname(user.getNickname());
+									reply.setAvatarPath(user.getAvatarPath());
+									reply.setAvatarName(user.getAvatarName());
+									
+									List<String> roleNameList = userRoleManage.queryUserRoleName(reply.getUserName());
+									reply.setUserRoleNameList(roleNameList);
+								}
+								
 							}
 							
 							comment.addReply(reply);

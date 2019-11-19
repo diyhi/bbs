@@ -194,6 +194,36 @@ public class RemindServiceBean extends DaoSupport<Remind> implements RemindServi
 	}
 	
 	/**
+	 * 根据问题Id删除提醒
+	 * @param questionId 问题Id
+	 * @return
+	 */
+	public Integer deleteRemindByQuestionId(Long questionId){
+		int j = 0;
+		
+		//表编号
+		int tableNumber = remindConfig.getTableQuantity();
+		for(int i = 0; i<tableNumber; i++){
+			if(i == 0){//默认对象
+				Query query = em.createQuery("delete from Remind o where o.questionId=?1")
+						.setParameter(1, questionId);
+				j += query.executeUpdate();
+
+			}else{//带下划线对象
+				Query query = em.createQuery("delete from Remind_"+i+" o where o.questionId=?1")
+						.setParameter(1, questionId);
+				j += query.executeUpdate();
+
+			}
+		}
+		
+
+		return j;
+		
+		
+	}
+	
+	/**
 	 * 根据用户Id查询提醒分页
 	 * @param userId 用户Id
 	 * @param status 状态

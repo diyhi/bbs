@@ -39,8 +39,13 @@ public class UserDynamicEntity implements Serializable{
 	/** 头像名称 **/
 	@Transient
 	protected String avatarName;
-	/** 模块 100.话题  200.评论 300.引用评论 400.回复 **/
+	/** 模块 100.话题  200.评论 300.引用评论 400.评论回复  500.问题 600.答案 700.答案回复 **/
 	protected Integer module;
+	
+	/** 功能Id组 格式：,话题Id,评论Id,回复Id,  或者 ,问题Id,答案Id,答案回复Id   **/
+	@Column(length=100)
+	protected String functionIdGroup;
+	
 	
 	/** 话题Id -1表示默认空值 **/
 	protected Long topicId = -1L;
@@ -75,6 +80,34 @@ public class UserDynamicEntity implements Serializable{
 	/** 回复内容 **/
 	@Transient
 	protected String replyContent;
+	
+	
+	/** 问题Id -1表示默认空值 **/
+	protected Long questionId = -1L;
+	/** 答案Id -1表示默认空值 **/
+	protected Long answerId = -1L;
+	/** 答案回复Id -1表示默认空值 **/
+	protected Long answerReplyId = -1L;
+	/** 问题标题 **/
+	@Transient
+	protected String questionTitle;
+	/** 问题内容 **/
+	@Transient
+	protected String questionContent;
+	/** 问题查看总数 **/
+	@Transient
+	protected Long questionViewTotal;
+	/** 问题回答总数 **/
+	@Transient
+	protected Long questionAnswerTotal = 0L;
+	/** 答案内容 **/
+	@Transient
+	protected String answerContent;
+	/** 答案回复内容 **/
+	@Transient
+	protected String answerReplyContent;
+	
+
 	/** 发表时间 **/
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date postTime = new Date();
@@ -240,6 +273,86 @@ public class UserDynamicEntity implements Serializable{
 
 	public void setAllowRoleViewList(List<String> allowRoleViewList) {
 		this.allowRoleViewList = allowRoleViewList;
+	}
+
+	public Long getQuestionId() {
+		return questionId;
+	}
+
+	public void setQuestionId(Long questionId) {
+		this.questionId = questionId;
+	}
+
+	public Long getAnswerId() {
+		return answerId;
+	}
+
+	public void setAnswerId(Long answerId) {
+		this.answerId = answerId;
+	}
+
+	public Long getAnswerReplyId() {
+		return answerReplyId;
+	}
+
+	public void setAnswerReplyId(Long answerReplyId) {
+		this.answerReplyId = answerReplyId;
+	}
+
+	public String getFunctionIdGroup() {
+		return functionIdGroup;
+	}
+
+	public void setFunctionIdGroup(String functionIdGroup) {
+		this.functionIdGroup = functionIdGroup;
+	}
+
+	public String getQuestionTitle() {
+		return questionTitle;
+	}
+
+	public void setQuestionTitle(String questionTitle) {
+		this.questionTitle = questionTitle;
+	}
+
+	public String getQuestionContent() {
+		return questionContent;
+	}
+
+	public void setQuestionContent(String questionContent) {
+		this.questionContent = questionContent;
+	}
+
+	public Long getQuestionViewTotal() {
+		return questionViewTotal;
+	}
+
+	public void setQuestionViewTotal(Long questionViewTotal) {
+		this.questionViewTotal = questionViewTotal;
+	}
+
+	public Long getQuestionAnswerTotal() {
+		return questionAnswerTotal;
+	}
+
+	public void setQuestionAnswerTotal(Long questionAnswerTotal) {
+		this.questionAnswerTotal = questionAnswerTotal;
+	}
+
+	public String getAnswerContent() {
+		return answerContent;
+	}
+
+	public void setAnswerContent(String answerContent) {
+		this.answerContent = answerContent;
+	}
+
+	public String getAnswerReplyContent() {
+		return answerReplyContent;
+	}
+
+	public void setAnswerReplyContent(String answerReplyContent) {
+		this.answerReplyContent = answerReplyContent;
 	}
 	
 }

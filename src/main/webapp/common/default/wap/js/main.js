@@ -127,11 +127,23 @@ Vue.prototype.unreadMessageCount = function (){
 
 /**------------------------------------------- 页面组件 ------------------------------------------------**/
 
+
+
+
+
+
+
+
+
+
 //首页组件
 var index_component = Vue.extend({
+	name: 'index',//组件名称，keep-alive缓存需要本参数
 	template : '#index-template',
 	data : function data() {
 		return {
+			popup_allTag :false,
+			
 			topicList : [], //话题列表
 			currentpage : 1, //当前页码
 			totalpage : 1, //总页数
@@ -176,8 +188,17 @@ var index_component = Vue.extend({
 	
 	created : function created() {
 		//初始化
-		this.init();
+		this.initialization();
+		//设置缓存
+		this.$store.commit('setCacheComponents',  ['index']);
 
+	},
+	beforeDestroy : function() {
+		//销毁滚动条
+		if (this.scroll != null) {
+			this.scroll.destroy();
+			this.scroll = null;
+		}
 	},
 	mounted : function mounted(){
 		//挂载完成后，判断浏览器是否支持popstate
@@ -193,13 +214,21 @@ var index_component = Vue.extend({
 	deactivated: function() {//keep-alive组件停用时调用 (keepAlive缓存机制才会触发的钩子函数)
 		this.showTopicList(false);
 	},
+	beforeRouteLeave: function (to, from, next) {
+		if (to.path == '/thread') {//前往话题内容页的时候需要缓存组件，其他情况下不需要缓存
+			this.$store.commit('setCacheComponents',  ['index']);
+		} else {
+			this.$store.commit('setCacheComponents',  []);
+		}
+		next();
+	},
 	//在当前路由改变，但是该组件被复用时调用
 	beforeRouteUpdate : function beforeRouteUpdate(to, from, next) {
 		next(true);
 		//重置data
 		Object.assign(this.$data, this.$options.data());
 		//初始化
-		this.init();
+		this.initialization();
 	},
 	methods : {
 		//显示话题列表
@@ -282,11 +311,19 @@ var index_component = Vue.extend({
 								}
 							}
 							_self.tagList = tagList;
+							//滚动
+							_self.$nextTick(function() {
+								_self.initScroll();
+							});
+							
 							if(_self.tagSlots[0].values == null || _self.tagSlots[0].values.length == 0){//第一次打开时设置值
 								_self.tagSlots[0].values = tagList;
 							}
 							
 						}
+						
+						
+						
 					}
 				}
 			});
@@ -622,23 +659,44 @@ var index_component = Vue.extend({
 			}
 		},
 		
+		//显示所有标签选择
+		displayAllTag : function(event) {
+			//显示
+			this.popup_allTag = true;
+			
+			//查询标签列表
+			this.queryTag();
+		},
+		
 		//初始化
-		init : function() {
+		initialization : function() {
 			var tagId = getUrlParam("tagId");//当前标签
 			if(tagId != null){
 				this.tagId = tagId;
 				//查询标签列表
 				this.queryTag();
+				
+				
 			}
 			var page = getUrlParam("page");//当前标签
 			if(page != null){
 				this.currentpage = parseInt(page);//当前页码
 			}
-			
 			//查询话题列表
 			this.queryTopicList();
-
 		},
+		
+		
+		//初始化BScroll滚动插件
+		initScroll : function initScroll() {
+			this.scroll = new BScroll(this.$refs.tagScroll, {
+				scrollY : true, //滚动方向为 Y 轴
+				click : true, //是否派发click事件
+				autoBlur:false,//默认值：true 在滚动之前会让当前激活的元素（input、textarea）自动失去焦点
+				preventDefault : true, //是否阻止默认事件
+				HWCompositing : true, //是否启用硬件加速
+			});
+		}
 	}
 });
 				
@@ -698,7 +756,7 @@ var thread_component = Vue.extend({
 	
 	created : function created() {
 		//初始化
-		this.init();
+		this.initialization();
 	},
 	mounted : function mounted(){
 		//挂载完成后，判断浏览器是否支持popstate
@@ -718,7 +776,7 @@ var thread_component = Vue.extend({
 		//重置data
 		Object.assign(this.$data, this.$options.data());
 		//初始化
-		this.init();
+		this.initialization();
 	},
 	beforeDestroy : function() {
 		//销毁滚动条
@@ -866,7 +924,7 @@ var thread_component = Vue.extend({
 		    }
 		},
 		//查询话题
-		queryTopic : function() {
+		queryTopic : function(event) {
 			var _self = this;
 			var data = "topicId=" + _self.topicId; //提交参数
 			$.ajax({
@@ -891,7 +949,6 @@ var thread_component = Vue.extend({
 					}
 				}
 			});
-			
 		},
 		
 		
@@ -1893,7 +1950,7 @@ var thread_component = Vue.extend({
 								for (var error in value_error) {
 									if (error != "") {
 										if (error == "content") {
-											_self.error.commentContent = value_error[error];
+											_self.error.replyContent = value_error[error];
 										} else if (error == "reply") {
 											_self.error.reply = value_error[error];
 										}  else if (error == "captchaValue") {
@@ -1973,7 +2030,7 @@ var thread_component = Vue.extend({
 		},
 		
 		//初始化
-		init : function() {
+		initialization : function() {
 			var topicId = getUrlParam("topicId");//话题Id
 			if(topicId != null){
 				this.topicId = topicId;
@@ -2017,6 +2074,1375 @@ var thread_component = Vue.extend({
 	}
 });
 
+//问答列表组件
+var askList_component = Vue.extend({
+	name: 'askList',//组件名称，keep-alive缓存需要本参数
+	template : '#askList-template',
+	data : function data() {
+		return {
+			popup_allTag :false,
+			allTagList: '',//全部标签
+			
+			questionTagId :'',//标签Id
+			questionTagName :'',//标签名称
+			filterCondition:'',//过滤条件
+			questionList : [], //问题列表
+			currentpage : 1, //当前页码
+			totalpage : 1, //总页数
+			on: '',//上一页
+			next: '',//下一页
+			
+		};
+	},
+	
+	created : function created() {
+		//初始化
+		this.initialization();
+		//设置缓存
+		this.$store.commit('setCacheComponents',  ['askList']);
+	},
+	beforeDestroy : function() {
+		//销毁滚动条
+		if (this.scroll != null) {
+			this.scroll.destroy();
+			this.scroll = null;
+		}
+	},
+	
+	beforeRouteLeave: function (to, from, next) {
+		if (to.path == '/question') {//前往问题内容页的时候需要缓存组件，其他情况下不需要缓存
+			this.$store.commit('setCacheComponents',  ['askList']);
+		} else {
+			this.$store.commit('setCacheComponents',  []);
+		}
+		next();
+	},
+	//在当前路由改变，但是该组件被复用时调用
+	beforeRouteUpdate : function beforeRouteUpdate(to, from, next) {
+		next(true);
+		//重置data
+		Object.assign(this.$data, this.$options.data());
+		//初始化
+		this.initialization();
+	},
+	methods : {
+		//发表问题界面跳转
+		addQuestionJump : function() {
+			this.$router.push({
+				path : '/user/addQuestion'
+			});
+		},
+		//查询问题列表
+		queryQuestionList : function() {
+			var _self = this;
+			var data = "";
+			if(_self.questionTagId != null && _self.questionTagId != ""){
+				data += "questionTagId=" + _self.questionTagId;
+			}
+			if(_self.filterCondition != null){
+				data += "filterCondition=" + _self.filterCondition;
+			}
+			
+			
+			
+			data += "&page=" + _self.currentpage; //提交参数
+			$.ajax({
+				type : "GET",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "queryQuestionList",
+				data : data,
+				success : function success(result) {
+					if (result != "") {
+						var pageView = $.parseJSON(result);
+						var new_questionList = pageView.records;
+						if (new_questionList != null && new_questionList.length > 0) {
+							_self.questionList = new_questionList;
+						}
+						_self.currentpage = pageView.currentpage;
+						_self.totalpage = pageView.totalpage;
+						if(pageView.currentpage != 1){
+							_self.on = pageView.currentpage-1;
+						}else{
+							_self.on = '';
+						}
+						if(pageView.pageindex.endindex >0 && pageView.currentpage != pageView.totalpage && pageView.records.length > 0){
+							
+							_self.next = pageView.currentpage+1;
+						}else{
+							_self.next = '';
+						}
+						
+					}
+				}
+			});
+			
+		},
+		
+		
+		//显示所有标签
+		showAllTag : function() {
+			var _self = this;
+			//显示
+			_self.popup_allTag = true;
+			var tagId = getUrlParam("questionTagId");//当前标签
+			if(tagId != null){
+				_self.questionTagId = tagId;
+			}
+			
+			_self.queryAllTag();
+		},
+		
+		
+		//查询所有标签
+		queryAllTag : function() {
+			var _self = this;
+
+			$.ajax({
+				type : "GET",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "queryAllQuestionTag",
+				success : function success(result) {
+					if (result != "") {
+						var tagList = $.parseJSON(result);
+						if (tagList != null && tagList.length > 0) {
+							_self.allTagList = tagList;
+							
+							for (var i= 0; i < tagList.length; i++) {
+								var questionTag = tagList[i];
+								if(_self.questionTagId == questionTag.id){
+									_self.questionTagName = questionTag.name;
+									break;
+								}
+								if (questionTag.childTag != null && questionTag.childTag.length > 0) {
+									for (var j = 0; j < questionTag.childTag.length; j++) {
+										var childQuestionTag = questionTag.childTag[j];
+										if(_self.questionTagId == childQuestionTag.id){
+											_self.questionTagName = childQuestionTag.name;
+											break;
+										}
+									}
+									
+								}
+							}
+						}
+						
+					}
+					//滚动
+					_self.$nextTick(function() {
+						_self.initScroll();
+					});
+				}
+			});
+		},
+		
+		//初始化
+		initialization : function() {
+
+			var tagId = getUrlParam("questionTagId");//当前标签
+			if(tagId != null){
+				this.questionTagId = tagId;
+				//查询所有标签列表
+				this.queryAllTag();
+			}
+			var filterCondition = getUrlParam("filterCondition");//过滤条件
+			if(filterCondition != null){
+				this.filterCondition = filterCondition;
+			}
+			var page = getUrlParam("page");//当前页码
+			if(page != null){
+				this.currentpage = parseInt(page);//当前页码
+			}
+			//查询问题列表
+			this.queryQuestionList();
+		},
+		
+		
+		//初始化BScroll滚动插件
+		initScroll : function initScroll() {
+			this.scroll = new BScroll(this.$refs.questionTagScroll, {
+				scrollY : true, //滚动方向为 Y 轴
+				click : true, //是否派发click事件
+				autoBlur:false,//默认值：true 在滚动之前会让当前激活的元素（input、textarea）自动失去焦点
+				preventDefault : true, //是否阻止默认事件
+				HWCompositing : true, //是否启用硬件加速
+			});
+		}
+	}
+});
+
+
+//问题内容组件
+var question_component = Vue.extend({
+	template : '#question-template',
+	data : function data() {
+		return {
+			questionId :'',//问题Id
+			answerId:'',//答案Id
+			question : '', //问题
+			answerList : '', //答案列表
+			currentpage : 1, //当前答案页码
+			totalpage : 1, //答案总页数
+			on: '',//上一页
+			next: '',//下一页
+			replyExpandOrShrink : [], //回复展开/收缩 map格式 key:答案Id value:是否展开
+			
+			show_question:true,//问题内容显示/隐藏
+			show_answerEditor:false,//添加答案富文本编辑器显示/隐藏
+			
+			popup_reply : false, //发表回复弹出层
+			answerContent:'',//发表答案内容
+			replyAnswerId :'',//回复答案Id
+			replyContent:'',//发表回复内容
+			
+			showCaptcha : false, //发表答案/发表回复是否显示验证码
+			imgUrl : '', //验证码图片
+			captchaKey : '', //验证码key
+			captchaValue : '', //验证码value
+			error : {
+				answerContent : '',
+				replyContent: '',
+				captchaValue : '',
+				answer: '',
+				reply: '',
+			},
+			answerEditor : '',//答案富文本编辑器
+		};
+	},
+	
+	created : function created() {
+		//初始化
+		this.initialization();
+	},
+	mounted : function mounted(){
+		//挂载完成后，判断浏览器是否支持popstate
+		if (window.history && window.history.pushState) {//监听浏览器前进后退按钮
+			
+			window.addEventListener('popstate', this.goBack, false);
+		}
+	},
+	destroyed : function destroyed() {//离开当前页面
+		this.showQuestion(false);
+		//页面销毁时，取消监听
+		window.removeEventListener('popstate', this.goBack, false);
+	},
+	deactivated: function() {//keep-alive组件停用时调用 (keepAlive缓存机制才会触发的钩子函数)
+		this.showQuestion(false);
+	},
+	//在当前路由改变，但是该组件被复用时调用
+	beforeRouteUpdate : function beforeRouteUpdate(to, from, next) {
+		next(true);
+		//重置data
+		Object.assign(this.$data, this.$options.data());
+		//初始化
+		this.initialization();
+	},
+	beforeDestroy : function() {
+		//销毁滚动条
+		if (this.scroll != null) {
+			this.scroll.destroy();
+			this.scroll = null;
+		}
+	},
+	
+	methods : {
+		//显示问题内容界面
+		showQuestion : function(back){
+		    this.show_question = true;//显示问题页
+		    this.show_answerEditor = false;//隐藏答案富文本编辑器
+		    //判断浏览器是否支持popstate
+			if (window.history && window.history.pushState && back) {
+				//后退
+				history.go(-1);
+			}
+		},
+
+		//查询问题
+		queryQuestion : function() {
+			var _self = this;
+			var data = "questionId=" + _self.questionId; //提交参数
+			$.ajax({
+				type : "GET",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "queryQuestionContent",
+				data : data,
+				success : function success(result) {
+					if (result != "") {
+						var question = $.parseJSON(result);
+						if (question != null) {
+							_self.question = question;
+						}
+					}
+				}
+			});
+			
+		},
+
+	
+		//查询答案列表
+		queryAnswerList : function() {
+			var _self = this;
+			var data = "";
+			if(_self.questionId != null && _self.questionId != ""){
+				data += "questionId=" + _self.questionId;
+			}
+			if(_self.answerId != null && _self.answerId != ""){//提交答案Id时不能提交分页数
+				data += "&answerId=" + _self.answerId;
+			}else{
+				data += "&page=" + _self.currentpage; //提交参数
+			}
+			
+			$.ajax({
+				type : "GET",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "queryAnswerList",
+				data : data,
+				success : function success(result) {
+					if (result != "") {
+						var pageView = $.parseJSON(result);
+						var new_answerList = pageView.records;
+						if (new_answerList != null && new_answerList.length > 0) {
+							_self.answerList = new_answerList;
+							
+							for (var i = 0; i <new_answerList.length; i++) {
+								var answer = new_answerList[i];
+								_self.$set(_self.replyExpandOrShrink, answer.id, false); //是否展开	
+							}
+							
+						}
+						_self.currentpage = pageView.currentpage;
+						_self.totalpage = pageView.totalpage;
+						if(pageView.currentpage != 1){
+							_self.on = pageView.currentpage-1;
+						}else{
+							_self.on = '';
+						}
+						if(pageView.pageindex.endindex >0 && pageView.currentpage != pageView.totalpage && pageView.records.length > 0){
+							
+							_self.next = pageView.currentpage+1;
+						}else{
+							_self.next = '';
+						}
+						
+						_self.$nextTick(function() {
+							//跳转到锚点
+							if(_self.answerId != null && _self.answerId != ""){
+								var anchor = _self.$el.querySelector("#anchor_"+_self.answerId);
+								if(anchor != null){
+									document.body.scrollTop = anchor.offsetTop; // chrome
+							        document.documentElement.scrollTop = anchor.offsetTop; // firefox
+								}
+							}
+						});
+						
+					}
+				}
+			});
+		},
+		
+		//展示/隐藏回复
+		telescopicReply : function(answerId) {
+			for (var data in this.replyExpandOrShrink) {
+				if(answerId == data){
+					var status = this.replyExpandOrShrink[data];
+					if(status){
+						this.$set(this.replyExpandOrShrink,answerId, false); //收缩
+					}else{
+						this.$set(this.replyExpandOrShrink,answerId, true); //伸展
+					}
+					break;
+				}
+			}	
+		},
+		
+		//发表答案界面
+		addAnswerUI : function() {
+			var _self = this;
+			
+			_self.show_question = false;//隐藏问题页
+			_self.show_answerEditor = true;//显示问题富文本编辑器
+			//判断浏览器是否支持popstate
+			if (window.history && window.history.pushState) {
+				// 向历史记录中插入了当前页
+		        history.pushState(null, null, document.URL);
+			}
+			
+			//查询添加答案页
+			_self.queryAddAnswer(function (returnValue){
+				
+				//编辑器图标
+				var editorIconList = new Array();
+				for (var key in returnValue) {
+					if (key == "availableTag") {//答案编辑器允许使用标签
+						var availableTagList = $.parseJSON(returnValue[key]);
+						for(var i=0; i<availableTagList.length; i++){
+							var _availableTag = availableTagList[i];
+							
+							if(_availableTag == "forecolor"){//文字颜色
+							//	editorIconList.push("foreColor");
+							}else if(_availableTag == "hilitecolor"){//文字背景
+							//	editorIconList.push("backColor");
+							}else if(_availableTag == "bold"){//粗体
+								editorIconList.push("bold");
+							}else if(_availableTag == "italic"){//斜体
+								editorIconList.push("italic");
+							}else if(_availableTag == "underline"){//下划线
+								editorIconList.push("underline");
+							}else if(_availableTag == "link"){//插入链接
+								editorIconList.push("link");
+							}else if(_availableTag == "emoticons"){//插入表情
+								editorIconList.push("emoticon");
+							}else if(_availableTag == "image"){//图片
+								editorIconList.push("image");
+							}else if(_availableTag == "insertfile"){//文件
+								editorIconList.push("file");
+							}
+						}
+					}
+				}
+				
+				_self.$refs.answerContentEditorToolbar.innerHTML = "";
+				_self.$refs.answerContentEditorText.innerHTML = "";
+				//创建编辑器
+				_self.answerEditor = createEditor(_self.$refs.answerContentEditorToolbar,_self.$refs.answerContentEditorText,_self.$store.state.commonPath,editorIconList,null,'user/control/answer/uploadImage?questionId='+_self.questionId,_self,"answerContent");
+				
+				
+			});
+			
+			
+		},
+	
+		//查询添加答案页
+		queryAddAnswer : function(callback) {
+			var _self = this;
+
+			//清空表单
+			_self.answerContent = ''; //发表答案内容
+			_self.showCaptcha = false, //是否显示验证码
+			_self.imgUrl = ''; //验证码图片
+			_self.captchaKey = ''; //验证码key
+			_self.captchaValue = ''; //验证码value
+
+
+			//清空所有错误
+			_self.error.answerContent = "";
+			_self.error.captchaValue = "";
+			_self.error.answer = "";
+			
+			$.ajax({
+				type : "GET",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "queryAddAnswer",
+				success : function success(result) {
+					if (result != "") {
+						var returnValue = $.parseJSON(result);
+						if (returnValue != null) {
+							for (var key in returnValue) {
+								if (key == "allowAnswer") {
+									if(returnValue[key] == false){
+										_self.showQuestion(true);//显示话题内容界面
+										_self.$toast({
+											message : "发表答案功能未开放",
+											duration : 3000,
+										});
+									}
+								}else if (key == "captchaKey") {
+									//显示验证码
+									var value_captchaKey = returnValue[key];
+									_self.showCaptcha = true;
+									_self.captchaKey = value_captchaKey;
+									_self.imgUrl = "captcha/" + value_captchaKey + ".jpg";
+									//设置验证码图片
+									_self.replaceCaptcha();
+								}
+							}
+							//回调
+							callback(returnValue);
+						}
+						
+					}
+				}
+			});
+		},
+		
+		//添加答案
+		addAnswer : function(event) {
+		//	if (!event._constructed) { //如果不存在这个属性,则不执行下面的函数
+		//		return;
+		//	}
+			var _self = this;
+			
+		
+			
+			//清空所有错误
+			_self.error.answerContent = "";
+			_self.error.answer = "";
+			_self.error.captchaValue = "";
+
+			
+			var parameter = "&questionId=" + _self.questionId; //提交参数
+	
+			parameter += "&content=" + encodeURIComponent(_self.answerEditor.txt.html());
+			//验证码Key
+			parameter += "&captchaKey=" + encodeURIComponent(_self.captchaKey);
+
+			//验证码值
+			parameter += "&captchaValue=" + encodeURIComponent(_self.captchaValue.trim());
+
+			//令牌
+			parameter += "&token=" + _self.$store.state.token;
+
+			$.ajax({
+				type : "POST",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "user/control/answer/add",
+				data : parameter,
+				success : function success(result) {
+					if (result != "") {
+						var returnValue = $.parseJSON(result);
+
+						var value_success = "";
+						var value_error = null;
+						var value_captchaKey = null;
+
+						for (var key in returnValue) {
+							if (key == "success") {
+								value_success = returnValue[key];
+							} else if (key == "error") {
+								value_error = returnValue[key];
+							} else if (key == "captchaKey") {
+								//显示验证码
+								value_captchaKey = returnValue[key];
+							}
+						}
+
+						//提交成功
+						if (value_success == "true") {
+							_self.$toast({
+								message : "提交成功",
+								duration : 3000,
+							});
+							_self.showQuestion(true);//显示问题内容界面
+
+							
+							//清空分页数据
+							_self.answerList = []; //答案列表
+							
+							_self.answerContent = '';//清空答案内容
+							_self.answerEditor.txt.clear();//清空编辑器内容
+						
+							//查询答案列表
+							_self.queryAnswerList();
+							
+						} else {
+							//显示错误
+							if (value_error != null) {
+								//有错误时清除验证码
+								_self.captchaValue = "";
+								var error_html = "";
+								for (var error in value_error) {
+									if (error != "") {
+										if (error == "content") {
+											_self.error.answerContent = value_error[error];
+										} else if (error == "answer") {
+											_self.error.answer = value_error[error];
+										}  else if (error == "captchaValue") {
+											_self.error.captchaValue = value_error[error];
+										} else if (error == "token") {
+											//如果令牌错误
+											_self.$toast({
+												message : "页面已过期，3秒后自动刷新",
+												duration : 3000,
+											});
+											setTimeout(function() {
+												//刷新当前页面
+												window.location.reload();
+											}, 3000);
+										}
+									}
+								}
+							}
+
+							if (value_captchaKey != null) {
+								_self.showCaptcha = true;
+								_self.captchaKey = value_captchaKey;
+								_self.imgUrl = "captcha/" + value_captchaKey + ".jpg";
+								//设置验证码图片
+								_self.replaceCaptcha();
+							}
+						}
+					}
+				}
+			});
+		},
+		
+		
+		
+		//回复界面
+		addReplyUI : function(answerId) {
+			this.popup_reply = true;
+
+			//查询回复页
+			this.queryAddReply(answerId);
+		},
+		//查询回复页
+		queryAddReply : function(answerId) {
+			var _self = this;
+
+			//清空表单
+			_self.replyAnswerId = '';//回复答案Id
+			_self.replyContent = ''; //发表回复内容
+			_self.showCaptcha = false, //是否显示验证码
+			_self.imgUrl = ''; //验证码图片
+			_self.captchaKey = ''; //验证码key
+			_self.captchaValue = ''; //验证码value
+
+
+			//清空所有错误
+			_self.error.replyContent = "";
+			_self.error.captchaValue = "";
+			_self.error.reply = "";
+			
+			
+			var parameter = "&answerId=" + answerId; //提交参数
+			
+			$.ajax({
+				type : "GET",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "queryAddAnswerReply",
+				data : parameter,
+				success : function success(result) {
+					if (result != "") {
+						_self.replyAnswerId = answerId;
+						var returnValue = $.parseJSON(result);
+						if (returnValue != null) {
+							for (var key in returnValue) {
+								if (key == "allowReply") {
+									if(returnValue[key] == false){
+										_self.popup_reply = false;
+										_self.$toast({
+											message : "发表回复功能未开放",
+											duration : 3000,
+										});
+									}	
+								}else if (key == "captchaKey") {
+									//显示验证码
+									var value_captchaKey = returnValue[key];
+									_self.showCaptcha = true;
+									_self.captchaKey = value_captchaKey;
+									_self.imgUrl = "captcha/" + value_captchaKey + ".jpg";
+									//设置验证码图片
+									_self.replaceCaptcha();
+								}
+							}
+						}
+						
+						//滚动
+						_self.$nextTick(function() {
+							_self.initScroll(_self.$refs.addReplyFormScroll);
+
+						});
+					}
+				}
+			});
+		},
+		
+		//添加回复
+		addReply : function(event) {
+		//	if (!event._constructed) { //如果不存在这个属性,则不执行下面的函数
+		//		return;
+		//	}
+			var _self = this;
+			//清空所有错误
+			_self.error.replyContent = "";
+			_self.error.reply = "";
+			_self.error.captchaValue = "";
+
+			
+			var parameter = "&answerId=" + _self.replyAnswerId; //提交参数
+			if (_self.replyContent != null && _self.replyContent != "") {
+				parameter += "&content=" + encodeURIComponent(_self.replyContent);
+			}
+			
+			//验证码Key
+			parameter += "&captchaKey=" + encodeURIComponent(_self.captchaKey);
+
+			//验证码值
+			parameter += "&captchaValue=" + encodeURIComponent(_self.captchaValue.trim());
+
+			//令牌
+			parameter += "&token=" + _self.$store.state.token;
+			
+			$.ajax({
+				type : "POST",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "user/control/answer/addAnswerReply",
+				data : parameter,
+				success : function success(result) {
+					if (result != "") {
+						var returnValue = $.parseJSON(result);
+
+						var value_success = "";
+						var value_error = null;
+						var value_captchaKey = null;
+
+						for (var key in returnValue) {
+							if (key == "success") {
+								value_success = returnValue[key];
+							} else if (key == "error") {
+								value_error = returnValue[key];
+							} else if (key == "captchaKey") {
+								//显示验证码
+								value_captchaKey = returnValue[key];
+							}
+						}
+
+						//提交成功
+						if (value_success == "true") {
+							_self.$toast({
+								message : "提交成功",
+								duration : 3000,
+							});
+							_self.popup_reply = false;
+
+							
+							//清空分页数据
+							_self.answerList = []; //答案列表
+							
+						//	_self.currentpage = 1; //当前页码
+						//	_self.totalpage = 1; //总页数
+						//	_self.on = '';//上一页
+						//	_self.next = '';//下一页
+						
+							//查询答案列表
+							_self.queryAnswerList();
+							
+						} else {
+							//显示错误
+							if (value_error != null) {
+								//有错误时清除验证码
+								_self.captchaValue = "";
+								var error_html = "";
+								for (var error in value_error) {
+									if (error != "") {
+										if (error == "content") {
+											_self.error.replyContent = value_error[error];
+										} else if (error == "answerReply") {
+											_self.error.reply = value_error[error];
+										}  else if (error == "captchaValue") {
+											_self.error.captchaValue = value_error[error];
+										} else if (error == "token") {
+											//如果令牌错误
+											_self.$toast({
+												message : "页面已过期，3秒后自动刷新",
+												duration : 3000,
+											});
+											setTimeout(function() {
+												//刷新当前页面
+												window.location.reload();
+											}, 3000);
+										}
+									}
+								}
+							}
+
+							if (value_captchaKey != null) {
+								_self.showCaptcha = true;
+								_self.captchaKey = value_captchaKey;
+								_self.imgUrl = "captcha/" + value_captchaKey + ".jpg";
+								//设置验证码图片
+								_self.replaceCaptcha();
+							}
+						}
+					}
+				}
+			});
+		},
+		
+		
+		//采纳答案
+		adoptionAnswer : function(id) {
+			var _self = this;
+			_self.$messagebox.confirm('确定采纳?').then(function (action) {
+				var parameter = "&answerId=" + id;
+
+				//	alert(parameter);
+				//令牌
+				parameter += "&token=" + _self.$store.state.token;
+				$.ajax({
+					type : "POST",
+					cache : false,
+					async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+					url : "user/control/question/adoptionAnswer",
+					data : parameter,
+					success : function success(result) {
+						if (result != "") {
+
+							var returnValue = $.parseJSON(result);
+
+							var value_success = "";
+							var value_error = null;
+
+							for (var key in returnValue) {
+								if (key == "success") {
+									value_success = returnValue[key];
+								} else if (key == "error") {
+									value_error = returnValue[key];
+								}
+							}
+
+							//加入成功
+							if (value_success == "true") {
+								_self.$toast({
+									message : "采纳当前答案成功，3秒后自动刷新当前页面",
+									duration : 3000,
+									className : "mint-ui-toast",
+								});
+
+								setTimeout(function() {
+									//清空分页数据
+									_self.answerList = []; //答案列表
+									//查询答案列表
+									_self.queryAnswerList();
+								}, 3000);
+								
+							} else {
+								//显示错误
+								if (value_error != null) {
+
+
+									var htmlContent = "";
+									var count = 0;
+									for (var errorKey in value_error) {
+										var errorValue = value_error[errorKey];
+										count++;
+										htmlContent += count + ". " + errorValue + "<br>";
+									}
+									_self.$messagebox('提示', htmlContent);
+
+								}
+							}
+						}
+					}
+				});
+			}).catch(function (err){//不捕获 Promise 的异常,若用户点击了取消按钮,会出现警告
+			    console.log(err);
+			});
+		},
+		
+		
+		
+
+		//更换验证码
+		replaceCaptcha : function replaceCaptcha(event) {
+			var _self = this;
+			_self.imgUrl = "captcha/" + _self.captchaKey + ".jpg?" + Math.random();
+		},
+
+		//验证验证码
+		validation_captchaValue : function validation_captchaValue(event) {
+			var _self = this;
+			var cv = this.captchaValue.trim();
+			if (cv.length < 4) {
+				_self.error.captchaValue = "请填写完整验证码";
+			}
+			if (cv.length >= 4) {
+				var parameter = "";
+				parameter += "&captchaKey=" + _self.captchaKey;
+				parameter += "&captchaValue=" + cv;
+
+				$.ajax({
+					type : "GET",
+					cache : false,
+					async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+					url : "userVerification",
+					data : parameter,
+					success : function success(result) {
+						if (result == "false") {
+							_self.error.captchaValue = "验证码错误";
+						}
+					},
+					beforeSend : function beforeSend(XMLHttpRequest) {
+						//发送请求前
+						_self.$indicator.open({
+							spinnerType : 'fading-circle'
+						}); //显示旋转进度条
+
+						//清除验证码错误
+						_self.error.captchaValue = "";
+					},
+					complete : function complete(XMLHttpRequest, textStatus) {
+						//请求完成后回调函数 (请求成功或失败时均调用)
+						_self.$indicator.close(); //关闭旋转进度条
+					}
+				});
+			}
+		},
+		
+		//初始化
+		initialization : function() {
+			var questionId = getUrlParam("questionId");//问题Id
+			if(questionId != null){
+				this.questionId = questionId;
+			}
+			var answerId = getUrlParam("answerId");//答案Id
+			if(answerId != null){
+				this.answerId = answerId;
+			}
+			
+			var page = getUrlParam("page");
+			if(page != null){
+				this.currentpage = parseInt(page);//当前页码
+			}
+			
+			//查询问题
+			this.queryQuestion();
+			//查询答案列表
+			this.queryAnswerList();
+		},
+		//初始化BScroll滚动插件//this.$refs.addAnswerFormScroll
+		initScroll : function initScroll(ref) {
+			this.scroll = new BScroll(ref, {
+				scrollY : true, //滚动方向为 Y 轴
+				click : true, //是否派发click事件
+				autoBlur:false,//默认值：true 在滚动之前会让当前激活的元素（input、textarea）自动失去焦点
+				preventDefault : true, //是否阻止默认事件
+				preventDefaultException:{ tagName: /^(INPUT|TEXTAREA|BUTTON|SELECT|HIDE)$/ ,className:/(^|\s)(editor-toolbar|w-e-menu|editor-text|w-e-text)(\s|$)/},//列出哪些元素不屏蔽默认事件 className必须是最里层的元素
+				eventPassthrough :'horizontal',//解决文本无法复制
+				HWCompositing : true, //是否启用硬件加速
+			});
+		},
+	}
+});
+
+//提问题
+var addQuestion_component = Vue.extend({
+	template : '#addQuestion-template',
+	data : function data() {
+		return {
+			question: '',//问题
+			questionTitle:'',//发表问题标题
+			questionContent:'',//发表问题内容
+			maxQuestionTagQuantity:0,//标签最多可选数量
+			currentQuestionTagQuantity:0,//标签已选择数量
+			
+			popup_allTag :false,
+			allTagList: '',//全部标签
+			selectedFirstTagId: '',//选中的一级标签Id
+			childTagList: '',//选中一级标签的子标签集合
+			selectedTagList: [],//选中标签对象集合 id:标签Id name:标签名称
+			
+			
+			showCaptcha : false, //发表问题是否显示验证码
+			imgUrl : '', //发表问题验证码图片
+			captchaKey : '', //发表问题验证码key
+			captchaValue : '', //发表问题验证码value
+			error : {
+				questionTitle : '',
+				questionContent: '',
+				tagId: '',
+				captchaValue : '',
+				question: '',
+			},
+			questionEditor:'',//富文本编辑器
+		};
+	},	
+	created : function created() {
+		this.queryAddQuestion();
+	},
+	beforeDestroy : function() {
+		//销毁滚动条
+		if (this.scroll != null) {
+			this.scroll.destroy();
+			this.scroll = null;
+		}
+	},
+	methods : {
+		//显示标签界面
+		showTagUI : function() {
+			var _self = this;
+			
+			_self.popup_allTag = true;
+			_self.queryAllTag();
+		},
+		
+
+		//查询所有标签
+		queryAllTag : function() {
+			var _self = this;
+
+			$.ajax({
+				type : "GET",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "queryAllQuestionTag",
+				success : function success(result) {
+					if (result != "") {
+						var tagList = $.parseJSON(result);
+						if (tagList != null && tagList.length > 0) {
+							_self.allTagList = tagList;
+							
+							for (var i= 0; i < tagList.length; i++) {
+								var questionTag = tagList[i];
+								//第一次选中第一个标签
+								if(_self.selectedFirstTagId == ''){
+									_self.childTagList = questionTag.childTag;
+									_self.selectedFirstTagId = questionTag.id;
+									break;
+								}else{
+									if(_self.selectedFirstTagId == questionTag.id){
+										_self.childTagList = questionTag.childTag;
+										break;
+									}
+								}
+							}
+						}
+						
+					}
+					//滚动
+					_self.$nextTick(function() {
+						_self.initScroll();
+					});
+				}
+			});
+		},
+		//选择子标签
+		selectChildTag : function(questionTagId) {
+			var _self = this;
+			_self.selectedFirstTagId = questionTagId;
+			
+			if(_self.allTagList != '' && _self.allTagList.length >0){
+				for (var i= 0; i < _self.allTagList.length; i++) {
+					var questionTag = _self.allTagList[i];
+					
+					if(questionTagId == questionTag.id){
+						_self.childTagList = questionTag.childTag;
+						
+						//如果只有一个节点，则允许选择本标签
+						if(questionTag.childNodeNumber == 0){
+							_self.selectedTag(questionTag);
+						}
+
+						break;
+					}
+					
+				}
+				
+			}
+			
+		},
+		//选中标签
+		selectedTag : function(childQuestionTag) {
+			//如果超过最大允许选择数量
+			if(this.selectedTagList.length >= this.maxQuestionTagQuantity){
+				this.$toast({
+					message : "已超过允许选择的最大标签数量",
+					duration : 3000,
+					className : "mint-ui-toast",
+				});
+				return;
+			}
+			
+			
+			//判断是否重复选择
+			if(this.selectedTagList != null && this.selectedTagList.length >0){
+				for(var i=0; i<this.selectedTagList.length; i++){
+					var selectedTag = this.selectedTagList[i];
+					if(selectedTag.id == childQuestionTag.id){
+						
+						return;
+					}
+				}
+				
+			}
+			
+			
+			var o = new Object();
+			o.id = childQuestionTag.id;
+			o.name = childQuestionTag.name;
+
+			this.selectedTagList.push(o);
+			
+			
+			
+		},
+		//删除标签
+		deleteTag : function(questionTagId) {
+			if(this.selectedTagList != null && this.selectedTagList.length >0){
+				for(var i=0; i<this.selectedTagList.length; i++){
+					var selectedTag = this.selectedTagList[i];
+					if(selectedTag.id == questionTagId){
+						this.selectedTagList.splice(i, 1);
+						return;
+					}
+				}
+				
+			}
+		
+		},
+		
+		
+		//查询添加问题页
+		queryAddQuestion : function() {
+			var _self = this;
+			var data = "";
+			
+			$.ajax({
+				type : "GET",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "queryAddQuestion",
+				data : data,
+				success : function success(result) {
+					if (result != "") {
+						var returnValue = $.parseJSON(result);
+						if (returnValue != null) {
+							var availableTag_value = null;
+							for (var key in returnValue) {
+								if (key == "allowQuestion") {
+									if(returnValue[key] == false){
+										_self.$toast({
+											message : "提问题功能未开放",
+											duration : 3000,
+										});
+									}	
+								}else if (key == "availableTag") {
+									availableTag_value = returnValue[key];
+								}else if (key == "maxQuestionTagQuantity") {
+									_self.maxQuestionTagQuantity = parseInt(returnValue[key]);
+								}else if (key == "captchaKey") {
+									//显示验证码
+									var value_captchaKey = returnValue[key];
+									_self.showCaptcha = true;
+									_self.captchaKey = value_captchaKey;
+									_self.imgUrl = "captcha/" + value_captchaKey + ".jpg";
+									//设置验证码图片
+									_self.replaceCaptcha();
+								}
+							}
+							//编辑器图标
+							var editorIconList = new Array();
+							
+							if(availableTag_value != null){//问题编辑器允许使用标签
+								var availableTagList = $.parseJSON(availableTag_value);
+								for(var i=0; i<availableTagList.length; i++){
+									var _availableTag = availableTagList[i];
+									
+									if(_availableTag == "forecolor"){//文字颜色
+									//	editorIconList.push("foreColor");
+									}else if(_availableTag == "hilitecolor"){//文字背景
+									//	editorIconList.push("backColor");
+									}else if(_availableTag == "bold"){//粗体
+										editorIconList.push("bold");
+									}else if(_availableTag == "italic"){//斜体
+										editorIconList.push("italic");
+									}else if(_availableTag == "underline"){//下划线
+										editorIconList.push("underline");
+									}else if(_availableTag == "link"){//插入链接
+										editorIconList.push("link");
+									}else if(_availableTag == "emoticons"){//插入表情
+										editorIconList.push("emoticon");
+									}else if(_availableTag == "image"){//图片
+										editorIconList.push("image");
+									}
+								}
+							}
+							
+							//创建编辑器
+							_self.questionEditor = createEditor(_self.$refs.questionContentEditorToolbar,_self.$refs.questionContentEditorText,_self.$store.state.commonPath,editorIconList,null,'user/control/question/upload',_self,"questionContent");
+							//_self.questionEditor.txt.clear();//清空
+							
+						}
+						
+					}
+				}
+			});
+		},
+		//添加问题
+		addQuestion : function() {
+			var _self = this;
+			//清空所有错误
+			_self.error.questionTitle = "";
+			_self.error.questionContent = "";
+			_self.error.tagId = "";
+			_self.error.question = "";
+			_self.error.captchaValue = "";
+
+			var parameter = ""; //提交参数
+			if (_self.questionTitle != null && _self.questionTitle != "") {
+				parameter += "&title=" + encodeURIComponent(_self.questionTitle);
+			}
+			
+			
+			if(_self.selectedTagList != null && _self.selectedTagList.length >0){
+				for(var i=0; i<_self.selectedTagList.length; i++){
+					var selectedTag = _self.selectedTagList[i];
+					parameter += "&tagId=" + selectedTag.id;
+				}
+				
+			}
+			
+
+			parameter += "&content=" + encodeURIComponent(_self.questionEditor.txt.html());
+			
+			
+			//验证码Key
+			parameter += "&captchaKey=" + encodeURIComponent(_self.captchaKey);
+
+			//验证码值
+			parameter += "&captchaValue=" + encodeURIComponent(_self.captchaValue.trim());
+
+			//令牌
+			parameter += "&token=" + _self.$store.state.token;
+			$.ajax({
+				type : "POST",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "user/control/question/add",
+				data : parameter,
+				success : function success(result) {
+					if (result != "") {
+						var returnValue = $.parseJSON(result);
+
+						var value_success = "";
+						var value_error = null;
+						var value_captchaKey = null;
+
+						for (var key in returnValue) {
+							if (key == "success") {
+								value_success = returnValue[key];
+							} else if (key == "error") {
+								value_error = returnValue[key];
+							} else if (key == "captchaKey") {
+								//显示验证码
+								value_captchaKey = returnValue[key];
+							}
+						}
+
+						//提交成功
+						if (value_success == "true") {
+						//	console.log(_self.$route.meta);
+							//_self.$route.meta.keepAlive=false;
+							_self.$toast({
+								message : "提交成功，3秒后跳转到问答页",
+								duration : 3000,
+							});
+							setTimeout(function() {
+								//跳转到问答页
+								_self.$router.push({
+									path : '/askList',
+								});
+							}, 3000);
+							
+							
+						} else {
+							//显示错误
+							if (value_error != null) {
+								//有错误时清除验证码
+								_self.captchaValue = "";
+								var error_html = "";
+								for (var error in value_error) {
+									if (error != "") {
+										if (error == "title") {
+											_self.error.questionTitle = value_error[error];
+										}else if (error == "content") {
+											_self.error.questionContent = value_error[error];
+										} else if (error == "tagId") {
+											_self.error.tagId = value_error[error];
+										} else if (error == "question") {
+											_self.error.question = value_error[error];
+										} else if (error == "captchaValue") {
+											_self.error.captchaValue = value_error[error];
+										} else if (error == "token") {
+											//如果令牌错误
+											_self.$toast({
+												message : "页面已过期，3秒后自动刷新",
+												duration : 3000,
+											});
+											setTimeout(function() {
+												//刷新当前页面
+												window.location.reload();
+											}, 3000);
+										}
+									}
+								}
+							}
+
+							if (value_captchaKey != null) {
+								_self.showCaptcha = true;
+								_self.captchaKey = value_captchaKey;
+								_self.imgUrl = "captcha/" + value_captchaKey + ".jpg";
+								//设置验证码图片
+								_self.replaceCaptcha();
+							}
+						}
+					}
+				}
+			});
+		},
+		//更换验证码
+		replaceCaptcha : function(event) {
+			var _self = this;
+			_self.imgUrl = "captcha/" + _self.captchaKey + ".jpg?" + Math.random();
+		},
+		//验证验证码
+		validation_captchaValue : function() {
+			var _self = this;
+			var cv = this.captchaValue.trim();
+			if (cv.length < 4) {
+				_self.error.captchaValue = "请填写完整验证码";
+			}
+			if (cv.length >= 4) {
+				var parameter = "";
+				parameter += "&captchaKey=" + _self.captchaKey;
+				parameter += "&captchaValue=" + cv;
+
+				$.ajax({
+					type : "GET",
+					cache : false,
+					async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+					url : "userVerification",
+					data : parameter,
+					success : function success(result) {
+						if (result == "false") {
+							_self.error.captchaValue = "验证码错误";
+						}
+					},
+					beforeSend : function beforeSend(XMLHttpRequest) {
+						//发送请求前
+						_self.$indicator.open({
+							spinnerType : 'fading-circle'
+						}); //显示旋转进度条
+
+						//清除验证码错误
+						_self.error.captchaValue = "";
+					},
+					complete : function complete(XMLHttpRequest, textStatus) {
+						//请求完成后回调函数 (请求成功或失败时均调用)
+						_self.$indicator.close(); //关闭旋转进度条
+					}
+				});
+			}
+		},
+		//初始化BScroll滚动插件
+		initScroll : function initScroll() {
+			this.scroll = new BScroll(this.$refs.questionTagScroll, {
+				scrollY : true, //滚动方向为 Y 轴
+				click : true, //是否派发click事件
+				autoBlur:false,//默认值：true 在滚动之前会让当前激活的元素（input、textarea）自动失去焦点
+				preventDefault : true, //是否阻止默认事件
+				HWCompositing : true, //是否启用硬件加速
+			});
+		}
+	},
+});
 
 
 //搜索框
@@ -2056,7 +3482,7 @@ var search_component = Vue.extend({
 	data : function data() {
 		return {
 			keyword : '', //搜索内容
-			topicList : [], //话题列表
+			searchResultList : [], //搜索结果列表
 			currentpage : 1, //当前页码
 			totalpage : 1, //总页数
 			on: '',//上一页
@@ -2065,7 +3491,7 @@ var search_component = Vue.extend({
 	},
 	created : function created() {
 		//初始化
-		this.init();
+		this.initialization();
 	},
 	//在当前路由改变，但是该组件被复用时调用
 	beforeRouteUpdate : function beforeRouteUpdate(to, from, next) {
@@ -2073,7 +3499,7 @@ var search_component = Vue.extend({
 		//重置data
 		Object.assign(this.$data, this.$options.data());
 		//初始化
-		this.init();
+		this.initialization();
 	},
 	methods : {
 		//搜索话题
@@ -2101,7 +3527,7 @@ var search_component = Vue.extend({
 						for (var key in returnValue) {
 							if (key == "success") {
 								value_success = returnValue[key];
-							}else if (key == "topicPage") {
+							}else if (key == "searchResultPage") {
 								pageView = returnValue[key];
 							} else if (key == "error") {
 								value_error = returnValue[key];
@@ -2109,9 +3535,7 @@ var search_component = Vue.extend({
 						}
 						
 						if (value_success == "true") {
-							_self.topicList = pageView.records;
-							_self.currentpage = pageView.currentpage;
-							_self.totalpage = pageView.totalpage;
+							_self.searchResultList = pageView.records;
 							_self.currentpage = pageView.currentpage;
 							_self.totalpage = pageView.totalpage;
 							if(pageView.currentpage != 1){
@@ -2148,7 +3572,7 @@ var search_component = Vue.extend({
 
 		},
 		//初始化数据
-		init : function() {
+		initialization : function() {
 			var keyword = getUrlParam("keyword");
 			if (keyword != null && keyword != "") {
 				this.keyword = decodeURIComponent(keyword);
@@ -2157,7 +3581,7 @@ var search_component = Vue.extend({
 			if (page != null && page != "") {
 				this.currentpage = decodeURIComponent(page);
 			}
-			//搜索话题
+			//搜索话题和问题
 			this.searchTopic();
 			
 		},
@@ -2203,7 +3627,7 @@ var register_component = Vue.extend({
 		};
 	},
 	created : function() {
-		this.init();
+		this.initialization();
 	},
 	methods : {
 		//查询注册页
@@ -2609,7 +4033,7 @@ var register_component = Vue.extend({
 			this.customError = [];
 		},
 		//初始化数据
-		init : function() {
+		initialization : function() {
 			//查询注册页
 			this.queryRegister();
 		},
@@ -4097,7 +5521,7 @@ var topicList_component = Vue.extend({
 	},
 	created : function created() {
 		//初始化
-		this.init();
+		this.initialization();
 	},
 	//在当前路由改变，但是该组件被复用时调用
 	beforeRouteUpdate : function beforeRouteUpdate(to, from, next) {
@@ -4105,7 +5529,7 @@ var topicList_component = Vue.extend({
 		//重置data
 		Object.assign(this.$data, this.$options.data());
 		//初始化
-		this.init();
+		this.initialization();
 	},
 	methods : {
 		
@@ -4147,7 +5571,7 @@ var topicList_component = Vue.extend({
 			
 		},
 		//初始化
-		init : function() {
+		initialization : function() {
 			var page = getUrlParam("page");//当前标签
 			if(page != null){
 				this.currentpage = parseInt(page);//当前页码
@@ -4175,7 +5599,7 @@ var commentList_component = Vue.extend({
 	},
 	created : function created() {
 		//初始化
-		this.init();
+		this.initialization();
 	},
 	//在当前路由改变，但是该组件被复用时调用
 	beforeRouteUpdate : function beforeRouteUpdate(to, from, next) {
@@ -4183,7 +5607,7 @@ var commentList_component = Vue.extend({
 		//重置data
 		Object.assign(this.$data, this.$options.data());
 		//初始化
-		this.init();
+		this.initialization();
 	},
 	methods : {
 		
@@ -4225,12 +5649,11 @@ var commentList_component = Vue.extend({
 			
 		},
 		//初始化
-		init : function() {
+		initialization : function() {
 			var page = getUrlParam("page");//当前标签
 			if(page != null){
 				this.currentpage = parseInt(page);//当前页码
 			}
-			
 			//查询评论列表
 			this.queryCommentList();
 		},
@@ -4252,7 +5675,7 @@ var replyList_component = Vue.extend({
 	},
 	created : function created() {
 		//初始化
-		this.init();
+		this.initialization();
 	},
 	//在当前路由改变，但是该组件被复用时调用
 	beforeRouteUpdate : function beforeRouteUpdate(to, from, next) {
@@ -4260,7 +5683,7 @@ var replyList_component = Vue.extend({
 		//重置data
 		Object.assign(this.$data, this.$options.data());
 		//初始化
-		this.init();
+		this.initialization();
 	},
 	methods : {
 		
@@ -4302,12 +5725,11 @@ var replyList_component = Vue.extend({
 			
 		},
 		//初始化
-		init : function() {
+		initialization : function() {
 			var page = getUrlParam("page");//当前标签
 			if(page != null){
 				this.currentpage = parseInt(page);//当前页码
 			}
-			
 			//查询回复列表
 			this.queryReplyList();
 		},
@@ -4315,6 +5737,238 @@ var replyList_component = Vue.extend({
 	},
 });
 
+//我的问题
+var questionList_component = Vue.extend({
+	template : '#questionList-template',
+	data : function data() {
+		return {
+			questionList : [], //问题集合
+			loading : false, //加载中
+			currentpage : 0, //当前页码
+			totalpage : 1, //总页数
+			on: '',//上一页
+			next: '',//下一页
+		}
+	},
+	created : function created() {
+		//初始化
+		this.initialization();
+	},
+	//在当前路由改变，但是该组件被复用时调用
+	beforeRouteUpdate : function beforeRouteUpdate(to, from, next) {
+		next(true);
+		//重置data
+		Object.assign(this.$data, this.$options.data());
+		//初始化
+		this.initialization();
+	},
+	methods : {
+		
+		//查询问题列表
+		queryQuestionList : function() {
+			var _self = this;
+			var data = "";
+			data += "&page=" + _self.currentpage; //提交参数
+			$.ajax({
+				type : "GET",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "user/control/questionList",
+				data : data,
+				success : function success(result) {
+					if (result != "") {
+						var pageView = $.parseJSON(result);
+						var new_questionList = pageView.records;
+						if (new_questionList != null && new_questionList.length > 0) {
+							_self.questionList = new_questionList;
+						}
+						_self.currentpage = pageView.currentpage;
+						_self.totalpage = pageView.totalpage;
+						if(pageView.currentpage != 1){
+							_self.on = pageView.currentpage-1;
+						}else{
+							_self.on = '';
+						}
+						if(pageView.pageindex.endindex >0 && pageView.currentpage != pageView.totalpage && pageView.records.length > 0){
+							
+							_self.next = pageView.currentpage+1;
+						}else{
+							_self.next = '';
+						}
+						
+					}
+				}
+			});
+			
+		},
+		//初始化
+		initialization : function() {
+			var page = getUrlParam("page");//当前标签
+			if(page != null){
+				this.currentpage = parseInt(page);//当前页码
+			}
+			
+			//查询问题列表
+			this.queryQuestionList();
+		},
+		
+	},
+});
+
+//我的答案
+var answerList_component = Vue.extend({
+	template : '#answerList-template',
+	data : function data() {
+		return {
+			answerList : [], //答案集合
+			loading : false, //加载中
+			currentpage : 0, //当前页码
+			totalpage : 1, //总页数
+			on: '',//上一页
+			next: '',//下一页
+		}
+	},
+	created : function created() {
+		//初始化
+		this.initialization();
+	},
+	//在当前路由改变，但是该组件被复用时调用
+	beforeRouteUpdate : function beforeRouteUpdate(to, from, next) {
+		next(true);
+		//重置data
+		Object.assign(this.$data, this.$options.data());
+		//初始化
+		this.initialization();
+	},
+	methods : {
+		
+		//查询答案列表
+		queryAnswerList : function() {
+			var _self = this;
+			var data = "";
+			data += "&page=" + _self.currentpage; //提交参数
+			$.ajax({
+				type : "GET",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "user/control/answerList",
+				data : data,
+				success : function success(result) {
+					if (result != "") {
+						var pageView = $.parseJSON(result);
+						var new_answerList = pageView.records;
+						if (new_answerList != null && new_answerList.length > 0) {
+							_self.answerList = new_answerList;
+						}
+						_self.currentpage = pageView.currentpage;
+						_self.totalpage = pageView.totalpage;
+						if(pageView.currentpage != 1){
+							_self.on = pageView.currentpage-1;
+						}else{
+							_self.on = '';
+						}
+						if(pageView.pageindex.endindex >0 && pageView.currentpage != pageView.totalpage && pageView.records.length > 0){
+							
+							_self.next = pageView.currentpage+1;
+						}else{
+							_self.next = '';
+						}
+						
+					}
+				}
+			});
+			
+		},
+		//初始化
+		initialization : function() {
+			var page = getUrlParam("page");//当前标签
+			if(page != null){
+				this.currentpage = parseInt(page);//当前页码
+			}
+			
+			//查询答案列表
+			this.queryAnswerList();
+		},
+		
+	},
+});
+//我的答案回复
+var answerReplyList_component = Vue.extend({
+	template : '#answerReplyList-template',
+	data : function data() {
+		return {
+			answerReplyList : [], //答案回复集合
+			loading : false, //加载中
+			currentpage : 0, //当前页码
+			totalpage : 1, //总页数
+			on: '',//上一页
+			next: '',//下一页
+		}
+	},
+	created : function created() {
+		//初始化
+		this.initialization();
+	},
+	//在当前路由改变，但是该组件被复用时调用
+	beforeRouteUpdate : function beforeRouteUpdate(to, from, next) {
+		next(true);
+		//重置data
+		Object.assign(this.$data, this.$options.data());
+		//初始化
+		this.initialization();
+	},
+	methods : {
+		
+		//查询回复列表
+		queryAnswerReplyList : function() {
+			var _self = this;
+			var data = "";
+			data += "&page=" + _self.currentpage; //提交参数
+			$.ajax({
+				type : "GET",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "user/control/answerReplyList",
+				data : data,
+				success : function success(result) {
+					if (result != "") {
+						var pageView = $.parseJSON(result);
+						var new_answerReplyList = pageView.records;
+						if (new_answerReplyList != null && new_answerReplyList.length > 0) {
+							_self.answerReplyList = new_answerReplyList;
+						}
+						_self.currentpage = pageView.currentpage;
+						_self.totalpage = pageView.totalpage;
+						if(pageView.currentpage != 1){
+							_self.on = pageView.currentpage-1;
+						}else{
+							_self.on = '';
+						}
+						if(pageView.pageindex.endindex >0 && pageView.currentpage != pageView.totalpage && pageView.records.length > 0){
+							
+							_self.next = pageView.currentpage+1;
+						}else{
+							_self.next = '';
+						}
+						
+					}
+				}
+			});
+			
+		},
+		//初始化
+		initialization : function() {
+			var page = getUrlParam("page");//当前标签
+			if(page != null){
+				this.currentpage = parseInt(page);//当前页码
+			}
+			
+			//查询回复列表
+			this.queryAnswerReplyList();
+		},
+		
+	},
+});
 
 //积分记录
 var point_component = Vue.extend({
@@ -5940,7 +7594,7 @@ var privateMessageChat_component = Vue.extend({
 	},
 	created : function created() {
 		//初始化
-	//	this.init();
+		this.initialization();
 	},
 	beforeDestroy : function() {
 		//销毁滚动条
@@ -6246,7 +7900,7 @@ var privateMessageChat_component = Vue.extend({
 		},
 		
 		//初始化
-		init : function() {
+		initialization : function() {
 				
 			var friendUserName = getUrlParam("friendUserName");
 			if(friendUserName != null){
@@ -7295,7 +8949,7 @@ var payment_component = Vue.extend({
 		};
 	},
 	created : function() {
-		this.init();
+		this.initialization();
 	},
 	methods : {
 		//查询支付页
@@ -7497,7 +9151,7 @@ var payment_component = Vue.extend({
 
 
 		//初始化数据
-		init : function() {
+		initialization : function() {
 			var paymentModule = getUrlParam("paymentModule");
 			if (paymentModule != null && paymentModule != "") {
 				this.paymentModule = paymentModule;
@@ -8008,22 +9662,12 @@ var bottomTab_component = Vue.extend({
 	data : function data() {
 		return {
 			bottomTab : 'index',
-			popup_tag :false,
-			tagList: '',//全部标签
-			selectedTagId :'',//已选中标签Id
 		};
 	},
 	created : function created() {
 		this.defaultSelected();
 		
 		
-	},
-	beforeDestroy : function() {
-		//销毁滚动条
-		if (this.scroll != null) {
-			this.scroll.destroy();
-			this.scroll = null;
-		}
 	},
 	methods : {
 		//提交数据
@@ -8034,14 +9678,19 @@ var bottomTab_component = Vue.extend({
 				this.$router.push({
 					path : '/index'
 				});
-			} else if ('tag' == this.bottomTab) {
+			} else if ('askList' == this.bottomTab) {
+				//问答
+				this.$router.push({
+					path : '/askList'
+				});
+				/**
 				//全部标签
 				this.popup_tag = true;
 				this.queryTag();
 				var tagId = getUrlParam("tagId");//当前标签
 				if(tagId != null){
 					this.selectedTagId = tagId;
-				}
+				}**/
 				
 			} else if ('search' == this.bottomTab) {
 				//搜索
@@ -8067,48 +9716,15 @@ var bottomTab_component = Vue.extend({
 			//如果以/shop/index/开头
 			if (pathName.indexOf(this.$store.state.contextPath + "/index/") >= 0) {
 				this.bottomTab = "index";
-			//} else if (pathName.indexOf(this.$store.state.contextPath + "/allType/") >= 0) {
-			//	this.bottomTab = "allTag";
+			} else if (pathName.indexOf(this.$store.state.contextPath + "/askList/") >= 0) {
+				this.bottomTab = "askList";
 			} else if (pathName.indexOf(this.$store.state.contextPath + "/search/") >= 0) {
 				this.bottomTab = "search";
 			} else if (pathName.indexOf(this.$store.state.contextPath + "/user/control/") >= 0) {
 				this.bottomTab = "mine";
 			}
 		},
-		//查询标签
-		queryTag : function() {
-			var _self = this;
-			$.ajax({
-				type : "GET",
-				cache : false,
-				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
-				url : "allTag",
-				success : function success(result) {
-					if (result != "") {
-						var dataView = $.parseJSON(result);
-						if (dataView != null && dataView.length > 0) {
-							_self.tagList = dataView;
-							
-						}
-					}
-					//滚动
-					_self.$nextTick(function() {
-						_self.initScroll();
-					});
-				}
-			});
-		},
 		
-		//初始化BScroll滚动插件
-		initScroll : function initScroll() {
-			this.scroll = new BScroll(this.$refs.tagScroll, {
-				scrollY : true, //滚动方向为 Y 轴
-				click : true, //是否派发click事件
-				autoBlur:false,//默认值：true 在滚动之前会让当前激活的元素（input、textarea）自动失去焦点
-				preventDefault : true, //是否阻止默认事件
-				HWCompositing : true, //是否启用硬件加速
-			});
-		},
 	},
 	
 	
@@ -8121,8 +9737,12 @@ Vue.component('bottomtab-component', bottomTab_component); //组件名必须小�
 //定义路由
 var routes = [ 
     {path : '/',redirect : '/index'}, //router的重定向方法
-	{path : '/index',component : index_component,meta:{keepAlive: true}}, //首页  keepAlive true:缓存数据 false:不缓存数据
+	{path : '/index',component : index_component}, //首页
 	{path : '/thread',component : thread_component}, //话题内容
+	{path : '/askList',component : askList_component}, //问答列表
+	{path : '/question',component : question_component}, //问题内容
+	{path : '/user/addQuestion',component : addQuestion_component}, //提问题
+	
 	{path : '/search',component : search_component}, //搜索列表
 	{path : '/register',component : register_component}, //注册组件
 	{path : '/agreement',component : agreement_component}, //服务协议
@@ -8133,6 +9753,9 @@ var routes = [
 	{path : '/user/control/topicList',component : topicList_component}, //我的话题
 	{path : '/user/control/commentList',component : commentList_component}, //我的评论
 	{path : '/user/control/replyList',component : replyList_component}, //我的回复
+	{path : '/user/control/questionList',component : questionList_component}, //我的问题
+	{path : '/user/control/answerList',component : answerList_component}, //我的答案
+	{path : '/user/control/answerReplyList',component : answerReplyList_component}, //我的答案回复
 	{path : '/user/control/point',component : point_component}, //积分记录
 	{path : '/user/control/editUser',component : editUser_component}, //修改个人信息
 	{path : '/user/control/realNameAuthentication',component : realNameAuthentication_component}, //实名认证
@@ -8181,6 +9804,8 @@ var store = new Vuex.Store({
 		systemNotify_badge: false,
 		remind_badge: false,
 		allMessage_badge: false,
+		
+		cacheComponents: [],//keepAlive缓存组件
 	},
 	
 	
@@ -8229,9 +9854,18 @@ var store = new Vuex.Store({
 		setAllMessage_badge : function setAllMessage_badge(state, isShow) {
 			state.allMessage_badge = isShow;
 		},
+		
+		//设置缓存组件
+		setCacheComponents : function setCacheComponents(state, data) {
+			state.cacheComponents = data;
+		},
 	},
 	// 在store中定义getters（可以认为是store的计算属性）。Getters接收state作为其第一个函数
-	getters : {},
+	getters : {
+		cacheComponents: function (state) {
+			return state.cacheComponents;
+		}
+	},
 	//异步操作方法
 	actions : {}
 });
@@ -8327,13 +9961,18 @@ var vue = new Vue({
 	store : store, //将store实例注入到根组件下的所有子组件中,子组件通过this.$store来访问store
 	router : router, //通过vue配置中的router挂载router实例
 	created : function created() {
-		this.init();
+		this.initialization();
+	},
+	
+	computed: {
+		cacheComponents : function () {
+			return this.$store.getters.cacheComponents;
+		}
 	},
 	methods : {
 		//初始化数据
-		init : function init(event) {
+		initialization : function initialization(event) {
 			var _self = this;
-
 			_self.$store.commit('setBaseURL', getMetaTag().baseURL);
 			_self.$store.commit('setCommonPath', getMetaTag().commonPath);
 			_self.$store.commit('setContextPath', getMetaTag().contextPath);
@@ -8345,7 +9984,7 @@ var vue = new Vue({
 			_self.$store.commit('setSystemNotify_badge', false);
 			_self.$store.commit('setAllMessage_badge', false);
 			
-			
+		
 			
 			//启动定时查询消息
 			_self.timerUnreadMessage();

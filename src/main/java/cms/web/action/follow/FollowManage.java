@@ -384,4 +384,22 @@ public class FollowManage {
 	public void delete_cache_findAllFollow(String userName){
 	}
 
+	 /**
+   	 * 查询缓存 查询关注总数
+   	 * @param userName 用户名称
+   	 * @return
+   	 */
+   	@Cacheable(value="followManage_cache_followCount",key="#userName")
+   	public Long query_cache_followCount(Long userId, String userName){
+   		return followService.findFollowCountByUserName(userId, userName);
+   	}
+   	/**
+   	 * 删除缓存 关注总数
+   	 * @param userName 用户名称
+   	 * @return
+   	 */
+   	@CacheEvict(value="followManage_cache_followCount",key="#userName")
+   	public void delete_cache_followCount(String userName){
+   	}
+	
 }

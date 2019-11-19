@@ -4,7 +4,11 @@
 		<li class="title <#if baseURI == 'user/control/userDynamicList'> selected</#if>"><a href="user/control/userDynamicList">动态</a></li>
 	    <li class="title <#if baseURI == 'user/control/topicList' || baseURI == 'user/control/topicUnhideList' || baseURI == 'user/control/topicFavoriteList' || baseURI == 'user/control/topicLikeList'> selected</#if>"><a href="user/control/topicList">话题</a></li>
 	    <li class="title <#if baseURI == 'user/control/commentList'> selected</#if>"><a href="user/control/commentList">评论</a></li>
-	    <li class="title <#if baseURI == 'user/control/replyList'> selected</#if>"><a href="user/control/replyList">回复</a></li>
+	    <li class="title <#if baseURI == 'user/control/replyList'> selected</#if>"><a href="user/control/replyList">评论回复</a></li>
+	    <li class="title <#if baseURI == 'user/control/questionList'> selected</#if>"><a href="user/control/questionList">问题</a></li>
+	    <li class="title <#if baseURI == 'user/control/answerList'> selected</#if>"><a href="user/control/answerList">答案</a></li>
+	    <li class="title <#if baseURI == 'user/control/answerReplyList'> selected</#if>"><a href="user/control/answerReplyList">答案回复</a></li>
+	  
 	    <li class="title <#if baseURI == 'user/control/favoriteList'> selected</#if>"><a href="user/control/favoriteList">收藏夹</a></li>
 	    <li class="title <#if baseURI == 'user/control/likeList'> selected</#if>"><a href="user/control/likeList">点赞</a></li>
 	    <li class="title <#if baseURI == 'user/control/followList'> selected</#if>"><a href="user/control/followList">关注</a></li>
@@ -15,9 +19,19 @@
     	<li class="title <#if baseURI == 'user/control/membershipCardOrderList'> selected</#if>"><a href="user/control/membershipCardOrderList">会员卡订单</a></li>
     	<li class="title <#if baseURI == 'user/control/balance' || baseURI == 'user/control/payment' > selected</#if>"><a href="user/control/balance">余额</a></li>
 
-	    <li class="title <#if baseURI == 'user/control/editUser'> selected</#if>" ><a href="user/control/editUser">修改个人资料</a></li>
-	    <li class="title <#if baseURI == 'user/control/realNameAuthentication' || baseURI == 'user/control/phoneBinding' || baseURI == 'user/control/updatePhoneBinding/step1' || baseURI == 'user/control/updatePhoneBinding/step2'> selected</#if>"><a href="user/control/realNameAuthentication">实名认证</a></li>
-	    <li class="title <#if baseURI == 'user/control/point'> selected</#if>" ><a href="user/control/point">积分日志</a></li>
-	    <li class="title <#if baseURI == 'user/control/userLoginLogList'> selected</#if>"><a href="user/control/userLoginLogList">登录日志</a></li>
+    	<li class="title more hide" >
+    		<span>更多</span><i class="cms-angle-down"></i>
+    		<div class="nav-pop-list" >
+		        <ul class="ul-navlist">
+		        	<li><a href="user/control/editUser">修改个人资料</a></li>
+		        	<li><a href="user/control/realNameAuthentication">实名认证</a></li>
+		        	<li><a href="user/control/point">积分日志</a></li>
+		        	<li><a href="user/control/userLoginLogList">登录日志</a></li>
+		        </ul>
+		    </div>
+    	
+    	</li>
     </ul>
+    
+   
 </div>

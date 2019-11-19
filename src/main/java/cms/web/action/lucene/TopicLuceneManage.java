@@ -298,6 +298,7 @@ public class TopicLuceneManage {
 			    	Topic topic = new Topic();
 					Document targetDoc = searcher.doc(scoreDocs[i].doc); //根据文档编号取出相应的文档   
 					topic.setId(Long.parseLong(targetDoc.get("id")));
+					
 					String _title = targetDoc.get("title");
 					if (_title != null && !"".equals(_title)) {   
 						//执行转义

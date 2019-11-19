@@ -9,6 +9,7 @@
 	<meta name="description" content="${description}"/>
 	<link rel="shortcut icon" type="image/x-icon" href="${baseURL}${commonPath}images/favicon.ico" media="screen" />
 	<link href="${commonPath}css/common.css" type="text/css" rel="stylesheet" >
+	<link href="${commonPath}css/themify-icons/style.css" type="text/css" rel="stylesheet">
 	<script language="javascript" src="${commonPath}js/tool.js" type="text/javascript"></script>
 	<script language="javascript" src="${commonPath}js/ajax.js" type="text/javascript"></script>
 	<script language="javascript" src="${commonPath}js/json2.js" type="text/javascript"></script>
@@ -54,6 +55,12 @@
 								会员卡订单支付
 							<#elseif pointLog.module == 600>
 								充值
+							<#elseif pointLog.module == 700>
+								问题
+							<#elseif pointLog.module == 800>
+								答案
+							<#elseif pointLog.module == 900>
+								答案回复
 							</#if>	
 												
 						</TD>

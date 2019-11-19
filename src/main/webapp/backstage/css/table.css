@@ -390,6 +390,154 @@ filter:alpha(opacity: 0);
 }
 
 
+/* 问题标签导航 */
+.questionTagNavigation{
+	width: 480px;
+	min-height: 100px;
+	background: #f6f6f6;
+	font-size: 14px;
+}
+
+.questionTagNavigation .nav {
+	display: flex;
+	flex-wrap: wrap;
+	padding-left: 0;
+	list-style: none;
+	margin-bottom: 20px!important;
+	margin-right: 20px;
+}
+.questionTagNavigation .nav .nav-item{
+	margin-right: 8px!important;
+	margin-bottom: 8px!important;
+	line-height: 26px;
+	
+}
+.questionTagNavigation .nav .nav-item .nav-link {
+	border-radius: 3px;
+	padding: 4px 8px;
+	border: 1px solid #42a5f5;
+	color: #42a5f5;
+	background-color: #fff;
+}
+
+.questionTagNavigation .nav .nav-item .active{
+	color: #42a5f5;
+	background-color: #e7f5fe;
+}
+.questionTagNavigation .nav a {
+	color: #6c757d
+}
+
+.questionTagNavigation .tab-content{
+	margin-right: 20px;
+	margin-bottom: 10px!important;
+}
+
+.questionTagNavigation .tab-content>.tab-pane {
+	display: none
+}
+.questionTagNavigation .tab-content>.active {
+	display: block
+}
+.questionTagNavigation .tab-content .tab-pane {
+	
+}
+.questionTagNavigation .child-tag {
+	display: inline-block;
+	font-size: 14px;
+	padding: 0 8px;
+	height: 26px;
+	line-height: 26px;
+	border-radius: 3px;
+	background-color: #c4e4fc;
+	color:#359ff5;
+	margin-right: 8px;
+	margin-bottom: 8px;
+}
+.questionTagNavigation .child-tag:hover {
+	text-decoration: none;
+	background-color: #a2d7fe;
+}
+
+
+
+
+
+/* 问题标签按钮 */
+.questionTag{
+	margin-top: 0px;
+	margin-bottom: 3px;
+	line-height: 40px;
+}
+.questionTag .btn {
+	display: inline-block;
+	font-weight: 400;
+	text-align: center;
+	vertical-align: middle;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	
+	border: 1px solid transparent;
+	color: #83878f;
+	background-color: #e7eaee;
+	border-color: #e7eaee;
+
+	padding: 3px 8px;
+	font-size: 14px;
+	line-height: 22px;
+	border-radius: 3px;
+	transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+	outline:none;
+	
+	
+}
+.questionTag .btn:hover {
+	color: #5c5f65;
+	background-color: #e2e6ea;
+	border-color: #dae0e5
+}
+.questionTag .mr{
+	margin-right: 5px!important;
+}
+
+.questionTag .ml{
+	margin-left: 5px!important;
+}
+
+.questionTag .addTag{
+	position: relative;
+	display: inline-block!important
+}
+.questionTag .warning {
+	-webkit-animation: tag-warning 2s;
+	animation: tag-warning 2s
+}
+/**将动画与元素绑定**/
+@-webkit-keyframes tag-warning {
+	0% {
+		background-color: #ff9e00;
+		border-color: #ff9e00
+	}
+
+	to {
+		background-color: #fff
+	}
+}
+
+@keyframes tag-warning {
+	0% {
+		background-color: #ff9e00;
+		border-color: #ff9e00
+	}
+
+	to {
+		background-color: #fff
+	}
+}
+
+
 
 
 /* 编辑器表格 */

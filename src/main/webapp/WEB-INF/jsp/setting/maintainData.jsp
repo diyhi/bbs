@@ -52,6 +52,39 @@ function rebuildTopicIndex(){
 } 
 
 
+//重建问题索引
+function rebuildQuestionIndex(){
+	var parameter = "";
+	var csrf =  getCsrf();
+	parameter += "&_csrf_token="+csrf.token;
+	parameter += "&_csrf_header="+csrf.header;
+	//删除第一个&号,防止因为多了&号而出现警告: Parameters: Invalid chunk ignored.信息
+	if(parameter.indexOf("&") == 0){
+		parameter = parameter.substring(1,parameter.length);
+	}
+	//设置按钮不可用
+	document.getElementById("rebuildQuestionIndex_button").disabled = true;
+	post_request(function(value){
+		if(value != ""){
+			if(value == "1"){
+				document.getElementById("rebuildQuestionIndex_message").innerHTML="任务开始运行";	
+				document.getElementById("rebuildQuestionIndex_error").innerHTML="";
+			}
+			if(value == "2"){
+				document.getElementById("rebuildQuestionIndex_error").innerHTML="任务正在运行,请稍后再试";
+				//设置按钮可用
+				document.getElementById("rebuildQuestionIndex_button").disabled = false;
+			}
+			if(value == "3"){
+				document.getElementById("rebuildQuestionIndex_error").innerHTML="索引运行过程中，不能执行创建";
+				//设置按钮可用
+				document.getElementById("rebuildQuestionIndex_button").disabled = false;
+			}
+		}	
+	},
+		"${config:url(pageContext.request)}control/systemSetting/manage${config:suffix()}?method=rebuildQuestionIndex&timestamp=" + new Date().getTime(), true,parameter);
+} 
+
 //修改数据库密码页
 function updateDatabasePasswordUI(){	
 	var html = "";
@@ -301,6 +334,12 @@ function deleteUserLoginLogData(){
     <TD class="t-label t-label-h" width="30%">重建话题索引：</TD>
     <TD class="t-content" width="70%" colSpan="3">
     	<INPUT id="rebuildTopicIndex_button" type="button" class="functionButton5" value="开始重建" onClick="javascript:rebuildTopicIndex()">&nbsp;<span id="rebuildTopicIndex_message" style="color: green;"></span>&nbsp;<span id="rebuildTopicIndex_error" style="color: red;"></span>&nbsp;<span class="span-help">需要时间取决于话题数量</span>
+    </TD>
+  </TR>
+  <TR>
+    <TD class="t-label t-label-h" width="30%">重建问题索引：</TD>
+    <TD class="t-content" width="70%" colSpan="3">
+    	<INPUT id="rebuildQuestionIndex_button" type="button" class="functionButton5" value="开始重建" onClick="javascript:rebuildQuestionIndex()">&nbsp;<span id="rebuildQuestionIndex_message" style="color: green;"></span>&nbsp;<span id="rebuildQuestionIndex_error" style="color: red;"></span>&nbsp;<span class="span-help">需要时间取决于话题数量</span>
     </TD>
   </TR>
   <TR>

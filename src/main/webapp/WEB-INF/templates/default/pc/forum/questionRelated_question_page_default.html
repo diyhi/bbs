@@ -1,0 +1,97 @@
+<#--  问题列表 分页 -->
+<@function page="${url_page}" questionTagId="${url_questionTagId}" filterCondition="${url_filterCondition}">
+
+
+<div class="askListModule">
+	<ul class="nav clearfix">
+         <li <#if url_filterCondition == '' || url_filterCondition == '10'> class='active'</#if>><a href="${baseURI}">最新</a></li>
+         <li <#if url_filterCondition == '20'> class='active'</#if>><a href="${baseURI}?filterCondition=20">未解决</a></li>
+         <li <#if url_filterCondition == '30'> class='active'</#if>><a href="${baseURI}?filterCondition=30">已解决</a></li>
+         <!-- 
+         <li class=""><a href="${baseURI}?filterCondition=40">积分悬赏</a></li>
+         <li class=""><a href="${baseURI}?filterCondition=50">现金悬赏</a></li> -->
+         <a href="user/addQuestion" class="btn"><i class="cms-pencil-alt"></i> 提问题</a>
+	</ul>
+	<div class="question-box">
+		<div class="questionList">
+			<#if questionRelated_question_page?exists && questionRelated_question_page.records?exists && questionRelated_question_page.records?size gt 0>
+				<#list questionRelated_question_page.records as question>
+					<div class="questionItem">
+					
+						<div class="avatarBox">
+				            <a class="avatarLink" href="user/control/home?userName=${question.userName}">
+				            	<#if question.avatarName != null>
+									<img src="${question.avatarPath}100x100/${question.avatarName}">
+								<#else>
+									<img src="${commonPath}images/min_avata.png">
+								</#if>                                                           
+				            </a>   
+				        </div>
+						
+						<div class="content clearfix">
+							<ul class="info">
+					        	<li>
+					            	<a class="userName" href="user/control/home?userName=${question.userName}">
+					            		${(question.nickname != null && question.nickname??) ?string(question.nickname , question.userName)}
+					            	</a>
+					            	<#list question.userRoleNameList as roleName>
+										<span class="userRoleName">${roleName}</span>
+									</#list>
+					            	<#if question.isStaff>
+										<span class="staff">官方人员</span>
+									</#if>
+					            	<span class="postTime">发表时间：${question.postTime}</span>
+					            	<#if question.lastAnswerTime != null>
+					            		<span class="lastAnswerTime">最新回复：${question.lastAnswerTime}</span>
+					            	</#if>
+					        	</li>
+					        </ul>
+							<h2 class="title clearfix">
+								<a href="question?questionId=${question.id}">
+					            	${question.title}
+					            </a>
+					            <#list question.questionTagAssociationList as questionTag>
+									<span class="questionTag">${questionTag.questionTagName}</span>		
+								</#list>
+							</h2>
+							<div class="clearfix"></div>
+							<h2 class="summary">
+								${question.summary}
+							</h2>
+						</div>
+						
+						<div class="rank clearfix">
+							<div class="answers <#if question.adoptionAnswerId gt 0 > solve</#if> ">
+								<#if question.answerTotal gte 1000000 > <#-- 超过1000000显示999k+ -->
+						    		999k+
+						    	<#elseif question.answerTotal gte 1000> <#-- 向下取整 -->
+						    		${(question.answerTotal/1000)?floor}k
+						    	<#else>	
+						    		${question.answerTotal}
+						    	</#if>  
+						        <small><#if question.adoptionAnswerId gt 0 >解决<#else>回答</#if></small>
+						    </div>
+						    <div class="views">
+						    	<#if question.viewTotal gte 1000000 > <#-- 超过1000000显示999k+ -->
+						    		999k+
+						    	<#elseif question.viewTotal gte 1000> <#-- 向下取整 -->
+						    		${(question.viewTotal/1000)?floor}k
+						    	<#else>	
+						    		${question.viewTotal}
+						    	</#if>  
+						    	<small>浏览</small>
+						    </div>
+						</div>
+					</div>    
+				</#list>
+			</#if>     
+        	
+            <div class="questionPage">
+				<#assign pageView = questionRelated_question_page>
+				<#--引入分页-->
+				<@include action="${newPublic_1}"/>
+			</div>
+		</div>
+	</div>
+</div>
+</@function>

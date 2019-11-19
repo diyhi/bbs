@@ -1,0 +1,266 @@
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">返回值</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="20%">类型</th> 
+			<th width="50%">说明</th> 
+		</tr>
+	</thead> 
+	 <tbody> 
+		<tr> 
+			<td>questionRelated_question_page</td> 
+			<td><a style="color: #317ee7" onclick="anchorJump('#anchor_10'); return false;">PageView</a></td>
+			<td>问题分页</td> 
+		</tr> 
+	</tbody> 
+</table>
+
+<table id="anchor_10" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">分页 PageView</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>records</td> 
+			<td>List&lt<a style="color: #317ee7" onclick="anchorJump('#anchor_20'); return false;">Question</a>></td>
+			<td>数据展示列表</td>
+		</tr>
+		<tr> 
+			<td>pageIndex</td> 
+			<td><a style="color: #317ee7" onclick="anchorJump('#anchor_30'); return false;">PageIndex</a></td>
+			<td>页码索引</td>
+		</tr>
+		<tr> 
+			<td>totalpage</td> 
+			<td>long</td>
+			<td>总页数</td>
+		</tr>
+		<tr> 
+			<td>maxresult</td> 
+			<td>long</td>
+			<td>每页显示记录数</td>
+		</tr>
+		<tr> 
+			<td>currentpage</td> 
+			<td>long</td>
+			<td>当前页</td>
+		</tr>
+		<tr> 
+			<td>pagecount</td> 
+			<td>long</td>
+			<td>页码显示总数</td>
+		</tr>
+		<tr> 
+			<td>onUrl</td> 
+			<td>String</td>
+			<td>上一页URL</td>
+		</tr>
+		<tr> 
+			<td>nextUrl</td> 
+			<td>String</td>
+			<td>下一页URL</td>
+		</tr>
+	</tbody> 
+</table>
+<table id="anchor_30" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">分页索引 PageIndex</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>startindex</td> 
+			<td>long</td>
+			<td>分页开始索引</td>
+		</tr>
+		<tr> 
+			<td>endindex</td> 
+			<td>long</td>
+			<td>分页结束索引</td>
+		</tr>
+	</tbody> 
+</table>
+<table id="anchor_20" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="4">问题 Question</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%" colspan="2">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>id</td> 
+			<td>Long</td>
+			<td colspan="2">问题Id</td>
+		</tr>
+		<tr> 
+			<td>title</td> 
+			<td>String</td>
+			<td colspan="2">标题</td>
+		</tr>
+		<tr> 
+			<td>questionTagAssociationList</td> 
+			<td>List&lt<a style="color: #317ee7" onclick="anchorJump('#anchor_120'); return false;">QuestionTagAssociation</a>></td>
+			<td colspan="2">问题标签关联集合</td>
+		</tr>
+		<tr> 
+			<td>summary</td> 
+			<td>String</td>
+			<td colspan="2">内容摘要(不含隐藏标签内的内容)</td>
+		</tr>
+		
+		<tr> 
+			<td>postTime</td> 
+			<td>Date</td>
+			<td colspan="2">发表时间</td>
+		</tr>
+		<tr> 
+			<td>lastAnswerTime</td> 
+			<td>Date</td>
+			<td colspan="2">最后回答时间</td>
+		</tr>
+		<tr> 
+			<td>answerTotal</td> 
+			<td>Long</td>
+			<td colspan="2">答案总数</td>
+		</tr>
+		<tr> 
+			<td>allow</td> 
+			<td>boolean</td>
+			<td colspan="2">允许回答</td>
+		</tr>
+		<tr> 
+			<td>viewTotal</td> 
+			<td>Long</td>
+			<td colspan="2">查看总数</td>
+		</tr>
+		<tr> 
+			<td>userName</td> 
+			<td>String</td>
+			<td colspan="2">用户名称</td>
+		</tr>
+		<tr> 
+			<td>userRoleNameList</td> 
+			<td>List&ltString></td>
+			<td colspan="2">用户角色名称集合</td>
+		</tr>
+		<tr> 
+			<td>nickname</td> 
+			<td>String</td>
+			<td colspan="2">呢称</td>
+		</tr>
+		<tr> 
+			<td>avatarPath</td> 
+			<td>String</td>
+			<td>头像路径</td>
+			<td width="15%" rowspan="2">页面上显示200*200头像示例${question.avatarPath}${question.avatarName}   &nbsp;&nbsp;显示100*100头像示例${question.avatarPath}100x100/${question.avatarName}</td> 
+		</tr>
+		<tr> 
+			<td>avatarName</td> 
+			<td>String</td>
+			<td>头像名称</td>
+		</tr>
+		<tr> 
+			<td>isStaff</td> 
+			<td>boolean</td>
+			<td colspan="2">是否为员工</td>
+		</tr>
+		<tr> 
+			<td>sort</td> 
+			<td>Integer</td>
+			<td colspan="2">排序 默认为0</td>
+		</tr>
+	</tbody> 
+</table>
+
+<table id="anchor_120" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">问题标签关联 QuestionTagAssociation</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>questionTagId</td> 
+			<td>Long</td>
+			<td>问题标签Id</td>
+		</tr>
+		<tr> 
+			<td>questionTagName</td> 
+			<td>String</td>
+			<td>问题标签名称</td>
+		</tr>
+	</tbody> 
+</table>
+<table class="exampleTable" > 
+	<thead>
+		<tr> 
+			<th colspan="4">方法支持参数</th>
+		</tr>
+		<tr> 
+			<th width="30%">参数</th> 
+			<th width="20%">类型</th> 
+			<th width="10%">是否必填</th> 
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	 <tbody> 
+		<tr> 
+			<td>questionTagId</td> 
+			<td>Long</td>
+			<td>否</td>
+			<td>标签Id</td> 
+		</tr>
+		<tr> 
+			<td>filterCondition</td> 
+			<td>Long</td>
+			<td>否</td>
+			<td>过滤条件 全部：值为空或10   未解决：20   已解决：30   积分悬赏：40   现金悬赏：50</td> 
+		</tr>
+		<tr> 
+			<td>page</td> 
+			<td>Integer</td>
+			<td>否</td>
+			<td>页码</td> 
+		</tr>
+	</tbody> 
+</table>
+<h2 style="margin:0;padding:0; margin-top: 10px;">示例</h2>
+<textarea name="exampleCode">
+
+<@function page="${url_page}" questionTagId="${url_questionTagId}" filterCondition="${url_filterCondition}">
+   	<#if questionRelated_question_page?exists && questionRelated_question_page.records?exists && questionRelated_question_page.records?size gt 0>
+		<#list questionRelated_question_page.records as question>
+			<#-- 标题 -->
+			<a href="question?questionId=${question.id}">${question.title}</a>
+			<#-- 发表时间 -->
+			${question.postTime}
+		</#list>
+	</#if>
+</@function>
+</textarea>

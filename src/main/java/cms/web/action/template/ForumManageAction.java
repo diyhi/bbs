@@ -30,11 +30,15 @@ import cms.bean.PageForm;
 import cms.bean.forumCode.ForumCodeNode;
 import cms.bean.help.Help;
 import cms.bean.help.HelpType;
+import cms.bean.question.QuestionTag;
 import cms.bean.template.Forum;
 import cms.bean.template.Forum_AdvertisingRelated_Image;
+import cms.bean.template.Forum_AnswerRelated_Answer;
 import cms.bean.template.Forum_CommentRelated_Comment;
 import cms.bean.template.Forum_CustomForumRelated_CustomHTML;
 import cms.bean.template.Forum_HelpRelated_Help;
+import cms.bean.template.Forum_QuestionRelated_LikeQuestion;
+import cms.bean.template.Forum_QuestionRelated_Question;
 import cms.bean.template.Forum_SystemRelated_SearchWord;
 import cms.bean.template.Forum_TopicRelated_LikeTopic;
 import cms.bean.template.Forum_TopicRelated_Topic;
@@ -43,6 +47,7 @@ import cms.bean.template.Templates;
 import cms.bean.topic.Tag;
 import cms.service.help.HelpService;
 import cms.service.help.HelpTypeService;
+import cms.service.question.QuestionTagService;
 import cms.service.template.TemplateService;
 import cms.service.topic.TagService;
 import cms.service.topic.TopicService;
@@ -71,7 +76,7 @@ public class ForumManageAction{
 	
 	@Resource TagService tagService;
 	@Resource TopicService topicService;
-		
+	@Resource QuestionTagService questionTagService;
 	@Resource LayoutManage layoutManage;
 	@Resource FileManage fileManage;
 	@Resource ForumCodeManage forumCodeManage;
@@ -260,6 +265,24 @@ public class ForumManageAction{
 						model.addAttribute("page_Forum_CommentRelated_Comment",forum.getFormValue());	
 					}
 				}
+				
+				if(forum.getForumChildType().equals("问题列表")){
+					if("page".equals(forum.getDisplayType())){//分页
+						model.addAttribute("page_Forum_QuestionRelated_Question",forum.getFormValue());	
+					}
+				}
+
+				if(forum.getForumChildType().equals("答案列表")){
+					if("page".equals(forum.getDisplayType())){//分页
+						model.addAttribute("page_Forum_AnswerRelated_Answer",forum.getFormValue());	
+					}
+				}
+				if(forum.getForumChildType().equals("相似问题")){
+					if("collection".equals(forum.getDisplayType())){//集合
+						model.addAttribute("collection_Forum_QuestionRelated_LikeQuestion",forum.getFormValue());	
+					}
+				}
+				
 				if(forum.getForumChildType().equals("在线帮助列表")){
 					if("monolayer".equals(forum.getDisplayType())){//单层
 						model.addAttribute("monolayer_Forum_HelpRelated_Help",forum.getFormValue());	
@@ -498,6 +521,22 @@ public class ForumManageAction{
 						}
 					}
 					
+					if(forum.getForumChildType().equals("问题列表")){
+						if("page".equals(forum.getDisplayType())){//分页
+							model.addAttribute("page_Forum_QuestionRelated_Question",forum.getFormValue());	
+						}
+					}
+					if(forum.getForumChildType().equals("答案列表")){
+						if("page".equals(forum.getDisplayType())){//分页
+							model.addAttribute("page_Forum_AnswerRelated_Answer",forum.getFormValue());	
+						}
+					}
+					if(forum.getForumChildType().equals("相似问题")){
+						if("collection".equals(forum.getDisplayType())){//集合
+							model.addAttribute("collection_Forum_QuestionRelated_LikeQuestion",forum.getFormValue());	
+						}
+					}
+					
 					if(forum.getForumChildType().equals("在线帮助列表")){
 						if("monolayer".equals(forum.getDisplayType())){//单层
 							model.addAttribute("monolayer_Forum_HelpRelated_Help",forum.getFormValue());	
@@ -667,6 +706,22 @@ public class ForumManageAction{
 						model.addAttribute("page_Forum_CommentRelated_Comment",new_forum.getFormValue());	
 					}
 				}
+				if(forum.getForumChildType().equals("问题列表")){
+					if("page".equals(forum.getDisplayType())){//分页
+						model.addAttribute("page_Forum_QuestionRelated_Question",new_forum.getFormValue());	
+					}
+				}
+				if(forum.getForumChildType().equals("答案列表")){
+					if("page".equals(forum.getDisplayType())){//分页
+						model.addAttribute("page_Forum_AnswerRelated_Answer",new_forum.getFormValue());	
+					}
+				}
+				if(forum.getForumChildType().equals("相似问题")){
+					if("collection".equals(forum.getDisplayType())){//集合
+						model.addAttribute("collection_Forum_QuestionRelated_LikeQuestion",new_forum.getFormValue());	
+					}
+				}
+				
 				if(forum.getForumChildType().equals("在线帮助列表")){
 					if("monolayer".equals(forum.getDisplayType())){//单层
 						model.addAttribute("monolayer_Forum_HelpRelated_Help",new_forum.getFormValue());	
@@ -1235,6 +1290,152 @@ public class ForumManageAction{
 			}
 		}
 		
+		
+		Forum_QuestionRelated_Question page_Forum_QuestionRelated_Question = new Forum_QuestionRelated_Question();
+		
+		if(formbean.getForumChildType().equals("问题列表")){
+			if("page".equals(displayType)){//分页
+				String page_question_sort = request.getParameter("page_question_sort");//排序
+				String page_question_maxResult = request.getParameter("page_question_maxResult");//每页显示记录数
+				String page_question_pageCount = request.getParameter("page_question_pageCount");//页码显示总数
+				String page_question_tagId = request.getParameter("page_question_tagId");//标签Id
+				String page_question_tag_transferPrameter = request.getParameter("page_question_tag_transferPrameter");//是否传递标签参数
+				
+				String page_question_filterCondition = request.getParameter("page_question_filterCondition");//过滤条件
+				String page_question_filterCondition_transferPrameter = request.getParameter("page_question_filterCondition_transferPrameter");//是否传递过滤条件参数
+	
+				Integer question_maxResult = null;//每页显示记录数
+				Integer question_pageCount = null;//页码显示总数
+				Long question_tagId = null;//标签Id
+				
+				Integer question_filterCondition = null;//过滤条件
+
+				boolean question_tag_transferPrameter = false;//是否传递标签参数
+				
+				boolean question_filterCondition_transferPrameter = false;//是否传递过滤条件参数
+				
+				
+				//是否传递标签参数
+				if(page_question_tag_transferPrameter != null && "true".equals(page_question_tag_transferPrameter)){
+					question_tag_transferPrameter = true;
+				}
+				//是否传递过滤条件参数
+				if(page_question_filterCondition_transferPrameter != null && "true".equals(page_question_filterCondition_transferPrameter)){
+					question_filterCondition_transferPrameter = true;
+				}
+				
+				//每页显示记录数
+				if(page_question_maxResult != null && !"".equals(page_question_maxResult.trim())){	
+					boolean page_question_maxResult_Verification = Verification.isPositiveIntegerZero(page_question_maxResult.trim());//非负整数（正整数+ 0）
+					if(!page_question_maxResult_Verification){
+						forumError.put("page_question_maxResult", "请填写数字！");
+					}else{
+						question_maxResult = Integer.parseInt(page_question_maxResult.trim());
+					}
+				}
+				//页码显示总数
+				if(page_question_pageCount != null && !"".equals(page_question_pageCount.trim())){
+					boolean page_question_pageCount_Verification = Verification.isPositiveIntegerZero(page_question_pageCount.trim());//非负整数（正整数+ 0）
+					if(!page_question_pageCount_Verification){
+						forumError.put("page_question_pageCount", "请填写数字！");
+					}else{
+						question_pageCount = Integer.parseInt(page_question_pageCount.trim());
+					}
+				}
+				if(page_question_tagId != null && !"".equals(page_question_tagId.trim())){
+					question_tagId = Long.parseLong(page_question_tagId);
+				}
+				if(page_question_filterCondition != null && !"".equals(page_question_filterCondition.trim())){
+					question_filterCondition = Integer.parseInt(page_question_filterCondition);
+				}
+				
+				//标签
+				if(question_tagId != null && question_tagId >0L && question_tag_transferPrameter == false){
+					QuestionTag questionTag = questionTagService.findById(question_tagId);
+					if(questionTag != null){
+						page_Forum_QuestionRelated_Question.setQuestion_tagId(questionTag.getId());
+						
+						page_Forum_QuestionRelated_Question.setQuestion_tagName(questionTag.getName());
+					}	
+				}
+				//过滤条件
+				if(question_filterCondition != null && question_filterCondition >0 && question_filterCondition_transferPrameter == false){
+					page_Forum_QuestionRelated_Question.setQuestion_filterCondition(question_filterCondition);
+				}
+				
+				page_Forum_QuestionRelated_Question.setQuestion_id(UUIDUtil.getUUID32());
+				page_Forum_QuestionRelated_Question.setQuestion_sort(Integer.parseInt(page_question_sort));
+				page_Forum_QuestionRelated_Question.setQuestion_maxResult(question_maxResult);//每页显示记录数
+				page_Forum_QuestionRelated_Question.setQuestion_pageCount(question_pageCount);//页码显示总数
+				page_Forum_QuestionRelated_Question.setQuestion_tag_transferPrameter(question_tag_transferPrameter);//是否传递标签参数
+				page_Forum_QuestionRelated_Question.setQuestion_filterCondition_transferPrameter(question_filterCondition_transferPrameter);//是否传递过滤条件参数
+				forum.setFormValue(JsonUtils.toJSONString(page_Forum_QuestionRelated_Question));//加入表单值
+				
+			}
+		}
+		
+		Forum_AnswerRelated_Answer collection_Forum_AnswerRelated_Answer = new Forum_AnswerRelated_Answer();
+		//评论列表
+		if(formbean.getForumChildType().equals("答案列表")){
+			if("page".equals(displayType)){//集合
+				String page_answer_sort = request.getParameter("page_answer_sort");//排序
+				String page_answer_maxResult = request.getParameter("page_answer_maxResult");//每页显示记录数
+				String page_answer_pageCount = request.getParameter("page_answer_pageCount");//页码显示总数
+			
+				Integer answer_maxResult = null;//每页显示记录数
+				Integer answer_pageCount = null;//页码显示总数
+				
+				//每页显示记录数
+				if(page_answer_maxResult != null && !"".equals(page_answer_maxResult.trim())){	
+					boolean page_answer_maxResult_Verification = Verification.isPositiveIntegerZero(page_answer_maxResult.trim());//非负整数（正整数+ 0）
+					if(!page_answer_maxResult_Verification){
+						forumError.put("page_answer_maxResult", "请填写数字！");
+					}else{
+						answer_maxResult = Integer.parseInt(page_answer_maxResult.trim());
+					}
+				}
+				//页码显示总数
+				if(page_answer_pageCount != null && !"".equals(page_answer_pageCount.trim())){
+					boolean page_answer_pageCount_Verification = Verification.isPositiveIntegerZero(page_answer_pageCount.trim());//非负整数（正整数+ 0）
+					if(!page_answer_pageCount_Verification){
+						forumError.put("page_answer_pageCount", "请填写数字！");
+					}else{
+						answer_pageCount = Integer.parseInt(page_answer_pageCount.trim());
+					}
+				}
+				
+				collection_Forum_AnswerRelated_Answer.setAnswer_id(UUIDUtil.getUUID32());
+				collection_Forum_AnswerRelated_Answer.setAnswer_sort(Integer.parseInt(page_answer_sort));
+				collection_Forum_AnswerRelated_Answer.setAnswer_maxResult(answer_maxResult);//每页显示记录数
+				collection_Forum_AnswerRelated_Answer.setAnswer_pageCount(answer_pageCount);//页码显示总数
+				forum.setFormValue(JsonUtils.toJSONString(collection_Forum_AnswerRelated_Answer));//加入表单值
+				
+				
+				
+			}
+		}
+		Forum_QuestionRelated_LikeQuestion collection_Forum_QuestionRelated_LikeQuestion = new Forum_QuestionRelated_LikeQuestion();
+		if(formbean.getForumChildType().equals("相似问题")){
+			if("collection".equals(displayType)){//集合
+				String collection_likeQuestion_maxResult = request.getParameter("collection_likeQuestion_maxResult");//显示记录数
+				
+				Integer likeQuestion_maxResult = null;//显示记录数
+				
+				//显示记录数
+				if(collection_likeQuestion_maxResult != null && !"".equals(collection_likeQuestion_maxResult.trim())){	
+					boolean collection_likeQuestion_maxResult_Verification = Verification.isPositiveIntegerZero(collection_likeQuestion_maxResult.trim());//非负整数（正整数+ 0）
+					if(!collection_likeQuestion_maxResult_Verification){
+						forumError.put("collection_likeQuestion_maxResult", "请填写数字！");
+					}else{
+						likeQuestion_maxResult = Integer.parseInt(collection_likeQuestion_maxResult.trim());
+					}
+				}
+				collection_Forum_QuestionRelated_LikeQuestion.setLikeQuestion_id(UUIDUtil.getUUID32());
+				collection_Forum_QuestionRelated_LikeQuestion.setLikeQuestion_maxResult(likeQuestion_maxResult);//显示记录数
+				forum.setFormValue(JsonUtils.toJSONString(collection_Forum_QuestionRelated_LikeQuestion));//加入表单值
+				
+			}
+		}
 		
 		
 		

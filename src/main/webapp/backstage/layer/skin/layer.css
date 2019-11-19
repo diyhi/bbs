@@ -552,7 +552,7 @@ html #layui_layer_skinlayercss {
 	font-size:12px;
 	_float:left;
 	border-radius:3px;
-	box-shadow:1px 1px 3px rgba(0,0,0,.3);
+	box-shadow:1px 1px 3px rgba(0,0,0,.1);
 	background-color:#F90;
 	color:#fff
 }
@@ -616,3 +616,5 @@ html #layui_layer_skinlayercss {
 .layui-layer-molv .layui-layer-btn .layui-layer-btn1 {
 	background:#92B8B1
 }
+
+

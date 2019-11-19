@@ -11,6 +11,7 @@
 	<meta name="csrfToken" content="${token}"/>
 	<link rel="shortcut icon" type="image/x-icon" href="${baseURL}${commonPath}images/favicon.ico" media="screen" />
 	<link href="${commonPath}css/common.css" type="text/css" rel="stylesheet" charset="utf-8">
+	<link href="${commonPath}css/themify-icons/style.css" type="text/css" rel="stylesheet">
 	<script language="javascript" src="${commonPath}js/tool.js" type="text/javascript"></script>
 	<script language="javascript" src="${commonPath}js/ajax.js" type="text/javascript"></script>
 	<script language="javascript" src="${commonPath}js/json2.js" type="text/javascript"></script>
@@ -179,7 +180,52 @@
 									<cite>
 										<a href="thread?topicId=${remind.topicId}&commentId=${remind.friendTopicCommentId}">${remind.topicTitle}</a>
 									</cite>
-									发表了回复
+									发表了话题回复
+									
+								<#elseif remind.typeCode == 120>
+									<cite>
+										<a href="user/control/home?userName=${remind.senderUserName}">
+											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
+										</a>
+									</cite> 
+									在
+									<cite>
+										<a href="question?questionId=${remind.questionId}&answerId=${remind.friendQuestionAnswerId}">${remind.questionTitle}</a>
+									</cite> 
+									回答了我的问题
+								<#elseif remind.typeCode == 130>
+									<cite>
+										<a href="user/control/home?userName=${remind.senderUserName}">
+											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
+										</a>
+									</cite> 
+									在
+									<cite>
+										<a href="question?questionId=${remind.questionId}&answerId=${remind.friendQuestionAnswerId}">${remind.questionTitle}</a>
+									</cite> 
+									回复了我的问题
+								<#elseif remind.typeCode == 140>
+									<cite>
+										<a href="user/control/home?userName=${remind.senderUserName}">
+											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
+										</a>
+									</cite> 
+									在
+									<cite>
+										<a href="question?questionId=${remind.questionId}&answerId=${remind.questionAnswerId}">${remind.questionTitle}</a>
+									</cite> 
+									回复了我的答案
+								<#elseif remind.typeCode == 150>
+									<cite>
+										<a href="user/control/home?userName=${remind.senderUserName}">
+											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
+										</a>
+									</cite> 
+									在
+									<cite>
+										<a href="question?questionId=${remind.questionId}&answerId=${remind.friendQuestionAnswerId}">${remind.questionTitle}</a>
+									</cite> 
+									回复了我回复过的答案
 								</#if>
 							</div>
 							<div class="clearfix"></div>

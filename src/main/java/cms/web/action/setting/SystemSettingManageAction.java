@@ -30,6 +30,8 @@ import cms.web.action.FileManage;
 import cms.web.action.cache.CacheManage;
 import cms.web.action.cache.CacheStatus;
 import cms.web.action.cache.SelectCache;
+import cms.web.action.lucene.QuestionIndexManage;
+import cms.web.action.lucene.QuestionLuceneInit;
 import cms.web.action.lucene.TopicIndexManage;
 import cms.web.action.lucene.TopicLuceneInit;
 import net.rubyeye.xmemcached.MemcachedClient;
@@ -69,6 +71,7 @@ public class SystemSettingManageAction {
 	private Validator validator; 
 	
 	@Resource TopicIndexManage topicIndexManage;
+	@Resource QuestionIndexManage questionIndexManage;
 	@Resource FileManage fileManage;
 	
 	/**
@@ -93,6 +96,20 @@ public class SystemSettingManageAction {
 				systemSite.setTopicEditorTagObject(editorTag);
 			}
 		}
+		if(systemSite.getQuestionEditorTag() != null && !"".equals(systemSite.getQuestionEditorTag().trim())){
+			EditorTag editorTag = JsonUtils.toObject(systemSite.getQuestionEditorTag(), EditorTag.class);
+			if(editorTag != null){
+				systemSite.setQuestionEditorTagObject(editorTag);
+			}
+		}
+		if(systemSite.getAnswerEditorTag() != null && !"".equals(systemSite.getAnswerEditorTag().trim())){
+			EditorTag editorTag = JsonUtils.toObject(systemSite.getAnswerEditorTag(), EditorTag.class);
+			if(editorTag != null){
+				systemSite.setAnswerEditorTagObject(editorTag);
+			}
+		}
+		
+		
 		//允许上传文件格式
 		List<String> formatList = fileManage.readRichTextAllowFileUploadFormat();
 		
@@ -118,7 +135,8 @@ public class SystemSettingManageAction {
 		}
 		formbean.setTopicEditorTag(JsonUtils.toJSONString(formbean.getTopicEditorTagObject()));
 		formbean.setEditorTag(JsonUtils.toJSONString(formbean.getEditorTagObject()));
-		
+		formbean.setQuestionEditorTag(JsonUtils.toJSONString(formbean.getQuestionEditorTagObject()));
+		formbean.setAnswerEditorTag(JsonUtils.toJSONString(formbean.getAnswerEditorTagObject()));
 		
 		formbean.setId(1);
 		formbean.setVersion(new Date().getTime());
@@ -290,6 +308,34 @@ public class SystemSettingManageAction {
 			boolean allow = TopicLuceneInit.INSTANCE.allowCreateIndexWriter();//是否允许创建IndexWriter
 			if(allow){
 				settingManage.addAllTopicIndex();
+				return "1";
+			}else{
+				return "3";
+			}
+			
+			
+		}
+		// 1.任务开始运行;   2.任务正在运行  3.索引运行过程中，不能执行创建
+	}
+	
+	/**
+	 * 重建问题全文索引
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(params="method=rebuildQuestionIndex",method=RequestMethod.POST)
+	@ResponseBody//方式来做ajax,直接返回字符串
+	public String rebuildQuestionIndex(ModelMap model
+			) throws Exception {
+		Long count = questionIndexManage.taskRunMark_add(-1L);
+		
+		if(count >=0L){
+			return "2";
+		}else{
+			boolean allow = QuestionLuceneInit.INSTANCE.allowCreateIndexWriter();//是否允许创建IndexWriter
+			if(allow){
+				settingManage.addAllQuestionIndex();
 				return "1";
 			}else{
 				return "3";

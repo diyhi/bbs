@@ -104,6 +104,56 @@ function reductionRemind(id,userId){
 				<a href="control/topic/manage${config:suffix()}?method=view&topicId=${entry.topicId}&commentId=${entry.friendTopicCommentId}" style="color: #33a3dc;">${entry.topicTitle}</a>
 				回复了我回复过的评论
 	    	</c:if>
+	    	<c:if test="${entry.typeCode == 60}">
+	    		在
+				<a href="control/topic/manage${config:suffix()}?method=view&topicId=${entry.topicId}" style="color: #33a3dc;">${entry.topicTitle}</a>
+				解锁了我的话题
+	    	</c:if>
+	    	<c:if test="${entry.typeCode == 70}">
+	    		在
+				<a href="control/topic/manage${config:suffix()}?method=view&topicId=${entry.topicId}" style="color: #33a3dc;">${entry.topicTitle}</a>
+				赞了我的话题
+	    	</c:if>
+	    	<c:if test="${entry.typeCode == 80}">
+	    		关注了我
+	    	</c:if>
+	    	<c:if test="${entry.typeCode == 90}">
+	    		我关注的 ${entry.senderUserName} 
+	    		发表了话题
+				<a href="control/topic/manage${config:suffix()}?method=view&topicId=${entry.topicId}" style="color: #33a3dc;">${entry.topicTitle}</a>
+	    	</c:if>
+	    	<c:if test="${entry.typeCode == 100}">
+	    		我关注的 ${entry.senderUserName} 
+	    		在
+				<a href="control/topic/manage${config:suffix()}?method=view&topicId=${entry.topicId}&commentId=${entry.friendTopicCommentId}" style="color: #33a3dc;">${entry.topicTitle}</a>
+				发表了评论
+	    	</c:if>
+	    	<c:if test="${entry.typeCode == 110}">
+	    		我关注的 ${entry.senderUserName} 
+	    		在
+				<a href="control/topic/manage${config:suffix()}?method=view&topicId=${entry.topicId}&commentId=${entry.friendTopicCommentId}" style="color: #33a3dc;">${entry.topicTitle}</a>
+				发表了回复
+	    	</c:if>
+	    	<c:if test="${entry.typeCode == 120}">
+	    		在
+				<a href="control/question/manage${config:suffix()}?method=view&questionId=${entry.questionId}&answerId=${entry.friendQuestionAnswerId}" style="color: #33a3dc;">${entry.questionTitle}</a>
+				回答了我的问题
+	    	</c:if>
+	    	<c:if test="${entry.typeCode == 130}">
+	    		在
+				<a href="control/question/manage${config:suffix()}?method=view&questionId=${entry.questionId}&answerId=${entry.friendQuestionAnswerId}" style="color: #33a3dc;">${entry.questionTitle}</a>
+				回复了我的问题
+	    	</c:if>
+	    	<c:if test="${entry.typeCode == 140}">
+	    		在
+				<a href="control/question/manage${config:suffix()}?method=view&questionId=${entry.questionId}&answerId=${entry.questionAnswerId}" style="color: #33a3dc;">${entry.questionTitle}</a>
+				回复了我的答案
+	    	</c:if>
+	    	<c:if test="${entry.typeCode == 150}">
+	    		在
+				<a href="control/question/manage${config:suffix()}?method=view&questionId=${entry.questionId}&answerId=${entry.friendQuestionAnswerId}" style="color: #33a3dc;">${entry.questionTitle}</a>
+				回复了我回复过的答案
+	    	</c:if>
 	    </TD>
 	    <TD width="15%"><fmt:formatDate value="${entry.sendTime}"  pattern="yyyy-MM-dd HH:mm:ss"/></TD>
 	    <TD width="15%"><fmt:formatDate value="${entry.readTime}"  pattern="yyyy-MM-dd HH:mm:ss"/></TD>

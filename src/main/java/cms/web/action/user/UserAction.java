@@ -53,6 +53,7 @@ public class UserAction {
 	
 	@Resource SettingService settingService;
 	
+	
 	/**
 	 * 用户列表
 	 * @param formbean

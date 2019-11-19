@@ -211,7 +211,7 @@ function sureSubmit(){
     <TR>
     <TD class="t-label t-label-h" width="12%">内容：</TD>
     <TD class="t-content" width="88%">
-    	<textarea id="content" name="content" style="width:99%;height:300px;visibility:hidden;">${topic.content}</textarea>
+    	<textarea id="content" name="content" style="width:99%;height:400px;visibility:hidden;">${topic.content}</textarea>
 		<span id="content_error" name="error" class="span-text"></span>
     </TD>
    </TR>

@@ -37,6 +37,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import cms.bean.payment.PaymentLog;
 import cms.bean.payment.PaymentVerificationLog;
+import cms.bean.question.Answer;
+import cms.bean.question.AnswerReply;
+import cms.bean.question.Question;
+import cms.bean.question.QuestionIndex;
+import cms.bean.question.QuestionTag;
+import cms.bean.question.QuestionTagAssociation;
 import cms.bean.user.PointLog;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -56,6 +62,10 @@ import cms.bean.user.UserInputValue;
 import cms.bean.user.UserRole;
 import cms.bean.user.UserRoleGroup;
 import cms.service.payment.PaymentService;
+import cms.service.question.AnswerService;
+import cms.service.question.QuestionIndexService;
+import cms.service.question.QuestionService;
+import cms.service.question.QuestionTagService;
 import cms.service.setting.SettingService;
 import cms.service.topic.CommentService;
 import cms.service.topic.TagService;
@@ -76,6 +86,7 @@ import cms.web.action.SystemException;
 import cms.web.action.TextFilterManage;
 import cms.web.action.lucene.TopicLuceneManage;
 import cms.web.action.payment.PaymentManage;
+import cms.web.action.question.QuestionManage;
 import cms.web.action.thumbnail.ThumbnailManage;
 import cms.web.action.topic.TopicManage;
 
@@ -120,6 +131,12 @@ public class UserManageAction {
 	@Resource UserRoleManage userRoleManage;
 	@Resource PaymentService paymentService;
 	@Resource PaymentManage paymentManage;
+	@Resource QuestionManage questionManage;
+	
+	@Resource QuestionService questionService;
+	@Resource QuestionTagService questionTagService;
+	@Resource AnswerService answerService;
+	@Resource QuestionIndexService questionIndexService;
 	
 	/**
 	 * 用户管理 查看
@@ -1108,6 +1125,12 @@ public class UserManageAction {
 							
 							//删除评论文件
 							topicManage.deleteCommentFile(user.getUserName(), false);
+							
+							//删除用户问题文件
+							questionManage.deleteQuestionFile(user.getUserName(), false);
+							
+							//删除答案文件
+							questionManage.deleteAnswerFile(user.getUserName(), false);
 
 							DateTime dateTime = new DateTime(user.getRegistrationDate());     
 							String date = dateTime.toString("yyyy-MM-dd");
@@ -1129,7 +1152,7 @@ public class UserManageAction {
 						for(User user : userList){
 							//添加删除索引标记
 							topicIndexService.addTopicIndex(new TopicIndex(user.getUserName(),4));
-							
+							questionIndexService.addQuestionIndex(new QuestionIndex(user.getUserName(),4));
 							
 							//删除缓存用户状态
 							userManage.delete_userState(user.getUserName());
@@ -1413,6 +1436,223 @@ public class UserManageAction {
 
 		return "jsp/user/allReplyList";
 	}
+	
+	
+	/**
+	 * 发表的问题
+	 * 
+	 * @param pageForm
+	 * @param model
+	 * @param userName 用户名称
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(params="method=allQuestion",method=RequestMethod.GET)
+	public String allQuestion(PageForm pageForm,ModelMap model,String userName,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		if(userName != null && !"".equals(userName.trim())){
+			StringBuffer jpql = new StringBuffer("");
+			//存放参数值
+			List<Object> params = new ArrayList<Object>();
+
+			jpql.append(" and o.userName=?"+ (params.size()+1));
+			params.add(userName.trim());
+			
+			//删除第一个and
+			String _jpql = org.apache.commons.lang3.StringUtils.difference(" and", jpql.toString());
+			
+			PageView<Question> pageView = new PageView<Question>(settingService.findSystemSetting_cache().getBackstagePageNumber(),pageForm.getPage(),10);
+			//当前页
+			int firstindex = (pageForm.getPage()-1)*pageView.getMaxresult();;	
+			//排序
+			LinkedHashMap<String,String> orderby = new LinkedHashMap<String,String>();
+			
+			orderby.put("id", "desc");//根据id字段降序排序
+			
+			
+			//调用分页算法类
+			QueryResult<Question> qr = questionService.getScrollData(Question.class, firstindex, pageView.getMaxresult(), _jpql, params.toArray(),orderby);
+			if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
+				List<QuestionTag> questionTagList = questionTagService.findAllQuestionTag();
+				
+				if(questionTagList != null && questionTagList.size() >0){
+					for(Question question : qr.getResultlist()){
+						List<QuestionTagAssociation> questionTagAssociationList = questionManage.query_cache_findQuestionTagAssociationByQuestionId(question.getId());
+						if(questionTagAssociationList != null && questionTagAssociationList.size() >0){
+							for(QuestionTag questionTag : questionTagList){
+								for(QuestionTagAssociation questionTagAssociation : questionTagAssociationList){
+									if(questionTagAssociation.getQuestionTagId().equals(questionTag.getId())){
+										questionTagAssociation.setQuestionTagName(questionTag.getName());
+										question.addQuestionTagAssociation(questionTagAssociation);
+										break;
+									}
+								}
+							}
+						}
+					}
+				}
+				
+			}
+
+			pageView.setQueryResult(qr);
+			
+			
+			model.addAttribute("pageView", pageView);
+		}
+		
+		
+		
+
+		return "jsp/user/allQuestionList";
+	}
+	
+	/**
+	 * 发表的答案
+	 * @param pageForm
+	 * @param model
+	 * @param userName 用户名称
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(params="method=allAnswer",method=RequestMethod.GET)
+	public String allAuditAnswer(PageForm pageForm,ModelMap model,String userName,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+
+		if(userName != null && !"".equals(userName.trim())){
+			StringBuffer jpql = new StringBuffer("");
+			//存放参数值
+			List<Object> params = new ArrayList<Object>();
+
+			jpql.append(" and o.userName=?"+ (params.size()+1));
+			params.add(userName.trim());
+			
+			//删除第一个and
+			String _jpql = org.apache.commons.lang3.StringUtils.difference(" and", jpql.toString());
+			
+			PageView<Answer> pageView = new PageView<Answer>(settingService.findSystemSetting_cache().getBackstagePageNumber(),pageForm.getPage(),10);
+			//当前页
+			int firstindex = (pageForm.getPage()-1)*pageView.getMaxresult();;	
+			//排序
+			LinkedHashMap<String,String> orderby = new LinkedHashMap<String,String>();
+			
+			orderby.put("id", "desc");//根据id字段降序排序
+			
+			
+			//调用分页算法类
+			QueryResult<Answer> qr = answerService.getScrollData(Answer.class, firstindex, pageView.getMaxresult(), _jpql, params.toArray(),orderby);
+			if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
+				List<Long> questionIdList = new ArrayList<Long>();
+				for(Answer o :qr.getResultlist()){
+	    			o.setContent(textFilterManage.filterText(o.getContent()));
+	    			if(!questionIdList.contains(o.getQuestionId())){
+	    				questionIdList.add(o.getQuestionId());
+	    			}
+	    		}
+				List<Question> questionList = questionService.findTitleByIdList(questionIdList);
+				if(questionList != null && questionList.size() >0){
+					for(Answer o :qr.getResultlist()){
+						for(Question question : questionList){
+							if(question.getId().equals(o.getQuestionId())){
+								o.setQuestionTitle(question.getTitle());
+								break;
+							}
+						}
+						
+					}
+				}
+				
+			}
+
+			pageView.setQueryResult(qr);
+			
+			
+			model.addAttribute("pageView", pageView);
+		}
+		
+
+		return "jsp/user/allAnswerList";
+	}
+	
+	/**
+	 * 发表的答案回复
+	 * @param pageForm
+	 * @param model
+	 * @param userName 用户名称
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(params="method=allAnswerReply",method=RequestMethod.GET)
+	public String allAuditAnswerReply(PageForm pageForm,ModelMap model,String userName,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		if(userName != null && !"".equals(userName.trim())){
+			StringBuffer jpql = new StringBuffer("");
+			//存放参数值
+			List<Object> params = new ArrayList<Object>();
+
+			jpql.append(" and o.userName=?"+ (params.size()+1));
+			params.add(userName.trim());
+			
+			//删除第一个and
+			String _jpql = org.apache.commons.lang3.StringUtils.difference(" and", jpql.toString());
+			
+			PageView<AnswerReply> pageView = new PageView<AnswerReply>(settingService.findSystemSetting_cache().getBackstagePageNumber(),pageForm.getPage(),10);
+			//当前页
+			int firstindex = (pageForm.getPage()-1)*pageView.getMaxresult();;	
+			//排序
+			LinkedHashMap<String,String> orderby = new LinkedHashMap<String,String>();
+			
+			orderby.put("id", "desc");//根据id字段降序排序
+			
+			
+			//调用分页算法类
+			QueryResult<AnswerReply> qr = answerService.getScrollData(AnswerReply.class, firstindex, pageView.getMaxresult(), _jpql, params.toArray(),orderby);
+			if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
+				List<Long> questionIdList = new ArrayList<Long>();
+				for(AnswerReply o :qr.getResultlist()){
+	    				
+	    			o.setContent(textFilterManage.filterText(o.getContent()));
+	    			if(!questionIdList.contains(o.getQuestionId())){
+	    				questionIdList.add(o.getQuestionId());
+	    			}
+	    		}
+				List<Question> questionList = questionService.findTitleByIdList(questionIdList);
+				if(questionList != null && questionList.size() >0){
+					for(AnswerReply o :qr.getResultlist()){
+						for(Question question : questionList){
+							if(question.getId().equals(o.getQuestionId())){
+								o.setQuestionTitle(question.getTitle());
+								break;
+							}
+						}
+						
+					}
+				}
+				
+			}
+
+			pageView.setQueryResult(qr);
+			
+			
+			model.addAttribute("pageView", pageView);
+		}
+		
+
+		return "jsp/user/allAnswerReplyList";
+	}
+	
+	
+	
+	
+	
 	
 	
 	/**

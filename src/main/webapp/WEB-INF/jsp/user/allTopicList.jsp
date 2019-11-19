@@ -153,7 +153,7 @@ function reductionTopic(){
   <THEAD class="t-list-thead">
   <TR>
   	<TH><INPUT name="all" onclick="javascript:allSelect(this, 'topicId')" type="checkbox" ></TH>
-    <TH>话题名称</TH>
+    <TH>话题标题</TH>
     <TH>标签名称</TH>
     <TH>状态</TH>
     <TH>允许评论</TH>

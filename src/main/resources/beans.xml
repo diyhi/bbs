@@ -176,6 +176,11 @@ http://www.springframework.org/schema/task http://www.springframework.org/schema
 		<task:scheduled ref="task" method="topicIndex" cron="0 0/1 * * * ?"/>
 	</task:scheduled-tasks>
 	
+	<!-- 定时任务 - 生成问题全文索引 每隔1分钟执行一次-->
+	<task:scheduler id="scheduler_questionIndex" pool-size="1"/>
+	<task:scheduled-tasks scheduler="scheduler_questionIndex">
+		<task:scheduled ref="task" method="questionIndex" cron="0 0/1 * * * ?"/>
+	</task:scheduled-tasks>
 	
 	<!-- 定时任务 - 处理缩略图 每隔10分钟运行一次-->
 	<task:scheduler id="scheduler_treatmentThumbnail" pool-size="1"/>

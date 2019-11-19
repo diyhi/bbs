@@ -43,7 +43,7 @@ function auditTopic(topicId){
 		if(value == "1"){
 			window.location.reload();
 		}else{
-			alert("发布失败");
+			alert("审核失败");
 		}
 	},
 		"${config:url(pageContext.request)}control/topic/manage${config:suffix()}?method=auditTopic&timestamp=" + new Date().getTime(), true,parameter);
@@ -66,7 +66,7 @@ function auditComment(commentId){
 		if(value == "1"){
 			window.location.reload();
 		}else{
-			alert("发布失败");
+			alert("审核失败");
 		}
 	},
 		"${config:url(pageContext.request)}control/comment/manage${config:suffix()}?method=auditComment&timestamp=" + new Date().getTime(), true,parameter);
@@ -88,7 +88,7 @@ function auditReply(replyId){
 		if(value == "1"){
 			window.location.reload();
 		}else{
-			alert("发布失败");
+			alert("审核失败");
 		}
 	},
 		"${config:url(pageContext.request)}control/comment/manage${config:suffix()}?method=auditReply&timestamp=" + new Date().getTime(), true,parameter);
@@ -351,7 +351,7 @@ $(function() {
 						</TD>
 						<TD width="50%" style="border-top: #bfe3ff 1px dotted;" align="right">
 							<c:if test="${topic.status == 10}">
-								<A onclick="javascript:if(window.confirm('确定发布吗? ')){auditTopic('${topic.id}');return false;}else{return false};" hidefocus="true" href="#" ondragstart= "return false">立即审核</A>&nbsp;&nbsp;
+								<A onclick="javascript:if(window.confirm('确定审核通过吗? ')){auditTopic('${topic.id}');return false;}else{return false};" hidefocus="true" href="#" ondragstart= "return false">立即审核</A>&nbsp;&nbsp;
 							</c:if>
 							<A hidefocus="true"  href="control/topicLike/list${config:suffix()}?topicId=${topic.id}&visible=${param.visible}&topicPage=${param.topicPage}&userName=${param.userName}&id=${param.id}&queryState=${param.queryState}&jumpStatus=${param.jumpStatus}&userPage=${param.userPage}&commentPage=${param.commentPage}&replyPage=${param.replyPage}" ondragstart= "return false">点赞用户</A>&nbsp;&nbsp;
 							<A hidefocus="true"  href="control/topicFavorite/list${config:suffix()}?topicId=${topic.id}&visible=${param.visible}&topicPage=${param.topicPage}&userName=${param.userName}&id=${param.id}&queryState=${param.queryState}&jumpStatus=${param.jumpStatus}&userPage=${param.userPage}&commentPage=${param.commentPage}&replyPage=${param.replyPage}" ondragstart= "return false">收藏用户</A>&nbsp;&nbsp;

@@ -470,6 +470,47 @@ public class TemplateManage {
 		layoutList.add(layout_membershipCardOrder);
 		
 		
+		
+		
+		//我的问题
+		Layout layout_question = new Layout();
+		layout_question.setId(UUIDUtil.getUUID32());
+		layout_question.setName("我的问题");
+		layout_question.setDirName(dirName);
+		layout_question.setLayoutFile("questionList.html");
+		layout_question.setType(1);//默认页
+		layout_question.setSort(1800);//排序
+		layout_question.setReferenceCode("user/control/questionList");
+		layoutList.add(layout_question);
+		
+		//我的答案
+		Layout layout_answer = new Layout();
+		layout_answer.setId(UUIDUtil.getUUID32());
+		layout_answer.setName("我的答案");
+		layout_answer.setDirName(dirName);
+		layout_answer.setLayoutFile("answerList.html");
+		layout_answer.setType(1);//默认页
+		layout_answer.setSort(1900);//排序
+		layout_answer.setReferenceCode("user/control/answerList");
+		layoutList.add(layout_answer);
+		
+		//我的答案回复
+		Layout layout_answerReply = new Layout();
+		layout_answerReply.setId(UUIDUtil.getUUID32());
+		layout_answerReply.setName("我的答案回复");
+		layout_answerReply.setDirName(dirName);
+		layout_answerReply.setLayoutFile("answerReplyList.html");
+		layout_answerReply.setType(1);//默认页
+		layout_answerReply.setSort(2000);//排序
+		layout_answerReply.setReferenceCode("user/control/answerReplyList");
+		layoutList.add(layout_answerReply);
+		
+		
+		
+		
+		
+		
+		
 		return layoutList;
 	}
 	

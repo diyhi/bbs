@@ -162,6 +162,12 @@ function setAllowFilterWord(obj){
     <div class="itemTab" onclick="put_css(3)">
     	<span>评论编辑器</span>
     </div>
+    <div class="itemTab" onclick="put_css(4)">
+    	<span>问题编辑器</span>
+    </div>
+    <div class="itemTab" onclick="put_css(5)">
+    	<span>答案编辑器</span>
+    </div>
 </div>
 <div class="clear"></div>
 <div id="card">
@@ -273,11 +279,34 @@ function setAllowFilterWord(obj){
 			    </TD>
 			</TR>
 			<TR>
+			    <TD class="t-label t-label-h" width="20%">提交问题每分钟提交超过：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<input class="form-text" name="question_submitQuantity" maxlength="10" size="10" value="${systemSetting.question_submitQuantity}"/>&nbsp;次以上出现验证码
+			    	<span class="span-help">0为每次都出现验证码</span>
+			    	<web:errors path="question_submitQuantity" cssStyle="color: red;"/>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">提交答案每分钟提交超过：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<input class="form-text" name="answer_submitQuantity" maxlength="10" size="10" value="${systemSetting.answer_submitQuantity}"/>&nbsp;次以上出现验证码
+			    	<span class="span-help">0为每次都出现验证码</span>
+			    	<web:errors path="answer_submitQuantity" cssStyle="color: red;"/>
+			    </TD>
+			</TR>
+			<TR>
 			    <TD class="t-label t-label-h" width="20%">发表私信每分钟提交超过：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">
 			    	<input class="form-text" name="privateMessage_submitQuantity" maxlength="10" size="10" value="${systemSetting.privateMessage_submitQuantity}"/>&nbsp;次以上出现验证码
 			    	<span class="span-help">0为每次都出现验证码</span>
 			    	<web:errors path="privateMessage_submitQuantity" cssStyle="color: red;"/>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">提交问题最多可选择标签数量：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<input class="form-text" name="maxQuestionTagQuantity" maxlength="10" size="10" value="${systemSetting.maxQuestionTagQuantity}"/>
+			    	<web:errors path="maxQuestionTagQuantity" cssStyle="color: red;"/>
 			    </TD>
 			</TR>
 			<TR>
@@ -299,6 +328,27 @@ function setAllowFilterWord(obj){
 			    <TD class="t-content" width="80%" colSpan="3">
 			    	<input class="form-text" name="reply_rewardPoint" maxlength="10" size="10" value="${systemSetting.reply_rewardPoint}"/>
 			    	<web:errors path="reply_rewardPoint" cssStyle="color: red;"/>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">提交问题奖励积分：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<input class="form-text" name="question_rewardPoint" maxlength="10" size="10" value="${systemSetting.question_rewardPoint}"/>
+			    	<web:errors path="question_rewardPoint" cssStyle="color: red;"/>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">提交答案奖励积分：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<input class="form-text" name="answer_rewardPoint" maxlength="10" size="10" value="${systemSetting.answer_rewardPoint}"/>
+			    	<web:errors path="answer_rewardPoint" cssStyle="color: red;"/>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">提交答案回复奖励积分：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<input class="form-text" name="answerReply_rewardPoint" maxlength="10" size="10" value="${systemSetting.answerReply_rewardPoint}"/>
+			    	<web:errors path="answerReply_rewardPoint" cssStyle="color: red;"/>
 			    </TD>
 			</TR>
 			<TR>
@@ -347,6 +397,51 @@ function setAllowFilterWord(obj){
 			    </TD>
 			</TR>
 			<TR>
+			    <TD class="t-label t-label-h" width="20%">前台提交问题审核：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label>
+			    		<form:radiobutton path="question_review" value="10"/>全部审核
+			    	</label>
+			    	<label>
+			    		<form:radiobutton path="question_review" value="30"/>特权会员免审核
+			    	</label>
+			    	<label>
+			    		<form:radiobutton path="question_review" value="50"/>无需审核
+			    	</label>
+			    	<web:errors path="question_review" cssStyle="color: red;"/>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">前台提交答案审核：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label>
+			    		<form:radiobutton path="answer_review" value="10"/>全部审核
+			    	</label>
+			    	<label>
+			    		<form:radiobutton path="answer_review" value="30"/>特权会员免审核
+			    	</label>
+			    	<label>
+			    		<form:radiobutton path="answer_review" value="50"/>无需审核
+			    	</label>
+			    	<web:errors path="answer_review" cssStyle="color: red;"/>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">前台提交答案回复审核：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label>
+			    		<form:radiobutton path="answerReply_review" value="10"/>全部审核
+			    	</label>
+			    	<label>
+			    		<form:radiobutton path="answerReply_review" value="30"/>特权会员免审核
+			    	</label>
+			    	<label>
+			    		<form:radiobutton path="answerReply_review" value="50"/>无需审核
+			    	</label>
+			    	<web:errors path="answerReply_review" cssStyle="color: red;"/>
+			    </TD>
+			</TR>
+			<TR>
 			    <TD class="t-label t-label-h" width="20%">允许提交在线留言：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">
 			    	<label>
@@ -382,7 +477,30 @@ function setAllowFilterWord(obj){
 			    	<web:errors path="allowComment" cssStyle="color: red;"/>
 			    </TD>
 			</TR>
-			
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">全局允许提交问题：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label>
+			    		<form:radiobutton path="allowQuestion" value="true"/>是
+			    	</label>
+			    	<label>
+			    		<form:radiobutton path="allowQuestion" value="false"/>否
+			    	</label>
+			    	<web:errors path="allowQuestion" cssStyle="color: red;"/>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">全局允许提交答案：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label>
+			    		<form:radiobutton path="allowAnswer" value="true"/>是
+			    	</label>
+			    	<label>
+			    		<form:radiobutton path="allowAnswer" value="false"/>否
+			    	</label>
+			    	<web:errors path="allowAnswer" cssStyle="color: red;"/>
+			    </TD>
+			</TR>
 			
 			
 			<TR>
@@ -407,6 +525,30 @@ function setAllowFilterWord(obj){
 			    		<form:radiobutton path="realNameUserAllowComment" value="false"/>否
 			    	</label>
 			    	<web:errors path="realNameUserAllowComment" cssStyle="color: red;"/>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">实名用户才允许提交问题：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label>
+			    		<form:radiobutton path="realNameUserAllowQuestion" value="true"/>是
+			    	</label>
+			    	<label>
+			    		<form:radiobutton path="realNameUserAllowQuestion" value="false"/>否
+			    	</label>
+			    	<web:errors path="realNameUserAllowQuestion" cssStyle="color: red;"/>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">实名用户才允许提交答案：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label>
+			    		<form:radiobutton path="realNameUserAllowAnswer" value="true"/>是
+			    	</label>
+			    	<label>
+			    		<form:radiobutton path="realNameUserAllowAnswer" value="false"/>否
+			    	</label>
+			    	<web:errors path="realNameUserAllowAnswer" cssStyle="color: red;"/>
 			    </TD>
 			</TR>
 			<TR>
@@ -839,6 +981,310 @@ function setAllowFilterWord(obj){
 	
 	
     </div>
+    <!-- 问题编辑器 -->
+    <div style="">
+    <TABLE class="t-table" cellSpacing="1" cellPadding="2" width="100%" border="0">
+		<TBODY>
+			<TR>
+		    	<TD class="t-label t-label-h" width="20%">字体<span class="toolbar-icon-url icon-fontname"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="questionEditorTagObject.fontname" value="true"/>打开</label>
+			    	<label><form:radiobutton path="questionEditorTagObject.fontname" value="false"/>关闭</label>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">文字大小<span class="toolbar-icon-url icon-fontsize"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="questionEditorTagObject.fontsize" value="true"/>打开</label>
+			    	<label><form:radiobutton path="questionEditorTagObject.fontsize" value="false"/>关闭</label>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">文字颜色<span class="toolbar-icon-url icon-forecolor"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="questionEditorTagObject.forecolor" value="true"/>打开</label>
+			    	<label><form:radiobutton path="questionEditorTagObject.forecolor" value="false"/>关闭</label>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">文字背景<span class="toolbar-icon-url icon-hilitecolor"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="questionEditorTagObject.hilitecolor" value="true"/>打开</label>
+			    	<label><form:radiobutton path="questionEditorTagObject.hilitecolor" value="false"/>关闭</label>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">粗体<span class="toolbar-icon-url icon-bold"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="questionEditorTagObject.bold" value="true"/>打开</label>
+			    	<label><form:radiobutton path="questionEditorTagObject.bold" value="false"/>关闭</label>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">斜体<span class="toolbar-icon-url icon-italic"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="questionEditorTagObject.italic" value="true"/>打开</label>
+			    	<label><form:radiobutton path="questionEditorTagObject.italic" value="false"/>关闭</label>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">下划线<span class="toolbar-icon-url icon-underline"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="questionEditorTagObject.underline" value="true"/>打开</label>
+			    	<label><form:radiobutton path="questionEditorTagObject.underline" value="false"/>关闭</label>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">删除格式<span class="toolbar-icon-url icon-removeformat"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="questionEditorTagObject.removeformat" value="true"/>打开</label>
+			    	<label><form:radiobutton path="questionEditorTagObject.removeformat" value="false"/>关闭</label>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">超级链接<span class="toolbar-icon-url icon-link"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="questionEditorTagObject.link" value="true"/>打开</label>
+			    	<label><form:radiobutton path="questionEditorTagObject.link" value="false"/>关闭</label>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">取消超级链接<span class="toolbar-icon-url icon-unlink"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="questionEditorTagObject.unlink" value="true"/>打开</label>
+			    	<label><form:radiobutton path="questionEditorTagObject.unlink" value="false"/>关闭</label>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">左对齐<span class="toolbar-icon-url icon-justifyleft"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="questionEditorTagObject.justifyleft" value="true"/>打开</label>
+			    	<label><form:radiobutton path="questionEditorTagObject.justifyleft" value="false"/>关闭</label>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">居中<span class="toolbar-icon-url icon-justifycenter"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="questionEditorTagObject.justifycenter" value="true"/>打开</label>
+			    	<label><form:radiobutton path="questionEditorTagObject.justifycenter" value="false"/>关闭</label>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">右对齐<span class="toolbar-icon-url icon-justifyright"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="questionEditorTagObject.justifyright" value="true"/>打开</label>
+			    	<label><form:radiobutton path="questionEditorTagObject.justifyright" value="false"/>关闭</label>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">编号<span class="toolbar-icon-url icon-insertorderedlist"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="questionEditorTagObject.insertorderedlist" value="true"/>打开</label>
+			    	<label><form:radiobutton path="questionEditorTagObject.insertorderedlist" value="false"/>关闭</label>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">项目符号<span class="toolbar-icon-url icon-insertunorderedlist"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="questionEditorTagObject.insertunorderedlist" value="true"/>打开</label>
+			    	<label><form:radiobutton path="questionEditorTagObject.insertunorderedlist" value="false"/>关闭</label>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">插入表情<span class="toolbar-icon-url icon-emoticons"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="questionEditorTagObject.emoticons" value="true"/>打开</label>
+			    	<label><form:radiobutton path="questionEditorTagObject.emoticons" value="false"/>关闭</label>
+			    </TD>
+			</TR>
+			
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">图片<span class="toolbar-icon-url icon-image"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="questionEditorTagObject.image" value="true" onclick="selectImage('question',this.value);"/>打开</label>
+			    	<label><form:radiobutton path="questionEditorTagObject.image" value="false" onclick="selectImage('question',this.value);"/>关闭</label>
+			    </TD>
+			</TR>
+			<TR id="questionImageFormat_tr" <c:if test="${systemSetting.questionEditorTagObject.image == false}"> style="display: none;"</c:if>>
+			    <TD class="t-label t-label-h" width="20%">允许上传图片格式：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:checkbox path="questionEditorTagObject.imageFormat" value="JPG"/>JPG</label>
+			    	<label><form:checkbox path="questionEditorTagObject.imageFormat" value="JPEG"/>JPEG</label>
+			    	<label><form:checkbox path="questionEditorTagObject.imageFormat" value="BMP"/>BMP</label>
+			    	<label><form:checkbox path="questionEditorTagObject.imageFormat" value="PNG"/>PNG</label>
+			    	<label><form:checkbox path="questionEditorTagObject.imageFormat" value="GIF"/>GIF</label>
+			    </TD>
+			</TR>
+			<TR id="questionImageSize_tr" <c:if test="${systemSetting.questionEditorTagObject.image == false}"> style="display: none;"</c:if>>
+			    <TD class="t-label t-label-h" width="20%">允许上传图片大小：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<form:input class="form-text" path="questionEditorTagObject.imageSize" size="10"/>&nbsp;K
+			    	<web:errors path="questionEditorTagObject.imageSize" cssStyle="color: red;"/>
+			    </TD>
+			</TR>
+			<TR id="questionFileSize_tr" <c:if test="${systemSetting.questionEditorTagObject.file == false}"> style="display: none;"</c:if>>
+			    <TD class="t-label t-label-h" width="20%">允许上传文件大小：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<form:input class="form-text" path="questionEditorTagObject.fileSize" size="10"/>&nbsp;K
+			    	<web:errors path="questionEditorTagObject.fileSize" cssStyle="color: red;"/>
+			    </TD>
+			</TR>
+		</TBODY>
+	</TABLE>
+    </div>
+    
+    <!-- 答案编辑器 -->
+    <div style="">
+    <TABLE class="t-table" cellSpacing="1" cellPadding="2" width="100%" border="0">
+		<TBODY>
+			<TR>
+		    	<TD class="t-label t-label-h" width="20%">字体<span class="toolbar-icon-url icon-fontname"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="answerEditorTagObject.fontname" value="true"/>打开</label>
+			    	<label><form:radiobutton path="answerEditorTagObject.fontname" value="false"/>关闭</label>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">文字大小<span class="toolbar-icon-url icon-fontsize"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="answerEditorTagObject.fontsize" value="true"/>打开</label>
+			    	<label><form:radiobutton path="answerEditorTagObject.fontsize" value="false"/>关闭</label>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">文字颜色<span class="toolbar-icon-url icon-forecolor"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="answerEditorTagObject.forecolor" value="true"/>打开</label>
+			    	<label><form:radiobutton path="answerEditorTagObject.forecolor" value="false"/>关闭</label>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">文字背景<span class="toolbar-icon-url icon-hilitecolor"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="answerEditorTagObject.hilitecolor" value="true"/>打开</label>
+			    	<label><form:radiobutton path="answerEditorTagObject.hilitecolor" value="false"/>关闭</label>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">粗体<span class="toolbar-icon-url icon-bold"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="answerEditorTagObject.bold" value="true"/>打开</label>
+			    	<label><form:radiobutton path="answerEditorTagObject.bold" value="false"/>关闭</label>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">斜体<span class="toolbar-icon-url icon-italic"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="answerEditorTagObject.italic" value="true"/>打开</label>
+			    	<label><form:radiobutton path="answerEditorTagObject.italic" value="false"/>关闭</label>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">下划线<span class="toolbar-icon-url icon-underline"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="answerEditorTagObject.underline" value="true"/>打开</label>
+			    	<label><form:radiobutton path="answerEditorTagObject.underline" value="false"/>关闭</label>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">删除格式<span class="toolbar-icon-url icon-removeformat"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="answerEditorTagObject.removeformat" value="true"/>打开</label>
+			    	<label><form:radiobutton path="answerEditorTagObject.removeformat" value="false"/>关闭</label>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">超级链接<span class="toolbar-icon-url icon-link"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="answerEditorTagObject.link" value="true"/>打开</label>
+			    	<label><form:radiobutton path="answerEditorTagObject.link" value="false"/>关闭</label>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">取消超级链接<span class="toolbar-icon-url icon-unlink"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="answerEditorTagObject.unlink" value="true"/>打开</label>
+			    	<label><form:radiobutton path="answerEditorTagObject.unlink" value="false"/>关闭</label>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">左对齐<span class="toolbar-icon-url icon-justifyleft"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="answerEditorTagObject.justifyleft" value="true"/>打开</label>
+			    	<label><form:radiobutton path="answerEditorTagObject.justifyleft" value="false"/>关闭</label>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">居中<span class="toolbar-icon-url icon-justifycenter"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="answerEditorTagObject.justifycenter" value="true"/>打开</label>
+			    	<label><form:radiobutton path="answerEditorTagObject.justifycenter" value="false"/>关闭</label>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">右对齐<span class="toolbar-icon-url icon-justifyright"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="answerEditorTagObject.justifyright" value="true"/>打开</label>
+			    	<label><form:radiobutton path="answerEditorTagObject.justifyright" value="false"/>关闭</label>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">编号<span class="toolbar-icon-url icon-insertorderedlist"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="answerEditorTagObject.insertorderedlist" value="true"/>打开</label>
+			    	<label><form:radiobutton path="answerEditorTagObject.insertorderedlist" value="false"/>关闭</label>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">项目符号<span class="toolbar-icon-url icon-insertunorderedlist"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="answerEditorTagObject.insertunorderedlist" value="true"/>打开</label>
+			    	<label><form:radiobutton path="answerEditorTagObject.insertunorderedlist" value="false"/>关闭</label>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">插入表情<span class="toolbar-icon-url icon-emoticons"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="answerEditorTagObject.emoticons" value="true"/>打开</label>
+			    	<label><form:radiobutton path="answerEditorTagObject.emoticons" value="false"/>关闭</label>
+			    </TD>
+			</TR>
+			
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">图片<span class="toolbar-icon-url icon-image"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="answerEditorTagObject.image" value="true" onclick="selectImage('answer',this.value);"/>打开</label>
+			    	<label><form:radiobutton path="answerEditorTagObject.image" value="false" onclick="selectImage('answer',this.value);"/>关闭</label>
+			    </TD>
+			</TR>
+			<TR id="answerImageFormat_tr" <c:if test="${systemSetting.answerEditorTagObject.image == false}"> style="display: none;"</c:if>>
+			    <TD class="t-label t-label-h" width="20%">允许上传图片格式：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:checkbox path="answerEditorTagObject.imageFormat" value="JPG"/>JPG</label>
+			    	<label><form:checkbox path="answerEditorTagObject.imageFormat" value="JPEG"/>JPEG</label>
+			    	<label><form:checkbox path="answerEditorTagObject.imageFormat" value="BMP"/>BMP</label>
+			    	<label><form:checkbox path="answerEditorTagObject.imageFormat" value="PNG"/>PNG</label>
+			    	<label><form:checkbox path="answerEditorTagObject.imageFormat" value="GIF"/>GIF</label>
+			    </TD>
+			</TR>
+			<TR id="answerImageSize_tr" <c:if test="${systemSetting.answerEditorTagObject.image == false}"> style="display: none;"</c:if>>
+			    <TD class="t-label t-label-h" width="20%">允许上传图片大小：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<form:input class="form-text" path="answerEditorTagObject.imageSize" size="10"/>&nbsp;K
+			    	<web:errors path="answerEditorTagObject.imageSize" cssStyle="color: red;"/>
+			    </TD>
+			</TR>
+			<TR id="answerFileSize_tr" <c:if test="${systemSetting.answerEditorTagObject.file == false}"> style="display: none;"</c:if>>
+			    <TD class="t-label t-label-h" width="20%">允许上传文件大小：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<form:input class="form-text" path="answerEditorTagObject.fileSize" size="10"/>&nbsp;K
+			    	<web:errors path="answerEditorTagObject.fileSize" cssStyle="color: red;"/>
+			    </TD>
+			</TR>
+		</TBODY>
+	</TABLE>
+    </div>
+    
  </div>
 <TABLE class="t-table" cellSpacing="1" cellPadding="2" width="100%" border="0">
 			<TBODY> 

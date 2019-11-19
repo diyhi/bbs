@@ -22,7 +22,7 @@ import javax.persistence.Transient;
  *
  */
 @Entity
-@Table(indexes = {@Index(name="topic_idx", columnList="tagId,status"),@Index(name="topic_3_idx", columnList="userName,postTime")})
+@Table(indexes = {@Index(name="topic_idx", columnList="tagId,status"),@Index(name="topic_3_idx", columnList="userName,postTime"),@Index(name="topic_4_idx", columnList="status,sort,lastUpdateTime")})
 public class Topic implements Serializable{
 	private static final long serialVersionUID = -684257451052921859L;
 	

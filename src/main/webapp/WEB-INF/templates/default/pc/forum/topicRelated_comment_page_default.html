@@ -44,38 +44,43 @@
 					<div class="commentContent"><#noescape>${comment.content}</#noescape></div>
 					<div class="clearfix"></div>
 					<#if comment.totalReply gt 0> 
-						<div class="reply">
-							<strong class="replyCount">--- 共有 ${comment.totalReply} 条回复 --- </strong>
-			
-							<table class="reply-table">
-							    <tbody>	 
-							    	<#list comment.replyList as reply>
-							    		<tr>
-							    			<td width="30" >
-							    				<div class="author">
-							    				<a href="user/control/home?userName=${reply.userName}">
-								    				<#if reply.avatarName != null>
-														<img src="${reply.avatarPath}100x100/${reply.avatarName}" >
-													<#else>
-														<img src="${commonPath}images/min_avata.png" >
-													</#if> 
-												</a>
+						<div class="replyList">
+							<ul class="box">
+								<#list comment.replyList as reply>
+									<li>
+										
+								        <div class="reply-top" >
+									    	<a class="avatarBox" href="user/control/home?userName=${reply.userName}">
+												<#if reply.avatarName != null>
+													<img src="${reply.avatarPath}100x100/${reply.avatarName}" >
+												<#else>
+													<img src="${commonPath}images/min_avata.png" >
+												</#if>
+											</a>
+									    	<a class="userName" href="user/control/home?userName=${reply.userName}">
+												${(reply.nickname != null && reply.nickname??) ?string(reply.nickname , reply.userName)}
+											</a>
+											<#if reply.isStaff>
+												<div class="userTag">
+										        	<span class="staff">官方人员</span>
+									        	</div>
+											</#if>
+											
+											<#if reply.userRoleNameList?size gt 0>
+												<div class="userTag">
+													<#list reply.userRoleNameList as roleName>
+														<span class="userRoleName">${roleName}</span>
+													</#list>
 												</div>
-							    			</td>
-											<td width="60" >
-												<div class="userName">
-												<a href="user/control/home?userName=${reply.userName}">
-													${(reply.nickname != null && reply.nickname??) ?string(reply.nickname , reply.userName)}
-												</a>
-												</div>
-											</td>
-											<td><span class="replyContent">${reply.content}</span></td>
-											<td width="60" ><span class="replyTime">${reply.postTime}</span></td>
-										</tr>
-							    	</#list> 
-								</tbody>
-							</table>
-						</div>
+											</#if> 
+											<span class="time">${reply.postTime}</span>
+										</div>
+										<div style="clear:both; height: 0; line-height: 0; font-size: 0;"></div>
+										<div class="replyContent">${reply.content}</div>
+									</li>
+								</#list>
+							</ul>
+						</div> 
 					</#if> 
 					<div class="tipBottom">
 						<span class="a-toolbar">

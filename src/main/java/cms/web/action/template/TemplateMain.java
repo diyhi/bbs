@@ -14,6 +14,9 @@ import cms.bean.help.Help;
 import cms.bean.help.HelpType;
 import cms.bean.links.Links;
 import cms.bean.membershipCard.MembershipCard;
+import cms.bean.question.Answer;
+import cms.bean.question.Question;
+import cms.bean.question.QuestionTag;
 import cms.bean.template.Advert;
 import cms.bean.template.Column;
 import cms.bean.template.CustomHTML;
@@ -35,6 +38,8 @@ import cms.web.action.template.impl.Help_TemplateManage;
 import cms.web.action.template.impl.Like_TemplateManage;
 import cms.web.action.template.impl.Links_TemplateManage;
 import cms.web.action.template.impl.MembershipCard_TemplateManage;
+import cms.web.action.template.impl.QuestionTag_TemplateManage;
+import cms.web.action.template.impl.Question_TemplateManage;
 import cms.web.action.template.impl.System_TemplateManage;
 import cms.web.action.template.impl.Tag_TemplateManage;
 import cms.web.action.template.impl.Topic_TemplateManage;
@@ -55,6 +60,8 @@ public class TemplateMain {
 	
 	@Resource Tag_TemplateManage tag_TemplateManage;//标签 -- 模板方法实现
 	@Resource Topic_TemplateManage topic_TemplateManage;//话题 -- 模板方法实现
+	@Resource QuestionTag_TemplateManage questionTag_TemplateManage;// 问题标签 -- 模板方法实现
+	@Resource Question_TemplateManage question_TemplateManage;// 问题 -- 模板方法实现
 	@Resource Feedback_TemplateManage feedback_TemplateManage;
 	@Resource Links_TemplateManage links_TemplateManage;// 友情链接 -- 模板方法实现
 	
@@ -167,7 +174,63 @@ public class TemplateMain {
 				Map<String,Object> value = topic_TemplateManage.replyComment_collection(forum, submitParameter,runtimeParameter);
 				return value;
 			}
-		}else if(forum.getForumChildType().equals("加入收藏夹")){
+		}
+		if(forum.getForumChildType().equals("问题标签列表")){
+			if(forum.getDisplayType().equals("collection")){//集合
+				List<QuestionTag> value = questionTag_TemplateManage.questionTag_collection(forum, submitParameter,runtimeParameter);
+				return value;
+			}
+		}else if(forum.getForumChildType().equals("问题列表")){
+			if(forum.getDisplayType().equals("page")){//分页
+				PageView<Question> value = question_TemplateManage.question_page(forum, submitParameter,runtimeParameter);
+				return value;
+			}
+		}else if(forum.getForumChildType().equals("问题内容")){
+			if(forum.getDisplayType().equals("entityBean")){//实体对象
+				Question value = question_TemplateManage.content_entityBean(forum, submitParameter,runtimeParameter);
+				return value;
+			}
+		}else if(forum.getForumChildType().equals("答案列表")){
+			if(forum.getDisplayType().equals("page")){//分页
+				PageView<Answer> value = question_TemplateManage.answer_page(forum, submitParameter,runtimeParameter);
+				return value;
+			}
+		}else if(forum.getForumChildType().equals("添加问题")){
+			if(forum.getDisplayType().equals("collection")){//集合
+				Map<String,Object> value = question_TemplateManage.addQuestion_collection(forum, submitParameter,runtimeParameter);
+				return value;
+			}
+		}else if(forum.getForumChildType().equals("添加答案")){
+			if(forum.getDisplayType().equals("collection")){//集合
+				Map<String,Object> value = question_TemplateManage.addAnswer_collection(forum, submitParameter,runtimeParameter);
+				return value;
+			}
+		}else if(forum.getForumChildType().equals("回复答案")){
+			if(forum.getDisplayType().equals("collection")){//集合
+				Map<String,Object> value = question_TemplateManage.replyAnswer_collection(forum, submitParameter,runtimeParameter);
+				return value;
+			}
+		}else if(forum.getForumChildType().equals("采纳答案")){
+			if(forum.getDisplayType().equals("collection")){//集合
+				Map<String,Object> value = question_TemplateManage.adoptionAnswer_collection(forum, submitParameter,runtimeParameter);
+				return value;
+			}
+		}else if(forum.getForumChildType().equals("回答总数")){
+			if(forum.getDisplayType().equals("entityBean")){//实体对象
+				Long value = question_TemplateManage.answerCount_entityBean(forum, submitParameter, runtimeParameter);
+				return value;
+			}
+		}else if(forum.getForumChildType().equals("相似问题")){
+			if(forum.getDisplayType().equals("collection")){//集合
+				
+				List<Question> value = question_TemplateManage.question_like_collection(forum, submitParameter,runtimeParameter);
+				return value;
+			}
+		}
+		
+		
+		
+		else if(forum.getForumChildType().equals("加入收藏夹")){
 			if(forum.getDisplayType().equals("collection")){//集合
 				Map<String,Object> value = favorite_TemplateManage.addFavorite_collection(forum, submitParameter, runtimeParameter);
 				return value;
@@ -200,6 +263,11 @@ public class TemplateMain {
 		}else if(forum.getForumChildType().equals("关注用户")){
 			if(forum.getDisplayType().equals("collection")){//集合
 				Map<String,Object> value = follow_TemplateManage.addFollow_collection(forum, submitParameter, runtimeParameter);
+				return value;
+			}
+		}else if(forum.getForumChildType().equals("关注总数")){
+			if(forum.getDisplayType().equals("entityBean")){//实体对象
+				Long value = follow_TemplateManage.followCount_entityBean(forum, submitParameter, runtimeParameter);
 				return value;
 			}
 		}else if(forum.getForumChildType().equals("粉丝总数")){

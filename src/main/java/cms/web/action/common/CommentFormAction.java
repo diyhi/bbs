@@ -325,7 +325,7 @@ public class CommentFormAction {
 			userDynamic.setCommentId(comment.getId());
 			userDynamic.setPostTime(postTime);
 			userDynamic.setStatus(comment.getStatus());
-			
+			userDynamic.setFunctionIdGroup(","+topic.getId()+","+comment.getId()+",");
 			Object new_userDynamic = userDynamicManage.createUserDynamicObject(userDynamic);
 			userService.saveUserDynamic(new_userDynamic);
 
@@ -334,6 +334,7 @@ public class CommentFormAction {
 			userManage.delete_cache_findUserById(accessUser.getUserId());
 			userManage.delete_cache_findUserByUserName(accessUser.getUserName());
 			topicManage.delete_cache_findWhetherCommentTopic(comment.getTopicId(),accessUser.getUserName());
+			topicManage.deleteTopicCache(topicId);
 			
 			followManage.delete_cache_userUpdateFlag(accessUser.getUserName());
 			
@@ -476,7 +477,7 @@ public class CommentFormAction {
 	@RequestMapping(value="/uploadImage", method=RequestMethod.POST)
 	@ResponseBody//方式来做ajax,直接返回字符串
 	public String uploadImage(ModelMap model,Long topicId,
-			MultipartFile imgFile, HttpServletRequest request,HttpServletResponse response) throws Exception {
+			MultipartFile file, HttpServletRequest request,HttpServletResponse response) throws Exception {
 
 		Map<String,Object> returnJson = new HashMap<String,Object>();
 		String errorMessage  = "";
@@ -487,7 +488,7 @@ public class CommentFormAction {
 			errorMessage = "权限不足";
 		}else{
 			//文件上传
-			if(flag_permission && imgFile != null && !imgFile.isEmpty()){
+			if(flag_permission && file != null && !file.isEmpty()){
 				if(topicId != null && topicId >0L){
 					
 					SystemSetting systemSetting = settingService.findSystemSetting_cache();
@@ -503,11 +504,11 @@ public class CommentFormAction {
 							
 							
 							//当前图片文件名称
-							String fileName = imgFile.getOriginalFilename();
+							String fileName = file.getOriginalFilename();
 							//当前图片类型
 						//	String imgType = file.getContentType();
 							//文件大小
-							Long size = imgFile.getSize();
+							Long size = file.getSize();
 							//取得文件后缀
 							String suffix = fileName.substring(fileName.lastIndexOf('.')+1).toLowerCase();
 							
@@ -518,7 +519,7 @@ public class CommentFormAction {
 							long imageSize = editorSiteObject.getImageSize();
 
 							//验证文件类型
-							boolean authentication = fileManage.validateFileSuffix(imgFile.getOriginalFilename(),imageFormat);
+							boolean authentication = fileManage.validateFileSuffix(file.getOriginalFilename(),imageFormat);
 							
 							if(authentication ){
 								if(size/1024 <= imageSize){
@@ -536,7 +537,7 @@ public class CommentFormAction {
 									//生成锁文件
 									fileManage.newFile(lockPathDir+topicId+"_"+newFileName);
 									//保存文件
-									fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
+									fileManage.writeFile(pathDir, newFileName,file.getBytes());
 									
 									//上传成功
 									returnJson.put("error", 0);//0成功  1错误
@@ -820,7 +821,7 @@ public class CommentFormAction {
 			userDynamic.setQuoteCommentId(comment.getId());
 			userDynamic.setPostTime(newComment.getPostTime());
 			userDynamic.setStatus(newComment.getStatus());
-			
+			userDynamic.setFunctionIdGroup(","+topic.getId()+","+newComment.getId()+",");
 			Object new_userDynamic = userDynamicManage.createUserDynamicObject(userDynamic);
 			userService.saveUserDynamic(new_userDynamic);
 			
@@ -1207,7 +1208,7 @@ public class CommentFormAction {
 			userDynamic.setReplyId(reply.getId());
 			userDynamic.setPostTime(reply.getPostTime());
 			userDynamic.setStatus(reply.getStatus());
-			
+			userDynamic.setFunctionIdGroup(","+reply.getTopicId()+","+reply.getCommentId()+","+reply.getId()+",");
 			Object new_userDynamic = userDynamicManage.createUserDynamicObject(userDynamic);
 			userService.saveUserDynamic(new_userDynamic);
 			

@@ -3,7 +3,7 @@ package cms.bean.template;
 import java.io.Serializable;
 
 /**
- * 版块---评论相关--评论 
+ * 版块---评论相关--评论
  *
  */
 public class Forum_CommentRelated_Comment implements Serializable{

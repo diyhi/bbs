@@ -38,6 +38,9 @@
 	    	<c:if test="${entry.module == 400}">积分解锁话题隐藏内容</c:if>
 	    	<c:if test="${entry.module == 500}">会员卡订单支付</c:if>
 	    	<c:if test="${entry.module == 600}">充值</c:if>
+	    	<c:if test="${entry.module == 700}">提交问题</c:if>
+	    	<c:if test="${entry.module == 800}">提交答案</c:if>
+	    	<c:if test="${entry.module == 900}">提交答案回复</c:if>
 	    </TD>
 	    <TD width="15%">
 	    	${entry.userName}

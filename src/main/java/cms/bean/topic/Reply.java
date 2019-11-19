@@ -1,7 +1,9 @@
 package cms.bean.topic;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -63,6 +65,10 @@ public class Reply implements Serializable{
 	
 	/** 状态 10.待审核 20.已发布 **/
 	private Integer status = 10;
+	
+	/** 用户角色名称集合 **/
+	@Transient
+	private List<String> userRoleNameList = new ArrayList<String>();
 	
 	public Long getId() {
 		return id;
@@ -147,6 +153,12 @@ public class Reply implements Serializable{
 	}
 	public void setNickname(String nickname) {
 		this.nickname = nickname;
+	}
+	public List<String> getUserRoleNameList() {
+		return userRoleNameList;
+	}
+	public void setUserRoleNameList(List<String> userRoleNameList) {
+		this.userRoleNameList = userRoleNameList;
 	}
 	
 	

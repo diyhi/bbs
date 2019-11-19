@@ -48,6 +48,12 @@ public interface RemindService extends DAO<Remind>{
 	 */
 	public Integer deleteRemindByTopicId(Long topicId);
 	/**
+	 * 根据问题Id删除提醒
+	 * @param questionId 问题Id
+	 * @return
+	 */
+	public Integer deleteRemindByQuestionId(Long questionId);
+	/**
 	 * 根据用户Id查询提醒分页
 	 * @param userId 用户Id
 	 * @param status 状态

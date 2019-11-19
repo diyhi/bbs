@@ -33,6 +33,8 @@ import cms.service.message.PrivateMessageService;
 import cms.service.message.RemindService;
 import cms.service.message.SystemNotifyService;
 import cms.service.payment.PaymentService;
+import cms.service.question.AnswerService;
+import cms.service.question.QuestionService;
 import cms.service.user.UserGradeService;
 import cms.service.user.UserRoleService;
 import cms.service.user.UserService;
@@ -69,6 +71,8 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 	@Resource FollowService followService;
 	@Resource UserRoleService userRoleService;
 	@Resource PaymentService paymentService;
+	@Resource QuestionService questionService;
+	@Resource AnswerService answerService;
 	
 	/**
 	 * 根据条件分页查询用户名称
@@ -617,7 +621,16 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 		//删除用户角色组
 		userRoleService.deleteUserRoleGroup(userNameList);
 		
-
+		//删除问题
+		questionService.deleteQuestion(userNameList);
+		
+		//删除答案
+		answerService.deleteAnswer(userNameList);
+		
+		//删除回复
+		answerService.deleteAnswerReply(userNameList);
+		//删除问题标签关联
+		questionService.deleteQuestionTagAssociationByUserId(userNameList);
 		return j;
 	}
 	/**
@@ -1196,20 +1209,26 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 	 */
 	public Integer updateUserDynamicTopicStatus(Long userId,String userName,Long topicId,Integer status){
 		int i = 0;
+		
+		//功能Id组
+		String functionIdGroup = ","+topicId+",";
+		
 		//表编号
 		int tableNumber = userDynamicConfig.userIdRemainder(userId);
 		if(tableNumber == 0){//默认对象
-			Query query = em.createQuery("update UserDynamic o set o.status=?1 where o.topicId=?2 and o.userName=?3 and o.module=?4")
+			Query query = em.createQuery("update UserDynamic o set o.status=?1 where o.functionIdGroup like ?2 and o.userName=?3 and o.module=?4")
 					.setParameter(1, status)
-					.setParameter(2, topicId)
+					.setParameter(2, functionIdGroup+"%")
 					.setParameter(3, userName)
 					.setParameter(4, 100);
 			i += query.executeUpdate();
 			
+				
+			
 		}else{//带下划线对象
-			Query query = em.createQuery("update UserDynamic_"+tableNumber+" o set o.status=?1 where o.topicId=?2 and o.userName=?3 and o.module=?4")
+			Query query = em.createQuery("update UserDynamic_"+tableNumber+" o set o.status=?1 where o.functionIdGroup like ?2 and o.userName=?3 and o.module=?4")
 					.setParameter(1, status)
-					.setParameter(2, topicId)
+					.setParameter(2, functionIdGroup+"%")
 					.setParameter(3, userName)
 					.setParameter(4, 100);
 			i += query.executeUpdate();	
@@ -1220,26 +1239,30 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 	 * 修改评论状态
 	 * @param userId 用户Id
 	 * @param userName 用户名称
+	 * @param topicId 话题Id
 	 * @param commentId 评论Id
 	 * @param status 状态
 	 */
-	public Integer updateUserDynamicCommentStatus(Long userId,String userName,Long commentId,Integer status){
+	public Integer updateUserDynamicCommentStatus(Long userId,String userName,Long topicId,Long commentId,Integer status){
 		int i = 0;
+		//功能Id组
+		String functionIdGroup = ","+topicId+","+commentId+",";
+		
 		//表编号
 		int tableNumber = userDynamicConfig.userIdRemainder(userId);
 		if(tableNumber == 0){//默认对象
-			Query query = em.createQuery("update UserDynamic o set o.status=?1 where o.commentId=?2 and o.userName=?3 and o.module>=?4 and o.module<=?5")
+			Query query = em.createQuery("update UserDynamic o set o.status=?1 where o.functionIdGroup like ?2 and o.userName=?3 and o.module>=?4 and o.module<=?5")
 					.setParameter(1, status)
-					.setParameter(2, commentId)
+					.setParameter(2, functionIdGroup+"%")
 					.setParameter(3, userName)
 					.setParameter(4, 200)
 					.setParameter(5, 300);
 			i += query.executeUpdate();
 			
 		}else{//带下划线对象
-			Query query = em.createQuery("update UserDynamic_"+tableNumber+" o set o.status=?1 where o.commentId=?2 and o.userName=?3 and o.module>=?4 and o.module<=?5")
+			Query query = em.createQuery("update UserDynamic_"+tableNumber+" o set o.status=?1 where o.functionIdGroup like ?2 and o.userName=?3 and o.module>=?4 and o.module<=?5")
 					.setParameter(1, status)
-					.setParameter(2, commentId)
+					.setParameter(2, functionIdGroup+"%")
 					.setParameter(3, userName)
 					.setParameter(4, 200)
 					.setParameter(5, 300);
@@ -1251,25 +1274,30 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 	 * 修改回复状态
 	 * @param userId 用户Id
 	 * @param userName 用户名称
+	 * @param topicId 话题Id
+	 * @param commentId 评论Id
 	 * @param replyId 回复Id
 	 * @param status 状态
 	 */
-	public Integer updateUserDynamicReplyStatus(Long userId,String userName,Long replyId,Integer status){
+	public Integer updateUserDynamicReplyStatus(Long userId,String userName,Long topicId,Long commentId,Long replyId,Integer status){
 		int i = 0;
+		//功能Id组
+		String functionIdGroup = ","+topicId+","+commentId+","+replyId+",";
+		
 		//表编号
 		int tableNumber = userDynamicConfig.userIdRemainder(userId);
 		if(tableNumber == 0){//默认对象
-			Query query = em.createQuery("update UserDynamic o set o.status=?1 where o.replyId=?2 and o.userName=?3  and o.module=?4")
+			Query query = em.createQuery("update UserDynamic o set o.status=?1 where o.functionIdGroup like ?2 and o.userName=?3 and o.module=?4")
 					.setParameter(1, status)
-					.setParameter(2, replyId)
+					.setParameter(2, functionIdGroup+"%")
 					.setParameter(3, userName)
 					.setParameter(4, 400);
 			i += query.executeUpdate();
 			
 		}else{//带下划线对象
-			Query query = em.createQuery("update UserDynamic_"+tableNumber+" o set o.status=?1 where o.replyId=?2 and o.userName=?3  and o.module=?4")
+			Query query = em.createQuery("update UserDynamic_"+tableNumber+" o set o.status=?1 where o.functionIdGroup like ?2 and o.userName=?3 and o.module=?4")
 					.setParameter(1, status)
-					.setParameter(2, replyId)
+					.setParameter(2, functionIdGroup+"%")
 					.setParameter(3, userName)
 					.setParameter(4, 400);
 			i += query.executeUpdate();	
@@ -1285,18 +1313,22 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 	 */
 	public Integer softDeleteUserDynamicByTopicId(Long userId,String userName,Long topicId){
 		int i = 0;
+		
+		//功能Id组
+		String functionIdGroup = ","+topicId+",";
+				
 		//表编号
 		int tableNumber = userDynamicConfig.userIdRemainder(userId);
 		if(tableNumber == 0){//默认对象
-			Query query = em.createQuery("update UserDynamic o set o.status=o.status+100 where o.topicId=?1 and o.userName=?2 and o.module=?3 and o.status <100")
-					.setParameter(1, topicId)
+			Query query = em.createQuery("update UserDynamic o set o.status=o.status+100 where o.functionIdGroup like ?1 and o.userName=?2 and o.module=?3 and o.status <100")
+					.setParameter(1, functionIdGroup+"%")
 					.setParameter(2, userName)
 					.setParameter(3, 100);
 			i += query.executeUpdate();
 			
 		}else{//带下划线对象
-			Query query = em.createQuery("update UserDynamic_"+tableNumber+" o set o.status=o.status+100 where o.topicId=?1 and o.userName=?2 and o.module=?3 and o.status <100")
-					.setParameter(1, topicId)
+			Query query = em.createQuery("update UserDynamic_"+tableNumber+" o set o.status=o.status+100 where o.functionIdGroup like ?1 and o.userName=?2 and o.module=?3 and o.status <100")
+					.setParameter(1, functionIdGroup+"%")
 					.setParameter(2, userName)
 					.setParameter(3, 100);
 			i += query.executeUpdate();	
@@ -1313,18 +1345,21 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 	 */
 	public Integer reductionUserDynamicByTopicId(Long userId,String userName,Long topicId){
 		int i = 0;
+		//功能Id组
+		String functionIdGroup = ","+topicId+",";
+		
 		//表编号
 		int tableNumber = userDynamicConfig.userIdRemainder(userId);
 		if(tableNumber == 0){//默认对象
-			Query query = em.createQuery("update UserDynamic o set o.status=o.status-100 where o.topicId=?1 and o.userName=?2 and o.module=?3 and o.status >100")
-					.setParameter(1, topicId)
+			Query query = em.createQuery("update UserDynamic o set o.status=o.status-100 where o.functionIdGroup like ?1 and o.userName=?2 and o.module=?3 and o.status >100")
+					.setParameter(1, functionIdGroup+"%")
 					.setParameter(2, userName)
 					.setParameter(3, 100);
 			i += query.executeUpdate();
 			
 		}else{//带下划线对象
-			Query query = em.createQuery("update UserDynamic_"+tableNumber+" o set o.status=o.status-100 where o.topicId=?1 and o.userName=?2 and o.module=?3 and o.status >100")
-					.setParameter(1, topicId)
+			Query query = em.createQuery("update UserDynamic_"+tableNumber+" o set o.status=o.status-100 where o.functionIdGroup like ?1 and o.userName=?2 and o.module=?3 and o.status >100")
+					.setParameter(1, functionIdGroup+"%")
 					.setParameter(2, userName)
 					.setParameter(3, 100);
 			i += query.executeUpdate();	
@@ -1342,17 +1377,21 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 	 */
 	public Integer deleteUserDynamicByTopicId(Long topicId){
 		int j = 0;
+		
+		//功能Id组
+		String functionIdGroup = ","+topicId+",";
+		
 		//表数量
 		int tableQuantity = userLoginLogConfig.getTableQuantity();
 		for(int i =0; i<tableQuantity; i++){
 			
 			if(i == 0){//默认对象
-				Query query = em.createQuery("delete from UserDynamic o where o.topicId=?1")
-						.setParameter(1, topicId);
+				Query query = em.createQuery("delete from UserDynamic o where o.functionIdGroup like ?1")
+						.setParameter(1, functionIdGroup+"%");
 				j += query.executeUpdate();
 			}else{
-				Query query = em.createQuery("delete from UserDynamic_"+i+" o where o.topicId=?1")
-						.setParameter(1, topicId);
+				Query query = em.createQuery("delete from UserDynamic_"+i+" o where o.functionIdGroup like ?1")
+						.setParameter(1, functionIdGroup+"%");
 				j += query.executeUpdate();	
 			}
 		}
@@ -1361,21 +1400,26 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 	
 	/**
 	 * 根据评论Id删除用户动态(评论下的回复也同时删除)
+	 * @param topicId 话题Id
 	 * @param commentId 评论Id
 	 */
-	public Integer deleteUserDynamicByCommentId(Long commentId){
+	public Integer deleteUserDynamicByCommentId(Long topicId,Long commentId){
 		int j = 0;
+		
+		//功能Id组
+		String functionIdGroup = ","+topicId+","+commentId+",";
+		
 		//表数量
 		int tableQuantity = userLoginLogConfig.getTableQuantity();
 		for(int i =0; i<tableQuantity; i++){
 			
 			if(i == 0){//默认对象
-				Query query = em.createQuery("delete from UserDynamic o where o.commentId=?1")
-						.setParameter(1, commentId);
+				Query query = em.createQuery("delete from UserDynamic o where o.functionIdGroup like ?1")
+						.setParameter(1, functionIdGroup+"%");
 				j += query.executeUpdate();
 			}else{
-				Query query = em.createQuery("delete from UserDynamic_"+i+" o where o.commentId=?1")
-						.setParameter(1, commentId);
+				Query query = em.createQuery("delete from UserDynamic_"+i+" o where o.functionIdGroup like ?1")
+						.setParameter(1, functionIdGroup+"%");
 				j += query.executeUpdate();	
 			}
 		}
@@ -1384,20 +1428,26 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 	/**
 	 * 根据回复Id删除用户动态
 	 * @param userId 用户Id
+	 * @param topicId 话题Id
 	 * @param commentId 评论Id
+	 * @param replyId 回复Id
 	 */
-	public Integer deleteUserDynamicByReplyId(Long userId,Long replyId){
+	public Integer deleteUserDynamicByReplyId(Long userId,Long topicId,Long commentId,Long replyId){
 		int i = 0;
+		
+		//功能Id组
+		String functionIdGroup = ","+topicId+","+commentId+","+replyId+",";
+		
 		//表编号
 		int tableNumber = userDynamicConfig.userIdRemainder(userId);
 		if(tableNumber == 0){//默认对象
-			Query query = em.createQuery("delete from UserDynamic o where o.replyId=?1")
-					.setParameter(1, replyId);
+			Query query = em.createQuery("delete from UserDynamic o where o.functionIdGroup like ?1")
+					.setParameter(1, functionIdGroup+"%");
 			i += query.executeUpdate();
 
 		}else{//带下划线对象
-			Query query = em.createQuery("delete from UserDynamic_"+tableNumber+" o where o.replyId=?1")
-					.setParameter(1, replyId);
+			Query query = em.createQuery("delete from UserDynamic_"+tableNumber+" o where o.functionIdGroup like ?1")
+					.setParameter(1, functionIdGroup+"%");
 			i += query.executeUpdate();	
 		}
 		return i;
@@ -1423,6 +1473,257 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 			}
 		}
 		return j;
+	}
+	
+	
+	
+	
+	/**
+	 * 修改问题状态
+	 * @param userId 用户Id
+	 * @param userName 用户名称
+	 * @param questionId 问题Id
+	 * @param status 状态
+	 */
+	public Integer updateUserDynamicQuestionStatus(Long userId,String userName,Long questionId,Integer status){
+		int i = 0;
+		
+		//功能Id组
+		String functionIdGroup = ","+questionId+",";
+
+		//表编号
+		int tableNumber = userDynamicConfig.userIdRemainder(userId);
+		if(tableNumber == 0){//默认对象
+			Query query = em.createQuery("update UserDynamic o set o.status=?1 where o.functionIdGroup like ?2 and o.userName=?3 and o.module=?4")
+					.setParameter(1, status)
+					.setParameter(2, functionIdGroup+"%")
+					.setParameter(3, userName)
+					.setParameter(4, 500);
+			i += query.executeUpdate();
+			
+		}else{//带下划线对象
+			Query query = em.createQuery("update UserDynamic_"+tableNumber+" o set o.status=?1 where o.functionIdGroup like ?2 and o.userName=?3 and o.module=?4")
+					.setParameter(1, status)
+					.setParameter(2, functionIdGroup+"%")
+					.setParameter(3, userName)
+					.setParameter(4, 500);
+			i += query.executeUpdate();	
+		}
+		return i;
+	}
+	/**
+	 * 修改答案状态
+	 * @param userId 用户Id
+	 * @param userName 用户名称
+	 * @param questionId 问题Id
+	 * @param answerId 答案Id
+	 * @param status 状态
+	 */
+	public Integer updateUserDynamicAnswerStatus(Long userId,String userName,Long questionId,Long answerId,Integer status){
+		int i = 0;
+		//功能Id组
+		String functionIdGroup = ","+questionId+","+answerId+",";
+		
+		//表编号
+		int tableNumber = userDynamicConfig.userIdRemainder(userId);
+		if(tableNumber == 0){//默认对象
+			Query query = em.createQuery("update UserDynamic o set o.status=?1 where o.functionIdGroup like ?2 and o.userName=?3 and o.module=?4")
+					.setParameter(1, status)
+					.setParameter(2, functionIdGroup+"%")
+					.setParameter(3, userName)
+					.setParameter(4, 600);
+			i += query.executeUpdate();
+			
+		}else{//带下划线对象
+			Query query = em.createQuery("update UserDynamic_"+tableNumber+" o set o.status=?1 where o.functionIdGroup like ?2 and o.userName=?3 and o.module=?4")
+					.setParameter(1, status)
+					.setParameter(2, functionIdGroup+"%")
+					.setParameter(3, userName)
+					.setParameter(4, 600);
+			i += query.executeUpdate();	
+		}
+		return i;
+	}
+	/**
+	 * 修改答案回复状态
+	 * @param userId 用户Id
+	 * @param userName 用户名称
+	 * @param questionId 问题Id
+	 * @param answerId 答案Id
+	 * @param answerReplyId 答案回复Id
+	 * @param status 状态
+	 */
+	public Integer updateUserDynamicAnswerReplyStatus(Long userId,String userName,Long questionId,Long answerId,Long answerReplyId,Integer status){
+		int i = 0;
+		//功能Id组
+		String functionIdGroup = ","+questionId+","+answerId+","+answerReplyId+",";
+
+		//表编号
+		int tableNumber = userDynamicConfig.userIdRemainder(userId);
+		if(tableNumber == 0){//默认对象
+			Query query = em.createQuery("update UserDynamic o set o.status=?1 where o.functionIdGroup like ?2 and o.userName=?3 and o.module=?4")
+					.setParameter(1, status)
+					.setParameter(2, functionIdGroup+"%")
+					.setParameter(3, userName)
+					.setParameter(4, 700);
+			i += query.executeUpdate();
+			
+		}else{//带下划线对象
+			
+			Query query = em.createQuery("update UserDynamic_"+tableNumber+" o set o.status=?1 where o.functionIdGroup like ?2 and o.userName=?3 and o.module=?4")
+					.setParameter(1, status)
+					.setParameter(2, functionIdGroup+"%")
+					.setParameter(3, userName)
+					.setParameter(4, 700);
+			i += query.executeUpdate();	
+		}
+		return i;
+	}
+	
+	/**
+	 * 根据问题Id软删除用户动态
+	 * @param userId 用户Id
+	 * @param userName 用户名称
+	 * @param questionId 问题Id
+	 */
+	public Integer softDeleteUserDynamicByQuestionId(Long userId,String userName,Long questionId){
+		int i = 0;
+		
+		//功能Id组
+		String functionIdGroup = ","+questionId+",";
+		
+		//表编号
+		int tableNumber = userDynamicConfig.userIdRemainder(userId);
+		if(tableNumber == 0){//默认对象
+			Query query = em.createQuery("update UserDynamic o set o.status=o.status+100 where o.functionIdGroup like ?1 and o.userName=?2 and o.module=?3 and o.status <100")
+					.setParameter(1, functionIdGroup+"%")
+					.setParameter(2, userName)
+					.setParameter(3, 500);
+			i += query.executeUpdate();
+			
+		}else{//带下划线对象
+			Query query = em.createQuery("update UserDynamic_"+tableNumber+" o set o.status=o.status+100 where o.functionIdGroup like ?1 and o.userName=?2 and o.module=?3 and o.status <100")
+					.setParameter(1, functionIdGroup+"%")
+					.setParameter(2, userName)
+					.setParameter(3, 500);
+			i += query.executeUpdate();	
+		}
+		return i;
+		
+	}
+	
+	/**
+	 * 根据问题Id还原用户动态
+	 * @param userId 用户Id
+	 * @param userName 用户名称
+	 * @param questionId 问题Id
+	 */
+	public Integer reductionUserDynamicByQuestionId(Long userId,String userName,Long questionId){
+		int i = 0;
+		
+		//功能Id组
+		String functionIdGroup = ","+questionId+",";
+				
+		//表编号
+		int tableNumber = userDynamicConfig.userIdRemainder(userId);
+		if(tableNumber == 0){//默认对象
+			Query query = em.createQuery("update UserDynamic o set o.status=o.status-100 where o.functionIdGroup like ?1 and o.userName=?2 and o.module=?3 and o.status >100")
+					.setParameter(1, functionIdGroup+"%")
+					.setParameter(2, userName)
+					.setParameter(3, 500);
+			i += query.executeUpdate();
+			
+		}else{//带下划线对象
+			Query query = em.createQuery("update UserDynamic_"+tableNumber+" o set o.status=o.status-100 where o.functionIdGroup like ?1 and o.userName=?2 and o.module=?3 and o.status >100")
+					.setParameter(1, functionIdGroup+"%")
+					.setParameter(2, userName)
+					.setParameter(3, 500);
+			i += query.executeUpdate();	
+		}
+		return i;
+		
+	}
+	
+	/**
+	 * 根据问题Id删除用户动态(问题下的答案和回复也同时删除)
+	 * @param questionId 问题Id
+	 */
+	public Integer deleteUserDynamicByQuestionId(Long questionId){
+		int j = 0;
+		
+		//功能Id组
+		String functionIdGroup = ","+questionId+",";
+				
+		//表数量
+		int tableQuantity = userLoginLogConfig.getTableQuantity();
+		for(int i =0; i<tableQuantity; i++){
+			
+			if(i == 0){//默认对象
+				Query query = em.createQuery("delete from UserDynamic o where o.functionIdGroup like ?1")
+						.setParameter(1, functionIdGroup+"%");
+				j += query.executeUpdate();
+			}else{
+				Query query = em.createQuery("delete from UserDynamic_"+i+" o where o.functionIdGroup like ?1")
+						.setParameter(1, functionIdGroup+"%");
+				j += query.executeUpdate();	
+			}
+		}
+		return j;
+	}
+	
+	/**
+	 * 根据答案Id删除用户动态(答案下的回复也同时删除)
+	 * @param questionId 问题Id
+	 * @param answerId 答案Id
+	 */
+	public Integer deleteUserDynamicByAnswerId(Long questionId,Long answerId){
+		int j = 0;
+		
+		//功能Id组
+		String functionIdGroup = ","+questionId+","+answerId+",";
+				
+		//表数量
+		int tableQuantity = userLoginLogConfig.getTableQuantity();
+		for(int i =0; i<tableQuantity; i++){
+			
+			if(i == 0){//默认对象
+				Query query = em.createQuery("delete from UserDynamic o where o.functionIdGroup like ?1")
+						.setParameter(1, functionIdGroup+"%");
+				j += query.executeUpdate();
+			}else{
+				Query query = em.createQuery("delete from UserDynamic_"+i+" o where o.functionIdGroup like ?1")
+						.setParameter(1, functionIdGroup+"%");
+				j += query.executeUpdate();	
+			}
+		}
+		return j;
+	}
+	/**
+	 * 根据答案回复Id删除用户动态
+	 * @param userId 用户Id
+	 * @param questionId 问题Id
+	 * @param answerId 答案Id
+	 * @param answerReplyId 答案回复Id
+	 */
+	public Integer deleteUserDynamicByAnswerReplyId(Long userId,Long questionId,Long answerId,Long answerReplyId){
+		int i = 0;
+		
+		//功能Id组
+		String functionIdGroup = ","+questionId+","+answerId+","+answerReplyId+",";
+		
+		//表编号
+		int tableNumber = userDynamicConfig.userIdRemainder(userId);
+		if(tableNumber == 0){//默认对象
+			Query query = em.createQuery("delete from UserDynamic o where o.functionIdGroup like ?1")
+					.setParameter(1, functionIdGroup+"%");
+			i += query.executeUpdate();
+
+		}else{//带下划线对象
+			Query query = em.createQuery("delete from UserDynamic_"+tableNumber+" o where o.functionIdGroup like ?1")
+					.setParameter(1, functionIdGroup+"%");
+			i += query.executeUpdate();	
+		}
+		return i;
 	}
 	
 	

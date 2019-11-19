@@ -214,7 +214,7 @@
 								allowPreviewEmoticons : true,//true或false，true时鼠标放在表情上可以预览表情
 								allowImageUpload : true,//true时显示图片上传按钮
 								uploadJson :'user/control/comment/uploadImage.htm?topicId='+topicId,//指定浏览远程图片的服务器端程序
-								
+								filePostName:'file',//文件上传字段 默认imgFile
 								items : availableTag_obj,
 								afterChange : function() {
 									this.sync();

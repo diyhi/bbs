@@ -117,6 +117,56 @@ public class CaptchaManage {
 	}
 	
 	
+	/**---------------------------------- 问题 ---------------------------------------**/
+	/**
+	 * 是否显示验证码
+	 * @param userName 用户名称
+	 * @return 验证码标记
+	 */
+	public boolean question_isCaptcha(String userName){
+		boolean isCaptcha = false;
+		
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.getQuestion_submitQuantity() <=0){//为0时每次都出现验证码
+			isCaptcha = true;
+		}else{
+			//用户每分钟提交次数
+			Integer quantity = settingManage.getSubmitQuantity("question", userName); 
+			
+			//如果每用户每分钟提交超过设定次数，则需验证码
+			if(quantity != null && quantity >= systemSetting.getQuestion_submitQuantity()){
+				isCaptcha = true;
+			}
+		}
+		return isCaptcha;
+	}
+	
+	
+	/**---------------------------------- 答案 ---------------------------------------**/
+	/**
+	 * 是否显示验证码
+	 * @param userName 用户名称
+	 * @return 验证码标记
+	 */
+	public boolean answer_isCaptcha(String userName){
+		boolean isCaptcha = false;
+		
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.getAnswer_submitQuantity() <=0){//为0时每次都出现验证码
+			isCaptcha = true;
+		}else{
+			//用户每分钟提交次数
+			Integer quantity = settingManage.getSubmitQuantity("answer", userName); 
+			
+			//如果每用户每分钟提交超过设定次数，则需验证码
+			if(quantity != null && quantity >= systemSetting.getAnswer_submitQuantity()){
+				isCaptcha = true;
+			}
+			
+		}
+		return isCaptcha;
+	}
+	
 	
 	/**---------------------------------- 用户登录 ---------------------------------------**/
 	/**

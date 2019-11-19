@@ -341,6 +341,7 @@ public class PrivateMessageServiceBean extends DaoSupport<PrivateMessage> implem
 		
 		return qr;
 	}
+	
 	/**
 	 * 根据用户Id查询私信对话分页总数
 	 * @param userId 用户Id
@@ -377,7 +378,6 @@ public class PrivateMessageServiceBean extends DaoSupport<PrivateMessage> implem
 			return (Long)query.getSingleResult();
 		}
 	}
-	
 	/**
 	 * 根据用户Id查询未读私信数量
 	 * @param userId 用户Id

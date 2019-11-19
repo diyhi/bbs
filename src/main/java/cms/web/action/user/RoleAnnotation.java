@@ -11,6 +11,7 @@ import cms.bean.user.ResourceEnum;
 /**
  * 自定义角色注解
  * 注解参考： @RoleAnnotation(resourceCode=ResourceEnum._2001000)
+ * 具体由cms.web.filter.TempletesInterceptor的方法处理
  */
 
 @Documented //注解是否将包含在JavaDoc中

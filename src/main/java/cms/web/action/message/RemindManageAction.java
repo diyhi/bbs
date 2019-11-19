@@ -21,11 +21,13 @@ import cms.bean.PageForm;
 import cms.bean.PageView;
 import cms.bean.QueryResult;
 import cms.bean.message.Remind;
+import cms.bean.question.Question;
 import cms.bean.topic.Topic;
 import cms.bean.user.User;
 import cms.service.message.RemindService;
 import cms.service.setting.SettingService;
 import cms.service.user.UserService;
+import cms.web.action.question.QuestionManage;
 import cms.web.action.topic.TopicManage;
 
 /**
@@ -37,7 +39,7 @@ import cms.web.action.topic.TopicManage;
 public class RemindManageAction {
 
 	@Resource RemindService remindService; 
-	
+	@Resource QuestionManage questionManage;
 	@Resource SettingService settingService;
 	@Resource UserService userService;
 	@Resource TopicManage topicManage;
@@ -84,7 +86,16 @@ public class RemindManageAction {
 						if(topic != null){
 							remind.setTopicTitle(topic.getTitle());
 						}
+						
 					}
+					if(remind.getQuestionId() != null && remind.getQuestionId() >0L){
+						Question question = questionManage.query_cache_findById(remind.getQuestionId());//查询缓存
+						if(question != null){
+							remind.setQuestionTitle(question.getTitle());
+						}
+						
+					}
+					
 				}
 			}
 			

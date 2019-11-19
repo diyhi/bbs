@@ -4,7 +4,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3c.org/TR/1999/REC-html401-19991224/loose.dtd">
 <HTML xmlns="http://www.w3.org/1999/xhtml"><HEAD>
 <base href="${config:url(pageContext.request)}">
-<TITLE>全部待审核评论</TITLE>
+<TITLE>用户的全部评论</TITLE>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="_csrf_token" content="${_csrf.token}"/>
 <meta name="_csrf_header" content="${_csrf.headerName}"/>
@@ -82,7 +82,7 @@ function deleteComment(commentId){
 <TABLE class="t-list-table" cellSpacing="1" cellPadding="0" width="100%" border="0">
   <THEAD class="t-list-thead">
   <TR>
-    <TH>话题名称</TH>
+    <TH>话题标题</TH>
     <TH>评论内容</TH>
    	<TH>会员/员工</TH>
     <TH>评论时间</TH>
@@ -97,7 +97,7 @@ function deleteComment(commentId){
 	    <TD width="15%"><fmt:formatDate value="${entry.postTime}" pattern="yyyy-MM-dd HH:mm:ss"/></TD>
 	    <TD width="15%">
 	    	<c:if test="${entry.status == 10}">
-	    		<A onclick="javascript:if(window.confirm('确定发布吗? ')){auditComment('${entry.id}');return false;}else{return false};" hidefocus="true" href="#" ondragstart= "return false">立即审核</A>
+	    		<A onclick="javascript:if(window.confirm('确定通过吗? ')){auditComment('${entry.id}');return false;}else{return false};" hidefocus="true" href="#" ondragstart= "return false">立即审核</A>
 	    	</c:if>
 	    	<a href="${config:url(pageContext.request)}control/topic/manage${config:suffix()}?method=view&topicId=${entry.topicId}&commentId=${entry.id}&userName=${param.userName}&id=${param.id}&queryState=${param.queryState}&jumpStatus=${param.jumpStatus}&userPage=${param.userPage}&commentPage=${param.page}&origin=20">查看</a>
 	    	<a href="#" onclick="javascript:if(window.confirm('确定删除吗? ')){deleteComment('${entry.id}');return false;}else{return false};" hidefocus="true" ondragstart= "return false">删除</a>
