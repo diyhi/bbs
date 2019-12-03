@@ -20,142 +20,146 @@
 <#-- 引入页头 -->
 <@include action="${newPublic_2}"/>
 <div class="skeleton ">
-	<div class="main wrap backgroundModule" >
+	<div class="main wrap" >
 		<div class="topicModule">
-			<table cellspacing="0" cellpadding="0">  
-				<#if searchResultPage?exists && searchResultPage.records?exists && searchResultPage.records?size gt 0>
-					<#list searchResultPage.records as searchResult>
-						<#if searchResult.indexModule == 10>
-							<#assign topic = searchResult.topic>
-							<tbody>               
-								<tr>
-						    		<th> 
-								        <div class="avatarBox">
-								            <a class="avatarLink" href="user/control/home?userName=${topic.userName}">
-								                <#if topic.avatarName != null>
-													<img src="${topic.avatarPath}${topic.avatarName}">
-												<#else>
-													<img src="${commonPath}images/min_avata.png">
-												</#if>                                                           
-								            </a>   
-								        </div>
-								        <div class="content highlight">
-								            <a href="thread?topicId=${topic.id}" class="title">
-									          	<#noescape>${topic.title}</#noescape></span>
-											</a>
-											<#list topic.allowRoleViewList as roleName>
+			<div class="topic-box">
+				<div class="topicList">
+					<#if searchResultPage?exists && searchResultPage.records?exists && searchResultPage.records?size gt 0>
+						<#list searchResultPage.records as searchResult>
+							<#if searchResult.indexModule == 10>
+								<#assign topic = searchResult.topic>	
+								<div class="topicItem">
+									<div class="avatarBox">
+							            <a class="avatarLink" href="user/control/home?userName=${topic.userName}">
+							            	<#if topic.avatarName != null>
+												<img src="${topic.avatarPath}100x100/${topic.avatarName}">
+											<#else>
+												<img src="${commonPath}images/min_avata.png">
+											</#if>                                                           
+							            </a>   
+							        </div>
+									
+									<div class="content clearfix">
+										<ul class="info">
+								        	<li>
+								        		<span class="module">话题</span>
+								            	<span class="tag">${topic.tagName}</span>
+								            	<a class="userName" href="user/control/home?userName=${topic.userName}">
+								            		${(topic.nickname != null && topic.nickname??) ?string(topic.nickname , topic.userName)}
+								            	</a>
+								            	<#list topic.userRoleNameList as roleName>
+													<span class="userRoleName">${roleName}</span>
+												</#list>
+								            	<#if topic.isStaff>
+													<span class="staff">官方人员</span>
+												</#if>
+								            	<span class="postTime">发表时间：${topic.postTime}</span>
+								            	<#if topic.lastReplyTime != null>
+								            		<span class="lastReplyTime">最新回复：${topic.lastReplyTime}</span>
+								            	</#if>
+								        	</li>
+								        </ul>
+										<h2 class="title highlight clearfix">
+											<a href="thread?topicId=${topic.id}">
+								            	<#noescape>${topic.title}</#noescape>
+								            </a>
+								            <#list topic.allowRoleViewList as roleName>
 												<span class="topicRoleName">${roleName}</span>
-												
 											</#list>
-											<div class="clear"></div>
-											<div class="info clearfix">
+										</h2>
+										<div class="clearfix"></div>
+										<div class="detail">
+											<h2 class="summary highlight">
+												<#noescape>${topic.content}</#noescape>
+											</h2>
+						                </div>
+									</div>
+									
+									<div class="statistic clearfix">
+					                	
+					                	<div class="viewTotal">
+					                		<i class="cms-view icon"></i>
+					                		${topic.viewTotal}
+					                	</div>
+					                	
+					                	<div class="commentTotal">
+					                		<i class="cms-commentCount icon"></i>
+					                		${topic.commentTotal}
+					                	</div>
+									</div>
+								</div>
 								
-												<a href="javascript:;" class="clear">
-													<em class="replies">${topic.commentTotal}</em>
-													<img class="images" src="${commonPath}images/comment.png" style="float: right;*margin-top: 26px;" alt=""/>
-												</a>
+							<#elseif searchResult.indexModule == 20>
+								<#assign question = searchResult.question>
 								
-												<a href="" class="view" style="*margin-top: 20px;">
-													<img class="images" src="${commonPath}images/pageview.png" alt="" style="float: left;"/>${topic.viewTotal}
-												</a>
-												<span class="module">话题</span>
-												<span class="module">${topic.tagName}</span>
-												<em>  
-								                	<a href="#" >
-									           			<span style="display:inline-block;margin-left: 7px;">
-									                    	${(topic.nickname != null && topic.nickname??) ?string(topic.nickname , topic.userName)}
-									                    </span>
-								                    </a>
-								                    <#list topic.userRoleNameList as roleName>
-														<span class="userRoleName">${roleName}</span>
-														
-													</#list>
-													<#if topic.isStaff>
-														<span class="staff">官方人员</span>
-													</#if>
-								                </em>
-								                <em>发表时间：${topic.postTime}</em>
-								                <#if topic.lastReplyTime != null>
-								                	<em>最新回复：${topic.lastReplyTime}</em>
-								                </#if>
-								                
-											</div>
-										</div>
-										<div class="highlight" style="margin-left: 82px;margin-right: 8px;margin-top:5px; font-size: 14px;">
-											<#noescape>${topic.content}</#noescape>
-										</div>
-									</th>    
-						        	<td></td>
-								</tr>
-							</tbody>
-						<#elseif searchResult.indexModule == 20>
-							<#assign question = searchResult.question>
-							<tbody>               
-								<tr>
-						    		<th> 
-								        <div class="avatarBox">
-								            <a class="avatarLink" href="user/control/home?userName=${question.userName}">
-								                <#if question.avatarName != null>
-													<img src="${question.avatarPath}${question.avatarName}">
-												<#else>
-													<img src="${commonPath}images/min_avata.png">
-												</#if>                                                           
-								            </a>   
-								        </div>
-								        <div class="content highlight">
-								            <a href="question?questionId=${question.id}" class="title">
-									          	<#noescape>${question.title}</#noescape></span>
-											</a>
-											<div class="clear"></div>
-											<div class="info clearfix">
-								
-												<a href="javascript:;" class="clear">
-													<em class="replies">${question.answerTotal}</em>
-													<img class="images" src="${commonPath}images/comment.png" style="float: right;*margin-top: 26px;" alt=""/>
-												</a>
-								
-												<a href="" class="view" style="*margin-top: 20px;">
-													<img class="images" src="${commonPath}images/pageview.png" alt="" style="float: left;"/>${question.viewTotal}
-												</a>
-												<span class="module">问题</span>
-												<em>  
-								                	<a href="#" >
-									           			<span style="display:inline-block;margin-left: 7px;">
-									                    	${(question.nickname != null && question.nickname??) ?string(question.nickname , question.userName)}
-									                    </span>
-								                    </a>
-								                    <#list question.userRoleNameList as roleName>
-														<span class="userRoleName">${roleName}</span>
-														
-													</#list>
-													<#if question.isStaff>
-														<span class="staff">官方人员</span>
-													</#if>
-								                </em>
-								                <em>发表时间：${question.postTime}</em>
-								                <#if question.lastAnswerTime != null>
-								                	<em>最新回复：${question.lastAnswerTime}</em>
-								                </#if>
-								                
-											</div>
-										</div>
-										<div class="highlight" style="margin-left: 82px;margin-right: 8px;margin-top:5px; font-size: 14px;">
-											<#noescape>${question.content}</#noescape>
-										</div>
-									</th>    
-						        	<td></td>
-								</tr>
-							</tbody>
-							
-						</#if>  
-					</#list>
-				</#if>                                    
-			</table>
-			
-			<div class="topicPage">
-				<#assign pageView = searchResultPage>
-				<#--引入分页-->
-				<@include action="${newPublic_1}"/>
+								<div class="topicItem">
+									<div class="avatarBox">
+							            <a class="avatarLink" href="user/control/home?userName=${question.userName}">
+							            	<#if question.avatarName != null>
+												<img src="${question.avatarPath}100x100/${question.avatarName}">
+											<#else>
+												<img src="${commonPath}images/min_avata.png">
+											</#if>                                                           
+							            </a>   
+							        </div>
+									
+									<div class="content clearfix">
+										<ul class="info">
+								        	<li>
+								        		<span class="module">问题</span>
+								            	<a class="userName" href="user/control/home?userName=${question.userName}">
+								            		${(question.nickname != null && question.nickname??) ?string(question.nickname , question.userName)}
+								            	</a>
+								            	<#list question.userRoleNameList as roleName>
+													<span class="userRoleName">${roleName}</span>
+												</#list>
+								            	<#if question.isStaff>
+													<span class="staff">官方人员</span>
+												</#if>
+								            	<span class="postTime">发表时间：${question.postTime}</span>
+								            	<#if question.lastAnswerTime != null>
+								            		<span class="lastReplyTime">最新回复：${question.lastAnswerTime}</span>
+								            	</#if>
+								        	</li>
+								        </ul>
+										<h2 class="title highlight clearfix">
+											<a href="question?questionId=${question.id}">
+								            	<#noescape>${question.title}</#noescape>
+								            </a>
+										</h2>
+										<div class="clearfix"></div>
+										<div class="detail">
+											<h2 class="summary highlight">
+												<#noescape>${question.content}</#noescape>
+											</h2>
+						                </div>
+									</div>
+									
+									<div class="statistic clearfix">
+					                	
+					                	<div class="viewTotal">
+					                		<i class="cms-view icon"></i>
+					                		${question.viewTotal}
+					                	</div>
+					                	
+					                	<div class="commentTotal">
+					                		<i class="cms-commentCount icon"></i>
+					                		${question.answerTotal}
+					                	</div>
+									</div>
+								</div>
+						
+						
+							</#if>  
+						</#list>
+					</#if>     
+					
+					<div class="topicPage">
+						<#assign pageView = searchResultPage>
+						<#--引入分页-->
+						<@include action="${newPublic_1}"/>
+					</div>
+				</div>
 			</div>
 		</div>
 		

@@ -1,20 +1,19 @@
 <#--  相似话题 集合 -->
 <#--  topicId 本模板由引入模块传参 -->
-<@function > 	
-	<#if topicRelated_likeTopic_collection?? && topicRelated_likeTopic_collection?size gt 0 >  
-	<div class="likeTopic">
-	    <ul class="head"><span>相关话题</span></ul>
-	    <ul class="content">
-	    	<#list topicRelated_likeTopic_collection as likeTopic>
-				<li>
-					<a href="thread?topicId=${likeTopic.id}" title="${likeTopic.title}" target="_blank">
-		                ${likeTopic.title}
-		            </a>
-				</li>
-			</#list>
-		</ul>
+<@function > 
+<#if topicRelated_likeTopic_collection?? && topicRelated_likeTopic_collection?size gt 0 >  
+	<div class="likeTopicModule clearfix">
+		<div class="likeTopic">
+		    <div class="title">相关话题</div>
+		    <ul class="topicList">
+		    	<#list topicRelated_likeTopic_collection as likeTopic>
+			        <li class="topic-title ">
+			            <a  href="thread?topicId=${likeTopic.id}" title="${likeTopic.title}" target="_blank" ">${likeTopic.title}</a>
+			        </li>
+		        </#list>
+		       
+			</ul>
+		</div>
 	</div>
-	  
-		
-	</#if>
+</#if>
 </@function>

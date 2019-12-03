@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'themify';
-  src:  url('fonts/themify.eot?yboxlf');
-  src:  url('fonts/themify.eot?yboxlf#iefix') format('embedded-opentype'),
-    url('fonts/themify.ttf?yboxlf') format('truetype'),
-    url('fonts/themify.woff?yboxlf') format('woff'),
-    url('fonts/themify.svg?yboxlf#themify') format('svg');
+  src:  url('fonts/themify.eot?dyrqpw');
+  src:  url('fonts/themify.eot?dyrqpw#iefix') format('embedded-opentype'),
+    url('fonts/themify.ttf?dyrqpw') format('truetype'),
+    url('fonts/themify.woff?dyrqpw') format('woff'),
+    url('fonts/themify.svg?dyrqpw#themify') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -25,6 +25,15 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.cms-append:before {
+  content: "\e914";
+}
+.cms-quote-right-solid:before {
+  content: "\e912";
+}
+.cms-quote-left-solid:before {
+  content: "\e913";
+}
 .cms-chess-queen-solid:before {
   content: "\e910";
 }

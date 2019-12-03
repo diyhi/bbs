@@ -100,7 +100,7 @@ function deleteQuestion(){
 				alert("删除失败");
 			}
 		},
-			"${config:url(pageContext.request)}control/question/manage${config:suffix()}?method=delete&visible=${param.visible}&timestamp=" + new Date().getTime(), true,parameter);
+			"${config:url(pageContext.request)}control/question/manage${config:suffix()}?method=deleteQuestion&visible=${param.visible}&timestamp=" + new Date().getTime(), true,parameter);
 	}else{
 		alert("请选择选项");
 	}

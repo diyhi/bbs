@@ -463,7 +463,7 @@ public class TopicManageAction {
 			model.addAttribute("error", error);
 		}else{
 			topicService.saveTopic(topic);
-			
+			topicManage.delete_cache_markUpdateTopicStatus(topic.getId());//删除 标记修改话题状态
 			//更新索引
 			topicIndexService.addTopicIndex(new TopicIndex(String.valueOf(topic.getId()),1));
 			
@@ -984,6 +984,7 @@ public class TopicManageAction {
 					topicManage.deleteTopicCache(topic.getId());//删除话题缓存
 					topicManage.delete_cache_analysisHiddenTag(topic.getId());//删除解析隐藏标签缓存
 					topicManage.delete_cache_analysisFullFileName(topic.getId());//删除 解析上传的文件完整路径名称缓存
+					topicManage.delete_cache_markUpdateTopicStatus(topic.getId());//删除 标记修改话题状态
 					
 					Object[] obj = textFilterManage.readPathName(old_content,"topic");
 					if(obj != null && obj.length >0){

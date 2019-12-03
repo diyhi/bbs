@@ -116,4 +116,5 @@
 }**/
 .tm-m-photo-viewer,  .tm-m-photo-viewer img,  .tm-m-photos-thumb .tm-current img {
 	cursor: url(common/default/pc/js/imageZoom/img/zoom_out.cur), url(img/zoomOut.png), auto;
+	
 }

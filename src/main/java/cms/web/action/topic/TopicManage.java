@@ -580,11 +580,11 @@ public class TopicManage {
     /**
      * 生成处理'隐藏标签'Id
      * @param topicId 话题Id
-     * @param lastUpdateTime 最后修改时间
+     * @param topicContentUpdateMark 话题内容修改标记
      * @param visibleTagList 允许可见的隐藏标签
      * @return
      */
-    public String createProcessHideTagId(Long topicId,Date lastUpdateTime,List<Integer> visibleTagList){
+    public String createProcessHideTagId(Long topicId,Integer topicContentUpdateMark,List<Integer> visibleTagList){
     	String id = topicId+"|";
     	
     	if(visibleTagList != null && visibleTagList.size() >0){
@@ -614,8 +614,8 @@ public class TopicManage {
     			id+="0,";
     		}
     	}
-    	if(lastUpdateTime != null){
-			id+="|"+lastUpdateTime.getTime();
+    	if(topicContentUpdateMark != null){
+			id+="|"+topicContentUpdateMark;
 		}else{
 			id+="|";
 		}
@@ -625,11 +625,11 @@ public class TopicManage {
     /**
      * 生成处理'上传的文件完整路径名称'Id
      * @param topicId 话题Id
-     * @param lastUpdateTime 最后修改时间
+     * @param topicContentUpdateMark 话题内容修改标记
      * @param fullFileNameMap 完整路径名称 key: 完整路径名称 value: 重定向接口
      * @return
      */
-    public String createProcessFullFileNameId(Long topicId,Date lastUpdateTime,Map<String,String> fullFileNameMap){
+    public String createProcessFullFileNameId(Long topicId,Integer topicContentUpdateMark,Map<String,String> fullFileNameMap){
     	String id = topicId+"|";
 
     	StringBuffer sb = new StringBuffer("");
@@ -638,8 +638,8 @@ public class TopicManage {
     		
     	}
     	id+= cms.utils.MD5.getMD5(sb.toString())+"|";
-    	if(lastUpdateTime != null){
-			id+="|"+lastUpdateTime.getTime();
+    	if(topicContentUpdateMark != null){
+			id+="|"+topicContentUpdateMark;
 		}else{
 			id+="|";
 		}
@@ -751,6 +751,26 @@ public class TopicManage {
 	@Cacheable(value="topicManage_cache_processFullFileName",key="#processFullFileNameId")
 	public String query_cache_processFullFileName(String html,String item,Map<String,String> newFullFileNameMap,String processFullFileNameId){
 		return textFilterManage.processFullFileName(html,item,newFullFileNameMap);
+	}
+	
+	
+	/**
+	 * 查询缓存 标记修改话题状态
+	 * @param topicId 话题Id
+	 * @param randomNumber 随机数
+	 * @return
+	 */
+	@Cacheable(value="topicManage_cache_markUpdateTopicStatus",key="#topicId")
+	public Integer query_cache_markUpdateTopicStatus(Long topicId, Integer randomNumber){
+		return randomNumber;
+	}
+	/**
+	 * 删除缓存 标记修改话题状态
+	 * @param topicId 话题Id
+	 * @return
+	 */
+	@CacheEvict(value="topicManage_cache_markUpdateTopicStatus",key="#topicId")
+	public void delete_cache_markUpdateTopicStatus(Long topicId){
 	}
 
 }

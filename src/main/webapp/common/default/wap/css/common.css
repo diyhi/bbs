@@ -442,6 +442,7 @@ html,body{
 .topicContentModule .topicDetail .main hide .submit-box .button{ width:96px; height:26px; line-height:28px; border:0; background:#888888; font-size:16px; color:#fff; float:right; font-weight:bold; cursor:pointer;text-decoration: none; outline: none}
 .topicContentModule .topicDetail .main hide .submit-box .button:hover{background:#808080;}
 
+
 .topicContentModule .operating {
 	display:inline-block;text-align: center;width: 100%;
 }
@@ -903,8 +904,6 @@ html,body{
 .questionContentModule .questionDetail {
 	margin-left:8px;
 	margin-right:8px;
-	overflow: hidden;
-	zoom: 1;
 	border-bottom: 1px solid #eee;
 }
 .questionContentModule .questionDetail .head {
@@ -957,6 +956,53 @@ html,body{
 .questionContentModule .questionDetail .main img{
 	max-width:100%;height:auto;border:none;background:none;padding:0;
 }
+
+.questionContentModule .questionDetail .appendBox{
+	margin-top:25px;
+	position:relative;
+}
+.questionContentModule .questionDetail .odd .appendHead{
+	color: #f9ce00;
+}
+.questionContentModule .questionDetail .odd:before{
+	content: " ";
+	position: absolute;
+	top: 0px;
+	left: -8px;
+	bottom:0px;
+	border-left: 5px solid #f9ce00;
+}
+.questionContentModule .questionDetail .even .appendHead{
+	color: #85eb4e;
+}
+.questionContentModule .questionDetail .even:before{
+	content: " ";
+	position: absolute;
+	top: 0px;
+	left: -8px;
+	bottom:0px;
+	border-left: 5px solid #85eb4e;
+}
+.questionContentModule .questionDetail .appendBox .appendHead {
+	height: 24px;
+}
+.questionContentModule .questionDetail .appendBox .appendHead .prompt{
+	font-size: 15px;
+	line-height: 34px;
+}
+.questionContentModule .questionDetail .appendBox .appendHead .appendTime{
+	margin-left:5px;
+	font-size: 15px;
+	line-height: 34px;
+}
+.questionContentModule .questionDetail .appendBox .appendContent{padding:20px 0px;color:#333;font-size:16px;line-height:28px; word-wrap:break-word;min-height: 80px;}
+.questionContentModule .questionDetail .appendBox .appendContent a{
+	color: #26a2ff;
+}
+.questionContentModule .questionDetail .appendBox .appendContent p{font-size:16px;word-wrap:break-word}
+.questionContentModule .questionDetail .appendBox .appendContent img{max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;}
+
+
 
 .questionContentModule .answerList {
 	width: 100%;
@@ -1443,6 +1489,25 @@ html,body{
 	background-color: #a2d7fe;
 }
 
+/** 追加问题 **/
+.appendQuestionModule{
+	padding-top: 40px;padding-bottom: 2px;
+}
+.appendQuestionModule .appendQuestionScroll {
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    right:0;
+    margin-bottom: 0;
+    border-bottom: none;
+    -webkit-overflow-scrolling: touch;
+    overflow-scrolling: touch;
+}
+.appendQuestionModule .appendQuestionScroll .box{
+}
+.appendQuestionModule .appendQuestionScroll .box .appendQuestionForm{margin-left:5px; margin-right: 5px;}
+.appendQuestionModule .appendQuestionScroll .box .appendQuestionForm .tips{line-height:30px; margin-left: 10px}
+.appendQuestionModule .appendQuestionScroll .box .appendQuestionForm .tips span{color: red;}
 
 
 /** 搜索列表 **/
@@ -1969,8 +2034,8 @@ html,body{
 	font-size: 14px;margin-left:6px;
 	color:#aaa;
 }
-.topicListModule .topicList .item .topInfo .bRight .status{fontsize:13px;padding-right: 5px;}
-.topicListModule .topicList .item .topInfo .bRight .fast{fontsize:13px;padding-right: 5px;}
+.topicListModule .topicList .item .topInfo .bRight .status{font-size:13px;padding-right: 5px;}
+.topicListModule .topicList .item .topInfo .bRight .fast{font-size:13px;padding-right: 5px;}
 
 .topicListModule .topicList .item .topInfo .bRight .time{font-style:normal;}
 .topicListModule .topicList .item .title{
@@ -2068,7 +2133,7 @@ html,body{
 .questionListModule .questionList .item .topInfo .bLeft{
 	float:left!important;
 	display:inline-block;
-	width:60%;
+	width:50%;
 	overflow:hidden;
 	text-overflow:ellipsis; 
 	white-space:nowrap; 
@@ -2092,8 +2157,8 @@ html,body{
 	font-size: 14px;margin-left:6px;
 	color:#aaa;
 }
-.questionListModule .questionList .item .topInfo .bRight .status{fontsize:13px;padding-right: 5px;}
-.questionListModule .questionList .item .topInfo .bRight .fast{fontsize:13px;padding-right: 5px;}
+.questionListModule .questionList .item .topInfo .bRight .status{font-size:13px;padding-right: 5px; }
+.questionListModule .questionList .item .topInfo .bRight .fast{font-size:13px;padding-right: 5px;}
 
 .questionListModule .questionList .item .topInfo .bRight .time{font-style:normal;}
 .questionListModule .questionList .item .title{
@@ -3347,7 +3412,7 @@ html,body{
 }
 
 /** 修改话题 **/
- .topicScroll{
+.editTopicModule{
 	padding-top: 40px;padding-bottom: 2px;
 }
 .editTopicModule .topicScroll {

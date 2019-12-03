@@ -23,7 +23,7 @@
 					
 					<div class="answerSubmit">
 						<span class="submitButton-box" >
-							<button type="button" class="submitButton" onClick="javascript:ajax_sureSubmit('${identificationNumber}')">提交</button>
+							<button type="button" class="submitButton" onClick="javascript:ajax_reply_sureSubmit('${identificationNumber}')">提交</button>
 						</span>
 						<!-- 调用方法在questionRelated_answer_page页 -->
 						<span class="cancelButton-box" >
@@ -117,11 +117,11 @@
 					}
 				
 					//表单Form方式提交
-					function sureSubmit(obj){
+					function reply_sureSubmit(obj){
 						obj.submit();
 					} 
 					//Ajax方式提交
-					function ajax_sureSubmit(identificationNumber){
+					function ajax_reply_sureSubmit(identificationNumber){
 						if(verificationCode() == true){
 							var parameter = "";
 							//答案Id

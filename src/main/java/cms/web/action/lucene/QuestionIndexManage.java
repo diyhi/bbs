@@ -7,6 +7,7 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.cache.annotation.CacheEvict;
@@ -15,6 +16,9 @@ import org.springframework.cache.CacheManager;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+
+import cms.bean.question.AppendQuestionItem;
 import cms.bean.question.Question;
 import cms.bean.question.QuestionIndex;
 import cms.bean.question.QuestionTag;
@@ -22,6 +26,7 @@ import cms.bean.question.QuestionTagAssociation;
 import cms.service.question.QuestionIndexService;
 import cms.service.question.QuestionService;
 import cms.service.question.QuestionTagService;
+import cms.utils.JsonUtils;
 
 /**
  * 问题全文索引定时索引管理
@@ -126,6 +131,14 @@ public class QuestionIndexManage {
 						
 						if(questionTagList != null && questionTagList.size() >0){
 							for(Question question : questionList){
+								//删除最后一个逗号
+								String _appendContent = StringUtils.substringBeforeLast(question.getAppendContent(), ",");//从右往左截取到相等的字符,保留左边的
+
+								List<AppendQuestionItem> appendQuestionItemList = JsonUtils.toGenericObject(_appendContent+"]", new TypeReference< List<AppendQuestionItem> >(){});
+								question.setAppendQuestionItemList(appendQuestionItemList);
+								
+								
+								
 								List<QuestionTagAssociation> questionTagAssociationList = questionService.findQuestionTagAssociationByQuestionId(question.getId());
 								if(questionTagAssociationList != null && questionTagAssociationList.size() >0){
 									for(QuestionTag questionTag : questionTagList){
@@ -200,6 +213,13 @@ public class QuestionIndexManage {
 					
 					if(questionTagList != null && questionTagList.size() >0){
 						for(Question question : questionList){
+							//删除最后一个逗号
+							String _appendContent = StringUtils.substringBeforeLast(question.getAppendContent(), ",");//从右往左截取到相等的字符,保留左边的
+
+							List<AppendQuestionItem> appendQuestionItemList = JsonUtils.toGenericObject(_appendContent+"]", new TypeReference< List<AppendQuestionItem> >(){});
+							question.setAppendQuestionItemList(appendQuestionItemList);
+							
+							
 							List<QuestionTagAssociation> questionTagAssociationList = questionService.findQuestionTagAssociationByQuestionId(question.getId());
 							if(questionTagAssociationList != null && questionTagAssociationList.size() >0){
 								for(QuestionTag questionTag : questionTagList){

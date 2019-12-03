@@ -619,7 +619,17 @@
 						<div v-if="question.lastUpdateTime != null" class="lastUpdateTime">最后修改时间：{{question.lastUpdateTime}}</div>
 						<!-- 内容 -->
 						<div v-html="question.content"></div>
+						<div :class="(index%2)==0 ? 'appendBox odd' : 'appendBox even'" v-for="(appendQuestionItem,index) in question.appendQuestionItemList">
+							<div class="appendHead">
+								<span class="prompt">第{{index + 1}}条附言</span>
+								<span class="appendTime">{{appendQuestionItem.postTime}}</span>
+							</div>
+		                	<div class="appendContent" >
+		                		<div v-html="appendQuestionItem.content"></div>
+		                	</div> 
+						</div>	
 					</div>
+					
 				</div>
 				
 				
@@ -901,7 +911,57 @@
 	</div>
 </template>
 
-
+<!-- 追加问题 -->
+<template id="appendQuestion-template">
+	<div>
+		<mt-header fixed title="追加问题" style="background: #fafafa; color: #000000;font-size: 14px">
+	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
+	    	<router-link to="/index" slot="right">
+			    <span class="cms-home" style="font-size: 18px;"></span>
+			</router-link>
+		</mt-header>
+		<div class="appendQuestionModule">
+	    	<div class="appendQuestionScroll">
+				<div class="box" >
+					<div class="appendQuestionForm" >
+						<ul>
+							<li>
+								<div ref="appendQuestionContentEditorToolbar" class="editor-toolbar"></div>
+								<div ref="appendQuestionContentEditorText"  class="editor-text"></div>
+								<p class="tips">
+							    	<span>{{error.appendQuestionContent}}</span>	
+							    </p>
+							</li>
+							
+							<li v-if="showCaptcha" >
+					        	<input type="hidden" v-model="captchaKey">
+					        	<mt-field v-model.trim="captchaValue"  v-on:input="validation_captchaValue" label="验证码" placeholder="请输入验证码"  type="text">
+									
+								</mt-field>
+								<div style="position: absolute;right: 0px;margin-top: -45px; ">
+									<img :src="imgUrl" @click="replaceCaptcha" height="45px" width="120px" >
+								</div>
+								<p class="tips">
+							    	<span>{{error.captchaValue}}</span>	
+							    </p>
+					        </li>
+					      
+					        <li style="margin-left: 10px;margin-right: 10px; margin-top: 10px; padding-bottom: 10px;">
+								<mt-button  type="primary" size="large"  @click.native="appendQuestion">提交</mt-button>
+								<p class="tips">
+							    	<span>{{error.question}}</span>	
+							    </p>
+								
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+	        
+	        
+		</div>
+	</div>
+</template>
 
 <!-- 搜索框 -->
 <template id="searchBar-template">
@@ -1697,6 +1757,7 @@
 			            </span>
 			            <p class="bRight">
 			            	<span class="status" v-if="question.status == 10">[待审核]</span>
+			            	<router-link class="fast cms-append"  tag="span" :to="{path: '/user/appendQuestion', query: {questionId: question.id}}" ></router-link>
 			            	<i class="time">{{question.postTime}}</i>
 			            </p> 
 			        </div>

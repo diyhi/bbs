@@ -200,6 +200,11 @@ public class TemplateMain {
 				Map<String,Object> value = question_TemplateManage.addQuestion_collection(forum, submitParameter,runtimeParameter);
 				return value;
 			}
+		}else if(forum.getForumChildType().equals("追加问题")){
+			if(forum.getDisplayType().equals("collection")){//集合
+				Map<String,Object> value = question_TemplateManage.appendQuestion_collection(forum, submitParameter,runtimeParameter);
+				return value;
+			}
 		}else if(forum.getForumChildType().equals("添加答案")){
 			if(forum.getDisplayType().equals("collection")){//集合
 				Map<String,Object> value = question_TemplateManage.addAnswer_collection(forum, submitParameter,runtimeParameter);

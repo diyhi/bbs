@@ -11,12 +11,14 @@ import javax.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 
 import cms.bean.PageForm;
 import cms.bean.PageView;
 import cms.bean.QueryResult;
 import cms.bean.question.Answer;
 import cms.bean.question.AnswerReply;
+import cms.bean.question.AppendQuestionItem;
 import cms.bean.question.Question;
 import cms.bean.question.QuestionTag;
 import cms.bean.question.QuestionTagAssociation;
@@ -389,6 +391,13 @@ public class Question_TemplateManage {
 					
 				}
 				
+				//删除最后一个逗号
+				String _appendContent = StringUtils.substringBeforeLast(question.getAppendContent(), ",");//从右往左截取到相等的字符,保留左边的
+
+				List<AppendQuestionItem> appendQuestionItemList = JsonUtils.toGenericObject(_appendContent+"]", new TypeReference< List<AppendQuestionItem> >(){});
+				question.setAppendQuestionItemList(appendQuestionItemList);
+				
+				
 				User user = null;
 				if(question.getIsStaff() == false){//会员
 					user = userManage.query_cache_findUserByUserName(question.getUserName());
@@ -452,7 +461,41 @@ public class Question_TemplateManage {
 		return value;
 	}
 	
-
+	/**
+	 * 问题  -- 追加
+	 * @param forum
+	 */
+	public Map<String,Object> appendQuestion_collection(Forum forum,Map<String,Object> parameter,Map<String,Object> runtimeParameter){
+		Map<String,Object> value = new HashMap<String,Object>();
+		
+		AccessUser accessUser = null;
+		//获取运行时参数
+		if(runtimeParameter != null && runtimeParameter.size() >0){		
+			for(Map.Entry<String,Object> paramIter : runtimeParameter.entrySet()) {
+				if("accessUser".equals(paramIter.getKey())){
+					accessUser = (AccessUser)paramIter.getValue();
+				}
+			}
+		}
+		if(accessUser != null){
+			boolean captchaKey = captchaManage.question_isCaptcha(accessUser.getUserName());//验证码标记
+			if(captchaKey ==true){
+				value.put("captchaKey",UUIDUtil.getUUID32());//是否有验证码
+			}
+		}
+		
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		
+		//如果全局不允许提交问题
+		if(systemSetting.isAllowQuestion() == false){
+			value.put("allowQuestion",false);//不允许提交问题
+		}else{
+			value.put("allowQuestion",true);//允许提交问题
+		}
+		
+		value.put("availableTag", questionManage.availableTag());//问题编辑器允许使用标签
+		return value;
+	}
 	
 	/**
 	 * 答案列表  -- 集合

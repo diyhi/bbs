@@ -1,15 +1,14 @@
 <#-- 话题列表  分页 -->
 <@function page="${url_page}" tagId="${url_tagId}">
 
-
 <div class="topicModule">
-<table cellspacing="0" cellpadding="0">  
-	<#if topicRelated_topic_page?exists && topicRelated_topic_page.records?exists && topicRelated_topic_page.records?size gt 0>
-		<#list topicRelated_topic_page.records as topic>
-			<tbody>               
-				<tr>
-		    		<th> 
-				        <div class="avatarBox">
+	<div class="topic-box">
+		<div class="topicList">
+			<#if topicRelated_topic_page?exists && topicRelated_topic_page.records?exists && topicRelated_topic_page.records?size gt 0>
+				<#list topicRelated_topic_page.records as topic>
+					<div class="topicItem">
+					
+						<div class="avatarBox">
 				            <a class="avatarLink" href="user/control/home?userName=${topic.userName}">
 				            	<#if topic.avatarName != null>
 									<img src="${topic.avatarPath}100x100/${topic.avatarName}">
@@ -18,90 +17,85 @@
 								</#if>                                                           
 				            </a>   
 				        </div>
-				        <div class="content">
-				            <a href="thread?topicId=${topic.id}" class="title">
-					          	<span>${topic.title}</span>
-							</a>
-							<#list topic.allowRoleViewList as roleName>
-								<span class="topicRoleName">${roleName}</span>
-								
-							</#list>
-							<div class="clear"></div>
-							<div class="info clearfix">
-				
-								<a href="javascript:;" class="clear">
-									<em class="replies">${topic.commentTotal}</em>
-									<img class="images" src="${commonPath}images/comment.png" style="float: right;*margin-top: 26px;" alt=""/>
-								</a>
-				
-								<a href="" class="view" style="*margin-top: 20px;">
-									<img class="images" src="${commonPath}images/pageview.png" alt="" style="float: left;"/>${topic.viewTotal}
-								</a>
-								<span class="tag">${topic.tagName}</span>
-								<em>  
-				                	<a href="user/control/home?userName=${topic.userName}">
-					           			<span style="display:inline-block;margin-left: 7px;">
-					                    	${(topic.nickname != null && topic.nickname??) ?string(topic.nickname , topic.userName)}
-					                    </span>
-				                    </a>
-				                    <#list topic.userRoleNameList as roleName>
+						
+						<div class="content clearfix">
+							<ul class="info">
+					        	<li>
+					            	<span class="tag">${topic.tagName}</span>
+					            	<a class="userName" href="user/control/home?userName=${topic.userName}">
+					            		${(topic.nickname != null && topic.nickname??) ?string(topic.nickname , topic.userName)}
+					            	</a>
+					            	<#list topic.userRoleNameList as roleName>
 										<span class="userRoleName">${roleName}</span>
 									</#list>
-									<#if topic.isStaff>
+					            	<#if topic.isStaff>
 										<span class="staff">官方人员</span>
 									</#if>
-									
-				                </em>
-				                
-				                
-				                <em>发表时间：${topic.postTime}</em>
-				                <#if topic.lastReplyTime != null>
-				                	<em>最新回复：${topic.lastReplyTime}</em>
-				                </#if>
-				                
-							</div>
-						</div>
-						<div style="margin-left: 82px; position: relative;">
-							<#if topic.imageInfoList?size gt 0>
-			                	<div class="tm-m-photos topic_thumbnail_${topic.id}">
-									<ul class="tm-m-photos-thumb">
-										<#list topic.imageInfoList as imageInfo>
-											<li data-src="${imageInfo.path}${imageInfo.name}"><div class="img" style="background-image: url(${imageInfo.path}120x120/${imageInfo.name})"></div> <b class="tm-photos-arrow"></b> </li>
-										</#list>
-									</ul>
-									<div class="tm-m-photo-viewer transition1 topic_original_${topic.id}" style="margin-bottom:  -10px;"> 
-										<img src="${commonPath}images/null.gif"> 
-										<a class="tm-m-photo-viewer-navleft navleft_${topic.id}" style="cursor: default;"> <i class="tm-m-photo-viewer-navicon">&lt;</i> </a> 
-										<a class="tm-m-photo-viewer-navright navright_${topic.id}" style="cursor: pointer;"> <i class="tm-m-photo-viewer-navicon">&gt;</i> </a> 
+					            	<span class="postTime">发表时间：${topic.postTime}</span>
+					            	<#if topic.lastReplyTime != null>
+					            		<span class="lastReplyTime">最新回复：${topic.lastReplyTime}</span>
+					            	</#if>
+					        	</li>
+					        </ul>
+							<h2 class="title clearfix">
+								<a href="thread?topicId=${topic.id}">
+					            	${topic.title}
+					            </a>
+					            <#list topic.allowRoleViewList as roleName>
+									<span class="topicRoleName">${roleName}</span>
+								</#list>
+							</h2>
+							<div class="clearfix"></div>
+							
+							<div class="detail">
+								<#if topic.imageInfoList?size gt 0>
+				                	<div class="tm-m-photos topic_thumbnail_${topic.id}">
+										<ul class="tm-m-photos-thumb">
+											<#list topic.imageInfoList as imageInfo>
+												<li data-src="${imageInfo.path}${imageInfo.name}"><div class="img" style="background-image: url(${imageInfo.path}120x120/${imageInfo.name})"></div> <b class="tm-photos-arrow"></b> </li>
+											</#list>
+										</ul>
+										<div class="tm-m-photo-viewer transition1 topic_original_${topic.id}" style="margin-bottom:  -10px;"> 
+											<img src="${commonPath}images/null.gif"> 
+											<span class="tm-m-photo-viewer-navleft navleft_${topic.id}" style="cursor: default;"> <i class="tm-m-photo-viewer-navicon">&lt;</i> </span> 
+											<span class="tm-m-photo-viewer-navright navright_${topic.id}" style="cursor: pointer;"> <i class="tm-m-photo-viewer-navicon">&gt;</i> </span> 
+										</div>
 									</div>
-								</div>
-							<#else>
-								<div class="summary">
-									${topic.summary}
-								</div>
-							</#if>
-		                </div>
-						<script>
-							
-							$(function () {
-								new commentMove(".topic_thumbnail_${topic.id}",".topic_original_${topic.id}","${topic.id}").init();
-								
-							
-						    })
-						</script>
-					</th>    
-		        	<td></td>
-				</tr>
-			</tbody>          
-		</#list>
-	</#if>                                    
-</table>
-
-<div class="topicPage">
-	<#assign pageView = topicRelated_topic_page>
-	<#--引入分页-->
-	<@include action="${newPublic_1}"/>
-</div>
-
+								<#else>
+									<h2 class="summary">
+										${topic.summary}
+									</h2>
+								</#if>
+								<script>
+									$(function () {
+										new commentMove(".topic_thumbnail_${topic.id}",".topic_original_${topic.id}","${topic.id}").init();
+								    })
+								</script>
+			                </div>
+						</div>
+						
+						<div class="statistic clearfix">
+		                	
+		                	<div class="viewTotal">
+		                		<i class="cms-view icon"></i>
+		                		${topic.viewTotal}
+		                	</div>
+		                	
+		                	<div class="commentTotal">
+		                		<i class="cms-commentCount icon"></i>
+		                		${topic.commentTotal}
+		                	</div>
+						</div>
+					</div>    
+				</#list>
+			</#if>     
+        	
+            <div class="topicPage">
+				<#assign pageView = topicRelated_topic_page>
+				<#--引入分页-->
+				<@include action="${newPublic_1}"/>
+			</div>
+		</div>
+	</div>
 </div>
 </@function>

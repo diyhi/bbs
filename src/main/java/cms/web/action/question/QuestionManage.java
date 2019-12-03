@@ -15,8 +15,10 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.util.concurrent.AtomicLongMap;
 
+import cms.bean.question.AppendQuestionItem;
 import cms.bean.question.Question;
 import cms.bean.question.QuestionTagAssociation;
 import cms.bean.setting.EditorTag;
@@ -174,14 +176,25 @@ public class QuestionManage {
 		String fileNumber = questionManage.generateFileNumber(userName, isStaff);
 		
 		while(true){
-			Map<Long,String> questionContentMap = questionService.findQuestionContentByPage(firstIndex, maxResult,userName,isStaff);
-			if(questionContentMap == null || questionContentMap.size() == 0){
+			List<Question> questionContentList = questionService.findQuestionContentByPage(firstIndex, maxResult,userName,isStaff);
+			if(questionContentList == null || questionContentList.size() == 0){
 				break;
 			}
 			firstIndex = firstIndex+maxResult;
-			for (Map.Entry<Long,String> entry : questionContentMap.entrySet()) { 
-				Long questionId = entry.getKey();
-				String questionContent = entry.getValue();
+			for (Question question :questionContentList) { 
+				Long questionId = question.getId();
+				String questionContent = question.getContent();
+				
+				
+				//删除最后一个逗号
+				String _appendContent = StringUtils.substringBeforeLast(question.getAppendContent(), ",");//从右往左截取到相等的字符,保留左边的
+
+				List<AppendQuestionItem> appendQuestionItemList = JsonUtils.toGenericObject(_appendContent+"]", new TypeReference< List<AppendQuestionItem> >(){});
+				if(appendQuestionItemList != null && appendQuestionItemList.size() >0){
+					for(AppendQuestionItem appendQuestionItem : appendQuestionItemList){
+						questionContent += appendQuestionItem.getContent();
+					}
+				}
 				
 				if(questionContent != null && !"".equals(questionContent.trim())){
 					Object[] obj = textFilterManage.readPathName(questionContent,"question");

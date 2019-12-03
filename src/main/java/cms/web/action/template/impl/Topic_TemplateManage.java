@@ -8,6 +8,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -485,8 +486,9 @@ public class Topic_TemplateManage {
 							newFullFileNameMap.put(entry.getKey(), SecureLink.createRedirectLink(entry.getKey(),entry.getValue(),topic.getTagId(),systemSetting.getFileSecureLinkSecret()));
 						}
 						
+						Integer topicContentUpdateMark = topicManage.query_cache_markUpdateTopicStatus(topicId, Integer.parseInt(RandomStringUtils.randomNumeric(8)));
 						//生成处理'上传的文件完整路径名称'Id
-						String processFullFileNameId = topicManage.createProcessFullFileNameId(topicId,topic.getLastUpdateTime(),newFullFileNameMap);
+						String processFullFileNameId = topicManage.createProcessFullFileNameId(topicId,topicContentUpdateMark,newFullFileNameMap);
 						
 						topic.setContent(topicManage.query_cache_processFullFileName(topic.getContent(),"topic",newFullFileNameMap,processFullFileNameId));
 						
@@ -567,8 +569,12 @@ public class Topic_TemplateManage {
 							}
 						}
 					}
+					
+					
+					Integer topicContentUpdateMark = topicManage.query_cache_markUpdateTopicStatus(topicId, Integer.parseInt(RandomStringUtils.randomNumeric(8)));
+					
 					//生成处理'隐藏标签'Id
-					String processHideTagId = topicManage.createProcessHideTagId(topicId,topic.getLastUpdateTime(), visibleTagList);
+					String processHideTagId = topicManage.createProcessHideTagId(topicId,topicContentUpdateMark, visibleTagList);
 					
 					//处理隐藏标签
 					String content = topicManage.query_cache_processHiddenTag(topic.getContent(),visibleTagList,processHideTagId+"|"+topicContentDigest);
@@ -848,6 +854,11 @@ public class Topic_TemplateManage {
 		jpql.append(" and o.status=?"+ (params.size()+1));
 		params.add(20);
 		
+		
+		//删除第一个and
+		String jpql_str = StringUtils.difference(" and", jpql.toString());
+		
+		
 		//排行依据
 		if(sort == 1){
 			orderby.put("postTime", "desc");//发布时间排序   新-->旧
@@ -855,7 +866,7 @@ public class Topic_TemplateManage {
 			orderby.put("postTime", "asc");//发布时间排序  旧-->新
 		}
 		//根据sort字段降序排序
-		QueryResult<Comment> qr = commentService.getScrollData(Comment.class,firstIndex, pageView.getMaxresult(),jpql.toString(),params.toArray(),orderby);
+		QueryResult<Comment> qr = commentService.getScrollData(Comment.class,firstIndex, pageView.getMaxresult(),jpql_str,params.toArray(),orderby);
 		
 		
 		List<Long> commentIdList = new ArrayList<Long>();

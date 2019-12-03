@@ -303,7 +303,7 @@ function sureSubmit(){
 		}
 		
 	},
-		"${config:url(pageContext.request)}control/question/manage${config:suffix()}?method=edit&timestamp=" + new Date().getTime(), true,parameter);
+		"${config:url(pageContext.request)}control/question/manage${config:suffix()}?method=editQuestion&timestamp=" + new Date().getTime(), true,parameter);
 
 
 

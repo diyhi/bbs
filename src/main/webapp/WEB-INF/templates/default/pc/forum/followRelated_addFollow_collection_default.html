@@ -14,8 +14,15 @@
 			//Ajax方式提交
 			function addFollow(){
 				var parameter = "";
-				//话题Id
-				parameter += "&userName="+getUrlParam("userName");//从URL中获取
+				//用户名称
+				var _userName = document.getElementById("_userName");
+				if(_userName != null){//从隐藏域中获取
+					parameter += "&userName="+_userName.value;//从URL中获取
+				}else{
+					parameter += "&userName="+getUrlParam("userName");//从URL中获取
+				}
+				
+				
 				//从meta标签获取令牌
 				parameter += "&token="+getCsrf();
 			   	//删除第一个&号,防止因为多了&号而出现警告: Parameters: Invalid chunk ignored.信息
@@ -64,8 +71,18 @@
 		
 			//查询是否已经关注该用户
 			function queryFollowing(){
-				//从URL获取用户名称
-				var userName = getUrlParam("userName");
+				var parameter = "";
+				//用户名称
+				var _userName = document.getElementById("_userName");
+				if(_userName != null){//从隐藏域中获取
+					parameter += "&userName="+_userName.value;//从URL中获取
+				}else{
+					parameter += "&userName="+getUrlParam("userName");//从URL中获取
+				}
+				//删除第一个&号,防止因为多了&号而出现警告: Parameters: Invalid chunk ignored.信息
+				if(parameter.indexOf("&") == 0){
+					parameter = parameter.substring(1,parameter.length);
+				}
 				get_request(function(value){
 					if(value != ""){
 						var data = JSON.parse(value);
@@ -76,7 +93,7 @@
 			        	
 			        }
 				},
-					"queryFollowing.htm?userName="+userName+"&timestamp=" + new Date().getTime(), true);
+					"queryFollowing.htm?"+parameter+"&timestamp=" + new Date().getTime(), true);
 			}
 			queryFollowing();
 		</script>

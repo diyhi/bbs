@@ -6,227 +6,244 @@
 	
 	<#--  全局允许提交评论 -->
 	<#if returnValue['allowComment'] == true>
-	<div class="comment-formModule comment-formModule-center">
-		<div class="quoteBox">
-			${(returnValue['quoteContent'])!}
-		</div>
-		<form id="addReplyCommentForm" action="user/control/comment/addQuote" method="post">
+		<div class="quote-formModule">
+			<div class="addQuote-wrap">
+				<div class="head"><i class="cms-quote-left-solid icon"></i></div>
 			
-			<#-- 提交后跳转参数  参数必须经过encodeBase64URL编码后才能提交 不填写时默认跳转回当前页 -->
-			<input type="hidden" id="jumpUrl" name="jumpUrl" value="">
-			<p class="quote-textarea-box"><textarea class="quote-textarea" onfocus="" id="quoteCommentContent" name="content" maxlength="100" >${comment.content}</textarea></p>
-			
-			<span id="${identificationNumber}_content_error" class="error">${(error['content'])!}</span> 
-			<span id="${identificationNumber}_comment_error" class="error">${error['comment']}</span>
-			<div class="form-action">
-			
-				<#-- 获取评论Id -->
-				<input type="hidden" id="commentId" name="commentId" value="${url_commentId}">
-				<#-- 获取令牌 -->
-				<input type="hidden" id="token" name="token" value="${token!}">
-				<div class="commentSubmit">
-		        	<span class="submitButton"><INPUT type="button" value="提交" onClick="javascript:ajax_sureSubmit('${identificationNumber}')"></span>
-		        </div>
-				
-				<#-- identificationNumber:识别号：用来区别每次请求 -->
-				<#-- 验证码 -->
-				<#if returnValue['captchaKey'] != "">	
-				<div class="captchaModule">
-					<div class="captcha_div">
-						<div class="captchaBox">
-							<input type="hidden" id="${identificationNumber}_captchaKey" name="captchaKey" value="${(returnValue['captchaKey'])!}">
-							<input id="${identificationNumber}_captchaValue" name="captchaValue" type="text" maxLength="5" autocomplete="off" tabindex="3" onfocus="inputBoxTip_click(this);" onblur="inputBoxTip_leave('${identificationNumber}',this);"/>
-							<label class="promptTag" id="${identificationNumber}_captchaValueBoxTip"  for="captchaValue">验证码</label>
-						</div>
-						<a class="captchaImage" href="javascript:void(0);" >
-							<img id="${identificationNumber}_captcha" src="captcha/${(returnValue['captchaKey'])!}.jpg" onClick="replaceCaptcha('${identificationNumber}');" tabindex="4" />
-						</a>
-						<a  href="javascript:void(0);" onClick="replaceCaptcha('${identificationNumber}');" tabindex="5">换一幅</a>
-					</div>
-					<p class="tips">
-						
-						<#-- 验证码错误 -->
-						<span id="${identificationNumber}_captchaValue_error">${(error['captchaValue'])!}</span>
-						
-					</p>
-				</div>
-				</#if>
-			</div>	
-			
-			
-			
-			<script language="javascript" type="text/javascript">
-			
-				//点击输入框提示 
-				function inputBoxTip_click(obj){
-					document.getElementById(obj.id+"BoxTip").style.display="none";
-		
-				}
-				//离开输入框提示
-				function inputBoxTip_leave(identificationNumber,obj){
-					if(obj.value != ""){
-						document.getElementById(obj.id+"BoxTip").style.display="none";
-					}else{
-						document.getElementById(obj.id+"BoxTip").style.display="";
-					}
-					verificationCode(identificationNumber);
-				}
-			
-				//校对验证码 identificationNumber:识别号：用来区别每次请求
-				function verificationCode(identificationNumber){
-					var flag = true;
-					if( document.getElementById(identificationNumber+"_"+"captchaKey") != null){
-						
-						var captchaKey = document.getElementById(identificationNumber+"_"+"captchaKey").value;
-						var parameter = document.getElementById(identificationNumber+"_"+"captchaValue").value;
-						if(parameter != ""){
-						
-							var parameter_trim = trim(parameter);
-							if(parameter_trim != ""){
-								//ajax使用同步提交
-								get_request(function(value){
-					            	if(value == "false"){
-					            	
-						            	document.getElementById(identificationNumber+"_"+"captchaValue_error").innerHTML = "验证码错误";
-						            	flag = false;
-					            	}
-					            },
-							 		"checkCaptcha.htm?captchaKey="+captchaKey+"&captchaValue="+parameter_trim+"&timestamp=" + new Date().getTime(), false);
-					            	
-							}else{
-								document.getElementById(identificationNumber+"_"+"captchaValue_error").innerHTML = "验证码不能为空";
-								flag = false;
-							}
-						}else{
-							document.getElementById(identificationNumber+"_"+"captchaValue_error").innerHTML = "验证码不能为空";
-							flag = false;
-						}
-						if(flag == true){
-							document.getElementById(identificationNumber+"_"+"captchaValue_error").innerHTML = "";
-						}
-					}
-			
-					return flag;
-				}
-				//更换验证码
-				function replaceCaptcha(identificationNumber){
-					var captchaKey = document.getElementById(identificationNumber+"_"+"captchaKey").value;
-					document.getElementById(identificationNumber+"_"+"captcha").src = "captcha/"+captchaKey+".jpg?" + Math.random(); 
-				}
-			
-				//表单Form方式提交
-				function sureSubmit(obj){
-					obj.submit();
-				} 
-				//Ajax方式提交
-				function ajax_sureSubmit(identificationNumber){
-					if(verificationCode() == true){
-						var parameter = "";
-						parameter += "&commentId="+document.getElementById("commentId").value;
-						//获取令牌
-						parameter += "&token="+document.getElementById("token").value;
-						
-						//获取验证码key
-						var captchaKey = document.getElementById(identificationNumber+"_"+"captchaKey");
-						if(captchaKey != null){
-							parameter += "&captchaKey="+captchaKey.value;
-						}
-						
-						//获取验证码value
-						var captchaValue = document.getElementById(identificationNumber+"_"+"captchaValue");
-						if(captchaValue != null){
-							parameter += "&captchaValue="+captchaValue.value;
-						}
-						
-						//获取内容
-						var content = document.getElementById("quoteCommentContent").value;
-						parameter += "&content="+encodeURIComponent(content);
+				<form id="addQuoteCommentForm" action="user/control/comment/addQuote" method="post">
+					<#-- 提交后跳转参数  参数必须经过encodeBase64URL编码后才能提交 不填写时默认跳转回当前页 -->
+					<input type="hidden" id="jumpUrl" name="jumpUrl" value="">
+					<textarea class="quote-textarea" onfocus="" id="${identificationNumber}_quoteCommentContent" name="content" >${comment.content}</textarea>
 					
-					   	//删除第一个&号,防止因为多了&号而出现警告: Parameters: Invalid chunk ignored.信息
-						if(parameter.indexOf("&") == 0){
-							parameter = parameter.substring(1,parameter.length);
-						}
-					   	post_request(function(value){
-							var data = JSON.parse(value);
-							for(var returnValue in data){
+					<span id="${identificationNumber}_content_error" class="error">${(error['content'])!}</span> 
+					<span id="${identificationNumber}_comment_error" class="error">${error['comment']}</span>
+					<div class="form-action">
+					
+						<#-- 获取评论Id -->
+						<input type="hidden" id="commentId" name="commentId" value="${url_commentId}">
+						<#-- 获取令牌 -->
+						<input type="hidden" id="token" name="token" value="${token!}">
+						<div class="quoteSubmit">
+							<span class="submitButton-box" >
+								<button type="button" class="submitButton" onClick="javascript:ajax_quote_sureSubmit('${identificationNumber}')">提交</button>
+							</span>
+							<!-- 调用方法在topicRelated_comment_page页 -->
+							<span class="cancelButton-box" >
+								<button type="button" class="cancelButton" onClick="javascript:cancelQuote('${url_commentId}')">取消</button>
+							</span>
+						</div>
+						<#-- identificationNumber:识别号：用来区别每次请求 -->
+						<#-- 验证码 -->
+						<#if returnValue['captchaKey'] != "">	
+						<div class="captchaModule">
+							<div class="captcha_div">
+								<div class="captchaBox">
+									<input type="hidden" id="${identificationNumber}_captchaKey" name="captchaKey" value="${(returnValue['captchaKey'])!}">
+									<input id="${identificationNumber}_captchaValue" name="captchaValue" type="text" maxLength="5" autocomplete="off" tabindex="3" onfocus="inputBoxTip_click(this);" onblur="inputBoxTip_leave('${identificationNumber}',this);"/>
+									<label class="promptTag" id="${identificationNumber}_captchaValueBoxTip"  for="captchaValue">验证码</label>
+								</div>
+								<a class="captchaImage" href="javascript:void(0);" >
+									<img id="${identificationNumber}_captcha" src="captcha/${(returnValue['captchaKey'])!}.jpg" onClick="replaceCaptcha('${identificationNumber}');" tabindex="4" />
+								</a>
+								<a  href="javascript:void(0);" onClick="replaceCaptcha('${identificationNumber}');" tabindex="5">换一幅</a>
+							</div>
+							<p class="tips">
 								
-								if(returnValue == "success"){
-				        			if(data[returnValue] == "true"){
-				        				//需引入layer
-				        				layer.open({
-										    type: 1, 
-										    title:"提示",
-										    content: "<div style='line-height: 36px; font-size: 15px;text-align:center; margin-left: 8px;margin-right: 8px;'>提交成功</div>", 
-										    area: ['260px', '120px'],//宽高
-											end: function(layero, index){
-												//刷新页面
-				        						document.location.reload();
-											}
-										});
-				        			}
-				        		}else if(returnValue == "error"){
-				        			
-				        			var error = data[returnValue];
-				        			for(var key in error){
-				        				var error_html = document.getElementById(identificationNumber+"_"+key+"_error");
-				        	
-				        				if(error_html != null){
-				        					error_html.innerHTML = error[key];
-				        				}
-				        				
-				        			}
-				        		}else if(returnValue == "captchaKey"){//显示验证码
-		        					
-									var captchaKey = data[returnValue];
-									if(captchaKey != ""){
-										//设置验证码Key
-										if(document.getElementById(identificationNumber+"_"+"captchaKey")!= null){
-		
-											document.getElementById(identificationNumber+"_"+"captchaKey").value = captchaKey;
-											//设置验证码图片
-											replaceCaptcha(identificationNumber);
-										}	
+								<#-- 验证码错误 -->
+								<span id="${identificationNumber}_captchaValue_error">${(error['captchaValue'])!}</span>
+								
+							</p>
+						</div>
+						</#if>
+					</div>
+				
+					<script language="javascript" type="text/javascript">
+			
+						//点击输入框提示 
+						function inputBoxTip_click(obj){
+							document.getElementById(obj.id+"BoxTip").style.display="none";
+				
+						}
+						//离开输入框提示
+						function inputBoxTip_leave(identificationNumber,obj){
+							if(obj.value != ""){
+								document.getElementById(obj.id+"BoxTip").style.display="none";
+							}else{
+								document.getElementById(obj.id+"BoxTip").style.display="";
+							}
+							verificationCode(identificationNumber);
+						}
+					
+						//校对验证码 identificationNumber:识别号：用来区别每次请求
+						function verificationCode(identificationNumber){
+							var flag = true;
+							if( document.getElementById(identificationNumber+"_"+"captchaKey") != null){
+								
+								var captchaKey = document.getElementById(identificationNumber+"_"+"captchaKey").value;
+								var parameter = document.getElementById(identificationNumber+"_"+"captchaValue").value;
+								if(parameter != ""){
+								
+									var parameter_trim = trim(parameter);
+									if(parameter_trim != ""){
+										//ajax使用同步提交
+										get_request(function(value){
+							            	if(value == "false"){
+							            	
+								            	document.getElementById(identificationNumber+"_"+"captchaValue_error").innerHTML = "验证码错误";
+								            	flag = false;
+							            	}
+							            },
+									 		"checkCaptcha.htm?captchaKey="+captchaKey+"&captchaValue="+parameter_trim+"&timestamp=" + new Date().getTime(), false);
+							            	
+									}else{
+										document.getElementById(identificationNumber+"_"+"captchaValue_error").innerHTML = "验证码不能为空";
+										flag = false;
 									}
+								}else{
+									document.getElementById(identificationNumber+"_"+"captchaValue_error").innerHTML = "验证码不能为空";
+									flag = false;
 								}
-				        	}
-						},
-							"user/control/comment/addQuote.htm?timestamp=" + new Date().getTime(), true,parameter);
-					}
-				} 
+								if(flag == true){
+									document.getElementById(identificationNumber+"_"+"captchaValue_error").innerHTML = "";
+								}
+							}
+					
+							return flag;
+						}
+						//更换验证码
+						function replaceCaptcha(identificationNumber){
+							var captchaKey = document.getElementById(identificationNumber+"_"+"captchaKey").value;
+							document.getElementById(identificationNumber+"_"+"captcha").src = "captcha/"+captchaKey+".jpg?" + Math.random(); 
+						}
+					
+						//表单Form方式提交
+						function quote_sureSubmit(obj){
+							obj.submit();
+						} 
+						//Ajax方式提交
+						function ajax_quote_sureSubmit(identificationNumber){
+							if(verificationCode() == true){
+								var parameter = "";
+								parameter += "&commentId="+document.getElementById("commentId").value;
+								//获取令牌
+								parameter += "&token="+document.getElementById("token").value;
+								
+								//获取验证码key
+								var captchaKey = document.getElementById(identificationNumber+"_captchaKey");
+								if(captchaKey != null){
+									parameter += "&captchaKey="+captchaKey.value;
+								}
+								
+								//获取验证码value
+								var captchaValue = document.getElementById(identificationNumber+"_captchaValue");
+								if(captchaValue != null){
+									parameter += "&captchaValue="+captchaValue.value;
+								}
+								
+								//获取内容
+								var content = document.getElementById(identificationNumber+"_quoteCommentContent").value;
+								parameter += "&content="+encodeURIComponent(content);
+							
+							   	//删除第一个&号,防止因为多了&号而出现警告: Parameters: Invalid chunk ignored.信息
+								if(parameter.indexOf("&") == 0){
+									parameter = parameter.substring(1,parameter.length);
+								}
+							   	post_request(function(value){
+									var data = JSON.parse(value);
+									for(var returnValue in data){
+										
+										if(returnValue == "success"){
+						        			if(data[returnValue] == "true"){
+						        				//需引入layer
+						        				layer.msg('提交成功,3秒后自动刷新本页', 
+													{
+													  time: 3000 //3秒关闭（如果不配置，默认是3秒）
+													},function(){//关闭后的操作
+														//刷新页面
+						        						document.location.reload();
+													}
+												);
+						        			}
+						        		}else if(returnValue == "error"){
+						        			
+						        			var error = data[returnValue];
+						        			for(var key in error){
+						        				var error_html = document.getElementById(identificationNumber+"_"+key+"_error");
+						        	
+						        				if(error_html != null){
+						        					error_html.innerHTML = error[key];
+						        				}
+						        				
+						        			}
+						        		}else if(returnValue == "captchaKey"){//显示验证码
+				        					
+											var captchaKey = data[returnValue];
+											if(captchaKey != ""){
+												//设置验证码Key
+												if(document.getElementById(identificationNumber+"_"+"captchaKey")!= null){
 				
-	
-				var editor;
-				KindEditor.ready(function(K) {
-					var availableTag_obj = ['source', '|'];//['source', '|','fontname','fontsize','emoticons'];
-					if(document.getElementById("availableTag") != null){
-						var availableTag = document.getElementById("availableTag").value;
-						if(availableTag != ""){
+													document.getElementById(identificationNumber+"_"+"captchaKey").value = captchaKey;
+													//设置验证码图片
+													replaceCaptcha(identificationNumber);
+												}	
+											}
+										}
+						        	}
+								},
+									"user/control/comment/addQuote.htm?timestamp=" + new Date().getTime(), true,parameter);
+							}
+						} 
 						
-							availableTag_obj = JSON.parse(availableTag);//JSON转为对象
-						}
-					}
-					//获取URL中的话题Id
-					var topicId = getUrlParam("topicId");
-					editor = K.create('textarea[id="quoteCommentContent"]', {
-		
-						basePath : '${commonPath}js/kindeditor/',//指定编辑器的根目录路径
-						formatUploadUrl :false,//false时不会自动格式化上传后的URL
-						resizeType : 1,//2或1或0，2时可以拖动改变宽度和高度，1时只能改变高度，0时不能拖动。默认值: 2 
-						allowPreviewEmoticons : true,//true或false，true时鼠标放在表情上可以预览表情
-						allowImageUpload : true,//true时显示图片上传按钮
-						uploadJson :'user/control/comment/uploadImage.htm?topicId='+topicId,//指定浏览远程图片的服务器端程序
-						
-						width : '100%',
-						items : availableTag_obj,
-						afterChange : function() {
-							this.sync();
-						}
+						$(function () {
+							var availableTag_obj = ['source', '|'];//['source', '|','fontname','fontsize','emoticons'];
+							if(document.getElementById("availableTag") != null){
+								var availableTag = document.getElementById("availableTag").value;
+								if(availableTag != ""){
+								
+									availableTag_obj = JSON.parse(availableTag);//JSON转为对象
+								}
+							}
+							//获取URL中的话题Id
+							var topicId = getUrlParam("topicId");
 
-					});
-				});
+							var editor = KindEditor.create('textarea[id="${identificationNumber}_quoteCommentContent"]', {
+								themeType : 'new',//新外观
+								basePath : '${commonPath}js/kindeditor/',//指定编辑器的根目录路径
+								formatUploadUrl :false,//false时不会自动格式化上传后的URL
+								resizeType : 1,//2或1或0，2时可以拖动改变宽度和高度，1时只能改变高度，0时不能拖动。默认值: 2 
+								allowPreviewEmoticons : true,//true或false，true时鼠标放在表情上可以预览表情
+								allowImageUpload : true,//true时显示图片上传按钮
+								uploadJson :'user/control/comment/uploadImage.htm?topicId='+topicId,//指定浏览远程图片的服务器端程序
+								
+								width : '100%',
+								items : availableTag_obj,
+								afterChange : function() {
+									this.sync();
+								}
+		
+							});
+						});
+					</script>
 				
-			</script>
-		</form>
-	</div>
+				</form>
+			</div>
+		</div>
+	<#else>
+		<#-- 不允许评论 -->
+		<div class="quote-disableFormModule">
+			<div class="disableForm-wrap">
+				<div class="respond">
+					<p>全站关闭评论</p>
+				</div>
+			</div>
+		</div>
 	</#if>
 </@function>
+
+
+
+
+
+
+
+

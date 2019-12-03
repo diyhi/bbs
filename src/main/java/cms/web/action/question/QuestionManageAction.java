@@ -27,12 +27,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 
 import cms.bean.PageForm;
 import cms.bean.PageView;
 import cms.bean.QueryResult;
 import cms.bean.question.Answer;
 import cms.bean.question.AnswerReply;
+import cms.bean.question.AppendQuestionItem;
 import cms.bean.question.Question;
 import cms.bean.question.QuestionIndex;
 import cms.bean.question.QuestionTag;
@@ -103,6 +105,11 @@ public class QuestionManageAction {
 					question.setIpAddress(IpAddress.queryAddress(question.getIp().trim()));
 				}
 
+				//删除最后一个逗号
+				String _appendContent = StringUtils.substringBeforeLast(question.getAppendContent(), ",");//从右往左截取到相等的字符,保留左边的
+
+				List<AppendQuestionItem> appendQuestionItemList = JsonUtils.toGenericObject(_appendContent+"]", new TypeReference< List<AppendQuestionItem> >(){});
+				question.setAppendQuestionItemList(appendQuestionItemList);
 				
 				
 				model.addAttribute("question", question);
@@ -439,6 +446,198 @@ public class QuestionManageAction {
 	
 	
 	/**
+	 * 问题   追加界面显示
+	 */
+	@RequestMapping(params="method=appendQuestion",method=RequestMethod.GET)
+	public String appendQuestionUI(Long questionId,ModelMap model,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		if(questionId != null && questionId >0L){
+			Question question = questionService.findById(questionId);
+			if(question != null){
+				model.addAttribute("question", question);
+			}else{
+				throw new SystemException("问题不存在");
+			}	
+			
+		}
+		return "jsp/question/add_appendQuestion";
+	}
+	
+	
+	
+	/**
+	 * 问题  追加
+	 * @param model
+	 * @param questionId 问题Id
+	 * @param content 追加内容
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@ResponseBody//方式来做ajax,直接返回字符串
+	@RequestMapping(params="method=appendQuestion", method=RequestMethod.POST)
+	public String appendQuestion(ModelMap model,Long questionId,String content,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+		List<String> imageNameList = null;
+		boolean isImage = false;//是否含有图片
+		List<String> flashNameList = null;
+		boolean isFlash = false;//是否含有Flash
+		List<String> mediaNameList = null;
+		boolean isMedia = false;//是否含有音视频
+		List<String> fileNameList = null;
+		boolean isFile = false;//是否含有文件
+		boolean isMap = false;//是否含有地图
+		Map<String,String> error = new HashMap<String,String>();
+	
+		String appendContent = "";
+		Question question = null;
+		if(questionId != null && questionId >0L){
+			question = questionService.findById(questionId);
+			if(question != null){
+				if(content != null && !"".equals(content.trim())){
+					//过滤标签
+					content = textFilterManage.filterTag(request,content);
+					Object[] object = textFilterManage.filterHtml(request,content,"question",null);
+					String value = (String)object[0];
+					imageNameList = (List<String>)object[1];
+					isImage = (Boolean)object[2];//是否含有图片
+					flashNameList = (List<String>)object[3];
+					isFlash = (Boolean)object[4];//是否含有Flash
+					mediaNameList = (List<String>)object[5];
+					isMedia = (Boolean)object[6];//是否含有音视频
+					fileNameList = (List<String>)object[7];
+					isFile = (Boolean)object[8];//是否含有文件
+					isMap = (Boolean)object[9];//是否含有地图
+				
+					
+					
+					//不含标签内容
+					String source_text = textFilterManage.filterText(content);
+					//清除空格&nbsp;
+					String source_trimSpace = cms.utils.StringUtil.replaceSpace(source_text).trim();
+					
+					if(isImage == true || isFlash == true || isMedia == true || isFile==true ||isMap== true || (!"".equals(source_text.trim()) && !"".equals(source_trimSpace))){
+						
+						appendContent = value;
+					}else{
+						error.put("content", "问题内容不能为空");
+					}	
+				}else{
+					error.put("content", "问题内容不能为空");
+				}
+				
+			}else{
+				error.put("content", "问题不存在");
+			}
+		}else{
+			error.put("content", "问题Id不能为空");
+		}
+		
+		String appendContent_json = "";
+		if(appendContent != null && !"".equals(appendContent.trim())){
+			AppendQuestionItem appendQuestionItem = new AppendQuestionItem();
+			appendQuestionItem.setId(UUIDUtil.getUUID32());
+			appendQuestionItem.setContent(appendContent.trim());
+			appendQuestionItem.setPostTime(new Date());
+			appendContent_json = JsonUtils.toJSONString(appendQuestionItem);
+		}else{
+			error.put("content", "追加内容不能为空");
+		}
+		
+		
+		if(error != null && error.size() >0){
+			model.addAttribute("error", error);	
+			
+		}else{
+
+			//追加问题
+			questionService.saveAppendQuestion(questionId, appendContent_json+",");
+			//更新索引
+			questionIndexService.addQuestionIndex(new QuestionIndex(String.valueOf(question.getId()),2));
+
+			//删除缓存
+			questionManage.delete_cache_findById(questionId);//删除问题缓存
+			
+			//上传文件编号
+			String fileNumber = questionManage.generateFileNumber(question.getUserName(), question.getIsStaff());
+			
+			
+			
+			//删除图片锁
+			if(imageNameList != null && imageNameList.size() >0){
+				for(String imageName :imageNameList){
+			
+					 if(imageName != null && !"".equals(imageName.trim())){
+		 
+						 //如果验证不是当前用户上传的文件，则不删除锁
+						 if(!questionManage.getFileNumber(fileManage.getBaseName(imageName.trim())).equals(fileNumber)){
+							 continue;
+						 }
+						 
+						 fileManage.deleteLock("file"+File.separator+"question"+File.separator+"lock"+File.separator,imageName.replaceAll("/","_"));
+					
+					 }
+				}
+			}
+			//falsh
+			if(flashNameList != null && flashNameList.size() >0){
+				for(String flashName :flashNameList){
+					 if(flashName != null && !"".equals(flashName.trim())){
+						 //如果验证不是当前用户上传的文件，则不删除锁
+						 if(!questionManage.getFileNumber(fileManage.getBaseName(flashName.trim())).equals(fileNumber)){
+							 continue;
+						 }
+						 
+						 fileManage.deleteLock("file"+File.separator+"question"+File.separator+"lock"+File.separator,flashName.replaceAll("/","_"));
+					
+					 }
+				}
+			}
+			//音视频
+			if(mediaNameList != null && mediaNameList.size() >0){
+				for(String mediaName :mediaNameList){
+					if(mediaName != null && !"".equals(mediaName.trim())){
+						//如果验证不是当前用户上传的文件，则不删除锁
+						if(!questionManage.getFileNumber(fileManage.getBaseName(mediaName.trim())).equals(fileNumber)){
+							continue;
+						}
+						fileManage.deleteLock("file"+File.separator+"question"+File.separator+"lock"+File.separator,mediaName.replaceAll("/","_"));
+					
+					}
+				}
+			}
+			//文件
+			if(fileNameList != null && fileNameList.size() >0){
+				for(String fileName :fileNameList){
+					if(fileName != null && !"".equals(fileName.trim())){
+						//如果验证不是当前用户上传的文件，则不删除锁
+						if(!questionManage.getFileNumber(fileManage.getBaseName(fileName.trim())).equals(fileNumber)){
+							continue;
+						}
+						fileManage.deleteLock("file"+File.separator+"question"+File.separator+"lock"+File.separator,fileName.replaceAll("/","_"));
+					
+					}
+				}
+			}
+			
+		}
+		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
+		
+		if(error != null && error.size() >0){
+			returnValue.put("success", "false");
+			returnValue.put("error", error);
+		}else{
+			returnValue.put("success", "true");
+			
+		}
+		return JsonUtils.toJSONString(returnValue);
+	}
+	
+	
+	
+	/**
 	 *  文件上传
 	 * 
 	 * 员工发问题 上传文件名为UUID + a + 员工Id
@@ -649,8 +848,8 @@ public class QuestionManageAction {
 	 * 问题   修改界面显示
 	 * 
 	 */
-	@RequestMapping(params="method=edit", method=RequestMethod.GET)
-	public String editUI(ModelMap model,Long questionId,Boolean visible,
+	@RequestMapping(params="method=editQuestion", method=RequestMethod.GET)
+	public String editQuestionUI(ModelMap model,Long questionId,Boolean visible,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		if(questionId != null && questionId >0L){
 			Question question = questionService.findById(questionId);
@@ -691,8 +890,8 @@ public class QuestionManageAction {
 	 * @param isQuestionList 上一链接是否来自问题列表
 	 */
 	@ResponseBody//方式来做ajax,直接返回字符串
-	@RequestMapping(params="method=edit", method=RequestMethod.POST)
-	public String edit(ModelMap model,Long questionId,Long[] tagId,
+	@RequestMapping(params="method=editQuestion", method=RequestMethod.POST)
+	public String editQuestion(ModelMap model,Long questionId,Long[] tagId,
 			String title,Boolean allow,Integer status,
 			String content,String sort,Boolean visible,Boolean isQuestionList,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -1040,14 +1239,364 @@ public class QuestionManageAction {
 		}
 		return JsonUtils.toJSONString(returnValue);
 	}
+	
+	
+	/**
+	 * 问题   修改追加界面显示
+	 */
+	@RequestMapping(params="method=editAppendQuestion",method=RequestMethod.GET)
+	public String editAppendQuestionUI(Long questionId,String appendQuestionItemId,ModelMap model,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		if(questionId != null && questionId >0L){
+			Question question = questionService.findById(questionId);
+			if(question != null){
+				//删除最后一个逗号
+				String _appendContent = StringUtils.substringBeforeLast(question.getAppendContent(), ",");//从右往左截取到相等的字符,保留左边的
+
+				List<AppendQuestionItem> appendQuestionItemList = JsonUtils.toGenericObject(_appendContent+"]", new TypeReference< List<AppendQuestionItem> >(){});
+				if(appendQuestionItemList != null && appendQuestionItemList.size() >0){
+					for(AppendQuestionItem appendQuestionItem : appendQuestionItemList){
+						if(appendQuestionItem.getId().equals(appendQuestionItemId)){
+							model.addAttribute("appendQuestionItem", appendQuestionItem);
+							break;
+						}
+					}
+				}
+
+				model.addAttribute("question", question);
+			}else{
+				throw new SystemException("问题不存在");
+			}	
+			
+		}
+		return "jsp/question/edit_appendQuestion";
+	}
+	
+	
+	/**
+	 * 问题   追加修改
+	 * @param model
+	 * @param questionId
+	 * @param appendQuestionItemId
+	 * @param content
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@ResponseBody//方式来做ajax,直接返回字符串
+	@RequestMapping(params="method=editAppendQuestion", method=RequestMethod.POST)
+	public String editAppendQuestion(ModelMap model,Long questionId,String appendQuestionItemId, String content,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		Question question = null;
+		List<String> imageNameList = null;
+		boolean isImage = false;//是否含有图片
+		List<String> flashNameList = null;
+		boolean isFlash = false;//是否含有Flash
+		List<String> mediaNameList = null;
+		boolean isMedia = false;//是否含有音视频
+		List<String> fileNameList = null;
+		boolean isFile = false;//是否含有文件
+		boolean isMap = false;//是否含有地图
+		Map<String,String> error = new HashMap<String,String>();
+		
+		List<String> oldPathFileList = new ArrayList<String>();//旧路径文件
+		
+		String old_content = "";
+		String appendContent = "";
+		if(questionId != null && questionId >0L){
+			question = questionService.findById(questionId);
+			if(question != null){
+				//删除最后一个逗号
+				String _appendContent = StringUtils.substringBeforeLast(question.getAppendContent(), ",");//从右往左截取到相等的字符,保留左边的
+
+				List<AppendQuestionItem> appendQuestionItemList = JsonUtils.toGenericObject(_appendContent+"]", new TypeReference< List<AppendQuestionItem> >(){});
+				
+				boolean flag = false;
+				if(appendQuestionItemList != null && appendQuestionItemList.size() >0){
+					for(AppendQuestionItem appendQuestionItem : appendQuestionItemList){
+						if(appendQuestionItem.getId().equals(appendQuestionItemId)){
+							old_content = appendQuestionItem.getContent();
+							flag = true;
+							break;
+						}
+					}
+				}
+				if(flag == false){
+					error.put("question", "追加问题不存在");
+				}
+				
+				
+				if(content != null && !"".equals(content.trim())){
+					
+					//过滤标签
+					content = textFilterManage.filterTag(request,content);
+					Object[] object = textFilterManage.filterHtml(request,content,"question",null);
+			
+					String value = (String)object[0];
+					imageNameList = (List<String>)object[1];
+					isImage = (Boolean)object[2];//是否含有图片
+					flashNameList = (List<String>)object[3];
+					isFlash = (Boolean)object[4];//是否含有Flash
+					mediaNameList = (List<String>)object[5];
+					isMedia = (Boolean)object[6];//是否含有音视频
+					fileNameList = (List<String>)object[7];
+					isFile = (Boolean)object[8];//是否含有文件
+					isMap = (Boolean)object[9];//是否含有地图
+
+					//不含标签内容
+					String source_text = textFilterManage.filterText(content);
+					//清除空格&nbsp;
+					String source_trimSpace = cms.utils.StringUtil.replaceSpace(source_text).trim();
+					if(isImage == true || isFlash == true || isMedia == true || isFile==true ||isMap== true || (!"".equals(source_text.trim()) && !"".equals(source_trimSpace))){
+						
+						appendContent = value;
+					}else{
+						error.put("content", "问题内容不能为空");
+					}	
+				}else{
+					error.put("content", "问题内容不能为空");
+				}
+
+				if(appendQuestionItemList != null && appendQuestionItemList.size() >0){
+					for(AppendQuestionItem appendQuestionItem : appendQuestionItemList){
+						if(appendQuestionItem.getId().equals(appendQuestionItemId)){
+							appendQuestionItem.setContent(appendContent);
+						}
+					}
+				}
+				
+				
+				String appendContent_json = JsonUtils.toJSONString(appendQuestionItemList);
+				//删除最后一个中括号
+				appendContent_json = StringUtils.substringBeforeLast(appendContent_json, "]");//从右往左截取到相等的字符,保留左边的
+
+					
+				
+				
+				if(error.size() ==0){
+					
+					
+					int i = questionService.updateAppendQuestion(questionId,appendContent_json+",");
+					//更新索引
+					questionIndexService.addQuestionIndex(new QuestionIndex(String.valueOf(question.getId()),2));
+
+					//删除缓存
+					questionManage.delete_cache_findById(question.getId());//删除问题缓存
+					
+					Object[] obj = textFilterManage.readPathName(old_content,"question");
+					if(obj != null && obj.length >0){
+						//旧图片
+						List<String> old_imageNameList = (List<String>)obj[0];
+						
+						if(old_imageNameList != null && old_imageNameList.size() >0){
+							
+					        Iterator<String> iter = old_imageNameList.iterator();
+					        while (iter.hasNext()) {
+					        	String imageName = iter.next();  
+					        	
+								for(String new_imageName : imageNameList){
+									if(imageName.equals("file/question/"+new_imageName)){
+										iter.remove();
+										break;
+									}
+								}
+							}
+							if(old_imageNameList != null && old_imageNameList.size() >0){
+								for(String imageName : old_imageNameList){
+									
+									oldPathFileList.add(fileManage.toSystemPath(imageName));
+			
+								}
+								
+							}
+						}
+						
+						//旧Flash
+						List<String> old_flashNameList = (List<String>)obj[1];		
+						if(old_flashNameList != null && old_flashNameList.size() >0){		
+					        Iterator<String> iter = old_flashNameList.iterator();
+					        while (iter.hasNext()) {
+					        	String flashName = iter.next();  
+								for(String new_flashName : flashNameList){
+									if(flashName.equals("file/question/"+new_flashName)){
+										iter.remove();
+										break;
+									}
+								}
+							}
+							if(old_flashNameList != null && old_flashNameList.size() >0){
+								for(String flashName : old_flashNameList){
+									oldPathFileList.add(fileManage.toSystemPath(flashName));
+									
+								}
+								
+							}
+						}
+		
+						//旧影音
+						List<String> old_mediaNameList = (List<String>)obj[2];	
+						if(old_mediaNameList != null && old_mediaNameList.size() >0){		
+					        Iterator<String> iter = old_mediaNameList.iterator();
+					        while (iter.hasNext()) {
+					        	String mediaName = iter.next();  
+								for(String new_mediaName : mediaNameList){
+									if(mediaName.equals("file/question/"+new_mediaName)){
+										iter.remove();
+										break;
+									}
+								}
+							}
+							if(old_mediaNameList != null && old_mediaNameList.size() >0){
+								for(String mediaName : old_mediaNameList){
+									oldPathFileList.add(fileManage.toSystemPath(mediaName));
+									
+								}
+								
+							}
+						}
+						
+						//旧文件
+						List<String> old_fileNameList = (List<String>)obj[3];		
+						if(old_fileNameList != null && old_fileNameList.size() >0){		
+					        Iterator<String> iter = old_fileNameList.iterator();
+					        while (iter.hasNext()) {
+					        	String fileName = iter.next();  
+								for(String new_fileName : fileNameList){
+									if(fileName.equals("file/question/"+new_fileName)){
+										iter.remove();
+										break;
+									}
+								}
+							}
+							if(old_fileNameList != null && old_fileNameList.size() >0){
+								for(String fileName : old_fileNameList){
+									oldPathFileList.add(fileManage.toSystemPath(fileName));
+									
+								}
+								
+							}
+						}
+					}
+					
+					
+					//上传文件编号
+					String fileNumber = questionManage.generateFileNumber(question.getUserName(), question.getIsStaff());
+					
+					//删除图片锁
+					if(imageNameList != null && imageNameList.size() >0){
+						for(String imageName :imageNameList){
+					
+							 if(imageName != null && !"".equals(imageName.trim())){
+								 //如果验证不是当前用户上传的文件，则不删除
+								 if(!questionManage.getFileNumber(fileManage.getBaseName(imageName.trim())).equals(fileNumber)){
+										continue;
+								 }
+								 fileManage.deleteLock("file"+File.separator+"question"+File.separator+"lock"+File.separator,imageName.replaceAll("/","_"));
+			
+							 }
+						}
+					}
+					//删除Falsh锁
+					if(flashNameList != null && flashNameList.size() >0){
+						for(String flashName :flashNameList){
+							 
+							 if(flashName != null && !"".equals(flashName.trim())){
+								 //如果验证不是当前用户上传的文件，则不删除
+								 if(!questionManage.getFileNumber(fileManage.getBaseName(flashName.trim())).equals(fileNumber)){
+										continue;
+								 }
+								 fileManage.deleteLock("file"+File.separator+"question"+File.separator+"lock"+File.separator,flashName.replaceAll("/","_"));
+				
+							 }
+						}
+					}
+					//删除音视频锁
+					if(mediaNameList != null && mediaNameList.size() >0){
+						for(String mediaName :mediaNameList){
+							if(mediaName != null && !"".equals(mediaName.trim())){
+								//如果验证不是当前用户上传的文件，则不删除
+								if(!questionManage.getFileNumber(fileManage.getBaseName(mediaName.trim())).equals(fileNumber)){
+									continue;
+								}
+								fileManage.deleteLock("file"+File.separator+"question"+File.separator+"lock"+File.separator,mediaName.replaceAll("/","_"));
+							
+							}
+						}
+					}
+					//删除文件锁
+					if(fileNameList != null && fileNameList.size() >0){
+						for(String fileName :fileNameList){
+							if(fileName != null && !"".equals(fileName.trim())){
+								//如果验证不是当前用户上传的文件，则不删除
+								if(!questionManage.getFileNumber(fileManage.getBaseName(fileName.trim())).equals(fileNumber)){
+									continue;
+								}
+								fileManage.deleteLock("file"+File.separator+"question"+File.separator+"lock"+File.separator,fileName.replaceAll("/","_"));
+							
+							}
+						}
+					}
+					
+					//删除旧路径文件
+					if(oldPathFileList != null && oldPathFileList.size() >0){
+						for(String oldPathFile :oldPathFileList){
+							//如果验证不是当前用户上传的文件，则不删除
+							if(!questionManage.getFileNumber(fileManage.getBaseName(oldPathFile.trim())).equals(fileNumber)){
+								continue;
+							}
+							
+							
+							//替换路径中的..号
+							oldPathFile = fileManage.toRelativePath(oldPathFile);
+							
+							//删除旧路径文件
+							Boolean state = fileManage.deleteFile(oldPathFile);
+							if(state != null && state == false){
+
+								//替换指定的字符，只替换第一次出现的
+								oldPathFile = StringUtils.replaceOnce(oldPathFile, "file"+File.separator+"question"+File.separator, "");
+								oldPathFile = StringUtils.replace(oldPathFile, File.separator, "_");//替换所有出现过的字符
+								
+								//创建删除失败文件
+								fileManage.failedStateFile("file"+File.separator+"question"+File.separator+"lock"+File.separator+oldPathFile);
+							}
+						}
+					}
+					
+					
+					
+					
+				}
+				
+			}else{
+				error.put("question", "问题不存在");
+			}
+		}else{
+			error.put("question", "Id不存在");
+		}
+		
+		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
+		
+		if(error != null && error.size() >0){
+			returnValue.put("success", "false");
+			returnValue.put("error", error);
+		}else{
+			returnValue.put("success", "true");
+			
+		}
+		return JsonUtils.toJSONString(returnValue);
+	}
+	
+	
 	/**
 	 * 问题   删除
 	 * @param model
 	 * @param questionId
 	*/
-	@RequestMapping(params="method=delete", method=RequestMethod.POST)
+	@RequestMapping(params="method=deleteQuestion", method=RequestMethod.POST)
 	@ResponseBody//方式来做ajax,直接返回字符串
-	public String delete(ModelMap model,Long[] questionId,
+	public String deleteQuestion(ModelMap model,Long[] questionId,
 			Boolean isQuestionList,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
@@ -1090,7 +1639,25 @@ public class QuestionManageAction {
 							questionManage.delete_cache_findQuestionTagAssociationByQuestionId(question.getId());//删除'根据问题Id查询问题标签关联'缓存
 							//更新索引
 							questionIndexService.addQuestionIndex(new QuestionIndex(String.valueOf(question.getId()),3));
-							Object[] obj = textFilterManage.readPathName(question.getContent(),"question");
+							
+							
+							
+							
+							
+							String questionContent = question.getContent();
+							
+							//删除最后一个逗号
+							String _appendContent = StringUtils.substringBeforeLast(question.getAppendContent(), ",");//从右往左截取到相等的字符,保留左边的
+
+							List<AppendQuestionItem> appendQuestionItemList = JsonUtils.toGenericObject(_appendContent+"]", new TypeReference< List<AppendQuestionItem> >(){});
+							if(appendQuestionItemList != null && appendQuestionItemList.size() >0){
+								for(AppendQuestionItem appendQuestionItem : appendQuestionItemList){
+									questionContent += appendQuestionItem.getContent();
+								}
+							}
+							
+							
+							Object[] obj = textFilterManage.readPathName(questionContent,"question");
 							if(obj != null && obj.length >0){
 								List<String> filePathList = new ArrayList<String>();
 								
@@ -1150,6 +1717,130 @@ public class QuestionManageAction {
 						
 						
 					}	
+					return"1";	
+				}
+			}
+		}
+		return"0";
+	}
+	
+	
+	/**
+	 * 追加问题   删除
+	 * @param model
+	 * @param questionId
+	 * @param appendQuestionItemId
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(params="method=deleteAppendQuestion", method=RequestMethod.POST)
+	@ResponseBody//方式来做ajax,直接返回字符串
+	public String deleteAppendQuestion(ModelMap model,Long questionId,String appendQuestionItemId,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
+		if(questionId != null && questionId >0 && appendQuestionItemId != null && !"".equals(appendQuestionItemId.trim())){
+			
+		
+			Question question = questionService.findById(questionId);
+			if(question != null){
+				boolean flag = false;
+				String old_content = "";
+				//删除最后一个逗号
+				String _appendContent = StringUtils.substringBeforeLast(question.getAppendContent(), ",");//从右往左截取到相等的字符,保留左边的
+	
+				List<AppendQuestionItem> appendQuestionItemList = JsonUtils.toGenericObject(_appendContent+"]", new TypeReference< List<AppendQuestionItem> >(){});
+			
+				if(appendQuestionItemList != null && appendQuestionItemList.size() >0){
+					
+					Iterator<AppendQuestionItem> iter = appendQuestionItemList.iterator();  
+					while (iter.hasNext()) {  
+						AppendQuestionItem appendQuestionItem = iter.next();  
+						if(appendQuestionItem.getId().equals(appendQuestionItemId)){
+							old_content = appendQuestionItem.getContent();
+							flag = true;
+							iter.remove();
+							break;
+						}
+					}  
+				}
+				
+				
+				
+				
+				String appendContent_json = JsonUtils.toJSONString(appendQuestionItemList);
+				//删除最后一个中括号
+				appendContent_json = StringUtils.substringBeforeLast(appendContent_json, "]");//从右往左截取到相等的字符,保留左边的
+	
+				if(appendQuestionItemList.size() >0){
+					appendContent_json += ",";
+				}
+				if(flag){
+					String fileNumber = questionManage.generateFileNumber(question.getUserName(), question.getIsStaff());
+					
+					int i = questionService.updateAppendQuestion(questionId, appendContent_json);
+
+					
+					questionManage.delete_cache_findById(question.getId());//删除缓存
+					//更新索引
+					questionIndexService.addQuestionIndex(new QuestionIndex(String.valueOf(question.getId()),2));
+					Object[] obj = textFilterManage.readPathName(old_content,"question");
+					if(obj != null && obj.length >0){
+						List<String> filePathList = new ArrayList<String>();
+						
+						//删除图片
+						List<String> imageNameList = (List<String>)obj[0];		
+						for(String imageName :imageNameList){
+							filePathList.add(imageName);
+							
+						}
+						//删除Flash
+						List<String> flashNameList = (List<String>)obj[1];		
+						for(String flashName :flashNameList){
+							filePathList.add(flashName);
+						}
+						//删除影音
+						List<String> mediaNameList = (List<String>)obj[2];		
+						for(String mediaName :mediaNameList){
+							filePathList.add(mediaName);
+						}
+						//删除文件
+						List<String> fileNameList = (List<String>)obj[3];		
+						for(String fileName :fileNameList){
+							filePathList.add(fileName);
+						}
+
+						
+						for(String filePath :filePathList){
+							
+							
+							 //如果验证不是当前用户上传的文件，则不删除
+							 if(!questionManage.getFileNumber(fileManage.getBaseName(filePath.trim())).equals(fileNumber)){
+								 continue;
+							 }
+							
+							//替换路径中的..号
+							filePath = fileManage.toRelativePath(filePath);
+							
+							//删除旧路径文件
+							Boolean state = fileManage.deleteFile(filePath);
+							if(state != null && state == false){
+								 //替换指定的字符，只替换第一次出现的
+								filePath = StringUtils.replaceOnce(filePath, "file/question/", "");
+								//创建删除失败文件
+								fileManage.failedStateFile("file"+File.separator+"question"+File.separator+"lock"+File.separator+filePath.replaceAll("/","_"));
+							}
+						}
+						
+						//清空目录
+						Boolean state_ = fileManage.removeDirectory("file"+File.separator+"answer"+File.separator+question.getId()+File.separator);
+						if(state_ != null && state_ == false){
+							//创建删除失败目录文件
+							fileManage.failedStateFile("file"+File.separator+"answer"+File.separator+"lock"+File.separator+"#"+question.getId());
+						}
+						
+					}
 					return"1";	
 				}
 			}

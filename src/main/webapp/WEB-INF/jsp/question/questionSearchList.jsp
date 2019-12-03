@@ -99,7 +99,7 @@ function deleteQuestion(questionId){
 			alert("删除失败");
 		}
 	},
-		"${config:url(pageContext.request)}control/question/manage${config:suffix()}?method=delete&timestamp=" + new Date().getTime(), true,parameter);
+		"${config:url(pageContext.request)}control/question/manage${config:suffix()}?method=deleteQuestion&timestamp=" + new Date().getTime(), true,parameter);
 }
 
 

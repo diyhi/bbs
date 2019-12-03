@@ -371,6 +371,13 @@
 		overflowToDisk="true"
 		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="1800" 
 		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
+	<!-- 标记修改话题状态 -->
+	<cache name="topicManage_cache_markUpdateTopicStatus" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
+		
+		
 	<!-- 查询会员卡 -->
 	<cache name="membershipCardManage_cache_findById" maxElementsInMemory="900000" 
 		overflowToDisk="true"

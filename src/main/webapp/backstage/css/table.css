@@ -539,6 +539,63 @@ filter:alpha(opacity: 0);
 
 
 
+.appendQuestionModule .appendBox{
+	margin-left:5px;margin-right:5px;margin-top: 25px;margin-bottom: 5px;text-align: left; *width: 600px;/*IE 6和7*/ 
+	position:relative;
+}
+.appendQuestionModule .odd .head{
+	color: #f9ce00;
+}
+.appendQuestionModule .odd:before{
+	content: " ";
+	position: absolute;
+	top: 0px;
+	left: -10px;
+	bottom:0px;
+	border-left: 5px solid #f9ce00;
+}
+.appendQuestionModule .even .head{
+	color: #85eb4e;
+}
+.appendQuestionModule .even:before{
+	content: " ";
+	position: absolute;
+	top: 0px;
+	left: -10px;
+	bottom:0px;
+	border-left: 5px solid #85eb4e;
+}
+.appendQuestionModule .appendBox .head {
+	height: 24px;
+}
+.appendQuestionModule .appendBox .head .prompt{
+	font-size: 15px;
+	line-height: 34px;
+}
+.appendQuestionModule .appendBox .head .appendTime{
+	margin-left:5px;
+	font-size: 15px;
+	line-height: 34px;
+}
+.appendQuestionModule .appendBox .head .editAppendQuestion{
+	margin-left:10px;
+	font-size: 15px;
+	line-height: 34px;
+}
+.appendQuestionModule .appendBox .head .deleteAppendQuestion{
+	font-size: 15px;
+	line-height: 34px;
+}
+
+.appendQuestionModule .appendBox .appendContent{padding:20px 0px;color:#333;font-size:16px;line-height:28px; word-wrap:break-word;min-height: 80px;}
+.appendQuestionModule .appendBox .appendContent a{
+	color: #26a2ff;
+}
+.appendQuestionModule .appendBox .appendContent p{font-size:16px;word-wrap:break-word}
+.appendQuestionModule .appendBox .appendContent img{max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;}
+
+
+
 
 /* 编辑器表格 */
 .exampleTable{

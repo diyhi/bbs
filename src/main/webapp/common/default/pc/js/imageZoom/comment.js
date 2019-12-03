@@ -36,12 +36,12 @@ commentMove.prototype = {
                 var imageHeight = img.height;
                 
                 //最大宽度
-                if(imageWidth >800){
-                	imageWidth = 800;
+                if(imageWidth >1000){
+                	imageWidth = 1000;
                 //	imageHeight = img.height/(img.width/imageWidth);
                 	
                 }
-                $(that.boxcontent).css({ "width": imageWidth, "height": imageHeight })
+                $(that.boxcontent).css({ "width": imageWidth, "height": imageHeight,"padding-bottom": 8+'px'})
                 $(that.obj.prevButton).css({ "width": imageWidth / 3, "height": imageHeight })
                 $(that.obj.prevButton).children().css({ "top": imageHeight / 2 - 10 + 'px' })
                 $(that.obj.nextButton).children().css({ "top": imageHeight / 2 - 10 + 'px' })
@@ -49,7 +49,7 @@ commentMove.prototype = {
             img.src = src;//src 属性一定要写到 onload 的后面，否则程序在 IE 中会出错
             
             if (!src) {
-                $(that.boxcontent).css({ "width": 0, "height": 0 });
+                $(that.boxcontent).css({ "width": 0, "height": 0,"padding-bottom": 0});
             } else {
                 $(that.boxcontent + " img").attr('src', src);
             }

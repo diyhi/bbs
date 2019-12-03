@@ -4,7 +4,7 @@
 <@function topicId="${url_topicId}" commentId="${url_commentId}" page="${url_page}" >
 <#assign pageView =  topicRelated_comment_page> 
 
-<#if pageView.records?exists> 
+<#if pageView.records?exists && topicRelated_comment_page.records?size gt 0> 
 	
 	<div class="commentModule" >
 		<ol class="commentlist">
@@ -82,9 +82,16 @@
 							</ul>
 						</div> 
 					</#if> 
+					<div id="commentReply-post_${comment.id}" class="commentReply-post">
+					
+					</div>
+					<div id="quote-post_${comment.id}" class="quote-post">
+					
+					</div>
 					<div class="tipBottom">
 						<span class="a-toolbar">
 							<a href="javascript:" onclick="replyLayer('${comment.id}','${(comment.nickname != null && comment.nickname??) ?string(comment.nickname , comment.userName)}');">回复</a>&nbsp;|&nbsp;
+
 							<a href="javascript:" onclick="quoteLayer('${comment.id}','${(comment.nickname != null && comment.nickname??) ?string(comment.nickname , comment.userName)}')">引用</a>
 							<!-- 是否登录 -->
 							<input type="hidden" id="isLogin" value="<#if systemUser != null>true<#else>false</#if>">
@@ -95,14 +102,14 @@
 				</div>
 			</#list>
 		</ol>
+		<div class="commentPage">
+		   	<#-- 分页 公共页(生成新引用页)-->
+			<@include action="${newPublic_1}"/>
+		</div>
 	</div>
-	
 </#if>	
 </@function>
-<div class="commentPage">
-   	<#-- 分页 公共页(生成新引用页)-->
-	<@include action="${newPublic_1}"/>
-</div>
+
 
 
 <script type="text/javascript">
@@ -124,8 +131,7 @@ $(function() {
  });  
 
 
-
-//回复弹出层
+//回复展开层
 function replyLayer(commentId,userName){
 	//判断是否已登录
 	var isLogin = document.getElementById("isLogin").value;
@@ -142,19 +148,6 @@ function replyLayer(commentId,userName){
 		return false;
 	}
 	
-	
-
-	var div = "<div id='divMessage'></div>";
-	layer.open({
-	    type: 1, 
-	    title:"回复 "+userName,
-	    content: div, //这里content是一个普通的String
-	    moveOut:true,//是否允许拖拽到窗口外
-	    area: ['800px', '500px']//宽高
-
-	});
-	
-	
 	var parameter = "";//URI参数
 	parameter += "&commentId="+commentId;
 	
@@ -162,13 +155,53 @@ function replyLayer(commentId,userName){
 	//回复页面
 	get_request(function(value){
 		if(value != ""){
-			$("#divMessage").html(value);
+			$("#commentReply-post_"+commentId).html(value);
 		}
 	},
 	getBasePath()+"comment_reply.htm?"+parameter+"&timestamp=" + new Date().getTime(), true);
 	
 }
+function cancelReply(commentId){
+	$("#commentReply-post_"+commentId).html("");
+}
 
+
+//引用弹出层
+function quoteLayer(commentId,userName){
+	//判断是否已登录
+	var isLogin = document.getElementById("isLogin").value;
+	if(isLogin == "false"){
+		layer.open({
+		    type: 1, 
+		    title:"提示",
+		    content: "<div style='line-height: 36px; font-size: 15px;text-align:center; margin-left: 8px;margin-right: 8px;'>请先登录</div>", 
+		    area: ['260px', '120px'],//宽高
+			success: function(layero, index){
+				 
+			}
+		});
+		return false;
+	}
+	
+	var parameter = "";//URI参数
+	parameter += "&commentId="+commentId;
+	
+	
+	//引用页面
+	get_request(function(value){
+		if(value != ""){
+			$("#quote-post_"+commentId).html(value);
+		}
+	},
+	getBasePath()+"comment_quote.htm?"+parameter+"&timestamp=" + new Date().getTime(), true);
+
+
+
+}
+function cancelQuote(commentId){
+	$("#quote-post_"+commentId).html("");
+}
+/**
 //引用弹出层
 function quoteLayer(commentId,userName){
 	//判断是否已登录
@@ -215,6 +248,6 @@ function quoteLayer(commentId,userName){
 	},
 	getBasePath()+"comment_quote?"+parameter+"&timestamp=" + new Date().getTime(), true);
 	
-}
+}**/
 </script> 
 

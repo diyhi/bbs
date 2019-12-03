@@ -401,27 +401,28 @@ html,body{
 
 
 
-
-/* 左边栏 */
-.leftColumn{ 
-	width: 1210px; 
-	float: left;
-	padding:0px;
-	background:transparent;
-	
-}
-
-/* 标签 */
+/* 话题题标签 */
 .tabModule {
-    padding: 10px;
+	margin-top:10px;
+    padding: 8px 18px 8px 18px;
     font-size: 14px;
     line-height: 150%;
     text-align: left;
     background-color: #fff; 
-    border-top-left-radius: 3px; 
-    border-top-right-radius: 3px;
+    position: relative;
+	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
 }
-.tabModule .tab:link,.tabModule .tab:visited,.tabModule .tab:active {
+.tabModule .tab-box{
+	
+	margin-right: 90px;
+}
+.tabModule .tab-box .tab{
+	margin-top: 8px;
+	margin-bottom: 8px;
+}
+.tabModule .tab-box .tab:link,
+.tabModule .tab-box .tab:visited,
+.tabModule .tab-box .tab:active {
     display: inline-block;
     font-size: 14px;
     line-height: 14px;
@@ -429,111 +430,152 @@ html,body{
     margin-right: 5px;
     border-radius: 3px;
     color: #555;
-    position:relative;
-    behavior: url(common/default/pc/js/css3pie/PIE.htc);  /*通知IE浏览器调用脚本作用于当前类*/
-}
-
-.tabModule .tab:hover {
     background-color: #f5f5f5;
-    color: #000;
+    position:relative;
+}
+.tabModule .tab-box .tab:hover {
+    background-color: #ebebeb;
+    color: #555;
     text-decoration: none;
 }
-
-.tabModule .tab_current:link,.tabModule .tab_current:visited,.tabModule .tab_current:active {
+.tabModule .tab-box .tab_current:link,
+.tabModule .tab-box .tab_current:visited,
+.tabModule .tab-box .tab_current:active {
     display: inline-block;
     font-size: 14px;
     line-height: 14px;
     padding: 5px 8px 5px 8px;
     margin-right: 5px;
     border-radius: 3px;
-    background-color: #334;
+    background-color: #334;;
     color: #fff;
     position:relative;
     behavior: url(common/default/pc/js/css3pie/PIE.htc);  /*通知IE浏览器调用脚本作用于当前类*/
 }
-
-.tabModule .tab_current:hover {
+.tabModule .tab-box .tab_current:hover {
     background-color: #445;
     color: #fff;
     text-decoration: none;
 }
+.tabModule .more{
+	position: absolute;
+	top: 18px;
+	right: 15px;
+}
+.tabModule .readMore{
+	color: #555;
+	cursor:default;
+}
+.tabModule .readMore i{
+	display:block;
+	float:right;
+	margin-top: 4px;
+	margin-left: 3px;
+}
+.tabModule .shrinkMore{
+	position: relative;
+	display: block;
+	color: #555;
+	text-align:center;
+	height: 30px;
+	line-height:30px;
+	font-size:15px;
+	margin-top: 10px;
+}
 
 /* 话题模块 */
-.topicModule {
-	padding: 6px;
-	background: #fff;
+.topicModule{
+	margin-top: 10px;
+	
+}
+.topicModule .topic-box{
+	background:#fff;padding:0px 15px 0px 15px;
+	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
+	
+}
+.topicModule .topic-box .topicList {
+	margin-bottom: 10px;
+}
+.topicModule .topic-box .topicList .topicItem {
+	margin: 0;
+	border-bottom: 1px solid #f1f1f1;
+	padding: 15px 0 10px 0;
 	position: relative;
-	border-radius:4px;
-	padding-bottom:0;
-	behavior: url(common/default/pc/js/css3pie/PIE.htc);  /*通知IE浏览器调用脚本作用于当前类*/
 }
-.topicModule table {
-	width: 100%;
-	table-layout: fixed;
-	border-collapse: separate;
-}
-.topicModule th{
-	padding: 5px 0;
-	padding-right: 1.5em;
-	zoom: 1;
-	height: 22px;
-	line-height: 22px;
-	padding:20px 0px;
-	border-top: 1px solid #eee;
-	border-bottom: none;
-}
-.topicModule th:last-child {
-	border-bottom: 1px solid #fff!important;
-}
-.topicModule th a:visited{
-	color: #666;
-}
-.topicModule td {
-	padding: 5px 0;
-	border-bottom: 1px solid #eee;
-	width: 0;
-	height: 0;
-	overflow: hidden;
-}
-.topicModule th em {
-	margin-right: 20px;
-	zoom: 1;
-	color: #c4c4c4;
-	font-size: 13px;
-	*margin-top: 20px;
-}
-.topicModule th em a{
-	color: #c4c4c4;
-}
-.topicModule th {
-	height: 0px;
-}
-/* 头像 */
-.topicModule .avatarBox {
+.topicModule .topic-box .topicList .topicItem .avatarBox {
 	position: relative;
-	margin-left: 0;
+	margin-left: 0px;
 	padding: 0;
+	float: left;
 }
-
-.topicModule .avatarBox .avatarLink {
+.topicModule .topic-box .topicList .topicItem .avatarBox .avatarLink {
 	display: block;
 	position: relative;
 	float: left;
-	padding-left: 6px;
+	padding-left: 4px;
 }
-
-.topicModule .avatarBox .avatarLink  img {
+.topicModule .topic-box .topicList .topicItem .avatarBox .avatarLink  img {
 	float: none;
 	display: block;
-	width: 60px;
-	height: 60px;
+	width: 62px;
+	height: 62px;
 	float: left;
 	margin-right: 10px;
 	border-radius:60px;
 	position:relative;
-	behavior: url(common/default/pc/js/css3pie/PIE.htc);  /*通知IE浏览器调用脚本作用于当前类*/
 }
-.topicModule .userRoleName{
+.topicModule .topic-box .topicList .topicItem .content {
+	/**
+	overflow: auto;
+	overflow-x: hidden;**/
+	margin-left:88px;
+	margin-right:160px;
+	
+	
+}
+.topicModule .topic-box .topicList .topicItem .content .info {
+	margin-top:2px;
+	margin-bottom: 8px;
+	color: #c4c4c4;
+	font-size: 14px;
+	padding-left: 0;
+	list-style: none;
+}
+.topicModule .topic-box .topicList .topicItem .content .info>li{
+	display: inline-block;
+}
+.topicModule .topic-box .topicList .topicItem .content .info .tag{
+	display: inline-block;
+	min-width: 10px;
+	padding: 4px 7px;
+	font-size: 12px;
+	color: #666666;
+	line-height: 1;
+	vertical-align: baseline;
+	white-space: nowrap;
+	text-align: center;
+	background-color: #f5f5f5;
+	border-radius: 2px;
+	
+}
+.topicModule .topic-box .topicList .topicItem .content .info .module{
+	display: inline-block;
+	min-width: 10px;
+	padding: 4px 7px;
+	font-size: 12px;
+	color: #666666;
+	line-height: 1;
+	vertical-align: baseline;
+	white-space: nowrap;
+	text-align: center;
+	background-color: #f5f5f5;
+	border-radius: 2px;
+	
+}
+.topicModule .topic-box .topicList .topicItem .content .info .userName{
+	color: #999;
+}
+.topicModule .topic-box .topicList .topicItem .content .info .userRoleName{
 	white-space:nowrap;
 	color:#fff;
 	background-color:#ffcc00;
@@ -541,7 +583,7 @@ html,body{
 	padding:0 5px;
 	font-size: 12px;
 }
-.topicModule .staff{
+.topicModule .topic-box .topicList .topicItem .content .info .staff{
 	white-space:nowrap;
 	color:#fff;
 	background-color:#32aa66;
@@ -549,135 +591,101 @@ html,body{
 	padding:0 5px;
 	font-size: 12px;
 }
-
-/* 列表内容 */
-.topicModule .content {
-	position: relative;
-	margin-left: 82px;
-	width: 1100px;
-	overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+.topicModule .topic-box .topicList .topicItem .content .info .postTime{
+	margin-left: 10px;
 }
-.topicModule .highlight B{
-	color: #fc0012;
+.topicModule .topic-box .topicList .topicItem .content .info .lastReplyTime{
+	margin-left: 10px;
 }
-
-.topicModule .content .info {
-	margin-top: 3px;*margin-top: -16px; margin-bottom: 3px;
-}
-
-.topicModule .content .info a {
-	color: #aaa;
-}
-
-
-.topicModule .content .info .tag{
-	display: inline-block;
-	min-width: 10px;
-	padding: 4px 7px;
-	font-size: 12px;
-	color: #666666;
-	line-height: 1;
-	vertical-align: baseline;
-	white-space: nowrap;
-	text-align: center;
-	background-color: #f5f5f5;
-	border-radius: 2px;
+.topicModule .topic-box .topicList .topicItem .content .title {
+	margin: 0 5px 0 0;
+	font-size: 18px;
+	line-height: 28px;
 	
 }
-.topicModule .content .info .module{
-	display: inline-block;
-	min-width: 10px;
-	padding: 4px 7px;
-	font-size: 12px;
-	color: #666666;
-	line-height: 1;
-	vertical-align: baseline;
-	white-space: nowrap;
-	text-align: center;
-	background-color: #f5f5f5;
-	border-radius: 2px;
-	
-}
-
-/* 标题 #555*/
-.topicModule .content .title {
-	font-family: STHeiti,Microsoft YaHei,Tahoma,Helvetica,'SimSun',sans-serif;
-	font-size: 16px;
+.topicModule .topic-box .topicList .topicItem .content .title a{
 	color: #393939;
 }
-
-*html .topicModule .content .title {
-	font-family: STHeiti,Microsoft YaHei,Tahoma,Helvetica,'SimSun',sans-serif;
-	font-size: 16px;
-	display: block;
-}
-
-.topicModule .content .title:hover{
+.topicModule .topic-box .topicList .topicItem .content .title a:hover {
+	text-decoration: none;
 	color: #2196F3;
 }
-.topicModule .topicRoleName{
+.topicModule .topic-box .topicList .topicItem .content .title .topicRoleName{
 	white-space:nowrap;
 	color:#fff;
 	background-color:#ffb800;
 	border-radius:4px;
 	padding:0 5px;
-	font-size: 14px;
-	position:relative;/** 这两行让标签上移 **/
+	font-size: 13px;
+	position:relative;
     top:-1px;
 }
-								
-								
-/* 查看数量 */
-.topicModule .view {
-	line-height: 22px;
-	margin: 0 9px 0 5px;
-	float: right;
-	font-size: 12px;
+.topicModule .highlight B{
+	color: #fc0012;
+	font-weight:normal;
 }
-
-/* 回复数量 */
-.topicModule .replies{
-	margin-right: 9px;
-	float: right;
+.topicModule .topic-box .topicList .topicItem .content .detail{
+	position: relative;
 }
-
-.topicModule .images{
-    width:16px;
-    margin-top: 6px;
-    margin-right: 8px;
+.topicModule .topic-box .topicList .topicItem .content .detail .tm-m-photos{
+	margin-top: 4px;
 }
-
-.topicModule .summary{
-	font-size: 14px;color: #aaa;line-height: 24px;
+.topicModule .topic-box .topicList .topicItem .content .detail .summary{
+	margin: 3px 5px 0 0;
+	font-size: 15px;
+	line-height: 28px;
+	font-weight:normal;
+	text-decoration:none;
+	color: #aaa;
 }
-
-.topicModule .topicPage{
-	padding-top:20px;background: #fff;height: 50px;
-
-	border-top: 1px solid #eee;
+.topicModule .topic-box .topicList .topicItem .statistic {
+	position:absolute;
+	top:48px;
+	right:0px;
+	font-size: 14px;
+	color: #c4c4c4;
+	
+}
+.topicModule .topic-box .topicList .topicItem .statistic .viewTotal{
+	float: left;margin-right: 4px;min-width: 60px;
+}
+.topicModule .topic-box .topicList .topicItem .statistic .viewTotal .icon{
+	margin-left: 3px;position:relative;top: 1px;color: #e6e6e6;
+}
+.topicModule .topic-box .topicList .topicItem .statistic .commentTotal{
+	float: right;margin-right: 10px;min-width: 50px;
+}
+.topicModule .topic-box .topicList .topicItem .statistic .commentTotal .icon{
+	margin-left: 3px;position:relative;top: 1px;color: #e6e6e6;
+}
+.topicModule .topicPage {
+	padding-top:20px;background: #fff;height: 54px;
 	overflow: hidden;
 }
 
 
 
-
-
 /* 提交话题 */
 .topic-formModule {
-	position: relative;   margin-left: 10px;margin-right: 10px; 
+	margin-top:10px;
+	
 }
-.topic-formModule .textarea{
+.topic-formModule .addTopic-wrap{
+	position: relative;
+	background: #fff;
+	padding:15px 18px 50px 15px;
+	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
+}
+.topic-formModule .addTopic-wrap .textarea{
 	width:100%;height:300px;visibility:hidden;
 }
-.topic-formModule .form-action {
+.topic-formModule .addTopic-wrap .form-action {
 	 padding-left: 0px; padding-right: 0px; padding-top: 8px;margin-bottom: 12px;
 }
-
-
-.topic-formModule .error {
+.topic-formModule .addTopic-wrap .error {
 	color: red;
 }
-.topic-formModule .topicSubmit {
+.topic-formModule .addTopic-wrap .topicSubmit {
 	width: 70px;
 	height: 38px;
 	float: left;
@@ -685,10 +693,10 @@ html,body{
 	position: relative;
 	z-index: 2;
 }
-.topic-formModule .captchaModule .captcha_div{
+.topic-formModule .addTopic-wrap .captchaModule .captcha_div{
 	height: 38px;line-height:38px;
 }
-.topic-formModule .captchaModule .captchaBox{
+.topic-formModule .addTopic-wrap .captchaModule .captchaBox{
 	height:32px;
 	border:1px solid #e6e6e6;
 	width:85px;
@@ -697,7 +705,7 @@ html,body{
 	margin-left: 10px;
 	margin-top:1px;
 }
-.topic-formModule .captchaModule .captchaBox input{
+.topic-formModule .addTopic-wrap .captchaModule .captchaBox input{
 	position: relative;  
 	background-image:url(../images/null.gif);
 	background-color:transparent;
@@ -711,7 +719,7 @@ html,body{
 	padding:0 5px;
 	font-size:18px; 
 }
-.topic-formModule .captchaModule .promptTag {
+.topic-formModule .addTopic-wrap .captchaModule .promptTag {
 	float:left; 
 	font-size:14px; 
 	height:22px; 
@@ -721,84 +729,134 @@ html,body{
 	margin-left:-74px; 
 	color:#B0B0B0;
 }
-.topic-formModule .captchaModule .captcha_div .captchaImage{width:100px;height:32px;float: left;margin:1px 15px 0 5px;}
-.topic-formModule .captchaModule .captcha_div .captchaImage img{width:100px;height:34px;outline:none;}
-.topic-formModule .captchaModule .tips{
+.topic-formModule .addTopic-wrap .captchaModule .captcha_div .captchaImage{width:100px;height:32px;float: left;margin:1px 15px 0 5px;}
+.topic-formModule .addTopic-wrap .captchaModule .captcha_div .captchaImage img{width:100px;height:34px;outline:none;}
+.topic-formModule .addTopic-wrap .captchaModule .tips{
 	padding-left:10px;height: 18px;line-height: 18px;
 }
-.topic-formModule .captchaModule .tips span{
+.topic-formModule .addTopic-wrap .captchaModule .tips span{
 	color: red;
 }
-
-
-/* 左边栏 */
-.leftColumn_article{ 
-	width: 910px; 
-	float: left;
-	padding:0px;
+/* 添加答案模块(未登录) */
+.addTopicModule{
+	margin-top:10px;
+}
+.addTopicModule .addTopic-wrap{
 	background: #fff;
-	border-right: 1px solid #f1f1f1;
-	border-radius:4px 0px 0px 4px;
+	padding:15px 15px 15px 15px;
+	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
 }
+.addTopicModule .respond {background: #f6f6f6;border-radius:4px;line-height: 40px;text-align:center;}
+.addTopicModule .respond p {font-size:15px;padding:8px;overflow:hidden;color: #aaaaaa}
+.addTopicModule .respond a{color: #26a2ff;}
+/* 全站关闭发表话题 */
+.addTopic-disableFormModule{
+	margin-top:10px;
+}
+.addTopic-disableFormModule .disableForm-wrap{
+	background: #fff;
+	padding:15px 15px 15px 15px;
+}
+.addTopic-disableFormModule .disableForm-wrap .respond {background: #f6f6f6;border-radius:4px;line-height: 40px;text-align:center;}
+.addTopic-disableFormModule .disableForm-wrap .respond p {font-size:15px;padding:8px;overflow:hidden;color: #aaaaaa}
 
-/* 话题内容 */
-.articleModule{
-	padding: 10px;
+
+
+
+
+
+
+
+.topicContentModule{
+	margin:10px auto auto auto;
+}
+.topicContentModule .left {
+	float: left;
+	width: 900px;
+	height: auto;
+	padding-bottom: 10px;
+}
+.topicContentModule .left .topic-wrap{
+	background: #fff;
+	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
 	position: relative;
-	padding-bottom:0;
 }
-.articleModule .tab{
-	padding: 10px;
-    font-size: 14px;
-    line-height: 150%;
-    text-align: left;
-    background-color: #fff; 
-    border-top-left-radius: 3px; 
-    border-top-right-radius: 3px;
+.topicContentModule .left .topic-wrap .topicTag{
+	padding-top:15px;
+	margin-left:15px;
 }
-.articleModule .tab a{
+.topicContentModule .left .topic-wrap .topicTag .tag{
 	display: inline-block;
     font-size: 14px;
-    line-height: 13px;
+    line-height: 14px;
     padding: 6px 8px 6px 8px;
     margin-right: 5px;
     border-radius: 3px;
-    position:relative;
+    color: #555;
     background-color: #f5f5f5;
+    position:relative;
+}
+.topicContentModule .left .topic-wrap .topicTag .tag:hover {
+    background-color: #ebebeb;
     color: #555;
     text-decoration: none;
-    
-    behavior: url(common/default/pc/js/css3pie/PIE.htc);  /*通知IE浏览器调用脚本作用于当前类*/
 }
-.articleModule .editTopic{
+.topicContentModule .left .topic-wrap .editTopic{
 	position:absolute; 
 	right: 5px;
 	top: 20px;
 }
-.articleModule .editTopic i{
+.topicContentModule .left .topic-wrap .editTopic i{
 	font-size: 13px;
 	margin-right: 2px;
 }
-.articleModule .editTopic a{
-	font-size: 14px;
+.topicContentModule .left .topic-wrap .editTopic a{
+	font-size: 15px;
 	margin-right: 8px;
 }
+.topicContentModule .left .topic-wrap .topicBox{
+	height: auto;
 
-.articleModule .articleBox{margin-top:2px;}
-.articleModule .articleBox h1{color:#404040;font-size:25px;border:none;margin-top:0;font-weight:normal;line-height:28px; text-align: center;}
-.articleModule .articleBox h2{color:#404040;font-size:18px;border:none;margin-top:0;font-weight:normal;margin-top: 20px;border-bottom:1px dotted #eee;}
-.articleModule .articleBox .topicContent{border-top:1px dotted #eee;margin-top:20px;padding:20px 5px;color:#666666;font-size:16px;word-wrap:break-word}
-.articleModule .articleBox .topicContent .lastUpdateTime{
+	
+	padding:15px 15px 15px 15px;
+}
+
+.topicContentModule .left .topic-wrap .topicBox .title{
+	color:#333;
+	font-size:24px;
+	border:none;
+	line-height:34px; 
+	margin:9px 0 18px 0;
+}
+.topicContentModule .left .topic-wrap .topicBox .topicInfo{
+	color: #ccc;font-size: 14px;
+}
+.topicContentModule .left .topic-wrap .topicBox .topicInfo .postTime{
+	float: left;
+}
+.topicContentModule .left .topic-wrap .topicBox .topicInfo .viewTotal-icon{
+	float: left;margin-left: 20px;margin-top: 4px;
+}
+.topicContentModule .left .topic-wrap .topicBox .topicInfo .viewTotal{
+	float: left;margin-left: 3px;
+}
+.topicContentModule .left .topic-wrap .topicBox .topicInfo .comment-icon{
+	float: left;margin-left: 20px;margin-top: 4px;
+}
+.topicContentModule .left .topic-wrap .topicBox .topicInfo .comment{
+	float: left;margin-left: 3px;
+}
+.topicContentModule .left .topic-wrap .topicBox .topicContent .lastUpdateTime{
 	text-align: center;line-height: 40px;padding-bottom: 30px;color: #939499;
 }
-.articleModule .articleBox .topicContent a{
+.topicContentModule .left .topic-wrap .topicBox .topicContent{border-top:1px solid #f1f1f1;margin-top:5px;padding:20px 0px;color:#333;font-size:16px; line-height:28px; word-wrap:break-word;min-height: 100px;}
+.topicContentModule .left .topic-wrap .topicBox .topicContent a{
 	color: #26a2ff;
 }
-.articleModule .articleBox .topicContent p{font-size:16px;word-wrap:break-word}
-.articleModule .articleBox .topicContent img{max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;}
-
+.topicContentModule .left .topic-wrap .topicBox .topicContent p{font-size:16px;word-wrap:break-word}
+.topicContentModule .left .topic-wrap .topicBox .topicContent img{max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;}
 /* 隐藏标签 IE8以下浏览器不支持自定义标签，需要在页头<head>标签内执行document.createElement('hide') */
-.articleModule .articleBox .topicContent hide{
+.topicContentModule .left .topic-wrap .topicBox .topicContent hide{
 	display:block;
 	background: #fbfbfb;
 	min-height:100px;
@@ -810,41 +868,153 @@ html,body{
 	border-radius: 5px;
 	
 }
-
-.articleModule .articleBox .topicContent hide .hide-box{
+.topicContentModule .left .topic-wrap .topicBox .topicContent hide .hide-box{
 	margin: 5px;position: relative;text-align: center;
 }
-.articleModule .articleBox .topicContent hide .background-image{
+.topicContentModule .left .topic-wrap .topicBox .topicContent hide .background-image{
 	margin: auto;
 	margin-top:12px;
 	background:url(../images/lock.png) no-repeat;width: 48px;height: 48px;
 	opacity:0.25;
 	filter:alpha(opacity=25); 
 }
-.articleModule .articleBox .topicContent hide .background-prompt{
+.topicContentModule .left .topic-wrap .topicBox .topicContent hide .background-prompt{
 	margin-top: 2px; color: #999999;font-size: 16px;
 }
-.articleModule .articleBox .topicContent hide .highlight{font-weight:bold;}
+.topicContentModule .left .topic-wrap .topicBox .topicContent hide .highlight{font-weight:bold;}
 /*border:#a9a9a9 solid 2px;  边框#b2b5bc #777777*/
-.articleModule .articleBox .topicContent hide .input-box{margin: auto; margin-top: 10px;margin-bottom:18px; border:#888888 solid 2px; width:226px; height:26px; overflow:hidden; border-radius: 2px;}
-.articleModule .articleBox .topicContent hide .input-box .text{ width:145px; height:26px; line-height:26px; border:0; float:left; font-size:14px; color:#4f4f4f; text-indent: 6px; vertical-align:middle;outline:none; background: #f7f8fa;}
+.topicContentModule .left .topic-wrap .topicBox .topicContent hide .input-box{margin: auto; margin-top: 10px;margin-bottom:18px; border:#888888 solid 2px; width:226px; height:26px; overflow:hidden; border-radius: 2px;}
+.topicContentModule .left .topic-wrap .topicBox .topicContent hide .input-box .text{ width:145px; height:26px; line-height:26px; border:0; float:left; font-size:14px; color:#4f4f4f; text-indent: 6px; vertical-align:middle;outline:none; background: #f7f8fa;}
+.topicContentModule .left .topic-wrap .topicBox .topicContent hide .input-box .button{ width:79px;*width:76px; height:26px; line-height:28px; border:0; background:#888888; font-size:16px; color:#fff; float:right; font-weight:bold; cursor:pointer;text-decoration: none; outline: none}
+.topicContentModule .left .topic-wrap .topicBox .topicContent hide .input-box .button:hover{background:#808080;}/*background:#606060;*/
+.topicContentModule .left .topic-wrap .topicBox .topicContent hide .submit-box{margin: auto; margin-top: 10px;margin-bottom:18px; border:#888888 solid 2px; width:96px; height:26px; overflow:hidden; border-radius: 2px;}
+.topicContentModule .left .topic-wrap .topicBox .topicContent hide .submit-box .button{ width:96px; height:26px; line-height:28px; border:0; background:#888888; font-size:16px; color:#fff; float:right; font-weight:bold; cursor:pointer;text-decoration: none; outline: none}
+.topicContentModule .left .topic-wrap .topicBox .topicContent hide .submit-box .button:hover{background:#808080;}
 
-.articleModule .articleBox .topicContent hide .input-box .button{ width:79px;*width:76px; height:26px; line-height:28px; border:0; background:#888888; font-size:16px; color:#fff; float:right; font-weight:bold; cursor:pointer;text-decoration: none; outline: none}
-.articleModule .articleBox .topicContent hide .input-box .button:hover{background:#808080;}/*background:#606060;*/
+.topicContentModule .right{
+	float: right;
+	width: 300px;
+	height: auto;
+	padding-bottom: 10px;
+}
+.topicContentModule .right .userInfo-wrap{
+	background: #fff;
+	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
+}
+.topicContentModule .right .userInfo-wrap .userInfo {
+	padding: 20px 0 20px 0;
+	margin-left:8px;
+	margin-right:8px;
+	height: auto;
+	overflow: hidden;
+	position: relative;
+}
+.topicContentModule .right .userInfo-wrap .userInfo .author{
+	text-align: center;
+}
+.topicContentModule .right .userInfo-wrap .userInfo .author img{
+	width: 70px;
+    height: 70px;
+    border-radius: 50%;
+   
+}
+.topicContentModule .right .userInfo-wrap .userInfo .name{
+ font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+  color: #333333;	
+  margin:14px 0 2px 0;
+}
+.topicContentModule .right .userInfo-wrap .userInfo .role{
+	text-align: center;
+}
+.topicContentModule .right .userInfo-wrap .userInfo .role .userRoleName{
+	white-space:nowrap; 
+	color:#fff;
+	background-color:#ffcc00;
+	border-radius:4px;
+	padding:1px 5px;
+	font-size: 13px;
+}
+.topicContentModule .right .userInfo-wrap .userInfo .role .staff{
+	white-space:nowrap; 
+	color:#fff;
+	background-color:#32aa66;
+	border-radius:4px;
+	padding:1px 5px;
+	font-size: 13px;
+}
+.topicContentModule .right .userInfo-wrap .userInfo ul{
+	width: 100%;
+	height: auto;
+	overflow: hidden;
+	padding: 15px 0 18px 0;
+	border-top: 1px solid #f1f1f1;
+	margin-top: 20px;
+}
+.topicContentModule .right .userInfo-wrap .userInfo ul li{
+	float: left;
+	width: 33%;
+}
+.topicContentModule .right .userInfo-wrap .userInfo ul li span{
+	display: block;
+	text-align: center;
+}
+.topicContentModule .right .userInfo-wrap .userInfo ul li span a{
+    color: #333;
+    margin-bottom: 0px;
+}
+.topicContentModule .right .userInfo-wrap .userInfo ul li span:nth-child(1){
+  font-size: 16px;
+  font-weight: 600;
+  color: #333333;
+}
+.topicContentModule .right .userInfo-wrap .userInfo ul li span:nth-child(2){
+	font-size: 12px;
+	color: #666;
+}
+.topicContentModule .right .userInfo-wrap .userInfo ul li span:nth-child(2) a{
+    color: #666;
+}
+.topicContentModule .right .userInfo-wrap .userInfo .action-button {
+	text-align: center;
+}
+.topicContentModule .right .userInfo-wrap .userInfo .action-button .privateMessageBox{
 
-.articleModule .articleBox .topicContent hide .submit-box{margin: auto; margin-top: 10px;margin-bottom:18px; border:#888888 solid 2px; width:96px; height:26px; overflow:hidden; border-radius: 2px;}
-.articleModule .articleBox .topicContent hide .submit-box .button{ width:96px; height:26px; line-height:28px; border:0; background:#888888; font-size:16px; color:#fff; float:right; font-weight:bold; cursor:pointer;text-decoration: none; outline: none}
-.articleModule .articleBox .topicContent hide .submit-box .button:hover{background:#808080;}
+}
+.topicContentModule .right .userInfo-wrap .userInfo .action-button .privateMessageBox .privateMessageButton{
+	color: #30aff7;
+    border-color: #30aff7;
+    outline: none;
+    display: inline-block;
+    padding: 0 16px;
+    font-size: 14px;
+    line-height: 32px;
+    text-align: center;
+    cursor: pointer;
+    background: none;
+    border: 1px solid;
+    border-radius: 3px;
+    margin: 0;
+	
+}
+.topicContentModule .right .userInfo-wrap .userInfo .action-button .privateMessageBox .privateMessageButton:hover {  
+    background: #e2f2ff;  
+} 
+
 
 
 /* 评论 */
 .commentModule{
-	padding: 0px 10px 10px 10px;
+	margin-top:10px;
+	padding: 0px 10px 50px 10px;
 	position: relative;
 	padding-bottom:0;
+	background: #fff;
+	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
 }
-.commentModule .commentlist{list-style:none;font-size: 14px;}
-.commentModule .commentlist .comment{padding:10px 0 5px 72px;border-bottom:1px solid #f1f1f1;}
+.commentModule .commentlist{list-style:none;font-size: 15px;}
+.commentModule .commentlist .comment{padding:15px 0 5px 77px;border-bottom:1px solid #f1f1f1;}
 .commentModule .commentlist .comment-author{position:relative;color:#999}
 .commentModule .commentlist .comment-author img{
 	width:60px;
@@ -876,41 +1046,27 @@ html,body{
 }
 .commentModule .commentlist .commentTime{margin-bottom:5px;color:#999;font-size: 13px;}
 .commentModule .commentlist .commentTime a{color:#999;}
-.commentModule .commentlist .comment .commentContent{padding:0px;word-wrap:break-word;color:#666;font-size: 14px;margin-top: 20px;line-height: 26px;}
+.commentModule .commentlist .comment .commentContent{padding:0px;word-wrap:break-word;color:#666;font-size: 15px;margin-top: 20px;line-height: 26px;}
 /* 评论图片尺寸 */
 .commentModule .commentlist .comment .commentContent img {max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;}
 
 
 .commentModule .commentlist .quote{
-	width: 800px; padding:5px 8px;border-bottom:none;text-align: left;color: 666;margin-top: 20px;
+	padding:5px 8px;border-bottom:none;text-align: left;color: 666;margin-top: 20px;
 }
 .commentModule .commentlist .quote div{
-	background:#fafafa;padding:8px;border:1px solid #ddd;line-height:140%;margin-bottom:5px;line-height: 26px;border-radius: 3px;
+	background:#fafafa;padding:6px 8px 8px 8px;border:1px solid #ddd;line-height:140%;margin-bottom:6px;line-height: 28px;border-radius: 3px;
 }
 .commentModule .commentlist .quote div span{
-	color:#aaa;font-size:14px;height: 28px;
-}
-.commentModule .commentlist .content {
-	float: left;
-	width: 800px;
-	padding-bottom: 10px;
-	font-size: 14px;
-	min-height: 22px;
-	margin-left: 45px;
-	word-break: break-word;
-}
-.commentModule .commentlist .content img {
-	max-width: 850px;
-	max-height:700px\9; width:expression(document.body.clientHeight>700?"700px":"auto"); overflow:hidden;
-	
+	color:#aaa;font-size:15px;height: 30px;
 }
 .commentModule .commentlist .replyList {
-	border-top: 1px solid #eee;
+	border-top: 1px solid #f6f6f6;
 	padding: 10px 0 0px;
 	margin-left: 36px;
 	margin-right:10px;
 	position: relative;
-	font-size: 14px;
+	font-size: 15px;
 	line-height: 22px;
 	margin-top: 20px;
 	background: #fcfcfc;
@@ -918,10 +1074,10 @@ html,body{
 .commentModule .commentlist .replyList:before {
 	position: absolute;
 	display: block;
-	width: 6px;
-	height: 6px;
-	border-top: 1px solid #eee;
-	border-left: 1px solid #eee;
+	width: 10px;
+	height: 10px;
+	border-top: 1px solid #f6f6f6;
+	border-left: 1px solid #f6f6f6;
 	-webkit-transform: rotate(45deg);
 	-moz-transform: rotate(45deg);
 	-o-transform: rotate(45deg);
@@ -991,7 +1147,7 @@ html,body{
 	
 }
 .commentModule .commentlist .tipBottom {
-	font-size: 10pt;
+	font-size: 13px;
 	color: #aaa;
 	margin: 15px 10px 5px 50px;
 	text-align: right;
@@ -1007,57 +1163,44 @@ html,body{
 	margin-top: 8px;margin-right:8px;height: 40px;
 }
 
-/* 评论提交*/
-.comment-formModule {
-	position: relative; margin-left: 10px; margin-right: 10px;
-}
-.comment-formModule-center{
-	width:580px;
-	margin-left: auto; margin-right: auto;
-	
-}
-.comment-formModule .textarea{
-	width:100%;visibility:hidden;height: 200px;
-}
-.comment-formModule .quoteBox{
-	background:#fffee6; padding:10px;border:1px solid #ffe7ce;margin-top: 10px;
-	
-}
-.comment-formModule .quote-textarea-box {
-	padding-bottom: 10px; padding-left: 0px;  padding-right: 2px; padding-top: 10px;
-}
 
-.comment-formModule .quote-textarea {
-	padding-bottom: 4px; padding-left: 15px;  padding-right: 15px; height: 200px; overflow: auto; padding-top: 4px; 
-}
 
-.comment-formModule .reply-textarea-box{
-	
-	margin-top: 8px;
-	margin-left: 0px;
-	margin-right: 0px;
-	margin-bottom: 8px;
+
+
+
+
+
+
+
+
+
+/* 回复评论  */
+.commentModule .commentlist .commentReply-post{
+	margin-top: 5px;
+	margin-left: 36px;
+	margin-right:10px;
 }
-.comment-formModule .reply-textarea{
-	width:554px;
-	height:150px;
+.commentReply-formModule {
+	margin-top:10px;
 	
-	line-height: 1.33em;
-	-webkit-box-shadow: none;
-    box-shadow: none;
+}
+.commentReply-formModule .addReply-wrap{
+	position: relative;
+	padding:0px 9px 50px 1px;
+}
+.commentReply-formModule .addReply-wrap .reply-textarea{
+	line-height: 24px;
     border-radius: 2px;
-    border: 1px solid #dce3e8;
+    border: 1px solid #e6e6e6;
 	vertical-align: top;
-	
-	margin: 0em;
-    -webkit-appearance: none;
-    -webkit-tap-highlight-color: rgba(255,255,255,0);
-    padding: 0.78em 1em;
+	font-size: 14px;
+    resize: vertical;
+	padding: 3px 3px;
     background: #ffffff;
-    border: 1px solid rgba(39,41,43,0.15);
     outline: none;
     color: rgba(0,0,0,0.8);
-    border-radius: 0.28rem;
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: rgba(255,255,255,0);
     -webkit-box-shadow: 0em 0em 0em 0em transparent inset;
     box-shadow: 0em 0em 0em 0em transparent inset;
     -webkit-transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
@@ -1065,38 +1208,83 @@ html,body{
     transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, -webkit-box-shadow 0.2s ease;
     transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
     transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, -webkit-box-shadow 0.2s ease;
-    font-size: 1em;
-   
-    resize: vertical;
+	height:150px;
+	width: 100%;
 	
 }
-.comment-formModule .form-action {
+.commentReply-formModule .addReply-wrap .form-action {
 	 padding-left: 0px; padding-right: 0px; padding-top: 8px;margin-bottom: 12px;
 }
-.comment-formModule .error {
+.commentReply-formModule .addReply-wrap .error {
 	color: red;
 }
-.comment-formModule .commentSubmit {
-	width: 70px;
+.commentReply-formModule .addReply-wrap .replySubmit {
 	height: 38px;
 	float: left;
 	margin-right: 10px;
 	position: relative;
 	z-index: 2
 }
-.comment-formModule .captchaModule .captcha_div{
+
+.commentReply-formModule .addReply-wrap .submitButton-box{
+	margin-right: 5px;
+}
+.commentReply-formModule .addReply-wrap .submitButton-box .submitButton{
+	color: #fff;
+    border-color: #30aff7;
+    outline: none;
+    display: inline-block;
+    padding: 1px 16px;
+    font-size: 16px;
+    line-height: 32px;
+    text-align: center;
+    cursor: pointer;
+    background: #30aff7;
+    border: 1px solid;
+    border-radius: 3px;
+    margin: 0;
+	
+}
+.commentReply-formModule .addReply-wrap .submitButton-box .submitButton:hover {  
+    background: #45b6f7;  
+} 
+
+.commentReply-formModule .addReply-wrap .cancelButton-box{
+	position: relative;top: 1px;
+}
+.commentReply-formModule .addReply-wrap .cancelButton-box .cancelButton{
+	color: #30aff7;
+    border-color: #30aff7;
+    outline: none;
+    display: inline-block;
+    padding: 0 16px;
+    font-size: 16px;
+    line-height: 32px;
+    text-align: center;
+    cursor: pointer;
+    background: none;
+    border: 1px solid;
+    border-radius: 3px;
+    margin: 0;
+	
+}
+.commentReply-formModule .addReply-wrap .cancelButton-box .cancelButton:hover {  
+    background: #e2f2ff;  
+} 
+.commentReply-formModule .addReply-wrap .captchaModule{
+	float: left;margin-top: 1px;
+}
+.commentReply-formModule .addReply-wrap .captchaModule .captcha_div{
 	height: 38px;line-height:38px;
 }
-.comment-formModule .captchaModule .captchaBox{
-	height:32px;
+.commentReply-formModule .addReply-wrap .captchaModule .captchaBox{
+	height:33px;
 	border:1px solid #e6e6e6;
 	width:85px;
-	float: left;
-	margin-left:10px;
-	margin-top:1px;
+	float: left;;
 	border-radius:2px;
 }
-.comment-formModule .captchaModule .captchaBox input{
+.commentReply-formModule .addReply-wrap .captchaModule .captchaBox input{
 	position: relative;  
 	background-image:url(../images/null.gif);
 	background-color:transparent;
@@ -1110,7 +1298,7 @@ html,body{
 	padding:0 5px;
 	font-size:18px; 
 }
-.comment-formModule .captchaModule .promptTag {
+.commentReply-formModule .addReply-wrap .captchaModule .promptTag {
 	float:left; 
 	font-size:14px; 
 	height:22px; 
@@ -1120,131 +1308,295 @@ html,body{
 	margin-left:-74px; 
 	color:#B0B0B0;
 }
-.comment-formModule .captchaModule .captcha_div .captchaImage{width:100px;height:32px;float: left;margin:0 15px 0 5px;}
-.comment-formModule .captchaModule .captcha_div .captchaImage img{width:100px;height:34px;outline:none;}
-.comment-formModule .captchaModule .tips{
+.commentReply-formModule .addReply-wrap .captchaModule .captcha_div .captchaImage{width:100px;height:32px;float: left;margin:0 15px 0 5px;}
+.commentReply-formModule .addReply-wrap .captchaModule .captcha_div .captchaImage img{width:100px;height:34px;outline:none;}
+.commentReply-formModule .addReply-wrap .captchaModule .tips{
 	padding-left:10px;height: 18px;line-height: 18px;
 }
-.comment-formModule .captchaModule .tips span{
+.commentReply-formModule .addReply-wrap .captchaModule .tips span{
 	color: red;
 }
-/* 添加评论模块(未登录) */
-.addCommentModule{
-	padding: 0px 10px 10px 10px;
-	position: relative;
-	padding-bottom:0;
+.commentReply-disableFormModule{
+	margin-top:10px;
 }
-.addCommentModule .respond {margin-bottom:20px}
-.addCommentModule .respond p label{width:auto;padding:0 0 0 5px;}
-.addCommentModule .respond h2{font-size:12px;margin-top:15px;border:none}
+.commentReply-disableFormModule .disableForm-wrap{
+	background: #fff;
+	padding:15px 0px 15px 0px;
+}
+.commentReply-disableFormModule .disableForm-wrap .respond {background: #f6f6f6;border-radius:4px;line-height: 40px;text-align:center;}
+.commentReply-disableFormModule .disableForm-wrap .respond p {font-size:15px;padding:8px;overflow:hidden;color: #aaaaaa}
 
-/* 右边栏 */
-.main_bg{ 
-	background:#fff;border-radius:4px;
-	behavior: url(common/default/pc/js/css3pie/PIE.htc);  /*通知IE浏览器调用脚本作用于当前类*/
-}
-/* 话题信息 */
-.articleInfoModule{ 
-	width: 299px; 
-	float: right;
-}
-.articleInfoModule .user{ 
-	height: 150px;
-	padding:10px 0 20px 25px;
-	font-size: 13px;
-}
 
-.articleInfoModule .user .author img{
-	width:70px;
-	height:70px;
-	position:absolute;
-	-webkit-border-radius:50%;
-	-moz-border-radius:50%;
-	border-radius:50%;
-	display:block;
-	behavior: url(common/default/pc/js/css3pie/PIE.htc);  /*通知IE浏览器调用脚本作用于当前类*/
-}
-.articleInfoModule .user .author span{
-	position:absolute;
-	margin-top:16px;
-	margin-left:85px;
-	font-size: 15px;
-}
-.articleInfoModule .user .author .role{
-	position:absolute;
-	margin-top:40px;
-	margin-left:85px;
-	width: 180px;
-}
-.articleInfoModule .user .author .role .userRoleName{
-	white-space:nowrap; 
-	color:#fff;
-	background-color:#ffcc00;
-	border-radius:4px;
-	padding:0 5px;
-	font-size: 12px;
-}
-.articleInfoModule .user .author .role .staff{
-	white-space:nowrap; 
-	color:#fff;
-	background-color:#32aa66;
-	border-radius:4px;
-	padding:0 5px;
-	font-size: 12px;
-}
-.articleInfoModule .user .userInfo{
-	position:absolute;
-	border-top: 1px solid #f1f1f1;
-	margin-top:80px;
-	width: 250px;
-}
-.articleInfoModule .user .userInfo span{
-	display:block;
+/* 引用评论  */
+.commentModule .commentlist .quote-post{
 	margin-top: 5px;
-	color:#999999;
+	margin-left: 36px;
+	margin-right:10px;
+}
+.quote-formModule {
+	margin-top:50px;
 	
 }
+.quote-formModule .addQuote-wrap{
+	position: relative;
+	padding:0px 9px 50px 1px;
+}
+.quote-formModule .addQuote-wrap .head{
+	border-bottom :3px solid #f1f1f1;
+	margin-bottom: 10px;
+	position: relative;
+}
+.quote-formModule .addQuote-wrap .head .icon{
+	position: absolute;font-size: 40px;top: -34px;left: -38px;color: #f1f1f1;
+}
+.quote-formModule .addQuote-wrap .quote-textarea{
+	width:100%;visibility:hidden;height: 200px;
+}
+.quote-formModule .addQuote-wrap .promptInfo{
+	position: absolute;
+	right:15px;
+	bottom:32px;
+}
+.quote-formModule .addQuote-wrap .promptInfo h2{
+	font-size: 16px;
+	color: #ccc;
+}
+.quote-formModule .addQuote-wrap .form-action {
+	 padding-left: 0px; padding-right: 0px; padding-top: 8px;margin-bottom: 12px;
+}
+.quote-formModule .addQuote-wrap .error {
+	color: red;
+}
+.quote-formModule .addQuote-wrap .quoteSubmit {
+	height: 38px;
+	float: left;
+	margin-right: 10px;
+	position: relative;
+	z-index: 2
+}
 
+.quote-formModule .addQuote-wrap .submitButton-box{
+	margin-right: 5px;
+}
+.quote-formModule .addQuote-wrap .submitButton-box .submitButton{
+	color: #fff;
+    border-color: #30aff7;
+    outline: none;
+    display: inline-block;
+    padding: 1px 16px;
+    font-size: 16px;
+    line-height: 32px;
+    text-align: center;
+    cursor: pointer;
+    background: #30aff7;
+    border: 1px solid;
+    border-radius: 3px;
+    margin: 0;
+	
+}
+.quote-formModule .addQuote-wrap .submitButton-box .submitButton:hover {  
+    background: #45b6f7;  
+} 
+
+.quote-formModule .addQuote-wrap .cancelButton-box{
+	position: relative;top: 1px;
+}
+.quote-formModule .addQuote-wrap .cancelButton-box .cancelButton{
+	color: #30aff7;
+    border-color: #30aff7;
+    outline: none;
+    display: inline-block;
+    padding: 0 16px;
+    font-size: 16px;
+    line-height: 32px;
+    text-align: center;
+    cursor: pointer;
+    background: none;
+    border: 1px solid;
+    border-radius: 3px;
+    margin: 0;
+	
+}
+.quote-formModule .addQuote-wrap .cancelButton-box .cancelButton:hover {  
+    background: #e2f2ff;  
+} 
+.quote-formModule .addQuote-wrap .captchaModule{
+	float: left;margin-top: 1px;
+}
+.quote-formModule .addQuote-wrap .captchaModule .captcha_div{
+	height: 38px;line-height:38px;
+}
+.quote-formModule .addQuote-wrap .captchaModule .captchaBox{
+	height:33px;
+	border:1px solid #e6e6e6;
+	width:85px;
+	float: left;;
+	border-radius:2px;
+}
+.quote-formModule .addQuote-wrap .captchaModule .captchaBox input{
+	position: relative;  
+	background-image:url(../images/null.gif);
+	background-color:transparent;
+	outline: none; 
+	float:left;
+	height:32px; 
+	width:85px;
+	line-height:30px;
+	border:0;
+	color:#333;
+	padding:0 5px;
+	font-size:18px; 
+}
+.quote-formModule .addQuote-wrap .captchaModule .promptTag {
+	float:left; 
+	font-size:14px; 
+	height:22px; 
+	line-height:22px; 
+	cursor:text; 
+	margin-top:6px;
+	margin-left:-74px; 
+	color:#B0B0B0;
+}
+.quote-formModule .addQuote-wrap .captchaModule .captcha_div .captchaImage{width:100px;height:32px;float: left;margin:0 15px 0 5px;}
+.quote-formModule .addQuote-wrap .captchaModule .captcha_div .captchaImage img{width:100px;height:34px;outline:none;}
+.quote-formModule .addQuote-wrap .captchaModule .tips{
+	padding-left:10px;height: 18px;line-height: 18px;
+}
+.quote-formModule .addQuote-wrap .captchaModule .tips span{
+	color: red;
+}
+
+
+.quote-disableFormModule{
+	margin-top:10px;
+}
+.quote-disableFormModule .disableForm-wrap{
+	background: #fff;
+	padding:15px 0px 15px 0px;
+}
+.quote-disableFormModule .disableForm-wrap .respond {background: #f6f6f6;border-radius:4px;line-height: 40px;text-align:center;}
+.quote-disableFormModule .disableForm-wrap .respond p {font-size:15px;padding:8px;overflow:hidden;color: #aaaaaa}
+
+
+
+/* 评论提交*/
+.comment-formModule {
+	margin-top:10px;
+	
+}
+.comment-formModule .addComment-wrap{
+	position: relative;
+	background: #fff;
+	padding:15px 18px 50px 15px;
+	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
+}
+.comment-formModule .addComment-wrap .textarea{
+	width:100%;visibility:hidden;height: 200px;
+}
+.comment-formModule .addComment-wrap .promptInfo{
+	position: absolute;
+	right:15px;
+	bottom:32px;
+}
+.comment-formModule .addComment-wrap .promptInfo h2{
+	font-size: 16px;
+	color: #ccc;
+}
+.comment-formModule .addComment-wrap .form-action {
+	 padding-left: 0px; padding-right: 0px; padding-top: 8px;margin-bottom: 12px;
+}
+.comment-formModule .addComment-wrap .error {
+	color: red;
+}
+.comment-formModule .addComment-wrap .commentSubmit {
+	width: 70px;
+	height: 38px;
+	float: left;
+	margin-right: 10px;
+	position: relative;
+	z-index: 2
+}
+.comment-formModule .addComment-wrap .captchaModule{
+	float: left;
+}
+.comment-formModule .addComment-wrap .captchaModule .captcha_div{
+	height: 38px;line-height:38px;
+}
+.comment-formModule .addComment-wrap .captchaModule .captchaBox{
+	height:33px;
+	border:1px solid #e6e6e6;
+	width:85px;
+	float: left;
+	margin-left:10px;
+	border-radius:2px;
+}
+.comment-formModule .addComment-wrap .captchaModule .captchaBox input{
+	position: relative;  
+	background-image:url(../images/null.gif);
+	background-color:transparent;
+	outline: none; 
+	float:left;
+	height:32px; 
+	width:85px;
+	line-height:30px;
+	border:0;
+	color:#333;
+	padding:0 5px;
+	font-size:18px; 
+}
+.comment-formModule .addComment-wrap .captchaModule .promptTag {
+	float:left; 
+	font-size:14px; 
+	height:22px; 
+	line-height:22px; 
+	cursor:text; 
+	margin-top:6px;
+	margin-left:-74px; 
+	color:#B0B0B0;
+}
+.comment-formModule .addComment-wrap .captchaModule .captcha_div .captchaImage{width:100px;height:32px;float: left;margin:0 15px 0 5px;}
+.comment-formModule .addComment-wrap .captchaModule .captcha_div .captchaImage img{width:100px;height:34px;outline:none;}
+.comment-formModule .addComment-wrap .captchaModule .tips{
+	padding-left:10px;height: 18px;line-height: 18px;
+}
+.comment-formModule .addComment-wrap .captchaModule .tips span{
+	color: red;
+}
+/* 添加答案模块(未登录) */
+.addCommentModule{
+	margin-top:10px;
+}
+.addCommentModule .addComment-wrap{
+	background: #fff;
+	padding:15px 15px 15px 15px;
+	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
+}
+.addCommentModule .respond {background: #f6f6f6;border-radius:4px;line-height: 40px;text-align:center;}
+.addCommentModule .respond p {font-size:15px;padding:8px;overflow:hidden;color: #aaaaaa}
+.addCommentModule .respond a{color: #26a2ff;}
 
 
 /* 相关话题 */
-.likeTopic {
-	width: 299px;float: right;
+.likeTopicModule{
+	margin-top: 10px;
+	background: #fff;
+	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
 }
-.likeTopic ul{
-    margin-bottom: -8px;
-}
-.likeTopic li{
-    margin-bottom: 8px;
-}
-.likeTopic li span{
-    margin-left: 10px;
-}
-.likeTopic .head {
-    background: #f5f5f5;
-    height: 36px;
-    line-height: 36px;
-    padding-left: 12px;
-    color: #333;
-    font-size: 15px;
-}
+.likeTopicModule .likeTopic{margin-bottom:10px;padding:0 15px 0;}
+.likeTopicModule .likeTopic .title{font-size:18px;padding:20px 0 15px;color:#333;border-bottom:1px solid #f1f1f1;}
+.likeTopicModule .likeTopic .topicList {font-size: 15px;margin-top: 10px;}
+.likeTopicModule .likeTopic .topicList > .topic-title {counter-increment: index;display: flex;flex-direction: row;padding-top: 5px;padding-bottom: 5px;}
+.likeTopicModule .likeTopic .topicList > .topic-title::before {content: counter(index);display: flex;width: 22px;height: 22px;background-color: #f6f6f6;text-align: center;border-radius: 4px;flex: none;align-items: center;justify-content: center;color: #939499;}
+.likeTopicModule .likeTopic .topicList > .topic-title .top::before {background-color: #2196F3;color: #fff;}
+.likeTopicModule .likeTopic .topicList > .topic-title > a {display: block;word-break: break-word;flex: auto;margin-left: 8px;position: relative;top: -1px;color: #666;}
+.likeTopicModule .likeTopic .topicList > .topic-title > a:hover {color: #2196F3;}
 
-.likeTopic .content {
-    padding: 15px 8px 17px;
-    word-break: break-all;
-    font-size: 14px;
-}
 
-.likeTopic .content li a {
-    width: 220px;
-    text-overflow: ellipsis;
-    color: #666;
-}
-.likeTopic .content li a:hover{color:#999;}
 
 /** 收藏夹表单模块 **/
 .favorite-formModule {
-   margin-top: 30px;text-align: center;
+   margin-top: 40px;text-align: center;
+   margin-bottom: 10px;
 }
 /** 带数字按钮 **/
 .numberButton{
@@ -1386,14 +1738,18 @@ html,body{
 .addFeedbackModule .prompt .respond p label{width:auto;padding:0 0 0 5px;}
 .addFeedbackModule .prompt .respond h2{font-size:12px;margin-top:15px;border:none}
 
+
+
 /* 友情链接 */
 .linkModule {
-	clear: both;
-	margin: 0 auto;
-	margin-left: 5px;
-	margin-right: 5px;
+	margin-top: 10px;
+	
 }
-.linkModule .title {
+.linkModule .link-box{
+	background:#fff;padding:0px 15px 0px 15px;
+	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
+}
+.linkModule .link-box .title {
 	clear: both;
 	padding: 10px 0 0 2px;
 	color: #9f9f9f;
@@ -1402,24 +1758,25 @@ html,body{
 	line-height: 38px;
 	border-bottom: 1px dashed #eee;
 }
-.linkModule .links-logo {
+.linkModule .link-box .links-logo {
 	clear: both;
-	padding: 10px 5px 0px 5px;
+	padding: 10px 0px 0px 0px;
 }
-.linkModule .links-logo li {
+.linkModule .link-box .links-logo li {
 	width: 170px;
 	height: 50px;
 	float: left;
-	line-height: 30px
+	margin-right: 10px;
 }
-.linkModule .links-text {
-	clear: both;
-	padding: 0px 5px 0px 5px;
+.linkModule .link-box .links-text {
+	padding: 0px 0px 10px 0px;
 }
-.linkModule .links-text li {
-	width: 170px;
+.linkModule .link-box .links-text li {
 	float: left;
-	line-height: 30px
+	width: 170px;
+	font-size: 14px;
+	line-height: 22px;
+	margin-right: 10px;
 }
 
 
@@ -1505,14 +1862,14 @@ html,body{
 	background: red;
 	margin-top: 60px;
 	position: relative;
-	box-shadow: 0 1px 3px 0 rgba(0,0,0,.02),0 4px 8px 0 rgba(0,0,0,.02)
+	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
 }
 .user-home-header .avatarRing {
 	width: 150px;
 	height: 100px;
 	background: #fff;
 	border-radius: 4px;
-	box-shadow: 0 1px 3px 0 rgba(0,0,0,.02),0 4px 8px 0 rgba(0,0,0,.02);
+	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
 	position: absolute;
 	left: 15px;
 	top: -40px
@@ -1682,7 +2039,7 @@ html,body{
 	width:19%; position:relative;float:left; height:130px;border:1px solid #fff;
 	padding:10px 0 0;margin:5px 5px 5px 5px;
 	display:block;background-color:#fff;
-	box-shadow: 0 1px 3px 0 rgba(0,0,0,.02),0 4px 8px 0 rgba(0,0,0,.02)
+	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
 }
 .selfService .box .ul .item .a-pic{width: 100px;height: 100px;text-align: center;}
 .selfService .box .ul .item .img {
@@ -1697,7 +2054,7 @@ html,body{
 .home-userDynamic{
 	display:block;
 	background-color:#fff;
-	box-shadow: 0 1px 3px 0 rgba(0,0,0,.02),0 4px 8px 0 rgba(0,0,0,.02);
+	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
 	margin-top: 12px;
 }
 .loader{
@@ -1875,7 +2232,7 @@ html,body{
 	line-height:46px;
 	text-align: center;
 	background: #fff;
-	box-shadow: 0 1px 3px 0 rgba(0,0,0,.02),0 4px 8px 0 rgba(0,0,0,.02);
+	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
 }
 .privateMessageChatTop .back-to-list{
 	position: absolute;
@@ -1899,7 +2256,7 @@ html,body{
 }
 /* 最近对话用户 */
 .recentlyChatUserModule {
-	display: inline; float: left; margin:10px 0px 0px 0px;border-radius: 1px; width:280px; background: #fff;box-shadow: 0 1px 3px 0 rgba(0,0,0,.02),0 4px 8px 0 rgba(0,0,0,.02)
+	display: inline; float: left; margin:10px 0px 0px 0px;border-radius: 1px; width:280px; background: #fff;box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
 }
 .recentlyChatUserModule .title {
 	border-bottom:1px solid #eee;height: 38px;line-height: 38px;
@@ -1937,7 +2294,7 @@ html,body{
 	background-position: center;
 	padding: 0px 10px 90px 10px;
 	background: #fff;
-	box-shadow: 0 1px 3px 0 rgba(0,0,0,.02),0 4px 8px 0 rgba(0,0,0,.02)
+	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
 }
 .privateMessageChatModule .friend{
 	margin: 26px 52px 0 10px;
@@ -2135,7 +2492,7 @@ html,body{
 	margin-bottom:10px;
 	background: #fff;
 	padding-bottom: 1px;
-	box-shadow: 0 1px 3px 0 rgba(0,0,0,.02),0 4px 8px 0 rgba(0,0,0,.02)
+	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
 }
 .privateMessageChatForm textarea{
 	line-height: 24px;
@@ -2526,7 +2883,7 @@ html,body{
 	position: relative;
 	padding-bottom:0;
 }
-.userDynamicModule .userDynamicList{list-style:none;font-size: 14px;}
+.userDynamicModule .userDynamicList{list-style:none;font-size: 14px;margin-bottom: 10px;}
 .userDynamicModule .userDynamicList .userDynamic{padding:10px 0 5px 100px;border-bottom:1px solid #f1f1f1; position: relative;}
 .userDynamicModule .userDynamicList .userDynamic-author{position:relative;color:#999}
 .userDynamicModule .userDynamicList .userDynamic-author img{
@@ -2544,7 +2901,7 @@ html,body{
 .userDynamicModule .userDynamicList .userDynamicTime{margin-bottom:5px;color:#999;font-size: 13px;}
 .userDynamicModule .userDynamicList .userDynamicTime a{color:#999;}
 .userDynamicModule .userDynamicList .userDynamic .topicTitle{
-	padding:0px;word-wrap:break-word;color:#666;font-size: 14px;margin-top: 5px;
+	padding:0px;word-wrap:break-word;color:#666;font-size: 15px;margin-top: 5px;
 }
 .userDynamicModule .userDynamicList .userDynamic .topicTitle span{
 	background-color: #f0f0f0;
@@ -2554,6 +2911,8 @@ html,body{
 	padding: 3px 8px 3px 8px;
 	vertical-align: middle;
 	line-height: 32px;
+	position: relative;
+	top: -1px;
 }
 .userDynamicModule .userDynamicList .userDynamic .topicTitle a{
 	color: #2196F3;
@@ -2708,9 +3067,9 @@ html,body{
 .membershipCardListModule ul{ margin-left: -16px;}
 .membershipCardListModule li{
   
-	-moz-box-shadow: 0 1px 3px 0 rgba(0,0,0,.02),0 4px 8px 0 rgba(0,0,0,.02);
-	-webkit-box-shadow: 0 1px 3px 0 rgba(0,0,0,.02),0 4px 8px 0 rgba(0,0,0,.02);
-	box-shadow: 0 1px 3px 0 rgba(0,0,0,.02),0 4px 8px 0 rgba(0,0,0,.02);
+	-moz-box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
+	-webkit-box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
+	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
 	float: left; width: 250px; background-color: #fff; padding: 25px 20px; color: #666; font-size: 12px; margin-left: 16px;margin-top:18px; position: relative;}
 .membershipCardListModule h5{ text-align: center; color: #333; font-size: 24px; line-height: 24px; font-weight: normal;}
 /**
@@ -2756,7 +3115,7 @@ html,body{
 	margin-top:20px;
 	background: #fff;
 	padding: 2px 20px 2px 20px;
-	box-shadow: 0 1px 3px 0 rgba(0,0,0,.02),0 4px 8px 0 rgba(0,0,0,.02);
+	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
 	position: relative;
 	height: 48px;
 }
@@ -2798,6 +3157,7 @@ html,body{
     margin: 30px 15px;
     overflow: hidden;
     background-color: #FFFFFF;
+  
     -moz-box-shadow: 0 1px 3px 0 rgba(0,0,0,.03),0 4px 8px 0 rgba(0,0,0,.03);
 	-webkit-box-shadow: 0 1px 3px 0 rgba(0,0,0,.03),0 4px 8px 0 rgba(0,0,0,.03);
 	box-shadow: 0 1px 3px 0 rgba(0,0,0,.03),0 4px 8px 0 rgba(0,0,0,.03);
@@ -2868,7 +3228,7 @@ html,body{
 
 /* 余额 */
 .balanceModule{padding: 30px 0 30px 30px;background: #fff;position: relative;margin-bottom: 10px;
-	box-shadow: 0 1px 6px 0 rgba(0,0,0,.02),0 8px 12px 0 rgba(0,0,0,.02);
+	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
 }
 .balanceModule .deposit{font-size: 16px; }
 .balanceModule .button{margin-left: 200px; display: block;margin-top: -26px;}
@@ -3014,20 +3374,25 @@ html,body{
 /*修改话题*/
 .editTopicModule{
 	margin-top: 10px;
+	margin-bottom: 10px;
 }
-.editTopicModule .topic-form {
-	position: relative;   margin-left: 10px;margin-right: 10px; 
+.editTopicModule .topic-box{
+	background:#fff;padding:15px 15px 40px 15px;
+	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
 }
-.editTopicModule .topic-form .textarea{
+.editTopicModule .topic-box .topic-form {
+	position: relative;
+}
+.editTopicModule .topic-box .topic-form .textarea{
 	width:100%;height:550px;visibility:hidden;
 }
-.editTopicModule .topic-form .form-action {
+.editTopicModule .topic-box .topic-form .form-action {
 	 padding-left: 0px; padding-right: 0px; padding-top: 8px;margin-bottom: 12px;
 }
-.editTopicModule .topic-form .error {
+.editTopicModule .topic-box .topic-form .error {
 	color: red;
 }
-.editTopicModule .topic-form .topicSubmit {
+.editTopicModule .topic-box .topic-form .topicSubmit {
 	width: 70px;
 	height: 38px;
 	float: left;
@@ -3035,10 +3400,10 @@ html,body{
 	position: relative;
 	z-index: 2;
 }
-.editTopicModule .topic-form .captchaModule .captcha_div{
+.editTopicModule .topic-box .topic-form .captchaModule .captcha_div{
 	height: 38px;line-height:38px;
 }
-.editTopicModule .topic-form .captchaModule .captchaBox{
+.editTopicModule .topic-box .topic-form .captchaModule .captchaBox{
 	height:32px;
 	border:1px solid #e6e6e6;
 	width:85px;
@@ -3047,7 +3412,7 @@ html,body{
 	margin-left: 10px;
 	margin-top:1px;
 }
-.editTopicModule .topic-form .captchaModule .captchaBox input{
+.editTopicModule .topic-box .topic-form .captchaModule .captchaBox input{
 	position: relative;  
 	background-image:url(../images/null.gif);
 	background-color:transparent;
@@ -3061,7 +3426,7 @@ html,body{
 	padding:0 5px;
 	font-size:18px; 
 }
-.editTopicModule .topic-form .captchaModule .promptTag {
+.editTopicModule .topic-box .topic-form .captchaModule .promptTag {
 	float:left; 
 	font-size:14px; 
 	height:22px; 
@@ -3071,12 +3436,12 @@ html,body{
 	margin-left:-74px; 
 	color:#B0B0B0;
 }
-.editTopicModule .topic-form .captchaModule .captcha_div .captchaImage{width:100px;height:32px;float: left;margin:1px 15px 0 5px;}
-.editTopicModule .topic-form .captchaModule .captcha_div .captchaImage img{width:100px;height:34px;outline:none;}
-.editTopicModule .topic-form .captchaModule .tips{
+.editTopicModule .topic-box .topic-form .captchaModule .captcha_div .captchaImage{width:100px;height:32px;float: left;margin:1px 15px 0 5px;}
+.editTopicModule .topic-box .topic-form .captchaModule .captcha_div .captchaImage img{width:100px;height:34px;outline:none;}
+.editTopicModule .topic-box .topic-form .captchaModule .tips{
 	padding-left:10px;height: 18px;line-height: 18px;
 }
-.editTopicModule .topic-form .captchaModule .tips span{
+.editTopicModule .topic-box .topic-form .captchaModule .tips span{
 	color: red;
 }
 
@@ -3161,7 +3526,7 @@ html,body{
 
 .askListModule .question-box{
 	background:#fff;padding:0px 15px 0px 15px;
-	box-shadow: 0 1px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
+	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
 	
 }
 .askListModule .question-box .questionList {
@@ -3250,7 +3615,6 @@ html,body{
 
 .askListModule .question-box .questionList .questionItem .content .title {
 	font-weight:600;
-	display: inline;
 	margin: 0 5px 0 0;
 	font-size: 18px;
 	line-height: 28px;
@@ -3358,10 +3722,8 @@ html,body{
     line-height: 150%;
     text-align: left;
     background-color: #fff; 
-    border-top-left-radius: 3px; 
-    border-top-right-radius: 3px;
     position: relative;
-    box-shadow: 0 1px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
+    box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
 }
 .questionTabModule .questionTab-box{
 	
@@ -3453,11 +3815,13 @@ html,body{
 }
 .questionContentModule .left .question-wrap{
 	background: #fff;
-	box-shadow: 0 1px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
+	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
+	position: relative;
 }
 .questionContentModule .left .question-wrap .questionTag{
 	padding-top:15px;
 	margin-left:15px;
+	margin-right: 70px;
 }
 .questionContentModule .left .question-wrap .questionTag .tag{
 	display: inline-block;
@@ -3474,6 +3838,22 @@ html,body{
     background-color: #d8edff;
     color: #2196F3;
     text-decoration: none;
+}
+.questionContentModule .left .question-wrap .appendQuestion{
+	position:absolute; 
+	right: 5px;
+	top: 17px;
+	cursor:pointer;
+}
+.questionContentModule .left .question-wrap .appendQuestion i{
+	font-size: 16px;
+	margin-right: 2px;
+	position: relative;
+	top: 2px;
+}
+.questionContentModule .left .question-wrap .appendQuestion span{
+	font-size: 15px;
+	margin-right: 8px;
 }
 .questionContentModule .left .question-wrap .questionBox{
 	height: auto;
@@ -3510,13 +3890,56 @@ html,body{
 }
 
 
-.questionContentModule .left .question-wrap .questionBox .content{border-top:1px solid #f1f1f1;margin-top:5px;padding:20px 0px;color:#333;font-size:16px;word-wrap:break-word;min-height: 100px;}
+.questionContentModule .left .question-wrap .questionBox .content{border-top:1px solid #f1f1f1;margin-top:5px;padding:20px 0px;color:#333;font-size:16px;line-height:28px; word-wrap:break-word;min-height: 100px;}
 .questionContentModule .left .questionBox .content a{
 	color: #26a2ff;
 }
 .questionContentModule .left .question-wrap .questionBox .content p{font-size:16px;word-wrap:break-word}
 .questionContentModule .left .question-wrap .questionBox .content img{max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;}
-
+.questionContentModule .left .question-wrap .questionBox .appendBox{
+	margin-top:25px;
+	position:relative;
+}
+.questionContentModule .left .question-wrap .questionBox .odd .head{
+	color: #f9ce00;
+}
+.questionContentModule .left .question-wrap .questionBox .odd:before{
+	content: " ";
+	position: absolute;
+	top: 0px;
+	left: -15px;
+	bottom:0px;
+	border-left: 5px solid #f9ce00;
+}
+.questionContentModule .left .question-wrap .questionBox .even .head{
+	color: #85eb4e;
+}
+.questionContentModule .left .question-wrap .questionBox .even:before{
+	content: " ";
+	position: absolute;
+	top: 0px;
+	left: -15px;
+	bottom:0px;
+	border-left: 5px solid #85eb4e;
+}
+.questionContentModule .left .question-wrap .questionBox .appendBox .head {
+	height: 24px;
+}
+.questionContentModule .left .question-wrap .questionBox .appendBox .head .prompt{
+	font-size: 15px;
+	line-height: 34px;
+}
+.questionContentModule .left .question-wrap .questionBox .appendBox .head .appendTime{
+	margin-left:5px;
+	font-size: 15px;
+	line-height: 34px;
+}
+.questionContentModule .left .question-wrap .questionBox .appendBox .appendContent{padding:20px 0px;color:#333;font-size:16px;line-height:28px; word-wrap:break-word;min-height: 80px;}
+.questionContentModule .left .question-wrap .questionBox .appendBox .appendContent a{
+	color: #26a2ff;
+}
+.questionContentModule .left .question-wrap .questionBox .appendBox .appendContent p{font-size:16px;word-wrap:break-word}
+.questionContentModule .left .question-wrap .questionBox .appendBox .appendContent img{max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;}
 
 .questionContentModule .right{
 	float: right;
@@ -3526,7 +3949,7 @@ html,body{
 }
 .questionContentModule .right .userInfo-wrap{
 	background: #fff;
-	box-shadow: 0 1px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
+	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
 }
 .questionContentModule .right .userInfo-wrap .userInfo {
 	padding: 20px 0 20px 0;
@@ -3637,9 +4060,9 @@ html,body{
 	position: relative;
 	padding-bottom:0;
 	background: #fff;
-	box-shadow: 0 1px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
+	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
 }
-.answerModule .answerlist{list-style:none;font-size: 14px;}
+.answerModule .answerlist{list-style:none;font-size: 15px;}
 .answerModule .answerlist .answer{padding:15px 0 5px 77px;border-bottom:1px solid #f1f1f1;}
 .answerModule .answerlist .active{
 	position:relative;
@@ -3706,16 +4129,6 @@ html,body{
 .ribbon-wrapper .ribbon:after {
 	right: 0; 
 }
-/**
-.answerModule .answerlist .active .adoption i{
-	margin-right: 4px;
-	
-}
-.answerModule .answerlist .active .adoption span{
-	position: relative;
-	top: -2px;
-}**/
-
 .answerModule .answerlist .answer-author{position:relative;color:#999}
 .answerModule .answerlist .answer-author img{
 	width:60px;
@@ -3771,23 +4184,8 @@ html,body{
 
 .answerModule .answerlist .answer .answerContent{padding:0px;word-wrap:break-word;color:#666;font-size: 15px;margin-top: 20px;line-height: 26px;}
 .answerModule .answerlist .answer .answerContent img {max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;}
-
-.answerModule .answerlist .content {
-	float: left;
-	width: 800px;
-	padding-bottom: 10px;
-	font-size: 14px;
-	min-height: 22px;
-	margin-left: 45px;
-	word-break: break-word;
-}
-.answerModule .answerlist .content img {
-	max-width: 850px;
-	max-height:700px\9; width:expression(document.body.clientHeight>700?"700px":"auto"); overflow:hidden;
-	
-}
 .answerModule .answerlist .tipBottom {
-	font-size: 10pt;
+	font-size: 13px;
 	color: #aaa;
 	margin: 15px 10px 5px 50px;
 	text-align: right;
@@ -3806,12 +4204,12 @@ html,body{
 	margin-top: 20px;margin-right:8px;height: 52px;
 }
 .answerModule .answerlist .replyList {
-	border-top: 1px solid #eee;
+	border-top: 1px solid #f6f6f6;
 	padding: 10px 0 0px;
 	margin-left: 36px;
 	margin-right:10px;
 	position: relative;
-	font-size: 14px;
+	font-size: 15px;
 	line-height: 22px;
 	margin-top: 20px;
 	background: #fcfcfc;
@@ -3819,10 +4217,10 @@ html,body{
 .answerModule .answerlist .replyList:before {
 	position: absolute;
 	display: block;
-	width: 6px;
-	height: 6px;
-	border-top: 1px solid #eee;
-	border-left: 1px solid #eee;
+	width: 10px;
+	height: 10px;
+	border-top: 1px solid #f6f6f6;
+	border-left: 1px solid #f6f6f6;
 	-webkit-transform: rotate(45deg);
 	-moz-transform: rotate(45deg);
 	-o-transform: rotate(45deg);
@@ -4041,7 +4439,7 @@ html,body{
 }
 .answerReply-disableFormModule .disableForm-wrap{
 	background: #fff;
-	padding:15px 15px 15px 15px;
+	padding:15px 0px 15px 0px;
 }
 .answerReply-disableFormModule .disableForm-wrap .respond {background: #f6f6f6;border-radius:4px;line-height: 40px;text-align:center;}
 .answerReply-disableFormModule .disableForm-wrap .respond p {font-size:15px;padding:8px;overflow:hidden;color: #aaaaaa}
@@ -4050,7 +4448,7 @@ html,body{
 .likeQuestionModule{
 	margin-top: 10px;
 	background: #fff;
-	box-shadow: 0 1px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
+	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
 }
 .likeQuestionModule .likeQuestion{margin-bottom:10px;padding:0 15px 0;}
 .likeQuestionModule .likeQuestion .title{font-size:18px;padding:20px 0 15px;color:#333;border-bottom:1px solid #f1f1f1;font-weight: 600;}
@@ -4070,7 +4468,7 @@ html,body{
 .addQuestionModule .question-wrap{
 	background: #fff;
 	padding:15px 15px 30px 15px;
-	box-shadow: 0 1px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
+	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
 }
 .addQuestionModule .question-form {
 	position: relative; 
@@ -4148,18 +4546,6 @@ html,body{
 		background-color: #fff
 	}
 }
-.addQuestion-disableFormModule{
-	margin-top:10px;
-}
-.addQuestion-disableFormModule .disableForm-wrap{
-	background: #fff;
-	padding:15px 15px 15px 15px;
-}
-.addQuestion-disableFormModule .disableForm-wrap .respond {background: #f6f6f6;border-radius:4px;line-height: 40px;text-align:center;}
-.addQuestion-disableFormModule .disableForm-wrap .respond p {font-size:15px;padding:8px;overflow:hidden;color: #aaaaaa}
-
-
-
 /* 问题标签导航 */
 .questionTagNavigation{
 	width: 480px;
@@ -4291,6 +4677,148 @@ html,body{
 .addQuestionModule .question-form .captchaModule .tips span{
 	color: red;
 }
+.addQuestion-disableFormModule{
+	margin-top:10px;
+}
+.addQuestion-disableFormModule .disableForm-wrap{
+	background: #fff;
+	padding:15px 15px 15px 15px;
+}
+.addQuestion-disableFormModule .disableForm-wrap .respond {background: #f6f6f6;border-radius:4px;line-height: 40px;text-align:center;}
+.addQuestion-disableFormModule .disableForm-wrap .respond p {font-size:15px;padding:8px;overflow:hidden;color: #aaaaaa}
+
+
+/*追加问题*/
+.appendQuestion-form {
+	position: relative; 
+}
+.appendQuestion-form  .textarea{
+	width:100%;height:200px;visibility:hidden;
+}
+.appendQuestion-form .form-action {
+	 padding-left: 0px; padding-right: 0px; padding-top: 8px;margin-bottom: 12px;
+}
+.appendQuestion-form .form-action .appendQuestionSubmit {
+	height: 38px;
+	float: left;
+	margin-right: 10px;
+	position: relative;
+	z-index: 2
+}
+.appendQuestion-form .form-action .appendQuestionSubmit .submitButton-box{
+	margin-right: 5px;
+}
+.appendQuestion-form .form-action .appendQuestionSubmit .submitButton-box .submitButton{
+	color: #fff;
+    border-color: #30aff7;
+    outline: none;
+    display: inline-block;
+    padding: 1px 16px;
+    font-size: 16px;
+    line-height: 32px;
+    text-align: center;
+    cursor: pointer;
+    background: #30aff7;
+    border: 1px solid;
+    border-radius: 3px;
+    margin: 0;
+	
+}
+.appendQuestion-form .form-action .appendQuestionSubmit .submitButton-box .submitButton:hover {  
+    background: #45b6f7;  
+} 
+.appendQuestion-form .form-action .appendQuestionSubmit .cancelButton-box{
+	position: relative;top: 2px;
+}
+.appendQuestion-form .form-action .appendQuestionSubmit .cancelButton-box .cancelButton{
+	color: #30aff7;
+    border-color: #30aff7;
+    outline: none;
+    display: inline-block;
+    padding: 0 16px;
+    font-size: 16px;
+    line-height: 32px;
+    text-align: center;
+    cursor: pointer;
+    background: none;
+    border: 1px solid;
+    border-radius: 3px;
+    margin: 0;
+	
+}
+.appendQuestion-form .form-action .appendQuestionSubmit .cancelButton-box .cancelButton:hover {  
+    background: #e2f2ff;  
+} 
+
+.appendQuestion-form .promptInfo{
+	float: right;
+	margin-top: 5px;
+}
+.appendQuestion-form .promptInfo h2{
+	font-size: 16px;
+	color: #ccc;
+}
+.appendQuestion-form  .error {
+	color: red;
+}
+.appendQuestion-form  .captchaModule{
+	float: left;
+}
+.appendQuestion-form  .captchaModule .captcha_div{
+	height: 38px;line-height:38px;
+}
+.appendQuestion-form  .captchaModule .captchaBox{
+	height:32px;
+	border:1px solid #e6e6e6;
+	width:85px;
+	float: left;
+	border-radius:2px;
+	margin-top:2px;
+}
+.appendQuestion-form  .captchaModule .captchaBox input{
+	position: relative;  
+	background-image:url(../images/null.gif);
+	background-color:transparent;
+	outline: none; 
+	float:left;
+	height:32px; 
+	width:85px;
+	line-height:30px;
+	border:0;
+	color:#333;
+	padding:0 5px;
+	font-size:18px; 
+}
+.appendQuestion-form  .captchaModule .promptTag {
+	float:left; 
+	font-size:14px; 
+	height:22px; 
+	line-height:22px; 
+	cursor:text; 
+	margin-top:6px;
+	margin-left:-74px; 
+	color:#B0B0B0;
+}
+.appendQuestion-form  .captchaModule .captcha_div .captchaImage{
+	width:100px;height:32px;float: left;margin:1px 15px 0 5px;
+	position: relative;top: 1px;
+}
+.appendQuestion-form  .captchaModule .captcha_div .captchaImage img{width:100px;height:34px;outline:none;}
+.appendQuestion-form  .captchaModule .tips{
+	height: 18px;line-height: 18px;
+}
+.appendQuestion-form  .captchaModule .tips span{
+	color: red;
+}
+.appendQuestion-disableFormModule{
+	margin-top:10px;
+}
+.appendQuestion-disableFormModule .disableForm-wrap{
+	background: #fff;
+	padding:15px 15px 15px 15px;
+}
+.appendQuestion-disableFormModule .disableForm-wrap .respond {background: #f6f6f6;border-radius:4px;line-height: 40px;text-align:center;}
+.appendQuestion-disableFormModule .disableForm-wrap .respond p {font-size:15px;padding:8px;overflow:hidden;color: #aaaaaa}
 
 
 
@@ -4303,7 +4831,7 @@ html,body{
 	position: relative;
 	background: #fff;
 	padding:15px 18px 50px 15px;
-	box-shadow: 0 1px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
+	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
 }
 .answer-formModule .addAnswer-wrap .textarea{
 	width:100%;visibility:hidden;height: 200px;
@@ -4384,7 +4912,7 @@ html,body{
 .addAnswerModule .addAnswer-wrap{
 	background: #fff;
 	padding:15px 15px 15px 15px;
-	box-shadow: 0 1px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
+	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
 }
 .addAnswerModule .respond {background: #f6f6f6;border-radius:4px;line-height: 40px;text-align:center;}
 .addAnswerModule .respond p {font-size:15px;padding:8px;overflow:hidden;color: #aaaaaa}
@@ -4393,7 +4921,7 @@ html,body{
 
 /* 数据表格 */
 .dataTable {
-	margin-bottom:50px; background: #fff;padding-right:8px;padding-left:8px;padding-top:8px;padding-bottom: 70px;
+	margin-bottom:50px; background: #fff;padding-right:8px;padding-left:8px;padding-top:8px;padding-bottom: 70px;font-size: 14px;
 }
 .dataTable .dataList{
   width: 100%; border-collapse: collapse;
@@ -4455,7 +4983,6 @@ html,body{
 
 
 
-
 /* 页脚 border-top: 1px solid #e1e1e1; */
 .footer { min-width: 990px; 
 	background: #f7f6f6;
@@ -4473,6 +5000,7 @@ html,body{
 .footer .copyright a { font-family: Tahoma; margin-left: 16px; color: #999;}
 .footer .copyright a:hover { text-decoration: underline; }
 .footer .copyright span { margin-left: 17px; }
+
 
 
 

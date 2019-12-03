@@ -55,64 +55,67 @@
 <#-- 引入页头 -->
 <@include action="${newPublic_2}"/>
 <div class="skeleton">
-	<div class="main wrap backgroundModule" >
-		<div class="leftColumn_article">
-			<#if topic != null && topic?? >
-				<div class="articleModule" >
-				
-					<div class="tab">
-						<a href="?tagId=${topic.tagId}"class="tab">${topic.tagName}</a>
+	<div class="main wrap" >
+		<#if topic != null && topic?? >
+		<div class="topicContentModule">
+	        <div class="left">
+	        	<div class="topic-wrap">
+			        <div class="topicTag">
+						<a href="?tagId=${topic.tagId}" class="tag">${topic.tagName}</a>
 					</div>
 					<#if topic.userName == systemUser.userName>
 						<div class="editTopic" >
 							<a href="user/editTopic?topicId=${topic.id}" ><i class="cms-pencil-alt" ></i>编辑</a>
 						</div>
 					</#if>
-					<div class="articleBox">
-						<h1>${topic.title}</h1>
-						<!-- topicId属性用来支持JS获取隐藏内容 -->
+		        	<div class="topicBox">
+		                <div class="title">${topic.title}</div>
+		                <div class="topicInfo clearfix" >
+		                	<div class="postTime">${topic.postTime}</div>
+		                	<div class="viewTotal-icon"><i class="cms-view"></i></div>
+		                	<div class="viewTotal">${topic.viewTotal}次阅读</div>
+		                	<div class="comment-icon"><i class="cms-commentCount"></i></div>
+		                	<div class="comment">${topic.commentTotal}个评论</div>
+		                </div>
+		                <!-- topicId属性用来支持JS获取隐藏内容 -->
 						<div class="topicContent" topicId="${topic.id}">
-							<#if topic.lastUpdateTime != null>
+							 <#if topic.lastUpdateTime != null>
 								<div class="lastUpdateTime">最后修改时间：${topic.lastUpdateTime}</div>
 							</#if>
-							<#noescape>${topic.content}</#noescape>
+		                	<#noescape>${topic.content}</#noescape>
 							
 							
 							<!-- 
-								<div class="hide-box">	
-									<div class="background-image"></div>
-									
-									<div class="background-prompt">此处内容已被隐藏，输入密码可见</div>			
-									<div class="input-box">
-										<input type="password" id="hide_password" class="text" maxlength="30"  placeholder="密码" value="">
-										<input type="button" value="提交" class="button" onclick="search();return false">
-									</div>
-									-->
-									<!-- 
-									<div class="background-prompt">此处内容已被隐藏，评论话题可见</div>
-									-->
-									<!--  
-									<div class="background-prompt">此处内容已被隐藏，达到‘新手上路’等级可见</div>			
-									-->
-									<!--  
-									<div class="background-prompt">此处内容已被隐藏，需要 50 积分购买可见</div>			
-									<div class="submit-box">
-										<input type="button" value="立即购买" class="button" onclick="search();return false">
-									</div>
-									-->
-									<!--  
-									<div class="background-prompt">此处内容已被隐藏，需要 50 人民币购买可见</div>			
-									<div class="submit-box">
-										<input type="button" value="立即购买" class="button" onclick="search();return false">
-									</div>
-									-->
-									
-									<!-- 
-								</div>-->
+							<div class="hide-box">	
+								<div class="background-image"></div>
 								
+								<div class="background-prompt">此处内容已被隐藏，输入密码可见</div>			
+								<div class="input-box">
+									<input type="password" id="hide_password" class="text" maxlength="30"  placeholder="密码" value="">
+									<input type="button" value="提交" class="button" onclick="search();return false">
+								</div>
+								-->
+								<!-- 
+								<div class="background-prompt">此处内容已被隐藏，评论话题可见</div>
+								-->
+								<!--  
+								<div class="background-prompt">此处内容已被隐藏，达到‘新手上路’等级可见</div>			
+								-->
+								<!--  
+								<div class="background-prompt">此处内容已被隐藏，需要 50 积分购买可见</div>			
+								<div class="submit-box">
+									<input type="button" value="立即购买" class="button" onclick="search();return false">
+								</div>
+								-->
+								<!--  
+								<div class="background-prompt">此处内容已被隐藏，需要 50 人民币购买可见</div>			
+								<div class="submit-box">
+									<input type="button" value="立即购买" class="button" onclick="search();return false">
+								</div>
+								-->
 								
-								
-						
+								<!-- 
+							</div>-->    
 						</div>
 						
 						<div class="favorite-formModule">
@@ -123,14 +126,11 @@
 							<@include action="${likeRelated_addLike_1}"/>
 	
 						</div>
-						<h2></h2>
-						
 					</div>
 				</div>
 				
 				<#-- 引入话题取消隐藏 本方法处理话题隐藏内容 -->
 				<@include action="${topicRelated_topicUnhide_1}"/> 
-				
 				
 				<#-- 引入评论列表 -->
 				<@include action="${topicRelated_comment_2}"/> 
@@ -148,51 +148,123 @@
 						</div>
 					</div>
 				</#if>
-				 
 				
 				
-			</#if>
-		</div>
-		<#if topic != null && topic?? >
-			<div class="articleInfoModule">
-				<div class="user">
-					<div class="author">
-						<a href="user/control/home?userName=${topic.userName}" >
-							<#if topic.avatarName != null>
-								<img src="${topic.avatarPath}${topic.avatarName}" >
-							<#else>
-								<img src="${commonPath}images/min_avata.png" >
-							</#if> 
-						</a>
-						<span>
-							<a href="user/control/home?userName=${topic.userName}">
+				
+			</div>
+			
+			<div class="right">
+				<div class="userInfo-wrap clearfix">
+					<div class="userInfo">
+						<div class="author">
+				            <a href="user/control/home?userName=${topic.userName}" >
+								<#if topic.avatarName != null>
+									<img src="${topic.avatarPath}${topic.avatarName}" >
+								<#else>
+									<img src="${commonPath}images/min_avata.png" >
+								</#if> 
+							</a>
+						</div>
+						<p class="name">
+							<a href="user/control/home?userName=${topic.userName}" target="_blank">
 								${(topic.nickname != null && topic.nickname??) ?string(topic.nickname , topic.userName)}
 							</a>
-						</span>
-						<div class="role">
-						<#list topic.userRoleNameList as roleName>
-							<i class="userRoleName">${roleName}</i>				
-						</#list>
-						</div>
+						</p>
+						<#if topic.userRoleNameList?size gt 0>
+							<div class="role">
+								<#list topic.userRoleNameList as roleName>
+									<i class="userRoleName">${roleName}</i>				
+								</#list>
+							</div>
+						</#if>
 						<#if topic.isStaff>
 							<div class="role">
 								<i class="staff">官方人员</i>	
 							</div>
 						</#if>
-					</div>
-					<div class="userInfo">
-						<span>${topic.postTime}</span>
-						<span>${topic.viewTotal} 次浏览</span>
-						<span>${topic.commentTotal} 个评论</span>
+						<ul>
+			            	<li>
+			                	<span id="answerCount">0</span>
+			                    <span>回答</span>
+			                </li>
+			                <li>
+			                    <span id="followerCount">0</span>
+			                    <span>粉丝</span>
+			                </li>
+			                <li>
+			                    <span id="followCount">0</span>
+			                    <span>关注</span>
+			             	</li>
+			             	<input type="hidden" id="_userName" value="${topic.userName}"/>
+			             	
+			             	<script language="javascript" type="text/javascript">
+								//查询回答总数
+								function queryAnswerCount(){
+									//获取用户名称
+									var userName = document.getElementById("_userName").value;
+									get_request(function(value){
+										if(value != ""){
+											var data = JSON.parse(value);
+									        document.getElementById("answerCount").innerHTML = data;
+								        }
+									},
+										"queryAnswerCount.htm?userName="+userName+"&timestamp=" + new Date().getTime(), true);
+								}
+								queryAnswerCount();
+								
+								//查询粉丝总数
+								function queryFollowerCount(){
+									//获取用户名称
+									var userName = document.getElementById("_userName").value;
+									get_request(function(value){
+										if(value != ""){
+											var data = JSON.parse(value);
+									        document.getElementById("followerCount").innerHTML = data;
+								        }
+									},
+										"queryFollowerCount.htm?userName="+userName+"&timestamp=" + new Date().getTime(), true);
+								}
+								queryFollowerCount();
+								
+								
+								//查询关注总数
+								function queryFollowCount(){
+									//获取用户名称
+									var userName = document.getElementById("_userName").value;
+									get_request(function(value){
+										if(value != ""){
+											var data = JSON.parse(value);
+									        document.getElementById("followCount").innerHTML = data;
+								        }
+									},
+										"queryFollowCount.htm?userName="+userName+"&timestamp=" + new Date().getTime(), true);
+								}
+								queryFollowCount();
+							</script>
+			             	
+			             	
+			             	
+			             	
+			             	
+						</ul>
+						<#if !topic.isStaff>
+							<div class="action-button">
+								<#-- 引入关注用户 -->
+								<@include action="${followRelated_addFollow_3}"/>
+								<span class="privateMessageBox" >
+									<button type="button" class="privateMessageButton" onClick="javascript:window.location.href='${baseURL}user/control/privateMessageChatList?friendUserName=${user.userName}'">发私信</button>
+								</span>
+							</div>
+						</#if>
 					</div>
 				</div>
+				
+				<#-- 引入相似问题 -->
+				<@include action="${topicRelated_likeTopic_1}" topicId="${topic.id}"/>
+				
 			</div>
-			
-			<!-- 相似话题 -->
-			<@include action="${topicRelated_likeTopic_1}" topicId="${topic.id}"/>
-			
-		</#if>
-	
+		</div>
+		</#if> 
 	</div>
 </div>
 <#-- 引入页脚 -->
@@ -224,7 +296,7 @@
 <!-- 图片点击放大 -->
 <script type="text/javascript">
 	$(function () {
-    	$("img").simplebox();
+    	$(".topicContent img,.commentContent img").simplebox();
 	});
 </script>
 

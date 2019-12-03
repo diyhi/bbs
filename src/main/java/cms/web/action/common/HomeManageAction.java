@@ -3822,8 +3822,9 @@ public class HomeManageAction {
 										newFullFileNameMap.put(entry.getKey(), SecureLink.createRedirectLink(entry.getKey(),entry.getValue(),topicInfo.getTagId(),systemSetting.getFileSecureLinkSecret()));
 									}
 									
+									Integer topicContentUpdateMark = topicManage.query_cache_markUpdateTopicStatus(topicInfo.getId(), Integer.parseInt(RandomStringUtils.randomNumeric(8)));
 									//生成处理'上传的文件完整路径名称'Id
-									String processFullFileNameId = topicManage.createProcessFullFileNameId(topicInfo.getId(),topicInfo.getLastUpdateTime(),newFullFileNameMap);
+									String processFullFileNameId = topicManage.createProcessFullFileNameId(topicInfo.getId(),topicContentUpdateMark,newFullFileNameMap);
 									
 									topicInfo.setContent(topicManage.query_cache_processFullFileName(topicInfo.getContent(),"topic",newFullFileNameMap,processFullFileNameId));
 									
@@ -3905,9 +3906,10 @@ public class HomeManageAction {
 									}
 								}
 								
+								Integer topicContentUpdateMark = topicManage.query_cache_markUpdateTopicStatus(userDynamic.getTopicId(), Integer.parseInt(RandomStringUtils.randomNumeric(8)));
 								
 								//生成处理'隐藏标签'Id
-								String processHideTagId = topicManage.createProcessHideTagId(userDynamic.getTopicId(),topicInfo.getLastUpdateTime(), visibleTagList);
+								String processHideTagId = topicManage.createProcessHideTagId(userDynamic.getTopicId(),topicContentUpdateMark, visibleTagList);
 								
 								//处理隐藏标签
 								String content = topicManage.query_cache_processHiddenTag(topicInfo.getContent(),visibleTagList,processHideTagId+"|"+topicContentDigest);

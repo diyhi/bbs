@@ -9,6 +9,7 @@ import java.util.List;
 import javax.annotation.Resource;
 
 import cms.bean.QueryResult;
+import cms.bean.question.AppendQuestionItem;
 import cms.bean.question.Question;
 import cms.bean.question.QuestionTagAssociation;
 import cms.utils.HtmlEscape;
@@ -105,10 +106,15 @@ public class QuestionLuceneManage {
 					doc.add(title); 	
 					doc.add(new SortedDocValuesField("title", new BytesRef(question.getTitle())));//排序
 
-					
+					String questionContent = question.getContent();
+					if(question.getAppendQuestionItemList() != null && question.getAppendQuestionItemList().size() >0){
+						for(AppendQuestionItem appendQuestionItem : question.getAppendQuestionItemList()){
+							questionContent += appendQuestionItem.getContent();
+						}
+					}
 					//内容
-					Field content = new TextField("content",question.getContent(),Field.Store.YES);
-					content.setTokenStream(analyzer_content.tokenStream("content",question.getContent()));
+					Field content = new TextField("content",questionContent,Field.Store.YES);
+					content.setTokenStream(analyzer_content.tokenStream("content",questionContent));
 					doc.add(content); 	
 				//	doc.add(new SortedDocValuesField("content", new BytesRef(productInfo.getContent())));//排序
 				

@@ -46,7 +46,7 @@ public interface QuestionService extends DAO<Question>{
 	 * @param isStaff 是否为员工
 	 * @return
 	 */
-	public Map<Long,String> findQuestionContentByPage(int firstIndex, int maxResult,String userName,boolean isStaff);
+	public List<Question> findQuestionContentByPage(int firstIndex, int maxResult,String userName,boolean isStaff);
 	/**
 	 * 分页查询问题
 	 * @param firstIndex 开始索引
@@ -66,7 +66,20 @@ public interface QuestionService extends DAO<Question>{
 	 * @param questionTagAssociationList 问题标签关联集合
 	 */
 	public void saveQuestion(Question question,List<QuestionTagAssociation> questionTagAssociationList);
-	
+	/**
+	 * 追加问题
+	 * @param questionId 问题Id
+	 * @param appendContent 追加问题内容 AppendQuestionItem对象的JSON格式加上逗号
+	 * @return
+	 */
+	public Integer saveAppendQuestion(Long questionId,String appendContent);
+	/**
+	 * 修改追加问题
+	 * @param questionId 问题Id
+	 * @param appendContent 追加问题内容
+	 * @return
+	 */
+	public Integer updateAppendQuestion(Long questionId,String appendContent);
 	/**
 	 * 增加展示次数
 	 * @param countMap key: 话题Id value:展示次数

@@ -146,10 +146,56 @@ function cancelAdoptionAnswer(answerId){
 
 //显示修改问题页
 function showUpdateQuestion(questionId){
-	var url ="${config:url(pageContext.request)}control/question/manage${config:suffix()}?method=edit&questionId="+questionId+"&timestamp=" + new Date().getTime();
+	var url ="${config:url(pageContext.request)}control/question/manage${config:suffix()}?method=editQuestion&questionId="+questionId+"&timestamp=" + new Date().getTime();
 	window.parent.loadQuestion("修改问题",url);
 
 }
+
+
+//显示追加提问页
+function showAppendQuestion(questionId){
+	var url ="${config:url(pageContext.request)}control/question/manage${config:suffix()}?method=appendQuestion&questionId="+questionId+"&timestamp=" + new Date().getTime();
+	window.parent.loadQuestion("追加提问",url);
+
+}
+//显示修改追加提问页
+function showUpdateAppendQuestion(questionId,appendQuestionItemId){
+	var url ="${config:url(pageContext.request)}control/question/manage${config:suffix()}?method=editAppendQuestion&questionId="+questionId+"&appendQuestionItemId="+appendQuestionItemId+"&timestamp=" + new Date().getTime();
+	window.parent.loadQuestion("修改追加提问",url);
+
+}
+
+
+//删除追加问题
+function deleteAppendQuestion(questionId,appendQuestionItemId){
+	if(window.confirm('确定删除吗?')){
+		var parameter = "";
+		
+		parameter += "&questionId="+questionId;
+		parameter += "&appendQuestionItemId="+appendQuestionItemId;
+		var csrf =  getCsrf();
+		parameter += "&_csrf_token="+csrf.token;
+		parameter += "&_csrf_header="+csrf.header;
+	   	//删除第一个&号,防止因为多了&号而出现警告: Parameters: Invalid chunk ignored.信息
+		if(parameter.indexOf("&") == 0){
+			parameter = parameter.substring(1,parameter.length);
+		}
+	   	post_request(function(value){
+			if(value == "1"){
+				systemMsgShow("提交成功,3秒后自动刷新");//弹出提示层
+        		setTimeout("window.parent.callbackQuestion();",3000);//延迟3秒后刷新当前页面
+			}else{
+				alert("删除失败");
+			}
+		},
+			"${config:url(pageContext.request)}control/question/manage${config:suffix()}?method=deleteAppendQuestion&timestamp=" + new Date().getTime(), true,parameter);
+			
+	}else{
+		return false;
+	};
+}
+
+
 //删除问题
 function deleteQuestion(questionId){	
 	if(window.confirm('确定删除吗?')){
@@ -170,7 +216,7 @@ function deleteQuestion(questionId){
 				alert("删除失败");
 			}
 		},
-			"${config:url(pageContext.request)}control/question/manage${config:suffix()}?method=delete&visible=${param.visible}&timestamp=" + new Date().getTime(), true,parameter);
+			"${config:url(pageContext.request)}control/question/manage${config:suffix()}?method=deleteQuestion&visible=${param.visible}&timestamp=" + new Date().getTime(), true,parameter);
 			
 	}else{return false;};
 }
@@ -381,6 +427,21 @@ $(function() {
 				<enhance:out escapeXml="false">
 					<div class="comment">${question.content}</div>
 				</enhance:out>
+				<div class="appendQuestionModule" >
+					<c:forEach items="${question.appendQuestionItemList}" var="appendQuestionItem" varStatus="status">
+						<div class="appendBox <c:if test="${status.count %2==0}"> odd</c:if> <c:if test="${status.count %2 >0}"> even</c:if>" >
+							<div class="head">
+								<span class="prompt">第${status.count}条附言</span>
+								<span class="appendTime"><fmt:formatDate value="${appendQuestionItem.postTime}" pattern="yyyy-MM-dd HH:mm:ss" /></span>
+								<A class="editAppendQuestion" hidefocus="true" onClick="showUpdateAppendQuestion('${question.id}','${appendQuestionItem.id}'); return false" href="#" ondragstart= "return false">修改</A>
+								<A class="editAppendQuestion" hidefocus="true" onClick="deleteAppendQuestion('${question.id}','${appendQuestionItem.id}'); return false" href="#" ondragstart= "return false">删除</A>
+							</div>
+		                	<div class="appendContent" >
+		                		<enhance:out escapeXml="false">${appendQuestionItem.content}</enhance:out>
+		                	</div> 
+						</div>
+					</c:forEach>
+				</div>
 				<TABLE  cellSpacing="2" cellPadding="0" width="99%"  border="0">
 					<TR class="noDiscolor">
 						<TD width="50%" style="border-top: #bfe3ff 1px dotted;" align="left">
@@ -390,6 +451,7 @@ $(function() {
 							<c:if test="${question.status == 10}">
 								<A onclick="javascript:if(window.confirm('确定审核通过吗? ')){auditQuestion('${question.id}');return false;}else{return false};" hidefocus="true" href="#" ondragstart= "return false">立即审核</A>&nbsp;&nbsp;
 							</c:if>
+							<A hidefocus="true" onClick="showAppendQuestion('${question.id}'); return false" href="#" ondragstart= "return false">追加提问</A>&nbsp;&nbsp;
 							<A hidefocus="true" onClick="showUpdateQuestion('${question.id}'); return false" href="#" ondragstart= "return false">修改</A>&nbsp;&nbsp;
 							<A hidefocus="true" onClick="deleteQuestion('${question.id}'); return false;" href="#" ondragstart= "return false">删除</A>
 						</TD>

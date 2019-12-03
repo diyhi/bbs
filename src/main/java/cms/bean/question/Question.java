@@ -44,7 +44,12 @@ public class Question implements Serializable{
 	private String summary;
 	/** 追加内容 **/
 	@Lob
-	private String appendContent;
+	private String appendContent = "[";
+	
+	/** 追加内容集合 **/
+	@Transient
+	private List<AppendQuestionItem> appendQuestionItemList = new ArrayList<AppendQuestionItem>();
+	
 	
 	
 	/** 发表时间 **/
@@ -251,6 +256,16 @@ public class Question implements Serializable{
 
 	public void setAdoptionAnswerId(Long adoptionAnswerId) {
 		this.adoptionAnswerId = adoptionAnswerId;
+	}
+
+
+	public List<AppendQuestionItem> getAppendQuestionItemList() {
+		return appendQuestionItemList;
+	}
+
+
+	public void setAppendQuestionItemList(List<AppendQuestionItem> appendQuestionItemList) {
+		this.appendQuestionItemList = appendQuestionItemList;
 	}
 	
 	

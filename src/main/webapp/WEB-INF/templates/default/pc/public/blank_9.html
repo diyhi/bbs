@@ -44,8 +44,40 @@
 							<a href="askList?questionTagId=${questionTag.questionTagId}"  class="tag">${questionTag.questionTagName}</a>		
 						</#list>
 			        </div>
+			        <#if question.userName == systemUser.userName>
+						<div class="appendQuestion" >
+							<span onclick="appendQuestionLayer('${question.id}');"><i class="cms-append" ></i>追加提问</span>
+						</div>
+						
+						
+						<script type="text/javascript">
+							//追加提问展开层
+							function appendQuestionLayer(questionId){
+								var parameter = "";//URI参数
+								parameter += "questionId="+questionId;
+								
+								
+								//回复页面
+								get_request(function(value){
+									if(value != ""){
+										$("#appendQuestion-post").html(value);
+									}
+								},
+								getBasePath()+"user/appendQuestion.htm?"+parameter+"&timestamp=" + new Date().getTime(), true);
+								
+							}
+							function cancelAppendQuestion(){
+								$("#appendQuestion-post").html("");
+							}
+						</script> 
+						
+					</#if>
 		        	<div class="questionBox">
 		                <div class="title">${question.title}</div>
+		                
+		                <div id="appendQuestion-post" class="appendQuestion-post">
+					
+						</div>
 		                <div class="questionInfo clearfix" >
 		                	<div class="postTime">${question.postTime}</div>
 		                	<div class="viewTotal-icon"><i class="cms-view"></i></div>
@@ -56,6 +88,17 @@
 						<div class="content" >
 		                	<#noescape>${question.content}</#noescape>          
 						</div>
+						<#list question.appendQuestionItemList as appendQuestionItem>
+							<div class="appendBox ${(appendQuestionItem_index%2==0 )?then(' odd' ,' even')}" >
+								<div class="head">
+									<span class="prompt">第${appendQuestionItem_index + 1}条附言</span>
+									<span class="appendTime">${appendQuestionItem.postTime?datetime}</span>
+								</div>
+			                	<div class="appendContent" >
+			                		<#noescape>${appendQuestionItem.content}</#noescape>
+			                	</div> 
+							</div>		
+						</#list>
 					</div>
 				</div>
 				
@@ -189,7 +232,7 @@
 <!-- 图片点击放大 -->
 <script type="text/javascript">
 	$(function () {
-    	$(".content img,.answerContent img").simplebox();
+    	$(".content img,.appendContent img,.answerContent img").simplebox();
 	});
 </script>
 </html>

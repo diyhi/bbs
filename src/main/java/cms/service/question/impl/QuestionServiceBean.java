@@ -95,7 +95,7 @@ public class QuestionServiceBean extends DaoSupport<Question> implements Questio
 	public List<Question> findQuestionByQuestionIdList(List<Long> questionIdList){
 		List<Question> questionList = new ArrayList<Question>();
 		
-		Query query = em.createQuery("select o.id,o.title,o.content," +
+		Query query = em.createQuery("select o.id,o.title,o.content,o.appendContent," +
 				"o.postTime,o.userName,o.isStaff,o.status " +
 				" from Question o where o.id in(:questionId)");
 		query.setParameter("questionId", questionIdList);	
@@ -108,15 +108,17 @@ public class QuestionServiceBean extends DaoSupport<Question> implements Questio
 				Long id = (Long)obj[0];
 				String title = (String)obj[1];
 				String content = (String)obj[2];
-				Date postTime = (Date)obj[3];
-				String userName = (String)obj[4];
-				Boolean isStaff = (Boolean)obj[5];
-				Integer status = (Integer)obj[6];
+				String appendContent = (String)obj[3];
+				Date postTime = (Date)obj[4];
+				String userName = (String)obj[5];
+				Boolean isStaff = (Boolean)obj[6];
+				Integer status = (Integer)obj[7];
 
 				Question question = new Question();
 				question.setId(id);
 				question.setTitle(title);
 				question.setContent(content);
+				question.setAppendContent(appendContent);
 				question.setPostTime(postTime);
 				question.setUserName(userName);
 				question.setIsStaff(isStaff);
@@ -137,10 +139,10 @@ public class QuestionServiceBean extends DaoSupport<Question> implements Questio
 	 * @return
 	 */
 	@Transactional(readOnly=true,propagation=Propagation.NOT_SUPPORTED)
-	public Map<Long,String> findQuestionContentByPage(int firstIndex, int maxResult,String userName,boolean isStaff){
-		Map<Long,String> questionContentList = new HashMap<Long,String>();//key:问题Id  value:问题内容
+	public List<Question> findQuestionContentByPage(int firstIndex, int maxResult,String userName,boolean isStaff){
+		List<Question> questionContentList = new ArrayList<Question>();
 		
-		String sql = "select o.id,o.content from Question o where o.userName=?1 and o.isStaff=?2";
+		String sql = "select o.id,o.content,o.appendContent from Question o where o.userName=?1 and o.isStaff=?2";
 		Query query = em.createQuery(sql);	
 		query.setParameter(1, userName);
 		query.setParameter(2, isStaff);
@@ -155,7 +157,13 @@ public class QuestionServiceBean extends DaoSupport<Question> implements Questio
 				Object[] obj = (Object[])objectList.get(i);
 				Long id = (Long)obj[0];
 				String content = (String)obj[1];
-				questionContentList.put(id, content);
+				String appendContent = (String)obj[2];
+				
+				Question question = new Question();
+				question.setId(id);
+				question.setContent(content);
+				question.setAppendContent(appendContent);
+				questionContentList.add(question);
 			}
 		}
 		
@@ -171,7 +179,7 @@ public class QuestionServiceBean extends DaoSupport<Question> implements Questio
 	public List<Question> findQuestionByPage(int firstIndex, int maxResult){
 		List<Question> questionList = new ArrayList<Question>();
 		
-		String sql = "select o.id,o.title,o.content," +
+		String sql = "select o.id,o.title,o.content,o.appendContent," +
 				"o.postTime,o.userName,o.isStaff,o.status " +
 				" from Question o ";
 
@@ -189,15 +197,17 @@ public class QuestionServiceBean extends DaoSupport<Question> implements Questio
 				Long id = (Long)obj[0];
 				String title = (String)obj[1];
 				String content = (String)obj[2];
-				Date postTime = (Date)obj[3];
-				String userName = (String)obj[4];
-				Boolean isStaff = (Boolean)obj[5];
-				Integer status = (Integer)obj[6];
+				String appendContent = (String)obj[3];
+				Date postTime = (Date)obj[4];
+				String userName = (String)obj[5];
+				Boolean isStaff = (Boolean)obj[6];
+				Integer status = (Integer)obj[7];
 
 				Question question = new Question();
 				question.setId(id);
 				question.setTitle(title);
 				question.setContent(content);
+				question.setAppendContent(appendContent);
 				question.setPostTime(postTime);
 				question.setUserName(userName);
 				question.setIsStaff(isStaff);
@@ -238,7 +248,32 @@ public class QuestionServiceBean extends DaoSupport<Question> implements Questio
 	}
 	
 	
-	
+	/**
+	 * 保存追加问题
+	 * @param questionId 问题Id
+	 * @param appendContent 追加问题内容 AppendQuestionItem对象的JSON格式加上逗号
+	 * @return
+	 */
+	public Integer saveAppendQuestion(Long questionId,String appendContent){
+		
+		Query query = em.createQuery("update Question o set o.appendContent=CONCAT(o.appendContent,?1) where o.id=?2")
+				.setParameter(1, appendContent)
+				.setParameter(2, questionId);
+		return query.executeUpdate();
+	}
+	/**
+	 * 修改追加问题
+	 * @param questionId 问题Id
+	 * @param appendContent 追加问题内容
+	 * @return
+	 */
+	public Integer updateAppendQuestion(Long questionId,String appendContent){
+		
+		Query query = em.createQuery("update Question o set o.appendContent=?1 where o.id=?2")
+				.setParameter(1, appendContent)
+				.setParameter(2, questionId);
+		return query.executeUpdate();
+	}
 	
 	
 	/**
@@ -278,15 +313,14 @@ public class QuestionServiceBean extends DaoSupport<Question> implements Questio
 	 * @return
 	 */
 	public Integer updateQuestion(Question question,List<QuestionTagAssociation> questionTagAssociationList){
-		Query query = em.createQuery("update Question o set o.title=?1, o.content=?2,o.summary=?3,o.allow=?4,o.status=?5,o.sort=?6,o.lastUpdateTime=?7 where o.id=?8")
+		Query query = em.createQuery("update Question o set o.title=?1, o.content=?2,o.summary=?3,o.allow=?4,o.status=?5,o.sort=?6 where o.id=?7")
 		.setParameter(1, question.getTitle())
 		.setParameter(2, question.getContent())
 		.setParameter(3, question.getSummary())
 		.setParameter(4, question.isAllow())
 		.setParameter(5, question.getStatus())
 		.setParameter(6, question.getSort())
-		.setParameter(7, question.getLastUpdateTime())
-		.setParameter(8, question.getId());
+		.setParameter(7, question.getId());
 		int i = query.executeUpdate();
 		
 		if(i >0){

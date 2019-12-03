@@ -1,10 +1,33 @@
 <#--  标签导航 -->
 <#--  适用话题列表 -->
+<#--  调用的页面需引入js/jquery/readmore2.js -->
 <@function>
 	<div class="tabModule">
-		<a href="" <#if url_tagId == ''>class='tab_current'<#else> class='tab'</#if>>全部</a>
-		<#list topicRelated_tag_collection as tag>	
-			<a href="?tagId=${tag.id}" <#if tag.id == url_tagId> class='tab_current'<#else> class='tab'</#if>>${tag.name}</a>
-		</#list>
+		<div class="tab-box" >
+			<div id="tabNavigation">
+				<a href="${baseURI}" <#if url_tagId == ''> class='tab_current'<#else> class='tab'</#if>>全部</a>
+				<#list topicRelated_tag_collection as tag>	
+					<a href="?tagId=${tag.id}" <#if tag.id == url_tagId> class='tab_current'<#else> class='tab'</#if>>${tag.name}</a>
+				</#list>		
+			</div>
+		</div>
+		<div id="tabNavigation_more" class="more"></div>
 	</div>	
+	<script type="text/javascript">
+	$(document).ready(function () {
+		//隐藏高度超过100px的内容
+		$('#tabNavigation').readmore({
+			speed: 100,//速度
+			collapsedHeight: 42,//默认高度
+			moreLink: '<div class="readMore">更多 <i class="cms-angle-down"></i></div>',
+			bindLink: '#tabNavigation_more',
+			rootElement: '.tabModule',
+			afterToggle: function(trigger, element, expanded) {
+
+			}
+		});
+		
+		
+	});
+	</script>
 </@function>	
