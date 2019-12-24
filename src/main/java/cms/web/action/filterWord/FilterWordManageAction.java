@@ -22,9 +22,10 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import cms.bean.FilterWord.FilterWord;
 import cms.utils.FileSize;
+import cms.utils.FileUtil;
 import cms.utils.JsonUtils;
 import cms.utils.PathUtil;
-import cms.web.action.FileManage;
+import cms.web.action.fileSystem.localImpl.LocalFileManage;
 
 /**
  * 过滤词管理
@@ -33,8 +34,7 @@ import cms.web.action.FileManage;
 @Controller
 @RequestMapping("/control/filterWord/manage") 
 public class FilterWordManageAction {
-	@Resource FileManage fileManage;
-	
+	@Resource LocalFileManage localFileManage;
 	
 	
 	/**
@@ -52,7 +52,7 @@ public class FilterWordManageAction {
 		
 		if(file.exists()){
 			
-			List<String> wordList = fileManage.readLines(file,"utf-8");
+			List<String> wordList = FileUtil.readLines(file,"utf-8");
 			if(wordList != null){
 				filterWord.setWordNumber(wordList.size());
 				for(int i=0; i<wordList.size(); i++){
@@ -92,17 +92,16 @@ public class FilterWordManageAction {
 				//验证文件后缀
 				List<String> flashFormatList = new ArrayList<String>();
 				flashFormatList.add("txt");
-				boolean authentication = fileManage.validateFileSuffix(file.getOriginalFilename(),flashFormatList);
+				boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),flashFormatList);
 				if(authentication){
 					
 					//文件保存目录
 					String pathDir = "WEB-INF"+File.separator+"data"+File.separator+"filterWord"+File.separator;
 					//生成文件保存目录
-					fileManage.createFolder(pathDir);
-					//文件输出流
-					fileoutstream = new FileOutputStream(new File(PathUtil.path()+File.separator+pathDir, "word.txt"));
-					//写入硬盘
-					fileoutstream.write(file.getBytes());
+					FileUtil.createFolder(pathDir);
+					//保存文件
+					localFileManage.writeFile(pathDir, "word.txt",file.getBytes());
+					
 				}else{
 					error.put("file", "文件格式错误");
 				}
@@ -141,7 +140,7 @@ public class FilterWordManageAction {
 	@ResponseBody//方式来做ajax,直接返回字符串
 	public String deleteFilterWord(ModelMap model,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
-		Boolean state = fileManage.deleteFile("WEB-INF"+File.separator+"data"+File.separator+"filterWord"+File.separator+"word.txt");
+		Boolean state = localFileManage.deleteFile("WEB-INF"+File.separator+"data"+File.separator+"filterWord"+File.separator+"word.txt");
 		if(state != null && state == true){
 			return "1";
 		}

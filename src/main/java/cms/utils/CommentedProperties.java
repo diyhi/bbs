@@ -10,11 +10,17 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.core.io.ClassPathResource;
 
 /** 
  *   CommentedProperties
@@ -36,7 +42,12 @@ import java.util.Set;
  * @author BrokenDreams
  */
 public class CommentedProperties{
+	private static final Logger logger = LogManager.getLogger(CommentedProperties.class);
+	
+	//读取富文本编辑器允许文件上传格式
+	private static List<String> fileUploadFormatList = null;
 
+	
 	/**
 	 * 内部属性表
 	 */
@@ -663,5 +674,56 @@ public class CommentedProperties{
 	private static final char[] hexDigit = {
 		'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'
 	};
+
+	
+	
+	/**
+	 * 读取富文本编辑器允许文件上传格式
+	 * @return
+	 */
+	public static List<String> readRichTextAllowFileUploadFormat(){	
+		if(fileUploadFormatList != null && fileUploadFormatList.size() >0){
+			return fileUploadFormatList;
+		}
+		//富文本文件上传格式
+		List<String> _fileUploadFormatList = new ArrayList<String>();
+		
+		
+		org.springframework.core.io.Resource resource = new ClassPathResource("/richText.properties");//读取配置文件
+		CommentedProperties props = new CommentedProperties();
+
+		try {
+			props.load(resource.getInputStream(),"utf-8");
+			
+			Set<String> propertyNameList = props.propertyNames();
+			if(propertyNameList != null && propertyNameList.size() >0){
+				for(String propertyName : propertyNameList){
+					if(propertyName.trim().equals("fileUploadFormat")){
+						String value = props.getProperty(propertyName.trim());
+						if(value != null && !"".equals(value.trim())){
+							String[] values = value.trim().split(",");
+							if(values != null && values.length >0){
+								for(String format : values){
+									if(format != null && !"".equals(format.trim())){
+										_fileUploadFormatList.add(format.trim());
+									}
+									
+								}
+							}
+						}
+					}
+				}
+				
+				fileUploadFormatList = _fileUploadFormatList;
+			}
+	
+		} catch (IOException e) {
+			if (logger.isErrorEnabled()) {
+	            logger.error("读取配置文件richText.properties错误",e);
+	        }
+		}
+		return _fileUploadFormatList;	
+
+	}
 
 }

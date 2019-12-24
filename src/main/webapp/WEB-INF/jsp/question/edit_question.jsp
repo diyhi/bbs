@@ -10,15 +10,15 @@
 <meta name="_csrf_header" content="${_csrf.headerName}"/>
 <LINK href="backstage/css/list.css" type="text/css" rel="stylesheet">
 <LINK href="backstage/css/table.css" type="text/css" rel="stylesheet">
+<script language="JavaScript" src="backstage/jquery/jquery.min.js"></script>
 <link href="backstage/kindeditor/themes/default/default.css" rel="stylesheet"/>
-<link href="backstage/kindeditor/plugins/hide/hide.css" rel="stylesheet"/>
 <script charset="utf-8" src="backstage/kindeditor/kindeditor-min.js"></script>
 <script charset="utf-8" src="backstage/kindeditor/lang/zh-CN.js"></script>
 
 <script type="text/javascript" src="backstage/js/ajax.js" language="javascript" ></script>
 <script type="text/javascript" src="backstage/js/Tool.js" charset="UTF-8"></script>
 <script type="text/javascript" src="backstage/js/json3.js"></script>
-<script language="JavaScript" src="backstage/jquery/jquery.min.js"></script>
+
 <link rel="stylesheet" href="backstage/layer/skin/layer.css"  type="text/css" />
 
 
@@ -226,7 +226,16 @@ function sureSubmit(){
 	if(title != ""){
 		parameter += "&title="+encodeURIComponent(title);
 	}
-	
+	//积分
+	var point = document.getElementById("point").value;
+	if(point != ""){
+		parameter += "&point="+encodeURIComponent(point);
+	}
+	//金额
+	var amount = document.getElementById("amount").value;
+	if(amount != ""){
+		parameter += "&amount="+encodeURIComponent(amount);
+	}
 	
 	//内容
 	var content = document.getElementById("content").value;
@@ -242,8 +251,7 @@ function sureSubmit(){
 	}else{
 		document.getElementById("submitForm").innerHTML = "请选择标签";
 	}
-    
-
+   
 	//排序
 	var sort = document.getElementById("sort").value;
 	if(sort != ""){
@@ -326,6 +334,22 @@ function sureSubmit(){
     <TD class="t-content" width="88%">
     	<input type="text" class="form-text" id="title" size="50" value="${question.title}">
 		<SPAN class="span-text" id="title_error" name="error">${error["title"]}</SPAN>
+    </TD>
+   </TR>
+   <TR>
+  	<TD class="t-label t-label-h" width="12%">积分：</TD>
+    <TD class="t-content" width="88%">
+    	<input type="text" class="form-text" id="point" name="point" size="10" maxlength="8" value="${question.point}" <c:if test="${question.adoptionAnswerId gt 0}"> disabled='disabled'</c:if>>
+		<SPAN class="span-text" id="point_error" name="error">${error["point"]}</SPAN>
+		<SPAN class="span-help">最多允许使用积分${maxPoint}</SPAN>
+    </TD>
+   </TR>
+   <TR>
+  	<TD class="t-label t-label-h" width="12%">金额：</TD>
+    <TD class="t-content" width="88%">
+    	<input type="text" class="form-text" id="amount" name="amount" size="10" maxlength="8" value="${question.amount}" <c:if test="${question.isStaff== true || question.adoptionAnswerId gt 0}"> disabled='disabled'</c:if>>
+		<SPAN class="span-text" id="amount_error" name="error">${error["amount"]}</SPAN>
+		<SPAN class="span-help">最多允许使用预存款${maxDeposit}</SPAN>
     </TD>
    </TR>
   	<TR>
@@ -414,7 +438,7 @@ function initKindEditor(){
         'superscript', 'clearhtml', 'quickformat', 'selectall', '|', 'fullscreen', 
         'formatblock', 'fontname', 'fontsize', '/', 'forecolor', 'hilitecolor', 'bold',
         'italic', 'underline', 'strikethrough', 'lineheight', 'removeformat', '|', 'image', 'multiimage',
-        'flash', 'media', 'insertfile','emoticons','baidumap', 'table', 'hr',   'pagebreak',
+         'media', 'insertfile','emoticons','baidumap', 'table', 'hr',   'pagebreak',
          'link', 'unlink'],
 			afterChange : function() {
 				this.sync();

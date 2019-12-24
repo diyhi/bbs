@@ -1,12 +1,14 @@
 package cms.service.question;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-
+import cms.bean.payment.PaymentLog;
 import cms.bean.question.Question;
 import cms.bean.question.QuestionTagAssociation;
+import cms.bean.user.PointLog;
 import cms.service.besa.DAO;
 
 /**
@@ -64,8 +66,12 @@ public interface QuestionService extends DAO<Question>{
 	 * 保存问题
 	 * @param question 问题
 	 * @param questionTagAssociationList 问题标签关联集合
+	 * @param point 扣减用户积分
+	 * @param pointLog 积分日志
+	 * @param amount 扣减用户预存款
+	 * @param paymentLog 支付日志
 	 */
-	public void saveQuestion(Question question,List<QuestionTagAssociation> questionTagAssociationList);
+	public void saveQuestion(Question question,List<QuestionTagAssociation> questionTagAssociationList,Long point,PointLog pointLog,BigDecimal amount,PaymentLog paymentLog);
 	/**
 	 * 追加问题
 	 * @param questionId 问题Id
@@ -97,10 +103,16 @@ public interface QuestionService extends DAO<Question>{
 	 * 修改问题
 	 * @param question 问题
 	 * @param questionTagAssociationList 问题标签关联集合
+	 * @param changePointSymbol 变更积分符号 true：问题增加积分  false：问题减少积分
+	 * @param changePoint 变更积分
+	 * @param changeAmountSymbol 变更金额符号 true：问题增加金额  false：问题减少金额
+	 * @param changeAmount 变更金额
+	 * @param pointLogObject 用户悬赏积分日志
+	 * @param paymentLogObject 用户悬赏金额日志
 	 * @return
 	 */
-	public Integer updateQuestion(Question question,List<QuestionTagAssociation> questionTagAssociationList);
-	
+	public Integer updateQuestion(Question question,List<QuestionTagAssociation> questionTagAssociationList,
+			boolean changePointSymbol,Long changePoint, boolean changeAmountSymbol, BigDecimal changeAmount,Object pointLogObject,Object paymentLogObject);
 	/**
 	 * 修改问题最后回答时间
 	 * @param questionId 问题Id
@@ -150,9 +162,14 @@ public interface QuestionService extends DAO<Question>{
 	/**
 	 * 删除问题
 	 * @param questionId 问题Id
+	 * @param userName 用户名称
+	 * @param point 扣减用户积分
+	 * @param pointLogObject 积分日志
+	 * @param amount 扣减用户预存款
+	 * @param paymentLogObject 支付日志
 	 * @return
 	 */
-	public Integer deleteQuestion(Long questionId);
+	public Integer deleteQuestion(Long questionId,String userName,Long point,Object pointLogObject,BigDecimal amount,Object paymentLogObject);
 	/**
 	 * 根据用户名称集合删除问题
 	 * @param userNameList 用户名称集合

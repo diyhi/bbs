@@ -2308,6 +2308,9 @@ var question_component = Vue.extend({
 				reply: '',
 			},
 			answerEditor : '',//答案富文本编辑器
+			
+			alreadyFavoriteQuestion :false,//用户是否已经收藏问题
+			questionFavoriteCount : 0,//问题用户收藏总数
 		};
 	},
 	
@@ -2379,7 +2382,116 @@ var question_component = Vue.extend({
 			});
 			
 		},
+		//查询用户是否已经收藏问题
+		queryAlreadyFavoriteQuestion : function() {
+			var _self = this;
+			var data = "questionId=" + _self.questionId; //提交参数
+			$.ajax({
+				type : "GET",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "queryAlreadyFavoriteQuestion",
+				data : data,
+				success : function success(result) {
+					if (result != "") {
+						var alreadyFavoriteQuestion = $.parseJSON(result);
+						if (alreadyFavoriteQuestion != null) {
+							_self.alreadyFavoriteQuestion = alreadyFavoriteQuestion;
+						}
+					}
+				}
+			});
+		},
+		//查询问题用户收藏总数
+		queryQuestionFavoriteCount : function() {
+			var _self = this;
+			var data = "questionId=" + _self.questionId; //提交参数
+			$.ajax({
+				type : "GET",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "queryQuestionFavoriteCount",
+				data : data,
+				success : function success(result) {
+					if (result != "") {
+						var count = $.parseJSON(result);
+						if (count != null) {
+							_self.questionFavoriteCount = count;
+						}
+					}
+				}
+			});
+		},
+		//加入收藏夹
+		addFavorite : function(id) {
+			var _self = this;
+			_self.$messagebox.confirm('确定加入收藏夹?').then(function (action) {
+				var parameter = "&questionId=" + id;
 
+				//	alert(parameter);
+				//令牌
+				parameter += "&token=" + _self.$store.state.token;
+				$.ajax({
+					type : "POST",
+					cache : false,
+					async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+					url : "user/control/favorite/add",
+					data : parameter,
+					success : function success(result) {
+						if (result != "") {
+
+							var returnValue = $.parseJSON(result);
+
+							var value_success = "";
+							var value_error = null;
+
+							for (var key in returnValue) {
+								if (key == "success") {
+									value_success = returnValue[key];
+								} else if (key == "error") {
+									value_error = returnValue[key];
+								}
+							}
+
+							//加入成功
+							if (value_success == "true") {
+								_self.$toast({
+									message : "加入成功",
+									duration : 3000,
+									className : "mint-ui-toast",
+								});
+
+								setTimeout(function() {
+									//刷新用户是否已经收藏问题
+									_self.queryAlreadyFavoriteQuestion();
+									
+									//刷新问题用户收藏总数
+									_self.queryQuestionFavoriteCount();
+								}, 3000);
+								
+							} else {
+								//显示错误
+								if (value_error != null) {
+
+
+									var htmlContent = "";
+									var count = 0;
+									for (var errorKey in value_error) {
+										var errorValue = value_error[errorKey];
+										count++;
+										htmlContent += count + ". " + errorValue + "<br>";
+									}
+									_self.$messagebox('提示', htmlContent);
+
+								}
+							}
+						}
+					}
+				});
+			}).catch(function (err){//不捕获 Promise 的异常,若用户点击了取消按钮,会出现警告
+			    console.log(err);
+			});
+		},
 	
 		//查询答案列表
 		queryAnswerList : function() {
@@ -3006,6 +3118,10 @@ var question_component = Vue.extend({
 			this.queryQuestion();
 			//查询答案列表
 			this.queryAnswerList();
+			//查询用户是否已经收藏问题
+			this.queryAlreadyFavoriteQuestion();
+			//查询问题用户收藏总数
+			this.queryQuestionFavoriteCount();
 		},
 		//初始化BScroll滚动插件//this.$refs.addAnswerFormScroll
 		initScroll : function initScroll(ref) {
@@ -3029,6 +3145,10 @@ var addQuestion_component = Vue.extend({
 		return {
 			question: '',//问题
 			questionTitle:'',//发表问题标题
+			questionAmount: '',//悬赏金额
+			questionPoint: '',//悬赏积分
+			maxDeposit: '',//最多允许悬赏金额
+			maxPoint: '',//最多允许悬赏积分
 			questionContent:'',//发表问题内容
 			maxQuestionTagQuantity:0,//标签最多可选数量
 			currentQuestionTagQuantity:0,//标签已选择数量
@@ -3046,6 +3166,8 @@ var addQuestion_component = Vue.extend({
 			captchaValue : '', //发表问题验证码value
 			error : {
 				questionTitle : '',
+				questionAmount: '',
+				questionPoint: '',
 				questionContent: '',
 				tagId: '',
 				captchaValue : '',
@@ -3212,9 +3334,13 @@ var addQuestion_component = Vue.extend({
 											message : "提问题功能未开放",
 											duration : 3000,
 										});
-									}	
+									}
 								}else if (key == "availableTag") {
 									availableTag_value = returnValue[key];
+								}else if (key == "maxDeposit") {
+									_self.maxDeposit = returnValue[key];
+								}else if (key == "maxPoint") {
+									_self.maxPoint = returnValue[key];
 								}else if (key == "maxQuestionTagQuantity") {
 									_self.maxQuestionTagQuantity = parseInt(returnValue[key]);
 								}else if (key == "captchaKey") {
@@ -3270,16 +3396,24 @@ var addQuestion_component = Vue.extend({
 			var _self = this;
 			//清空所有错误
 			_self.error.questionTitle = "";
+			_self.error.questionAmount = "";
+			_self.error.questionPoint = "";
 			_self.error.questionContent = "";
 			_self.error.tagId = "";
 			_self.error.question = "";
 			_self.error.captchaValue = "";
+			
 
 			var parameter = ""; //提交参数
 			if (_self.questionTitle != null && _self.questionTitle != "") {
 				parameter += "&title=" + encodeURIComponent(_self.questionTitle);
 			}
-			
+			if (_self.questionAmount != null && _self.questionAmount != "") {
+				parameter += "&amount=" + encodeURIComponent(_self.questionAmount);
+			}
+			if (_self.questionPoint != null && _self.questionPoint != "") {
+				parameter += "&point=" + encodeURIComponent(_self.questionPoint);
+			}
 			
 			if(_self.selectedTagList != null && _self.selectedTagList.length >0){
 				for(var i=0; i<_self.selectedTagList.length; i++){
@@ -3352,7 +3486,11 @@ var addQuestion_component = Vue.extend({
 									if (error != "") {
 										if (error == "title") {
 											_self.error.questionTitle = value_error[error];
-										}else if (error == "content") {
+										}else if (error == "amount") {
+											_self.error.questionAmount = value_error[error];
+										} else if (error == "point") {
+											_self.error.questionPoint = value_error[error];
+										} else if (error == "content") {
 											_self.error.questionContent = value_error[error];
 										} else if (error == "tagId") {
 											_self.error.tagId = value_error[error];
@@ -3371,6 +3509,8 @@ var addQuestion_component = Vue.extend({
 												window.location.reload();
 											}, 3000);
 										}
+										
+										
 									}
 								}
 							}
@@ -5110,7 +5250,9 @@ var home_component = Vue.extend({
 		}
 	},
 	created : function created() {
-		this.loadHome();
+		//用户中心页由this.scrollQueryUserDynamicList()进行初始化
+		
+	//	this.loadHome();
 		
 		//查询消息
 		this.unreadMessageCount();
@@ -5319,7 +5461,7 @@ var home_component = Vue.extend({
 									className : "mint-ui-toast",
 								});
 								
-								_self.loadHome();
+								_self.loadHome(function (){});
 							//	_self.option.img ='';
 								//清空表单值
 							//	_self.$refs.selectImgFile_ref.value ='';
@@ -5447,7 +5589,7 @@ var home_component = Vue.extend({
 		},
 		
 		//加载用户中心页
-		loadHome : function() {
+		loadHome : function(callback) {
 			var _self = this;
 			var data = "";
 			var userName = getUrlParam("userName");//用户名称
@@ -5475,7 +5617,8 @@ var home_component = Vue.extend({
 								_self.queryFollowerCount();
 							}
 						}
-
+						//回调
+						callback();
 					}
 				}
 			});
@@ -5522,11 +5665,27 @@ var home_component = Vue.extend({
 			this.queryUserDynamicList();
 		},
 		
+		//滚动加载查询动态列表
+		scrollQueryUserDynamicList : function() {
+			var _self = this;
+			//因为v-infinite-scroll标签会在打开页面立即运行，并且动态列表需要用户信息，所以在这里调用查询用户中心页面
+			if(_self.user == ""){
+				_self.loadHome(function (){
+					if(_self.user.userName == _self.$store.state.user.userName){//如果查询用户自已的动态，则不显示
+						return;
+					}
+					
+					_self.queryUserDynamicList();
+				});
+			}
+		},
+		
+		
 		//查询动态列表
 		queryUserDynamicList : function() {
 			var _self = this;
 			
-			if (_self.currentpage < _self.totalpage) {
+			if (_self.user.userName != undefined && _self.currentpage < _self.totalpage) {
 				//先改总页数为0，避免请求为空时死循环
 				_self.totalpage = 0;
 				_self.loading = true;
@@ -5771,7 +5930,6 @@ var home_component = Vue.extend({
 		}
 	}
 });
-
 
 //我的话题
 var topicList_component = Vue.extend({

@@ -114,6 +114,10 @@ public class SystemSetting implements Serializable{
 	/** 解锁话题隐藏内容平台分成比例 默认0% **/
 	private Integer topicUnhidePlatformShareProportion = 0;
 	
+	/** 悬赏问答平台分成比例 默认0% **/
+	private Integer questionRewardPlatformShareProportion = 0;
+	
+	
 	
 	/** 文件防盗链密钥 **/
 	@Column(length=190)
@@ -606,6 +610,14 @@ public class SystemSetting implements Serializable{
 
 	public void setMaxQuestionTagQuantity(Integer maxQuestionTagQuantity) {
 		this.maxQuestionTagQuantity = maxQuestionTagQuantity;
+	}
+
+	public Integer getQuestionRewardPlatformShareProportion() {
+		return questionRewardPlatformShareProportion;
+	}
+
+	public void setQuestionRewardPlatformShareProportion(Integer questionRewardPlatformShareProportion) {
+		this.questionRewardPlatformShareProportion = questionRewardPlatformShareProportion;
 	}
 
 

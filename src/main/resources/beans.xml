@@ -448,6 +448,11 @@ http://www.springframework.org/schema/task http://www.springframework.org/schema
         <!-- 支付日志分表数量 -->
         <property name="tableQuantity" value="4" />    
     </bean>
+    <!-- 创建问题收藏配置 -->
+    <bean id="questionFavoriteConfig" class="cms.web.action.favorite.QuestionFavoriteConfig" >
+        <!-- 问题收藏分表数量 -->
+        <property name="tableQuantity" value="4" />    
+    </bean>
     
    	<!-- 让普通的java类获取spring 的bean配置 -->
    	<bean id="SpringConfigTool" class="cms.utils.SpringConfigTool"></bean>

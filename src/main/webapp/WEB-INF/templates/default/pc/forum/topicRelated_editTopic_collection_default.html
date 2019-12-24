@@ -37,12 +37,13 @@
 						<input type="hidden" id="token" name="token" value="${token!}">
 						
 						<div class="topicSubmit">
-							<!-- 
-				        	<span class="submitButton"><INPUT type="button" value="提交" onClick="javascript:sureSubmit(this.form)"></span>  -->
-				        	<span class="submitButton"><INPUT type="button" value="提交" onClick="javascript:ajax_sureSubmit('${identificationNumber}')"></span>
-				        </div>
-						
-						
+							<span class="submitButton-box" >
+								<button id="${identificationNumber}_submitForm" type="button" class="submitButton" onClick="javascript:ajax_sureSubmit('${identificationNumber}')">提交</button>
+							</span>
+							<span class="cancelButton-box" >
+								<button type="button" class="cancelButton" onClick="javascript:window.location.href='thread?topicId=${url_topicId}'">取消</button>
+							</span>
+						</div>
 						<#-- identificationNumber:识别号：用来区别每次请求 -->
 						<#-- 验证码 -->
 						<#if returnValue['captchaKey'] != "">	
@@ -132,6 +133,8 @@
 						} 
 						//Ajax方式提交
 						function ajax_sureSubmit(identificationNumber){
+							//按钮设置 disabled="disabled"
+							document.getElementById(identificationNumber+"_submitForm").disabled=true;
 							//清空所有错误提示
 							var error_tag = getElementsByName_pseudo("span", "error");
 							for(var i = 0;i < error_tag.length; i++) {
@@ -183,16 +186,14 @@
 										if(returnValue == "success"){
 						        			if(data[returnValue] == "true"){
 						        				//需引入layer
-						        				layer.open({
-												    type: 1, 
-												    title:"提示",
-												    content: "<div style='line-height: 36px; font-size: 15px;text-align:center; margin-left: 8px;margin-right: 8px;'>提交成功</div>", 
-												    area: ['260px', '120px'],//宽高
-													end: function(layero, index){
-														//刷新页面
-						        						document.location.reload();
+						        				layer.msg('提交成功,3秒后跳转到话题内容页', 
+													{
+													  time: 3000 //3秒关闭（如果不配置，默认是3秒）
+													},function(){//关闭后的操作
+														//跳转
+														window.location.href = "thread?topicId="+getUrlParam("topicId");
 													}
-												});
+												);
 						        				
 						        			}
 						        		}else if(returnValue == "error"){
@@ -206,6 +207,8 @@
 						        				}
 						        				
 						        			}
+						        			//按钮设置 disabled="disabled"
+											document.getElementById(identificationNumber+"_submitForm").disabled=false;
 						        		}else if(returnValue == "captchaKey"){//显示验证码
 				        					
 											var captchaKey = data[returnValue];
@@ -222,6 +225,9 @@
 						        	}
 								},
 									"user/control/topic/edit?timestamp=" + new Date().getTime(), true,parameter);
+							}else{
+								//按钮设置 disabled="disabled"
+								document.getElementById(identificationNumber+"_submitForm").disabled=false;
 							}
 						} 
 						

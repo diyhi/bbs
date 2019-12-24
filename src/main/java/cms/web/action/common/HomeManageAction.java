@@ -95,6 +95,7 @@ import cms.service.user.UserGradeService;
 import cms.service.user.UserRoleService;
 import cms.service.user.UserService;
 import cms.utils.Base64;
+import cms.utils.FileUtil;
 import cms.utils.HtmlEscape;
 import cms.utils.IpAddress;
 import cms.utils.JsonUtils;
@@ -108,9 +109,9 @@ import cms.utils.WebUtil;
 import cms.utils.threadLocal.AccessUserThreadLocal;
 import cms.web.action.AccessSourceDeviceManage;
 import cms.web.action.CSRFTokenManage;
-import cms.web.action.FileManage;
 import cms.web.action.TextFilterManage;
 import cms.web.action.favorite.FavoriteManage;
+import cms.web.action.fileSystem.FileManage;
 import cms.web.action.follow.FollowManage;
 import cms.web.action.follow.FollowerManage;
 import cms.web.action.like.LikeManage;
@@ -122,7 +123,6 @@ import cms.web.action.question.AnswerManage;
 import cms.web.action.question.QuestionManage;
 import cms.web.action.setting.SettingManage;
 import cms.web.action.sms.SmsManage;
-import cms.web.action.thumbnail.ThumbnailManage;
 import cms.web.action.topic.CommentManage;
 import cms.web.action.topic.TopicManage;
 import cms.web.action.user.RoleAnnotation;
@@ -142,7 +142,7 @@ public class HomeManageAction {
 	@Resource UserGradeService userGradeService;
 	
 	@Resource AccessSourceDeviceManage accessSourceDeviceManage;
-	
+	@Resource FileManage fileManage;
 	
 	@Resource CaptchaManage captchaManage;
 	
@@ -151,7 +151,6 @@ public class HomeManageAction {
 	@Resource UserCustomService userCustomService;
 	@Resource CommentService commentService;
 	
-	@Resource FileManage fileManage;
 	@Resource TagService tagService;
 	@Resource TopicService topicService;
 	@Resource TextFilterManage textFilterManage;
@@ -174,7 +173,6 @@ public class HomeManageAction {
 	
 	@Resource OAuthManage oAuthManage;
 	
-	@Resource ThumbnailManage thumbnailManage;
 	
 	@Resource FavoriteService favoriteService;
 	
@@ -1402,12 +1400,12 @@ public class HomeManageAction {
 						fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
 
 						//生成100*100缩略图
-						thumbnailManage.createImage(imgFile.getInputStream(),PathUtil.path()+File.separator+pathDir_100+newFileName,"png",100,100);
+						fileManage.createImage(imgFile.getInputStream(),PathUtil.path()+File.separator+pathDir_100+newFileName,"png",100,100);
 						
 					}
 				}else{//图片类型
 					//验证文件类型
-					boolean authentication = fileManage.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
+					boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
 			
 					if(authentication){
 						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
@@ -1426,7 +1424,7 @@ public class HomeManageAction {
 			            int srcHeight = bufferImage.getHeight();  
 						
 						//取得文件后缀
-						String suffix = fileManage.getExtension(fileName).toLowerCase();
+						String suffix = FileUtil.getExtension(fileName).toLowerCase();
 						
 						//构建文件名称
 						newFileName = UUIDUtil.getUUID32()+ "." + suffix;
@@ -1440,15 +1438,15 @@ public class HomeManageAction {
 								fileManage.writeFile(pathDir_100, newFileName,imgFile.getBytes());
 							}else{
 								//生成100*100缩略图
-								thumbnailManage.createImage(imgFile.getInputStream(),PathUtil.path()+File.separator+pathDir_100+newFileName,suffix,100,100);
+								fileManage.createImage(imgFile.getInputStream(),PathUtil.path()+File.separator+pathDir_100+newFileName,suffix,100,100);
 								
 							}
 						}else{
 							//生成200*200缩略图
-							thumbnailManage.createImage(imgFile.getInputStream(),PathUtil.path()+File.separator+pathDir+newFileName,suffix,x,y,width,height,200,200);
+							fileManage.createImage(imgFile.getInputStream(),PathUtil.path()+File.separator+pathDir+newFileName,suffix,x,y,width,height,200,200);
 
 							//生成100*100缩略图
-							thumbnailManage.createImage(imgFile.getInputStream(),PathUtil.path()+File.separator+pathDir_100+newFileName,suffix,x,y,width,height,100,100);   
+							fileManage.createImage(imgFile.getInputStream(),PathUtil.path()+File.separator+pathDir_100+newFileName,suffix,x,y,width,height,100,100);   
 						}		
 						
 					}else{
@@ -3511,6 +3509,65 @@ public class HomeManageAction {
 		}
 	}
 	
+	/**
+	 * 问题收藏列表
+	 * @param model
+	 * @param pageForm
+	 * @param questionId 问题Id
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/user/control/questionFavoriteList",method=RequestMethod.GET) 
+	public String questionFavoriteList(ModelMap model,PageForm pageForm,Long questionId,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+		
+		String dirName = templateService.findTemplateDir_cache();
+		
+		
+		String accessPath = accessSourceDeviceManage.accessDevices(request);
+	   
+		//调用分页算法代码
+		PageView<Favorites> pageView = new PageView<Favorites>(settingService.findSystemSetting_cache().getForestagePageNumber(),pageForm.getPage(),10,request.getRequestURI(),request.getQueryString());
+		
+		//获取登录用户
+	  	AccessUser accessUser = AccessUserThreadLocal.get();
+	  	if(questionId != null && questionId > 0L){
+	  		Question questionInfo = questionManage.query_cache_findById(questionId);//查询缓存
+	  		if(questionInfo != null && questionInfo.getUserName().equals(accessUser.getUserName())){
+	  			//当前页
+	  			int firstIndex = (pageForm.getPage()-1)*pageView.getMaxresult();
+	  			
+	  			
+	  			QueryResult<Favorites> qr = favoriteService.findFavoritePageByQuestionId(firstIndex,pageView.getMaxresult(),questionId);
+	  			if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
+	  				for(Favorites favorites : qr.getResultlist()){
+	  					Question question = questionManage.query_cache_findById(favorites.getQuestionId());//查询缓存
+	  					if(question != null){
+	  						favorites.setQuestionTitle(question.getTitle());
+	  					}
+	  				}
+	  			}
+	  			//将查询结果集传给分页List
+	  			pageView.setQueryResult(qr);
+	  		}
+	  	}
+	  	
+	  	
+		
+		
+		if(isAjax){
+			WebUtil.writeToWeb(JsonUtils.toJSONString(pageView), "json", response);
+			return null;
+		}else{
+			model.addAttribute("pageView", pageView);
+			return "templates/"+dirName+"/"+accessPath+"/questionFavoriteList";	
+		}
+	}
+	
 	
 	/**
 	 * 收藏夹列表
@@ -3542,10 +3599,18 @@ public class HomeManageAction {
 		QueryResult<Favorites> qr = favoriteService.findFavoriteByUserId(accessUser.getUserId(),accessUser.getUserName(),firstIndex,pageView.getMaxresult());
 		if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
 			for(Favorites favorites : qr.getResultlist()){
-				Topic topic = topicManage.queryTopicCache(favorites.getTopicId());//查询缓存
-				if(topic != null){
-					favorites.setTopicTitle(topic.getTitle());
+				if(favorites.getModule().equals(10)){//话题
+					Topic topic = topicManage.queryTopicCache(favorites.getTopicId());//查询缓存
+					if(topic != null){
+						favorites.setTopicTitle(topic.getTitle());
+					}
+				}else if(favorites.getModule().equals(20)){//问题
+					Question question = questionManage.query_cache_findById(favorites.getQuestionId());//查询缓存
+					if(question != null){
+						favorites.setQuestionTitle(question.getTitle());
+					}
 				}
+				
 			}
 		}
 		//将查询结果集传给分页List
@@ -3598,13 +3663,20 @@ public class HomeManageAction {
 	  	Favorites favorites = null;
 	  	//话题收藏Id
 	  	String topicFavoriteId = null;
+	  	//问题收藏Id
+	  	String questionFavoriteId = null;
   		if(favoriteId == null || "".equals(favoriteId.trim())){
   			error.put("favorite", ErrorView._1530.name());//收藏Id不存在
   		}else{
   			favorites  = favoriteService.findById(favoriteId.trim());
   			if(favorites != null){
   				if(favorites.getUserName().equals(accessUser.getUserName())){
-  					topicFavoriteId = favoriteManage.createTopicFavoriteId(favorites.getTopicId(), accessUser.getUserId());
+  					if(favorites.getModule().equals(10)){//话题模块
+  						topicFavoriteId = favoriteManage.createTopicFavoriteId(favorites.getTopicId(), accessUser.getUserId());
+  					}else if(favorites.getModule().equals(20)){//问题模块
+  						questionFavoriteId = favoriteManage.createQuestionFavoriteId(favorites.getQuestionId(), accessUser.getUserId());
+  					}
+  					
   				}else{
   					error.put("favorite", ErrorView._1560.name());//本收藏不属于当前用户
   				}
@@ -3614,13 +3686,24 @@ public class HomeManageAction {
   		}
   		
 		if(error.size() == 0){
-			int i = favoriteService.deleteFavorite(favoriteId.trim(),topicFavoriteId);
-			if(i == 0){
-				error.put("favorite", ErrorView._1540.name());//删除收藏失败
+			if(favorites.getModule().equals(10)){//话题模块
+				int i = favoriteService.deleteFavorite(favoriteId.trim(),topicFavoriteId, null);
+				if(i == 0){
+					error.put("favorite", ErrorView._1540.name());//删除收藏失败
+				}
+				//删除收藏缓存
+				favoriteManage.delete_cache_findTopicFavoriteById(topicFavoriteId);
+				favoriteManage.delete_cache_findFavoriteCountByTopicId(favorites.getTopicId());
+			}else if(favorites.getModule().equals(20)){//问题模块
+				int i = favoriteService.deleteFavorite(favoriteId.trim(),null,questionFavoriteId);
+				if(i == 0){
+					error.put("favorite", ErrorView._1540.name());//删除收藏失败
+				}
+				//删除收藏缓存
+				favoriteManage.delete_cache_findQuestionFavoriteById(questionFavoriteId);
+				favoriteManage.delete_cache_findFavoriteCountByQuestionId(favorites.getQuestionId());
 			}
-			//删除收藏缓存
-			favoriteManage.delete_cache_findTopicFavoriteById(topicFavoriteId);
-			favoriteManage.delete_cache_findFavoriteCountByTopicId(favorites.getTopicId());
+			
 		}
 		
 		Map<String,String> returnError = new HashMap<String,String>();//错误

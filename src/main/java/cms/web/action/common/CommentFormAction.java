@@ -47,6 +47,7 @@ import cms.service.topic.CommentService;
 import cms.service.topic.TopicService;
 import cms.service.user.UserService;
 import cms.utils.Base64;
+import cms.utils.FileUtil;
 import cms.utils.IpAddress;
 import cms.utils.JsonUtils;
 import cms.utils.RefererCompare;
@@ -55,8 +56,8 @@ import cms.utils.WebUtil;
 import cms.utils.threadLocal.AccessUserThreadLocal;
 import cms.web.action.AccessSourceDeviceManage;
 import cms.web.action.CSRFTokenManage;
-import cms.web.action.FileManage;
 import cms.web.action.TextFilterManage;
+import cms.web.action.fileSystem.FileManage;
 import cms.web.action.filterWord.SensitiveWordFilterManage;
 import cms.web.action.follow.FollowManage;
 import cms.web.action.message.RemindManage;
@@ -78,7 +79,6 @@ public class CommentFormAction {
 	@Resource TemplateService templateService;
 	
 	@Resource CaptchaManage captchaManage;
-	@Resource FileManage fileManage;
 	@Resource CommentService commentService;
 	@Resource AccessSourceDeviceManage accessSourceDeviceManage;
 	
@@ -99,7 +99,7 @@ public class CommentFormAction {
 	@Resource RemindService remindService;
 	@Resource UserDynamicManage userDynamicManage;
 	@Resource FollowManage followManage;
-	
+	@Resource FileManage fileManage;
 	@Resource UserRoleManage userRoleManage;
 	
 	/**
@@ -376,7 +376,7 @@ public class CommentFormAction {
 				for(String imageName :imageNameList){
 					if(imageName != null && !"".equals(imageName.trim())){
 						//如果验证不是当前用户上传的文件，则不删除锁
-						 if(!topicManage.getFileNumber(fileManage.getBaseName(imageName.trim())).equals(fileNumber)){
+						 if(!topicManage.getFileNumber(FileUtil.getBaseName(imageName.trim())).equals(fileNumber)){
 							 continue;
 						 }
 						 fileManage.deleteLock("file"+File.separator+"comment"+File.separator+"lock"+File.separator,imageName.replaceAll("/","_"));
@@ -519,7 +519,7 @@ public class CommentFormAction {
 							long imageSize = editorSiteObject.getImageSize();
 
 							//验证文件类型
-							boolean authentication = fileManage.validateFileSuffix(file.getOriginalFilename(),imageFormat);
+							boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),imageFormat);
 							
 							if(authentication ){
 								if(size/1024 <= imageSize){
@@ -535,7 +535,7 @@ public class CommentFormAction {
 									//生成锁文件保存目录
 									fileManage.createFolder(lockPathDir);
 									//生成锁文件
-									fileManage.newFile(lockPathDir+topicId+"_"+newFileName);
+									fileManage.addLock(lockPathDir,topicId+"_"+newFileName);
 									//保存文件
 									fileManage.writeFile(pathDir, newFileName,file.getBytes());
 									
@@ -896,7 +896,7 @@ public class CommentFormAction {
 				for(String imageName :imageNameList){
 					if(imageName != null && !"".equals(imageName.trim())){
 						//如果验证不是当前用户上传的文件，则不删除锁
-						 if(!topicManage.getFileNumber(fileManage.getBaseName(imageName.trim())).equals(fileNumber)){
+						 if(!topicManage.getFileNumber(FileUtil.getBaseName(imageName.trim())).equals(fileNumber)){
 							 continue;
 						 }
 						 fileManage.deleteLock("file"+File.separator+"comment"+File.separator+"lock"+File.separator,imageName.replaceAll("/","_"));

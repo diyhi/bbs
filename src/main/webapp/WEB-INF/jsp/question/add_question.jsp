@@ -8,15 +8,15 @@
 <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <LINK href="backstage/css/list.css" type="text/css" rel="stylesheet">
 <LINK href="backstage/css/table.css" type="text/css" rel="stylesheet">
+<script language="JavaScript" src="backstage/jquery/jquery.min.js"></script>
 <link href="backstage/kindeditor/themes/default/default.css" rel="stylesheet"/>
-<link href="backstage/kindeditor/plugins/hide/hide.css" rel="stylesheet"/>
 <script charset="utf-8" src="backstage/kindeditor/kindeditor-min.js"></script>
 <script charset="utf-8" src="backstage/kindeditor/lang/zh-CN.js"></script>
 
 <script type="text/javascript" src="backstage/js/ajax.js" language="javascript" ></script>
 <script type="text/javascript" src="backstage/js/Tool.js" charset="UTF-8"></script>
 <script type="text/javascript" src="backstage/js/json3.js"></script>
-<script language="JavaScript" src="backstage/jquery/jquery.min.js"></script>
+
 <link rel="stylesheet" href="backstage/layer/skin/layer.css"  type="text/css" />
 
 
@@ -241,6 +241,13 @@ function sureSubmit(objForm){
 		<SPAN class="span-text">${error["title"]}</SPAN>
     </TD>
    </TR>
+   <TR>
+  	<TD class="t-label t-label-h" width="12%">积分：</TD>
+    <TD class="t-content" width="88%">
+    	<input type="text" class="form-text" name="point" size="10" maxlength="8" value="${question.point}">
+		<SPAN class="span-text">${error["point"]}</SPAN>
+    </TD>
+   </TR>
   	<TR>
 	  	<TD class="t-label t-label-h" width="12%">标签：</TD>
 	    <TD class="t-content" width="88%">
@@ -326,7 +333,7 @@ function initKindEditor(){
         'superscript', 'clearhtml', 'quickformat', 'selectall', '|', 'fullscreen', 
         'formatblock', 'fontname', 'fontsize', '/', 'forecolor', 'hilitecolor', 'bold',
         'italic', 'underline', 'strikethrough', 'lineheight', 'removeformat', '|', 'image', 'multiimage',
-        'flash', 'media', 'insertfile','emoticons','baidumap', 'table', 'hr',   'pagebreak',
+         'media', 'insertfile','emoticons','baidumap', 'table', 'hr',   'pagebreak',
          'link', 'unlink'],
 			afterChange : function() {
 				this.sync();

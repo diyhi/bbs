@@ -595,6 +595,24 @@ filter:alpha(opacity: 0);
 .appendQuestionModule .appendBox .appendContent img{max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;}
 
 
+.rewardModule{
+	background: #fcf3e6;
+	border-radius:3px;
+	margin: 6px 8px;
+}
+.rewardModule .rewardInfo{
+	
+	padding: 10px 10px;color: #e2b46d;font-size: 14px;
+}
+.rewardModule .rewardInfo .symbol{
+	font-family:Arial;font-weight:normal; vertical-align: middle; display:inline-block;margin-left: 5px;color: #cca558;
+}
+.rewardModule .rewardInfo .amount{
+	margin-left: 1px;color: #cca558; margin-right: 5px;font-weight: 700;font-size: 16px;
+}
+.rewardModule .rewardInfo .point{
+	color: #cca558; margin-right: 5px;font-weight: 700;font-size: 16px;
+}
 
 
 /* 编辑器表格 */

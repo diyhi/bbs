@@ -409,6 +409,7 @@ function initConfig(){
 	
 	t=config.addtitle('平台收益管理','运营管理',1);
 	config.additem('解锁话题隐藏内容分成',t,'${config:url(pageContext.request)}control/topicUnhidePlatformShare/list${config:suffix()}');//解锁话题隐藏内容平台分成
+	config.additem('问答悬赏平台分成',t,'${config:url(pageContext.request)}control/questionRewardPlatformShare/list${config:suffix()}');
 	
 
 

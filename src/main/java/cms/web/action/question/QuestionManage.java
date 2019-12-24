@@ -28,9 +28,10 @@ import cms.service.question.AnswerService;
 import cms.service.question.QuestionService;
 import cms.service.staff.StaffService;
 import cms.service.user.UserService;
+import cms.utils.FileUtil;
 import cms.utils.JsonUtils;
-import cms.web.action.FileManage;
 import cms.web.action.TextFilterManage;
+import cms.web.action.fileSystem.FileManage;
 import cms.web.action.setting.SettingManage;
 /**
  * 问题管理
@@ -44,9 +45,9 @@ public class QuestionManage {
 	@Resource QuestionService questionService;
 	@Resource StaffService staffService;
 	@Resource UserService userService;
-	@Resource FileManage fileManage;
 	@Resource SettingManage settingManage;
 	@Resource AnswerService answerService;
+	@Resource FileManage fileManage;
 	
 	//key: 问题Id value:展示次数
     private AtomicLongMap<Long> countMap = AtomicLongMap.create();
@@ -228,20 +229,21 @@ public class QuestionManage {
 							
 							
 							 //如果验证不是当前用户上传的文件，则不删除
-							 if(!questionManage.getFileNumber(fileManage.getBaseName(filePath.trim())).equals(fileNumber)){
+							 if(!questionManage.getFileNumber(FileUtil.getBaseName(filePath.trim())).equals(fileNumber)){
 								 continue;
 							 }
 							
 							//替换路径中的..号
-							filePath = fileManage.toRelativePath(filePath);
-							
+							filePath = FileUtil.toRelativePath(filePath);
+							filePath = FileUtil.toSystemPath(filePath);
 							//删除旧路径文件
 							Boolean state = fileManage.deleteFile(filePath);
 							if(state != null && state == false){
 								 //替换指定的字符，只替换第一次出现的
-								filePath = StringUtils.replaceOnce(filePath, "file/question/", "");
+								filePath = StringUtils.replaceOnce(filePath, "file"+File.separator+"question"+File.separator, "");
+								
 								//创建删除失败文件
-								fileManage.failedStateFile("file"+File.separator+"question"+File.separator+"lock"+File.separator+filePath.replaceAll("/","_"));
+								fileManage.failedStateFile("file"+File.separator+"question"+File.separator+"lock"+File.separator+FileUtil.toUnderline(filePath));
 							}
 						}
 						
@@ -284,24 +286,23 @@ public class QuestionManage {
 					if(imageNameList != null && imageNameList.size() >0){
 						for(String imagePath : imageNameList){
 							//如果验证不是当前用户上传的文件，则不删除锁
-							 if(!questionManage.getFileNumber(fileManage.getBaseName(imagePath.trim())).equals(fileNumber)){
+							 if(!questionManage.getFileNumber(FileUtil.getBaseName(imagePath.trim())).equals(fileNumber)){
 								 continue;
 							 }
 							
 							
 							//替换路径中的..号
-							imagePath = fileManage.toRelativePath(imagePath);
-							//替换路径分割符
-							imagePath = StringUtils.replace(imagePath, "/", File.separator);
+							imagePath = FileUtil.toRelativePath(imagePath);
+							
+							imagePath = FileUtil.toSystemPath(imagePath);
 							
 							Boolean state = fileManage.deleteFile(imagePath);
 							if(state != null && state == false){	
 								//替换指定的字符，只替换第一次出现的
 								imagePath = StringUtils.replaceOnce(imagePath, "file"+File.separator+"answer"+File.separator, "");
-								imagePath = StringUtils.replace(imagePath, File.separator, "_");//替换所有出现过的字符
 								
 								//创建删除失败文件
-								fileManage.failedStateFile("file"+File.separator+"answer"+File.separator+"lock"+File.separator+imagePath);
+								fileManage.failedStateFile("file"+File.separator+"answer"+File.separator+"lock"+File.separator+FileUtil.toUnderline(imagePath));
 							
 							}
 						}

@@ -137,9 +137,9 @@ function doHandleMonth(month){
 <TABLE class="t-list-table" cellSpacing="1" cellPadding="0" width="100%" border="0">
   <THEAD class="t-list-thead">
   <TR>
-	<TH>解锁话题的用户名称</TH>
 	<TH>话题标题</TH>
     <TH>发布话题的用户名称</TH>
+    <TH>解锁话题的用户名称</TH>
     <TH>发布话题的用户分成流水号</TH>
     <TH>平台分成比例</TH>
     <TH>总金额</TH>
@@ -149,14 +149,14 @@ function doHandleMonth(month){
   <TBODY class="t-list-tbody" align="center">
    <c:forEach items="${pageView.records}" var="entry">
 	  <TR >
-	    <TD width="13%">
-	    	${entry.unlockUserName}
-	    </TD>
 	     <TD width="13%">
 	    	${entry.topicTitle}
 	    </TD>
 	    <TD width="13%">
 	    	${entry.postUserName}<c:if test="${entry.staff}"><span style="color: green;"> 员工</span></c:if>
+	    </TD>
+	    <TD width="13%">
+	    	${entry.unlockUserName}
 	    </TD>
 	    <TD width="19%">
 	    	${entry.postUserShareRunningNumber}

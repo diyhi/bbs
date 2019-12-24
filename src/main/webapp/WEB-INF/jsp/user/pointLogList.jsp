@@ -41,14 +41,17 @@
 	    	<c:if test="${entry.module == 700}">提交问题</c:if>
 	    	<c:if test="${entry.module == 800}">提交答案</c:if>
 	    	<c:if test="${entry.module == 900}">提交答案回复</c:if>
+	    	<c:if test="${entry.module == 1000}">悬赏积分</c:if>
+	    	<c:if test="${entry.module == 1100}">采纳答案</c:if>
+	    	<c:if test="${entry.module == 1200}">调整赏金</c:if>
 	    </TD>
 	    <TD width="15%">
 	    	${entry.userName}
 	    </TD>
 	    
 	    <TD width="20%" >
-	    	<c:if test="${entry.operationUserType ==0 }">[系统]</c:if>
-	    	<c:if test="${entry.operationUserType ==1 }">[员工]</c:if>
+	    	<c:if test="${entry.operationUserType ==0 }"><span style="color: orange;">[系统]</span></c:if>
+	    	<c:if test="${entry.operationUserType ==1 }"><span style="color: green;">[员工]</span></c:if>
 	    	<c:if test="${entry.operationUserType ==2 }">[会员]</c:if>
 	    	${entry.operationUserName}
 	    </TD>

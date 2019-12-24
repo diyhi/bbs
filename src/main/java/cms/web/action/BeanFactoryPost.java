@@ -264,5 +264,22 @@ public class BeanFactoryPost implements BeanFactoryPostProcessor{
 				}	
 			}
 		}
+		
+		
+		BeanDefinition questionFavorite_bd = beanFactory.getBeanDefinition("questionFavoriteConfig");
+		if(questionFavorite_bd != null){
+			MutablePropertyValues mutablePropertyValues = questionFavorite_bd.getPropertyValues();
+			TypedStringValue typedStringValue = (TypedStringValue)mutablePropertyValues.getPropertyValue("tableQuantity").getValue();
+
+			//问题收藏分表数量
+			Integer tableQuantity = Integer.parseInt(typedStringValue.getValue());
+			if(tableQuantity >1){
+				for(int i =1; i<tableQuantity; i++){
+					
+					//初始化问题收藏bean
+					CreateBean.createQuestionFavoriteBean(i);
+				}	
+			}
+		}
 	}
 }

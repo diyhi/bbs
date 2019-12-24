@@ -2,7 +2,7 @@ package cms.web.action.quartz;
 
 import javax.annotation.Resource;
 
-import cms.web.action.FileManage;
+import cms.web.action.fileSystem.FileManage;
 import cms.web.action.lucene.QuestionIndexManage;
 import cms.web.action.lucene.TopicIndexManage;
 import cms.web.action.thumbnail.ThumbnailManage;

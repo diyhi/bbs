@@ -21,12 +21,13 @@ import cms.bean.template.Layout;
 import cms.bean.template.Templates;
 import cms.service.template.TemplateService;
 import cms.utils.Coding;
+import cms.utils.FileUtil;
 import cms.utils.JsonUtils;
 import cms.utils.PathUtil;
 import cms.utils.RedirectPath;
 import cms.utils.Verification;
-import cms.web.action.FileManage;
 import cms.web.action.SystemException;
+import cms.web.action.fileSystem.localImpl.LocalFileManage;
 import cms.web.action.template.TemplateManage;
 
 import org.springframework.stereotype.Controller;
@@ -35,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 
 
 /**
@@ -47,7 +49,7 @@ public class ForumCodeManageAction {
 	@Resource ForumCodeManage forumCodeManage;
 	@Resource TemplateService templateService;//通过接口引用代理返回的对象
 	@Resource TemplateManage templateManage;
-	@Resource FileManage fileManage;
+	@Resource LocalFileManage localFileManage;
 	
 	/**
 	 * 版块代码管理    添加
@@ -145,12 +147,12 @@ public class ForumCodeManageAction {
 			String pc_path = "WEB-INF"+File.separator+"templates"+File.separator+dirName+File.separator+"pc"+File.separator+"forum"+File.separator;
 			
 			//创建文件并将注释写入模板文件
-			fileManage.writeStringToFile(pc_path+fileName,"<#-- "+(remark != null && remark != "" ? " "+remark+"" :"")+" -->","utf-8",false);
+			FileUtil.writeStringToFile(pc_path+fileName,"<#-- "+(remark != null && remark != "" ? " "+remark+"" :"")+" -->","utf-8",false);
 			
 			String wap_path = "WEB-INF"+File.separator+"templates"+File.separator+dirName+File.separator+"wap"+File.separator+"forum"+File.separator;
 			
 			//创建文件并将注释写入模板文件
-			fileManage.writeStringToFile(wap_path+fileName,"<#-- "+(remark != null && remark != "" ? " "+remark+"" :"")+" -->","utf-8",false);
+			FileUtil.writeStringToFile(wap_path+fileName,"<#-- "+(remark != null && remark != "" ? " "+remark+"" :"")+" -->","utf-8",false);
 			
 			
 			returnJson.put("success", true);
@@ -264,7 +266,7 @@ public class ForumCodeManageAction {
 			if(pc_oldFile.renameTo(pc_newFile)){
 			
 				//修改备注
-				fileManage.writeStringToFile(pc_newPath,forumCodeManage.read(PathUtil.path()+File.separator+pc_newPath, remark),"utf-8", false);
+				FileUtil.writeStringToFile(pc_newPath,forumCodeManage.read(PathUtil.path()+File.separator+pc_newPath, remark),"utf-8", false);
 				
 				
 				//修改移动端
@@ -275,7 +277,7 @@ public class ForumCodeManageAction {
 				File wap_oldFile =new File(wap_oldPath);   
 				if(wap_oldFile.renameTo(wap_newFile)){
 					//修改备注
-					fileManage.writeStringToFile(wap_newPath,forumCodeManage.read(PathUtil.path()+File.separator+wap_newPath, remark),"utf-8", false);
+					FileUtil.writeStringToFile(wap_newPath,forumCodeManage.read(PathUtil.path()+File.separator+wap_newPath, remark),"utf-8", false);
 					
 				}
 				
@@ -302,9 +304,9 @@ public class ForumCodeManageAction {
 		Map<String,Object> returnJson = new HashMap<String,Object>();
 		if(fileName != null && !"".equals(fileName.trim())){
 			String pc_path = "WEB-INF"+File.separator+"templates"+File.separator+dirName+File.separator+"pc"+File.separator+"forum"+File.separator+fileName+".html";
-			fileManage.deleteFile(pc_path);
+			localFileManage.deleteFile(pc_path);
 			String wap_path = "WEB-INF"+File.separator+"templates"+File.separator+dirName+File.separator+"wap"+File.separator+"forum"+File.separator+fileName+".html";
-			fileManage.deleteFile(wap_path);
+			localFileManage.deleteFile(wap_path);
 			returnJson.put("success", true);
 		}
 		return JsonUtils.toJSONString(returnJson);
@@ -381,8 +383,8 @@ public class ForumCodeManageAction {
 			String pc_path = "WEB-INF"+File.separator+"templates"+File.separator+dirName+File.separator+"pc"+File.separator+"forum"+File.separator+module+".html";
 			String wap_path = "WEB-INF"+File.separator+"templates"+File.separator+dirName+File.separator+"wap"+File.separator+"forum"+File.separator+module+".html";
 			
-			fileManage.writeStringToFile(pc_path,pc_code,"utf-8", false);
-			fileManage.writeStringToFile(wap_path,wap_code,"utf-8", false);
+			FileUtil.writeStringToFile(pc_path,pc_code,"utf-8", false);
+			FileUtil.writeStringToFile(wap_path,wap_code,"utf-8", false);
 			
 		}else{
 			throw new SystemException("参数不能为空！");
@@ -492,8 +494,8 @@ public class ForumCodeManageAction {
 				String pc_path = "WEB-INF"+File.separator+"templates"+File.separator+dirName+File.separator+"pc"+File.separator+"forum"+File.separator+forum.getModule()+".html";
 				String wap_path = "WEB-INF"+File.separator+"templates"+File.separator+dirName+File.separator+"wap"+File.separator+"forum"+File.separator+forum.getModule()+".html";
 				
-				fileManage.writeStringToFile(pc_path,pc_code,"utf-8", false);
-				fileManage.writeStringToFile(wap_path,wap_code,"utf-8", false);
+				FileUtil.writeStringToFile(pc_path,pc_code,"utf-8", false);
+				FileUtil.writeStringToFile(wap_path,wap_code,"utf-8", false);
 			}else{
 				throw new SystemException("版块不存在！");
 			}

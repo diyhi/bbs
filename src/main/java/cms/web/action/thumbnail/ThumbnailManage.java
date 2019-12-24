@@ -20,8 +20,9 @@ import javax.annotation.Resource;
 import net.coobird.thumbnailator.Thumbnails;
 import cms.bean.thumbnail.Thumbnail;
 import cms.bean.topic.ImageInfo;
+import cms.utils.FileUtil;
 import cms.utils.PathUtil;
-import cms.web.action.FileManage;
+import cms.web.action.fileSystem.localImpl.LocalFileManage;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -44,9 +45,7 @@ import com.alibaba.simpleimage.util.ImageReadHelper;
 public class ThumbnailManage {
 	private static final Logger logger = LogManager.getLogger(ThumbnailManage.class);
 	
-	
-	@Resource FileManage fileManage;
-	
+	@Resource LocalFileManage localFileManage;
 	
 	/**
 	 * 取得缩略图标记
@@ -67,7 +66,7 @@ public class ThumbnailManage {
 		for (Iterator<File> iterator = files.iterator(); iterator.hasNext();) {
 		    File file = iterator.next();
 		    if(!file.isHidden()){//不是隐藏文件
-		    	 List<String> markerList = fileManage.readLines(file,"utf-8");
+		    	 List<String> markerList = FileUtil.readLines(file,"utf-8");
 		    	 if(markerList != null && markerList.size() >0){
 		    		 StringBuffer value = new StringBuffer("");
 		    		 for(String marker : markerList){
@@ -132,14 +131,14 @@ public class ThumbnailManage {
 		for(Entry<String, String> entry : thumbnailMarker.entrySet()){
 			if("+".equals(entry.getValue())){//生成缩略图
 				//读取标记文件
-				List<String> markerList = fileManage.readLines(new File(marker_dir+entry.getKey()+".txt"),"utf-8");
+				List<String> markerList = FileUtil.readLines(new File(marker_dir+entry.getKey()+".txt"),"utf-8");
 		    	if(markerList != null && markerList.size() >0){
 		    		StringBuffer value = new StringBuffer("");
 		    		for(String marker : markerList){
 		    			value.append(marker);
 		    		}
 		    		if(value != null && "+".equals(value.toString().trim())){//如果标记文件状态不变，则删除标记
-		    			fileManage.deleteFile("file"+File.separator+"topic"+File.separator+"thumbnailMarker"+File.separator+entry.getKey()+".txt");
+		    			localFileManage.deleteFile("file"+File.separator+"topic"+File.separator+"thumbnailMarker"+File.separator+entry.getKey()+".txt");
 		    		}
 		    		
 		    	}
@@ -147,14 +146,14 @@ public class ThumbnailManage {
 			}else if("-".equals(entry.getValue())){
 				
 				//读取标记文件
-				List<String> markerList = fileManage.readLines(new File(marker_dir+entry.getKey()+".txt"),"utf-8");
+				List<String> markerList = FileUtil.readLines(new File(marker_dir+entry.getKey()+".txt"),"utf-8");
 		    	if(markerList != null && markerList.size() >0){
 		    		StringBuffer value = new StringBuffer("");
 		    		for(String marker : markerList){
 		    			value.append(marker);
 		    		}
 		    		if(value != null && "-".equals(value.toString().trim())){//如果标记文件状态不变，则增加一行-标记
-		    			fileManage.writeStringToFile("file"+File.separator+"topic"+File.separator+"thumbnailMarker"+File.separator+entry.getKey()+".txt","-","utf-8",true);
+		    			FileUtil.writeStringToFile("file"+File.separator+"topic"+File.separator+"thumbnailMarker"+File.separator+entry.getKey()+".txt","-","utf-8",true);
 		    		}
 	
 		    	}
@@ -162,14 +161,14 @@ public class ThumbnailManage {
 				
 			}else if("--".equals(entry.getValue())){
 				//读取标记文件
-				List<String> markerList = fileManage.readLines(new File(marker_dir+entry.getKey()+".txt"),"utf-8");
+				List<String> markerList = FileUtil.readLines(new File(marker_dir+entry.getKey()+".txt"),"utf-8");
 		    	if(markerList != null && markerList.size() >0){
 		    		StringBuffer value = new StringBuffer("");
 		    		for(String marker : markerList){
 		    			value.append(marker);
 		    		}
 		    		if(value != null && "--".equals(value.toString().trim())){//如果标记文件状态不变，则删除标记
-		    			fileManage.deleteFile("file"+File.separator+"topic"+File.separator+"thumbnailMarker"+File.separator+entry.getKey()+".txt");
+		    			localFileManage.deleteFile("file"+File.separator+"topic"+File.separator+"thumbnailMarker"+File.separator+entry.getKey()+".txt");
 		    		}
 	
 		    	}
@@ -231,84 +230,13 @@ public class ThumbnailManage {
 	 */
 	private void deleteThumbnailDir(Path dir,String specificationGroup){
 		File f = new File(dir.toAbsolutePath()+File.separator+specificationGroup); 
-		fileManage.removeDirectory(f);
+		FileUtil.removeDirectory(f);
 		
 	}
 	
 
 	
-	
-    /**
-	 * 生成缩略图
-	 * @param sourcePath 源图片路径
-	 * @param outputPath 输出图片路径
-	 * @param width 宽
-	 * @param high 高
-	 
-	private void createImage(String sourcePath,String outputPath,int width,int high) {
-		FileInputStream inStream = null;
-		FileOutputStream outStream = null;
-		WriteRender wr = null;
-		
-		ScaleParameter scaleParam = new ScaleParameter(width, high);  //将图像缩略到1024x1024以内，不足1024x1024则不做任何处理
-		try {
-			File in = new File(sourcePath);
-			if(in.exists()){
-				
-				inStream = new FileInputStream(in);
-				outStream = new FileOutputStream(new File(outputPath));
-				
-				ImageRender rr = new ReadRender(inStream);
-		        ImageRender sr = new ScaleRender(rr, scaleParam);
-		        wr = new WriteRender(sr, outStream);
-		     
-		        wr.render();                            //触发图像处理
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			if (logger.isErrorEnabled()) {
-	            logger.error("生成缩略图",e);
-	        }
-		} catch (SimpleImageException e) {
-			// TODO Auto-generated catch block
-		//	e.printStackTrace();
-			if (logger.isErrorEnabled()) {
-	            logger.error("生成缩略图",e);
-	        }
-		}finally {	
-			if(inStream != null){
-				try {
-					inStream.close();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-				//	e.printStackTrace();
-					if (logger.isErrorEnabled()) {
-			            logger.error("生成缩略图关闭输入流错误",e);
-			        }
-				}
-			}
-			if(outStream != null){
-				try {
-					outStream.close();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-				//	e.printStackTrace();
-					if (logger.isErrorEnabled()) {
-			            logger.error("生成缩略图关闭输出流错误",e);
-			        }
-				}
-			}
-	        if (wr != null) {
-	            try {
-	                wr.dispose();//释放simpleImage的内部资源
-	            } catch (SimpleImageException ignore) {
-	            	if (logger.isErrorEnabled()) {
-			            logger.error("释放simpleImage的内部资源错误",ignore);
-			        }
-	            }
-	        }
-		}
-	}*/
+
 	/**
 	 * 生成缩略图
 	 * @param sourcePath 源图片路径
@@ -477,7 +405,7 @@ public class ThumbnailManage {
 	 * 异步增加缩略图
 	 * @param thumbnailList 缩略图对象集合
 	 * @param imageInfoList 图片信息集合
-	 */
+	*/
 	@Async
 	public void addThumbnail(List<Thumbnail> thumbnailList,List<ImageInfo> imageInfoList){
 		
@@ -493,20 +421,7 @@ public class ThumbnailManage {
 			high = Integer.parseInt(specification[1]);
 			
 			for(ImageInfo imageInfo : imageInfoList){
-				/**
-				for(int i=0; i<10000; i++){
-					String path =  PathUtil.path()+File.separator+fileManage.toSystemPath(imageInfo.getPath());
-					
-					
-					//生成目录
-					File file_dir = new File(path+thumbnail.getSpecificationGroup()+File.separator);
-					if (!file_dir.exists()) {//如果目录不存在
-						file_dir.mkdirs();//生成目录
-					}
-					this.createImage(path+imageInfo.getName(),file_dir+File.separator+i+"_"+imageInfo.getName(),width,high);
-				}**/
-				
-				String path =  PathUtil.path()+File.separator+fileManage.toSystemPath(imageInfo.getPath());
+				String path =  PathUtil.path()+File.separator+FileUtil.toSystemPath(imageInfo.getPath());
 				
 				
 				//生成目录
@@ -518,27 +433,10 @@ public class ThumbnailManage {
 				if(file.exists()){
 					this.createImage(file,file_dir+File.separator+imageInfo.getName(),width,high);
 				}
-				
-				/**
-				try {
-					File file = new File(path+imageInfo.getName());
-					if(file.exists()){
-						
-						Thumbnails.of(path+imageInfo.getName())        
-						.size(width,high)
-						.toFile(file_dir+File.separator+imageInfo.getName());		
-					}
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-				//	e.printStackTrace();
-					if (logger.isErrorEnabled()) {
-			            logger.error("异步增加缩略图",e);
-			        }
-				}**/
 			}
 			
 		}	
-	}
+	} 
 	
 	/**
 	 * 异步删除缩略图
@@ -549,8 +447,8 @@ public class ThumbnailManage {
 	public void deleteThumbnail(List<Thumbnail> thumbnailList,List<ImageInfo> imageInfoList){
 		for(Thumbnail thumbnail : thumbnailList){
 			for(ImageInfo imageInfo : imageInfoList){
-				String path =  fileManage.toSystemPath(imageInfo.getPath());
-				fileManage.deleteFile(path+thumbnail.getSpecificationGroup()+File.separator+imageInfo.getName());
+				String path =  FileUtil.toSystemPath(imageInfo.getPath());
+				localFileManage.deleteFile(path+thumbnail.getSpecificationGroup()+File.separator+imageInfo.getName());
 			}
 			
 		}	

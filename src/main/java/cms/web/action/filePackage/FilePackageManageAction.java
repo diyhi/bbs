@@ -23,12 +23,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+
 import cms.bean.filePackage.FileResource;
+import cms.utils.FileUtil;
 import cms.utils.JsonUtils;
 import cms.utils.PathUtil;
 import cms.utils.WebUtil;
-import cms.web.action.FileManage;
 import cms.web.action.SystemException;
+import cms.web.action.fileSystem.localImpl.LocalFileManage;
 
 
 /**
@@ -38,9 +40,8 @@ import cms.web.action.SystemException;
 @Controller
 @RequestMapping("/control/filePackage/manage") 
 public class FilePackageManageAction {
-	@Resource FileManage fileManage;
 	@Resource FilePackageManage filePackageManage;
-	
+	@Resource LocalFileManage localFileManage;
 	/**
 	 * 下载压缩文件
 	 * @param model
@@ -59,7 +60,7 @@ public class FilePackageManageAction {
 			throw new SystemException("文件不名称不能为空！");
 		}
 		//替换路径中的..号
-		fileName = fileManage.toRelativePath(fileName); 
+		fileName = FileUtil.toRelativePath(fileName); 
 		
 		String templateFile_path = "WEB-INF"+File.separator+"data"+ File.separator+"filePackage"+ File.separator+fileName;
 
@@ -87,10 +88,10 @@ public class FilePackageManageAction {
 			throws Exception {
 		if(fileName != null && !"".equals(fileName.trim())){
 			//替换路径中的..号
-			fileName = fileManage.toRelativePath(fileName);
+			fileName = FileUtil.toRelativePath(fileName);
 			//模板文件路径
 			String filePath = "WEB-INF"+File.separator+"data"+ File.separator+"filePackage"+ File.separator+fileName;
-			fileManage.deleteFile(filePath);
+			localFileManage.deleteFile(filePath);
 			return "1";
 		}
 		return "0";
@@ -243,7 +244,7 @@ public class FilePackageManageAction {
 					}
 				}
 			}else{
-				String path = PathUtil.path()+File.separator+(parentId == null || "".equals(parentId.trim()) ? "" :File.separator+fileManage.toRelativePath(fileManage.toSystemPath(parentId)));
+				String path = PathUtil.path()+File.separator+(parentId == null || "".equals(parentId.trim()) ? "" :File.separator+FileUtil.toRelativePath(FileUtil.toSystemPath(parentId)));
 				
 				File dir = new File(path);
 				if(dir.isDirectory()){

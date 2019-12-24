@@ -75,19 +75,19 @@ import cms.service.user.UserCustomService;
 import cms.service.user.UserGradeService;
 import cms.service.user.UserRoleService;
 import cms.service.user.UserService;
+import cms.utils.FileUtil;
 import cms.utils.JsonUtils;
 import cms.utils.PathUtil;
 import cms.utils.RedirectPath;
 import cms.utils.SHA;
 import cms.utils.UUIDUtil;
 import cms.utils.Verification;
-import cms.web.action.FileManage;
 import cms.web.action.SystemException;
 import cms.web.action.TextFilterManage;
+import cms.web.action.fileSystem.FileManage;
 import cms.web.action.lucene.TopicLuceneManage;
 import cms.web.action.payment.PaymentManage;
 import cms.web.action.question.QuestionManage;
-import cms.web.action.thumbnail.ThumbnailManage;
 import cms.web.action.topic.TopicManage;
 
 /**
@@ -121,9 +121,6 @@ public class UserManageAction {
 	@Resource TopicManage topicManage;
 	
 	
-	@Resource FileManage fileManage;
-	@Resource ThumbnailManage thumbnailManage;
-	
 	@Resource TopicLuceneManage topicLuceneManage;
 	@Resource TopicIndexService topicIndexService;
 	
@@ -137,7 +134,7 @@ public class UserManageAction {
 	@Resource QuestionTagService questionTagService;
 	@Resource AnswerService answerService;
 	@Resource QuestionIndexService questionIndexService;
-	
+	@Resource FileManage fileManage;
 	/**
 	 * 用户管理 查看
 	 */
@@ -1132,17 +1129,18 @@ public class UserManageAction {
 							//删除答案文件
 							questionManage.deleteAnswerFile(user.getUserName(), false);
 
-							DateTime dateTime = new DateTime(user.getRegistrationDate());     
-							String date = dateTime.toString("yyyy-MM-dd");
-							
-							String pathFile = "file"+File.separator+"avatar"+File.separator + date +File.separator  +user.getAvatarName();
-							//删除头像
-							fileManage.deleteFile(pathFile);
-							
-							String pathFile_100 = "file"+File.separator+"avatar"+File.separator + date +File.separator +"100x100" +File.separator+user.getAvatarName();
-							//删除头像100*100
-							fileManage.deleteFile(pathFile_100);
-							
+							if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
+								DateTime dateTime = new DateTime(user.getRegistrationDate());     
+								String date = dateTime.toString("yyyy-MM-dd");
+								
+								String pathFile = "file"+File.separator+"avatar"+File.separator + date +File.separator  +user.getAvatarName();
+								//删除头像
+								fileManage.deleteFile(pathFile);
+								
+								String pathFile_100 = "file"+File.separator+"avatar"+File.separator + date +File.separator +"100x100" +File.separator+user.getAvatarName();
+								//删除头像100*100
+								fileManage.deleteFile(pathFile_100);
+							}
 						}
 						
 						
@@ -1775,7 +1773,7 @@ public class UserManageAction {
 				if(size/1024 <= imageSize){
 					
 					//验证文件类型
-					boolean authentication = fileManage.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
+					boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
 			
 					if(authentication){
 						//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
@@ -1803,7 +1801,7 @@ public class UserManageAction {
 			            int srcHeight = bufferImage.getHeight();  
 						
 						//取得文件后缀
-						String suffix = fileManage.getExtension(fileName).toLowerCase();
+						String suffix = FileUtil.getExtension(fileName).toLowerCase();
 						//构建文件名称
 						newFileName = UUIDUtil.getUUID32()+ "." + suffix;
 						
@@ -1816,14 +1814,14 @@ public class UserManageAction {
 								fileManage.writeFile(pathDir_100, newFileName,imgFile.getBytes());
 							}else{
 								//生成100*100缩略图
-								thumbnailManage.createImage(imgFile.getInputStream(),PathUtil.path()+File.separator+pathDir_100+newFileName,suffix,100,100);
+								fileManage.createImage(imgFile.getInputStream(),PathUtil.path()+File.separator+pathDir_100+newFileName,suffix,100,100);
 							}
 						}else{
 							//生成200*200缩略图
-							thumbnailManage.createImage(imgFile.getInputStream(),PathUtil.path()+File.separator+pathDir+newFileName,suffix,x,y,width,height,200,200);
+							fileManage.createImage(imgFile.getInputStream(),PathUtil.path()+File.separator+pathDir+newFileName,suffix,x,y,width,height,200,200);
 
 							//生成100*100缩略图
-							thumbnailManage.createImage(imgFile.getInputStream(),PathUtil.path()+File.separator+pathDir_100+newFileName,suffix,x,y,width,height,100,100);
+							fileManage.createImage(imgFile.getInputStream(),PathUtil.path()+File.separator+pathDir_100+newFileName,suffix,x,y,width,height,100,100);
     
 						}	
 					}else{

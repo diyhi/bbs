@@ -44,6 +44,7 @@ import cms.service.setting.SettingService;
 import cms.service.template.TemplateService;
 import cms.service.user.UserService;
 import cms.utils.Base64;
+import cms.utils.FileUtil;
 import cms.utils.IpAddress;
 import cms.utils.JsonUtils;
 import cms.utils.RefererCompare;
@@ -52,8 +53,8 @@ import cms.utils.WebUtil;
 import cms.utils.threadLocal.AccessUserThreadLocal;
 import cms.web.action.AccessSourceDeviceManage;
 import cms.web.action.CSRFTokenManage;
-import cms.web.action.FileManage;
 import cms.web.action.TextFilterManage;
+import cms.web.action.fileSystem.FileManage;
 import cms.web.action.filterWord.SensitiveWordFilterManage;
 import cms.web.action.follow.FollowManage;
 import cms.web.action.message.RemindManage;
@@ -75,7 +76,7 @@ import cms.web.taglib.Configuration;
 public class AnswerFormAction {
 	@Resource TemplateService templateService;
 	@Resource CaptchaManage captchaManage;
-	@Resource FileManage fileManage;
+	
 	@Resource UserRoleManage userRoleManage;
 	
 	
@@ -85,7 +86,7 @@ public class AnswerFormAction {
 	@Resource SettingManage settingManage;
 	@Resource SettingService settingService;
 	@Resource UserService userService;
-	
+	@Resource FileManage fileManage;
 	
 	@Resource CSRFTokenManage csrfTokenManage;
 	
@@ -374,7 +375,7 @@ public class AnswerFormAction {
 				for(String imageName :imageNameList){
 					if(imageName != null && !"".equals(imageName.trim())){
 						//如果验证不是当前用户上传的文件，则不删除锁
-						 if(!questionManage.getFileNumber(fileManage.getBaseName(imageName.trim())).equals(fileNumber)){
+						 if(!questionManage.getFileNumber(FileUtil.getBaseName(imageName.trim())).equals(fileNumber)){
 							 continue;
 						 }
 						 fileManage.deleteLock("file"+File.separator+"answer"+File.separator+"lock"+File.separator,imageName.replaceAll("/","_"));
@@ -517,7 +518,7 @@ public class AnswerFormAction {
 							long imageSize = editorSiteObject.getImageSize();
 
 							//验证文件类型
-							boolean authentication = fileManage.validateFileSuffix(file.getOriginalFilename(),imageFormat);
+							boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),imageFormat);
 							
 							if(authentication ){
 								if(size/1024 <= imageSize){
@@ -533,7 +534,7 @@ public class AnswerFormAction {
 									//生成锁文件保存目录
 									fileManage.createFolder(lockPathDir);
 									//生成锁文件
-									fileManage.newFile(lockPathDir+questionId+"_"+newFileName);
+									fileManage.addLock(lockPathDir,questionId+"_"+newFileName);
 									//保存文件
 									fileManage.writeFile(pathDir, newFileName,file.getBytes());
 									

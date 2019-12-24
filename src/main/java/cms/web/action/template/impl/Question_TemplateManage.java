@@ -1,5 +1,6 @@
 package cms.web.action.template.impl;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -181,19 +182,21 @@ public class Question_TemplateManage {
 		if(filterCondition != null){
 			if(filterCondition.equals(20)){//未解决：20
 				jpql.append(" and o.adoptionAnswerId=?"+ (params.size()+1));
-				params.add(0L);//设置o.visible=?1是否可见
+				params.add(0L);
 			}else if(filterCondition.equals(30)){//已解决：30
 				jpql.append(" and o.adoptionAnswerId>?"+ (params.size()+1));
-				params.add(0L);//设置o.visible=?1是否可见
+				params.add(0L);
 			}else if(filterCondition.equals(40)){//积分悬赏：40
-				
+				jpql.append(" and o.point>?"+ (params.size()+1));
+				params.add(0L);
 			}else if(filterCondition.equals(50)){//现金悬赏：50
-				
+				jpql.append(" and o.amount>?"+ (params.size()+1));
+				params.add(new BigDecimal("0"));
 			}
 		}
 		
 		jpql.append(" and o.status=?"+ (params.size()+1));
-		params.add(20);//设置o.visible=?1是否可见
+		params.add(20);
 		
 		
 		//排序
@@ -445,6 +448,12 @@ public class Question_TemplateManage {
 			if(captchaKey ==true){
 				value.put("captchaKey",UUIDUtil.getUUID32());//是否有验证码
 			}
+		}
+		
+		User user = userManage.query_cache_findUserByUserName(accessUser.getUserName());
+		if(user != null){
+			value.put("maxDeposit",user.getDeposit());//允许使用的预存款
+			value.put("maxPoint",user.getPoint());//允许使用的积分
 		}
 		
 		SystemSetting systemSetting = settingService.findSystemSetting_cache();

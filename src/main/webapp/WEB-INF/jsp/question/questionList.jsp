@@ -94,10 +94,41 @@ function deleteQuestion(){
 			parameter = parameter.substring(1,parameter.length);
 		}
 	   	post_request(function(value){
-			if(value == "1"){
-				window.location.reload();
-			}else{
-				alert("删除失败");
+			var data = JSON.parse(value);
+			for(var returnValue in data){
+			if(returnValue == "success"){
+	       		if(data[returnValue] == "true"){
+	       				//需引入layer
+	       				layer.msg('删除问题成功,3秒后自动刷新', 
+							{
+							  time: 3000 //3秒关闭（如果不配置，默认是3秒）
+							},function(){//关闭后的操作
+								window.location.reload();
+							}
+						);
+	       				
+	       			}
+	       		}else if(returnValue == "error"){
+	       			
+	       			var errorValue = data[returnValue];
+					var htmlValue = "";
+					var i = 0;
+					for(var error in errorValue){
+						if(error != ""){	
+							i++;
+							htmlValue += "&nbsp;&nbsp;"+i+"、"+errorValue[error]+"<br>";
+						}
+					}
+					
+					layer.open({
+					  type: 1,
+					  title: '错误', 
+					  skin: 'layui-layer-rim', //加上边框
+					  area: ['300px', '150px'], //宽高
+					  content: "<div style='line-height: 36px; font-size: 15px; margin-left: 8px;margin-right: 8px;'>"+htmlValue+"</div>"
+					});
+	       		}
+		
 			}
 		},
 			"${config:url(pageContext.request)}control/question/manage${config:suffix()}?method=deleteQuestion&visible=${param.visible}&timestamp=" + new Date().getTime(), true,parameter);

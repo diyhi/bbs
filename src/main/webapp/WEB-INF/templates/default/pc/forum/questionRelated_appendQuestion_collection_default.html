@@ -23,7 +23,7 @@
 
 					<div class="appendQuestionSubmit">
 						<span class="submitButton-box" >
-							<button type="button" class="submitButton" onClick="javascript:ajax_appendQuestion_sureSubmit('${identificationNumber}')">提交</button>
+							<button type="button" id="${identificationNumber}_submitForm" class="submitButton" onClick="javascript:ajax_appendQuestion_sureSubmit('${identificationNumber}')">提交</button>
 						</span>
 						<!-- 调用方法在blank_9页 -->
 						<span class="cancelButton-box" >
@@ -123,6 +123,9 @@
 					} 
 					//Ajax方式提交
 					function ajax_appendQuestion_sureSubmit(identificationNumber){
+						//按钮设置 disabled="disabled"
+						document.getElementById(identificationNumber+"_submitForm").disabled=true;
+					
 						//清空所有错误提示
 						var error_tag = getElementsByName_pseudo("span", "error");
 						for(var i = 0;i < error_tag.length; i++) {
@@ -188,6 +191,8 @@
 					        				}
 					        				
 					        			}
+					        			//按钮设置 disabled="disabled"
+										document.getElementById(identificationNumber+"_submitForm").disabled=false;
 					        		}else if(returnValue == "captchaKey"){//显示验证码
 			        					
 										var captchaKey = data[returnValue];
@@ -204,6 +209,9 @@
 					        	}
 							},
 								"user/control/question/appendQuestion?timestamp=" + new Date().getTime(), true,parameter);
+						}else{
+							//按钮设置 disabled="disabled"
+							document.getElementById(identificationNumber+"_submitForm").disabled=false;
 						}
 					} 
 					

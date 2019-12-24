@@ -44,15 +44,16 @@ import cms.bean.template.Layout;
 import cms.bean.template.TemplateData;
 import cms.bean.template.Templates;
 import cms.service.template.TemplateService;
+import cms.utils.FileUtil;
 import cms.utils.JsonUtils;
 import cms.utils.PathUtil;
 import cms.utils.RedirectPath;
 import cms.utils.UUIDUtil;
 import cms.utils.WebUtil;
 import cms.utils.ZipUtil;
-import cms.web.action.FileManage;
 import cms.web.action.SystemException;
 import cms.web.action.TextFilterManage;
+import cms.web.action.fileSystem.localImpl.LocalFileManage;
 
 /**
  * 模板目录管理
@@ -69,8 +70,7 @@ public class TemplateManageAction {
 	@Resource(name = "templateValidator") 
 	private Validator validator; 
 	@Resource TemplateManage templateManage;
-	@Resource FileManage fileManage;
-	
+	@Resource LocalFileManage localFileManage;
 	@Resource TextFilterManage textFilterManage;
 	
 	/**
@@ -110,10 +110,10 @@ public class TemplateManageAction {
 					formatList.add("jpeg");
 					formatList.add("bmp");
 					formatList.add("png");
-					boolean authentication = fileManage.validateFileSuffix(file.getOriginalFilename(),formatList);
+					boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),formatList);
 					if(authentication){
 						//取得文件后缀		
-						String ext = fileManage.getExtension(file.getOriginalFilename());
+						String ext = FileUtil.getExtension(file.getOriginalFilename());
 						//文件保存目录
 						String pathDir = "common"+File.separator+formbean.getDirName()+File.separator;
 						//构建文件名称
@@ -121,9 +121,9 @@ public class TemplateManageAction {
 						templates.setThumbnailSuffix(ext);
 						
 						//生成文件保存目录
-						fileManage.createFolder(pathDir);
+						FileUtil.createFolder(pathDir);
 						//保存文件
-						fileManage.writeFile(pathDir, fileName,file.getBytes());
+						localFileManage.writeFile(pathDir, fileName,file.getBytes());
 				   }else{
 					   result.rejectValue("thumbnailSuffix","errors.required", new String[]{"图片格式错误"},"");
 				   }
@@ -191,7 +191,7 @@ public class TemplateManageAction {
 					String imagePathName = request.getParameter("imagePath_1");//图片路径
 					if(imagePathName != null && !"".equals(imagePathName)){
 						//取得文件后缀
-						String ext = fileManage.getExtension(imagePathName);
+						String ext = FileUtil.getExtension(imagePathName);
 						templates.setThumbnailSuffix(ext);
 						
 					}else{
@@ -209,10 +209,10 @@ public class TemplateManageAction {
 					formatList.add("jpeg");
 					formatList.add("bmp");
 					formatList.add("png");
-					boolean authentication = fileManage.validateFileSuffix(file.getOriginalFilename(),formatList);
+					boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),formatList);
 					if(authentication){
 						//取得文件后缀		
-						String ext = fileManage.getExtension(file.getOriginalFilename());
+						String ext = FileUtil.getExtension(file.getOriginalFilename());
 						//文件保存目录
 						String pathDir = "common"+File.separator+formbean.getDirName()+File.separator;
 						//构建文件名称
@@ -222,9 +222,9 @@ public class TemplateManageAction {
 						}
 						templates.setThumbnailSuffix(ext);
 						//生成文件保存目录
-						fileManage.createFolder(pathDir);
+						FileUtil.createFolder(pathDir);
 						//保存文件
-						fileManage.writeFile(pathDir, fileName,file.getBytes());
+						localFileManage.writeFile(pathDir, fileName,file.getBytes());
 						
 						
 				   }else{
@@ -255,7 +255,7 @@ public class TemplateManageAction {
 			 String pathDir = "common"+File.separator+old_templates.getDirName()+File.separator+"templates."+old_templates.getThumbnailSuffix();
 				
 			//删除旧路径文件
-			fileManage.deleteFile(pathDir);
+			 localFileManage.deleteFile(pathDir);
 		}
 		
 		model.addAttribute("message","修改模板成功");//返回消息
@@ -274,14 +274,14 @@ public class TemplateManageAction {
 			Templates templates = templateService.findTemplatebyDirName(dirName.trim());
 			if(templates != null){
 				//替换路径中的..号
-				dirName = fileManage.toRelativePath(dirName);
+				dirName = FileUtil.toRelativePath(dirName);
 				templateService.deleteTemplate(dirName.trim());
 				//删除资源文件
-				fileManage.removeDirectory("common"+File.separator+dirName.trim()+File.separator);
+				localFileManage.removeDirectory("common"+File.separator+dirName.trim()+File.separator);
 				//删除模板图片文件
-				fileManage.removeDirectory("file"+File.separator+"template"+File.separator+dirName.trim()+File.separator);
+				localFileManage.removeDirectory("file"+File.separator+"template"+File.separator+dirName.trim()+File.separator);
 				//删除模板文件
-				fileManage.removeDirectory("WEB-INF"+File.separator+"templates"+File.separator + dirName.trim() + File.separator);
+				localFileManage.removeDirectory("WEB-INF"+File.separator+"templates"+File.separator + dirName.trim() + File.separator);
 				return "1";
 			}
 		}
@@ -307,7 +307,7 @@ public class TemplateManageAction {
 			return "0";
 		}
 		//替换路径中的..号
-		dirName = fileManage.toRelativePath(dirName);
+		dirName = FileUtil.toRelativePath(dirName);
 		
 		//构建文件名称
 		String tempDirName = UUIDUtil.getUUID32();
@@ -333,7 +333,7 @@ public class TemplateManageAction {
 		templateData.setLayoutList(layoutList);
 		templateData.setForumList(forumList);
 		//备份到临时目录
-		fileManage.writeStringToFile(pathDir+"templateData.data",JsonUtils.toJSONString(templateData),"UTF-8", false);
+		FileUtil.writeStringToFile(pathDir+"templateData.data",JsonUtils.toJSONString(templateData),"UTF-8", false);
 		
 		//创建模板目录
 		String template_dir_path = realpathDir+"templates"+File.separator;
@@ -357,17 +357,17 @@ public class TemplateManageAction {
 		//模板源目录
 		String template_source = "WEB-INF"+File.separator+"templates"+File.separator+dirName+File.separator;	
 		//复制模板文件到临时目录
-		fileManage.copyDirectory(template_source, pathDir+"templates"+File.separator);
+		FileUtil.copyDirectory(template_source, pathDir+"templates"+File.separator);
 			
 		//资源文件源目录
 		String file_source = "common"+File.separator+dirName+File.separator;
 		//复制模板文件到临时目录
-		fileManage.copyDirectory(file_source, pathDir+"common"+File.separator);
+		FileUtil.copyDirectory(file_source, pathDir+"common"+File.separator);
 		
 		//模板上传文件源目录
 		String upload_source = "file"+File.separator+"template"+File.separator+dirName+File.separator;
 		//复制模板文件到临时目录
-		fileManage.copyDirectory(upload_source, pathDir+"uploadFile"+File.separator);
+		FileUtil.copyDirectory(upload_source, pathDir+"uploadFile"+File.separator);
 		
 		
 		SimpleDateFormat dateformat=new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
@@ -382,7 +382,7 @@ public class TemplateManageAction {
 				PathUtil.path()+File.separator+"WEB-INF"+File.separator+"data"+ File.separator+"templateBackup"+ File.separator+zipName);//第一个参数：待压缩目录  第二个参数：输出文件
 	
 		//删除临时文件
-		fileManage.removeDirectory("WEB-INF"+File.separator+"data"+File.separator + "temp" + File.separator+ tempDirName +File.separator);
+		localFileManage.removeDirectory("WEB-INF"+File.separator+"data"+File.separator + "temp" + File.separator+ tempDirName +File.separator);
 		
 		return "1";
 	}
@@ -404,10 +404,10 @@ public class TemplateManageAction {
 			throws Exception {
 		if(fileName != null && !"".equals(fileName.trim())){
 			//替换路径中的..号
-			fileName = fileManage.toRelativePath(fileName);
+			fileName = FileUtil.toRelativePath(fileName);
 			//模板文件路径
 			String templateFile_path = "WEB-INF"+File.separator+"data"+ File.separator+"templateBackup"+ File.separator+fileName;
-			fileManage.deleteFile(templateFile_path);
+			localFileManage.deleteFile(templateFile_path);
 			return "1";
 		}
 		return "0";
@@ -431,7 +431,7 @@ public class TemplateManageAction {
 			throw new SystemException("文件不名称不能为空！");
 		}
 		//替换路径中的..号
-		fileName = fileManage.toRelativePath(fileName); 
+		fileName = FileUtil.toRelativePath(fileName); 
 		
 		String templateFile_path = "WEB-INF"+File.separator+"data"+ File.separator+"templateBackup"+ File.separator+fileName;
 
@@ -462,7 +462,7 @@ public class TemplateManageAction {
 			return "-1";
 		}
 		//替换路径中的..号
-		templateFileName = fileManage.toRelativePath(templateFileName);
+		templateFileName = FileUtil.toRelativePath(templateFileName);
 		
 		//模板文件路径
 		String templateFile_path = "WEB-INF"+File.separator+"data"+ File.separator+"templateBackup"+ File.separator+templateFileName;
@@ -494,18 +494,18 @@ public class TemplateManageAction {
 			
 			if(templateDirName != null && !"".equals(templateDirName.trim())){
 				//替换路径中的..号
-				templateDirName = fileManage.toRelativePath(templateDirName);
+				templateDirName = FileUtil.toRelativePath(templateDirName);
 				//验证目录是否重复
 				Templates t = templateService.findTemplatebyDirName(templateDirName.trim());
 				if(t != null){
 					//删除临时文件
-					fileManage.removeDirectory("WEB-INF"+File.separator+"data"+File.separator + "temp" + File.separator+ tempDirName +File.separator);
+					localFileManage.removeDirectory("WEB-INF"+File.separator+"data"+File.separator + "temp" + File.separator+ tempDirName +File.separator);
 					
 					return "-3";
 				}
 				
 				//读取模板数据
-				String templateData_str = fileManage.readFileToString(temp_dir_path+templateDirName+File.separator+"templateData.data","UTF-8");
+				String templateData_str = FileUtil.readFileToString(temp_dir_path+templateDirName+File.separator+"templateData.data","UTF-8");
 				
 				if(templateData_str != null && !"".equals(templateData_str.trim())){
 					TemplateData templateData = JsonUtils.toGenericObject(templateData_str, new TypeReference<TemplateData>(){});		
@@ -613,32 +613,32 @@ public class TemplateManageAction {
 					String template_source = temp_dir_path+templateDirName+File.separator+"templates"+File.separator+next_templates_dirName+File.separator;	
 					
 					//重命名文件夹名称,和模板名称一致
-					fileManage.renameFile(template_source, templateDirName);
+					FileUtil.renameFile(template_source, templateDirName);
 					
 					//复制模板文件到模板目录
-					fileManage.copyDirectory(temp_dir_path+templateDirName+File.separator+"templates"+File.separator+templateDirName+File.separator, "WEB-INF"+File.separator+"templates");
+					FileUtil.copyDirectory(temp_dir_path+templateDirName+File.separator+"templates"+File.separator+templateDirName+File.separator, "WEB-INF"+File.separator+"templates");
 				}
 				if(next_common_dirName != null && !"".equals(next_common_dirName.trim())){
 					String file_source = temp_dir_path+templateDirName+File.separator+"common"+File.separator+next_common_dirName+File.separator;
 					//重命名文件夹名称,和模板名称一致
-					fileManage.renameFile(file_source, templateDirName);
+					FileUtil.renameFile(file_source, templateDirName);
 					//复制模板资源文件到文件目录
-					fileManage.copyDirectory(temp_dir_path+templateDirName+File.separator+"common"+File.separator+templateDirName+File.separator, "common");
+					FileUtil.copyDirectory(temp_dir_path+templateDirName+File.separator+"common"+File.separator+templateDirName+File.separator, "common");
 					
 				}
 				if(next_uploadFile_dirName != null && !"".equals(next_uploadFile_dirName.trim())){
 					String upload_source = temp_dir_path+templateDirName+File.separator+"uploadFile"+File.separator+next_common_dirName+File.separator;
 					//重命名文件夹名称,和模板名称一致
-					fileManage.renameFile(upload_source, templateDirName);
+					FileUtil.renameFile(upload_source, templateDirName);
 					//复制模板上传文件到文件目录
-					fileManage.copyDirectory(temp_dir_path+templateDirName+File.separator+"uploadFile"+File.separator+templateDirName+File.separator, "file"+File.separator+"template");
+					FileUtil.copyDirectory(temp_dir_path+templateDirName+File.separator+"uploadFile"+File.separator+templateDirName+File.separator, "file"+File.separator+"template");
 					
 				}
 				
 				
 				
 				//删除临时文件
-				fileManage.removeDirectory("WEB-INF"+File.separator+"data"+File.separator + "temp" + File.separator+ tempDirName +File.separator);
+				localFileManage.removeDirectory("WEB-INF"+File.separator+"data"+File.separator + "temp" + File.separator+ tempDirName +File.separator);
 				
 				
 			}
@@ -673,7 +673,7 @@ public class TemplateManageAction {
 			formatList.add("zip");
 			
 			//验证文件后缀
-			boolean fileSuffix = fileManage.validateFileSuffix(file.getName(),formatList);
+			boolean fileSuffix = FileUtil.validateFileSuffix(file.getName(),formatList);
 			if(fileSuffix){
 				//读取压缩文件
 			    ZipFile zip = null;
@@ -685,7 +685,7 @@ public class TemplateManageAction {
 					Enumeration<ZipArchiveEntry> entry = zip.getEntries();
 					A:while(entry.hasMoreElements()){//依次访问各条目
 						ZipArchiveEntry ze = entry.nextElement();  
-						String fileName = fileManage.getName(ze.getName());//文件名称
+						String fileName = FileUtil.getName(ze.getName());//文件名称
 						
 						if(templates.getDirName() == null || "".equals(templates.getDirName())){		
 							//截取到等于第二个参数的字符串为止
@@ -780,7 +780,7 @@ public class TemplateManageAction {
 			if(error.size() == 0){
 
 				//替换路径中的..号
-				fileName = fileManage.toRelativePath(fileName.trim());
+				fileName = FileUtil.toRelativePath(fileName.trim());
 				
 				//模板文件路径
 				String templateFile_path = "WEB-INF"+File.separator+"data"+ File.separator+"templateBackup"+ File.separator+fileName;
@@ -819,7 +819,7 @@ public class TemplateManageAction {
 								
 		
 					//删除临时文件
-					fileManage.removeDirectory("WEB-INF"+File.separator+"data"+File.separator + "temp" + File.separator+ tempDirName +File.separator);
+					localFileManage.removeDirectory("WEB-INF"+File.separator+"data"+File.separator + "temp" + File.separator+ tempDirName +File.separator);
 				}
 				
 			}
@@ -872,7 +872,7 @@ public class TemplateManageAction {
 			long uploadSize = 204800000L;//单位为字节  例1024000为1M
 			
 			//验证文件后缀
-			boolean authentication = fileManage.validateFileSuffix(uploadFile.getOriginalFilename(),formatList);
+			boolean authentication = FileUtil.validateFileSuffix(uploadFile.getOriginalFilename(),formatList);
 			if(authentication == false){
 				error.put("uploadFile", "当前文件格式不允许上传");
 			}
@@ -893,7 +893,7 @@ public class TemplateManageAction {
 				//使用指定的字符生成1位长度的随机字符串
 		        String text = RandomStringUtils.random(2, character);
 		       
-				newFilename =  fileManage.getBaseName(uploadFile.getOriginalFilename())+"_"+text+"."+fileManage.getExtension(uploadFile.getOriginalFilename());
+				newFilename =  FileUtil.getBaseName(uploadFile.getOriginalFilename())+"_"+text+"."+FileUtil.getExtension(uploadFile.getOriginalFilename());
 				
 				File _templateFile = new File(path+File.separator+newFilename);
 				if(_templateFile.isFile()){
@@ -912,7 +912,7 @@ public class TemplateManageAction {
 				try {
 				
 					//文件输出流
-					fileoutstream = new FileOutputStream(new File(path, fileManage.toRelativePath(fileManage.toSystemPath(newFilename))));
+					fileoutstream = new FileOutputStream(new File(path, FileUtil.toRelativePath(FileUtil.toSystemPath(newFilename))));
 					//写入硬盘
 					fileoutstream.write(uploadFile.getBytes());
 					

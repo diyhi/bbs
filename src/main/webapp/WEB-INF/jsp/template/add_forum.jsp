@@ -25,7 +25,7 @@
      var type=[
      ["话题列表","话题内容","评论列表","标签列表","添加话题","添加评论","引用评论","回复评论","相似话题","话题取消隐藏","修改话题"],
      ["问题列表","问题内容","答案列表","问题标签列表","添加问题","追加问题","添加答案","回复答案","采纳答案","回答总数","相似问题"],
-     ["加入收藏夹","话题会员收藏总数","用户是否已经收藏话题"],
+     ["加入收藏夹","话题会员收藏总数","用户是否已经收藏话题","问题会员收藏总数","用户是否已经收藏问题"],
      ["给话题点赞","话题点赞总数","用户是否已经点赞该话题"],
      ["关注用户","关注总数","粉丝总数","是否已经关注该用户"],
      ["会员卡列表","会员卡内容","购买会员卡"],
@@ -1749,7 +1749,7 @@ init();
         'superscript', 'clearhtml', 'quickformat', 'selectall', '|', 'fullscreen', 
         'formatblock', 'fontname', 'fontsize', '/', 'forecolor', 'hilitecolor', 'bold',
         'italic', 'underline', 'strikethrough', 'lineheight', 'removeformat', '|', 'image', 'multiimage',
-        'flash', 'media', 'insertfile','emoticons','baidumap', 'table', 'hr',   'pagebreak',
+         'media', 'insertfile','emoticons','baidumap', 'table', 'hr',   'pagebreak',
          'link', 'unlink'],
 			afterChange : function() {
 				this.sync();

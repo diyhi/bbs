@@ -1,0 +1,137 @@
+<#-- 问题加入收藏夹 -->
+<@function>
+	<#-- 已登录 -->
+	<#if systemUser != null>
+		<#--  返回Map<String,Object>类型 -->
+		<#assign returnValue = favoriteRelated_addFavorite_collection>
+		
+		<span id="favoriteButton" class="numberButton" onClick="javascript:addFavorite()">
+			<span class="button" >
+				<span id="favorite">收藏</span>
+			</span>
+			<span id="favoriteCount" class="number">0</span>
+		</span>
+		
+		
+		<script language="javascript" type="text/javascript">
+			//Ajax方式提交
+			function addFavorite(){
+				var parameter = "";
+				//问题Id
+				parameter += "&questionId="+getUrlParam("questionId");//从URL中获取
+				//获取令牌
+				parameter += "&token="+document.getElementById("token").value;
+			   	//删除第一个&号,防止因为多了&号而出现警告: Parameters: Invalid chunk ignored.信息
+				if(parameter.indexOf("&") == 0){
+					parameter = parameter.substring(1,parameter.length);
+				}
+			   	post_request(function(value){
+					var data = JSON.parse(value);
+					for(var returnValue in data){
+						
+						if(returnValue == "success"){
+		        			if(data[returnValue] == "true"){
+		        				layer.msg('加入收藏夹成功', 
+									{
+									  time: 5000 //3秒关闭（如果不配置，默认是3秒）
+									},function(){
+										//关闭后的操作
+									}
+								);
+								
+								queryAlreadyFavoriteQuestion();
+								queryQuestionFavoriteCount();
+		        			}
+		        		}else if(returnValue == "error"){
+		        			
+		        			
+		        			var errorValue = data[returnValue];
+							var htmlValue = "";
+							var i = 0;
+							for(var error in errorValue){
+								if(error != ""){	
+									i++;
+									htmlValue += "&nbsp;&nbsp;"+i+"、"+errorValue[error]+"<br>";
+								}
+							}
+							
+							layer.open({
+							  type: 1,
+							  title: '错误', 
+							  skin: 'layui-layer-rim', //加上边框
+							  area: ['300px', '150px'], //宽高
+							   content: "<div style='line-height: 36px; font-size: 15px; margin-left: 8px;margin-right: 8px;'>"+htmlValue+"</div>"
+							});
+		        		}
+		        	}
+				},
+					"user/control/favorite/add?timestamp=" + new Date().getTime(), true,parameter);
+			}
+		
+			//用户是否已经收藏问题
+			function queryAlreadyFavoriteQuestion(){
+				//从URL获取问题Id
+				var questionId = getUrlParam("questionId");
+				get_request(function(value){
+				
+					if(value != ""){
+						var data = JSON.parse(value);
+						if(data == true){
+							document.getElementById("favorite").innerHTML = "已收藏";
+							document.getElementById("favoriteButton").onclick = "";
+						}
+			        	
+			        }
+				},
+					"queryAlreadyFavoriteQuestion.htm?questionId="+questionId+"&timestamp=" + new Date().getTime(), true);
+			}
+			queryAlreadyFavoriteQuestion();
+		</script>
+		
+		
+		
+	<#else>
+		<#-- 未登录 -->
+		<span id="favoriteButton" class="numberButton" onClick="javascript:prompt()">
+			<span class="button" >收藏</span>
+			<span id="favoriteCount" class="number">0</span>
+		</span>
+		
+		<#-- 需要先引入layer -->
+		<script language="javascript" type="text/javascript">
+			function prompt(){
+				layer.open({
+				    type: 1, 
+				    title:"提示",
+				    content: "<div style='line-height: 36px; font-size: 15px;text-align:center; margin-left: 8px;margin-right: 8px;'>请先登录</div>", 
+				    area: ['260px', '120px'],//宽高
+					end: function(layero, index){
+					}
+				});
+			}
+		   	
+		</script>
+	</#if>
+	
+	
+	
+	<script type="text/javascript">
+		
+		//查询问题用户收藏总数
+		function queryQuestionFavoriteCount(){	
+			//从URL获取问题Id
+			var questionId = getUrlParam("questionId");
+			get_request(function(value){
+				if(value != ""){
+					var data = JSON.parse(value);
+		        	document.getElementById("favoriteCount").innerHTML = data;
+		        }
+			},
+				"queryQuestionFavoriteCount.htm?questionId="+questionId+"&timestamp=" + new Date().getTime(), true);
+							           
+		}
+		queryQuestionFavoriteCount();
+	</script>
+		
+	
+</@function>

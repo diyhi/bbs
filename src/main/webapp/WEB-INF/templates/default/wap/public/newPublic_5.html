@@ -80,12 +80,17 @@
 				        </div>
 				        <div class="clearfix"></div>
 				      
-				        <router-link class="title"  tag="div" :to="{path: '/thread', query: {topicId: topic.id}}" >
-					    	<span>{{topic.title}}</span>
-					    	<i class="topicRoleName" v-for="(roleName,index) in topic.allowRoleViewList" >{{roleName}}</i>
-					    </router-link>
-				         
-				         
+				      	<div class="title">
+				      		<router-link  tag="span" :to="{path: '/thread', query: {topicId: topic.id}}" >{{topic.title}}</router-link>
+				      		<i class="topicRoleName" v-for="(roleName,index) in topic.allowRoleViewList" >{{roleName}}</i>
+				      		<span :class="'hideTagType hide_'+key"  v-for="(value, key) in topic.hideTagTypeMap">
+                      			<span class="circle point" v-if="value==true"><i class="cms-unlock-solid" ></i></span>
+                      			<span class="circle" v-if="value==false"><i class="cms-lock-solid" ></i></span>
+	                      	</span> 
+				      		
+				      	
+				      		
+				      	</div>
 				        <div class="summary" v-if="topic.imageInfoList.length ==0">
 							<span>{{topic.summary}}</span>
 						</div>
@@ -496,16 +501,21 @@
 			</div>
 			<div class="nav-tabs">
 				<ul class="nav clearfix">
-			         <li :class="(filterCondition == '' || filterCondition == 10) ? 'active' : ''">
+			        <li :class="(filterCondition == '' || filterCondition == 10) ? 'active' : ''">
 			         	<router-link :to="{path: '/askList'}" >最新</router-link>
-			         </li>
-			         <li :class="filterCondition == 20 ? 'active' : ''">
+			        </li>
+			        <li :class="filterCondition == 20 ? 'active' : ''">
 			         	<router-link :to="{path: '/askList', query: {filterCondition: 20}}" >未解决</router-link>
-			         </li>
-			         <li :class="filterCondition == 30 ? 'active' : ''">
+			        </li>
+			        <li :class="filterCondition == 30 ? 'active' : ''">
 			         	<router-link :to="{path: '/askList', query: {filterCondition: 30}}" >已解决</router-link>
-			         </li> 
-			       
+			        </li> 
+			       	<li :class="filterCondition == 40 ? 'active' : ''">
+			         	<router-link :to="{path: '/askList', query: {filterCondition: 40}}" >积分悬赏</router-link>
+			        </li> 
+			        <li :class="filterCondition == 50 ? 'active' : ''">
+			         	<router-link :to="{path: '/askList', query: {filterCondition: 50}}" >现金悬赏</router-link>
+			        </li> 
 				</ul>
 			</div>
 			<div class="questionList">
@@ -525,14 +535,24 @@
 			        </div>
 			        <div class="clearfix"></div>
 			      
-			        <router-link class="title"  tag="div" :to="{path: '/question', query: {questionId: question.id}}" >
-				    	<span>{{question.title}}</span>
-				    </router-link>
-			         
-			         
+			      	<div class="title">
+			      		 <router-link tag="span" :to="{path: '/question', query: {questionId: question.id}}" >{{question.title}}</router-link>
+			      	</div>
+
 			        <div class="summary">
 						<span>{{question.summary}}</span>
 					</div>
+					
+					<div class="reward" v-if="question.amount > 0 || question.point > 0">
+						<div class="box">
+	                	<span class="rewardInfo" >
+	                		悬赏<span v-if="question.amount > 0">金额<span class="symbol">¥</span><span class="amount">{{question.amount}}</span>元 </span>
+		                		
+		                	<span v-if="question.point > 0"><span class="point">{{question.point}}</span>积分</span>
+	                	</span>
+	                	</div>
+	                </div>
+					
 					<div class="detailInfo">                                   
 			            <span class="bLeft">
 			                <div class="userName">{{question.nickname != null && question.nickname != '' ? question.nickname : question.userName}}</div>
@@ -616,6 +636,18 @@
 				        </div>
 					</div>
 					<div class="main"> 
+					 
+		                <div class="reward" >
+		                	<div class="rewardInfo" v-if="question.amount > 0 || question.point > 0">
+		                		<i class="icon cms-deposit" ></i>
+		                		悬赏<span v-if="question.amount > 0">金额<span class="symbol">¥</span><span class="amount">{{question.amount}}</span>元 </span>
+		                		
+		                		<span v-if="question.point > 0"><span class="point" >{{question.point}}</span>积分</span>
+		                		
+		                	</div>
+		                </div>
+		           
+					
 						<div v-if="question.lastUpdateTime != null" class="lastUpdateTime">最后修改时间：{{question.lastUpdateTime}}</div>
 						<!-- 内容 -->
 						<div v-html="question.content"></div>
@@ -628,6 +660,11 @@
 		                		<div v-html="appendQuestionItem.content"></div>
 		                	</div> 
 						</div>	
+						<div class="operating">
+							<div class="bottomInfo">
+								<mt-button type="default" plain @click.native="addFavorite(question.id);"  :disabled="alreadyFavoriteQuestion">{{alreadyFavoriteQuestion == true ? '已收藏':'收藏'}} ({{questionFavoriteCount}})</mt-button>
+							</div>
+						</div>
 					</div>
 					
 				</div>
@@ -824,9 +861,27 @@
 					<div class="questionForm" >
 						<ul>
 							<li>
-								<mt-field v-model.trim="questionTitle" label="标题" placeholder="输入标题" type="textarea" rows="2" ></mt-field>
+								<mt-field v-model.trim="questionTitle" label="标题" placeholder="输入标题" type="textarea" ></mt-field>
 								<p class="tips">
 							    	<span>{{error.questionTitle}}</span>	
+							    </p>
+							</li>
+							<li>
+								<mt-field v-model.trim="questionAmount" label="悬赏金额" placeholder="悬赏金额" type="text" :attr="{ maxlength: 8 }"></mt-field>
+								<p class="tips">
+							    	<span>{{error.questionAmount}}</span>	
+							    </p>
+							    <p class="help">
+							    	<span>悬赏金额不能超过 {{maxDeposit}} 元</span>	
+							    </p>
+							</li>
+							<li>
+								<mt-field v-model.trim="questionPoint" label="悬赏积分" placeholder="悬赏积分" type="number"></mt-field>
+								<p class="tips">
+							    	<span>{{error.questionPoint}}</span>	
+							    </p>
+							    <p class="help">
+							    	<span>悬赏积分不能超过 {{maxPoint}}</span>	
 							    </p>
 							</li>
 					        <li>
@@ -993,12 +1048,11 @@
 				            <img :src="$store.state.commonPath+'images/min_avata.png'" v-if="searchResult.topic.avatarName == null || searchResult.topic.avatarName == ''">
 				        </div>
 				        
-				    	<!-- router-link渲染成<div>标签-->
-				    	<router-link class="title"  tag="div" :to="{path: '/thread', query: {topicId: searchResult.topic.id}}">
-				           <span class="module">话题</span>
-				           <span v-html="searchResult.topic.title"></span>
-				            <i class="topicRoleName" v-for="(roleName,index) in searchResult.topic.allowRoleViewList" >{{roleName}}</i>
-				        </router-link>
+				        <div class="title">
+				        	<span class="module">话题</span>
+				        	<router-link  tag="span" :to="{path: '/thread', query: {topicId: searchResult.topic.id}}" v-html="searchResult.topic.title"></router-link>
+				        	<i class="topicRoleName" v-for="(roleName,index) in searchResult.topic.allowRoleViewList" >{{roleName}}</i>
+				        </div>
 				       
 				        <div class="content">
 				            <span v-html="searchResult.topic.content"></span>
@@ -1019,11 +1073,10 @@
 				            <img :src="$store.state.commonPath+'images/min_avata.png'" v-if="searchResult.question.avatarName == null || searchResult.question.avatarName == ''">
 				        </div>
 				        
-				    	<!-- router-link渲染成<div>标签-->
-				    	<router-link class="title"  tag="div" :to="{path: '/question', query: {questionId: searchResult.question.id}}">
-				           <span class="module">问题</span>
-				           <span v-html="searchResult.question.title"></span>
-				        </router-link>
+				        <div class="title">
+				        	<span class="module">问题</span>
+				        	<router-link  tag="span" :to="{path: '/question', query: {questionId: searchResult.question.id}}" v-html="searchResult.question.title"></router-link>
+				        </div>
 				       
 				        <div class="content">
 				            <span v-html="searchResult.question.content"></span>
@@ -1456,7 +1509,7 @@
 		</div>
 		
 		<!-- 动态内容 -->
-		<div class="userDynamicList" v-if="user.userName != $store.state.user.userName" v-infinite-scroll="queryUserDynamicList" infinite-scroll-disabled="loading" infinite-scroll-distance="10">
+		<div class="userDynamicList" v-infinite-scroll="scrollQueryUserDynamicList" infinite-scroll-disabled="loading" infinite-scroll-distance="10">
 			<div class="item" v-for="(userDynamic,index) in userDynamicList" >
 				<div class="head">
 					<!-- router-link渲染成<div>标签-->
@@ -1874,6 +1927,10 @@
 						<mt-cell :title="pointLog.times" :value="(pointLog.pointState == 1? '+' :'-' ) +pointLog.point" v-if="pointLog.module == 700" :label="'发表问题 [问题Id: '+pointLog.parameterId+']'"></mt-cell>
 						<mt-cell :title="pointLog.times" :value="(pointLog.pointState == 1? '+' :'-' ) +pointLog.point" v-if="pointLog.module == 800" :label="'发表答案 [答案Id: '+pointLog.parameterId+']'"></mt-cell>
 						<mt-cell :title="pointLog.times" :value="(pointLog.pointState == 1? '+' :'-' ) +pointLog.point" v-if="pointLog.module == 900" :label="'发表答案回复 [答案回复Id: '+pointLog.parameterId+']'"></mt-cell>				
+						<mt-cell :title="pointLog.times" :value="(pointLog.pointState == 1? '+' :'-' ) +pointLog.point" v-if="pointLog.module == 1000" :label="'悬赏积分 [问题Id: '+pointLog.parameterId+']'"></mt-cell>
+						<mt-cell :title="pointLog.times" :value="(pointLog.pointState == 1? '+' :'-' ) +pointLog.point" v-if="pointLog.module == 1100" :label="'采纳答案 [答案Id: '+pointLog.parameterId+']'"></mt-cell>
+						<mt-cell :title="pointLog.times" :value="(pointLog.pointState == 1? '+' :'-' ) +pointLog.point" v-if="pointLog.module == 1200" :label="'调整赏金 [问题Id: '+pointLog.parameterId+']'"></mt-cell>
+
 
 						<div class="remark" v-if="pointLog.remark != ''">备注：{{pointLog.remark}}</div>
 					</li>
@@ -2570,6 +2627,12 @@
 				<div v-infinite-scroll="queryFavorite" infinite-scroll-disabled="loading" infinite-scroll-distance="10">
 					<div class="item" v-for="favorite in favoriteList">
 			            <div class="head">
+			            	<span class="module" v-if="favorite.module == 10">
+			                    话题
+			                </span>
+			                <span class="module" v-if="favorite.module == 20">
+			                    问题
+			                </span>
 							<span class="info" >
 			                    <h2>{{favorite.addtime}}</h2>
 			                </span>
@@ -2577,9 +2640,12 @@
 			            </div>
 			            <div class="main">
 			            	<!-- router-link渲染成<p>标签-->
-			            	<router-link tag="p" class="content" :to="{path: '/thread', query: {topicId: favorite.topicId}}" >
+			            	<router-link v-if="favorite.module == 10" tag="p" class="content" :to="{path: '/thread', query: {topicId: favorite.topicId}}" >
 								{{favorite.topicTitle}}
-							</router-link>                        
+							</router-link>    
+							<router-link v-if="favorite.module == 20" tag="p" class="content" :to="{path: '/question', query: {questionId: favorite.questionId}}" >
+								{{favorite.questionTitle}}
+							</router-link>                      
 						</div>
 					</div>
 				</div>
@@ -2836,6 +2902,9 @@
 			                    <span class="payment" v-if="paymentLog.paymentModule == 5">冲值</span>
 			                    <span class="payment" v-if="paymentLog.paymentModule == 70">余额购买话题隐藏内容</span>
 			                    <span class="payment" v-if="paymentLog.paymentModule == 80">解锁话题隐藏内容分成</span>
+			                    <span class="payment" v-if="paymentLog.paymentModule == 90">悬赏金额</span>
+			                    <span class="payment" v-if="paymentLog.paymentModule == 100">采纳答案</span>
+			                    <span class="payment" v-if="paymentLog.paymentModule == 110">调整赏金</span>
 			                </span>
 			                <span class="time" >
 			                	{{paymentLog.times}}
@@ -3114,14 +3183,14 @@
 <link href="${baseURL}${commonPath}js/vue-photo-preview/skin.css" type="text/css" rel="stylesheet">
 <script src="${commonPath}js/vue-photo-preview/vue-photo-preview.js" type="text/javascript"></script> 
 
-<link href="${baseURL}${commonPath}css/common.css?6c" type="text/css" rel="stylesheet">
+<link href="${baseURL}${commonPath}css/common.css?1stdfd3" type="text/css" rel="stylesheet">
 <script src="${commonPath}js/better-scroll.min.js?2d" type="text/javascript"></script> 
  
 <script src="${commonPath}js/vue-cropper.js" type="text/javascript"></script>
  <script src="${commonPath}js/v-readmore.min.js" type="text/javascript"></script>
 <script src="${commonPath}js/wangeditor/wangEditor.min.js?5" type="text/javascript"></script>
 
-<script src="${commonPath}js/main.js?6" type="text/javascript"></script>
+<script src="${commonPath}js/main.js?88ddd" type="text/javascript"></script>
 
 
 

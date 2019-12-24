@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
 
 import cms.bean.forumCode.ForumCodeNode;
 import cms.bean.template.Layout;
+import cms.utils.FileUtil;
 import cms.utils.UUIDUtil;
-import cms.web.action.FileManage;
 import cms.web.action.forumCode.ForumCodeManage;
 
 /**
@@ -22,7 +22,6 @@ import cms.web.action.forumCode.ForumCodeManage;
 @Component("templateManage")
 public class TemplateManage {
 	@Resource ForumCodeManage forumCodeManage;
-	@Resource FileManage fileManage;
 	
 	
 	/**
@@ -507,7 +506,16 @@ public class TemplateManage {
 		
 		
 		
-		
+		//问题收藏列表
+		Layout layout_questionFavoriteList = new Layout();
+		layout_questionFavoriteList.setId(UUIDUtil.getUUID32());
+		layout_questionFavoriteList.setName("问题收藏列表");
+		layout_questionFavoriteList.setDirName(dirName);
+		layout_questionFavoriteList.setLayoutFile("questionFavoriteList.html");
+		layout_questionFavoriteList.setType(1);//默认页
+		layout_questionFavoriteList.setSort(2100);//排序
+		layout_questionFavoriteList.setReferenceCode("user/control/questionFavoriteList");
+		layoutList.add(layout_questionFavoriteList);
 		
 		
 		
@@ -523,12 +531,12 @@ public class TemplateManage {
 
 		//生成资源目录
 		String resource_path = "common"+File.separator+newDirName+File.separator;
-		fileManage.createFolder(resource_path+"pc"+File.separator);
-		fileManage.createFolder(resource_path+"wap"+File.separator);
+		FileUtil.createFolder(resource_path+"pc"+File.separator);
+		FileUtil.createFolder(resource_path+"wap"+File.separator);
 		
 		//生成模板目录
 		String path_dir = "WEB-INF"+File.separator+"templates"+File.separator+newDirName;
-		fileManage.createFolder(path_dir);
+		FileUtil.createFolder(path_dir);
 		
 		//生成模板目录内文件夹
 		List<String> folder = new ArrayList<String>();//文件夹名称
@@ -536,10 +544,10 @@ public class TemplateManage {
 		folder.add("public");//公共页面
 		for(String s: folder){
 			String pc_path_folder = "WEB-INF"+File.separator+"templates"+File.separator+newDirName+File.separator+"pc"+File.separator+s;
-			fileManage.createFolder(pc_path_folder);
+			FileUtil.createFolder(pc_path_folder);
 			
 			String wap_path_folder = "WEB-INF"+File.separator+"templates"+File.separator+newDirName+File.separator+"wap"+File.separator+s;
-			fileManage.createFolder(wap_path_folder);
+			FileUtil.createFolder(wap_path_folder);
 		}
 		
 		
@@ -547,11 +555,11 @@ public class TemplateManage {
 		for(Layout layout :layoutList){
 			String pc_path = "WEB-INF"+File.separator+"templates"+File.separator+newDirName+File.separator+"pc"+File.separator+layout.getLayoutFile();
 			//创建文件并将注释写入模板文件
-			fileManage.writeStringToFile(pc_path,"<#-- "+layout.getName()+" -->","utf-8",false);
+			FileUtil.writeStringToFile(pc_path,"<#-- "+layout.getName()+" -->","utf-8",false);
 			
 			String wap_path = "WEB-INF"+File.separator+"templates"+File.separator+newDirName+File.separator+"wap"+File.separator+layout.getLayoutFile();
 			//创建文件并将注释写入模板文件
-			fileManage.writeStringToFile(wap_path,"<#-- "+layout.getName()+" -->","utf-8",false);
+			FileUtil.writeStringToFile(wap_path,"<#-- "+layout.getName()+" -->","utf-8",false);
 		}
 		//生成版块默认文件
 		List<ForumCodeNode> forumCodeNodeList = forumCodeManage.forumCodeNodeList(newDirName);
@@ -576,20 +584,20 @@ public class TemplateManage {
 						String pc_path = "WEB-INF"+File.separator+"templates"+File.separator+newDirName+File.separator+"pc"+File.separator+"forum"+File.separator+prefix+displayType+"_default.html";
 
 						//创建文件并将注释写入模板文件
-						fileManage.writeStringToFile(pc_path,"<#-- "+childNode.getNodeName()+"  "+s+" -->","utf-8",false);
+						FileUtil.writeStringToFile(pc_path,"<#-- "+childNode.getNodeName()+"  "+s+" -->","utf-8",false);
 						String wap_path = "WEB-INF"+File.separator+"templates"+File.separator+newDirName+File.separator+"wap"+File.separator+"forum"+File.separator+prefix+displayType+"_default.html";
 
 						//创建文件并将注释写入模板文件
-						fileManage.writeStringToFile(wap_path,"<#-- "+childNode.getNodeName()+"  "+s+" -->","utf-8",false);
+						FileUtil.writeStringToFile(wap_path,"<#-- "+childNode.getNodeName()+"  "+s+" -->","utf-8",false);
 					}
 				}else{
 					String pc_path = "WEB-INF"+File.separator+"templates"+File.separator+newDirName+File.separator+"pc"+File.separator+"forum"+File.separator+prefix+"default.html";
 					//创建文件并将注释写入模板文件
-					fileManage.writeStringToFile(pc_path,"<#-- "+childNode.getNodeName()+" -->","utf-8",false);
+					FileUtil.writeStringToFile(pc_path,"<#-- "+childNode.getNodeName()+" -->","utf-8",false);
 					
 					String wap_path = "WEB-INF"+File.separator+"templates"+File.separator+newDirName+File.separator+"wap"+File.separator+"forum"+File.separator+prefix+"default.html";
 					//创建文件并将注释写入模板文件
-					fileManage.writeStringToFile(wap_path,"<#-- "+childNode.getNodeName()+" -->","utf-8",false);
+					FileUtil.writeStringToFile(wap_path,"<#-- "+childNode.getNodeName()+" -->","utf-8",false);
 				}
 			}
 		}
@@ -625,7 +633,7 @@ public class TemplateManage {
 			
 			String path = "WEB-INF"+ File.separator+ "example" + File.separator+reference_start+".html";
 			
-			example = fileManage.readFileToString(path,"utf-8");
+			example = FileUtil.readFileToString(path,"utf-8");
 			
 		}
 		

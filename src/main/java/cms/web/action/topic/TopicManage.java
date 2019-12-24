@@ -32,13 +32,13 @@ import cms.service.thumbnail.ThumbnailService;
 import cms.service.topic.CommentService;
 import cms.service.topic.TopicService;
 import cms.service.user.UserService;
+import cms.utils.FileUtil;
 import cms.utils.JsonUtils;
 import cms.utils.Verification;
-import cms.web.action.FileManage;
 import cms.web.action.TextFilterManage;
 import cms.web.action.cache.CacheManage;
+import cms.web.action.fileSystem.FileManage;
 import cms.web.action.setting.SettingManage;
-import cms.web.action.thumbnail.ThumbnailManage;
 import net.sf.cglib.beans.BeanCopier;
 /**
  * 话题管理
@@ -54,11 +54,9 @@ public class TopicManage {
 	@Resource CommentService commentService;
 	@Resource StaffService staffService;
 	@Resource UserService userService;
-	@Resource FileManage fileManage;
 	@Resource ThumbnailService thumbnailService;
-	@Resource ThumbnailManage thumbnailManage;
 	@Resource CacheManage cacheManage;
-	
+	@Resource FileManage fileManage;
 	@Resource TopicUnhideConfig topicUnhideConfig;
 	@Resource SettingManage settingManage;
 	
@@ -213,9 +211,9 @@ public class TopicManage {
 							
 							if(thumbnailList != null && thumbnailList.size() >0){
 								//获取文件路径
-								String path = fileManage.getFullPath(imageName);
+								String path = FileUtil.getFullPath(imageName);
 								//获取文件名,含后缀
-								String name = fileManage.getName(imageName);
+								String name = FileUtil.getName(imageName);
 								
 								imageInfoList.add(new ImageInfo(path,name));
 							}
@@ -241,25 +239,25 @@ public class TopicManage {
 							
 							
 							 //如果验证不是当前用户上传的文件，则不删除
-							 if(!topicManage.getFileNumber(fileManage.getBaseName(filePath.trim())).equals(fileNumber)){
+							 if(!topicManage.getFileNumber(FileUtil.getBaseName(filePath.trim())).equals(fileNumber)){
 								 continue;
 							 }
 							
 							//替换路径中的..号
-							filePath = fileManage.toRelativePath(filePath);
-							
+							filePath = FileUtil.toRelativePath(filePath);
+							filePath  = FileUtil.toSystemPath(filePath);
 							//删除旧路径文件
 							Boolean state = fileManage.deleteFile(filePath);
 							if(state != null && state == false){
 								 //替换指定的字符，只替换第一次出现的
-								filePath = StringUtils.replaceOnce(filePath, "file/topic/", "");
+								filePath = StringUtils.replaceOnce(filePath, "file"+File.separator+"topic"+File.separator, "");
 								//创建删除失败文件
-								fileManage.failedStateFile("file"+File.separator+"topic"+File.separator+"lock"+File.separator+filePath.replaceAll("/","_"));
+								fileManage.failedStateFile("file"+File.separator+"topic"+File.separator+"lock"+File.separator+FileUtil.toUnderline(filePath));
 							}
 						}
 						//删除缩略图
 						if(imageInfoList != null && imageInfoList.size()>0){
-							thumbnailManage.deleteThumbnail(thumbnailList, imageInfoList);
+							fileManage.deleteThumbnail(thumbnailList, imageInfoList);
 						}
 						
 					}
@@ -301,25 +299,23 @@ public class TopicManage {
 					if(imageNameList != null && imageNameList.size() >0){
 						for(String imagePath : imageNameList){
 							//如果验证不是当前用户上传的文件，则不删除锁
-							 if(!topicManage.getFileNumber(fileManage.getBaseName(imagePath.trim())).equals(fileNumber)){
+							 if(!topicManage.getFileNumber(FileUtil.getBaseName(imagePath.trim())).equals(fileNumber)){
 								 continue;
 							 }
 							
 							
 							//替换路径中的..号
-							imagePath = fileManage.toRelativePath(imagePath);
-							//替换路径分割符
-							imagePath = StringUtils.replace(imagePath, "/", File.separator);
+							imagePath = FileUtil.toRelativePath(imagePath);
+							imagePath  = FileUtil.toSystemPath(imagePath);
 							
 							Boolean state = fileManage.deleteFile(imagePath);
 							
 							if(state != null && state == false){	
 								//替换指定的字符，只替换第一次出现的
 								imagePath = StringUtils.replaceOnce(imagePath, "file"+File.separator+"comment"+File.separator, "");
-								imagePath = StringUtils.replace(imagePath, File.separator, "_");//替换所有出现过的字符
 								
 								//创建删除失败文件
-								fileManage.failedStateFile("file"+File.separator+"comment"+File.separator+"lock"+File.separator+imagePath);
+								fileManage.failedStateFile("file"+File.separator+"comment"+File.separator+"lock"+File.separator+FileUtil.toUnderline(imagePath));
 							
 							}
 						}

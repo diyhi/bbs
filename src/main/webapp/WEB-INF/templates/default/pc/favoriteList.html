@@ -87,7 +87,8 @@ function deleteFavorite(favoriteId){
 				<THEAD>
 					<TR class="dataThead">
 						<TH width="50%">标题</TH>	
-						<TH width="30%">收藏时间</TH>	
+						<TH width="10%">模块</TH>	
+						<TH width="20%">收藏时间</TH>	
 						<TH width="20%">操作</TH>
 					</TR>
 				</THEAD>
@@ -96,7 +97,19 @@ function deleteFavorite(favoriteId){
 					<#list pageView.records as favorites>
 					<TR>
 						<TD class="dataTD">
-							<a href="thread?topicId=${favorites.topicId}" target="_blank" class="link">${favorites.topicTitle}</a>
+							<#if favorites.module == 10>
+								<a href="thread?topicId=${favorites.topicId}" target="_blank" class="link">${favorites.topicTitle}</a>
+							<#elseif favorites.module == 20>
+								<a href="question?questionId=${favorites.questionId}" target="_blank" class="link">${favorites.questionTitle}</a>
+							</#if> 
+							
+						</TD>
+						<TD class="dataTD">
+							<#if favorites.module == 10>
+								话题
+							<#elseif favorites.module == 20>
+								问题
+							</#if> 
 						</TD>
 						<TD class="dataTD">
 							${favorites.addtime}	

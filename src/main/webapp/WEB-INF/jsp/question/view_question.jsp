@@ -109,10 +109,42 @@ function adoptionAnswer(answerId){
 	}
 	
 	post_request(function(value){
-		if(value == "1"){
-			window.location.reload();
-		}else{
-			alert("采纳失败");
+		var data = JSON.parse(value);
+		for(var returnValue in data){
+		if(returnValue == "success"){
+       		if(data[returnValue] == "true"){
+       				//需引入layer
+       				layer.msg('采纳成功,3秒后自动刷新', 
+						{
+						  time: 3000 //3秒关闭（如果不配置，默认是3秒）
+						},function(){//关闭后的操作
+							//刷新页面
+       						document.location.reload();
+						}
+					);
+       				
+       			}
+       		}else if(returnValue == "error"){
+       			
+       			var errorValue = data[returnValue];
+				var htmlValue = "";
+				var i = 0;
+				for(var error in errorValue){
+					if(error != ""){	
+						i++;
+						htmlValue += "&nbsp;&nbsp;"+i+"、"+errorValue[error]+"<br>";
+					}
+				}
+				
+				layer.open({
+				  type: 1,
+				  title: '错误', 
+				  skin: 'layui-layer-rim', //加上边框
+				  area: ['300px', '150px'], //宽高
+				  content: "<div style='line-height: 36px; font-size: 15px; margin-left: 8px;margin-right: 8px;'>"+htmlValue+"</div>"
+				});
+       		}
+	
 		}
 	},
 		"${config:url(pageContext.request)}control/answer/manage${config:suffix()}?method=adoptionAnswer&timestamp=" + new Date().getTime(), true,parameter);
@@ -132,10 +164,42 @@ function cancelAdoptionAnswer(answerId){
 	}
 	
 	post_request(function(value){
-		if(value == "1"){
-			window.location.reload();
-		}else{
-			alert("采纳失败");
+		var data = JSON.parse(value);
+		for(var returnValue in data){
+		if(returnValue == "success"){
+       		if(data[returnValue] == "true"){
+       				//需引入layer
+       				layer.msg('取消采纳成功,3秒后自动刷新', 
+						{
+						  time: 3000 //3秒关闭（如果不配置，默认是3秒）
+						},function(){//关闭后的操作
+							//刷新页面
+       						document.location.reload();
+						}
+					);
+       				
+       			}
+       		}else if(returnValue == "error"){
+       			
+       			var errorValue = data[returnValue];
+				var htmlValue = "";
+				var i = 0;
+				for(var error in errorValue){
+					if(error != ""){	
+						i++;
+						htmlValue += "&nbsp;&nbsp;"+i+"、"+errorValue[error]+"<br>";
+					}
+				}
+				
+				layer.open({
+				  type: 1,
+				  title: '错误', 
+				  skin: 'layui-layer-rim', //加上边框
+				  area: ['300px', '150px'], //宽高
+				  content: "<div style='line-height: 36px; font-size: 15px; margin-left: 8px;margin-right: 8px;'>"+htmlValue+"</div>"
+				});
+       		}
+	
 		}
 	},
 		"${config:url(pageContext.request)}control/answer/manage${config:suffix()}?method=cancelAdoptionAnswer&timestamp=" + new Date().getTime(), true,parameter);
@@ -210,10 +274,42 @@ function deleteQuestion(questionId){
 			parameter = parameter.substring(1,parameter.length);
 		}
 	   	post_request(function(value){
-			if(value == "1"){
-				window.location.href='${config:url(pageContext.request)}control/question/list${config:suffix()}?visible=${param.visible}&page=${param.page}';
-			}else{
-				alert("删除失败");
+	   		var data = JSON.parse(value);
+			for(var returnValue in data){
+			if(returnValue == "success"){
+	       		if(data[returnValue] == "true"){
+	       				//需引入layer
+	       				layer.msg('删除问题成功,3秒后自动跳转到问题列表', 
+							{
+							  time: 3000 //3秒关闭（如果不配置，默认是3秒）
+							},function(){//关闭后的操作
+								//跳转
+	       						window.location.href='${config:url(pageContext.request)}control/question/list${config:suffix()}?visible=${param.visible}&page=${param.page}';
+							}
+						);
+	       				
+	       			}
+	       		}else if(returnValue == "error"){
+	       			
+	       			var errorValue = data[returnValue];
+					var htmlValue = "";
+					var i = 0;
+					for(var error in errorValue){
+						if(error != ""){	
+							i++;
+							htmlValue += "&nbsp;&nbsp;"+i+"、"+errorValue[error]+"<br>";
+						}
+					}
+					
+					layer.open({
+					  type: 1,
+					  title: '错误', 
+					  skin: 'layui-layer-rim', //加上边框
+					  area: ['300px', '150px'], //宽高
+					  content: "<div style='line-height: 36px; font-size: 15px; margin-left: 8px;margin-right: 8px;'>"+htmlValue+"</div>"
+					});
+	       		}
+		
 			}
 		},
 			"${config:url(pageContext.request)}control/question/manage${config:suffix()}?method=deleteQuestion&visible=${param.visible}&timestamp=" + new Date().getTime(), true,parameter);
@@ -295,10 +391,42 @@ function deleteAnswer(answerId){
 		}
 		
 		post_request(function(value){
-			if(value == "1"){
-				window.location.reload();
-			}else{
-				alert("删除失败");
+			var data = JSON.parse(value);
+			for(var returnValue in data){
+			if(returnValue == "success"){
+	       		if(data[returnValue] == "true"){
+	       				//需引入layer
+	       				layer.msg('取消采纳成功,3秒后自动刷新', 
+							{
+							  time: 3000 //3秒关闭（如果不配置，默认是3秒）
+							},function(){//关闭后的操作
+								//刷新页面
+	       						document.location.reload();
+							}
+						);
+	       				
+	       			}
+	       		}else if(returnValue == "error"){
+	       			
+	       			var errorValue = data[returnValue];
+					var htmlValue = "";
+					var i = 0;
+					for(var error in errorValue){
+						if(error != ""){	
+							i++;
+							htmlValue += "&nbsp;&nbsp;"+i+"、"+errorValue[error]+"<br>";
+						}
+					}
+					
+					layer.open({
+					  type: 1,
+					  title: '错误', 
+					  skin: 'layui-layer-rim', //加上边框
+					  area: ['300px', '150px'], //宽高
+					  content: "<div style='line-height: 36px; font-size: 15px; margin-left: 8px;margin-right: 8px;'>"+htmlValue+"</div>"
+					});
+	       		}
+		
 			}
 		},
 			"${config:url(pageContext.request)}control/answer/manage${config:suffix()}?method=delete&timestamp=" + new Date().getTime(), true,parameter);
@@ -399,6 +527,10 @@ $(function() {
 	<c:if test="${param.origin == 30 }">
 		<input class="functionButton" type="button" onClick="javascript:window.location.href='${config:url(pageContext.request)}control/user/manage${config:suffix()}?method=allAnswerReply&userName=${param.userName}&id=${param.id}&queryState=${param.queryState}&jumpStatus=${param.jumpStatus}&userPage=${param.userPage}&page=${param.answerReplyPage}'" value="返回">
 	</c:if>
+	<!-- 来自用户的收藏夹 -->
+	<c:if test="${param.origin == 40 }">
+		<input class="functionButton" type="button" onClick="javascript:window.location.href='${config:url(pageContext.request)}control/favorite/list${config:suffix()}?userName=${param.userName}&id=${param.id}&queryState=${param.queryState}&jumpStatus=${param.jumpStatus}&userPage=${param.userPage}&page=${param.favoritePage}'" value="返回">
+	</c:if>
 </div>
 
 <TABLE class="t-list-table" cellSpacing="1" cellPadding="0" width="100%" border="0" style="table-layout:fixed;">
@@ -424,6 +556,18 @@ $(function() {
 						<TD width="60%" style="BORDER-BOTTOM: #bfe3ff 1px dotted" align="right">${question.ip}&nbsp;${question.ipAddress}</TD>
 					</TR>	
 				</TABLE>
+				
+				<c:if test="${question.amount gt 0 || question.point gt 0}">
+				
+	                <div class="rewardModule" >
+	                	<div class="rewardInfo" >
+	                		悬赏<c:if test="${question.amount gt 0}">金额<span class="symbol">¥</span><span class="amount">${question.amount}</span>元 </c:if>
+	                		<c:if test="${question.point gt 0}">
+	                			<span class="point">${question.point}</span>积分
+	                		</c:if>
+	                	</div>
+	                </div>
+				</c:if>
 				<enhance:out escapeXml="false">
 					<div class="comment">${question.content}</div>
 				</enhance:out>
@@ -451,6 +595,7 @@ $(function() {
 							<c:if test="${question.status == 10}">
 								<A onclick="javascript:if(window.confirm('确定审核通过吗? ')){auditQuestion('${question.id}');return false;}else{return false};" hidefocus="true" href="#" ondragstart= "return false">立即审核</A>&nbsp;&nbsp;
 							</c:if>
+							<A hidefocus="true"  href="control/questionFavorite/list${config:suffix()}?questionId=${question.id}&visible=${param.visible}&questionPage=${param.questionPage}&userName=${param.userName}&id=${param.id}&queryState=${param.queryState}&jumpStatus=${param.jumpStatus}&userPage=${param.userPage}&commentPage=${param.commentPage}&replyPage=${param.replyPage}" ondragstart= "return false">收藏用户</A>&nbsp;&nbsp;
 							<A hidefocus="true" onClick="showAppendQuestion('${question.id}'); return false" href="#" ondragstart= "return false">追加提问</A>&nbsp;&nbsp;
 							<A hidefocus="true" onClick="showUpdateQuestion('${question.id}'); return false" href="#" ondragstart= "return false">修改</A>&nbsp;&nbsp;
 							<A hidefocus="true" onClick="deleteQuestion('${question.id}'); return false;" href="#" ondragstart= "return false">删除</A>

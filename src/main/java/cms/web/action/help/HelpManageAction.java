@@ -23,13 +23,15 @@ import cms.bean.help.HelpType;
 import cms.service.help.HelpService;
 import cms.service.help.HelpTypeService;
 import cms.service.setting.SettingService;
+import cms.utils.CommentedProperties;
 import cms.utils.FileType;
+import cms.utils.FileUtil;
 import cms.utils.JsonUtils;
 import cms.utils.RedirectPath;
 import cms.utils.UUIDUtil;
-import cms.web.action.FileManage;
 import cms.web.action.SystemException;
 import cms.web.action.TextFilterManage;
+import cms.web.action.fileSystem.FileManage;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -57,9 +59,8 @@ public class HelpManageAction {
 	@Resource HelpService helpService; 
 	@Resource HelpTypeService helpTypeService;
 	@Resource TextFilterManage textFilterManage;
-	@Resource FileManage fileManage;
-	
 	@Resource SettingService settingService;
+	@Resource FileManage fileManage;
 	
 	/**
 	 * 帮助   查看
@@ -155,19 +156,19 @@ public class HelpManageAction {
 					for(Map.Entry<String,String> entry : file_path.entrySet()) {//key:旧文件路径  value:新文件路径
 						
 						//旧路径 左斜杆路径转为系统路径
-						String old_path_Delimiter = fileManage.toSystemPath(entry.getKey());
+						String old_path_Delimiter = FileUtil.toSystemPath(entry.getKey());
 						
 						//新路径 左斜杆路径转为系统路径
-						String new_path_Delimiter = fileManage.toSystemPath(entry.getValue());
+						String new_path_Delimiter = FileUtil.toSystemPath(entry.getValue());
 							
 						//替换路径中的..号
-						old_path_Delimiter = fileManage.toRelativePath(old_path_Delimiter);
-						new_path_Delimiter = fileManage.toRelativePath(new_path_Delimiter);
+						old_path_Delimiter = FileUtil.toRelativePath(old_path_Delimiter);
+						new_path_Delimiter = FileUtil.toRelativePath(new_path_Delimiter);
 						
 						//复制文件到新路径
 						fileManage.copyFile(old_path_Delimiter, new_path_Delimiter);
 						//取得文件名称
-						String fileName = fileManage.getName(entry.getKey());
+						String fileName = FileUtil.getName(entry.getKey());
 						
 						//新建文件锁到新路径
 						 //生成锁文件名称
@@ -266,15 +267,14 @@ public class HelpManageAction {
 				if(oldPathFileList != null && oldPathFileList.size() >0){
 					for(String oldPathFile :oldPathFileList){
 						//替换路径中的..号
-						oldPathFile = fileManage.toRelativePath(oldPathFile);
+						oldPathFile = FileUtil.toRelativePath(oldPathFile);
 						Boolean state = fileManage.deleteFile(oldPathFile);
 						if(state != null && state == false){
 							//替换指定的字符，只替换第一次出现的
 							oldPathFile = StringUtils.replaceOnce(oldPathFile, "file"+File.separator+"help"+File.separator, "");
-							oldPathFile = StringUtils.replace(oldPathFile, File.separator, "_");//替换所有出现过的字符
 							
 							//创建删除失败文件
-							fileManage.failedStateFile("file"+File.separator+"help"+File.separator+"lock"+File.separator+oldPathFile);
+							fileManage.failedStateFile("file"+File.separator+"help"+File.separator+"lock"+File.separator+FileUtil.toUnderline(oldPathFile));
 						
 						}
 					}
@@ -319,7 +319,7 @@ public class HelpManageAction {
 				//文件大小
 				Long size = imgFile.getSize();
 			
-				String suffix = fileManage.getExtension(fileName).toLowerCase();
+				String suffix = FileUtil.getExtension(fileName).toLowerCase();
 
 				if(dir.equals("image")){
 					//允许上传图片格式
@@ -334,7 +334,7 @@ public class HelpManageAction {
 					long imageSize = 200000L;
 
 					//验证文件类型
-					boolean authentication = fileManage.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
+					boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
 					
 					//如果用flash控件上传
 					if(imgFile.getContentType().equalsIgnoreCase("application/octet-stream")){
@@ -357,11 +357,11 @@ public class HelpManageAction {
 						String newFileName = UUIDUtil.getUUID32()+ "." + suffix;
 						
 						//生成文件保存目录
-						fileManage.createFolder(pathDir);
+						FileUtil.createFolder(pathDir);
 						//生成锁文件保存目录
-						fileManage.createFolder(lockPathDir);
+						FileUtil.createFolder(lockPathDir);
 						//生成锁文件
-						fileManage.newFile(lockPathDir+helpTypeId+"_"+date +"_image_"+newFileName);
+						fileManage.addLock(lockPathDir,helpTypeId+"_"+date +"_image_"+newFileName);
 						//保存文件
 						fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
 						
@@ -378,7 +378,7 @@ public class HelpManageAction {
 					flashFormatList.add("swf");
 					
 					//验证文件后缀
-					boolean authentication = fileManage.validateFileSuffix(imgFile.getOriginalFilename(),flashFormatList);
+					boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),flashFormatList);
 
 					if(authentication){
 						
@@ -389,11 +389,11 @@ public class HelpManageAction {
 						String newFileName = UUIDUtil.getUUID32()+ "." + suffix;
 						
 						//生成文件保存目录
-						fileManage.createFolder(pathDir);
+						FileUtil.createFolder(pathDir);
 						//生成锁文件保存目录
-						fileManage.createFolder(lockPathDir);
+						FileUtil.createFolder(lockPathDir);
 						//生成锁文件
-						fileManage.newFile(lockPathDir+helpTypeId+"_"+date +"_flash_"+newFileName);
+						fileManage.addLock(lockPathDir,helpTypeId+"_"+date +"_flash_"+newFileName);
 						//保存文件
 						fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
 						
@@ -422,7 +422,7 @@ public class HelpManageAction {
 					
 					
 					//验证文件后缀
-					boolean authentication = fileManage.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
+					boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
 					
 					if(authentication){	
 						//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
@@ -432,11 +432,11 @@ public class HelpManageAction {
 						//构建文件名称
 						String newFileName = UUIDUtil.getUUID32()+ "." + suffix;
 						//生成文件保存目录
-						fileManage.createFolder(pathDir);
+						FileUtil.createFolder(pathDir);
 						//生成锁文件保存目录
-						fileManage.createFolder(lockPathDir);
+						FileUtil.createFolder(lockPathDir);
 						//生成锁文件
-						fileManage.newFile(lockPathDir+helpTypeId+"_"+date +"_media_"+newFileName);
+						fileManage.addLock(lockPathDir,helpTypeId+"_"+date +"_media_"+newFileName);
 						//保存文件
 						fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
 
@@ -447,11 +447,9 @@ public class HelpManageAction {
 					}
 				}else if(dir.equals("file")){
 					//允许上传文件格式
-					List<String> formatList = fileManage.readRichTextAllowFileUploadFormat();
-
-					
+					List<String> formatList = CommentedProperties.readRichTextAllowFileUploadFormat();
 					//验证文件后缀
-					boolean authentication = fileManage.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
+					boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
 					if(authentication){
 						//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
 						String pathDir = "file"+File.separator+"help"+File.separator + helpTypeId + File.separator + date+ File.separator +"file"+ File.separator;
@@ -461,11 +459,11 @@ public class HelpManageAction {
 						String newFileName = UUIDUtil.getUUID32()+ "." + suffix;
 						
 						//生成文件保存目录
-						fileManage.createFolder(pathDir);
+						FileUtil.createFolder(pathDir);
 						//生成锁文件保存目录
-						fileManage.createFolder(lockPathDir);
+						FileUtil.createFolder(lockPathDir);
 						//生成锁文件
-						fileManage.newFile(lockPathDir+helpTypeId+"_"+date +"_file_"+newFileName);
+						fileManage.addLock(lockPathDir,helpTypeId+"_"+date +"_file_"+newFileName);
 						//保存文件
 						fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
 						
@@ -585,19 +583,19 @@ public class HelpManageAction {
 						for(Map.Entry<String,String> entry : file_path.entrySet()) {//key:旧文件路径  value:新文件路径
 							
 							//旧路径 左斜杆路径转为系统路径
-							String old_path_Delimiter = fileManage.toSystemPath(entry.getKey());
+							String old_path_Delimiter = FileUtil.toSystemPath(entry.getKey());
 							
 							//新路径 左斜杆路径转为系统路径
-							String new_path_Delimiter = fileManage.toSystemPath(entry.getValue());
+							String new_path_Delimiter = FileUtil.toSystemPath(entry.getValue());
 								
 							//替换路径中的..号
-							old_path_Delimiter = fileManage.toRelativePath(old_path_Delimiter);
-							new_path_Delimiter = fileManage.toRelativePath(new_path_Delimiter);
+							old_path_Delimiter = FileUtil.toRelativePath(old_path_Delimiter);
+							new_path_Delimiter = FileUtil.toRelativePath(new_path_Delimiter);
 							
 							//复制文件到新路径
 							fileManage.copyFile(old_path_Delimiter, new_path_Delimiter);
 							//取得文件名称
-							String fileName = fileManage.getName(entry.getKey());
+							String fileName = FileUtil.getName(entry.getKey());
 							
 							//新建文件锁到新路径
 							 //生成锁文件名称
@@ -666,7 +664,7 @@ public class HelpManageAction {
 						}
 						if(old_imageNameList != null && old_imageNameList.size() >0){
 							for(String imageName : old_imageNameList){
-								oldPathFileList.add(fileManage.toSystemPath(imageName));
+								oldPathFileList.add(FileUtil.toSystemPath(imageName));
 							}
 							
 						}
@@ -687,7 +685,7 @@ public class HelpManageAction {
 						}
 						if(old_flashNameList != null && old_flashNameList.size() >0){
 							for(String flashName : old_flashNameList){
-								oldPathFileList.add(fileManage.toSystemPath(flashName));
+								oldPathFileList.add(FileUtil.toSystemPath(flashName));
 							}
 							
 						}
@@ -708,7 +706,7 @@ public class HelpManageAction {
 						}
 						if(old_mediaNameList != null && old_mediaNameList.size() >0){
 							for(String mediaName : old_mediaNameList){
-								oldPathFileList.add(fileManage.toSystemPath(mediaName));
+								oldPathFileList.add(FileUtil.toSystemPath(mediaName));
 							}
 							
 						}
@@ -729,7 +727,7 @@ public class HelpManageAction {
 						}
 						if(old_fileNameList != null && old_fileNameList.size() >0){
 							for(String fileName : old_fileNameList){
-								oldPathFileList.add(fileManage.toSystemPath(fileName));
+								oldPathFileList.add(FileUtil.toSystemPath(fileName));
 							}
 							
 						}
@@ -785,17 +783,16 @@ public class HelpManageAction {
 				if(oldPathFileList != null && oldPathFileList.size() >0){
 					for(String oldPathFile :oldPathFileList){
 						//替换路径中的..号
-						oldPathFile = fileManage.toRelativePath(oldPathFile);
+						oldPathFile = FileUtil.toRelativePath(oldPathFile);
 						
 						//删除旧路径文件
 						Boolean state = fileManage.deleteFile(oldPathFile);
 						if(state != null && state == false){
 							//替换指定的字符，只替换第一次出现的
 							oldPathFile = StringUtils.replaceOnce(oldPathFile, "file"+File.separator+"help"+File.separator, "");
-							oldPathFile = StringUtils.replace(oldPathFile, File.separator, "_");//替换所有出现过的字符
 							
 							//创建删除失败文件
-							fileManage.failedStateFile("file"+File.separator+"help"+File.separator+"lock"+File.separator+oldPathFile);
+							fileManage.failedStateFile("file"+File.separator+"help"+File.separator+"lock"+File.separator+FileUtil.toUnderline(oldPathFile));
 
 						}
 					}
@@ -877,15 +874,16 @@ public class HelpManageAction {
 								
 								for(String filePath :filePathList){
 									//替换路径中的..号
-									filePath = fileManage.toRelativePath(filePath);
-									
+									filePath = FileUtil.toRelativePath(filePath);
+									filePath = FileUtil.toSystemPath(filePath);
 									//删除旧路径文件
 									Boolean state = fileManage.deleteFile(filePath);
 									if(state != null && state == false){
 										 //替换指定的字符，只替换第一次出现的
-										filePath = StringUtils.replaceOnce(filePath, "file/help/", "");
+										filePath = StringUtils.replaceOnce(filePath, "file"+File.separator+"help"+File.separator, "");
+										
 										//创建删除失败文件
-										fileManage.failedStateFile("file"+File.separator+"help"+File.separator+"lock"+File.separator+filePath.replaceAll("/","_"));
+										fileManage.failedStateFile("file"+File.separator+"help"+File.separator+"lock"+File.separator+FileUtil.toUnderline(filePath));
 									}
 								}
 								
@@ -952,19 +950,19 @@ public class HelpManageAction {
 						for(Map.Entry<String,String> entry : file_path.entrySet()) {//key:旧文件路径  value:新文件路径
 							
 							//旧路径 左斜杆路径转为系统路径
-							String old_path_Delimiter = fileManage.toSystemPath(entry.getKey());
+							String old_path_Delimiter = FileUtil.toSystemPath(entry.getKey());
 							
 							//新路径 左斜杆路径转为系统路径
-							String new_path_Delimiter = fileManage.toSystemPath(entry.getValue());
+							String new_path_Delimiter = FileUtil.toSystemPath(entry.getValue());
 								
 							//替换路径中的..号
-							old_path_Delimiter = fileManage.toRelativePath(old_path_Delimiter);
-							new_path_Delimiter = fileManage.toRelativePath(new_path_Delimiter);
+							old_path_Delimiter = FileUtil.toRelativePath(old_path_Delimiter);
+							new_path_Delimiter = FileUtil.toRelativePath(new_path_Delimiter);
 							
 							//复制文件到新路径
 							fileManage.copyFile(old_path_Delimiter, new_path_Delimiter);
 							//取得文件名称
-							String fileName = fileManage.getName(entry.getKey());
+							String fileName = FileUtil.getName(entry.getKey());
 							
 							//新建文件锁到新路径
 							 //生成锁文件名称
@@ -997,17 +995,16 @@ public class HelpManageAction {
 			if(pathFileList != null && pathFileList.size() >0){
 				for(String pathFile :pathFileList){
 					//替换路径中的..号
-					pathFile = fileManage.toRelativePath(pathFile);
+					pathFile = FileUtil.toRelativePath(pathFile);
 					
 					//删除旧路径文件
 					Boolean state = fileManage.deleteFile(pathFile);
 					if(state != null && state == false){
 						//替换指定的字符，只替换第一次出现的
 						pathFile = StringUtils.replaceOnce(pathFile, "file"+File.separator+"help"+File.separator, "");
-						pathFile = StringUtils.replace(pathFile, File.separator, "_");//替换所有出现过的字符
 						
 						//创建删除失败文件
-						fileManage.failedStateFile("file"+File.separator+"help"+File.separator+"lock"+File.separator+pathFile);
+						fileManage.failedStateFile("file"+File.separator+"help"+File.separator+"lock"+File.separator+FileUtil.toUnderline(pathFile));
 					
 					
 					}

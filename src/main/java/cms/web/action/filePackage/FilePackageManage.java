@@ -14,10 +14,10 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import cms.bean.ZipPack;
+import cms.utils.FileUtil;
 import cms.utils.PathUtil;
 import cms.utils.UUIDUtil;
 import cms.utils.ZipUtil;
-import cms.web.action.FileManage;
 
 /**
  * 打包管理
@@ -25,7 +25,6 @@ import cms.web.action.FileManage;
  */
 @Component("filePackageManage")
 public class FilePackageManage {
-	@Resource FileManage fileManage;
 	
 	/**
 	 * 文件打包
@@ -52,13 +51,13 @@ public class FilePackageManage {
 						List<ZipPack> zipPackList = new ArrayList<ZipPack>();
 						
 						
-						String path = PathUtil.path()+File.separator+fileManage.toRelativePath(fileManage.toSystemPath(id));
-						File file = new File(PathUtil.path()+File.separator+fileManage.toRelativePath(fileManage.toSystemPath(id)));
+						String path = PathUtil.path()+File.separator+FileUtil.toRelativePath(FileUtil.toSystemPath(id));
+						File file = new File(PathUtil.path()+File.separator+FileUtil.toRelativePath(FileUtil.toSystemPath(id)));
 						 // 判断此文件是否是一个文件夹
 		                if (file.isDirectory()) {	
 		                	ZipPack zipPack = new ZipPack();
 		                	zipPack.setSource(path);
-		                	zipPack.setEntryPath(new File(PathUtil.path()).getName()+ File.separator+fileManage.toRelativePath(fileManage.toSystemPath(id)));
+		                	zipPack.setEntryPath(new File(PathUtil.path()).getName()+ File.separator+FileUtil.toRelativePath(FileUtil.toSystemPath(id)));
 		                	zipPack.setDirectory(true);
 		                	zipPackList.add(zipPack);
 		                }else{
@@ -70,7 +69,7 @@ public class FilePackageManage {
 		                	
 		                	ZipPack zipPack = new ZipPack();
 		                	zipPack.setSource(path);
-		                	zipPack.setEntryPath(new File(PathUtil.path()).getName()+ File.separator+(_id != null && !"".equals(_id) ? fileManage.toRelativePath(fileManage.toSystemPath(_id)) : ""));
+		                	zipPack.setEntryPath(new File(PathUtil.path()).getName()+ File.separator+(_id != null && !"".equals(_id) ? FileUtil.toRelativePath(FileUtil.toSystemPath(_id)) : ""));
 		                	zipPack.setDirectory(false);
 		                	zipPackList.add(zipPack);
 		                }
@@ -89,13 +88,13 @@ public class FilePackageManage {
 				List<ZipPack> zipPackList = new ArrayList<ZipPack>();
 				
 				for(String id : compressList){
-					String path = PathUtil.path()+File.separator+fileManage.toRelativePath(fileManage.toSystemPath(id));
-					File file = new File(PathUtil.path()+File.separator+fileManage.toRelativePath(fileManage.toSystemPath(id)));
+					String path = PathUtil.path()+File.separator+FileUtil.toRelativePath(FileUtil.toSystemPath(id));
+					File file = new File(PathUtil.path()+File.separator+FileUtil.toRelativePath(FileUtil.toSystemPath(id)));
 					 // 判断此文件是否是一个文件夹
 	                if (file.isDirectory()) {	
 	                	ZipPack zipPack = new ZipPack();
 	                	zipPack.setSource(path);
-	                	zipPack.setEntryPath(new File(PathUtil.path()).getName()+ File.separator+fileManage.toRelativePath(fileManage.toSystemPath(id)));
+	                	zipPack.setEntryPath(new File(PathUtil.path()).getName()+ File.separator+FileUtil.toRelativePath(FileUtil.toSystemPath(id)));
 	                	zipPack.setDirectory(true);
 	                	zipPackList.add(zipPack);
 	                }else{
@@ -107,7 +106,7 @@ public class FilePackageManage {
 	                	
 	                	ZipPack zipPack = new ZipPack();
 	                	zipPack.setSource(path);
-	                	zipPack.setEntryPath(new File(PathUtil.path()).getName()+ File.separator+(_id != null && !"".equals(_id) ? fileManage.toRelativePath(fileManage.toSystemPath(_id)) : ""));
+	                	zipPack.setEntryPath(new File(PathUtil.path()).getName()+ File.separator+(_id != null && !"".equals(_id) ? FileUtil.toRelativePath(FileUtil.toSystemPath(_id)) : ""));
 	                	zipPack.setDirectory(false);
 	                	zipPackList.add(zipPack);
 	                }

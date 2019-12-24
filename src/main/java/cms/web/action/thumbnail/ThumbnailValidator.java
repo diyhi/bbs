@@ -8,19 +8,17 @@ import javax.annotation.Resource;
 import cms.bean.thumbnail.Thumbnail;
 import cms.service.thumbnail.ThumbnailService;
 import cms.utils.PathUtil;
-import cms.web.action.FileManage;
 
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
 /**
- * 缩略图校验器
+ * 定时任务校验器
  *
  */
 @Component("thumbnailValidator")
 public class ThumbnailValidator implements Validator{
-	@Resource FileManage fileManage;
 	@Resource ThumbnailService thumbnailService;
 	
 	public boolean supports(Class<?> clazz) {//该校验器支持的目标类 

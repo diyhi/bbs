@@ -24,12 +24,16 @@ public class FavoritesEntity implements Serializable{
 	/** ID **/
 	@Id @Column(length=36)
 	protected String id;
+	
+	/** 模块 10:话题 20:问题 **/
+	protected Integer module;
+	
 	/** 收藏夹的用户名称 **/
 	@Column(length=30)
 	protected String userName;
 	
 	
-	/** 发布话题的用户名称 **/
+	/** 发布 话题/问题 的用户名称 **/
 	@Column(length=30)
 	protected String postUserName;
 	
@@ -43,6 +47,13 @@ public class FavoritesEntity implements Serializable{
 	/** 话题标题 **/
 	@Transient
 	protected String topicTitle;
+	
+	/** 问题Id **/
+	protected Long questionId;
+
+	/** 问题标题 **/
+	@Transient
+	protected String questionTitle;
 
 	public String getId() {
 		return id;
@@ -89,6 +100,30 @@ public class FavoritesEntity implements Serializable{
 
 	public void setPostUserName(String postUserName) {
 		this.postUserName = postUserName;
+	}
+
+	public Integer getModule() {
+		return module;
+	}
+
+	public void setModule(Integer module) {
+		this.module = module;
+	}
+
+	public Long getQuestionId() {
+		return questionId;
+	}
+
+	public void setQuestionId(Long questionId) {
+		this.questionId = questionId;
+	}
+
+	public String getQuestionTitle() {
+		return questionTitle;
+	}
+
+	public void setQuestionTitle(String questionTitle) {
+		this.questionTitle = questionTitle;
 	}
 	
 	

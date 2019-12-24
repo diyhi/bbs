@@ -23,7 +23,7 @@
             $('.slb').addClass('slb--invert');
             $image.addClass('slb--invert');
         } else {
-            $overlay.css('background-color', 'white');
+            $overlay.css({"background-color":"white","cursor":"zoom-out"});
             $cross.addClass('cross--light');
         }
 

@@ -51,14 +51,16 @@ import cms.service.question.QuestionTagService;
 import cms.service.template.TemplateService;
 import cms.service.topic.TagService;
 import cms.service.topic.TopicService;
+import cms.utils.CommentedProperties;
 import cms.utils.FileType;
+import cms.utils.FileUtil;
 import cms.utils.JsonUtils;
 import cms.utils.RedirectPath;
 import cms.utils.UUIDUtil;
 import cms.utils.Verification;
-import cms.web.action.FileManage;
 import cms.web.action.SystemException;
 import cms.web.action.TextFilterManage;
+import cms.web.action.fileSystem.localImpl.LocalFileManage;
 import cms.web.action.forumCode.ForumCodeManage;
 
 /**
@@ -73,12 +75,11 @@ public class ForumManageAction{
 	private TemplateService templateService;//通过接口引用代理返回的对象
 	@Resource HelpTypeService helpTypeService;
 	@Resource HelpService helpService;
-	
+	@Resource LocalFileManage localFileManage;
 	@Resource TagService tagService;
 	@Resource TopicService topicService;
 	@Resource QuestionTagService questionTagService;
 	@Resource LayoutManage layoutManage;
-	@Resource FileManage fileManage;
 	@Resource ForumCodeManage forumCodeManage;
 	
 	@Resource TextFilterManage textFilterManage;
@@ -378,7 +379,7 @@ public class ForumManageAction{
 					if(collection_Forum_AdvertisingRelated_imageList != null && collection_Forum_AdvertisingRelated_imageList.size() >0){
 						for(Forum_AdvertisingRelated_Image forum_AdvertisingRelated_Image :collection_Forum_AdvertisingRelated_imageList){
 							if(forum_AdvertisingRelated_Image.getImage_fileName() != null && !"".equals(forum_AdvertisingRelated_Image.getImage_fileName().trim())){	
-								fileManage.deleteLock("file"+File.separator+"template"+File.separator+"lock"+File.separator,dirName +"_"+fileManage.toRelativePath(forum_AdvertisingRelated_Image.getImage_fileName()));
+								localFileManage.deleteLock("file"+File.separator+"template"+File.separator+"lock"+File.separator,dirName +"_"+FileUtil.toRelativePath(forum_AdvertisingRelated_Image.getImage_fileName()));
 							}
 						}
 					}
@@ -445,8 +446,9 @@ public class ForumManageAction{
 								for(String oldPathFile :pathFileList){
 									 //替换指定的字符，只替换第一次出现的
 									oldPathFile = StringUtils.replaceOnce(oldPathFile, "file/template/", "");
+									
 									if(oldPathFile != null && !"".equals(oldPathFile.trim())){
-										 fileManage.deleteLock("file"+File.separator+"template"+File.separator+"lock"+File.separator,oldPathFile.replaceAll("/","_"));
+										localFileManage.deleteLock("file"+File.separator+"template"+File.separator+"lock"+File.separator,oldPathFile.replaceAll("/","_"));
 									 }
 								}
 							}
@@ -772,7 +774,7 @@ public class ForumManageAction{
 							if(forum_AdvertisingRelated_Image.getImage_fileName() != null && !"".equals(forum_AdvertisingRelated_Image.getImage_fileName().trim())){
 								
 								
-								fileManage.deleteLock("file"+File.separator+"template"+File.separator+"lock"+File.separator,dirName +"_"+fileManage.toRelativePath(forum_AdvertisingRelated_Image.getImage_fileName()));
+								localFileManage.deleteLock("file"+File.separator+"template"+File.separator+"lock"+File.separator,dirName +"_"+FileUtil.toRelativePath(forum_AdvertisingRelated_Image.getImage_fileName()));
 							}
 						}
 					}
@@ -841,7 +843,7 @@ public class ForumManageAction{
 									 //替换指定的字符，只替换第一次出现的
 									oldPathFile = StringUtils.replaceOnce(oldPathFile, "file/template/", "");
 									if(oldPathFile != null && !"".equals(oldPathFile.trim())){
-										 fileManage.deleteLock("file"+File.separator+"template"+File.separator+"lock"+File.separator,oldPathFile.replaceAll("/","_"));
+										localFileManage.deleteLock("file"+File.separator+"template"+File.separator+"lock"+File.separator,oldPathFile.replaceAll("/","_"));
 									 }
 								}
 							}
@@ -895,14 +897,14 @@ public class ForumManageAction{
 			        //删除旧图片
 			        for(String old_image :old_imageList){
 						//替换路径中的..号
-			        	old_image = fileManage.toRelativePath(old_image);
-						Boolean state = fileManage.deleteFile(old_image);
+			        	old_image = FileUtil.toRelativePath(old_image);
+						Boolean state = localFileManage.deleteFile(old_image);
 						if(state != null && state == false){
 							//替换指定的字符，只替换第一次出现的
 							old_image = StringUtils.replaceOnce(old_image, "file/template/", "");
 							old_image = StringUtils.replace(old_image, "/", "_");//替换所有出现过的字符
 							//创建删除失败文件
-							fileManage.failedStateFile("file"+File.separator+"template"+File.separator+"lock"+File.separator+old_image);
+							localFileManage.failedStateFile("file"+File.separator+"template"+File.separator+"lock"+File.separator+old_image);
 						}
 					}
 				}
@@ -1034,14 +1036,16 @@ public class ForumManageAction{
 							
 							for(String old_pathFile : old_pathFileList){
 								//替换路径中的..号
-								old_pathFile = fileManage.toRelativePath(old_pathFile);
-								Boolean state = fileManage.deleteFile(old_pathFile);
+								old_pathFile = FileUtil.toRelativePath(old_pathFile);
+								old_pathFile = FileUtil.toSystemPath(old_pathFile);
+								Boolean state = localFileManage.deleteFile(old_pathFile);
+								
 								if(state != null && state == false){
 									//替换指定的字符，只替换第一次出现的
-									old_pathFile = StringUtils.replaceOnce(old_pathFile, "file/template/", "");
-									old_pathFile = StringUtils.replace(old_pathFile, "/", "_");//替换所有出现过的字符
+									old_pathFile = StringUtils.replaceOnce(old_pathFile, "file"+File.separator+"template"+File.separator, "");
+									old_pathFile = FileUtil.toUnderline(old_pathFile);//替换所有出现过的字符
 									//创建删除失败文件
-									fileManage.failedStateFile("file"+File.separator+"template"+File.separator+"lock"+File.separator+old_pathFile);
+									localFileManage.failedStateFile("file"+File.separator+"template"+File.separator+"lock"+File.separator+old_pathFile);
 								}
 							}
 							
@@ -1108,10 +1112,10 @@ public class ForumManageAction{
 							formatList.add("jpeg");
 							formatList.add("bmp");
 							formatList.add("png");
-							boolean authentication = fileManage.validateFileSuffix(file.getOriginalFilename(),formatList);
+							boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),formatList);
 							if(authentication){
 								//取得文件后缀		
-								String ext = fileManage.getExtension(file.getOriginalFilename());
+								String ext = FileUtil.getExtension(file.getOriginalFilename());
 								//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
 								String pathDir = "file"+File.separator+"template"+File.separator + dirName +File.separator;
 								//构建文件名称
@@ -1120,13 +1124,13 @@ public class ForumManageAction{
 								image_fileName = fileName;
 								
 								//生成文件保存目录
-								fileManage.createFolder(pathDir);
+								FileUtil.createFolder(pathDir);
 								//生成锁文件名称
 								String lockFileName = dirName +"_"+fileName;
 								//添加文件锁
-								fileManage.addLock("file"+File.separator+"template"+File.separator+"lock"+File.separator,lockFileName);
+								localFileManage.addLock("file"+File.separator+"template"+File.separator+"lock"+File.separator,lockFileName);
 								//保存文件
-								fileManage.writeFile(pathDir, fileName,file.getBytes());
+								localFileManage.writeFile(pathDir, fileName,file.getBytes());
 							   
 								
 							}else{
@@ -1137,7 +1141,7 @@ public class ForumManageAction{
 							
 							if(collection_image_imagePath[i] != null && !"".equals(collection_image_imagePath[i].trim())){
 								//取得文件名称
-								String fileName = fileManage.getName(collection_image_imagePath[i].trim());
+								String fileName = FileUtil.getName(collection_image_imagePath[i].trim());
 								//旧路径必须为file/template/开头
 								if(!collection_image_imagePath[i].trim().substring(0, 14).equals("file/template/")){
 									continue;
@@ -1708,7 +1712,7 @@ public class ForumManageAction{
 				//文件大小
 				Long size = imgFile.getSize();
 				//取得文件后缀
-				String suffix = fileManage.getExtension(fileName).toLowerCase();
+				String suffix = FileUtil.getExtension(fileName).toLowerCase();
 				
 				if(dir.equals("image")){
 					//允许上传图片格式
@@ -1722,7 +1726,7 @@ public class ForumManageAction{
 					//允许上传图片大小
 					long imageSize = 200000L;
 	
-					boolean authentication = fileManage.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
+					boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
 					
 					
 					//如果用flash控件上传
@@ -1747,13 +1751,13 @@ public class ForumManageAction{
 						String newFileName = UUIDUtil.getUUID32()+ "." + suffix;
 						
 						//生成文件保存目录
-						fileManage.createFolder(pathDir);
+						FileUtil.createFolder(pathDir);
 						//生成锁文件保存目录
-						fileManage.createFolder(lockPathDir);
+						FileUtil.createFolder(lockPathDir);
 						//生成锁文件
-						fileManage.newFile(lockPathDir+layout.getDirName()+"_image_"+newFileName);
+						localFileManage.addLock(lockPathDir,layout.getDirName()+"_image_"+newFileName);
 						//保存文件
-						fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
+						localFileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
 						
 						//上传成功
 						returnJson.put("error", 0);//0成功  1错误
@@ -1767,7 +1771,7 @@ public class ForumManageAction{
 					flashFormatList.add("swf");
 					
 					//验证文件后缀
-					boolean authentication = fileManage.validateFileSuffix(imgFile.getOriginalFilename(),flashFormatList);
+					boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),flashFormatList);
 					
 					if(authentication){
 						
@@ -1779,13 +1783,13 @@ public class ForumManageAction{
 						String newFileName = UUIDUtil.getUUID32()+ "." + suffix;
 						
 						//生成文件保存目录
-						fileManage.createFolder(pathDir);
+						FileUtil.createFolder(pathDir);
 						//生成锁文件保存目录
-						fileManage.createFolder(lockPathDir);
+						FileUtil.createFolder(lockPathDir);
 						//生成锁文件
-						fileManage.newFile(lockPathDir+layout.getDirName() +"_flash_"+newFileName);
+						localFileManage.addLock(lockPathDir,layout.getDirName() +"_flash_"+newFileName);
 						//保存文件
-						fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
+						localFileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
 						
 						//上传成功
 						returnJson.put("error", 0);//0成功  1错误
@@ -1811,7 +1815,7 @@ public class ForumManageAction{
 					
 					
 					//验证文件后缀
-					boolean authentication = fileManage.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
+					boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
 					
 					if(authentication){
 						//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
@@ -1822,13 +1826,13 @@ public class ForumManageAction{
 						String newFileName = UUIDUtil.getUUID32()+ "." + suffix;
 						
 						//生成文件保存目录
-						fileManage.createFolder(pathDir);
+						FileUtil.createFolder(pathDir);
 						//生成锁文件保存目录
-						fileManage.createFolder(lockPathDir);
+						FileUtil.createFolder(lockPathDir);
 						//生成锁文件
-						fileManage.newFile(lockPathDir+layout.getDirName()+"_media_"+newFileName);
+						localFileManage.addLock(lockPathDir,layout.getDirName()+"_media_"+newFileName);
 						//保存文件
-						fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
+						localFileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
 						
 						//上传成功
 						returnJson.put("error", 0);//0成功  1错误
@@ -1837,10 +1841,10 @@ public class ForumManageAction{
 					}
 				}else if(dir.equals("file")){
 					//允许上传文件格式
-					List<String> formatList = fileManage.readRichTextAllowFileUploadFormat();
+					List<String> formatList = CommentedProperties.readRichTextAllowFileUploadFormat();
 					
 					//验证文件后缀
-					boolean authentication = fileManage.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
+					boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
 					if(authentication){
 						//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
 						String pathDir = "file"+File.separator+"template"+File.separator + layout.getDirName()+ File.separator +"file"+ File.separator;
@@ -1850,13 +1854,13 @@ public class ForumManageAction{
 						String newFileName = UUIDUtil.getUUID32()+ "." + suffix;
 						
 						//生成文件保存目录
-						fileManage.createFolder(pathDir);
+						FileUtil.createFolder(pathDir);
 						//生成锁文件保存目录
-						fileManage.createFolder(lockPathDir);
+						FileUtil.createFolder(lockPathDir);
 						//生成锁文件
-						fileManage.newFile(lockPathDir+layout.getDirName()+"_file_"+newFileName);
+						localFileManage.addLock(lockPathDir,layout.getDirName()+"_file_"+newFileName);
 						//保存文件
-						fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
+						localFileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
 						
 						//上传成功
 						returnJson.put("error", 0);//0成功  1错误

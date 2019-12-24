@@ -10,13 +10,14 @@
 <meta name="_csrf_header" content="${_csrf.headerName}"/>
 <LINK href="backstage/css/list.css" type="text/css" rel="stylesheet">
 <LINK href="backstage/css/table.css" type="text/css" rel="stylesheet">
+<script language="JavaScript" src="backstage/jquery/jquery.min.js"></script>
 <link href="backstage/kindeditor/themes/default/default.css" rel="stylesheet"/>
 <link href="backstage/kindeditor/plugins/hide/hide.css" rel="stylesheet"/>
 <script charset="utf-8" src="backstage/kindeditor/kindeditor.js"></script>
 <script charset="utf-8" src="backstage/kindeditor/lang/zh-CN.js"></script>
 <script type="text/javascript" src="backstage/js/ajax.js" language="javascript" ></script>
 <script type="text/javascript" src="backstage/js/Tool.js" charset="UTF-8"></script>
-<script language="JavaScript" src="backstage/jquery/jquery.min.js"></script>
+
 <link rel="stylesheet" href="backstage/layer/skin/layer.css"  type="text/css" />
 
 <!--[if (IE 6)|(IE 7)|(IE 8)]>
@@ -321,7 +322,7 @@ function initKindEditor(){
         'superscript', 'clearhtml', 'quickformat', 'selectall', '|', 'fullscreen', 
         'formatblock', 'fontname', 'fontsize', '/', 'forecolor', 'hilitecolor', 'bold',
         'italic', 'underline', 'strikethrough', 'lineheight', 'removeformat', '|', 'image', 'multiimage',
-        'flash', 'media', 'insertfile','emoticons','baidumap', 'table', 'hr',   'pagebreak',
+         'media', 'insertfile','emoticons','baidumap', 'table', 'hr',   'pagebreak',
          'link', 'unlink','hide','hidePassword','hideComment','hideGrade','hidePoint','hideAmount'],
          	userGradeList:userGradeList_obj,
 			afterChange : function() {

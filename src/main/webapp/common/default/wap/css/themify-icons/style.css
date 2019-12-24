@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'themify';
-  src:  url('fonts/themify.eot?dyrqpw');
-  src:  url('fonts/themify.eot?dyrqpw#iefix') format('embedded-opentype'),
-    url('fonts/themify.ttf?dyrqpw') format('truetype'),
-    url('fonts/themify.woff?dyrqpw') format('woff'),
-    url('fonts/themify.svg?dyrqpw#themify') format('svg');
+  src:  url('fonts/themify.eot?w6hewr');
+  src:  url('fonts/themify.eot?w6hewr#iefix') format('embedded-opentype'),
+    url('fonts/themify.ttf?w6hewr') format('truetype'),
+    url('fonts/themify.woff?w6hewr') format('woff'),
+    url('fonts/themify.svg?w6hewr#themify') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -27,6 +27,12 @@
 
 .cms-append:before {
   content: "\e914";
+}
+.cms-unlock-solid:before {
+  content: "\e916";
+}
+.cms-lock-solid:before {
+  content: "\e915";
 }
 .cms-quote-right-solid:before {
   content: "\e912";

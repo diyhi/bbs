@@ -46,7 +46,7 @@
 							<div class="topicSubmit">
 								<!-- 
 					        	<span class="submitButton"><INPUT type="button" value="提交" onClick="javascript:sureSubmit(this.form)"></span> -->
-					        	<span class="submitButton"><INPUT type="button" value="提交" onClick="javascript:ajax_sureSubmit('${identificationNumber}')"></span>
+					        	<span class="submitButton"><INPUT id="${identificationNumber}_submitForm" type="button" value="提交" onClick="javascript:ajax_sureSubmit('${identificationNumber}')"></span>
 					        </div>
 							
 							
@@ -139,6 +139,8 @@
 							} 
 							//Ajax方式提交
 							function ajax_sureSubmit(identificationNumber){
+								//按钮设置 disabled="disabled"
+								document.getElementById(identificationNumber+"_submitForm").disabled=true;
 								//清空所有错误提示
 								var error_tag = getElementsByName_pseudo("span", "error");
 								for(var i = 0;i < error_tag.length; i++) {
@@ -218,6 +220,8 @@
 							        				}
 							        				
 							        			}
+							        			//按钮设置 disabled="disabled"
+												document.getElementById(identificationNumber+"_submitForm").disabled=false;
 							        		}else if(returnValue == "captchaKey"){//显示验证码
 					        					
 												var captchaKey = data[returnValue];
@@ -234,6 +238,9 @@
 							        	}
 									},
 										"user/control/topic/add?timestamp=" + new Date().getTime(), true,parameter);
+								}else{
+									//按钮设置 disabled="disabled"
+									document.getElementById(identificationNumber+"_submitForm").disabled=false;
 								}
 							} 
 							

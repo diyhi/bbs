@@ -9,10 +9,11 @@ import cms.bean.upgrade.UpgradeLog;
 import cms.bean.upgrade.UpgradeSystem;
 import cms.service.template.TemplateService;
 import cms.service.upgrade.UpgradeService;
+import cms.utils.FileUtil;
 import cms.utils.JsonUtils;
 import cms.utils.ObjectConversion;
 import cms.utils.SpringConfigTool;
-import cms.web.action.FileManage;
+import cms.web.action.fileSystem.localImpl.LocalFileManage;
 import cms.web.action.upgrade.UpgradeManage;
 /**
  * 3.3升级到3.4版本执行程序
@@ -27,10 +28,9 @@ public class Upgrade3_3to3_4 {
 	 */
     public static void run(String upgradeId){
     	UpgradeService upgradeService = (UpgradeService)SpringConfigTool.getContext().getBean("upgradeServiceBean");
-    	FileManage fileManage = (FileManage)SpringConfigTool.getContext().getBean("fileManage");
     	UpgradeManage upgradeManage = (UpgradeManage)SpringConfigTool.getContext().getBean("upgradeManage");
     	TemplateService templateService = (TemplateService)SpringConfigTool.getContext().getBean("templateServiceBean");
-
+    	LocalFileManage localFileManage = (LocalFileManage)SpringConfigTool.getContext().getBean("localFileManage");
     	for(int i =0; i< 100; i++){
     		upgradeManage.taskRunMark_delete();
 			upgradeManage.taskRunMark_add(1L);
@@ -67,12 +67,12 @@ public class Upgrade3_3to3_4 {
     			//更改运行状态
 				upgradeService.updateRunningStatus(upgradeId ,9999,JsonUtils.toJSONString(new UpgradeLog(new Date(),"升级完成",1))+",");
 				//写入当前BBS版本
-				fileManage.writeStringToFile("WEB-INF"+File.separator+"data"+File.separator+"systemVersion.txt",upgradeSystem.getId(),"utf-8",false);
+				FileUtil.writeStringToFile("WEB-INF"+File.separator+"data"+File.separator+"systemVersion.txt",upgradeSystem.getId(),"utf-8",false);
 				
 				//临时目录路径
 				String temp_path = "WEB-INF"+File.separator+"data"+File.separator+"temp"+File.separator+"upgrade"+File.separator;
 				//删除临时文件夹
-				fileManage.removeDirectory(temp_path+upgradeSystem.getUpdatePackageFirstDirectory()+File.separator);
+				localFileManage.removeDirectory(temp_path+upgradeSystem.getUpdatePackageFirstDirectory()+File.separator);
 				
     		}
     		

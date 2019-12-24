@@ -1,6 +1,6 @@
 <#-- 话题列表  分页 -->
+<#-- 页面需引入layer.js -->
 <@function page="${url_page}" tagId="${url_tagId}">
-
 <div class="topicModule">
 	<div class="topic-box">
 		<div class="topicList">
@@ -44,6 +44,15 @@
 					            <#list topic.allowRoleViewList as roleName>
 									<span class="topicRoleName">${roleName}</span>
 								</#list>
+								<#list topic.hideTagTypeMap as key, value>
+									<span class="hideTagType hide_${key}" data="${key}">
+		                      			<#if value?c == 'true'>
+		                      				<span class="circle point"><i class="cms-unlock-solid" ></i></span>
+		                      			<#else>
+		                      				<span class="circle"><i class="cms-lock-solid" ></i></span>
+		                      			</#if>
+			                      	</span> 
+								</#list>
 							</h2>
 							<div class="clearfix"></div>
 							
@@ -55,10 +64,10 @@
 												<li data-src="${imageInfo.path}${imageInfo.name}"><div class="img" style="background-image: url(${imageInfo.path}120x120/${imageInfo.name})"></div> <b class="tm-photos-arrow"></b> </li>
 											</#list>
 										</ul>
-										<div class="tm-m-photo-viewer transition1 topic_original_${topic.id}" style="margin-bottom:  -10px;"> 
+										<div class="tm-m-photo-viewer transition1 topic_original_${topic.id}"> 
 											<img src="${commonPath}images/null.gif"> 
-											<span class="tm-m-photo-viewer-navleft navleft_${topic.id}" style="cursor: default;"> <i class="tm-m-photo-viewer-navicon">&lt;</i> </span> 
-											<span class="tm-m-photo-viewer-navright navright_${topic.id}" style="cursor: pointer;"> <i class="tm-m-photo-viewer-navicon">&gt;</i> </span> 
+											<span class="tm-m-photo-viewer-navleft navleft_${topic.id}"></span> 
+											<span class="tm-m-photo-viewer-navright navright_${topic.id}" ></span> 
 										</div>
 									</div>
 								<#else>
@@ -98,4 +107,66 @@
 		</div>
 	</div>
 </div>
+
+
+
+
+<script type="text/javascript">
+var tip_index = 0;
+$(".hideTagType").on('mouseenter', this,function() {
+	var hideTagType = $(this).attr("data");
+	var hideTagValue = "";
+	if(hideTagType == 10){
+		hideTagValue = "输入密码可见";
+	}else if(hideTagType == 20){
+		hideTagValue = "评论话题可见";
+	}else if(hideTagType == 30){
+		hideTagValue = "达到等级可见";
+	}else if(hideTagType == 40){
+		hideTagValue = "积分购买可见";
+	}else if(hideTagType == 50){
+		hideTagValue = "余额购买可见";
+	}
+	
+	tip_index = layer.tips(hideTagValue, $(this).children("span:first-child"), {
+		tips: 1,//[1, "rgba(0, 0, 0,0.5)"],
+		time: 5000,
+		skin: 'hideTag-class'
+	});
+}).on('mouseleave', this, function(){
+	layer.close(tip_index);
+});
+</script>
+<style type="text/css">
+/** 半透明提示层 **/
+.hideTag-class .layui-layer-content{
+	background-color: rgba(0,0,0,0.7);
+}
+.hideTag-class .layui-layer-content .layui-layer-TipsG {
+	position: absolute;
+	width: 0;
+	height: 0;
+	border-width: 5px;
+	*overflow: hidden;
+	
+	border-style: dashed;
+ 	border-color:rgba(0,0,0,0.7) transparent transparent transparent;
+	margin-bottom: -2px;
+	margin-bottom: 3px\0;
+	*margin-bottom: 3px;
+}
+
+.hideTag-class .layui-layer-content .layui-layer-TipsT {
+	left: 7px;
+	border-right-style: solid;
+	border-right-color: rgba(0,0,0,0.7);
+}
+
+
+</style>
+
+
+
+
+
 </@function>

@@ -462,7 +462,7 @@ function deleteDescriptionTagRow(rowId){
         'superscript', 'clearhtml', 'quickformat', 'selectall', '|', 'fullscreen', 
         'formatblock', 'fontname', 'fontsize', '/', 'forecolor', 'hilitecolor', 'bold',
         'italic', 'underline', 'strikethrough', 'lineheight', 'removeformat', '|', 'image', 'multiimage',
-        'flash', 'media', 'insertfile','emoticons','baidumap', 'table', 'hr',   'pagebreak',
+         'media', 'insertfile','emoticons','baidumap', 'table', 'hr',   'pagebreak',
          'link', 'unlink'],
 			afterChange : function() {
 				this.sync();

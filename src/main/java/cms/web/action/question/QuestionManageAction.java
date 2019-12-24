@@ -1,6 +1,7 @@
 package cms.web.action.question;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -32,6 +33,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import cms.bean.PageForm;
 import cms.bean.PageView;
 import cms.bean.QueryResult;
+import cms.bean.payment.PaymentLog;
 import cms.bean.question.Answer;
 import cms.bean.question.AnswerReply;
 import cms.bean.question.AppendQuestionItem;
@@ -40,6 +42,7 @@ import cms.bean.question.QuestionIndex;
 import cms.bean.question.QuestionTag;
 import cms.bean.question.QuestionTagAssociation;
 import cms.bean.staff.SysUsers;
+import cms.bean.user.PointLog;
 import cms.bean.user.User;
 import cms.service.question.AnswerService;
 import cms.service.question.QuestionIndexService;
@@ -47,15 +50,19 @@ import cms.service.question.QuestionService;
 import cms.service.question.QuestionTagService;
 import cms.service.setting.SettingService;
 import cms.service.user.UserService;
+import cms.utils.CommentedProperties;
 import cms.utils.FileType;
+import cms.utils.FileUtil;
 import cms.utils.IpAddress;
 import cms.utils.JsonUtils;
 import cms.utils.RedirectPath;
 import cms.utils.UUIDUtil;
 import cms.utils.Verification;
-import cms.web.action.FileManage;
 import cms.web.action.SystemException;
 import cms.web.action.TextFilterManage;
+import cms.web.action.fileSystem.FileManage;
+import cms.web.action.payment.PaymentManage;
+import cms.web.action.user.PointManage;
 import cms.web.action.user.UserManage;
 
 
@@ -72,14 +79,15 @@ public class QuestionManageAction {
 	@Resource AnswerManage answerManage;
 	@Resource AnswerService answerService;
 	@Resource TextFilterManage textFilterManage;
-	@Resource FileManage fileManage;
 	@Resource QuestionManage questionManage;
 	@Resource QuestionTagService questionTagService;
 	@Resource QuestionTagManage questionTagManage;
 	@Resource UserManage userManage;
 	@Resource UserService userService;
 	@Resource QuestionIndexService questionIndexService;
-	
+	@Resource FileManage fileManage;
+	@Resource PointManage pointManage;
+	@Resource PaymentManage paymentManage;
 	/**
 	 * 问题   查看
 	 * @param questionId
@@ -223,7 +231,7 @@ public class QuestionManageAction {
 	 * isQuestionList 上一链接是否来自问题列表
 	 */
 	@RequestMapping(params="method=add", method=RequestMethod.POST)
-	public String add(ModelMap model,Long[] tagId,String tagName, String title,Boolean allow,Integer status,
+	public String add(ModelMap model,Long[] tagId,String tagName, String title,Boolean allow,Integer status,String point,
 			String content,String sort,Boolean isQuestionList,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Question question = new Question();
@@ -332,8 +340,25 @@ public class QuestionManageAction {
 			error.put("content", "问题内容不能为空");
 		}
 		
-		
-		
+		if(point != null && !"".equals(point.trim())){
+			if(point.trim().length()>8){
+				error.put("point", "不能超过8位数字");
+			}else{
+				boolean pointVerification = Verification.isPositiveIntegerZero(point.trim());//正整数+0
+				if(pointVerification){
+					Long _rewardPoint = Long.parseLong(point.trim());
+					if(_rewardPoint < 0L){
+						error.put("point","不能小于0");
+						
+					}
+					if(error.size() ==0){
+						question.setPoint(_rewardPoint);
+					}
+				}else{
+					error.put("point","请填写正整数");
+				}
+			}	
+		}
 		
 		if(sort != null){
 			if(Verification.isNumeric(sort.toString())){
@@ -358,7 +383,7 @@ public class QuestionManageAction {
 			
 			
 		}else{
-			questionService.saveQuestion(question,new ArrayList<QuestionTagAssociation>(questionTagAssociationList));
+			questionService.saveQuestion(question,new ArrayList<QuestionTagAssociation>(questionTagAssociationList),null,null,null,null);
 			
 			//更新索引
 			questionIndexService.addQuestionIndex(new QuestionIndex(String.valueOf(question.getId()),1));
@@ -376,7 +401,7 @@ public class QuestionManageAction {
 					 if(imageName != null && !"".equals(imageName.trim())){
 		 
 						 //如果验证不是当前用户上传的文件，则不删除锁
-						 if(!questionManage.getFileNumber(fileManage.getBaseName(imageName.trim())).equals(fileNumber)){
+						 if(!questionManage.getFileNumber(FileUtil.getBaseName(imageName.trim())).equals(fileNumber)){
 							 continue;
 						 }
 						 
@@ -390,7 +415,7 @@ public class QuestionManageAction {
 				for(String flashName :flashNameList){
 					 if(flashName != null && !"".equals(flashName.trim())){
 						 //如果验证不是当前用户上传的文件，则不删除锁
-						 if(!questionManage.getFileNumber(fileManage.getBaseName(flashName.trim())).equals(fileNumber)){
+						 if(!questionManage.getFileNumber(FileUtil.getBaseName(flashName.trim())).equals(fileNumber)){
 							 continue;
 						 }
 						 
@@ -404,7 +429,7 @@ public class QuestionManageAction {
 				for(String mediaName :mediaNameList){
 					if(mediaName != null && !"".equals(mediaName.trim())){
 						//如果验证不是当前用户上传的文件，则不删除锁
-						if(!questionManage.getFileNumber(fileManage.getBaseName(mediaName.trim())).equals(fileNumber)){
+						if(!questionManage.getFileNumber(FileUtil.getBaseName(mediaName.trim())).equals(fileNumber)){
 							continue;
 						}
 						fileManage.deleteLock("file"+File.separator+"question"+File.separator+"lock"+File.separator,mediaName.replaceAll("/","_"));
@@ -417,7 +442,7 @@ public class QuestionManageAction {
 				for(String fileName :fileNameList){
 					if(fileName != null && !"".equals(fileName.trim())){
 						//如果验证不是当前用户上传的文件，则不删除锁
-						if(!questionManage.getFileNumber(fileManage.getBaseName(fileName.trim())).equals(fileNumber)){
+						if(!questionManage.getFileNumber(FileUtil.getBaseName(fileName.trim())).equals(fileNumber)){
 							continue;
 						}
 						fileManage.deleteLock("file"+File.separator+"question"+File.separator+"lock"+File.separator,fileName.replaceAll("/","_"));
@@ -572,7 +597,7 @@ public class QuestionManageAction {
 					 if(imageName != null && !"".equals(imageName.trim())){
 		 
 						 //如果验证不是当前用户上传的文件，则不删除锁
-						 if(!questionManage.getFileNumber(fileManage.getBaseName(imageName.trim())).equals(fileNumber)){
+						 if(!questionManage.getFileNumber(FileUtil.getBaseName(imageName.trim())).equals(fileNumber)){
 							 continue;
 						 }
 						 
@@ -586,7 +611,7 @@ public class QuestionManageAction {
 				for(String flashName :flashNameList){
 					 if(flashName != null && !"".equals(flashName.trim())){
 						 //如果验证不是当前用户上传的文件，则不删除锁
-						 if(!questionManage.getFileNumber(fileManage.getBaseName(flashName.trim())).equals(fileNumber)){
+						 if(!questionManage.getFileNumber(FileUtil.getBaseName(flashName.trim())).equals(fileNumber)){
 							 continue;
 						 }
 						 
@@ -600,7 +625,7 @@ public class QuestionManageAction {
 				for(String mediaName :mediaNameList){
 					if(mediaName != null && !"".equals(mediaName.trim())){
 						//如果验证不是当前用户上传的文件，则不删除锁
-						if(!questionManage.getFileNumber(fileManage.getBaseName(mediaName.trim())).equals(fileNumber)){
+						if(!questionManage.getFileNumber(FileUtil.getBaseName(mediaName.trim())).equals(fileNumber)){
 							continue;
 						}
 						fileManage.deleteLock("file"+File.separator+"question"+File.separator+"lock"+File.separator,mediaName.replaceAll("/","_"));
@@ -613,7 +638,7 @@ public class QuestionManageAction {
 				for(String fileName :fileNameList){
 					if(fileName != null && !"".equals(fileName.trim())){
 						//如果验证不是当前用户上传的文件，则不删除锁
-						if(!questionManage.getFileNumber(fileManage.getBaseName(fileName.trim())).equals(fileNumber)){
+						if(!questionManage.getFileNumber(FileUtil.getBaseName(fileName.trim())).equals(fileNumber)){
 							continue;
 						}
 						fileManage.deleteLock("file"+File.separator+"question"+File.separator+"lock"+File.separator,fileName.replaceAll("/","_"));
@@ -676,7 +701,7 @@ public class QuestionManageAction {
 				//文件大小
 				Long size = imgFile.getSize();
 				//取得文件后缀
-				String suffix = fileManage.getExtension(fileName).toLowerCase();
+				String suffix = FileUtil.getExtension(fileName).toLowerCase();
 
 				if(dir.equals("image")){
 					//允许上传图片格式
@@ -691,7 +716,7 @@ public class QuestionManageAction {
 					long imageSize = 200000L;
 
 					//验证文件类型
-					boolean authentication = fileManage.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
+					boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
 					
 					//如果用flash控件上传
 					if(imgFile.getContentType().equalsIgnoreCase("application/octet-stream")){
@@ -718,7 +743,7 @@ public class QuestionManageAction {
 						//生成锁文件保存目录
 						fileManage.createFolder(lockPathDir);
 						//生成锁文件
-						fileManage.newFile(lockPathDir+date +"_image_"+newFileName);
+						fileManage.addLock(lockPathDir,date +"_image_"+newFileName);
 						//保存文件
 						fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
 						
@@ -734,7 +759,7 @@ public class QuestionManageAction {
 					flashFormatList.add("swf");
 					
 					//验证文件后缀
-					boolean authentication = fileManage.validateFileSuffix(imgFile.getOriginalFilename(),flashFormatList);
+					boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),flashFormatList);
 					
 					if(authentication){
 						
@@ -750,7 +775,7 @@ public class QuestionManageAction {
 						//生成锁文件保存目录
 						fileManage.createFolder(lockPathDir);
 						//生成锁文件
-						fileManage.newFile(lockPathDir+date +"_flash_"+newFileName);
+						fileManage.addLock(lockPathDir,date +"_flash_"+newFileName);
 						//保存文件
 						fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
 						
@@ -779,7 +804,7 @@ public class QuestionManageAction {
 					
 					
 					//验证文件后缀
-					boolean authentication = fileManage.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
+					boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
 					
 					if(authentication){
 						
@@ -795,7 +820,7 @@ public class QuestionManageAction {
 						//生成锁文件保存目录
 						fileManage.createFolder(lockPathDir);
 						//生成锁文件
-						fileManage.newFile(lockPathDir+date +"_media_"+newFileName);
+						fileManage.addLock(lockPathDir,date +"_media_"+newFileName);
 						//保存文件
 						fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
 
@@ -806,10 +831,10 @@ public class QuestionManageAction {
 					}
 				}else if(dir.equals("file")){
 					//允许上传文件格式
-					List<String> formatList = fileManage.readRichTextAllowFileUploadFormat();
+					List<String> formatList = CommentedProperties.readRichTextAllowFileUploadFormat();
 					
 					//验证文件后缀
-					boolean authentication = fileManage.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
+					boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
 					if(authentication){
 						
 						//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
@@ -824,7 +849,7 @@ public class QuestionManageAction {
 						//生成锁文件保存目录
 						fileManage.createFolder(lockPathDir);
 						//生成锁文件
-						fileManage.newFile(lockPathDir+date +"_file_"+newFileName);
+						fileManage.addLock(lockPathDir,date +"_file_"+newFileName);
 						//保存文件
 						fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
 
@@ -871,6 +896,13 @@ public class QuestionManageAction {
 					}
 					
 				}
+				
+				User user = userManage.query_cache_findUserByUserName(question.getUserName());
+				if(user != null){
+					model.addAttribute("maxDeposit",user.getDeposit());//允许使用的预存款
+					model.addAttribute("maxPoint",user.getPoint());//允许使用的积分
+				}
+				
 			}else{
 				throw new SystemException("问题不存在");
 			}	
@@ -892,9 +924,19 @@ public class QuestionManageAction {
 	@ResponseBody//方式来做ajax,直接返回字符串
 	@RequestMapping(params="method=editQuestion", method=RequestMethod.POST)
 	public String editQuestion(ModelMap model,Long questionId,Long[] tagId,
-			String title,Boolean allow,Integer status,
+			String title,Boolean allow,Integer status,String point,String amount,
 			String content,String sort,Boolean visible,Boolean isQuestionList,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
+		String username = "";//用户名称
+		String userId = "";//用户Id
+		Object principal  =  SecurityContextHolder.getContext().getAuthentication().getPrincipal(); 
+		if(principal instanceof SysUsers){
+			userId =((SysUsers)principal).getUserId();
+			username =((SysUsers)principal).getUserAccount();
+		}
+		
+		
 		Question question = null;
 		List<String> imageNameList = null;
 		boolean isImage = false;//是否含有图片
@@ -952,6 +994,133 @@ public class QuestionManageAction {
 				}else{
 					error.put("tagId", "标签不能为空");
 				}
+				
+				//悬赏积分
+				Long rewardPoint = null;
+				//悬赏金额
+				BigDecimal rewardAmount = null;
+
+				User user = userService.findUserByUserName(question.getUserName());//查询用户数据
+				if(question.getAdoptionAnswerId().equals(0L)){//未采纳答案的问题才允许修改赏金
+					if(point != null && !"".equals(point.trim())){
+						if(point.trim().length()>8){
+							error.put("point", "不能超过8位数字");
+						}else{
+							boolean pointVerification = Verification.isPositiveIntegerZero(point.trim());//正整数+0
+							if(pointVerification){
+								Long _rewardPoint = Long.parseLong(point.trim());
+								if(_rewardPoint < 0L){
+									error.put("point","不能小于0");
+									
+								}
+								
+								if(question.getIsStaff()==false && _rewardPoint > user.getPoint()){
+									error.put("point","不能大于账户积分");
+								}
+								
+								if(error.size() ==0){
+									rewardPoint = _rewardPoint;
+								}
+							}else{
+								error.put("point","请填写正整数或0");
+							}
+						}	
+					}
+					
+					if(user != null && question.getIsStaff()==false && amount != null && !"".equals(amount.trim())){
+						if(amount.trim().length()>12){
+							error.put("amount", "不能超过12位数字");
+						}else{
+							boolean amountVerification = amount.trim().matches("(([1-9]{1}\\d*)|([0]{1}))(\\.(\\d){1,2})?$");//金额
+							if(amountVerification){
+								BigDecimal _rewardAmount = new BigDecimal(amount.trim());
+								if(_rewardAmount.compareTo(user.getDeposit()) >0){
+									error.put("amount", "不能大于账户预存款");
+									
+								}
+								if(_rewardAmount.compareTo(new BigDecimal("0")) <0){
+									error.put("amount","不能小于0");
+								}
+								if(error.size() ==0){
+									rewardAmount = _rewardAmount;
+								}
+							}else{
+								error.put("amount", "请填写金额");
+							}
+						}	
+					}
+				}
+				
+				//变更积分符号
+				boolean changePointSymbol = true;//true：加号  false：减号
+				//变更积分
+				Long changePoint = 0L;
+				//变更金额符号
+				boolean changeAmountSymbol = true;//true：加号  false：减号
+				//变更金额
+				BigDecimal changeAmount = new BigDecimal("0");
+
+				if(rewardPoint != null && rewardPoint > question.getPoint()){
+					changePointSymbol = true;
+					changePoint = rewardPoint - question.getPoint();
+				}
+				if(rewardPoint != null && rewardPoint < question.getPoint()){
+					changePointSymbol = false;
+					changePoint = question.getPoint() - rewardPoint;
+				}
+				
+				if(rewardAmount != null && rewardAmount.compareTo(question.getAmount()) > 0){
+					changeAmountSymbol = true;
+					changeAmount = rewardAmount.subtract(question.getAmount());
+				}
+				if(rewardAmount != null && rewardAmount.compareTo(question.getAmount()) < 0){
+					changeAmountSymbol = false;
+					changeAmount = question.getAmount().subtract(rewardAmount);
+				}
+				
+				//用户悬赏积分日志
+				Object pointLogObject = null;
+				//用户悬赏金额日志
+				Object paymentLogObject = null;
+				
+				Date time = new Date();
+				if(changePoint != null && changePoint>0L){//如果有变更积分
+					question.setPoint(rewardPoint);
+					
+					if(question.getIsStaff()==false){
+						PointLog reward_pointLog = new PointLog();
+						reward_pointLog.setId(pointManage.createPointLogId(user.getId()));
+						reward_pointLog.setModule(1200);//1200.调整赏金
+						reward_pointLog.setParameterId(question.getId());//参数Id 
+						reward_pointLog.setOperationUserType(1);//操作用户类型  0:系统  1: 员工  2:会员
+						reward_pointLog.setOperationUserName(username);//操作用户名称
+						reward_pointLog.setPointState(changePointSymbol==true ? 2 :1);//2:账户支出
+						reward_pointLog.setPoint(changePoint);//积分
+						reward_pointLog.setUserName(user.getUserName());//用户名称
+						reward_pointLog.setRemark("");
+						reward_pointLog.setTimes(time);
+						pointLogObject = pointManage.createPointLogObject(reward_pointLog);
+					}
+				}
+				if(changeAmount != null && changeAmount.compareTo(new BigDecimal("0")) >0){//如果有变更金额
+					question.setAmount(rewardAmount);
+					
+					PaymentLog reward_paymentLog = new PaymentLog();
+					reward_paymentLog.setPaymentRunningNumber(paymentManage.createRunningNumber(user.getId()));//支付流水号
+					reward_paymentLog.setPaymentModule(110);//支付模块 110.调整赏金
+					reward_paymentLog.setParameterId(question.getId());//参数Id 
+					reward_paymentLog.setOperationUserType(1);//操作用户类型  0:系统  1: 员工  2:会员
+					reward_paymentLog.setOperationUserName(username);//操作用户名称  0:系统  1: 员工  2:会员
+					reward_paymentLog.setAmountState(changeAmountSymbol==true ? 2 :1);//金额状态  1:账户存入  2:账户支出 
+					reward_paymentLog.setAmount(changeAmount);//金额
+					reward_paymentLog.setInterfaceProduct(0);//接口产品
+					reward_paymentLog.setUserName(user.getUserName());//用户名称
+					reward_paymentLog.setTimes(time);
+					paymentLogObject = paymentManage.createPaymentLogObject(reward_paymentLog);
+					
+				}
+				
+			
 				
 				if(content != null && !"".equals(content.trim())){
 					
@@ -1017,208 +1186,212 @@ public class QuestionManageAction {
 				
 				
 				if(error.size() ==0){
-					question.setLastUpdateTime(new Date());//最后修改时间
-					int i = questionService.updateQuestion(question,new ArrayList<QuestionTagAssociation>(questionTagAssociationList));
-					//更新索引
-					questionIndexService.addQuestionIndex(new QuestionIndex(String.valueOf(question.getId()),2));
 					
-					if(i >0 && question.getStatus() < 100 && !old_status.equals(status)){
-						User user = userManage.query_cache_findUserByUserName(question.getUserName());
+					try {
+						question.setLastUpdateTime(new Date());//最后修改时间
+						int i = questionService.updateQuestion(question,new ArrayList<QuestionTagAssociation>(questionTagAssociationList),
+								changePointSymbol,changePoint,changeAmountSymbol, changeAmount,pointLogObject,paymentLogObject);
+						//更新索引
+						questionIndexService.addQuestionIndex(new QuestionIndex(String.valueOf(question.getId()),2));
+						
+						if(i >0 && question.getStatus() < 100 && !old_status.equals(status)){
+							if(user != null){
+								//修改用户动态问题状态
+								userService.updateUserDynamicQuestionStatus(user.getId(),question.getUserName(),question.getId(),question.getStatus());
+							}
+							
+						}
+						
+						
+						//删除缓存
+						questionManage.delete_cache_findById(question.getId());//删除问题缓存
+						questionManage.delete_cache_findQuestionTagAssociationByQuestionId(question.getId());//删除'根据问题Id查询问题标签关联'缓存
 						if(user != null){
-							//修改用户动态问题状态
-							userService.updateUserDynamicQuestionStatus(user.getId(),question.getUserName(),question.getId(),question.getStatus());
+							userManage.delete_cache_findUserById(user.getId());
+							userManage.delete_cache_findUserByUserName(user.getUserName());
 						}
 						
-					}
-					 
-					
-					//删除缓存
-					questionManage.delete_cache_findById(question.getId());//删除问题缓存
-					questionManage.delete_cache_findQuestionTagAssociationByQuestionId(question.getId());//删除'根据问题Id查询问题标签关联'缓存
-					
-					Object[] obj = textFilterManage.readPathName(old_content,"question");
-					if(obj != null && obj.length >0){
-						//旧图片
-						List<String> old_imageNameList = (List<String>)obj[0];
-						
-						if(old_imageNameList != null && old_imageNameList.size() >0){
+						Object[] obj = textFilterManage.readPathName(old_content,"question");
+						if(obj != null && obj.length >0){
+							//旧图片
+							List<String> old_imageNameList = (List<String>)obj[0];
 							
-					        Iterator<String> iter = old_imageNameList.iterator();
-					        while (iter.hasNext()) {
-					        	String imageName = iter.next();  
-					        	
-								for(String new_imageName : imageNameList){
-									if(imageName.equals("file/question/"+new_imageName)){
-										iter.remove();
-										break;
-									}
-								}
-							}
 							if(old_imageNameList != null && old_imageNameList.size() >0){
-								for(String imageName : old_imageNameList){
-									
-									oldPathFileList.add(fileManage.toSystemPath(imageName));
-			
-								}
 								
-							}
-						}
-						
-						//旧Flash
-						List<String> old_flashNameList = (List<String>)obj[1];		
-						if(old_flashNameList != null && old_flashNameList.size() >0){		
-					        Iterator<String> iter = old_flashNameList.iterator();
-					        while (iter.hasNext()) {
-					        	String flashName = iter.next();  
-								for(String new_flashName : flashNameList){
-									if(flashName.equals("file/question/"+new_flashName)){
-										iter.remove();
-										break;
+						        Iterator<String> iter = old_imageNameList.iterator();
+						        while (iter.hasNext()) {
+						        	String imageName = iter.next();  
+						        	
+									for(String new_imageName : imageNameList){
+										if(imageName.equals("file/question/"+new_imageName)){
+											iter.remove();
+											break;
+										}
 									}
 								}
-							}
-							if(old_flashNameList != null && old_flashNameList.size() >0){
-								for(String flashName : old_flashNameList){
-									oldPathFileList.add(fileManage.toSystemPath(flashName));
-									
-								}
-								
-							}
-						}
-		
-						//旧影音
-						List<String> old_mediaNameList = (List<String>)obj[2];	
-						if(old_mediaNameList != null && old_mediaNameList.size() >0){		
-					        Iterator<String> iter = old_mediaNameList.iterator();
-					        while (iter.hasNext()) {
-					        	String mediaName = iter.next();  
-								for(String new_mediaName : mediaNameList){
-									if(mediaName.equals("file/question/"+new_mediaName)){
-										iter.remove();
-										break;
-									}
-								}
-							}
-							if(old_mediaNameList != null && old_mediaNameList.size() >0){
-								for(String mediaName : old_mediaNameList){
-									oldPathFileList.add(fileManage.toSystemPath(mediaName));
-									
-								}
-								
-							}
-						}
-						
-						//旧文件
-						List<String> old_fileNameList = (List<String>)obj[3];		
-						if(old_fileNameList != null && old_fileNameList.size() >0){		
-					        Iterator<String> iter = old_fileNameList.iterator();
-					        while (iter.hasNext()) {
-					        	String fileName = iter.next();  
-								for(String new_fileName : fileNameList){
-									if(fileName.equals("file/question/"+new_fileName)){
-										iter.remove();
-										break;
-									}
-								}
-							}
-							if(old_fileNameList != null && old_fileNameList.size() >0){
-								for(String fileName : old_fileNameList){
-									oldPathFileList.add(fileManage.toSystemPath(fileName));
-									
-								}
-								
-							}
-						}
-					}
-					
-					
-					//上传文件编号
-					String fileNumber = questionManage.generateFileNumber(question.getUserName(), question.getIsStaff());
-					
-					//删除图片锁
-					if(imageNameList != null && imageNameList.size() >0){
-						for(String imageName :imageNameList){
-					
-							 if(imageName != null && !"".equals(imageName.trim())){
-								 //如果验证不是当前用户上传的文件，则不删除
-								 if(!questionManage.getFileNumber(fileManage.getBaseName(imageName.trim())).equals(fileNumber)){
-										continue;
-								 }
-								 fileManage.deleteLock("file"+File.separator+"question"+File.separator+"lock"+File.separator,imageName.replaceAll("/","_"));
-			
-							 }
-						}
-					}
-					//删除Falsh锁
-					if(flashNameList != null && flashNameList.size() >0){
-						for(String flashName :flashNameList){
-							 
-							 if(flashName != null && !"".equals(flashName.trim())){
-								 //如果验证不是当前用户上传的文件，则不删除
-								 if(!questionManage.getFileNumber(fileManage.getBaseName(flashName.trim())).equals(fileNumber)){
-										continue;
-								 }
-								 fileManage.deleteLock("file"+File.separator+"question"+File.separator+"lock"+File.separator,flashName.replaceAll("/","_"));
+								if(old_imageNameList != null && old_imageNameList.size() >0){
+									for(String imageName : old_imageNameList){
+										
+										oldPathFileList.add(FileUtil.toSystemPath(imageName));
 				
-							 }
-						}
-					}
-					//删除音视频锁
-					if(mediaNameList != null && mediaNameList.size() >0){
-						for(String mediaName :mediaNameList){
-							if(mediaName != null && !"".equals(mediaName.trim())){
-								//如果验证不是当前用户上传的文件，则不删除
-								if(!questionManage.getFileNumber(fileManage.getBaseName(mediaName.trim())).equals(fileNumber)){
-									continue;
+									}
+									
 								}
-								fileManage.deleteLock("file"+File.separator+"question"+File.separator+"lock"+File.separator,mediaName.replaceAll("/","_"));
+							}
 							
+							//旧Flash
+							List<String> old_flashNameList = (List<String>)obj[1];		
+							if(old_flashNameList != null && old_flashNameList.size() >0){		
+						        Iterator<String> iter = old_flashNameList.iterator();
+						        while (iter.hasNext()) {
+						        	String flashName = iter.next();  
+									for(String new_flashName : flashNameList){
+										if(flashName.equals("file/question/"+new_flashName)){
+											iter.remove();
+											break;
+										}
+									}
+								}
+								if(old_flashNameList != null && old_flashNameList.size() >0){
+									for(String flashName : old_flashNameList){
+										oldPathFileList.add(FileUtil.toSystemPath(flashName));
+										
+									}
+									
+								}
+							}
+			
+							//旧影音
+							List<String> old_mediaNameList = (List<String>)obj[2];	
+							if(old_mediaNameList != null && old_mediaNameList.size() >0){		
+						        Iterator<String> iter = old_mediaNameList.iterator();
+						        while (iter.hasNext()) {
+						        	String mediaName = iter.next();  
+									for(String new_mediaName : mediaNameList){
+										if(mediaName.equals("file/question/"+new_mediaName)){
+											iter.remove();
+											break;
+										}
+									}
+								}
+								if(old_mediaNameList != null && old_mediaNameList.size() >0){
+									for(String mediaName : old_mediaNameList){
+										oldPathFileList.add(FileUtil.toSystemPath(mediaName));
+										
+									}
+									
+								}
+							}
+							
+							//旧文件
+							List<String> old_fileNameList = (List<String>)obj[3];		
+							if(old_fileNameList != null && old_fileNameList.size() >0){		
+						        Iterator<String> iter = old_fileNameList.iterator();
+						        while (iter.hasNext()) {
+						        	String fileName = iter.next();  
+									for(String new_fileName : fileNameList){
+										if(fileName.equals("file/question/"+new_fileName)){
+											iter.remove();
+											break;
+										}
+									}
+								}
+								if(old_fileNameList != null && old_fileNameList.size() >0){
+									for(String fileName : old_fileNameList){
+										oldPathFileList.add(FileUtil.toSystemPath(fileName));
+										
+									}
+									
+								}
 							}
 						}
-					}
-					//删除文件锁
-					if(fileNameList != null && fileNameList.size() >0){
-						for(String fileName :fileNameList){
-							if(fileName != null && !"".equals(fileName.trim())){
-								//如果验证不是当前用户上传的文件，则不删除
-								if(!questionManage.getFileNumber(fileManage.getBaseName(fileName.trim())).equals(fileNumber)){
-									continue;
-								}
-								fileManage.deleteLock("file"+File.separator+"question"+File.separator+"lock"+File.separator,fileName.replaceAll("/","_"));
-							
+						
+						
+						//上传文件编号
+						String fileNumber = questionManage.generateFileNumber(question.getUserName(), question.getIsStaff());
+						
+						//删除图片锁
+						if(imageNameList != null && imageNameList.size() >0){
+							for(String imageName :imageNameList){
+						
+								 if(imageName != null && !"".equals(imageName.trim())){
+									 //如果验证不是当前用户上传的文件，则不删除
+									 if(!questionManage.getFileNumber(FileUtil.getBaseName(imageName.trim())).equals(fileNumber)){
+											continue;
+									 }
+									 fileManage.deleteLock("file"+File.separator+"question"+File.separator+"lock"+File.separator,imageName.replaceAll("/","_"));
+				
+								 }
 							}
 						}
-					}
+						//删除Falsh锁
+						if(flashNameList != null && flashNameList.size() >0){
+							for(String flashName :flashNameList){
+								 
+								 if(flashName != null && !"".equals(flashName.trim())){
+									 //如果验证不是当前用户上传的文件，则不删除
+									 if(!questionManage.getFileNumber(FileUtil.getBaseName(flashName.trim())).equals(fileNumber)){
+											continue;
+									 }
+									 fileManage.deleteLock("file"+File.separator+"question"+File.separator+"lock"+File.separator,flashName.replaceAll("/","_"));
 					
-					//删除旧路径文件
-					if(oldPathFileList != null && oldPathFileList.size() >0){
-						for(String oldPathFile :oldPathFileList){
-							//如果验证不是当前用户上传的文件，则不删除
-							if(!questionManage.getFileNumber(fileManage.getBaseName(oldPathFile.trim())).equals(fileNumber)){
-								continue;
+								 }
 							}
-							
-							
-							//替换路径中的..号
-							oldPathFile = fileManage.toRelativePath(oldPathFile);
-							
-							//删除旧路径文件
-							Boolean state = fileManage.deleteFile(oldPathFile);
-							if(state != null && state == false){
-
-								//替换指定的字符，只替换第一次出现的
-								oldPathFile = StringUtils.replaceOnce(oldPathFile, "file"+File.separator+"question"+File.separator, "");
-								oldPathFile = StringUtils.replace(oldPathFile, File.separator, "_");//替换所有出现过的字符
+						}
+						//删除音视频锁
+						if(mediaNameList != null && mediaNameList.size() >0){
+							for(String mediaName :mediaNameList){
+								if(mediaName != null && !"".equals(mediaName.trim())){
+									//如果验证不是当前用户上传的文件，则不删除
+									if(!questionManage.getFileNumber(FileUtil.getBaseName(mediaName.trim())).equals(fileNumber)){
+										continue;
+									}
+									fileManage.deleteLock("file"+File.separator+"question"+File.separator+"lock"+File.separator,mediaName.replaceAll("/","_"));
 								
-								//创建删除失败文件
-								fileManage.failedStateFile("file"+File.separator+"question"+File.separator+"lock"+File.separator+oldPathFile);
+								}
 							}
 						}
+						//删除文件锁
+						if(fileNameList != null && fileNameList.size() >0){
+							for(String fileName :fileNameList){
+								if(fileName != null && !"".equals(fileName.trim())){
+									//如果验证不是当前用户上传的文件，则不删除
+									if(!questionManage.getFileNumber(FileUtil.getBaseName(fileName.trim())).equals(fileNumber)){
+										continue;
+									}
+									fileManage.deleteLock("file"+File.separator+"question"+File.separator+"lock"+File.separator,fileName.replaceAll("/","_"));
+								
+								}
+							}
+						}
+						
+						//删除旧路径文件
+						if(oldPathFileList != null && oldPathFileList.size() >0){
+							for(String oldPathFile :oldPathFileList){
+								//如果验证不是当前用户上传的文件，则不删除
+								if(!questionManage.getFileNumber(FileUtil.getBaseName(oldPathFile.trim())).equals(fileNumber)){
+									continue;
+								}
+								
+								
+								//替换路径中的..号
+								oldPathFile = FileUtil.toRelativePath(oldPathFile);
+								
+								//删除旧路径文件
+								Boolean state = fileManage.deleteFile(oldPathFile);
+								if(state != null && state == false){
+
+									//替换指定的字符，只替换第一次出现的
+									oldPathFile = StringUtils.replaceOnce(oldPathFile, "file"+File.separator+"question"+File.separator, "");
+									
+									//创建删除失败文件
+									fileManage.failedStateFile("file"+File.separator+"question"+File.separator+"lock"+File.separator+FileUtil.toUnderline(oldPathFile));
+								}
+							}
+						}
+					} catch (SystemException e) {
+						error.put("question", e.getMessage());//提交问题错误
 					}
-					
-					
-					
-					
 				}
 				
 			}else{
@@ -1405,7 +1578,7 @@ public class QuestionManageAction {
 							if(old_imageNameList != null && old_imageNameList.size() >0){
 								for(String imageName : old_imageNameList){
 									
-									oldPathFileList.add(fileManage.toSystemPath(imageName));
+									oldPathFileList.add(FileUtil.toSystemPath(imageName));
 			
 								}
 								
@@ -1427,7 +1600,7 @@ public class QuestionManageAction {
 							}
 							if(old_flashNameList != null && old_flashNameList.size() >0){
 								for(String flashName : old_flashNameList){
-									oldPathFileList.add(fileManage.toSystemPath(flashName));
+									oldPathFileList.add(FileUtil.toSystemPath(flashName));
 									
 								}
 								
@@ -1449,7 +1622,7 @@ public class QuestionManageAction {
 							}
 							if(old_mediaNameList != null && old_mediaNameList.size() >0){
 								for(String mediaName : old_mediaNameList){
-									oldPathFileList.add(fileManage.toSystemPath(mediaName));
+									oldPathFileList.add(FileUtil.toSystemPath(mediaName));
 									
 								}
 								
@@ -1471,7 +1644,7 @@ public class QuestionManageAction {
 							}
 							if(old_fileNameList != null && old_fileNameList.size() >0){
 								for(String fileName : old_fileNameList){
-									oldPathFileList.add(fileManage.toSystemPath(fileName));
+									oldPathFileList.add(FileUtil.toSystemPath(fileName));
 									
 								}
 								
@@ -1489,7 +1662,7 @@ public class QuestionManageAction {
 					
 							 if(imageName != null && !"".equals(imageName.trim())){
 								 //如果验证不是当前用户上传的文件，则不删除
-								 if(!questionManage.getFileNumber(fileManage.getBaseName(imageName.trim())).equals(fileNumber)){
+								 if(!questionManage.getFileNumber(FileUtil.getBaseName(imageName.trim())).equals(fileNumber)){
 										continue;
 								 }
 								 fileManage.deleteLock("file"+File.separator+"question"+File.separator+"lock"+File.separator,imageName.replaceAll("/","_"));
@@ -1503,7 +1676,7 @@ public class QuestionManageAction {
 							 
 							 if(flashName != null && !"".equals(flashName.trim())){
 								 //如果验证不是当前用户上传的文件，则不删除
-								 if(!questionManage.getFileNumber(fileManage.getBaseName(flashName.trim())).equals(fileNumber)){
+								 if(!questionManage.getFileNumber(FileUtil.getBaseName(flashName.trim())).equals(fileNumber)){
 										continue;
 								 }
 								 fileManage.deleteLock("file"+File.separator+"question"+File.separator+"lock"+File.separator,flashName.replaceAll("/","_"));
@@ -1516,7 +1689,7 @@ public class QuestionManageAction {
 						for(String mediaName :mediaNameList){
 							if(mediaName != null && !"".equals(mediaName.trim())){
 								//如果验证不是当前用户上传的文件，则不删除
-								if(!questionManage.getFileNumber(fileManage.getBaseName(mediaName.trim())).equals(fileNumber)){
+								if(!questionManage.getFileNumber(FileUtil.getBaseName(mediaName.trim())).equals(fileNumber)){
 									continue;
 								}
 								fileManage.deleteLock("file"+File.separator+"question"+File.separator+"lock"+File.separator,mediaName.replaceAll("/","_"));
@@ -1529,7 +1702,7 @@ public class QuestionManageAction {
 						for(String fileName :fileNameList){
 							if(fileName != null && !"".equals(fileName.trim())){
 								//如果验证不是当前用户上传的文件，则不删除
-								if(!questionManage.getFileNumber(fileManage.getBaseName(fileName.trim())).equals(fileNumber)){
+								if(!questionManage.getFileNumber(FileUtil.getBaseName(fileName.trim())).equals(fileNumber)){
 									continue;
 								}
 								fileManage.deleteLock("file"+File.separator+"question"+File.separator+"lock"+File.separator,fileName.replaceAll("/","_"));
@@ -1542,13 +1715,13 @@ public class QuestionManageAction {
 					if(oldPathFileList != null && oldPathFileList.size() >0){
 						for(String oldPathFile :oldPathFileList){
 							//如果验证不是当前用户上传的文件，则不删除
-							if(!questionManage.getFileNumber(fileManage.getBaseName(oldPathFile.trim())).equals(fileNumber)){
+							if(!questionManage.getFileNumber(FileUtil.getBaseName(oldPathFile.trim())).equals(fileNumber)){
 								continue;
 							}
 							
 							
 							//替换路径中的..号
-							oldPathFile = fileManage.toRelativePath(oldPathFile);
+							oldPathFile = FileUtil.toRelativePath(oldPathFile);
 							
 							//删除旧路径文件
 							Boolean state = fileManage.deleteFile(oldPathFile);
@@ -1556,10 +1729,9 @@ public class QuestionManageAction {
 
 								//替换指定的字符，只替换第一次出现的
 								oldPathFile = StringUtils.replaceOnce(oldPathFile, "file"+File.separator+"question"+File.separator, "");
-								oldPathFile = StringUtils.replace(oldPathFile, File.separator, "_");//替换所有出现过的字符
 								
 								//创建删除失败文件
-								fileManage.failedStateFile("file"+File.separator+"question"+File.separator+"lock"+File.separator+oldPathFile);
+								fileManage.failedStateFile("file"+File.separator+"question"+File.separator+"lock"+File.separator+FileUtil.toUnderline(oldPathFile));
 							}
 						}
 					}
@@ -1600,6 +1772,17 @@ public class QuestionManageAction {
 			Boolean isQuestionList,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
+		String username = "";//用户名称
+		String userId = "";//用户Id
+		Object principal  =  SecurityContextHolder.getContext().getAuthentication().getPrincipal(); 
+		if(principal instanceof SysUsers){
+			userId =((SysUsers)principal).getUserId();
+			username =((SysUsers)principal).getUserAccount();
+		}
+		Map<String,String> error = new HashMap<String,String>();//错误
+		
+		
+		
 		if(questionId != null && questionId.length >0){
 			List<Long> questionIdList = new ArrayList<Long>();
 			for(Long l :questionId){
@@ -1612,10 +1795,20 @@ public class QuestionManageAction {
 				List<Question> questionList = questionService.findByIdList(questionIdList);
 				if(questionList != null && questionList.size() >0){
 					for(Question question : questionList){
+						User user = userManage.query_cache_findUserByUserName(question.getUserName());
+						//悬赏金额
+						BigDecimal rewardAmount = new BigDecimal("0.00");
+						//悬赏积分
+						Long rewardPoint = 0L;
+						//用户悬赏积分日志
+						Object pointLogObject = null;
+						//用户悬赏金额日志
+						Object paymentLogObject = null;
+						
 						if(question.getStatus() < 100){//标记删除
 							int i = questionService.markDelete(question.getId());
 
-							User user = userManage.query_cache_findUserByUserName(question.getUserName());
+							
 							if(i >0 && user != null){
 								//修改问题状态
 								userService.softDeleteUserDynamicByQuestionId(user.getId(),question.getUserName(),question.getId());
@@ -1625,103 +1818,170 @@ public class QuestionManageAction {
 							questionManage.delete_cache_findById(question.getId());//删除缓存
 							questionManage.delete_cache_findQuestionTagAssociationByQuestionId(question.getId());//删除'根据问题Id查询问题标签关联'缓存
 						}else{//物理删除
+							if(question.getAdoptionAnswerId().equals(0L) && !question.getIsStaff()){//如果悬赏未采纳答案，则将赏金退还给提问用户
+								
+								Date time = new Date();
+								
+								
+								
+								if(user != null && question.getPoint() != null && question.getPoint() >0L){
+									rewardPoint = question.getPoint();
+									PointLog reward_pointLog = new PointLog();
+									reward_pointLog.setId(pointManage.createPointLogId(user.getId()));
+									reward_pointLog.setModule(1000);//1000.悬赏积分
+									reward_pointLog.setParameterId(question.getId());//参数Id 
+									reward_pointLog.setOperationUserType(1);//操作用户类型  0:系统  1: 员工  2:会员
+									reward_pointLog.setOperationUserName(username);//操作用户名称
+									reward_pointLog.setPointState(1);//2:账户支出
+									reward_pointLog.setPoint(question.getPoint());//积分
+									reward_pointLog.setUserName(user.getUserName());//用户名称
+									reward_pointLog.setRemark("");
+									reward_pointLog.setTimes(time);
+									pointLogObject = pointManage.createPointLogObject(reward_pointLog);
+								}
+								
+								
+								
+								if(user != null && question.getAmount() != null && question.getAmount().compareTo(new BigDecimal("0")) >0){
+									rewardAmount = question.getAmount();
+									PaymentLog reward_paymentLog = new PaymentLog();
+									reward_paymentLog.setPaymentRunningNumber(paymentManage.createRunningNumber(user.getId()));//支付流水号
+									reward_paymentLog.setPaymentModule(90);//支付模块 90.悬赏金额
+									reward_paymentLog.setParameterId(question.getId());//参数Id 
+									reward_paymentLog.setOperationUserType(1);//操作用户类型  0:系统  1: 员工  2:会员
+									reward_paymentLog.setOperationUserName(username);//操作用户名称  0:系统  1: 员工  2:会员
+									reward_paymentLog.setAmountState(1);//金额状态  1:账户存入  2:账户支出 
+									reward_paymentLog.setAmount(question.getAmount());//金额
+									reward_paymentLog.setInterfaceProduct(0);//接口产品
+									reward_paymentLog.setUserName(user.getUserName());//用户名称
+									reward_paymentLog.setTimes(time);
+									paymentLogObject = paymentManage.createPaymentLogObject(reward_paymentLog);
+								}
+								
+								
+							}
 							
 							String fileNumber = questionManage.generateFileNumber(question.getUserName(), question.getIsStaff());
+							try {
+								int i = questionService.deleteQuestion(question.getId(),question.getUserName(),rewardPoint,pointLogObject,rewardAmount,paymentLogObject);
 							
-							int i = questionService.deleteQuestion(question.getId());
-							
-							if(i>0){
-								//根据问题Id删除用户动态(问题下的评论和回复也同时删除)
-								userService.deleteUserDynamicByQuestionId(question.getId());
-							}
-							
-							questionManage.delete_cache_findById(question.getId());//删除缓存
-							questionManage.delete_cache_findQuestionTagAssociationByQuestionId(question.getId());//删除'根据问题Id查询问题标签关联'缓存
-							//更新索引
-							questionIndexService.addQuestionIndex(new QuestionIndex(String.valueOf(question.getId()),3));
-							
-							
-							
-							
-							
-							String questionContent = question.getContent();
-							
-							//删除最后一个逗号
-							String _appendContent = StringUtils.substringBeforeLast(question.getAppendContent(), ",");//从右往左截取到相等的字符,保留左边的
+								if(i>0){
+									//根据问题Id删除用户动态(问题下的评论和回复也同时删除)
+									userService.deleteUserDynamicByQuestionId(question.getId());
+								}
+								
+								questionManage.delete_cache_findById(question.getId());//删除缓存
+								questionManage.delete_cache_findQuestionTagAssociationByQuestionId(question.getId());//删除'根据问题Id查询问题标签关联'缓存
+								if(user != null){
+									userManage.delete_cache_findUserById(user.getId());
+									userManage.delete_cache_findUserByUserName(user.getUserName());
+								}
+								
+								//更新索引
+								questionIndexService.addQuestionIndex(new QuestionIndex(String.valueOf(question.getId()),3));
+								
+								
+								
+								
+								
+								String questionContent = question.getContent();
+								
+								//删除最后一个逗号
+								String _appendContent = StringUtils.substringBeforeLast(question.getAppendContent(), ",");//从右往左截取到相等的字符,保留左边的
 
-							List<AppendQuestionItem> appendQuestionItemList = JsonUtils.toGenericObject(_appendContent+"]", new TypeReference< List<AppendQuestionItem> >(){});
-							if(appendQuestionItemList != null && appendQuestionItemList.size() >0){
-								for(AppendQuestionItem appendQuestionItem : appendQuestionItemList){
-									questionContent += appendQuestionItem.getContent();
-								}
-							}
-							
-							
-							Object[] obj = textFilterManage.readPathName(questionContent,"question");
-							if(obj != null && obj.length >0){
-								List<String> filePathList = new ArrayList<String>();
-								
-								//删除图片
-								List<String> imageNameList = (List<String>)obj[0];		
-								for(String imageName :imageNameList){
-									filePathList.add(imageName);
-									
-								}
-								//删除Flash
-								List<String> flashNameList = (List<String>)obj[1];		
-								for(String flashName :flashNameList){
-									filePathList.add(flashName);
-								}
-								//删除影音
-								List<String> mediaNameList = (List<String>)obj[2];		
-								for(String mediaName :mediaNameList){
-									filePathList.add(mediaName);
-								}
-								//删除文件
-								List<String> fileNameList = (List<String>)obj[3];		
-								for(String fileName :fileNameList){
-									filePathList.add(fileName);
-								}
-	
-								
-								for(String filePath :filePathList){
-									
-									
-									 //如果验证不是当前用户上传的文件，则不删除
-									 if(!questionManage.getFileNumber(fileManage.getBaseName(filePath.trim())).equals(fileNumber)){
-										 continue;
-									 }
-									
-									//替换路径中的..号
-									filePath = fileManage.toRelativePath(filePath);
-									
-									//删除旧路径文件
-									Boolean state = fileManage.deleteFile(filePath);
-									if(state != null && state == false){
-										 //替换指定的字符，只替换第一次出现的
-										filePath = StringUtils.replaceOnce(filePath, "file/question/", "");
-										//创建删除失败文件
-										fileManage.failedStateFile("file"+File.separator+"question"+File.separator+"lock"+File.separator+filePath.replaceAll("/","_"));
+								List<AppendQuestionItem> appendQuestionItemList = JsonUtils.toGenericObject(_appendContent+"]", new TypeReference< List<AppendQuestionItem> >(){});
+								if(appendQuestionItemList != null && appendQuestionItemList.size() >0){
+									for(AppendQuestionItem appendQuestionItem : appendQuestionItemList){
+										questionContent += appendQuestionItem.getContent();
 									}
 								}
 								
-								//清空目录
-								Boolean state_ = fileManage.removeDirectory("file"+File.separator+"answer"+File.separator+question.getId()+File.separator);
-								if(state_ != null && state_ == false){
-									//创建删除失败目录文件
-									fileManage.failedStateFile("file"+File.separator+"answer"+File.separator+"lock"+File.separator+"#"+question.getId());
-								}
 								
+								Object[] obj = textFilterManage.readPathName(questionContent,"question");
+								if(obj != null && obj.length >0){
+									List<String> filePathList = new ArrayList<String>();
+									
+									//删除图片
+									List<String> imageNameList = (List<String>)obj[0];		
+									for(String imageName :imageNameList){
+										filePathList.add(FileUtil.toSystemPath(imageName));
+										
+									}
+									//删除Flash
+									List<String> flashNameList = (List<String>)obj[1];		
+									for(String flashName :flashNameList){
+										filePathList.add(FileUtil.toSystemPath(flashName));
+									}
+									//删除影音
+									List<String> mediaNameList = (List<String>)obj[2];		
+									for(String mediaName :mediaNameList){
+										filePathList.add(FileUtil.toSystemPath(mediaName));
+									}
+									//删除文件
+									List<String> fileNameList = (List<String>)obj[3];		
+									for(String fileName :fileNameList){
+										filePathList.add(FileUtil.toSystemPath(fileName));
+									}
+		
+									
+									for(String filePath :filePathList){
+										
+										
+										 //如果验证不是当前用户上传的文件，则不删除
+										 if(!questionManage.getFileNumber(FileUtil.getBaseName(filePath.trim())).equals(fileNumber)){
+											 continue;
+										 }
+										
+										//替换路径中的..号
+										filePath = FileUtil.toRelativePath(filePath);
+										
+										//删除旧路径文件
+										Boolean state = fileManage.deleteFile(filePath);
+										if(state != null && state == false){
+											 //替换指定的字符，只替换第一次出现的
+											filePath = StringUtils.replaceOnce(filePath, "file"+File.separator+"question"+File.separator, "");
+											//创建删除失败文件
+											fileManage.failedStateFile("file"+File.separator+"question"+File.separator+"lock"+File.separator+FileUtil.toUnderline(filePath));
+										}
+									}
+									
+									//清空目录
+									Boolean state_ = fileManage.removeDirectory("file"+File.separator+"answer"+File.separator+question.getId()+File.separator);
+									if(state_ != null && state_ == false){
+										//创建删除失败目录文件
+										fileManage.failedStateFile("file"+File.separator+"answer"+File.separator+"lock"+File.separator+"#"+question.getId());
+									}
+									
+								}
+							} catch (SystemException e) {
+								error.put("answer", e.getMessage());
 							}
+							
 						}
 						
 						
 					}	
-					return"1";	
+					
+				}else{
+					error.put("questionId", "问题不存在");
 				}
+			}else{
+				error.put("questionId", "问题Id组不能为空");
 			}
+		}else{
+			error.put("questionId", "问题Id不能为空");
 		}
-		return"0";
+		
+		
+		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
+		
+		if(error != null && error.size() >0){
+			returnValue.put("success", "false");
+			returnValue.put("error", error);	
+		}else{
+			returnValue.put("success", "true");
+		}
+		return JsonUtils.toJSONString(returnValue);
 	}
 	
 	
@@ -1792,23 +2052,23 @@ public class QuestionManageAction {
 						//删除图片
 						List<String> imageNameList = (List<String>)obj[0];		
 						for(String imageName :imageNameList){
-							filePathList.add(imageName);
+							filePathList.add(FileUtil.toSystemPath(imageName));
 							
 						}
 						//删除Flash
 						List<String> flashNameList = (List<String>)obj[1];		
 						for(String flashName :flashNameList){
-							filePathList.add(flashName);
+							filePathList.add(FileUtil.toSystemPath(flashName));
 						}
 						//删除影音
 						List<String> mediaNameList = (List<String>)obj[2];		
 						for(String mediaName :mediaNameList){
-							filePathList.add(mediaName);
+							filePathList.add(FileUtil.toSystemPath(mediaName));
 						}
 						//删除文件
 						List<String> fileNameList = (List<String>)obj[3];		
 						for(String fileName :fileNameList){
-							filePathList.add(fileName);
+							filePathList.add(FileUtil.toSystemPath(fileName));
 						}
 
 						
@@ -1816,20 +2076,22 @@ public class QuestionManageAction {
 							
 							
 							 //如果验证不是当前用户上传的文件，则不删除
-							 if(!questionManage.getFileNumber(fileManage.getBaseName(filePath.trim())).equals(fileNumber)){
+							 if(!questionManage.getFileNumber(FileUtil.getBaseName(filePath.trim())).equals(fileNumber)){
 								 continue;
 							 }
 							
 							//替换路径中的..号
-							filePath = fileManage.toRelativePath(filePath);
+							filePath = FileUtil.toRelativePath(filePath);
 							
 							//删除旧路径文件
 							Boolean state = fileManage.deleteFile(filePath);
 							if(state != null && state == false){
 								 //替换指定的字符，只替换第一次出现的
-								filePath = StringUtils.replaceOnce(filePath, "file/question/", "");
+								filePath = StringUtils.replaceOnce(filePath, "file"+File.separator+"question"+File.separator, "");
+								
+								
 								//创建删除失败文件
-								fileManage.failedStateFile("file"+File.separator+"question"+File.separator+"lock"+File.separator+filePath.replaceAll("/","_"));
+								fileManage.failedStateFile("file"+File.separator+"question"+File.separator+"lock"+File.separator+FileUtil.toUnderline(filePath));
 							}
 						}
 						

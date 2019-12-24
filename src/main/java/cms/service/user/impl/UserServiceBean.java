@@ -612,7 +612,7 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 		//删除关注
 		followService.deleteFollowByUserName(userNameList);
 		
-		//根据发布动态图片的用户名称删除收藏
+		//根据话题/问题的用户名称删除收藏
 		favoriteService.deleteFavoriteByPostUserName(userNameList);
 
 		//删除用户动态

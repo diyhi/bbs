@@ -100,6 +100,8 @@ CREATE TABLE `favorites_0` (
   `postUserName` varchar(30) DEFAULT NULL,
   `topicId` bigint(20) DEFAULT NULL,
   `userName` varchar(30) DEFAULT NULL,
+  `module` int(11) DEFAULT NULL,
+  `questionId` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `favorites_1_idx` (`userName`,`addtime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -114,6 +116,8 @@ CREATE TABLE `favorites_1` (
   `postUserName` varchar(30) DEFAULT NULL,
   `topicId` bigint(20) DEFAULT NULL,
   `userName` varchar(30) DEFAULT NULL,
+  `module` int(11) DEFAULT NULL,
+  `questionId` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `favorites_1_idx` (`userName`,`addtime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -128,6 +132,8 @@ CREATE TABLE `favorites_2` (
   `postUserName` varchar(30) DEFAULT NULL,
   `topicId` bigint(20) DEFAULT NULL,
   `userName` varchar(30) DEFAULT NULL,
+  `module` int(11) DEFAULT NULL,
+  `questionId` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `favorites_1_idx` (`userName`,`addtime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -142,6 +148,8 @@ CREATE TABLE `favorites_3` (
   `postUserName` varchar(30) DEFAULT NULL,
   `topicId` bigint(20) DEFAULT NULL,
   `userName` varchar(30) DEFAULT NULL,
+  `module` int(11) DEFAULT NULL,
+  `questionId` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `favorites_1_idx` (`userName`,`addtime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -763,10 +771,70 @@ CREATE TABLE `question` (
   `userName` varchar(30) DEFAULT NULL,
   `viewTotal` bigint(20) DEFAULT NULL,
   `adoptionAnswerId` bigint(20) DEFAULT NULL,
+  `amount` decimal(12,2) NOT NULL,
+  `point` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `question_1_idx` (`userName`,`postTime`),
-  KEY `question_2_idx` (`status`,`sort`,`lastUpdateTime`),
-  KEY `question_3_idx` (`adoptionAnswerId`,`status`,`sort`,`lastUpdateTime`)
+  KEY `question_4_idx` (`status`,`sort`,`lastAnswerTime`),
+  KEY `question_5_idx` (`adoptionAnswerId`,`status`,`sort`,`lastAnswerTime`),
+  KEY `question_6_idx` (`point`,`status`,`sort`,`lastAnswerTime`),
+  KEY `question_7_idx` (`amount`,`status`,`sort`,`lastAnswerTime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "questionfavorite_0"
+#
+
+CREATE TABLE `questionfavorite_0` (
+  `id` varchar(40) NOT NULL,
+  `addtime` datetime DEFAULT NULL,
+  `postUserName` varchar(30) DEFAULT NULL,
+  `questionId` bigint(20) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `questionFavorite_1_idx` (`questionId`,`addtime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "questionfavorite_1"
+#
+
+CREATE TABLE `questionfavorite_1` (
+  `id` varchar(40) NOT NULL,
+  `addtime` datetime DEFAULT NULL,
+  `postUserName` varchar(30) DEFAULT NULL,
+  `questionId` bigint(20) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `questionFavorite_1_idx` (`questionId`,`addtime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "questionfavorite_2"
+#
+
+CREATE TABLE `questionfavorite_2` (
+  `id` varchar(40) NOT NULL,
+  `addtime` datetime DEFAULT NULL,
+  `postUserName` varchar(30) DEFAULT NULL,
+  `questionId` bigint(20) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `questionFavorite_1_idx` (`questionId`,`addtime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "questionfavorite_3"
+#
+
+CREATE TABLE `questionfavorite_3` (
+  `id` varchar(40) NOT NULL,
+  `addtime` datetime DEFAULT NULL,
+  `postUserName` varchar(30) DEFAULT NULL,
+  `questionId` bigint(20) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `questionFavorite_1_idx` (`questionId`,`addtime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 #
@@ -778,6 +846,26 @@ CREATE TABLE `questionindex` (
   `dataId` varchar(32) DEFAULT NULL,
   `indexState` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "questionrewardplatformshare"
+#
+
+CREATE TABLE `questionrewardplatformshare` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `adoptionTime` datetime DEFAULT NULL,
+  `answerUserName` varchar(30) DEFAULT NULL,
+  `answerUserShareRunningNumber` varchar(32) DEFAULT NULL,
+  `platformShareProportion` int(11) DEFAULT NULL,
+  `postUserName` varchar(80) DEFAULT NULL,
+  `questionId` bigint(20) DEFAULT NULL,
+  `shareAmount` decimal(14,4) NOT NULL,
+  `staff` bit(1) NOT NULL,
+  `totalAmount` decimal(12,2) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `questionRewardPlatformShare_1_idx` (`adoptionTime`),
+  KEY `questionRewardPlatformShare_2_idx` (`questionId`,`answerUserName`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 #
@@ -1251,6 +1339,7 @@ CREATE TABLE `systemsetting` (
   `realNameUserAllowAnswer` bit(1) NOT NULL,
   `realNameUserAllowQuestion` bit(1) NOT NULL,
   `maxQuestionTagQuantity` int(11) DEFAULT NULL,
+  `questionRewardPlatformShareProportion` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -1367,10 +1456,9 @@ CREATE TABLE `topic` (
   PRIMARY KEY (`id`),
   KEY `topic_idx` (`tagId`,`status`),
   KEY `topic_3_idx` (`userName`,`postTime`),
-  KEY `topic_4_idx` (`status`,`sort`,`lastUpdateTime`)
+  KEY `topic_5_idx` (`status`,`sort`,`lastReplyTime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-#
 
 #
 # Structure for table "topicfavorite_0"

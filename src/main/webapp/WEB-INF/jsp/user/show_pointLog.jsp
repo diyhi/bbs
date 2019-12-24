@@ -42,6 +42,9 @@ function SureSubmit(objForm){
 	    	<c:if test="${pointLog.module == 700}">提交问题</c:if>
 	    	<c:if test="${pointLog.module == 800}">提交答案</c:if>
 	    	<c:if test="${pointLog.module == 900}">提交答案回复</c:if>
+	    	<c:if test="${pointLog.module == 1000}">悬赏积分</c:if>
+	    	<c:if test="${pointLog.module == 1100}">采纳答案</c:if>
+	    	<c:if test="${pointLog.module == 1200}">调整赏金</c:if>
 	    </TD>
 	  </TR>	
 	   <TR>
@@ -67,6 +70,12 @@ function SureSubmit(objForm){
 	    	<c:if test="${pointLog.module == 400}">话题Id：${pointLog.parameterId}</c:if>
 	    	<c:if test="${pointLog.module == 500}">订单号：${pointLog.parameterId}</c:if>
 	    	<c:if test="${pointLog.module == 600}">用户Id：${pointLog.parameterId}</c:if>
+	    	<c:if test="${pointLog.module == 700}">问题Id：${pointLog.parameterId}</c:if>
+	    	<c:if test="${pointLog.module == 800}">答案Id：${pointLog.parameterId}</c:if>
+	    	<c:if test="${pointLog.module == 900}">答案Id：${pointLog.parameterId}</c:if>
+	    	<c:if test="${pointLog.module == 1000}">问题Id：${pointLog.parameterId}</c:if>
+	    	<c:if test="${pointLog.module == 1100}">答案Id：${pointLog.parameterId}</c:if>
+	    	<c:if test="${pointLog.module == 1200}">问题Id：${pointLog.parameterId}</c:if>
 	    </TD>
 	  </TR>
 	  <TR>

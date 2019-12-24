@@ -15,9 +15,10 @@ import cms.bean.template.Forum_AdvertisingRelated_Image;
 import cms.bean.template.Forum_CustomForumRelated_CustomHTML;
 import cms.bean.template.Layout;
 import cms.service.template.TemplateService;
+import cms.utils.FileUtil;
 import cms.utils.JsonUtils;
-import cms.web.action.FileManage;
 import cms.web.action.TextFilterManage;
+import cms.web.action.fileSystem.localImpl.LocalFileManage;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -29,8 +30,9 @@ import org.springframework.stereotype.Component;
 @Component("layoutManage")
 public class LayoutManage {
 	@Resource TemplateService templateService;//通过接口引用代理返回的对象
-	@Resource FileManage fileManage;
 	@Resource TextFilterManage textFilterManage;
+	@Resource LocalFileManage localFileManage;
+	
 	/**
 	 * 查询‘更多’
 	 * @param dirName 目录名称
@@ -96,7 +98,7 @@ public class LayoutManage {
 									if(forum_AdvertisingRelated_Image.getImage_fileName() != null && !"".equals(forum_AdvertisingRelated_Image.getImage_fileName().trim())){
 										
 										//删除旧文件
-										fileManage.deleteFile(path+forum_AdvertisingRelated_Image.getImage_fileName());
+										localFileManage.deleteFile(path+forum_AdvertisingRelated_Image.getImage_fileName());
 											
 										
 									}
@@ -168,14 +170,14 @@ public class LayoutManage {
 								if(pathFileList != null && pathFileList.size() >0){
 									for(String oldPathFile :pathFileList){
 										//替换路径中的..号
-										oldPathFile = fileManage.toRelativePath(oldPathFile);
+										oldPathFile = FileUtil.toRelativePath(oldPathFile);
 										//删除路径文件
-										Boolean state = fileManage.deleteFile(oldPathFile.replaceAll("/",separator));
+										Boolean state = localFileManage.deleteFile(oldPathFile.replaceAll("/",separator));
 										if(state != null && state == false){
 											 //替换指定的字符，只替换第一次出现的
 											oldPathFile = StringUtils.replaceOnce(oldPathFile, "file/template/", "");
 											//创建删除失败文件
-											fileManage.failedStateFile("file"+File.separator+"template"+File.separator+"lock"+File.separator+oldPathFile.replaceAll("/","_"));
+											localFileManage.failedStateFile("file"+File.separator+"template"+File.separator+"lock"+File.separator+oldPathFile.replaceAll("/","_"));
 										}
 									}
 								}

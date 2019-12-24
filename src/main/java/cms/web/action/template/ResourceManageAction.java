@@ -17,11 +17,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import cms.service.template.TemplateService;
 import cms.utils.Coding;
+import cms.utils.FileUtil;
 import cms.utils.JsonUtils;
 import cms.utils.PathUtil;
 import cms.utils.WebUtil;
-import cms.web.action.FileManage;
 import cms.web.action.SystemException;
+import cms.web.action.fileSystem.localImpl.LocalFileManage;
 
 import org.apache.commons.io.FileUtils;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+
 /**
  * 资源管理
  *
@@ -39,8 +41,8 @@ import org.springframework.web.multipart.MultipartFile;
 @Controller
 @RequestMapping("/control/resource/manage") 
 public class ResourceManageAction {
-	@Resource FileManage fileManage;
 	@Resource TemplateService templateService;
+	@Resource LocalFileManage localFileManage;
 	
 	/**
 	 * 资源管理 文件查看
@@ -59,9 +61,9 @@ public class ResourceManageAction {
 		
 		if(resourceId != null && !"".equals(resourceId.trim()) && dirName != null && !"".equals(dirName.trim())){
 
-			String path = PathUtil.path()+File.separator+"common"+File.separator+fileManage.toRelativePath(dirName)+File.separator+fileManage.toRelativePath(fileManage.toSystemPath(resourceId));
+			String path = PathUtil.path()+File.separator+"common"+File.separator+FileUtil.toRelativePath(dirName)+File.separator+FileUtil.toRelativePath(FileUtil.toSystemPath(resourceId));
 			
-			String suffix = fileManage.getExtension(path);
+			String suffix = FileUtil.getExtension(path);
 			if(suffix != null && !"".equals(suffix.trim())){//如果是js,css后缀文件
 				if("js".equalsIgnoreCase(suffix) || "css".equalsIgnoreCase(suffix)){
 					StringBuffer sb = new StringBuffer();
@@ -103,9 +105,9 @@ public class ResourceManageAction {
 			throws Exception {
 		
 		if(resourceId != null && !"".equals(resourceId.trim()) && dirName != null && !"".equals(dirName.trim())){
-			String path = PathUtil.path()+File.separator+"common"+File.separator+fileManage.toRelativePath(dirName)+File.separator+fileManage.toRelativePath(fileManage.toSystemPath(resourceId));
+			String path = PathUtil.path()+File.separator+"common"+File.separator+FileUtil.toRelativePath(dirName)+File.separator+FileUtil.toRelativePath(FileUtil.toSystemPath(resourceId));
 			
-			String fileName = fileManage.getName(path);//获取文件名,含后缀
+			String fileName = FileUtil.getName(path);//获取文件名,含后缀
 			
 			File file = new File(path);
 			return WebUtil.downloadResponse(FileUtils.readFileToByteArray(file), fileName,request);
@@ -138,9 +140,9 @@ public class ResourceManageAction {
 		Map<String,String> error = new HashMap<String,String>();
 
 		if(dirName != null && !"".equals(dirName.trim())){
-			String path = PathUtil.path()+File.separator+"common"+File.separator+fileManage.toRelativePath(dirName)+File.separator+fileManage.toRelativePath(fileManage.toSystemPath(resourceId));
+			String path = PathUtil.path()+File.separator+"common"+File.separator+FileUtil.toRelativePath(dirName)+File.separator+FileUtil.toRelativePath(FileUtil.toSystemPath(resourceId));
 			
-			boolean validateFolderName = fileManage.validateFileName(folderName);
+			boolean validateFolderName = FileUtil.validateFileName(folderName);
 			if(validateFolderName == false){
 				error.put("folderName", "名称不能含有特殊字符");
 				
@@ -152,8 +154,8 @@ public class ResourceManageAction {
 			}
 			if(file.isDirectory()){//如果是目录
 				if(validateFolderName == true){
-					String newFolder = "common"+File.separator+fileManage.toRelativePath(dirName)+File.separator+fileManage.toRelativePath(fileManage.toSystemPath(resourceId)+File.separator+fileManage.toRelativePath(fileManage.toSystemPath(folderName)));
-					boolean flag = fileManage.createFolder(newFolder);
+					String newFolder = "common"+File.separator+FileUtil.toRelativePath(dirName)+File.separator+FileUtil.toRelativePath(FileUtil.toSystemPath(resourceId)+File.separator+FileUtil.toRelativePath(FileUtil.toSystemPath(folderName)));
+					boolean flag = FileUtil.createFolder(newFolder);
 					if(!flag){
 						error.put("folderName", "新建文件夹错误");
 					}
@@ -189,7 +191,7 @@ public class ResourceManageAction {
 		Map<String,Object> returnJson = new HashMap<String,Object>();
 		Map<String,String> error = new HashMap<String,String>();
 		if(dirName != null && !"".equals(dirName.trim())){
-			String path = PathUtil.path()+File.separator+"common"+File.separator+fileManage.toRelativePath(dirName)+(resourceId == null || "".equals(resourceId.trim()) ? "" :File.separator+fileManage.toRelativePath(fileManage.toSystemPath(resourceId)));
+			String path = PathUtil.path()+File.separator+"common"+File.separator+FileUtil.toRelativePath(dirName)+(resourceId == null || "".equals(resourceId.trim()) ? "" :File.separator+FileUtil.toRelativePath(FileUtil.toSystemPath(resourceId)));
 			
 			File file = new File(path);
 			
@@ -214,7 +216,7 @@ public class ResourceManageAction {
 				long uploadSize = 2048000L;//单位为字节  例1024000为1M
 				
 				//验证文件后缀
-				boolean authentication = fileManage.validateFileSuffix(uploadFile.getOriginalFilename(),formatList);
+				boolean authentication = FileUtil.validateFileSuffix(uploadFile.getOriginalFilename(),formatList);
 				if(authentication == false){
 					error.put("uploadFile", "当前文件格式不允许上传");
 				}
@@ -229,7 +231,7 @@ public class ResourceManageAction {
 					try {
 					
 						//文件输出流
-						fileoutstream = new FileOutputStream(new File(path, fileManage.toRelativePath(fileManage.toSystemPath(uploadFile.getOriginalFilename()))));
+						fileoutstream = new FileOutputStream(new File(path, FileUtil.toRelativePath(FileUtil.toSystemPath(uploadFile.getOriginalFilename()))));
 						//写入硬盘
 						fileoutstream.write(uploadFile.getBytes());
 						
@@ -273,9 +275,9 @@ public class ResourceManageAction {
 		if(resourceId != null && !"".equals(resourceId.trim()) && dirName != null && !"".equals(dirName.trim())){
 			if(rename != null && !"".equals(rename.trim())){
 				
-				String path = PathUtil.path()+File.separator+"common"+File.separator+fileManage.toRelativePath(dirName)+File.separator+fileManage.toRelativePath(fileManage.toSystemPath(resourceId));
-				String suffix = fileManage.getExtension(path);//获取后缀
-				boolean validateFolderName = fileManage.validateFileName(rename);
+				String path = PathUtil.path()+File.separator+"common"+File.separator+FileUtil.toRelativePath(dirName)+File.separator+FileUtil.toRelativePath(FileUtil.toSystemPath(resourceId));
+				String suffix = FileUtil.getExtension(path);//获取后缀
+				boolean validateFolderName = FileUtil.validateFileName(rename);
 				if(validateFolderName == false){
 					error.put("rename", "名称不能含有特殊字符");
 				}
@@ -283,8 +285,8 @@ public class ResourceManageAction {
 				File file = new File(path);
 				if(file.isFile()){//文件
 					if(validateFolderName == true){
-						String resPath = "common"+File.separator+fileManage.toRelativePath(dirName)+File.separator+fileManage.toRelativePath(fileManage.toSystemPath(resourceId));
-						boolean flag = fileManage.renameFile(resPath,rename+"."+suffix);
+						String resPath = "common"+File.separator+FileUtil.toRelativePath(dirName)+File.separator+FileUtil.toRelativePath(FileUtil.toSystemPath(resourceId));
+						boolean flag = FileUtil.renameFile(resPath,rename+"."+suffix);
 						if(!flag){
 							error.put("rename", "重命名错误");
 						}else{
@@ -315,8 +317,8 @@ public class ResourceManageAction {
 					if(validateFolderName == true){
 						
 						
-						String resPath = "common"+File.separator+fileManage.toRelativePath(dirName)+File.separator+fileManage.toRelativePath(fileManage.toSystemPath(resourceId));
-						boolean flag = fileManage.renameFile(resPath,rename);
+						String resPath = "common"+File.separator+FileUtil.toRelativePath(dirName)+File.separator+FileUtil.toRelativePath(FileUtil.toSystemPath(resourceId));
+						boolean flag = FileUtil.renameFile(resPath,rename);
 						if(!flag){
 							error.put("rename", "重命名错误");
 						}else{
@@ -373,15 +375,15 @@ public class ResourceManageAction {
 		
 		if(resourceId != null && !"".equals(resourceId.trim()) && dirName != null && !"".equals(dirName.trim())){
 			
-			String path = "common"+File.separator+fileManage.toRelativePath(dirName)+File.separator+fileManage.toRelativePath(fileManage.toSystemPath(resourceId));
+			String path = "common"+File.separator+FileUtil.toRelativePath(dirName)+File.separator+FileUtil.toRelativePath(FileUtil.toSystemPath(resourceId));
 			
 			File file = new File(PathUtil.path()+File.separator+path);
 			if(file.isFile()){//文件
 				
-				fileManage.deleteFile(path);
+				localFileManage.deleteFile(path);
 				return "1";
 			}else if(file .isDirectory()){//目录
-				fileManage.removeDirectory(path);
+				localFileManage.removeDirectory(path);
 				return "1";
 			}
 			

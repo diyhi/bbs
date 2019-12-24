@@ -18,9 +18,10 @@ import cms.service.topic.CommentService;
 import cms.service.topic.TopicService;
 import cms.service.upgrade.UpgradeService;
 import cms.service.user.UserService;
+import cms.utils.FileUtil;
 import cms.utils.JsonUtils;
 import cms.utils.SpringConfigTool;
-import cms.web.action.FileManage;
+import cms.web.action.fileSystem.localImpl.LocalFileManage;
 import cms.web.action.topic.CommentManage;
 import cms.web.action.upgrade.UpgradeManage;
 import cms.web.action.user.UserDynamicManage;
@@ -39,10 +40,9 @@ public class Upgrade3_1to3_2 {
 	 */
     public static void run(String upgradeId){
     	UpgradeService upgradeService = (UpgradeService)SpringConfigTool.getContext().getBean("upgradeServiceBean");
-    	FileManage fileManage = (FileManage)SpringConfigTool.getContext().getBean("fileManage");
     	UpgradeManage upgradeManage = (UpgradeManage)SpringConfigTool.getContext().getBean("upgradeManage");
     	TemplateService templateService = (TemplateService)SpringConfigTool.getContext().getBean("templateServiceBean");
-    	
+    	LocalFileManage localFileManage = (LocalFileManage)SpringConfigTool.getContext().getBean("localFileManage");
     	TopicService topicService = (TopicService)SpringConfigTool.getContext().getBean("topicServiceBean");
     	UserService userService = (UserService)SpringConfigTool.getContext().getBean("userServiceBean");
     	UserManage userManage = (UserManage)SpringConfigTool.getContext().getBean("userManage");
@@ -95,12 +95,12 @@ public class Upgrade3_1to3_2 {
     			//更改运行状态
 				upgradeService.updateRunningStatus(upgradeId ,9999,JsonUtils.toJSONString(new UpgradeLog(new Date(),"升级完成",1))+",");
 				//写入当前BBS版本
-				fileManage.writeStringToFile("WEB-INF"+File.separator+"data"+File.separator+"systemVersion.txt",upgradeSystem.getId(),"utf-8",false);
+				FileUtil.writeStringToFile("WEB-INF"+File.separator+"data"+File.separator+"systemVersion.txt",upgradeSystem.getId(),"utf-8",false);
 				
 				//临时目录路径
 				String temp_path = "WEB-INF"+File.separator+"data"+File.separator+"temp"+File.separator+"upgrade"+File.separator;
 				//删除临时文件夹
-				fileManage.removeDirectory(temp_path+upgradeSystem.getUpdatePackageFirstDirectory()+File.separator);
+				localFileManage.removeDirectory(temp_path+upgradeSystem.getUpdatePackageFirstDirectory()+File.separator);
 				
     		}
     		

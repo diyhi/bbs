@@ -85,6 +85,17 @@
 		                	<div class="answer-icon"><i class="cms-commentCount"></i></div>
 		                	<div class="answer">${question.answerTotal}个回答</div>
 		                </div>
+		                <#if question.amount gt 0 || question.point gt 0 >
+		                <div class="reward" >
+		                	<div class="info" >
+		                		<i class="icon cms-deposit" ></i>
+		                		悬赏<#if question.amount gt 0>金额<span class="symbol">¥</span><span class="amount">${question.amount}</span>元 </#if>
+		                		<#if question.point gt 0>
+		                			<span class="point">${question.point}</span>积分
+		                		</#if>
+		                	</div>
+		                </div>
+		                </#if>
 						<div class="content" >
 		                	<#noescape>${question.content}</#noescape>          
 						</div>
@@ -99,6 +110,11 @@
 			                	</div> 
 							</div>		
 						</#list>
+						
+						<div class="favorite-formModule">
+							<#-- 引入添加收藏夹 -->
+							<@include action="${favoriteRelated_addFavorite_2}"/>
+						</div>
 					</div>
 				</div>
 				

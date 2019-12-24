@@ -1,9 +1,10 @@
 package cms.service.question;
 
 
+import java.math.BigDecimal;
 import java.util.List;
 
-
+import cms.bean.platformShare.QuestionRewardPlatformShare;
 import cms.bean.question.Answer;
 import cms.bean.question.AnswerReply;
 import cms.service.besa.DAO;
@@ -75,15 +76,32 @@ public interface AnswerService  extends DAO<Answer>{
 	 * 采纳答案
 	 * @param questionId 问题Id
 	 * @param answerId 答案Id
+	 * @param changeAdoption 是否更改采纳答案
+	 * @param cancelAdoptionUserName 取消采纳用户名称
+	 * @param cancelAdoptionPointLogObject 取消采纳用户退还悬赏积分日志
+	 * @param cancelAdoptionUserNameShareAmount 取消采纳用户退还分成金额
+	 * @param cancelAdoptionPaymentLogObject 取消采纳用户退还悬赏金额日志
+	 * @param userName 回答的用户名称
+	 * @param point 扣减用户积分
+	 * @param pointLogObject 积分日志
+	 * @param amount 扣减用户预存款
+	 * @param paymentLogObject 支付日志
+	 * @param questionRewardPlatformShare 平台分成
 	 * @return
 	 */
-	public int updateAdoptionAnswer(Long questionId, Long answerId);
+	public int updateAdoptionAnswer(Long questionId, Long answerId,boolean changeAdoption,String cancelAdoptionUserName,Object cancelAdoptionPointLogObject,BigDecimal cancelAdoptionUserNameShareAmount,Object cancelAdoptionPaymentLogObject,
+			String userName,Long point,Object pointLogObject,BigDecimal amount,Object paymentLogObject,QuestionRewardPlatformShare questionRewardPlatformShare);
 	/**
 	 * 取消采纳答案
 	 * @param questionId 问题Id
+	 * @param cancelAdoptionUserName 取消采纳用户名称
+	 * @param cancelAdoptionPointLogObject 取消采纳用户退还悬赏积分日志
+	 * @param cancelAdoptionUserNameShareAmount 取消采纳用户退还分成金额
+	 * @param cancelAdoptionPaymentLogObject 取消采纳用户退还悬赏金额日志
+	 * @param point 扣减用户积分
 	 * @return
 	 */
-	public int updateCancelAdoptionAnswer(Long questionId);
+	public int updateCancelAdoptionAnswer(Long questionId,String cancelAdoptionUserName,Object cancelAdoptionPointLogObject,BigDecimal cancelAdoptionUserNameShareAmount,Object cancelAdoptionPaymentLogObject,Long point);
 	/**
 	 * 修改答案状态
 	 * @param answerId 答案Id
@@ -96,9 +114,14 @@ public interface AnswerService  extends DAO<Answer>{
 	 * 删除答案
 	 * @param questionId 问题Id
 	 * @param answerId 答案Id
+	 * @param cancelAdoptionUserName 取消采纳用户名称
+	 * @param cancelAdoptionPointLogObject 取消采纳用户退还悬赏积分日志
+	 * @param cancelAdoptionUserNameShareAmount 取消采纳用户退还分成金额
+	 * @param cancelAdoptionPaymentLogObject 取消采纳用户退还悬赏金额日志
+	 * @param point 扣减用户积分
 	 * @return
 	*/
-	public Integer deleteAnswer(Long questionId,Long answerId);
+	public Integer deleteAnswer(Long questionId,Long answerId,String cancelAdoptionUserName,Object cancelAdoptionPointLogObject,BigDecimal cancelAdoptionUserNameShareAmount,Object cancelAdoptionPaymentLogObject,Long point);
 	/**
 	 * 根据用户名称集合删除答案
 	 * @param userNameList 用户名称集合

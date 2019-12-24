@@ -43,6 +43,9 @@
 	    	<c:if test="${entry.paymentModule == 6}">账户提现</c:if>
 	    	<c:if test="${entry.paymentModule == 70}">余额购买话题隐藏内容</c:if>
 	    	<c:if test="${entry.paymentModule == 80}">解锁话题隐藏内容分成</c:if>
+	    	<c:if test="${entry.paymentModule == 90}">悬赏金额</c:if>
+	    	<c:if test="${entry.paymentModule == 100}">采纳答案</c:if>
+	    	<c:if test="${entry.paymentModule == 110}">调整赏金</c:if>
 	    </TD>
 	    <TD width="12%">
 	    	<c:if test="${entry.interfaceProduct == -1}">员工操作</c:if>

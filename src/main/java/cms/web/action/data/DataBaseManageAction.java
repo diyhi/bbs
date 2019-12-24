@@ -10,8 +10,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import cms.bean.data.TableInfoObject;
 import cms.utils.FileSize;
+import cms.utils.FileUtil;
 import cms.utils.PathUtil;
-import cms.web.action.FileManage;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class DataBaseManageAction {
 	@Resource MySqlDataManage mySqlDataManage;
 	@Resource DataRunMarkManage dataRunMarkManage;
-	@Resource FileManage fileManage;
 	
 	/**
 	 * 备份页面
@@ -79,10 +78,10 @@ public class DataBaseManageAction {
 			String path = "WEB-INF"+File.separator+"data" +File.separator+"backup" + File.separator+dateTime;
 			
 			//读取当前商城版本
-			String currentVersion = fileManage.readFileToString("WEB-INF"+File.separator+"data"+File.separator+"systemVersion.txt","utf-8");
+			String currentVersion = FileUtil.readFileToString("WEB-INF"+File.separator+"data"+File.separator+"systemVersion.txt","utf-8");
 			
 			//写入备份数据库版本
-			fileManage.writeStringToFile(path+File.separator+"version.txt",currentVersion,"utf-8",false);
+			FileUtil.writeStringToFile(path+File.separator+"version.txt",currentVersion,"utf-8",false);
 			mySqlDataManage.backup(path);
 		
 		}
@@ -128,7 +127,7 @@ public class DataBaseManageAction {
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		//显示还原数据目录
-		String path = PathUtil.path()+File.separator+"WEB-INF"+File.separator+"data"+File.separator + "backup" + File.separator+fileManage.toRelativePath(dateName)+ File.separator;
+		String path = PathUtil.path()+File.separator+"WEB-INF"+File.separator+"data"+File.separator + "backup" + File.separator+FileUtil.toRelativePath(dateName)+ File.separator;
 		model.addAttribute("file", mySqlDataManage.getFile(path));
 		return "jsp/data/dataReset";
 	}
@@ -142,14 +141,14 @@ public class DataBaseManageAction {
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		//显示还原数据目录
-		String path = "WEB-INF"+File.separator+"data"+File.separator + "backup" + File.separator+fileManage.toRelativePath(dateName);
+		String path = "WEB-INF"+File.separator+"data"+File.separator + "backup" + File.separator+FileUtil.toRelativePath(dateName);
 				
 		//读取备份的数据库版本
-		String version = fileManage.readFileToString(path+File.separator+"version.txt","utf-8");
-		//读取当前商城版本
-		String currentVersion = fileManage.readFileToString("WEB-INF"+File.separator+"data"+File.separator+"systemVersion.txt","utf-8");
+		String version = FileUtil.readFileToString(path+File.separator+"version.txt","utf-8");
+		//读取当前BBS版本
+		String currentVersion = FileUtil.readFileToString("WEB-INF"+File.separator+"data"+File.separator+"systemVersion.txt","utf-8");
 		if(!currentVersion.equals(version)){
-			return "3";//备份文件版本和当前商城系统版本不匹配
+			return "3";//备份文件版本和当前BBS系统版本不匹配
 			
 		}
 		

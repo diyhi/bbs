@@ -26,15 +26,19 @@
 	-webkit-border-radius: 2px;
 	-moz-border-radius: 2px;
 	-o-border-radius: 2px;
-	cursor: auto;
+	cursor: url(common/default/pc/js/imageZoom/img/zoom_out.cur), url(img/zoomOut.png), auto;
 }
 .tm-m-photo-viewer {
 	position: relative;
-	margin: 10px 0px;
+	margin: 10px 0px -5px 0px;
 	width: 0px;
 	height: 0px;
 	background: #fff;
 	overflow: hidden;
+}
+/** 当图片超宽时本配置可以自适应显示全图 **/
+.tm-m-photo-viewer img{
+	max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;
 }
 .tm-m-photo-viewer-navleft, .tm-m-photo-viewer-navright {
 	position: absolute;
@@ -46,14 +50,12 @@
 .tm-m-photo-viewer-navleft {
 	top: 0;
 	left: 0;
-	width: 10px;
-	cursor: pointer;
+	width: 50px;
 }
 .tm-m-photo-viewer-navright {
 	top: 0;
 	right: 0;
-	width: 80px;
-	cursor: pointer;
+	width: 50px;
 }
 .tm-photos-arrow {
 	width: 0;
@@ -75,23 +77,6 @@
 	bottom: -12px;
 }
 
-.tm-m-photo-viewer-navicon {
-	display: none;
-	font-size: 60px;
-	font-style: normal;
-	color: #b8b8b8;
-	cursor: pointer;
-}
-.tm-m-photo-viewer-navright .tm-m-photo-viewer-navicon {
-	position: absolute;
-	top: 50%;
-	right: 8px;
-}
-.tm-m-photo-viewer-navleft .tm-m-photo-viewer-navicon {
-	position: absolute;
-	top: 50%;
-	left: 8px;
-}
 /*cursor IE不支持相对路径**/
 .tm-m-photos-thumb .img {
 	padding-bottom: 100%;
@@ -114,7 +99,7 @@
 	height: 80px;
 	cursor: url(common/default/pc/js/imageZoom/img/zoom_in.cur), url(img/zoomIn.png), auto;
 }**/
-.tm-m-photo-viewer,  .tm-m-photo-viewer img,  .tm-m-photos-thumb .tm-current img {
+.tm-m-photos-thumb .tm-current, .tm-m-photos-thumb .tm-current .img{
 	cursor: url(common/default/pc/js/imageZoom/img/zoom_out.cur), url(img/zoomOut.png), auto;
-	
 }
+

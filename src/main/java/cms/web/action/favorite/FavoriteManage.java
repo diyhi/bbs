@@ -5,6 +5,7 @@ package cms.web.action.favorite;
 import javax.annotation.Resource;
 
 import cms.bean.favorite.Favorites;
+import cms.bean.favorite.QuestionFavorite;
 import cms.bean.favorite.TopicFavorite;
 import cms.service.favorite.FavoriteService;
 import cms.utils.UUIDUtil;
@@ -28,7 +29,7 @@ public class FavoriteManage {
     @Resource FavoritesConfig favoritesConfig;
     @Resource FavoriteService favoriteService;
     @Resource TopicFavoriteConfig topicFavoriteConfig;
-    
+    @Resource QuestionFavoriteConfig questionFavoriteConfig;
     
     
 	/**
@@ -206,6 +207,100 @@ public class FavoriteManage {
     }
     
     
+    /**---------------------------------------------- 问题收藏 ----------------------------------------------**/
+    /**
+	 * 取得问题收藏Id的问题Id(后N位)
+	 * @param questionFavoriteId 问题收藏Id
+	 * @return
+	 */
+    public int getQuestionFavoriteId(String questionFavoriteId){
+    	String[] idGroup = questionFavoriteId.split("_");
+    	Long questionId = Long.parseLong(idGroup[0]);
+    	
+    	//选取得后N位问题Id
+    	String after_questionId = String.format("%04d", Math.abs(questionId)%10000);
+    	return Integer.parseInt(after_questionId);
+    } 
+    
+    /**
+     * 生成问题收藏Id
+     * 问题收藏Id格式（问题Id_用户Id）
+     * @param questionId 问题Id
+     * @param userId 用户Id
+     * @return
+     */
+    public String createQuestionFavoriteId(Long questionId,Long userId){
+    	return questionId+"_"+userId;
+    }
+    /**
+     * 校验问题收藏Id
+     * 问题收藏Id要先判断最后4位是不是数字
+     * @param questionFavoriteId 问题收藏Id
+     * @return
+     */
+    public boolean verificationQuestionFavoriteId(String questionFavoriteId){
+    	if(questionFavoriteId != null && !"".equals(questionFavoriteId.trim())){
+    		String[] idGroup = questionFavoriteId.split("_");
+    		for(String id : idGroup){
+    			boolean verification = Verification.isPositiveIntegerZero(id);//数字
+    			if(!verification){
+    				return false;
+    			}
+    			return true;
+    		}	
+			
+    	}
+    	return false;
+    }
+    
+    
+    /**
+     * 生成问题收藏对象
+     * @return
+     */
+    public Object createQuestionFavoriteObject(QuestionFavorite questionFavorite){
+    	//表编号
+		int tableNumber = questionFavoriteConfig.questionFavoriteIdRemainder(questionFavorite.getId());
+		if(tableNumber == 0){//默认对象
+			return questionFavorite;
+		}else{//带下划线对象
+			Class<?> c;
+			try {
+				c = Class.forName("cms.bean.favorite.QuestionFavorite_"+tableNumber);
+				Object object = c.newInstance();
+				
+				BeanCopier copier = BeanCopier.create(QuestionFavorite.class,object.getClass(), false); 
+			
+				copier.copy(questionFavorite,object, null);
+				return object;
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+			//	e.printStackTrace();
+				if (logger.isErrorEnabled()) {
+		            logger.error("生成问题收藏对象",e);
+		        }
+			} catch (InstantiationException e) {
+				// TODO Auto-generated catch block
+				//e.printStackTrace();
+				if (logger.isErrorEnabled()) {
+		            logger.error("生成问题收藏对象",e);
+		        }
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				//e.printStackTrace();
+				if (logger.isErrorEnabled()) {
+		            logger.error("生成问题收藏对象",e);
+		        }
+			}	
+		}
+		return null;
+    }
+    
+    
+    
+    
+    
+    
     
     
     
@@ -246,6 +341,44 @@ public class FavoriteManage {
 	 */
 	@CacheEvict(value="favoriteManage_cache_findFavoriteCountByTopicId",key="#topicId")
 	public void delete_cache_findFavoriteCountByTopicId(Long topicId){
+	}
+	
+	
+	 /**
+	 * 查询缓存 查询问题收藏
+	 * @param questionFavoriteId 问题收藏Id
+	 * @return
+	 */
+	@Cacheable(value="favoriteManage_cache_findQuestionFavoriteById",key="#questionFavoriteId")
+	public QuestionFavorite query_cache_findQuestionFavoriteById(String questionFavoriteId){
+		return favoriteService.findQuestionFavoriteById(questionFavoriteId);
+	}
+	/**
+	 * 删除缓存 问题收藏
+	 * @param questionFavoriteId 问题收藏Id
+	 * @return
+	 */
+	@CacheEvict(value="favoriteManage_cache_findQuestionFavoriteById",key="#questionFavoriteId")
+	public void delete_cache_findQuestionFavoriteById(String questionFavoriteId){
+	}
+    
+    
+	/**
+	 * 查询缓存 根据问题Id查询被收藏数量
+	 * @param questionId 问题Id
+	 * @return
+	 */
+	@Cacheable(value="favoriteManage_cache_findFavoriteCountByQuestionId",key="#questionId")
+	public Long query_cache_findFavoriteCountByQuestionId(Long questionId){
+		return favoriteService.findFavoriteCountByQuestionId(questionId);
+	}
+	/**
+	 * 删除缓存 根据问题Id查询被收藏数量
+	 * @param questionId 问题Id
+	 * @return
+	 */
+	@CacheEvict(value="favoriteManage_cache_findFavoriteCountByQuestionId",key="#questionId")
+	public void delete_cache_findFavoriteCountByQuestionId(Long questionId){
 	}
     
 }

@@ -15,10 +15,11 @@ import cms.bean.PageForm;
 import cms.bean.links.Links;
 import cms.service.links.LinksService;
 import cms.service.setting.SettingService;
+import cms.utils.FileUtil;
 import cms.utils.RedirectPath;
 import cms.utils.UUIDUtil;
-import cms.web.action.FileManage;
 import cms.web.action.SystemException;
+import cms.web.action.fileSystem.FileManage;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -43,7 +44,6 @@ public class LinksManageAction {
 	@Resource(name = "linksValidator") 
 	private Validator validator; 
 	@Resource LinksService linksService; 
-	
 	@Resource FileManage fileManage;
 	
 	@Resource SettingService settingService;
@@ -79,10 +79,10 @@ public class LinksManageAction {
 		if (images == null || images.isEmpty()) { 
 			if(imagePath != null && !"".equals(imagePath.trim())){
 				
-				String fileName = fileManage.getName(imagePath);
+				String fileName = FileUtil.getName(imagePath);
 				
 				//取得路径名称
-				String pathName = fileManage.getFullPath(imagePath);
+				String pathName = FileUtil.getFullPath(imagePath);
 				
 				//旧路径必须为file/links/开头
 				if(imagePath.substring(0, 11).equals("file/links/")){
@@ -117,10 +117,10 @@ public class LinksManageAction {
 			formatList.add("jpeg");
 			formatList.add("bmp");
 			formatList.add("png");
-			boolean authentication = fileManage.validateFileSuffix(images.getOriginalFilename(),formatList);
+			boolean authentication = FileUtil.validateFileSuffix(images.getOriginalFilename(),formatList);
 			if(authentication){
 				//取得文件后缀		
-				String ext = fileManage.getExtension(images.getOriginalFilename());
+				String ext = FileUtil.getExtension(images.getOriginalFilename());
 				//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
 				String pathDir = "file"+File.separator+"links"+File.separator;
 				//构建文件名称
@@ -129,7 +129,7 @@ public class LinksManageAction {
 				_fileName = fileName; 
 				  
 				//生成文件保存目录
-				fileManage.createFolder(pathDir);
+				FileUtil.createFolder(pathDir);
 				 
 				//生成锁文件名称
 				String lockFileName = fileName;
@@ -217,10 +217,10 @@ public class LinksManageAction {
 		if (images == null || images.isEmpty()) { 
 			if(imagePath != null && !"".equals(imagePath.trim())){
 				//取得文件名称
-				String fileName = fileManage.getName(imagePath);
+				String fileName = FileUtil.getName(imagePath);
 
 				//取得路径名称
-				String pathName = fileManage.getFullPath(imagePath);
+				String pathName = FileUtil.getFullPath(imagePath);
 				
 				//旧路径必须为file/links/开头
 				if(imagePath.substring(0, 11).equals("file/links/")){
@@ -254,10 +254,10 @@ public class LinksManageAction {
 			formatList.add("jpeg");
 			formatList.add("bmp");
 			formatList.add("png");
-			boolean authentication = fileManage.validateFileSuffix(images.getOriginalFilename(),formatList);
+			boolean authentication = FileUtil.validateFileSuffix(images.getOriginalFilename(),formatList);
 			if(authentication){
 				//取得文件后缀		
-				String ext = fileManage.getExtension(images.getOriginalFilename());
+				String ext = FileUtil.getExtension(images.getOriginalFilename());
 				//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
 				String pathDir = "file"+File.separator+"links"+File.separator;
 				//构建文件名称
@@ -266,7 +266,7 @@ public class LinksManageAction {
 				_fileName = fileName;
 				   
 				//生成文件保存目录
-				fileManage.createFolder(pathDir);
+				FileUtil.createFolder(pathDir);
 				//生成锁文件名称
 				String lockFileName = fileName;
 				//添加文件锁
@@ -299,9 +299,9 @@ public class LinksManageAction {
 			if(!(_imagePath+_fileName).equals(old_links.getImage())){//如果图片有变化
 				//删除旧图片
 				//替换路径中的..号
-				String oldPathFile = fileManage.toRelativePath(old_links.getImage());
+				String oldPathFile = FileUtil.toRelativePath(old_links.getImage());
 				//删除旧文件
-				fileManage.deleteFile(fileManage.toSystemPath(oldPathFile));
+				fileManage.deleteFile(FileUtil.toSystemPath(oldPathFile));
 			}
 		}
 		
@@ -338,9 +338,9 @@ public class LinksManageAction {
 					
 					//删除旧图片
 					//替换路径中的..号
-					String oldPathFile = fileManage.toRelativePath(links.getImage());
+					String oldPathFile = FileUtil.toRelativePath(links.getImage());
 					//删除旧文件
-					fileManage.deleteFile(fileManage.toSystemPath(oldPathFile));
+					fileManage.deleteFile(FileUtil.toSystemPath(oldPathFile));
 					
 				}
 				return "1";

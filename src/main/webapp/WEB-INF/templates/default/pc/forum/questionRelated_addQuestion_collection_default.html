@@ -5,6 +5,7 @@
 	
 	<#--  全局允许提交问题 -->
 	<#if returnValue['allowQuestion'] == true>
+	
 		<!-- 问题编辑器允许使用标签 -->
 		<input type="hidden" id="questionAvailableTag"  value="${returnValue['availableTag']}">
 		
@@ -16,9 +17,19 @@
 				<#-- 提交后跳转参数  参数必须经过encodeBase64URL编码后才能提交 不填写时默认跳转回当前页 -->
 				<input type="hidden" id="jumpUrl" name="jumpUrl" value="">
 				
-				<div style="height: 40px;">
+				<div class="item">
 					<input type="text" id="title" name="title" class="formText" size="90" value="${question.title}" alt="标题" title="标题" placeholder="标题"/>
 					<span id="${identificationNumber}_title_error" class="error" name="error">${(error['title'])!}</span>
+				</div>
+				<div class="item">
+					<input type="text" id="amount" name="amount" class="formText" size="10" maxlength="8" value="${question.amount}" alt="悬赏金额" title="悬赏金额" placeholder="悬赏金额"/><span class="unit">元</span>
+					<span id="${identificationNumber}_amount_error" class="error" name="error">${(error['amount'])!}</span>
+					<span class="help" >悬赏金额不能超过 ${returnValue['maxDeposit']} 元</span>
+				</div>
+				<div class="item">
+					<input type="text" id="point" name="point" class="formText" size="10" maxlength="8" value="${question.amount}" alt="悬赏积分" title="悬赏积分" placeholder="悬赏积分"/><span class="unit">积分</span>
+					<span id="${identificationNumber}_point_error" class="error" name="error">${(error['point'])!}</span>
+					<span class="help" >悬赏积分不能超过 ${returnValue['maxPoint']}</span>
 				</div>
 				<div class="questionTag">
 					<#list question.questionTagAssociationList as questionTagAssociation>
@@ -31,8 +42,8 @@
 				</div>
 
 				<p><textarea class="textarea" onfocus="" id="questionContent" name="content" >${question.content}</textarea></p>
-				
 				<span id="${identificationNumber}_content_error" class="error" name="error">${(error['content'])!}</span> 
+
 				<span id="${identificationNumber}_question_error" class="error" name="error">${error['question']}</span>
 				<div class="form-action">
 					<#-- 获取令牌 -->
@@ -41,7 +52,7 @@
 					<div class="questionSubmit">
 						<!-- 
 			        	<span class="submitButton"><INPUT type="button" value="提交" onClick="javascript:sureSubmit(this.form)"></span> -->
-			        	<span class="submitButton"><INPUT type="button" value="提交" onClick="javascript:ajax_sureSubmit('${identificationNumber}')"></span>
+			        	<span class="submitButton"><INPUT id="${identificationNumber}_submitForm"  type="button" value="提交" onClick="javascript:ajax_sureSubmit('${identificationNumber}')"></span>
 			        </div>
 					
 					
@@ -378,6 +389,8 @@
 					} 
 					//Ajax方式提交
 					function ajax_sureSubmit(identificationNumber){
+						//按钮设置 disabled="disabled"
+						document.getElementById(identificationNumber+"_submitForm").disabled=true;
 						//清空所有错误提示
 						var error_tag = getElementsByName_pseudo("span", "error");
 						for(var i = 0;i < error_tag.length; i++) {
@@ -423,6 +436,13 @@
 							var content = document.getElementById("questionContent").value;
 							parameter += "&content="+encodeURIComponent(content);
 						
+							//悬赏金额
+							var amount = document.getElementById("amount").value;
+							parameter += "&amount="+encodeURIComponent(amount);
+							//悬赏积分
+							var point = document.getElementById("point").value;
+							parameter += "&point="+encodeURIComponent(point);
+						
 						
 						
 						   	//删除第一个&号,防止因为多了&号而出现警告: Parameters: Invalid chunk ignored.信息
@@ -457,6 +477,8 @@
 					        				}
 					        				
 					        			}
+					        			//按钮设置 disabled="disabled"
+										document.getElementById(identificationNumber+"_submitForm").disabled=false;
 					        		}else if(returnValue == "captchaKey"){//显示验证码
 			        					
 										var captchaKey = data[returnValue];
@@ -471,8 +493,12 @@
 										}
 									}
 					        	}
+					        	
 							},
 								"user/control/question/add?timestamp=" + new Date().getTime(), true,parameter);
+						}else{
+							//按钮设置 disabled="disabled"
+							document.getElementById(identificationNumber+"_submitForm").disabled=false;
 						}
 					} 
 					

@@ -1,6 +1,7 @@
 package cms.bean.question;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -17,12 +18,13 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
+
 /**
  * 问题
  *
  */
 @Entity
-@Table(indexes = {@Index(name="question_1_idx", columnList="userName,postTime"),@Index(name="question_2_idx", columnList="status,sort,lastUpdateTime"),@Index(name="question_3_idx", columnList="adoptionAnswerId,status,sort,lastUpdateTime")})
+@Table(indexes = {@Index(name="question_1_idx", columnList="userName,postTime"),@Index(name="question_4_idx", columnList="status,sort,lastAnswerTime"),@Index(name="question_5_idx", columnList="adoptionAnswerId,status,sort,lastAnswerTime"),@Index(name="question_6_idx", columnList="point,status,sort,lastAnswerTime"),@Index(name="question_7_idx", columnList="amount,status,sort,lastAnswerTime")})
 public class Question implements Serializable{
 	private static final long serialVersionUID = 8441186002971301170L;
 	/** Id **/
@@ -103,6 +105,13 @@ public class Question implements Serializable{
 	private Integer sort = 0;
 	/** 状态 10.待审核 20.已发布 110.待审核删除 120.已发布删除 **/
 	private Integer status = 10;
+	
+	/** 悬赏金额  **/
+	@Column(nullable=false,precision=12, scale=2)
+	private BigDecimal amount = new BigDecimal("0.00");
+	/** 悬赏积分  **/
+	private Long point = 0L;
+
 	
 	/**
 	 * 添加标签
@@ -266,6 +275,26 @@ public class Question implements Serializable{
 
 	public void setAppendQuestionItemList(List<AppendQuestionItem> appendQuestionItemList) {
 		this.appendQuestionItemList = appendQuestionItemList;
+	}
+
+
+	public BigDecimal getAmount() {
+		return amount;
+	}
+
+
+	public void setAmount(BigDecimal amount) {
+		this.amount = amount;
+	}
+
+
+	public Long getPoint() {
+		return point;
+	}
+
+
+	public void setPoint(Long point) {
+		this.point = point;
 	}
 	
 	

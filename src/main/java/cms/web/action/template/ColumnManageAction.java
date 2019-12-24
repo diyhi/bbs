@@ -18,10 +18,11 @@ import cms.bean.template.Forum;
 import cms.bean.template.Layout;
 import cms.bean.template.Templates;
 import cms.service.template.TemplateService;
+import cms.utils.FileUtil;
 import cms.utils.JsonUtils;
 import cms.utils.UUIDUtil;
-import cms.web.action.FileManage;
 import cms.web.action.SystemException;
+import cms.web.action.fileSystem.localImpl.LocalFileManage;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 
 /**
  * 栏目管理
@@ -41,8 +43,9 @@ public class ColumnManageAction {
 	@Resource ColumnManage columnManage;
 	@Resource(name="templateServiceBean")
 	private TemplateService templateService;//通过接口引用代理返回的对象
-	@Resource FileManage fileManage;
 	@Resource LayoutManage layoutManage;
+	@Resource LocalFileManage localFileManage;
+	
 	/**
 	 * 栏目列表
 	 * @param dirName 模板目录名称
@@ -173,11 +176,11 @@ public class ColumnManageAction {
 				//生成文件
 				String pc_path = "WEB-INF"+File.separator+"templates"+File.separator+dirName+File.separator+"pc"+File.separator+"public"+File.separator;
 				//创建文件并将注释写入模板文件
-				fileManage.writeStringToFile(pc_path+layout.getLayoutFile(),"<#-- "+column.getName()+" -->","utf-8",false);
+				FileUtil.writeStringToFile(pc_path+layout.getLayoutFile(),"<#-- "+column.getName()+" -->","utf-8",false);
 				//生成文件
 				String wap_path = "WEB-INF"+File.separator+"templates"+File.separator+dirName+File.separator+"wap"+File.separator+"public"+File.separator;
 				//创建文件并将注释写入模板文件
-				fileManage.writeStringToFile(wap_path+layout.getLayoutFile(),"<#-- "+column.getName()+" -->","utf-8",false);
+				FileUtil.writeStringToFile(wap_path+layout.getLayoutFile(),"<#-- "+column.getName()+" -->","utf-8",false);
 				
 			}
 
@@ -280,11 +283,11 @@ public class ColumnManageAction {
 					//路径
 					String pc_path = "WEB-INF"+File.separator+"templates"+File.separator+dirName+File.separator+"pc"+File.separator+"public"+File.separator;
 					//删除空白页文件
-					fileManage.deleteFile(pc_path+"column_"+column.getId()+".html");
+					localFileManage.deleteFile(pc_path+"column_"+column.getId()+".html");
 					//路径
 					String wap_path = "WEB-INF"+File.separator+"templates"+File.separator+dirName+File.separator+"wap"+File.separator+"public"+File.separator;
 					//删除空白页文件
-					fileManage.deleteFile(wap_path+"column_"+column.getId()+".html");
+					localFileManage.deleteFile(wap_path+"column_"+column.getId()+".html");
 					
 					//删除布局
 					Layout layout = templateService.findLayoutByReferenceCode(dirName,7,"column_"+column.getId());
@@ -314,11 +317,11 @@ public class ColumnManageAction {
 					//路径
 					String pc_path = "WEB-INF"+File.separator+"templates"+File.separator+dirName+File.separator+"pc"+File.separator+"public"+File.separator;
 					//创建文件并将注释写入模板文件
-					fileManage.writeStringToFile(pc_path+layout.getLayoutFile(),"<#-- "+column.getName()+" -->","utf-8",false);
+					FileUtil.writeStringToFile(pc_path+layout.getLayoutFile(),"<#-- "+column.getName()+" -->","utf-8",false);
 					//路径
 					String wap_path = "WEB-INF"+File.separator+"templates"+File.separator+dirName+File.separator+"wap"+File.separator+"public"+File.separator;
 					//创建文件并将注释写入模板文件
-					fileManage.writeStringToFile(wap_path+layout.getLayoutFile(),"<#-- "+column.getName()+" -->","utf-8",false);
+					FileUtil.writeStringToFile(wap_path+layout.getLayoutFile(),"<#-- "+column.getName()+" -->","utf-8",false);
 					
 				}
 				
@@ -352,11 +355,11 @@ public class ColumnManageAction {
 				//路径
 				String pc_path = "WEB-INF"+File.separator+"templates"+File.separator+dirName+File.separator+"pc"+File.separator+"public"+File.separator;
 				//删除空白页文件
-				fileManage.deleteFile(pc_path+"column_"+id+".html");
+				localFileManage.deleteFile(pc_path+"column_"+id+".html");
 				//路径
 				String wap_path = "WEB-INF"+File.separator+"templates"+File.separator+dirName+File.separator+"wap"+File.separator+"public"+File.separator;
 				//删除空白页文件
-				fileManage.deleteFile(wap_path+"column_"+id+".html");
+				localFileManage.deleteFile(wap_path+"column_"+id+".html");
 				//删除布局
 				Layout layout = templateService.findLayoutByReferenceCode(dirName,7,"column_"+id);
 				if(layout != null){

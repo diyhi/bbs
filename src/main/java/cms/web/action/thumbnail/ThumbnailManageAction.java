@@ -8,8 +8,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import cms.bean.thumbnail.Thumbnail;
 import cms.service.thumbnail.ThumbnailService;
+import cms.utils.FileUtil;
 import cms.utils.RedirectPath;
-import cms.web.action.FileManage;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequestMapping("/control/thumbnail/manage") 
 public class ThumbnailManageAction {
 	@Resource ThumbnailService thumbnailService;
-	@Resource FileManage fileManage;
 	
 	@Resource(name = "thumbnailValidator") 
 	private Validator validator; 
@@ -68,7 +67,7 @@ public class ThumbnailManageAction {
 		thumbnail.setSpecificationGroup(specificationGroup.toString());
 		
 		//添加样式增加缩略图标记
-		fileManage.writeStringToFile("file"+File.separator+"topic"+File.separator+"thumbnailMarker"+File.separator+specificationGroup.toString()+".txt","+","utf-8", false);
+		FileUtil.writeStringToFile("file"+File.separator+"topic"+File.separator+"thumbnailMarker"+File.separator+specificationGroup.toString()+".txt","+","utf-8", false);
 				
 		thumbnailService.saveThumbnail(thumbnail);
 		
@@ -92,7 +91,7 @@ public class ThumbnailManageAction {
 			Thumbnail thumbnail = thumbnailService.findByThumbnailId(thumbnailId);
 			if(thumbnail != null){
 				//添加样式删除缩略图标记
-				fileManage.writeStringToFile("file"+File.separator+"topic"+File.separator+"thumbnailMarker"+File.separator+thumbnail.getSpecificationGroup()+".txt","-","utf-8", false);
+				FileUtil.writeStringToFile("file"+File.separator+"topic"+File.separator+"thumbnailMarker"+File.separator+thumbnail.getSpecificationGroup()+".txt","-","utf-8", false);
 				
 				int i = thumbnailService.deleteThumbnail(thumbnailId);
 				if(i >0){

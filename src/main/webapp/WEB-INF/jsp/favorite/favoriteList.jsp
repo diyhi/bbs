@@ -26,13 +26,23 @@
   <THEAD class="t-list-thead">
   <TR>
     <TH>标题</TH>
+    <TH>模块</TH>
     <TH>加入时间</TH>
     </TR></THEAD>
   <TBODY class="t-list-tbody" align="center">
    <c:forEach items="${pageView.records}" var="entry">
 	  <TR > 
-	    <TD width="70%">
-	    	<a href="${config:url(pageContext.request)}control/topic/manage${config:suffix()}?method=view&topicId=${entry.topicId}&origin=40&userName=${param.userName}&id=${param.id}&queryState=${param.queryState}&jumpStatus=${param.jumpStatus}&userPage=${param.userPage}&favoritePage=${param.page}">${entry.topicTitle}</a>
+	    <TD width="60%">
+	    	<c:if test="${entry.module == 10}">
+	    		<a href="${config:url(pageContext.request)}control/topic/manage${config:suffix()}?method=view&topicId=${entry.topicId}&origin=40&userName=${param.userName}&id=${param.id}&queryState=${param.queryState}&jumpStatus=${param.jumpStatus}&userPage=${param.userPage}&favoritePage=${param.page}">${entry.topicTitle}</a>
+	    	</c:if>
+	    	<c:if test="${entry.module == 20}">
+	    		<a href="${config:url(pageContext.request)}control/question/manage${config:suffix()}?method=view&questionId=${entry.questionId}&origin=40&userName=${param.userName}&id=${param.id}&queryState=${param.queryState}&jumpStatus=${param.jumpStatus}&userPage=${param.userPage}&favoritePage=${param.page}">${entry.questionTitle}</a>
+	    	</c:if>
+	    </TD>
+	    <TD width="10%">
+	    	<c:if test="${entry.module == 10}">话题</c:if>
+	    	<c:if test="${entry.module == 20}">问题</c:if>
 	    </TD>
 	    <TD width="30%">
 	    	<fmt:formatDate value="${entry.addtime}"  pattern="yyyy-MM-dd HH:mm:ss"/>

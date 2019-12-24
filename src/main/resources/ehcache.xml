@@ -311,6 +311,17 @@
 		overflowToDisk="true"
 		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
 		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>		
+	<!-- 根据Id查询问题收藏 -->
+	<cache name="favoriteManage_cache_findQuestionFavoriteById" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
+	<!-- 根据问题Id查询被收藏数量 -->
+	<cache name="favoriteManage_cache_findFavoriteCountByQuestionId" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
+		
 		
 	<!-- 根据Id查询关注 -->
 	<cache name="followManage_cache_findById" maxElementsInMemory="900000" 

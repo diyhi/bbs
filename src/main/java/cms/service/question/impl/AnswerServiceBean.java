@@ -1,5 +1,6 @@
 package cms.service.question.impl;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,11 +11,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import cms.bean.payment.PaymentLog;
+import cms.bean.platformShare.QuestionRewardPlatformShare;
 import cms.bean.question.Answer;
 import cms.bean.question.AnswerReply;
+import cms.bean.question.Question;
+import cms.bean.question.QuestionTagAssociation;
+import cms.bean.user.PointLog;
 import cms.service.besa.DaoSupport;
+import cms.service.platformShare.PlatformShareService;
 import cms.service.question.AnswerService;
 import cms.service.question.QuestionService;
+import cms.service.user.UserService;
+import cms.web.action.SystemException;
 
 
 /**
@@ -26,8 +35,8 @@ import cms.service.question.QuestionService;
 public class AnswerServiceBean extends DaoSupport<Answer> implements AnswerService {
 
 	@Resource QuestionService questionService;
-
-	
+	@Resource UserService userService;
+	@Resource PlatformShareService platformShareService;
 	
 	/**
 	 * 根据答案Id查询答案
@@ -190,13 +199,31 @@ public class AnswerServiceBean extends DaoSupport<Answer> implements AnswerServi
 		return query.executeUpdate();
 	}
 	
+	
+	
+	
+	
+	
+	
 	/**
 	 * 采纳答案
 	 * @param questionId 问题Id
 	 * @param answerId 答案Id
+	 * @param changeAdoption 是否更改采纳答案
+	 * @param cancelAdoptionUserName 取消采纳用户名称
+	 * @param cancelAdoptionPointLogObject 取消采纳用户退还悬赏积分日志
+	 * @param cancelAdoptionUserNameShareAmount 取消采纳用户退还分成金额
+	 * @param cancelAdoptionPaymentLogObject 取消采纳用户退还悬赏金额日志
+	 * @param userName 回答的用户名称
+	 * @param point 扣减用户积分
+	 * @param pointLogObject 积分日志
+	 * @param amount 扣减用户预存款
+	 * @param paymentLogObject 支付日志
+	 * @param questionRewardPlatformShare 平台分成
 	 * @return
 	 */
-	public int updateAdoptionAnswer(Long questionId, Long answerId){
+	public int updateAdoptionAnswer(Long questionId, Long answerId,boolean changeAdoption,String cancelAdoptionUserName,Object cancelAdoptionPointLogObject,BigDecimal cancelAdoptionUserNameShareAmount,Object cancelAdoptionPaymentLogObject,
+			String userName,Long point,Object pointLogObject,BigDecimal amount,Object paymentLogObject,QuestionRewardPlatformShare questionRewardPlatformShare){
 		//先设置所有答案为不采纳
 		Query query = em.createQuery("update Answer o set o.adoption=?1 where o.questionId=?2")
 				.setParameter(1, false)
@@ -210,22 +237,104 @@ public class AnswerServiceBean extends DaoSupport<Answer> implements AnswerServi
 		if(i >0){
 			//修改问题的采纳答案Id
 			questionService.updateAdoptionAnswerId(questionId, answerId);
+			if(changeAdoption){//如果是更改采纳
+				//悬赏退还
+				this.rewardReturn(cancelAdoptionUserName,cancelAdoptionPointLogObject,cancelAdoptionUserNameShareAmount,cancelAdoptionPaymentLogObject,point);
+				//悬赏支付
+				this.rewardPayment(userName,point,pointLogObject,amount,paymentLogObject);
+
+				//删除旧的平台分成
+				platformShareService.deleteQuestionRewardPlatformShare(questionId, cancelAdoptionUserName);
+				//保存新的平台分成
+				if(questionRewardPlatformShare != null){//平台分成
+					this.save(questionRewardPlatformShare);
+				}
+			}else{
+				//悬赏支付
+				this.rewardPayment(userName,point,pointLogObject,amount,paymentLogObject);
+				
+				if(questionRewardPlatformShare != null){//平台分成
+					this.save(questionRewardPlatformShare);
+				}
+			}
+			
+			
 		}
 		return i;
 	}
+	
+	
+	/**
+	 * 悬赏支付
+	 * @param userName 用户名称
+	 * @param point 扣减用户积分
+	 * @param pointLogObject 积分日志
+	 * @param amount 扣减用户预存款
+	 * @param paymentLogObject 支付日志
+	 */
+	private void rewardPayment(String userName,Long point,Object pointLogObject,BigDecimal amount,Object paymentLogObject){
+		if(point != null && point >0L){//积分
+			//增加用户积分
+			userService.addUserPoint(userName,point,pointLogObject);
+
+		}
+		if(amount != null && amount.compareTo(new BigDecimal("0")) >0){//余额
+			//增加用户预存款
+			userService.addUserDeposit(userName, amount, paymentLogObject);
+		}
+		
+	}
+	
+
+	/**
+	 * 悬赏退还
+	 */
+	private void rewardReturn(String cancelAdoptionUserName,Object cancelAdoptionPointLogObject,BigDecimal cancelAdoptionUserNameShareAmount,Object cancelAdoptionPaymentLogObject,Long point){
+		if(cancelAdoptionPointLogObject !=null && point != null && point >0L){//积分
+			//扣减用户积分
+			int i = userService.subtractUserPoint(cancelAdoptionUserName,point, cancelAdoptionPointLogObject);
+			if(i == 0){
+				throw new SystemException("扣减积分失败");
+			}
+		}
+		
+		if(cancelAdoptionPaymentLogObject != null && cancelAdoptionUserNameShareAmount != null && cancelAdoptionUserNameShareAmount.compareTo(new BigDecimal("0")) >0){//余额
+			//扣减用户预存款
+			int i = userService.subtractUserDeposit(cancelAdoptionUserName, cancelAdoptionUserNameShareAmount, cancelAdoptionPaymentLogObject);
+			if(i ==0){
+				throw new SystemException("扣减预存款失败");
+			}
+		}
+		
+	}
+	
 	/**
 	 * 取消采纳答案
 	 * @param questionId 问题Id
+	 * @param cancelAdoptionUserName 取消采纳用户名称
+	 * @param cancelAdoptionPointLogObject 取消采纳用户退还悬赏积分日志
+	 * @param cancelAdoptionUserNameShareAmount 取消采纳用户退还分成金额
+	 * @param cancelAdoptionPaymentLogObject 取消采纳用户退还悬赏金额日志
+	 * @param point 扣减用户积分
 	 * @return
 	 */
-	public int updateCancelAdoptionAnswer(Long questionId){
+	public int updateCancelAdoptionAnswer(Long questionId,String cancelAdoptionUserName,Object cancelAdoptionPointLogObject,BigDecimal cancelAdoptionUserNameShareAmount,Object cancelAdoptionPaymentLogObject,Long point){
 		//先设置所有答案为不采纳
 		Query query = em.createQuery("update Answer o set o.adoption=?1 where o.questionId=?2")
 				.setParameter(1, false)
 				.setParameter(2, questionId);
 		query.executeUpdate();
 		//修改问题的采纳答案Id
-		return questionService.updateAdoptionAnswerId(questionId, 0L);
+		int i = questionService.updateAdoptionAnswerId(questionId, 0L);
+		
+		if(i>0){
+			//悬赏退还
+			this.rewardReturn(cancelAdoptionUserName,cancelAdoptionPointLogObject,cancelAdoptionUserNameShareAmount,cancelAdoptionPaymentLogObject,point);
+			
+			//删除平台分成
+			platformShareService.deleteQuestionRewardPlatformShare(questionId, cancelAdoptionUserName);
+		}
+		return i;
 	}
 	
 	
@@ -234,13 +343,33 @@ public class AnswerServiceBean extends DaoSupport<Answer> implements AnswerServi
 	 * 删除答案
 	 * @param questionId 问题Id
 	 * @param answerId 答案Id
+	 * @param cancelAdoptionUserName 取消采纳用户名称
+	 * @param cancelAdoptionPointLogObject 取消采纳用户退还悬赏积分日志
+	 * @param cancelAdoptionUserNameShareAmount 取消采纳用户退还分成金额
+	 * @param cancelAdoptionPaymentLogObject 取消采纳用户退还悬赏金额日志
+	 * @param point 扣减用户积分
 	 * @return
 	*/
-	public Integer deleteAnswer(Long questionId,Long answerId){
+	public Integer deleteAnswer(Long questionId,Long answerId,String cancelAdoptionUserName,Object cancelAdoptionPointLogObject,BigDecimal cancelAdoptionUserNameShareAmount,Object cancelAdoptionPaymentLogObject,Long point){
 		//删除答案
 		Query delete = em.createQuery("delete from Answer o where o.id=?1");
 		delete.setParameter(1, answerId);
 		int i = delete.executeUpdate();
+		if(i >0){
+			//悬赏退还
+			this.rewardReturn(cancelAdoptionUserName,cancelAdoptionPointLogObject,cancelAdoptionUserNameShareAmount,cancelAdoptionPaymentLogObject,point);
+			
+			if(cancelAdoptionUserName != null){
+				//修改问题的采纳答案Id
+				questionService.updateAdoptionAnswerId(questionId, 0L);
+				
+				//删除平台分成
+				platformShareService.deleteQuestionRewardPlatformShare(questionId, cancelAdoptionUserName);
+			}
+			
+			
+		}
+		
 		
 		//删除答案回复
 		Query delete_reply = em.createQuery("delete from AnswerReply o where o.answerId=?1");

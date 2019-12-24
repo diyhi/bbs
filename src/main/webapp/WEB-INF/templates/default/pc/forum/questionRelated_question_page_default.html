@@ -7,9 +7,8 @@
          <li <#if url_filterCondition == '' || url_filterCondition == '10'> class='active'</#if>><a href="${baseURI}">最新</a></li>
          <li <#if url_filterCondition == '20'> class='active'</#if>><a href="${baseURI}?filterCondition=20">未解决</a></li>
          <li <#if url_filterCondition == '30'> class='active'</#if>><a href="${baseURI}?filterCondition=30">已解决</a></li>
-         <!-- 
-         <li class=""><a href="${baseURI}?filterCondition=40">积分悬赏</a></li>
-         <li class=""><a href="${baseURI}?filterCondition=50">现金悬赏</a></li> -->
+         <li <#if url_filterCondition == '40'> class='active'</#if>><a href="${baseURI}?filterCondition=40">积分悬赏</a></li>
+         <li <#if url_filterCondition == '50'> class='active'</#if>><a href="${baseURI}?filterCondition=50">现金悬赏</a></li>
          <a href="user/addQuestion" class="btn"><i class="cms-pencil-alt"></i> 提问题</a>
 	</ul>
 	<div class="question-box">
@@ -44,6 +43,18 @@
 					            	<#if question.lastAnswerTime != null>
 					            		<span class="lastAnswerTime">最新回复：${question.lastAnswerTime}</span>
 					            	</#if>
+					            	
+					            	<#if question.amount gt 0 || question.point gt 0 >
+						                <span class="reward" >
+						                	<span class="rewardInfo" >
+						                		悬赏<#if question.amount gt 0>金额<span class="symbol">¥</span><span class="amount">${question.amount}</span>元 </#if>
+						                		<#if question.point gt 0>
+						                			<span class="point">${question.point}</span>积分
+						                		</#if>
+						                	</span>
+						                </span>
+						            </#if>
+					            	
 					        	</li>
 					        </ul>
 							<h2 class="title clearfix">

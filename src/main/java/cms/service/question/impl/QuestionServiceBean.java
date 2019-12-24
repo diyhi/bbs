@@ -1,9 +1,9 @@
 package cms.service.question.impl;
 
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,12 +14,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+
+import cms.bean.payment.PaymentLog;
 import cms.bean.question.Question;
 import cms.bean.question.QuestionTagAssociation;
+import cms.bean.user.PointLog;
 import cms.service.besa.DaoSupport;
+import cms.service.favorite.FavoriteService;
 import cms.service.message.RemindService;
 import cms.service.question.QuestionService;
+import cms.service.user.UserService;
 import cms.utils.ObjectConversion;
+import cms.web.action.SystemException;
+import cms.web.action.payment.PaymentManage;
+import cms.web.action.user.PointManage;
 
 /**
  * 问题管理实现类
@@ -29,8 +37,11 @@ import cms.utils.ObjectConversion;
 @Transactional
 public class QuestionServiceBean extends DaoSupport<Question> implements QuestionService{
 	
-	@Resource  RemindService remindService;
-	
+	@Resource RemindService remindService;
+	@Resource FavoriteService favoriteService;
+	@Resource UserService userService;
+	@Resource PointManage pointManage;
+	@Resource PaymentManage paymentManage;
 	
 	/**
 	 * 根据Id查询问题
@@ -237,13 +248,35 @@ public class QuestionServiceBean extends DaoSupport<Question> implements Questio
 	 * 保存问题
 	 * @param question 问题
 	 * @param questionTagAssociationList 问题标签关联集合
+	 * @param point 扣减用户积分
+	 * @param pointLog 积分日志
+	 * @param amount 扣减用户预存款
+	 * @param paymentLog 支付日志
 	 */
-	public void saveQuestion(Question question,List<QuestionTagAssociation> questionTagAssociationList){
+	public void saveQuestion(Question question,List<QuestionTagAssociation> questionTagAssociationList,Long point,PointLog pointLog,BigDecimal amount,PaymentLog paymentLog){
 		this.save(question);
 		
 		for(QuestionTagAssociation questionTagAssociation : questionTagAssociationList){
 			questionTagAssociation.setQuestionId(question.getId());
 			this.save(questionTagAssociation);
+		}
+		if(point != null && point >0L){//积分
+			pointLog.setParameterId(question.getId());
+			Object pointLogObject = pointManage.createPointLogObject(pointLog);
+			//扣减用户积分
+			int i = userService.subtractUserPoint(question.getUserName(),point, pointLogObject);
+			if(i == 0){
+				throw new SystemException("扣减积分失败");
+			}
+		}
+		if(amount != null && amount.compareTo(new BigDecimal("0")) >0){//余额
+			paymentLog.setParameterId(question.getId());
+			Object paymentLogObject = paymentManage.createPaymentLogObject(paymentLog);
+			//扣减用户预存款
+			int i = userService.subtractUserDeposit(question.getUserName(), amount, paymentLogObject);
+			if(i ==0){
+				throw new SystemException("扣减预存款失败");
+			}
 		}
 	}
 	
@@ -310,17 +343,27 @@ public class QuestionServiceBean extends DaoSupport<Question> implements Questio
 	 * 修改问题
 	 * @param question 问题
 	 * @param questionTagAssociationList 问题标签关联集合
+	 * @param changePointSymbol 变更积分符号 true：问题增加积分  false：问题减少积分
+	 * @param changePoint 变更积分
+	 * @param changeAmountSymbol 变更金额符号 true：问题增加金额  false：问题减少金额
+	 * @param changeAmount 变更金额
+	 * @param pointLogObject 用户悬赏积分日志
+	 * @param paymentLogObject 用户悬赏金额日志
 	 * @return
 	 */
-	public Integer updateQuestion(Question question,List<QuestionTagAssociation> questionTagAssociationList){
-		Query query = em.createQuery("update Question o set o.title=?1, o.content=?2,o.summary=?3,o.allow=?4,o.status=?5,o.sort=?6 where o.id=?7")
+	public Integer updateQuestion(Question question,List<QuestionTagAssociation> questionTagAssociationList,
+			boolean changePointSymbol,Long changePoint, boolean changeAmountSymbol, BigDecimal changeAmount,Object pointLogObject,Object paymentLogObject){
+		
+		Query query = em.createQuery("update Question o set o.title=?1, o.content=?2,o.summary=?3,o.allow=?4,o.status=?5,o.sort=?6,o.point=?7,o.amount=?8 where o.id=?9")
 		.setParameter(1, question.getTitle())
 		.setParameter(2, question.getContent())
 		.setParameter(3, question.getSummary())
 		.setParameter(4, question.isAllow())
 		.setParameter(5, question.getStatus())
 		.setParameter(6, question.getSort())
-		.setParameter(7, question.getId());
+		.setParameter(7, question.getPoint())
+		.setParameter(8, question.getAmount())
+		.setParameter(9, question.getId());
 		int i = query.executeUpdate();
 		
 		if(i >0){
@@ -333,6 +376,32 @@ public class QuestionServiceBean extends DaoSupport<Question> implements Questio
 			for(QuestionTagAssociation questionTagAssociation : questionTagAssociationList){
 				questionTagAssociation.setQuestionId(question.getId());
 				this.save(questionTagAssociation);
+			}
+			
+			if(pointLogObject != null){
+				if(changePointSymbol){
+					//扣减用户积分
+					int j = userService.subtractUserPoint(question.getUserName(),changePoint, pointLogObject);
+					if(j == 0){
+						throw new SystemException("扣减积分失败");
+					}
+				}else{
+					//增加用户积分
+					userService.addUserPoint(question.getUserName(),changePoint,pointLogObject);
+					
+				}
+			}
+			if(paymentLogObject != null){
+				if(changeAmountSymbol){//增加
+					//扣减用户预存款
+					int j = userService.subtractUserDeposit(question.getUserName(), changeAmount, paymentLogObject);
+					if(j ==0){
+						throw new SystemException("扣减预存款失败");
+					}
+				}else{
+					//增加用户预存款
+					userService.addUserDeposit(question.getUserName(), changeAmount, paymentLogObject);	
+				}
 			}
 		}
 		
@@ -436,9 +505,14 @@ public class QuestionServiceBean extends DaoSupport<Question> implements Questio
 	/**
 	 * 删除问题
 	 * @param questionId 问题Id
+	 * @param userName 用户名称
+	 * @param point 扣减用户积分
+	 * @param pointLogObject 积分日志
+	 * @param amount 扣减用户预存款
+	 * @param paymentLogObject 支付日志
 	 * @return
 	 */
-	public Integer deleteQuestion(Long questionId){
+	public Integer deleteQuestion(Long questionId,String userName,Long point,Object pointLogObject,BigDecimal amount,Object paymentLogObject){
 		int i = 0;
 		Query delete = em.createQuery("delete from Question o where o.id=?1")
 		.setParameter(1, questionId);
@@ -458,7 +532,17 @@ public class QuestionServiceBean extends DaoSupport<Question> implements Questio
 		remindService.deleteRemindByQuestionId(questionId);
 		
 		//删除收藏
-	//	favoriteService.deleteFavoriteByTopicId(topicId);
+		favoriteService.deleteFavoriteByQuestionId(questionId);
+		
+		if(point != null && point >0L){//积分
+			//增加用户积分
+			userService.addUserPoint(userName,point,pointLogObject);
+
+		}
+		if(amount != null && amount.compareTo(new BigDecimal("0")) >0){//余额
+			//增加用户预存款
+			userService.addUserDeposit(userName, amount, paymentLogObject);
+		}
 		
 		return i;
 	}

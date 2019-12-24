@@ -25,7 +25,7 @@
 						<input type="hidden" id="token" name="token" value="${token!}">
 						<div class="quoteSubmit">
 							<span class="submitButton-box" >
-								<button type="button" class="submitButton" onClick="javascript:ajax_quote_sureSubmit('${identificationNumber}')">提交</button>
+								<button id="${identificationNumber}_submitForm" type="button" class="submitButton" onClick="javascript:ajax_quote_sureSubmit('${identificationNumber}')">提交</button>
 							</span>
 							<!-- 调用方法在topicRelated_comment_page页 -->
 							<span class="cancelButton-box" >
@@ -122,6 +122,8 @@
 						} 
 						//Ajax方式提交
 						function ajax_quote_sureSubmit(identificationNumber){
+							//按钮设置 disabled="disabled"
+							document.getElementById(identificationNumber+"_submitForm").disabled=true;
 							if(verificationCode() == true){
 								var parameter = "";
 								parameter += "&commentId="+document.getElementById("commentId").value;
@@ -175,6 +177,8 @@
 						        				}
 						        				
 						        			}
+						        			//按钮设置 disabled="disabled"
+											document.getElementById(identificationNumber+"_submitForm").disabled=false;
 						        		}else if(returnValue == "captchaKey"){//显示验证码
 				        					
 											var captchaKey = data[returnValue];
@@ -191,6 +195,9 @@
 						        	}
 								},
 									"user/control/comment/addQuote.htm?timestamp=" + new Date().getTime(), true,parameter);
+							}else{
+								//按钮设置 disabled="disabled"
+								document.getElementById(identificationNumber+"_submitForm").disabled=false;
 							}
 						} 
 						

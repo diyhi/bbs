@@ -27,16 +27,18 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+
 import cms.bean.install.Install;
 import cms.utils.CommentedProperties;
 import cms.utils.DruidTool;
+import cms.utils.FileUtil;
 import cms.utils.PathUtil;
 import cms.utils.SHA;
 import cms.utils.SqlFile;
 import cms.utils.UUIDUtil;
 import cms.utils.Verification;
 import cms.utils.WebUtil;
-import cms.web.action.FileManage;
+import cms.web.action.fileSystem.localImpl.LocalFileManage;
 import net.rubyeye.xmemcached.MemcachedClient;
 import net.rubyeye.xmemcached.MemcachedClientBuilder;
 import net.rubyeye.xmemcached.XMemcachedClientBuilder;
@@ -385,7 +387,7 @@ public class InstallManageAction extends HttpServlet{
 				String path = PathUtil.path()+File.separator+"WEB-INF"+File.separator+"data"+File.separator+"install"+File.separator;
 				//导入SQL结构文件
 				SqlFile.importSQL(conn,path+"structure_tables_mysql.sql","utf-8");
-				
+					
 				//导入SQL数据文件
 				SqlFile.importSQL(conn,path+"data_tables_mysql.sql","utf-8");
 				
@@ -442,19 +444,19 @@ public class InstallManageAction extends HttpServlet{
 		
 		
 		
-		FileManage fileManage = new FileManage();
+		LocalFileManage localFileManage = new LocalFileManage();
 		if(error.size() ==0){
     		//复制文件
 			Map<String,String> copyFileMap = new HashMap<String,String>();//key:旧文件路径  value:新文件路径
 			copyFileMap.put("WEB-INF"+File.separator+"data"+File.separator+"install"+File.separator+"web.xml", "WEB-INF");
 			for (Map.Entry<String,String> entry : copyFileMap.entrySet()) {  
-				fileManage.copyFile(entry.getKey(), entry.getValue());
+				localFileManage.copyFile(entry.getKey(), entry.getValue());
 			}
 		}
     	
 		if(error.size() ==0){
 			//写入禁止安装系统
-			fileManage.writeStringToFile("WEB-INF"+File.separator+"data"+File.separator+"install"+File.separator+"status.txt","1","utf-8",false);
+			FileUtil.writeStringToFile("WEB-INF"+File.separator+"data"+File.separator+"install"+File.separator+"status.txt","1","utf-8",false);
 		}
 		
 		
@@ -475,9 +477,9 @@ public class InstallManageAction extends HttpServlet{
 	 * @return
 	 */
 	private boolean installSystem(){
-		FileManage fileManage = new FileManage();
+		
 		//读取版本文件
-    	String version = fileManage.readFileToString("WEB-INF"+File.separator+"data"+File.separator+"install"+File.separator+"status.txt","UTF-8");
+    	String version = FileUtil.readFileToString("WEB-INF"+File.separator+"data"+File.separator+"install"+File.separator+"status.txt","UTF-8");
     	if(version.equals("0")){
     		return true;
     	}else{

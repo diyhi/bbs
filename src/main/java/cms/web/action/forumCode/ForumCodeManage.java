@@ -16,8 +16,8 @@ import javax.annotation.Resource;
 import cms.bean.forumCode.ForumCodeFile;
 import cms.bean.forumCode.ForumCodeNode;
 import cms.service.template.TemplateService;
+import cms.utils.FileUtil;
 import cms.utils.PathUtil;
-import cms.web.action.FileManage;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,7 +33,6 @@ public class ForumCodeManage {
 	
 	
 	@Resource TemplateService templateService;//通过接口引用代理返回的对象
-	@Resource FileManage fileManage;
 	/**
 	 * 版块代码节点
 	 * @param dirName 目录
@@ -79,6 +78,10 @@ public class ForumCodeManage {
 		childNode13.add(new ForumCodeNode(13001,"加入收藏夹","favoriteRelated_addFavorite_",Arrays.asList(new String[]{"集合"})));
 		childNode13.add(new ForumCodeNode(13002,"话题会员收藏总数","favoriteRelated_favoriteCount_",Arrays.asList(new String[]{"实体对象"})));
 		childNode13.add(new ForumCodeNode(13003,"用户是否已经收藏话题","favoriteRelated_alreadyCollected_",Arrays.asList(new String[]{"实体对象"})));
+		
+		childNode13.add(new ForumCodeNode(13004,"问题会员收藏总数","favoriteRelated_questionFavoriteCount_",Arrays.asList(new String[]{"实体对象"})));
+		childNode13.add(new ForumCodeNode(13005,"用户是否已经收藏问题","favoriteRelated_alreadyFavoriteQuestion_",Arrays.asList(new String[]{"实体对象"})));
+		
 		forumCodeNodeList.add(new ForumCodeNode(130,"收藏夹",childNode13));//添加一级节点
 		
 		//点赞
@@ -220,7 +223,7 @@ public class ForumCodeManage {
 					String value = this.forumCodeRemark(pc_file+File.separator+pc_files[i].getName());
 					
 			        String fileName = pc_files[i].getName();//文件名带后缀
-			        String suffix = fileManage.getExtension(fileName);//文件后缀
+			        String suffix = FileUtil.getExtension(fileName);//文件后缀
 			        if(suffix != null && "html".equals(suffix)){
 			        	ForumCodeFile forumCodeFile = new ForumCodeFile();
 		        		
@@ -242,7 +245,7 @@ public class ForumCodeManage {
 				if(wap_files[i].isFile()&&(!wap_files[i].isHidden())){//判断是否是文件并不能是隐藏文件
 					
 			        String fileName = wap_files[i].getName();//文件名带后缀
-			        String suffix = fileManage.getExtension(fileName);//文件后缀
+			        String suffix = FileUtil.getExtension(fileName);//文件后缀
 			        if(suffix != null && "html".equals(suffix)){
 		        		fileName = fileName.substring(0,fileName.length() - 5);//删除后缀
 		        		for(ForumCodeFile forumCodeFile : forumCodeFileList){

@@ -58,6 +58,7 @@ import cms.service.topic.TopicService;
 import cms.service.user.UserGradeService;
 import cms.service.user.UserService;
 import cms.utils.Base64;
+import cms.utils.FileUtil;
 import cms.utils.IpAddress;
 import cms.utils.JsonUtils;
 import cms.utils.RefererCompare;
@@ -66,14 +67,13 @@ import cms.utils.WebUtil;
 import cms.utils.threadLocal.AccessUserThreadLocal;
 import cms.web.action.AccessSourceDeviceManage;
 import cms.web.action.CSRFTokenManage;
-import cms.web.action.FileManage;
 import cms.web.action.TextFilterManage;
+import cms.web.action.fileSystem.FileManage;
 import cms.web.action.filterWord.SensitiveWordFilterManage;
 import cms.web.action.follow.FollowManage;
 import cms.web.action.message.RemindManage;
 import cms.web.action.payment.PaymentManage;
 import cms.web.action.setting.SettingManage;
-import cms.web.action.thumbnail.ThumbnailManage;
 import cms.web.action.topic.TopicManage;
 import cms.web.action.user.PointManage;
 import cms.web.action.user.UserDynamicManage;
@@ -91,7 +91,6 @@ public class TopicFormAction {
 	@Resource TemplateService templateService;
 	
 	@Resource CaptchaManage captchaManage;
-	@Resource FileManage fileManage;
 	@Resource CommentService commentService;
 	@Resource AccessSourceDeviceManage accessSourceDeviceManage;
 	
@@ -109,12 +108,11 @@ public class TopicFormAction {
 	@Resource TopicManage topicManage;
 	@Resource SensitiveWordFilterManage sensitiveWordFilterManage;
 	@Resource ThumbnailService thumbnailService;
-	@Resource ThumbnailManage thumbnailManage;
 	@Resource UserManage userManage;
 	
 	@Resource RemindService remindService;
 	@Resource RemindManage remindManage;
-	
+	@Resource FileManage fileManage;
 	@Resource UserGradeService userGradeService;
 	@Resource UserDynamicManage userDynamicManage;
 	@Resource FollowManage followManage;
@@ -459,8 +457,8 @@ public class TopicFormAction {
 			if(other_imageNameList != null && other_imageNameList.size() >0){
 				for(int i=0; i<other_imageNameList.size(); i++){
 					ImageInfo imageInfo = new ImageInfo();
-					imageInfo.setName(fileManage.getName(other_imageNameList.get(i)));
-					imageInfo.setPath(fileManage.getFullPath(other_imageNameList.get(i)));
+					imageInfo.setName(FileUtil.getName(other_imageNameList.get(i)));
+					imageInfo.setPath(FileUtil.getFullPath(other_imageNameList.get(i)));
 					
 					beforeImageList.add(imageInfo);
 					
@@ -524,7 +522,7 @@ public class TopicFormAction {
 			
 					 if(imageName != null && !"".equals(imageName.trim())){
 						//如果验证不是当前用户上传的文件，则不删除锁
-						 if(!topicManage.getFileNumber(fileManage.getBaseName(imageName.trim())).equals(fileNumber)){
+						 if(!topicManage.getFileNumber(FileUtil.getBaseName(imageName.trim())).equals(fileNumber)){
 							 continue;
 						 }
 						 
@@ -539,7 +537,7 @@ public class TopicFormAction {
 				for(String flashName :flashNameList){
 					 if(flashName != null && !"".equals(flashName.trim())){
 						//如果验证不是当前用户上传的文件，则不删除锁
-						if(!topicManage.getFileNumber(fileManage.getBaseName(flashName.trim())).equals(fileNumber)){
+						if(!topicManage.getFileNumber(FileUtil.getBaseName(flashName.trim())).equals(fileNumber)){
 							continue;
 						}
 						fileManage.deleteLock("file"+File.separator+"topic"+File.separator+"lock"+File.separator,flashName.replaceAll("/","_"));
@@ -552,7 +550,7 @@ public class TopicFormAction {
 				for(String mediaName :mediaNameList){
 					if(mediaName != null && !"".equals(mediaName.trim())){
 						//如果验证不是当前用户上传的文件，则不删除锁
-						if(!topicManage.getFileNumber(fileManage.getBaseName(mediaName.trim())).equals(fileNumber)){
+						if(!topicManage.getFileNumber(FileUtil.getBaseName(mediaName.trim())).equals(fileNumber)){
 							continue;
 						}
 						fileManage.deleteLock("file"+File.separator+"topic"+File.separator+"lock"+File.separator,mediaName.replaceAll("/","_"));
@@ -565,7 +563,7 @@ public class TopicFormAction {
 				for(String fileName :fileNameList){
 					if(fileName != null && !"".equals(fileName.trim())){
 						//如果验证不是当前用户上传的文件，则不删除锁
-						if(!topicManage.getFileNumber(fileManage.getBaseName(fileName.trim())).equals(fileNumber)){
+						if(!topicManage.getFileNumber(FileUtil.getBaseName(fileName.trim())).equals(fileNumber)){
 							continue;
 						}
 						fileManage.deleteLock("file"+File.separator+"topic"+File.separator+"lock"+File.separator,fileName.replaceAll("/","_"));
@@ -578,7 +576,7 @@ public class TopicFormAction {
 			if(thumbnailList != null && thumbnailList.size() >0){
 				//异步增加缩略图
 				if(beforeImageList != null && beforeImageList.size() >0){
-					thumbnailManage.addThumbnail(thumbnailList,beforeImageList);
+					fileManage.addThumbnail(thumbnailList,beforeImageList);
 				}
 			}
 			
@@ -989,8 +987,8 @@ public class TopicFormAction {
 				if(other_imageNameList != null && other_imageNameList.size() >0){
 					for(int i=0; i<other_imageNameList.size(); i++){
 						ImageInfo imageInfo = new ImageInfo();
-						imageInfo.setName(fileManage.getName(other_imageNameList.get(i)));
-						imageInfo.setPath(fileManage.getFullPath(other_imageNameList.get(i)));
+						imageInfo.setName(FileUtil.getName(other_imageNameList.get(i)));
+						imageInfo.setPath(FileUtil.getFullPath(other_imageNameList.get(i)));
 						
 						beforeImageList.add(imageInfo);
 						
@@ -1053,7 +1051,7 @@ public class TopicFormAction {
 						if(old_imageNameList != null && old_imageNameList.size() >0){
 							for(String imageName : old_imageNameList){
 								
-								oldPathFileList.add(fileManage.toSystemPath(imageName));
+								oldPathFileList.add(FileUtil.toSystemPath(imageName));
 		
 							}
 							
@@ -1075,7 +1073,7 @@ public class TopicFormAction {
 						}
 						if(old_flashNameList != null && old_flashNameList.size() >0){
 							for(String flashName : old_flashNameList){
-								oldPathFileList.add(fileManage.toSystemPath(flashName));
+								oldPathFileList.add(FileUtil.toSystemPath(flashName));
 								
 							}
 							
@@ -1097,7 +1095,7 @@ public class TopicFormAction {
 						}
 						if(old_mediaNameList != null && old_mediaNameList.size() >0){
 							for(String mediaName : old_mediaNameList){
-								oldPathFileList.add(fileManage.toSystemPath(mediaName));
+								oldPathFileList.add(FileUtil.toSystemPath(mediaName));
 								
 							}
 							
@@ -1119,7 +1117,7 @@ public class TopicFormAction {
 						}
 						if(old_fileNameList != null && old_fileNameList.size() >0){
 							for(String fileName : old_fileNameList){
-								oldPathFileList.add(fileManage.toSystemPath(fileName));
+								oldPathFileList.add(FileUtil.toSystemPath(fileName));
 								
 							}
 							
@@ -1146,13 +1144,13 @@ public class TopicFormAction {
 						}
 						if(deleteBeforeImageList != null && deleteBeforeImageList.size() >0){
 							//删除旧缩略图
-							thumbnailManage.deleteThumbnail(thumbnailList,oldBeforeImageList);
+							fileManage.deleteThumbnail(thumbnailList,oldBeforeImageList);
 						}
 					}
 					
 					//异步增加缩略图
 					if(beforeImageList != null && beforeImageList.size() >0){
-						thumbnailManage.addThumbnail(thumbnailList,beforeImageList);
+						fileManage.addThumbnail(thumbnailList,beforeImageList);
 					}
 				}
 				
@@ -1165,7 +1163,7 @@ public class TopicFormAction {
 				
 						 if(imageName != null && !"".equals(imageName.trim())){
 							 //如果验证不是当前用户上传的文件，则不删除
-							 if(!topicManage.getFileNumber(fileManage.getBaseName(imageName.trim())).equals(fileNumber)){
+							 if(!topicManage.getFileNumber(FileUtil.getBaseName(imageName.trim())).equals(fileNumber)){
 									continue;
 							 }
 							 fileManage.deleteLock("file"+File.separator+"topic"+File.separator+"lock"+File.separator,imageName.replaceAll("/","_"));
@@ -1179,7 +1177,7 @@ public class TopicFormAction {
 						 
 						 if(flashName != null && !"".equals(flashName.trim())){
 							 //如果验证不是当前用户上传的文件，则不删除
-							 if(!topicManage.getFileNumber(fileManage.getBaseName(flashName.trim())).equals(fileNumber)){
+							 if(!topicManage.getFileNumber(FileUtil.getBaseName(flashName.trim())).equals(fileNumber)){
 									continue;
 							 }
 							 fileManage.deleteLock("file"+File.separator+"topic"+File.separator+"lock"+File.separator,flashName.replaceAll("/","_"));
@@ -1192,7 +1190,7 @@ public class TopicFormAction {
 					for(String mediaName :mediaNameList){
 						if(mediaName != null && !"".equals(mediaName.trim())){
 							//如果验证不是当前用户上传的文件，则不删除
-							if(!topicManage.getFileNumber(fileManage.getBaseName(mediaName.trim())).equals(fileNumber)){
+							if(!topicManage.getFileNumber(FileUtil.getBaseName(mediaName.trim())).equals(fileNumber)){
 								continue;
 							}
 							fileManage.deleteLock("file"+File.separator+"topic"+File.separator+"lock"+File.separator,mediaName.replaceAll("/","_"));
@@ -1205,7 +1203,7 @@ public class TopicFormAction {
 					for(String fileName :fileNameList){
 						if(fileName != null && !"".equals(fileName.trim())){
 							//如果验证不是当前用户上传的文件，则不删除
-							if(!topicManage.getFileNumber(fileManage.getBaseName(fileName.trim())).equals(fileNumber)){
+							if(!topicManage.getFileNumber(FileUtil.getBaseName(fileName.trim())).equals(fileNumber)){
 								continue;
 							}
 							fileManage.deleteLock("file"+File.separator+"topic"+File.separator+"lock"+File.separator,fileName.replaceAll("/","_"));
@@ -1218,13 +1216,13 @@ public class TopicFormAction {
 				if(oldPathFileList != null && oldPathFileList.size() >0){
 					for(String oldPathFile :oldPathFileList){
 						//如果验证不是当前用户上传的文件，则不删除
-						if(!topicManage.getFileNumber(fileManage.getBaseName(oldPathFile.trim())).equals(fileNumber)){
+						if(!topicManage.getFileNumber(FileUtil.getBaseName(oldPathFile.trim())).equals(fileNumber)){
 							continue;
 						}
 						
 						
 						//替换路径中的..号
-						oldPathFile = fileManage.toRelativePath(oldPathFile);
+						oldPathFile = FileUtil.toRelativePath(oldPathFile);
 						
 						//删除旧路径文件
 						Boolean state = fileManage.deleteFile(oldPathFile);
@@ -1382,7 +1380,7 @@ public class TopicFormAction {
 								//文件大小
 								Long size = file.getSize();
 								//取得文件后缀
-								String suffix = fileManage.getExtension(fileName).toLowerCase();
+								String suffix = FileUtil.getExtension(fileName).toLowerCase();
 								
 								//允许上传图片格式
 								List<String> imageFormat = editorSiteObject.getImageFormat();
@@ -1390,7 +1388,7 @@ public class TopicFormAction {
 								long imageSize = editorSiteObject.getImageSize();
 								
 								//验证文件类型
-								boolean authentication = fileManage.validateFileSuffix(file.getOriginalFilename(),imageFormat);
+								boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),imageFormat);
 								
 								if(authentication ){
 									if(size/1024 <= imageSize){
@@ -1406,7 +1404,7 @@ public class TopicFormAction {
 										//生成锁文件保存目录
 										fileManage.createFolder(lockPathDir);
 										//生成锁文件
-										fileManage.newFile(lockPathDir+date +"_image_"+newFileName);
+										fileManage.addLock(lockPathDir,date +"_image_"+newFileName);
 										//保存文件
 										fileManage.writeFile(pathDir, newFileName,file.getBytes());
 										//上传成功
@@ -1442,7 +1440,7 @@ public class TopicFormAction {
 								//文件大小
 								Long size = file.getSize();
 								//取得文件后缀
-								String suffix = fileManage.getExtension(fileName).toLowerCase();
+								String suffix = FileUtil.getExtension(fileName).toLowerCase();
 								
 								//允许上传文件格式
 								List<String> imageFormat = editorSiteObject.getFileFormat();
@@ -1450,7 +1448,7 @@ public class TopicFormAction {
 								long fileSize = editorSiteObject.getFileSize();
 								
 								//验证文件类型
-								boolean authentication = fileManage.validateFileSuffix(file.getOriginalFilename(),imageFormat);
+								boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),imageFormat);
 								
 								if(authentication ){
 									if(size/1024 <= fileSize){
@@ -1466,7 +1464,7 @@ public class TopicFormAction {
 										//生成锁文件保存目录
 										fileManage.createFolder(lockPathDir);
 										//生成锁文件
-										fileManage.newFile(lockPathDir+date +"_file_"+newFileName);
+										fileManage.addLock(lockPathDir,date +"_file_"+newFileName);
 										//保存文件
 										fileManage.writeFile(pathDir, newFileName,file.getBytes());
 										//上传成功

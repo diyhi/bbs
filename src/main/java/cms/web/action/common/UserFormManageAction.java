@@ -908,74 +908,74 @@ public class UserFormManageAction {
 				
 			}
 			
-			
-			//验证用户名
-			user = userService.findUserByUserName(userName);
-			if(user != null){
-				List<UserGrade> userGradeList = userGradeService.findAllGrade_cache();	
-				if(userGradeList != null && userGradeList.size() >0){
-					for(UserGrade userGrade : userGradeList){//取得所有等级 
-						if(user.getPoint() >= userGrade.getNeedPoint()){
-							user.setGradeId(userGrade.getId());
-							user.setGradeName(userGrade.getName());//将等级值设进等级参数里
-							break;
+			if(error.size() == 0){
+				//验证用户名
+				user = userService.findUserByUserName(userName);
+				if(user != null){
+					List<UserGrade> userGradeList = userGradeService.findAllGrade_cache();	
+					if(userGradeList != null && userGradeList.size() >0){
+						for(UserGrade userGrade : userGradeList){//取得所有等级 
+							if(user.getPoint() >= userGrade.getNeedPoint()){
+								user.setGradeId(userGrade.getId());
+								user.setGradeName(userGrade.getName());//将等级值设进等级参数里
+								break;
+							}
 						}
 					}
-				}
-				//密码
-				password = SHA.sha256Hex(password.trim()+"["+user.getSalt()+"]");
-				
-				//判断密码
-				if(user.getState() >1 ){
-					//禁止用户
-					error.put("userName", ErrorView._824.name());//禁止用户
-				}else if(password.equals(user.getPassword())){
+					//密码
+					password = SHA.sha256Hex(password.trim()+"["+user.getSalt()+"]");
 					
-					
-					//访问令牌
-					String accessToken = UUIDUtil.getUUID32();
-					//刷新令牌
-					String refreshToken = UUIDUtil.getUUID32();
+					//判断密码
+					if(user.getState() >1 ){
+						//禁止用户
+						error.put("userName", ErrorView._824.name());//禁止用户
+					}else if(password.equals(user.getPassword())){
+						
+						
+						//访问令牌
+						String accessToken = UUIDUtil.getUUID32();
+						//刷新令牌
+						String refreshToken = UUIDUtil.getUUID32();
 
-					//删除缓存用户状态
-					userManage.delete_userState(user.getUserName());
+						//删除缓存用户状态
+						userManage.delete_userState(user.getUserName());
 
-					//写入登录日志
-					UserLoginLog userLoginLog = new UserLoginLog();
-					userLoginLog.setId(userLoginLogManage.createUserLoginLogId(user.getId()));
-					userLoginLog.setIp(IpAddress.getClientIpAddress(request));
-					userLoginLog.setUserId(user.getId());
-					userLoginLog.setTypeNumber(10);//登录
-					userLoginLog.setLogonTime(new Date());
-					Object new_userLoginLog = userLoginLogManage.createUserLoginLogObject(userLoginLog);
-					userService.saveUserLoginLog(new_userLoginLog);
-					
-					
-					
-					oAuthManage.addAccessToken(accessToken, new AccessUser(user.getId(),user.getUserName(),user.getNickname(),user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),rememberMe));
-					oAuthManage.addRefreshToken(refreshToken, new RefreshUser(accessToken,user.getId(),user.getUserName(),user.getNickname(),user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),rememberMe));
-					
-					//存放时间 单位/秒
-					int maxAge = 0;
-					if(rememberMe == true){
-						maxAge = 15*24*60*60;
+						//写入登录日志
+						UserLoginLog userLoginLog = new UserLoginLog();
+						userLoginLog.setId(userLoginLogManage.createUserLoginLogId(user.getId()));
+						userLoginLog.setIp(IpAddress.getClientIpAddress(request));
+						userLoginLog.setUserId(user.getId());
+						userLoginLog.setTypeNumber(10);//登录
+						userLoginLog.setLogonTime(new Date());
+						Object new_userLoginLog = userLoginLogManage.createUserLoginLogObject(userLoginLog);
+						userService.saveUserLoginLog(new_userLoginLog);
+						
+						
+						
+						oAuthManage.addAccessToken(accessToken, new AccessUser(user.getId(),user.getUserName(),user.getNickname(),user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),rememberMe));
+						oAuthManage.addRefreshToken(refreshToken, new RefreshUser(accessToken,user.getId(),user.getUserName(),user.getNickname(),user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),rememberMe));
+						
+						//存放时间 单位/秒
+						int maxAge = 0;
+						if(rememberMe == true){
+							maxAge = 15*24*60*60;
+						}
+						
+						//将访问令牌添加到Cookie
+						WebUtil.addCookie(response, "cms_accessToken", accessToken, maxAge);
+						//将刷新令牌添加到Cookie
+						WebUtil.addCookie(response, "cms_refreshToken", refreshToken, maxAge);
+						AccessUserThreadLocal.set(new AccessUser(user.getId(),user.getUserName(),user.getNickname(),user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),rememberMe));
+						
+					}else{
+						//密码错误
+						error.put("password", ErrorView._826.name());//密码错误
 					}
-					
-					//将访问令牌添加到Cookie
-					WebUtil.addCookie(response, "cms_accessToken", accessToken, maxAge);
-					//将刷新令牌添加到Cookie
-					WebUtil.addCookie(response, "cms_refreshToken", refreshToken, maxAge);
-					AccessUserThreadLocal.set(new AccessUser(user.getId(),user.getUserName(),user.getNickname(),user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),rememberMe));
-					
 				}else{
-					//密码错误
-					error.put("password", ErrorView._826.name());//密码错误
+					//用户名错误
+					error.put("userName",  ErrorView._825.name());//用户名错误
 				}
-			}else{
-				//用户名错误
-				error.put("userName",  ErrorView._825.name());//用户名错误
 			}
-            
 			
 		}
 		

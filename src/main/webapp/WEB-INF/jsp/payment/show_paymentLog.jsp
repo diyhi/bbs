@@ -38,6 +38,9 @@ function SureSubmit(objForm){
 	    	<c:if test="${paymentLog.paymentModule == 6}">账户提现</c:if>
 	    	<c:if test="${paymentLog.paymentModule == 70}">余额购买话题隐藏内容</c:if>
 	    	<c:if test="${paymentLog.paymentModule == 80}">解锁话题隐藏内容分成</c:if>
+	    	<c:if test="${paymentLog.paymentModule == 90}">悬赏金额</c:if>
+	    	<c:if test="${paymentLog.paymentModule == 100}">采纳答案</c:if>
+	    	<c:if test="${paymentLog.paymentModule == 110}">调整赏金</c:if>
 	    </TD>
 	  </TR>	
  	<TR>
@@ -75,6 +78,9 @@ function SureSubmit(objForm){
 	    	<c:if test="${paymentLog.paymentModule == 1}">订单Id: ${paymentLog.parameterId}</c:if>
 	    	<c:if test="${paymentLog.paymentModule == 5}">用户Id: ${paymentLog.parameterId}</c:if>
 	    	<c:if test="${paymentLog.paymentModule == 70 || paymentLog.paymentModule == 80}">话题Id: ${paymentLog.parameterId}</c:if>	
+	    	<c:if test="${paymentLog.paymentModule == 90}">问题Id: ${paymentLog.parameterId}</c:if>	
+	    	<c:if test="${paymentLog.paymentModule == 100}">答案Id: ${paymentLog.parameterId}</c:if>	
+	    	<c:if test="${paymentLog.paymentModule == 110}">问题Id: ${paymentLog.parameterId}</c:if>	
 	    </TD>
 	  </TR>
 	  <TR>

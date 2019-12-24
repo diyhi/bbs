@@ -2,23 +2,22 @@
   position: fixed;
   right: 0;
   top: 0;
-  margin: 30px 55px 0 0;
+  margin: 10px 10px 0 0;
   cursor: pointer;
   transition: 300ms all ease-in-out;
   z-index: 99;
   opacity: 1;
   will-change: transform; 
   
-
-  
+	width: 40px;height: 40px;
   }
 
 .cross::after,
 .cross::before {
   position: absolute;
   content: '';
-  width: 35px;
-  height: 2px; }
+  width: 30px;
+  height: 2px; top: 20px;left: 5px;}
 
 .cross::after {
   -webkit-transform: rotate(45deg);
@@ -30,7 +29,7 @@
 
 .cross--light::after,
 .cross--light::before {
-  background-color: black; }
+  background-color: #807f7f; }
 
 .cross--dark::after,
 .cross--dark::before {
@@ -45,7 +44,7 @@
   box-shadow: 2px 2px 12px 1px rgba(255, 255, 255, 0.3); }
 
 .slb--opened {
-  cursor: auto; }
+  cursor:zoom-out; }
 
 .pop-in {
   -webkit-animation: pop-in 250ms;

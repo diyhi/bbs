@@ -3,6 +3,7 @@ package cms.bean.topic;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -22,7 +23,7 @@ import javax.persistence.Transient;
  *
  */
 @Entity
-@Table(indexes = {@Index(name="topic_idx", columnList="tagId,status"),@Index(name="topic_3_idx", columnList="userName,postTime"),@Index(name="topic_4_idx", columnList="status,sort,lastUpdateTime")})
+@Table(indexes = {@Index(name="topic_idx", columnList="tagId,status"),@Index(name="topic_3_idx", columnList="userName,postTime"),@Index(name="topic_5_idx", columnList="status,sort,lastReplyTime")})
 public class Topic implements Serializable{
 	private static final long serialVersionUID = -684257451052921859L;
 	
@@ -99,6 +100,11 @@ public class Topic implements Serializable{
 	/** 话题允许查看的角色名称集合(默认角色除外) **/
 	@Transient
 	private List<String> allowRoleViewList = new ArrayList<String>();
+	
+	/** key:内容含有隐藏标签类型  10.输入密码可见  20.评论话题可见  30.达到等级可见 40.积分购买可见 50.余额购买可见  value:当前用户是否已对隐藏内容解锁 **/
+	@Transient
+	private LinkedHashMap<Integer,Boolean> hideTagTypeMap = new LinkedHashMap<Integer,Boolean>();
+	
 	
 	/** 是否为员工 true:员工  false:会员 **/
 	private Boolean isStaff = false;
@@ -257,6 +263,12 @@ public class Topic implements Serializable{
 	}
 	public void setAllowRoleViewList(List<String> allowRoleViewList) {
 		this.allowRoleViewList = allowRoleViewList;
+	}
+	public LinkedHashMap<Integer, Boolean> getHideTagTypeMap() {
+		return hideTagTypeMap;
+	}
+	public void setHideTagTypeMap(LinkedHashMap<Integer, Boolean> hideTagTypeMap) {
+		this.hideTagTypeMap = hideTagTypeMap;
 	}
 	
 }

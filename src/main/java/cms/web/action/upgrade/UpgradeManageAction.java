@@ -39,14 +39,14 @@ import cms.bean.upgrade.UpgradePackage;
 import cms.bean.upgrade.UpgradeSystem;
 import cms.service.upgrade.UpgradeService;
 import cms.utils.CommentedProperties;
-import cms.utils.FileAuthorizationDetection;
 import cms.utils.FileSize;
+import cms.utils.FileUtil;
 import cms.utils.JsonUtils;
 import cms.utils.PathUtil;
 import cms.utils.ZipCallback;
 import cms.utils.ZipUtil;
-import cms.web.action.FileManage;
 import cms.web.action.TextFilterManage;
+import cms.web.action.fileSystem.localImpl.LocalFileManage;
 
 
 /**
@@ -57,9 +57,8 @@ import cms.web.action.TextFilterManage;
 @RequestMapping("/control/upgrade/manage") 
 public class UpgradeManageAction {
 	private static final Logger logger = LogManager.getLogger(UpgradeManageAction.class);
-	
+	@Resource LocalFileManage localFileManage;
 	@Resource UpgradeService upgradeService;
-	@Resource FileManage fileManage;
 	@Resource TextFilterManage textFilterManage;
 	@Resource UpgradeManage upgradeManage;
 	//是否需要重启
@@ -77,8 +76,8 @@ public class UpgradeManageAction {
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 		
-		//读取当前BBS版本
-		String currentVersion = fileManage.readFileToString("WEB-INF"+File.separator+"data"+File.separator+"systemVersion.txt","utf-8");
+		//读取当前商城版本
+		String currentVersion = FileUtil.readFileToString("WEB-INF"+File.separator+"data"+File.separator+"systemVersion.txt","utf-8");
 
 		List<UpgradeSystem> upgradeSystemList = upgradeService.findAllUpgradeSystem();
 		UpgradeSystem notCompletedUpgrade = null;//未完成升级
@@ -121,7 +120,7 @@ public class UpgradeManageAction {
 						Enumeration<ZipArchiveEntry> entry = zip.getEntries();
 						while(entry.hasMoreElements()){//依次访问各条目
 							ZipArchiveEntry ze = entry.nextElement();  
-							String fileName = fileManage.getName(ze.getName());//文件名称
+							String fileName = FileUtil.getName(ze.getName());//文件名称
 							 //读取配置文件
 						    if("config.properties".equals(fileName)){
 						    	CommentedProperties props = new CommentedProperties();
@@ -234,141 +233,135 @@ public class UpgradeManageAction {
 		Map<String,Object> returnValue = new HashMap<String,Object>();
 		Map<String,String> error = new HashMap<String,String>();
 		
-		//检测文件权限
-		String authorization = FileAuthorizationDetection.detection();
-		if(authorization == null){
-			Long count = upgradeManage.taskRunMark_add(-1L);
-			if(count >=0L){
-				error.put("upgradeNow", "任务正在运行,不能升级");
-			}else{
+		Long count = upgradeManage.taskRunMark_add(-1L);
+		if(count >=0L){
+			error.put("upgradeNow", "任务正在运行,不能升级");
+		}else{
+			
+			upgradeManage.taskRunMark_delete();
+			upgradeManage.taskRunMark_add(1L);
+			
+			
+			if(updatePackageName != null && !"".equals(updatePackageName.trim())){
+				//升级包文件路径
+				String updatePackage_path = PathUtil.path()+File.separator+"WEB-INF"+File.separator+"data"+File.separator+"upgrade"+File.separator+FileUtil.toRelativePath(updatePackageName);
+				//临时目录路径
+				String temp_path = PathUtil.path()+File.separator+"WEB-INF"+File.separator+"data"+File.separator+"temp"+File.separator+"upgrade"+File.separator;
 				
-				upgradeManage.taskRunMark_delete();
-				upgradeManage.taskRunMark_add(1L);
+				//读取升级包
+				File updatePackage = new File(updatePackage_path);
 				
-				if(updatePackageName != null && !"".equals(updatePackageName.trim())){
-					//升级包文件路径
-					String updatePackage_path = PathUtil.path()+File.separator+"WEB-INF"+File.separator+"data"+File.separator+"upgrade"+File.separator+fileManage.toRelativePath(updatePackageName);
-					//临时目录路径
-					String temp_path = PathUtil.path()+File.separator+"WEB-INF"+File.separator+"data"+File.separator+"temp"+File.separator+"upgrade"+File.separator;
+				if (updatePackage.exists()) {//如果文件存在
+					//解压到临时目录
+					try {
+						ZipUtil.unZip(updatePackage_path, temp_path);
 					
-					//读取升级包
-					File updatePackage = new File(updatePackage_path);
+					} catch (Exception e) {
+						error.put("upgradeNow", "解压到临时目录失败");
+						e.printStackTrace();
+					}
+	
+					//目录参数
+					class DirectoryParameter { 
+						//第一个目录
+						private String firstDirectory = null;
+						
+						public String getFirstDirectory() { 
+				            return firstDirectory;
+				        }
+				        public void setFirstDirectory(String firstDirectory) { 
+				            this.firstDirectory = firstDirectory;
+				        } 
+				    }
 					
-					if (updatePackage.exists()) {//如果文件存在
-						//解压到临时目录
-						try {
-							ZipUtil.unZip(updatePackage_path, temp_path);
-						
-						} catch (Exception e) {
-							error.put("upgradeNow", "解压到临时目录失败");
-							e.printStackTrace();
-						}
-		
-						//目录参数
-						class DirectoryParameter { 
-							//第一个目录
-							private String firstDirectory = null;
-							
-							public String getFirstDirectory() { 
-					            return firstDirectory;
-					        }
-					        public void setFirstDirectory(String firstDirectory) { 
-					            this.firstDirectory = firstDirectory;
-					        } 
-					    }
-						
-						DirectoryParameter directoryParameter = new DirectoryParameter(); 
+					DirectoryParameter directoryParameter = new DirectoryParameter(); 
 
-						ZipUtil.iterate(new File(updatePackage_path), new ZipCallback() {
-							  public void process(ZipArchiveEntry zipEntry) throws Exception {
-								  if(directoryParameter.getFirstDirectory() == null || "".equals(directoryParameter.getFirstDirectory().trim())){
-									  directoryParameter.setFirstDirectory(StringUtils.substringBefore(zipEntry.getName(), "/"));
-								  }
+					ZipUtil.iterate(new File(updatePackage_path), new ZipCallback() {
+						  public void process(ZipArchiveEntry zipEntry) throws Exception {
+							  if(directoryParameter.getFirstDirectory() == null || "".equals(directoryParameter.getFirstDirectory().trim())){
+								  directoryParameter.setFirstDirectory(StringUtils.substringBefore(zipEntry.getName(), "/"));
 							  }
-							});
-						if(directoryParameter.getFirstDirectory() != null && !"".equals(directoryParameter.getFirstDirectory().trim())){
-							//读取升级包信息
-							CommentedProperties props = new CommentedProperties();
-							try {
-								props.load(new File(temp_path+directoryParameter.getFirstDirectory()+File.separator+"config.properties"),"utf-8");
-								//旧版本
-								String oldSystemVersion = props.getProperty("oldSystemVersion");
-								//升级包版本
-								String updatePackageVersion = props.getProperty("updatePackageVersion");
-								//新版本
-								String newSystemVersion = props.getProperty("newSystemVersion");
-								//说明
-								String explanation = props.getProperty("explanation");
-								//排序
-								String sort = props.getProperty("sort");
-								
-								UpgradeSystem upgradeSystem = new UpgradeSystem();
+						  }
+						});
+					if(directoryParameter.getFirstDirectory() != null && !"".equals(directoryParameter.getFirstDirectory().trim())){
+						//读取升级包信息
+						CommentedProperties props = new CommentedProperties();
+						try {
+							props.load(new File(temp_path+directoryParameter.getFirstDirectory()+File.separator+"config.properties"),"utf-8");
+							//旧版本
+							String oldSystemVersion = props.getProperty("oldSystemVersion");
+							//升级包版本
+							String updatePackageVersion = props.getProperty("updatePackageVersion");
+							//新版本
+							String newSystemVersion = props.getProperty("newSystemVersion");
+							//说明
+							String explanation = props.getProperty("explanation");
+							//排序
+							String sort = props.getProperty("sort");
+							
+							UpgradeSystem upgradeSystem = new UpgradeSystem();
 
-								upgradeSystem.setId(newSystemVersion);
-								upgradeSystem.setOldSystemVersion(oldSystemVersion);
-								upgradeSystem.setUpdatePackageVersion(updatePackageVersion);
-								upgradeSystem.setSort(Long.parseLong(sort));
-								upgradeSystem.setRunningStatus(1);
-								upgradeSystem.setExplanation(textFilterManage.filterTag_br(explanation));
-								upgradeSystem.setUpdatePackageName(updatePackage.getName());
-								upgradeSystem.setUpdatePackageTime(new Date(updatePackage.lastModified()));
-								upgradeSystem.setUpdatePackageFirstDirectory(directoryParameter.getFirstDirectory());
-								
-								
-								List<String> deleteFilePathList = new ArrayList<String>();;
-								
-								Set<String> keyList = props.propertyNames();
-								if(keyList != null && keyList.size() >0){
-									for(String key : keyList){
-										if(key != null && !"".equals(key.trim())){
-											if(key.startsWith("delete_")){
-												
-												String value = props.getProperty(key);
-												if(value != null && !"".equals(value.trim())){
-													deleteFilePathList.add(value.trim());
-												}
-											}
+							upgradeSystem.setId(newSystemVersion);
+							upgradeSystem.setOldSystemVersion(oldSystemVersion);
+							upgradeSystem.setUpdatePackageVersion(updatePackageVersion);
+							upgradeSystem.setSort(Long.parseLong(sort));
+							upgradeSystem.setRunningStatus(1);
+							upgradeSystem.setExplanation(textFilterManage.filterTag_br(explanation));
+							upgradeSystem.setUpdatePackageName(updatePackage.getName());
+							upgradeSystem.setUpdatePackageTime(new Date(updatePackage.lastModified()));
+							upgradeSystem.setUpdatePackageFirstDirectory(directoryParameter.getFirstDirectory());
+							
+							
+							List<String> deleteFilePathList = new ArrayList<String>();;
+							
+							Set<String> keyList = props.propertyNames();
+							if(keyList != null && keyList.size() >0){
+								for(String key : keyList){
+									if(key != null && !"".equals(key.trim())){
+										if(key.startsWith("delete_")){
 											
+											String value = props.getProperty(key);
+											if(value != null && !"".equals(value.trim())){
+												deleteFilePathList.add(value.trim());
+											}
 										}
 										
 									}
+									
 								}
-								upgradeSystem.setDeleteFilePath(JsonUtils.toJSONString(deleteFilePathList));
-								
-								UpgradeLog upgradeLog = new UpgradeLog();
-								upgradeLog.setTime(new Date());
-								upgradeLog.setGrade(1);
-								upgradeLog.setContent("解压升级包到临时目录成功");
-								String upgradeLog_json = JsonUtils.toJSONString(upgradeLog);
-								upgradeSystem.setUpgradeLog("["+upgradeLog_json+",");
-								try {
-									upgradeService.save(upgradeSystem);
-									returnValue.put("upgradeId", newSystemVersion);
-								} catch (Exception e) {
-									error.put("upgradeNow", "升级错误");
-									//e.printStackTrace();
-								}
-								 
-							} catch (IOException e) {
-								error.put("upgradeNow", "读取配置文件失败");
-							//	e.printStackTrace();
 							}
-						}else{
-							error.put("upgradeNow", "读取第一个目录失败");
+							upgradeSystem.setDeleteFilePath(JsonUtils.toJSONString(deleteFilePathList));
+							
+							UpgradeLog upgradeLog = new UpgradeLog();
+							upgradeLog.setTime(new Date());
+							upgradeLog.setGrade(1);
+							upgradeLog.setContent("解压升级包到临时目录成功");
+							String upgradeLog_json = JsonUtils.toJSONString(upgradeLog);
+							upgradeSystem.setUpgradeLog("["+upgradeLog_json+",");
+							try {
+								upgradeService.save(upgradeSystem);
+								returnValue.put("upgradeId", newSystemVersion);
+							} catch (Exception e) {
+								error.put("upgradeNow", "升级错误");
+								//e.printStackTrace();
+							}
+							 
+						} catch (IOException e) {
+							error.put("upgradeNow", "读取配置文件失败");
+						//	e.printStackTrace();
 						}
-					}else{	
-						error.put("upgradeNow", "升级包不存在");
+					}else{
+						error.put("upgradeNow", "读取第一个目录失败");
 					}
-						
-				}else{
-					error.put("upgradeNow", "当前操作已完成");
+				}else{	
+					error.put("upgradeNow", "升级包不存在");
 				}
-				
+					
+			}else{
+				error.put("upgradeNow", "当前操作已完成");
 			}
-		}else{
-			error.put("upgradeNow", authorization);//文件没有读或写权限
+			
 		}
-		
 
 		if(error.size() >0){
 			//失败
@@ -426,7 +419,7 @@ public class UpgradeManageAction {
 						
 						if(!"cms".equals(current_dir)){
 							//重命名文件夹名称,和使用的目录名称一致
-							boolean flag = fileManage.renameFile(resDirPath, current_dir);
+							boolean flag = FileUtil.renameFile(resDirPath, current_dir);
 							if(flag){
 								upgradeService.addLog(upgradeId, JsonUtils.toJSONString(new UpgradeLog(new Date(),"重命名临时文件夹成功",1))+",");
 								
@@ -444,7 +437,7 @@ public class UpgradeManageAction {
 						
 						//复制升级文件到目录
 						try {
-							fileManage.copyDirectory(new_resDirPath, "..");
+							FileUtil.copyDirectory(new_resDirPath, "..");
 							//更改运行状态
 							upgradeService.updateRunningStatus(upgradeId ,20,JsonUtils.toJSONString(new UpgradeLog(new Date(),"复制升级文件到目录完成",1))+",");
 						} catch (Exception e) {
@@ -472,7 +465,7 @@ public class UpgradeManageAction {
 								for(String deleteFilePath : deleteFilePathList){
 									
 									try {
-										fileManage.deleteFile(fileManage.toSystemPath(deleteFilePath));
+										localFileManage.deleteFile(FileUtil.toSystemPath(deleteFilePath));
 									} catch (Exception e) {
 										flag = false;
 										upgradeService.addLog(upgradeId, JsonUtils.toJSONString(new UpgradeLog(new Date(),"删除文件失败--> "+deleteFilePath,1))+",");
@@ -593,13 +586,13 @@ public class UpgradeManageAction {
 				//验证文件后缀
 				List<String> flashFormatList = new ArrayList<String>();
 				flashFormatList.add("zip");
-				boolean authentication = fileManage.validateFileSuffix(file.getOriginalFilename(),flashFormatList);
+				boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),flashFormatList);
 				if(authentication){
 					
 					//文件保存目录
 					String pathDir = "WEB-INF"+File.separator+"data"+File.separator+"upgrade"+File.separator;
 					//生成文件保存目录
-					fileManage.createFolder(pathDir);
+					FileUtil.createFolder(pathDir);
 					//文件输出流
 					fileoutstream = new FileOutputStream(new File(PathUtil.path()+File.separator+pathDir, file.getOriginalFilename()));
 					//写入硬盘
@@ -644,7 +637,7 @@ public class UpgradeManageAction {
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		if(fileName != null && !"".equals(fileName.trim())){
 			
-			Boolean state = fileManage.deleteFile("WEB-INF"+File.separator+"data"+File.separator+"upgrade"+File.separator+fileManage.toRelativePath(fileName.trim()));
+			Boolean state = localFileManage.deleteFile("WEB-INF"+File.separator+"data"+File.separator+"upgrade"+File.separator+FileUtil.toRelativePath(fileName.trim()));
 			if(state != null && state == true){
 				return "1";
 			}

@@ -10,8 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import cms.bean.data.DataBaseFile;
+import cms.utils.FileUtil;
 import cms.utils.PathUtil;
-import cms.web.action.FileManage;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class DataBaseAction {
 	@Resource MySqlDataManage mySqlDataManage;
-	@Resource FileManage fileManage;
 	
 	/**
 	 * 数据库备份文件列表
@@ -50,7 +49,7 @@ public class DataBaseAction {
 			
 			
 			//读取备份的数据库版本
-			String version = fileManage.readFileToString(path+File.separator+entry.getKey()+File.separator+"version.txt","utf-8");
+			String version = FileUtil.readFileToString(path+entry.getKey()+File.separator+"version.txt","utf-8");
 			dataBaseFile.setVersion(version);
 			
 			dataBaseFileList.add(dataBaseFile);

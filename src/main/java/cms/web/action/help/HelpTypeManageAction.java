@@ -17,8 +17,8 @@ import cms.bean.help.HelpType;
 import cms.service.help.HelpTypeService;
 import cms.service.setting.SettingService;
 import cms.utils.RedirectPath;
-import cms.web.action.FileManage;
 import cms.web.action.SystemException;
+import cms.web.action.fileSystem.FileManage;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
@@ -41,7 +41,6 @@ public class HelpTypeManageAction {
 	private Validator validator; 
 	@Resource HelpTypeService helpTypeService; 
 	@Resource HelpTypeManage helpTypeManage;
-	
 	@Resource FileManage fileManage;
 	
 	@Resource SettingService settingService;

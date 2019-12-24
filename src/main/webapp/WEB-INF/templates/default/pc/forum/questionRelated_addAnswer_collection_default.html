@@ -25,7 +25,7 @@
 							
 							<div class="answerSubmit">
 					        	<!-- <span class="submitButton"><INPUT type="button" value="提交" onClick="javascript:sureSubmit(this.form)"></span> -->
-					        	<span class="submitButton"><INPUT type="button" value="提交" onClick="javascript:ajax_sureSubmit('${identificationNumber}')"></span>
+					        	<span class="submitButton"><INPUT type="button" id="${identificationNumber}_submitForm" value="提交" onClick="javascript:ajax_sureSubmit('${identificationNumber}')"></span>
 					        </div>
 							<#-- identificationNumber:识别号：用来区别每次请求 -->
 							<#-- 验证码 -->
@@ -120,6 +120,8 @@
 							} 
 							//Ajax方式提交
 							function ajax_sureSubmit(identificationNumber){
+								//按钮设置 disabled="disabled"
+								document.getElementById(identificationNumber+"_submitForm").disabled=true;
 								if(verificationCode() == true){
 									var parameter = "";
 									parameter += "&questionId="+getUrlParam("questionId");//获取URL参数
@@ -175,6 +177,8 @@
 							        				}
 							        				
 							        			}
+							        			//按钮设置 disabled="disabled"
+												document.getElementById(identificationNumber+"_submitForm").disabled=false;
 							        		}else if(returnValue == "captchaKey"){//显示验证码
 					        					
 												var captchaKey = data[returnValue];
@@ -191,6 +195,9 @@
 							        	}
 									},
 										"user/control/answer/add?timestamp=" + new Date().getTime(), true,parameter);
+								}else{
+									//按钮设置 disabled="disabled"
+									document.getElementById(identificationNumber+"_submitForm").disabled=false;
 								}
 							}  
 							 

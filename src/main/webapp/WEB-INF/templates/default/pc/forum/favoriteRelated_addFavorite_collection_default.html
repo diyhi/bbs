@@ -1,4 +1,4 @@
-<#--  加入收藏夹 -->
+<#--  话题加入收藏夹 -->
 <@function>
 	<#-- 已登录 -->
 	<#if systemUser != null>
@@ -38,6 +38,9 @@
 										//关闭后的操作
 									}
 								);
+								
+								queryAlreadyCollected();
+								queryFavoriteCount();
 		        			}
 		        		}else if(returnValue == "error"){
 		        			

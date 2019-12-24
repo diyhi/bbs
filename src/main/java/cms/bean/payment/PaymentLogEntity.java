@@ -27,9 +27,9 @@ public class PaymentLogEntity implements Serializable{
 	@Id @Column(length=32)
 	protected String paymentRunningNumber;
 	
-	/** 支付模块 1.订单支付   5.用户充值 6.账户提现 70.余额购买话题隐藏内容 80.解锁话题隐藏内容分成 **/
+	/** 支付模块 1.订单支付   5.用户充值 6.账户提现 70.余额购买话题隐藏内容 80.解锁话题隐藏内容分成 90.悬赏金额 100.采纳答案 110.调整赏金 **/
 	protected Integer paymentModule;
-	/** 参数Id    订单Id ,用户Id 话题Id **/
+	/** 参数Id    用户Id 话题Id 评论Id 问题Id 答案Id **/
 	protected Long parameterId;
 	
 	/** 接口产品  -1:员工操作  0:预存款支付  1.支付宝即时到账  4.支付宝手机网站 **/

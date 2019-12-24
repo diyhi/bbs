@@ -26,7 +26,6 @@ import cms.utils.DruidTool;
 import cms.utils.JsonUtils;
 import cms.utils.RedirectPath;
 import cms.utils.Verification;
-import cms.web.action.FileManage;
 import cms.web.action.cache.CacheManage;
 import cms.web.action.cache.CacheStatus;
 import cms.web.action.cache.SelectCache;
@@ -72,7 +71,6 @@ public class SystemSettingManageAction {
 	
 	@Resource TopicIndexManage topicIndexManage;
 	@Resource QuestionIndexManage questionIndexManage;
-	@Resource FileManage fileManage;
 	
 	/**
 	 * 系统设置 修改界面显示
@@ -111,7 +109,7 @@ public class SystemSettingManageAction {
 		
 		
 		//允许上传文件格式
-		List<String> formatList = fileManage.readRichTextAllowFileUploadFormat();
+		List<String> formatList = CommentedProperties.readRichTextAllowFileUploadFormat();
 		
 		model.addAttribute("fileUploadFormatList",formatList);
 		
@@ -128,7 +126,7 @@ public class SystemSettingManageAction {
 		this.validator.validate(formbean, result); 
 		if (result.hasErrors()) {  
 			//允许上传文件格式
-			List<String> formatList = fileManage.readRichTextAllowFileUploadFormat();
+			List<String> formatList = CommentedProperties.readRichTextAllowFileUploadFormat();
 			
 			model.addAttribute("fileUploadFormatList",formatList);
 			return "jsp/setting/edit_systemSetting";

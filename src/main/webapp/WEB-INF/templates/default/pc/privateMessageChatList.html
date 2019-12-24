@@ -184,7 +184,7 @@
 				<span id="token_error" name="error" class="error">${(error['token'])!}</span>
 				<div class="form-action">
 					<div class="chatSubmit">
-			        	<span class="submitButton"><INPUT type="button" value="提交" onClick="javascript:ajax_submit()"></span>
+			        	<span class="submitButton"><INPUT id="submitForm" type="button" value="提交" onClick="javascript:ajax_submit()"></span>
 			        </div>
 					
 					
@@ -303,6 +303,8 @@
 			
 			//ajax提交方式
 			function ajax_submit(){
+				//按钮设置 disabled="disabled"
+				document.getElementById("submitForm").disabled=true;
 				//清空错误提示
 				var error_tag = getElementsByName_pseudo("span", "error");
 				for(var i = 0;i < error_tag.length; i++) {
@@ -331,6 +333,8 @@
 					parameter += "&messageContent="+encodeURIComponent(privateMessageContent);
 				}else{
 					document.getElementById("messageContent_error").innerHTML = "私信内容不能为空";
+					//按钮设置 disabled="disabled"
+					document.getElementById("submitForm").disabled=false;
 					return;
 				}
 				
@@ -371,7 +375,8 @@
 		        				replaceCaptcha(identificationNumber);	
 		        			}
 		        			
-		        			
+		        			//按钮设置 disabled="disabled"
+							document.getElementById("submitForm").disabled=false;
 		        		}else if(returnValue == "captchaKey"){//如果需要验证码
 		        			document.getElementById("captchaModule").style.display = "";//显示
 	        				var identificationNumber = document.getElementById("identificationNumber").value;

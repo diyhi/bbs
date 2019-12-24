@@ -559,7 +559,14 @@ function setAllowFilterWord(obj){
 			    	<web:errors path="topicUnhidePlatformShareProportion" cssStyle="color: red;"/>
 			    </TD>
 			</TR>
-			
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">悬赏问答平台分成比例：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<input class="form-text" name="questionRewardPlatformShareProportion" maxlength="3" size="3" value="${systemSetting.questionRewardPlatformShareProportion}"/>&nbsp;%
+			    	<span class="span-help">0至100之间的整数</span>
+			    	<web:errors path="questionRewardPlatformShareProportion" cssStyle="color: red;"/>
+			    </TD>
+			</TR>
 			<TR>
 			    <TD class="t-label t-label-h" width="20%">敏感词过滤：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">

@@ -38,14 +38,16 @@ import cms.bean.user.UserRole;
 import cms.service.membershipCard.MembershipCardService;
 import cms.service.setting.SettingService;
 import cms.service.user.UserRoleService;
+import cms.utils.CommentedProperties;
 import cms.utils.FileType;
+import cms.utils.FileUtil;
 import cms.utils.JsonUtils;
 import cms.utils.RedirectPath;
 import cms.utils.UUIDUtil;
 import cms.utils.Verification;
-import cms.web.action.FileManage;
 import cms.web.action.SystemException;
 import cms.web.action.TextFilterManage;
+import cms.web.action.fileSystem.FileManage;
 
 /**
  * 会员卡管理
@@ -58,9 +60,9 @@ public class MembershipCardManageAction {
 	@Resource MembershipCardService membershipCardService;
 	@Resource MembershipCardManage membershipCardManage;
 	@Resource TextFilterManage textFilterManage;
-	@Resource FileManage fileManage;
 	@Resource UserRoleService userRoleService;
 	@Resource SettingService settingService;
+	@Resource FileManage fileManage;
 	
 	/**
 	 * 查询用户会员卡订单列表
@@ -952,7 +954,7 @@ public class MembershipCardManageAction {
 					}
 					if(old_imageNameList != null && old_imageNameList.size() >0){
 						for(String imageName : old_imageNameList){
-							oldPathFileList.add(fileManage.toSystemPath(imageName));
+							oldPathFileList.add(FileUtil.toSystemPath(imageName));
 						}
 						
 					}
@@ -973,7 +975,7 @@ public class MembershipCardManageAction {
 					}
 					if(old_flashNameList != null && old_flashNameList.size() >0){
 						for(String flashName : old_flashNameList){
-							oldPathFileList.add(fileManage.toSystemPath(flashName));
+							oldPathFileList.add(FileUtil.toSystemPath(flashName));
 						}
 						
 					}
@@ -994,7 +996,7 @@ public class MembershipCardManageAction {
 					}
 					if(old_mediaNameList != null && old_mediaNameList.size() >0){
 						for(String mediaName : old_mediaNameList){
-							oldPathFileList.add(fileManage.toSystemPath(mediaName));
+							oldPathFileList.add(FileUtil.toSystemPath(mediaName));
 						}
 						
 					}
@@ -1015,7 +1017,7 @@ public class MembershipCardManageAction {
 					}
 					if(old_fileNameList != null && old_fileNameList.size() >0){
 						for(String fileName : old_fileNameList){
-							oldPathFileList.add(fileManage.toSystemPath(fileName));
+							oldPathFileList.add(FileUtil.toSystemPath(fileName));
 						}
 						
 					}
@@ -1025,7 +1027,7 @@ public class MembershipCardManageAction {
 			if(oldPathFileList != null && oldPathFileList.size() >0){
 				for(String oldPathFile :oldPathFileList){
 					//替换路径中的..号
-					oldPathFile = fileManage.toRelativePath(oldPathFile);
+					oldPathFile = FileUtil.toRelativePath(oldPathFile);
 					
 					//删除旧路径文件
 					Boolean state = fileManage.deleteFile(oldPathFile);
@@ -1110,7 +1112,7 @@ public class MembershipCardManageAction {
 				//文件大小
 				Long size = imgFile.getSize();
 			
-				String suffix = fileManage.getExtension(fileName).toLowerCase();
+				String suffix = FileUtil.getExtension(fileName).toLowerCase();
 
 				if(dir.equals("image")){
 					//允许上传图片格式
@@ -1125,7 +1127,7 @@ public class MembershipCardManageAction {
 					long imageSize = 200000L;
 
 					//验证文件类型
-					boolean authentication = fileManage.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
+					boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
 					
 					//如果用flash控件上传
 					if(imgFile.getContentType().equalsIgnoreCase("application/octet-stream")){
@@ -1152,7 +1154,7 @@ public class MembershipCardManageAction {
 						//生成锁文件保存目录
 						fileManage.createFolder(lockPathDir);
 						//生成锁文件
-						fileManage.newFile(lockPathDir+date +"_image_"+newFileName);
+						fileManage.addLock(lockPathDir,date +"_image_"+newFileName);
 						//保存文件
 						fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
 						
@@ -1169,7 +1171,7 @@ public class MembershipCardManageAction {
 					flashFormatList.add("swf");
 					
 					//验证文件后缀
-					boolean authentication = fileManage.validateFileSuffix(imgFile.getOriginalFilename(),flashFormatList);
+					boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),flashFormatList);
 
 					if(authentication){
 						
@@ -1184,7 +1186,7 @@ public class MembershipCardManageAction {
 						//生成锁文件保存目录
 						fileManage.createFolder(lockPathDir);
 						//生成锁文件
-						fileManage.newFile(lockPathDir+date +"_flash_"+newFileName);
+						fileManage.addLock(lockPathDir,date +"_flash_"+newFileName);
 						//保存文件
 						fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
 						
@@ -1213,7 +1215,7 @@ public class MembershipCardManageAction {
 					
 					
 					//验证文件后缀
-					boolean authentication = fileManage.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
+					boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
 					
 					if(authentication){	
 						//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
@@ -1227,7 +1229,7 @@ public class MembershipCardManageAction {
 						//生成锁文件保存目录
 						fileManage.createFolder(lockPathDir);
 						//生成锁文件
-						fileManage.newFile(lockPathDir+date +"_media_"+newFileName);
+						fileManage.addLock(lockPathDir,date +"_media_"+newFileName);
 						//保存文件
 						fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
 
@@ -1238,10 +1240,9 @@ public class MembershipCardManageAction {
 					}
 				}else if(dir.equals("file")){
 					//允许上传文件格式
-					List<String> formatList = fileManage.readRichTextAllowFileUploadFormat();
-					
+					List<String> formatList = CommentedProperties.readRichTextAllowFileUploadFormat();
 					//验证文件后缀
-					boolean authentication = fileManage.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
+					boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
 					if(authentication){
 						//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
 						String pathDir = "file"+File.separator+"membershipCard"+File.separator + date+ File.separator +"file"+ File.separator;
@@ -1255,7 +1256,7 @@ public class MembershipCardManageAction {
 						//生成锁文件保存目录
 						fileManage.createFolder(lockPathDir);
 						//生成锁文件
-						fileManage.newFile(lockPathDir+date +"_file_"+newFileName);
+						fileManage.addLock(lockPathDir,date +"_file_"+newFileName);
 						//保存文件
 						fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
 						

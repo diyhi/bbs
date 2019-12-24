@@ -10,9 +10,9 @@ import javax.servlet.http.HttpServletRequest;
 import cms.bean.PageForm;
 import cms.bean.template.Templates;
 import cms.service.template.TemplateService;
+import cms.utils.FileUtil;
 import cms.utils.JsonUtils;
 import cms.utils.PathUtil;
-import cms.web.action.FileManage;
 import cms.web.action.SystemException;
 
 import org.springframework.stereotype.Controller;
@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
  */
 @Controller
 public class ResourceAction {
-	@Resource FileManage fileManage;
 	@Resource TemplateService templateService;
 	
 	@RequestMapping("/control/resource/list") 
@@ -62,7 +61,7 @@ public class ResourceAction {
 		}
 		List<cms.bean.template.Resource> resourceList = new ArrayList<cms.bean.template.Resource>();
 
-		String path = PathUtil.path()+File.separator+"common"+File.separator+fileManage.toRelativePath(dirName)+(parentId == null || "".equals(parentId.trim()) ? "" :File.separator+fileManage.toRelativePath(fileManage.toSystemPath(parentId)));
+		String path = PathUtil.path()+File.separator+"common"+File.separator+FileUtil.toRelativePath(dirName)+(parentId == null || "".equals(parentId.trim()) ? "" :File.separator+FileUtil.toRelativePath(FileUtil.toSystemPath(parentId)));
 		
 		File dir = new File(path);
 		if(dir.isDirectory()){

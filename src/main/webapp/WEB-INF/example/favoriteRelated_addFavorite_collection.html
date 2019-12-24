@@ -115,6 +115,11 @@
 			<td>话题收藏错误</td>
 		</tr>
 		<tr> 
+			<td>questionFavorite</td> 
+			<td>String</td>
+			<td>问题收藏错误</td>
+		</tr>
+		<tr> 
 			<td>favorites</td> 
 			<td>String</td>
 			<td>收藏夹错误</td>
@@ -125,7 +130,7 @@
 <table id="anchor_600" class="exampleTable" > 
 	<thead>
 		<tr> 
-			<th colspan="4">提交收藏夹参数</th>
+			<th colspan="5">提交收藏夹参数</th>
 		</tr>
 		<tr> 
 			<th width="30%">参数</th> 
@@ -138,20 +143,27 @@
 		<tr> 
 			<td>topicId</td> 
 			<td>Long</td>
-			<td>是</td>
+			<td>按需填写</td>
 			<td>话题Id</td> 
+			<td  rowspan="2">话题Id和问题Id必须选填一个</td>
+		</tr>
+		<tr> 
+			<td>questionId</td> 
+			<td>Long</td>
+			<td>按需填写</td>
+			<td>问题Id</td> 
 		</tr>
 		<tr> 
 			<td>token</td> 
 			<td>String</td>
 			<td>是</td>
-			<td>令牌</td> 
+			<td colspan="2">令牌</td> 
 		</tr>
 		<tr> 
 			<td>jumpUrl</td> 
 			<td>String</td>
 			<td>否</td>
-			<td>'提交表单 - 默认方式'提交成功后跳转路径,不填写默认跳转到表单提交页；参数必须经过encodeBase64URL编码后才能提交。例${encodeBase64URL('/index')}</td> 
+			<td colspan="2">'提交表单 - 默认方式'提交成功后跳转路径,不填写默认跳转到表单提交页；参数必须经过encodeBase64URL编码后才能提交。例${encodeBase64URL('/index')}</td> 
 		</tr>
 		
 	</tbody> 

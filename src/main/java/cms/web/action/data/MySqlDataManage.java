@@ -30,8 +30,8 @@ import cms.bean.data.TableInfoObject;
 import cms.bean.data.TableProperty;
 import cms.service.data.DataService;
 import cms.utils.FileSize;
+import cms.utils.FileUtil;
 import cms.utils.PathUtil;
-import cms.web.action.FileManage;
 
 /**
  * MySQL备份/还原管理
@@ -42,7 +42,6 @@ public class MySqlDataManage {
 	 private static final Logger logger = LogManager.getLogger(MySqlDataManage.class);
 	
 	@Resource DataRunMarkManage dataRunMarkManage;
-	@Resource FileManage fileManage;
 	
 	@Resource(name="mySqlDataServiceBean")
 	private DataService dataService;//通过接口引用代理返回的对象
@@ -87,7 +86,7 @@ public class MySqlDataManage {
 		dataRunMarkManage.taskRunMark_delete();
 		dataRunMarkManage.taskRunMark_add(1L);
 		//生成文件夹
-		fileManage.createFolder(path);
+		FileUtil.createFolder(path);
 		backupProgress = "开始备份";
 		List<TableInfoObject> tableInfoObjectList = dataService.findTable();//数据库表名
 		this.noBackupCount = tableInfoObjectList.size();

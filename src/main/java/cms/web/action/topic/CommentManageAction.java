@@ -35,11 +35,12 @@ import cms.service.setting.SettingService;
 import cms.service.topic.CommentService;
 import cms.service.topic.TopicService;
 import cms.service.user.UserService;
+import cms.utils.FileUtil;
 import cms.utils.IpAddress;
 import cms.utils.JsonUtils;
 import cms.utils.UUIDUtil;
-import cms.web.action.FileManage;
 import cms.web.action.TextFilterManage;
+import cms.web.action.fileSystem.FileManage;
 import cms.web.action.filterWord.SensitiveWordFilterManage;
 import cms.web.action.setting.SettingManage;
 import cms.web.action.user.UserManage;
@@ -55,7 +56,6 @@ public class CommentManageAction {
 	@Resource CommentService commentService;//通过接口引用代理返回的对象
 	@Resource SettingManage settingManage;
 	@Resource CommentManage commentManage;
-	@Resource FileManage fileManage;
 	
 	@Resource TextFilterManage textFilterManage;
 	
@@ -64,7 +64,7 @@ public class CommentManageAction {
 	@Resource SettingService settingService;
 	@Resource TopicManage topicManage;
 	@Resource TopicService topicService;
-	
+	@Resource FileManage fileManage;
 	@Resource UserService userService;
 	@Resource UserManage userManage;
 	
@@ -125,7 +125,7 @@ public class CommentManageAction {
 					for(String imageName :imageNameList){
 						if(imageName != null && !"".equals(imageName.trim())){
 							//如果验证不是当前用户上传的文件，则不删除锁
-							 if(!topicManage.getFileNumber(fileManage.getBaseName(imageName.trim())).equals(fileNumber)){
+							 if(!topicManage.getFileNumber(FileUtil.getBaseName(imageName.trim())).equals(fileNumber)){
 								 continue;
 							 }
 							 fileManage.deleteLock("file"+File.separator+"comment"+File.separator+"lock"+File.separator,imageName.replaceAll("/","_"));
@@ -246,7 +246,7 @@ public class CommentManageAction {
 						for(String imageName :imageNameList){
 							if(imageName != null && !"".equals(imageName.trim())){
 								 //如果验证不是当前用户上传的文件，则不删除
-								 if(!topicManage.getFileNumber(fileManage.getBaseName(imageName.trim())).equals(fileNumber)){
+								 if(!topicManage.getFileNumber(FileUtil.getBaseName(imageName.trim())).equals(fileNumber)){
 										continue;
 								 }
 								 fileManage.deleteLock("file"+File.separator+"comment"+File.separator+"lock"+File.separator,imageName.replaceAll("/","_"));
@@ -261,10 +261,10 @@ public class CommentManageAction {
 				        Iterator<String> iter = old_ImageName.iterator();
 				        while (iter.hasNext()) {
 				        	String imageName = iter.next();//含有路径
-				        	String old_name = fileManage.getName(imageName);
+				        	String old_name = FileUtil.getName(imageName);
 				        	
 							for(String new_imageName : imageNameList){
-								String new_name = fileManage.getName(new_imageName);
+								String new_name = FileUtil.getName(new_imageName);
 								if(old_name.equals(new_name)){
 									iter.remove();
 									break;
@@ -274,11 +274,11 @@ public class CommentManageAction {
 						if(old_ImageName != null && old_ImageName.size() >0){
 							for(String imagePath : old_ImageName){
 								 //如果验证不是当前用户上传的文件，则不删除
-								 if(!topicManage.getFileNumber(fileManage.getBaseName(imagePath.trim())).equals(fileNumber)){
+								 if(!topicManage.getFileNumber(FileUtil.getBaseName(imagePath.trim())).equals(fileNumber)){
 										continue;
 								 }
 								//替换路径中的..号
-								imagePath = fileManage.toRelativePath(imagePath);
+								imagePath = FileUtil.toRelativePath(imagePath);
 								//替换路径分割符
 								imagePath = StringUtils.replace(imagePath, "/", File.separator);
 								
@@ -347,13 +347,13 @@ public class CommentManageAction {
 					if(imageNameList != null && imageNameList.size() >0){
 						for(String imagePath : imageNameList){
 							//如果验证不是当前用户上传的文件，则不删除锁
-							 if(!topicManage.getFileNumber(fileManage.getBaseName(imagePath.trim())).equals(fileNumber)){
+							 if(!topicManage.getFileNumber(FileUtil.getBaseName(imagePath.trim())).equals(fileNumber)){
 								 continue;
 							 }
 							
 							
 							//替换路径中的..号
-							imagePath = fileManage.toRelativePath(imagePath);
+							imagePath = FileUtil.toRelativePath(imagePath);
 							//替换路径分割符
 							imagePath = StringUtils.replace(imagePath, "/", File.separator);
 							
@@ -414,7 +414,7 @@ public class CommentManageAction {
 					long imageSize = editorSiteObject.getImageSize();
 
 					//验证文件类型
-					boolean authentication = fileManage.validateFileSuffix(imgFile.getOriginalFilename(),imageFormat);
+					boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),imageFormat);
 					
 					if(authentication && size/1024 <= imageSize){
 						
@@ -430,7 +430,7 @@ public class CommentManageAction {
 						//生成锁文件保存目录
 						fileManage.createFolder(lockPathDir);
 						//生成锁文件
-						fileManage.newFile(lockPathDir+topicId+"_"+newFileName);
+						fileManage.addLock(lockPathDir,topicId+"_"+newFileName);
 						//保存文件
 						fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
 		
@@ -561,7 +561,7 @@ public class CommentManageAction {
 						for(String imageName :imageNameList){
 							if(imageName != null && !"".equals(imageName.trim())){
 								//如果验证不是当前用户上传的文件，则不删除锁
-								 if(!topicManage.getFileNumber(fileManage.getBaseName(imageName.trim())).equals(fileNumber)){
+								 if(!topicManage.getFileNumber(FileUtil.getBaseName(imageName.trim())).equals(fileNumber)){
 									 continue;
 								 }
 								 fileManage.deleteLock("file"+File.separator+"comment"+File.separator+"lock"+File.separator,imageName.replaceAll("/","_"));

@@ -149,7 +149,8 @@ public class Topic_TemplateManage {
 			}
 		}
 		
-		
+		AccessUser accessUser = null;
+
 		//获取运行时参数
 		if(runtimeParameter != null && runtimeParameter.size() >0){		
 			for(Map.Entry<String,Object> paramIter : runtimeParameter.entrySet()) {
@@ -157,6 +158,8 @@ public class Topic_TemplateManage {
 					requestURI = (String)paramIter.getValue();
 				}else if("queryString".equals(paramIter.getKey())){
 					queryString = (String)paramIter.getValue();
+				}else if("accessUser".equals(paramIter.getKey())){
+					accessUser = (AccessUser)paramIter.getValue();
 				}
 			}
 		}
@@ -215,6 +218,35 @@ public class Topic_TemplateManage {
 			
 			if(tagList != null && tagList.size() >0){
 				for(Topic topic : qr.getResultlist()){
+					
+					//解析隐藏标签
+					Map<Integer,Object> analysisHiddenTagMap = topicManage.query_cache_analysisHiddenTag(topic.getContent(),topic.getId());
+					if(analysisHiddenTagMap != null && analysisHiddenTagMap.size() >0){
+						
+						//内容含有隐藏标签类型
+						LinkedHashMap<Integer,Boolean> hideTagTypeMap = new LinkedHashMap<Integer,Boolean>();//key:内容含有隐藏标签类型  10.输入密码可见  20.评论话题可见  30.达到等级可见 40.积分购买可见 50.余额购买可见  value:当前用户是否已对隐藏内容解锁
+						
+						//允许可见的隐藏标签
+						List<Integer> visibleTagList = this.getVisibleTagList(accessUser,topic);
+						
+						
+						for (HideTagType hideTagType : HideTagType.values()) {//按枚举类的顺序排序
+				            for (Map.Entry<Integer,Object> entry : analysisHiddenTagMap.entrySet()) {
+								if(entry.getKey().equals(hideTagType.getName())){
+									if(visibleTagList.contains(entry.getKey())){
+										hideTagTypeMap.put(entry.getKey(), true);
+										
+									}else{
+										hideTagTypeMap.put(entry.getKey(), false);
+									}
+									break;
+								}
+							}
+				        }
+						topic.setHideTagTypeMap(hideTagTypeMap);
+						
+					}
+					
 					topic.setIpAddress(null);//IP地址不显示
 					topic.setContent(null);//话题内容不显示
 					if(topic.getPostTime().equals(topic.getLastReplyTime())){//如果发贴时间等于回复时间，则不显示回复时间
@@ -501,74 +533,7 @@ public class Topic_TemplateManage {
 				
 				//处理隐藏标签
 				if(topic.getContent() != null && !"".equals(topic.getContent().trim())){
-					//允许可见的隐藏标签
-					List<Integer> visibleTagList = new ArrayList<Integer>();
-					if(accessUser != null){
-						//如果话题由当前用户发表，则显示全部隐藏内容
-						if(topic.getIsStaff() == false && topic.getUserName().equals(accessUser.getUserName())){
-							visibleTagList.add(HideTagType.PASSWORD.getName());
-							visibleTagList.add(HideTagType.COMMENT.getName());
-							visibleTagList.add(HideTagType.GRADE.getName());
-							visibleTagList.add(HideTagType.POINT.getName());
-							visibleTagList.add(HideTagType.AMOUNT.getName());
-						}else{
-							//解析隐藏标签
-							Map<Integer,Object> analysisHiddenTagMap = topicManage.query_cache_analysisHiddenTag(topic.getContent(),topic.getId());
-							for (Map.Entry<Integer,Object> entry : analysisHiddenTagMap.entrySet()) {
-								
-								if(entry.getKey().equals(HideTagType.PASSWORD.getName())){//输入密码可见
-									//话题取消隐藏Id
-								  	String topicUnhideId = topicManage.createTopicUnhideId(accessUser.getUserId(), HideTagType.PASSWORD.getName(), topicId);
-								  
-									TopicUnhide topicUnhide = topicManage.query_cache_findTopicUnhideById(topicUnhideId);
-							  		
-							  		if(topicUnhide != null){
-							  			visibleTagList.add(HideTagType.PASSWORD.getName());//当前话题已经取消隐藏
-								  	}
-								}else if(entry.getKey().equals(HideTagType.COMMENT.getName())){//评论话题可见
-									Boolean isUnhide = topicManage.query_cache_findWhetherCommentTopic(topicId,accessUser.getUserName());
-									if(isUnhide){
-										visibleTagList.add(HideTagType.COMMENT.getName());//当前话题已经取消隐藏
-									}
-								}else if(entry.getKey().equals(HideTagType.GRADE.getName())){//超过等级可见
-									User _user = userManage.query_cache_findUserByUserName(accessUser.getUserName());
-									if(_user != null){
-										List<UserGrade> userGradeList = userGradeService.findAllGrade_cache();//取得用户所有等级
-										if(userGradeList != null && userGradeList.size() >0){
-											for(UserGrade userGrade : userGradeList){
-												if(_user.getPoint() >= userGrade.getNeedPoint() && (Long)entry.getValue() <=userGrade.getNeedPoint()){
-													visibleTagList.add(HideTagType.GRADE.getName());//当前话题已经取消隐藏
-													
-													break;
-												}
-											} 
-												
-											
-										}
-									}
-									
-								}else if(entry.getKey().equals(HideTagType.POINT.getName())){//积分购买可见
-									//话题取消隐藏Id
-								  	String topicUnhideId = topicManage.createTopicUnhideId(accessUser.getUserId(), HideTagType.POINT.getName(), topicId);
-								  
-									TopicUnhide topicUnhide = topicManage.query_cache_findTopicUnhideById(topicUnhideId);
-							  		
-							  		if(topicUnhide != null){
-							  			visibleTagList.add(HideTagType.POINT.getName());//当前话题已经取消隐藏
-								  	}
-								}else if(entry.getKey().equals(HideTagType.AMOUNT.getName())){//余额购买可见
-									//话题取消隐藏Id
-								  	String topicUnhideId = topicManage.createTopicUnhideId(accessUser.getUserId(), HideTagType.AMOUNT.getName(), topicId);
-								  	TopicUnhide topicUnhide = topicManage.query_cache_findTopicUnhideById(topicUnhideId);
-							  		
-							  		if(topicUnhide != null){
-							  			visibleTagList.add(HideTagType.AMOUNT.getName());//当前话题已经取消隐藏
-								  	}
-								}
-								
-							}
-						}
-					}
+					List<Integer> visibleTagList = this.getVisibleTagList(accessUser,topic);
 					
 					
 					Integer topicContentUpdateMark = topicManage.query_cache_markUpdateTopicStatus(topicId, Integer.parseInt(RandomStringUtils.randomNumeric(8)));
@@ -589,6 +554,92 @@ public class Topic_TemplateManage {
 		}
 		return null;
 	}
+	
+	/**
+	 * 允许可见的隐藏标签
+	 */
+	private List<Integer> getVisibleTagList(AccessUser accessUser,Topic topic){
+		//允许可见的隐藏标签
+		List<Integer> visibleTagList = new ArrayList<Integer>();
+		if(accessUser != null){
+			//如果话题由当前用户发表，则显示全部隐藏内容
+			if(topic.getIsStaff() == false && topic.getUserName().equals(accessUser.getUserName())){
+				visibleTagList.add(HideTagType.PASSWORD.getName());
+				visibleTagList.add(HideTagType.COMMENT.getName());
+				visibleTagList.add(HideTagType.GRADE.getName());
+				visibleTagList.add(HideTagType.POINT.getName());
+				visibleTagList.add(HideTagType.AMOUNT.getName());
+			}else{
+				//解析隐藏标签
+				Map<Integer,Object> analysisHiddenTagMap = topicManage.query_cache_analysisHiddenTag(topic.getContent(),topic.getId());
+				for (Map.Entry<Integer,Object> entry : analysisHiddenTagMap.entrySet()) {
+					
+					if(entry.getKey().equals(HideTagType.PASSWORD.getName())){//输入密码可见
+						//话题取消隐藏Id
+					  	String topicUnhideId = topicManage.createTopicUnhideId(accessUser.getUserId(), HideTagType.PASSWORD.getName(), topic.getId());
+					  
+						TopicUnhide topicUnhide = topicManage.query_cache_findTopicUnhideById(topicUnhideId);
+				  		
+				  		if(topicUnhide != null){
+				  			visibleTagList.add(HideTagType.PASSWORD.getName());//当前话题已经取消隐藏
+					  	}
+					}else if(entry.getKey().equals(HideTagType.COMMENT.getName())){//评论话题可见
+						Boolean isUnhide = topicManage.query_cache_findWhetherCommentTopic(topic.getId(),accessUser.getUserName());
+						if(isUnhide){
+							visibleTagList.add(HideTagType.COMMENT.getName());//当前话题已经取消隐藏
+						}
+					}else if(entry.getKey().equals(HideTagType.GRADE.getName())){//超过等级可见
+						User _user = userManage.query_cache_findUserByUserName(accessUser.getUserName());
+						if(_user != null){
+							List<UserGrade> userGradeList = userGradeService.findAllGrade_cache();//取得用户所有等级
+							if(userGradeList != null && userGradeList.size() >0){
+								for(UserGrade userGrade : userGradeList){
+									if(_user.getPoint() >= userGrade.getNeedPoint() && (Long)entry.getValue() <=userGrade.getNeedPoint()){
+										visibleTagList.add(HideTagType.GRADE.getName());//当前话题已经取消隐藏
+										
+										break;
+									}
+								} 
+									
+								
+							}
+						}
+						
+					}else if(entry.getKey().equals(HideTagType.POINT.getName())){//积分购买可见
+						//话题取消隐藏Id
+					  	String topicUnhideId = topicManage.createTopicUnhideId(accessUser.getUserId(), HideTagType.POINT.getName(), topic.getId());
+					  
+						TopicUnhide topicUnhide = topicManage.query_cache_findTopicUnhideById(topicUnhideId);
+				  		
+				  		if(topicUnhide != null){
+				  			visibleTagList.add(HideTagType.POINT.getName());//当前话题已经取消隐藏
+					  	}
+					}else if(entry.getKey().equals(HideTagType.AMOUNT.getName())){//余额购买可见
+						//话题取消隐藏Id
+					  	String topicUnhideId = topicManage.createTopicUnhideId(accessUser.getUserId(), HideTagType.AMOUNT.getName(), topic.getId());
+					  	TopicUnhide topicUnhide = topicManage.query_cache_findTopicUnhideById(topicUnhideId);
+				  		
+				  		if(topicUnhide != null){
+				  			visibleTagList.add(HideTagType.AMOUNT.getName());//当前话题已经取消隐藏
+					  	}
+					}
+					
+				}
+			}
+		}
+		return visibleTagList;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	/**
 	 * 话题  -- 取消隐藏
@@ -854,10 +905,9 @@ public class Topic_TemplateManage {
 		jpql.append(" and o.status=?"+ (params.size()+1));
 		params.add(20);
 		
-		
 		//删除第一个and
 		String jpql_str = StringUtils.difference(" and", jpql.toString());
-		
+				
 		
 		//排行依据
 		if(sort == 1){

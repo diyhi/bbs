@@ -24,13 +24,14 @@ import cms.bean.template.Templates;
 import cms.service.template.TemplateService;
 import cms.utils.Coding;
 import cms.utils.DisablePath;
+import cms.utils.FileUtil;
 import cms.utils.JsonUtils;
 import cms.utils.PathUtil;
 import cms.utils.RedirectPath;
 import cms.utils.UUIDUtil;
 import cms.utils.Verification;
-import cms.web.action.FileManage;
 import cms.web.action.SystemException;
+import cms.web.action.fileSystem.localImpl.LocalFileManage;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
@@ -41,6 +42,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 
 
 /**
@@ -55,8 +57,8 @@ public class LayoutManageAction {
 	private TemplateService templateService;//通过接口引用代理返回的对象
 	@Resource TemplateManage templateManage;
 	@Resource LayoutManage layoutManage;
-	@Resource FileManage fileManage;
 	@Resource ColumnManage columnManage;
+	@Resource LocalFileManage localFileManage;
 	
 	//?  匹配任何单字符
 	//*  匹配0或者任意数量的字符
@@ -340,34 +342,34 @@ public class LayoutManageAction {
 				String default_wap_path = "WEB-INF"+File.separator+"templates"+File.separator+pathName+File.separator+"wap"+File.separator;
 				
 				//创建文件并将注释写入模板文件
-				fileManage.writeStringToFile(default_pc_path + layout.getLayoutFile(),"<#-- 默认"+layout.getName()+" -->","utf-8",false);
+				FileUtil.writeStringToFile(default_pc_path + layout.getLayoutFile(),"<#-- 默认"+layout.getName()+" -->","utf-8",false);
 				//创建文件并将注释写入模板文件
-				fileManage.writeStringToFile(default_wap_path + layout.getLayoutFile(),"<#-- 默认"+layout.getName()+" -->","utf-8",false);
+				FileUtil.writeStringToFile(default_wap_path + layout.getLayoutFile(),"<#-- 默认"+layout.getName()+" -->","utf-8",false);
 		
 			}else if(layout.getType().equals(2)){//2.商品分类 
 				//创建文件并将注释写入模板文件
-				fileManage.writeStringToFile(pc_path + layout.getLayoutFile(),"<#-- "+layout.getName()+" 商品分类 -->","utf-8",false);
+				FileUtil.writeStringToFile(pc_path + layout.getLayoutFile(),"<#-- "+layout.getName()+" 商品分类 -->","utf-8",false);
 				//创建文件并将注释写入模板文件
-				fileManage.writeStringToFile(wap_path + layout.getLayoutFile(),"<#-- "+layout.getName()+" 商品分类 -->","utf-8",false);
+				FileUtil.writeStringToFile(wap_path + layout.getLayoutFile(),"<#-- "+layout.getName()+" 商品分类 -->","utf-8",false);
 			
 			}else if(formbean.getType().equals(3)){//更多
 				//创建文件并将注释写入模板文件
-				fileManage.writeStringToFile(pc_path + layout.getLayoutFile(),"<#-- "+layout.getName()+" 更多 -->","utf-8",false);
+				FileUtil.writeStringToFile(pc_path + layout.getLayoutFile(),"<#-- "+layout.getName()+" 更多 -->","utf-8",false);
 				//创建文件并将注释写入模板文件
-				fileManage.writeStringToFile(wap_path + layout.getLayoutFile(),"<#-- "+layout.getName()+" 更多 -->","utf-8",false);
+				FileUtil.writeStringToFile(wap_path + layout.getLayoutFile(),"<#-- "+layout.getName()+" 更多 -->","utf-8",false);
 		
 			}else if(layout.getType().equals(4)){//空白页
 				if(layout.getLayoutFile() != null && !"".equals(layout.getLayoutFile().trim())){
 					//创建文件并将注释写入模板文件
-					fileManage.writeStringToFile(pc_path+layout.getLayoutFile(),"<#-- "+layout.getName()+" 空白页 -->","utf-8",false);
+					FileUtil.writeStringToFile(pc_path+layout.getLayoutFile(),"<#-- "+layout.getName()+" 空白页 -->","utf-8",false);
 					//创建文件并将注释写入模板文件
-					fileManage.writeStringToFile(wap_path+layout.getLayoutFile(),"<#-- "+layout.getName()+" 空白页 -->","utf-8",false);
+					FileUtil.writeStringToFile(wap_path+layout.getLayoutFile(),"<#-- "+layout.getName()+" 空白页 -->","utf-8",false);
 				}
 			}else if(formbean.getType().equals(5)){//公共页(生成新引用页)
 				//创建文件并将注释写入模板文件
-				fileManage.writeStringToFile(pc_path+ layout.getLayoutFile(),"<#-- "+layout.getName()+" 公共页(生成新引用页) -->","utf-8",false);
+				FileUtil.writeStringToFile(pc_path+ layout.getLayoutFile(),"<#-- "+layout.getName()+" 公共页(生成新引用页) -->","utf-8",false);
 				//创建文件并将注释写入模板文件
-				fileManage.writeStringToFile(wap_path+ layout.getLayoutFile(),"<#-- "+layout.getName()+" 公共页(生成新引用页) -->","utf-8",false);
+				FileUtil.writeStringToFile(wap_path+ layout.getLayoutFile(),"<#-- "+layout.getName()+" 公共页(生成新引用页) -->","utf-8",false);
 		  		
 			}	
 		}else{
@@ -582,18 +584,18 @@ public class LayoutManageAction {
 				if(layout.getLayoutFile() != null && !"".equals(layout.getLayoutFile().trim())){
 					String pc_path = "WEB-INF"+File.separator+"templates"+File.separator+layout.getDirName()+File.separator+"pc"+File.separator+"public"+File.separator;
 					//删除模板文件
-					fileManage.deleteFile(pc_path+layout.getLayoutFile());
+					localFileManage.deleteFile(pc_path+layout.getLayoutFile());
 					String wap_path = "WEB-INF"+File.separator+"templates"+File.separator+layout.getDirName()+File.separator+"wap"+File.separator+"public"+File.separator;
 					//删除模板文件
-					fileManage.deleteFile(wap_path+layout.getLayoutFile());
+					localFileManage.deleteFile(wap_path+layout.getLayoutFile());
 				}
 				if(layout.getType().equals(1)){//默认页
 					String pc_path = "WEB-INF"+File.separator+"templates"+File.separator+layout.getDirName()+File.separator+"pc"+File.separator;
 					//删除模板文件
-					fileManage.deleteFile(pc_path+layout.getLayoutFile());
+					localFileManage.deleteFile(pc_path+layout.getLayoutFile());
 					String wap_path = "WEB-INF"+File.separator+"templates"+File.separator+layout.getDirName()+File.separator+"wap"+File.separator;
 					//删除模板文件
-					fileManage.deleteFile(wap_path+layout.getLayoutFile());
+					localFileManage.deleteFile(wap_path+layout.getLayoutFile());
 				}else if(layout.getType().equals(7)){//站点栏目详细页
 					String columnId_str = layout.getReferenceCode().split("_")[1];
 					Column column = columnManage.queryColumnById(Integer.parseInt(columnId_str),dirName);
@@ -606,11 +608,11 @@ public class LayoutManageAction {
 							//路径
 							String pc_path = "WEB-INF"+File.separator+"templates"+File.separator+dirName+File.separator+"pc"+File.separator+"public"+File.separator;
 							//删除空白页文件
-							fileManage.deleteFile(pc_path+"column_"+id+".html");
+							localFileManage.deleteFile(pc_path+"column_"+id+".html");
 							//路径
 							String wap_path = "WEB-INF"+File.separator+"templates"+File.separator+dirName+File.separator+"wap"+File.separator+"public"+File.separator;
 							//删除空白页文件
-							fileManage.deleteFile(wap_path+"column_"+id+".html");
+							localFileManage.deleteFile(wap_path+"column_"+id+".html");
 							//删除布局
 							Layout _layout = templateService.findLayoutByReferenceCode(dirName,7,"column_"+id);
 							if(_layout != null){
@@ -921,10 +923,10 @@ public class LayoutManageAction {
 					pc_path = "WEB-INF"+File.separator+"templates"+File.separator+dirName+File.separator+"pc"+File.separator+"public"+File.separator+layout.getLayoutFile();
 					wap_path = "WEB-INF"+File.separator+"templates"+File.separator+dirName+File.separator+"wap"+File.separator+"public"+File.separator+layout.getLayoutFile();
 				}
-				fileManage.writeStringToFile(pc_path,pc_code,"utf-8", false);
+				FileUtil.writeStringToFile(pc_path,pc_code,"utf-8", false);
 				
 				
-				fileManage.writeStringToFile(wap_path,wap_code,"utf-8", false);
+				FileUtil.writeStringToFile(wap_path,wap_code,"utf-8", false);
 			}else{
 				throw new SystemException("布局不存在！");
 			}

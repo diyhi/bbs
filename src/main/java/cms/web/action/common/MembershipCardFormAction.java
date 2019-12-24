@@ -6,10 +6,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Resource;
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -23,22 +19,16 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import cms.bean.ErrorView;
-import cms.bean.follow.Follow;
-import cms.bean.follow.Follower;
 import cms.bean.membershipCard.MembershipCard;
 import cms.bean.membershipCard.MembershipCardOrder;
 import cms.bean.membershipCard.Specification;
-import cms.bean.message.Remind;
 import cms.bean.payment.PaymentLog;
 import cms.bean.user.AccessUser;
 import cms.bean.user.PointLog;
-import cms.bean.user.ResourceEnum;
 import cms.bean.user.User;
 import cms.bean.user.UserRole;
 import cms.bean.user.UserRoleGroup;
-import cms.service.follow.FollowService;
 import cms.service.membershipCard.MembershipCardService;
-import cms.service.message.RemindService;
 import cms.service.template.TemplateService;
 import cms.service.user.UserRoleService;
 import cms.service.user.UserService;
@@ -50,14 +40,9 @@ import cms.utils.threadLocal.AccessUserThreadLocal;
 import cms.web.action.AccessSourceDeviceManage;
 import cms.web.action.CSRFTokenManage;
 import cms.web.action.SystemException;
-import cms.web.action.follow.FollowManage;
-import cms.web.action.follow.FollowerManage;
 import cms.web.action.membershipCard.MembershipCardManage;
-import cms.web.action.message.RemindManage;
 import cms.web.action.payment.PaymentManage;
 import cms.web.action.user.PointManage;
-import cms.web.action.user.RoleAnnotation;
-import cms.web.action.user.UserManage;
 import cms.web.action.user.UserRoleManage;
 import cms.web.taglib.Configuration;
 
@@ -212,17 +197,33 @@ public class MembershipCardFormAction {
 				update_userRoleGroup = new UserRoleGroup();
 				update_userRoleGroup.setUserName(accessUser.getUserName());
 				update_userRoleGroup.setUserRoleId(userRole.getId());
-				
 				DateTime dateTime = new DateTime(userRoleGroup.getValidPeriodEnd());
-				if(specification.getUnit().equals(10)){//时长单位 10.小时
-					dateTime = dateTime.plusHours(specification.getDuration());// 增加小时
-				}else if(specification.getUnit().equals(20)){//20.日
-					dateTime = dateTime.plusDays(specification.getDuration()); // 增加天 
-				}else if(specification.getUnit().equals(30)){//30.月
-					dateTime = dateTime.plusMonths(specification.getDuration()); // 增加月
-				}else if(specification.getUnit().equals(40)){//40.年
-					dateTime = dateTime.plusYears(specification.getDuration()); // 增加年
+				
+				
+				//和系统时间比  
+				if(dateTime.isAfterNow()){//如果在系统时间之后
+					if(specification.getUnit().equals(10)){//时长单位 10.小时
+						dateTime = dateTime.plusHours(specification.getDuration());// 增加小时
+					}else if(specification.getUnit().equals(20)){//20.日
+						dateTime = dateTime.plusDays(specification.getDuration()); // 增加天 
+					}else if(specification.getUnit().equals(30)){//30.月
+						dateTime = dateTime.plusMonths(specification.getDuration()); // 增加月
+					}else if(specification.getUnit().equals(40)){//40.年
+						dateTime = dateTime.plusYears(specification.getDuration()); // 增加年
+					}
+				}else{//如果已过期,则有效期从当前时间算起
+					dateTime = new DateTime();
+					if(specification.getUnit().equals(10)){//时长单位 10.小时
+						dateTime = dateTime.plusHours(specification.getDuration());// 增加小时
+					}else if(specification.getUnit().equals(20)){//20.日
+						dateTime = dateTime.plusDays(specification.getDuration()); // 增加天 
+					}else if(specification.getUnit().equals(30)){//30.月
+						dateTime = dateTime.plusMonths(specification.getDuration()); // 增加月
+					}else if(specification.getUnit().equals(40)){//40.年
+						dateTime = dateTime.plusYears(specification.getDuration()); // 增加年
+					}
 				}
+				
 				update_userRoleGroup.setValidPeriodEnd(dateTime.toDate());
 			}
 		

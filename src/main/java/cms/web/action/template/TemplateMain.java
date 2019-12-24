@@ -250,6 +250,16 @@ public class TemplateMain {
 				Boolean value = favorite_TemplateManage.alreadyCollected_entityBean(forum, submitParameter, runtimeParameter);
 				return value;
 			}
+		}else if(forum.getForumChildType().equals("问题会员收藏总数")){
+			if(forum.getDisplayType().equals("entityBean")){//实体对象
+				Long value = favorite_TemplateManage.questionFavoriteCount_entityBean(forum, submitParameter, runtimeParameter);
+				return value;
+			}
+		}else if(forum.getForumChildType().equals("用户是否已经收藏问题")){
+			if(forum.getDisplayType().equals("entityBean")){//实体对象
+				Boolean value = favorite_TemplateManage.alreadyFavoriteQuestion_entityBean(forum, submitParameter, runtimeParameter);
+				return value;
+			}
 		}else if(forum.getForumChildType().equals("给话题点赞")){
 			if(forum.getDisplayType().equals("collection")){//集合
 				Map<String,Object> value = like_TemplateManage.addLike_collection(forum, submitParameter, runtimeParameter);

@@ -11,7 +11,6 @@ import cms.bean.topic.Tag;
 import cms.service.setting.SettingService;
 import cms.service.topic.TagService;
 import cms.utils.RedirectPath;
-import cms.web.action.FileManage;
 import cms.web.action.SystemException;
 
 import org.springframework.stereotype.Controller;
@@ -35,7 +34,6 @@ public class TagManageAction {
 	@Resource TagService tagService; 
 	@Resource TagManage tagManage;
 	
-	@Resource FileManage fileManage;
 	
 	@Resource SettingService settingService;
 	

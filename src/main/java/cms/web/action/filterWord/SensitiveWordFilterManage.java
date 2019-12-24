@@ -3,16 +3,13 @@ package cms.web.action.filterWord;
 import java.io.File;
 import java.util.List;
 
-import javax.annotation.Resource;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-
+import cms.utils.FileUtil;
 import cms.utils.PathUtil;
-import cms.web.action.FileManage;
 
 /**
  * 敏感词过滤管理
@@ -22,7 +19,6 @@ import cms.web.action.FileManage;
 public class SensitiveWordFilterManage {
 	private static final Logger logger = LogManager.getLogger(SensitiveWordFilterManage.class);
 	
-	@Resource FileManage fileManage;
 	
 	//上次执行版本
 	private String version = "";
@@ -145,7 +141,7 @@ public class SensitiveWordFilterManage {
 				String path = PathUtil.path()+File.separator+"WEB-INF"+File.separator+"data"+File.separator+"filterWord"+File.separator;
 				File file = new File(path+"word.txt");
 				if(file.exists()){
-					List<String> wordList = fileManage.readLines(file,"utf-8");
+					List<String> wordList = FileUtil.readLines(file,"utf-8");
 					if(wordList != null && wordList.size() >0){
 						for(String word : wordList){
 							if(word != null && !"".equals(word.trim())){

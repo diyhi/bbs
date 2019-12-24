@@ -153,6 +153,17 @@ public class SystemSettingValidator implements Validator{
 		}else{
 			errors.rejectValue("topicUnhidePlatformShareProportion","errors.required", new String[]{"不能为空"},"");
 		}
+		//悬赏问答平台分成比例
+		if(systemSetting.getQuestionRewardPlatformShareProportion() != null){
+			if(systemSetting.getQuestionRewardPlatformShareProportion() <0){
+				errors.rejectValue("questionRewardPlatformShareProportion","errors.required", new String[]{"必须大于或等于0"},"");
+			}
+			if(systemSetting.getQuestionRewardPlatformShareProportion() >100){
+				errors.rejectValue("questionRewardPlatformShareProportion","errors.required", new String[]{"必须小于或等于100"},"");
+			}
+		}else{
+			errors.rejectValue("questionRewardPlatformShareProportion","errors.required", new String[]{"不能为空"},"");
+		}
 		//文件防盗链密钥
 		if(systemSetting.getFileSecureLinkSecret() != null && !"".equals(systemSetting.getFileSecureLinkSecret().trim())){
 			if(systemSetting.getFileSecureLinkSecret().trim().length() != 16){

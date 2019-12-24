@@ -3,8 +3,12 @@ package cms.service.favorite;
 
 import java.util.List;
 
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
 import cms.bean.QueryResult;
 import cms.bean.favorite.Favorites;
+import cms.bean.favorite.QuestionFavorite;
 import cms.bean.favorite.TopicFavorite;
 import cms.service.besa.DAO;
 
@@ -29,18 +33,20 @@ public interface FavoriteService extends DAO<Favorites>{
 	 */
 	public QueryResult<Favorites> findFavoriteByUserId(Long userId,String userName,int firstIndex, int maxResult);
 	/**
-	 * 保存收藏夹
+	 * 保存收藏
 	 * @param favorites 收藏夹
 	 * @param topicFavorite 话题收藏
+	 * @param questionFavorite 问题收藏
 	 */
-	public void saveFavorite(Object favorites,Object topicFavorite);
+	public void saveFavorite(Object favorites,Object topicFavorite,Object questionFavorite);
 	
 	/**
 	 * 删除收藏
 	 * @param favoriteId 收藏夹Id
 	 * @param topicFavoriteId 话题收藏Id
+	 * @param questionFavoriteId 问题收藏Id
 	 */
-	public Integer deleteFavorite(String favoriteId,String topicFavoriteId);
+	public Integer deleteFavorite(String favoriteId,String topicFavoriteId,String questionFavoriteId);
 	/**
 	 * 根据话题Id删除收藏
 	 * @param topicId 话题Id
@@ -76,4 +82,30 @@ public interface FavoriteService extends DAO<Favorites>{
 	 * @return
 	 */
 	public Long findFavoriteCountByTopicId(Long topicId);
+	/**
+	 * 根据问题Id删除收藏
+	 * @param questionId 问题Id
+	 */
+	public Integer deleteFavoriteByQuestionId(Long questionId);
+	/**
+	 * 根据Id查询问题收藏
+	 * @param questionFavoriteId 问题收藏Id
+	 * @return
+	 */
+	public QuestionFavorite findQuestionFavoriteById(String questionFavoriteId);
+	/**
+	 * 根据问题Id查询收藏夹分页
+	 * @param firstIndex 索引开始,即从哪条记录开始
+	 * @param maxResult 获取多少条数据
+	 * @param questionId 问题Id
+	 * @return
+	 */
+	public QueryResult<Favorites> findFavoritePageByQuestionId(int firstIndex, int maxResult,Long questionId);
+	/**
+	 * 根据问题Id查询被收藏数量
+	 * @param questionId 问题Id
+	 * @return
+	 */
+	public Long findFavoriteCountByQuestionId(Long questionId);
+	
 }
