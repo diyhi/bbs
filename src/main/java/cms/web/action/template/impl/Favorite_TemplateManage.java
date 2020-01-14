@@ -43,7 +43,7 @@ public class Favorite_TemplateManage {
 				}
 			}
 		}
-		if(topicId != null){
+		if(topicId != null && topicId >0L){
 			
 			//根据话题Id查询被收藏数量
 			return favoriteManage.query_cache_findFavoriteCountByTopicId(topicId);
@@ -81,7 +81,7 @@ public class Favorite_TemplateManage {
 				}
 			}
 		}
-		if(accessUser != null && topicId != null){
+		if(accessUser != null && topicId != null && topicId >0L){
 			//话题收藏Id
 		  	String topicFavoriteId = favoriteManage.createTopicFavoriteId(topicId, accessUser.getUserId());
 		  
@@ -116,7 +116,7 @@ public class Favorite_TemplateManage {
 				}
 			}
 		}
-		if(questionId != null){
+		if(questionId != null && questionId >0L){
 			
 			//根据问题Id查询被收藏数量
 			return favoriteManage.query_cache_findFavoriteCountByQuestionId(questionId);
@@ -154,7 +154,7 @@ public class Favorite_TemplateManage {
 				}
 			}
 		}
-		if(accessUser != null && questionId != null){
+		if(accessUser != null && questionId != null && questionId >0L){
 			//问题收藏Id
 		  	String questionFavoriteId = favoriteManage.createQuestionFavoriteId(questionId, accessUser.getUserId());
 		  

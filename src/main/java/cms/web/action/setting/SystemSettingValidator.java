@@ -1,10 +1,13 @@
 package cms.web.action.setting;
 
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
 import cms.bean.setting.SystemSetting;
+import cms.utils.CommentedProperties;
 
 @Component("systemSettingValidator")
 public class SystemSettingValidator implements Validator{
@@ -211,6 +214,13 @@ public class SystemSettingValidator implements Validator{
 		}
 		//话题编辑器标签
 		if(systemSetting.getTopicEditorTagObject() != null){
+			
+			if(systemSetting.getTopicEditorTagObject().isUploadVideo()){//上传视频
+				if(systemSetting.getTopicEditorTagObject().getVideoSize() == null || systemSetting.getTopicEditorTagObject().getVideoSize() <=0){
+					errors.rejectValue("topicEditorTagObject.videoSize","errors.required", new String[]{"必须大于0"},"");
+				}
+			}
+			
 			if(systemSetting.getTopicEditorTagObject().isImage()){//图片
 				if(systemSetting.getTopicEditorTagObject().getImageSize() == null || systemSetting.getTopicEditorTagObject().getImageSize() <=0){
 					errors.rejectValue("topicEditorTagObject.imageSize","errors.required", new String[]{"必须大于0"},"");
@@ -221,13 +231,80 @@ public class SystemSettingValidator implements Validator{
 					errors.rejectValue("topicEditorTagObject.fileSize","errors.required", new String[]{"必须大于0"},"");
 				}
 			}
-			
+			//允许上传图片格式
+			List<String> imageFormatList = systemSetting.getTopicEditorTagObject().getImageFormat();
+			if(imageFormatList != null && imageFormatList.size() >0){
+				List<String> imageUploadFormatList = CommentedProperties.readRichTextAllowImageUploadFormat();
+				if(imageUploadFormatList != null && imageUploadFormatList.size() >0){
+					A:for(String imageFormat : imageFormatList){
+						if(imageFormat != null && !"".equals(imageFormat.trim())){
+							for(String imageUploadFormat : imageUploadFormatList){
+								if(imageUploadFormat != null && imageFormat.trim().equals(imageUploadFormat.trim())){
+									continue A;
+								}
+							}
+						}
+						errors.rejectValue("topicEditorTagObject.imageFormat","errors.required", new String[]{imageFormat+"格式不属于预设格式"},"");
+					}
+				}
+			}
+			//允许上传文件格式
+			List<String> fileFormatList = systemSetting.getTopicEditorTagObject().getFileFormat();
+			if(fileFormatList != null && fileFormatList.size() >0){
+				List<String> fileUploadFormatList = CommentedProperties.readRichTextAllowFileUploadFormat();
+				if(fileUploadFormatList != null && fileUploadFormatList.size() >0){
+					A:for(String fileFormat : fileFormatList){
+						if(fileFormat != null && !"".equals(fileFormat.trim())){
+							for(String fileUploadFormat : fileUploadFormatList){
+								if(fileUploadFormat != null && fileFormat.trim().equals(fileUploadFormat.trim())){
+									continue A;
+								}
+							}
+						}
+						errors.rejectValue("topicEditorTagObject.fileFormat","errors.required", new String[]{fileFormat+"格式不属于预设格式"},"");
+					}
+				}
+			}	
+			//允许上传视频格式
+			List<String> videoFormatList = systemSetting.getTopicEditorTagObject().getVideoFormat();
+			if(videoFormatList != null && videoFormatList.size() >0){
+				List<String> videoUploadFormatList = CommentedProperties.readRichTextAllowVideoUploadFormat();
+				if(videoUploadFormatList != null && videoUploadFormatList.size() >0){
+					A:for(String videoFormat : videoFormatList){
+						if(videoFormat != null && !"".equals(videoFormat.trim())){
+							for(String videoUploadFormat : videoUploadFormatList){
+								if(videoUploadFormat != null && videoFormat.trim().equals(videoUploadFormat.trim())){
+									continue A;
+								}
+							}
+						}
+						errors.rejectValue("topicEditorTagObject.videoFormat","errors.required", new String[]{videoFormat+"格式不属于预设格式"},"");
+					}
+				}
+			}
 		}
 		//评论编辑器标签
 		if(systemSetting.getEditorTagObject() != null){
 			if(systemSetting.getEditorTagObject().isImage()){//图片
 				if(systemSetting.getEditorTagObject().getImageSize() == null || systemSetting.getEditorTagObject().getImageSize() <=0){
 					errors.rejectValue("editorTagObject.imageSize","errors.required", new String[]{"必须大于0"},"");
+				}
+			}
+			//允许上传图片格式
+			List<String> imageFormatList = systemSetting.getEditorTagObject().getImageFormat();
+			if(imageFormatList != null && imageFormatList.size() >0){
+				List<String> imageUploadFormatList = CommentedProperties.readRichTextAllowImageUploadFormat();
+				if(imageUploadFormatList != null && imageUploadFormatList.size() >0){
+					A:for(String imageFormat : imageFormatList){
+						if(imageFormat != null && !"".equals(imageFormat.trim())){
+							for(String imageUploadFormat : imageUploadFormatList){
+								if(imageUploadFormat != null && imageFormat.trim().equals(imageUploadFormat.trim())){
+									continue A;
+								}
+							}
+						}
+						errors.rejectValue("editorTagObject.imageFormat","errors.required", new String[]{imageFormat+"格式不属于预设格式"},"");
+					}
 				}
 			}
 		}
@@ -238,7 +315,23 @@ public class SystemSettingValidator implements Validator{
 					errors.rejectValue("questionEditorTagObject.imageSize","errors.required", new String[]{"必须大于0"},"");
 				}
 			}
-			
+			//允许上传图片格式
+			List<String> imageFormatList = systemSetting.getQuestionEditorTagObject().getImageFormat();
+			if(imageFormatList != null && imageFormatList.size() >0){
+				List<String> imageUploadFormatList = CommentedProperties.readRichTextAllowImageUploadFormat();
+				if(imageUploadFormatList != null && imageUploadFormatList.size() >0){
+					A:for(String imageFormat : imageFormatList){
+						if(imageFormat != null && !"".equals(imageFormat.trim())){
+							for(String imageUploadFormat : imageUploadFormatList){
+								if(imageUploadFormat != null && imageFormat.trim().equals(imageUploadFormat.trim())){
+									continue A;
+								}
+							}
+						}
+						errors.rejectValue("questionEditorTagObject.imageFormat","errors.required", new String[]{imageFormat+"格式不属于预设格式"},"");
+					}
+				}
+			}
 		}
 		//答案编辑器标签
 		if(systemSetting.getAnswerEditorTagObject() != null){
@@ -247,7 +340,23 @@ public class SystemSettingValidator implements Validator{
 					errors.rejectValue("answerEditorTagObject.imageSize","errors.required", new String[]{"必须大于0"},"");
 				}
 			}
-			
+			//允许上传图片格式
+			List<String> imageFormatList = systemSetting.getAnswerEditorTagObject().getImageFormat();
+			if(imageFormatList != null && imageFormatList.size() >0){
+				List<String> imageUploadFormatList = CommentedProperties.readRichTextAllowImageUploadFormat();
+				if(imageUploadFormatList != null && imageUploadFormatList.size() >0){
+					A:for(String imageFormat : imageFormatList){
+						if(imageFormat != null && !"".equals(imageFormat.trim())){
+							for(String imageUploadFormat : imageUploadFormatList){
+								if(imageUploadFormat != null && imageFormat.trim().equals(imageUploadFormat.trim())){
+									continue A;
+								}
+							}
+						}
+						errors.rejectValue("answerEditorTagObject.imageFormat","errors.required", new String[]{imageFormat+"格式不属于预设格式"},"");
+					}
+				}
+			}
 		}
 		
 	}

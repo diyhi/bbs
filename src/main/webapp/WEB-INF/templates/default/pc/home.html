@@ -16,6 +16,7 @@
 	<script language="javascript" src="${commonPath}js/ajax.js" type="text/javascript"></script>
 	<script language="javascript" src="${commonPath}js/json2.js" type="text/javascript"></script>
 	<script type="text/javascript" src="${commonPath}js/jquery/jquery.min.js" language="javascript"></script>
+	<script type="text/javascript" src="${commonPath}js/jquery/jquery.letterAvatar.js" language="javascript"></script>
 	<script type="text/javascript" src="${commonPath}js/jquery/readmore.min.js" language="javascript"></script>
 	<link href="${commonPath}js/layer/skin/default/layer.css"  type="text/css" rel="stylesheet"/>
 	<script type="text/javascript" src="${commonPath}js/layer/layer.js" language="javascript"></script>
@@ -41,7 +42,8 @@
 						<#if user.avatarName != null>
 							<img src="${user.avatarPath}${user.avatarName}">
 						<#else>
-							<img src="${commonPath}images/max_avata.png">
+							<!--[if (IE)]><img src="${commonPath}images/min_avata.png"><![endif]-->
+							<!--[if !(IE)]><!--><img width="140px" height="140px" avatar="${(user.nickname != null && user.nickname??) ?string(user.nickname , user.userName)}" ><!--<![endif]-->
 						</#if>
 					</div>
 					<div class="counts clearfix">
@@ -314,7 +316,15 @@
 						if(userDynamic.avatarName != null && userDynamic.avatarName != ''){
 							html += "<img src='"+userDynamic.avatarPath+"100x100/"+userDynamic.avatarName+"' >";
 						}else{
-							html += "<img src='"+commonPath+"images/min_avata.png' >";
+					
+							html += "<!--[if (IE)]><img src='"+commonPath+"images/min_avata.png'><![endif]-->";
+						
+							if(userDynamic.nickname != null && userDynamic.nickname != ''){
+								html += "<!--[if !(IE)]><!--><img avatar='"+userDynamic.nickname+"' ><!--<![endif]-->";
+							}else{
+								html += "<!--[if !(IE)]><!--><img avatar='"+userDynamic.userName+"' ><!--<![endif]-->";
+							}
+
 						}
 						html += "";
 						html += "";
@@ -331,25 +341,25 @@
 						html += 	"<div class='userDynamicTime'>"+userDynamic.postTime+"</div>";			
 						html += 	"<div class='topicTitle'>";
 						if(userDynamic.module == 100){
-							html += "<span>发表了话题</span>";	
+							html += "<span class='info'>发表了话题</span>";	
 							html += 		"<a href='thread?topicId="+userDynamic.topicId+"'> "+userDynamic.topicTitle+"</a>";
 						}else if(userDynamic.module == 200){
-							html += "<span>评论了话题</span>";	
+							html += "<span class='info'>评论了话题</span>";	
 							html += 		"<a href='thread?topicId="+userDynamic.topicId+"'> "+userDynamic.topicTitle+"</a>";
 						}else if(userDynamic.module == 300){
-							html += "<span>引用了话题</span>";
+							html += "<span class='info'>引用了话题</span>";
 							html += 		"<a href='thread?topicId="+userDynamic.topicId+"'> "+userDynamic.topicTitle+"</a>";	
 						}else if(userDynamic.module == 400){
-							html += "<span>回复了话题</span>";
+							html += "<span class='info'>回复了话题</span>";
 							html += 		"<a href='thread?topicId="+userDynamic.topicId+"'> "+userDynamic.topicTitle+"</a>";	
 						}else if(userDynamic.module == 500){
-							html += "<span>提交了问题</span>";
+							html += "<span class='info'>提交了问题</span>";
 							html += 		"<a href='question?questionId="+userDynamic.questionId+"'> "+userDynamic.questionTitle+"</a>";	
 						}else if(userDynamic.module == 600){
-							html += "<span>回答了问题</span>";	
+							html += "<span class='info'>回答了问题</span>";	
 							html += 		"<a href='question?questionId="+userDynamic.questionId+"'> "+userDynamic.questionTitle+"</a>";	
 						}else if(userDynamic.module == 700){
-							html += "<span>回复了问题</span>";	
+							html += "<span class='info'>回复了问题</span>";	
 							html += 		"<a href='question?questionId="+userDynamic.questionId+"'> "+userDynamic.questionTitle+"</a>";	
 						}
 						
@@ -360,6 +370,18 @@
 						
 						}
 						
+						for (var key in userDynamic.hideTagTypeMap) {  
+            				var flag = userDynamic.hideTagTypeMap[key];
+            				html += "<span class='hideTagType hide_"+key+"' data='"+key+"'>";	
+            				if(flag == true){
+            					html += "<span class='circle point'><i class='cms-unlock-solid' ></i></span>";	
+            				}else{
+            					html += "<span class='circle'><i class='cms-lock-solid' ></i></span>";	
+            				}
+            				
+           					html += "</span> ";	
+						}
+				
 						html += 	"</div>";	
 						if(userDynamic.module == 100){
 							html += "<div class='topicContent' topicId='"+userDynamic.topicId+"' >"+userDynamic.topicContent+"</div>";
@@ -412,7 +434,8 @@
 						}else if(userDynamic.module == 500){
 							html += "<a href='question?questionId="+userDynamic.questionId+"' target='_blank' >查看原文</a>";
 							html += "<span >"+userDynamic.questionViewTotal+"次阅读</span>";	
-							html += "<span >"+userDynamic.questionAnswerTotal+"个回答</span>";	
+							html += "<span >"+userDynamic.questionAnswerTotal+"个回答</span>";
+							html += "<span id='questionFavoriteCount_"+userDynamic.questionId+"'>0人收藏</span>";		
 						}else if(userDynamic.module == 600){
 							html += "<a href='question?questionId="+userDynamic.questionId+"&answerId="+userDynamic.answerId+"'  target='_blank' >查看原文</a>";	
 						}else if(userDynamic.module == 700){
@@ -430,6 +453,10 @@
 				$("#home-userDynamic").append(html);
 				
 				setTimeout(function () {
+					//生成头像
+					LetterAvatar.transform();
+				
+				
 					if(pageView.records != null && pageView.records.length >0){
 						for(var i = 0; i<pageView.records.length; i++){
 							var userDynamic =pageView.records[i];
@@ -437,7 +464,9 @@
 								queryFavoriteCount(userDynamic.topicId);
 								queryLikeCount(userDynamic.topicId);
 							}
-							
+							if(userDynamic.module == 500){
+								queryQuestionFavoriteCount(userDynamic.questionId);
+							}
 						}
 					}
 				}, 100);
@@ -467,6 +496,19 @@
 					"queryLikeCount?topicId="+topicId+"&timestamp=" + new Date().getTime(), true);
 								           
 			}
+			//查询问题用户收藏总数
+			function queryQuestionFavoriteCount(questionId){	
+				get_request(function(value){
+					if(value != ""){
+						var data = JSON.parse(value);
+			        	document.getElementById("questionFavoriteCount_"+questionId).innerHTML = data+"人收藏";
+			        }
+				},
+					"queryQuestionFavoriteCount?questionId="+questionId+"&timestamp=" + new Date().getTime(), true);
+								           
+			}
+			
+			
 			// 获取随机数
 			function getRandom(m) {
 				//生成的随机数截取m位，生成的随机数最大不超过13位，能保证首位不为0

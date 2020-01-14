@@ -1,0 +1,23 @@
+修改1142行initImage方法，让图片放大时满屏
+
+initImage: function initImage(done) {
+....
+
+width = Math.min(width * 0.9, naturalWidth);
+height = Math.min(height * 0.9, naturalHeight);
+
+....
+}
+
+改成
+
+initImage: function initImage(done) {
+....
+
+width = Math.min(width, naturalWidth);
+height = Math.min(height , naturalHeight);
+
+....
+}
+
+

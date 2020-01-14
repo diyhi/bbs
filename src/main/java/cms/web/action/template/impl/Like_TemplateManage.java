@@ -42,7 +42,7 @@ public class Like_TemplateManage {
 				}
 			}
 		}
-		if(topicId != null){
+		if(topicId != null && topicId >0L){
 			
 			//根据话题Id查询被收藏数量
 			return likeManage.query_cache_findLikeCountByTopicId(topicId);
@@ -80,7 +80,7 @@ public class Like_TemplateManage {
 				}
 			}
 		}
-		if(accessUser != null && topicId != null){
+		if(accessUser != null && topicId != null && topicId>0L){
 			//话题收藏Id
 		  	String topicLikeId = likeManage.createTopicLikeId(topicId, accessUser.getUserId());
 		  

@@ -16,6 +16,7 @@
 	<script language="javascript" src="${commonPath}js/ajax.js" type="text/javascript"></script>
 	<script language="javascript" src="${commonPath}js/json2.js" type="text/javascript"></script>
 	<script language="javascript" src="${commonPath}js/jquery/jquery.min.js" type="text/javascript"></script>
+	<script type="text/javascript" src="${commonPath}js/jquery/jquery.letterAvatar.js" language="javascript"></script>
 	<link href="${commonPath}js/layer/skin/default/layer.css"  type="text/css" rel="stylesheet"/>
 	<script type="text/javascript" src="${commonPath}js/layer/layer.js" language="javascript"></script>
 </head>
@@ -46,7 +47,8 @@
 									<#if privateMessage.friendAvatarName != null>
 										<img src="${privateMessage.friendAvatarPath}${privateMessage.friendAvatarName}" class='avatar' height='64px' width='64px'>
 									<#else>
-										<img src="${commonPath}images/min_avata.png" class='avatar' height='64px' width='64px'>
+										<!--[if (IE)]><img src="${commonPath}images/min_avata.png"><![endif]-->
+										<!--[if !(IE)]><!--><img height='64px' width='64px' avatar="${(privateMessage.friendNickname != null && privateMessage.friendNickname??) ?string(privateMessage.friendNickname , privateMessage.friendUserName)}" ><!--<![endif]-->
 									</#if>
 								</a>
 								<cite>

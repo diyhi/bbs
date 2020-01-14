@@ -1,0 +1,223 @@
+@font-face {
+  font-family: 'fontawesome';
+  src:  url('fonts/fontawesome.eot?y6r20');
+  src:  url('fonts/fontawesome.eot?y6r20#iefix') format('embedded-opentype'),
+    url('fonts/fontawesome.ttf?y6r20') format('truetype'),
+    url('fonts/fontawesome.woff?y6r20') format('woff'),
+    url('fonts/fontawesome.svg?y6r20#fontawesome') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+.fa {
+    display: inline-block;
+    font-size:14px;
+}
+
+[class^="fa-"], [class*=" fa-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'fontawesome' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.fa-forecolor:before {
+  content: "\e929";
+}
+.fa-tablerowinsertbelow:before {
+  content: "\e92f";
+}
+.fa-tablerowinsertabove:before {
+  content: "\e930";
+}
+.fa-tablecolinsertright:before {
+  content: "\e931";
+}
+.fa-tablecolinsertleft:before {
+  content: "\e932";
+}
+.fa-tablecolmerge:before {
+  content: "\e948";
+}
+.fa-tablerowmerge:before {
+  content: "\e94f";
+}
+.fa-tabledelete:before {
+  content: "\e93d";
+}
+.fa-tableinsert:before {
+  content: "\e944";
+}
+.fa-tablecoldelete:before {
+  content: "\e92e";
+}
+.fa-tablerowdelete:before {
+  content: "\e935";
+}
+.fa-tablecolsplit:before {
+  content: "\e92d";
+}
+.fa-tablerowsplit:before {
+  content: "\e937";
+}
+.fa-hilitecolor:before {
+  content: "\e922";
+}
+.fa-tablecellprop:before {
+  content: "\e934";
+}
+.fa-tableprop:before {
+  content: "\e933";
+}
+.fa-rightBottomCorner:before {
+  content: "\e92b";
+}
+.fa-template:before {
+  content: "\e928";
+}
+.fa-quickformat:before {
+  content: "\e91c";
+}
+.fa-lineheight:before {
+  content: "\e91a";
+}
+.fa-selectall:before {
+  content: "\e913";
+}
+.fa-emoticons:before {
+  content: "\e9df";
+}
+.fa-fontname:before {
+  content: "\ea5c";
+}
+.fa-strikethrough:before {
+  content: "\ea65";
+}
+.fa-pagebreak:before {
+  content: "\ea68";
+}
+.fa-table:before {
+  content: "\ea71";
+}
+.fa-image:before {
+  content: "\e916";
+}
+.fa-multiimage:before {
+  content: "\e917";
+}
+.fa-justifycenter:before {
+  content: "\e900";
+}
+.fa-justifyfull:before {
+  content: "\e901";
+}
+.fa-justifyleft:before {
+  content: "\e902";
+}
+.fa-justifyright:before {
+  content: "\e903";
+}
+.fa-angle-down:before {
+  content: "\e904";
+}
+.fa-bold:before {
+  content: "\e914";
+}
+.fa-clearhtml:before {
+  content: "\e915";
+}
+.fa-caret-down:before {
+  content: "\e906";
+}
+.fa-checked:before {
+  content: "\e926";
+}
+.fa-source:before {
+  content: "\e907";
+}
+.fa-removeformat:before {
+  content: "\e908";
+}
+.fa-fullscreen:before {
+  content: "\e909";
+}
+.fa-preview:before {
+  content: "\e927";
+}
+.fa-formatblock:before {
+  content: "\e921";
+}
+.fa-indent:before {
+  content: "\e905";
+}
+.fa-italic:before {
+  content: "\e918";
+}
+.fa-link:before {
+  content: "\e91d";
+}
+.fa-insertorderedlist:before {
+  content: "\e90a";
+}
+.fa-insertunorderedlist:before {
+  content: "\e90b";
+}
+.fa-hide:before {
+  content: "\e919";
+}
+.fa-baidumap:before {
+  content: "\e90c";
+}
+.fa-hr:before {
+  content: "\e91f";
+}
+.fa-outdent:before {
+  content: "\e91b";
+}
+.fa-insertfile:before {
+  content: "\e925";
+}
+.fa-question-circle:before {
+  content: "\e90d";
+}
+.fa-quote-left:before {
+  content: "\e90e";
+}
+.fa-quote-right:before {
+  content: "\e90f";
+}
+.fa-sort:before {
+  content: "\e92c";
+}
+.fa-subscript:before {
+  content: "\e910";
+}
+.fa-superscript:before {
+  content: "\e911";
+}
+.fa-code:before {
+  content: "\e923";
+}
+.fa-fontsize:before {
+  content: "\e924";
+}
+.fa-close:before {
+  content: "\e92a";
+}
+.fa-underline:before {
+  content: "\e912";
+}
+.fa-unlink:before {
+  content: "\e91e";
+}
+.fa-media:before {
+  content: "\e920";
+}

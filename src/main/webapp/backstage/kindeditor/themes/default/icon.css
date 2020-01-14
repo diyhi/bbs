@@ -2,7 +2,6 @@
 	background-image: url(default.png);
 	display:inline-block;
 	vertical-align:top;
-
 }
 .icon-new {
 	background-position: 0px -1200px;
@@ -104,4 +103,13 @@
 	display:inline-block;
 	vertical-align:top;
 }
-
+.icon-media {
+	background-position: 0px -528px;
+	width: 16px;
+	height: 16px;
+}
+.icon-fullscreen {
+	background-position: 0px -656px;
+	width: 16px;
+	height: 16px;
+}

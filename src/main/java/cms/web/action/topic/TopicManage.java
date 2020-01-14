@@ -376,7 +376,7 @@ public class TopicManage {
 			boolean area_3 = false;
 			
 			tag.add("source");
-			tag.add("|");
+		//	tag.add("|");
 			if(editor.isFontname()){//字体
 				tag.add("fontname");
 				area_1 = true;
@@ -386,7 +386,7 @@ public class TopicManage {
 				area_1 = true;
 			}
 			if(area_1 == true){
-				tag.add("|");
+		//		tag.add("|");
 			}
 			
 			if(editor.isForecolor()){//文字颜色
@@ -422,7 +422,7 @@ public class TopicManage {
 				area_2 = true;
 			}
 			if(area_2 == true){
-				tag.add("|");
+			//	tag.add("|");
 			}
 			
 			if(editor.isJustifyleft()){//左对齐
@@ -446,7 +446,7 @@ public class TopicManage {
 				area_3 = true;
 			}
 			if(area_3 == true){
-				tag.add("|");
+			//	tag.add("|");
 			}
 			
 			if(editor.isEmoticons()){//插入表情
@@ -458,6 +458,17 @@ public class TopicManage {
 			if(editor.isFile()){//文件
 				tag.add("insertfile");
 			}
+			if(editor.isEmbedVideo() || editor.isUploadVideo()){//视频
+				tag.add("media");
+				
+				if(editor.isEmbedVideo()){//嵌入视频
+					tag.add("embedVideo");
+				}
+				if(editor.isUploadVideo()){//上传视频
+					tag.add("uploadVideo");
+				}
+			}
+			
 			
 			if(editor.isHidePassword()){//输入密码可见
 				tag.add("hidePassword");
@@ -475,7 +486,9 @@ public class TopicManage {
 				tag.add("hideAmount");
 			}
 
-			
+			if(editor.isFullscreen()){//全屏显示
+				tag.add("fullscreen");
+			}
 		}
 		return JsonUtils.toJSONString(tag);
 	}

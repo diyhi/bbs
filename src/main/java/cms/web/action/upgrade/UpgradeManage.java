@@ -11,6 +11,8 @@ import cms.bean.upgrade.UpgradeSystem;
 import cms.service.upgrade.UpgradeService;
 import cms.utils.JsonUtils;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Async;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Component;
  */
 @Component("upgradeManage")
 public class UpgradeManage {
+	private static final Logger logger = LogManager.getLogger(UpgradeManage.class);
 	@Resource UpgradeService upgradeService;
 	
 	/**
@@ -44,24 +47,45 @@ public class UpgradeManage {
 				m.invoke(cls,upgradeId);
 			} catch (ClassNotFoundException e) {
 				error = true;
+				if (logger.isErrorEnabled()) {
+		            logger.error("升级处理数据错误",e);
+		        }
 			//	e.printStackTrace();
 			} catch (NoSuchMethodException e) {
 				error = true;
+				if (logger.isErrorEnabled()) {
+		            logger.error("升级处理数据错误",e);
+		        }
 			//	e.printStackTrace();
 			} catch (SecurityException e) {
 				error = true;
+				if (logger.isErrorEnabled()) {
+		            logger.error("升级处理数据错误",e);
+		        }
 			//	e.printStackTrace();
 			} catch (IllegalAccessException e) {
 				error = true;
+				if (logger.isErrorEnabled()) {
+		            logger.error("升级处理数据错误",e);
+		        }
 			//	e.printStackTrace();
 			} catch (IllegalArgumentException e) {
 				error = true;
+				if (logger.isErrorEnabled()) {
+		            logger.error("升级处理数据错误",e);
+		        }
 			//	e.printStackTrace();
 			} catch (InvocationTargetException e) {
 				error = true;
+				if (logger.isErrorEnabled()) {
+		            logger.error("升级处理数据错误",e);
+		        }
 			//	e.printStackTrace();
 			} catch (Exception e) {
 				error = true;
+				if (logger.isErrorEnabled()) {
+		            logger.error("升级处理数据错误",e);
+		        }
 			//	e.printStackTrace();
 			}finally{
 				if(error){

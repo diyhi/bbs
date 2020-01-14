@@ -21,6 +21,8 @@
 	<link href="${commonPath}js/jcrop/css/jquery.Jcrop.min.css" type="text/css" rel="stylesheet" >
 	<script src="${commonPath}js/jcrop/js/jquery.Jcrop.min.js" language="javascript" type="text/javascript"></script>
 	
+	<script type="text/javascript" src="${commonPath}js/jquery/jquery.letterAvatar.js" language="javascript"></script>
+	
 	<link href="${commonPath}js/layer/skin/default/layer.css"  type="text/css" rel="stylesheet"/>
 	<script type="text/javascript" src="${commonPath}js/layer/layer.js" language="javascript"></script>
 </head>
@@ -843,8 +845,9 @@
 		             <#if user.avatarName != null>
 						<img src="${user.avatarPath}${user.avatarName}">
 					<#else>
-						<img src="${commonPath}images/min_avata.png">
-					</#if>
+						<!--[if (IE)]><img src="${commonPath}images/min_avata.png"><![endif]-->
+						<!--[if !(IE)]><!--><img avatar="${(user.nickname != null && user.nickname??) ?string(user.nickname , user.userName)}" ><!--<![endif]-->
+					</#if> 
 		        </div>
 				<table class="blankTable" border="0" cellSpacing="2" cellPadding="0" width="100%">
 					<tbody>

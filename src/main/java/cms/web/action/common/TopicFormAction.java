@@ -1215,6 +1215,7 @@ public class TopicFormAction {
 				//删除旧路径文件
 				if(oldPathFileList != null && oldPathFileList.size() >0){
 					for(String oldPathFile :oldPathFileList){
+						
 						//如果验证不是当前用户上传的文件，则不删除
 						if(!topicManage.getFileNumber(FileUtil.getBaseName(oldPathFile.trim())).equals(fileNumber)){
 							continue;
@@ -1328,7 +1329,7 @@ public class TopicFormAction {
 
 	/**
 	 * 文件上传
-	 * dir: 上传类型，分别为image、file 
+	 * dir: 上传类型，分别为image、file、media
 	 * 
 	 * 员工发话题 上传文件名为UUID + a + 员工Id
 	 * 用户发话题 上传文件名为UUID + b + 用户Id
@@ -1477,6 +1478,65 @@ public class TopicFormAction {
 									}
 								}else{
 									errorMessage = "当前文件类型不允许上传";
+								}
+							}else{
+								errorMessage = "不允许上传文件";
+							}
+						}else{
+							errorMessage = "权限不足";
+						}
+						
+					}else if(dir.equals("media")){	
+						//是否有当前功能操作权限
+						boolean flag_permission = userRoleManage.isPermission(ResourceEnum._2004000,null);
+						if(flag_permission){
+							if(editorSiteObject.isUploadVideo()){//允许上传视频
+								//上传文件编号
+								String fileNumber = "b"+accessUser.getUserId();
+								
+								//当前文件名称
+								String fileName = file.getOriginalFilename();
+								
+								//文件大小
+								Long size = file.getSize();
+								//取得文件后缀
+								String suffix = FileUtil.getExtension(fileName).toLowerCase();
+								
+								//允许上传视频格式
+								List<String> imageFormat = editorSiteObject.getVideoFormat();
+								//允许上传视频大小
+								long fileSize = editorSiteObject.getVideoSize();
+								
+								//验证视频类型
+								boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),imageFormat);
+								
+								if(authentication ){
+									if(size/1024 <= fileSize){
+										//文件保存目录;分多目录主要是为了分散文件目录,提高检索速度
+										String pathDir = "file"+File.separator+"topic"+File.separator + date +File.separator +"media"+ File.separator;
+										//文件锁目录
+										String lockPathDir = "file"+File.separator+"topic"+File.separator+"lock"+File.separator;
+										//构建文件名称
+										String newFileName = UUIDUtil.getUUID32()+ fileNumber+"." + suffix;
+										
+										//生成文件保存目录
+										fileManage.createFolder(pathDir);
+										//生成锁文件保存目录
+										fileManage.createFolder(lockPathDir);
+										//生成锁文件
+										fileManage.addLock(lockPathDir,date +"_media_"+newFileName);
+										//保存文件
+										fileManage.writeFile(pathDir, newFileName,file.getBytes());
+										//上传成功
+										returnJson.put("error", 0);//0成功  1错误
+										returnJson.put("url", "file/topic/"+date+"/media/"+newFileName);
+										returnJson.put("title", file.getOriginalFilename());//旧文件名称
+										return JsonUtils.toJSONString(returnJson);
+									}else{
+										errorMessage = "文件超出允许上传大小";
+									}
+								}else{
+									errorMessage = "当前视频类型不允许上传";
 								}
 							}else{
 								errorMessage = "不允许上传文件";

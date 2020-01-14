@@ -15,9 +15,7 @@
 <script language="javascript" src="backstage/js/Tool.js" type="text/javascript"></script>
 <script language="javascript" src="backstage/js/ajax.js" type="text/javascript"></script>
 
-<link href="backstage/kindeditor/themes/default/default.css" rel="stylesheet"/>
 <script charset="utf-8" src="backstage/kindeditor/kindeditor-min.js"></script>
-<script charset="utf-8" src="backstage/kindeditor/lang/zh-CN.js"></script>
 <script type="text/javascript" src="backstage/js/json3.js"></script>
 <script type="text/javascript" src="backstage/lhgdialog/lhgcore.lhgdialog.min.js"></script>
 <link rel="stylesheet" href="backstage/syntaxhighlighter/styles/shCoreDefault.css"  type="text/css" />
@@ -731,6 +729,7 @@ $(function() {
 	
 		editor = K.create('textarea[name="content"]', {
 			basePath : '${config:url(pageContext.request)}backstage/kindeditor/',//指定编辑器的根目录路径
+			themeType : 'style :darkGray',//深灰主题 加冒号的是主题样式文件名称同时也是主题目录
 		//	autoHeightMode : true,//值为true，并引入autoheight.js插件时自动调整高度
 			formatUploadUrl :false,//false时不会自动格式化上传后的URL
 			resizeType : 1,//2或1或0，2时可以拖动改变宽度和高度，1时只能改变高度，0时不能拖动。默认值: 2 

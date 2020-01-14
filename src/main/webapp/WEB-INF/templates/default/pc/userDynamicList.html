@@ -16,6 +16,7 @@
 	<script language="javascript" src="${commonPath}js/ajax.js" type="text/javascript"></script>
 	<script language="javascript" src="${commonPath}js/json2.js" type="text/javascript"></script>
 	<script type="text/javascript" src="${commonPath}js/jquery/jquery.min.js" language="javascript"></script>
+	<script type="text/javascript" src="${commonPath}js/jquery/jquery.letterAvatar.js" language="javascript"></script>
 	<script type="text/javascript" src="${commonPath}js/jquery/readmore.min.js" language="javascript"></script>
 	<link href="${commonPath}js/layer/skin/default/layer.css"  type="text/css" rel="stylesheet"/>
 	<script type="text/javascript" src="${commonPath}js/layer/layer.js" language="javascript"></script>
@@ -53,7 +54,8 @@
 							<#if userDynamic.avatarName != null>
 								<img src="${userDynamic.avatarPath}100x100/${userDynamic.avatarName}" >
 							<#else>
-								<img src="${commonPath}images/min_avata.png" >
+								<!--[if (IE)]><img src="${commonPath}images/min_avata.png"><![endif]-->
+								<!--[if !(IE)]><!--><img avatar="${(userDynamic.nickname != null && userDynamic.nickname??) ?string(userDynamic.nickname , userDynamic.userName)}" ><!--<![endif]-->
 							</#if> 
 							<cite>
 								<a class="userName" href="user/control/home?userName=${userDynamic.userName}">
@@ -65,25 +67,25 @@
 						
 						<div class="topicTitle">
 							<#if userDynamic.module == 100>
-								<span>发表了话题</span>
+								<span class="info">发表了话题</span>
 								<a href="thread?topicId=${userDynamic.topicId}">${userDynamic.topicTitle}</a>
 							<#elseif userDynamic.module == 200>
-								<span>评论了话题</span>
+								<span class="info">评论了话题</span>
 								<a href="thread?topicId=${userDynamic.topicId}">${userDynamic.topicTitle}</a>
 							<#elseif userDynamic.module == 300>
-								<span>引用了话题</span>
+								<span class="info">引用了话题</span>
 								<a href="thread?topicId=${userDynamic.topicId}">${userDynamic.topicTitle}</a>
 							<#elseif userDynamic.module == 400>
-								<span>回复了话题</span>
+								<span class="info">回复了话题</span>
 								<a href="thread?topicId=${userDynamic.topicId}">${userDynamic.topicTitle}</a>
 							<#elseif userDynamic.module == 500>
-								<span>提交了问题</span>
+								<span class="info">提交了问题</span>
 								<a href="question?questionId=${userDynamic.questionId}">${userDynamic.questionTitle}</a>
 							<#elseif userDynamic.module == 600>
-								<span>回答了问题</span>
+								<span class="info">回答了问题</span>
 								<a href="question?questionId=${userDynamic.questionId}">${userDynamic.questionTitle}</a>
 							<#elseif userDynamic.module == 700>
-								<span>回复了问题</span>
+								<span class="info">回复了问题</span>
 								<a href="question?questionId=${userDynamic.questionId}">${userDynamic.questionTitle}</a>
 							</#if> 
 							
@@ -174,6 +176,24 @@
 									<a href="question?questionId=${userDynamic.questionId}"" target="_blank" >查看原文</a>
 									<span >${userDynamic.questionViewTotal}次阅读</span>
 									<span >${userDynamic.questionAnswerTotal}个回答</span>
+									<span id="questionFavoriteCount_${userDynamic.questionId}">0人收藏</span>
+									
+									<script type="text/javascript">				
+										//查询问题用户收藏总数
+										function queryQuestionFavoriteCount(){	
+											//从URL获取问题Id
+											var questionId = ${userDynamic.questionId};
+											get_request(function(value){
+												if(value != ""){
+													var data = JSON.parse(value);
+													document.getElementById("questionFavoriteCount_"+questionId).innerHTML = data+"人收藏";
+										        }
+											},
+												"queryQuestionFavoriteCount.htm?questionId="+questionId+"&timestamp=" + new Date().getTime(), true);
+															           
+										}
+										queryQuestionFavoriteCount();	
+									</script>	
 								<#elseif userDynamic.module == 600>
 									<a href="question?questionId=${userDynamic.questionId}&answerId=${userDynamic.answerId}" target="_blank" >查看原文</a>
 								<#elseif userDynamic.module == 700>

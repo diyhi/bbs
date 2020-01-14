@@ -482,88 +482,110 @@ public class CommentFormAction {
 		Map<String,Object> returnJson = new HashMap<String,Object>();
 		String errorMessage  = "";
 		
-		//是否有当前功能操作权限
-		boolean flag_permission = userRoleManage.isPermission(ResourceEnum._2002000,null);
-		if(flag_permission == false){
-			errorMessage = "权限不足";
-		}else{
-			//文件上传
-			if(flag_permission && file != null && !file.isEmpty()){
-				if(topicId != null && topicId >0L){
-					
-					SystemSetting systemSetting = settingService.findSystemSetting_cache();
-					
-					EditorTag editorSiteObject = settingManage.readEditorTag();
-					if(editorSiteObject != null && systemSetting.isAllowComment()){//是否全局允许评论
-						if(editorSiteObject.isImage()){//允许上传图片
-							//获取登录用户
-						  	AccessUser accessUser = AccessUserThreadLocal.get();
-							
-							//上传文件编号
-							String fileNumber = "b"+accessUser.getUserId();
-							
-							
-							//当前图片文件名称
-							String fileName = file.getOriginalFilename();
-							//当前图片类型
-						//	String imgType = file.getContentType();
-							//文件大小
-							Long size = file.getSize();
-							//取得文件后缀
-							String suffix = fileName.substring(fileName.lastIndexOf('.')+1).toLowerCase();
-							
-							
-							//允许上传图片格式
-							List<String> imageFormat = editorSiteObject.getImageFormat();
-							//允许上传图片大小
-							long imageSize = editorSiteObject.getImageSize();
-
-							//验证文件类型
-							boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),imageFormat);
-							
-							if(authentication ){
-								if(size/1024 <= imageSize){
-									//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
-									String pathDir = "file"+File.separator+"comment"+File.separator + topicId + File.separator;
-									//文件锁目录
-									String lockPathDir = "file"+File.separator+"comment"+File.separator+"lock"+File.separator;
-									//构建文件名称
-									String newFileName = UUIDUtil.getUUID32()+fileNumber+ "." + suffix;
-									
-									//生成文件保存目录
-									fileManage.createFolder(pathDir);
-									//生成锁文件保存目录
-									fileManage.createFolder(lockPathDir);
-									//生成锁文件
-									fileManage.addLock(lockPathDir,topicId+"_"+newFileName);
-									//保存文件
-									fileManage.writeFile(pathDir, newFileName,file.getBytes());
-									
-									//上传成功
-									returnJson.put("error", 0);//0成功  1错误
-									returnJson.put("url", "file/comment/"+topicId+"/"+newFileName);
-									
-									return JsonUtils.toJSONString(returnJson);
-								}else{
-									errorMessage = "文件超出允许上传大小";
-								}
-								
-							}else{
-								errorMessage = "当前文件类型不允许上传";
-							}
-						}else{
-							errorMessage = "不允许上传图片";
-						}
-					}else{
-						errorMessage = "不允许评论";
-					}
-				}else{
-					errorMessage = "话题Id不能为空";
-				}
-			}else{
-				errorMessage = "文件内容不能为空";
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		
+		//获取登录用户
+	  	AccessUser accessUser = AccessUserThreadLocal.get();
+		boolean flag = true;
+		
+		//如果全局不允许提交评论
+		if(systemSetting.isAllowComment() == false){
+			flag = false;
+		}
+		
+		//如果实名用户才允许提交话题
+		if(systemSetting.isRealNameUserAllowComment() == true){
+			User _user = userManage.query_cache_findUserByUserName(accessUser.getUserName());
+			if(_user.isRealNameAuthentication() == false){
+				flag = false;
 			}
 		}
+		if(flag){
+			//是否有当前功能操作权限
+			boolean flag_permission = userRoleManage.isPermission(ResourceEnum._2002000,null);
+			if(flag_permission == false){
+				errorMessage = "权限不足";
+			}else{
+				//文件上传
+				if(flag_permission && file != null && !file.isEmpty()){
+					if(topicId != null && topicId >0L){
+						
+						
+						
+						EditorTag editorSiteObject = settingManage.readEditorTag();
+						if(editorSiteObject != null && systemSetting.isAllowComment()){//是否全局允许评论
+							if(editorSiteObject.isImage()){//允许上传图片
+								
+								//上传文件编号
+								String fileNumber = "b"+accessUser.getUserId();
+								
+								
+								//当前图片文件名称
+								String fileName = file.getOriginalFilename();
+								//当前图片类型
+							//	String imgType = file.getContentType();
+								//文件大小
+								Long size = file.getSize();
+								//取得文件后缀
+								String suffix = fileName.substring(fileName.lastIndexOf('.')+1).toLowerCase();
+								
+								
+								//允许上传图片格式
+								List<String> imageFormat = editorSiteObject.getImageFormat();
+								//允许上传图片大小
+								long imageSize = editorSiteObject.getImageSize();
+
+								//验证文件类型
+								boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),imageFormat);
+								
+								if(authentication ){
+									if(size/1024 <= imageSize){
+										//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
+										String pathDir = "file"+File.separator+"comment"+File.separator + topicId + File.separator;
+										//文件锁目录
+										String lockPathDir = "file"+File.separator+"comment"+File.separator+"lock"+File.separator;
+										//构建文件名称
+										String newFileName = UUIDUtil.getUUID32()+fileNumber+ "." + suffix;
+										
+										//生成文件保存目录
+										fileManage.createFolder(pathDir);
+										//生成锁文件保存目录
+										fileManage.createFolder(lockPathDir);
+										//生成锁文件
+										fileManage.addLock(lockPathDir,topicId+"_"+newFileName);
+										//保存文件
+										fileManage.writeFile(pathDir, newFileName,file.getBytes());
+										
+										//上传成功
+										returnJson.put("error", 0);//0成功  1错误
+										returnJson.put("url", "file/comment/"+topicId+"/"+newFileName);
+										
+										return JsonUtils.toJSONString(returnJson);
+									}else{
+										errorMessage = "文件超出允许上传大小";
+									}
+									
+								}else{
+									errorMessage = "当前文件类型不允许上传";
+								}
+							}else{
+								errorMessage = "不允许上传图片";
+							}
+						}else{
+							errorMessage = "不允许评论";
+						}
+					}else{
+						errorMessage = "话题Id不能为空";
+					}
+				}else{
+					errorMessage = "文件内容不能为空";
+				}
+			}
+		}else{
+			errorMessage = "不允许发表评论";
+		}
+		
+		
 
 		//上传失败
 		returnJson.put("error", 1);

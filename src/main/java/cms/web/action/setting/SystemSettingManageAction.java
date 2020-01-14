@@ -46,6 +46,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 
+
 /**
  * 系统设置
  *
@@ -72,6 +73,9 @@ public class SystemSettingManageAction {
 	@Resource TopicIndexManage topicIndexManage;
 	@Resource QuestionIndexManage questionIndexManage;
 	
+	
+	
+	
 	/**
 	 * 系统设置 修改界面显示
 	 */
@@ -79,8 +83,7 @@ public class SystemSettingManageAction {
 	public String editSystemSettingUI(ModelMap model,SystemSetting formbean,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		SystemSetting systemSite = settingService.findSystemSetting();
-		
-		
+	
 		if(systemSite.getEditorTag() != null && !"".equals(systemSite.getEditorTag().trim())){
 			EditorTag editorTag = JsonUtils.toObject(systemSite.getEditorTag(), EditorTag.class);
 			if(editorTag != null){
@@ -106,12 +109,17 @@ public class SystemSettingManageAction {
 				systemSite.setAnswerEditorTagObject(editorTag);
 			}
 		}
-		
+		//允许上传图片格式
+		List<String> imageUploadFormatList = CommentedProperties.readRichTextAllowImageUploadFormat();
+		model.addAttribute("imageUploadFormatList",imageUploadFormatList);
 		
 		//允许上传文件格式
-		List<String> formatList = CommentedProperties.readRichTextAllowFileUploadFormat();
+		List<String> fileUploadFormatList = CommentedProperties.readRichTextAllowFileUploadFormat();
+		model.addAttribute("fileUploadFormatList",fileUploadFormatList);
 		
-		model.addAttribute("fileUploadFormatList",formatList);
+		//允许上传视频格式
+		List<String> videoUploadFormatList = CommentedProperties.readRichTextAllowVideoUploadFormat();
+		model.addAttribute("videoUploadFormatList",videoUploadFormatList);
 		
 		model.addAttribute("systemSetting",systemSite);
 		return "jsp/setting/edit_systemSetting";
@@ -125,10 +133,17 @@ public class SystemSettingManageAction {
 		//数据校验
 		this.validator.validate(formbean, result); 
 		if (result.hasErrors()) {  
-			//允许上传文件格式
-			List<String> formatList = CommentedProperties.readRichTextAllowFileUploadFormat();
+			//允许上传图片格式
+			List<String> imageUploadFormatList = CommentedProperties.readRichTextAllowImageUploadFormat();
+			model.addAttribute("imageUploadFormatList",imageUploadFormatList);
 			
-			model.addAttribute("fileUploadFormatList",formatList);
+			//允许上传文件格式
+			List<String> fileUploadFormatList = CommentedProperties.readRichTextAllowFileUploadFormat();
+			model.addAttribute("fileUploadFormatList",fileUploadFormatList);
+			
+			//允许上传视频格式
+			List<String> videoUploadFormatList = CommentedProperties.readRichTextAllowVideoUploadFormat();
+			model.addAttribute("videoUploadFormatList",videoUploadFormatList);
 			return "jsp/setting/edit_systemSetting";
 		}
 		formbean.setTopicEditorTag(JsonUtils.toJSONString(formbean.getTopicEditorTagObject()));

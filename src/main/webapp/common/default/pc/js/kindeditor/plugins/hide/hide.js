@@ -157,7 +157,7 @@ KindEditor.plugin('hide', function(K) {
 					
 					if(tabIndexBox == 0){//输入密码可见
 						if (password == "") {
-							alert("请输入密码");
+							K.popupMessage("请输入密码");
 							passwordBox[0].focus();
 							return;
 						}
@@ -165,7 +165,7 @@ KindEditor.plugin('hide', function(K) {
 						
 					}else if(tabIndexBox == 2){//达到等级可见
 						if (grade == "" || !/^[0-9]*[1-9][0-9]*$/.test(grade)) {//正整数
-							alert("请选择等级");
+							K.popupMessage("请选择等级");
 							if(gradeBox[0] != null){
 								gradeBox[0].focus();
 							}
@@ -173,13 +173,13 @@ KindEditor.plugin('hide', function(K) {
 						}
 					}else if(tabIndexBox == 3){//积分购买可见
 						if (point == "" || !/^[0-9]*[1-9][0-9]*$/.test(point)) {//正整数
-							alert("请输入大于0的数字");
+							K.popupMessage("请输入大于0的数字");
 							pointBox[0].focus();
 							return;
 						}
 					}else if(tabIndexBox == 4){//余额购买可见  正整数,也可接收正浮点数，两位小数
 						if (amount == "" || !/^(([1-9]\d*)(\.\d{1,2})?)$|(0\.0?([1-9]\d?))$/.test(amount)) {
-							alert("请输入大于0的金额");
+							K.popupMessage("请输入大于0的金额");
 							amountBox[0].focus();
 							return;
 						}

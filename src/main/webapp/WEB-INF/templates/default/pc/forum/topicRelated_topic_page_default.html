@@ -13,7 +13,8 @@
 				            	<#if topic.avatarName != null>
 									<img src="${topic.avatarPath}100x100/${topic.avatarName}">
 								<#else>
-									<img src="${commonPath}images/min_avata.png">
+									<!--[if (IE)]><img src="${commonPath}images/min_avata.png"><![endif]-->
+									<!--[if !(IE)]><!--><img avatar="${(topic.nickname != null && topic.nickname??) ?string(topic.nickname , topic.userName)}" ><!--<![endif]-->
 								</#if>                                                           
 				            </a>   
 				        </div>
@@ -137,35 +138,6 @@ $(".hideTagType").on('mouseenter', this,function() {
 	layer.close(tip_index);
 });
 </script>
-<style type="text/css">
-/** 半透明提示层 **/
-.hideTag-class .layui-layer-content{
-	background-color: rgba(0,0,0,0.7);
-}
-.hideTag-class .layui-layer-content .layui-layer-TipsG {
-	position: absolute;
-	width: 0;
-	height: 0;
-	border-width: 5px;
-	*overflow: hidden;
-	
-	border-style: dashed;
- 	border-color:rgba(0,0,0,0.7) transparent transparent transparent;
-	margin-bottom: -2px;
-	margin-bottom: 3px\0;
-	*margin-bottom: 3px;
-}
-
-.hideTag-class .layui-layer-content .layui-layer-TipsT {
-	left: 7px;
-	border-right-style: solid;
-	border-right-color: rgba(0,0,0,0.7);
-}
-
-
-</style>
-
-
 
 
 

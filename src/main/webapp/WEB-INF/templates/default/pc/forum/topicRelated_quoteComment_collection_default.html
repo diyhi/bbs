@@ -212,12 +212,13 @@
 							}
 							//获取URL中的话题Id
 							var topicId = getUrlParam("topicId");
-
+							KindEditor.options.cssData = 'body { font-size: 14px; }';
 							var editor = KindEditor.create('textarea[id="${identificationNumber}_quoteCommentContent"]', {
-								themeType : 'new',//新外观
+								themeType : 'style :minimalist customization',//极简主题 加冒号的是主题样式文件名称同时也是主题目录
 								basePath : '${commonPath}js/kindeditor/',//指定编辑器的根目录路径
 								formatUploadUrl :false,//false时不会自动格式化上传后的URL
 								resizeType : 1,//2或1或0，2时可以拖动改变宽度和高度，1时只能改变高度，0时不能拖动。默认值: 2 
+								autoHeightMode : true,//自适应高度
 								allowPreviewEmoticons : true,//true或false，true时鼠标放在表情上可以预览表情
 								allowImageUpload : true,//true时显示图片上传按钮
 								uploadJson :'user/control/comment/uploadImage.htm?topicId='+topicId,//指定浏览远程图片的服务器端程序

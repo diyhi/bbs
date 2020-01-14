@@ -480,6 +480,12 @@ html,body{
 .topicContentModule .topicDetail .main img{
 	max-width:100%;height:auto;border:none;background:none;padding:0;
 }
+.topicContentModule .topicDetail .main iframe{
+	width:100%; height: 300px;padding:10px 0px; 
+}
+.topicContentModule .topicDetail .main video{
+	width:100%; height: 300px;padding:10px 0px; outline:none;
+}
 .topicContentModule .topicDetail .main hide{
 	display:block;
 	background: #fbfbfb;
@@ -1896,6 +1902,73 @@ html,body{
 	position: relative;
 	top: -1px;
 }
+.homeModule .userDynamicList .item .main .hideTagType{
+	font-size:0;/*父级元素设置font-size:0; 解决 display：inline-block两个元素之间的默认空格 */
+	position: relative;
+	top: -1px;
+}
+.homeModule .userDynamicList .item .main .hideTagType .circle{
+	border-radius:10px;display: inline-block;margin-right:5px;
+	width: 20px;height: 20px;
+	position:relative;
+}
+.homeModule .userDynamicList .item .main .hideTagType .circle i{
+	font-size: 12px;line-height: 20px; margin-left: 5px;
+}
+.homeModule .userDynamicList .item .main .hideTagType .point:before{
+	content: ' ';
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    border-radius: 2px;
+    top: 13px;
+    left: 8px;
+}
+.homeModule .userDynamicList .item .main .hide_10 .circle{
+	background: #ebebeb;
+}
+.homeModule .userDynamicList .item .main .hide_10 .point:before{
+	background-color: #ebebeb;
+}
+.homeModule .userDynamicList .item .main .hide_10 .circle i{
+	color: #b2b2b2;
+}
+.homeModule .userDynamicList .item .main .hide_20 .circle{
+	background: #bbf9d5;
+}
+.homeModule .userDynamicList .item .main .hide_20 .point:before{
+	background-color: #bbf9d5;
+}
+.homeModule .userDynamicList .item .main .hide_20 .circle i{
+	color: #21de70;
+}
+.homeModule .userDynamicList .item .main .hide_30 .circle{
+	background: #bfebfb;
+}
+.homeModule .userDynamicList .item .main .hide_30 .point:before{
+	background-color: #bfebfb;
+}
+.homeModule .userDynamicList .item .main .hide_30 .circle i{
+	color: #27c3fc;
+}
+.homeModule .userDynamicList .item .main .hide_40 .circle{
+	background: #e2cffe;
+}
+.homeModule .userDynamicList .item .main .hide_40 .point:before{
+	background-color: #e2cffe;
+}
+.homeModule .userDynamicList .item .main .hide_40 .circle i{
+	color: #af82f2;
+}
+.homeModule .userDynamicList .item .main .hide_50 .circle{
+	background: #fedbb2;
+}
+.homeModule .userDynamicList .item .main .hide_50 .point:before{
+	background-color: #fedbb2;
+}
+.homeModule .userDynamicList .item .main .hide_50 .circle i{
+	color: #fe9d2d;
+}
 .homeModule .userDynamicList .item .main .topicContent{
 	margin: 10px 0px 10px 30px;
 	min-height: 40px;
@@ -1914,6 +1987,12 @@ html,body{
 }
 .homeModule .userDynamicList .item .main .topicContent img{
 	max-width:100%;height:auto;border:none;background:none;padding:0;
+}
+.homeModule .userDynamicList .item .main .topicContent iframe{
+	width:100%; height: 400px;padding:10px 0px; 
+}
+.homeModule .userDynamicList .item .main .topicContent video{
+	width:100%; height: 400px;padding:10px 0px; outline:none;
 }
 .homeModule .userDynamicList .item .main .topicContent hide{
 	display:block;

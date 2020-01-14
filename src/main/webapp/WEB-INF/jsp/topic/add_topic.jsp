@@ -9,11 +9,10 @@
 <LINK href="backstage/css/list.css" type="text/css" rel="stylesheet">
 <LINK href="backstage/css/table.css" type="text/css" rel="stylesheet">
 <script language="JavaScript" src="backstage/jquery/jquery.min.js"></script>
-<link href="backstage/kindeditor/themes/default/default.css" rel="stylesheet"/>
-<link href="backstage/kindeditor/plugins/hide/hide.css" rel="stylesheet"/>
-<script charset="utf-8" src="backstage/kindeditor/kindeditor-min.js"></script>
-<script charset="utf-8" src="backstage/kindeditor/lang/zh-CN.js"></script>
 
+<script charset="utf-8" src="backstage/kindeditor/kindeditor-min.js"></script>
+
+<script type="text/javascript" src="backstage/js/json3.js" language="javascript" ></script>
 <script type="text/javascript" src="backstage/js/ajax.js" language="javascript" ></script>
 <script type="text/javascript" src="backstage/js/Tool.js" charset="UTF-8"></script>
 
@@ -249,6 +248,7 @@ function initKindEditor(){
 		
 		editor = K.create('textarea[name="content"]', {
 			basePath : '${config:url(pageContext.request)}backstage/kindeditor/',//指定编辑器的根目录路径
+			themeType : 'style :darkGray',//深灰主题 加冒号的是主题样式文件名称同时也是主题目录
 		//	autoHeightMode : true,//值为true，并引入autoheight.js插件时自动调整高度
 			formatUploadUrl :false,//false时不会自动格式化上传后的URL
 			resizeType : 1,//2或1或0，2时可以拖动改变宽度和高度，1时只能改变高度，0时不能拖动。默认值: 2 
@@ -260,10 +260,10 @@ function initKindEditor(){
 			items : ['source', '|', 'preview', 'template', 'code',
         '|', 'justifyleft', 'justifycenter', 'justifyright',
         'justifyfull', 'insertorderedlist', 'insertunorderedlist', 'indent', 'outdent', 'subscript',
-        'superscript', 'clearhtml', 'quickformat', 'selectall', '|', 'fullscreen', 
-        'formatblock', 'fontname', 'fontsize', '/', 'forecolor', 'hilitecolor', 'bold',
+        'superscript', 'clearhtml', 'quickformat', 'selectall', '|',
+        'formatblock', 'fontname',  'fontsize','fullscreen',  '/', 'forecolor', 'hilitecolor', 'bold',
         'italic', 'underline', 'strikethrough', 'lineheight', 'removeformat', '|', 'image', 'multiimage',
-         'media', 'insertfile','emoticons','baidumap', 'table', 'hr',   'pagebreak',
+         'media','embedVideo','uploadVideo', 'insertfile','emoticons','baidumap', 'table', 'hr',   'pagebreak',
          'link', 'unlink','hide','hidePassword','hideComment','hideGrade','hidePoint'],
          	userGradeList:userGradeList_obj,
 			afterChange : function() {

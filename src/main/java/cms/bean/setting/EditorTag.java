@@ -59,6 +59,16 @@ public class EditorTag implements Serializable{
 	/** 允许上传文件大小 **/
 	private Long fileSize;
 	
+	/** 允许嵌入视频 **/
+	private boolean embedVideo = false;
+	
+	/** 允许上传视频 **/
+	private boolean uploadVideo = false;
+	/** 允许上传视频格式 **/
+	private List<String> videoFormat = new ArrayList<String>();
+	/** 允许上传视频大小 **/
+	private Long videoSize;
+	
 	/** 输入密码可见 **/
 	private boolean hidePassword = false;
 	/** 评论话题可见 **/
@@ -69,6 +79,10 @@ public class EditorTag implements Serializable{
 	private boolean hidePoint = false;
 	/** 余额购买可见 **/
 	private boolean hideAmount = false;
+	
+	/** 全屏显示 **/
+	private boolean fullscreen = false;
+	
 	
 	/**
 	 * 添加图片格式
@@ -260,6 +274,48 @@ public class EditorTag implements Serializable{
 
 	public void setFile(boolean file) {
 		this.file = file;
+	}
+
+	
+
+	public boolean isEmbedVideo() {
+		return embedVideo;
+	}
+
+	public void setEmbedVideo(boolean embedVideo) {
+		this.embedVideo = embedVideo;
+	}
+
+	public boolean isUploadVideo() {
+		return uploadVideo;
+	}
+
+	public void setUploadVideo(boolean uploadVideo) {
+		this.uploadVideo = uploadVideo;
+	}
+
+	public List<String> getVideoFormat() {
+		return videoFormat;
+	}
+
+	public void setVideoFormat(List<String> videoFormat) {
+		this.videoFormat = videoFormat;
+	}
+
+	public Long getVideoSize() {
+		return videoSize;
+	}
+
+	public void setVideoSize(Long videoSize) {
+		this.videoSize = videoSize;
+	}
+
+	public boolean isFullscreen() {
+		return fullscreen;
+	}
+
+	public void setFullscreen(boolean fullscreen) {
+		this.fullscreen = fullscreen;
 	}
 
 }

@@ -54,13 +54,17 @@ $.ajaxSettings = $.extend($.ajaxSettings, {
 Vue.component('v-select', VueSelect.VueSelect);
 
 //Vue.component('vue-cropper', window['vue-cropper'].default);
+Vue.use(VueViewer.default);
 
+
+/**
 //图片预览组件
-Vue.use(vuePhotoPreview,{
-	fullscreenEl:false, //关闭全屏按钮
-	history: true //禁用历史记录模块 预览图时后退是退出预览弹出层
+Vue.use(Viewer, {
+	defaultOptions: {
+		zIndex: 9999
+	}
 });
-
+**/
 
 
 //定时查询消息
@@ -171,6 +175,18 @@ var index_component = Vue.extend({
 				topic: '',
 			},
 			
+			
+			pictureOptions: {//放大图片配置
+		        url: 'data-src',//定义从何处获取原始图像URL进行查看
+		        navbar:true, //导航栏
+		        title:false, //标题
+		        toolbar:false, //工具栏
+		        loop:false, //是否启用循环查看
+		        viewed : function(e) {
+		        //	this.viewer.zoomTo(1);
+		        }
+		    },
+			
 			tagList:'',//标签集合
 			
 			//标签数据
@@ -231,6 +247,7 @@ var index_component = Vue.extend({
 		this.initialization();
 	},
 	methods : {
+	
 		//显示话题列表
 		showTopicList : function(back){
 		    this.show_topic = true;//显示话题页
@@ -270,6 +287,7 @@ var index_component = Vue.extend({
 						var new_topicList = pageView.records;
 						if (new_topicList != null && new_topicList.length > 0) {
 							_self.topicList = new_topicList;
+							
 						}
 						_self.currentpage = pageView.currentpage;
 						_self.totalpage = pageView.totalpage;
@@ -284,6 +302,23 @@ var index_component = Vue.extend({
 						}else{
 							_self.next = '';
 						}
+						
+						/**
+						//生成首字符头像
+						_self.$nextTick(function() {
+							if (_self.topicList != null && _self.topicList.length > 0) {
+								for(var i=0;i<_self.topicList.length; i++){
+									var topic = _self.topicList[i];
+									if(topic.avatarName == null || topic.avatarName == ''){
+										var char = (topic.nickname != null && topic.nickname !="") ? topic.nickname : topic.userName;
+										//元素的实际宽度
+										var width= _self.$refs['avatarData_'+topic.id][0].offsetWidth;
+										_self.$refs['avatarData_'+topic.id][0].src = letterAvatar(char, width);	
+									}
+								}
+							}
+						});
+						**/
 						
 					}
 				}
@@ -367,6 +402,12 @@ var index_component = Vue.extend({
 								editorIconList.push("emoticon");
 							}else if(_availableTag == "image"){//图片
 								editorIconList.push("image");
+							}else if(_availableTag == "media"){//视频
+								editorIconList.push("video");
+							}else if(_availableTag == "embedVideo"){//嵌入视频
+								editorIconList.push("embedVideo");
+							}else if(_availableTag == "uploadVideo"){//上传视频
+								editorIconList.push("uploadVideo");
 							}else if(_availableTag == "insertfile"){//文件
 								editorIconList.push("file");
 							}else if(_availableTag == "hidePassword"){//输入密码可见
@@ -751,6 +792,20 @@ var thread_component = Vue.extend({
 			alreadyLiked:false,//用户是否已经点赞该话题
 			likeCount : 0,//话题用户点赞总数
 			hidePasswordIndex:0,//隐藏标签密码框索引
+			
+			pictureOptions: {//放大图片配置
+		        url: 'src',//定义从何处获取原始图像URL进行查看
+		        navbar : true, //导航栏
+		        title : false, //标题
+		        toolbar : false, //工具栏
+		        loop:false, //是否启用循环查看
+		        filter : function(image) {
+		        	return image.dataset.enable != 'false';//将不允许放大的表情图片过滤
+		        },
+		        viewed : function(e) {
+		        //	this.viewer.zoomTo(1);
+		        }
+		    },
 		};
 	},
 	
@@ -797,7 +852,16 @@ var thread_component = Vue.extend({
 				};
 			};	
 		},
-		
+		//动态解析评论模板数据
+		commentDataComponent: function commentDataComponent() {
+			return function (commentContentData) {
+				return {
+					template: commentContentData, // use content as template for this component
+					props: this.$options.props, // re-use current props definitions
+					
+				};
+			};	
+		},
 		//动态解析隐藏标签模板数据
 		hideTagComponent: function hideTagComponent() {
 			return function (html) {
@@ -926,6 +990,11 @@ var thread_component = Vue.extend({
 		//查询话题
 		queryTopic : function(event) {
 			var _self = this;
+			var _topic =new Object();//请求数据前显示
+			_topic.content = "";
+			_self.topic = _topic;
+			
+			
 			var data = "topicId=" + _self.topicId; //提交参数
 			$.ajax({
 				type : "GET",
@@ -937,13 +1006,15 @@ var thread_component = Vue.extend({
 					if (result != "") {
 						var topic = $.parseJSON(result);
 						if (topic != null) {
+							
 							//处理隐藏标签
 							var contentNode = document.createElement("div");
 							contentNode.innerHTML = topic.content;
+							
 							_self.hidePasswordIndex = 0;
-							_self.getChildNode(contentNode);
+							_self.bindNode(contentNode);
 							topic.content = contentNode.innerHTML;
-
+							
 							_self.topic = topic;
 						}
 					}
@@ -952,8 +1023,9 @@ var thread_component = Vue.extend({
 		},
 		
 		
-		//递归获取所有的子节点
-		getChildNode : function(node) {
+		
+		//递归绑定节点参数
+		bindNode : function(node) {
 			//先找到子节点
 	        var nodeList = node.childNodes;
 	        for(var i = 0;i < nodeList.length;i++){
@@ -963,6 +1035,7 @@ var thread_component = Vue.extend({
 	            var random = Math.random().toString().slice(2);
 	            //判断是否是元素节点。如果节点是元素(Element)节点，则 nodeType 属性将返回 1。如果节点是属性(Attr)节点，则 nodeType 属性将返回 2。
 	            if(childNode.nodeType == 1){
+	            	//处理隐藏内容
 	            	if(childNode.nodeName.toLowerCase() == "hide" ){
 	            		if(childNode.getAttribute("hide-type") == "10"){//输入密码可见
 	            			var nodeHtml = "";
@@ -1013,8 +1086,17 @@ var thread_component = Vue.extend({
 	            			childNode.innerHTML = nodeHtml;
 	    				}
 	            	}
-	               
-	            	this.getChildNode(childNode);
+	            	//处理图片放大
+	            	if(childNode.nodeName.toLowerCase() == "img" ){
+	            		var src = childNode.getAttribute("src");
+	            		
+	            		if(childNode.getAttribute("width") == null){//不是表情图片
+	            			childNode.setAttribute("key",random+"_"+i);
+	            		}else{
+	            			childNode.setAttribute("data-enable","false");//标记不显示放大图
+	            		}
+	            	}
+	            	this.bindNode(childNode);
 	            }
 	        }
 	    },
@@ -1265,7 +1347,7 @@ var thread_component = Vue.extend({
 						var pageView = $.parseJSON(result);
 						var new_commentList = pageView.records;
 						if (new_commentList != null && new_commentList.length > 0) {
-							_self.commentList = new_commentList;
+							
 							
 							for (var i = 0; i <new_commentList.length; i++) {
 								var comment = new_commentList[i];
@@ -1285,7 +1367,16 @@ var thread_component = Vue.extend({
 									_self.$set(_self.quoteData, comment.id, quoteContent);
 								}
 								
+								//处理图片放大标签
+								var contentNode = document.createElement("div");
+								contentNode.innerHTML = comment.content;
+								_self.bindNode(contentNode);
+								comment.content = contentNode.innerHTML;
+								
+								
 							}
+
+							_self.commentList = new_commentList;
 							
 						}
 						_self.currentpage = pageView.currentpage;
@@ -2311,6 +2402,20 @@ var question_component = Vue.extend({
 			
 			alreadyFavoriteQuestion :false,//用户是否已经收藏问题
 			questionFavoriteCount : 0,//问题用户收藏总数
+			
+			pictureOptions: {//放大图片配置
+		        url: 'src',//定义从何处获取原始图像URL进行查看
+		        navbar : true, //导航栏
+		        title : false, //标题
+		        toolbar : false, //工具栏
+		        loop:false, //是否启用循环查看
+		        filter : function(image) {
+		        	return image.dataset.enable != 'false';//将不允许放大的表情图片过滤
+		        },
+		        viewed : function(e) {
+		        //	this.viewer.zoomTo(1);
+		        }
+		    },
 		};
 	},
 	
@@ -2348,7 +2453,18 @@ var question_component = Vue.extend({
 			this.scroll = null;
 		}
 	},
-	
+	computed: {
+		//动态解析模板数据
+		analyzeDataComponent: function analyzeDataComponent() {
+			return function (questionContentData) {
+				return {
+					template: questionContentData, // use content as template for this component
+					props: this.$options.props, // re-use current props definitions
+					
+				};
+			};	
+		},
+	},
 	methods : {
 		//显示问题内容界面
 		showQuestion : function(back){
@@ -2364,6 +2480,7 @@ var question_component = Vue.extend({
 		//查询问题
 		queryQuestion : function() {
 			var _self = this;
+
 			var data = "questionId=" + _self.questionId; //提交参数
 			$.ajax({
 				type : "GET",
@@ -2375,13 +2492,70 @@ var question_component = Vue.extend({
 					if (result != "") {
 						var question = $.parseJSON(result);
 						if (question != null) {
+							
+							//处理隐藏标签
+							var contentNode = document.createElement("div");
+							contentNode.innerHTML = question.content;
+							
+							_self.bindNode(contentNode);
+							question.content = contentNode.innerHTML;
+					
+							if(question.appendQuestionItemList != null && question.appendQuestionItemList.length >0){
+								for(var i=0; i<question.appendQuestionItemList.length; i++){
+									var appendQuestionItem = question.appendQuestionItemList[i];
+									
+									//处理图片放大标签
+									var contentNode2 = document.createElement("div");
+									contentNode2.innerHTML = appendQuestionItem.content;
+									_self.bindNode(contentNode2);
+									appendQuestionItem.content = contentNode2.innerHTML;
+									
+									
+								}
+								
+							}
+							
+							
 							_self.question = question;
+							
+							
 						}
 					}
 				}
 			});
 			
 		},
+		
+		
+		//递归绑定节点参数
+		bindNode : function(node) {
+			//先找到子节点
+	        var nodeList = node.childNodes;
+	        for(var i = 0;i < nodeList.length;i++){
+	            //childNode获取到到的节点包含了各种类型的节点
+	            //但是我们只需要元素节点  通过nodeType去判断当前的这个节点是不是元素节点
+	        	var childNode = nodeList[i];
+	            var random = Math.random().toString().slice(2);
+	            //判断是否是元素节点。如果节点是元素(Element)节点，则 nodeType 属性将返回 1。如果节点是属性(Attr)节点，则 nodeType 属性将返回 2。
+	            if(childNode.nodeType == 1){
+	            	if(childNode.nodeName.toLowerCase() == "img" ){
+	            		var src = childNode.getAttribute("src");
+	            		
+	            		if(childNode.getAttribute("width") == null){//不是表情图片
+	            			childNode.setAttribute("key",random+"_"+i);
+	            		}else{
+	            			childNode.setAttribute("data-enable","false");//标记不显示放大图
+	            		}
+	            	}
+	            	
+	            	this.bindNode(childNode);
+	            }
+	        }
+		},
+		
+		
+		
+		
 		//查询用户是否已经收藏问题
 		queryAlreadyFavoriteQuestion : function() {
 			var _self = this;
@@ -2517,12 +2691,20 @@ var question_component = Vue.extend({
 						var pageView = $.parseJSON(result);
 						var new_answerList = pageView.records;
 						if (new_answerList != null && new_answerList.length > 0) {
-							_self.answerList = new_answerList;
 							
 							for (var i = 0; i <new_answerList.length; i++) {
 								var answer = new_answerList[i];
 								_self.$set(_self.replyExpandOrShrink, answer.id, false); //是否展开	
+								
+								//处理图片放大标签
+								var contentNode = document.createElement("div");
+								contentNode.innerHTML = answer.content;
+								_self.bindNode(contentNode);
+								answer.content = contentNode.innerHTML;
 							}
+							_self.answerList = new_answerList;
+							
+							
 							
 						}
 						_self.currentpage = pageView.currentpage;
@@ -5246,7 +5428,22 @@ var home_component = Vue.extend({
 			hidePasswordIndex:0,//隐藏标签密码框索引
 			favoriteCountGroup:[],//话题收藏总数组
 			likeCountGroup:[],//话题点赞总数组
-			following:false//是否已经关注该用户
+			questionFavoriteCountGroup:[],//问题收藏总数组
+			following:false,//是否已经关注该用户
+			
+			pictureOptions: {//放大图片配置
+		        url: 'src',//定义从何处获取原始图像URL进行查看
+		        navbar : true, //导航栏
+		        title : false, //标题
+		        toolbar : false, //工具栏
+		        loop:false, //是否启用循环查看
+		        filter : function(image) {
+		        	return image.dataset.enable != 'false';//将不允许放大的表情图片过滤
+		        },
+		        viewed : function(e) {
+		        //	this.viewer.zoomTo(1);
+		        }
+		    },
 		}
 	},
 	created : function created() {
@@ -5262,6 +5459,17 @@ var home_component = Vue.extend({
 	    'vue-cropper': window['vue-cropper'].default
 	},
 	computed: {
+		//动态解析模板数据
+		analyzeDataComponent: function analyzeDataComponent() {
+			return function (questionContentData) {
+				return {
+					template: questionContentData, // use content as template for this component
+					props: this.$options.props, // re-use current props definitions
+					
+				};
+			};	
+		},
+		
 		//动态解析评论引用模板数据
 		quoteDataComponent: function quoteDataComponent() {
 			return function (quoteContentData) {
@@ -5661,6 +5869,7 @@ var home_component = Vue.extend({
 			this.hidePasswordIndex=0;//隐藏标签密码框索引	
 			this.favoriteCountGroup = [];//话题收藏总数组
 			this.likeCountGroup = [];//话题点赞总数组
+			this.questionFavoriteCountGroup = [];//问题收藏总数组
 			//查询动态列表
 			this.queryUserDynamicList();
 		},
@@ -5710,15 +5919,16 @@ var home_component = Vue.extend({
 									var userDynamic =  new_userDynamicList[i];
 									_self.favoriteCountGroup.push(0);
 									_self.likeCountGroup.push(0);
+									_self.questionFavoriteCountGroup.push(0);
 									if(userDynamic.module == 100){
 										//处理隐藏标签
 										var contentNode = document.createElement("div");
 										contentNode.innerHTML = userDynamic.topicContent;
 										_self.hidePasswordIndex = 0;
-										_self.getChildNode(contentNode,userDynamic.topicId);
+										_self.bindNode(contentNode,userDynamic.topicId);
 										userDynamic.topicContent = contentNode.innerHTML;
 										
-										//收藏数量
+										//话题收藏数量
 										_self.queryFavoriteCount(userDynamic.topicId,_self.favoriteCountGroup.length-1,function(index,count) {
 											if(count != null && count != ''){
 												_self.$set(_self.favoriteCountGroup, index, parseInt(count));
@@ -5734,7 +5944,37 @@ var home_component = Vue.extend({
 										});
 										
 										
+									}else if(userDynamic.module == 200){
+										//处理图片标签
+										var contentNode = document.createElement("div");
+										contentNode.innerHTML = userDynamic.commentContent;
+										_self.bindNode(contentNode,null);
+										userDynamic.commentContent = contentNode.innerHTML;
+									}else if(userDynamic.module == 500){
+										//问题收藏数量
+										_self.queryQuestionFavoriteCount(userDynamic.questionId,_self.questionFavoriteCountGroup.length-1,function(index,count) {
+											if(count != null && count != ''){
+												_self.$set(_self.questionFavoriteCountGroup, index, parseInt(count));
+											}
+											
+										});
+										//处理图片标签
+										var contentNode = document.createElement("div");
+										contentNode.innerHTML = userDynamic.questionContent;
+										_self.bindNode(contentNode,null);
+										userDynamic.questionContent = contentNode.innerHTML;
+									}else if(userDynamic.module == 600){
+										//处理图片标签
+										var contentNode = document.createElement("div");
+										contentNode.innerHTML = userDynamic.answerContent;
+										_self.bindNode(contentNode,null);
+										userDynamic.answerContent = contentNode.innerHTML;
 									}
+									
+									
+									
+									
+									
 								}
 								
 								_self.userDynamicList.push.apply(_self.userDynamicList, new_userDynamicList); //合并两个数组
@@ -5755,7 +5995,7 @@ var home_component = Vue.extend({
 			}	
 		},
 		//递归获取所有的子节点
-		getChildNode : function(node,topicId) {
+		bindNode : function(node,topicId) {
 			//先找到子节点
 	        var nodeList = node.childNodes;
 	        for(var i = 0;i < nodeList.length;i++){
@@ -5815,8 +6055,22 @@ var home_component = Vue.extend({
 	            			childNode.innerHTML = nodeHtml;
 	    				}
 	            	}
-	               
-	            	this.getChildNode(childNode,topicId);
+	            	//处理图片放大
+	            	if(childNode.nodeName.toLowerCase() == "img" ){
+	            		var src = childNode.getAttribute("src");
+	            		
+	            		if(childNode.getAttribute("width") == null){//不是表情图片
+	            			childNode.setAttribute("key",random+"_"+i);
+	            		}else{
+	            			childNode.setAttribute("data-enable","false");//标记不显示放大图
+	            		}
+	            	}
+	            	//处理视频标签
+	            	if(childNode.nodeName.toLowerCase() == "video" ){
+	            		//将所有video标签加上preload ="none"属性，让浏览器不加载视频文件
+	            		childNode.setAttribute("preload","none");
+	            	}
+	            	this.bindNode(childNode,topicId);
 	            }
 	        }
 	    },
@@ -5867,6 +6121,32 @@ var home_component = Vue.extend({
 				}
 			});
 		},
+		
+		//查询问题用户收藏总数
+		queryQuestionFavoriteCount : function(questionId,index,callback) {
+			var _self = this;
+			var data = "questionId=" + questionId; //提交参数
+			$.ajax({
+				type : "GET",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "queryQuestionFavoriteCount",
+				data : data,
+				success : function success(result) {
+					if (result != "") {
+						var count = $.parseJSON(result);
+						if (count != null) {
+							
+							callback(index,count);
+						//	_self.favoriteCount = count;
+						}
+					}
+				}
+			});
+		},
+		
+		
+		
 		
 		//显示'用户设置'			
 		displayUserSetting : function() {
@@ -9893,6 +10173,12 @@ var editTopic_component = Vue.extend({
 										editorIconList.push("emoticon");
 									}else if(_availableTag == "image"){//图片
 										editorIconList.push("image");
+									}else if(_availableTag == "media"){//视频
+										editorIconList.push("video");
+									}else if(_availableTag == "embedVideo"){//嵌入视频
+										editorIconList.push("embedVideo");
+									}else if(_availableTag == "uploadVideo"){//上传视频
+										editorIconList.push("uploadVideo");
 									}else if(_availableTag == "insertfile"){//文件
 										editorIconList.push("file");
 									}else if(_availableTag == "hidePassword"){//输入密码可见
@@ -9950,7 +10236,8 @@ var editTopic_component = Vue.extend({
 			if (_self.topicTitle != null && _self.topicTitle != "") {
 				parameter += "&title=" + encodeURIComponent(_self.topicTitle);
 			}
-
+			
+			
 			parameter += "&content=" + encodeURIComponent(_self.topicEditor.txt.html());
 			
 			
@@ -10675,8 +10962,48 @@ function getObjectURL(file) {
 	}
 	return url;
 }
-
-
+//生成字母头像
+function letterAvatar (name, size, color) {
+	name  = name || '';
+	size  = size || 60;
+	var colours = [
+			"#eccc68", "#ff7f50", "#ff6b81", "#ffa502", "#747d8c", "#ff4757", "#7bed9f", "#70a1ff", "#8e44ad", "#2ed573", 
+			"#1e90ff", "#a4b0be", "#ff6348", "#ff9ff3", "#f368e0", "#48dbfb", "#badc58", "#6ab04c", "#0fbcf9", "#f9ca24"
+		],
+		nameSplit = String(name).split(' '),
+		initials, charIndex, colourIndex, canvas, context, dataURI;
+	if (nameSplit.length == 1) {
+		initials = nameSplit[0] ? nameSplit[0].charAt(0):'?';
+	} else {
+		initials = nameSplit[0].charAt(0) + nameSplit[1].charAt(0);
+	}
+	if (window.devicePixelRatio) {
+		size = (size * window.devicePixelRatio);
+	}
+	
+	
+	charIndex     = (initials == '?' ? 72 : initials.charCodeAt(0)) - 64;
+	colourIndex   = charIndex % 20;
+	canvas        = document.createElement('canvas');
+	canvas.width  = size;
+	canvas.height = size;
+	context       = canvas.getContext("2d");
+	 
+	//偏移
+	var offset = 0;
+	if(/^[\u4E00-\u9FA5]+$/.test(initials)){ //如果是中文
+		offset = 1;
+	}
+	context.fillStyle = color ? color : colours[colourIndex - 1];
+	context.fillRect (0, 0, canvas.width, canvas.height);
+	context.font = Math.round(canvas.width/2)+"px Arial";
+	context.textAlign = "center";
+	context.fillStyle = "#FFF";
+	context.fillText(initials, (size / 2)+offset, (size / 1.5)+offset);
+	dataURI = canvas.toDataURL();
+	canvas  = null;
+	return dataURI;
+}
 //创建富文本编辑器
 function createEditor(editorToolbar,editorText,commonPath,menus,userGradeList,imgPath,self,param) {
 	var E = window.wangEditor;
@@ -10723,20 +11050,50 @@ function createEditor(editorToolbar,editorText,commonPath,menus,userGradeList,im
     
     
     var emoticonList_1 = new Array();
-    for(var i=0; i<50; i++){
+    for(var i=0; i<35; i++){
     	var o=new Object();
     	o.alt = '';
-    	o.src = new_commonPath+'pc/js/kindeditor/plugins/emoticons/images/'+i+'.gif';
+    	o.width = '32px';
+    	o.height = '32px';
+    	o.src = new_commonPath+'pc/js/kindeditor/plugins/emoticons/twemoji/'+i+'.svg';
     	emoticonList_1.push(o);
     }
     var emoticonList_2 = new Array();
-    for(var i=50; i<90; i++){
+    for(var i=35; i<70; i++){
     	var o=new Object();
     	o.alt = '';
-    	o.src = new_commonPath+'pc/js/kindeditor/plugins/emoticons/images/'+i+'.gif';
+    	o.width = '32px';
+    	o.height = '32px';
+    	o.src = new_commonPath+'pc/js/kindeditor/plugins/emoticons/twemoji/'+i+'.svg';
     	emoticonList_2.push(o);
     }
-    
+    var emoticonList_3 = new Array();
+    for(var i=70; i<105; i++){
+    	var o=new Object();
+    	o.alt = '';
+    	o.width = '32px';
+    	o.height = '32px';
+    	o.src = new_commonPath+'pc/js/kindeditor/plugins/emoticons/twemoji/'+i+'.svg';
+    	emoticonList_3.push(o);
+    }
+    var emoticonList_4 = new Array();
+    for(var i=105; i<140; i++){
+    	var o=new Object();
+    	o.alt = '';
+    	o.width = '32px';
+    	o.height = '32px';
+    	o.src = new_commonPath+'pc/js/kindeditor/plugins/emoticons/twemoji/'+i+'.svg';
+    	emoticonList_4.push(o);
+    }
+    var emoticonList_5 = new Array();
+    for(var i=140; i<152; i++){
+    	var o=new Object();
+    	o.alt = '';
+    	o.width = '32px';
+    	o.height = '32px';
+    	o.src = new_commonPath+'pc/js/kindeditor/plugins/emoticons/twemoji/'+i+'.svg';
+    	emoticonList_5.push(o);
+    }
     // 表情面板可以有多个 tab ，因此要配置成一个数组。数组每个元素代表一个 tab 的配置
     editor.customConfig.emotions = [
         {
@@ -10754,6 +11111,30 @@ function createEditor(editorToolbar,editorText,commonPath,menus,userGradeList,im
             type: 'image',
             // content -> 数组
             content: emoticonList_2
+        },
+        {
+            // tab 的标题
+            title: '表情3',
+            // type -> 'emoji' / 'image'
+            type: 'image',
+            // content -> 数组
+            content: emoticonList_3
+        },
+        {
+            // tab 的标题
+            title: '表情4',
+            // type -> 'emoji' / 'image'
+            type: 'image',
+            // content -> 数组
+            content: emoticonList_4
+        },
+        {
+            // tab 的标题
+            title: '表情5',
+            // type -> 'emoji' / 'image'
+            type: 'image',
+            // content -> 数组
+            content: emoticonList_5
         }
     ]
     
@@ -10868,8 +11249,58 @@ function createEditor(editorToolbar,editorText,commonPath,menus,userGradeList,im
 		});
     	
     	
+    },
+    //视频上传
+    editor.customConfig.customUploadVideo = function (files, insert) {
+    	// files 是 input 中选中的文件列表
+        // insert 是获取图片 url 后，插入到编辑器的方法
+    	
+    	var formData = new FormData();
+    	Array.prototype.forEach.call(files, function(file) {
+    		formData.append(editor.customConfig.uploadFileName, file);
+    		
+    	});
+		//令牌
+	//	formData.append("token", store.state.token);
+    	
+    	var uploadImgServer = editor.customConfig.uploadImgServer;
+    	if (uploadImgServer.indexOf('?') > 0) {
+            uploadImgServer += '&';
+        } else {
+            uploadImgServer += '?';
+        }
+        uploadImgServer +=  'dir=media';
+    	
+    	
+		$.ajax({
+			type : "POST",
+			cache : false,
+			async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+			url : uploadImgServer,
+			data : formData,
+			contentType : false, // 不设置内容类型
+			processData : false, // 不处理数据
+			success : function success(result) {
+				if (result != "") {
+					var returnValue = $.parseJSON(result);
+					if(returnValue.error ==0){
+			    		// 举例：假如上传文件成功后，服务器端返回的是 {url:'....'} 这种格式，即可这样插入图片：
+				        var url = returnValue.url;
+				        var title = returnValue.title;
+				     // 上传代码返回结果之后，将文件插入到编辑器中
+				        insert(url,title);
+			    		// result 必须是一个 JSON 格式字符串！！！否则报错
+			    	}else{
+			    		//弹出提示内容
+						Vue.$messagebox('错误', returnValue.message);
+			    	} 
+					
+				}
+			}
+		});
+    	
+    	
     }
-    
     /**
     editor.customConfig.uploadImgHooks = {
 	    // 如果服务器端返回的不是 {errno:0, data: [...]} 这种格式，可使用该配置

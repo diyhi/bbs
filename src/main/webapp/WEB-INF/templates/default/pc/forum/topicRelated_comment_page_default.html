@@ -16,7 +16,8 @@
 						<#if comment.avatarName != null>
 							<img src="${comment.avatarPath}100x100/${comment.avatarName}" >
 						<#else>
-							<img src="${commonPath}images/min_avata.png" >
+							<!--[if (IE)]><img src="${commonPath}images/min_avata.png"><![endif]-->
+							<!--[if !(IE)]><!--><img avatar="${(comment.nickname != null && comment.nickname??) ?string(comment.nickname , comment.userName)}" ><!--<![endif]-->
 						</#if> 
 						<cite>
 							<a href="user/control/home?userName=${comment.userName}">
@@ -54,8 +55,9 @@
 												<#if reply.avatarName != null>
 													<img src="${reply.avatarPath}100x100/${reply.avatarName}" >
 												<#else>
-													<img src="${commonPath}images/min_avata.png" >
-												</#if>
+													<!--[if (IE)]><img src="${commonPath}images/min_avata.png"><![endif]-->
+													<!--[if !(IE)]><!--><img avatar="${(reply.nickname != null && reply.nickname??) ?string(reply.nickname , reply.userName)}" ><!--<![endif]-->
+												</#if> 
 											</a>
 									    	<a class="userName" href="user/control/home?userName=${reply.userName}">
 												${(reply.nickname != null && reply.nickname??) ?string(reply.nickname , reply.userName)}

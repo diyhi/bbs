@@ -120,6 +120,18 @@ function selectFile(module,value){
 		document.getElementById(module+"FileSize_tr").style.display = "none";
 	}
 }
+//选择上传视频参数
+function selectUploadVideo(module,value){
+	if(value == "true"){
+	
+		document.getElementById(module+"UploadVideoFormat_tr").style.display = "";
+		document.getElementById(module+"UploadVideoSize_tr").style.display = "";
+		
+	}else{
+		document.getElementById(module+"UploadVideoFormat_tr").style.display = "none";
+		document.getElementById(module+"UploadVideoSize_tr").style.display = "none";
+	}
+}
 
 
 //关闭站点提示
@@ -790,6 +802,13 @@ function setAllowFilterWord(obj){
 			    </TD>
 			</TR>
 			<TR>
+			    <TD class="t-label t-label-h" width="20%">全屏显示<span class="toolbar-icon-url icon-fullscreen"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="topicEditorTagObject.fullscreen" value="true"/>打开</label>
+			    	<label><form:radiobutton path="topicEditorTagObject.fullscreen" value="false"/>关闭</label>
+			    </TD>
+			</TR>
+			<TR>
 			    <TD class="t-label t-label-h" width="20%">图片<span class="toolbar-icon-url icon-image"></span>：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">
 			    	<label><form:radiobutton path="topicEditorTagObject.image" value="true" onclick="selectImage('topic',this.value);"/>打开</label>
@@ -799,12 +818,11 @@ function setAllowFilterWord(obj){
 			<TR id="topicImageFormat_tr" <c:if test="${systemSetting.topicEditorTagObject.image == false}"> style="display: none;"</c:if>>
 			    <TD class="t-label t-label-h" width="20%">允许上传图片格式：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">
-			    	<label><form:checkbox path="topicEditorTagObject.imageFormat" value="JPG"/>JPG</label>
-			    	<label><form:checkbox path="topicEditorTagObject.imageFormat" value="JPEG"/>JPEG</label>
-			    	<label><form:checkbox path="topicEditorTagObject.imageFormat" value="BMP"/>BMP</label>
-			    	<label><form:checkbox path="topicEditorTagObject.imageFormat" value="PNG"/>PNG</label>
-			    	<label><form:checkbox path="topicEditorTagObject.imageFormat" value="GIF"/>GIF</label>
-			    </TD>
+			    	<c:forEach items="${imageUploadFormatList}" var="imageUploadFormat">
+			    		<label><form:checkbox path="topicEditorTagObject.imageFormat" value="${imageUploadFormat}"/>${imageUploadFormat}</label>
+			    	</c:forEach>
+			    	<web:errors path="topicEditorTagObject.imageFormat" cssStyle="color: red;"/>
+			    </TD> 
 			</TR>
 			<TR id="topicImageSize_tr" <c:if test="${systemSetting.topicEditorTagObject.image == false}"> style="display: none;"</c:if>>
 			    <TD class="t-label t-label-h" width="20%">允许上传图片大小：</TD>
@@ -836,6 +854,38 @@ function setAllowFilterWord(obj){
 			    <TD class="t-content" width="80%" colSpan="3">
 			    	<form:input class="form-text" path="topicEditorTagObject.fileSize" size="10"/>&nbsp;K
 			    	<web:errors path="topicEditorTagObject.fileSize" cssStyle="color: red;"/>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">嵌入视频<span class="toolbar-icon-url icon-media"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="topicEditorTagObject.embedVideo" value="true"/>打开</label>
+			    	<label><form:radiobutton path="topicEditorTagObject.embedVideo" value="false"/>关闭</label>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">上传视频<span class="toolbar-icon-url icon-media"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="topicEditorTagObject.uploadVideo" value="true" onclick="selectUploadVideo('topic',this.value);"/>打开</label>
+			    	<label><form:radiobutton path="topicEditorTagObject.uploadVideo" value="false" onclick="selectUploadVideo('topic',this.value);"/>关闭</label>
+			    </TD>
+			</TR>
+			<TR id="topicUploadVideoFormat_tr" <c:if test="${systemSetting.topicEditorTagObject.uploadVideo == false}"> style="display: none;"</c:if>>
+			    <TD class="t-label t-label-h" width="20%">允许上传视频格式：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	
+			    	<c:forEach items="${videoUploadFormatList}" var="videoUploadFormat">
+			    		<label><form:checkbox path="topicEditorTagObject.videoFormat" value="${videoUploadFormat}"/>${videoUploadFormat}</label>
+			    	
+			    	</c:forEach>
+			    	<web:errors path="topicEditorTagObject.videoFormat" cssStyle="color: red;"/>
+			    </TD>
+			</TR>
+			<TR id="topicUploadVideoSize_tr" <c:if test="${systemSetting.topicEditorTagObject.uploadVideo == false}"> style="display: none;"</c:if>>
+			    <TD class="t-label t-label-h" width="20%">允许上传视频大小：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<form:input class="form-text" path="topicEditorTagObject.videoSize" size="10"/>&nbsp;K
+			    	<web:errors path="topicEditorTagObject.videoSize" cssStyle="color: red;"/>
 			    </TD>
 			</TR>
 		</TBODY>
@@ -960,6 +1010,13 @@ function setAllowFilterWord(obj){
 			    </TD>
 			</TR>
 			<TR>
+			    <TD class="t-label t-label-h" width="20%">全屏显示<span class="toolbar-icon-url icon-fullscreen"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="editorTagObject.fullscreen" value="true"/>打开</label>
+			    	<label><form:radiobutton path="editorTagObject.fullscreen" value="false"/>关闭</label>
+			    </TD>
+			</TR>
+			<TR>
 			    <TD class="t-label t-label-h" width="20%">图片<span class="toolbar-icon-url icon-image"></span>：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">
 			    	<label><form:radiobutton path="editorTagObject.image" value="true" onclick="selectImage('comment',this.value);"/>打开</label>
@@ -969,11 +1026,10 @@ function setAllowFilterWord(obj){
 			<TR id="commentImageFormat_tr" <c:if test="${systemSetting.editorTagObject.image == false}"> style="display: none;"</c:if>>
 			    <TD class="t-label t-label-h" width="20%">允许上传图片格式：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">
-			    	<label><form:checkbox path="editorTagObject.imageFormat" value="JPG"/>JPG</label>
-			    	<label><form:checkbox path="editorTagObject.imageFormat" value="JPEG"/>JPEG</label>
-			    	<label><form:checkbox path="editorTagObject.imageFormat" value="BMP"/>BMP</label>
-			    	<label><form:checkbox path="editorTagObject.imageFormat" value="PNG"/>PNG</label>
-			    	<label><form:checkbox path="editorTagObject.imageFormat" value="GIF"/>GIF</label>
+			    	<c:forEach items="${imageUploadFormatList}" var="imageUploadFormat">
+			    		<label><form:checkbox path="editorTagObject.imageFormat" value="${imageUploadFormat}"/>${imageUploadFormat}</label>
+			    	</c:forEach>
+			    	<web:errors path="editorTagObject.imageFormat" cssStyle="color: red;"/>
 			    </TD>
 			</TR>
 			<TR id="commentImageSize_tr" <c:if test="${systemSetting.editorTagObject.image == false}"> style="display: none;"</c:if>>
@@ -1104,7 +1160,13 @@ function setAllowFilterWord(obj){
 			    	<label><form:radiobutton path="questionEditorTagObject.emoticons" value="false"/>关闭</label>
 			    </TD>
 			</TR>
-			
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">全屏显示<span class="toolbar-icon-url icon-fullscreen"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="questionEditorTagObject.fullscreen" value="true"/>打开</label>
+			    	<label><form:radiobutton path="questionEditorTagObject.fullscreen" value="false"/>关闭</label>
+			    </TD>
+			</TR>
 			<TR>
 			    <TD class="t-label t-label-h" width="20%">图片<span class="toolbar-icon-url icon-image"></span>：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">
@@ -1115,11 +1177,10 @@ function setAllowFilterWord(obj){
 			<TR id="questionImageFormat_tr" <c:if test="${systemSetting.questionEditorTagObject.image == false}"> style="display: none;"</c:if>>
 			    <TD class="t-label t-label-h" width="20%">允许上传图片格式：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">
-			    	<label><form:checkbox path="questionEditorTagObject.imageFormat" value="JPG"/>JPG</label>
-			    	<label><form:checkbox path="questionEditorTagObject.imageFormat" value="JPEG"/>JPEG</label>
-			    	<label><form:checkbox path="questionEditorTagObject.imageFormat" value="BMP"/>BMP</label>
-			    	<label><form:checkbox path="questionEditorTagObject.imageFormat" value="PNG"/>PNG</label>
-			    	<label><form:checkbox path="questionEditorTagObject.imageFormat" value="GIF"/>GIF</label>
+			    	<c:forEach items="${imageUploadFormatList}" var="imageUploadFormat">
+			    		<label><form:checkbox path="questionEditorTagObject.imageFormat" value="${imageUploadFormat}"/>${imageUploadFormat}</label>
+			    	</c:forEach>
+			    	<web:errors path="questionEditorTagObject.imageFormat" cssStyle="color: red;"/>
 			    </TD>
 			</TR>
 			<TR id="questionImageSize_tr" <c:if test="${systemSetting.questionEditorTagObject.image == false}"> style="display: none;"</c:if>>
@@ -1256,7 +1317,13 @@ function setAllowFilterWord(obj){
 			    	<label><form:radiobutton path="answerEditorTagObject.emoticons" value="false"/>关闭</label>
 			    </TD>
 			</TR>
-			
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">全屏显示<span class="toolbar-icon-url icon-fullscreen"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="answerEditorTagObject.fullscreen" value="true"/>打开</label>
+			    	<label><form:radiobutton path="answerEditorTagObject.fullscreen" value="false"/>关闭</label>
+			    </TD>
+			</TR>
 			<TR>
 			    <TD class="t-label t-label-h" width="20%">图片<span class="toolbar-icon-url icon-image"></span>：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">
@@ -1267,11 +1334,10 @@ function setAllowFilterWord(obj){
 			<TR id="answerImageFormat_tr" <c:if test="${systemSetting.answerEditorTagObject.image == false}"> style="display: none;"</c:if>>
 			    <TD class="t-label t-label-h" width="20%">允许上传图片格式：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">
-			    	<label><form:checkbox path="answerEditorTagObject.imageFormat" value="JPG"/>JPG</label>
-			    	<label><form:checkbox path="answerEditorTagObject.imageFormat" value="JPEG"/>JPEG</label>
-			    	<label><form:checkbox path="answerEditorTagObject.imageFormat" value="BMP"/>BMP</label>
-			    	<label><form:checkbox path="answerEditorTagObject.imageFormat" value="PNG"/>PNG</label>
-			    	<label><form:checkbox path="answerEditorTagObject.imageFormat" value="GIF"/>GIF</label>
+			    	<c:forEach items="${imageUploadFormatList}" var="imageUploadFormat">
+			    		<label><form:checkbox path="answerEditorTagObject.imageFormat" value="${imageUploadFormat}"/>${imageUploadFormat}</label>
+			    	</c:forEach>
+			    	<web:errors path="answerEditorTagObject.imageFormat" cssStyle="color: red;"/>
 			    </TD>
 			</TR>
 			<TR id="answerImageSize_tr" <c:if test="${systemSetting.answerEditorTagObject.image == false}"> style="display: none;"</c:if>>

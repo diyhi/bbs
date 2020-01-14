@@ -68,6 +68,10 @@
 				    	<div class="avatarBox">
 				            <img :src="topic.avatarPath+'100x100/'+topic.avatarName" v-if="topic.avatarName != null">
 				            <img :src="$store.state.commonPath+'images/min_avata.png'" v-if="topic.avatarName == null || topic.avatarName == ''">
+				        	
+				        	<!-- 首字符头像
+				         	<img :ref="'avatarData_'+topic.id"  v-if="topic.avatarName == null || topic.avatarName == ''">
+				         	-->
 				        </div>
 				    	<div class="topInfo">                                   
 				            <span class="bLeft">
@@ -94,16 +98,22 @@
 				        <div class="summary" v-if="topic.imageInfoList.length ==0">
 							<span>{{topic.summary}}</span>
 						</div>
-				        <div class="picInfo" v-if="topic.imageInfoList.length >0">
-							<span v-for="imageInfo in topic.imageInfoList" class="imageBox">
-								
-								<div class="img" v-lazy:background-image="imageInfo.path+'120x120/'+imageInfo.name">
-									<!-- 放大图片插件需要,将图片opacity设为0 -->
-									<img :preview="topic.id" :large="imageInfo.path+imageInfo.name" >
+				        <div class="picInfo" v-if="topic.imageInfoList.length >0" v-viewer="pictureOptions">
+				        	<span v-for="(imageInfo,index) in topic.imageInfoList" class="imageBox" >
+					        	<div class="img" v-lazy:background-image="imageInfo.path+'120x120/'+imageInfo.name" >
+					        		<img :src="imageInfo.path+'120x120/'+imageInfo.name" :key="index":data-src="imageInfo.path+imageInfo.name" >
+									<!--
+									<img :src="$store.state.commonPath+'images/null.gif'" :key="index":data-src="imageInfo.path+imageInfo.name" >
+					        	-->
 								</div>
+					        	
+					        </span>
+				        
 							<!--
 								<div class="img" v-lazy:background-image="imageInfo.path+'120x120/'+imageInfo.name"></div>-->
-							</span>
+							
+							
+							
 						</div>
 						<div class="detailInfo">                                   
 				            <span class="bLeft">
@@ -246,8 +256,8 @@
 				            </p> 
 				        </div>
 					</div>
-					<div class="main"> 
-						<div v-if="topic.lastUpdateTime != null" class="lastUpdateTime">最后修改时间：{{topic.lastUpdateTime}}</div>
+					<div class="main" v-viewer="pictureOptions"> 
+						<div v-if="topic.lastUpdateTime != null" class="lastUpdateTime" >最后修改时间：{{topic.lastUpdateTime}}</div>
 						<!-- 内容 -->
 						<component v-bind:is ="hideTagComponent(topic.content)" v-bind="$props" />
 					</div>
@@ -290,8 +300,13 @@
 								<component v-bind:is ="quoteDataComponent(quoteData[comment.id])" v-bind="$props" />
 							</div>
 							
+							<p class="commentContent" v-viewer="pictureOptions">
+								<component v-bind:is ="commentDataComponent(comment.content)" v-bind="$props" />
+							</p>
+							<!-- 
 							<p class="commentContent" v-html="comment.content"></p>
-							
+							 -->
+							 
 		                    <div class="replyList" v-if="comment.replyList.length >0">
 								<ul class="box">
 								
@@ -637,8 +652,8 @@
 					</div>
 					<div class="main"> 
 					 
-		                <div class="reward" >
-		                	<div class="rewardInfo" v-if="question.amount > 0 || question.point > 0">
+		                <div class="reward" v-if="question.amount > 0 || question.point > 0">
+		                	<div class="rewardInfo" >
 		                		<i class="icon cms-deposit" ></i>
 		                		悬赏<span v-if="question.amount > 0">金额<span class="symbol">¥</span><span class="amount">{{question.amount}}</span>元 </span>
 		                		
@@ -649,15 +664,23 @@
 		           
 					
 						<div v-if="question.lastUpdateTime != null" class="lastUpdateTime">最后修改时间：{{question.lastUpdateTime}}</div>
-						<!-- 内容 -->
-						<div v-html="question.content"></div>
+						
+						<div v-viewer="pictureOptions"> 
+							<!-- 内容 -->
+							<component v-bind:is ="analyzeDataComponent(question.content)" v-bind="$props" />
+						</div>
+						
+						
 						<div :class="(index%2)==0 ? 'appendBox odd' : 'appendBox even'" v-for="(appendQuestionItem,index) in question.appendQuestionItemList">
 							<div class="appendHead">
 								<span class="prompt">第{{index + 1}}条附言</span>
 								<span class="appendTime">{{appendQuestionItem.postTime}}</span>
 							</div>
 		                	<div class="appendContent" >
-		                		<div v-html="appendQuestionItem.content"></div>
+		                		<div v-viewer="pictureOptions"> 
+									<!-- 内容 -->
+									<component v-bind:is ="analyzeDataComponent(appendQuestionItem.content)" v-bind="$props" />
+								</div>
 		                	</div> 
 						</div>	
 						<div class="operating">
@@ -698,8 +721,10 @@
 							</div>
 						</div>
 	                    <div class="main">
-							<p class="answerContent" v-html="answer.content"></p>
-							
+							<p class="answerContent" v-viewer="pictureOptions"> 
+								<!-- 内容 -->
+								<component v-bind:is ="analyzeDataComponent(answer.content)" v-bind="$props" />
+							</p>
 		                    <div class="replyList" v-if="answer.answerReplyList.length >0">
 								<ul class="box">
 								
@@ -1525,7 +1550,7 @@
 	                    <p class="time">{{userDynamic.postTime}}</p>
 	                </span>                    
 	            </div>
-	            <div class="main">
+	            <div class="main" v-viewer="pictureOptions">
 	            	
 					
 					<div class="title">
@@ -1544,8 +1569,13 @@
 						<!-- router-link渲染成<span>标签-->
 						<router-link tag="span" v-if="userDynamic.module == 100 || userDynamic.module == 200 || userDynamic.module == 300 || userDynamic.module == 400" :to="{path: '/thread', query: {topicId: userDynamic.topicId}}" >
 							{{userDynamic.topicTitle}}
-							<i class="topicRoleName" v-for="(roleName,index) in userDynamic.allowRoleViewList" >{{roleName}}</i>
+							
 						</router-link>
+						<i class="topicRoleName" v-for="(roleName,index) in userDynamic.allowRoleViewList" >{{roleName}}</i>
+						<span :class="'hideTagType hide_'+key"  v-for="(value, key) in userDynamic.hideTagTypeMap">
+                     			<span class="circle point" v-if="value==true"><i class="cms-unlock-solid" ></i></span>
+                     			<span class="circle" v-if="value==false"><i class="cms-lock-solid" ></i></span>
+                      	</span> 
 						
 						<!-- router-link渲染成<span>标签-->
 						<router-link tag="span" v-if="userDynamic.module == 500 || userDynamic.module == 600 || userDynamic.module == 700" :to="{path: '/question', query: {questionId: userDynamic.questionId}}" >
@@ -1557,7 +1587,7 @@
 						<div class="topicContent" v-if="userDynamic.module == 100" ><component v-bind:is ="hideTagComponent(userDynamic.topicContent)" v-bind="$props" /></div>
 	            	</v-readmore>
 	            	<v-readmore>
-	            		<div class="commentContent" v-if="userDynamic.module == 200" v-html="userDynamic.commentContent"></div>
+	            		<div class="commentContent" v-if="userDynamic.module == 200" ><component v-bind:is ="analyzeDataComponent(userDynamic.commentContent)" v-bind="$props" /></div>
 	            	</v-readmore>
 	            	<v-readmore>
 	            	<div v-if="userDynamic.module == 300" >
@@ -1573,10 +1603,10 @@
 	            		<div class="replyContent" v-if="userDynamic.module == 400" >{{userDynamic.replyContent}}</div> 
 	            	</v-readmore>
 	            	<v-readmore>
-	            		<div class="commentContent" v-if="userDynamic.module == 500" v-html="userDynamic.questionContent"></div>
+	            		<div class="commentContent" v-if="userDynamic.module == 500" ><component v-bind:is ="analyzeDataComponent(userDynamic.questionContent)" v-bind="$props" /></div>
 	            	</v-readmore>   
 	            	<v-readmore>
-	            		<div class="commentContent" v-if="userDynamic.module == 600" v-html="userDynamic.answerContent"></div>
+	            		<div class="commentContent" v-if="userDynamic.module == 600" ><component v-bind:is ="analyzeDataComponent(userDynamic.answerContent)" v-bind="$props" /></div>
 	            	</v-readmore>  
 	            	<v-readmore>
 	            		<div class="replyContent" v-if="userDynamic.module == 700" >{{userDynamic.answerReplyContent}}</div> 
@@ -1595,6 +1625,8 @@
 						<router-link class="btn" tag="span" :to="{path: '/question', query: {questionId: userDynamic.questionId}}" v-if="userDynamic.module == 500">查看原文</router-link>
 						<span class="btn" v-if="userDynamic.module == 500"><i class="cms-view" style="font-size: 13px;"></i> {{userDynamic.questionViewTotal}}</span>
 						<span class="btn" v-if="userDynamic.module == 500"><i class="cms-comment" style="font-size: 12px;"></i> {{userDynamic.questionAnswerTotal}}</span>
+						<span class="btn" v-if="userDynamic.module == 500"><i class="cms-favorites" style="font-size: 12px;"></i> {{questionFavoriteCountGroup[index]}}</span>
+						
 						<router-link class="btn" tag="span"  :to="{path: '/question', query: {questionId: userDynamic.questionId,answerId: userDynamic.answerId}}" v-if="userDynamic.module == 600 || userDynamic.module == 700 ">查看原文</router-link>			
 					</div>
 				</div>
@@ -3180,17 +3212,18 @@
 <link href="${baseURL}${commonPath}js/mint-ui/style.css" type="text/css" rel="stylesheet">
 <script src="${commonPath}js/mint-ui/index.js" type="text/javascript"></script>
 
-<link href="${baseURL}${commonPath}js/vue-photo-preview/skin.css" type="text/css" rel="stylesheet">
-<script src="${commonPath}js/vue-photo-preview/vue-photo-preview.js" type="text/javascript"></script> 
+<link href="${baseURL}${commonPath}js/v-viewer/viewer.min.css" type="text/css" rel="stylesheet">
+<script src="${commonPath}js/v-viewer/viewer.min.js?1" type="text/javascript"></script> 
+<script src="${commonPath}js/v-viewer/v-viewer.min.js" type="text/javascript"></script> 
 
-<link href="${baseURL}${commonPath}css/common.css?1stdfd3" type="text/css" rel="stylesheet">
+<link href="${baseURL}${commonPath}css/common.css?ffd3" type="text/css" rel="stylesheet">
 <script src="${commonPath}js/better-scroll.min.js?2d" type="text/javascript"></script> 
  
 <script src="${commonPath}js/vue-cropper.js" type="text/javascript"></script>
  <script src="${commonPath}js/v-readmore.min.js" type="text/javascript"></script>
-<script src="${commonPath}js/wangeditor/wangEditor.min.js?5" type="text/javascript"></script>
+<script src="${commonPath}js/wangeditor/wangEditor.min.js?6" type="text/javascript"></script>
 
-<script src="${commonPath}js/main.js?88ddd" type="text/javascript"></script>
+<script src="${commonPath}js/main.js?66dfdd3d" type="text/javascript"></script>
 
 
 
@@ -3300,6 +3333,10 @@ image[lazy=loading] {
 .vue-cropper .crop-info{
 	border-radius:3px;
 }
+
+
+
+
 
 </style>
 

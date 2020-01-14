@@ -3,6 +3,7 @@ package cms.bean.user;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -70,7 +71,12 @@ public class UserDynamicEntity implements Serializable{
 	protected Long topicCommentTotal = 0L;
 	/** 话题允许查看的角色名称集合(默认角色除外) **/
 	@Transient
-	private List<String> allowRoleViewList = new ArrayList<String>();
+	protected List<String> allowRoleViewList = new ArrayList<String>();
+	
+	/** key:内容含有隐藏标签类型  10.输入密码可见  20.评论话题可见  30.达到等级可见 40.积分购买可见 50.余额购买可见  value:当前用户是否已对隐藏内容解锁 **/
+	@Transient
+	protected LinkedHashMap<Integer,Boolean> hideTagTypeMap = new LinkedHashMap<Integer,Boolean>();
+	
 	/** 评论内容 **/
 	@Transient
 	protected String commentContent;
@@ -353,6 +359,14 @@ public class UserDynamicEntity implements Serializable{
 
 	public void setAnswerReplyContent(String answerReplyContent) {
 		this.answerReplyContent = answerReplyContent;
+	}
+
+	public LinkedHashMap<Integer, Boolean> getHideTagTypeMap() {
+		return hideTagTypeMap;
+	}
+
+	public void setHideTagTypeMap(LinkedHashMap<Integer, Boolean> hideTagTypeMap) {
+		this.hideTagTypeMap = hideTagTypeMap;
 	}
 	
 }

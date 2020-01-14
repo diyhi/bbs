@@ -355,7 +355,7 @@ public class FileUtil {
 		String systemPath = "";
 		if(path != null && !"".equals(path.trim())){
 			systemPath = StringUtils.replace(path, "..", "-");
-			systemPath = StringUtils.replace(path, "%", "-");//百分号替换为横杆
+			systemPath = StringUtils.replace(systemPath, "%", "-");//百分号替换为横杆
 		}
 		return systemPath;
 	}

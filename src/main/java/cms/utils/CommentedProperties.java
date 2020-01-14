@@ -44,9 +44,15 @@ import org.springframework.core.io.ClassPathResource;
 public class CommentedProperties{
 	private static final Logger logger = LogManager.getLogger(CommentedProperties.class);
 	
+	
+	//读取富文本编辑器允许图片上传格式
+	private static List<String> imageUploadFormatList = null;
 	//读取富文本编辑器允许文件上传格式
 	private static List<String> fileUploadFormatList = null;
-
+	//读取富文本编辑器允许视频上传格式
+	private static List<String> videoUploadFormatList = null;
+	//富文本嵌入视频地址白名单
+	private static List<String> embedVideoWhiteList = null;
 	
 	/**
 	 * 内部属性表
@@ -678,6 +684,56 @@ public class CommentedProperties{
 	
 	
 	/**
+	 * 读取富文本编辑器允许图片上传格式
+	 * @return
+	 */
+	public static List<String> readRichTextAllowImageUploadFormat(){	
+		if(imageUploadFormatList != null && imageUploadFormatList.size() >0){
+			return imageUploadFormatList;
+		}
+		//富文本图片上传格式
+		List<String> _imageUploadFormatList = new ArrayList<String>();
+		
+		
+		org.springframework.core.io.Resource resource = new ClassPathResource("/richText.properties");//读取配置文件
+		CommentedProperties props = new CommentedProperties();
+
+		try {
+			props.load(resource.getInputStream(),"utf-8");
+			
+			Set<String> propertyNameList = props.propertyNames();
+			if(propertyNameList != null && propertyNameList.size() >0){
+				for(String propertyName : propertyNameList){
+					if(propertyName.trim().equals("imageUploadFormat")){
+						String value = props.getProperty(propertyName.trim());
+						if(value != null && !"".equals(value.trim())){
+							String[] values = value.trim().split(",");
+							if(values != null && values.length >0){
+								for(String format : values){
+									if(format != null && !"".equals(format.trim())){
+										_imageUploadFormatList.add(format.trim());
+									}
+									
+								}
+							}
+						}
+					}
+				}
+				
+				imageUploadFormatList = _imageUploadFormatList;
+			}
+	
+		} catch (IOException e) {
+			if (logger.isErrorEnabled()) {
+	            logger.error("读取配置文件richText.properties错误",e);
+	        }
+		}
+		return _imageUploadFormatList;	
+
+	}
+	
+	
+	/**
 	 * 读取富文本编辑器允许文件上传格式
 	 * @return
 	 */
@@ -726,4 +782,108 @@ public class CommentedProperties{
 
 	}
 
+	/**
+	 * 读取富文本编辑器允许视频上传格式
+	 * @return
+	 */
+	public static List<String> readRichTextAllowVideoUploadFormat(){	
+		if(videoUploadFormatList != null && videoUploadFormatList.size() >0){
+			return videoUploadFormatList;
+		}
+		//富文本视频上传格式
+		List<String> _videoUploadFormatList = new ArrayList<String>();
+		
+		
+		org.springframework.core.io.Resource resource = new ClassPathResource("/richText.properties");//读取配置文件
+		CommentedProperties props = new CommentedProperties();
+
+		try {
+			props.load(resource.getInputStream(),"utf-8");
+			
+			Set<String> propertyNameList = props.propertyNames();
+			if(propertyNameList != null && propertyNameList.size() >0){
+				for(String propertyName : propertyNameList){
+					if(propertyName.trim().equals("videoUploadFormat")){
+						String value = props.getProperty(propertyName.trim());
+						if(value != null && !"".equals(value.trim())){
+							String[] values = value.trim().split(",");
+							if(values != null && values.length >0){
+								for(String format : values){
+									if(format != null && !"".equals(format.trim())){
+										_videoUploadFormatList.add(format.trim());
+									}
+									
+								}
+							}
+						}
+					}
+				}
+				
+				videoUploadFormatList = _videoUploadFormatList;
+			}
+	
+		} catch (IOException e) {
+			if (logger.isErrorEnabled()) {
+	            logger.error("读取配置文件richText.properties错误",e);
+	        }
+		}
+		return _videoUploadFormatList;	
+
+	}
+	
+	
+	/**
+	 * 读取富文本编辑器嵌入视频地址白名单
+	 * @return
+	 */
+	public static List<String> readRichTextAllowEmbedVideoWhiteList(){	
+		if(embedVideoWhiteList != null && embedVideoWhiteList.size() >0){
+			return embedVideoWhiteList;
+		}
+		//嵌入视频地址白名单
+		List<String> _embedVideoWhiteList = new ArrayList<String>();
+		
+		
+		org.springframework.core.io.Resource resource = new ClassPathResource("/richText.properties");//读取配置文件
+		CommentedProperties props = new CommentedProperties();
+
+		try {
+			props.load(resource.getInputStream(),"utf-8");
+			
+			Set<String> propertyNameList = props.propertyNames();
+			if(propertyNameList != null && propertyNameList.size() >0){
+				for(String propertyName : propertyNameList){
+					if(propertyName.trim().equals("embedVideoWhite")){
+						String value = props.getProperty(propertyName.trim());
+						if(value != null && !"".equals(value.trim())){
+							String[] values = value.trim().split(",");
+							if(values != null && values.length >0){
+								for(String format : values){
+									if(format != null && !"".equals(format.trim())){
+										_embedVideoWhiteList.add(format.trim());
+									}
+									
+								}
+							}
+						}
+					}
+				}
+				
+				embedVideoWhiteList = _embedVideoWhiteList;
+			}
+	
+		} catch (IOException e) {
+			if (logger.isErrorEnabled()) {
+	            logger.error("读取配置文件richText.properties错误",e);
+	        }
+		}
+		return _embedVideoWhiteList;	
+
+	}
+	
+	
+	
+	
+	
+	
 }

@@ -33,6 +33,56 @@ var _VERSION = '4.1.12 (2019-03-07)',
 	_matches = /(?:msie|firefox|webkit|opera)[\/:\s](\d+)/.exec(_ua),
 	_V = _matches ? _matches[1] : '0',
 	_TIME = new Date().getTime();
+	
+//弹出提示信息
+function _popupMessage (content) { 
+	$("#_kindEditor_msg").remove();
+	var html ='<div id="_kindEditor_msg" class="ke-kindEditor_msg" ><p>'+content+'</p></div>';
+	$("body").append(html);
+	_popupMessage_center($("#_kindEditor_msg"));
+	
+	var t=setTimeout(next,4000);
+	function next(){
+		$("#_kindEditor_msg").remove();
+	      
+	}	
+}
+//弹出提示信息垂直居中  
+function _popupMessage_center(obj) {   
+	var screenWidth = $(window).width(), screenHeight = $(window).height(); //当前浏览器窗口的 宽高  
+	var scrolltop = $(document).scrollTop();//获取当前窗口距离页面顶部高度  
+	
+	var objTop = (screenHeight - obj.height())/2 + scrolltop;  
+	obj.css({top: objTop + 'px'});  
+  
+	//浏览器窗口大小改变时  
+	$(window).resize(function() {  
+		screenWidth = $(window).width();  
+		screenHeight = $(window).height();  
+		scrolltop = $(document).scrollTop();  
+		
+		objTop = (screenHeight - obj.height())/2 + scrolltop;  
+		obj.css({top: objTop + 'px'});  
+	 
+	});  
+	//浏览器有滚动条时的操作、  
+	$(window).scroll(function() {  
+		screenWidth = $(window).width();  
+		screenHeight = $(window).height();  
+		scrolltop = $(document).scrollTop();  
+		objTop = (screenHeight - obj.height())/2 + scrolltop;  
+		obj.css({top: objTop + 'px'});  
+	});  
+}   
+
+
+
+
+
+
+
+
+
 function _isArray(val) {
 	if (!val) {
 		return false;
@@ -206,11 +256,12 @@ var K = {
 	invalidUrl : _invalidUrl,
 	addParam : _addParam,
 	extend : _extend,
-	json : _json
+	json : _json,
+	popupMessage : _popupMessage
 };
 var _INLINE_TAG_MAP = _toMap('a,abbr,acronym,b,basefont,bdo,big,br,button,cite,code,del,dfn,em,font,i,img,input,ins,kbd,label,map,q,s,samp,select,small,span,strike,strong,sub,sup,textarea,tt,u,var'),
 	_BLOCK_TAG_MAP = _toMap('address,applet,blockquote,body,center,dd,dir,div,dl,dt,fieldset,form,frameset,h1,h2,h3,h4,h5,h6,head,hr,html,iframe,ins,isindex,li,map,menu,meta,noframes,noscript,object,ol,p,pre,script,style,table,tbody,td,tfoot,th,thead,title,tr,ul'),
-	_SINGLE_TAG_MAP = _toMap('area,base,basefont,br,col,frame,hr,img,input,isindex,link,meta,param,embed'),
+	_SINGLE_TAG_MAP = _toMap('area,base,basefont,br,col,frame,hr,img,input,isindex,link,meta,param,video'),
 	_STYLE_TAG_MAP = _toMap('b,basefont,big,del,em,font,i,s,small,span,strike,strong,sub,sup,u'),
 	_CONTROL_TAG_MAP = _toMap('img,table,input,textarea,button'),
 	_PRE_TAG_MAP = _toMap('pre,style,script'),
@@ -282,7 +333,8 @@ K.options = {
 		'flash', 'media', 'insertfile', 'table', 'hr', 'emoticons', 'baidumap', 'pagebreak',
 		'anchor', 'link', 'unlink', '|', 'about'
 	],
-	noDisableItems : ['source', 'fullscreen'],
+	noDisableItems : ['source', 'fullscreen','embedVideo','uploadVideo'],
+	noToolbarItems : ['embedVideo','uploadVideo','hidePassword','hideComment','hideGrade','hidePoint','hideAmount'],//不在工具栏显示的标签
 	colorTable : [
 		['#E53333', '#E56600', '#FF9900', '#64451D', '#DFC5A4', '#FFE500'],
 		['#009900', '#006600', '#99BB00', '#B8D100', '#60D978', '#00D5FF'],
@@ -313,8 +365,9 @@ K.options = {
 			'.font-style', '.text-decoration', '.vertical-align', '.background', '.border'
 		],
 		a : ['id', 'class', 'href', 'target', 'name'],
-		embed : ['id', 'class', 'src', 'width', 'height', 'type', 'loop', 'autostart', 'quality', '.width', '.height', 'align', 'allowscriptaccess', 'wmode'],
-		img : ['id', 'class', 'src', 'width', 'height', 'border', 'alt', 'title', 'align', '.width', '.height', '.border'],
+		video : ['id', 'class', 'src', 'width', 'height', 'loop', 'autoplay', 'muted', '.width', '.height', 'align', 'poster','preload','controls'],//视频
+		
+		img : ['id', 'class', 'src', 'width', 'height', 'border', 'alt', 'title', 'align', '.width', '.height', '.border','data-ke-tag'],//加上data-ke-tag修复上传视频点击全屏时丢失源地址的错误
 		'p,ol,ul,li,blockquote,h1,h2,h3,h4,h5,h6' : [
 			'id', 'class', 'align', '.text-align', '.color', '.background-color', '.font-size', '.font-family', '.background',
 			'.font-weight', '.font-style', '.text-decoration', '.vertical-align', '.text-indent', '.margin-left'
@@ -323,7 +376,8 @@ K.options = {
 		hr : ['id', 'class', '.page-break-after'],
 		'br,tbody,tr,strong,b,sub,sup,em,i,u,strike,s,del' : ['id', 'class'],
 
-		iframe : ['id', 'class', 'src', 'frameborder', 'width', 'height', '.width', '.height']
+		iframe : ['id', 'class', 'src', 'width', 'height', '.width', '.height','scrolling','border','allow','frameborder','framespacing','allowfullscreen']
+		
 	},
 	layout : '<div class="container"><div class="toolbar"></div><div class="edit"></div><div class="statusbar"></div></div>'
 };
@@ -768,6 +822,7 @@ function _formatHtml(html, htmlTags, urlType, wellFormatted, indentChar) {
 	html = html.replace(/<[^>]+/g, function($0) {
 		return $0.replace(/\s+/g, ' ');
 	});
+	
 	var htmlTagMap = {};
 	if (htmlTags) {
 		_each(htmlTags, function(key, val) {
@@ -793,6 +848,7 @@ function _formatHtml(html, htmlTags, urlType, wellFormatted, indentChar) {
 			attr = $4 || '',
 			endSlash = $5 ? ' ' + $5 : '',
 			endNewline = $6 || '';
+	
 		if (htmlTags && !htmlTagMap[tagName]) {
 			return '';
 		}
@@ -883,6 +939,7 @@ function _formatHtml(html, htmlTags, urlType, wellFormatted, indentChar) {
 				if (_inArray(key, ['src', 'href']) >= 0) {
 					attrMap[key] = _formatUrl(val, urlType);
 				}
+				
 				if (htmlTags && key !== 'style' && !htmlTagMap[tagName]['*'] && !htmlTagMap[tagName][key] ||
 					tagName === 'body' && key === 'contenteditable' ||
 					/^kindeditor_\d+$/.test(key)) {
@@ -939,41 +996,53 @@ function _clearMsWord(html, htmlTags) {
 }
 
 function _mediaType(src) {
+	/**
 	if (/\.(rm|rmvb)(\?|$)/i.test(src)) {
 		return 'audio/x-pn-realaudio-plugin';
 	}
 	if (/\.(swf|flv)(\?|$)/i.test(src)) {
 		return 'application/x-shockwave-flash';
 	}
-	return 'video/x-ms-asf-plugin';
+	if (/\.(mp4|mp5)(\?|$)/i.test(src)) {//视频
+	    return 'video/mp4';
+	}
+	return 'video/x-ms-asf-plugin';**/
+	return 'video/mp4';
 }
 
 function _mediaClass(type) {
+	/**
 	if (/realaudio/i.test(type)) {
 		return 'ke-rm';
 	}
 	if (/flash/i.test(type)) {
 		return 'ke-flash';
 	}
-	return 'ke-media';
+	if (/video/i.test(type)) {//视频
+	    return 'ke-video';
+	}
+	return 'ke-media';**/
+	return 'ke-video';
 }
 function _mediaAttrs(srcTag) {
 	return _getAttrList(unescape(srcTag));
 }
-function _mediaEmbed(attrs) {
-	var html = '<embed ';
-	_each(attrs, function(key, val) {
-		html += key + '="' + val + '" ';
-	});
-	html += '/>';
-	return html;
+function _mediaVideo(attrs) {//视频
+    var html = '<video  '
+    _each(attrs, function(key, val) {
+    	html += key + '="' + val + '" ';
+    });
+ 
+    html += '/>';
+    return html;
 }
 function _mediaImg(blankPath, attrs) {
 	var width = attrs.width,
 		height = attrs.height,
 		type = attrs.type || _mediaType(attrs.src),
-		srcTag = _mediaEmbed(attrs),
+		srcTag = _mediaVideo(attrs);  //视频
 		style = '';
+	
 	if (/\D/.test(width)) {
 		style += 'width:' + width + ';';
 	} else if (width > 0) {
@@ -989,9 +1058,46 @@ function _mediaImg(blankPath, attrs) {
 		html += 'style="' + style + '" ';
 	}
 	html += 'data-ke-tag="' + escape(srcTag) + '" alt="" />';
+	
 	return html;
 }
 
+function _embedClass(type) {
+	return 'ke-iframe';
+}
+function _embedVideo(attrs) {//嵌入视频
+    var html = '<iframe  '
+    _each(attrs, function(key, val) {
+    	html += key + '="' + val + '" ';
+    });
+ 
+    html += '></iframe>';
+    return html;
+}
+function _embedVideoImg(blankPath, attrs) {
+	var width = attrs.width,
+	height = attrs.height,
+	type = attrs.type || _mediaType(attrs.src),
+	srcTag = _embedVideo(attrs);  //视频
+	style = '';
+
+	if (/\D/.test(width)) {
+		style += 'width:' + width + ';';
+	} else if (width > 0) {
+		style += 'width:' + width + 'px;';
+	}
+	if (/\D/.test(height)) {
+		style += 'height:' + height + ';';
+	} else if (height > 0) {
+		style += 'height:' + height + 'px;';
+	}
+	var html = '<img class="' + _embedClass(type) + '" src="' + blankPath + '" ';
+	if (style !== '') {
+		html += 'style="' + style + '" ';
+	}
+	html += 'data-ke-tag="' + escape(srcTag) + '" alt="" />';
+	return html;
+}
 
 
 
@@ -1014,8 +1120,10 @@ K.getCssList = _getCssList;
 K.getAttrList = _getAttrList;
 K.mediaType = _mediaType;
 K.mediaAttrs = _mediaAttrs;
-K.mediaEmbed = _mediaEmbed;
+K.mediaVideo = _mediaVideo;//视频
 K.mediaImg = _mediaImg;
+K.embedVideo = _embedVideo;//嵌入视频
+K.embedVideoImg= _embedVideoImg;
 K.clearMsWord = _clearMsWord;
 K.tmpl = _tmpl;
 
@@ -2644,21 +2752,27 @@ function _hasAttrOrCssByKey(knode, map, mapKey) {
 }
 
 function _removeAttrOrCss(knode, map) {
+	
 	if (knode.type != 1) {
 		return;
 	}
+	
 	_removeAttrOrCssByKey(knode, map, '*');
 	_removeAttrOrCssByKey(knode, map);
 }
 function _removeAttrOrCssByKey(knode, map, mapKey) {
 	mapKey = mapKey || knode.name;
+	
 	if (knode.type !== 1) {
 		return;
 	}
+	
 	var newMap = _singleKeyMap(map);
 	if (!newMap[mapKey]) {
 		return;
 	}
+	
+	
 	var arr = newMap[mapKey].split(','), allFlag = false;
 	for (var i = 0, len = arr.length; i < len; i++) {
 		var key = arr[i];
@@ -2844,10 +2958,37 @@ _extend(KCmd, {
 		var self = this, doc = self.doc, range = self.range, wrapper;
 		wrapper = K(val, doc);
 		if (range.collapsed) {
-			range.shrink();
+			//允许先选择功能项再输入内容。实现A
+			
+			range.shrink();//缩小边界
+			wrapper.html("&#8203;");
 			range.insertNode(wrapper[0]).selectNodeContents(wrapper[0]);
+			range.collapse(false);
+			self.select();
+			/**
+			var tag = '';
+			if(val.substr(0, 3) == "<st"){
+				tag = '<strong id="__kindeditor_wrap_tag__">&#8203;</strong>';
+			}else if(val.substr(0, 3) == "<em"){
+				tag = '<em id="__kindeditor_wrap_tag__">&#8203;</em>';
+			}
+			this.inserthtml(tag);
+
+			var p = K('#__kindeditor_wrap_tag__', doc);
+			range.selectNodeContents(p[0]);
+			p.removeAttr('id');
+			range.collapse(false);
+
+			**/
+			
+			
+			/**
+			range.shrink();//缩小边界
+			range.insertNode(wrapper[0]).selectNodeContents(wrapper[0]);
+			**/
 			return self;
 		}
+
 		if (wrapper.isBlock()) {
 			var copyWrapper = wrapper.clone(true), child = copyWrapper;
 			while (child.first()) {
@@ -2857,7 +2998,7 @@ _extend(KCmd, {
 			range.insertNode(copyWrapper[0]).selectNode(copyWrapper[0]);
 			return self;
 		}
-		range.enlarge();
+		range.enlarge();//扩大边界
 		var bookmark = range.createBookmark(), ancestor = range.commonAncestor(), isStart = false;
 		K(ancestor).scan(function(node) {
 			if (!isStart && node == bookmark.start) {
@@ -2937,10 +3078,10 @@ _extend(KCmd, {
 		}
 		return this;
 	},
-	remove : function(map) {
+	remove : function(map,tagName) {
 		var self = this, doc = self.doc, range = self.range;
 		range.enlarge();
-		if (range.startOffset === 0) {
+		if (range.startOffset === 0) {//选中区域的起始位置
 			var ksc = K(range.startContainer), parent;
 			while ((parent = ksc.parent()) && parent.isStyle() && parent.children().length == 1) {
 				ksc = parent;
@@ -2956,7 +3097,9 @@ _extend(KCmd, {
 			}
 		}
 		var sc, so;
-		if (range.collapsed) {
+		if (range.collapsed) {//选中区域的起点和结束点在一起时为true；Range对象为空（刚createRange()时）也为true。
+			
+			
 			self.split(true, map);
 			sc = range.startContainer;
 			so = range.startOffset;
@@ -2976,8 +3119,10 @@ _extend(KCmd, {
 				sc.remove();
 			}
 			range.collapse(true);
+			
 			return self;
 		}
+		
 		self.split(true, map);
 		self.split(false, map);
 		var startDummy = doc.createElement('span'), endDummy = doc.createElement('span');
@@ -2996,6 +3141,7 @@ _extend(KCmd, {
 				nodeList.push(node);
 			}
 		});
+		
 		K(startDummy).remove();
 		K(endDummy).remove();
 		sc = range.startContainer;
@@ -3024,6 +3170,13 @@ _extend(KCmd, {
 		}
 		var bookmark = range.createBookmark(true);
 		_each(nodeList, function(i, node) {
+			var knode = K(node);
+			if(knode.type !== 1 && tagName != undefined){
+				
+				//删除指定标签格式。  例如将<strong>123<em>456</em></strong>里面的5的加粗取消
+				self.removeformatTag(tagName);
+
+			}
 			_removeAttrOrCss(K(node), map);
 		});
 		range.moveToBookmark(bookmark);
@@ -3147,56 +3300,113 @@ _extend(KCmd, {
 		return val;
 	},
 	toggle : function(wrapper, map) {
+		
 		var self = this;
+		var range = this.range;//选中区域
+		var doc = self.doc;
+		
+		
+		
 		if (self.commonNode(map)) {
-			self.remove(map);
-		} else {
+			var tagName = K(wrapper, doc).name;
+			self.remove(map,tagName);
+			/**
+			if (range.collapsed) {
+				
+				var tag = '<span id="__kindeditor_toggle_tag__">&#8203;</span>';
+				this.inserthtml(tag);//插入指定的HTML内容到光标处。 &#8203;是零宽空格字符
+
+				var p = K('#__kindeditor_toggle_tag__', doc);
+				range.selectNodeContents(p[0]);
+				p.removeAttr('id');
+				
+				range.collapse(false);
+				
+				//console.log("内容 "+range.html());
+			}**/
+			/** 
+			if (range.collapsed) {
+				//允许先选择功能项再输入内容。实现B
+			//	var _wrapper = K(wrapper, doc);
+				range.shrink();//缩小边界
+				var _wrapper = K("<span></span>", doc);//插入指定的HTML内容到光标处。
+				_wrapper.html("&#8203;");//&#8203;是零宽空格字符
+				range.insertNode(_wrapper[0]).selectNodeContents(_wrapper[0]);
+				range.collapse(false);
+				
+			}**/
+			
+			
+			if (range.collapsed) {//BUG:选择颜色后再选择加粗和斜体输入字符，再同时取消加粗和斜体,再输入字符，颜色会被同时取消
+				//允许先选择功能项再输入内容。实现B
+				var _wrapper = K("<span></span>", doc);//插入指定的HTML内容到光标处。
+				_wrapper.html("&nbsp;");//&#8203;是零宽空格字符
+				range.insertNode(_wrapper[0]).selectNodeContents(_wrapper[0]);
+				self.removeformatTag(tagName);
+				_wrapper.html("");
+			}
+
+		} else {	
 			self.wrap(wrapper);
 		}
 		return self.select();
 	},
-	bold : function() {
+	bold : function() {//粗体
 		return this.toggle('<strong></strong>', {
 			span : '.font-weight=bold',
 			strong : '*',
 			b : '*'
 		});
 	},
-	italic : function() {
+	italic : function() {//斜体
 		return this.toggle('<em></em>', {
 			span : '.font-style=italic',
 			em : '*',
 			i : '*'
 		});
 	},
-	underline : function() {
+	underline : function() {//下划线
 		return this.toggle('<u></u>', {
 			span : '.text-decoration=underline',
 			u : '*'
 		});
 	},
-	strikethrough : function() {
+	strikethrough : function() {//删除线
 		return this.toggle('<s></s>', {
 			span : '.text-decoration=line-through',
 			s : '*'
 		});
 	},
-	forecolor : function(val) {
+	forecolor : function(val) {//文字颜色
+		if(val == ""){
+			//删除颜色
+			this.removeformatColor(".color");
+		}
 		return this.wrap('<span style="color:' + val + ';"></span>').select();
 	},
-	hilitecolor : function(val) {
+	hilitecolor : function(val) {//文字背景
+		if(val == ""){
+			//删除颜色
+			this.removeformatColor(".background-color");
+		}
 		return this.wrap('<span style="background-color:' + val + ';"></span>').select();
 	},
-	fontsize : function(val) {
+	fontsize : function(val) {//文字大小
 		return this.wrap('<span style="font-size:' + val + ';"></span>').select();
 	},
-	fontname : function(val) {
+	fontname : function(val) {//字体
 		return this.fontfamily(val);
 	},
 	fontfamily : function(val) {
 		return this.wrap('<span style="font-family:' + val + ';"></span>').select();
 	},
-	removeformat : function() {
+	removeformat : function() {//删除格式
+		var self = this;
+		var range = this.range;//选中区域
+		var doc = self.doc;
+		if (range.collapsed) {//如果没有选择文本，则不删除格式
+			return;
+		}
 		var map = {
 			'*' : '.font-weight,.font-style,.text-decoration,.color,.background-color,.font-size,.font-family,.text-indent'
 		},
@@ -3207,6 +3417,179 @@ _extend(KCmd, {
 		this.remove(map);
 		return this.select();
 	},
+	
+	
+	
+	
+	//删除指定标签的格式
+	removeformatTag : function(tag) {
+		var map = {
+		//	'*' : '.font-weight,.font-style,.text-decoration,.color,.background-color,.font-size,.font-family,.text-indent'
+			'*' : '.font-weight,.font-style,.text-decoration,.font-size,.font-family,.text-indent'
+		},
+		//tags = _toMap('b,basefont,big,del,em,font,i,s,small,span,strike,strong,sub,sup,u');
+		tags = _toMap(tag);
+		_each(tags, function(key, val) {
+			map[key] = '*';
+			
+		});
+		
+		var self = this, doc = self.doc, range = self.range;
+		range.enlarge();
+		if (range.startOffset === 0) {//选中区域的起始位置
+			var ksc = K(range.startContainer), parent;
+			while ((parent = ksc.parent()) && parent.isStyle() && parent.children().length == 1) {
+				ksc = parent;
+			}
+			range.setStart(ksc[0], 0);
+			ksc = K(range.startContainer);
+			if (ksc.isBlock()) {
+				_removeAttrOrCss(ksc, map);
+			}
+			var kscp = ksc.parent();
+			if (kscp && kscp.isBlock()) {
+				_removeAttrOrCss(kscp, map);
+			}
+		}
+		var sc, so;
+
+		self.split(true, map);
+		self.split(false, map);
+		var startDummy = doc.createElement('span'), endDummy = doc.createElement('span');
+		range.cloneRange().collapse(false).insertNode(endDummy);
+		range.cloneRange().collapse(true).insertNode(startDummy);
+		var nodeList = [], cmpStart = false;
+		K(range.commonAncestor()).scan(function(node) {
+			if (!cmpStart && node == startDummy) {
+				cmpStart = true;
+				return;
+			}
+			if (node == endDummy) {
+				return false;
+			}
+			if (cmpStart) {
+				nodeList.push(node);
+			}
+		});
+
+		K(startDummy).remove();
+		K(endDummy).remove();
+		sc = range.startContainer;
+		so = range.startOffset;
+		var ec = range.endContainer, eo = range.endOffset;
+		if (so > 0) {
+			var startBefore = K(sc.childNodes[so - 1]);
+			if (startBefore && _isEmptyNode(startBefore)) {
+				startBefore.remove();
+				range.setStart(sc, so - 1);
+				if (sc == ec) {
+					range.setEnd(ec, eo - 1);
+				}
+			}
+			var startAfter = K(sc.childNodes[so]);
+			if (startAfter && _isEmptyNode(startAfter)) {
+				startAfter.remove();
+				if (sc == ec) {
+					range.setEnd(ec, eo - 1);
+				}
+			}
+		}
+		var endAfter = K(ec.childNodes[range.endOffset]);
+		if (endAfter && _isEmptyNode(endAfter)) {
+			endAfter.remove();
+		}
+		var bookmark = range.createBookmark(true);
+		_each(nodeList, function(i, node) {
+			_removeAttrOrCss(K(node), map);
+		});
+		range.moveToBookmark(bookmark);
+		return this.select();
+	},
+	
+	//删除指定标签的颜色(同时有字体颜色和背景色时，删除后段字符颜色有会直接删除到最后的BUG，原版自带问题)
+	removeformatColor : function(attributes) {
+		var map = {
+		//	'*' : '.font-weight,.font-style,.text-decoration,.color,.background-color,.font-size,.font-family,.text-indent'
+			'*' : attributes
+		},
+		tags = _toMap('span');
+		_each(tags, function(key, val) {
+			map[key] = attributes.substr(1);//删除第一个字符  color   background-color
+		});
+		
+		
+		var self = this, doc = self.doc, range = self.range;
+		range.enlarge();
+		if (range.startOffset === 0) {//选中区域的起始位置
+			var ksc = K(range.startContainer), parent;
+			while ((parent = ksc.parent()) && parent.isStyle() && parent.children().length == 1) {
+				ksc = parent;
+			}
+			range.setStart(ksc[0], 0);
+			ksc = K(range.startContainer);
+			if (ksc.isBlock()) {
+				_removeAttrOrCss(ksc, map);
+			}
+			var kscp = ksc.parent();
+			if (kscp && kscp.isBlock()) {
+				_removeAttrOrCss(kscp, map);
+			}
+		}
+		var sc, so;
+
+		self.split(true, map);
+		self.split(false, map);
+		var startDummy = doc.createElement('span'), endDummy = doc.createElement('span');
+		range.cloneRange().collapse(false).insertNode(endDummy);
+		range.cloneRange().collapse(true).insertNode(startDummy);
+		var nodeList = [], cmpStart = false;
+		K(range.commonAncestor()).scan(function(node) {
+			if (!cmpStart && node == startDummy) {
+				cmpStart = true;
+				return;
+			}
+			if (node == endDummy) {
+				return false;
+			}
+			if (cmpStart) {
+				nodeList.push(node);
+			}
+		});
+	
+		K(startDummy).remove();
+		K(endDummy).remove();
+		sc = range.startContainer;
+		so = range.startOffset;
+		var ec = range.endContainer, eo = range.endOffset;
+		if (so > 0) {
+			var startBefore = K(sc.childNodes[so - 1]);
+			if (startBefore && _isEmptyNode(startBefore)) {
+				startBefore.remove();
+				range.setStart(sc, so - 1);
+				if (sc == ec) {
+					range.setEnd(ec, eo - 1);
+				}
+			}
+			var startAfter = K(sc.childNodes[so]);
+			if (startAfter && _isEmptyNode(startAfter)) {
+				startAfter.remove();
+				if (sc == ec) {
+					range.setEnd(ec, eo - 1);
+				}
+			}
+		}
+		var endAfter = K(ec.childNodes[range.endOffset]);
+		if (endAfter && _isEmptyNode(endAfter)) {
+			endAfter.remove();
+		}
+		var bookmark = range.createBookmark(true);
+		_each(nodeList, function(i, node) {
+			_removeAttrOrCss(K(node), map);
+		});
+		range.moveToBookmark(bookmark);
+		return this.select();
+	},
+	
 	inserthtml : function(val, quickMode) {
 		var self = this, range = self.range;
 		if (val === '') {
@@ -3250,10 +3633,10 @@ _extend(KCmd, {
 		insertHtml(range, val);
 		return self;
 	},
-	hr : function() {
+	hr : function() {//插入横线
 		return this.inserthtml('<hr />');
 	},
-	print : function() {
+	print : function() {//打印
 		this.win.print();
 		return this;
 	},
@@ -3528,7 +3911,7 @@ _extend(KWidget, {
 			}
 		}
 		if (y !== null) {
-			y = y < 0 ? 0 : _addUnit(y);
+			y = y < 0 ? 0 : _addUnit(parseInt(y));//修复上传图片或者视频的弹窗有时候不出现，只出现遮罩
 			self.div.css('top', y);
 			if (updateProp) {
 				self.y = y;
@@ -3651,13 +4034,13 @@ function _getInitHtml(themesPath, bodyClass, cssPath, cssData) {
 		'	width:100px;',
 		'	height:100px;',
 		'}',
-		'img.ke-media {',
+		'img.ke-media,img.ke-video,img.ke-iframe {',//视频
 		'	border:1px solid #AAA;',
 		'	background-image:url(' + themesPath + 'common/media.gif);',
 		'	background-position:center center;',
 		'	background-repeat:no-repeat;',
-		'	width:100px;',
-		'	height:100px;',
+		'	width:320px;',
+		'	height:240px;',
 		'}',
 		'img.ke-anchor {',
 		'	border:1px dashed #666;',
@@ -3943,7 +4326,26 @@ _extend(KEdit, KWidget, {
 		}
 		K(body).bind('paste', timeoutHandler);
 		K(body).bind('cut', timeoutHandler);
+		
+		$(doc).on('customChange',function() {//监听自定义change事件，
+	    	fn();
+	    });
 		return self;
+	},
+	/**
+	afterInput : function(fn) {//监听Input事件
+		var self = this, doc = self.doc, body = doc.body;
+		$(doc).on('input propertychange',function() {
+	    	fn();
+	    });
+		return self;
+	},**/
+	trigger : function() {//触发事件, 例如编辑框设置为自适应高度时，图片上传、视频上传，执行此函数可以让编辑框刷新高度
+		var self = this, doc = self.doc, body = doc.body;
+		setTimeout(function() {
+			$(doc).trigger("customChange");//触发自定义change事件
+			//$(doc).trigger("input");//触发input事件,配合this.afterInput()监听方法执行
+		}, 25);
 	}
 });
 function _edit(options) {
@@ -3969,6 +4371,10 @@ function _selectToolbar(name, fn) {
 function KToolbar(options) {
 	this.init(options);
 }
+
+
+
+//工具栏
 _extend(KToolbar, KWidget, {
 	init : function(options) {
 		var self = this;
@@ -4102,6 +4508,7 @@ _extend(KMenu, KWidget, {
 	},
 	addItem : function(item) {
 		var self = this;
+		
 		if (item.title === '-') {
 			self.div.append(K('<div class="ke-menu-separator"></div>'));
 			return;
@@ -4144,11 +4551,20 @@ _extend(KMenu, KWidget, {
 			itemDiv.append(centerDiv);
 		}
 		itemDiv.append(rightDiv);
+		
+		
+		var icon = "";
 		if (item.checked) {
-			iconClass = 'ke-icon-checked';
+			iconClass = 'fa fa-checked ke-icon-checked';//icon图标
+		}else{
+			if (iconClass !== '') {
+				icon = iconClass.replace("ke-icon-","fa fa-");
+			}
 		}
+		
 		if (iconClass !== '') {
-			leftDiv.html('<span class="ke-inline-block ke-toolbar-icon ke-toolbar-icon-url ' + iconClass + '"></span>');
+			//leftDiv.html('<span class="ke-inline-block ke-toolbar-icon ke-toolbar-icon-url ' + iconClass + '"></span>');
+			leftDiv.html('<span class="ke-inline-block ke-toolbar-icon ke-toolbar-icon-url '+icon+" " + iconClass + '"></span>');//icon图标
 		}
 		rightDiv.html(item.title);
 		return self;
@@ -4262,7 +4678,7 @@ _extend(KUploadButton, {
 			cls = button[0].className || '',
 			target = options.target || 'kindeditor_upload_iframe_' + new Date().getTime();
 		options.afterError = options.afterError || function(str) {
-			alert(str);
+			K.popupMessage(str);
 		};
 		var hiddenElements = [];
 		for(var k in extraParams){
@@ -4272,7 +4688,7 @@ _extend(KUploadButton, {
 			'<div class="ke-inline-block ' + cls + '">',
 			(options.target ? '' : '<iframe name="' + target + '" style="display:none;"></iframe>'),
 			(options.form ? '<div class="ke-upload-area">' : '<form class="ke-upload-area ke-form" method="post" enctype="multipart/form-data" target="' + target + '" action="' + url + '">'),
-			'<span class="ke-button-common">',
+			'<span class="ke-button-common  ke-button-outer">',
 			hiddenElements.join(''),
 			'<input type="button" class="ke-button-common ke-button" value="' + title + '" />',
 			'</span>',
@@ -4288,6 +4704,7 @@ _extend(KUploadButton, {
 		self.form = options.form ? K(options.form) : K('form', div);
 		self.fileBox = K('.ke-upload-file', div);
 		var width = options.width || K('.ke-button-common', div).width();
+		
 		K('.ke-upload-area', div).width(width);
 		self.options = options;
 	},
@@ -4384,7 +4801,7 @@ _extend(KDialog, KWidget, {
 		var headerDiv = K('<div class="ke-dialog-header"></div>');
 		contentDiv.append(headerDiv);
 		headerDiv.html(title);
-		self.closeIcon = K('<span class="ke-dialog-icon-close" title="' + closeBtn.name + '"></span>').click(closeBtn.click);
+		self.closeIcon = K('<span class="ke-dialog-icon-close fa fa-close" title="' + closeBtn.name + '"></span>').click(closeBtn.click);//icon标签
 		headerDiv.append(self.closeIcon);
 		self.draggable({
 			clickEl : headerDiv,
@@ -5075,6 +5492,7 @@ KEditor.prototype = {
 				position : 'absolute',
 				left : 0,
 				top : 0,
+				'background-color' : '#fcfcfc',//全屏时改变背景颜色
 				'z-index' : 811211
 			});
 			if (!_GECKO) {
@@ -5088,6 +5506,9 @@ KEditor.prototype = {
 			K(document.body.parentNode).css('overflow', 'hidden');
 			self._fullscreenExecuted = true;
 		} else {
+			container.css({
+				'background-color' : ''//取消全屏时改变背景颜色
+			});
 			if (self._fullscreenExecuted) {
 				K(document.body).css({
 					'height' : '',
@@ -5101,13 +5522,25 @@ KEditor.prototype = {
 		}
 		var htmlList = [];
 		K.each(self.items, function(i, name) {
-			if (name == '|') {
-				htmlList.push('<span class="ke-inline-block ke-separator"></span>');
-			} else if (name == '/') {
-				htmlList.push('<div class="ke-hr"></div>');
-			} else {
-				htmlList.push('<span class="ke-outline" data-name="' + name + '" title="' + self.lang(name) + '" unselectable="on">');
-				htmlList.push('<span class="ke-toolbar-icon ke-toolbar-icon-url ke-icon-' + name + '" unselectable="on"></span></span>');
+			var flag = false;
+			K.each(self.noToolbarItems, function(i, itemName) {
+				if(name == itemName){//如果图标不在工具栏显示
+					flag = true;
+				}
+			
+			});
+			if(flag == false){
+				if (name == '|') {
+					htmlList.push('<span class="ke-inline-block ke-separator"></span>');
+				} else if (name == '/') {
+					htmlList.push('<div class="ke-hr"></div>');
+				} else {
+					htmlList.push('<span class="ke-outline" data-name="' + name + '" title="' + self.lang(name) + '" unselectable="on">');
+				//	htmlList.push('<span class="ke-toolbar-icon ke-toolbar-icon-url ke-icon-' + name + '" unselectable="on"></span></span>');
+					//icon图标
+					htmlList.push('<span class="ke-toolbar-icon ke-toolbar-icon-url ke-icon-' + name + ' fa fa-' + name + '" unselectable="on"></span></span>');
+	           
+				}
 			}
 		});
 		var toolbar = self.toolbar = _toolbar({
@@ -5201,8 +5634,8 @@ KEditor.prototype = {
 			}
 		});
 		statusbar.removeClass('statusbar').addClass('ke-statusbar')
-			.append('<span class="ke-inline-block ke-statusbar-center-icon"></span>')
-			.append('<span class="ke-inline-block ke-statusbar-right-icon"></span>');
+			.append('<span class="ke-inline-block ke-statusbar-center-icon fa fa-angle-down"></span>')//icon图标
+			.append('<span class="ke-inline-block ke-statusbar-right-icon fa fa-angle-rightBottomCorner"></span>');
 		if (self._fullscreenResizeHandler) {
 			K(window).unbind('resize', self._fullscreenResizeHandler);
 			self._fullscreenResizeHandler = null;
@@ -5328,7 +5761,7 @@ KEditor.prototype = {
 	text : function(val) {
 		var self = this;
 		if (val === undefined) {
-			return _trim(self.html().replace(/<(?!img|embed).*?>/ig, '').replace(/&nbsp;/ig, ' '));
+			return _trim(self.html().replace(/<(?!img|video|iframe).*?>/ig, '').replace(/&nbsp;/ig, ' '));//视频
 		} else {
 			return self.html(_escape(val));
 		}
@@ -5351,7 +5784,7 @@ KEditor.prototype = {
 			return self.html().length;
 		}
 		if (mode === 'text') {
-			return self.text().replace(/<(?:img|embed).*?>/ig, 'K').replace(/\r\n|\n|\r/g, '').length;
+			return self.text().replace(/<(?:img|video|iframe).*?>/ig, 'K').replace(/\r\n|\n|\r/g, '').length;//视频
 		}
 		return 0;
 	},
@@ -5435,7 +5868,7 @@ KEditor.prototype = {
 	redo : function() {
 		return _undoToRedo.call(this, this._redoStack, this._undoStack);
 	},
-	fullscreen : function(bool) {
+	fullscreen : function(bool) {//全屏
 		this.fullscreenMode = (bool === undefined ? !this.fullscreenMode : bool);
 		this.addBookmark(false);
 		return this.remove().create();
@@ -5563,9 +5996,39 @@ function _create(expr, options) {
 	options.langPath = _undef(options.langPath, options.basePath + 'lang/');
 	options.pluginsPath = _undef(options.pluginsPath, options.basePath + 'plugins/');
 	if (_undef(options.loadStyleMode, K.options.loadStyleMode)) {
-		var themeType = _undef(options.themeType, K.options.themeType);
-		_loadStyle(options.themesPath + 'default/default.css');
-		_loadStyle(options.themesPath + themeType + '/' + themeType + '.css');
+		var _themeType = _undef(options.themeType, K.options.themeType);
+		
+		var directory = "";
+		var themeTypeGroup = new Array();
+		
+		//按空格分割
+		var themeTypeList = _themeType.split(/\s+/);
+		if(themeTypeList != null && themeTypeList.length >0){
+			for(var i =0; i<themeTypeList.length; i++){
+				var theme = themeTypeList[i];
+				if(theme != null && theme != ""){
+					if(theme.substr(0, 1) == ":"){//如果同时是目录
+						directory = theme.substr(1,theme.length);
+						themeTypeGroup.push(directory);
+					}else{
+						themeTypeGroup.push(theme);
+					}
+				}
+			}
+		}
+		if(_themeType == "default"){
+			_loadStyle(options.themesPath + _themeType + '/default.css');//加载样式
+		}else{
+			var first = "";
+			for(var i =0; i<themeTypeGroup.length; i++){
+				var themeType = themeTypeGroup[i];
+				
+				_loadStyle(options.themesPath + directory + '/' + themeType + '.css');//加载样式
+			}
+		}
+	
+		
+		
 	}
 	function create(editor) {
 		_each(_plugins, function(name, fn) {
@@ -5828,7 +6291,7 @@ _plugin('core', function(K) {
 			try {
 				self.exec(name, null);
 			} catch(e) {
-				alert(self.lang(name + 'Error'));
+				K.popupMessage(self.lang(name + 'Error'));
 			}
 		});
 	});
@@ -6058,7 +6521,9 @@ _plugin('core', function(K) {
 		return html.replace(/(<(?:noscript|noscript\s[^>]*)>)([\s\S]*?)(<\/noscript>)/ig, function($0, $1, $2, $3) {
 			return $1 + _unescape($2).replace(/\s+/g, ' ') + $3;
 		})
-		.replace(/<img[^>]*class="?ke-(flash|rm|media)"?[^>]*>/ig, function(full) {
+		
+		
+		.replace(/<img[^>]*class="?ke-(flash|rm|media|video)"?[^>]*>/ig, function(full) {//视频
 			var imgAttrs = _getAttrList(full);
 			var styles = _getCssList(imgAttrs.style || '');
 			var attrs = _mediaAttrs(imgAttrs['data-ke-tag']);
@@ -6072,7 +6537,23 @@ _plugin('core', function(K) {
 			}
 			attrs.width = _undef(imgAttrs.width, width);
 			attrs.height = _undef(imgAttrs.height, height);
-			return _mediaEmbed(attrs);
+			return _mediaVideo(attrs);
+		})
+		.replace(/<img[^>]*class="?ke-(iframe)"?[^>]*>/ig, function(full) {//嵌入视频
+			var imgAttrs = _getAttrList(full);
+			var styles = _getCssList(imgAttrs.style || '');
+			var attrs = _mediaAttrs(imgAttrs['data-ke-tag']);
+			var width = _undef(styles.width, '');
+			var height = _undef(styles.height, '');
+			if (/px/i.test(width)) {
+				width = _removeUnit(width);
+			}
+			if (/px/i.test(height)) {
+				height = _removeUnit(height);
+			}
+			attrs.width = _undef(imgAttrs.width, width);
+			attrs.height = _undef(imgAttrs.height, height);
+			return _embedVideo(attrs);
 		})
 		.replace(/<img[^>]*class="?ke-anchor"?[^>]*>/ig, function(full) {
 			var imgAttrs = _getAttrList(full);
@@ -6106,12 +6587,19 @@ _plugin('core', function(K) {
 				return full;
 			});
 		}
-		return html.replace(/<embed[^>]*type="([^"]+)"[^>]*>(?:<\/embed>)?/ig, function(full) {
+		return html.replace(/<video[^>]*src="([^"]+)"[^>]*>(?:<\/video>)?/ig, function(full) {//视频
 			var attrs = _getAttrList(full);
 			attrs.src = _undef(attrs.src, '');
 			attrs.width = _undef(attrs.width, 0);
 			attrs.height = _undef(attrs.height, 0);
 			return _mediaImg(self.themesPath + 'common/blank.gif', attrs);
+		})
+		.replace(/<iframe[^>]*src="([^"]+)"[^>]*>(?:<\/iframe>)?/ig, function(full) {//嵌入视频
+			var attrs = _getAttrList(full);
+			attrs.src = _undef(attrs.src, '');
+			attrs.width = _undef(attrs.width, 0);
+			attrs.height = _undef(attrs.height, 0);
+			return _embedVideoImg(self.themesPath + 'common/blank.gif', attrs);
 		})
 		.replace(/<a[^>]*name="([^"]+)"[^>]*>(?:<\/a>)?/ig, function(full) {
 			var attrs = _getAttrList(full);
@@ -6251,6 +6739,8 @@ KindEditor.lang({
 	invalidPadding : '边距必须为数字。',
 	invalidSpacing : '间距必须为数字。',
 	invalidJson : '服务器发生故障。',
+	invalidVideoCode: '请输入视频代码。',
+	invalidVideoCodeFormat: '代码格式如：&lt;iframe src=https://.. >&lt;/iframe>',
 	uploadSuccess : '上传成功。',
 	cutError : '您的浏览器安全设置不允许使用剪切操作，请使用快捷键(Ctrl+X)来完成。',
 	copyError : '您的浏览器安全设置不允许使用复制操作，请使用快捷键(Ctrl+C)来完成。',
@@ -6435,7 +6925,7 @@ KindEditor.plugin('anchor', function(K) {
 /*******************************************************************************
 * KindEditor - WYSIWYG HTML Editor for Internet
 * Copyright (C) 2006-2011 kindsoft.net
-*
+* 自适应高度
 * @author Roddy <luolonghao@gmail.com>
 * @site http://www.kindsoft.net/
 * @licence http://www.kindsoft.net/license.php
@@ -6445,12 +6935,22 @@ KindEditor.plugin('autoheight', function(K) {
 	if (!self.autoHeightMode) {
 		return;
 	}
-	var minHeight;
+	var minHeight = K.removeUnit(self.height);
 	function hideScroll() {
 		var edit = self.edit;
 		var body = edit.doc.body;
 		edit.iframe[0].scroll = 'no';
 		body.style.overflowY = 'hidden';
+	}
+	function resetHeight_change() {//点击文本框时增加时高度
+		if(self.fullscreenMode){
+			return;
+		}
+		var edit = self.edit;
+		var body = edit.doc.body;
+
+		edit.iframe.height(minHeight);
+		self.resize(null, Math.max((K.IE ? body.scrollHeight : body.offsetHeight) + 76, minHeight));
 	}
 	function resetHeight() {
 		if(self.fullscreenMode){
@@ -6459,11 +6959,16 @@ KindEditor.plugin('autoheight', function(K) {
 		var edit = self.edit;
 		var body = edit.doc.body;
 		edit.iframe.height(minHeight);
-		self.resize(null, Math.max((K.IE ? body.scrollHeight : body.offsetHeight) + 76, minHeight));
+		self.resize(null, Math.max((K.IE ? body.scrollHeight : body.offsetHeight), minHeight));
 	}
 	function init() {
-		minHeight = K.removeUnit(self.height);
-		self.edit.afterChange(resetHeight);
+		if(minHeight != K.removeUnit(self.height)){//高度有变化
+			minHeight = K.removeUnit(self.height);
+			
+		}else{
+			minHeight = K.removeUnit(self.height)-76;
+		}
+		self.edit.afterChange(resetHeight_change);
 		if(!self.fullscreenMode){
 			hideScroll();
 		}
@@ -6706,7 +7211,7 @@ KindEditor.plugin('map', function(K) {
 /*******************************************************************************
 * KindEditor - WYSIWYG HTML Editor for Internet
 * Copyright (C) 2006-2011 kindsoft.net
-*
+* 清除HTML代码
 * @author Roddy <luolonghao@gmail.com>
 * @site http://www.kindsoft.net/
 * @licence http://www.kindsoft.net/license.php
@@ -6720,7 +7225,9 @@ KindEditor.plugin('clearhtml', function(K) {
 		html = html.replace(/(<style[^>]*>)([\s\S]*?)(<\/style>)/ig, '');
 		html = K.formatHtml(html, {
 			a : ['href', 'target'],
-			embed : ['src', 'width', 'height', 'type', 'loop', 'autostart', 'quality', '.width', '.height', 'align', 'allowscriptaccess'],
+			video : ['src', 'width', 'height', 'loop', 'autoplay', 'muted', '.width', '.height', 'align', 'poster','preload','controls'],//视频
+			iframe : ['src', 'frameborder', 'width', 'height', '.width', '.height','scrolling','border','allow','frameborder','framespacing','allowfullscreen'],//嵌入袖频
+			
 			img : ['src', 'width', 'height', 'border', 'alt', 'title', '.width', '.height'],
 			table : ['border'],
 			'td,th' : ['rowspan', 'colspan'],
@@ -6781,7 +7288,7 @@ KindEditor.plugin('code', function(K) {
 							cls = type === '' ? '' :  ' lang-' + type,
 							html = '<pre class="prettyprint' + cls + '">\n' + K.escape(code) + '</pre> ';
 						if (K.trim(code) === '') {
-							alert(lang.pleaseInput);
+							K.popupMessage(lang.pleaseInput);
 							textarea[0].focus();
 							return;
 						}
@@ -6797,19 +7304,23 @@ KindEditor.plugin('code', function(K) {
 /*******************************************************************************
 * KindEditor - WYSIWYG HTML Editor for Internet
 * Copyright (C) 2006-2011 kindsoft.net
-*
+* 表情
 * @author Roddy <luolonghao@gmail.com>
 * @site http://www.kindsoft.net/
 * @licence http://www.kindsoft.net/license.php
 *******************************************************************************/
 KindEditor.plugin('emoticons', function(K) {
 	var self = this, name = 'emoticons',
-		path = (self.emoticonsPath || self.pluginsPath + 'emoticons/images/'),
+		path = (self.emoticonsPath || self.pluginsPath + 'emoticons/twemoji/'),
 		allowPreview = self.allowPreviewEmoticons === undefined ? true : self.allowPreviewEmoticons,
 		currentPageNum = 1;
 	self.clickToolbar(name, function() {
-		var rows = 5, cols = 9, total = 135, startNum = 0,
-			cells = rows * cols, pages = Math.ceil(total / cells),
+		var rows = 5, //每页显示多少行
+			cols = 9, //每页显示多少列
+			total = 148, //表情总共数量
+			startNum = 0,//初始显示第几个表情
+			cells = rows * cols,//每页显示的表情数量
+			pages = Math.ceil(total / cells),//多少分页
 			colsHalf = Math.floor(cols / 2),
 			wrapperDiv = K('<div class="ke-plugin-emoticons"></div>'),
 			elements = [],
@@ -6823,7 +7334,7 @@ KindEditor.plugin('emoticons', function(K) {
 		var previewDiv, previewImg;
 		if (allowPreview) {
 			previewDiv = K('<div class="ke-preview"></div>').css('right', 0);
-			previewImg = K('<img class="ke-preview-img" src="' + path + startNum + '.gif" />');
+			previewImg = K('<img class="ke-preview-img" width="64px" height="64px" src="' + path + startNum + '.svg" />');
 			wrapperDiv.append(previewDiv);
 			previewDiv.append(previewImg);
 		}
@@ -6837,8 +7348,8 @@ KindEditor.plugin('emoticons', function(K) {
 						previewDiv.css('left', '');
 						previewDiv.css('right', 0);
 					}
-					previewImg.attr('src', path + num + '.gif');
-					K(this).addClass('ke-on');
+					previewImg.attr('src', path + num + '.svg');
+					K(this).addClass('ke-on');//显示鼠标悬浮表情显示大表情
 				});
 			} else {
 				cell.mouseover(function() {
@@ -6849,7 +7360,8 @@ KindEditor.plugin('emoticons', function(K) {
 				K(this).removeClass('ke-on');
 			});
 			cell.click(function(e) {
-				self.insertHtml('<img src="' + path + num + '.gif" border="0" alt="" />').hideMenu().focus();
+				//表情插入到编辑器
+				self.insertHtml('<img width="32px" height="32px" src="' + path + num + '.svg" border="0" alt="" />').hideMenu().focus();
 				e.stop();
 			});
 		}
@@ -6876,9 +7388,11 @@ KindEditor.plugin('emoticons', function(K) {
 					var cell = K(row.insertCell(j));
 					cell.addClass('ke-cell');
 					bindCellEvent(cell, j, num);
+				
 					var span = K('<span class="ke-img"></span>')
-						.css('background-position', '-' + (24 * num) + 'px 0px')
-						.css('background-image', 'url(' + path + 'static.gif)');
+					.css('background-position', '4px 4px')
+					.css('background-size', '32px 32px')
+					.css('background-image', 'url(' + path + num + '.svg)');
 					cell.append(span);
 					elements.push(cell);
 					num++;
@@ -6909,12 +7423,13 @@ KindEditor.plugin('emoticons', function(K) {
 			wrapperDiv.append(pageDiv);
 			for (var pageNum = 1; pageNum <= pages; pageNum++) {
 				if (currentPageNum !== pageNum) {
-					var a = K('<a href="javascript:;">[' + pageNum + ']</a>');
+					var a = K('<a href="javascript:;">' + pageNum + '</a>');
 					bindPageEvent(a, pageNum);
 					pageDiv.append(a);
 					elements.push(a);
 				} else {
-					pageDiv.append(K('@[' + pageNum + ']'));
+				//	pageDiv.append(K('@' + pageNum + ''));
+					pageDiv.append(K('@<span>' + pageNum + '</span>'));
 				}
 				pageDiv.append(K('@&nbsp;'));
 			}
@@ -7155,17 +7670,17 @@ KindEditor.plugin('flash', function(K) {
 							width = widthBox.val(),
 							height = heightBox.val();
 						if (url == 'http://' || K.invalidUrl(url)) {
-							alert(self.lang('invalidUrl'));
+							K.popupMessage(self.lang('invalidUrl'));
 							urlBox[0].focus();
 							return;
 						}
 						if (!/^\d*$/.test(width)) {
-							alert(self.lang('invalidWidth'));
+							K.popupMessage(self.lang('invalidWidth'));
 							widthBox[0].focus();
 							return;
 						}
 						if (!/^\d*$/.test(height)) {
-							alert(self.lang('invalidHeight'));
+							K.popupMessage(self.lang('invalidHeight'));
 							heightBox[0].focus();
 							return;
 						}
@@ -7203,9 +7718,9 @@ KindEditor.plugin('flash', function(K) {
 							if (self.afterUpload) {
 								self.afterUpload.call(self, url, data, name);
 							}
-							alert(self.lang('uploadSuccess'));
+							K.popupMessage(self.lang('uploadSuccess'));
 						} else {
-							alert(data.message);
+							K.popupMessage(data.message);
 						}
 					},
 					afterError : function(html) {
@@ -7262,7 +7777,7 @@ KindEditor.plugin('flash', function(K) {
 /*******************************************************************************
 * KindEditor - WYSIWYG HTML Editor for Internet
 * Copyright (C) 2006-2011 kindsoft.net
-*
+* 图片上传
 * @author Roddy <luolonghao@gmail.com>
 * @site http://www.kindsoft.net/
 * @licence http://www.kindsoft.net/license.php
@@ -7305,14 +7820,14 @@ KindEditor.plugin('image', function(K) {
 			'<span class="ke-button-common ke-button-outer">',
 			'<input type="button" class="ke-button-common ke-button" name="viewServer" value="' + lang.viewServer + '" />',
 			'</span>',
-			'</div>',
-			'<div class="ke-dialog-row">',
+			'</div>',	
+			'<div class="ke-dialog-row" style="display: none;">',/*不显示这几项*/
 			'<label for="remoteWidth" style="width:60px;">' + lang.size + '</label>',
 			lang.width + ' <input type="text" id="remoteWidth" class="ke-input-text ke-input-number" name="width" value="" maxlength="4" /> ',
 			lang.height + ' <input type="text" class="ke-input-text ke-input-number" name="height" value="" maxlength="4" /> ',
 			'<img class="ke-refresh-btn" src="' + imgPath + 'refresh.png" width="16" height="16" alt="" style="cursor:pointer;" title="' + lang.resetSize + '" />',
 			'</div>',
-			'<div class="ke-dialog-row">',
+			'<div class="ke-dialog-row" style="display: none;">',/*不显示这几项*/
 			'<label style="width:60px;">' + lang.align + '</label>',
 			'<input type="radio" name="align" class="ke-inline-block" value="" checked="checked" /> <img name="defaultImg" src="' + imgPath + 'align_top.gif" width="23" height="25" alt="" />',
 			' <input type="radio" name="align" class="ke-inline-block" value="left" /> <img name="leftImg" src="' + imgPath + 'align_left.gif" width="23" height="25" alt="" />',
@@ -7352,7 +7867,7 @@ KindEditor.plugin('image', function(K) {
 					}
 					if (showLocal && showRemote && tabs && tabs.selectedIndex === 1 || !showRemote) {
 						if (uploadbutton.fileBox.val() == '') {
-							alert(self.lang('pleaseSelectFile'));
+							K.popupMessage(self.lang('pleaseSelectFile'));
 							return;
 						}
 						dialog.showLoading(self.lang('uploadLoading'));
@@ -7372,17 +7887,17 @@ KindEditor.plugin('image', function(K) {
 						}
 					});
 					if (url == 'http://' || K.invalidUrl(url)) {
-						alert(self.lang('invalidUrl'));
+						K.popupMessage(self.lang('invalidUrl'));
 						urlBox[0].focus();
 						return;
 					}
 					if (!/^\d*$/.test(width)) {
-						alert(self.lang('invalidWidth'));
+						K.popupMessage(self.lang('invalidWidth'));
 						widthBox[0].focus();
 						return;
 					}
 					if (!/^\d*$/.test(height)) {
-						alert(self.lang('invalidHeight'));
+						K.popupMessage(self.lang('invalidHeight'));
 						heightBox[0].focus();
 						return;
 					}
@@ -7430,7 +7945,7 @@ KindEditor.plugin('image', function(K) {
 			fieldName : filePostName,
 			form : K('.ke-form', div),
 			target : target,
-			width: 60,
+			width: 70,
 			afterUpload : function(data) {
 				dialog.hideLoading();
 				if (data.error === 0) {
@@ -7449,7 +7964,7 @@ KindEditor.plugin('image', function(K) {
 						K(".ke-refresh-btn", div).click();
 					}
 				} else {
-					alert(data.message);
+					K.popupMessage(data.message);
 				}
 			},
 			afterError : function(html) {
@@ -7526,6 +8041,8 @@ KindEditor.plugin('image', function(K) {
 		}
 		return dialog;
 	};
+	
+	var doc = self.doc;
 	self.plugin.image = {
 		edit : function() {
 			var img = self.plugin.getSelectedImage();
@@ -7553,6 +8070,8 @@ KindEditor.plugin('image', function(K) {
 					setTimeout(function() {
 						self.hideDialog().focus();
 					}, 0);
+				
+					self.edit.trigger();//触发事件
 				}
 			});
 		},
@@ -7571,7 +8090,7 @@ KindEditor.plugin('image', function(K) {
 /*******************************************************************************
 * KindEditor - WYSIWYG HTML Editor for Internet
 * Copyright (C) 2006-2011 kindsoft.net
-*
+* 插入文件
 * @author Roddy <luolonghao@gmail.com>
 * @site http://www.kindsoft.net/
 * @licence http://www.kindsoft.net/license.php
@@ -7617,7 +8136,7 @@ KindEditor.plugin('insertfile', function(K) {
 					var url = K.trim(urlBox.val()),
 						title = titleBox.val();
 					if (url == 'http://' || K.invalidUrl(url)) {
-						alert(self.lang('invalidUrl'));
+						K.popupMessage(self.lang('invalidUrl'));
 						urlBox[0].focus();
 						return;
 					}
@@ -7625,6 +8144,7 @@ KindEditor.plugin('insertfile', function(K) {
 						title = url;
 					}
 					clickFn.call(self, url, title);
+					self.edit.trigger();//触发事件
 				}
 			}
 		}),
@@ -7650,10 +8170,11 @@ KindEditor.plugin('insertfile', function(K) {
 						if (self.afterUpload) {
 							self.afterUpload.call(self, url, data, name);
 						}
-						alert(self.lang('uploadSuccess'));
+						K.popupMessage(self.lang('uploadSuccess'));
 					} else {
-						alert(data.message);
+						K.popupMessage(data.message);
 					}
+					
 				},
 				afterError : function(html) {
 					dialog.hideLoading();
@@ -7773,7 +8294,7 @@ KindEditor.plugin('link', function(K) {
 						click : function(e) {
 							var url = K.trim(urlBox.val());
 							if (url == 'http://' || K.invalidUrl(url)) {
-								alert(self.lang('invalidUrl'));
+								K.popupMessage(self.lang('invalidUrl'));
 								urlBox[0].focus();
 								return;
 							}
@@ -7808,7 +8329,7 @@ KindEditor.plugin('link', function(K) {
 /*******************************************************************************
 * KindEditor - WYSIWYG HTML Editor for Internet
 * Copyright (C) 2006-2011 kindsoft.net
-*
+* 视频
 * @author Roddy <luolonghao@gmail.com>
 * @site http://www.kindsoft.net/
 * @licence http://www.kindsoft.net/license.php
@@ -7820,11 +8341,21 @@ KindEditor.plugin('media', function(K) {
 		formatUploadUrl = K.undef(self.formatUploadUrl, true),
 		extraParams = K.undef(self.extraFileUploadParams, {}),
 		filePostName = K.undef(self.filePostName, 'imgFile'),
-		uploadJson = K.undef(self.uploadJson, self.basePath + 'php/upload_json.php');
+		uploadJson = K.undef(self.uploadJson, self.basePath + 'php/upload_json.php'),
+		items = K.undef(self.items, []),
+		tabIndex = K.undef(0, 0);;
 	self.plugin.media = {
 		edit : function() {
 			var html = [
-				'<div style="padding:20px;">',
+			    '<div style="padding:20px;">',
+				//tabs
+				'<div class="tabs"></div>',
+				//选项1
+				'<div class="tab1" style="display:none;">',    
+				'<textarea name="videoCode" class="ke-textarea" style="width:408px;height:115px;" placeholder="代码格式如：<iframe src=https://.. ></iframe>"></textarea>',
+				'</div>',
+				//选项2          
+				'<div class="tab2" style="display:none;">',
 				'<div class="ke-dialog-row">',
 				'<label for="keUrl" style="width:60px;">' + lang.url + '</label>',
 				'<input class="ke-input-text" type="text" id="keUrl" name="url" value="" style="width:160px;" /> &nbsp;',
@@ -7833,6 +8364,19 @@ KindEditor.plugin('media', function(K) {
 				'<input type="button" class="ke-button-common ke-button" name="viewServer" value="' + lang.viewServer + '" />',
 				'</span>',
 				'</div>',
+				'<div class="ke-dialog-row" style="display: none;">',/*不显示这几项*/
+				'<label for="keWidth" style="width:60px;">' + lang.width + '</label>',
+				'<input type="text" id="keWidth" class="ke-input-text ke-input-number" name="width" value="550" maxlength="4" />',
+				'</div>',
+				'<div class="ke-dialog-row" style="display: none;">',/*不显示这几项*/
+				'<label for="keHeight" style="width:60px;">' + lang.height + '</label>',
+				'<input type="text" id="keHeight" class="ke-input-text ke-input-number" name="height" value="400" maxlength="4" />',
+				'</div>',
+				'<div class="ke-dialog-row" style="display: none;">',/*不显示这几项*/
+				'<label for="keAutostart">' + lang.autostart + '</label>',
+				'<input type="checkbox" id="keAutostart" name="autostart" value="" /> ',
+				'</div>',
+				/**
 				'<div class="ke-dialog-row">',
 				'<label for="keWidth" style="width:60px;">' + lang.width + '</label>',
 				'<input type="text" id="keWidth" class="ke-input-text ke-input-number" name="width" value="550" maxlength="4" />',
@@ -7845,12 +8389,14 @@ KindEditor.plugin('media', function(K) {
 				'<label for="keAutostart">' + lang.autostart + '</label>',
 				'<input type="checkbox" id="keAutostart" name="autostart" value="" /> ',
 				'</div>',
+				**/
+				'</div>',
 				'</div>'
 			].join('');
 			var dialog = self.createDialog({
 				name : name,
 				width : 450,
-				height : 230,
+				height : 280,
 				title : self.lang(name),
 				body : html,
 				yesBtn : {
@@ -7858,46 +8404,146 @@ KindEditor.plugin('media', function(K) {
 					click : function(e) {
 						var url = K.trim(urlBox.val()),
 							width = widthBox.val(),
-							height = heightBox.val();
-						if (url == 'http://' || K.invalidUrl(url)) {
-							alert(self.lang('invalidUrl'));
-							urlBox[0].focus();
-							return;
-						}
-						if (!/^\d*$/.test(width)) {
-							alert(self.lang('invalidWidth'));
-							widthBox[0].focus();
-							return;
-						}
-						if (!/^\d*$/.test(height)) {
-							alert(self.lang('invalidHeight'));
-							heightBox[0].focus();
-							return;
-						}
-						var html = K.mediaImg(self.themesPath + 'common/blank.gif', {
+							height = heightBox.val(),
+							videoCode = videoCodeBox.val();
+						
+						if(tabIndexBox ==0){
+							if(K.trim(videoCode) === ''){
+								K.popupMessage(self.lang('invalidVideoCode'));
+								videoCodeBox[0].focus();
+	                            return;
+							}
+							
+							var iframe_obj = K(K(videoCode).get(0));
+							if(iframe_obj == null){
+								K.popupMessage(self.lang('invalidVideoCodeFormat'));
+								videoCodeBox[0].focus();
+	                            return;
+							}
+							
+							if(iframe_obj.name.toLowerCase()=='iframe'){
+								var _src = iframe_obj.attr('src');
+								var _scrolling = iframe_obj.attr('scrolling');
+								var _border = iframe_obj.attr('border');
+								var _allow = iframe_obj.attr('allow');
+								var _frameborder = iframe_obj.attr('frameborder');
+								var _framespacing = iframe_obj.attr('framespacing');
+								var _allowfullscreen = iframe_obj.attr('allowfullscreen');
+								
+								
+								var html = K.embedVideoImg(self.themesPath + 'common/blank.gif', {
+									src : _src,
+									scrolling : _scrolling,
+									border : _border,
+									allow : _allow,
+									width : '',
+									height : '',
+									frameborder : _frameborder,
+									framespacing : _framespacing,
+									allowfullscreen : _allowfullscreen
+								});
+								self.insertHtml(html).hideDialog().focus();
+								
+								self.edit.trigger();//触发事件
+							}else{
+								K.popupMessage(self.lang('invalidVideoCodeFormat'));
+								videoCodeBox[0].focus();
+	                            return;
+							}
+						}else{
+							if (url == 'http://' || K.invalidUrl(url)) {
+								K.popupMessage(self.lang('invalidUrl'));
+								urlBox[0].focus();
+								return;
+							}
+							if (!/^\d*$/.test(width)) {
+								K.popupMessage(self.lang('invalidWidth'));
+								widthBox[0].focus();
+								return;
+							}
+							if (!/^\d*$/.test(height)) {
+								K.popupMessage(self.lang('invalidHeight'));
+								heightBox[0].focus();
+								return;
+							}
+							var html = K.mediaImg(self.themesPath + 'common/blank.gif', {
 								src : url,
 								type : K.mediaType(url),
 								width : width,
 								height : height,
-								autostart : autostartBox[0].checked ? 'true' : 'false',
-								loop : 'true'
+							//	autoplay : autostartBox[0].checked ? 'autoplay' : 'none',
+							//	loop : 'loop',
+								controls : 'controls'
 							});
-						self.insertHtml(html).hideDialog().focus();
+							self.insertHtml(html).hideDialog().focus();
+							self.edit.trigger();//触发事件
+						}
+						
+					
 					}
 				}
 			}),
 			div = dialog.div,
+
 			urlBox = K('[name="url"]', div),
 			viewServerBtn = K('[name="viewServer"]', div),
 			widthBox = K('[name="width"]', div),
 			heightBox = K('[name="height"]', div),
-			autostartBox = K('[name="autostart"]', div);
+			autostartBox = K('[name="autostart"]', div),
+			videoCodeBox = K('[name="videoCode"]', div);
 			urlBox.val('http://');
+		
+			var tabs;
+			tabs = K.tabs({
+				src : K('.tabs', div),
+				afterSelect : function(i) {
+					tabIndexBox = i;
+				}
+			});
+			
+			var tabTitle1 = "";
+			var tabTitle2 = "";
+			for(var i = 0;i < items.length;i++){
+				var item = items[i];
+				if(item == "embedVideo"){
+					tabTitle1 = "嵌入视频";
+				}
+				if(item == "uploadVideo"){
+					tabTitle2 = "上传视频";
+				}
+			}
+
+			tabs.add({
+				title : tabTitle1,//嵌入视频
+				panel : K('.tab1', div)
+			});
+			tabs.add({
+				title : tabTitle2,//上传视频
+				panel : K('.tab2', div)
+			});
+			
+			//第一次打开时显示
+			
+			//显示第一个标签项内容		
+			if(tabTitle2 !=""){
+				tabIndex = 1;
+			}
+			if(tabTitle1 !=""){
+				tabIndex = 0;
+			}
+
+			
+			tabs.select(tabIndex);
+
+			K('.tab'+(tabIndex+1), div).show();
+
+			
 			if (allowMediaUpload) {
 				var uploadbutton = K.uploadbutton({
 					button : K('.ke-upload-button', div)[0],
 					fieldName : filePostName,
 					extraParams : extraParams,
+					width : 60,//上传按钮宽度
 					url : K.addParam(uploadJson, 'dir=media'),
 					afterUpload : function(data) {
 						dialog.hideLoading();
@@ -7910,9 +8556,9 @@ KindEditor.plugin('media', function(K) {
 							if (self.afterUpload) {
 								self.afterUpload.call(self, url, data, name);
 							}
-							alert(self.lang('uploadSuccess'));
+							K.popupMessage(self.lang('uploadSuccess'));
 						} else {
-							alert(data.message);
+							K.popupMessage(data.message);
 						}
 					},
 					afterError : function(html) {
@@ -7955,9 +8601,14 @@ KindEditor.plugin('media', function(K) {
 				widthBox.val(K.removeUnit(img.css('width')) || attrs.width || 0);
 				heightBox.val(K.removeUnit(img.css('height')) || attrs.height || 0);
 				autostartBox[0].checked = (attrs.autostart === 'true');
+			//	videoCodeBox.val("");
+				
 			}
 			urlBox[0].focus();
 			urlBox[0].select();
+			
+			
+			
 		},
 		'delete' : function() {
 			self.plugin.getSelectedMedia().remove();
@@ -7970,7 +8621,7 @@ KindEditor.plugin('media', function(K) {
 /*******************************************************************************
 * KindEditor - WYSIWYG HTML Editor for Internet
 * Copyright (C) 2006-2011 kindsoft.net
-*
+* 图片批量上传
 * @author Roddy <luolonghao@gmail.com>
 * @site http://www.kindsoft.net/
 * @licence http://www.kindsoft.net/license.php
@@ -7983,115 +8634,111 @@ K.extend(KSWFUpload, {
 	init : function(options) {
 		var self = this;
 		options.afterError = options.afterError || function(str) {
-			alert(str);
+			K.popupMessage(str);
 		};
 		self.options = options;
 		self.progressbars = {};
+		
+		
 		self.div = K(options.container).html([
 			'<div class="ke-swfupload">',
 			'<div class="ke-swfupload-top">',
-			'<div class="ke-inline-block ke-swfupload-button">',
-			'<input type="button" value="Browse" />',
+
+			'<div class="ke-inline-block ke-swfupload-button ke-swfupload-desc">',
+			    '<span class="ke-button-common ke-button-outer ke-swfupload-selectFile">',
+				'<input type="button" class="ke-button-common ke-button" value="添加图片" />',
+				'</span>',
 			'</div>',
-			'<div class="ke-inline-block ke-swfupload-desc">' + options.uploadDesc + '</div>',
-			'<span class="ke-button-common ke-button-outer ke-swfupload-startupload">',
-			'<input type="button" class="ke-button-common ke-button" value="' + options.startButtonValue + '" />',
-			'</span>',
+			'<div class="ke-inline-block ke-swfupload-desc"></div>',
 			'</div>',
 			'<div class="ke-swfupload-body"></div>',
 			'</div>'
 		].join(''));
+
 		self.bodyDiv = K('.ke-swfupload-body', self.div);
 		function showError(itemDiv, msg) {
 			K('.ke-status > div', itemDiv).hide();
 			K('.ke-message', itemDiv).addClass('ke-error').show().html(K.escape(msg));
 		}
-		var settings = {
-			debug : false,
-			upload_url : options.uploadUrl,
-			flash_url : options.flashUrl,
-			file_post_name : options.filePostName,
-			button_placeholder : K('.ke-swfupload-button > input', self.div)[0],
-			button_image_url: options.buttonImageUrl,
-			button_width: options.buttonWidth,
-			button_height: options.buttonHeight,
-			button_cursor : SWFUpload.CURSOR.HAND,
-			file_types : options.fileTypes,
-			file_types_description : options.fileTypesDesc,
-			file_upload_limit : options.fileUploadLimit,
-			file_size_limit : options.fileSizeLimit,
-			post_params : options.postParams,
-			file_queued_handler : function(file) {
-				file.url = self.options.fileIconUrl;
-				self.appendFile(file);
-			},
-			file_queue_error_handler : function(file, errorCode, message) {
-				var errorName = '';
-				switch (errorCode) {
-					case SWFUpload.QUEUE_ERROR.QUEUE_LIMIT_EXCEEDED:
-						errorName = options.queueLimitExceeded;
-						break;
-					case SWFUpload.QUEUE_ERROR.FILE_EXCEEDS_SIZE_LIMIT:
-						errorName = options.fileExceedsSizeLimit;
-						break;
-					case SWFUpload.QUEUE_ERROR.ZERO_BYTE_FILE:
-						errorName = options.zeroByteFile;
-						break;
-					case SWFUpload.QUEUE_ERROR.INVALID_FILETYPE:
-						errorName = options.invalidFiletype;
-						break;
-					default:
-						errorName = options.unknownError;
-						break;
-				}
-				K.DEBUG && alert(errorName);
-			},
-			upload_start_handler : function(file) {
-				var self = this;
-				var itemDiv = K('div[data-id="' + file.id + '"]', self.bodyDiv);
-				K('.ke-status > div', itemDiv).hide();
-				K('.ke-progressbar', itemDiv).show();
-			},
-			upload_progress_handler : function(file, bytesLoaded, bytesTotal) {
-				var percent = Math.round(bytesLoaded * 100 / bytesTotal);
-				var progressbar = self.progressbars[file.id];
-				progressbar.bar.css('width', Math.round(percent * 80 / 100) + 'px');
-				progressbar.percent.html(percent + '%');
-			},
-			upload_error_handler : function(file, errorCode, message) {
-				if (file && file.filestatus == SWFUpload.FILE_STATUS.ERROR) {
-					var itemDiv = K('div[data-id="' + file.id + '"]', self.bodyDiv).eq(0);
-					showError(itemDiv, self.options.errorMessage);
-				}
-			},
-			upload_success_handler : function(file, serverData) {
-				var itemDiv = K('div[data-id="' + file.id + '"]', self.bodyDiv).eq(0);
-				var data = {};
-				try {
-					data = K.json(serverData);
-				} catch (e) {
-					self.options.afterError.call(this, '<!doctype html><html>' + serverData + '</html>');
-				}
-				if (data.error !== 0) {
-					showError(itemDiv, K.DEBUG ? data.message : self.options.errorMessage);
-					return;
-				}
-				file.url = data.url;
-				K('.ke-img', itemDiv).attr('src', file.url).attr('data-status', file.filestatus).data('data', data);
-				K('.ke-status > div', itemDiv).hide();
-			}
-		};
-		self.swfu = new SWFUpload(settings);
-		K('.ke-swfupload-startupload input', self.div).click(function() {
-			self.swfu.startUpload();
+
+		var uploader = WebUploader.create({
+		    //swf文件路径
+		    swf: options.flashUrl,
+		    //文件接收服务端。
+		    server: options.uploadUrl,
+		    //选择文件的按钮。可选。 内部根据当前运行是创建，可能是input元素，也可能是flash.
+		 //   pick: K('.ke-swfupload-button > div', self.div)[0],
+		    pick: K('.ke-swfupload-button > span', self.div)[0],
+		    //配置压缩的图片的选项。如果此选项为false, 则图片在上传前不进行压缩
+		    compress: false,
+		    //选完文件后，是否自动上传
+		    auto: true,
+		    //[可选] [默认值：'file'] 设置文件上传域的name。
+		    fileVal: options.filePostName,
+		    //指定接受哪些类型的文件。 由于目前还有ext转mimeType表，所以这里需要分开指定。
+		    accept: {
+		    	title: self.options.fileTypesDesc,
+		    	extensions: self.options.extensions,
+		    	mimeTypes: 'image/*'
+		    }
+		
+		    
 		});
+		//当有文件被添加进队列的时候，添加到页面预览
+		uploader.on( 'fileQueued', function(file){
+			file.url = self.options.fileIconUrl;
+			self.appendFile(file);
+			
+			var itemDiv = K('div[data-id="' + file.id + '"]', self.bodyDiv);
+			K('.ke-status > div', itemDiv).hide();
+			K('.ke-progressbar', itemDiv).show();
+			
+		});
+		// 文件上传过程中创建进度条实时显示。
+	    uploader.on( 'uploadProgress', function(file,percentage){
+	    	var percent = Math.round(percentage * 100);
+			var progressbar = self.progressbars[file.id];
+			progressbar.bar.css('width', Math.round(percent * 80 / 100) + 'px');
+			progressbar.percent.html(percent + '%');
+
+	    });
+	    
+	    //文件上传成功
+	    uploader.on( 'uploadSuccess', function(file,response){
+	    	var itemDiv = K('div[data-id="' + file.id + '"]', self.bodyDiv).eq(0);
+			var data = response;
+
+			if (data.error !== 0) {
+				showError(itemDiv, K.DEBUG ? data.message : self.options.errorMessage);
+				return;
+			}
+			file.url = data.url;
+			K('.ke-img', itemDiv).attr('src', file.url).attr('data-status', 'complete').data('data', data);//complete表示上传成功状态
+			K('.ke-status > div', itemDiv).hide();
+			
+			//uploader.removeFile(file, true); // 启用多次上传同一个图片
+	    });
+	    //文件上传失败
+	    uploader.on( 'uploadError', function(file,reason){
+	    	if (file) {
+				var itemDiv = K('div[data-id="' + file.id + '"]', self.bodyDiv).eq(0);
+				showError(itemDiv, self.options.errorMessage);
+			}
+	    });
+	    //完成上传完了，成功或者失败，先删除进度条。
+	    uploader.on( 'uploadComplete', function(file){
+			var itemDiv = K('div[data-id="' + file.id + '"]', self.bodyDiv);
+			K('.ke-progressbar', itemDiv).hide();
+	    });
+	    
+	    self.swfu = uploader;
 	},
 	getUrlList : function() {
 		var list = [];
 		K('.ke-img', self.bodyDiv).each(function() {
 			var img = K(this);
 			var status = img.attr('data-status');
-			if (status == SWFUpload.FILE_STATUS.COMPLETE) {
+			if (status == "complete") {//complete表示上传成功状态
 				list.push(img.data('data'));
 			}
 		});
@@ -8099,7 +8746,8 @@ K.extend(KSWFUpload, {
 	},
 	removeFile : function(fileId) {
 		var self = this;
-		self.swfu.cancelUpload(fileId);
+		//取消文件上传
+		self.swfu.cancelFile(fileId);
 		var itemDiv = K('div[data-id="' + fileId + '"]', self.bodyDiv);
 		K('.ke-photo', itemDiv).unbind();
 		K('.ke-delete', itemDiv).unbind();
@@ -8123,9 +8771,10 @@ K.extend(KSWFUpload, {
 				K(this).removeClass('ke-on');
 			});
 		itemDiv.append(photoDiv);
-		var img = K('<img src="' + file.url + '" class="ke-img" data-status="' + file.filestatus + '" width="80" height="80" alt="' + file.name + '" />');
+		//data-status="queued"表示已经进入队列, 等待上传状态
+		var img = K('<img src="' + file.url + '" class="ke-img" data-status="queued" width="80" height="80" alt="' + file.name + '" />');
 		photoDiv.append(img);
-		K('<span class="ke-delete"></span>').appendTo(photoDiv).click(function() {
+		K('<span class="ke-delete fa fa-close"></span>').appendTo(photoDiv).click(function() {//icon图标
 			self.removeFile(file.id);
 		});
 		var statusDiv = K('<div class="ke-status"></div>').appendTo(photoDiv);
@@ -8154,14 +8803,19 @@ KindEditor.plugin('multiimage', function(K) {
 		formatUploadUrl = K.undef(self.formatUploadUrl, true),
 		uploadJson = K.undef(self.uploadJson, self.basePath + 'php/upload_json.php'),
 		imgPath = self.pluginsPath + 'multiimage/images/',
-		imageSizeLimit = K.undef(self.imageSizeLimit, '1MB'),
-		imageFileTypes = K.undef(self.imageFileTypes, '*.jpg;*.gif;*.png'),
-		imageUploadLimit = K.undef(self.imageUploadLimit, 20),
+		extensions = K.undef(self.extensions, 'jpg,jpeg,png,gif,png,bmp'),//允许上传文件后缀
+		imageSizeLimit = K.undef(self.imageSizeLimit, '1MB'),//验证文件总大小是否超出限制, 超出则不允许加入队列
+		fileNumLimit = K.undef(self.fileNumLimit, 20),//验证文件总数量, 超出则不允许加入队列
 		filePostName = K.undef(self.filePostName, 'imgFile'),
 		lang = self.lang(name + '.');
+	
+		K.loadScript(K.options.pluginsPath+name+"/webuploader.min.js");
+		K.loadStyle(K.options.pluginsPath+name+"/webuploader.css");
+	
+	
 	self.plugin.multiImageDialog = function(options) {
 		var clickFn = options.clickFn,
-			uploadDesc = K.tmpl(lang.uploadDesc, {uploadLimit : imageUploadLimit, sizeLimit : imageSizeLimit});
+			uploadDesc = K.tmpl(lang.uploadDesc, {uploadLimit : fileNumLimit, sizeLimit : imageSizeLimit});
 		var html = [
 			'<div style="padding:20px;">',
 			'<div class="swfupload">',
@@ -8171,13 +8825,14 @@ KindEditor.plugin('multiimage', function(K) {
 		var dialog = self.createDialog({
 			name : name,
 			width : 650,
-			height : 510,
+			height : 530,
 			title : self.lang(name),
 			body : html,
 			previewBtn : {
 				name : lang.insertAll,
 				click : function(e) {
 					clickFn.call(self, swfupload.getUrlList());
+					self.edit.trigger();//触发事件
 				}
 			},
 			yesBtn : {
@@ -8193,6 +8848,7 @@ KindEditor.plugin('multiimage', function(K) {
 			}
 		}),
 		div = dialog.div;
+		//设置参数
 		var swfupload = K.swfupload({
 			container : K('.swfupload', div),
 			buttonImageUrl : imgPath + (self.langType == 'zh-CN' ? 'select-files-zh-CN.png' : 'select-files-en.png'),
@@ -8202,11 +8858,12 @@ KindEditor.plugin('multiimage', function(K) {
 			uploadDesc : uploadDesc,
 			startButtonValue : lang.startUpload,
 			uploadUrl : K.addParam(uploadJson, 'dir=image'),
-			flashUrl : imgPath + 'swfupload.swf',
+			flashUrl : self.pluginsPath + 'multiimage/Uploader.swf',
 			filePostName : filePostName,
-			fileTypes : '*.jpg;*.jpeg;*.gif;*.png;*.bmp',
+			fileTypes : '*.jpg;*.jpeg;*.gif;*.png;*.bmp',//本参数作废，不再使用
+			extensions : extensions,//允许上传文件后缀
 			fileTypesDesc : 'Image Files',
-			fileUploadLimit : imageUploadLimit,
+			fileNumLimit : fileNumLimit,
 			fileSizeLimit : imageSizeLimit,
 			postParams :  K.undef(self.extraFileUploadParams, {}),
 			queueLimitExceeded : lang.queueLimitExceeded,
@@ -8220,9 +8877,16 @@ KindEditor.plugin('multiimage', function(K) {
 				self.errorDialog(html);
 			}
 		});
+
 		return dialog;
 	};
 	self.clickToolbar(name, function() {
+		 // 使用 IE6，7，8 时，如果 Flash 播放器版本低则需要升级一下
+	    if (!WebUploader.Uploader.support()) {
+	    	K.popupMessage("您的浏览器不支持批量上传！如果你使用的是 IE 浏览器，请尝试升级 Flash 播放器");
+	        return;
+	    }
+	    
 		self.plugin.multiImageDialog({
 			clickFn : function (urlList) {
 				if (urlList.length === 0) {
@@ -8241,776 +8905,12 @@ KindEditor.plugin('multiimage', function(K) {
 		});
 	});
 });
-/* ******************* */
-/* Constructor & Init  */
-/* ******************* */
-(function() {
-window.SWFUpload = function (settings) {
-	this.initSWFUpload(settings);
-};
-SWFUpload.prototype.initSWFUpload = function (settings) {
-	try {
-		this.customSettings = {};
-		this.settings = settings;
-		this.eventQueue = [];
-		this.movieName = "KindEditor_SWFUpload_" + SWFUpload.movieCount++;
-		this.movieElement = null;
-		SWFUpload.instances[this.movieName] = this;
-		this.initSettings();
-		this.loadFlash();
-		this.displayDebugInfo();
-	} catch (ex) {
-		delete SWFUpload.instances[this.movieName];
-		throw ex;
-	}
-};
-/* *************** */
-/* Static Members  */
-/* *************** */
-SWFUpload.instances = {};
-SWFUpload.movieCount = 0;
-SWFUpload.version = "2.2.0 2009-03-25";
-SWFUpload.QUEUE_ERROR = {
-	QUEUE_LIMIT_EXCEEDED	  		: -100,
-	FILE_EXCEEDS_SIZE_LIMIT  		: -110,
-	ZERO_BYTE_FILE			  		: -120,
-	INVALID_FILETYPE		  		: -130
-};
-SWFUpload.UPLOAD_ERROR = {
-	HTTP_ERROR				  		: -200,
-	MISSING_UPLOAD_URL	      		: -210,
-	IO_ERROR				  		: -220,
-	SECURITY_ERROR			  		: -230,
-	UPLOAD_LIMIT_EXCEEDED	  		: -240,
-	UPLOAD_FAILED			  		: -250,
-	SPECIFIED_FILE_ID_NOT_FOUND		: -260,
-	FILE_VALIDATION_FAILED	  		: -270,
-	FILE_CANCELLED			  		: -280,
-	UPLOAD_STOPPED					: -290
-};
-SWFUpload.FILE_STATUS = {
-	QUEUED		 : -1,
-	IN_PROGRESS	 : -2,
-	ERROR		 : -3,
-	COMPLETE	 : -4,
-	CANCELLED	 : -5
-};
-SWFUpload.BUTTON_ACTION = {
-	SELECT_FILE  : -100,
-	SELECT_FILES : -110,
-	START_UPLOAD : -120
-};
-SWFUpload.CURSOR = {
-	ARROW : -1,
-	HAND : -2
-};
-SWFUpload.WINDOW_MODE = {
-	WINDOW : "window",
-	TRANSPARENT : "transparent",
-	OPAQUE : "opaque"
-};
-SWFUpload.completeURL = function(url) {
-	if (typeof(url) !== "string" || url.match(/^https?:\/\//i) || url.match(/^\//)) {
-		return url;
-	}
-	var currentURL = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ":" + window.location.port : "");
-	var indexSlash = window.location.pathname.lastIndexOf("/");
-	var path;
-	if (indexSlash <= 0) {
-		path = "/";
-	} else {
-		path = window.location.pathname.substr(0, indexSlash) + "/";
-	}
-	return /*currentURL +*/ path + url;
-};
-/* ******************** */
-/* Instance Members  */
-/* ******************** */
-SWFUpload.prototype.initSettings = function () {
-	this.ensureDefault = function (settingName, defaultValue) {
-		this.settings[settingName] = (this.settings[settingName] == undefined) ? defaultValue : this.settings[settingName];
-	};
-	this.ensureDefault("upload_url", "");
-	this.ensureDefault("preserve_relative_urls", false);
-	this.ensureDefault("file_post_name", "Filedata");
-	this.ensureDefault("post_params", {});
-	this.ensureDefault("use_query_string", false);
-	this.ensureDefault("requeue_on_error", false);
-	this.ensureDefault("http_success", []);
-	this.ensureDefault("assume_success_timeout", 0);
-	this.ensureDefault("file_types", "*.*");
-	this.ensureDefault("file_types_description", "All Files");
-	this.ensureDefault("file_size_limit", 0);
-	this.ensureDefault("file_upload_limit", 0);
-	this.ensureDefault("file_queue_limit", 0);
-	this.ensureDefault("flash_url", "swfupload.swf");
-	this.ensureDefault("prevent_swf_caching", true);
-	this.ensureDefault("button_image_url", "");
-	this.ensureDefault("button_width", 1);
-	this.ensureDefault("button_height", 1);
-	this.ensureDefault("button_text", "");
-	this.ensureDefault("button_text_style", "color: #000000; font-size: 16pt;");
-	this.ensureDefault("button_text_top_padding", 0);
-	this.ensureDefault("button_text_left_padding", 0);
-	this.ensureDefault("button_action", SWFUpload.BUTTON_ACTION.SELECT_FILES);
-	this.ensureDefault("button_disabled", false);
-	this.ensureDefault("button_placeholder_id", "");
-	this.ensureDefault("button_placeholder", null);
-	this.ensureDefault("button_cursor", SWFUpload.CURSOR.ARROW);
-	this.ensureDefault("button_window_mode", SWFUpload.WINDOW_MODE.WINDOW);
-	this.ensureDefault("debug", false);
-	this.settings.debug_enabled = this.settings.debug;
-	this.settings.return_upload_start_handler = this.returnUploadStart;
-	this.ensureDefault("swfupload_loaded_handler", null);
-	this.ensureDefault("file_dialog_start_handler", null);
-	this.ensureDefault("file_queued_handler", null);
-	this.ensureDefault("file_queue_error_handler", null);
-	this.ensureDefault("file_dialog_complete_handler", null);
-	this.ensureDefault("upload_start_handler", null);
-	this.ensureDefault("upload_progress_handler", null);
-	this.ensureDefault("upload_error_handler", null);
-	this.ensureDefault("upload_success_handler", null);
-	this.ensureDefault("upload_complete_handler", null);
-	this.ensureDefault("debug_handler", this.debugMessage);
-	this.ensureDefault("custom_settings", {});
-	this.customSettings = this.settings.custom_settings;
-	if (!!this.settings.prevent_swf_caching) {
-		this.settings.flash_url = this.settings.flash_url + (this.settings.flash_url.indexOf("?") < 0 ? "?" : "&") + "preventswfcaching=" + new Date().getTime();
-	}
-	if (!this.settings.preserve_relative_urls) {
-		this.settings.upload_url = SWFUpload.completeURL(this.settings.upload_url);
-		this.settings.button_image_url = SWFUpload.completeURL(this.settings.button_image_url);
-	}
-	delete this.ensureDefault;
-};
-SWFUpload.prototype.loadFlash = function () {
-	var targetElement, tempParent;
-	if (document.getElementById(this.movieName) !== null) {
-		throw "ID " + this.movieName + " is already in use. The Flash Object could not be added";
-	}
-	targetElement = document.getElementById(this.settings.button_placeholder_id) || this.settings.button_placeholder;
-	if (targetElement == undefined) {
-		throw "Could not find the placeholder element: " + this.settings.button_placeholder_id;
-	}
-	tempParent = document.createElement("div");
-	tempParent.innerHTML = this.getFlashHTML();
-	targetElement.parentNode.replaceChild(tempParent.firstChild, targetElement);
-	if (window[this.movieName] == undefined) {
-		window[this.movieName] = this.getMovieElement();
-	}
-};
-SWFUpload.prototype.getFlashHTML = function () {
-	var classid = '';
-	if (KindEditor.IE && KindEditor.V > 8) {
-		classid = ' classid = "clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"';
-	}
-	return ['<object id="', this.movieName, '"' + classid + ' type="application/x-shockwave-flash" data="', this.settings.flash_url, '" width="', this.settings.button_width, '" height="', this.settings.button_height, '" class="swfupload">',
-				'<param name="wmode" value="', this.settings.button_window_mode, '" />',
-				'<param name="movie" value="', this.settings.flash_url, '" />',
-				'<param name="quality" value="high" />',
-				'<param name="menu" value="false" />',
-				'<param name="allowScriptAccess" value="always" />',
-				'<param name="flashvars" value="' + this.getFlashVars() + '" />',
-				'</object>'].join("");
-};
-SWFUpload.prototype.getFlashVars = function () {
-	var paramString = this.buildParamString();
-	var httpSuccessString = this.settings.http_success.join(",");
-	return ["movieName=", encodeURIComponent(this.movieName),
-			"&amp;uploadURL=", encodeURIComponent(this.settings.upload_url),
-			"&amp;useQueryString=", encodeURIComponent(this.settings.use_query_string),
-			"&amp;requeueOnError=", encodeURIComponent(this.settings.requeue_on_error),
-			"&amp;httpSuccess=", encodeURIComponent(httpSuccessString),
-			"&amp;assumeSuccessTimeout=", encodeURIComponent(this.settings.assume_success_timeout),
-			"&amp;params=", encodeURIComponent(paramString),
-			"&amp;filePostName=", encodeURIComponent(this.settings.file_post_name),
-			"&amp;fileTypes=", encodeURIComponent(this.settings.file_types),
-			"&amp;fileTypesDescription=", encodeURIComponent(this.settings.file_types_description),
-			"&amp;fileSizeLimit=", encodeURIComponent(this.settings.file_size_limit),
-			"&amp;fileUploadLimit=", encodeURIComponent(this.settings.file_upload_limit),
-			"&amp;fileQueueLimit=", encodeURIComponent(this.settings.file_queue_limit),
-			"&amp;debugEnabled=", encodeURIComponent(this.settings.debug_enabled),
-			"&amp;buttonImageURL=", encodeURIComponent(this.settings.button_image_url),
-			"&amp;buttonWidth=", encodeURIComponent(this.settings.button_width),
-			"&amp;buttonHeight=", encodeURIComponent(this.settings.button_height),
-			"&amp;buttonText=", encodeURIComponent(this.settings.button_text),
-			"&amp;buttonTextTopPadding=", encodeURIComponent(this.settings.button_text_top_padding),
-			"&amp;buttonTextLeftPadding=", encodeURIComponent(this.settings.button_text_left_padding),
-			"&amp;buttonTextStyle=", encodeURIComponent(this.settings.button_text_style),
-			"&amp;buttonAction=", encodeURIComponent(this.settings.button_action),
-			"&amp;buttonDisabled=", encodeURIComponent(this.settings.button_disabled),
-			"&amp;buttonCursor=", encodeURIComponent(this.settings.button_cursor)
-		].join("");
-};
-SWFUpload.prototype.getMovieElement = function () {
-	if (this.movieElement == undefined) {
-		this.movieElement = document.getElementById(this.movieName);
-	}
-	if (this.movieElement === null) {
-		throw "Could not find Flash element";
-	}
-	return this.movieElement;
-};
-SWFUpload.prototype.buildParamString = function () {
-	var postParams = this.settings.post_params;
-	var paramStringPairs = [];
-	if (typeof(postParams) === "object") {
-		for (var name in postParams) {
-			if (postParams.hasOwnProperty(name)) {
-				paramStringPairs.push(encodeURIComponent(name.toString()) + "=" + encodeURIComponent(postParams[name].toString()));
-			}
-		}
-	}
-	return paramStringPairs.join("&amp;");
-};
-SWFUpload.prototype.destroy = function () {
-	try {
-		this.cancelUpload(null, false);
-		var movieElement = null;
-		movieElement = this.getMovieElement();
-		if (movieElement && typeof(movieElement.CallFunction) === "unknown") {
-			for (var i in movieElement) {
-				try {
-					if (typeof(movieElement[i]) === "function") {
-						movieElement[i] = null;
-					}
-				} catch (ex1) {}
-			}
-			try {
-				movieElement.parentNode.removeChild(movieElement);
-			} catch (ex) {}
-		}
-		window[this.movieName] = null;
-		SWFUpload.instances[this.movieName] = null;
-		delete SWFUpload.instances[this.movieName];
-		this.movieElement = null;
-		this.settings = null;
-		this.customSettings = null;
-		this.eventQueue = null;
-		this.movieName = null;
-		return true;
-	} catch (ex2) {
-		return false;
-	}
-};
-SWFUpload.prototype.displayDebugInfo = function () {
-	this.debug(
-		[
-			"---SWFUpload Instance Info---\n",
-			"Version: ", SWFUpload.version, "\n",
-			"Movie Name: ", this.movieName, "\n",
-			"Settings:\n",
-			"\t", "upload_url:               ", this.settings.upload_url, "\n",
-			"\t", "flash_url:                ", this.settings.flash_url, "\n",
-			"\t", "use_query_string:         ", this.settings.use_query_string.toString(), "\n",
-			"\t", "requeue_on_error:         ", this.settings.requeue_on_error.toString(), "\n",
-			"\t", "http_success:             ", this.settings.http_success.join(", "), "\n",
-			"\t", "assume_success_timeout:   ", this.settings.assume_success_timeout, "\n",
-			"\t", "file_post_name:           ", this.settings.file_post_name, "\n",
-			"\t", "post_params:              ", this.settings.post_params.toString(), "\n",
-			"\t", "file_types:               ", this.settings.file_types, "\n",
-			"\t", "file_types_description:   ", this.settings.file_types_description, "\n",
-			"\t", "file_size_limit:          ", this.settings.file_size_limit, "\n",
-			"\t", "file_upload_limit:        ", this.settings.file_upload_limit, "\n",
-			"\t", "file_queue_limit:         ", this.settings.file_queue_limit, "\n",
-			"\t", "debug:                    ", this.settings.debug.toString(), "\n",
-			"\t", "prevent_swf_caching:      ", this.settings.prevent_swf_caching.toString(), "\n",
-			"\t", "button_placeholder_id:    ", this.settings.button_placeholder_id.toString(), "\n",
-			"\t", "button_placeholder:       ", (this.settings.button_placeholder ? "Set" : "Not Set"), "\n",
-			"\t", "button_image_url:         ", this.settings.button_image_url.toString(), "\n",
-			"\t", "button_width:             ", this.settings.button_width.toString(), "\n",
-			"\t", "button_height:            ", this.settings.button_height.toString(), "\n",
-			"\t", "button_text:              ", this.settings.button_text.toString(), "\n",
-			"\t", "button_text_style:        ", this.settings.button_text_style.toString(), "\n",
-			"\t", "button_text_top_padding:  ", this.settings.button_text_top_padding.toString(), "\n",
-			"\t", "button_text_left_padding: ", this.settings.button_text_left_padding.toString(), "\n",
-			"\t", "button_action:            ", this.settings.button_action.toString(), "\n",
-			"\t", "button_disabled:          ", this.settings.button_disabled.toString(), "\n",
-			"\t", "custom_settings:          ", this.settings.custom_settings.toString(), "\n",
-			"Event Handlers:\n",
-			"\t", "swfupload_loaded_handler assigned:  ", (typeof this.settings.swfupload_loaded_handler === "function").toString(), "\n",
-			"\t", "file_dialog_start_handler assigned: ", (typeof this.settings.file_dialog_start_handler === "function").toString(), "\n",
-			"\t", "file_queued_handler assigned:       ", (typeof this.settings.file_queued_handler === "function").toString(), "\n",
-			"\t", "file_queue_error_handler assigned:  ", (typeof this.settings.file_queue_error_handler === "function").toString(), "\n",
-			"\t", "upload_start_handler assigned:      ", (typeof this.settings.upload_start_handler === "function").toString(), "\n",
-			"\t", "upload_progress_handler assigned:   ", (typeof this.settings.upload_progress_handler === "function").toString(), "\n",
-			"\t", "upload_error_handler assigned:      ", (typeof this.settings.upload_error_handler === "function").toString(), "\n",
-			"\t", "upload_success_handler assigned:    ", (typeof this.settings.upload_success_handler === "function").toString(), "\n",
-			"\t", "upload_complete_handler assigned:   ", (typeof this.settings.upload_complete_handler === "function").toString(), "\n",
-			"\t", "debug_handler assigned:             ", (typeof this.settings.debug_handler === "function").toString(), "\n"
-		].join("")
-	);
-};
-/* Note: addSetting and getSetting are no longer used by SWFUpload but are included
-	the maintain v2 API compatibility
-*/
-SWFUpload.prototype.addSetting = function (name, value, default_value) {
-    if (value == undefined) {
-        return (this.settings[name] = default_value);
-    } else {
-        return (this.settings[name] = value);
-	}
-};
-SWFUpload.prototype.getSetting = function (name) {
-    if (this.settings[name] != undefined) {
-        return this.settings[name];
-	}
-    return "";
-};
-SWFUpload.prototype.callFlash = function (functionName, argumentArray) {
-	argumentArray = argumentArray || [];
-	var movieElement = this.getMovieElement();
-	var returnValue, returnString;
-	try {
-		returnString = movieElement.CallFunction('<invoke name="' + functionName + '" returntype="javascript">' + __flash__argumentsToXML(argumentArray, 0) + '</invoke>');
-		returnValue = eval(returnString);
-	} catch (ex) {
-		throw "Call to " + functionName + " failed";
-	}
-	if (returnValue != undefined && typeof returnValue.post === "object") {
-		returnValue = this.unescapeFilePostParams(returnValue);
-	}
-	return returnValue;
-};
-/* *****************************
-	-- Flash control methods --
-	Your UI should use these
-	to operate SWFUpload
-   ***************************** */
-SWFUpload.prototype.selectFile = function () {
-	this.callFlash("SelectFile");
-};
-SWFUpload.prototype.selectFiles = function () {
-	this.callFlash("SelectFiles");
-};
-SWFUpload.prototype.startUpload = function (fileID) {
-	this.callFlash("StartUpload", [fileID]);
-};
-SWFUpload.prototype.cancelUpload = function (fileID, triggerErrorEvent) {
-	if (triggerErrorEvent !== false) {
-		triggerErrorEvent = true;
-	}
-	this.callFlash("CancelUpload", [fileID, triggerErrorEvent]);
-};
-SWFUpload.prototype.stopUpload = function () {
-	this.callFlash("StopUpload");
-};
-/* ************************
- * Settings methods
- *   These methods change the SWFUpload settings.
- *   SWFUpload settings should not be changed directly on the settings object
- *   since many of the settings need to be passed to Flash in order to take
- *   effect.
- * *********************** */
-SWFUpload.prototype.getStats = function () {
-	return this.callFlash("GetStats");
-};
-SWFUpload.prototype.setStats = function (statsObject) {
-	this.callFlash("SetStats", [statsObject]);
-};
-SWFUpload.prototype.getFile = function (fileID) {
-	if (typeof(fileID) === "number") {
-		return this.callFlash("GetFileByIndex", [fileID]);
-	} else {
-		return this.callFlash("GetFile", [fileID]);
-	}
-};
-SWFUpload.prototype.addFileParam = function (fileID, name, value) {
-	return this.callFlash("AddFileParam", [fileID, name, value]);
-};
-SWFUpload.prototype.removeFileParam = function (fileID, name) {
-	this.callFlash("RemoveFileParam", [fileID, name]);
-};
-SWFUpload.prototype.setUploadURL = function (url) {
-	this.settings.upload_url = url.toString();
-	this.callFlash("SetUploadURL", [url]);
-};
-SWFUpload.prototype.setPostParams = function (paramsObject) {
-	this.settings.post_params = paramsObject;
-	this.callFlash("SetPostParams", [paramsObject]);
-};
-SWFUpload.prototype.addPostParam = function (name, value) {
-	this.settings.post_params[name] = value;
-	this.callFlash("SetPostParams", [this.settings.post_params]);
-};
-SWFUpload.prototype.removePostParam = function (name) {
-	delete this.settings.post_params[name];
-	this.callFlash("SetPostParams", [this.settings.post_params]);
-};
-SWFUpload.prototype.setFileTypes = function (types, description) {
-	this.settings.file_types = types;
-	this.settings.file_types_description = description;
-	this.callFlash("SetFileTypes", [types, description]);
-};
-SWFUpload.prototype.setFileSizeLimit = function (fileSizeLimit) {
-	this.settings.file_size_limit = fileSizeLimit;
-	this.callFlash("SetFileSizeLimit", [fileSizeLimit]);
-};
-SWFUpload.prototype.setFileUploadLimit = function (fileUploadLimit) {
-	this.settings.file_upload_limit = fileUploadLimit;
-	this.callFlash("SetFileUploadLimit", [fileUploadLimit]);
-};
-SWFUpload.prototype.setFileQueueLimit = function (fileQueueLimit) {
-	this.settings.file_queue_limit = fileQueueLimit;
-	this.callFlash("SetFileQueueLimit", [fileQueueLimit]);
-};
-SWFUpload.prototype.setFilePostName = function (filePostName) {
-	this.settings.file_post_name = filePostName;
-	this.callFlash("SetFilePostName", [filePostName]);
-};
-SWFUpload.prototype.setUseQueryString = function (useQueryString) {
-	this.settings.use_query_string = useQueryString;
-	this.callFlash("SetUseQueryString", [useQueryString]);
-};
-SWFUpload.prototype.setRequeueOnError = function (requeueOnError) {
-	this.settings.requeue_on_error = requeueOnError;
-	this.callFlash("SetRequeueOnError", [requeueOnError]);
-};
-SWFUpload.prototype.setHTTPSuccess = function (http_status_codes) {
-	if (typeof http_status_codes === "string") {
-		http_status_codes = http_status_codes.replace(" ", "").split(",");
-	}
-	this.settings.http_success = http_status_codes;
-	this.callFlash("SetHTTPSuccess", [http_status_codes]);
-};
-SWFUpload.prototype.setAssumeSuccessTimeout = function (timeout_seconds) {
-	this.settings.assume_success_timeout = timeout_seconds;
-	this.callFlash("SetAssumeSuccessTimeout", [timeout_seconds]);
-};
-SWFUpload.prototype.setDebugEnabled = function (debugEnabled) {
-	this.settings.debug_enabled = debugEnabled;
-	this.callFlash("SetDebugEnabled", [debugEnabled]);
-};
-SWFUpload.prototype.setButtonImageURL = function (buttonImageURL) {
-	if (buttonImageURL == undefined) {
-		buttonImageURL = "";
-	}
-	this.settings.button_image_url = buttonImageURL;
-	this.callFlash("SetButtonImageURL", [buttonImageURL]);
-};
-SWFUpload.prototype.setButtonDimensions = function (width, height) {
-	this.settings.button_width = width;
-	this.settings.button_height = height;
-	var movie = this.getMovieElement();
-	if (movie != undefined) {
-		movie.style.width = width + "px";
-		movie.style.height = height + "px";
-	}
-	this.callFlash("SetButtonDimensions", [width, height]);
-};
-SWFUpload.prototype.setButtonText = function (html) {
-	this.settings.button_text = html;
-	this.callFlash("SetButtonText", [html]);
-};
-SWFUpload.prototype.setButtonTextPadding = function (left, top) {
-	this.settings.button_text_top_padding = top;
-	this.settings.button_text_left_padding = left;
-	this.callFlash("SetButtonTextPadding", [left, top]);
-};
-SWFUpload.prototype.setButtonTextStyle = function (css) {
-	this.settings.button_text_style = css;
-	this.callFlash("SetButtonTextStyle", [css]);
-};
-SWFUpload.prototype.setButtonDisabled = function (isDisabled) {
-	this.settings.button_disabled = isDisabled;
-	this.callFlash("SetButtonDisabled", [isDisabled]);
-};
-SWFUpload.prototype.setButtonAction = function (buttonAction) {
-	this.settings.button_action = buttonAction;
-	this.callFlash("SetButtonAction", [buttonAction]);
-};
-SWFUpload.prototype.setButtonCursor = function (cursor) {
-	this.settings.button_cursor = cursor;
-	this.callFlash("SetButtonCursor", [cursor]);
-};
-/* *******************************
-	Flash Event Interfaces
-	These functions are used by Flash to trigger the various
-	events.
-	All these functions a Private.
-	Because the ExternalInterface library is buggy the event calls
-	are added to a queue and the queue then executed by a setTimeout.
-	This ensures that events are executed in a determinate order and that
-	the ExternalInterface bugs are avoided.
-******************************* */
-SWFUpload.prototype.queueEvent = function (handlerName, argumentArray) {
-	if (argumentArray == undefined) {
-		argumentArray = [];
-	} else if (!(argumentArray instanceof Array)) {
-		argumentArray = [argumentArray];
-	}
-	var self = this;
-	if (typeof this.settings[handlerName] === "function") {
-		this.eventQueue.push(function () {
-			this.settings[handlerName].apply(this, argumentArray);
-		});
-		setTimeout(function () {
-			self.executeNextEvent();
-		}, 0);
-	} else if (this.settings[handlerName] !== null) {
-		throw "Event handler " + handlerName + " is unknown or is not a function";
-	}
-};
-SWFUpload.prototype.executeNextEvent = function () {
-	var  f = this.eventQueue ? this.eventQueue.shift() : null;
-	if (typeof(f) === "function") {
-		f.apply(this);
-	}
-};
-SWFUpload.prototype.unescapeFilePostParams = function (file) {
-	var reg = /[$]([0-9a-f]{4})/i;
-	var unescapedPost = {};
-	var uk;
-	if (file != undefined) {
-		for (var k in file.post) {
-			if (file.post.hasOwnProperty(k)) {
-				uk = k;
-				var match;
-				while ((match = reg.exec(uk)) !== null) {
-					uk = uk.replace(match[0], String.fromCharCode(parseInt("0x" + match[1], 16)));
-				}
-				unescapedPost[uk] = file.post[k];
-			}
-		}
-		file.post = unescapedPost;
-	}
-	return file;
-};
-SWFUpload.prototype.testExternalInterface = function () {
-	try {
-		return this.callFlash("TestExternalInterface");
-	} catch (ex) {
-		return false;
-	}
-};
-SWFUpload.prototype.flashReady = function () {
-	var movieElement = this.getMovieElement();
-	if (!movieElement) {
-		this.debug("Flash called back ready but the flash movie can't be found.");
-		return;
-	}
-	this.cleanUp(movieElement);
-	this.queueEvent("swfupload_loaded_handler");
-};
-SWFUpload.prototype.cleanUp = function (movieElement) {
-	try {
-		if (this.movieElement && typeof(movieElement.CallFunction) === "unknown") {
-			this.debug("Removing Flash functions hooks (this should only run in IE and should prevent memory leaks)");
-			for (var key in movieElement) {
-				try {
-					if (typeof(movieElement[key]) === "function") {
-						movieElement[key] = null;
-					}
-				} catch (ex) {
-				}
-			}
-		}
-	} catch (ex1) {
-	}
-	window["__flash__removeCallback"] = function (instance, name) {
-		try {
-			if (instance) {
-				instance[name] = null;
-			}
-		} catch (flashEx) {
-		}
-	};
-};
-/* This is a chance to do something before the browse window opens */
-SWFUpload.prototype.fileDialogStart = function () {
-	this.queueEvent("file_dialog_start_handler");
-};
-/* Called when a file is successfully added to the queue. */
-SWFUpload.prototype.fileQueued = function (file) {
-	file = this.unescapeFilePostParams(file);
-	this.queueEvent("file_queued_handler", file);
-};
-/* Handle errors that occur when an attempt to queue a file fails. */
-SWFUpload.prototype.fileQueueError = function (file, errorCode, message) {
-	file = this.unescapeFilePostParams(file);
-	this.queueEvent("file_queue_error_handler", [file, errorCode, message]);
-};
-/* Called after the file dialog has closed and the selected files have been queued.
-	You could call startUpload here if you want the queued files to begin uploading immediately. */
-SWFUpload.prototype.fileDialogComplete = function (numFilesSelected, numFilesQueued, numFilesInQueue) {
-	this.queueEvent("file_dialog_complete_handler", [numFilesSelected, numFilesQueued, numFilesInQueue]);
-};
-SWFUpload.prototype.uploadStart = function (file) {
-	file = this.unescapeFilePostParams(file);
-	this.queueEvent("return_upload_start_handler", file);
-};
-SWFUpload.prototype.returnUploadStart = function (file) {
-	var returnValue;
-	if (typeof this.settings.upload_start_handler === "function") {
-		file = this.unescapeFilePostParams(file);
-		returnValue = this.settings.upload_start_handler.call(this, file);
-	} else if (this.settings.upload_start_handler != undefined) {
-		throw "upload_start_handler must be a function";
-	}
-	if (returnValue === undefined) {
-		returnValue = true;
-	}
-	returnValue = !!returnValue;
-	this.callFlash("ReturnUploadStart", [returnValue]);
-};
-SWFUpload.prototype.uploadProgress = function (file, bytesComplete, bytesTotal) {
-	file = this.unescapeFilePostParams(file);
-	this.queueEvent("upload_progress_handler", [file, bytesComplete, bytesTotal]);
-};
-SWFUpload.prototype.uploadError = function (file, errorCode, message) {
-	file = this.unescapeFilePostParams(file);
-	this.queueEvent("upload_error_handler", [file, errorCode, message]);
-};
-SWFUpload.prototype.uploadSuccess = function (file, serverData, responseReceived) {
-	file = this.unescapeFilePostParams(file);
-	this.queueEvent("upload_success_handler", [file, serverData, responseReceived]);
-};
-SWFUpload.prototype.uploadComplete = function (file) {
-	file = this.unescapeFilePostParams(file);
-	this.queueEvent("upload_complete_handler", file);
-};
-/* Called by SWFUpload JavaScript and Flash functions when debug is enabled. By default it writes messages to the
-   internal debug console.  You can override this event and have messages written where you want. */
-SWFUpload.prototype.debug = function (message) {
-	this.queueEvent("debug_handler", message);
-};
-/* **********************************
-	Debug Console
-	The debug console is a self contained, in page location
-	for debug message to be sent.  The Debug Console adds
-	itself to the body if necessary.
-	The console is automatically scrolled as messages appear.
-	If you are using your own debug handler or when you deploy to production and
-	have debug disabled you can remove these functions to reduce the file size
-	and complexity.
-********************************** */
-SWFUpload.prototype.debugMessage = function (message) {
-	if (this.settings.debug) {
-		var exceptionMessage, exceptionValues = [];
-		if (typeof message === "object" && typeof message.name === "string" && typeof message.message === "string") {
-			for (var key in message) {
-				if (message.hasOwnProperty(key)) {
-					exceptionValues.push(key + ": " + message[key]);
-				}
-			}
-			exceptionMessage = exceptionValues.join("\n") || "";
-			exceptionValues = exceptionMessage.split("\n");
-			exceptionMessage = "EXCEPTION: " + exceptionValues.join("\nEXCEPTION: ");
-			SWFUpload.Console.writeLine(exceptionMessage);
-		} else {
-			SWFUpload.Console.writeLine(message);
-		}
-	}
-};
-SWFUpload.Console = {};
-SWFUpload.Console.writeLine = function (message) {
-	var console, documentForm;
-	try {
-		console = document.getElementById("SWFUpload_Console");
-		if (!console) {
-			documentForm = document.createElement("form");
-			document.getElementsByTagName("body")[0].appendChild(documentForm);
-			console = document.createElement("textarea");
-			console.id = "SWFUpload_Console";
-			console.style.fontFamily = "monospace";
-			console.setAttribute("wrap", "off");
-			console.wrap = "off";
-			console.style.overflow = "auto";
-			console.style.width = "700px";
-			console.style.height = "350px";
-			console.style.margin = "5px";
-			documentForm.appendChild(console);
-		}
-		console.value += message + "\n";
-		console.scrollTop = console.scrollHeight - console.clientHeight;
-	} catch (ex) {
-		alert("Exception: " + ex.name + " Message: " + ex.message);
-	}
-};
-})();
-(function() {
-/*
-	Queue Plug-in
-	Features:
-		*Adds a cancelQueue() method for cancelling the entire queue.
-		*All queued files are uploaded when startUpload() is called.
-		*If false is returned from uploadComplete then the queue upload is stopped.
-		 If false is not returned (strict comparison) then the queue upload is continued.
-		*Adds a QueueComplete event that is fired when all the queued files have finished uploading.
-		 Set the event handler with the queue_complete_handler setting.
-	*/
-if (typeof(SWFUpload) === "function") {
-	SWFUpload.queue = {};
-	SWFUpload.prototype.initSettings = (function (oldInitSettings) {
-		return function () {
-			if (typeof(oldInitSettings) === "function") {
-				oldInitSettings.call(this);
-			}
-			this.queueSettings = {};
-			this.queueSettings.queue_cancelled_flag = false;
-			this.queueSettings.queue_upload_count = 0;
-			this.queueSettings.user_upload_complete_handler = this.settings.upload_complete_handler;
-			this.queueSettings.user_upload_start_handler = this.settings.upload_start_handler;
-			this.settings.upload_complete_handler = SWFUpload.queue.uploadCompleteHandler;
-			this.settings.upload_start_handler = SWFUpload.queue.uploadStartHandler;
-			this.settings.queue_complete_handler = this.settings.queue_complete_handler || null;
-		};
-	})(SWFUpload.prototype.initSettings);
-	SWFUpload.prototype.startUpload = function (fileID) {
-		this.queueSettings.queue_cancelled_flag = false;
-		this.callFlash("StartUpload", [fileID]);
-	};
-	SWFUpload.prototype.cancelQueue = function () {
-		this.queueSettings.queue_cancelled_flag = true;
-		this.stopUpload();
-		var stats = this.getStats();
-		while (stats.files_queued > 0) {
-			this.cancelUpload();
-			stats = this.getStats();
-		}
-	};
-	SWFUpload.queue.uploadStartHandler = function (file) {
-		var returnValue;
-		if (typeof(this.queueSettings.user_upload_start_handler) === "function") {
-			returnValue = this.queueSettings.user_upload_start_handler.call(this, file);
-		}
-		returnValue = (returnValue === false) ? false : true;
-		this.queueSettings.queue_cancelled_flag = !returnValue;
-		return returnValue;
-	};
-	SWFUpload.queue.uploadCompleteHandler = function (file) {
-		var user_upload_complete_handler = this.queueSettings.user_upload_complete_handler;
-		var continueUpload;
-		if (file.filestatus === SWFUpload.FILE_STATUS.COMPLETE) {
-			this.queueSettings.queue_upload_count++;
-		}
-		if (typeof(user_upload_complete_handler) === "function") {
-			continueUpload = (user_upload_complete_handler.call(this, file) === false) ? false : true;
-		} else if (file.filestatus === SWFUpload.FILE_STATUS.QUEUED) {
-			continueUpload = false;
-		} else {
-			continueUpload = true;
-		}
-		if (continueUpload) {
-			var stats = this.getStats();
-			if (stats.files_queued > 0 && this.queueSettings.queue_cancelled_flag === false) {
-				this.startUpload();
-			} else if (this.queueSettings.queue_cancelled_flag === false) {
-				this.queueEvent("queue_complete_handler", [this.queueSettings.queue_upload_count]);
-				this.queueSettings.queue_upload_count = 0;
-			} else {
-				this.queueSettings.queue_cancelled_flag = false;
-				this.queueSettings.queue_upload_count = 0;
-			}
-		}
-	};
-}
-})();
+
 
 /*******************************************************************************
 * KindEditor - WYSIWYG HTML Editor for Internet
 * Copyright (C) 2006-2011 kindsoft.net
-*
+* 插入分页符
 * @author Roddy <luolonghao@gmail.com>
 * @site http://www.kindsoft.net/
 * @licence http://www.kindsoft.net/license.php
@@ -9294,37 +9194,37 @@ KindEditor.plugin('table', function(K) {
 							borderColor = K(colorBox[0]).html() || '',
 							bgColor = K(colorBox[1]).html() || '';
 						if (rows == 0 || !/^\d+$/.test(rows)) {
-							alert(self.lang('invalidRows'));
+							K.popupMessage(self.lang('invalidRows'));
 							rowsBox[0].focus();
 							return;
 						}
 						if (cols == 0 || !/^\d+$/.test(cols)) {
-							alert(self.lang('invalidRows'));
+							K.popupMessage(self.lang('invalidRows'));
 							colsBox[0].focus();
 							return;
 						}
 						if (!/^\d*$/.test(width)) {
-							alert(self.lang('invalidWidth'));
+							K.popupMessage(self.lang('invalidWidth'));
 							widthBox[0].focus();
 							return;
 						}
 						if (!/^\d*$/.test(height)) {
-							alert(self.lang('invalidHeight'));
+							K.popupMessage(self.lang('invalidHeight'));
 							heightBox[0].focus();
 							return;
 						}
 						if (!/^\d*$/.test(padding)) {
-							alert(self.lang('invalidPadding'));
+							K.popupMessage(self.lang('invalidPadding'));
 							paddingBox[0].focus();
 							return;
 						}
 						if (!/^\d*$/.test(spacing)) {
-							alert(self.lang('invalidSpacing'));
+							K.popupMessage(self.lang('invalidSpacing'));
 							spacingBox[0].focus();
 							return;
 						}
 						if (!/^\d*$/.test(border)) {
-							alert(self.lang('invalidBorder'));
+							K.popupMessage(self.lang('invalidBorder'));
 							borderBox[0].focus();
 							return;
 						}
@@ -9553,17 +9453,17 @@ KindEditor.plugin('table', function(K) {
 							borderColor = K(colorBox[0]).html() || '',
 							bgColor = K(colorBox[1]).html() || '';
 						if (!/^\d*$/.test(width)) {
-							alert(self.lang('invalidWidth'));
+							K.popupMessage(self.lang('invalidWidth'));
 							widthBox[0].focus();
 							return;
 						}
 						if (!/^\d*$/.test(height)) {
-							alert(self.lang('invalidHeight'));
+							K.popupMessage(self.lang('invalidHeight'));
 							heightBox[0].focus();
 							return;
 						}
 						if (!/^\d*$/.test(border)) {
-							alert(self.lang('invalidBorder'));
+							K.popupMessage(self.lang('invalidBorder'));
 							borderBox[0].focus();
 							return;
 						}

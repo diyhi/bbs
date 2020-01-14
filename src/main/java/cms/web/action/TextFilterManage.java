@@ -1,6 +1,8 @@
 package cms.web.action;
 
 import java.math.BigDecimal;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,6 +17,8 @@ import javax.servlet.http.HttpServletRequest;
 import cms.bean.setting.EditorTag;
 import cms.bean.topic.HideTagType;
 import cms.bean.user.UserGrade;
+import cms.utils.CommentedProperties;
+import cms.utils.FileUtil;
 import cms.utils.Verification;
 import cms.web.taglib.Configuration;
 
@@ -25,6 +29,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.safety.Whitelist;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
+
+import com.google.common.net.InternetDomainName;
 
 /**
  * 文本过滤管理
@@ -178,6 +184,8 @@ public class TextFilterManage {
 			whitelist.addTags("strong");
 			//vue-html5-editor
 			whitelist.addTags("b");
+			
+		
 		}
 		if(editorTag == null || editorTag.isItalic()){//斜体
 			//斜体
@@ -191,6 +199,8 @@ public class TextFilterManage {
 			//下划线
 			whitelist.addTags("u");
 		}
+		
+		
 		if(editorTag == null){
 			//删除线
 			whitelist.addTags("s");
@@ -232,13 +242,13 @@ public class TextFilterManage {
 		if(editorTag == null || editorTag.isEmoticons()){//插入表情
 			//插入表情
 			whitelist.addTags("img")
-			.addAttributes("img", "align", "alt", "height", "src", "title", "width","border")
+			.addAttributes("img", "align", "alt", "src", "title", "border")
 			.addProtocols("img", "src", "http", "https");
 		}
 		if(editorTag == null || editorTag.isImage()){//图片
 			//图片
 			whitelist.addTags("img")
-			.addAttributes("img", "align", "alt", "height", "src", "title", "width")
+			.addAttributes("img", "align", "alt", "src", "title")
 			.addProtocols("img", "src", "http", "https");
 		}
 		if(editorTag == null){
@@ -248,6 +258,20 @@ public class TextFilterManage {
 			.addProtocols("embed", "src", "http", "https")
 			.addEnforcedAttribute("embed", "allownetworking", "internal")
 			.addEnforcedAttribute("embed", "allowscriptaccess", "none");
+		}
+		if(editorTag == null || editorTag.isEmbedVideo()){
+			//iframe 嵌入视频
+			whitelist.addTags("iframe")
+			.addAttributes("iframe", "src", "frameborder","scrolling", "border", "allow","framespacing","allowfullscreen");
+		}
+		
+		if(editorTag == null || editorTag.isUploadVideo()){
+			//video 上传视频
+			whitelist.addTags("video")
+			.addAttributes("video", "type", "width","height", "controls", "src","loop")//"autoplay",
+			.addProtocols("video", "src", "http", "https")
+		//	.addEnforcedAttribute("video", "type", "video/mp4")
+			.addEnforcedAttribute("video", "controls", "controls");
 		}
 		
 		
@@ -339,7 +363,6 @@ public class TextFilterManage {
 	 */
 	public Object[] filterHtml(HttpServletRequest request,String html,String item,EditorTag editorTag) {  
 		
-		
 	//	Whitelist whitelist = (Whitelist)object[1];
 	
 	//	Document doc = Jsoup.parseBodyFragment(html,Configuration.url());
@@ -373,6 +396,9 @@ public class TextFilterManage {
 				 styleAllowTagList.add("text-indent");
 				 styleAllowTagList.add("font-family");
 				 styleAllowTagList.add("page-break-after");
+				 styleAllowTagList.add("font-weight");//font-weight: bold; 粗体 wangEditor
+				 styleAllowTagList.add("font-style");//font-style: italic; 斜体 wangEditor
+				 styleAllowTagList.add("text-decoration-line");//text-decoration-line: underline; 下划线 wangEditor
 				 
 				 //表格
 				 styleAllowTagList.add("border-spacing");//border-spacing: 0px;
@@ -437,24 +463,7 @@ public class TextFilterManage {
 			}
 	    }
 		
-		//插入动态地图
-		Elements iframe_pngs = doc.select("iframe[src]");  
-		for (Element element : iframe_pngs) {  
-			//<iframe style="width:560px;height:362px;" src="http://127.0.0.1:8080/shop/backstage/kindeditor/plugins/baidumap/index.html?center=121.473704%2C31.230393&zoom=11&width=558&height=360&markers=121.473704%2C31.230393&markerStyles=l%2CA" frameborder="0">
-			 String mapUrl = element.attr("src"); 
-			 if(mapUrl != null && !"".equals(mapUrl.trim())){
-				 mapUrl = StringUtils.deleteWhitespace(mapUrl);//删除字符串中的空白字符 
-				 
-				 if (mapUrl.trim().startsWith(Configuration.getUrl(request)+"backstage/kindeditor/plugins/baidumap/index.html")) {  
-					 //从左往右查到相等的字符开始，保留后边的，不包含等于的字符
-					 mapUrl =StringUtils.substringAfter(mapUrl, Configuration.getUrl(request));  
-	                 element.attr("src",  mapUrl);  
-	                 isMap = true;
-	             }else{
-	            	 element.attr("src",  "");  
-	             }
-			 }
-		}
+		
 
 		//上传图片文件名称
 		List<String> imageNameList = new ArrayList<String>();
@@ -466,10 +475,21 @@ public class TextFilterManage {
 			 String imageUrl = element.attr("src"); 
 			 if(imageUrl != null && !"".equals(imageUrl.trim())){
 			//	 
-				 
+				 //上传图片
 				 if (imageUrl.trim().startsWith(Configuration.getUrl(request)+"file/") ||
 						 imageUrl.trim().startsWith(Configuration.getUrl(request)+"common/") ||
 						 imageUrl.trim().startsWith(Configuration.getUrl(request)+"backstage/")) {  
+					 
+					//内置svg表情图片
+					 if (imageUrl.trim().startsWith(Configuration.getUrl(request)+"common/") ||
+							 imageUrl.trim().startsWith(Configuration.getUrl(request)+"backstage/")) {  
+						 String extension = FileUtil.getExtension(imageUrl);
+						 if(extension != null && "svg".equalsIgnoreCase(extension.trim())){
+							 element.attr("width",  "32px");  
+							 element.attr("height",  "32px");  
+						 }
+		             }
+					 
 					 //从左往右查到相等的字符开始，保留后边的，不包含等于的字符
 					 imageUrl =StringUtils.substringAfter(imageUrl, Configuration.getUrl(request));  
 	                 element.attr("src",  imageUrl);  
@@ -477,9 +497,16 @@ public class TextFilterManage {
 	                	 
 		            	 imageNameList.add(StringUtils.difference("file/"+item+"/", imageUrl));
 		             }
+	                 
+	                 
+	                 
+	                 
 	             }else{
 	            	 element.attr("src",  imageUrl);  
 	             }
+				 
+				 
+				 
 			 }
 			  
 		}
@@ -519,6 +546,61 @@ public class TextFilterManage {
 				 
 			 }
 		}
+		
+		Elements video_pngs = doc.select("video[src]");  
+		for (Element element : video_pngs) {  
+			String videoUrl = element.attr("src"); 
+			 if(videoUrl != null && !"".equals(videoUrl.trim())){
+				 isMedia = true;
+				 if (videoUrl.trim().startsWith(Configuration.getUrl(request)+"file/"+item+"/")) {  
+					 //从左往右查到相等的字符开始，保留后边的，不包含等于的字符
+					 videoUrl =StringUtils.substringAfter(videoUrl, Configuration.getUrl(request));  
+	                 element.attr("src",  videoUrl);
+	                 mediaNameList.add(StringUtils.difference("file/"+item+"/", videoUrl));
+	             }
+			 } 
+		}
+		
+		
+		//富文本嵌入视频地址白名单
+		List<String> embedVideoWhiteList = CommentedProperties.readRichTextAllowEmbedVideoWhiteList();
+		 
+		//插入动态地图和嵌入视频
+		Elements iframe_pngs = doc.select("iframe[src]");  
+		for (Element element : iframe_pngs) {  
+			//<iframe style="width:560px;height:362px;" src="http://127.0.0.1:8080/shop/backstage/kindeditor/plugins/baidumap/index.html?center=121.473704%2C31.230393&zoom=11&width=558&height=360&markers=121.473704%2C31.230393&markerStyles=l%2CA" frameborder="0">
+			 String iframeUrl = element.attr("src"); 
+			 if(iframeUrl != null && !"".equals(iframeUrl.trim())){
+				 iframeUrl = StringUtils.deleteWhitespace(iframeUrl);//删除字符串中的空白字符 
+
+				 element.attr("src",  ""); 
+				 
+				 if(embedVideoWhiteList != null && embedVideoWhiteList.size() >0){
+					 for(String embedVideoWhite : embedVideoWhiteList){
+						 if(embedVideoWhite != null && !"".equals(embedVideoWhite.trim())){
+							 String domain = this.getTopPrivateDomain(iframeUrl);
+							 if(domain != null && domain.equalsIgnoreCase(embedVideoWhite.trim())){
+								 element.attr("src",  iframeUrl);
+								 isMedia = true;
+								 break;
+							 }
+						 }
+					 }
+				 }
+				 
+				 if (iframeUrl.trim().startsWith(Configuration.getUrl(request)+"backstage/kindeditor/plugins/baidumap/index.html")) {//插入动态地图
+					 //从左往右查到相等的字符开始，保留后边的，不包含等于的字符
+					 iframeUrl =StringUtils.substringAfter(iframeUrl, Configuration.getUrl(request));  
+	                 element.attr("src",  iframeUrl);  
+	                 isMap = true;
+	             }
+				 
+				 
+			 }
+		}
+		
+		
+		
 		//上传文件名称
 		List<String> fileNameList = new ArrayList<String>();
 		Elements file_pngs = doc.select("a[href]");  
@@ -538,13 +620,40 @@ public class TextFilterManage {
 	//     Document clean = new Cleaner(whitelist).clean(doc);
 	//     return clean.body().html();//获取html 
 		
-		
 	//	return doc.body().html();
 		return new Object[]{doc.body().html(),imageNameList,isImage,flashNameList,isFlash,mediaNameList,isMedia,fileNameList,isFile,isMap};
 	}
     
 	
-	
+	/**
+	 * 获取URL中的根域名
+	 * 必须 http 或 https 或 // 开头
+	 * @param url
+	 * @return
+	 * @throws URISyntaxException
+	 */
+	private String getTopPrivateDomain(String url){
+		//java1.8.0_181以下版本的new URL(url).getHost()方法存在右斜杆和井号被绕过漏洞。例如在低版本https://www.aaa.com\www.bbb.com?a123执行结果为www.aaa.com\www.bbb.com
+		url = url.replaceAll("[\\\\#]","/"); //替换掉反斜线和井号
+
+		url = StringUtils.substringBefore(url, "?");//截取到等于第二个参数的字符串为止
+		
+	    String host = null;
+		try {
+			URI uri = new URI(url);
+			if(uri != null){
+				host = uri.getHost();
+			}
+		} catch (URISyntaxException e) {
+			//e.printStackTrace();
+		}
+	    if(host != null && !"".equals(host.trim())){
+	    	InternetDomainName domainName = InternetDomainName.from(host);
+	 	    return domainName.topPrivateDomain().toString();
+	    }
+	    
+	    return "";
+	}
 	
 	
 	/**
@@ -645,6 +754,36 @@ public class TextFilterManage {
 					 }
 				 }
 			}
+			
+			Elements video_pngs = doc.select("video[src]");  
+			for (Element element : video_pngs) {  
+				String mediaUrl = element.attr("src"); 
+				 if(mediaUrl != null && !"".equals(mediaUrl.trim())){
+					 if(StringUtils.startsWithIgnoreCase(mediaUrl, "file/"+item+"/")){
+						 String[] old_typeId_list = mediaUrl.split("/");
+						 String old_typeId = "";
+						 if(old_typeId_list.length >=2){
+							 old_typeId = old_typeId_list[2];
+							
+						 }
+						 String new_typeId_str = "";
+						 if(new_typeId == null){
+							 new_typeId_str = "null";
+						 }else{
+							 new_typeId_str = new_typeId.toString();
+						 }
+						 
+						
+						 if(!old_typeId.equals(new_typeId_str)){
+							 //替换指定的字符，只替换第一次出现的
+							 String url = StringUtils.replaceOnce(mediaUrl, "/"+old_typeId+"/", "/"+new_typeId_str+"/");
+							 element.attr("src",  url);
+							 path.put(mediaUrl, StringUtils.substringBeforeLast(url, "/"));//返回最后一个指定字符串之前的所有字符
+						 }
+					 }
+				 }
+			}
+			
 			Elements file_pngs = doc.select("a[href]");  
 			for (Element element : file_pngs) {  
 				String fileUrl = element.attr("href");
@@ -734,6 +873,17 @@ public class TextFilterManage {
 					 }
 				 }
 			}
+			Elements video_pngs = doc.select("video[src]");  
+			for (Element element : video_pngs) { 
+				String mediaUrl = element.attr("src"); 
+				if(mediaUrl != null && !"".equals(mediaUrl.trim())){
+					if(StringUtils.startsWithIgnoreCase(mediaUrl, "file/"+item+"/")){
+						mediaNameList.add(mediaUrl);
+					}
+				}
+			}
+			
+			
 			Elements file_pngs = doc.select("a[href]");  
 			for (Element element : file_pngs) {  
 				String fileUrl = element.attr("href");
@@ -790,6 +940,16 @@ public class TextFilterManage {
 					 }
 				 }
 			}
+			Elements video_pngs = doc.select("video[src]");  
+			for (Element element : video_pngs) { 
+				 String mediaUrl = element.attr("src"); 
+				 if(mediaUrl != null && !"".equals(mediaUrl.trim())){
+					 if(StringUtils.startsWithIgnoreCase(mediaUrl, oldPath)){
+						 element.attr("src",  "file/template/"+newDirectoryName+"/"+mediaUrl.substring(oldPath.length(), mediaUrl.length()));
+					 }
+				 }
+			}
+			
 			Elements file_pngs = doc.select("a[href]");  
 			for (Element element : file_pngs) {  
 				String fileUrl = element.attr("href");

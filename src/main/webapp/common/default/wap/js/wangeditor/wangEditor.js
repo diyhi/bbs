@@ -429,13 +429,57 @@ DomElement.prototype = {
     html: function html(value) {
         var elem = this[0];
         if (value == null) {
-            return elem.innerHTML;
+        	 //图片标签转视频标签
+        	this.imgToVideo();
+
+        	var html = elem.innerHTML;
+        	
+        	//视频标签转图片标签
+            this.videoToImg();
+        	
+            return html;
         } else {
             elem.innerHTML = value;
+            
+            //视频标签转图片标签
+            this.videoToImg();
+            
             return this;
         }
     },
+    // 视频标签转图片标签
+    videoToImg: function videoToImg() {
+    	//将所有video标签加上preload ="none"属性，让浏览器不加载视频文件
+        //this.find("video").attr("preload","none");
+        
+        //将所有的视频标签转为指定图片标签
+        this.find("video").forEach(function (item) {
+        	//获取Javascript文件自身所在URL路径
+        	var scripts = document.scripts;
+        	var url =scripts[scripts.length - 1].src;
+        	url = url.substring(0, url.lastIndexOf('/'));
 
+        	var node = $('<img class="playerImg" src="'+url+'/wangeditor/play.png" data="'+$(item).attr("src")+'"/>');
+        	node.insertAfter(item);
+        	$(item).remove();//删除当前节点
+        });
+    },
+    // 图片标签转视频标签
+    imgToVideo: function imgToVideo() {
+    	//将所有的视频转图片类型的标签转为视频标签
+        this.find("img").forEach(function (item) {
+        	
+        	if($(item).attr("class") == "playerImg"){
+        		//获取Javascript文件自身所在URL路径
+            	var scripts = document.scripts;
+            	var url =scripts[scripts.length - 1].src;
+            	url = url.substring(0, url.lastIndexOf('/'));
+            	var node = $('<video width="50px" height="50px" src="'+$(item).attr("data")+'" controls="controls" preload="none"/>');
+            	node.insertAfter(item);
+            	$(item).remove();//删除当前节点
+        	}
+        });
+    },
     // 获取 value
     val: function val() {
         var elem = this[0];
@@ -2159,11 +2203,13 @@ Emoticon.prototype = {
             // 图片表情
             if (emotType === 'image') {
                 content.forEach(function (item) {
-                    var src = item.src;
                     var alt = item.alt;
+                    var src = item.src;
+                    var width = item.width;
+                    var height = item.height;
                     if (src) {
                         // 加一个 data-w-e 属性，点击图片的时候不再提示编辑图片
-                        faceHtml += '<span class="w-e-item"><img src="' + src + '" alt="' + alt + '" data-w-e="1"/></span>';
+                        faceHtml += '<span class="w-e-item"><img width="' + width + '" height="' + height + '" src="' + src + '" alt="' + alt + '" data-w-e="1"/></span>';
                     }
                 });
             }
@@ -2563,6 +2609,7 @@ Table.prototype = {
 };
 
 /*
+ * 视频
     menu - video
 */
 // 构造函数
@@ -2585,11 +2632,32 @@ Video.prototype = {
 
     _createPanel: function _createPanel() {
         var _this = this;
-
+        var editor = this.editor;
+        var config = editor.config;
+        var isEmbedVideo = false;//是否允许嵌入视频
+        var isUploadVideo = false;//是否允许上传视频
+    	for(var i=0; i< config.menus.length; i++){
+			var menu = config.menus[i];
+			if(menu == "embedVideo"){
+				isEmbedVideo = true;
+			}else if(menu == "uploadVideo"){
+				isUploadVideo = true;
+			}
+		}
+      
+        
+        
         // 创建 id
         var textValId = getRandom('text-val');
         var btnId = getRandom('btn');
-
+        var inputUploadId = getRandom('input-upload');
+        var btnUploadId = getRandom('btn-upload');
+        
+        // 是否显示嵌入视频框
+        var embedVideoDisplay = isEmbedVideo ? 'inline-block' : 'none';
+        // 是否显示上传按钮
+        var uploadBtnDisplay = isUploadVideo ? 'inline-block' : 'none';
+        
         // 创建 panel
         var panel = new Panel(this, {
             width: 350,
@@ -2598,7 +2666,7 @@ Video.prototype = {
                 // 标题
                 title: '插入视频',
                 // 模板
-                tpl: '<div>\n                        <input id="' + textValId + '" type="text" class="block" placeholder="\u683C\u5F0F\u5982\uFF1A<iframe src=... ></iframe>"/>\n                        <div class="w-e-button-container">\n                            <button id="' + btnId + '" class="right">\u63D2\u5165</button>\n                        </div>\n                    </div>',
+                tpl: '<div>\n                        <input id="' + textValId + '" style="display:' + embedVideoDisplay + '" type="text" class="block" placeholder="\u683C\u5F0F\u5982\uFF1A<iframe src=... ></iframe>"/>\n                        <div class="w-e-button-container">\n                            <button id="' + btnUploadId + '" class="left" style="display:' + uploadBtnDisplay + '">\u4E0A\u4F20</button>\n                                <button id="' + btnId + '" style="display:' + embedVideoDisplay + '" class="right">\u63D2\u5165</button>\n                        </div>\n                            <div style="display:none;">\n                                <input id="' + inputUploadId + '" type="file"/>\n                    </div>',
                 // 事件绑定
                 events: [{
                     selector: '#' + btnId,
@@ -2618,6 +2686,43 @@ Video.prototype = {
                         // 返回 true，表示该事件执行完之后，panel 要关闭。否则 panel 不会关闭
                         return true;
                     }
+                },
+                // 上传文件
+                {
+                    selector: '#' + btnUploadId,
+                    type: 'click',
+                    fn: function fn() {
+                        var $file = $('#' + inputUploadId);
+                        var fileElem = $file[0];
+                        if (fileElem) {
+                            fileElem.click();
+                        } else {
+                            // 返回 true 可关闭 panel
+                            return true;
+                        }
+                    }
+                }, {
+                    // 选择文件完毕
+                    selector: '#' + inputUploadId,
+                    type: 'change',
+                    fn: function fn() {
+                        var $file = $('#' + inputUploadId);
+                        var fileElem = $file[0];
+                        if (!fileElem) {
+                            // 返回 true 可关闭 panel
+                            return true;
+                        }
+
+                        // 获取选中的 file 对象列表
+                        var fileList = fileElem.files;
+                        if (fileList.length) {
+                           // uploadVideo.uploadVideo(fileList, inputLinkId);
+                        	_this._uploadVideo(fileList);
+                        }
+
+                        // 返回 true 可关闭 panel
+                        return true
+                    }
                 }]
             } // first tab end
             ] // tabs end
@@ -2629,12 +2734,67 @@ Video.prototype = {
         // 记录属性
         this.panel = panel;
     },
+    
+    // 上传视频
+    _uploadVideo: function _uploadVideo(files) {
+	    if (!files || !files.length) {
+	        return;
+	    }
+	    
+	    // ------------------------------ 获取配置信息 ------------------------------
+	    var editor = this.editor;
+	    var config = editor.config;
+	    var customUploadVideo = config.customUploadVideo;
+	    if (!customUploadVideo) {
+	        this._alert('请配置customUploadVideo参数!');
+	        return;
+	    }
+	   
+	    // ------------------------------ 自定义上传 ------------------------------
+	    if (customUploadVideo && typeof customUploadVideo === 'function') {
+	    	customUploadVideo(files, this._insertLinkVideo.bind(this));
 
-    // 插入视频
+	        // 阻止以下代码执行
+	        return;
+	    }
+    	
+    	
+    	
+    	
+    	
+    },
+    // 嵌入视频代码
     _insert: function _insert(val) {
         var editor = this.editor;
         editor.cmd.do('insertHTML', val + '<p><br></p>');
+    },
+    // 插入上传视频代码
+    _insertLinkVideo: function _insertLinkVideo(link) {
+    	var editor = this.editor;
+    	if (!link) {
+            return;
+        }
+    	
+    	//preload ="none" 提示浏览器不需要缓存视频    同时设置初始内容时.txt.html()里将所有video标签都加上preload ="none"属性
+    	//editor.cmd.do('insertHTML', '<video src="' + link + '" controls="controls" preload ="none" /><p><br></p>');
+    	
+    	//获取Javascript文件自身所在URL路径
+    	var scripts = document.scripts;
+    	var url =scripts[scripts.length - 1].src;
+    	url = url.substring(0, url.lastIndexOf('/'));
+    	
+    	//将视频标签转为指定图片标签
+    	editor.cmd.do('insertHTML', '<img class="playerImg" src="'+url+'/wangeditor/play.png" data="' + link + '" /><p><br></p>');
+    	
+
+    	
+    },
+    // 试图改变 active 状态
+    tryChangeActive: function tryChangeActive(e) {
+    	
+    	
     }
+    
 };
 
 /*
@@ -2672,6 +2832,12 @@ Image.prototype = {
     _createEditPanel: function _createEditPanel() {
         var editor = this.editor;
 
+        //如果是视频标签转图片，则不执行
+        var _img = editor._selectedImg;
+        if (_img && _img.attr("class") =="playerImg") {
+        	return;
+        }
+        
         // id
         var width30 = getRandom('width-30');
         var width50 = getRandom('width-50');
@@ -4096,6 +4262,7 @@ Text.prototype = {
         // img 点击
         this._imgHandle();
 
+        
         // 拖拽事件
         this._dragHandle();
     },
@@ -5669,6 +5836,12 @@ polyfill();
   inlinecss += ".editor-text .inputValue_40::before {  content: '需要支付 ' attr(input-value) ' 积分可见';  color: #06b5ff;  font-size:14px;  position: absolute;  margin-top: -30px;  line-height: 30px;}";
   inlinecss += ".editor-text .inputValue_50::before {  content: '需要支付 ' attr(input-value) ' 元费用可见';  color: #06b5ff;  font-size:14px;  position: absolute;  margin-top: -30px;  line-height: 30px;}";
    
+  inlinecss += '.editor-text .playerImg {  border: 1px solid #ddd;  padding:50px; width: 64px; height: 64px;}';
+
+  
+  
+  
+  
   // 将 css 代码添加到 <style> 中
 var style = document.createElement('style');
 style.type = 'text/css';

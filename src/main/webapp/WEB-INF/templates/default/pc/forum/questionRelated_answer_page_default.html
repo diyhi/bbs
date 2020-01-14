@@ -15,8 +15,9 @@
 							<#if answer.avatarName != null>
 								<img src="${answer.avatarPath}100x100/${answer.avatarName}" >
 							<#else>
-								<img src="${commonPath}images/min_avata.png" >
-							</#if>
+								<!--[if (IE)]><img src="${commonPath}images/min_avata.png"><![endif]-->
+								<!--[if !(IE)]><!--><img avatar="${(answer.nickname != null && answer.nickname??) ?string(answer.nickname , answer.userName)}" ><!--<![endif]-->
+							</#if>   
 						</a>
 						
 						<#if question.userName == systemUser.userName && question.adoptionAnswerId == 0>
@@ -65,7 +66,8 @@
 												<#if reply.avatarName != null>
 													<img src="${reply.avatarPath}100x100/${reply.avatarName}" >
 												<#else>
-													<img src="${commonPath}images/min_avata.png" >
+													<!--[if (IE)]><img src="${commonPath}images/min_avata.png"><![endif]-->
+													<!--[if !(IE)]><!--><img class="round" avatar="${(reply.nickname != null && reply.nickname??) ?string(reply.nickname , reply.userName)}" ><!--<![endif]-->
 												</#if>
 											</a>
 									    	<a class="userName" href="user/control/home?userName=${reply.userName}">

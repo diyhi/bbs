@@ -521,7 +521,7 @@ html,body{
 	height: 62px;
 	float: left;
 	margin-right: 10px;
-	border-radius:60px;
+	border-radius:62px;
 	position:relative;
 }
 .topicModule .topic-box .topicList .topicItem .content {
@@ -934,6 +934,12 @@ html,body{
 	max-width:100%;height:auto;border:none;background:none;margin:0;padding:0; 
 	cursor: -webkit-zoom-in;
 	cursor: zoom-in;
+}
+.topicContentModule .left .topic-wrap .topicBox .topicContent iframe{
+	width:100%; height: 550px;padding:10px 0px; 
+}
+.topicContentModule .left .topic-wrap .topicBox .topicContent video{
+	width:100%; height: 550px;padding:10px 0px; outline:none;
 }
 /* 隐藏标签 IE8以下浏览器不支持自定义标签，需要在页头<head>标签内执行document.createElement('hide') */
 .topicContentModule .left .topic-wrap .topicBox .topicContent hide{
@@ -1425,15 +1431,17 @@ html,body{
 }
 .quote-formModule .addQuote-wrap{
 	position: relative;
-	padding:0px 9px 50px 1px;
+	padding:6px 20px 50px 20px;
+	background: #f9f9f9;
 }
 .quote-formModule .addQuote-wrap .head{
+	/**
 	border-bottom :3px solid #f1f1f1;
 	margin-bottom: 10px;
-	position: relative;
+	position: relative;**/
 }
 .quote-formModule .addQuote-wrap .head .icon{
-	position: absolute;font-size: 40px;top: -34px;left: -38px;color: #f1f1f1;
+	position: absolute;font-size: 50px;top: -38px;left: -42px;color: #f9f9f9;
 }
 .quote-formModule .addQuote-wrap .quote-textarea{
 	width:100%;visibility:hidden;height: 200px;
@@ -2996,7 +3004,7 @@ html,body{
 .userDynamicModule .userDynamicList .userDynamic .topicTitle{
 	padding:0px;word-wrap:break-word;color:#666;font-size: 15px;margin-top: 5px;
 }
-.userDynamicModule .userDynamicList .userDynamic .topicTitle span{
+.userDynamicModule .userDynamicList .userDynamic .topicTitle .info{
 	background-color: #f0f0f0;
 	border-radius: 4px;
 	color: #999;
@@ -3018,6 +3026,74 @@ html,body{
 	padding:0 5px;
 	font-size: 14px;
 	margin-left: 5px;
+}
+.userDynamicModule .userDynamicList .userDynamic .topicTitle .hideTagType{
+	font-size:0;/*父级元素设置font-size:0; 解决 display：inline-block两个元素之间的默认空格 */
+	position: relative;
+	top: -1px;
+	
+}
+.userDynamicModule .userDynamicList .userDynamic .topicTitle .hideTagType .circle{
+	border-radius:12px;display: inline-block;margin-left: 5px;
+	width: 24px;height: 24px;
+	position:relative;
+}
+.userDynamicModule .userDynamicList .userDynamic .topicTitle .hideTagType .circle i{
+	font-size: 14px;line-height: 24px; margin-left: 6px;
+}
+.userDynamicModule .userDynamicList .userDynamic .topicTitle .hideTagType .point:before{
+	content: ' ';
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    border-radius: 2px;
+    top: 13px;
+    left: 10px;
+}
+.userDynamicModule .userDynamicList .userDynamic .topicTitle .hide_10 .circle{
+	background: #ebebeb;
+}
+.userDynamicModule .userDynamicList .userDynamic .topicTitle .hide_10 .point:before{
+	background-color: #ebebeb;
+}
+.userDynamicModule .userDynamicList .userDynamic .topicTitle .hide_10 .circle i{
+	color: #b2b2b2;
+}
+.userDynamicModule .userDynamicList .userDynamic .topicTitle .hide_20 .circle{
+	background: #bbf9d5;
+}
+.userDynamicModule .userDynamicList .userDynamic .topicTitle .hide_20 .point:before{
+	background-color: #bbf9d5;
+}
+.userDynamicModule .userDynamicList .userDynamic .topicTitle .hide_20 .circle i{
+	color: #21de70;
+}
+.userDynamicModule .userDynamicList .userDynamic .topicTitle .circle{
+	background: #bfebfb;
+}
+.userDynamicModule .userDynamicList .userDynamic .topicTitle .point:before{
+	background-color: #bfebfb;
+}
+.userDynamicModule .userDynamicList .userDynamic .topicTitle .hide_30 .circle i{
+	color: #27c3fc;
+}
+.userDynamicModule .userDynamicList .userDynamic .topicTitle .hide_40 .circle{
+	background: #e2cffe;
+}
+.userDynamicModule .userDynamicList .userDynamic .topicTitle .hide_40 .point:before{
+	background-color: #e2cffe;
+}
+.userDynamicModule .userDynamicList .userDynamic .topicTitle .hide_40 .circle i{
+	color: #af82f2;
+}
+.userDynamicModule .userDynamicList .userDynamic .topicTitle .hide_50 .circle{
+	background: #fedbb2;
+}
+.userDynamicModule .userDynamicList .userDynamic .topicTitle .hide_50 .point:before{
+	background-color: #fedbb2;
+}
+.userDynamicModule .userDynamicList .userDynamic .topicTitle .hide_50 .circle i{
+	color: #fe9d2d;
 }
 .userDynamicModule .userDynamicList .userDynamic .topicContent{padding:0px;word-wrap:break-word;color:#666666;font-size:16px;margin-top:12px;}
 .userDynamicModule .userDynamicList .userDynamic .topicContent p{font-size:16px;word-wrap:break-word}
@@ -5196,6 +5272,32 @@ html,body{
 	min-width: 0;
 	*height: 2px;
 }
+
+
+/** 半透明提示层 **/
+.hideTag-class .layui-layer-content{
+	background-color: rgba(0,0,0,0.7);
+}
+.hideTag-class .layui-layer-content .layui-layer-TipsG {
+	position: absolute;
+	width: 0;
+	height: 0;
+	border-width: 5px;
+	*overflow: hidden;
+	
+	border-style: dashed;
+ 	border-color:rgba(0,0,0,0.7) transparent transparent transparent;
+	margin-bottom: -2px;
+	margin-bottom: 3px\0;
+	*margin-bottom: 3px;
+}
+
+.hideTag-class .layui-layer-content .layui-layer-TipsT {
+	left: 7px;
+	border-right-style: solid;
+	border-right-color: rgba(0,0,0,0.7);
+}
+
 
 
 

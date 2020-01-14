@@ -231,17 +231,27 @@
 					var questionAvailableTag_obj = null;//['source', '|','fontname','fontsize','emoticons'];
 					if(questionAvailableTag != ""){
 						questionAvailableTag_obj = JSON.parse(questionAvailableTag);//JSON转为对象
+						if(questionAvailableTag_obj != null && questionAvailableTag_obj.length >0){
+							for(var i=0; i< questionAvailableTag_obj.length; i++){
+								var availableTag = questionAvailableTag_obj[i];
+								if(availableTag == "image"){//增加批量插入图片按钮
+									questionAvailableTag_obj.splice(i+1, 0, 'multiimage');//在指定索引处插入元素
+									break;
+								}
+							}
+						}
 					}
 					var editor;
 					KindEditor.ready(function(K) {
 
 						editor = K.create('textarea[id="appendQuestionContent"]', {
-							themeType : 'new',//新外观
+							themeType : 'style :minimalist',//极简主题 加冒号的是主题样式文件名称同时也是主题目录
 							basePath : '${commonPath}js/kindeditor/',//指定编辑器的根目录路径
 							formatUploadUrl :false,//false时不会自动格式化上传后的URL
 							resizeType : 1,//2或1或0，2时可以拖动改变宽度和高度，1时只能改变高度，0时不能拖动。默认值: 2 
 							allowPreviewEmoticons : true,//true或false，true时鼠标放在表情上可以预览表情
 							allowImageUpload : true,//true时显示图片上传按钮
+							autoHeightMode : true,//自适应高度
 							uploadJson :'user/control/question/upload.htm?method=upload',//指定浏览远程图片的服务器端程序
 							filePostName:'file',//文件上传字段 默认imgFile
 							items : questionAvailableTag_obj,

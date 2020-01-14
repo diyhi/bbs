@@ -22,9 +22,8 @@
 <script type="text/javascript" src="${commonPath}js/ajax.js" language="javascript" ></script>
 <script type="text/javascript" src="${commonPath}js/json2.js" language="javascript" ></script>
 <script type="text/javascript" src="${commonPath}js/jquery/jquery.min.js" language="javascript"></script>
-<link href="${commonPath}js/kindeditor/themes/default/default.css" type="text/css" rel="stylesheet"/>
+<script type="text/javascript" src="${commonPath}js/jquery/jquery.letterAvatar.js" language="javascript"></script>
 <script type="text/javascript" src="${commonPath}js/kindeditor/kindeditor-min.js" language="javascript"></script>
-<script type="text/javascript" src="${commonPath}js/kindeditor/lang/zh-CN.js" language="javascript"></script>
 <link href="${commonPath}js/layer/skin/default/layer.css"  type="text/css" rel="stylesheet"/>
 <script type="text/javascript" src="${commonPath}js/layer/layer.js" language="javascript"></script>
 <link rel="stylesheet" href="${commonPath}js/syntaxhighlighter/styles/shCoreDefault.css"  type="text/css" />
@@ -161,8 +160,9 @@
 								<#if topic.avatarName != null>
 									<img src="${topic.avatarPath}${topic.avatarName}" >
 								<#else>
-									<img src="${commonPath}images/min_avata.png" >
-								</#if> 
+									<!--[if (IE)]><img src="${commonPath}images/min_avata.png"><![endif]-->
+									<!--[if !(IE)]><!--><img avatar="${(topic.nickname != null && topic.nickname??) ?string(topic.nickname , topic.userName)}" ><!--<![endif]-->
+								</#if>
 							</a>
 						</div>
 						<p class="name">
@@ -296,7 +296,10 @@
 <!-- 图片点击放大 -->
 <script type="text/javascript">
 	$(function () {
-    	$(".topicContent img,.commentContent img").simplebox();
+		//图片不含宽度的元素,因为svg表情不放大，svg表情后端默认设置了宽度
+    	$(".topicContent img:not([width]),.commentContent img:not([width])").simplebox();
+    	
+    //	$(".topicContent img,.commentContent img").simplebox();
 	});
 </script>
 

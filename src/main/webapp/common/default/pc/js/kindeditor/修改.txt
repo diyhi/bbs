@@ -127,3 +127,20 @@ if(tab.title != ''){
 			liList.push(li);
 			ul.append(li);
 		}
+
+-----------------------------------------------		
+4790行修改 解决图片上传按钮错位
+'<span class="ke-button-common">',
+修改为
+'<span class="ke-button-common  ke-button-outer">',	
+
+7428行		
+var uploadbutton = K.uploadbutton({
+			button : K('.ke-upload-button', div)[0],
+			fieldName : filePostName,
+			form : K('.ke-form', div),
+			target : target,
+			width: 60,	
+				
+将width: 60,改为width: 70,			
+		

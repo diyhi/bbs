@@ -684,7 +684,7 @@ public class QuestionManageAction {
 		String number = questionManage.generateFileNumber(userName, isStaff);
 		
 		
-		
+		String errorMessage  = "";
 		
 		Map<String,Object> returnJson = new HashMap<String,Object>();
 		if(dir != null && number != null && !"".equals(number.trim())){
@@ -729,29 +729,33 @@ public class QuestionManageAction {
 						}
 					}
 					
-					if(authentication && size/1024 <= imageSize){
-						
-						//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
-						String pathDir = "file"+File.separator+"question"+File.separator + date +File.separator +"image"+ File.separator;
-						//文件锁目录
-						String lockPathDir = "file"+File.separator+"question"+File.separator+"lock"+File.separator;
-						//构建文件名称
-						String newFileName = UUIDUtil.getUUID32()+ number+"." + suffix;
-						
-						//生成文件保存目录
-						fileManage.createFolder(pathDir);
-						//生成锁文件保存目录
-						fileManage.createFolder(lockPathDir);
-						//生成锁文件
-						fileManage.addLock(lockPathDir,date +"_image_"+newFileName);
-						//保存文件
-						fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
-						
-						//上传成功
-						returnJson.put("error", 0);//0成功  1错误
-						returnJson.put("url", "file/question/"+date+"/image/"+newFileName);
-						return JsonUtils.toJSONString(returnJson);
-						
+					if(authentication){
+						if(size/1024 <= imageSize){
+							//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
+							String pathDir = "file"+File.separator+"question"+File.separator + date +File.separator +"image"+ File.separator;
+							//文件锁目录
+							String lockPathDir = "file"+File.separator+"question"+File.separator+"lock"+File.separator;
+							//构建文件名称
+							String newFileName = UUIDUtil.getUUID32()+ number+"." + suffix;
+							
+							//生成文件保存目录
+							fileManage.createFolder(pathDir);
+							//生成锁文件保存目录
+							fileManage.createFolder(lockPathDir);
+							//生成锁文件
+							fileManage.addLock(lockPathDir,date +"_image_"+newFileName);
+							//保存文件
+							fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
+							
+							//上传成功
+							returnJson.put("error", 0);//0成功  1错误
+							returnJson.put("url", "file/question/"+date+"/image/"+newFileName);
+							return JsonUtils.toJSONString(returnJson);
+						}else{
+							errorMessage = "文件超出允许上传大小";
+						}
+					}else{
+						errorMessage = "当前文件类型不允许上传";
 					}
 				}else if(dir.equals("flash")){
 					//允许上传flash格式
@@ -828,6 +832,8 @@ public class QuestionManageAction {
 						returnJson.put("error", 0);//0成功  1错误
 						returnJson.put("url", "file/question/"+date+"/media/"+newFileName);
 						return JsonUtils.toJSONString(returnJson);
+					}else{
+						errorMessage = "当前文件类型不允许上传";
 					}
 				}else if(dir.equals("file")){
 					//允许上传文件格式
@@ -858,10 +864,18 @@ public class QuestionManageAction {
 						returnJson.put("url", "file/question/"+date+"/file/"+newFileName);
 						returnJson.put("title", imgFile.getOriginalFilename());//旧文件名称
 						return JsonUtils.toJSONString(returnJson);
+					}else{
+						errorMessage = "当前文件类型不允许上传";
 					}
+				}else{
+					errorMessage = "缺少dir参数";
 				}
+			}else{
+				errorMessage = "文件不能为空";
 			}
 
+		}else{
+			errorMessage = "参数不能为空";
 		}
 		
 		//上传失败

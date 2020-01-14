@@ -39,7 +39,7 @@ public class CommentManage {
 			boolean area_3 = false;
 			
 			tag.add("source");
-			tag.add("|");
+		//	tag.add("|");
 			if(editor.isFontname()){//字体
 				tag.add("fontname");
 				area_1 = true;
@@ -49,7 +49,7 @@ public class CommentManage {
 				area_1 = true;
 			}
 			if(area_1 == true){
-				tag.add("|");
+		//		tag.add("|");
 			}
 			
 			if(editor.isForecolor()){//文字颜色
@@ -85,7 +85,7 @@ public class CommentManage {
 				area_2 = true;
 			}
 			if(area_2 == true){
-				tag.add("|");
+			//	tag.add("|");
 			}
 			
 			if(editor.isJustifyleft()){//左对齐
@@ -109,7 +109,7 @@ public class CommentManage {
 				area_3 = true;
 			}
 			if(area_3 == true){
-				tag.add("|");
+			//	tag.add("|");
 			}
 			
 			if(editor.isEmoticons()){//插入表情
@@ -117,6 +117,10 @@ public class CommentManage {
 			}
 			if(editor.isImage()){//图片
 				tag.add("image");
+			}
+			
+			if(editor.isFullscreen()){//全屏显示
+				tag.add("fullscreen");
 			}
 		}
 		return JsonUtils.toJSONString(tag);

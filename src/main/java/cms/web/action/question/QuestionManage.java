@@ -335,7 +335,7 @@ public class QuestionManage {
 			boolean area_3 = false;
 			
 			tag.add("source");
-			tag.add("|");
+		//	tag.add("|");
 			if(editor.isFontname()){//字体
 				tag.add("fontname");
 				area_1 = true;
@@ -345,7 +345,7 @@ public class QuestionManage {
 				area_1 = true;
 			}
 			if(area_1 == true){
-				tag.add("|");
+		//		tag.add("|");
 			}
 			
 			if(editor.isForecolor()){//文字颜色
@@ -381,7 +381,7 @@ public class QuestionManage {
 				area_2 = true;
 			}
 			if(area_2 == true){
-				tag.add("|");
+			//	tag.add("|");
 			}
 			
 			if(editor.isJustifyleft()){//左对齐
@@ -405,7 +405,7 @@ public class QuestionManage {
 				area_3 = true;
 			}
 			if(area_3 == true){
-				tag.add("|");
+			//	tag.add("|");
 			}
 			
 			if(editor.isEmoticons()){//插入表情
@@ -418,7 +418,9 @@ public class QuestionManage {
 			if(editor.isFile()){//文件
 				tag.add("insertfile");
 			}**/
-	
+			if(editor.isFullscreen()){//全屏显示
+				tag.add("fullscreen");
+			}
 		}
 		return JsonUtils.toJSONString(tag);
 	}

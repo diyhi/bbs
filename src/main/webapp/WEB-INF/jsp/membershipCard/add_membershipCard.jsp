@@ -13,9 +13,7 @@
 <script type="text/javascript" src="backstage/jquery/jquery.min.js" language="JavaScript"></script>
 <link rel="stylesheet" href="backstage/layer/skin/layer.css"  type="text/css" />
 
-<link href="backstage/kindeditor/themes/default/default.css" rel="stylesheet"/>
 <script charset="utf-8" src="backstage/kindeditor/kindeditor-min.js"></script>
-<script charset="utf-8" src="backstage/kindeditor/lang/zh-CN.js"></script>
 
 <script language="javascript" type="text/javascript">
 function findObj(theObj, theDoc){
@@ -417,6 +415,7 @@ function deleteDescriptionTagRow(rowId){
 	KindEditor.ready(function(K) {
 		editor = K.create('textarea[name="introduction"]', {
 			basePath : '${config:url(pageContext.request)}backstage/kindeditor/',//指定编辑器的根目录路径
+			themeType : 'style :darkGray',//深灰主题 加冒号的是主题样式文件名称同时也是主题目录
 		//	autoHeightMode : true,//值为true，并引入autoheight.js插件时自动调整高度
 			formatUploadUrl :false,//false时不会自动格式化上传后的URL
 			resizeType : 2,//2或1或0，2时可以拖动改变宽度和高度，1时只能改变高度，0时不能拖动。默认值: 2 
@@ -427,13 +426,13 @@ function deleteDescriptionTagRow(rowId){
 		//	fileManagerJson : '${config:url(pageContext.request)}control/customComment/manage.htm?method=uploadImage',//指定浏览远程图片的服务器端程序
 
 			items : ['source', '|', 'preview', 'template',  
-        '|', 'justifyleft', 'justifycenter', 'justifyright',
-        'justifyfull', 'insertorderedlist', 'insertunorderedlist', 'indent', 'outdent', 'subscript',
-        'superscript', 'clearhtml', 'quickformat', 'selectall', '|', 'fullscreen', 
-        'formatblock', 'fontname', 'fontsize', '/', 'forecolor', 'hilitecolor', 'bold',
-        'italic', 'underline', 'strikethrough', 'lineheight', 'removeformat', '|', 'image', 'multiimage',
-         'media', 'insertfile','emoticons','baidumap', 'table', 'hr',   'pagebreak',
-         'link', 'unlink'],
+		        '|', 'justifyleft', 'justifycenter', 'justifyright',
+		        'justifyfull', 'insertorderedlist', 'insertunorderedlist', 'indent', 'outdent', 'subscript',
+		        'superscript', 'clearhtml', 'quickformat', 'selectall', '|', 
+		        'formatblock', 'fontname', 'fontsize','fullscreen', '/', 'forecolor', 'hilitecolor', 'bold',
+		        'italic', 'underline', 'strikethrough', 'lineheight', 'removeformat', '|', 'image', 'multiimage',
+		         'media','embedVideo','uploadVideo', 'insertfile','emoticons','baidumap', 'table', 'hr',   'pagebreak',
+		         'link', 'unlink'],
 			afterChange : function() {
 				this.sync();
 			}
