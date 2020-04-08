@@ -529,7 +529,7 @@ html,body{
 	overflow: auto;
 	overflow-x: hidden;**/
 	margin-left:88px;
-	margin-right:160px;
+	margin-right:100px;
 	
 	
 }
@@ -704,8 +704,74 @@ html,body{
 .topicModule .topic-box .topicList .topicItem .content .detail .tm-m-photos{
 	margin-top: 4px;
 }
-.topicModule .topic-box .topicList .topicItem .content .detail .summary{
+.topicModule .topic-box .topicList .topicItem .content .detail .videoInfo{
 	margin: 3px 5px 0 0;
+	
+	
+}
+/* 隐藏标签 IE8以下浏览器不支持自定义标签，需要在页头<head>标签内执行document.createElement('player') */
+.topicModule .topic-box .topicList .topicItem .content .detail .videoInfo player{
+	width: 320px;
+	height: 180px;
+	display: block;
+	float: left;
+	margin-right: 5px;
+	background: #000;
+	position: relative;
+	text-align: center;
+}
+
+.topicModule .topic-box .topicList .topicItem .content .detail .videoInfo player .cover{
+	max-height: 100%;  
+    max-width: 100%; 
+    width: auto;
+    height: auto;
+    position: absolute;  
+    top: 0;  
+    bottom: 0;  
+    left: 0;  
+    right: 0;  
+    margin: auto;
+}
+
+.topicModule .topic-box .topicList .topicItem .content .detail .videoInfo player .circle{
+	display: inline-block;
+	position: absolute;
+	top: 0;  
+    bottom: 0;  
+    left: 0;  
+    right: 0;  
+    margin: auto;
+	line-height:180px;
+	border-radius:30px;
+	width: 60px;
+	height: 60px;
+	background-color: rgba(0,0,0,0.5);
+}
+.topicModule .topic-box .topicList .topicItem .content .detail .videoInfo player .iconBox{
+    display: block;
+    position: relative;
+	width: 60px;
+	height: 60px;
+	
+}
+.topicModule .topic-box .topicList .topicItem .content .detail .videoInfo player .iconBox .playIcon{
+	font-size: 30px;
+    position: absolute;  
+	line-height:22px; 
+	width: 22px;
+	height: 22px;
+    top: 0;  
+    bottom: 0;  
+    left: 0;  
+    right: 0;  
+    margin: auto;
+    color: #fff;
+}
+
+
+.topicModule .topic-box .topicList .topicItem .content .detail .summary{
+	margin: 3px 50px 0 0;
 	font-size: 15px;
 	line-height: 28px;
 	font-weight:normal;
@@ -938,8 +1004,44 @@ html,body{
 .topicContentModule .left .topic-wrap .topicBox .topicContent iframe{
 	width:100%; height: 550px;padding:10px 0px; 
 }
-.topicContentModule .left .topic-wrap .topicBox .topicContent video{
-	width:100%; height: 550px;padding:10px 0px; outline:none;
+/* 隐藏标签 IE8以下浏览器不支持自定义标签，需要在页头<head>标签内执行document.createElement('player') */
+.topicContentModule .left .topic-wrap .topicBox .topicContent player{
+	width: 100%;
+	height: 576px;
+	display: block;
+	margin-top: 10px;
+}
+.dplayer-process {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 99;
+}
+.dplayer-process .box{
+	position: relative;
+	width: 100%;
+	height: 100%;
+}
+.dplayer-process .box .prompt{
+   	width: 250px;
+    height: 80px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+   	padding :0px 30px;
+   	border-radius :3px;
+   	color: #fff;
+   	line-height: 80px;
+   	font-size: 20px;
+   	background-color:rgb(0,0,0);
+	opacity:0.7;
+	filter:alpha(opacity=70);
+	text-align: center;
 }
 /* 隐藏标签 IE8以下浏览器不支持自定义标签，需要在页头<head>标签内执行document.createElement('hide') */
 .topicContentModule .left .topic-wrap .topicBox .topicContent hide{
@@ -1130,7 +1232,7 @@ html,body{
 	padding:0 5px;
 	font-size: 12px;
 }
-.commentModule .commentlist .commentTime{margin-bottom:5px;color:#999;font-size: 13px;}
+.commentModule .commentlist .commentTime{margin-top:2px; margin-bottom:5px;color:#999;font-size: 13px;}
 .commentModule .commentlist .commentTime a{color:#999;}
 .commentModule .commentlist .comment .commentContent{padding:0px;word-wrap:break-word;color:#666;font-size: 15px;margin-top: 20px;line-height: 26px;}
 /* 评论图片尺寸 */
@@ -1419,6 +1521,173 @@ html,body{
 .commentReply-disableFormModule .disableForm-wrap .respond p {font-size:15px;padding:8px;overflow:hidden;color: #aaaaaa}
 
 
+/* 修改评论回复  */
+.commentModule .commentlist .editCommentReply-post{
+	margin-top: 5px;
+	margin-left: 36px;
+	margin-right:10px;
+}
+.editCommentReply-formModule {
+	margin-top:30px;
+	margin-left: 10px;
+	margin-right:10px;
+	margin-bottom:10px;
+}
+.editCommentReply-formModule .editReply-wrap{
+	position: relative;
+	padding:0px 9px 50px 1px;
+}
+.editCommentReply-formModule .editReply-wrap .reply-textarea{
+	line-height: 24px;
+    border-radius: 2px;
+    border: 1px solid #e6e6e6;
+	vertical-align: top;
+	font-size: 14px;
+    resize: vertical;
+	padding: 3px 3px;
+    background: #ffffff;
+    outline: none;
+    color: rgba(0,0,0,0.8);
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: rgba(255,255,255,0);
+    -webkit-box-shadow: 0em 0em 0em 0em transparent inset;
+    box-shadow: 0em 0em 0em 0em transparent inset;
+    -webkit-transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    -webkit-transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, -webkit-box-shadow 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, -webkit-box-shadow 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, -webkit-box-shadow 0.2s ease;
+	height:150px;
+	width: 100%;
+	
+}
+.editCommentReply-formModule .editReply-wrap .form-action {
+	 padding-left: 0px; padding-right: 0px; padding-top: 8px;margin-bottom: 12px;
+}
+.editCommentReply-formModule .editReply-wrap .error {
+	color: red;
+}
+.editCommentReply-formModule .editReply-wrap .replySubmit {
+	height: 38px;
+	float: left;
+	margin-right: 10px;
+	position: relative;
+	z-index: 2
+}
+
+.editCommentReply-formModule .editReply-wrap .submitButton-box{
+	margin-right: 5px;
+}
+.editCommentReply-formModule .editReply-wrap .submitButton-box .submitButton{
+	color: #fff;
+    border-color: #30aff7;
+    outline: none;
+    display: inline-block;
+    padding: 1px 16px;
+    font-size: 16px;
+    line-height: 32px;
+    text-align: center;
+    cursor: pointer;
+    background: #30aff7;
+    border: 1px solid;
+    border-radius: 3px;
+    margin: 0;
+	
+}
+.editCommentReply-formModule .editReply-wrap .submitButton-box .submitButton:hover {  
+    background: #45b6f7;  
+} 
+.editCommentReply-formModule .editReply-wrap .submitButton-box .submitButton:disabled{  
+    border: 1px solid #e6e6e6;  
+    background-color: #fbfbfb;  
+    color:#c9c9c9;
+    margin-top: -1px;
+    margin-bottom: -1px;
+    border-radius:2px;
+}
+.editCommentReply-formModule .editReply-wrap .cancelButton-box{
+	position: relative;top: 1px;
+}
+.editCommentReply-formModule .editReply-wrap .cancelButton-box .cancelButton{
+	color: #30aff7;
+    border-color: #30aff7;
+    outline: none;
+    display: inline-block;
+    padding: 0 16px;
+    font-size: 16px;
+    line-height: 32px;
+    text-align: center;
+    cursor: pointer;
+    background: none;
+    border: 1px solid;
+    border-radius: 3px;
+    margin: 0;
+	
+}
+.editCommentReply-formModule .editReply-wrap .cancelButton-box .cancelButton:hover {  
+    background: #e2f2ff;  
+} 
+.editCommentReply-formModule .editReply-wrap .captchaModule{
+	float: left;margin-top: 1px;
+}
+.editCommentReply-formModule .editReply-wrap .captchaModule .captcha_div{
+	height: 38px;line-height:38px;
+}
+.editCommentReply-formModule .editReply-wrap .captchaModule .captchaBox{
+	height:33px;
+	border:1px solid #e6e6e6;
+	width:85px;
+	float: left;;
+	border-radius:2px;
+}
+.editCommentReply-formModule .editReply-wrap .captchaModule .captchaBox input{
+	position: relative;  
+	background-image:url(../images/null.gif);
+	background-color:transparent;
+	outline: none; 
+	float:left;
+	height:32px; 
+	width:85px;
+	line-height:30px;
+	border:0;
+	color:#333;
+	padding:0 5px;
+	font-size:18px; 
+}
+.editCommentReply-formModule .editReply-wrap .captchaModule .promptTag {
+	float:left; 
+	font-size:14px; 
+	height:22px; 
+	line-height:22px; 
+	cursor:text; 
+	margin-top:6px;
+	margin-left:-74px; 
+	color:#B0B0B0;
+}
+.editCommentReply-formModule .editReply-wrap .captchaModule .captcha_div .captchaImage{width:100px;height:32px;float: left;margin:0 15px 0 5px;}
+.editCommentReply-formModule .editReply-wrap .captchaModule .captcha_div .captchaImage img{width:100px;height:34px;outline:none;}
+.editCommentReply-formModule .editReply-wrap .captchaModule .tips{
+	padding-left:10px;height: 18px;line-height: 18px;
+}
+.editCommentReply-formModule .editReply-wrap .captchaModule .tips span{
+	color: red;
+}
+.editCommentReply-disableFormModule{
+	margin-top:30px;
+	margin-left: 10px;
+	margin-right:10px;
+	margin-bottom:10px;
+}
+.editCommentReply-disableFormModule .disableForm-wrap{
+	background: #fff;
+	border-radius:3px;
+	padding:15px 0px 15px 0px;
+}
+.editCommentReply-disableFormModule .disableForm-wrap .respond {border-radius:4px;line-height: 40px;text-align:center;}
+.editCommentReply-disableFormModule .disableForm-wrap .respond p {font-size:15px;padding:8px;overflow:hidden;color: #aaaaaa}
+
+
+
 /* 引用评论  */
 .commentModule .commentlist .quote-post{
 	margin-top: 5px;
@@ -1663,6 +1932,163 @@ html,body{
 .comment-formModule .addComment-wrap .captchaModule .tips span{
 	color: red;
 }
+
+/* 修改评论  */
+.commentModule .commentlist .editComment-post{
+	margin-top: 5px;
+	margin-left: 36px;
+	margin-right:10px;
+}
+.editComment-formModule {
+	margin-top:50px;
+	
+}
+.editComment-formModule .editComment-wrap{
+	position: relative;
+	padding:6px 20px 50px 20px;
+	background: #f9f9f9;
+}
+.editComment-formModule .editComment-wrap .head .icon{
+	position: absolute;font-size: 50px;top: -38px;left: -42px;color: #f9f9f9;
+}
+.editComment-formModule .editComment-wrap .editComment-textarea{
+	width:100%;visibility:hidden;height: 200px;
+}
+.editComment-formModule .editComment-wrap .promptInfo{
+	position: absolute;
+	right:15px;
+	bottom:32px;
+}
+.editComment-formModule .editComment-wrap .promptInfo h2{
+	font-size: 16px;
+	color: #ccc;
+}
+.editComment-formModule .editComment-wrap .form-action {
+	 padding-left: 0px; padding-right: 0px; padding-top: 8px;margin-bottom: 12px;
+}
+.editComment-formModule .editComment-wrap .error {
+	color: red;
+}
+.editComment-formModule .editComment-wrap .editCommentSubmit {
+	height: 38px;
+	float: left;
+	margin-right: 10px;
+	position: relative;
+	z-index: 2
+}
+
+.editComment-formModule .editComment-wrap .submitButton-box{
+	margin-right: 5px;
+}
+.editComment-formModule .editComment-wrap .submitButton-box .submitButton{
+	color: #fff;
+    border-color: #30aff7;
+    outline: none;
+    display: inline-block;
+    padding: 1px 16px;
+    font-size: 16px;
+    line-height: 32px;
+    text-align: center;
+    cursor: pointer;
+    background: #30aff7;
+    border: 1px solid;
+    border-radius: 3px;
+    margin: 0;
+	
+}
+.editComment-formModule .editComment-wrap .submitButton-box .submitButton:hover {  
+    background: #45b6f7;  
+} 
+.editComment-formModule .editComment-wrap .submitButton-box .submitButton:disabled{  
+    border: 1px solid #e6e6e6;  
+    background-color: #fbfbfb;  
+    color:#c9c9c9;
+    margin-top: -1px;
+    margin-bottom: -1px;
+    border-radius:2px;
+}
+.editComment-formModule .editComment-wrap .cancelButton-box{
+	position: relative;top: 1px;
+}
+.editComment-formModule .editComment-wrap .cancelButton-box .cancelButton{
+	color: #30aff7;
+    border-color: #30aff7;
+    outline: none;
+    display: inline-block;
+    padding: 0 16px;
+    font-size: 16px;
+    line-height: 32px;
+    text-align: center;
+    cursor: pointer;
+    background: none;
+    border: 1px solid;
+    border-radius: 3px;
+    margin: 0;
+	
+}
+.editComment-formModule .editComment-wrap .cancelButton-box .cancelButton:hover {  
+    background: #e2f2ff;  
+} 
+.editComment-formModule .editComment-wrap .captchaModule{
+	float: left;margin-top: 1px;
+}
+.editComment-formModule .editComment-wrap .captchaModule .captcha_div{
+	height: 38px;line-height:38px;
+}
+.editComment-formModule .editComment-wrap .captchaModule .captchaBox{
+	height:33px;
+	border:1px solid #e6e6e6;
+	width:85px;
+	float: left;;
+	border-radius:2px;
+}
+.editComment-formModule .editComment-wrap .captchaModule .captchaBox input{
+	position: relative;  
+	background-image:url(../images/null.gif);
+	background-color:transparent;
+	outline: none; 
+	float:left;
+	height:32px; 
+	width:85px;
+	line-height:30px;
+	border:0;
+	color:#333;
+	padding:0 5px;
+	font-size:18px; 
+}
+.editComment-formModule .editComment-wrap .captchaModule .promptTag {
+	float:left; 
+	font-size:14px; 
+	height:22px; 
+	line-height:22px; 
+	cursor:text; 
+	margin-top:6px;
+	margin-left:-74px; 
+	color:#B0B0B0;
+}
+.editComment-formModule .editComment-wrap .captchaModule .captcha_div .captchaImage{width:100px;height:32px;float: left;margin:0 15px 0 5px;}
+.editComment-formModule .editComment-wrap .captchaModule .captcha_div .captchaImage img{width:100px;height:34px;outline:none;}
+.editComment-formModule .editComment-wrap .captchaModule .tips{
+	padding-left:10px;height: 18px;line-height: 18px;
+}
+.editComment-formModule .editComment-wrap .captchaModule .tips span{
+	color: red;
+}
+
+
+.editComment-disableFormModule{
+	margin-top:10px;
+}
+.editComment-disableFormModule .disableForm-wrap{
+	background: #fff;
+	padding:15px 0px 15px 0px;
+}
+.editComment-disableFormModule .disableForm-wrap .respond {background: #f6f6f6;border-radius:4px;line-height: 40px;text-align:center;}
+.editComment-disableFormModule .disableForm-wrap .respond p {font-size:15px;padding:8px;overflow:hidden;color: #aaaaaa}
+
+
+
+
 /* 添加答案模块(未登录) */
 .addCommentModule{
 	margin-top:10px;
@@ -3098,6 +3524,66 @@ html,body{
 .userDynamicModule .userDynamicList .userDynamic .topicContent{padding:0px;word-wrap:break-word;color:#666666;font-size:16px;margin-top:12px;}
 .userDynamicModule .userDynamicList .userDynamic .topicContent p{font-size:16px;word-wrap:break-word}
 .userDynamicModule .userDynamicList .userDynamic .topicContent img{max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;}
+.userDynamicModule .userDynamicList .userDynamic .topicContent iframe{
+	width:100%; height: 550px;padding:10px 0px; 
+}
+/* 隐藏标签 IE8以下浏览器不支持自定义标签，需要在页头<head>标签内执行document.createElement('player') */
+.userDynamicModule .userDynamicList .userDynamic .topicContent player{
+	width: 480px;
+	height: 270px;
+	display: block;
+	margin-right: 5px;
+	background: #000;
+	position: relative;
+	text-align: center;
+}
+.userDynamicModule .userDynamicList .userDynamic .topicContent player .cover{
+	max-height: 100%;  
+    max-width: 100%; 
+    width: auto;
+    height: auto;
+    position: absolute;  
+    top: 0;  
+    bottom: 0;  
+    left: 0;  
+    right: 0;  
+    margin: auto;
+}
+
+.userDynamicModule .userDynamicList .userDynamic .topicContent player .buttonCircle{
+	display: inline-block;
+	position: absolute;
+	top: 0;  
+    bottom: 0;  
+    left: 0;  
+    right: 0;  
+    margin: auto;
+	line-height:270px;
+	border-radius:30px;
+	width: 60px;
+	height: 60px;
+	background-color: rgba(0,0,0,0.5);
+}
+.userDynamicModule .userDynamicList .userDynamic .topicContent player .iconBox{
+    display: block;
+    position: relative;
+	width: 60px;
+	height: 60px;
+	
+}
+.userDynamicModule .userDynamicList .userDynamic .topicContent player .iconBox .playIcon{
+	font-size: 30px;
+    position: absolute;  
+	line-height:22px; 
+	width: 22px;
+	height: 22px;
+    top: 0;  
+    bottom: 0;  
+    left: 0;  
+    right: 0;  
+    margin: auto;
+    color: #fff;
+}
 
 /* 隐藏标签 IE8以下浏览器不支持自定义标签，需要在页头<head>标签内执行document.createElement('hide') */
 .userDynamicModule .userDynamicList .userDynamic .topicContent hide{
@@ -5299,9 +5785,6 @@ html,body{
 }
 
 
-
-
-
 /* 页脚 border-top: 1px solid #e1e1e1; */
 .footer { min-width: 990px; 
 	background: #f7f6f6;
@@ -5319,3 +5802,7 @@ html,body{
 .footer .copyright a { font-family: Tahoma; margin-left: 16px; color: #999;}
 .footer .copyright a:hover { text-decoration: underline; }
 .footer .copyright span { margin-left: 17px; }
+
+
+
+

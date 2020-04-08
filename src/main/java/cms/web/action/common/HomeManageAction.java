@@ -34,6 +34,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import cms.bean.ErrorView;
+import cms.bean.MediaInfo;
 import cms.bean.PageForm;
 import cms.bean.PageView;
 import cms.bean.QueryResult;
@@ -115,6 +116,7 @@ import cms.web.action.fileSystem.FileManage;
 import cms.web.action.follow.FollowManage;
 import cms.web.action.follow.FollowerManage;
 import cms.web.action.like.LikeManage;
+import cms.web.action.mediaProcess.MediaProcessQueueManage;
 import cms.web.action.message.PrivateMessageManage;
 import cms.web.action.message.RemindManage;
 import cms.web.action.message.SubscriptionSystemNotifyManage;
@@ -199,6 +201,8 @@ public class HomeManageAction {
 	@Resource QuestionService questionService;
 	@Resource QuestionTagService questionTagService;
 	@Resource AnswerService answerService;
+	@Resource MediaProcessQueueManage mediaProcessQueueManage;
+	
 	
 	//?  匹配任何单字符
 	//*  匹配0或者任意数量的字符
@@ -3876,6 +3880,9 @@ public class HomeManageAction {
 						userDynamic.setAvatarName(user.getAvatarName());
 					}
 					
+				
+					
+					
 					if(userDynamic.getTopicId() >0L){
 						Topic topicInfo = topicManage.queryTopicCache(userDynamic.getTopicId());//查询缓存
 						if(topicInfo != null){
@@ -3883,15 +3890,17 @@ public class HomeManageAction {
 							userDynamic.setTopicViewTotal(topicInfo.getViewTotal());
 							userDynamic.setTopicCommentTotal(topicInfo.getCommentTotal());
 							
-							
-
 							List<String> topicRoleNameList = userRoleManage.queryAllowViewTopicRoleName(topicInfo.getTagId());
+							
+							
 							if(topicRoleNameList != null && topicRoleNameList.size() >0){
 								userDynamic.setAllowRoleViewList(topicRoleNameList);//话题允许查看的角色名称集合
 							}
 							SystemSetting systemSetting = settingService.findSystemSetting_cache();
 							//话题内容摘要MD5
-							String topicContentDigest = "";
+							String topicContentDigest_link = "";
+							String topicContentDigest_video = "";
+							
 							//处理文件防盗链
 							if(topicInfo.getContent() != null && !"".equals(topicInfo.getContent().trim()) && systemSetting.getFileSecureLinkSecret() != null && !"".equals(systemSetting.getFileSecureLinkSecret().trim())){
 								//解析上传的文件完整路径名称
@@ -3902,7 +3911,7 @@ public class HomeManageAction {
 									Map<String,String> newFullFileNameMap = new HashMap<String,String>();//新的完整路径名称 key: 完整路径名称 value: 重定向接口
 									for (Map.Entry<String,String> entry : analysisFullFileNameMap.entrySet()) {
 
-										newFullFileNameMap.put(entry.getKey(), SecureLink.createRedirectLink(entry.getKey(),entry.getValue(),topicInfo.getTagId(),systemSetting.getFileSecureLinkSecret()));
+										newFullFileNameMap.put(entry.getKey(), SecureLink.createDownloadRedirectLink(entry.getKey(),entry.getValue(),topicInfo.getTagId(),systemSetting.getFileSecureLinkSecret()));
 									}
 									
 									Integer topicContentUpdateMark = topicManage.query_cache_markUpdateTopicStatus(topicInfo.getId(), Integer.parseInt(RandomStringUtils.randomNumeric(8)));
@@ -3911,10 +3920,25 @@ public class HomeManageAction {
 									
 									topicInfo.setContent(topicManage.query_cache_processFullFileName(topicInfo.getContent(),"topic",newFullFileNameMap,processFullFileNameId));
 									
-									topicContentDigest = cms.utils.MD5.getMD5(processFullFileNameId);
+									topicContentDigest_link = cms.utils.MD5.getMD5(processFullFileNameId);
 								}
 								
 								
+							}
+							
+							
+							//处理视频播放器标签
+							if(topicInfo.getContent() != null && !"".equals(topicInfo.getContent().trim())){
+								Integer topicContentUpdateMark = topicManage.query_cache_markUpdateTopicStatus(topicInfo.getId(), Integer.parseInt(RandomStringUtils.randomNumeric(8)));
+								
+								//生成处理'视频播放器'Id
+								String processVideoPlayerId = mediaProcessQueueManage.createProcessVideoPlayerId(topicInfo.getId(),topicContentUpdateMark);
+								
+								//处理视频播放器标签
+								String content = mediaProcessQueueManage.query_cache_processVideoPlayer(topicInfo.getContent(),processVideoPlayerId+"|"+topicContentDigest_link,topicInfo.getTagId(),systemSetting.getFileSecureLinkSecret());
+								topicInfo.setContent(content);
+								
+								topicContentDigest_video = cms.utils.MD5.getMD5(processVideoPlayerId);
 							}
 
 							
@@ -4020,7 +4044,7 @@ public class HomeManageAction {
 								String processHideTagId = topicManage.createProcessHideTagId(userDynamic.getTopicId(),topicContentUpdateMark, visibleTagList);
 								
 								//处理隐藏标签
-								String content = topicManage.query_cache_processHiddenTag(topicInfo.getContent(),visibleTagList,processHideTagId+"|"+topicContentDigest);
+								String content = topicManage.query_cache_processHiddenTag(topicInfo.getContent(),visibleTagList,processHideTagId+"|"+topicContentDigest_link+"|"+ topicContentDigest_video);
 								userDynamic.setTopicContent(content);
 								
 								//如果话题不是当前用户发表的，则检查用户对话题的查看权限

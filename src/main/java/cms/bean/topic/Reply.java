@@ -62,6 +62,9 @@ public class Reply implements Serializable{
 	/** 回复时间 **/
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date postTime = new Date();
+	/** 最后修改时间 **/
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date lastUpdateTime;
 	
 	/** 状态 10.待审核 20.已发布 **/
 	private Integer status = 10;
@@ -159,6 +162,12 @@ public class Reply implements Serializable{
 	}
 	public void setUserRoleNameList(List<String> userRoleNameList) {
 		this.userRoleNameList = userRoleNameList;
+	}
+	public Date getLastUpdateTime() {
+		return lastUpdateTime;
+	}
+	public void setLastUpdateTime(Date lastUpdateTime) {
+		this.lastUpdateTime = lastUpdateTime;
 	}
 	
 	

@@ -204,16 +204,18 @@ public class CommentServiceBean extends DaoSupport<Comment> implements CommentSe
 	 * @param commentId 评论Id
 	 * @param content 内容
 	 * @param status 状态
+	 * @param lastUpdateTime 最后修改时间
 	 * @param lowerQuoteIdGroup 下级引用Id组
 	 * @param userName 用户名称
 	 * @return
 	 */
-	public Integer updateComment(Long commentId,String content,Integer status,String lowerQuoteIdGroup,String userName){
-		Query query = em.createQuery("update Comment o set o.content=?1,o.userName=?2,o.status=?3 where o.id=?4")
+	public Integer updateComment(Long commentId,String content,Integer status,Date lastUpdateTime,String lowerQuoteIdGroup,String userName){
+		Query query = em.createQuery("update Comment o set o.content=?1,o.userName=?2,o.status=?3,o.lastUpdateTime=?4 where o.id=?5")
 		.setParameter(1, content)
 		.setParameter(2, userName)
 		.setParameter(3, status)
-		.setParameter(4, commentId);
+		.setParameter(4, lastUpdateTime)
+		.setParameter(5, commentId);
 		int i = query.executeUpdate();
 		if(i >0){
 			Query query2 = em.createQuery("update Comment o set o.quoteUpdateId=CONCAT(o.quoteUpdateId,?1) where o.quoteIdGroup like ?2")
@@ -224,6 +226,24 @@ public class CommentServiceBean extends DaoSupport<Comment> implements CommentSe
 		}
 		
 		return i;
+	}
+	/**
+	 * 修改评论
+	 * @param commentId 评论Id
+	 * @param content 内容
+	 * @param status 状态
+	 * @param lastUpdateTime 最后修改时间
+	 * @param userName 用户名称
+	 * @return
+	 */
+	public Integer updateComment(Long commentId,String content,Integer status,Date lastUpdateTime,String userName){
+		Query query = em.createQuery("update Comment o set o.content=?1,o.userName=?2,o.status=?3,o.lastUpdateTime=?4 where o.id=?5")
+		.setParameter(1, content)
+		.setParameter(2, userName)
+		.setParameter(3, status)
+		.setParameter(4, lastUpdateTime)
+		.setParameter(5, commentId);
+		return query.executeUpdate();
 	}
 	
 	/**
@@ -361,14 +381,16 @@ public class CommentServiceBean extends DaoSupport<Comment> implements CommentSe
 	 * @param content 回复内容
 	 * @param userName 用户名称
 	 * @param status 状态
+	 * @param lastUpdateTime 最后修改时间
 	 * @return
 	*/
-	public Integer updateReply(Long replyId,String content,String userName,Integer status){
-		Query query = em.createQuery("update Reply o set o.content=?1,o.userName=?2,o.status=?3 where o.id=?4")
+	public Integer updateReply(Long replyId,String content,String userName,Integer status,Date lastUpdateTime){
+		Query query = em.createQuery("update Reply o set o.content=?1,o.userName=?2,o.status=?3,o.status=?4 where o.id=?5")
 		.setParameter(1, content)
 		.setParameter(2, userName)
 		.setParameter(3, status)
-		.setParameter(4, replyId);
+		.setParameter(4, status)
+		.setParameter(5, replyId);
 		int i = query.executeUpdate();
 		return i;
 	} 

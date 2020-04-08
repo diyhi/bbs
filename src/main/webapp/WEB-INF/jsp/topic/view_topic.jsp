@@ -12,6 +12,9 @@
 <link href="backstage/css/table.css" type="text/css" rel="stylesheet"/>
 <link rel="stylesheet" href="backstage/layer/skin/layer.css"  type="text/css" />
 <script language="JavaScript" src="backstage/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="backstage/DPlayer/hls.min.js" language="javascript"></script>
+<script type="text/javascript" src="backstage/DPlayer/DPlayer.min.js" language="javascript"></script>
+
 <script language="javascript" src="backstage/js/Tool.js" type="text/javascript"></script>
 <script language="javascript" src="backstage/js/ajax.js" type="text/javascript"></script>
 
@@ -94,6 +97,45 @@ function auditReply(replyId){
 	
 }
 
+
+
+//添加媒体处理任务
+function addMediaProcessQueue(topicId){
+	var parameter = "&id="+topicId;
+	parameter += "&module=10";
+	var csrf =  getCsrf();
+	parameter += "&_csrf_token="+csrf.token;
+	parameter += "&_csrf_header="+csrf.header;
+	//删除第一个&号,防止因为多了&号而出现警告: Parameters: Invalid chunk ignored.信息
+	if(parameter.indexOf("&") == 0){
+		parameter = parameter.substring(1,parameter.length);
+	}
+	
+	post_request(function(value){
+		if(value == "1"){
+			layer.msg('添加成功', 
+				{
+				  time: 3000 //3秒关闭（如果不配置，默认是3秒）
+				},function(){
+					//关闭后的操作
+					
+				}
+			);
+		}else{
+			layer.msg('添加失败', 
+				{
+				  time: 3000 //3秒关闭（如果不配置，默认是3秒）
+				},function(){
+					//关闭后的操作
+					
+				}
+			);
+		}
+	},
+		"${config:url(pageContext.request)}control/mediaProcessQueue/manage${config:suffix()}?method=addMediaProcessQueue&timestamp=" + new Date().getTime(), true,parameter);
+		
+	
+}
 
 //显示修改话题页
 function showUpdateTopic(topicId){
@@ -278,7 +320,7 @@ $(function() {
 <!-- IE6 会弹出'已终止操作'错误，本JS要放在Body标签下面 -->
 <script type="text/javascript" src="backstage/spin/spin.min.js" ></script>
 <script language="JavaScript" src="backstage/layer/layer.js" ></script>
-<form:form>
+
 <enhance:out escapeXml="false">
 <input type="hidden" id="availableTag" value="<c:out value="${availableTag}"></c:out>">
 </enhance:out>
@@ -340,7 +382,7 @@ $(function() {
 					</TR>	
 				</TABLE>
 				<enhance:out escapeXml="false">
-					<div class="comment">${topic.content}</div>
+					<div class="comment topicContent">${topic.content}</div>
 				</enhance:out>
 				<TABLE  cellSpacing="2" cellPadding="0" width="99%"  border="0">
 					<TR class="noDiscolor">
@@ -351,6 +393,7 @@ $(function() {
 							<c:if test="${topic.status == 10}">
 								<A onclick="javascript:if(window.confirm('确定审核通过吗? ')){auditTopic('${topic.id}');return false;}else{return false};" hidefocus="true" href="#" ondragstart= "return false">立即审核</A>&nbsp;&nbsp;
 							</c:if>
+							
 							<A hidefocus="true"  href="control/topicLike/list${config:suffix()}?topicId=${topic.id}&visible=${param.visible}&topicPage=${param.topicPage}&userName=${param.userName}&id=${param.id}&queryState=${param.queryState}&jumpStatus=${param.jumpStatus}&userPage=${param.userPage}&commentPage=${param.commentPage}&replyPage=${param.replyPage}" ondragstart= "return false">点赞用户</A>&nbsp;&nbsp;
 							<A hidefocus="true"  href="control/topicFavorite/list${config:suffix()}?topicId=${topic.id}&visible=${param.visible}&topicPage=${param.topicPage}&userName=${param.userName}&id=${param.id}&queryState=${param.queryState}&jumpStatus=${param.jumpStatus}&userPage=${param.userPage}&commentPage=${param.commentPage}&replyPage=${param.replyPage}" ondragstart= "return false">收藏用户</A>&nbsp;&nbsp;
 							<A hidefocus="true"  href="control/topic/topicUnhideList${config:suffix()}?topicId=${topic.id}&visible=${param.visible}&topicPage=${param.topicPage}&userName=${param.userName}&id=${param.id}&queryState=${param.queryState}&jumpStatus=${param.jumpStatus}&userPage=${param.userPage}&commentPage=${param.commentPage}&replyPage=${param.replyPage}" ondragstart= "return false">取消隐藏用户</A>&nbsp;&nbsp;
@@ -458,7 +501,7 @@ $(function() {
 <!-- 分页栏结束 -->
 
 
-
+<form:form>
 
 <TABLE class="t-table" cellSpacing="1" cellPadding="2" width="100%" border="0" style="margin-top: 34px;">
   <TBODY>
@@ -476,14 +519,14 @@ $(function() {
     </TD>
    </TR>
 </TBODY></TABLE>
-
+</form:form>
 
 
 
 
 
 </DIV>
-</form:form>
+
 </BODY>
 
 <script>
@@ -555,7 +598,77 @@ $(function() {
 </script>
 
 
+<script type="text/javascript">
+// 获取随机数
+function getRandom(m) {
+	//生成的随机数截取m位，生成的随机数最大不超过13位，能保证首位不为0
+    m = m > 13 ? 13 : m;
+   	var num = Math.random().toString();
+   	if(num.substr(num.length - m, 1) === '0') {           
+   		return getRandom(m);
+   	}
+	return num.substring(num.length - m);
+}
+//设置播放器标签
+function setPlayerTag(){
+	//获取<player>标签属性
+	$(".topicContent").find("player").each(function(){
+		var random = getRandom(13);
 
+		var id = "player_"+random;
+		var url = $(this).attr("url");
+		var cover = $(this).attr("cover");//封面
+		var thumbnail = $(this).attr("thumbnail");//缩略图
+		//设置Id
+		$(this).attr("id",id);
+		if(url == ""){//如果视频处理中
+			var dp = new DPlayer({
+         		container: document.getElementById(id),//播放器容器元素
+         		screenshot: false,//开启截图，如果开启，视频和视频封面需要开启跨域
+         		video: {
+         			    
+         		}
+         	});
+			insertProcess(id);
+		}else{
+			if(cover != undefined && cover != "" && thumbnail != undefined && thumbnail != ""){//切片视频
+				var dp = new DPlayer({
+					container: document.getElementById(id),//播放器容器元素
+					screenshot: false,//开启截图，如果开启，视频和视频封面需要开启跨域
+					hotkey: true,
+					video: {
+					    url: url,
+					    type: 'hls',
+					    pic: cover,//视频封面
+					    thumbnails: thumbnail//视频预览图
+					}
+				});
+			}else{
+				var dp = new DPlayer({
+           			container: document.getElementById(id),//播放器容器元素
+           			screenshot: false,//开启截图，如果开启，视频和视频封面需要开启跨域
+           			
+           			video: {
+           			    url: url
+           			}
+           		});
+			
+			}
+			
+			
+		}
+		
+	})
+
+}
+//插入处理提示层
+function insertProcess(id){
+	$("#"+id).prepend("<div class='dplayer-process'><div class='box'><div class='prompt'>视频处理中，请稍后再刷新</div></div></div>");
+}
+$(document).ready(function(){
+	setPlayerTag();
+});
+</script>
 
 
 

@@ -135,6 +135,11 @@ public class PageViewManage implements InitializingBean{
                     } catch (InterruptedException e) {  
                     //    e.printStackTrace();  
                         if (logger.isErrorEnabled()) {
+				            logger.error("访问量消费队列中断异常",e);
+				        }
+                    } catch (Exception e) {  
+                    //    e.printStackTrace();  
+                        if (logger.isErrorEnabled()) {
 				            logger.error("访问量消费队列错误",e);
 				        }
                     }

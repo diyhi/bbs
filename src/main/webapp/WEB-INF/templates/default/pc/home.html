@@ -26,6 +26,9 @@
 	<script language="javascript" src="${commonPath}js/syntaxhighlighter/scripts/shBrushJScript.js" type="text/javascript" ></script>
 	<script language="javascript" src="${commonPath}js/syntaxhighlighter/scripts/shBrushCss.js" type="text/javascript"></script>
 	<script language="javascript" src="${commonPath}js/syntaxhighlighter/scripts/shBrushJava.js" type="text/javascript"></script>
+	
+	<script type="text/javascript" src="${commonPath}js/DPlayer/hls.min.js" language="javascript"></script>
+	<script type="text/javascript" src="${commonPath}js/DPlayer/DPlayer.min.js" language="javascript"></script>
 </head>
 <body>
 
@@ -140,7 +143,7 @@
 					</li>
 					<li class="item" >
 						<a class="a-pic" href="user/control/replyList" >
-							<div class="img cms-reply " ></div> 	
+							<div class="img cms-reply " style="width: ;height: "></div> 	
 						</a>
 	    				<h4 class="title">
 	    					<a class="a-title" href="user/control/replyList" >我的回复</a>
@@ -702,7 +705,8 @@
 								
 								setTimeout(function () {	
 									setHideTagUI();
-								
+									//设置播放器标签
+									setPlayerTag();
 									
 									//隐藏高度超过100px的内容
 									$('.topicContent,#quoteModuleContent').readmore({
@@ -753,6 +757,7 @@
 					},page);
 					
 					
+					
 					$(window).scroll(function() {    
 						//当内容滚动到底部时加载新的内容 100为当距离最底部100个像素时开始加载.  
 						if ($(this).scrollTop() + $(window).height() + 100 >= $(document).height() && $(this).scrollTop() > 100) {   
@@ -768,6 +773,94 @@
 				}
 			});
 		</script>
+		
+		
+		<script type="text/javascript">
+			// 获取随机数
+			function getRandom(m) {
+				//生成的随机数截取m位，生成的随机数最大不超过13位，能保证首位不为0
+			    m = m > 13 ? 13 : m;
+			   	var num = Math.random().toString();
+			   	if(num.substr(num.length - m, 1) === '0') {           
+			   		return getRandom(m);
+			   	}
+				return num.substring(num.length - m);
+			}
+			
+			//设置播放器标签
+			function setPlayerTag(){
+				//获取<player>标签属性
+				$(".topicContent").find("player").each(function(){
+					var random = getRandom(13);
+					var id = "player_"+random;
+					var url = $(this).attr("url");
+					var cover = $(this).attr("cover");//封面
+					var thumbnail = $(this).attr("thumbnail");//缩略图
+					//设置Id
+					$(this).attr("id",id);
+									
+					if(cover != undefined && cover != ""){
+						var node = '<img class="cover" src="'+cover+'"/><span class="buttonCircle"><span class="iconBox"><i class="cms-control-play playIcon"></i></span></span>';
+					
+						$(this).append(node);
+					}else{
+						var node = '<span class="buttonCircle"><span class="iconBox"><i class="cms-control-play playIcon"></i></span></span>';
+					
+						$(this).append(node);
+					}
+					
+					
+					
+					$(this).click(function(){
+						$(this).unbind('click');//解绑事件
+						
+						if(url == ""){//如果视频处理中
+							var dp = new DPlayer({
+				         		container: document.getElementById(id),//播放器容器元素
+				         		screenshot: false,//开启截图，如果开启，视频和视频封面需要开启跨域
+				         		video: {
+				         			    
+				         		}
+				         	});
+							insertProcess(id);
+						}else{
+							if(cover != undefined && cover != "" && thumbnail != undefined && thumbnail != ""){//切片视频
+								var dp = new DPlayer({
+									container: document.getElementById(id),//播放器容器元素
+									screenshot: false,//开启截图，如果开启，视频和视频封面需要开启跨域
+									hotkey: true,
+									preload: 'none', //禁止视频预加载
+									video: {
+									    url: url,
+									    type: 'hls',
+									    pic: cover,//视频封面
+									    thumbnails: thumbnail//视频预览图
+									}
+								});
+								dp.play();//播放视频
+							
+							}else{
+								var dp = new DPlayer({
+			            			container: document.getElementById(id),//播放器容器元素
+			            			screenshot: false,//开启截图，如果开启，视频和视频封面需要开启跨域
+			            			
+			            			video: {
+			            			    url: url
+			            			}
+			            		});
+			            		dp.play();//播放视频
+							}
+						}
+					});
+				})
+			}
+			//插入处理提示层
+			function insertProcess(id){
+				$("#"+id).prepend("<div class='dplayer-process'><div class='box'><div class='prompt'>视频处理中，请稍后再刷新</div></div></div>");
+			}
+		
+		</script>
+		
 	</div>
 </div>
 

@@ -55,6 +55,8 @@ public class ForumCodeManage {
 		childNode.add(new ForumCodeNode(1009,"相似话题","topicRelated_likeTopic_",Arrays.asList(new String[]{"集合"})));
 		childNode.add(new ForumCodeNode(1010,"话题取消隐藏","topicRelated_topicUnhide_",Arrays.asList(new String[]{"集合"})));
 		childNode.add(new ForumCodeNode(1011,"修改话题","topicRelated_editTopic_",Arrays.asList(new String[]{"集合"})));
+		childNode.add(new ForumCodeNode(1012,"修改评论","topicRelated_editComment_",Arrays.asList(new String[]{"集合"})));
+		childNode.add(new ForumCodeNode(1013,"修改评论回复","topicRelated_editReply_",Arrays.asList(new String[]{"集合"})));
 		forumCodeNodeList.add(new ForumCodeNode(100,"话题",childNode));//添加一级节点
 		
 		//问答

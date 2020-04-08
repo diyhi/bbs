@@ -155,7 +155,7 @@ html,body{
 	margin-left:-8px;margin-right:0px;
 }
 .tagModule .box .tagList>div a{
-	color:#26a2ff;display:inline-block;padding:7px 8px;margin:10px 4px 0;border-radius:5px;border: 1px solid #26a2ff;
+	color:#26a2ff;display:inline-block;padding:6px 8px;margin:10px 4px 0;border-radius:5px;border: 1px solid #26a2ff;font-size:14px;
 }
 .tagModule .box .tagList .selected{
 	border:1px solid #26a2ff; background-color: #e5f3ff;
@@ -187,7 +187,7 @@ html,body{
 	margin-left:-8px;margin-right:0px;
 }
 .questionTagModule .box .tagList .item a{
-	color:#26a2ff;display:inline-block;padding:7px 8px;margin:10px 4px 0;border-radius:5px;border: 1px solid #26a2ff;
+	color:#26a2ff;display:inline-block;padding:6px 8px;margin:10px 4px 0;border-radius:5px;border: 1px solid #26a2ff;font-size:14px;
 }
 .questionTagModule .box .tagList .selected{
 	border:1px solid #26a2ff; background-color: #e5f3ff;
@@ -361,20 +361,77 @@ html,body{
 	overflow: hidden;
 	width:100%;
 }
-
-.indexModule .topicList .item .picInfo{position:relative;padding:0px 0px 0px 50px;display:inline-block;width: 100%; -webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box; }
+.indexModule .topicList .item .videoInfo{
+	padding:4px 10px 0px 50px;
+	
+}
+.indexModule .topicList .item .videoInfo player{
+	height: 180px;
+	display: block;
+	background: #000;
+	position: relative;
+	text-align: center;
+}
+.indexModule .topicList .item .videoInfo player .cover{
+	max-height: 100%;  
+    max-width: 100%; 
+    width: auto;
+    height: auto;
+    position: absolute;  
+    top: 0;  
+    bottom: 0;  
+    left: 0;  
+    right: 0;  
+    margin: auto;
+}
+.indexModule .topicList .item .videoInfo player .circle{
+	display: inline-block;
+	position: absolute;
+	top: 0;  
+    bottom: 0;  
+    left: 0;  
+    right: 0;  
+    margin: auto;
+	line-height:180px;
+	border-radius:30px;
+	width: 60px;
+	height: 60px;
+	background-color: rgba(0,0,0,0.5);
+}
+.indexModule .topicList .item .videoInfo player .iconBox{
+    display: block;
+    position: relative;
+	width: 60px;
+	height: 60px;
+}
+.indexModule .topicList .item .videoInfo player .iconBox .playIcon{
+	
+	font-size: 30px;
+    position: absolute;  
+	line-height:22px; 
+	width: 22px;
+	height: 22px;
+    top: 0;  
+    bottom: 0;  
+    left: 0;  
+    right: 0;  
+    margin: auto;
+    color: #fff;
+}
+.indexModule .topicList .item .picInfo{position:relative;padding:5px 0px 0px 50px;display:inline-block;width: 100%; -webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box; }
 .indexModule .topicList .item .picInfo .imageBox{display:block;color:gray;width:20%;margin-right:2%; float:left!important;}
 .indexModule .topicList .item .picInfo .imageBox .img{
     padding-bottom: 100%;
     height: 0;
 	background:no-repeat ;
-	background-size:cover;
+	background-size:cover;border-radius:2px;
 }
 .indexModule .topicList .item .picInfo .imageBox .img img{
     position: absolute;
     width: 20%;
     height: 100%;
   	opacity: 0;
+  	
 }
 
 .indexModule .topicList .topicPage{
@@ -483,9 +540,6 @@ html,body{
 .topicContentModule .topicDetail .main iframe{
 	width:100%; height: 300px;padding:10px 0px; 
 }
-.topicContentModule .topicDetail .main video{
-	width:100%; height: 300px;padding:10px 0px; outline:none;
-}
 .topicContentModule .topicDetail .main hide{
 	display:block;
 	background: #fbfbfb;
@@ -523,6 +577,44 @@ html,body{
 .topicContentModule .topicDetail .main hide .submit-box .button{ width:96px; height:26px; line-height:28px; border:0; background:#888888; font-size:16px; color:#fff; float:right; font-weight:bold; cursor:pointer;text-decoration: none; outline: none}
 .topicContentModule .topicDetail .main hide .submit-box .button:hover{background:#808080;}
 
+
+.topicContentModule .topicDetail .main player{
+	display: block;
+	margin-top: 8px;
+	height: 576px;
+}
+.dplayer-process {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 99;
+}
+.dplayer-process .box{
+	position: relative;
+	width: 100%;
+	height: 100%;
+}
+.dplayer-process .box .prompt{
+   	width: 250px;
+    height: 80px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+   	padding :0px 30px;
+   	border-radius :3px;
+   	color: #fff;
+   	line-height: 80px;
+   	font-size: 20px;
+   	background-color:rgb(0,0,0);
+	opacity:0.7;
+	filter:alpha(opacity=70);
+	text-align: center;
+}
 
 .topicContentModule .operating {
 	display:inline-block;text-align: center;width: 100%;
@@ -607,7 +699,7 @@ html,body{
 .topicContentModule .commentList .item .head .time {
 	font-size: 12px;
 	color:#aaa;
-	margin-top: 6px;
+	margin-top: 3px;
 	line-height: 12px
 }
 .topicContentModule .commentList .item .head .floor {
@@ -751,6 +843,11 @@ html,body{
 	height: 100%;
 	margin-right:4px;
 }
+.topicContentModule .commentList .item .bottomInfo .toolbar .edit-btn{
+	color: #999;
+	font-size: 14px;
+	margin-right: 30px;
+}
 .topicContentModule .commentList .item .bottomInfo .toolbar .quote-btn{
 	color: #999;
 	font-size: 14px;
@@ -809,7 +906,6 @@ html,body{
     right:0;
     margin-bottom: 0;
     border-bottom: none;
-    overflow-y:hidden;
     -webkit-overflow-scrolling: touch;
     overflow-scrolling: touch;
 }
@@ -821,6 +917,39 @@ html,body{
 .topicContentModule .addReplyScroll .box .addReplyForm .tips span{color: red;}
 
 
+.topicContentModule .editCommentScroll {
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    right:0;
+    margin-bottom: 0;
+    border-bottom: none;
+    -webkit-overflow-scrolling: touch;
+    overflow-scrolling: touch;
+}
+.topicContentModule .editCommentScroll .box{
+	padding-top: 40px;
+}
+.topicContentModule .editCommentScroll .box .editCommentForm{margin-left:5px; margin-right: 5px;}
+.topicContentModule .editCommentScroll .box .editCommentForm .tips{line-height:30px; margin-left: 115px}
+.topicContentModule .editCommentScroll .box .editCommentForm .tips span{color: red;}
+
+.topicContentModule .editReplyScroll {
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    right:0;
+    margin-bottom: 0;
+    border-bottom: none;
+    -webkit-overflow-scrolling: touch;
+    overflow-scrolling: touch;
+}
+.topicContentModule .editReplyScroll .box{
+	padding-top: 40px;
+}
+.topicContentModule .editReplyScroll .box .editReplyForm{margin-left:5px; margin-right: 5px;}
+.topicContentModule .editReplyScroll .box .editReplyForm .tips{line-height:30px; margin-left: 115px}
+.topicContentModule .editReplyScroll .box .editReplyForm .tips span{color: red;}
 
 /** 问答 **/
 .askListModule{padding-bottom: 50px;}
@@ -964,7 +1093,7 @@ html,body{
 	width:100%;
 }
 .askListModule .questionList .item .reward{
-	min-height: 20px;margin-right: 10px;margin-top: 5px;margin-bottom: -5px;
+	min-height: 20px;margin-right: 10px;margin-top: 5px;margin-bottom: -3px;
 }
 .askListModule .questionList .item .reward .box{
 	float:right;
@@ -1977,6 +2106,15 @@ html,body{
 	color: #222;
 	text-align: left;
 }
+
+.test{
+	margin: 10px 0px 10px 30px;
+	min-height: 40px;
+	font-size: 15px;
+	line-height: 1.8;
+	color: #222;
+	text-align: left;
+}
 .homeModule .userDynamicList .item .main .topicContent a{
 	font-size: 15px;
 	line-height: 1.8;
@@ -1991,8 +2129,58 @@ html,body{
 .homeModule .userDynamicList .item .main .topicContent iframe{
 	width:100%; height: 400px;padding:10px 0px; 
 }
-.homeModule .userDynamicList .item .main .topicContent video{
-	width:100%; height: 400px;padding:10px 0px; outline:none;
+.homeModule .userDynamicList .item .main .topicContent player{
+	height: 180px;
+	display: block;
+	background: #000;
+	position: relative;
+	text-align: center;
+}
+.homeModule .userDynamicList .item .main .topicContent player .cover{
+	max-height: 100%;  
+    max-width: 100%; 
+    width: auto;
+    height: auto;
+    position: absolute;  
+    top: 0;  
+    bottom: 0;  
+    left: 0;  
+    right: 0;  
+    margin: auto;
+}
+.homeModule .userDynamicList .item .main .topicContent player .buttonCircle{
+	display: inline-block;
+	position: absolute;
+	top: 0;  
+    bottom: 0;  
+    left: 0;  
+    right: 0;  
+    margin: auto;
+	line-height:180px;
+	border-radius:30px;
+	width: 60px;
+	height: 60px;
+	background-color: rgba(0,0,0,0.5);
+}
+.homeModule .userDynamicList .item .main .topicContent player .iconBox{
+    display: block;
+    position: relative;
+	width: 60px;
+	height: 60px;
+}
+.homeModule .userDynamicList .item .main .topicContent player .iconBox .playIcon{
+	font-size: 30px;
+    position: absolute;  
+	line-height:22px; 
+	width: 22px;
+	height: 22px;
+    top: 0;  
+    bottom: 0;  
+    left: 0;  
+    right: 0;  
+    margin: auto;
+    color: #fff;
+    font-style:normal;
 }
 .homeModule .userDynamicList .item .main .topicContent hide{
 	display:block;

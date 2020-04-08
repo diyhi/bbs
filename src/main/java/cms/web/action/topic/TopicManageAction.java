@@ -14,7 +14,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,6 +31,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import cms.bean.PageForm;
 import cms.bean.PageView;
 import cms.bean.QueryResult;
+import cms.bean.mediaProcess.MediaProcessQueue;
 import cms.bean.setting.SystemSetting;
 import cms.bean.staff.SysUsers;
 import cms.bean.thumbnail.Thumbnail;
@@ -44,6 +45,7 @@ import cms.bean.topic.Topic;
 import cms.bean.topic.TopicIndex;
 import cms.bean.user.User;
 import cms.bean.user.UserGrade;
+import cms.service.mediaProcess.MediaProcessService;
 import cms.service.setting.SettingService;
 import cms.service.thumbnail.ThumbnailService;
 import cms.service.topic.CommentService;
@@ -64,6 +66,7 @@ import cms.utils.Verification;
 import cms.web.action.SystemException;
 import cms.web.action.TextFilterManage;
 import cms.web.action.fileSystem.FileManage;
+import cms.web.action.mediaProcess.MediaProcessQueueManage;
 import cms.web.action.user.UserManage;
 
 
@@ -91,6 +94,9 @@ public class TopicManageAction {
 	
 	@Resource UserManage userManage;
 	@Resource UserService userService;
+	
+	@Resource MediaProcessService mediaProcessService;
+	@Resource MediaProcessQueueManage mediaProcessQueueManage;
 	
 	/**
 	 * 话题   查看
@@ -125,12 +131,22 @@ public class TopicManageAction {
 						Map<String,String> newFullFileNameMap = new HashMap<String,String>();//新的完整路径名称 key: 完整路径名称 value: 重定向接口
 						for (Map.Entry<String,String> entry : analysisFullFileNameMap.entrySet()) {
 
-							newFullFileNameMap.put(entry.getKey(), SecureLink.createRedirectLink(entry.getKey(),entry.getValue(),-1L,systemSetting.getFileSecureLinkSecret()));
+							newFullFileNameMap.put(entry.getKey(), SecureLink.createDownloadRedirectLink(entry.getKey(),entry.getValue(),-1L,systemSetting.getFileSecureLinkSecret()));
 						}
 						
 						topic.setContent(textFilterManage.processFullFileName(topic.getContent(),"topic",newFullFileNameMap));
 						
 					}
+					
+					
+					
+						
+						
+				}
+				if(topic.getContent() != null && !"".equals(topic.getContent().trim())){
+					//处理视频播放器标签
+					String content = textFilterManage.processVideoPlayer(topic.getContent(),-1L,systemSetting.getFileSecureLinkSecret());
+					topic.setContent(content);
 				}
 				
 				
@@ -372,7 +388,7 @@ public class TopicManageAction {
 				fileNameList = (List<String>)object[7];
 				isFile = (Boolean)object[8];//是否含有文件
 				isMap = (Boolean)object[9];//是否含有地图
-			
+				
 				
 				//校正隐藏标签
 				String validValue =  textFilterManage.correctionHiddenTag(value,userGradeList);
@@ -466,6 +482,27 @@ public class TopicManageAction {
 			topicManage.delete_cache_markUpdateTopicStatus(topic.getId());//删除 标记修改话题状态
 			//更新索引
 			topicIndexService.addTopicIndex(new TopicIndex(String.valueOf(topic.getId()),1));
+			
+			if(isMedia){
+				List<MediaProcessQueue> mediaProcessQueueList = new ArrayList<MediaProcessQueue>();
+				for(String fullPathName :mediaNameList){
+					//取得路径名称
+					String pathName = FileUtil.getFullPath(fullPathName);
+					//文件名称
+					String fileName = FileUtil.getName(fullPathName);
+					
+					MediaProcessQueue mediaProcessQueue = new MediaProcessQueue();
+					mediaProcessQueue.setModule(10);//10:话题
+					mediaProcessQueue.setType(10);//10:视频
+					mediaProcessQueue.setParameter(String.valueOf(topic.getId()));
+					mediaProcessQueue.setPostTime(topic.getPostTime());
+					mediaProcessQueue.setFilePath("file/topic/"+pathName);
+					mediaProcessQueue.setFileName(fileName);
+					mediaProcessQueueList.add(mediaProcessQueue);
+				}
+				mediaProcessService.saveMediaProcessQueueList(mediaProcessQueueList);
+			}
+			
 			
 			//上传文件编号
 			String fileNumber = "a"+userId;
@@ -991,7 +1028,7 @@ public class TopicManageAction {
 						}
 						
 					}
-					 
+					
 					
 					//删除缓存
 					topicManage.deleteTopicCache(topic.getId());//删除话题缓存
@@ -1001,6 +1038,43 @@ public class TopicManageAction {
 					
 					Object[] obj = textFilterManage.readPathName(old_content,"topic");
 					if(obj != null && obj.length >0){
+						//删除旧媒体处理任务
+						List<String> delete_mediaProcessFileNameList = new ArrayList<String>();//文件名称
+						//删除旧媒体切片文件夹
+						List<String> delete_mediaProcessDirectoryList = new ArrayList<String>();//文件夹
+						
+						//新增媒体处理任务
+						if(isMedia){
+							List<MediaProcessQueue> mediaProcessQueueList = new ArrayList<MediaProcessQueue>();
+							//旧影音
+							List<String> old_mediaNameList = (List<String>)obj[2];	
+							A:for(String fullPathName :mediaNameList){
+								for(String old_fullPathName : old_mediaNameList){
+									if(old_fullPathName.equals("file/topic/"+fullPathName)){
+										continue A;
+									}
+									
+								}
+								//取得路径名称
+								String pathName = FileUtil.getFullPath(fullPathName);
+								//文件名称
+								String fileName = FileUtil.getName(fullPathName);
+								
+								MediaProcessQueue mediaProcessQueue = new MediaProcessQueue();
+								mediaProcessQueue.setModule(10);//10:话题
+								mediaProcessQueue.setType(10);//10:视频
+								mediaProcessQueue.setParameter(String.valueOf(topic.getId()));
+								mediaProcessQueue.setPostTime(topic.getLastUpdateTime());
+								mediaProcessQueue.setFilePath("file/topic/"+pathName);
+								mediaProcessQueue.setFileName(fileName);
+								mediaProcessQueueList.add(mediaProcessQueue);
+							}
+							mediaProcessService.saveMediaProcessQueueList(mediaProcessQueueList);
+
+						}
+						
+						
+						
 						//旧图片
 						List<String> old_imageNameList = (List<String>)obj[0];
 						
@@ -1066,6 +1140,10 @@ public class TopicManageAction {
 								for(String mediaName : old_mediaNameList){
 									oldPathFileList.add(FileUtil.toSystemPath(mediaName));
 									
+									delete_mediaProcessFileNameList.add(FileUtil.getName(mediaName));
+							
+									
+									delete_mediaProcessDirectoryList.add(FileUtil.toSystemPath(FileUtil.getFullPath(mediaName))+FileUtil.getBaseName(mediaName)+File.separator);
 								}
 								
 							}
@@ -1092,6 +1170,24 @@ public class TopicManageAction {
 								
 							}
 						}
+						
+						//删除旧媒体处理任务
+						if(delete_mediaProcessFileNameList != null && delete_mediaProcessFileNameList.size() >0){
+							mediaProcessService.deleteMediaProcessQueue(delete_mediaProcessFileNameList);
+							//删除缓存
+							for(String delete_mediaProcessFileName : delete_mediaProcessFileNameList){
+								mediaProcessQueueManage.delete_cache_findMediaProcessQueueByFileName(delete_mediaProcessFileName);
+							}
+						}
+						//删除旧媒体切片文件夹
+						if(delete_mediaProcessDirectoryList != null && delete_mediaProcessDirectoryList.size() >0){
+							for(String mediaProcessDirectory :delete_mediaProcessDirectoryList){
+								if(mediaProcessDirectory != null && !"".equals(mediaProcessDirectory.trim())){
+									fileManage.removeDirectory(mediaProcessDirectory);
+								}
+							}
+						}
+						
 					}
 					
 					
@@ -1276,10 +1372,20 @@ public class TopicManageAction {
 							}
 							
 							topicManage.deleteTopicCache(topic.getId());//删除缓存
+							
+							topicManage.delete_cache_markUpdateTopicStatus(topic.getId());//删除 标记修改话题状态
+							
+							
 							//更新索引
 							topicIndexService.addTopicIndex(new TopicIndex(String.valueOf(topic.getId()),3));
 							Object[] obj = textFilterManage.readPathName(topic.getContent(),"topic");
 							if(obj != null && obj.length >0){
+								//删除旧媒体处理任务
+								List<String> delete_mediaProcessFileNameList = new ArrayList<String>();//文件名称
+								//删除旧媒体切片文件夹
+								List<String> delete_mediaProcessDirectoryList = new ArrayList<String>();//文件夹
+								
+								
 								List<String> filePathList = new ArrayList<String>();
 								
 								List<Thumbnail> thumbnailList = thumbnailService.findAllThumbnail_cache();
@@ -1310,13 +1416,16 @@ public class TopicManageAction {
 								List<String> mediaNameList = (List<String>)obj[2];		
 								for(String mediaName :mediaNameList){
 									filePathList.add(FileUtil.toSystemPath(mediaName));
+									
+									delete_mediaProcessFileNameList.add(FileUtil.getName(mediaName));
+									
+									delete_mediaProcessDirectoryList.add(FileUtil.toSystemPath(FileUtil.getFullPath(mediaName))+FileUtil.getBaseName(mediaName)+File.separator);
 								}
 								//删除文件
 								List<String> fileNameList = (List<String>)obj[3];		
 								for(String fileName :fileNameList){
 									filePathList.add(FileUtil.toSystemPath(fileName));
 								}
-	
 								
 								for(String filePath :filePathList){
 									
@@ -1345,6 +1454,24 @@ public class TopicManageAction {
 									fileManage.failedStateFile("file"+File.separator+"comment"+File.separator+"lock"+File.separator+"#"+topic.getId());
 								}
 								
+								//删除旧媒体处理任务
+								if(delete_mediaProcessFileNameList != null && delete_mediaProcessFileNameList.size() >0){
+									mediaProcessService.deleteMediaProcessQueue(delete_mediaProcessFileNameList);
+									
+									//删除缓存
+									for(String delete_mediaProcessFileName : delete_mediaProcessFileNameList){
+										mediaProcessQueueManage.delete_cache_findMediaProcessQueueByFileName(delete_mediaProcessFileName);
+									}
+									
+								}
+								//删除旧媒体切片文件夹
+								if(delete_mediaProcessDirectoryList != null && delete_mediaProcessDirectoryList.size() >0){
+									for(String mediaProcessDirectory :delete_mediaProcessDirectoryList){
+										if(mediaProcessDirectory != null && !"".equals(mediaProcessDirectory.trim())){
+											fileManage.removeDirectory(mediaProcessDirectory);
+										}
+									}
+								}
 							}
 						}
 						

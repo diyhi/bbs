@@ -14,11 +14,14 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import cms.bean.MediaInfo;
+import cms.bean.mediaProcess.MediaProcessQueue;
 import cms.bean.setting.EditorTag;
 import cms.bean.topic.HideTagType;
 import cms.bean.user.UserGrade;
 import cms.utils.CommentedProperties;
 import cms.utils.FileUtil;
+import cms.utils.SecureLink;
 import cms.utils.Verification;
 import cms.web.taglib.Configuration;
 
@@ -268,7 +271,7 @@ public class TextFilterManage {
 		if(editorTag == null || editorTag.isUploadVideo()){
 			//video 上传视频
 			whitelist.addTags("video")
-			.addAttributes("video", "type", "width","height", "controls", "src","loop")//"autoplay",
+			.addAttributes("video", "controls", "src","loop")//"autoplay",
 			.addProtocols("video", "src", "http", "https")
 		//	.addEnforcedAttribute("video", "type", "video/mp4")
 			.addEnforcedAttribute("video", "controls", "controls");
@@ -1419,6 +1422,79 @@ public class TextFilterManage {
 		return html;
 	}
 	
+	
+	
+	/**
+	 * 处理视频播放器标签
+	 * @param html 富文本内容
+	 * @param tagId 话题标签  -1表示管理后台打开链接，不校验权限
+	 * @param secret 密钥
+	 * @return
+	 */
+	public String processVideoPlayer(String html,Long tagId,String secret){
+		
+		if(!StringUtils.isBlank(html)){
+			Document doc = Jsoup.parseBodyFragment(html);
+			Elements elements = doc.select("video");  
+			for (Element element : elements) {
+				//标签src属性
+				String src = element.attr("src"); 
+
+				element.removeAttr("src"); 
+				//替换当前标签为<player>标签
+				element.tagName("player");
+				
+				
+				String url = "";
+				if(secret != null && !"".equals(secret.trim())){
+					url = SecureLink.createVideoRedirectLink(src,tagId,secret);
+				}else{
+					url = src;
+				}
+				element.attr("url",url); 
+			
+				
+			}
+			html = doc.body().html();
+		}
+		return html;
+	}
+	
+	/**
+	 * 处理视频信息
+	 * @param html 富文本内容
+	 * @param tagId 话题标签  -1表示管理后台打开链接，不校验权限
+	 * @param secret 密钥
+	 * @return
+	 */
+	public List<MediaInfo> processVideoInfo(String html,Long tagId,String secret){
+		List<MediaInfo> mediaInfoList = new ArrayList<MediaInfo>();
+		
+		if(!StringUtils.isBlank(html)){
+			Document doc = Jsoup.parseBodyFragment(html);
+			Elements elements = doc.select("video");  
+			for (Element element : elements) {
+				//标签src属性
+				String src = element.attr("src"); 
+
+				
+				String url = "";
+				if(secret != null && !"".equals(secret.trim())){
+					url = SecureLink.createVideoRedirectLink(src,tagId,secret);
+				}else{
+					url = src;
+				}
+				
+				
+				MediaInfo mediaInfo = new MediaInfo();
+				mediaInfo.setMediaUrl(url);
+			
+				mediaInfoList.add(mediaInfo);
+			}
+			
+		}
+		return mediaInfoList;
+	}
 }
 
 

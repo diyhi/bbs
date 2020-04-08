@@ -76,11 +76,22 @@ public interface CommentService  extends DAO<Comment>{
 	 * @param commentId 评论Id
 	 * @param content 内容
 	 * @param status 状态
+	 * @param lastUpdateTime 最后修改时间
 	 * @param lowerQuoteIdGroup 下级引用Id组
 	 * @param userName 用户名称
 	 * @return
 	 */
-	public Integer updateComment(Long commentId,String content,Integer status,String lowerQuoteIdGroup,String userName);
+	public Integer updateComment(Long commentId,String content,Integer status,Date lastUpdateTime,String lowerQuoteIdGroup,String userName);
+	/**
+	 * 修改评论
+	 * @param commentId 评论Id
+	 * @param content 内容
+	 * @param status 状态
+	 * @param lastUpdateTime 最后修改时间
+	 * @param userName 用户名称
+	 * @return
+	 */
+	public Integer updateComment(Long commentId,String content,Integer status,Date lastUpdateTime,String userName);
 	/**
 	 * 修改评论状态
 	 * @param commentId 评论Id
@@ -141,9 +152,10 @@ public interface CommentService  extends DAO<Comment>{
 	 * @param content 回复内容
 	 * @param userName 用户名称
 	 * @param status 状态
+	 * @param lastUpdateTime 最后修改时间
 	 * @return
 	*/
-	public Integer updateReply(Long replyId,String content,String userName,Integer status);
+	public Integer updateReply(Long replyId,String content,String userName,Integer status,Date lastUpdateTime);
 	/**
 	 * 修改回复状态
 	 * @param replyId 回复Id

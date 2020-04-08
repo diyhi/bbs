@@ -15,14 +15,14 @@ import cms.web.taglib.Configuration;
 public class SecureLink {
 	
 	/**
-	 * 生成重定向链接
+	 * 生成文件下载重定向链接
 	 * @param link 链接
 	 * @param fileName 文件名称
 	 * @param tagId 标签Id  -1表示管理后台打开链接，不校验权限
 	 * @param secret 密钥 16位字符
 	 * @return
 	 */
-	public static String createRedirectLink(String link,String fileName,Long tagId,String secret){
+	public static String createDownloadRedirectLink(String link,String fileName,Long tagId,String secret){
 		Map<String,String> parameterMap = new HashMap<String,String>();
 		parameterMap.put("link", link);
 		parameterMap.put("fileName", fileName);
@@ -38,7 +38,30 @@ public class SecureLink {
 		
 		return newLink;
 	}
+
 	
+	/**
+	 * 生成视频重定向链接
+	 * @param link 链接
+	 * @param tagId 标签Id  -1表示管理后台打开链接，不校验权限
+	 * @param secret 密钥 16位字符
+	 * @return
+	 */
+	public static String createVideoRedirectLink(String link,Long tagId,String secret){
+		Map<String,String> parameterMap = new HashMap<String,String>();
+		parameterMap.put("link", link);
+		parameterMap.put("tagId", String.valueOf(tagId));
+		String parameter_json = JsonUtils.toJSONString(parameterMap);
+		
+		String ciphertext = AES.encrypt(parameter_json, secret, null);
+		
+		
+		String newLink = UriComponentsBuilder.fromUriString("videoRedirect")
+        .queryParam("jump", Base64.encodeBase64URL(ciphertext))
+        .build().toString();
+		
+		return newLink;
+	}
 	
 	/**
 	 * 生成安全链接

@@ -716,7 +716,7 @@ public class TopicManage {
 	
 	
 	/**
-	 * 查询缓存 处理隐藏标签(缓存不做删除处理，到期自动失效，由话题'最后修改时间'做参数,确保查询为最新值)
+	 * 查询缓存 处理隐藏标签(缓存不做删除处理，到期自动失效，由话题'随机数'做参数,确保查询为最新值)
 	 * @param html 富文本内容
 	 * @param visibleTagList 允许可见的隐藏标签
 	 * @param processHideTagId 处理'隐藏标签'Id

@@ -28,6 +28,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import cms.bean.ErrorView;
+import cms.bean.mediaProcess.MediaProcessQueue;
 import cms.bean.message.Remind;
 import cms.bean.payment.PaymentLog;
 import cms.bean.platformShare.TopicUnhidePlatformShare;
@@ -47,6 +48,7 @@ import cms.bean.user.ResourceEnum;
 import cms.bean.user.User;
 import cms.bean.user.UserDynamic;
 import cms.bean.user.UserGrade;
+import cms.service.mediaProcess.MediaProcessService;
 import cms.service.message.RemindService;
 import cms.service.setting.SettingService;
 import cms.service.template.TemplateService;
@@ -119,7 +121,7 @@ public class TopicFormAction {
 	
 	@Resource UserRoleManage userRoleManage;
 	@Resource PaymentManage paymentManage;
-	
+	@Resource MediaProcessService mediaProcessService;
 	
 	/**
 	 * 话题  添加
@@ -515,6 +517,27 @@ public class TopicFormAction {
 			followManage.delete_cache_userUpdateFlag(accessUser.getUserName());
 			topicManage.delete_cache_markUpdateTopicStatus(topic.getId());//删除 标记修改话题状态
 			String fileNumber = "b"+ accessUser.getUserId();
+
+			if(isMedia){
+				List<MediaProcessQueue> mediaProcessQueueList = new ArrayList<MediaProcessQueue>();
+				for(String fullPathName :mediaNameList){
+					
+					//取得路径名称
+					String pathName = FileUtil.getFullPath(fullPathName);
+					//文件名称
+					String fileName = FileUtil.getName(fullPathName);
+					
+					MediaProcessQueue mediaProcessQueue = new MediaProcessQueue();
+					mediaProcessQueue.setModule(10);//10:话题
+					mediaProcessQueue.setType(10);//10:视频
+					mediaProcessQueue.setParameter(String.valueOf(topic.getId()));
+					mediaProcessQueue.setPostTime(topic.getPostTime());
+					mediaProcessQueue.setFilePath("file/topic/"+pathName);
+					mediaProcessQueue.setFileName(fileName);
+					mediaProcessQueueList.add(mediaProcessQueue);
+				}
+				mediaProcessService.saveMediaProcessQueueList(mediaProcessQueueList);
+			}
 			
 			//删除图片锁
 			if(imageNameList != null && imageNameList.size() >0){

@@ -18,6 +18,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
+import cms.bean.MediaInfo;
+
 /**
  * 话题
  *
@@ -70,6 +72,10 @@ public class Topic implements Serializable{
 	private String image;
 	@Transient
 	private List<ImageInfo> imageInfoList = new ArrayList<ImageInfo>();
+	
+	/** 媒体文件信息集合 **/
+	@Transient
+	private List<MediaInfo> mediaInfoList = new ArrayList<MediaInfo>();
 	
 	/** 评论总数 **/
 	private Long commentTotal = 0L;
@@ -269,6 +275,12 @@ public class Topic implements Serializable{
 	}
 	public void setHideTagTypeMap(LinkedHashMap<Integer, Boolean> hideTagTypeMap) {
 		this.hideTagTypeMap = hideTagTypeMap;
+	}
+	public List<MediaInfo> getMediaInfoList() {
+		return mediaInfoList;
+	}
+	public void setMediaInfoList(List<MediaInfo> mediaInfoList) {
+		this.mediaInfoList = mediaInfoList;
 	}
 	
 }

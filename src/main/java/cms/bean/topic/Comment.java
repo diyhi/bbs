@@ -75,6 +75,9 @@ public class Comment implements Serializable{
 	/** 评论时间 **/
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date postTime = new Date();
+	/** 最后修改时间 **/
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date lastUpdateTime;
 	
 	/** 用户角色名称集合 **/
 	@Transient
@@ -293,6 +296,16 @@ public class Comment implements Serializable{
 
 	public void setUserRoleNameList(List<String> userRoleNameList) {
 		this.userRoleNameList = userRoleNameList;
+	}
+
+
+	public Date getLastUpdateTime() {
+		return lastUpdateTime;
+	}
+
+
+	public void setLastUpdateTime(Date lastUpdateTime) {
+		this.lastUpdateTime = lastUpdateTime;
 	}
 	
 }

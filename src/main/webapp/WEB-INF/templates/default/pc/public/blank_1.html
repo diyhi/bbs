@@ -22,6 +22,10 @@
 <script type="text/javascript" src="${commonPath}js/ajax.js" language="javascript" ></script>
 <script type="text/javascript" src="${commonPath}js/json2.js" language="javascript" ></script>
 <script type="text/javascript" src="${commonPath}js/jquery/jquery.min.js" language="javascript"></script>
+<script type="text/javascript" src="${commonPath}js/DPlayer/hls.min.js" language="javascript"></script>
+<script type="text/javascript" src="${commonPath}js/DPlayer/DPlayer.min.js" language="javascript"></script>
+
+
 <script type="text/javascript" src="${commonPath}js/jquery/jquery.letterAvatar.js" language="javascript"></script>
 <script type="text/javascript" src="${commonPath}js/kindeditor/kindeditor-min.js" language="javascript"></script>
 <link href="${commonPath}js/layer/skin/default/layer.css"  type="text/css" rel="stylesheet"/>
@@ -53,6 +57,7 @@
 <body>
 <#-- 引入页头 -->
 <@include action="${newPublic_2}"/>
+
 <div class="skeleton">
 	<div class="main wrap" >
 		<#if topic != null && topic?? >
@@ -252,7 +257,7 @@
 								<#-- 引入关注用户 -->
 								<@include action="${followRelated_addFollow_3}"/>
 								<span class="privateMessageBox" >
-									<button type="button" class="privateMessageButton" onClick="javascript:window.location.href='${baseURL}user/control/privateMessageChatList?friendUserName=${user.userName}'">发私信</button>
+									<button type="button" class="privateMessageButton" onClick="javascript:window.location.href='${baseURL}user/control/privateMessageChatList?friendUserName=${topic.userName}'">发私信</button>
 								</span>
 							</div>
 						</#if>
@@ -291,6 +296,83 @@
 	SyntaxHighlighter.defaults['toolbar'] = false;//去掉右上角问号图标
 	
 </script>
+
+
+
+
+<script type="text/javascript">
+// 获取随机数
+function getRandom(m) {
+	//生成的随机数截取m位，生成的随机数最大不超过13位，能保证首位不为0
+    m = m > 13 ? 13 : m;
+   	var num = Math.random().toString();
+   	if(num.substr(num.length - m, 1) === '0') {           
+   		return getRandom(m);
+   	}
+	return num.substring(num.length - m);
+}
+//设置播放器标签
+function setPlayerTag(){
+	//获取<player>标签属性
+	$(".topicContent").find("player").each(function(){
+		var random = getRandom(13);
+
+		var id = "player_"+random;
+		var url = $(this).attr("url");
+		var cover = $(this).attr("cover");//封面
+		var thumbnail = $(this).attr("thumbnail");//缩略图
+		//设置Id
+		$(this).attr("id",id);
+		
+		if(url == ""){//如果视频处理中
+			var dp = new DPlayer({
+         		container: document.getElementById(id),//播放器容器元素
+         		screenshot: false,//开启截图，如果开启，视频和视频封面需要开启跨域
+         		video: {
+         			    
+         		}
+         	});
+			insertProcess(id);
+		}else{
+			if(cover != undefined && cover != "" && thumbnail != undefined && thumbnail != ""){//切片视频
+				var dp = new DPlayer({
+					container: document.getElementById(id),//播放器容器元素
+					screenshot: false,//开启截图，如果开启，视频和视频封面需要开启跨域
+					hotkey: true,
+					video: {
+					    url: url,
+					    type: 'hls',
+					    pic: cover,//视频封面
+					    thumbnails: thumbnail//视频预览图
+					}
+				});
+			}else{
+				var dp = new DPlayer({
+           			container: document.getElementById(id),//播放器容器元素
+           			screenshot: false,//开启截图，如果开启，视频和视频封面需要开启跨域
+           			
+           			video: {
+           			    url: url
+           			}
+           		});
+			
+			}
+			
+			
+		}
+		
+	})
+
+}
+//插入处理提示层
+function insertProcess(id){
+	$("#"+id).prepend("<div class='dplayer-process'><div class='box'><div class='prompt'>视频处理中，请稍后再刷新</div></div></div>");
+}
+$(document).ready(function(){
+	setPlayerTag();
+});
+</script>
+
 
 
 <!-- 图片点击放大 -->

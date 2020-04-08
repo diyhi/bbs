@@ -221,7 +221,7 @@ public class CommentManageAction {
 					String username = comment.getUserName();//用户名称
 					
 					//修改评论
-					int i = commentService.updateComment(comment.getId(),value,status,lowerQuoteIdGroup,username);
+					int i = commentService.updateComment(comment.getId(),value,status,new Date(),lowerQuoteIdGroup,username);
 					
 					
 					if(i >0 && !old_status.equals(status)){
@@ -763,12 +763,12 @@ public class CommentManageAction {
 				if((!"".equals(text.trim()) && !"".equals(trimSpace))){
 					String username = reply.getUserName();//用户名称
 					//修改回复
-					int i = commentService.updateReply(replyId,text,username,status);
+					int i = commentService.updateReply(replyId,text,username,status,new Date());
 					
 					if(i >0 && !old_status.equals(status)){
 						User user = userManage.query_cache_findUserByUserName(reply.getUserName());
 						if(user != null){
-							//修改话题状态
+							//修改回复状态
 							userService.updateUserDynamicReplyStatus(user.getId(),reply.getUserName(),reply.getTopicId(),reply.getCommentId(),reply.getId(),reply.getStatus());
 						}
 						

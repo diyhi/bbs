@@ -371,6 +371,17 @@
 		overflowToDisk="true"
 		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="1800" 
 		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>		
+	<!-- 处理视频播放器标签 -->
+	<cache name="mediaProcessQueueManage_cache_processVideoPlayer" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="1800" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
+	<!-- 处理视频信息 -->
+	<cache name="mediaProcessQueueManage_cache_processVideoInfo" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="1800" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>		
+		
 		
 	<!-- 解析解析上传的文件完整路径名称 -->
 	<cache name="topicManage_cache_analysisFullFileName" maxElementsInMemory="900000" 
@@ -404,4 +415,29 @@
 		overflowToDisk="true"
 		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
 		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>		
+		
+	<!-- 媒体处理 - 查询媒体处理设置 -->	
+	<cache name="mediaProcessServiceBean_cache_mediaProcessSetting" maxElementsInMemory="1" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
+	<!-- 媒体处理 - 查询待处理媒体 (更新一个全部刷新)-->	
+	<cache name="mediaProcessServiceBean_cache_mediaProcessQueue" maxElementsInMemory="100000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
+	<!-- 根据文件名称查询媒体处理 -->
+	<cache name="mediaProcessQueueManage_cache_findMediaProcessQueueByFileName" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>			
+		
+	<!-- 请求的唯一标识 -->
+	<cache name="mediaProcessQueueManage_cache_nonce" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="1200" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>
+		
+		
+			
 </ehcache>

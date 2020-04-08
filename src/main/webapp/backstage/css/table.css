@@ -109,7 +109,44 @@
 	color:#666666;font-size:13px;
 }
 
-
+/* 隐藏标签 IE8以下浏览器不支持自定义标签，需要在页头<head>标签内执行document.createElement('player') */
+.comment player{
+	width: 100%;
+	height: 576px;
+	display: block;
+}
+.dplayer-process {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 99;
+}
+.dplayer-process .box{
+	position: relative;
+	width: 100%;
+	height: 100%;
+}
+.dplayer-process .box .prompt{
+   	width: 250px;
+    height: 80px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+   	padding :0px 30px;
+   	border-radius :3px;
+   	color: #fff;
+   	line-height: 80px;
+   	font-size: 20px;
+   	background-color:rgb(0,0,0);
+	opacity:0.7;
+	filter:alpha(opacity=70);
+	text-align: center;
+}
 .comment hide {
 	border: 0;
 	border-left: 3px solid #06b5ff;

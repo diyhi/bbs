@@ -642,7 +642,13 @@ public class Question_TemplateManage {
 		if(questionId != null && questionId >0L){
 			jpql.append(" o.questionId=?"+ (params.size()+1));//所属父类的ID;(params.size()+1)是为了和下面的条件参数兼容
 			params.add(questionId);//设置o.parentId=?2参数
+		}else{
+			return pageView;
 		}
+		
+		
+		
+		
 		jpql.append(" and o.status=?"+ (params.size()+1));
 		params.add(20);
 		

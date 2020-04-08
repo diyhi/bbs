@@ -1,5 +1,5 @@
 <#-- 话题列表  分页 -->
-<#-- 页面需引入layer.js -->
+<#-- 页面需引入layer.js 和 DPlayer -->
 <@function page="${url_page}" tagId="${url_tagId}">
 <div class="topicModule">
 	<div class="topic-box">
@@ -58,19 +58,35 @@
 							<div class="clearfix"></div>
 							
 							<div class="detail">
-								<#if topic.imageInfoList?size gt 0>
-				                	<div class="tm-m-photos topic_thumbnail_${topic.id}">
-										<ul class="tm-m-photos-thumb">
-											<#list topic.imageInfoList as imageInfo>
-												<li data-src="${imageInfo.path}${imageInfo.name}"><div class="img" style="background-image: url(${imageInfo.path}120x120/${imageInfo.name})"></div> <b class="tm-photos-arrow"></b> </li>
-											</#list>
-										</ul>
-										<div class="tm-m-photo-viewer transition1 topic_original_${topic.id}"> 
-											<img src="${commonPath}images/null.gif"> 
-											<span class="tm-m-photo-viewer-navleft navleft_${topic.id}"></span> 
-											<span class="tm-m-photo-viewer-navright navright_${topic.id}" ></span> 
+								<#if topic.imageInfoList?size gt 0 || topic.mediaInfoList?size gt 0>
+									<#if topic.imageInfoList?size gt 0>
+					                	<div class="tm-m-photos topic_thumbnail_${topic.id}">
+											<ul class="tm-m-photos-thumb">
+												<#list topic.imageInfoList as imageInfo>
+													<li data-src="${imageInfo.path}${imageInfo.name}"><div class="img" style="background-image: url(${imageInfo.path}120x120/${imageInfo.name})"></div> <b class="tm-photos-arrow"></b> </li>
+												</#list>
+											</ul>
+											<div class="tm-m-photo-viewer transition1 topic_original_${topic.id}"> 
+												<img src="${commonPath}images/null.gif"> 
+												<span class="tm-m-photo-viewer-navleft navleft_${topic.id}"></span> 
+												<span class="tm-m-photo-viewer-navright navright_${topic.id}" ></span> 
+											</div>
 										</div>
-									</div>
+									<#else>
+										<div class="videoInfo">
+											
+											<#list topic.mediaInfoList as mediaInfo>
+												<#-- 视频最多显示3个 -->
+												<#if mediaInfo_index lt 3>
+													<player url="${mediaInfo.mediaUrl}" cover="${mediaInfo.cover}" thumbnail="${mediaInfo.thumbnail}">
+														<img class="cover" src="${mediaInfo.cover}"/>
+														<span class="circle"><span class="iconBox"><i class="cms-control-play playIcon"></i></span></span>
+														
+													</player>
+												</#if>
+											</#list>
+										</div>
+									</#if>
 								<#else>
 									<h2 class="summary">
 										${topic.summary}
@@ -140,5 +156,81 @@ $(".hideTagType").on('mouseenter', this,function() {
 </script>
 
 
+<script type="text/javascript">
+// 获取随机数
+function getRandom(m) {
+	//生成的随机数截取m位，生成的随机数最大不超过13位，能保证首位不为0
+    m = m > 13 ? 13 : m;
+   	var num = Math.random().toString();
+   	if(num.substr(num.length - m, 1) === '0') {           
+   		return getRandom(m);
+   	}
+	return num.substring(num.length - m);
+}
+
+//设置播放器标签
+function setPlayerTag(){
+	//获取<player>标签属性
+	$(".videoInfo").find("player").each(function(){
+		var random = getRandom(13);
+
+		var id = "player_"+random;
+		var url = $(this).attr("url");
+		var cover = $(this).attr("cover");//封面
+		var thumbnail = $(this).attr("thumbnail");//缩略图
+		//设置Id
+		$(this).attr("id",id);
+		
+		$(this).click(function(){
+			$(this).unbind('click');//解绑事件
+			
+			if(url == ""){//如果视频处理中
+				var dp = new DPlayer({
+	         		container: document.getElementById(id),//播放器容器元素
+	         		screenshot: false,//开启截图，如果开启，视频和视频封面需要开启跨域
+	         		video: {
+	         			    
+	         		}
+	         	});
+				insertProcess(id);
+			}else{
+				if(cover != undefined && cover != "" && thumbnail != undefined && thumbnail != ""){//切片视频
+					var dp = new DPlayer({
+						container: document.getElementById(id),//播放器容器元素
+						screenshot: false,//开启截图，如果开启，视频和视频封面需要开启跨域
+						hotkey: true,
+						preload: 'none', //禁止视频预加载
+						video: {
+						    url: url,
+						    type: 'hls',
+						    pic: cover,//视频封面
+						    thumbnails: thumbnail//视频预览图
+						}
+					});
+					dp.play();//播放视频
+				
+				}else{
+					var dp = new DPlayer({
+            			container: document.getElementById(id),//播放器容器元素
+            			screenshot: false,//开启截图，如果开启，视频和视频封面需要开启跨域
+            			
+            			video: {
+            			    url: url
+            			}
+            		});
+            		dp.play();//播放视频
+				}
+			}
+		});
+	})
+}
+//插入处理提示层
+function insertProcess(id){
+	$("#"+id).prepend("<div class='dplayer-process'><div class='box'><div class='prompt'>视频处理中，请稍后再刷新</div></div></div>");
+}
+$(document).ready(function(){
+	setPlayerTag();
+});
+</script>
 
 </@function>

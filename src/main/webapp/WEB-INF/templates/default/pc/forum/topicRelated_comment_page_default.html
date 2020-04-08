@@ -75,10 +75,17 @@
 													</#list>
 												</div>
 											</#if> 
-											<span class="time">${reply.postTime}</span>
+											
+											<span class="time">
+												<#if systemUser != null && reply.userName ==  systemUser.userName>
+													<a href="javascript:" onclick="editReplyLayer('${reply.id}','${(reply.nickname != null && reply.nickname??) ?string(reply.nickname , reply.userName)}');">编辑</a>&nbsp;
+												</#if>
+												${reply.postTime}
+											</span>
 										</div>
 										<div style="clear:both; height: 0; line-height: 0; font-size: 0;"></div>
-										<div class="replyContent">${reply.content}</div>
+										<div id="editCommentReply-replyContent_${reply.id}" class="replyContent">${reply.content}</div>
+										<div id="editCommentReply-post_${reply.id}" ></div>
 									</li>
 								</#list>
 							</ul>
@@ -90,9 +97,15 @@
 					<div id="quote-post_${comment.id}" class="quote-post">
 					
 					</div>
+					<div id="editComment-post_${comment.id}" class="editComment-post">
+					
+					</div>
 					<div class="tipBottom">
 						<span class="a-toolbar">
-							<a href="javascript:" onclick="replyLayer('${comment.id}','${(comment.nickname != null && comment.nickname??) ?string(comment.nickname , comment.userName)}');">回复</a>&nbsp;|&nbsp;
+							<#if systemUser != null && comment.userName ==  systemUser.userName>
+								<a href="javascript:" onclick="editCommentLayer('${comment.id}','${(comment.nickname != null && comment.nickname??) ?string(comment.nickname , comment.userName)}');">编辑</a>&nbsp;|
+							</#if>
+							<a href="javascript:" onclick="replyLayer('${comment.id}','${(comment.nickname != null && comment.nickname??) ?string(comment.nickname , comment.userName)}');">回复</a>&nbsp;|
 
 							<a href="javascript:" onclick="quoteLayer('${comment.id}','${(comment.nickname != null && comment.nickname??) ?string(comment.nickname , comment.userName)}')">引用</a>
 							<!-- 是否登录 -->
@@ -151,7 +164,7 @@ function replyLayer(commentId,userName){
 	}
 	
 	var parameter = "";//URI参数
-	parameter += "&commentId="+commentId;
+	parameter += "commentId="+commentId;
 	
 	
 	//回复页面
@@ -165,6 +178,46 @@ function replyLayer(commentId,userName){
 }
 function cancelReply(commentId){
 	$("#commentReply-post_"+commentId).html("");
+}
+
+//修改回复展开层
+function editReplyLayer(replyId,userName){
+	//判断是否已登录
+	var isLogin = document.getElementById("isLogin").value;
+	if(isLogin == "false"){
+		layer.open({
+		    type: 1, 
+		    title:"提示",
+		    content: "<div style='line-height: 36px; font-size: 15px;text-align:center; margin-left: 8px;margin-right: 8px;'>请先登录</div>", 
+		    area: ['260px', '120px'],//宽高
+			success: function(layero, index){
+				 
+			}
+		});
+		return false;
+	}
+	
+	$("#editCommentReply-replyContent_"+replyId).hide();
+	$("#editCommentReply-post_"+replyId).show();
+	
+	var parameter = "";//URI参数
+	parameter += "replyId="+replyId;
+	
+	
+	
+	//回复页面
+	get_request(function(value){
+		if(value != ""){
+			$("#editCommentReply-post_"+replyId).html(value);
+		}
+	},
+	getBasePath()+"user/editCommentReply?"+parameter+"&timestamp=" + new Date().getTime(), true);
+	
+}
+function cancelEditReply(replyId){
+	$("#editCommentReply-replyContent_"+replyId).show();
+	$("#editCommentReply-editContent_"+replyId).hide();
+	$("#editCommentReply-post_"+replyId).html("");
 }
 
 
@@ -186,7 +239,7 @@ function quoteLayer(commentId,userName){
 	}
 	
 	var parameter = "";//URI参数
-	parameter += "&commentId="+commentId;
+	parameter += "commentId="+commentId;
 	
 	
 	//引用页面
@@ -203,9 +256,10 @@ function quoteLayer(commentId,userName){
 function cancelQuote(commentId){
 	$("#quote-post_"+commentId).html("");
 }
-/**
-//引用弹出层
-function quoteLayer(commentId,userName){
+
+
+//修改评论弹出层
+function editCommentLayer(commentId,userName){
 	//判断是否已登录
 	var isLogin = document.getElementById("isLogin").value;
 	if(isLogin == "false"){
@@ -220,36 +274,24 @@ function quoteLayer(commentId,userName){
 		});
 		return false;
 	}
-
-
-	var div = "<div id='divMessage'></div>";
-	layer.open({
-	    type: 1, 
-	    title:"引用 "+userName,
-	    content: div, //这里content是一个普通的String
-	    moveOut:true,//是否允许拖拽到窗口外
-	    area: ['800px', '500px'],//宽高
-		zIndex:1,
-		
-		cancel: function(index){
-			// 关闭弹出层前移除编辑器,否则会在IE8下输入框失去焦点
-			KindEditor.remove('textarea[id="quoteCommentContent"]');//移除'引用回复'编辑器
-		
-		}
-	});
-
+	
 	var parameter = "";//URI参数
 	parameter += "commentId="+commentId;
 	
 	
-	//引用页面
+	//修改评论页面
 	get_request(function(value){
 		if(value != ""){
-			$("#divMessage").html(value);
+			$("#editComment-post_"+commentId).html(value);
 		}
 	},
-	getBasePath()+"comment_quote?"+parameter+"&timestamp=" + new Date().getTime(), true);
-	
-}**/
+	getBasePath()+"user/editComment.htm?"+parameter+"&timestamp=" + new Date().getTime(), true);
+
+
+
+}
+function cancelEditComment(commentId){
+	$("#editComment-post_"+commentId).html("");
+}
 </script> 
 

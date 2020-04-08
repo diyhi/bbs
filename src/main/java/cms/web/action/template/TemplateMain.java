@@ -169,9 +169,19 @@ public class TemplateMain {
 				Map<String,Object> value = topic_TemplateManage.quoteComment_collection(forum, submitParameter,runtimeParameter);
 				return value;
 			}
+		}else if(forum.getForumChildType().equals("修改评论")){
+			if(forum.getDisplayType().equals("collection")){//集合
+				Map<String,Object> value = topic_TemplateManage.editComment_collection(forum, submitParameter,runtimeParameter);
+				return value;
+			}
 		}else if(forum.getForumChildType().equals("回复评论")){
 			if(forum.getDisplayType().equals("collection")){//集合
 				Map<String,Object> value = topic_TemplateManage.replyComment_collection(forum, submitParameter,runtimeParameter);
+				return value;
+			}
+		}else if(forum.getForumChildType().equals("修改评论回复")){
+			if(forum.getDisplayType().equals("collection")){//集合
+				Map<String,Object> value = topic_TemplateManage.editCommentReply_collection(forum, submitParameter,runtimeParameter);
 				return value;
 			}
 		}

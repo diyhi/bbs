@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
+import cms.bean.MediaInfo;
 import cms.bean.PageForm;
 import cms.bean.PageView;
 import cms.bean.QueryResult;
@@ -46,6 +47,7 @@ import cms.utils.Verification;
 import cms.web.action.TextFilterManage;
 import cms.web.action.common.CaptchaManage;
 import cms.web.action.lucene.TopicLuceneManage;
+import cms.web.action.mediaProcess.MediaProcessQueueManage;
 import cms.web.action.setting.SettingManage;
 import cms.web.action.topic.CommentManage;
 import cms.web.action.topic.TopicManage;
@@ -75,6 +77,8 @@ public class Topic_TemplateManage {
 	@Resource UserManage userManage;
 	@Resource UserGradeService userGradeService;
 	@Resource UserRoleManage userRoleManage;
+	
+	@Resource MediaProcessQueueManage mediaProcessQueueManage;
 	
 	/**
 	 * 话题列表  -- 分页
@@ -210,6 +214,26 @@ public class Topic_TemplateManage {
 
 		
 		if(qr.getResultlist() != null && qr.getResultlist().size() >0){
+			SystemSetting systemSetting = settingService.findSystemSetting_cache();
+			
+			
+			for(Topic topic : qr.getResultlist()){
+				//处理视频播放器标签
+				if(topic.getContent() != null && !"".equals(topic.getContent().trim())){
+					Integer topicContentUpdateMark = topicManage.query_cache_markUpdateTopicStatus(topic.getId(), Integer.parseInt(RandomStringUtils.randomNumeric(8)));
+					
+					//生成处理'视频播放器'Id
+					String processVideoPlayerId = mediaProcessQueueManage.createProcessVideoPlayerId(topic.getId(),topicContentUpdateMark);
+					
+					//处理视频信息
+					List<MediaInfo> mediaInfoList = mediaProcessQueueManage.query_cache_processVideoInfo(topic.getContent(),processVideoPlayerId,topic.getTagId(),systemSetting.getFileSecureLinkSecret());
+					
+					topic.setMediaInfoList(mediaInfoList);
+					
+				}
+			}
+			
+			
 			//查询标签名称
 			List<Tag> tagList = tagService.findAllTag_cache();
 			Map<Long,List<String>> tagRoleNameMap = new HashMap<Long,List<String>>();//标签角色名称 key:标签Id value:角色名称集合
@@ -329,13 +353,14 @@ public class Topic_TemplateManage {
 					}
 				}
 				
-				//用户如果对话题项无查看权限，则不显示摘要和图片
+				//用户如果对话题项无查看权限，则不显示摘要、图片、视频
 				for (Map.Entry<Long,Boolean> entry : userViewPermissionMap.entrySet()) {
 					if(entry.getKey().equals(topic.getTagId())){
 						if(entry.getValue() != null && entry.getValue() == false){
 							topic.setImage(null);
 							topic.setImageInfoList(new ArrayList<ImageInfo>());
 							topic.setSummary("");
+							topic.setMediaInfoList(new ArrayList<MediaInfo>());
 						}
 						break;
 					}
@@ -502,8 +527,8 @@ public class Topic_TemplateManage {
 				SystemSetting systemSetting = settingService.findSystemSetting_cache();
 				
 				//话题内容摘要MD5
-				String topicContentDigest = "";
-				
+				String topicContentDigest_link = "";
+				String topicContentDigest_video = "";
 				
 				//处理文件防盗链
 				if(topic.getContent() != null && !"".equals(topic.getContent().trim()) && systemSetting.getFileSecureLinkSecret() != null && !"".equals(systemSetting.getFileSecureLinkSecret().trim())){
@@ -515,7 +540,7 @@ public class Topic_TemplateManage {
 						Map<String,String> newFullFileNameMap = new HashMap<String,String>();//新的完整路径名称 key: 完整路径名称 value: 重定向接口
 						for (Map.Entry<String,String> entry : analysisFullFileNameMap.entrySet()) {
 
-							newFullFileNameMap.put(entry.getKey(), SecureLink.createRedirectLink(entry.getKey(),entry.getValue(),topic.getTagId(),systemSetting.getFileSecureLinkSecret()));
+							newFullFileNameMap.put(entry.getKey(), SecureLink.createDownloadRedirectLink(entry.getKey(),entry.getValue(),topic.getTagId(),systemSetting.getFileSecureLinkSecret()));
 						}
 						
 						Integer topicContentUpdateMark = topicManage.query_cache_markUpdateTopicStatus(topicId, Integer.parseInt(RandomStringUtils.randomNumeric(8)));
@@ -524,10 +549,24 @@ public class Topic_TemplateManage {
 						
 						topic.setContent(topicManage.query_cache_processFullFileName(topic.getContent(),"topic",newFullFileNameMap,processFullFileNameId));
 						
-						topicContentDigest = cms.utils.MD5.getMD5(processFullFileNameId);
+						topicContentDigest_link = cms.utils.MD5.getMD5(processFullFileNameId);
 					}
 					
 					
+				}
+				
+				//处理视频播放器标签
+				if(topic.getContent() != null && !"".equals(topic.getContent().trim())){
+					Integer topicContentUpdateMark = topicManage.query_cache_markUpdateTopicStatus(topicId, Integer.parseInt(RandomStringUtils.randomNumeric(8)));
+					
+					//生成处理'视频播放器'Id
+					String processVideoPlayerId = mediaProcessQueueManage.createProcessVideoPlayerId(topicId,topicContentUpdateMark);
+					
+					//处理视频播放器标签
+					String content = mediaProcessQueueManage.query_cache_processVideoPlayer(topic.getContent(),processVideoPlayerId+"|"+topicContentDigest_link,topic.getTagId(),systemSetting.getFileSecureLinkSecret());
+					topic.setContent(content);
+					
+					topicContentDigest_video = cms.utils.MD5.getMD5(processVideoPlayerId);
 				}
 
 				
@@ -542,11 +581,15 @@ public class Topic_TemplateManage {
 					String processHideTagId = topicManage.createProcessHideTagId(topicId,topicContentUpdateMark, visibleTagList);
 					
 					//处理隐藏标签
-					String content = topicManage.query_cache_processHiddenTag(topic.getContent(),visibleTagList,processHideTagId+"|"+topicContentDigest);
+					String content = topicManage.query_cache_processHiddenTag(topic.getContent(),visibleTagList,processHideTagId+"|"+topicContentDigest_link+"|"+ topicContentDigest_video);
 					
 					//String content = textFilterManage.processHiddenTag(topic.getContent(),visibleTagList);
 					topic.setContent(content);
+					
+					
 				}
+				
+				
 				
 				return topic;
 			}
@@ -1146,6 +1189,69 @@ public class Topic_TemplateManage {
 		value.put("availableTag", commentManage.availableTag());//评论编辑器允许使用标签
 		return value;
 	}
+	
+	/**
+	 * 评论  -- 修改
+	 * @param forum
+	 */
+	public Map<String,Object> editComment_collection(Forum forum,Map<String,Object> parameter,Map<String,Object> runtimeParameter){
+		Map<String,Object> value = new HashMap<String,Object>();
+		
+		Long commentId = null;
+		AccessUser accessUser = null;
+		//获取运行时参数
+		if(runtimeParameter != null && runtimeParameter.size() >0){		
+			for(Map.Entry<String,Object> paramIter : runtimeParameter.entrySet()) {
+				if("accessUser".equals(paramIter.getKey())){
+					accessUser = (AccessUser)paramIter.getValue();
+				}
+			}
+		}
+		if(accessUser != null){
+			boolean captchaKey = captchaManage.comment_isCaptcha(accessUser.getUserName());//验证码标记
+			if(captchaKey ==true){
+				value.put("captchaKey",UUIDUtil.getUUID32());//是否有验证码
+			}
+		}
+		
+		//获取参数
+		if(parameter != null && parameter.size() >0){		
+			for(Map.Entry<String,Object> paramIter : parameter.entrySet()) {
+				if("commentId".equals(paramIter.getKey())){
+					if(Verification.isNumeric(paramIter.getValue().toString())){
+						if(paramIter.getValue().toString().length() <=18){
+							commentId = Long.parseLong(paramIter.getValue().toString());	
+						}
+					}
+				}
+			}
+		}
+		
+		if(accessUser != null && commentId != null && commentId >0L){
+			Comment comment = commentManage.query_cache_findByCommentId(commentId);//查询缓存
+			if(comment != null && comment.getStatus() <100 && comment.getUserName().equals(accessUser.getUserName())){
+				comment.setIpAddress(null);//IP地址不显示
+
+				value.put("comment",comment);
+				
+				
+			}
+		}
+		
+
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		
+		//如果全局不允许提交评论
+		if(systemSetting.isAllowComment() == false){
+			value.put("allowComment",false);//不允许提交评论
+		}else{
+			value.put("allowComment",true);//允许提交评论
+		}
+		value.put("availableTag", commentManage.availableTag());//评论编辑器允许使用标签
+		return value;
+	}
+	
+	
 	/**
 	 * 评论  -- 回复添加
 	 * @param forum
@@ -1169,6 +1275,68 @@ public class Topic_TemplateManage {
 				value.put("captchaKey",UUIDUtil.getUUID32());//验证码key
 			}
 		}
+		//如果全局不允许提交评论
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.isAllowComment()){
+			value.put("allowReply",true);//允许提交回复
+		}else{
+			value.put("allowReply",false);//不允许提交回复
+		}
+		return value;
+	}
+	
+	/**
+	 * 评论  -- 回复修改
+	 * @param forum
+	 */
+	public Map<String,Object> editCommentReply_collection(Forum forum,Map<String,Object> parameter,Map<String,Object> runtimeParameter){
+		Map<String,Object> value = new HashMap<String,Object>();
+		
+		Long replyId = null;
+		AccessUser accessUser = null;
+		//获取运行时参数
+		if(runtimeParameter != null && runtimeParameter.size() >0){		
+			for(Map.Entry<String,Object> paramIter : runtimeParameter.entrySet()) {
+				if("accessUser".equals(paramIter.getKey())){
+					accessUser = (AccessUser)paramIter.getValue();
+				}
+			}
+		}
+		
+		if(accessUser != null){
+			boolean captchaKey = captchaManage.comment_isCaptcha(accessUser.getUserName());//验证码标记
+			if(captchaKey ==true){
+				value.put("captchaKey",UUIDUtil.getUUID32());//验证码key
+			}
+		}
+		
+		
+		//获取参数
+		if(parameter != null && parameter.size() >0){		
+			for(Map.Entry<String,Object> paramIter : parameter.entrySet()) {
+				if("replyId".equals(paramIter.getKey())){
+					if(Verification.isNumeric(paramIter.getValue().toString())){
+						if(paramIter.getValue().toString().length() <=18){
+							replyId = Long.parseLong(paramIter.getValue().toString());	
+						}
+					}
+				}
+			}
+		}
+		
+		if(accessUser != null && replyId != null && replyId >0L){
+			Reply reply = commentManage.query_cache_findReplyByReplyId(replyId);//查询缓存
+			if(reply != null && reply.getStatus() <100 && reply.getUserName().equals(accessUser.getUserName())){
+				reply.setIpAddress(null);//IP地址不显示
+	
+				value.put("reply",reply);
+				
+				
+			}
+		}
+				
+		
+		
 		//如果全局不允许提交评论
 		SystemSetting systemSetting = settingService.findSystemSetting_cache();
 		if(systemSetting.isAllowComment()){

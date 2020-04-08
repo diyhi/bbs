@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'themify';
-  src:  url('fonts/themify.eot?w6hewr');
-  src:  url('fonts/themify.eot?w6hewr#iefix') format('embedded-opentype'),
-    url('fonts/themify.ttf?w6hewr') format('truetype'),
-    url('fonts/themify.woff?w6hewr') format('woff'),
-    url('fonts/themify.svg?w6hewr#themify') format('svg');
+  src:  url('fonts/themify.eot?madfxu');
+  src:  url('fonts/themify.eot?madfxu#iefix') format('embedded-opentype'),
+    url('fonts/themify.ttf?madfxu') format('truetype'),
+    url('fonts/themify.woff?madfxu') format('woff'),
+    url('fonts/themify.svg?madfxu#themify') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -51,6 +51,9 @@
 }
 .cms-angle-down:before {
   content: "\e64b";
+}
+.cms-control-play:before {
+  content: "\e6ad";
 }
 .cms-info-alt:before {
   content: "\e717";

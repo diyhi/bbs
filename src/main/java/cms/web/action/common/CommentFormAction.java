@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -62,6 +63,7 @@ import cms.web.action.filterWord.SensitiveWordFilterManage;
 import cms.web.action.follow.FollowManage;
 import cms.web.action.message.RemindManage;
 import cms.web.action.setting.SettingManage;
+import cms.web.action.topic.CommentManage;
 import cms.web.action.topic.TopicManage;
 import cms.web.action.user.PointManage;
 import cms.web.action.user.UserDynamicManage;
@@ -101,6 +103,8 @@ public class CommentFormAction {
 	@Resource FollowManage followManage;
 	@Resource FileManage fileManage;
 	@Resource UserRoleManage userRoleManage;
+	@Resource CommentManage commentManage;
+	
 	
 	/**
 	 * 评论   添加
@@ -999,6 +1003,377 @@ public class CommentFormAction {
 		}
 	 }
 	
+	
+	
+	
+	/**
+	 * 评论  修改
+	 * @param model
+	 * @param commentId 评论Id
+	 * @param content 内容
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/edit", method=RequestMethod.POST)
+	public String edit(ModelMap model,Long commentId,String content,
+			String token,String captchaKey,String captchaValue,String jumpUrl,
+			RedirectAttributes redirectAttrs,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+		//获取登录用户
+	  	AccessUser accessUser = AccessUserThreadLocal.get();
+		
+		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+		Map<String,String> error = new HashMap<String,String>();
+		
+		//判断令牌
+		if(token != null && !"".equals(token.trim())){	
+			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌
+			if(token_sessionid != null && !"".equals(token_sessionid.trim())){
+				if(!token_sessionid.equals(token)){
+					error.put("token", ErrorView._13.name());//令牌错误
+				}
+			}else{
+				error.put("token", ErrorView._12.name());//令牌过期
+			}
+		}else{
+			error.put("token", ErrorView._11.name());//令牌为空
+		}
+		
+		//验证码
+		boolean isCaptcha = captchaManage.comment_isCaptcha(accessUser.getUserName());
+		if(isCaptcha){//如果需要验证码
+			//验证验证码
+			if(captchaKey != null && !"".equals(captchaKey.trim())){
+				//增加验证码重试次数
+				//统计每分钟原来提交次数
+				Integer original = settingManage.getSubmitQuantity("captcha", captchaKey.trim());
+	    		if(original != null){
+	    			settingManage.addSubmitQuantity("captcha", captchaKey.trim(),original+1);//刷新每分钟原来提交次数
+	    		}else{
+	    			settingManage.addSubmitQuantity("captcha", captchaKey.trim(),1);//刷新每分钟原来提交次数
+	    		}
+				
+				
+				String _captcha = captchaManage.captcha_generate(captchaKey.trim(),"");
+				if(captchaValue != null && !"".equals(captchaValue.trim())){
+					if(_captcha != null && !"".equals(_captcha.trim())){
+						if(!_captcha.equalsIgnoreCase(captchaValue)){
+							error.put("captchaValue",ErrorView._15.name());//验证码错误
+						}
+					}else{
+						error.put("captchaValue",ErrorView._17.name());//验证码过期
+					}
+				}else{
+					error.put("captchaValue",ErrorView._16.name());//请输入验证码
+				}
+				//删除验证码
+				captchaManage.captcha_delete(captchaKey.trim());	
+			}else{
+				error.put("captchaValue", ErrorView._14.name());//验证码参数错误
+			}
+			
+		}
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+	
+		List<String> imageNameList = null;
+		Comment comment = null;
+		Topic topic = null;
+		//旧状态
+		Integer old_status = -1;
+		
+		String old_content = "";
+
+		if(commentId != null && commentId >0L){
+			comment = commentService.findByCommentId(commentId);
+			if(comment != null){
+				topic = topicService.findById(comment.getTopicId());
+				if(topic != null){
+					if(!comment.getUserName().equals(accessUser.getUserName())){
+						error.put("comment", ErrorView._117.name());//只允许修改自己发布的评论
+					}
+					/**
+					if(comment.getStatus() > 100){
+						error.put("comment", ErrorView._116.name());//评论已删除
+					}**/
+					
+					//是否有当前功能操作权限
+					boolean flag_permission = userRoleManage.isPermission(ResourceEnum._1008000,topic.getTagId());
+					if(flag_permission == false){
+						if(isAjax == true){
+							response.setStatus(403);//设置状态码
+				    		
+							WebUtil.writeToWeb("", "json", response);
+							return null;
+						}else{ 
+							String dirName = templateService.findTemplateDir_cache();
+								
+							String accessPath = accessSourceDeviceManage.accessDevices(request);	
+							request.setAttribute("message","权限不足"); 	
+							return "templates/"+dirName+"/"+accessPath+"/message";
+						}
+					}
+					
+					
+					
+					
+					
+					
+					//如果全局不允许提交评论
+					if(systemSetting.isAllowComment() == false){
+						error.put("comment", ErrorView._106.name());//禁止评论
+					}
+					
+					//如果实名用户才允许提交评论
+					if(systemSetting.isRealNameUserAllowComment() == true){
+						User _user = userManage.query_cache_findUserByUserName(accessUser.getUserName());
+						if(_user.isRealNameAuthentication() == false){
+							error.put("comment", ErrorView._108.name());//实名用户才允许提交评论
+						}
+						
+					}
+					old_status = comment.getStatus();
+					old_content = comment.getContent();
+				}else{
+					error.put("comment", ErrorView._112.name());//话题不存在
+				}
+				
+			}else{
+				error.put("comment", ErrorView._116.name());//评论不存在
+			}
+		
+		}else{
+			error.put("comment", ErrorView._120.name());//评论Id不能为空
+		}
+		
+		
+		if(error.size() ==0){
+			if(comment.getStatus().equals(20)){//如果已发布，则重新执行发贴审核逻辑
+				//前台发表评论审核状态
+				if(systemSetting.getComment_review().equals(10)){//10.全部审核 20.特权会员未触发敏感词免审核(未实现) 30.特权会员免审核 40.触发敏感词需审核(未实现) 50.无需审核
+					comment.setStatus(10);//10.待审核 	
+				}else if(systemSetting.getComment_review().equals(30)){
+					if(topic.getTagId() != null && topic.getTagId() >0L){
+						//是否有当前功能操作权限
+						boolean _flag_permission = userRoleManage.isPermission(ResourceEnum._1008000,topic.getTagId());
+						if(_flag_permission){
+							comment.setStatus(20);//20.已发布
+						}else{
+							comment.setStatus(10);//10.待审核 
+						}
+					}
+				}else{
+					comment.setStatus(20);//20.已发布
+				}
+			}
+			
+			
+			
+			if(content != null && !"".equals(content.trim())){
+				//过滤标签
+				content = textFilterManage.filterTag(request,content,settingManage.readEditorTag());
+				Object[] object = textFilterManage.filterHtml(request,content,"comment",settingManage.readEditorTag());
+				String value = (String)object[0];
+				imageNameList = (List<String>)object[1];
+				boolean isImage = (Boolean)object[2];//是否含有图片
+				//不含标签内容
+				String text = textFilterManage.filterText(content);
+				//清除空格&nbsp;
+				String trimSpace = cms.utils.StringUtil.replaceSpace(text).trim();
+				
+				if(isImage == true || (!"".equals(text.trim()) && !"".equals(trimSpace))){
+					if(systemSetting.isAllowFilterWord()){
+						String wordReplace = "";
+						if(systemSetting.getFilterWordReplace() != null){
+							wordReplace = systemSetting.getFilterWordReplace();
+						}
+						value = sensitiveWordFilterManage.filterSensitiveWord(value, wordReplace);
+					}
+					comment.setContent(value);
+				}else{
+					error.put("content",ErrorView._101.name());//内容不能为空
+				}
+			}else{
+				error.put("content",ErrorView._101.name());//内容不能为空
+			}
+			
+			
+		
+		}
+		
+		
+		
+		
+		
+		
+		if(error.size() == 0){
+				
+			int i = commentService.updateComment(comment.getId(),comment.getContent(),comment.getStatus(),new Date(),comment.getUserName());
+			
+			if(i >0 && comment.getStatus() < 100 && !old_status.equals(comment.getStatus())){
+				User user = userManage.query_cache_findUserByUserName(comment.getUserName());
+				if(user != null){
+					//修改评论状态
+					userService.updateUserDynamicCommentStatus(user.getId(),comment.getUserName(),comment.getTopicId(),comment.getId(),comment.getStatus());
+				}
+				
+			}
+			 
+			if(i >0){
+				//删除缓存
+				commentManage.delete_cache_findByCommentId(comment.getId());
+				
+
+				
+
+				
+				//上传文件编号
+				String fileNumber = topicManage.generateFileNumber(comment.getUserName(), comment.getIsStaff());
+				
+				//删除图片锁
+				if(imageNameList != null && imageNameList.size() >0){
+					for(String imageName :imageNameList){
+						if(imageName != null && !"".equals(imageName.trim())){
+							 //如果验证不是当前用户上传的文件，则不删除
+							 if(!topicManage.getFileNumber(FileUtil.getBaseName(imageName.trim())).equals(fileNumber)){
+									continue;
+							 }
+							 fileManage.deleteLock("file"+File.separator+"comment"+File.separator+"lock"+File.separator,imageName.replaceAll("/","_"));
+						 }
+					
+					}
+				}
+
+				
+				//旧图片名称
+				List<String> old_ImageName = textFilterManage.readImageName(old_content,"comment");
+				if(old_ImageName != null && old_ImageName.size() >0){		
+			        Iterator<String> iter = old_ImageName.iterator();
+			        while (iter.hasNext()) {
+			        	String imageName = iter.next();//含有路径
+			        	String old_name = FileUtil.getName(imageName);
+			        	
+						for(String new_imageName : imageNameList){
+							String new_name = FileUtil.getName(new_imageName);
+							if(old_name.equals(new_name)){
+								iter.remove();
+								break;
+							}
+						}
+					}
+					if(old_ImageName != null && old_ImageName.size() >0){
+						for(String imagePath : old_ImageName){
+							 //如果验证不是当前用户上传的文件，则不删除
+							 if(!topicManage.getFileNumber(FileUtil.getBaseName(imagePath.trim())).equals(fileNumber)){
+									continue;
+							 }
+							//替换路径中的..号
+							imagePath = FileUtil.toRelativePath(imagePath);
+							//替换路径分割符
+							imagePath = StringUtils.replace(imagePath, "/", File.separator);
+							
+							Boolean state = fileManage.deleteFile(imagePath);
+							if(state != null && state == false){	
+								//替换指定的字符，只替换第一次出现的
+								imagePath = StringUtils.replaceOnce(imagePath, "file"+File.separator+"comment"+File.separator, "");
+								imagePath = StringUtils.replace(imagePath, File.separator, "_");//替换所有出现过的字符
+								
+								//创建删除失败文件
+								fileManage.failedStateFile("file"+File.separator+"comment"+File.separator+"lock"+File.separator+imagePath);
+							
+							}
+						}
+						
+					}
+				}	
+
+			}else{
+				error.put("comment", ErrorView._119.name());//修改评论失败
+			}
+
+		}
+
+		
+		Map<String,String> returnError = new HashMap<String,String>();//错误
+		if(error.size() >0){
+			//将枚举数据转为错误提示字符
+    		for (Map.Entry<String,String> entry : error.entrySet()) {		 
+    			if(ErrorView.get(entry.getValue()) != null){
+    				returnError.put(entry.getKey(),  ErrorView.get(entry.getValue()));
+    			}else{
+    				returnError.put(entry.getKey(),  entry.getValue());
+    			}
+			}
+		}
+		if(isAjax == true){
+			
+    		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
+    		
+    		if(error != null && error.size() >0){
+    			returnValue.put("success", "false");
+    			returnValue.put("error", returnError);
+    			if(isCaptcha){
+    				returnValue.put("captchaKey", UUIDUtil.getUUID32());
+    			}
+    			
+    		}else{
+    			returnValue.put("success", "true");
+    		}
+    		WebUtil.writeToWeb(JsonUtils.toJSONString(returnValue), "json", response);
+			return null;
+		}else{
+			
+			
+			if(error != null && error.size() >0){//如果有错误
+				
+				redirectAttrs.addFlashAttribute("error", returnError);//重定向传参
+				redirectAttrs.addFlashAttribute("comment", comment);
+				
+
+				String referer = request.getHeader("referer");	
+				
+				
+				referer = StringUtils.removeStartIgnoreCase(referer,Configuration.getUrl(request));//移除开始部分的相同的字符,不区分大小写
+				referer = StringUtils.substringBefore(referer, ".");//截取到等于第二个参数的字符串为止
+				referer = StringUtils.substringBefore(referer, "?");//截取到等于第二个参数的字符串为止
+				
+				String queryString = request.getQueryString() != null && !"".equals(request.getQueryString().trim()) ? "?"+request.getQueryString() :"";
+
+				return "redirect:/"+referer+queryString;
+	
+			}
+			
+			
+			if(jumpUrl != null && !"".equals(jumpUrl.trim())){
+				String url = Base64.decodeBase64URL(jumpUrl.trim());
+				
+				return "redirect:"+url;
+			}else{//默认跳转
+				model.addAttribute("message", "修改评论成功");
+				String referer = request.getHeader("referer");
+				if(RefererCompare.compare(request, "login")){//如果是登录页面则跳转到首页
+					referer = Configuration.getUrl(request);
+				}
+				model.addAttribute("urlAddress", referer);
+				
+				String dirName = templateService.findTemplateDir_cache();
+				
+				
+				return "templates/"+dirName+"/"+accessSourceDeviceManage.accessDevices(request)+"/jump";	
+			}
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 	/**
 	 * 回复  添加
@@ -1419,5 +1794,302 @@ public class CommentFormAction {
 			}
 		}
 	}
+	
+	
+	/**
+	 * 评论回复  修改
+	 * @param model
+	 * @param replyId 回复Id
+	 * @param content 内容
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/editReply", method=RequestMethod.POST)
+	public String editReply(ModelMap model,Long replyId,String content,
+			String token,String captchaKey,String captchaValue,String jumpUrl,
+			RedirectAttributes redirectAttrs,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+		//获取登录用户
+	  	AccessUser accessUser = AccessUserThreadLocal.get();
+		
+		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+		Map<String,String> error = new HashMap<String,String>();
+		
+		//判断令牌
+		if(token != null && !"".equals(token.trim())){	
+			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌
+			if(token_sessionid != null && !"".equals(token_sessionid.trim())){
+				if(!token_sessionid.equals(token)){
+					error.put("token", ErrorView._13.name());//令牌错误
+				}
+			}else{
+				error.put("token", ErrorView._12.name());//令牌过期
+			}
+		}else{
+			error.put("token", ErrorView._11.name());//令牌为空
+		}
+		
+		//验证码
+		boolean isCaptcha = captchaManage.comment_isCaptcha(accessUser.getUserName());
+		if(isCaptcha){//如果需要验证码
+			//验证验证码
+			if(captchaKey != null && !"".equals(captchaKey.trim())){
+				//增加验证码重试次数
+				//统计每分钟原来提交次数
+				Integer original = settingManage.getSubmitQuantity("captcha", captchaKey.trim());
+	    		if(original != null){
+	    			settingManage.addSubmitQuantity("captcha", captchaKey.trim(),original+1);//刷新每分钟原来提交次数
+	    		}else{
+	    			settingManage.addSubmitQuantity("captcha", captchaKey.trim(),1);//刷新每分钟原来提交次数
+	    		}
+				
+				
+				String _captcha = captchaManage.captcha_generate(captchaKey.trim(),"");
+				if(captchaValue != null && !"".equals(captchaValue.trim())){
+					if(_captcha != null && !"".equals(_captcha.trim())){
+						if(!_captcha.equalsIgnoreCase(captchaValue)){
+							error.put("captchaValue",ErrorView._15.name());//验证码错误
+						}
+					}else{
+						error.put("captchaValue",ErrorView._17.name());//验证码过期
+					}
+				}else{
+					error.put("captchaValue",ErrorView._16.name());//请输入验证码
+				}
+				//删除验证码
+				captchaManage.captcha_delete(captchaKey.trim());	
+			}else{
+				error.put("captchaValue", ErrorView._14.name());//验证码参数错误
+			}
+			
+		}
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+	
+		Topic topic = null;
+		Reply reply = null;
+		//旧状态
+		Integer old_status = -1;
+		
+
+		if(replyId != null && replyId >0L){
+			reply = commentService.findReplyByReplyId(replyId);
+			if(reply != null){
+				topic = topicService.findById(reply.getTopicId());
+				if(topic != null){
+					if(!reply.getUserName().equals(accessUser.getUserName())){
+						error.put("reply", ErrorView._122.name());//只允许修改自己发布的回复
+					}
+					/**
+					if(reply.getStatus() > 100){
+						error.put("reply", ErrorView._116.name());//回复已删除
+					}**/
+					
+					//是否有当前功能操作权限
+					boolean flag_permission = userRoleManage.isPermission(ResourceEnum._1014000,topic.getTagId());
+					if(flag_permission == false){
+						if(isAjax == true){
+							response.setStatus(403);//设置状态码
+				    		
+							WebUtil.writeToWeb("", "json", response);
+							return null;
+						}else{ 
+							String dirName = templateService.findTemplateDir_cache();
+								
+							String accessPath = accessSourceDeviceManage.accessDevices(request);	
+							request.setAttribute("message","权限不足"); 	
+							return "templates/"+dirName+"/"+accessPath+"/message";
+						}
+					}
+					
+					
+					
+					
+					
+					
+					//如果全局不允许提交评论
+					if(systemSetting.isAllowComment() == false){
+						error.put("reply", ErrorView._123.name());//禁止回复
+					}
+					
+					//如果实名用户才允许提交评论
+					if(systemSetting.isRealNameUserAllowComment() == true){
+						User _user = userManage.query_cache_findUserByUserName(accessUser.getUserName());
+						if(_user.isRealNameAuthentication() == false){
+							error.put("reply", ErrorView._124.name());//实名用户才允许提交回复
+						}
+						
+					}
+					old_status = reply.getStatus();
+				}else{
+					error.put("reply", ErrorView._107.name());//话题不存在
+				}
+				
+			}else{
+				error.put("reply", ErrorView._125.name());//回复不存在
+			}
+		
+		}else{
+			error.put("reply", ErrorView._126.name());//回复Id不能为空
+		}
+		
+		
+		if(error.size() ==0){
+			if(reply.getStatus().equals(20)){//如果已发布，则重新执行发贴审核逻辑
+				//前台发表评论审核状态
+				if(systemSetting.getReply_review().equals(10)){//10.全部审核 20.特权会员未触发敏感词免审核(未实现) 30.特权会员免审核 40.触发敏感词需审核(未实现) 50.无需审核
+					reply.setStatus(10);//10.待审核 	
+				}else if(systemSetting.getReply_review().equals(30)){
+					if(topic.getTagId() != null && topic.getTagId() >0L){
+						//是否有当前功能操作权限
+						boolean _flag_permission = userRoleManage.isPermission(ResourceEnum._1014000,topic.getTagId());
+						if(_flag_permission){
+							reply.setStatus(20);//20.已发布
+						}else{
+							reply.setStatus(10);//10.待审核 
+						}
+					}
+				}else{
+					reply.setStatus(20);//20.已发布
+				}
+			}
+			
+			
+			
+			if(content != null && !"".equals(content.trim())){
+				
+				//不含标签内容
+				String text = textFilterManage.filterText(content);
+				//清除空格&nbsp;
+				String trimSpace = cms.utils.StringUtil.replaceSpace(text).trim();
+				
+				if((!"".equals(text.trim()) && !"".equals(trimSpace))){
+					
+					if(systemSetting.isAllowFilterWord()){
+						String wordReplace = "";
+						if(systemSetting.getFilterWordReplace() != null){
+							wordReplace = systemSetting.getFilterWordReplace();
+						}
+						text = sensitiveWordFilterManage.filterSensitiveWord(text, wordReplace);
+					}
+					reply.setContent(text);
+				}else{	
+					error.put("content", ErrorView._101.name());//内容不能为空
+					
+				}	
+				
+			}else{
+				error.put("content", ErrorView._101.name());//内容不能为空
+			}
+
+		}
+
+		
+		
+		
+		
+		
+	
+		
+		
+		
+		
+		if(error.size() == 0){
+			//修改回复
+			int i = commentService.updateReply(reply.getId(),reply.getContent(),reply.getUserName(),reply.getStatus(),new Date());
+			
+			if(i >0 && !old_status.equals(reply.getStatus())){
+				User user = userManage.query_cache_findUserByUserName(reply.getUserName());
+				if(user != null){
+					//修改回复状态
+					userService.updateUserDynamicReplyStatus(user.getId(),reply.getUserName(),reply.getTopicId(),reply.getCommentId(),reply.getId(),reply.getStatus());
+				}
+				
+			}
+			
+
+			 
+			if(i >0){
+				//删除缓存
+				commentManage.delete_cache_findReplyByReplyId(reply.getId());
+			}else{
+				error.put("reply", ErrorView._121.name());//修改回复失败
+			}
+
+		}
+
+		
+		Map<String,String> returnError = new HashMap<String,String>();//错误
+		if(error.size() >0){
+			//将枚举数据转为错误提示字符
+    		for (Map.Entry<String,String> entry : error.entrySet()) {		 
+    			if(ErrorView.get(entry.getValue()) != null){
+    				returnError.put(entry.getKey(),  ErrorView.get(entry.getValue()));
+    			}else{
+    				returnError.put(entry.getKey(),  entry.getValue());
+    			}
+			}
+		}
+		if(isAjax == true){
+			
+    		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
+    		
+    		if(error != null && error.size() >0){
+    			returnValue.put("success", "false");
+    			returnValue.put("error", returnError);
+    			if(isCaptcha){
+    				returnValue.put("captchaKey", UUIDUtil.getUUID32());
+    			}
+    			
+    		}else{
+    			returnValue.put("success", "true");
+    		}
+    		WebUtil.writeToWeb(JsonUtils.toJSONString(returnValue), "json", response);
+			return null;
+		}else{
+			
+			
+			if(error != null && error.size() >0){//如果有错误
+				
+				redirectAttrs.addFlashAttribute("error", returnError);//重定向传参
+				redirectAttrs.addFlashAttribute("reply", reply);
+				
+
+				String referer = request.getHeader("referer");	
+				
+				
+				referer = StringUtils.removeStartIgnoreCase(referer,Configuration.getUrl(request));//移除开始部分的相同的字符,不区分大小写
+				referer = StringUtils.substringBefore(referer, ".");//截取到等于第二个参数的字符串为止
+				referer = StringUtils.substringBefore(referer, "?");//截取到等于第二个参数的字符串为止
+				
+				String queryString = request.getQueryString() != null && !"".equals(request.getQueryString().trim()) ? "?"+request.getQueryString() :"";
+
+				return "redirect:/"+referer+queryString;
+	
+			}
+			
+			
+			if(jumpUrl != null && !"".equals(jumpUrl.trim())){
+				String url = Base64.decodeBase64URL(jumpUrl.trim());
+				
+				return "redirect:"+url;
+			}else{//默认跳转
+				model.addAttribute("message", "修改回复成功");
+				String referer = request.getHeader("referer");
+				if(RefererCompare.compare(request, "login")){//如果是登录页面则跳转到首页
+					referer = Configuration.getUrl(request);
+				}
+				model.addAttribute("urlAddress", referer);
+				
+				String dirName = templateService.findTemplateDir_cache();
+				
+				
+				return "templates/"+dirName+"/"+accessSourceDeviceManage.accessDevices(request)+"/jump";	
+			}
+		}
+	}
+	
 	
 }
