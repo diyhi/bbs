@@ -1,7 +1,6 @@
 package cms.web.action.common;
 
 
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -15,8 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
-import org.queryString.util.MultiMap;
-import org.queryString.util.UrlEncoded;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.AntPathMatcher;
@@ -29,6 +26,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 
 import cms.bean.ErrorView;
 import cms.bean.setting.SystemSetting;
+import cms.bean.thirdParty.WeiXinOpenId;
 import cms.bean.user.AccessUser;
 import cms.bean.user.DisableUserName;
 import cms.bean.user.FormCaptcha;
@@ -55,6 +53,7 @@ import cms.utils.threadLocal.AccessUserThreadLocal;
 import cms.web.action.AccessSourceDeviceManage;
 import cms.web.action.CSRFTokenManage;
 import cms.web.action.setting.SettingManage;
+import cms.web.action.thirdParty.ThirdPartyManage;
 import cms.web.action.user.UserLoginLogManage;
 import cms.web.action.user.UserManage;
 import cms.web.taglib.Configuration;
@@ -88,7 +87,8 @@ public class UserFormManageAction {
 	@Resource CSRFTokenManage csrfTokenManage;
 	
 	@Resource OAuthManage oAuthManage;
-	
+
+	@Resource ThirdPartyManage thirdPartyManage;
 	
 	
 	//?  匹配任何单字符
@@ -203,6 +203,7 @@ public class UserFormManageAction {
 	
 	/**
 	 * 会员注册
+	 * @param thirdPartyOpenId 第三方用户获取唯一标识  例如微信公众号openid
 	 * @param jumpUrl 跳转URL
 	 * @param token 令牌
 	 * @param captchaKey 验证Key
@@ -213,10 +214,10 @@ public class UserFormManageAction {
 	 */
 	@RequestMapping(value="/register",method=RequestMethod.POST) 
 	public String register(ModelMap model,User formbean,
-			String captchaKey,String captchaValue,
+			String captchaKey,String captchaValue,String thirdPartyOpenId,
 			String jumpUrl,String token,RedirectAttributes redirectAttrs,
 			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {	
+			throws Exception {
 		
 		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
 
@@ -530,6 +531,9 @@ public class UserFormManageAction {
 		}
 
 		if(error.size() == 0){
+			user.setType(10);
+			user.setPlatformUserId(user.getUserName());
+			
 			//用户自定义注册功能项用户输入值集合
 			List<UserInputValue> all_userInputValueList = new ArrayList<UserInputValue>();
 		
@@ -565,14 +569,20 @@ public class UserFormManageAction {
 				//刷新令牌
 				String refreshToken = UUIDUtil.getUUID32();
 	
-				oAuthManage.addAccessToken(accessToken, new AccessUser(user.getId(),user.getUserName(),user.getNickname(),user.getAvatarPath(),user.getAvatarName(), user.getSecurityDigest(),false));
-				oAuthManage.addRefreshToken(refreshToken, new RefreshUser(accessToken,user.getId(),user.getUserName(),user.getNickname(),user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),false));
+				String openId = "";//第三方openId
+				if(thirdPartyOpenId != null && !"".equals(thirdPartyOpenId.trim())){
+					openId = thirdPartyOpenId;
+					oAuthManage.addOpenId(openId,refreshToken);
+				}
+				
+				oAuthManage.addAccessToken(accessToken, new AccessUser(user.getId(),user.getUserName(),user.getNickname(),user.getAvatarPath(),user.getAvatarName(), user.getSecurityDigest(),false,openId));
+				oAuthManage.addRefreshToken(refreshToken, new RefreshUser(accessToken,user.getId(),user.getUserName(),user.getNickname(),user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),false,openId));
 	
 				//将访问令牌添加到Cookie
 				WebUtil.addCookie(response, "cms_accessToken", accessToken, 0);
 				//将刷新令牌添加到Cookie
 				WebUtil.addCookie(response, "cms_refreshToken", refreshToken, 0);
-				AccessUserThreadLocal.set(new AccessUser(user.getId(),user.getUserName(),user.getNickname(),user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),false));
+				AccessUserThreadLocal.set(new AccessUser(user.getId(),user.getUserName(),user.getNickname(),user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),false,openId));
 				
 				//删除缓存
 				userManage.delete_cache_findUserById(user.getId());
@@ -615,7 +625,7 @@ public class UserFormManageAction {
     			String _jumpUrl = "";
     			if(jumpUrl != null && !"".equals(jumpUrl.trim())){
     				//Base64解码后参数进行URL编码
-    				String parameter = this.parameterEncoded(Base64.decodeBase64URL(jumpUrl.trim()));
+    				String parameter = WebUtil.parameterEncoded(Base64.decodeBase64URL(jumpUrl.trim()));
     				
     				String encodedRedirectURL = response.encodeRedirectURL(parameter);
     				_jumpUrl = encodedRedirectURL;
@@ -625,7 +635,7 @@ public class UserFormManageAction {
     			
     			returnValue.put("success", "true");
     			returnValue.put("jumpUrl", _jumpUrl);
-    			returnValue.put("systemUser", new AccessUser(user.getId(),user.getUserName(),user.getNickname(),user.getAvatarPath(),user.getAvatarName(),null,false));//登录用户
+    			returnValue.put("systemUser", new AccessUser(user.getId(),user.getUserName(),user.getNickname(),user.getAvatarPath(),user.getAvatarName(),null,false,""));//登录用户
     			
     		}
     		
@@ -729,18 +739,70 @@ public class UserFormManageAction {
 	/**
 	 * 会员登录页面显示
 	 * @param jumpUrl 跳转URL
+	 * @param code 微信公众号code
 	 * @param response
 	 * @return
 	 * @throws Exception
 	 */
 	@RequestMapping(value="/login",method=RequestMethod.GET) 
-	public String loginUI(ModelMap model,String jumpUrl,
+	public String loginUI(ModelMap model,String jumpUrl,String code,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+		
+		//处理微信浏览器被清理缓存后公众号自动登录
+		if(code != null && !"".equals(code.trim()) && WebUtil.isWeChatBrowser(request)){//如果是微信客户端
+			
+			WeiXinOpenId weiXinOpenId = thirdPartyManage.queryWeiXinOpenId(code.trim());
+			if(weiXinOpenId != null && weiXinOpenId.getOpenId() != null && !"".equals(weiXinOpenId.getOpenId())){
+
+				//添加到缓存
+				thirdPartyManage.addWeiXinOpenId(code.trim(), weiXinOpenId);
+				
+				
+				
+				//刷新令牌号
+				String refreshToken = oAuthManage.getRefreshTokenByOpenId(weiXinOpenId.getOpenId());
+				if(refreshToken != null && !"".equals(refreshToken.trim())){
+
+					
+					RefreshUser refreshUser = oAuthManage.getRefreshUserByRefreshToken(refreshToken.trim());
+					if(refreshUser != null){
+						
+						//存放时间 单位/秒
+						int maxAge = 0;
+						if(refreshUser.isRememberMe()){
+							maxAge = WebUtil.cookieMaxAge;//默认Cookie有效期
+						}
+						//将令牌写入Cookie
+						
+						//将访问令牌添加到Cookie
+						WebUtil.addCookie(response, "cms_accessToken", refreshUser.getAccessToken(), maxAge);
+						//将刷新令牌添加到Cookie
+						WebUtil.addCookie(response, "cms_refreshToken", refreshToken, maxAge);
+
+						
+						if(jumpUrl != null && !"".equals(jumpUrl.trim())){
+							//Base64解码后参数进行URL编码
+							String parameter = WebUtil.parameterEncoded(Base64.decodeBase64URL(jumpUrl));
+							
+							String encodedRedirectURL = response.encodeRedirectURL(parameter);
+							response.sendRedirect((Configuration.getPath() != null && !"".equals(Configuration.getPath()) ?Configuration.getPath()+"/" : "")+encodedRedirectURL);
+							return null;
+							
+						}
+							
+						
+						
+						
+					}
+					
+				}
+				
+			}
+		}
+		
 		FormCaptcha formCaptcha = new FormCaptcha();
-		
-		
 		boolean isCaptcha = false;
 		SystemSetting systemSetting = settingService.findSystemSetting_cache();
 		if(systemSetting.getLogin_submitQuantity() <=0){//每分钟连续登录密码错误N次时出现验证码
@@ -821,6 +883,7 @@ public class UserFormManageAction {
 	 * 会员登录
 	 * @param jumpUrl 跳转URL
 	 * @param rememberMe 记住密码
+	 * @param thirdPartyOpenId 第三方用户获取唯一标识  例如微信公众号openid
 	 * @param response
 	 * @return
 	 * @throws Exception
@@ -829,6 +892,7 @@ public class UserFormManageAction {
 	public String login2(ModelMap model,String userName, String password,Boolean rememberMe,String jumpUrl,
 			RedirectAttributes redirectAttrs,
 			String token,String captchaKey,String captchaValue,
+			String thirdPartyOpenId,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
@@ -952,20 +1016,28 @@ public class UserFormManageAction {
 						
 						
 						
-						oAuthManage.addAccessToken(accessToken, new AccessUser(user.getId(),user.getUserName(),user.getNickname(),user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),rememberMe));
-						oAuthManage.addRefreshToken(refreshToken, new RefreshUser(accessToken,user.getId(),user.getUserName(),user.getNickname(),user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),rememberMe));
+						String openId = "";//第三方openId
+						if(thirdPartyOpenId != null && !"".equals(thirdPartyOpenId.trim())){
+							openId = thirdPartyOpenId.trim();
+							oAuthManage.addOpenId(openId,refreshToken);
+						}
+						
+						oAuthManage.addAccessToken(accessToken, new AccessUser(user.getId(),user.getUserName(),user.getNickname(),user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),rememberMe,openId));
+						oAuthManage.addRefreshToken(refreshToken, new RefreshUser(accessToken,user.getId(),user.getUserName(),user.getNickname(),user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),rememberMe,openId));
+						
+						
 						
 						//存放时间 单位/秒
 						int maxAge = 0;
 						if(rememberMe == true){
-							maxAge = 15*24*60*60;
+							maxAge = WebUtil.cookieMaxAge;//默认Cookie有效期
 						}
 						
 						//将访问令牌添加到Cookie
 						WebUtil.addCookie(response, "cms_accessToken", accessToken, maxAge);
 						//将刷新令牌添加到Cookie
 						WebUtil.addCookie(response, "cms_refreshToken", refreshToken, maxAge);
-						AccessUserThreadLocal.set(new AccessUser(user.getId(),user.getUserName(),user.getNickname(),user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),rememberMe));
+						AccessUserThreadLocal.set(new AccessUser(user.getId(),user.getUserName(),user.getNickname(),user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),rememberMe,openId));
 						
 					}else{
 						//密码错误
@@ -1014,7 +1086,7 @@ public class UserFormManageAction {
 		String _jumpUrl = "";
 		if(jumpUrl != null && !"".equals(jumpUrl.trim())){
 			//Base64解码后参数进行URL编码
-			String parameter = this.parameterEncoded(Base64.decodeBase64URL(jumpUrl.trim()));
+			String parameter = WebUtil.parameterEncoded(Base64.decodeBase64URL(jumpUrl.trim()));
 			
 			String encodedRedirectURL = response.encodeRedirectURL(parameter);
 			_jumpUrl = encodedRedirectURL;
@@ -1036,8 +1108,9 @@ public class UserFormManageAction {
     		}else{
     			ajax_return.put("success", "true");
     			ajax_return.put("jumpUrl", _jumpUrl);
-    			ajax_return.put("systemUser", new AccessUser(user.getId(),user.getUserName(),user.getNickname(),user.getAvatarPath(),user.getAvatarName(),null,false));//登录用户
+    			ajax_return.put("systemUser", new AccessUser(user.getId(),user.getUserName(),user.getNickname(),user.getAvatarPath(),user.getAvatarName(),null,false,""));//登录用户
     		}
+    		
     		
     		WebUtil.writeToWeb(JsonUtils.toJSONString(ajax_return), "json", response);
 			return null;
@@ -1053,7 +1126,7 @@ public class UserFormManageAction {
 	
 				if(jumpUrl != null && !"".equals(jumpUrl.trim())){
 					//Base64解码后参数进行URL编码
-					String parameter = this.parameterEncoded(Base64.decodeBase64URL(jumpUrl));
+					String parameter = WebUtil.parameterEncoded(Base64.decodeBase64URL(jumpUrl));
 					
 					String encodedRedirectURL = response.encodeRedirectURL(parameter);
 					response.sendRedirect((Configuration.getPath() != null && !"".equals(Configuration.getPath()) ?Configuration.getPath()+"/" : "")+encodedRedirectURL);
@@ -1067,61 +1140,7 @@ public class UserFormManageAction {
 	}
 	
 	
-	/**
-	 * URI参数编码
-	 * @param uri
-	 * @return
-	 */
-	private String parameterEncoded(String uri)throws Exception{
-		//截取到等于第二个参数的字符串为止,从左往右
-		String uri_before = StringUtils.substringBefore(uri, "?");
-		
-		//从左往右查到相等的字符开始，保留后边的，不包含等于的字符
-		String queryString = StringUtils.substringAfter(uri, "?");
-
-		//组装URL参数
-		StringBuffer url_parameter = new StringBuffer("");
-		//参数进行URL编码
-		if(queryString != null && !"".equals(queryString)){
-       		MultiMap<String> values = new MultiMap<String>();  
-	       	UrlEncoded.decodeTo(queryString, values, "UTF-8");
-	       	Iterator iter = values.entrySet().iterator();  
-	       	while(iter.hasNext()){  
-	       		Map.Entry e = (Map.Entry)iter.next();  
-	       		if(e.getValue() != null){
-	       			if(e.getValue() instanceof List){
-	       				List<String> valueList = (List)e.getValue();
-		       			if(valueList.size() >0){	
-		       				for(String value :valueList){
-		       					if(value != null && !"".equals(value.trim())){  					
-		       						url_parameter.append("&"+e.getKey()+"="+URLEncoder.encode(value,"utf-8"));
-		       					}
-		       				}
-			       			
-			       		}
-		       		}else{	
-		       			if(e.getValue() instanceof String){      				
-		       				String value = e.getValue().toString().trim();
-	       					if(value != null && !"".equals(value)){
-	       						url_parameter.append("&"+e.getKey()+"="+URLEncoder.encode(value,"utf-8"));
-			       			}	
-		       			}
-		       		}		
-	       		}
-	         	
-	       	   
-
-	       	} 
-       	}
-		String new_url_parameter = "";
-		if(url_parameter.length() >1){
-			new_url_parameter = "?";
-			//删除第一个&
-			new_url_parameter += StringUtils.difference("&", url_parameter.toString());
-		}
-		return uri_before+new_url_parameter;
-		
-	}
+	
 	
 	
 	/**
@@ -1312,7 +1331,12 @@ public class UserFormManageAction {
 	    	 User user = userManage.query_cache_findUserByUserName(userName.trim());
 	    	 if(user == null){
 	    		 error.put("userName", ErrorView._910.name());//用户不存在
-	    	 } 
+	    	 }else{
+	    		 if(user.getType() >10){
+	    			 error.put("userName", ErrorView._920.name());//用户不是本地密码账户
+	    		 }
+	    		 
+	    	 }
 	    }else{
 	    	error.put("userName", ErrorView._815.name());//用户名称不能为空
 	    }
@@ -1520,6 +1544,10 @@ public class UserFormManageAction {
 			user = userService.findUserByUserName(formbean.getUserName().trim());
 			if(user == null){
 				error.put("userName", ErrorView._825.name());//用户名错误
+			}else{
+				 if(user.getType() >10){
+	    			 error.put("userName", ErrorView._920.name());//用户不是本地密码账户
+	    		 }
 			}
 		}else{
 			error.put("userName", ErrorView._815.name());//用户名称不能为空

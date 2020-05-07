@@ -5,6 +5,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -13,8 +15,11 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.queryString.util.MultiMap;
+import org.queryString.util.UrlEncoded;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -31,7 +36,10 @@ public class WebUtil {
 	
 	//String regexp  = "((http[s]{0,1}|ftp)://[a-zA-Z0-9\\.\\-]+\\.([a-zA-Z]{2,4})(:\\d+)?(/[a-zA-Z0-9\\.\\-~!@#$%^&*+?:_/=<>]*)?)|(www.[a-zA-Z0-9\\.\\-]+\\.([a-zA-Z]{2,4})(:\\d+)?(/[a-zA-Z0-9\\.\\-~!@#$%^&*+?:_/=<>]*)?)"; // 结束条件
 	private static Pattern pattern = Pattern.compile("((http[s]{0,1})://[a-zA-Z0-9\\.\\-]+\\.([a-zA-Z]{2,4})(:\\d+)?(/[a-zA-Z0-9\\.\\-~!@#$%^&*+?:_/=<>]*)?)|(www.[a-zA-Z0-9\\.\\-]+\\.([a-zA-Z]{2,4})(:\\d+)?(/[a-zA-Z0-9\\.\\-~!@#$%^&*+?:_/=<>]*)?)", Pattern.CASE_INSENSITIVE);
-		
+	
+	/**默认Cookie有效期30*24*60*60  单位/秒  **/
+	public static int cookieMaxAge = 30*24*60*60;
+	
 	
     /**
      * 添加cookie
@@ -267,5 +275,86 @@ public class WebUtil {
         return resultText;
 	}
 
+	/**
+	 * 是否为微信浏览器
+	 * @param request
+	 * @return
+	 */
+	public static boolean isWeChatBrowser(HttpServletRequest request){
+		String userAgent = request.getHeader("user-agent").toLowerCase();
+		if(userAgent != null && !"".equals(userAgent.trim()) && userAgent.indexOf("micromessenger")>-1){
+			return true;
+		}
+		return false;
+	}
 	
+	/**
+	 * URI参数编码
+	 * @param uri
+	 * @return
+	 */
+	public static String parameterEncoded(String uri){
+		//截取到等于第二个参数的字符串为止,从左往右
+		String uri_before = StringUtils.substringBefore(uri, "?");
+		
+		//从左往右查到相等的字符开始，保留后边的，不包含等于的字符
+		String queryString = StringUtils.substringAfter(uri, "?");
+
+		//组装URL参数
+		StringBuffer url_parameter = new StringBuffer("");
+		//参数进行URL编码
+		if(queryString != null && !"".equals(queryString)){
+       		MultiMap<String> values = new MultiMap<String>();  
+	       	UrlEncoded.decodeTo(queryString, values, "UTF-8");
+	       	Iterator iter = values.entrySet().iterator();  
+	       	while(iter.hasNext()){  
+	       		Map.Entry e = (Map.Entry)iter.next();  
+	       		if(e.getValue() != null){
+	       			if(e.getValue() instanceof List){
+	       				List<String> valueList = (List)e.getValue();
+		       			if(valueList.size() >0){	
+		       				for(String value :valueList){
+		       					if(value != null && !"".equals(value.trim())){  					
+		       						try {
+										url_parameter.append("&"+e.getKey()+"="+URLEncoder.encode(value,"utf-8"));
+									} catch (UnsupportedEncodingException e1) {
+										// TODO Auto-generated catch block
+										if (logger.isErrorEnabled()) {
+											logger.error("将Url参数编码错误",e1);
+								        }
+									}
+		       					}
+		       				}
+			       			
+			       		}
+		       		}else{	
+		       			if(e.getValue() instanceof String){      				
+		       				String value = e.getValue().toString().trim();
+	       					if(value != null && !"".equals(value)){
+	       						try {
+	       							url_parameter.append("&"+e.getKey()+"="+URLEncoder.encode(value,"utf-8"));
+	       						} catch (UnsupportedEncodingException e1) {
+									// TODO Auto-generated catch block
+	       							if (logger.isErrorEnabled()) {
+	       					            logger.error("将Url参数编码错误",e1);
+	       					        }
+								}
+			       			}	
+		       			}
+		       		}		
+	       		}
+	         	
+	       	   
+
+	       	} 
+       	}
+		String new_url_parameter = "";
+		if(url_parameter.length() >1){
+			new_url_parameter = "?";
+			//删除第一个&
+			new_url_parameter += StringUtils.difference("&", url_parameter.toString());
+		}
+		return uri_before+new_url_parameter;
+		
+	}
 }

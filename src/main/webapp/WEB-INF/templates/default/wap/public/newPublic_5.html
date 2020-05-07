@@ -15,6 +15,7 @@
 	<meta name="_token" content="${token}"/>
 	<meta name="_userId" content="${systemUser.userId}"/>
 	<meta name="_userName" content="${systemUser.userName}"/>
+	<meta name="_weixin_oa_appid" content="${weixin_oa_appid}"/>
 	<style>
 		/*兼容template标签*/
 		template { 
@@ -67,12 +68,10 @@
 				<div class="topicList">
 				    <div class="item" v-for="topic in topicList" >
 				    	<div class="avatarBox">
-				            <img :src="topic.avatarPath+'100x100/'+topic.avatarName" v-if="topic.avatarName != null">
-				            <img :src="$store.state.commonPath+'images/min_avata.png'" v-if="topic.avatarName == null || topic.avatarName == ''">
-				        	
-				        	<!-- 首字符头像
+				            <img :src="topic.avatarPath+'100x100/'+topic.avatarName" v-if="topic.avatarName != null && topic.avatarName != ''">
+				        	<!-- 首字符头像-->
 				         	<img :ref="'avatarData_'+topic.id"  v-if="topic.avatarName == null || topic.avatarName == ''">
-				         	-->
+				         	
 				        </div>
 				    	<div class="topInfo">                                   
 				            <span class="bLeft">
@@ -240,8 +239,9 @@
 					<div class="head">
 						<!-- router-link渲染成<div>标签 -->
 				    	<router-link class="avatarBox"  tag="div" :to="{path: '/user/control/home', query: {userName: topic.userName}}">
-				        	<img :src="topic.avatarPath+'100x100/'+topic.avatarName" v-if="topic.avatarName != null">
-				            <img :src="$store.state.commonPath+'images/min_avata.png'" v-if="topic.avatarName == null || topic.avatarName == ''">
+				        	<img :src="topic.avatarPath+'100x100/'+topic.avatarName" v-if="topic.avatarName != null && topic.avatarName != ''">
+				            <!-- 首字符头像-->
+				         	<img ref="topicUserAvatar"  v-if="topic.avatarName == null || topic.avatarName == ''">
 				        </router-link>
 				    	<h1>
 				    		{{topic.title}}
@@ -284,8 +284,10 @@
 						<div class="head">
 							<!-- router-link渲染成<div>标签-->
 					    	<router-link class="avatarBox"  tag="div" :to="{path: '/user/control/home', query: {userName: comment.userName}}">
-					        	<img :src="comment.avatarPath+'100x100/'+comment.avatarName" v-if="comment.avatarName != null">
-					            <img :src="$store.state.commonPath+'images/min_avata.png'" v-if="comment.avatarName == null || comment.avatarName == ''">
+					        	<img :src="comment.avatarPath+'100x100/'+comment.avatarName" v-if="comment.avatarName != null && comment.avatarName != ''">
+								<!-- 首字符头像-->
+				         		<img :ref="'commentAvatarData_'+comment.id"  v-if="comment.avatarName == null || comment.avatarName == ''">
+				         	
 					        </router-link>
 							<span class="info" >
 								<!-- router-link渲染成<h2>标签-->
@@ -325,8 +327,10 @@
 								        <div class="reply-top" >
 									        <!-- router-link渲染成<div>标签-->
 									    	<router-link class="avatarBox"  tag="div" :to="{path: '/user/control/home', query: {userName: reply.userName}}">
-									        	<img :src="reply.avatarPath+'100x100/'+reply.avatarName" v-if="reply.avatarName != null">
-									            <img :src="$store.state.commonPath+'images/min_avata.png'" v-if="reply.avatarName == null || reply.avatarName == ''">
+									        	<img :src="reply.avatarPath+'100x100/'+reply.avatarName" v-if="reply.avatarName != null && reply.avatarName != ''">
+									            <!-- 首字符头像-->
+				         						<img :ref="'replyAvatarData_'+reply.id"  v-if="reply.avatarName == null || reply.avatarName == ''">
+				         	
 									        </router-link>
 		                                    <!-- router-link渲染成<span>标签-->
 									    	<router-link class="userName" tag="span" :to="{path: '/user/control/home', query: {userName: reply.userName}}">
@@ -647,8 +651,10 @@
 			<div class="questionList">
 			    <div class="item" v-for="question in questionList" >
 			    	<div class="avatarBox">
-			            <img :src="question.avatarPath+'100x100/'+question.avatarName" v-if="question.avatarName != null">
-			            <img :src="$store.state.commonPath+'images/min_avata.png'" v-if="question.avatarName == null || question.avatarName == ''">
+			            <img :src="question.avatarPath+'100x100/'+question.avatarName" v-if="question.avatarName != null && question.avatarName != ''">
+			            <!-- 首字符头像-->
+				        <img :ref="'questionAvatarData_'+question.id"  v-if="question.avatarName == null || question.avatarName == ''">
+				         	
 			        </div>
 			    	<div class="topInfo">
 			    		<span class="bLeft">
@@ -741,8 +747,9 @@
 					<div class="head">
 						<!-- router-link渲染成<div>标签-->
 				    	<router-link class="avatarBox"  tag="div" :to="{path: '/user/control/home', query: {userName: question.userName}}">
-				        	<img :src="question.avatarPath+'100x100/'+question.avatarName" v-if="question.avatarName != null">
-				            <img :src="$store.state.commonPath+'images/min_avata.png'" v-if="question.avatarName == null || question.avatarName == ''">
+				        	<img :src="question.avatarPath+'100x100/'+question.avatarName" v-if="question.avatarName != null && question.avatarName != ''">
+				            <!-- 首字符头像-->
+				         	<img ref="questionUserAvatar"  v-if="question.avatarName == null || question.avatarName == ''">
 				        </router-link>
 				    	<h1>
 				    		{{question.title}}
@@ -809,8 +816,10 @@
 						<div class="head">
 							<!-- router-link渲染成<div>标签-->
 					    	<router-link class="avatarBox"  tag="div" :to="{path: '/user/control/home', query: {userName: answer.userName}}">
-					        	<img :src="answer.avatarPath+'100x100/'+answer.avatarName" v-if="answer.avatarName != null">
-					            <img :src="$store.state.commonPath+'images/min_avata.png'" v-if="answer.avatarName == null || answer.avatarName == ''">
+					        	<img :src="answer.avatarPath+'100x100/'+answer.avatarName" v-if="answer.avatarName != null && answer.avatarName != ''">
+					          	<!-- 首字符头像-->
+				         		<img :ref="'answerAvatarData_'+answer.id"  v-if="answer.avatarName == null || answer.avatarName == ''">
+				         	
 					        </router-link>
 							<span class="info" >
 								<!-- router-link渲染成<h2>标签-->
@@ -843,8 +852,9 @@
 								        <div class="reply-top" >
 									        <!-- router-link渲染成<div>标签-->
 									    	<router-link class="avatarBox"  tag="div" :to="{path: '/user/control/home', query: {userName: reply.userName}}">
-									        	<img :src="reply.avatarPath+'100x100/'+reply.avatarName" v-if="reply.avatarName != null">
-									            <img :src="$store.state.commonPath+'images/min_avata.png'" v-if="reply.avatarName == null || reply.avatarName == ''">
+									        	<img :src="reply.avatarPath+'100x100/'+reply.avatarName" v-if="reply.avatarName != null && reply.avatarName != ''">
+									            <!-- 首字符头像-->
+				         						<img :ref="'answerReplyAvatarData_'+reply.id"  v-if="reply.avatarName == null || reply.avatarName == ''">
 									        </router-link>
 		                                    <!-- router-link渲染成<span>标签-->
 									    	<router-link class="userName" tag="span" :to="{path: '/user/control/home', query: {userName: reply.userName}}">
@@ -1180,8 +1190,9 @@
 			    <div class="item" v-for="searchResult in searchResultList" >
 			    	<div v-if="searchResult.indexModule == 10">
 				    	<div class="avatarBox">
-				            <img :src="searchResult.topic.avatarPath+'100x100/'+searchResult.topic.avatarName" v-if="searchResult.topic.avatarName != null">
-				            <img :src="$store.state.commonPath+'images/min_avata.png'" v-if="searchResult.topic.avatarName == null || searchResult.topic.avatarName == ''">
+				            <img :src="searchResult.topic.avatarPath+'100x100/'+searchResult.topic.avatarName" v-if="searchResult.topic.avatarName != null && searchResult.topic.avatarName != ''">
+				            <!-- 首字符头像-->
+				         	<img :ref="'searchResultTopicAvatarData_'+searchResult.topic.id"  v-if="searchResult.topic.avatarName == null || searchResult.topic.avatarName == ''">
 				        </div>
 				        
 				        <div class="title">
@@ -1205,8 +1216,10 @@
 			        
 			        <div v-if="searchResult.indexModule == 20">
 				    	<div class="avatarBox">
-				            <img :src="searchResult.question.avatarPath+'100x100/'+searchResult.question.avatarName" v-if="searchResult.question.avatarName != null">
-				            <img :src="$store.state.commonPath+'images/min_avata.png'" v-if="searchResult.question.avatarName == null || searchResult.question.avatarName == ''">
+				            <img :src="searchResult.question.avatarPath+'100x100/'+searchResult.question.avatarName" v-if="searchResult.question.avatarName != null && searchResult.question.avatarName != ''">
+				            <!-- 首字符头像-->
+				         	<img :ref="'searchResultQuestionAvatarData_'+searchResult.question.id"  v-if="searchResult.question.avatarName == null || searchResult.question.avatarName == ''">
+				      
 				        </div>
 				        
 				        <div class="title">
@@ -1477,7 +1490,7 @@
 	    	<span class="cms-home" style="font-size: 18px;"></span>
 		</router-link>
 	</mt-header>
-	<div class="loginModule">   
+	<div class="loginModule" v-show="show_loginModule">   
 		<ul>
 			<li>
 	        	<mt-field v-model.trim="userName" label="用户名" placeholder="请输入用户名"  type="text"></mt-field>
@@ -1520,6 +1533,14 @@
 	        		<router-link to="/findPassWord/step1" tag="div" class="findPassWord">找回密码</router-link>
 	        	</div>
 	        </li> 
+	        
+	        <div class="otherLogin" v-if="supportLoginInterfaceList != null && supportLoginInterfaceList.length >0">
+	        	<h4 class="title">其他登录方式</h4>
+	        	<p class="link">
+	        		<a @click="loginLink(supportLoginInterface.interfaceProduct)" :class="'icon-'+supportLoginInterface.interfaceProduct" v-for="supportLoginInterface in supportLoginInterfaceList" ></a>
+	        	</p>
+	        </div>
+	        
 		</ul>
 	</div>
 
@@ -1650,8 +1671,10 @@
 				<div class="head">
 					<!-- router-link渲染成<div>标签-->
 			    	<router-link class="avatarBox"  tag="div" :to="{path: '/user/control/home', query: {userName: userDynamic.userName}}">
-			        	<img :src="userDynamic.avatarPath+'100x100/'+userDynamic.avatarName" v-if="userDynamic.avatarName != null">
-			            <img :src="$store.state.commonPath+'images/min_avata.png'" v-if="userDynamic.avatarName == null || userDynamic.avatarName == ''">
+			        	<img :src="userDynamic.avatarPath+'100x100/'+userDynamic.avatarName" v-if="userDynamic.avatarName != null && userDynamic.avatarName != ''">
+			            <!-- 首字符头像-->
+				        <img :ref="'userDynamicAvatarData_'+userDynamic.id"  v-if="userDynamic.avatarName == null || userDynamic.avatarName == ''">
+									   
 			        </router-link>
 					<span class="info" >
 						<!-- router-link渲染成<h2>标签-->
@@ -2114,19 +2137,19 @@
 				<mt-cell :title="userRole.name" :value="'到期时间: '+userRole.validPeriodEnd" ></mt-cell>				
 				
 			</li>
-	        <li>
+	        <li v-if="user != null && user.type <40">
 	        	<mt-field v-model.trim="oldPassword" label="旧密码" placeholder="不修改密码请留空" type="password"></mt-field>
 	        	<p class="tips">
 			    	<span>{{error.oldPassword}}</span>
 			    </p>
 	        </li>
-	        <li>
+	        <li v-if="user != null && user.type <40">
 	        	<mt-field v-model.trim="password" label="新密码" placeholder="不修改密码请留空" type="password"></mt-field>
 	        	<p class="tips">
 			    	<span>{{error.password}}</span>
 			    </p>
 	        </li>
-	        <li>
+	        <li v-if="user != null && user.type <40">
 	        	<mt-field v-model.trim="confirmPassword" label="重复新密码" placeholder="不修改密码请留空" type="password"></mt-field>
 	        	<p class="tips">
 			    	<span>{{error.confirmPassword}}</span>
@@ -2378,8 +2401,9 @@
 				<div v-infinite-scroll="queryPrivateMessage" infinite-scroll-disabled="loading" infinite-scroll-distance="10">
 					<div class="item" v-for="privateMessage in privateMessageList">
 						<div class="avatarBox">
-				            <img :src="privateMessage.friendAvatarPath+'100x100/'+privateMessage.friendAvatarName" v-if="privateMessage.friendAvatarName != null">
-				            <img :src="$store.state.commonPath+'images/min_avata.png'" v-if="privateMessage.friendAvatarName == null || privateMessage.friendAvatarName == ''">
+				            <img :src="privateMessage.friendAvatarPath+'100x100/'+privateMessage.friendAvatarName" v-if="privateMessage.friendAvatarName != null && privateMessage.friendAvatarName != ''">
+				            <!-- 首字符头像-->
+				         	<img :ref="'privateMessageAvatarData_'+privateMessage.id"  v-if="privateMessage.friendAvatarName == null || privateMessage.friendAvatarName == ''">
 				        </div>
 						<div class="head">
 							<span class="info" >
@@ -2427,8 +2451,11 @@
 				<div class="friend" v-if="privateMessage.friendUserId == privateMessage.senderUserId">
 					<!-- router-link渲染成<a>标签-->
 			    	<router-link tag="a" :to="{path: '/user/control/home', query: {userName: privateMessage.senderUserName}}">
-			        	<img :src="privateMessage.senderAvatarPath+'100x100/'+privateMessage.senderAvatarName" v-if="privateMessage.senderAvatarName != null">
+			        	<img :src="privateMessage.senderAvatarPath+'100x100/'+privateMessage.senderAvatarName" v-if="privateMessage.senderAvatarName != null && privateMessage.senderAvatarName != ''">
 				        <img :src="$store.state.commonPath+'images/min_avata.png'" v-if="privateMessage.senderAvatarName == null || privateMessage.senderAvatarName == ''">     
+			        	<!-- 首字符头像-->
+				        <img :ref="'privateMessageChatAvatarData_'+privateMessage.id"  v-if="privateMessage.senderAvatarName == null || privateMessage.senderAvatarName == ''">
+				        
 			        </router-link>
 					<div>
 			            <span>
@@ -2443,8 +2470,11 @@
 				<div class="self" v-if="privateMessage.friendUserId != privateMessage.senderUserId">
 					<!-- router-link渲染成<a>标签-->
 			    	<router-link tag="a" :to="{path: '/user/control/home', query: {userName: privateMessage.senderUserName}}">
-			        	<img :src="privateMessage.senderAvatarPath+'100x100/'+privateMessage.senderAvatarName" v-if="privateMessage.senderAvatarName != null">
+			        	<img :src="privateMessage.senderAvatarPath+'100x100/'+privateMessage.senderAvatarName" v-if="privateMessage.senderAvatarName != null && privateMessage.senderAvatarName != ''">
 				        <img :src="$store.state.commonPath+'images/min_avata.png'" v-if="privateMessage.senderAvatarName == null || privateMessage.senderAvatarName == ''">     
+			        	<!-- 首字符头像-->
+				        <img :ref="'privateMessageChatAvatarData_'+privateMessage.id"  v-if="privateMessage.senderAvatarName == null || privateMessage.senderAvatarName == ''">
+				        
 			        </router-link>
 					<div>
 			            <span>
@@ -2583,8 +2613,10 @@
 				<div v-infinite-scroll="queryRemind" infinite-scroll-disabled="loading" infinite-scroll-distance="10">
 					<div class="item" v-for="remind in remindList">
 						<div class="avatarBox">
-				            <img :src="remind.senderAvatarPath+'100x100/'+remind.senderAvatarName" v-if="remind.senderAvatarName != null">
-				            <img :src="$store.state.commonPath+'images/min_avata.png'" v-if="remind.senderAvatarName == null || remind.senderAvatarName == ''">
+				            <img :src="remind.senderAvatarPath+'100x100/'+remind.senderAvatarName" v-if="remind.senderAvatarName != null && remind.senderAvatarName != ''">
+				            <!-- 首字符头像-->
+				        	<img :ref="'remindSenderAvatarData_'+remind.id"  v-if="remind.senderAvatarName == null || remind.senderAvatarName == ''">
+						
 				        </div>
 						<div class="head">
 							<span class="info" >  	
@@ -3336,7 +3368,7 @@
  <script src="${commonPath}js/v-readmore.min.js" type="text/javascript"></script>
 <script src="${commonPath}js/wangeditor/wangEditor.min.js?6" type="text/javascript"></script>
 <script src="${commonPath}js/vue-lazyload.js" type="text/javascript"></script> 
-<script src="${commonPath}js/main.js?66ggdfdd3cgd" type="text/javascript"></script>
+<script src="${commonPath}js/main.js?66ggdfdd3cgdd" type="text/javascript"></script>
 
 
 

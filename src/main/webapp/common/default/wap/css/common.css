@@ -1876,6 +1876,41 @@ html,body{
 .loginModule .info .register{margin-left: 20px;}
 .loginModule .info .findPassWord{float: right;margin-right: 20px;margin-top: -19px;}
 
+.loginModule .otherLogin{
+	margin-top: 70px;
+	border-top: 1px solid rgba(0,0,0,.1);
+	font-size: 16px;
+	
+}
+
+.loginModule .otherLogin .title{
+	color: rgba(0,0,0,.2);
+	width: 150px;
+	margin: -12px auto 0;
+	background: #fff;
+	text-align: center;
+	font-weight:normal;
+}
+
+.loginModule .otherLogin .link{
+	text-align: center;
+	margin: 5px 0 5px;
+}
+
+.loginModule .otherLogin .link a{
+	display: inline-block;
+	width: 48px;
+	color: rgba(0,0,0,.4);
+	margin: 0 10px;
+	background-size: 100% auto;
+	background-repeat: no-repeat;
+}
+.loginModule .otherLogin .link .icon-10{
+	background-image:url('../images/weixin.svg');
+	width: 35px;
+	height: 35px;
+}
+
 
 /* 用户中心页头 */
 .homeModule{padding-bottom: 45px;}
@@ -2428,9 +2463,9 @@ html,body{
 .topicListModule .topicList .item .topInfo .bRight .time{font-style:normal;}
 .topicListModule .topicList .item .title{
 	position:relative;
-	color:#222;padding:0px 10px 5px 10px;font-size:16px;
+	color:#222;padding:10px 10px 10px 10px;font-size:16px;
     line-height:24px;
-    max-height:48px;
+    max-height:42px;
     display: -webkit-box;
 	-webkit-box-orient: vertical;
 	-webkit-line-clamp: 2;
@@ -2462,7 +2497,7 @@ html,body{
 	position:relative;
 	color:#222;padding:0px 10px 5px 10px;font-size:16px;
     line-height:24px;
-    max-height:48px;
+    max-height:46px;
     display: -webkit-box;
 	-webkit-box-orient: vertical;
 	-webkit-line-clamp: 2;
@@ -2497,7 +2532,7 @@ html,body{
 	position:relative;
 	color:#222;padding:0px 10px 5px 10px;font-size:16px;
     line-height:24px;
-    max-height:48px;
+    max-height:46px;
     display: -webkit-box;
 	-webkit-box-orient: vertical;
 	-webkit-line-clamp: 2;
@@ -2551,9 +2586,9 @@ html,body{
 .questionListModule .questionList .item .topInfo .bRight .time{font-style:normal;}
 .questionListModule .questionList .item .title{
 	position:relative;
-	color:#222;padding:0px 10px 5px 10px;font-size:16px;
+	color:#222;padding:10px 10px 10px 10px;font-size:16px;
     line-height:24px;
-    max-height:48px;
+    max-height:42px;
     display: -webkit-box;
 	-webkit-box-orient: vertical;
 	-webkit-line-clamp: 2;
@@ -2585,7 +2620,7 @@ html,body{
 	position:relative;
 	color:#222;padding:0px 10px 5px 10px;font-size:16px;
     line-height:24px;
-    max-height:48px;
+    max-height:46px;
     display: -webkit-box;
 	-webkit-box-orient: vertical;
 	-webkit-line-clamp: 2;
@@ -2622,7 +2657,7 @@ html,body{
 	position:relative;
 	color:#222;padding:0px 10px 5px 10px;font-size:16px;
     line-height:24px;
-    max-height:48px;
+    max-height:46px;
     display: -webkit-box;
 	-webkit-box-orient: vertical;
 	-webkit-line-clamp: 2;

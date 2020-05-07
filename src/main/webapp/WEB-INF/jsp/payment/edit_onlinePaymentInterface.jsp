@@ -40,7 +40,7 @@ function SureSubmit(objForm){
 	    <TD class="t-label t-label-h" width="12%"><SPAN class="span-text">*</SPAN>名称：</TD>
 	    <TD class="t-content" width="88%" colSpan="3">
 	    	<input class="form-text" name="name" size="40" maxlength="80" value="${onlinePaymentInterface.name}">
-	    	&nbsp;<shop:errors path="name" cssClass="span-text"/>
+	    	&nbsp;<web:errors path="name" cssClass="span-text"/>
 	    </TD>
 	  </TR>
 	  <TR>
@@ -134,7 +134,7 @@ function SureSubmit(objForm){
 	    <TD class="t-label t-label-h" width="12%"><SPAN class="span-text">*</SPAN>排序：</TD>
 	    <TD class="t-content" width="88%" colSpan="3">
 	    	<input class="form-text" name="sort" size="8" maxlength="8" value="${onlinePaymentInterface.sort}">
-	    	&nbsp;<shop:errors path="sort" cssClass="span-text"/>
+	    	&nbsp;<web:errors path="sort" cssClass="span-text"/>
 	    </TD>
 	  </TR>
 	  

@@ -34,7 +34,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import cms.bean.ErrorView;
-import cms.bean.MediaInfo;
 import cms.bean.PageForm;
 import cms.bean.PageView;
 import cms.bean.QueryResult;
@@ -720,6 +719,8 @@ public class HomeManageAction {
 		viewUser.setGradeName(user.getGradeName());//将等级值设进等级参数里
 		viewUser.setAvatarPath(user.getAvatarPath());//头像路径
 		viewUser.setAvatarName(user.getAvatarName());//头像名称
+		viewUser.setType(user.getType());
+		viewUser.setPlatformUserId(user.getPlatformUserId());
 		
 		model.addAttribute("user",viewUser);
 
@@ -996,28 +997,33 @@ public class HomeManageAction {
 		}
 		
 		//验证数据
-		if(formbean.getPassword() != null && !"".equals(formbean.getPassword().trim())){
-			if(formbean.getPassword().trim().length() != 64){//判断是否是64位SHA256
-				error.put("password", ErrorView._801.name());//密码长度错误
-			}else{
-				new_user.setPassword(SHA.sha256Hex(formbean.getPassword().trim()+"["+user.getSalt()+"]"));
-				new_user.setSecurityDigest(new Date().getTime());
+		if(user.getType() <=30){//本地账户才允许设置的参数
+			if(formbean.getPassword() != null && !"".equals(formbean.getPassword().trim())){
+				if(formbean.getPassword().trim().length() != 64){//判断是否是64位SHA256
+					error.put("password", ErrorView._801.name());//密码长度错误
+				}else{
+					new_user.setPassword(SHA.sha256Hex(formbean.getPassword().trim()+"["+user.getSalt()+"]"));
+					new_user.setSecurityDigest(new Date().getTime());
+					
+					
+				}
 				
-				
-			}
-			
-			//比较旧密码
-			if(oldPassword != null && !"".equals(oldPassword.trim())){
-				if(!user.getPassword().equals(SHA.sha256Hex(oldPassword.trim()+"["+user.getSalt()+"]"))){
-					error.put("oldPassword", ErrorView._802.name());//旧密码错误
+				//比较旧密码
+				if(oldPassword != null && !"".equals(oldPassword.trim())){
+					if(!user.getPassword().equals(SHA.sha256Hex(oldPassword.trim()+"["+user.getSalt()+"]"))){
+						error.put("oldPassword", ErrorView._802.name());//旧密码错误
+					}
+				}else{
+					error.put("oldPassword", ErrorView._803.name());//旧密码不能为空
 				}
 			}else{
-				error.put("oldPassword", ErrorView._803.name());//旧密码不能为空
+				new_user.setPassword(user.getPassword());
+				new_user.setSecurityDigest(user.getSecurityDigest());
 			}
 		}else{
-			new_user.setPassword(user.getPassword());
 			new_user.setSecurityDigest(user.getSecurityDigest());
 		}
+		
 		
 		if(formbean.getNickname() != null && !"".equals(formbean.getNickname().trim())){
 			if(user.getNickname() == null || "".equals(user.getNickname().trim())){
@@ -1160,16 +1166,18 @@ public class HomeManageAction {
 					boolean rememberMe = maxAge >0 ? true :false;
 					
 					
-					oAuthManage.addAccessToken(accessToken, new AccessUser(_user.getId(),_user.getUserName(),_user.getNickname(),_user.getAvatarPath(),_user.getAvatarName(),_user.getSecurityDigest(),rememberMe));
-					oAuthManage.addRefreshToken(refreshToken, new RefreshUser(accessToken,_user.getId(),_user.getUserName(),_user.getNickname(),_user.getAvatarPath(),_user.getAvatarName(),_user.getSecurityDigest(),rememberMe));
+					oAuthManage.addAccessToken(accessToken, new AccessUser(_user.getId(),_user.getUserName(),_user.getNickname(),_user.getAvatarPath(),_user.getAvatarName(),_user.getSecurityDigest(),rememberMe,accessUser.getOpenId()));
+					oAuthManage.addRefreshToken(refreshToken, new RefreshUser(accessToken,_user.getId(),_user.getUserName(),_user.getNickname(),_user.getAvatarPath(),_user.getAvatarName(),_user.getSecurityDigest(),rememberMe,accessUser.getOpenId()));
 					
-					
+					//第三方openId
+					oAuthManage.addOpenId(accessUser.getOpenId(),refreshToken);
 					
 					//将访问令牌添加到Cookie
 					WebUtil.addCookie(response, "cms_accessToken", accessToken, maxAge);
 					//将刷新令牌添加到Cookie
 					WebUtil.addCookie(response, "cms_refreshToken", refreshToken, maxAge);
-					AccessUserThreadLocal.set(new AccessUser(_user.getId(),_user.getUserName(),_user.getNickname(),_user.getAvatarPath(),_user.getAvatarName(),_user.getSecurityDigest(),rememberMe));
+					AccessUserThreadLocal.set(new AccessUser(_user.getId(),_user.getUserName(),_user.getNickname(),_user.getAvatarPath(),_user.getAvatarName(),_user.getSecurityDigest(),rememberMe,accessUser.getOpenId()));
+					
 					
 					
 					

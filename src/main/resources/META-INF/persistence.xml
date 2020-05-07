@@ -24,7 +24,7 @@
 		<!-- 设置注解命名策略 -->
 		<property name="hibernate.physical_naming_strategy" value="cms.web.filter.MyPhysicalNamingStrategy"/>
 
-	
+		
   		<!-- 开启二级缓存 -->
 		<property name="hibernate.cache.use_second_level_cache" value="false"/>
 		<!-- 查询缓存 -->

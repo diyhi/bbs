@@ -921,6 +921,15 @@ function showDelta(obj,popId){
     <TD class="t-label t-label-h" width="12%">会员用户名：</TD>
     <TD class="t-content" width="63%" colSpan="2">
     	${user.userName}
+    	<c:if test="${user.type == 20}">
+    		&nbsp;&nbsp;手机用户：${user.platformUserId}
+    	</c:if>
+    	<c:if test="${user.type == 30}">
+    		&nbsp;&nbsp;邮箱用户：${user.platformUserId}
+    	</c:if>
+    	<c:if test="${user.type == 40}">
+    		&nbsp;&nbsp;微信用户：${user.platformUserId}
+    	</c:if>
     </TD>
     <TD class="t-content"  rowspan="6">
     	<c:if test="${user.avatarName != null}">

@@ -51,7 +51,7 @@ function sureSubmit(objForm){
 	<TR>
 	    <TD class="t-label t-label-h" width="12%"><SPAN class="span-text">*</SPAN>密码：</TD>
 	    <TD class="t-content" width="88%" colSpan="3">
-		    <input type="password" class="form-text" name="password" size="30" maxlength="30" value="${user.password }"/>
+		    <input type="password" class="form-text" name="password" size="30" maxlength="30" value="${user.password }" <c:if test="${user.type >=40}">disabled="disabled"</c:if>/>
 		    &nbsp;&nbsp;<span class="span-text">${error['password']}</span>
 		    <SPAN class="span-help">不修改请留空</SPAN>
 		</TD>
@@ -67,14 +67,14 @@ function sureSubmit(objForm){
 	<TR>
 	    <TD class="t-label t-label-h" width="12%"><SPAN class="span-text">*</SPAN>密码提示问题：</TD>
 	    <TD class="t-content" width="88%" colSpan="3">
-	    	<input class="form-text" name="issue" size="50" maxlength="40" value="${user.issue}"/>
+	    	<input class="form-text" name="issue" size="50" maxlength="40" value="${user.issue}" <c:if test="${user.type >=40}">disabled="disabled"</c:if>/>
 	    	&nbsp;&nbsp;<span class="span-text">${error['issue']}</span>
 	    </TD>
 	</TR>
 	<TR>
 	    <TD class="t-label t-label-h" width="12%"><SPAN class="span-text">*</SPAN>密码提示答案：</TD>
 	    <TD class="t-content" width="88%" colSpan="3">
-	    	<input class="form-text" name="answer" size="50" maxlength="40" value="${user.answer}"/>
+	    	<input class="form-text" name="answer" size="50" maxlength="40" value="${user.answer}" <c:if test="${user.type >=40}">disabled="disabled"</c:if>/>
 	    	&nbsp;&nbsp;<span class="span-text">${error['answer']}</span>
 	    	<SPAN class="span-help">不修改请留空</SPAN>
 	    </TD>

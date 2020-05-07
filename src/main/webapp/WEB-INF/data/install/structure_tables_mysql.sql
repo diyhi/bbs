@@ -421,6 +421,27 @@ CREATE TABLE `links` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 #
+# Structure for table "mediaprocessqueue"
+#
+
+CREATE TABLE `mediaprocessqueue` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `filePath` varchar(255) DEFAULT NULL,
+  `module` int(11) DEFAULT NULL,
+  `type` int(11) DEFAULT NULL,
+  `fileName` varchar(100) DEFAULT NULL,
+  `parameter` varchar(100) DEFAULT NULL,
+  `processProgress` double DEFAULT NULL,
+  `postTime` datetime DEFAULT NULL,
+  `errorInfo` longtext,
+  `ip` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `mediaProcessQueue_2_idx` (`fileName`),
+  KEY `mediaProcessQueue_1_idx` (`processProgress`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+#
 # Structure for table "membershipcard"
 #
 
@@ -1407,6 +1428,24 @@ CREATE TABLE `templates` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 #
+# Structure for table "thirdpartylogininterface"
+#
+
+CREATE TABLE `thirdpartylogininterface` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `dynamicParameter` longtext,
+  `enable` bit(1) NOT NULL,
+  `interfaceProduct` int(11) DEFAULT NULL,
+  `name` varchar(100) DEFAULT NULL,
+  `sort` int(11) DEFAULT NULL,
+  `supportEquipment` varchar(10) DEFAULT NULL,
+  `version` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+
+#
 # Structure for table "thumbnail"
 #
 
@@ -1721,8 +1760,11 @@ CREATE TABLE `user` (
   `nickname` varchar(50) DEFAULT NULL,
   `allowUserDynamic` bit(1) DEFAULT NULL,
   `deposit` decimal(14,4) DEFAULT NULL,
+  `platformUserId` varchar(90) DEFAULT NULL,
+  `type` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `UK4bakctviobmdk6ddh2nwg08c2` (`userName`),
+  UNIQUE KEY `UKmtrfpdps3j0ce18c8xglgjf7n` (`platformUserId`),
   KEY `user_idx` (`state`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

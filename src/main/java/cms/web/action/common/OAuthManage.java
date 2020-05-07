@@ -38,7 +38,7 @@ public class OAuthManage {
 	/**
 	 * 添加刷新令牌
 	 * @param refreshToken
-	 * @param accessToken 访问令牌
+	 * @param refreshUser 刷新令牌
 	 */
 	@CachePut(value="oAuthManage_cache_refreshToken",key="#refreshToken")
     public RefreshUser addRefreshToken(String refreshToken, RefreshUser refreshUser) {
@@ -53,6 +53,15 @@ public class OAuthManage {
 	@CachePut(value="oAuthManage_cache_accessToken",key="#accessToken")
     public AccessUser addAccessToken(String accessToken, AccessUser accessUser) {
 		return accessUser;
+    }
+	/**
+	 * 添加第三方用户的唯一标识(OpenId绑定到刷新令牌)
+	 * @param openId 第三方用户的唯一标识
+	 * @param refreshToken 刷新令牌号
+	 */
+	@CachePut(value="oAuthManage_cache_openId",key="#openId")
+    public String addOpenId(String openId, String refreshToken) {
+		return refreshToken;
     }
     
 	/**
@@ -74,6 +83,17 @@ public class OAuthManage {
     	return null;
     }
 	/**
+     * 根据第三方用户的唯一标识获取刷新令牌号
+     * @param openId 第三方用户的唯一标识
+     * @return
+     */
+	@Cacheable(value="oAuthManage_cache_openId",key="#openId")
+    public String getRefreshTokenByOpenId(String openId) {
+    	return null;
+    }
+	
+	
+	/**
 	 * 删除刷新令牌
 	 * @param refreshToken
 	 * @return
@@ -89,6 +109,18 @@ public class OAuthManage {
 	@CacheEvict(value="oAuthManage_cache_accessToken",key="#accessToken")
 	public void deleteAccessToken(String accessToken){
 	}
+	
+	
+	/**
+	 * 删除第三方用户的唯一标识
+	 * @param openId 第三方用户的唯一标识
+	 * @return
+	 */
+	@CacheEvict(value="oAuthManage_cache_openId",key="#openId")
+	public void deleteOpenId(String openId){
+	}
+	
+
     
     
 	/**
@@ -137,17 +169,34 @@ public class OAuthManage {
 		
 		
 		
-		oAuthManage.addAccessToken(new_accessToken, new AccessUser(refreshUser.getUserId(),refreshUser.getUserName(),nickname,avatarPath,avatarName, refreshUser.getSecurityDigest(),refreshUser.isRememberMe()));
+		oAuthManage.addAccessToken(new_accessToken, new AccessUser(refreshUser.getUserId(),refreshUser.getUserName(),nickname,avatarPath,avatarName, refreshUser.getSecurityDigest(),refreshUser.isRememberMe(),refreshUser.getOpenId()));
 		refreshUser.setAccessToken(new_accessToken);
 		oAuthManage.addRefreshToken(new_refreshToken, refreshUser);
 		
+		if(refreshUser.getOpenId() != null && !"".equals(refreshUser.getOpenId().trim())){
+			//第三方openId
+			oAuthManage.addOpenId(refreshUser.getOpenId(),new_refreshToken);
+		}
+		
+		
 		//将旧的刷新令牌的accessToken设为0
-		oAuthManage.addRefreshToken(oldRefreshToken, new RefreshUser("0",refreshUser.getUserId(),refreshUser.getUserName(),nickname,avatarPath,avatarName,refreshUser.getSecurityDigest(),refreshUser.isRememberMe()));
-		AccessUserThreadLocal.set(new AccessUser(refreshUser.getUserId(),refreshUser.getUserName(),nickname,avatarPath,avatarName,refreshUser.getSecurityDigest(),refreshUser.isRememberMe()));
+		oAuthManage.addRefreshToken(oldRefreshToken, new RefreshUser("0",refreshUser.getUserId(),refreshUser.getUserName(),nickname,avatarPath,avatarName,refreshUser.getSecurityDigest(),refreshUser.isRememberMe(),refreshUser.getOpenId()));
+		AccessUserThreadLocal.set(new AccessUser(refreshUser.getUserId(),refreshUser.getUserName(),nickname,avatarPath,avatarName,refreshUser.getSecurityDigest(),refreshUser.isRememberMe(),refreshUser.getOpenId()));
+		
+		
+		
+		
+		
+		//存放时间 单位/秒
+		int maxAge = 0;
+		if(refreshUser.isRememberMe()){
+			maxAge = WebUtil.cookieMaxAge;//默认Cookie有效期
+		}
+		
 		//将访问令牌添加到Cookie
-		WebUtil.addCookie(response, "cms_accessToken", new_accessToken, 0);
+		WebUtil.addCookie(response, "cms_accessToken", new_accessToken, maxAge);
 		//将刷新令牌添加到Cookie
-		WebUtil.addCookie(response, "cms_refreshToken", new_refreshToken, 0);
+		WebUtil.addCookie(response, "cms_refreshToken", new_refreshToken, maxAge);
 		
 		//写入登录日志
 		UserLoginLog userLoginLog = new UserLoginLog();

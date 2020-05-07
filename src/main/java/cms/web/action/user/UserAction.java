@@ -52,8 +52,8 @@ public class UserAction {
 	@Resource UserCustomService userCustomService;
 	
 	@Resource SettingService settingService;
-	
-		
+	@Resource UserManage userManage;
+
 	/**
 	 * 用户列表
 	 * @param formbean
@@ -69,7 +69,7 @@ public class UserAction {
 	public String execute(User formbean,PageForm pageForm,Boolean queryState,ModelMap model,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {	
-		
+	
 		
 		//调用分页算法代码
 		PageView<User> pageView = new PageView<User>(settingService.findSystemSetting_cache().getBackstagePageNumber(),pageForm.getPage(),10);
@@ -104,6 +104,16 @@ public class UserAction {
 				
 			}
 		}
+		
+		if(pageView.getRecords() != null && pageView.getRecords().size() >0){
+			for(User user : pageView.getRecords()){//取得所有用户
+				if(user.getType() >10){
+					user.setPlatformUserId(userManage.platformUserIdToThirdPartyUserId(user.getPlatformUserId()));
+				}
+				
+			}
+		}
+		
 		request.setAttribute("pageView", pageView);
 		return "jsp/user/userList";
 	}
@@ -151,13 +161,7 @@ public class UserAction {
 		//验证参数
 		if(searchType.equals(1)){//用户名
 			if(userName != null && !"".equals(userName.trim())){
-				boolean userNmaeVerification = Verification.isNumericLettersUnderscore(userName.trim());
-				if(userNmaeVerification){
-					_userName = userName.trim();
-					
-				}else{
-					error.put("userName", "会员用户名只能输入由数字、26个英文字母或者下划线组成");
-				}
+				_userName = userName.trim();
 			}else{
 				error.put("userName", "请填写用户名");
 			}	
@@ -521,6 +525,14 @@ public class UserAction {
 					//将查询结果集传给分页List
 					pageView.setQueryResult(qr);
 				}
+			}
+		}
+		if(pageView.getRecords() != null && pageView.getRecords().size() >0){
+			for(User user : pageView.getRecords()){//取得所有用户
+				if(user.getType() >10){
+					user.setPlatformUserId(userManage.platformUserIdToThirdPartyUserId(user.getPlatformUserId()));
+				}
+				
 			}
 		}
 		

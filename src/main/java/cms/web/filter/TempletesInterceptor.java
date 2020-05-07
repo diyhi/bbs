@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import cms.bean.setting.SystemSetting;
+import cms.bean.thirdParty.WeChatConfig;
 import cms.bean.user.AccessUser;
 import cms.bean.user.RefreshUser;
 import cms.bean.user.UserState;
@@ -30,6 +31,7 @@ import cms.web.action.CSRFTokenManage;
 import cms.web.action.common.OAuthManage;
 import cms.web.action.statistic.PageViewManage;
 import cms.web.action.template.TemplateMain;
+import cms.web.action.thirdParty.ThirdPartyManage;
 import cms.web.action.user.RoleAnnotation;
 import cms.web.action.user.UserManage;
 import cms.web.action.user.UserRoleManage;
@@ -64,6 +66,8 @@ public class TempletesInterceptor extends HandlerInterceptorAdapter {
 	@Resource UserManage userManage;
 	
 	@Resource UserRoleManage userRoleManage;
+	@Resource ThirdPartyManage thirdPartyManage;
+	
 	
 	//?  匹配任何单字符
 	//*  匹配0或者任意数量的字符
@@ -84,7 +88,7 @@ public class TempletesInterceptor extends HandlerInterceptorAdapter {
 	  
 	public boolean preHandle(HttpServletRequest request,HttpServletResponse response, 
 			Object handler) throws Exception { 
-	//System.out.println(request.getRequestURI()+" -- "+request.getQueryString());
+	//System.out.println(request.getRequestURI()+" -- "+request.getQueryString()+" -- "+request.getMethod());
 		
 		//拦截用户角色处理 注解参考： @RoleAnnotation(resourceCode=ResourceEnum._2001000)
 		if(handler instanceof HandlerMethod){
@@ -261,6 +265,14 @@ public class TempletesInterceptor extends HandlerInterceptorAdapter {
 	    			request.setAttribute("baseURI",Configuration.baseURI(request.getRequestURI(), request.getContextPath()));//系统资源标识符
 	    			request.setAttribute("token",csrf_token);
 	    			request.setAttribute("identificationNumber",UUIDUtil.getUUID32());//识别号：用来区别每次请求
+	    			
+	    			
+	    			WeChatConfig weChatConfig = thirdPartyManage.queryWeChatConfig();
+	    	    	if(weChatConfig != null){
+	    	    		request.setAttribute("weixin_oa_appid",weChatConfig.getOa_appID());//微信公众号appid
+	    	    	}
+	    			
+	    			
 	    			
     		    	if(requestName != null && !"".equals(requestName)){
     		    		

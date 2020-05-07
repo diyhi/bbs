@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
-
 import cms.bean.QueryResult;
 import cms.bean.user.DisableUserName;
 import cms.bean.user.PointLog;
@@ -72,7 +71,12 @@ public interface UserService extends DAO<User> {
 	 * @return
 	 */
 	public User findUserByNickname(String nickname);
-	
+	/**
+	 * 根据平台用户Id查询当前用户
+	 * @param platformUserId 平台用户Id
+	 * @return
+	 */
+	public User findUserByPlatformUserId(String platformUserId);
 	/**
 	 * 保存用户
 	 * @param user 用户

@@ -27,10 +27,12 @@ public class RefreshUser implements Serializable{
 	/** 记住密码 **/
 	private boolean rememberMe = false;
 	
+	/** 第三方用户的唯一标识 例如微信的openid **/
+	private String openId;
 	
 	public RefreshUser() {}
 	public RefreshUser(String accessToken, Long userId, String userName, String nickname, String avatarPath,
-			String avatarName, Long securityDigest, boolean rememberMe) {
+			String avatarName, Long securityDigest, boolean rememberMe,String openId) {
 		this.accessToken = accessToken;
 		this.userId = userId;
 		this.userName = userName;
@@ -39,6 +41,7 @@ public class RefreshUser implements Serializable{
 		this.avatarName = avatarName;
 		this.securityDigest = securityDigest;
 		this.rememberMe = rememberMe;
+		this.openId = openId;
 	}
 	public Long getUserId() {
 		return userId;
@@ -92,5 +95,12 @@ public class RefreshUser implements Serializable{
 	public void setNickname(String nickname) {
 		this.nickname = nickname;
 	}
+	public String getOpenId() {
+		return openId;
+	}
+	public void setOpenId(String openId) {
+		this.openId = openId;
+	}
+	
 	
 }

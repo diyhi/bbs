@@ -14,6 +14,7 @@
 		<script language="javascript" src="${commonPath}js/tool.js" type="text/javascript"></script>
 		<script language="javascript" src="${commonPath}js/ajax.js" type="text/javascript"></script>
 		<script language="javascript" src="${commonPath}js/json2.js" type="text/javascript"></script>
+		
     </head>
     <body>
     <#-- 引入页头 -->
@@ -27,7 +28,7 @@
 	           	
 	           	<div class="loginModule clearfix">
 	           		<div class="head">
-						<p>用户登录</p>
+						<p class="title">用户登录</p>
 					</div>
 					<div class="box">
 						<!-- 用户名 -->
@@ -83,7 +84,11 @@
 							<a href="javascript:void(0);" onClick="javascript:ajaxSubmit()" tabindex="6">登&nbsp;录</a>
 						</p>
 					</div>
-					 
+					
+					
+					<#-- 引入第三方登录模块 -->
+					<@include action="${systemRelated_thirdPartyLogin_1}"/>
+					
 				</div>
 				<div class="push"><!-- 将页脚固定在页面底部 --></div>
 				

@@ -153,6 +153,10 @@ public class UserManageAction {
 		user.setPassword(null);//密码不显示
 		user.setAnswer(null);//密码提示答案不显示
 		user.setSalt(null);//盐值不显示
+		if(user.getType() >10){
+			user.setPlatformUserId(userManage.platformUserIdToThirdPartyUserId(user.getPlatformUserId()));
+		}
+		
 		
 		List<UserGrade> userGradeList = userGradeService.findAllGrade();
 		if(userGradeList != null && userGradeList.size() >0){
@@ -561,7 +565,8 @@ public class UserManageAction {
 		//允许显示用户动态
 		user.setAllowUserDynamic(formbean.getAllowUserDynamic());
 		user.setSecurityDigest(new Date().getTime());
-		
+		user.setType(10);
+		user.setPlatformUserId(user.getUserName());
 		//用户自定义注册功能项用户输入值集合
 		List<UserInputValue> all_userInputValueList = new ArrayList<UserInputValue>();
 	
@@ -877,34 +882,38 @@ public class UserManageAction {
 		}else{
 			new_user.setNickname(null);
 		}
-		if(formbean.getPassword() != null && !"".equals(formbean.getPassword().trim())){//密码
-			if(formbean.getPassword().length()>30){
-				error.put("password", "密码不能超过30个字符");
+		if(user.getType() <=30){//本地账户才允许设置的参数
+			if(formbean.getPassword() != null && !"".equals(formbean.getPassword().trim())){//密码
+				if(formbean.getPassword().length()>30){
+					error.put("password", "密码不能超过30个字符");
+				}
+				//密码
+				new_user.setPassword(SHA.sha256Hex(SHA.sha256Hex(formbean.getPassword().trim())+"["+user.getSalt()+"]"));
+				new_user.setSecurityDigest(new Date().getTime());
+			}else{
+				new_user.setPassword(user.getPassword());
+				new_user.setSecurityDigest(user.getSecurityDigest());
 			}
-			//密码
-			new_user.setPassword(SHA.sha256Hex(SHA.sha256Hex(formbean.getPassword().trim())+"["+user.getSalt()+"]"));
-			new_user.setSecurityDigest(new Date().getTime());
-		}else{
-			new_user.setPassword(user.getPassword());
-			new_user.setSecurityDigest(user.getSecurityDigest());
-		}
-		if(formbean.getIssue() != null && !"".equals(formbean.getIssue().trim())){//密码提示问题
-			if(formbean.getIssue().length()>50){
-				error.put("issue", "密码提示问题不能超过50个字符");
+			if(formbean.getIssue() != null && !"".equals(formbean.getIssue().trim())){//密码提示问题
+				if(formbean.getIssue().length()>50){
+					error.put("issue", "密码提示问题不能超过50个字符");
+				}
+				new_user.setIssue(formbean.getIssue().trim());
+			}else{
+				error.put("issue", "密码提示问题不能为空");
 			}
-			new_user.setIssue(formbean.getIssue().trim());
-		}else{
-			error.put("issue", "密码提示问题不能为空");
-		}
-		if(formbean.getAnswer() != null && !"".equals(formbean.getAnswer().trim())){//密码提示答案
-			if(formbean.getAnswer().length()>50){
-				error.put("answer", "密码提示答案不能超过50个字符");
+			if(formbean.getAnswer() != null && !"".equals(formbean.getAnswer().trim())){//密码提示答案
+				if(formbean.getAnswer().length()>50){
+					error.put("answer", "密码提示答案不能超过50个字符");
+				}
+				//密码提示答案由  密码提示答案原文sha256  进行sha256组成
+				new_user.setAnswer(SHA.sha256Hex(SHA.sha256Hex(formbean.getAnswer().trim())));
+			}else{
+				new_user.setAnswer(user.getAnswer());
 			}
-			//密码提示答案由  密码提示答案原文sha256  进行sha256组成
-			new_user.setAnswer(SHA.sha256Hex(SHA.sha256Hex(formbean.getAnswer().trim())));
-		}else{
-			new_user.setAnswer(user.getAnswer());
+			
 		}
+		
 		if(formbean.getEmail() != null && !"".equals(formbean.getEmail().trim())){//邮箱
 			if(Verification.isEmail(formbean.getEmail().trim()) == false){
 				error.put("email", "Email地址不正确");

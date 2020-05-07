@@ -897,7 +897,7 @@
 						<tr>
 							<td align="right">旧密码： </td>
 							<td align="left">
-								<input type="password" id="oldPassword" name="oldPassword" class="formText" autocomplete="off" size="25" maxlength="20" onBlur="verification(this.id)"/>
+								<input type="password" id="oldPassword" name="oldPassword" class="formText" autocomplete="off" size="25" maxlength="20" onBlur="verification(this.id)" <#if user.type gte 40 > disabled='disabled'</#if>/>
 								<span id="oldPassword_error" class="error">${(error['oldPassword'])!}</span>
 								<span class="help">不修改密码请留空</span> 
 							</td>
@@ -905,7 +905,7 @@
 						<tr>
 							<td align="right">密码： </td>
 							<td>
-								<input type="password" id="password" name="password" class="formText" autocomplete="off" size="25" maxlength="20" onBlur="verification(this.id)"/>
+								<input type="password" id="password" name="password" class="formText" autocomplete="off" size="25" maxlength="20" onBlur="verification(this.id)" <#if user.type gte 40 > disabled='disabled'</#if> />
 								<span id="password_error" class="error">${(error['password'])!}</span>
 								<span class="help">不修改请留空</span> 
 							</td>
@@ -914,7 +914,7 @@
 						<tr>
 							<td align="right">确认密码:</td>
 							<td align="left">
-								<input type="password" id="confirmPassword" class="formText" autocomplete="off" size="25" maxlength="20" onBlur="verification(this.id)"/>
+								<input type="password" id="confirmPassword" class="formText" autocomplete="off" size="25" maxlength="20" onBlur="verification(this.id)" <#if user.type gte 40 > disabled='disabled'</#if> />
 								<span id="confirmPassword_error" class="error"></span>
 								<span class="help">不修改请留空</span>
 							</td>

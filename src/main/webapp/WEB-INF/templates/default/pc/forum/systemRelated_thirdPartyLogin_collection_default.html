@@ -1,0 +1,14 @@
+<#--  第三方登录 -->
+<@function>
+	<#if systemRelated_thirdPartyLogin_collection?? && systemRelated_thirdPartyLogin_collection?size gt 0>
+		<#assign supportLoginInterfaceList = systemRelated_thirdPartyLogin_collection>
+		<div class="otherLogin">
+	       	<h4 class="title">其他登录方式</h4>
+	       	<p class="link">
+	       		<#list supportLoginInterfaceList as supportLoginInterface>
+	       			<a href="thirdParty/loginLink?interfaceProduct=${supportLoginInterface.interfaceProduct}&jumpUrl=${url_jumpUrl}" class="icon-${supportLoginInterface.interfaceProduct}" title="${supportLoginInterface.name}"></a>
+	       		</#list>
+	       	</p>
+	    </div>
+    </#if>
+</@function>

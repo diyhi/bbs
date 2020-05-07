@@ -124,7 +124,7 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 		}
 		
 		//mysql强制使用索引:force index(索引名或者主键PRI)
-		String sql ="select t2.id, t2.userName,t2.nickname, t2.email, t2.registrationDate, t2.point, t2.state from(select o.id from user o force index(user_idx) "+(param != null && !"".equals(param.trim()) ? " where "+param:" ")+orderBy+" limit ?,?)t1,user t2 where t1.id=t2.id";
+		String sql ="select t2.id, t2.userName,t2.nickname, t2.email, t2.registrationDate, t2.point, t2.state,t2.type,t2.platformUserId from(select o.id from user o force index(user_idx) "+(param != null && !"".equals(param.trim()) ? " where "+param:" ")+orderBy+" limit ?,?)t1,user t2 where t1.id=t2.id";
 
 		Query query =  em.createNativeQuery(sql);
 		int placeholder = 1;//占位符参数
@@ -154,6 +154,8 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 				user.setRegistrationDate(ObjectConversion.conversion(object[4], ObjectConversion.TIMESTAMP));
 				user.setPoint(ObjectConversion.conversion(object[5], ObjectConversion.LONG));
 				user.setState(ObjectConversion.conversion(object[6], ObjectConversion.INTEGER));
+				user.setType(ObjectConversion.conversion(object[7], ObjectConversion.INTEGER));
+				user.setPlatformUserId(ObjectConversion.conversion(object[8], ObjectConversion.STRING));
 				userList.add(user);
 			}
 		}
@@ -209,7 +211,7 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 
 
 		//mysql强制使用索引:force index(索引名或者主键PRI)
-		String sql ="select t2.id,t2.userName,t2.nickname,t2.email,t2.registrationDate,t2.point,t2.state from(select u.userId from  user o, userinputvalue u where "+customParam+param+" group by u.userId having count(u.userId)>=? "+orderBy+" limit ?,?)t1,user t2 where t1.userId=t2.id";
+		String sql ="select t2.id,t2.userName,t2.nickname,t2.email,t2.registrationDate,t2.point,t2.state,t2.type,t2.platformUserId from(select u.userId from  user o, userinputvalue u where "+customParam+param+" group by u.userId having count(u.userId)>=? "+orderBy+" limit ?,?)t1,user t2 where t1.userId=t2.id";
 
 		Query query =  em.createNativeQuery(sql);
 
@@ -238,6 +240,8 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 				user.setRegistrationDate(ObjectConversion.conversion(object[4], ObjectConversion.TIMESTAMP));
 				user.setPoint(ObjectConversion.conversion(object[5], ObjectConversion.LONG));
 				user.setState(ObjectConversion.conversion(object[6], ObjectConversion.INTEGER));
+				user.setType(ObjectConversion.conversion(object[7], ObjectConversion.INTEGER));
+				user.setPlatformUserId(ObjectConversion.conversion(object[8], ObjectConversion.STRING));
 				userList.add(user);
 	
 			}
@@ -363,6 +367,35 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 		return null;
 		
 	}
+	
+	/**
+	 * 根据平台用户Id查询当前用户
+	 * @param platformUserId 平台用户Id
+	 * @return
+	 */
+	@Transactional(readOnly=true,propagation=Propagation.NOT_SUPPORTED)
+	public User findUserByPlatformUserId(String platformUserId){
+		Query query =  em.createQuery("select o from User o where o.platformUserId=?1");
+		//设置参数 
+		query.setParameter(1, platformUserId);
+		List<User> userList = query.getResultList();
+		for(User user : userList){
+			List<UserGrade> userGradeList = userGradeService.findAllGrade();//取得用户所有等级
+			if(userGradeList != null && userGradeList.size() >0){
+				for(UserGrade userGrade : userGradeList){
+					if(user.getPoint() >= userGrade.getNeedPoint()){
+						user.setGradeId(userGrade.getId());
+						user.setGradeName(userGrade.getName());//将等级值设进等级参数里
+						break;
+					}
+				} 
+			}
+			return user;
+		}
+		return null;
+		
+	}
+	
 	
 	/**
 	 * 保存用户

@@ -149,6 +149,7 @@ public class ForumCodeManage {
 		//系统
 		List<ForumCodeNode> childNode18 =  new ArrayList<ForumCodeNode>();//添加二级节点
 		childNode18.add(new ForumCodeNode(18001,"热门搜索词","systemRelated_searchWord_",Arrays.asList(new String[]{"集合"})));
+		childNode18.add(new ForumCodeNode(18010,"第三方登录","systemRelated_thirdPartyLogin_",Arrays.asList(new String[]{"集合"})));
 		forumCodeNodeList.add(new ForumCodeNode(118,"系统",childNode18));//添加一级节点
 		
 		List<ForumCodeFile> forumCodeFileList = this.readForumCodeFile(dirName);

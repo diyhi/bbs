@@ -428,6 +428,9 @@ function initConfig(){
 	config.additem('短信接口列表',t,'${config:url(pageContext.request)}control/smsInterface/list${config:suffix()}');
 	config.additem('短信发送错误日志',t,'${config:url(pageContext.request)}control/sendSmsLog/list${config:suffix()}');
 	
+	t=config.addtitle('第三方服务管理','系统设置',1);
+	config.additem('第三方登录接口列表',t,'${config:url(pageContext.request)}control/thirdPartyLoginInterface/list${config:suffix()}');
+	
 	t=config.addtitle('缩略图管理','系统设置',1);
 	config.additem('缩略图列表',t,'${config:url(pageContext.request)}control/thumbnail/list${config:suffix()}');
 

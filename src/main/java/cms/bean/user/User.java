@@ -29,8 +29,9 @@ import org.joda.time.DateTime;
  */
 @Entity
 @Table(name="user",uniqueConstraints = {
-		@UniqueConstraint(columnNames={"userName"}
-   )},indexes = {@Index(name="user_idx", columnList="state")}
+		@UniqueConstraint(columnNames={"userName"}),
+		@UniqueConstraint(columnNames={"platformUserId"}
+	)},indexes = {@Index(name="user_idx", columnList="state")}
 )//给user字段添加唯一性约束
 public class User implements Serializable{
 	private static final long serialVersionUID = 3692366870616346904L;
@@ -84,6 +85,12 @@ public class User implements Serializable{
 	/** 当前预存款 **/
 	@Column(precision=14, scale=4) 
 	private BigDecimal deposit = new BigDecimal("0");
+	
+	/** 用户类型 10:本地账号密码用户 20: 手机用户 30: 邮箱用户 40:微信用户 **/
+	private Integer type = 10;
+	/** 平台用户Id   本地账号密码用户类型为'会员用户名';  手机用户类型为'手机号-mobile';  邮箱用户类型为'邮箱-email';  第三方用户类型的为'第三方用户Id-第三方平台标记',例如微信为'unionid-weixin' **/
+	@Column(length=90)
+	private String platformUserId;
 	
 	/** 用户状态    1:正常用户   2:禁止用户   11: 正常用户删除   12: 禁止用户删除 **/
 	private Integer state = 1;
@@ -253,6 +260,18 @@ public class User implements Serializable{
 	}
 	public void setDeposit(BigDecimal deposit) {
 		this.deposit = deposit;
+	}
+	public Integer getType() {
+		return type;
+	}
+	public void setType(Integer type) {
+		this.type = type;
+	}
+	public String getPlatformUserId() {
+		return platformUserId;
+	}
+	public void setPlatformUserId(String platformUserId) {
+		this.platformUserId = platformUserId;
 	}
 
 }

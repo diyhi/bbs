@@ -260,6 +260,12 @@ html,body{
 
 /* 表单 text */
 .formText{height:24px; line-height:24px; padding:2px 4px;border:1px solid;border-color:#e0e0e0 #e0e0e0 #e0e0e0 #e0e0e0;background:#fff;border-radius:3px;}
+.formText:disabled{  
+    border: 1px solid #e6e6e6;  
+    background-color: #fbfbfb;  
+    color:#c9c9c9;
+    border-radius:2px;
+} 
 /* 表单 select */
 .formSelect{height:30px; line-height:30px; padding:2px 4px;border:1px solid;border-color:#e0e0e0 #e0e0e0 #e0e0e0 #e0e0e0;background:#fff;border-radius:3px;margin-right: 1px;}
 
@@ -2341,13 +2347,14 @@ html,body{
 }
 
 /* 登录 */
-.loginModule{background: #fff;padding:15px 25px 15px 15px;width:600px;color:#6e6e6e;margin:80px auto; border:1px solid #eef2f4;box-shadow: 0px 1px 2px #eee;}
+.loginModule{background: #fff;padding:15px 25px 35px 15px;width:600px;color:#6e6e6e;margin:80px auto; border:1px solid #eef2f4; box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);}
 .loginModule a,.loginModule a:hover{color:#1a66b3;}
 .loginModule input{outline:none;}
-.loginModule .head{padding:1px 0 6px 146px;height:auto !important;height:10px;font-size:16px;;border-bottom:1px solid #eef2f4;}
+.loginModule .head{padding:0px 0px 10px 0px;border-bottom:1px solid #eef2f4;}
+.loginModule .head .title{width:310px;margin:0 auto;text-align: center;font-weight:600;font-size:20px;color:#999;}
 .loginModule .box{width:310px;margin:0 auto;}
 .loginModule .box .username,.loginModule .box .password,.loginModule .box .captchaBox{height:36px;border:1px solid #e6e6e6;width:310px; border-radius:2px; }
-.loginModule .box .username { margin-top:15px; position:relative;}
+.loginModule .box .username { margin-top:20px; position:relative;}
 .loginModule .box .clearUserName { width:10px; height:11px; display:block; top:12px; left:290px; position:absolute; background:url(../images/login.png) -85px -5px no-repeat;}
 .loginModule .box .clearUserName:hover { background-position:-107px -5px;;}
 .loginModule .box .promptTag { float:left; font-size:13px; height:21px; line-height:21px; cursor:text; margin-top:-25px; color:#B0B0B0;}
@@ -2371,6 +2378,41 @@ html,body{
 .loginModule .box .loginButton a:hover{background:#45b6f7;text-decoration:none;}
 .loginModule .box .username.focus,.loginModule .box .password.focus,.loginModule .box .captchaBox.focus{border-color:#969696;}
 .loginModule .box .username.blur,.loginModule .box .password.blur,.loginModule .box .captchaBox.blur{border-color:#e6e6e6; color:#a0a0a0;}
+.loginModule .otherLogin{
+	width:310px;
+	margin:0 auto;
+	margin-top: 30px;
+	border-top: 1px solid rgba(0,0,0,.1);
+	font-size: 14px;
+}
+
+.loginModule .otherLogin .title{
+	color: rgba(0,0,0,.2);
+	width: 100px;
+	margin: -12px auto 0;
+	background: #fff;
+	text-align: center
+}
+
+.loginModule .otherLogin .link{
+	text-align: center;
+	margin: 10px 0 0px;
+}
+
+.loginModule .otherLogin .link a{
+	display: inline-block;
+	width: 48px;
+	color: rgba(0,0,0,.4);
+	margin: 0 10px;
+	background-size: 100% auto;
+	background-repeat: no-repeat;
+}
+.loginModule .otherLogin .link .icon-10{
+	background-image:url('../images/weixin.svg');
+	width: 30px;
+	height: 30px;
+}
+
 
 /* 找回密码 */
 .findPassWordModule{
@@ -5802,6 +5844,7 @@ html,body{
 .footer .copyright a { font-family: Tahoma; margin-left: 16px; color: #999;}
 .footer .copyright a:hover { text-decoration: underline; }
 .footer .copyright span { margin-left: 17px; }
+
 
 
 

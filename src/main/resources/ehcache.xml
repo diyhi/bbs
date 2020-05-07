@@ -93,10 +93,21 @@
 		overflowToDisk="true"
 		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="2592000" 
 		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>		
-	<!-- 开放授权管理 - 访问令牌 604800为一个星期-->		
+	<!-- 开放授权管理 - 访问令牌 7200为两小时-->		
 	<cache name="oAuthManage_cache_accessToken" maxElementsInMemory="99999999" 
 		overflowToDisk="true"
 		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="7200" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>		
+	<!-- 开放授权管理 - 第三方用户的唯一标识 过期时间必须和'oAuthManage_cache_refreshToken'一致 -->		
+	<cache name="oAuthManage_cache_openId" maxElementsInMemory="99999999" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="2592000" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
+		
+	<!-- 第三方服务管理 - 微信第三方用户的唯一标识票据 -->		
+	<cache name="thirdPartyManage_cache_weiXinOpenId" maxElementsInMemory="99999999" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="300" 
 		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>		
 		
 			
@@ -410,8 +421,13 @@
 		overflowToDisk="true"
 		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
 		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>		
-	<!-- 支付 (更新一个全部刷新)-->	
+	<!-- 支付接口 (更新一个全部刷新)-->	
 	<cache name="paymentServiceBean_cache" maxElementsInMemory="100000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
+	<!-- 第三方登录接口 -->	
+	<cache name="thirdPartyLoginServiceBean_cache" maxElementsInMemory="1" 
 		overflowToDisk="true"
 		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
 		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>		

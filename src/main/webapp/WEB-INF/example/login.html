@@ -13,6 +13,10 @@
 			<td>请求方式</td> 
 			<td colspan="2">GET</td>
 		</tr>
+		<tr> 
+			<td>请求参数</td> 
+			<td colspan="2"><a style="color: #317ee7" onclick="anchorJump('#anchor_500'); return false;">参数表</a></td>
+		</tr>
 		<tr>
 			<td rowspan="1">返回值</td> 
 			<td>表单验证码</td> 
@@ -256,6 +260,27 @@
 		</tr>
 	</tbody> 
 </table>
+<table id="anchor_500" class="exampleTable" > 
+	<thead>
+		<tr> 
+			<th colspan="4">访问'会员登录'页参数</th>
+		</tr>
+		<tr> 
+			<th width="30%">参数</th> 
+			<th width="20%">类型</th> 
+			<th width="10%">是否必填</th> 
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	 <tbody>
+	 	<tr> 
+			<td>code</td> 
+			<td>String</td>
+			<td>按需填写</td>
+			<td>微信公众号code 在微信浏览器使用此参数可以实现保持登录状态</td> 
+		</tr>
+	</tbody> 
+</table>
 <table id="anchor_600" class="exampleTable" > 
 	<thead>
 		<tr> 
@@ -298,6 +323,12 @@
 			<td>String</td>
 			<td>是</td>
 			<td>令牌</td> 
+		</tr>
+		<tr> 
+			<td>thirdPartyOpenId</td> 
+			<td>String</td>
+			<td>按需填写</td>
+			<td>第三方用户获取唯一标识  例如微信公众号openid</td> 
 		</tr>
 		<tr> 
 			<td>jumpUrl</td> 

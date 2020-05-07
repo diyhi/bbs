@@ -31,12 +31,14 @@ public class UserCustom implements Serializable{
 	/** 后台可搜索 **/
 	private boolean search = false;
 	/** 是否显示 **/
+	@Column(name="\"visible\"")
 	private boolean visible = true;
 	/** 选框类型  1.输入框 2.单选按钮  3.多选按钮 4.下拉列表  5.文本域textarea   **/
 	private Integer chooseType = 1;
 	
 	/** 参数值  json LinkedHashMap<String,String>格式 **/
 	@Lob
+	@Column(name="\"value\"")
 	private String value;
 	/** 参数值 **/
 	@Transient
@@ -58,6 +60,7 @@ public class UserCustom implements Serializable{
 	private Integer selete_size;
 	
 	/** 文本域内的可见行数 **/
+	@Column(name="\"rows\"")
 	private Integer rows;
 	/** 文本域内的可见宽度 **/
 	private Integer cols;

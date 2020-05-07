@@ -189,7 +189,18 @@ function reductionUser(){
    <c:forEach items="${pageView.records}" var="entry">
 	  <TR >
 	  	<TD width="3%"><INPUT type="checkbox" value="${entry.id }" name="userId" onclick="javascript:chooseSelectBox(this);"></TD>
-	    <TD width="15%">${entry.userName }</TD>
+	    <TD width="15%">
+	    	${entry.userName } 
+	    	<c:if test="${entry.type == 20}">
+	    		手机用户：${entry.platformUserId}
+	    	</c:if>
+	    	<c:if test="${entry.type == 30}">
+	    		邮箱用户：${entry.platformUserId}
+	    	</c:if>
+	    	<c:if test="${entry.type == 40}">
+	    		微信用户：${entry.platformUserId}
+	    	</c:if>
+	    </TD>
 	    <TD width="12%">${entry.nickname}</TD>
 	    <TD width="10%">${entry.point}</TD>
 	    <TD width="15%">${entry.gradeName}</TD>

@@ -296,7 +296,18 @@ function deleteUser(userId,state){
   <TBODY class="t-list-tbody" align="center">
    <c:forEach items="${pageView.records}" var="entry">
 	  <TR >
-	    <TD>${entry.userName}</TD>
+	    <TD>
+	    	${entry.userName}
+	    	<c:if test="${entry.type == 20}">
+	    		手机用户：${entry.platformUserId}
+	    	</c:if>
+	    	<c:if test="${entry.type == 30}">
+	    		邮箱用户：${entry.platformUserId}
+	    	</c:if>
+	    	<c:if test="${entry.type == 40}">
+	    		微信用户：${entry.platformUserId}
+	    	</c:if>
+	    </TD>
 	    <TD>${entry.nickname}</TD>
 		<TD>${entry.point}</TD>
 	    <TD><fmt:formatDate value="${entry.registrationDate}"  pattern="yyyy-MM-dd HH:mm:ss"/></TD>

@@ -22,6 +22,7 @@ import cms.bean.template.Column;
 import cms.bean.template.CustomHTML;
 import cms.bean.template.Forum;
 import cms.bean.template.Layout;
+import cms.bean.thirdParty.SupportLoginInterface;
 import cms.bean.topic.Comment;
 import cms.bean.topic.Tag;
 import cms.bean.topic.Topic;
@@ -382,7 +383,14 @@ public class TemplateMain {
 				List<String> value = system_TemplateManage.searchWord_collection(forum, submitParameter,runtimeParameter);
 				return value;
 			}	
+		}else if(forum.getForumChildType().equals("第三方登录")){
+			if(forum.getDisplayType().equals("collection")){//集合
+				List<SupportLoginInterface> value = system_TemplateManage.thirdPartyLogin_collection(forum, submitParameter,runtimeParameter);
+				return value;
+			}	
 		}
+		
+		
 		
 		return null;	
 	}

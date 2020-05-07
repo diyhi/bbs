@@ -17,6 +17,8 @@ $.ajaxSettings = $.extend($.ajaxSettings, {
 			spinnerType : 'fading-circle'
 		}); //显示旋转进度条
 	//	XMLHttpRequest.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+		
+		
 	},
 	complete : function complete(XMLHttpRequest, textStatus) {
 		if(XMLHttpRequest.status == 508){
@@ -453,7 +455,7 @@ var index_component = Vue.extend({
 							_self.next = '';
 						}
 						
-						/**
+						
 						//生成首字符头像
 						_self.$nextTick(function() {
 							if (_self.topicList != null && _self.topicList.length > 0) {
@@ -468,7 +470,7 @@ var index_component = Vue.extend({
 								}
 							}
 						});
-						**/
+						
 						
 					}
 				}
@@ -885,6 +887,8 @@ var index_component = Vue.extend({
 			}
 			//查询话题列表
 			this.queryTopicList();
+			
+			
 		},
 		
 		
@@ -1157,13 +1161,14 @@ var thread_component = Vue.extend({
 				        resumePlayerNodeData : function(){
 				        	var _self = this;
 				        	_self.$nextTick(function() {
-				        		
 					        	if(_self.$parent.playerObjectList.length >0){
 					        		for(var i=0; i< _self.$parent.playerNodeList.length; i++){
 					        			var playerNode = _self.$parent.playerNodeList[i];
 					        			var playerId = playerNode.getAttribute("id");
 					        			var node = document.getElementById(playerId);
-					        			node.parentNode.replaceChild(playerNode,node);
+					        			if(node != null){
+					        				node.parentNode.replaceChild(playerNode,node);
+					        			}
 					        			
 					        		}
 					        	}
@@ -1214,6 +1219,10 @@ var thread_component = Vue.extend({
 					if (result != "") {
 						var topic = $.parseJSON(result);
 						if (topic != null) {
+							//清空播放器
+							_self.clearVideoPlayer();
+							
+							
 							
 							//处理隐藏标签
 							var contentNode = document.createElement("div");
@@ -1234,6 +1243,18 @@ var thread_component = Vue.extend({
 								}, 30);
 							});
 							
+							//生成首字符头像
+							_self.$nextTick(function() {
+								if(_self.topic.avatarName == null || _self.topic.avatarName == ''){
+									var char = (_self.topic.nickname != null && _self.topic.nickname !="") ? _self.topic.nickname : _self.topic.userName;
+									//元素的实际宽度
+									var width= _self.$refs.topicUserAvatar.offsetWidth;
+									_self.$refs.topicUserAvatar.src = letterAvatar(char, width);	
+									
+									
+								}
+							});
+							
 							
 						}
 					}
@@ -1241,8 +1262,8 @@ var thread_component = Vue.extend({
 			});
 		},
 		
-		//渲染视频播放器
-		renderVideoPlayer : function() {
+		//清空播放器
+		clearVideoPlayer : function() {
 			var _self = this;
 			
 			for(var i=0; i< _self.playerObjectList.length; i++){
@@ -1250,6 +1271,15 @@ var thread_component = Vue.extend({
 				
 				playerObject.destroy();//销毁播放器
 			}
+			_self.playerObjectList.length = 0;//清空数组
+			_self.playerIdList.length = 0;//清空数组
+			_self.playerNodeList.length = 0;//清空数组
+		},
+		//渲染视频播放器
+		renderVideoPlayer : function() {
+			var _self = this;
+			
+			
 			
 			
 			for(var i=0; i< _self.playerIdList.length; i++){
@@ -1302,7 +1332,7 @@ var thread_component = Vue.extend({
 			
 			//添加播放器节点数据
 			if(_self.playerObjectList.length >0){
-				_self.playerNodeList.length = 0;//清空数组
+				
 				for(var i=0; i< _self.playerIdList.length; i++){
 			    	var playerId = _self.playerIdList[i];
 			    	var node = document.getElementById(playerId);//节点对象
@@ -1683,6 +1713,35 @@ var thread_component = Vue.extend({
 							}
 
 							_self.commentList = new_commentList;
+							
+							
+							//生成首字符头像
+							_self.$nextTick(function() {
+								if (_self.commentList != null && _self.commentList.length > 0) {
+									for(var i=0;i<_self.commentList.length; i++){
+										var comment = _self.commentList[i];
+										if(comment.avatarName == null || comment.avatarName == ''){
+											var char = (comment.nickname != null && comment.nickname !="") ? comment.nickname : comment.userName;
+											//元素的实际宽度
+											var width= _self.$refs['commentAvatarData_'+comment.id][0].offsetWidth;
+											_self.$refs['commentAvatarData_'+comment.id][0].src = letterAvatar(char, width);	
+										}
+										
+										if(comment.replyList != null && comment.replyList.length > 0){
+											for(var j=0;j<comment.replyList.length; j++){
+												var reply = comment.replyList[j];
+												if(reply.avatarName == null || reply.avatarName == ''){
+													var char = (reply.nickname != null && reply.nickname !="") ? reply.nickname : reply.userName;
+													//元素的实际宽度
+													var width= _self.$refs['replyAvatarData_'+reply.id][0].offsetWidth;
+													_self.$refs['replyAvatarData_'+reply.id][0].src = letterAvatar(char, width);	
+												}
+											}
+										}
+										
+									}
+								}
+							});
 							
 						}
 						_self.currentpage = pageView.currentpage;
@@ -2990,6 +3049,22 @@ var askList_component = Vue.extend({
 						var new_questionList = pageView.records;
 						if (new_questionList != null && new_questionList.length > 0) {
 							_self.questionList = new_questionList;
+							
+							//生成首字符头像
+							_self.$nextTick(function() {
+								if (_self.questionList != null && _self.questionList.length > 0) {
+									for(var i=0;i<_self.questionList.length; i++){
+										var question = _self.questionList[i];
+										if(question.avatarName == null || question.avatarName == ''){
+											var char = (question.nickname != null && question.nickname !="") ? question.nickname : question.userName;
+											//元素的实际宽度
+											var width= _self.$refs['questionAvatarData_'+question.id][0].offsetWidth;
+											_self.$refs['questionAvatarData_'+question.id][0].src = letterAvatar(char, width);	
+										}
+									}
+								}
+							});
+							
 						}
 						_self.currentpage = pageView.currentpage;
 						_self.totalpage = pageView.totalpage;
@@ -3259,7 +3334,17 @@ var question_component = Vue.extend({
 							
 							_self.question = question;
 							
-							
+							//生成首字符头像
+							_self.$nextTick(function() {
+								if(_self.question.avatarName == null || _self.question.avatarName == ''){
+									var char = (_self.question.nickname != null && _self.question.nickname !="") ? _self.question.nickname : _self.question.userName;
+									//元素的实际宽度
+									var width= _self.$refs.questionUserAvatar.offsetWidth;
+									_self.$refs.questionUserAvatar.src = letterAvatar(char, width);	
+									
+									
+								}
+							});
 						}
 					}
 				}
@@ -3449,6 +3534,34 @@ var question_component = Vue.extend({
 							}
 							_self.answerList = new_answerList;
 							
+							
+							//生成首字符头像
+							_self.$nextTick(function() {
+								if (_self.answerList != null && _self.answerList.length > 0) {
+									for(var i=0;i<_self.answerList.length; i++){
+										var answer = _self.answerList[i];
+										if(answer.avatarName == null || answer.avatarName == ''){
+											var char = (answer.nickname != null && answer.nickname !="") ? answer.nickname : answer.userName;
+											//元素的实际宽度
+											var width= _self.$refs['answerAvatarData_'+answer.id][0].offsetWidth;
+											_self.$refs['answerAvatarData_'+answer.id][0].src = letterAvatar(char, width);	
+										}
+										
+										if(answer.answerReplyList != null && answer.answerReplyList.length > 0){
+											for(var j=0;j<answer.answerReplyList.length; j++){
+												var reply = answer.answerReplyList[j];
+												if(reply.avatarName == null || reply.avatarName == ''){
+													var char = (reply.nickname != null && reply.nickname !="") ? reply.nickname : reply.userName;
+													//元素的实际宽度
+													var width= _self.$refs['answerReplyAvatarData_'+reply.id][0].offsetWidth;
+													_self.$refs['answerReplyAvatarData_'+reply.id][0].src = letterAvatar(char, width);	
+												}
+											}
+										}
+										
+									}
+								}
+							});
 							
 							
 						}
@@ -4883,6 +4996,36 @@ var search_component = Vue.extend({
 							}else{
 								_self.next = '';
 							}
+							
+							
+							//生成首字符头像
+							_self.$nextTick(function() {
+								if (_self.searchResultList != null &&_self.searchResultList.length > 0) {
+									for(var i=0;i<_self.searchResultList.length; i++){
+										var searchResult = _self.searchResultList[i];
+										if(searchResult.indexModule == 10){
+											if(searchResult.topic.avatarName == null || searchResult.topic.avatarName == ''){
+												var char = (searchResult.topic.nickname != null && searchResult.topic.nickname !="") ? searchResult.topic.nickname : searchResult.topic.userName;
+												//元素的实际宽度
+												var width= _self.$refs['searchResultTopicAvatarData_'+searchResult.topic.id][0].offsetWidth;
+												_self.$refs['searchResultTopicAvatarData_'+searchResult.topic.id][0].src = letterAvatar(char, width);	
+											}
+											
+										}else if(searchResult.indexModule == 20){
+											if(searchResult.question.avatarName == null || searchResult.question.avatarName == ''){
+												var char = (searchResult.question.nickname != null && searchResult.question.nickname !="") ? searchResult.question.nickname : searchResult.question.userName;
+												//元素的实际宽度
+												var width= _self.$refs['searchResultQuestionAvatarData_'+searchResult.question.id][0].offsetWidth;
+												_self.$refs['searchResultQuestionAvatarData_'+searchResult.question.id][0].src = letterAvatar(char, width);	
+											}
+											
+										}
+									}
+								}
+							});
+							
+							
+							
 						} else {
 							
 							if (value_error != null) {
@@ -4961,6 +5104,19 @@ var register_component = Vue.extend({
 		};
 	},
 	created : function() {
+		if(isWeiXinBrowser() && this.$store.state.weixin_oa_appid != ''){
+			//处理微信公众号自动登录
+			var weixin_openid_value = sessionStorage.getItem("weixin_openid"); 
+			if(weixin_openid_value == null || weixin_openid_value == ""){//如果来自微信内置浏览器
+				
+				//获取微信openid
+				getWeiXinOpenId();
+
+				sessionStorage.setItem("pushState", "true"); //标记添加URL记录
+			}
+		}
+		
+		
 		this.initialization();
 	},
 	methods : {
@@ -5170,6 +5326,12 @@ var register_component = Vue.extend({
 			//验证码值
 			parameter += "&captchaValue=" + encodeURIComponent(_self.captchaValue.trim());
 
+			
+			if(isWeiXinBrowser() && sessionStorage.getItem("weixin_openid") != null){//如果来自微信内置浏览器
+				//微信openid
+				parameter += "&thirdPartyOpenId=" + sessionStorage.getItem("weixin_openid"); 
+			}
+			
 			//令牌
 			parameter += "&token=" + _self.$store.state.token;
 
@@ -5915,6 +6077,7 @@ var login_component = Vue.extend({
 			password : '',
 			rememberMe:false,
 			showCaptcha : false,
+			show_loginModule : false,//是否显示登录页
 			imgUrl : '',
 			captchaKey : '',
 			captchaValue : '',
@@ -5922,14 +6085,79 @@ var login_component = Vue.extend({
 				userName : '',
 				password : '',
 				captchaValue : ''
-			}
+			},
+			supportLoginInterfaceList: '',//支持登录接口集合
+			jumpUrl : ''
 		};
 	},
+	
+	mounted : function mounted(){
+		if(isWeiXinBrowser()){//如果来自微信内置浏览器
+			//挂载完成后，判断浏览器是否支持popstate
+			if (window.history && window.history.pushState && this.$store.state.weixin_oa_appid != '') {//监听浏览器前进后退按钮
+				window.addEventListener('popstate', this.goBack, false);
+				
+			}
+		}
+		
+	},
+	destroyed : function destroyed() {//离开当前页面
+		if(isWeiXinBrowser() && this.$store.state.weixin_oa_appid != ''){//如果来自微信内置浏览器
+			//页面销毁时，取消监听
+			window.removeEventListener('popstate', this.goBack, false);
+		}
+	},
 	created : function created() {
+		var jumpUrl = getUrlParam("jumpUrl");
+		if(jumpUrl != null){
+			this.jumpUrl = jumpUrl;
+		}
+		
+		
+		if(isWeiXinBrowser() && this.$store.state.weixin_oa_appid != ''){
+			//处理微信公众号自动登录
+			var weixin_openid_value = sessionStorage.getItem("weixin_openid"); 
+			if(weixin_openid_value == null || weixin_openid_value == ""){//如果来自微信内置浏览器
+				
+				//获取微信openid
+				getWeiXinOpenId();
+
+				sessionStorage.setItem("pushState", "true"); //标记添加URL记录
+			}
+			window.history.pushState(null, null, "");
+		}
+		
+		
+		this.show_loginModule = true;
 		this.loadLogin();
+		
+	
+		//加载第三方登录
+		this.queryThirdPartyLogin();
+		
 	},
 	methods : {
-
+		//页面前进后退
+		goBack : function(){
+			
+		    if(isWeiXinBrowser() && this.$store.state.weixin_oa_appid != ''){//如果来自微信内置浏览器
+		    	var pushStateValue = sessionStorage.getItem("pushState"); 
+		    	if(pushStateValue != null && pushStateValue == "true"){
+			    	sessionStorage.removeItem("pushState");
+			    	this.$router.go(-3);
+		    	}else{
+		    		var pathname = window.location.pathname;
+		    		var jumpUrl = getUrlParam("jumpUrl");
+		    		if (jumpUrl != null && jumpUrl != "" && pathname == store.state.contextPath + "/login") {
+		    			this.$router.go(-2);
+		    		} else {
+		    			this.$router.back();
+		    		}
+		    	}	
+		    }else{
+		    	this.$router.back();
+		    }
+		},
 		//加载登录页
 		loadLogin : function loadLogin(event) {
 			var _self = this;
@@ -5953,6 +6181,35 @@ var login_component = Vue.extend({
 				}
 			});
 		},
+		
+		//查询第三方登录
+		queryThirdPartyLogin : function queryThirdPartyLogin(event) {
+			var _self = this;
+
+			$.ajax({
+				type : "GET",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "queryThirdPartyLogin",
+				//data: data,
+				success : function success(result) {
+					if (result != "") {
+						var supportLoginInterfaceList = $.parseJSON(result);
+						if (supportLoginInterfaceList != null && supportLoginInterfaceList.length > 0) {
+							_self.supportLoginInterfaceList = supportLoginInterfaceList;
+						}
+					}
+				}
+			});
+		},
+			
+		
+		//跳转第三方登录链接
+		loginLink : function loginLink(interfaceProduct) {
+			window.location.href = this.$store.state.baseURL + "thirdParty/loginLink?interfaceProduct="+interfaceProduct+"&jumpUrl="+this.jumpUrl;
+		},
+		
+		
 		//提交数据
 		submitData : function submitData(event) {
 			var _self = this;
@@ -5984,6 +6241,11 @@ var login_component = Vue.extend({
 			//自动登录
 			parameter += "&rememberMe=" + _self.rememberMe;
 			
+			
+			if(isWeiXinBrowser() && sessionStorage.getItem("weixin_openid") != null){//如果来自微信内置浏览器
+				//微信openid
+				parameter += "&thirdPartyOpenId=" + sessionStorage.getItem("weixin_openid"); 
+			}
 			
 			//令牌
 			parameter += "&token=" + _self.$store.state.token;
@@ -6782,6 +7044,24 @@ var home_component = Vue.extend({
 								}
 								
 								_self.userDynamicList.push.apply(_self.userDynamicList, new_userDynamicList); //合并两个数组
+								
+								
+								
+								//生成首字符头像
+								_self.$nextTick(function() {
+									if (new_userDynamicList != null && new_userDynamicList.length > 0) {
+										for(var i=0;i<new_userDynamicList.length; i++){
+											var userDynamic = new_userDynamicList[i];
+											if(userDynamic.avatarName == null || userDynamic.avatarName == ''){
+												var char = (userDynamic.nickname != null && userDynamic.nickname !="") ? userDynamic.nickname : userDynamic.userName;
+												//元素的实际宽度
+												var width= _self.$refs['userDynamicAvatarData_'+userDynamic.id][0].offsetWidth;
+												_self.$refs['userDynamicAvatarData_'+userDynamic.id][0].src = letterAvatar(char, width);	
+											}
+										}
+									}
+								});
+								
 							}
 							
 							_self.currentpage = pageView.currentpage;
@@ -7027,6 +7307,8 @@ var home_component = Vue.extend({
 							_self.$store.commit('setSystemUserId', '');
 							_self.$store.commit('setSystemUserName', '');
 							
+							sessionStorage.clear();//清空sessionStorage中所有信息
+							
 							_self.$router.replace({ path: '/'+value_jumpUrl });
 						} else {
 							for (var error in value_error) {
@@ -7055,6 +7337,7 @@ var home_component = Vue.extend({
 
 //我的话题
 var topicList_component = Vue.extend({
+	name: 'topicList',//组件名称，keep-alive缓存需要本参数
 	template : '#topicList-template',
 	data : function data() {
 		return {
@@ -7069,7 +7352,22 @@ var topicList_component = Vue.extend({
 	created : function created() {
 		//初始化
 		this.initialization();
+		//设置缓存
+		this.$store.commit('setCacheComponents',  ['topicList']);
 	},
+	beforeRouteLeave: function (to, from, next) {
+		if (to.path == '/thread'
+			|| to.path == '/user/control/topicUnhideList' 
+			|| to.path == '/user/control/topicFavoriteList' 
+			|| to.path == '/user/control/topicLikeList' 
+			|| to.path == '/user/editTopic') {//前往的URI路径需要缓存组件，其他情况下不需要缓存
+			this.$store.commit('setCacheComponents',  ['topicList']);
+		} else {
+			this.$store.commit('setCacheComponents',  []);
+		}
+		next();
+	},
+
 	//在当前路由改变，但是该组件被复用时调用
 	beforeRouteUpdate : function beforeRouteUpdate(to, from, next) {
 		next(true);
@@ -7133,6 +7431,7 @@ var topicList_component = Vue.extend({
 
 //我的评论
 var commentList_component = Vue.extend({
+	name: 'commentList',//组件名称，keep-alive缓存需要本参数
 	template : '#commentList-template',
 	data : function data() {
 		return {
@@ -7147,6 +7446,16 @@ var commentList_component = Vue.extend({
 	created : function created() {
 		//初始化
 		this.initialization();
+		//设置缓存
+		this.$store.commit('setCacheComponents',  ['commentList']);
+	},
+	beforeRouteLeave: function (to, from, next) {
+		if (to.path == '/thread') {//前往的URI路径需要缓存组件，其他情况下不需要缓存
+			this.$store.commit('setCacheComponents',  ['commentList']);
+		} else {
+			this.$store.commit('setCacheComponents',  []);
+		}
+		next();
 	},
 	//在当前路由改变，但是该组件被复用时调用
 	beforeRouteUpdate : function beforeRouteUpdate(to, from, next) {
@@ -7209,6 +7518,7 @@ var commentList_component = Vue.extend({
 });
 //我的回复
 var replyList_component = Vue.extend({
+	name: 'replyList',//组件名称，keep-alive缓存需要本参数
 	template : '#replyList-template',
 	data : function data() {
 		return {
@@ -7223,6 +7533,16 @@ var replyList_component = Vue.extend({
 	created : function created() {
 		//初始化
 		this.initialization();
+		//设置缓存
+		this.$store.commit('setCacheComponents',  ['replyList']);
+	},
+	beforeRouteLeave: function (to, from, next) {
+		if (to.path == '/thread') {//前往的URI路径需要缓存组件，其他情况下不需要缓存
+			this.$store.commit('setCacheComponents',  ['replyList']);
+		} else {
+			this.$store.commit('setCacheComponents',  []);
+		}
+		next();
 	},
 	//在当前路由改变，但是该组件被复用时调用
 	beforeRouteUpdate : function beforeRouteUpdate(to, from, next) {
@@ -7286,6 +7606,7 @@ var replyList_component = Vue.extend({
 
 //我的问题
 var questionList_component = Vue.extend({
+	name: 'questionList',//组件名称，keep-alive缓存需要本参数
 	template : '#questionList-template',
 	data : function data() {
 		return {
@@ -7300,6 +7621,16 @@ var questionList_component = Vue.extend({
 	created : function created() {
 		//初始化
 		this.initialization();
+		//设置缓存
+		this.$store.commit('setCacheComponents',  ['questionList']);
+	},
+	beforeRouteLeave: function (to, from, next) {
+		if (to.path == '/question' || to.path == '/user/appendQuestion') {//前往的URI路径需要缓存组件，其他情况下不需要缓存
+			this.$store.commit('setCacheComponents',  ['questionList']);
+		} else {
+			this.$store.commit('setCacheComponents',  []);
+		}
+		next();
 	},
 	//在当前路由改变，但是该组件被复用时调用
 	beforeRouteUpdate : function beforeRouteUpdate(to, from, next) {
@@ -7364,6 +7695,7 @@ var questionList_component = Vue.extend({
 
 //我的答案
 var answerList_component = Vue.extend({
+	name: 'answerList',//组件名称，keep-alive缓存需要本参数
 	template : '#answerList-template',
 	data : function data() {
 		return {
@@ -7378,7 +7710,18 @@ var answerList_component = Vue.extend({
 	created : function created() {
 		//初始化
 		this.initialization();
+		//设置缓存
+		this.$store.commit('setCacheComponents',  ['answerList']);
 	},
+	beforeRouteLeave: function (to, from, next) {
+		if (to.path == '/question') {//前往的URI路径需要缓存组件，其他情况下不需要缓存
+			this.$store.commit('setCacheComponents',  ['answerList']);
+		} else {
+			this.$store.commit('setCacheComponents',  []);
+		}
+		next();
+	},
+
 	//在当前路由改变，但是该组件被复用时调用
 	beforeRouteUpdate : function beforeRouteUpdate(to, from, next) {
 		next(true);
@@ -7441,6 +7784,7 @@ var answerList_component = Vue.extend({
 });
 //我的答案回复
 var answerReplyList_component = Vue.extend({
+	name: 'answerReplyList',//组件名称，keep-alive缓存需要本参数
 	template : '#answerReplyList-template',
 	data : function data() {
 		return {
@@ -7455,6 +7799,16 @@ var answerReplyList_component = Vue.extend({
 	created : function created() {
 		//初始化
 		this.initialization();
+		//设置缓存
+		this.$store.commit('setCacheComponents',  ['answerReplyList']);
+	},
+	beforeRouteLeave: function (to, from, next) {
+		if (to.path == '/question') {//前往的URI路径需要缓存组件，其他情况下不需要缓存
+			this.$store.commit('setCacheComponents',  ['answerReplyList']);
+		} else {
+			this.$store.commit('setCacheComponents',  []);
+		}
+		next();
 	},
 	//在当前路由改变，但是该组件被复用时调用
 	beforeRouteUpdate : function beforeRouteUpdate(to, from, next) {
@@ -7753,7 +8107,7 @@ var editUser_component = Vue.extend({
 			
 
 			var parameter = "";
-			if(_self.nickname != null && _self.nickname != ""){
+			if(_self.nickname != null && _self.nickname != "" && _self.allowNickname == false){
 				parameter += "&nickname=" +  encodeURIComponent(_self.nickname);
 			}
 			parameter += "&allowUserDynamic=" +  _self.allowUserDynamic;
@@ -8994,6 +9348,7 @@ var userLoginLog_component = Vue.extend({
 
 //私信
 var privateMessage_component = Vue.extend({
+	name: 'privateMessage',//组件名称，keep-alive缓存需要本参数
 	template : '#privateMessage-template',
 	data : function data() {
 		return {
@@ -9005,6 +9360,16 @@ var privateMessage_component = Vue.extend({
 	},
 	created : function created() {
 		this.queryPrivateMessage();
+		//设置缓存
+		this.$store.commit('setCacheComponents',  ['privateMessage']);
+	},
+	beforeRouteLeave: function (to, from, next) {
+		if (to.path == '/user/control/privateMessageChatList') {//前往的URI路径需要缓存组件，其他情况下不需要缓存
+			this.$store.commit('setCacheComponents',  ['privateMessage']);
+		} else {
+			this.$store.commit('setCacheComponents',  []);
+		}
+		next();
 	},
 	methods : {
 		//查询私信列表
@@ -9029,6 +9394,22 @@ var privateMessage_component = Vue.extend({
 							var new_privateMessageList = pageView.records;
 							if (new_privateMessageList != null && new_privateMessageList.length > 0) {
 								_self.privateMessageList.push.apply(_self.privateMessageList, new_privateMessageList); //合并两个数组
+								
+								//生成首字符头像
+								_self.$nextTick(function() {
+									if (new_privateMessageList != null && new_privateMessageList.length > 0) {
+										for(var i=0;i<new_privateMessageList.length; i++){
+											var privateMessage = new_privateMessageList[i];
+											if(privateMessage.friendAvatarName == null || privateMessage.friendAvatarName == ''){
+												var char = (privateMessage.friendNickname != null && privateMessage.friendNickname !="") ? privateMessage.friendNickname : privateMessage.friendUserName;
+												//元素的实际宽度
+												var width= _self.$refs['privateMessageAvatarData_'+privateMessage.id][0].offsetWidth;
+												_self.$refs['privateMessageAvatarData_'+privateMessage.id][0].src = letterAvatar(char, width);	
+											}
+										}
+									}
+								});
+								
 							}
 							_self.currentpage = pageView.currentpage;
 							_self.totalpage = pageView.totalpage;
@@ -9196,6 +9577,21 @@ var privateMessageChat_component = Vue.extend({
 									var privateMessageChat = new_privateMessageChatList[i];
 									lastId = privateMessageChat.id;
 								}
+								
+								//生成首字符头像
+								_self.$nextTick(function() {
+									if (new_privateMessageChatList != null && new_privateMessageChatList.length > 0) {
+										for(var i=0;i<new_privateMessageChatList.length; i++){
+											var privateMessageChat = new_privateMessageChatList[i];
+											if(privateMessageChat.senderAvatarName == null || privateMessageChat.senderAvatarName == ''){
+												var char = (privateMessageChat.senderNickname != null && privateMessageChat.senderNickname !="") ? privateMessageChat.senderNickname : privateMessageChat.senderUserName;
+												//元素的实际宽度
+												var width= _self.$refs['privateMessageChatAvatarData_'+privateMessageChat.id][0].offsetWidth;
+												_self.$refs['privateMessageChatAvatarData_'+privateMessageChat.id][0].src = letterAvatar(char, width);	
+											}
+										}
+									}
+								});
 							}
 							
 							_self.currentpage = pageView.currentpage;
@@ -9598,6 +9994,7 @@ var systemNotify_component = Vue.extend({
 
 //提醒
 var remind_component = Vue.extend({
+	name: 'remind',//组件名称，keep-alive缓存需要本参数
 	template : '#remind-template',
 	data : function data() {
 		return {
@@ -9609,6 +10006,18 @@ var remind_component = Vue.extend({
 	},
 	created : function created() {
 		this.queryRemind();
+		//设置缓存
+		this.$store.commit('setCacheComponents',  ['remind']);
+	},
+	beforeRouteLeave: function (to, from, next) {
+		if (to.path == '/user/control/home' 
+			|| to.path == '/thread'
+			|| to.path == '/question') {//前往的URI路径需要缓存组件，其他情况下不需要缓存
+			this.$store.commit('setCacheComponents',  ['remind']);
+		} else {
+			this.$store.commit('setCacheComponents',  []);
+		}
+		next();
 	},
 	methods : {
 		//查询提醒列表
@@ -9632,6 +10041,21 @@ var remind_component = Vue.extend({
 							var new_remindList = pageView.records;
 							if (new_remindList != null && new_remindList.length > 0) {
 								_self.remindList.push.apply(_self.remindList, new_remindList); //合并两个数组
+								
+								//生成首字符头像
+								_self.$nextTick(function() {
+									if (new_remindList != null && new_remindList.length > 0) {
+										for(var i=0;i<new_remindList.length; i++){
+											var remind = new_remindList[i];
+											if(remind.senderAvatarName == null || remind.senderAvatarName == ''){
+												var char = (remind.senderNickname != null && remind.senderNickname !="") ? remind.senderNickname : remind.senderUserName;
+												//元素的实际宽度
+												var width= _self.$refs['remindSenderAvatarData_'+remind.id][0].offsetWidth;
+												_self.$refs['remindSenderAvatarData_'+remind.id][0].src = letterAvatar(char, width);	
+											}
+										}
+									}
+								});
 							}
 							_self.currentpage = pageView.currentpage;
 							_self.totalpage = pageView.totalpage;
@@ -9847,6 +10271,7 @@ var favorite_component = Vue.extend({
 
 //话题收藏列表
 var topicFavorite_component = Vue.extend({
+	name: 'topicFavorite',//组件名称，keep-alive缓存需要本参数
 	template : '#topicFavorite-template',
 	data : function data() {
 		return {
@@ -9858,7 +10283,18 @@ var topicFavorite_component = Vue.extend({
 	},
 	created : function created() {
 		this.queryTopicFavorite();
+		//设置缓存
+		this.$store.commit('setCacheComponents',  ['topicFavorite']);
 	},
+	beforeRouteLeave: function (to, from, next) {
+		if (to.path == '/user/control/home') {//前往的URI路径需要缓存组件，其他情况下不需要缓存
+			this.$store.commit('setCacheComponents',  ['topicFavorite']);
+		} else {
+			this.$store.commit('setCacheComponents',  []);
+		}
+		next();
+	},
+
 	methods : {
 		//查询收藏分页
 		queryTopicFavorite : function() {
@@ -10034,6 +10470,7 @@ var like_component = Vue.extend({
 
 //话题点赞列表
 var topicLike_component = Vue.extend({
+	name: 'topicLike',//组件名称，keep-alive缓存需要本参数
 	template : '#topicLike-template',
 	data : function data() {
 		return {
@@ -10045,6 +10482,16 @@ var topicLike_component = Vue.extend({
 	},
 	created : function created() {
 		this.queryTopicLike();
+		//设置缓存
+		this.$store.commit('setCacheComponents',  ['topicLike']);
+	},
+	beforeRouteLeave: function (to, from, next) {
+		if (to.path == '/user/control/home') {//前往的URI路径需要缓存组件，其他情况下不需要缓存
+			this.$store.commit('setCacheComponents',  ['topicLike']);
+		} else {
+			this.$store.commit('setCacheComponents',  []);
+		}
+		next();
 	},
 	methods : {
 		//查询点赞分页
@@ -10274,6 +10721,7 @@ var follower_component = Vue.extend({
 
 //话题取消隐藏用户列表
 var topicUnhide_component = Vue.extend({
+	name: 'topicUnhide',//组件名称，keep-alive缓存需要本参数
 	template : '#topicUnhide-template',
 	data : function data() {
 		return {
@@ -10285,6 +10733,16 @@ var topicUnhide_component = Vue.extend({
 	},
 	created : function created() {
 	//	this.queryTopicUnhide();
+		//设置缓存
+		this.$store.commit('setCacheComponents',  ['topicUnhide']);
+	},
+	beforeRouteLeave: function (to, from, next) {
+		if (to.path == '/user/control/home') {//前往的URI路径需要缓存组件，其他情况下不需要缓存
+			this.$store.commit('setCacheComponents',  ['topicUnhide']);
+		} else {
+			this.$store.commit('setCacheComponents',  []);
+		}
+		next();
 	},
 	methods : {
 		//查询取消隐藏用户分页
@@ -11364,7 +11822,8 @@ var store = new Vuex.Store({
 		baseURL : '', //系统路径
 		commonPath : '', //资源路径
 		contextPath : '', //系统虚拟目录
-		token : '', //令牌标记,
+		token : '', //令牌标记
+		weixin_oa_appid : '', //微信公众号应用唯一标识
 		user : {
 			userId : '',
 			userName : ''
@@ -11404,6 +11863,10 @@ var store = new Vuex.Store({
 		//设置登录用户名称
 		setSystemUserName : function setSystemUserName(state, userName) {
 			state.user.userName = userName;
+		},
+		//设置微信公众号应用唯一标识
+		setWeixin_oa_appid : function setWeixin_oa_appid(state, appid) {
+			state.weixin_oa_appid = appid;
 		},
 		
 		
@@ -11546,6 +12009,7 @@ var vue = new Vue({
 			_self.$store.commit('setCommonPath', getMetaTag().commonPath);
 			_self.$store.commit('setContextPath', getMetaTag().contextPath);
 			_self.$store.commit('setToken', getMetaTag().token);
+			_self.$store.commit('setWeixin_oa_appid', getMetaTag().weixin_oa_appid);
 			_self.$store.commit('setSystemUserId', getMetaTag().userId);
 			_self.$store.commit('setSystemUserName', getMetaTag().userName);
 			
@@ -11553,7 +12017,7 @@ var vue = new Vue({
 			_self.$store.commit('setSystemNotify_badge', false);
 			_self.$store.commit('setAllMessage_badge', false);
 			
-		
+			
 			
 			//启动定时查询消息
 			_self.timerUnreadMessage();
@@ -11569,6 +12033,7 @@ var vue = new Vue({
 			//	var param = location.search; //获取url中"?"符后的字串
 
 		//	alert(pathname+" -- "+param);
+			
 			
 		},
 		
@@ -11593,6 +12058,7 @@ function getMetaTag() {
 	var commonPath = "";
 	var contextPath = "";
 	var token = "";
+	var weixin_oa_appid = "";
 	var userId = "";
 	var userName = "";
 	
@@ -11609,6 +12075,9 @@ function getMetaTag() {
 		}
 		if (meta[i].name == "_token") {
 			token = meta[i].getAttribute("content");
+		}
+		if (meta[i].name == "_weixin_oa_appid") {
+			weixin_oa_appid = meta[i].getAttribute("content");
 		}
 		if (meta[i].name == "_userId") {
 			userId = meta[i].getAttribute("content");
@@ -11627,6 +12096,8 @@ function getMetaTag() {
 		contextPath : contextPath,
 		//令牌
 		token : token,
+		//微信公众号应用唯一标识
+		weixin_oa_appid : weixin_oa_appid,
 		//登录用户Id
 		userId : userId,
 		//登录用户名称
@@ -11852,6 +12323,123 @@ function letterAvatar (name, size, color) {
 	canvas  = null;
 	return dataURI;
 }
+
+
+//是否为微信浏览器
+function isWeiXinBrowser() {
+	var ua = window.navigator.userAgent.toLowerCase();
+	if (ua.match(/MicroMessenger/i) == 'micromessenger') {
+		return true;
+	} else {
+		return false;
+	}
+}
+//删除url参数
+function deleteUrlParam(url,paramKey){
+  var urlParam = url.substr(url.indexOf("?")+1);
+  var beforeUrl = url.substr(0,url.indexOf("?"));
+  var nextUrl = "";
+   
+  var arr = new Array();
+  if(urlParam!=""){
+      var urlParamArr = urlParam.split("&");
+    
+      for(var i=0;i<urlParamArr.length;i++){
+          var paramArr = urlParamArr[i].split("=");
+          if(paramArr[0]!=paramKey){
+              arr.push(urlParamArr[i]);
+          }
+      }
+  }
+   
+  if(arr.length>0){
+      nextUrl = "?"+arr.join("&");
+  }
+
+  url = beforeUrl+nextUrl;
+ 
+  if(url.indexOf("?") == 0){//删除第一个问号
+	  url = url.substring(url.indexOf("?") + 1, url.length)
+	  
+  }
+  return url;
+}
+//获取微信公众号code
+function getWeiXinCode() {
+
+	var appid = store.state.weixin_oa_appid;
+	//获取URL中的微信code
+	var code = getUrlParam("code");
+			
+	if((appid != null && appid != "") && (code == null || code == "")){
+		var state = new Date().getTime();
+		
+		var url = deleteUrlParam(window.location.href,"code");//删除code参数
+		url = deleteUrlParam(url,"state");//删除state参数
+		var redirect_uri = encodeURIComponent(url);
+		window.location.href = "https://open.weixin.qq.com/connect/oauth2/authorize?appid="+appid+"&redirect_uri="+redirect_uri+"&response_type=code&scope=snsapi_base&state="+state+"&connect_redirect=1#wechat_redirect";
+	
+		//让后面的代码停止执行
+		throw new Error();
+		
+	}
+}
+
+//获取微信openid
+function getWeiXinOpenId() {
+	if(isWeiXinBrowser()){//如果来自微信内置浏览器
+
+		//获取微信公众号code
+		getWeiXinCode();
+		
+		//获取微信openid
+		var code = getUrlParam("code");
+		if(code != null && code != ""){
+			
+			//删除浏览器地址的指定参数
+			var url = deleteUrlParam(window.location.pathname + window.location.search,"code");//删除code参数
+			url = deleteUrlParam(url,"state");//删除state参数
+			history.replaceState({}, document.title, url);
+		//	history.pushState({}, document.title, url);
+			
+			
+			$.ajax({
+				type : "POST",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "thirdParty/queryWeiXinOpenId",
+				data : "code="+code,
+				success : function success(result) {
+					if (result != "") {
+						var returnValue = $.parseJSON(result);
+						if(returnValue.errorCode == ""){
+							//返回openid
+							sessionStorage.setItem("weixin_openid",returnValue.openId); 
+						}else{
+							Vue.$messagebox('错误'+returnValue.errorCode, returnValue.errorMessage);
+						}
+						
+			        	
+					}
+				},
+				beforeSend : function beforeSend(XMLHttpRequest) {
+					//本空方法不要删除，用来覆盖全局回调默认的旋转进度条
+					
+				},
+				complete : function complete(XMLHttpRequest, textStatus) {
+					//本空方法不要删除，用来覆盖全局回调默认的旋转进度条
+				}
+			});
+			
+		}
+		
+		
+	}
+	
+}
+
+
+
 //创建富文本编辑器
 function createEditor(editorToolbar,editorText,commonPath,menus,userGradeList,imgPath,self,param) {
 	var E = window.wangEditor;
