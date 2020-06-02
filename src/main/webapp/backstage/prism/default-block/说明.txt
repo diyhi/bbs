@@ -1,0 +1,109 @@
+prism-block为修改版
+
+
+
+prism.js的复制功能会访问
+https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js
+
+
+加入如下代码
+
+//获取JS文件自身路径
+var js=document.scripts,url=js[js.length-1].src,path=url.substring(0,url.lastIndexOf("/")+1);
+
+
+o.src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"
+改为
+o.src=path+"clipboard.min.js"
+------------------------------------------------------------------
+
+prism.js
+
+Copy字符改为“复制”
+
+
+
+
+------------------------------------------------------------------
+prism.css
+符号会有白色背景
+.style .token.string {
+	color: #9a6e3a;
+	background: hsla(0, 0%, 100%, .5);
+}
+
+改为
+.style .token.string {
+	color: #9a6e3a;
+	/**background: hsla(0, 0%, 100%, .5);**/
+}
+
+------------------
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+	background: #f5f2f0;
+}
+
+改为
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+	background: #f7f7f7;
+}
+
+
+------------------
+.line-numbers .line-numbers-rows {
+	position: absolute;
+	pointer-events: none;
+	top: 0;
+	font-size: 100%;
+	left: -3.8em;
+	width: 3em; /* works for line-numbers below 1000 lines */
+	letter-spacing: -1px;
+	border-right: 1px solid #999;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+
+}
+改为
+.line-numbers .line-numbers-rows {
+	position: absolute;
+	pointer-events: none;
+	top: -2px;
+	font-size: 100%;
+	left: -3.8em;
+	width: 3em; /* works for line-numbers below 1000 lines */
+	letter-spacing: -1px;
+	/**border-right: 1px solid #999;**/
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+
+}
+
+-----------------
+.line-numbers-rows > span:before {
+			content: counter(linenumber);
+			color: #999;
+			display: block;
+			padding-right: 0.8em;
+			text-align: right;
+		}
+
+改为
+.line-numbers-rows > span:before {
+			content: counter(linenumber);
+			color: #869194;
+			display: block;
+			padding-right: 0.8em;
+			text-align: right;
+			height: 100%;
+			background: #eff2f3;
+		}
+
+
+

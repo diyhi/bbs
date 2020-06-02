@@ -33,13 +33,13 @@ public class FollowerEntity implements Serializable{
 	/** 对方的用户名称 **/
 	@Column(length=30)
 	protected String friendUserName;
-	/** 私信对方呢称 **/
+	/** 对方呢称 **/
 	@Transient
 	protected String friendNickname;
-	/** 私信对方头像路径 **/
+	/** 对方头像路径 **/
 	@Transient
 	protected String friendAvatarPath;
-	/** 私信对方头像名称 **/
+	/** 对方头像名称 **/
 	@Transient
 	protected String friendAvatarName;
 	

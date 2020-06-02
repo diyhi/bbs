@@ -12,7 +12,8 @@
 <link href="backstage/css/table.css" type="text/css" rel="stylesheet"/>
 <script language="javascript" src="backstage/js/Tool.js" type="text/javascript"></script>
 <script language="javascript" src="backstage/js/ajax.js" type="text/javascript"></script>
-
+<script src="backstage/jquery/jquery.min.js" language="javascript" type="text/javascript"></script>
+<script language="javascript" src="backstage/jquery/jquery.letterAvatar.js" type="text/javascript"></script>
 <script type="text/javascript">
 
 //还原私信
@@ -80,14 +81,30 @@ function reductionPrivateMessage(id,userId){
     <TH>状态</TH>
     <TH>操作</TH>
     </TR></THEAD>
-  <TBODY class="t-list-tbody" align="center">
+  <TBODY class="t-list-tbody privateMessageChatModule" align="center">
    <c:forEach items="${pageView.records}" var="entry">
 	  <TR >
-	    <TD width="15%">${entry.senderUserName}</TD>
+	    <TD width="20%" style="text-align: left! important;">
+	    	<div class="avatarBox">
+				<c:if test="${entry.senderAvatarName != null && entry.senderAvatarName != ''}">
+					<img src="${entry.senderAvatarPath}100x100/${entry.senderAvatarName}" >
+				</c:if>
+	            <c:if test="${entry.senderAvatarName == null || entry.senderAvatarName == ''}">
+	            	<!-- 首字符头像-->
+	         		<img avatar="${(entry.senderNickname != null && entry.senderNickname !='') ? entry.senderNickname : entry.senderUserName}" >
+	            </c:if>
+			</div>
+			<span class="userName">
+		    	${entry.senderUserName}
+		    	<c:if test="${entry.senderNickname != null && entry.senderNickname != ''}">
+		    		（呢称：${entry.senderNickname}）
+		    	</c:if>
+	    	</span>
+	    </TD>
 	    <TD width="30%"><enhance:out escapeXml="false">${entry.messageContent}</enhance:out></TD>
 	    <TD width="15%"><fmt:formatDate value="${entry.sendTime}"  pattern="yyyy-MM-dd HH:mm:ss"/></TD>
 	    <TD width="15%"><fmt:formatDate value="${entry.readTime}"  pattern="yyyy-MM-dd HH:mm:ss"/></TD>
-	    <TD width="15%">
+	    <TD width="10%">
 	    	<c:if test="${entry.status == 10}">未读</c:if>
 	    	<c:if test="${entry.status == 20}"><span style="color: green;">已读</span></c:if>
 	    	<c:if test="${entry.status == 110}"><span style="color: red;">未读删除</span></c:if>

@@ -563,14 +563,40 @@ function setAllowFilterWord(obj){
 			    	<web:errors path="realNameUserAllowAnswer" cssStyle="color: red;"/>
 			    </TD>
 			</TR>
+
 			<TR>
-			    <TD class="t-label t-label-h" width="20%">解锁话题隐藏内容平台分成比例：</TD>
+			    <TD class="t-label t-label-h" width="20%">问题悬赏积分下限：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">
-			    	<input class="form-text" name="topicUnhidePlatformShareProportion" maxlength="3" size="3" value="${systemSetting.topicUnhidePlatformShareProportion}"/>&nbsp;%
-			    	<span class="span-help">0至100之间的整数</span>
-			    	<web:errors path="topicUnhidePlatformShareProportion" cssStyle="color: red;"/>
+			    	<input class="form-text" name="questionRewardPointMin" maxlength="15" size="15" value="${systemSetting.questionRewardPointMin}"/>
+			    	<span class="span-help">0至999999999999999之间的整数</span>
+			    	<web:errors path="questionRewardPointMin" cssStyle="color: red;"/>
 			    </TD>
 			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">问题悬赏积分上限：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<input class="form-text" name="questionRewardPointMax" maxlength="15" size="15" value="${systemSetting.questionRewardPointMax}"/>
+			    	<span class="span-help">空为无限制 0则不允许悬赏积分</span>
+			    	<web:errors path="questionRewardPointMax" cssStyle="color: red;"/>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">问题悬赏金额下限：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<input class="form-text" name="questionRewardAmountMin" maxlength="12" size="12" value="${systemSetting.questionRewardAmountMin}"/>
+			    	<span class="span-help">0至99999999之间的金额</span>
+			    	<web:errors path="questionRewardAmountMin" cssStyle="color: red;"/>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">问题悬赏金额上限：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<input class="form-text" name="questionRewardAmountMax" maxlength="12" size="12" value="${systemSetting.questionRewardAmountMax}"/>
+			    	<span class="span-help">空为无限制 0则不允许悬赏金额</span>
+			    	<web:errors path="questionRewardAmountMax" cssStyle="color: red;"/>
+			    </TD>
+			</TR>
+			
 			<TR>
 			    <TD class="t-label t-label-h" width="20%">悬赏问答平台分成比例：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">

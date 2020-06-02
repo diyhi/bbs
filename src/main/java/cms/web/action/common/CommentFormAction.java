@@ -786,7 +786,7 @@ public class CommentFormAction {
 					customQuote.setCommentId(comment.getId());
 					customQuote.setIsStaff(comment.getIsStaff());
 					customQuote.setUserName(comment.getUserName());
-					customQuote.setContent(textFilterManage.filterText(comment.getContent()));
+					customQuote.setContent(textFilterManage.filterText(textFilterManage.specifyHtmlTagToText(comment.getContent())));
 					old_customQuoteList.add(customQuote);
 					
 					//评论

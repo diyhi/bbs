@@ -258,7 +258,10 @@ public class UpgradeManageAction {
 					
 					} catch (Exception e) {
 						error.put("upgradeNow", "解压到临时目录失败");
-						e.printStackTrace();
+						//e.printStackTrace();
+						if (logger.isErrorEnabled()) {
+				            logger.error("解压到临时目录失败",e);
+				        }
 					}
 	
 					//目录参数
@@ -344,11 +347,17 @@ public class UpgradeManageAction {
 							} catch (Exception e) {
 								error.put("upgradeNow", "升级错误");
 								//e.printStackTrace();
+								if (logger.isErrorEnabled()) {
+						            logger.error("升级错误",e);
+						        }
 							}
 							 
 						} catch (IOException e) {
 							error.put("upgradeNow", "读取配置文件失败");
 						//	e.printStackTrace();
+							if (logger.isErrorEnabled()) {
+					            logger.error("读取配置文件失败",e);
+					        }
 						}
 					}else{
 						error.put("upgradeNow", "读取第一个目录失败");
@@ -431,49 +440,77 @@ public class UpgradeManageAction {
 							}
 						}
 						
-						
-						//新源目录路径
-						String new_resDirPath = temp_path+upgradeSystem.getUpdatePackageFirstDirectory()+File.separator+current_dir+File.separator;
-						
-						//复制升级文件到目录
-						try {
-							FileUtil.copyDirectory(new_resDirPath, "..");
-							//更改运行状态
-							upgradeService.updateRunningStatus(upgradeId ,20,JsonUtils.toJSONString(new UpgradeLog(new Date(),"复制升级文件到目录完成",1))+",");
-						} catch (Exception e) {
-							upgradeService.addLog(upgradeId, JsonUtils.toJSONString(new UpgradeLog(new Date(),"复制升级文件到目录失败",2))+",");
-							//添加错误中断
-							upgradeService.updateInterruptStatus(upgradeId, 1, JsonUtils.toJSONString(new UpgradeLog(new Date(),"出现错误中断升级过程",2))+",");
-						//	e.printStackTrace();
+						UpgradeSystem upgradeSystem_1 = upgradeService.findUpgradeSystemById(upgradeId);
+						if(upgradeSystem_1.getInterruptStatus() != 1){
+							//新源目录路径
+							String new_resDirPath = temp_path+upgradeSystem.getUpdatePackageFirstDirectory()+File.separator+current_dir+File.separator;
 							
+							//复制升级文件到目录
+							try {
+								FileUtil.copyDirectory(new_resDirPath, "..");
+								//更改运行状态
+								upgradeService.updateRunningStatus(upgradeId ,20,JsonUtils.toJSONString(new UpgradeLog(new Date(),"复制升级文件到目录完成",1))+",");
+							} catch (Exception e) {
+								upgradeService.addLog(upgradeId, JsonUtils.toJSONString(new UpgradeLog(new Date(),"复制升级文件到目录失败",2))+",");
+								//添加错误中断
+								upgradeService.updateInterruptStatus(upgradeId, 1, JsonUtils.toJSONString(new UpgradeLog(new Date(),"出现错误中断升级过程",2))+",");
+								//e.printStackTrace();
+								if (logger.isErrorEnabled()) {
+						            logger.error("复制升级文件到目录失败",e);
+						        }
+							}
 						}
-					
 						
 					}
 					
 					UpgradeSystem upgradeSystem_2 = upgradeService.findUpgradeSystemById(upgradeId);
 					//删除文件
-					if(upgradeSystem_2.getRunningStatus() >=20 && upgradeSystem_2.getRunningStatus()<40){
+					if(upgradeSystem_2.getInterruptStatus() != 1 && upgradeSystem_2.getRunningStatus() >=20 && upgradeSystem_2.getRunningStatus()<40){
 						restart = true;
 						boolean flag = true;
 						if(upgradeSystem_2.getDeleteFilePath() != null && !"".equals(upgradeSystem_2.getDeleteFilePath().trim())){
-							upgradeService.updateRunningStatus(upgradeId ,30,JsonUtils.toJSONString(new UpgradeLog(new Date(),"执行删除文件",1))+",");
+							upgradeService.updateRunningStatus(upgradeId ,30,JsonUtils.toJSONString(new UpgradeLog(new Date(),"执行删除文件任务",1))+",");
 							
 							List<String> deleteFilePathList = JsonUtils.toGenericObject(upgradeSystem_2.getDeleteFilePath(), new TypeReference< List<String> >(){});
 							if(deleteFilePathList != null && deleteFilePathList.size() >0){
 								
 								for(String deleteFilePath : deleteFilePathList){
-									
-									try {
-										localFileManage.deleteFile(FileUtil.toSystemPath(deleteFilePath));
-									} catch (Exception e) {
-										flag = false;
-										upgradeService.addLog(upgradeId, JsonUtils.toJSONString(new UpgradeLog(new Date(),"删除文件失败--> "+deleteFilePath,1))+",");
-										//添加错误中断
-										upgradeService.updateInterruptStatus(upgradeId, 1, JsonUtils.toJSONString(new UpgradeLog(new Date(),"出现错误中断升级过程",2))+",");
+									File file = new File(PathUtil.path()+File.separator+FileUtil.toSystemPath(deleteFilePath));
+									if(file.exists()){
+										if(file.isDirectory()){//目录
+											try {
+												localFileManage.removeDirectory(FileUtil.toSystemPath(deleteFilePath));
+											} catch (Exception e) {
+												flag = false;
+												upgradeService.addLog(upgradeId, JsonUtils.toJSONString(new UpgradeLog(new Date(),"删除目录失败--> "+deleteFilePath,1))+",");
+												//添加错误中断
+												upgradeService.updateInterruptStatus(upgradeId, 1, JsonUtils.toJSONString(new UpgradeLog(new Date(),"出现错误中断升级过程",2))+",");
+												
+												if (logger.isErrorEnabled()) {
+										            logger.error("删除目录失败"+deleteFilePath,e);
+										        }
+												break;
+												
+											}
+											
+										}else{//文件
+											try {
+												localFileManage.deleteFile(FileUtil.toSystemPath(deleteFilePath));
+											} catch (Exception e) {
+												flag = false;
+												upgradeService.addLog(upgradeId, JsonUtils.toJSONString(new UpgradeLog(new Date(),"删除文件失败--> "+deleteFilePath,1))+",");
+												//添加错误中断
+												upgradeService.updateInterruptStatus(upgradeId, 1, JsonUtils.toJSONString(new UpgradeLog(new Date(),"出现错误中断升级过程",2))+",");
+												
+												if (logger.isErrorEnabled()) {
+										            logger.error("删除文件失败"+deleteFilePath,e);
+										        }
+												break;
+												
+											}
+											
+										}
 										
-										break;
-									//	e.printStackTrace();
 									}
 								}	
 							}
@@ -490,7 +527,7 @@ public class UpgradeManageAction {
 					
 					UpgradeSystem upgradeSystem_3 = upgradeService.findUpgradeSystemById(upgradeId);
 					//重启服务器
-					if(upgradeSystem_3.getRunningStatus() >=40 && upgradeSystem_3.getRunningStatus()<100){
+					if(upgradeSystem_3.getInterruptStatus() != 1 && upgradeSystem_3.getRunningStatus() >=40 && upgradeSystem_3.getRunningStatus()<100){
 						if(restart == true){//未重启
 							//添加重启服务器中断
 							upgradeService.updateInterruptStatus(upgradeId, 2, JsonUtils.toJSONString(new UpgradeLog(new Date(),"需要重启应用服务器才能继续升级",1))+",");
@@ -504,7 +541,7 @@ public class UpgradeManageAction {
 					
 
 					UpgradeSystem upgradeSystem_4 = upgradeService.findUpgradeSystemById(upgradeId);
-					if(upgradeSystem_4.getRunningStatus() >= 100){
+					if(upgradeSystem_4.getInterruptStatus() != 1 && upgradeSystem_4.getRunningStatus() >= 100){
 						//执行处理数据
 						upgradeManage.manipulationData(upgradeId);
 					}
@@ -609,6 +646,9 @@ public class UpgradeManageAction {
 		} catch (Exception e) {
 			error.put("file", "上传错误");
 		//	e.printStackTrace();
+			if (logger.isErrorEnabled()) {
+	            logger.error("上传错误",e);
+	        }
 		}finally{
 			if(fileoutstream != null){
 				fileoutstream.close();

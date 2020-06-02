@@ -16,6 +16,7 @@
 	<script language="javascript" src="${commonPath}js/ajax.js" type="text/javascript"></script>
 	<script language="javascript" src="${commonPath}js/json2.js" type="text/javascript"></script>
 	<script language="javascript" src="${commonPath}js/jquery/jquery.min.js" type="text/javascript"></script>
+	<script type="text/javascript" src="${commonPath}js/jquery/jquery.letterAvatar.js" language="javascript"></script>
 	<link href="${commonPath}js/layer/skin/default/layer.css"  type="text/css" rel="stylesheet"/>
 	<script type="text/javascript" src="${commonPath}js/layer/layer.js" language="javascript"></script>
 </head>
@@ -32,16 +33,28 @@
 			<TABLE class="dataList" width="100%">
 				<THEAD>
 					<TR class="dataThead">
-						<TH width="50%">用户</TH>	
-						<TH width="30%">关注时间</TH>
+						<TH width="60%">用户</TH>	
+						<TH width="40%">关注时间</TH>
 					</TR>
 				</THEAD>
 				<TBODY>
 		    		<#if pageView.records?exists && pageView.records?size gt 0 >    
 					<#list pageView.records as follower>
 					<TR>
-						<TD class="dataTD">
-							<a href="user/control/home?userName=${follower.friendUserName}" target="_blank" class="link">
+						<TD class="dataTD followerModule" style="text-align: left! important;">
+							<div class="avatarBox">
+								<a href="user/control/home?userName=${follower.friendUserName}" target="_blank" class="link">
+									<#if follower.friendAvatarName != null && follower.friendAvatarName != ''>    
+										<img src="${follower.friendAvatarPath}100x100/${follower.friendAvatarName}" >
+						            </#if> 
+						            
+						        	<#if follower.friendAvatarName == null || follower.friendAvatarName == ''>    
+										<!-- 首字符头像-->
+						         		<img avatar="${(follower.friendNickname != null && follower.friendNickname??) ?string(follower.friendNickname , follower.friendUserName)}" >
+						            </#if> 
+								</a>
+							</div>
+							<a href="user/control/home?userName=${follower.friendUserName}" target="_blank" class="link userName">
 								${follower.friendUserName}
 								<#if follower.friendNickname != null && follower.friendNickname??>    
 									(${follower.friendNickname})

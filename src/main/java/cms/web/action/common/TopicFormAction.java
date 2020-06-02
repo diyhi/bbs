@@ -242,7 +242,7 @@ public class TopicFormAction {
 		}
 		
 		
-		//前3张图片地址
+		//图片地址
 		List<ImageInfo> beforeImageList = new ArrayList<ImageInfo>();
 				
 		
@@ -407,8 +407,9 @@ public class TopicFormAction {
 			//删除隐藏标签
 			String new_content = textFilterManage.deleteHiddenTag(value);
 
+		
 			//不含标签内容
-			String text = textFilterManage.filterText(new_content);
+			String text = textFilterManage.filterText(textFilterManage.specifyHtmlTagToText(new_content));
 			//清除空格&nbsp;
 			String trimSpace = cms.utils.StringUtil.replaceSpace(text).trim();
 			//摘要
@@ -464,9 +465,6 @@ public class TopicFormAction {
 					
 					beforeImageList.add(imageInfo);
 					
-					if(i ==2){//只添加3张图片
-						break;
-					}
 				}
 				topic.setImage(JsonUtils.toJSONString(beforeImageList));
 				
@@ -966,7 +964,7 @@ public class TopicFormAction {
 				String new_content = textFilterManage.deleteHiddenTag(value);
 
 				//不含标签内容
-				String text = textFilterManage.filterText(new_content);
+				String text = textFilterManage.filterText(textFilterManage.specifyHtmlTagToText(new_content));
 				//清除空格&nbsp;
 				String trimSpace = cms.utils.StringUtil.replaceSpace(text).trim();
 				//摘要
@@ -1015,9 +1013,6 @@ public class TopicFormAction {
 						
 						beforeImageList.add(imageInfo);
 						
-						if(i ==2){//只添加3张图片
-							break;
-						}
 					}
 					topic.setImage(JsonUtils.toJSONString(beforeImageList));
 					

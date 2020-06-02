@@ -63,31 +63,92 @@ public class ResourceManageAction {
 
 			String path = PathUtil.path()+File.separator+"common"+File.separator+FileUtil.toRelativePath(dirName)+File.separator+FileUtil.toRelativePath(FileUtil.toSystemPath(resourceId));
 			
+			
 			String suffix = FileUtil.getExtension(path);
 			if(suffix != null && !"".equals(suffix.trim())){//如果是js,css后缀文件
 				if("js".equalsIgnoreCase(suffix) || "css".equalsIgnoreCase(suffix)){
+					
 					StringBuffer sb = new StringBuffer();
-					try {
-						File f = new File(path); 
+					File file = new File(path); 
+					if(file.exists()){
+						
 						//调用文件编码判断类
-						String coding = Coding.detection(f);
-						InputStreamReader read = new InputStreamReader (new FileInputStream(f),coding); 
+						String coding = Coding.detection(file);
+						InputStreamReader read = new InputStreamReader (new FileInputStream(file),coding); 
 						BufferedReader br = new BufferedReader(read);
 						String row;
-						while((row = br.readLine())!=null){	
-							 sb.append(row).append("\n");
+						while((row = br.readLine())!=null){
+							sb.append(row).append("\n");
 						}
-						model.addAttribute("fileContent",sb.toString());
-						model.addAttribute("fileType",suffix.toLowerCase());
-					} catch (Exception e) {
+					}else{
 						throw new SystemException("系统找不到指定的文件");
-					}
+					}	
+					model.addAttribute("fileContent",sb.toString());
+					model.addAttribute("fileType",suffix.toLowerCase());
+					
 				}
 			}	
 		}
 		
 		
 		return "jsp/template/resource_showFile";
+	}
+	
+	/**
+	 * 资源管理 编辑文件
+	 * @param resourceId 资源Id
+	 * @param dirName 模板目录
+	 * @param content 文件内容
+	 * @param model
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(params="method=editFile", method=RequestMethod.POST)
+	@ResponseBody//方式来做ajax,直接返回字符串
+	public String editFile(String resourceId,String dirName,String content,
+			ModelMap model,HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		Map<String,Object> returnJson = new HashMap<String,Object>();
+		Map<String,String> error = new HashMap<String,String>();
+		if(resourceId != null && !"".equals(resourceId.trim()) && dirName != null && !"".equals(dirName.trim())){
+
+			String pathName = "common"+File.separator+FileUtil.toRelativePath(dirName)+File.separator+FileUtil.toRelativePath(FileUtil.toSystemPath(resourceId));
+			String fullPathName = PathUtil.path()+File.separator+pathName;
+			
+			
+			String suffix = FileUtil.getExtension(fullPathName);
+			if(suffix != null && !"".equals(suffix.trim())){//如果是js,css后缀文件
+				if("js".equalsIgnoreCase(suffix) || "css".equalsIgnoreCase(suffix)){
+					
+					File file = new File(fullPathName);
+					if(file.exists() && !file.isDirectory()){//如果是文件
+						FileUtil.writeStringToFile(pathName,content,"utf-8", false);
+						
+					}else{
+						error.put("resource", "文件不存在");
+					}
+				}else{
+					error.put("resource", "不是js或css后缀的文件");
+				}
+			}else{
+				error.put("resource", "文件后缀不能为空");
+			}
+		}else{
+			error.put("resource", "资源Id或模板目录不能为空");
+		}
+		
+		
+		if(error.size() >0){
+			//上传失败
+			returnJson.put("error", error);
+			returnJson.put("success", false);
+		}else{
+			returnJson.put("success", true);
+		}
+		
+		return JsonUtils.toJSONString(returnJson);
 	}
 	/**
 	 * 资源管理 下载

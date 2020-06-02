@@ -990,7 +990,9 @@ var thread_component = Vue.extend({
 		    
 		    playerIdList: [],//视频播放Id列表
 		    playerObjectList: [],//视频播放对象集合
-		    playerNodeList: []//视频节点对象集合
+		    playerNodeList: [],//视频节点对象集合
+		    
+		    following:false//是否已经关注该用户
 		};
 	},
 	
@@ -1255,7 +1257,8 @@ var thread_component = Vue.extend({
 								}
 							});
 							
-							
+							//查询是否已经关注该用户
+							_self.queryFollowing();
 						}
 					}
 				}
@@ -1438,6 +1441,99 @@ var thread_component = Vue.extend({
 	        }
 	    },
 		
+	    //查询是否已经关注该用户
+  		queryFollowing : function() {
+  			var _self = this;
+  			if(_self.topic != ''){
+  				var data = "userName=" + _self.topic.userName; //提交参数
+  				$.ajax({
+  					type : "GET",
+  					cache : false,
+  					async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+  					url : "queryFollowing",
+  					data : data,
+  					success : function success(result) {
+  						if (result != "") {
+  							var following = $.parseJSON(result);
+  							if (following != null) {
+  								_self.following = following;
+  							}
+  						}
+  					}
+  				});
+  				
+  			}
+  		},
+	    //添加关注
+  		addFollow : function(userName) {
+  			var _self = this;
+  			if(_self.following == false){
+  				_self.$messagebox.confirm('确定关注?').then(function (action) {
+  					var parameter = "&userName=" + userName;
+
+  					//	alert(parameter);
+  					//令牌
+  					parameter += "&token=" + _self.$store.state.token;
+  					$.ajax({
+  						type : "POST",
+  						cache : false,
+  						async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+  						url : "user/control/follow/add",
+  						data : parameter,
+  						success : function success(result) {
+  							if (result != "") {
+
+  								var returnValue = $.parseJSON(result);
+
+  								var value_success = "";
+  								var value_error = null;
+
+  								for (var key in returnValue) {
+  									if (key == "success") {
+  										value_success = returnValue[key];
+  									} else if (key == "error") {
+  										value_error = returnValue[key];
+  									}
+  								}
+
+  								//加入成功
+  								if (value_success == "true") {
+  									_self.$toast({
+  										message : "关注成功",
+  										duration : 3000,
+  										className : "mint-ui-toast",
+  									});
+
+  									setTimeout(function() {
+  										//查询是否已经关注该用户
+  										_self.queryFollowing();
+  									}, 3000);
+  									
+  								} else {
+  									//显示错误
+  									if (value_error != null) {
+
+
+  										var htmlContent = "";
+  										var count = 0;
+  										for (var errorKey in value_error) {
+  											var errorValue = value_error[errorKey];
+  											count++;
+  											htmlContent += count + ". " + errorValue + "<br>";
+  										}
+  										_self.$messagebox('提示', htmlContent);
+
+  									}
+  								}
+  							}
+  						}
+  					});
+  				}).catch(function (err){//不捕获 Promise 的异常,若用户点击了取消按钮,会出现警告
+  				    console.log(err);
+  				});
+  				
+  			}
+  		},
 		
 		//查询用户是否已经收藏话题
 		queryAlreadyCollected : function() {
@@ -1685,7 +1781,6 @@ var thread_component = Vue.extend({
 						var new_commentList = pageView.records;
 						if (new_commentList != null && new_commentList.length > 0) {
 							
-							
 							for (var i = 0; i <new_commentList.length; i++) {
 								var comment = new_commentList[i];
 								_self.$set(_self.replyExpandOrShrink, comment.id, false); //是否展开
@@ -1695,12 +1790,25 @@ var thread_component = Vue.extend({
 									var quoteContent = "";
 									for (var j = 0; j <comment.quoteList.length; j++) {
 										var quote = comment.quoteList[j];
-										quoteContent = "<div>"+quoteContent+"<span><router-link tag=\"span\" :to=\"{path: '/user/control/home', query: {userName: '"+quote.userName+"'}}\">"+(quote.nickname != null && quote.nickname != '' ? quote.nickname : quote.userName)+"</router-link>&nbsp;的评论：</span><br/>"+quote.content+"</div>";
+										//quoteContent = "<div>"+quoteContent+"<span><router-link tag=\"span\" :to=\"{path: '/user/control/home', query: {userName: '"+quote.userName+"'}}\">"+(quote.nickname != null && quote.nickname != '' ? quote.nickname : quote.userName)+"</router-link>&nbsp;的评论：</span><br/>"+quote.content+"</div>";
 										
+										
+										var avatarHtml = "<router-link class=\"avatarBox\"  tag=\"div\" :to=\"{path: '/user/control/home', query: {userName: '"+quote.userName+"'}}\">";
+										if(quote.avatarName != undefined && quote.avatarName != null && quote.avatarName != ''){
+											avatarHtml += "<img src=\""+quote.avatarPath+"100x100/"+quote.avatarName+"\">";
+											
+										}
+										if(quote.avatarName == undefined || quote.avatarName == null || quote.avatarName == ''){
+											var char = (quote.nickname != null && quote.nickname != '') ? quote.nickname : quote.userName;
+											var width = 16;//头像宽
+											avatarHtml += "<img src=\""+letterAvatar(char, width)+"\">";
+											
+										}
+											
+										avatarHtml += "</router-link>";
+										quoteContent = "<div class=\"quoteComment\">"+quoteContent+"<span class=\"userName\">"+avatarHtml+"<router-link tag=\"span\" :to=\"{path: '/user/control/home', query: {userName: '"+quote.userName+"'}}\">"+(quote.nickname != null && quote.nickname != '' ? quote.nickname : quote.userName)+"</router-link>&nbsp;的评论：</span><br/>"+quote.content+"</div>";
+	
 									}
-									
-									
-									
 									_self.$set(_self.quoteData, comment.id, quoteContent);
 								}
 								
@@ -1724,7 +1832,10 @@ var thread_component = Vue.extend({
 											var char = (comment.nickname != null && comment.nickname !="") ? comment.nickname : comment.userName;
 											//元素的实际宽度
 											var width= _self.$refs['commentAvatarData_'+comment.id][0].offsetWidth;
-											_self.$refs['commentAvatarData_'+comment.id][0].src = letterAvatar(char, width);	
+											_self.$refs['commentAvatarData_'+comment.id][0].src = letterAvatar(char, width);
+											
+											//引用评论头像由生成引用html时直接插入
+											
 										}
 										
 										if(comment.replyList != null && comment.replyList.length > 0){
@@ -2940,6 +3051,7 @@ var thread_component = Vue.extend({
 			this.queryAlreadyLiked();
 			//查询话题点赞总数
 			this.queryLikeCount();
+			
 		},
 		//初始化BScroll滚动插件//this.$refs.addCommentFormScroll
 		initScroll : function initScroll(ref) {
@@ -3232,6 +3344,8 @@ var question_component = Vue.extend({
 		        //	this.viewer.zoomTo(1);
 		        }
 		    },
+		    
+		    following :false//是否已经关注该用户
 		};
 	},
 	
@@ -3345,6 +3459,9 @@ var question_component = Vue.extend({
 									
 								}
 							});
+							
+							//查询是否已经关注该用户
+							_self.queryFollowing();
 						}
 					}
 				}
@@ -3384,7 +3501,99 @@ var question_component = Vue.extend({
 		},
 		
 		
-		
+		//查询是否已经关注该用户
+  		queryFollowing : function() {
+  			var _self = this;
+  			if(_self.question != ''){
+  				var data = "userName=" + _self.question.userName; //提交参数
+  				$.ajax({
+  					type : "GET",
+  					cache : false,
+  					async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+  					url : "queryFollowing",
+  					data : data,
+  					success : function success(result) {
+  						if (result != "") {
+  							var following = $.parseJSON(result);
+  							if (following != null) {
+  								_self.following = following;
+  							}
+  						}
+  					}
+  				});
+  				
+  			}
+  		},
+	    //添加关注
+  		addFollow : function(userName) {
+  			var _self = this;
+  			if(_self.following == false){
+  				_self.$messagebox.confirm('确定关注?').then(function (action) {
+  					var parameter = "&userName=" + userName;
+
+  					//	alert(parameter);
+  					//令牌
+  					parameter += "&token=" + _self.$store.state.token;
+  					$.ajax({
+  						type : "POST",
+  						cache : false,
+  						async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+  						url : "user/control/follow/add",
+  						data : parameter,
+  						success : function success(result) {
+  							if (result != "") {
+
+  								var returnValue = $.parseJSON(result);
+
+  								var value_success = "";
+  								var value_error = null;
+
+  								for (var key in returnValue) {
+  									if (key == "success") {
+  										value_success = returnValue[key];
+  									} else if (key == "error") {
+  										value_error = returnValue[key];
+  									}
+  								}
+
+  								//加入成功
+  								if (value_success == "true") {
+  									_self.$toast({
+  										message : "关注成功",
+  										duration : 3000,
+  										className : "mint-ui-toast",
+  									});
+
+  									setTimeout(function() {
+  										//查询是否已经关注该用户
+  										_self.queryFollowing();
+  									}, 3000);
+  									
+  								} else {
+  									//显示错误
+  									if (value_error != null) {
+
+
+  										var htmlContent = "";
+  										var count = 0;
+  										for (var errorKey in value_error) {
+  											var errorValue = value_error[errorKey];
+  											count++;
+  											htmlContent += count + ". " + errorValue + "<br>";
+  										}
+  										_self.$messagebox('提示', htmlContent);
+
+  									}
+  								}
+  							}
+  						}
+  					});
+  				}).catch(function (err){//不捕获 Promise 的异常,若用户点击了取消按钮,会出现警告
+  				    console.log(err);
+  				});
+  				
+  			}
+  		},
 		
 		//查询用户是否已经收藏问题
 		queryAlreadyFavoriteQuestion : function() {
@@ -4187,8 +4396,14 @@ var addQuestion_component = Vue.extend({
 			questionTitle:'',//发表问题标题
 			questionAmount: '',//悬赏金额
 			questionPoint: '',//悬赏积分
-			maxDeposit: '',//最多允许悬赏金额
-			maxPoint: '',//最多允许悬赏积分
+			maxDeposit: '',//用户共有预存款
+			maxPoint: '',//用户共有积分
+			questionRewardPointMin: '',//问题悬赏积分下限
+			questionRewardPointMax: '',//问题悬赏积分上限
+			questionRewardAmountMin: '',//问题悬赏金额下限
+			questionRewardAmountMax: '',//问题悬赏金额上限
+			
+			
 			questionContent:'',//发表问题内容
 			maxQuestionTagQuantity:0,//标签最多可选数量
 			currentQuestionTagQuantity:0,//标签已选择数量
@@ -4381,6 +4596,24 @@ var addQuestion_component = Vue.extend({
 									_self.maxDeposit = returnValue[key];
 								}else if (key == "maxPoint") {
 									_self.maxPoint = returnValue[key];
+								}else if (key == "questionRewardPointMin") {
+									_self.questionRewardPointMin = parseInt(returnValue[key]);
+								}else if (key == "questionRewardPointMax") {
+									var questionRewardPointMax_value = returnValue[key];
+									if(questionRewardPointMax_value != null){
+										_self.questionRewardPointMax = parseInt(returnValue[key]);
+									}else{
+										_self.questionRewardPointMax = null;
+									}
+								}else if (key == "questionRewardAmountMin") {
+									_self.questionRewardAmountMin = parseFloat(returnValue[key]);
+								}else if (key == "questionRewardAmountMax") {
+									var questionRewardAmountMax_value = returnValue[key];
+									if(questionRewardAmountMax_value != null){
+										_self.questionRewardAmountMax = parseFloat(returnValue[key]);
+									}else{
+										_self.questionRewardAmountMax = null;
+									}
 								}else if (key == "maxQuestionTagQuantity") {
 									_self.maxQuestionTagQuantity = parseInt(returnValue[key]);
 								}else if (key == "captchaKey") {
@@ -4743,7 +4976,7 @@ var appendQuestion_component = Vue.extend({
 				}
 			});
 		},
-		//保存追加话题
+		//保存追加问题
 		appendQuestion : function() {
 			var _self = this;
 			//清空所有错误
@@ -5251,6 +5484,18 @@ var register_component = Vue.extend({
 		//提交用户
 		addUser : function() {
 			var _self = this;
+			
+			//清除错误
+			_self.error.userName = '';//用户名
+			_self.error.password = ''; //密码
+			_self.error.confirmPassword  = '';//确认密码
+			_self.error.issue = '';//密码提示问题
+			_self.error.answer = '';//密码提示答案
+			_self.error.email = '';//邮箱
+			_self.error.captchaValue  = '';//验证码值
+			_self.error.register = '';//注册错误
+			_self.customError =[];//用户自定义注册功能项错误提示
+			
 
 			if (_self.agreement == false) { //如果不同意服务协议
 				_self.$messagebox('提示', '必须同意本站服务协议才能注册用户');
@@ -5392,9 +5637,11 @@ var register_component = Vue.extend({
 									_self.error.answer = errorValue;
 								} else if (error == "email") { //邮箱
 									_self.error.email = errorValue;
-								}  else if (error == "register") { //注册错误
+								} else if (error == "register") { //注册错误
 									_self.error.register = errorValue;
-								} else {
+								}  else if (error == "captchaValue") { //验证码错误
+									_self.error.captchaValue = errorValue;
+								}else {
 									var number = error.split("_")[1];
 									for (var i = 0; i < _self.userCustomList.length; i++) {
 										var userCustom = _self.userCustomList[i];
@@ -6471,7 +6718,8 @@ var home_component = Vue.extend({
 			videoPlayer.destroy();//销毁播放器
 			
 		}
-	},nents: {
+	},
+	components: {
 	    'vue-cropper': window['vue-cropper'].default
 	},
 	computed: {
@@ -6665,6 +6913,7 @@ var home_component = Vue.extend({
 		        alert('图片类型必须是.gif,jpeg,jpg,png,bmp中的一种');
 		        return false;
 		    }
+		    
 		    var reader = new FileReader();
 		    reader.onload = function (e) {
 		        var data = void 0;
@@ -9504,6 +9753,7 @@ var privateMessageChat_component = Vue.extend({
 			friendUserNameTitle:'',//对方用户名称标题
 			loading : false, //加载中
 			currentpage : null, //当前页码
+			totalrecord : 0, //对话总数
 			topText:'下拉加载更多',//下拉显示文本信息
 			
 			popup_privateMessage :false,//发私信弹出层
@@ -9523,6 +9773,7 @@ var privateMessageChat_component = Vue.extend({
 	created : function created() {
 		//初始化
 		this.initialization();
+		
 	},
 	beforeDestroy : function() {
 		//销毁滚动条
@@ -9533,7 +9784,7 @@ var privateMessageChat_component = Vue.extend({
 	},
 	methods : {
 		//查询私信对话列表
-		queryPrivateMessageChat : function() {
+		queryPrivateMessageChat : function(callback) {
 			var _self = this;
 			if (_self.currentpage ==null || _self.currentpage >0) {
 				_self.loading = true;
@@ -9594,6 +9845,7 @@ var privateMessageChat_component = Vue.extend({
 								});
 							}
 							
+							_self.totalrecord = pageView.totalrecord;
 							_self.currentpage = pageView.currentpage;
 							if(pageView.currentpage ==1){//如果为第一页，则下次不再查询
 								_self.currentpage = 0;
@@ -9609,6 +9861,12 @@ var privateMessageChat_component = Vue.extend({
 									}
 								}
 							});
+							
+							if(typeof callback === 'function') {
+								//回调
+								callback();
+							}
+							
 						}
 					},
 					complete : function complete(XMLHttpRequest, textStatus) {
@@ -9621,6 +9879,17 @@ var privateMessageChat_component = Vue.extend({
 			}else{
 				_self.$refs.loadmore.onTopLoaded();//查询完要调用一次，用于重新定位
 			}
+		},
+		
+
+		//消息滚动到底部
+		messageScrollBottom : function() {
+			var _self = this;
+			_self.$nextTick(function() {
+				setTimeout(function() {
+	                document.scrollingElement.scrollTop = document.scrollingElement.scrollHeight;
+	            }, 100);
+			});
 		},
 		//添加私信UI
 		addPrivateMessageUI : function(friendUserName) {
@@ -9695,7 +9964,10 @@ var privateMessageChat_component = Vue.extend({
 							_self.currentpage = null; //当前页码
 							_self.messageContent = '';//发私信内容
 							//查询私信对话列表
-							_self.queryPrivateMessageChat();
+							_self.queryPrivateMessageChat(function (returnValue){
+								//消息滚动到底部
+								_self.messageScrollBottom();
+							});
 							
 						} else {
 							//显示错误
@@ -9852,7 +10124,8 @@ var privateMessageChat_component = Vue.extend({
 			}
 			this.queryPrivateMessageChat();
 			
-			
+			//消息滚动到底部
+			this.messageScrollBottom();
 		},
 		//初始化BScroll滚动插件//this.$refs.addPrivateMessageFormScroll
 		initScroll : function initScroll(ref) {
@@ -10580,6 +10853,22 @@ var follow_component = Vue.extend({
 							var new_followList = pageView.records;
 							if (new_followList != null && new_followList.length > 0) {
 								_self.followList.push.apply(_self.followList, new_followList); //合并两个数组
+								
+								//生成首字符头像
+								_self.$nextTick(function() {
+									if (new_followList != null && new_followList.length > 0) {
+										for(var i=0;i<new_followList.length; i++){
+											var follow = new_followList[i];
+											if(follow.friendAvatarName == null || follow.friendAvatarName == ''){
+												var char = (follow.friendNickname != null && follow.friendNickname !="") ? follow.friendNickname : follow.friendUserName;
+												//元素的实际宽度
+												var width= _self.$refs['followUserAvatarData_'+follow.id][0].offsetWidth;
+												_self.$refs['followUserAvatarData_'+follow.id][0].src = letterAvatar(char, width);	
+											}
+										}
+									}
+								});
+								
 							}
 							_self.currentpage = pageView.currentpage;
 							_self.totalpage = pageView.totalpage;
@@ -10703,6 +10992,21 @@ var follower_component = Vue.extend({
 							var new_followerList = pageView.records;
 							if (new_followerList != null && new_followerList.length > 0) {
 								_self.followerList.push.apply(_self.followerList, new_followerList); //合并两个数组
+								
+								//生成首字符头像
+								_self.$nextTick(function() {
+									if (new_followerList != null && new_followerList.length > 0) {
+										for(var i=0;i<new_followerList.length; i++){
+											var follower = new_followerList[i];
+											if(follower.friendAvatarName == null || follower.friendAvatarName == ''){
+												var char = (follower.friendNickname != null && follower.friendNickname !="") ? follower.friendNickname : follower.friendUserName;
+												//元素的实际宽度
+												var width= _self.$refs['followerUserAvatarData_'+follower.id][0].offsetWidth;
+												_self.$refs['followerUserAvatarData_'+follower.id][0].src = letterAvatar(char, width);	
+											}
+										}
+									}
+								});
 							}
 							_self.currentpage = pageView.currentpage;
 							_self.totalpage = pageView.totalpage;
@@ -12267,7 +12571,13 @@ function calc_div(arg1, arg2, digits) {
 		result = num1.replace(".", "") / num2.replace(".", "") * Math.pow(10, t2 - t1)
 	return toFixed(result, digits);
 }
-
+//判断字符串是数值
+function isNumeric(n) {
+	var s = String(n)
+	if (!/^[0-9.eE+-]+$/.test(s)) return false;
+	var v = Number(s)
+	return Number.isFinite(v)
+}
 //建立一个可存取到该file的url  
 function getObjectURL(file) {
 	var url = null;
@@ -12578,6 +12888,8 @@ function createEditor(editorToolbar,editorText,commonPath,menus,userGradeList,im
     
     //后台代码接收文件的字段名称
     editor.customConfig.uploadFileName = "file";
+    //上传图片大小,默认小于5M(5 * 1024 * 1024)
+    editor.customConfig.uploadImgMaxSize = 200 * 1024 * 1024;
     
     //自定义 timeout 时间 默认的 timeout 时间是 10 秒钟
     editor.customConfig.uploadImgTimeout = 30000;

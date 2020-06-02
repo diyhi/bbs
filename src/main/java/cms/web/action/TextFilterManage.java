@@ -15,12 +15,12 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 
 import cms.bean.MediaInfo;
-import cms.bean.mediaProcess.MediaProcessQueue;
 import cms.bean.setting.EditorTag;
 import cms.bean.topic.HideTagType;
 import cms.bean.user.UserGrade;
 import cms.utils.CommentedProperties;
 import cms.utils.FileUtil;
+import cms.utils.HtmlEscape;
 import cms.utils.SecureLink;
 import cms.utils.Verification;
 import cms.web.taglib.Configuration;
@@ -29,6 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Document.OutputSettings;
 import org.jsoup.safety.Whitelist;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
@@ -293,9 +294,8 @@ public class TextFilterManage {
 		Whitelist whitelist = Whitelist.none();//只保留文本，其他所有的html内容均被删除
 		whitelist.addTags("br");
 		
-
-	//	return doc.outputSettings().toString();
-	     return Jsoup.clean(html, whitelist); 
+	    return Jsoup.clean(html, whitelist); 
+		//return Jsoup.clean(html,"", whitelist,new OutputSettings().prettyPrint(false)); //prettyPrint(是否重新格式化)
 	}
 	
 	
@@ -308,11 +308,9 @@ public class TextFilterManage {
 	public String filterTag(HttpServletRequest request,String html) {  
 		if(StringUtils.isBlank(html)) return ""; 
 		Whitelist whitelist = this.filterParameter(null);
-		
-		
-	//	return doc.outputSettings().toString();
-	     return Jsoup.clean(html, Configuration.getUrl(request),whitelist); 
-	//	return Jsoup.clean(html, whitelist); 
+	
+	    //return Jsoup.clean(html, Configuration.getUrl(request),whitelist); 
+		return Jsoup.clean(html, Configuration.getUrl(request),whitelist,new OutputSettings().prettyPrint(false)); //prettyPrint(是否重新格式化)
 	}
 	
 	/**
@@ -326,11 +324,10 @@ public class TextFilterManage {
 		if(StringUtils.isBlank(html)) return ""; 
 		Whitelist whitelist = this.filterParameter(editorTag);
 		
-		
-	//	return doc.outputSettings().toString();
-	    String content = Jsoup.clean(html, Configuration.getUrl(request),whitelist); 
 	
-		return content;
+		//return Jsoup.clean(html, Configuration.getUrl(request),whitelist); 
+	
+		return Jsoup.clean(html, Configuration.getUrl(request),whitelist,new OutputSettings().prettyPrint(false)); //prettyPrint(是否重新格式化)
 	}
 	
 	/**
@@ -340,8 +337,13 @@ public class TextFilterManage {
 	 */
 	public String filterText(String html) {  
 		if(StringUtils.isBlank(html)) return ""; 
-		 return Jsoup.clean(html, Whitelist.none()); //只保留文本，其他所有的html内容均被删除
-		 
+		return Jsoup.clean(html, Whitelist.none()); //只保留文本，其他所有的html内容均被删除
+		
+		//doc.text()或Jsoup.clean提取出文本，注意text会将p等标签转为空格而不是换行符，而clean默认会转为换行符。
+		
+		
+		//只保留文本，其他所有的html内容均被删除
+		//return Jsoup.clean(html, "",Whitelist.none(),new OutputSettings().prettyPrint(false)); //prettyPrint(是否重新格式化)
 	}
 	/**
 	 * 过滤标签并删除<hide>标签所有内容,只返回文本
@@ -352,9 +354,9 @@ public class TextFilterManage {
 		if(StringUtils.isBlank(html)) return ""; 
 		String newHtml = this.deleteHiddenTag(html);
 		if(StringUtils.isBlank(newHtml)) return ""; 
-		
-		return Jsoup.clean(newHtml, Whitelist.none()); //只保留文本，其他所有的html内容均被删除
-		 
+		//只保留文本，其他所有的html内容均被删除
+		return Jsoup.clean(newHtml, Whitelist.none()); 
+		//return Jsoup.clean(newHtml,"", Whitelist.none(),new OutputSettings().prettyPrint(false)); //prettyPrint(是否重新格式化)
 	}
 	
 	/**
@@ -619,6 +621,18 @@ public class TextFilterManage {
 			}
 		}
 
+		//转义pre标签内容 注意：前端富文本编辑器默认会自动转义，这里转义是为了防止前端绕过转义而导致某些JavaScript高亮插件显示错位，像&nbsp;这种空格标签前端不转义就不能显示本字符
+		Elements elements = doc.select("pre");  
+		for (Element element : elements) {
+			String htmlData = element.html();
+			if(htmlData != null && !"".equals(htmlData.trim())){
+				element.html(HtmlEscape.escapeSymbol(element.html()));//仅转义小于号和大于号
+			}
+		}
+		
+		//prettyPrint(是否重新格式化)、outline(是否强制所有标签换行)、indentAmount(缩进长度)    doc.outputSettings().indentAmount(0).prettyPrint(false);
+		doc.outputSettings().prettyPrint(false);
+				
 	//	 doc.outputSettings().escapeMode(EscapeMode.xhtml);
 	//     Document clean = new Cleaner(whitelist).clean(doc);
 	//     return clean.body().html();//获取html 
@@ -815,6 +829,8 @@ public class TextFilterManage {
 					}
 				}
 			}
+			//prettyPrint(是否重新格式化)、outline(是否强制所有标签换行)、indentAmount(缩进长度)    doc.outputSettings().indentAmount(0).prettyPrint(false);
+			doc.outputSettings().prettyPrint(false);
 			html = doc.body().html();
 		}
 		
@@ -963,7 +979,8 @@ public class TextFilterManage {
 					}
 				}
 			}
-			
+			//prettyPrint(是否重新格式化)、outline(是否强制所有标签换行)、indentAmount(缩进长度)    doc.outputSettings().indentAmount(0).prettyPrint(false);
+			doc.outputSettings().prettyPrint(false);
 			html = doc.body().html();
 		}
 		
@@ -1247,6 +1264,8 @@ public class TextFilterManage {
 				element.attr("class","inputValue_"+hide_type.trim()); 
 				
 			}
+			//prettyPrint(是否重新格式化)、outline(是否强制所有标签换行)、indentAmount(缩进长度)    doc.outputSettings().indentAmount(0).prettyPrint(false);
+			doc.outputSettings().prettyPrint(false);
 			html = doc.body().html();
 		}
 		return html;
@@ -1345,6 +1364,8 @@ public class TextFilterManage {
 					element.empty();	
 				}
 			}
+			//prettyPrint(是否重新格式化)、outline(是否强制所有标签换行)、indentAmount(缩进长度)    doc.outputSettings().indentAmount(0).prettyPrint(false);
+			doc.outputSettings().prettyPrint(false);
 			html = doc.body().html();
 		}
 		return html;
@@ -1362,6 +1383,8 @@ public class TextFilterManage {
 			for (Element element : elements) {
 				element.remove();
 			}
+			//prettyPrint(是否重新格式化)、outline(是否强制所有标签换行)、indentAmount(缩进长度)    doc.outputSettings().indentAmount(0).prettyPrint(false);
+			doc.outputSettings().prettyPrint(false);
 			html = doc.body().html();
 		}
 		return html;
@@ -1417,6 +1440,8 @@ public class TextFilterManage {
 					}
 				}
 			}
+			//prettyPrint(是否重新格式化)、outline(是否强制所有标签换行)、indentAmount(缩进长度)    doc.outputSettings().indentAmount(0).prettyPrint(false);
+			doc.outputSettings().prettyPrint(false);
 			html = doc.body().html();
 		}
 		return html;
@@ -1455,6 +1480,8 @@ public class TextFilterManage {
 			
 				
 			}
+			//prettyPrint(是否重新格式化)、outline(是否强制所有标签换行)、indentAmount(缩进长度)    doc.outputSettings().indentAmount(0).prettyPrint(false);
+			doc.outputSettings().prettyPrint(false);
 			html = doc.body().html();
 		}
 		return html;
@@ -1495,6 +1522,71 @@ public class TextFilterManage {
 		}
 		return mediaInfoList;
 	}
+	
+	/**
+	 * 指定Html标签转文本
+	 * @param html 富文本内容
+	 * @return  [视频] [图片] [表情] 
+	 */
+	public String specifyHtmlTagToText(String html){
+		if(!StringUtils.isBlank(html)){
+			
+			Document doc = Jsoup.parseBodyFragment(html);
+			//图片
+			Elements image_elements = doc.select("img[src]");  
+			for (Element element : image_elements) {
+				String imageUrl = element.attr("src"); 
+				if(StringUtils.startsWithIgnoreCase(imageUrl, "common/") || StringUtils.startsWithIgnoreCase(imageUrl, "backstage/")){
+					
+					//替换当前标签为<p>标签
+					element.tagName("p");
+					element.appendText("[表情]");
+	            }else{
+	            	//替换当前标签为<p>标签
+					element.tagName("p");
+	            	element.appendText("[图片]");
+	            }
+			}
+			
+			//插入动态地图和嵌入视频
+			Elements iframe_pngs = doc.select("iframe[src]");  
+			for (Element element : iframe_pngs) {  
+				//<iframe style="width:560px;height:362px;" src="http://127.0.0.1:8080/shop/backstage/kindeditor/plugins/baidumap/index.html?center=121.473704%2C31.230393&zoom=11&width=558&height=360&markers=121.473704%2C31.230393&markerStyles=l%2CA" frameborder="0">
+				 String iframeUrl = element.attr("src"); 
+				 if(iframeUrl != null && !"".equals(iframeUrl.trim())){
+					 iframeUrl = StringUtils.deleteWhitespace(iframeUrl);//删除字符串中的空白字符 
+					 
+					 if (StringUtils.startsWithIgnoreCase(iframeUrl.trim(), "backstage/kindeditor/plugins/baidumap/index.html") ) {//动态地图
+		                 //替换当前标签为<p>标签
+		                 element.tagName("p");
+		                 element.appendText("[地图]");
+		             }else{
+		            	//替换当前标签为<p>标签
+		                 element.tagName("p");
+		                 element.appendText("[外链视频]");
+		             }
+					 
+					 
+				 }
+			}
+
+			Elements video_pngs = doc.select("video[src]");  
+			for (Element element : video_pngs) { 
+				 String mediaUrl = element.attr("src"); 
+				 if(mediaUrl != null && !"".equals(mediaUrl.trim())){
+					 if(StringUtils.startsWithIgnoreCase(mediaUrl, "file/")){
+						//替换当前标签为<p>标签
+		                 element.tagName("p");
+		                 element.appendText("[视频]");
+					 }
+				 }
+			}
+			//prettyPrint(是否重新格式化)、outline(是否强制所有标签换行)、indentAmount(缩进长度)    doc.outputSettings().indentAmount(0).prettyPrint(false);
+			doc.outputSettings().prettyPrint(false);
+			html = doc.body().html();
+		}
+		
+		
+		return html;
+	}
 }
-
-

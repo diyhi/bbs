@@ -1,6 +1,9 @@
 package cms.web.action.setting;
 
+import java.math.BigDecimal;
 import java.util.List;
+
+import javax.persistence.Column;
 
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -145,6 +148,52 @@ public class SystemSettingValidator implements Validator{
 			errors.rejectValue("answerReply_rewardPoint","errors.required", new String[]{"不能为空"},"");
 		}
 		
+		
+		//问题悬赏积分下限
+		if(systemSetting.getQuestionRewardPointMin() != null){
+			if(systemSetting.getQuestionRewardPointMin() <0L){
+				errors.rejectValue("questionRewardPointMin","errors.required", new String[]{"必须大于或等于0"},"");
+			}
+		}else{
+			errors.rejectValue("questionRewardPointMin","errors.required", new String[]{"不能为空"},"");
+		}
+		//问题悬赏积分上限 空为无限制 0则不允许悬赏积分
+		if(systemSetting.getQuestionRewardPointMax() != null){
+			if(systemSetting.getQuestionRewardPointMax() <0L){
+				errors.rejectValue("questionRewardPointMax","errors.required", new String[]{"必须大于或等于0"},"");
+			}
+			if(systemSetting.getQuestionRewardPointMax() >999999999999999L){
+				errors.rejectValue("questionRewardPointMax","errors.required", new String[]{"不能大于999999999999999"},"");
+			}
+			if(systemSetting.getQuestionRewardPointMax() > 0L && systemSetting.getQuestionRewardPointMin() != null){
+				if(systemSetting.getQuestionRewardPointMin() >=systemSetting.getQuestionRewardPointMax()){
+					errors.rejectValue("questionRewardPointMax","errors.required", new String[]{"不能小于或等于问题悬赏积分下限"},"");
+				}
+			}
+		}
+		//问题悬赏积分下限
+		if(systemSetting.getQuestionRewardAmountMin() != null){
+			if(systemSetting.getQuestionRewardAmountMin().compareTo(new BigDecimal("0")) <0){
+				errors.rejectValue("questionRewardAmountMin","errors.required", new String[]{"必须大于或等于0"},"");
+			}
+		}else{
+			errors.rejectValue("questionRewardAmountMin","errors.required", new String[]{"不能为空"},"");
+		}
+		//问题悬赏金额上限
+		if(systemSetting.getQuestionRewardAmountMax() != null){
+			if(systemSetting.getQuestionRewardAmountMax().compareTo(new BigDecimal("0")) <0){
+				errors.rejectValue("questionRewardAmountMax","errors.required", new String[]{"必须大于或等于0"},"");
+			}
+			if(systemSetting.getQuestionRewardAmountMax().compareTo(new BigDecimal("99999999")) >0){
+				errors.rejectValue("questionRewardAmountMax","errors.required", new String[]{"不能大于99999999"},"");
+			}
+			if(systemSetting.getQuestionRewardAmountMax().compareTo(new BigDecimal("0")) >0 && systemSetting.getQuestionRewardAmountMin() != null){
+				if(systemSetting.getQuestionRewardAmountMin().compareTo(systemSetting.getQuestionRewardAmountMax()) >=0){
+					errors.rejectValue("questionRewardAmountMax","errors.required", new String[]{"不能小于或等于问题悬赏积分下限"},"");
+				}
+			}
+		}
+
 		//解锁话题隐藏内容平台分成比例
 		if(systemSetting.getTopicUnhidePlatformShareProportion() != null){
 			if(systemSetting.getTopicUnhidePlatformShareProportion() <0){

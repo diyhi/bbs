@@ -220,33 +220,41 @@ html,body{
 .indexModule .topicList .item {position: relative;margin-top: 2px;}
 .indexModule .topicList .item .avatarBox{
 	position:absolute;display:inline-block;border-radius:100%;
-	left: 6px;top:2px;
+	left: 10px;top:8px;
 	
 }
 .indexModule .topicList .item .avatarBox img{
 	border-radius:100%;
-	width: 32px;
+	width: 36px;
 }
-.indexModule .topicList .item .topInfo{height:26px;line-height:26px;padding:0px 10px 0px 50px;}
-.indexModule .topicList .item .topInfo .bLeft{float:left!important;display:inline-block;margin-top: 1px;}
-.indexModule .topicList .item .topInfo .bLeft .tagName{
-	background-color: #f5f5f5;
-    font-size: 12px;
-    line-height: 12px;
-    display: inline-block;
-    padding: 4px 4px 3px 4px;
-    -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
-    border-radius: 2px;
-    text-decoration: none;
-    color: #999;
-    
+.indexModule .topicList .item .topInfo{padding:2px 10px 0px 56px;}
+.indexModule .topicList .item .topInfo .top-box{}
+.indexModule .topicList .item .topInfo .top-box .userName{color:#aaa;font-size: 14px;position: relative;top: 1px;line-height:26px;margin-right: 1px;}
+.indexModule .topicList .item .topInfo .top-box .userRoleName{
+	margin-left:3px;
+	white-space:nowrap;
+	color:#e2b46e;
+	background-color:#f8e7c4;
+	border-radius:4px;
+	padding:1px 5px;
+	font-size: 12px;
 }
-.indexModule .topicList .item .topInfo .bRight{float:right!important;font-size:14px;color:#aaa;}
+.indexModule .topicList .item .topInfo .top-box .staff{
+	margin-left:3px;
+	white-space:nowrap;
+	color:#15d327;
+	background-color:#cafcc7;
+	border-radius:4px;
+	padding:1px 5px;
+	font-size: 12px;
+}
 
+.indexModule .topicList .item .topInfo .bottom-box{font-size:14px;color:#aaa;}
+.indexModule .topicList .item .topInfo .bottom-box .time{font-style:normal;}
 .indexModule .topicList .item .title{
 	position:relative;
-	color:#222;padding:2px 10px 0px 50px;
+	color:#222;
+	padding:10px 10px 0px 56px;
     max-height:48px;
 	font-size:16px;
     line-height:24px;
@@ -266,11 +274,14 @@ html,body{
 	font-size: 12px;
 	position: relative;
 	top: -1px;
+	
 }
 .indexModule .topicList .item .title .hideTagType{
-	font-size:0;/*父级元素设置font-size:0; 解决 display：inline-block两个元素之间的默认空格 */
+	font-size:0;/*父级元素设置font-size:0; 解决 display:inline-block两个元素之间的默认空格 */
+	line-height:0;
 	position: relative;
 	top: -1px;
+	
 }
 .indexModule .topicList .item .title .hideTagType .circle{
 	border-radius:10px;display: inline-block;margin-right:5px;
@@ -340,16 +351,9 @@ html,body{
 .indexModule .topicList .item .title .hide_50 .circle i{
 	color: #fe9d2d;
 }
-
-.indexModule .topicList .item .detailInfo{position:relative;line-height:24px;padding:5px 10px 0px 50px;height: 24px;border-bottom:1px solid #eee;}
-.indexModule .topicList .item .detailInfo .bLeft{float:left!important;color:#aaa;display:inline-block;height:25px;font-size:14px;}
-.indexModule .topicList .item .detailInfo .bLeft .userName{float:left!important;}
-.indexModule .topicList .item .detailInfo .time{font-style:normal;}
-.indexModule .topicList .item .detailInfo .bRight{float:right!important;font-size:14px;color:#aaa;margin-top: 1px;}
-
 .indexModule .topicList .item .summary{
 	
-	position:relative;padding:4px 10px 0px 50px;
+	position:relative;padding:9px 10px 0px 56px;
 }
 .indexModule .topicList .item .summary span{
 	color: #aaa;
@@ -362,7 +366,7 @@ html,body{
 	width:100%;
 }
 .indexModule .topicList .item .videoInfo{
-	padding:4px 10px 0px 50px;
+	padding:10px 10px 0px 56px;
 	
 }
 .indexModule .topicList .item .videoInfo player{
@@ -418,21 +422,74 @@ html,body{
     margin: auto;
     color: #fff;
 }
-.indexModule .topicList .item .picInfo{position:relative;padding:5px 0px 0px 50px;display:inline-block;width: 100%; -webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box; }
-.indexModule .topicList .item .picInfo .imageBox{display:block;color:gray;width:20%;margin-right:2%; float:left!important;}
-.indexModule .topicList .item .picInfo .imageBox .img{
-    padding-bottom: 100%;
-    height: 0;
-	background:no-repeat ;
-	background-size:cover;border-radius:2px;
+
+.indexModule .topicList .item .imageInfo{
+    position:relative;
+    padding:10px 7px 0px 56px;
 }
-.indexModule .topicList .item .picInfo .imageBox .img img{
+
+.indexModule .topicList .item .imageInfo .image-box{
+    display: -webkit-box;     /* OLD - iOS 6-, Safari 3.1-6 */
+    display: -moz-box;       /* OLD - Firefox 19- (buggy but mostly works) */
+    display: -ms-flexbox;     /* TWEENER - IE 10 */
+    display: -webkit-flex;   /* NEW - Chrome */
+    display: flex;           /* NEW, Spec - Opera 12.1, Firefox 20+ */
+   
+	-webkit-flex-wrap: wrap;
+    -moz-flex-wrap: wrap;
+    -ms-flex-wrap: wrap;
+    -o-flex-wrap: wrap;
+    flex-wrap: wrap;
+	max-width: 100%;
+}
+.indexModule .topicList .item .imageInfo .image-box .image-column{
+	width: 100%;
+}
+.indexModule .topicList .item .imageInfo .image-box .image-column .image{
+	width: calc((100% - 9px)/3);/*每行3张图片，每张图片3px间隔 */
+	max-width: 240px;
+	flex: 0 1 auto;
+	position: relative;
+	margin-top: 3px;
+	margin-right: 3px;
+	background-position: 50%;
+	background-repeat: no-repeat;
+	background-size: cover;
+	cursor: zoom-in;
+}/**
+.indexModule .topicList .item .imageInfo .image-box .image-column .image:not(:nth-child(3n)) {
+	margin-right: 4px;
+}**/
+/*控制图片的高度和宽度一样，padding-top基于父元素的宽度*/
+.indexModule .topicList .item .imageInfo .image-box .image-column .image .ratio{
+    pointer-events: none;
+    padding-top: 100%;
+}
+.indexModule .topicList .item .imageInfo .image-box .image-column .image .zoom{
     position: absolute;
-    width: 20%;
+   
+    width: 100%;
     height: 100%;
-  	opacity: 0;
-  	
+    opacity: 0;
 }
+
+.indexModule .topicList .item .detailInfo{position:relative;padding:12px 10px 0px 56px;height:27px; border-bottom:1px solid #eee;}
+.indexModule .topicList .item .detailInfo .bLeft{float:left!important;color:#aaa;display:inline-block;font-size:14px;}
+.indexModule .topicList .item .detailInfo .bLeft .tagName{
+	background-color: #f5f5f5;
+    font-size: 12px;
+    line-height: 12px;
+    display: inline-block;
+    padding: 4px 4px 3px 4px;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+    text-decoration: none;
+    color: #999;
+    
+}
+.indexModule .topicList .item .detailInfo .bRight{float:right!important;font-size:14px;color:#aaa;margin-top: 4px;}
+
 
 .indexModule .topicList .topicPage{
 	padding-top: 5px;padding-bottom: 10px;
@@ -468,55 +525,100 @@ html,body{
 
 /** 话题内容 **/
 .topicContentModule{
-	padding-top: 40px;padding-bottom: 2px;
+	padding-top: 40px;background: #fcfcfc;
+}
+.topicContentModule .head-box{
+	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
+	background: #fff;
+}
+
+.topicContentModule .head-box .userInfo{position:relative;padding:5px 10px 7px 10px;}
+.topicContentModule .head-box .userInfo .avatarBox{
+	position:absolute;display:inline-block;border-radius:100%;
+	left: 8px;top:10px;
+	
+}
+.topicContentModule .head-box .userInfo .avatarBox img{
+	border-radius:100%;
+	width: 36px;
+}
+.topicContentModule .head-box .userInfo .left{float:left!important;width: 75%;}
+.topicContentModule .head-box .userInfo .left .topInfo{padding:0px 0px 0px 46px;}
+.topicContentModule .head-box .userInfo .left .topInfo .top-box{}
+.topicContentModule .head-box .userInfo .left .topInfo .top-box .userName{color:#aaa;font-size: 14px;position: relative;top: 1px;line-height:26px;margin-right: 1px;}
+.topicContentModule .head-box .userInfo .left .topInfo .top-box .userRoleName{
+	margin-left:3px;
+	white-space:nowrap;
+	color:#e2b46e;
+	background-color:#f8e7c4;
+	border-radius:4px;
+	padding:1px 5px;
+	font-size: 12px;
+}
+.topicContentModule .head-box .userInfo .left .topInfo .top-box .staff{
+	margin-left:3px;
+	white-space:nowrap;
+	color:#15d327;
+	background-color:#cafcc7;
+	border-radius:4px;
+	padding:1px 5px;
+	font-size: 12px;
+}
+.topicContentModule .head-box .userInfo .left .topInfo .bottom-box{font-size:14px;color:#aaa;}
+.topicContentModule .head-box .userInfo .left .topInfo .bottom-box .time{font-style:normal;}
+.topicContentModule .head-box .userInfo .right{float:right!important;}
+.topicContentModule .head-box .userInfo .right .button{
+	margin-top: 7px;margin-right: 0px;
 }
 
 .topicContentModule .topicDetail {
-	margin-left:8px;
-	margin-right:8px;
+	margin-top:10px;
+	padding-bottom:2px;
 	overflow: hidden;
 	zoom: 1;
-	border-bottom: 1px solid #eee;
+	background: #fff;
+	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
 }
 .topicContentModule .topicDetail .head {
 	position: relative;
-	margin-top:10px;
+	margin-left:8px;
+	margin-right:8px;
 	margin-bottom: 2px;
+	padding-top:15px;
 	padding-bottom: 2px;
 	border-bottom: 1px solid #eee;
+	background: #fff;
+	box-shadow: 0 -4px 4px -4px rgba(0,0,0,.02);
 }
 .topicContentModule .topicDetail .head h1 {
 	color: #222;
 	font-weight: 300;
-	font-size: 18px;
-	margin-right: 30px;
+	font-size: 20px;
 }
-.topicContentModule .topicDetail .head .avatarBox{
-	position:absolute;display:inline-block;border-radius:100%;
-	right: 0px;top:-6px;
-	
+.topicContentModule .topicDetail .head .info{ padding:15px 0px 4px 0px;}
+.topicContentModule .topicDetail .head .info .left{float:left!important;}
+.topicContentModule .topicDetail .head .info .left .tagName{
+	background-color: #f5f5f5;
+    font-size: 12px;
+    line-height: 12px;
+    display: inline-block;
+    padding: 4px 4px 3px 4px;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+    text-decoration: none;
+    color: #999;
+    
 }
-.topicContentModule .topicDetail .head .avatarBox img{
-	border-radius:100%;
-	width: 32px;
-}
-.topicContentModule .topicDetail .head .info{ padding:8px 0px 0px 0px;min-height: 18px;line-height: 18px;}
-.topicContentModule .topicDetail .head .info .bLeft{float:left!important;color:#aaa;display:inline-block;height:18px;font-size:13px;}
-.topicContentModule .topicDetail .head .info .bLeft .userName{float:left!important;}
-.topicContentModule .topicDetail .head .info .time{font-style:normal;margin-left: 10px;}
-.topicContentModule .topicDetail .head .info .bRight{float:right!important;font-size:13px;color:#aaa;}
+.topicContentModule .topicDetail .head .info .right{float:right!important;font-size:13px;color:#aaa;position: relative;top: 5px;}
+.topicContentModule .topicDetail .head .info .right .editTopic{font-size: 12px;color: #aaa;margin-right: 10px;}
+.topicContentModule .topicDetail .head .info .right .editTopic-icon{font-size: 12px;color: #aaa; margin-right: 2px;}
+.topicContentModule .topicDetail .head .info .right .count-icon{font-size: 12px;color: #aaa;margin-right: 2px;}
+.topicContentModule .topicDetail .head .info .right .view-icon{font-size: 12px;margin-right: 2px;color: #aaa;margin-left: 10px;}
 
-/**
-.topicContentModule .topicDetail .head p{
-	margin-top: 8px;
-	color:#878787;
-	font-size: 13px;
-}
-.topicContentModule .topicDetail .head p span{
-	color:#ececec;
-}**/
+
 .topicContentModule .topicDetail .main {
-	margin: 10px 0px 10px 0px;
+	margin: 10px 8px 10px 8px;
 	min-height: 80px;
 	font-size: 15px;
 	line-height: 1.8;
@@ -622,10 +724,15 @@ html,body{
 .topicContentModule .operating .bottomInfo{
 	margin-top: 20px;line-height:34px; margin-bottom: 10px;
 }
+.topicContentModule .operating .bottomInfo .icon{
+	margin-right: 4px;position: relative;top: 1px;
+}
 
 .topicContentModule .commentList {
 	width: 100%;
-	overflow-x: hidden;
+	box-shadow: 0 -4px 4px -4px rgba(0,0,0,.02);
+	background: #fff;
+	margin-top: 10px;
 }
 .topicContentModule .commentList .badge {
 	white-space:nowrap; 
@@ -641,29 +748,30 @@ html,body{
 	border-bottom: 1px solid #eee;
 	margin-left: 8px; 
 	margin-right: 8px;
+	margin-top: 2px;
+	padding-bottom: 2px;
 }
 .topicContentModule .commentList .item .head {
-	min-height: 45px;
-	padding: 8px 0px 0;
+	min-height: 50px;
+	padding: 10px 0px 0;
 	margin: 0;
 	overflow: hidden;
 	position: relative;
 }
 .topicContentModule .commentList .item .head .avatarBox{
 	position:absolute;display:inline-block;border-radius:100%;
-	left: 0px;top:6px;
+	left: 0px;top:8px;
 	
 }
 .topicContentModule .commentList .item .head .avatarBox img{
 	border-radius:100%;
-	width: 32px;
-	
+	width: 36px;
 }
 
 .topicContentModule .commentList .item .head .info {
 	display: block;
 	float: left;
-	margin-left: 38px;
+	margin-left: 44px;
 }
 .topicContentModule .commentList .item .head .info h2 {
 	color:#aaa;
@@ -671,35 +779,48 @@ html,body{
 	line-height: 16px;
 }
 .topicContentModule .commentList .item .head .info h2 .userName{
-	float: left;
+	float: left;margin-right: 3px;
 }
 .topicContentModule .commentList .item .head .userTag{
 	float: left;margin-top: -1px;
 }
 .topicContentModule .commentList .item .head .userTag .master{
-	white-space:nowrap; 
-	font-style:normal;
-	margin-left:5px;
+	white-space:nowrap;
 	color:#fff;
 	background-color:#26a2ff;
 	border-radius:4px;
-	padding:1px 5px 0px;
+	padding:1px 5px;
 	font-size: 12px;
+	font-style: normal;
+	font-weight: normal;
 }
 .topicContentModule .commentList .item .head .userTag .userRoleName{
-	white-space:nowrap; 
-	font-style:normal;
-	margin-left:5px;
-	color:#fff;
-	background-color:#ffcc00;
+	margin-left:3px;
+	white-space:nowrap;
+	color:#e2b46e;
+	background-color:#f8e7c4;
 	border-radius:4px;
-	padding:1px 5px 0px;
+	padding:1px 5px;
 	font-size: 12px;
+	font-style: normal;
+	font-weight: normal;
 }
+.topicContentModule .commentList .item .head .userTag .staff{
+	margin-left:3px;
+	white-space:nowrap;
+	color:#15d327;
+	background-color:#cafcc7;
+	border-radius:4px;
+	padding:1px 5px;
+	font-size: 12px;
+	font-style: normal;
+	font-weight: normal;
+}
+
 .topicContentModule .commentList .item .head .time {
 	font-size: 12px;
 	color:#aaa;
-	margin-top: 3px;
+	margin-top: 5px;
 	line-height: 12px
 }
 .topicContentModule .commentList .item .head .floor {
@@ -707,6 +828,8 @@ html,body{
 	margin-right:5px;
 	font-size: 12px;
 	color:#aaa;
+	position: relative;
+	top: -1px;
 }
 .topicContentModule .commentList .item .main {
 	padding: 0 8px 0 8px;
@@ -723,21 +846,28 @@ html,body{
 	font-size: 15px;
 	color: #26a2ff;
 }
+.topicContentModule .commentList .item .main .commentContent p{font-size:16px;word-wrap:break-word}
 .topicContentModule .commentList .item .main .commentContent img {
-	max-width:100%;height:auto;border:none;background:none;padding:0;
-	/**
-	display: block;
-	max-width: 100%;
-	margin: 5px auto 0**/
+	max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;
 }
 .topicContentModule .commentList .item .main .quote{
 	 padding:5px 8px;border-bottom:none;text-align: left;margin-left: 5px;color: 878787;
 }
-.topicContentModule .commentList .item .main .quote div{
+.topicContentModule .commentList .item .main .quote .quoteComment{
 	background:#fafafa;padding:3px;border:1px solid #ddd;line-height:140%;margin-bottom:5px;font-size: 15px;border-radius: 3px;
 }
-.topicContentModule .commentList .item .main .quote div span{
-	color:#aaa;font-size:12px;
+.topicContentModule .commentList .item .main .quote .quoteComment .userName{
+	color:#aaa;font-size:12px;margin-left: 26px;position: relative;
+}
+.topicContentModule .commentList .item .main .quote .avatarBox{
+	position:absolute;display:inline-block;border-radius:100%;
+	left: -22px;top:-2px;
+	
+}
+.topicContentModule .commentList .item .main .quote .avatarBox img{
+	border-radius:100%;
+	width: 16px;
+	
 }
 .topicContentModule .commentList .replyList {
 	border-top: 1px solid #eee;
@@ -894,7 +1024,7 @@ html,body{
 }
 .topicContentModule .addQuoteScroll .box .addQuoteForm{margin-left:5px; margin-right: 5px;}
 .topicContentModule .addQuoteScroll .box .addQuoteForm .quoteBox{
-	background:#fafafa; padding:10px;border:1px solid #eee;margin-top: 10px;margin-bottom: 10px;
+	background:#fafafa; padding:10px;border:1px solid #eee;margin-top: 10px;margin-bottom: 10px;font-size: 14px;
 }
 .topicContentModule .addQuoteScroll .box .addQuoteForm .tips{line-height:30px; margin-left: 115px}
 .topicContentModule .addQuoteScroll .box .addQuoteForm .tips span{color: red;}
@@ -1027,42 +1157,52 @@ html,body{
 .askListModule .questionList .item {position: relative;margin-top: 2px;}
 .askListModule .questionList .item .avatarBox{
 	position:absolute;display:inline-block;border-radius:100%;
-	left: 6px;top:2px;
+	left: 10px;top:8px;
 	
 }
 .askListModule .questionList .item .avatarBox img{
 	border-radius:100%;
-	width: 32px;
+	width: 36px;
 }
-.askListModule .questionList .item .topInfo{height:26px;line-height:26px;padding:0px 10px 0px 50px;}
-.askListModule .questionList .item .topInfo .bLeft{
-	float:left!important;
-	display:inline-block;
-	margin-top: 1px;
-	width:60%;
-	overflow:hidden;
-	text-overflow:ellipsis; 
-	white-space:nowrap; 
+.askListModule .questionList .item .topInfo{padding:2px 50px 0px 56px;}
+.askListModule .questionList .item .topInfo .top-box{}
+.askListModule .questionList .item .topInfo .top-box .userName{color:#aaa;font-size: 14px;position: relative;top: 1px;line-height:26px;margin-right: 1px;}
+.askListModule .questionList .item .topInfo .top-box .userRoleName{
+	margin-left:3px;
+	white-space:nowrap;
+	color: #feb21a;
+    background-color: #ffedba;
+	border-radius:4px;
+	padding:1px 5px;
+	font-size: 12px;
 }
-.askListModule .questionList .item .topInfo .bLeft .tagName{
-	background-color: #f5f5f5;
-    font-size: 12px;
-    line-height: 12px;
-    display: inline-block;
-    padding: 4px 4px 3px 4px;
-    -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
-    border-radius: 2px;
-    text-decoration: none;
-    color: #999;
-    margin-right: 5px;
-    
+.askListModule .questionList .item .topInfo .top-box .staff{
+	margin-left:3px;
+	white-space:nowrap;
+	color:#15d327;
+	background-color:#cafcc7;
+	border-radius:4px;
+	padding:1px 5px;
+	font-size: 12px;
 }
-.askListModule .questionList .item .topInfo .bRight{float:right!important;font-size:14px;color:#aaa;}
-
+.askListModule .questionList .item .topInfo .bottom-box{font-size:14px;color:#aaa;}
+.askListModule .questionList .item .topInfo .bottom-box .time{font-style:normal;}
+.askListModule .questionList .item .topInfo .solve{
+	position: absolute;top: 7px;right: 10px;
+}
+.askListModule .questionList .item .topInfo .solve .adoption{
+	margin-left:3px;
+	white-space:nowrap;
+	color:#fff;
+	background-color:#26a2ff;
+	border-radius:4px;
+	padding:1px 5px;
+	font-size: 12px;
+}		            	
 .askListModule .questionList .item .title{
 	position:relative;
-	color:#222;padding:2px 10px 4px 50px;
+	color:#222;
+	padding:10px 10px 0px 56px;
     max-height:48px;
 	font-size:16px;
     line-height:24px;
@@ -1071,16 +1211,9 @@ html,body{
 	-webkit-line-clamp: 2;
 	overflow: hidden;
 }
-
-.askListModule .questionList .item .detailInfo{position:relative;line-height:24px;padding:5px 10px 0px 50px;height: 24px;border-bottom:1px solid #eee;}
-.askListModule .questionList .item .detailInfo .bLeft{float:left!important;color:#aaa;display:inline-block;height:25px;font-size:14px;}
-.askListModule .questionList .item .detailInfo .bLeft .userName{float:left!important;}
-.askListModule .questionList .item .detailInfo .time{font-style:normal;}
-.askListModule .questionList .item .detailInfo .bRight{float:right!important;font-size:14px;color:#aaa;margin-top: 1px;}
-
 .askListModule .questionList .item .summary{
 	
-	position:relative;padding:2px 10px 0px 50px;
+	position:relative;padding:2px 10px 0px 56px;
 }
 .askListModule .questionList .item .summary span{
 	color: #aaa;
@@ -1093,7 +1226,7 @@ html,body{
 	width:100%;
 }
 .askListModule .questionList .item .reward{
-	min-height: 20px;margin-right: 10px;margin-top: 5px;margin-bottom: -3px;
+	min-height: 20px;margin-right: 10px;margin-top: 10px;margin-bottom: -3px;
 }
 .askListModule .questionList .item .reward .box{
 	float:right;
@@ -1108,55 +1241,130 @@ html,body{
 	font-family:Arial;font-weight:normal; vertical-align: middle; display:inline-block;margin-left: 5px;color: #cca558;
 }
 .askListModule .questionList .item .reward .rewardInfo .amount{
-	margin-left: 1px;color: #cca558; margin-right: 5px;font-weight: 700;position: relative;top: 1px;
+	margin-left: 1px;color: #cca558; margin-right: 5px;font-weight: 700;
 }
 .askListModule .questionList .item .reward .rewardInfo .point{
-	color: #cca558; margin-right: 5px;font-weight: 700;position: relative;top: 1px;
+	color: #cca558; margin-right: 5px;font-weight: 700;
 }
+.askListModule .questionList .item .detailInfo{position:relative;padding:12px 10px 5px 56px; border-bottom:1px solid #eee;}
+.askListModule .questionList .item .detailInfo .bLeft{
+	float:left!important;
+	width: 50%;
+	overflow:hidden;
+	height: 20px;
+}
+.askListModule .questionList .item .detailInfo .bLeft .tagName{
+	margin-right:3px;
+	margin-bottom:3px;
+	background-color: #f5f5f5;
+    font-size: 12px;
+    line-height: 12px;
+    display: inline-block;
+    padding: 4px 4px 3px 4px;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+    text-decoration: none;
+    color: #999;
+    
+}
+.askListModule .questionList .item .detailInfo .bRight{float:right!important;font-size:14px;color:#aaa;margin-top: 2px;}
 .askListModule .questionList .questionPage{
 	padding-top: 5px;padding-bottom: 10px;
 }
 
 /** 问题内容 **/
 .questionContentModule{
-	padding-top: 40px;padding-bottom: 2px;
+	padding-top: 40px;background: #fcfcfc;
+}
+.questionContentModule .head-box{
+	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
+	background: #fff;
 }
 
+.questionContentModule .head-box .userInfo{position:relative;padding:5px 10px 7px 10px;}
+.questionContentModule .head-box .userInfo .avatarBox{
+	position:absolute;display:inline-block;border-radius:100%;
+	left: 8px;top:10px;
+	
+}
+.questionContentModule .head-box .userInfo .avatarBox img{
+	border-radius:100%;
+	width: 36px;
+}
+.questionContentModule .head-box .userInfo .left{float:left!important;width: 75%;}
+.questionContentModule .head-box .userInfo .left .topInfo{padding:0px 0px 0px 46px;}
+.questionContentModule .head-box .userInfo .left .topInfo .top-box{}
+.questionContentModule .head-box .userInfo .left .topInfo .top-box .userName{color:#aaa;font-size: 14px;position: relative;top: 1px;line-height:26px;margin-right: 1px;}
+.questionContentModule .head-box .userInfo .left .topInfo .top-box .userRoleName{
+	margin-left:3px;
+	white-space:nowrap;
+	color: #feb21a;
+    background-color: #ffedba;
+	border-radius:4px;
+	padding:1px 5px;
+	font-size: 12px;
+}
+.questionContentModule .head-box .userInfo .left .topInfo .top-box .staff{
+	margin-left:3px;
+	white-space:nowrap;
+	color:#15d327;
+	background-color:#cafcc7;
+	border-radius:4px;
+	padding:1px 5px;
+	font-size: 12px;
+}
+.questionContentModule .head-box .userInfo .left .topInfo .bottom-box{font-size:14px;color:#aaa;}
+.questionContentModule .head-box .userInfo .left .topInfo .bottom-box .time{font-style:normal;}
+.questionContentModule .head-box .userInfo .right{float:right!important;}
+.questionContentModule .head-box .userInfo .right .button{
+	margin-top: 7px;margin-right: 0px;
+}
 .questionContentModule .questionDetail {
-	margin-left:8px;
-	margin-right:8px;
-	border-bottom: 1px solid #eee;
+	margin-top:10px;
+	padding-bottom:2px;
+	background: #fff;
+	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
 }
 .questionContentModule .questionDetail .head {
 	position: relative;
-	margin-top:10px;
-	margin-bottom: 2px;
+	margin-left:8px;
+	margin-right:8px;
+	padding-top:15px;
 	padding-bottom: 2px;
 	border-bottom: 1px solid #eee;
+	background: #fff;
+	box-shadow: 0 -4px 4px -4px rgba(0,0,0,.02);
 }
 .questionContentModule .questionDetail .head h1 {
 	color: #222;
 	font-weight: 300;
-	font-size: 18px;
-	margin-right: 30px;
+	font-size: 20px;
 }
-.questionContentModule .questionDetail .head .avatarBox{
-	position:absolute;display:inline-block;border-radius:100%;
-	right: 0px;top:-6px;
-	
+.questionContentModule .questionDetail .head .info{ padding:15px 0px 1px 0px;}
+.questionContentModule .questionDetail .head .info .left{float:left!important;}
+.questionContentModule .questionDetail .head .info .left .tagName{
+	margin-right:3px;
+	margin-bottom:3px;
+	background-color: #f5f5f5;
+    font-size: 12px;
+    line-height: 12px;
+    display: inline-block;
+    padding: 4px 4px 3px 4px;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+    text-decoration: none;
+    color: #999;
 }
-.questionContentModule .questionDetail .head .avatarBox img{
-	border-radius:100%;
-	width: 32px;
-}
-.questionContentModule .questionDetail .head .info{ padding:8px 0px 0px 0px;min-height: 18px;line-height: 18px;}
-.questionContentModule .questionDetail .head .info .bLeft{float:left!important;color:#aaa;display:inline-block;height:18px;font-size:13px;}
-.questionContentModule .questionDetail .head .info .bLeft .userName{float:left!important;}
-.questionContentModule .questionDetail .head .info .time{font-style:normal;margin-left: 10px;}
-.questionContentModule .questionDetail .head .info .bRight{float:right!important;font-size:13px;color:#aaa;margin-top: 1px;}
+.questionContentModule .questionDetail .head .info .right{float:right!important;font-size:13px;color:#aaa;position: relative;top: 4px;}
+.questionContentModule .questionDetail .head .info .right .appendQuestion{font-size: 12px;color: #aaa;margin-right: 10px;}
+.questionContentModule .questionDetail .head .info .right .appendQuestion-icon{font-size: 12px;color: #aaa; margin-right: 2px;}
+.questionContentModule .questionDetail .head .info .right .count-icon{font-size: 12px;color: #aaa;margin-right: 2px;}
+.questionContentModule .questionDetail .head .info .right .view-icon{font-size: 12px;margin-right: 2px;color: #aaa;margin-left: 10px;}
 
 .questionContentModule .questionDetail .main {
-	margin: 10px 0px 10px 0px;
+	margin: 10px 8px 10px 8px;
 	min-height: 80px;
 	font-size: 15px;
 	line-height: 1.8;
@@ -1208,6 +1416,9 @@ html,body{
 .questionContentModule .operating .bottomInfo{
 	margin-top: 20px;line-height:34px; margin-bottom: 10px;
 }
+.questionContentModule .operating .bottomInfo .icon{
+	margin-right: 4px;position: relative;top: 1px;
+}
 .questionContentModule .questionDetail .appendBox{
 	margin-top:25px;
 	position:relative;
@@ -1257,7 +1468,9 @@ html,body{
 
 .questionContentModule .answerList {
 	width: 100%;
-	/**overflow-x: hidden;**/
+	box-shadow: 0 -4px 4px -4px rgba(0,0,0,.02);
+	background: #fff;
+	margin-top: 10px;
 }
 .questionContentModule .answerList .badge {
 	white-space:nowrap; 
@@ -1276,27 +1489,27 @@ html,body{
 	position: relative;
 }
 .questionContentModule .answerList .item .head {
-	min-height: 45px;
-	padding: 8px 0px 0;
+	min-height: 50px;
+	padding: 10px 0px 0;
 	margin: 0;
 	overflow: hidden;
 	position: relative;
 }
 .questionContentModule .answerList .item .head .avatarBox{
 	position:absolute;display:inline-block;border-radius:100%;
-	left: 0px;top:6px;
+	left: 0px;top:8px;
 	
 }
 .questionContentModule .answerList .item .head .avatarBox img{
 	border-radius:100%;
-	width: 32px;
+	width: 36px;
 	
 }
 
 .questionContentModule .answerList .item .head .info {
 	display: block;
 	float: left;
-	margin-left: 38px;
+	margin-left: 44px;
 }
 .questionContentModule .answerList .item .head .info h2 {
 	color:#aaa;
@@ -1304,30 +1517,43 @@ html,body{
 	line-height: 16px;
 }
 .questionContentModule .answerList .item .head .info h2 .userName{
-	float: left;
+	float: left;margin-right: 2px;
 }
 .questionContentModule .answerList .item .head .userTag{
 	float: left;margin-top: -1px;
 }
 .questionContentModule .answerList .item .head .userTag .master{
-	white-space:nowrap; 
-	font-style:normal;
-	margin-left:5px;
+
+	white-space:nowrap;
 	color:#fff;
 	background-color:#26a2ff;
 	border-radius:4px;
-	padding:1px 5px 0px;
+	padding:1px 5px;
 	font-size: 12px;
+	font-style: normal;
+	font-weight: normal;
 }
 .questionContentModule .answerList .item .head .userTag .userRoleName{
-	white-space:nowrap; 
-	font-style:normal;
-	margin-left:5px;
-	color:#fff;
-	background-color:#ffcc00;
+	margin-left:3px;
+	white-space:nowrap;
+	color: #feb21a;
+    background-color: #ffedba;
 	border-radius:4px;
-	padding:1px 5px 0px;
+	padding:1px 5px;
 	font-size: 12px;
+	font-style: normal;
+	font-weight: normal;
+}
+.questionContentModule .answerList .item .head .userTag .staff{
+	margin-left:3px;
+	white-space:nowrap;
+	color:#15d327;
+	background-color:#cafcc7;
+	border-radius:4px;
+	padding:1px 5px;
+	font-size: 12px;
+	font-style: normal;
+	font-weight:normal;
 }
 .questionContentModule .answerList .item .head .time {
 	font-size: 12px;
@@ -1417,12 +1643,13 @@ html,body{
 	margin-bottom: 10px;
 	color:#222;font-size: 15px;
 }
-.questionContentModule .answerList.item .main .answerContent a{
+.questionContentModule .answerList .item .main .answerContent a{
 	font-size: 15px;
 	color: #26a2ff;
 }
+.questionContentModule .answerList .item .main .answerContent p{font-size:16px;word-wrap:break-word}
 .questionContentModule .answerList .item .main .answerContent img {
-	max-width:100%;height:auto;border:none;background:none;padding:0;
+	max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;
 }
 .questionContentModule .answerList .replyList {
 	border-top: 1px solid #eee;
@@ -1497,6 +1724,16 @@ html,body{
 	padding:1px 5px 0px;
 	font-size: 12px;
 }
+.questionContentModule .answerList .replyList .box li .reply-top .userTag .staff{
+	margin-left:3px;
+	white-space:nowrap;
+	color:#15d327;
+	background-color:#cafcc7;
+	border-radius:4px;
+	padding:1px 5px;
+	font-size: 12px;
+	font-style: normal;
+}
 .questionContentModule .answerList .replyList .box li .reply-top .time {
 	float: right;
 	color:#aaa;
@@ -1518,7 +1755,7 @@ html,body{
 	color: #26a2ff;
 }
 .questionContentModule .answerList .item .bottomInfo {
-	height: 22px;
+	height: 24px;
 	overflow: hidden;
 	text-align: right;
 }
@@ -1731,7 +1968,7 @@ html,body{
 	height: 26px;
 	line-height: 26px;
 	border-radius: 3px;
-	background-color: #c4e4fc;
+	background-color: #e1f0ff;
 	color:#359ff5;
 	margin-right: 8px;
 	margin-bottom: 8px;
@@ -1767,7 +2004,69 @@ html,body{
 	padding-top: 36px;padding-bottom: 2px;position:relative;
 }
 .searchModule .topicList {margin-top: 3px;}
+.searchModule .topicList .item {position: relative;margin-top: 2px;}
+.searchModule .topicList .item .avatarBox{
+	position:absolute;display:inline-block;border-radius:100%;
+	left: 10px;top:8px;
 	
+}
+.searchModule .topicList .item .avatarBox img{
+	border-radius:100%;
+	width: 36px;
+}
+.searchModule .topicList .item .topInfo{padding:2px 10px 0px 56px;}
+.searchModule .topicList .item .topInfo .top-box{}
+.searchModule .topicList .item .topInfo .top-box .userName{color:#aaa;font-size: 14px;position: relative;top: 1px;line-height:26px;margin-right: 1px;}
+.searchModule .topicList .item .topInfo .top-box .userRoleName{
+	margin-left:3px;
+	white-space:nowrap;
+	color:#e2b46e;
+	background-color:#f8e7c4;
+	border-radius:4px;
+	padding:1px 5px;
+	font-size: 12px;
+}
+.searchModule .topicList .item .topInfo .top-box .staff{
+	margin-left:3px;
+	white-space:nowrap;
+	color:#15d327;
+	background-color:#cafcc7;
+	border-radius:4px;
+	padding:1px 5px;
+	font-size: 12px;
+}
+.searchModule .topicList .item .topInfo .bottom-box{font-size:14px;color:#aaa;}
+.searchModule .topicList .item .topInfo .bottom-box .time{font-style:normal;}
+.searchModule .topicList .item .title{
+	position:relative;
+	color:#222;
+	padding:10px 10px 0px 56px;
+    max-height:48px;
+	font-size:16px;
+    line-height:24px;
+    display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+	overflow: hidden;
+}
+.searchModule .topicList .item .title .topicRoleName{
+	font-style:normal;
+	margin-left:5px;
+	white-space:nowrap; 
+	color:#fff;
+	background-color:#ffcc00;
+	border-radius:4px;
+	padding:2px 4px 0px;
+	font-size: 12px;
+	position: relative;
+	top: -1px;
+	
+}
+
+
+
+
+/**
 .searchModule .topicList .item {position: relative; border-bottom:1px solid #eee;}
 .searchModule .topicList .item .avatarBox{
 	position:absolute;display:inline-block;border-radius:100%;
@@ -1815,10 +2114,10 @@ html,body{
 	font-size: 12px;
 	position: relative;
 	top: -1px;
-}
+}**/
 .searchModule .topicList .item .content{
 	position:relative;
-	color: #aaa;padding:0px 10px 5px 50px;font-size:14px;
+	color: #aaa;padding:4px 10px 0px 56px;font-size:14px;
     line-height:24px;
     max-height:48px;
     display: -webkit-box;
@@ -1827,11 +2126,29 @@ html,body{
 	overflow: hidden;
 }
 .searchModule .topicList .item B{color: #fc0012;}
+.searchModule .topicList .item .detailInfo{position:relative;padding:10px 10px 0px 56px;height:25px; border-bottom:1px solid #eee;}
+.searchModule .topicList .item .detailInfo .bLeft{float:left!important;color:#aaa;display:inline-block;font-size:14px;}
+.searchModule .topicList .item .detailInfo .bLeft .module{
+	background-color: #f5f5f5;
+    font-size: 12px;
+    line-height: 12px;
+    display: inline-block;
+    padding: 4px 4px 3px 4px;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+    text-decoration: none;
+    color: #999;
+    
+}
+.searchModule .topicList .item .detailInfo .bRight{float:right!important;font-size:14px;color:#aaa;margin-top: 3px;}
+
+/**
 .searchModule .topicList .detailInfo{line-height:26px;padding:0px 10px 0px 50px;height: 26px;}
 .searchModule .topicList .detailInfo .bLeft{float:left!important;color:#aaa;display:inline-block;height:25px;font-size:14px;}
 .searchModule .topicList .detailInfo .bLeft .userName{float:left!important;}
 .searchModule .topicList .detailInfo .time{font-style:normal;}
-.searchModule .topicList .detailInfo .bRight{float:right!important;font-size:14px;color:#aaa;margin-top: 1px;}
+.searchModule .topicList .detailInfo .bRight{float:right!important;font-size:14px;color:#aaa;margin-top: 1px;}**/
 .searchModule .topicList .topicPage{
 	padding-top: 5px;padding-bottom: 10px;
 }
@@ -1935,8 +2252,8 @@ html,body{
 	font-style:normal;
 	margin-left:5px;
 	white-space:nowrap; 
-	color:#fff;
-	background-color:#ffcc00;
+	color:#feb21a;
+	background-color:#ffedba;
 	border-radius:4px;
 	padding:2px 5px 0px;
 	font-size: 14px;
@@ -2134,15 +2451,6 @@ html,body{
 	color: #fe9d2d;
 }
 .homeModule .userDynamicList .item .main .topicContent{
-	margin: 10px 0px 10px 30px;
-	min-height: 40px;
-	font-size: 15px;
-	line-height: 1.8;
-	color: #222;
-	text-align: left;
-}
-
-.test{
 	margin: 10px 0px 10px 30px;
 	min-height: 40px;
 	font-size: 15px;
@@ -2789,7 +3097,7 @@ html,body{
 
 .privateMessageModule .privateMessageList .item .head {
 	min-height: 45px;
-	padding: 8px 0px 0px 40px;
+	padding: 9px 0px 0px 40px;
 	margin: 0;
 	overflow: hidden;
 }
@@ -2805,13 +3113,15 @@ html,body{
 .privateMessageModule .privateMessageList .item .head .time {
 	font-size: 12px;
 	color:#aaa;
-	margin-top: 6px;
+	margin-top: 3px;
 	line-height: 12px
 }
 .privateMessageModule .privateMessageList .item .head .operating {
 	float: right;
 	font-size: 12px;
 	color:#aaa;
+	position: relative;
+	top: -3px;
 }
 .privateMessageModule .privateMessageList .item .head .operating .delete-btn{
 	color: #999;
@@ -2833,20 +3143,17 @@ html,body{
 
 /** 私信对话 **/
 .privateMessageChatModule{
-	padding-top: 40px;padding-bottom: 2px;padding-bottom: 20px;
+	padding-top: 40px;padding-bottom: 70px;
 
 }
 
-.privateMessageChatModule .headInfo{margin-top: 10px; margin-left:8px; margin-right:8px; border-bottom:1px solid #eee; height: 38px; }
+.privateMessageChatModule .headInfo{margin-top: 6px; margin-left:8px; margin-right:8px; border-bottom:1px solid #eee;padding-bottom:4px; margin-bottom:5px; }
 .privateMessageChatModule .headInfo .title{
-	margin-left:10px;
-	float: left;
-	font-size: 16px; 
+	margin-left:4px;
+	font-size: 16px;
+	line-height:26px;
 	color:#2192f8;
 	padding:6px 0;
-}
-.privateMessageChatModule .headInfo .button{
-	float: right;
 }
 
 .privateMessageChatModule .friend{
@@ -2901,7 +3208,7 @@ html,body{
     border-style: solid;
     border-color:  transparent #fafafa transparent transparent;
     border-width: 10px;
-    left:5px;
+    left:4px;
 }
 .privateMessageChatModule .friend div span{
 	float: left;
@@ -2990,9 +3297,9 @@ html,body{
     content: "";
     position: absolute;
     border-style: solid;
-    border-color:  transparent transparent transparent #d4e9f9;
+    border-color:  transparent transparent transparent #e5f3ff;
     border-width: 10px;
-    left:5px;
+    left:4px;
 }
 .privateMessageChatModule .self div span{
 	min-height: 40px;
@@ -3002,8 +3309,9 @@ html,body{
 	border-radius: 10px;
 	position: relative;
 	max-width: 94%;
-	background: #d4e9f9;
-	border-color: #d4e9f9;
+	background: #e5f3ff;
+	border-color: #e5f3ff;
+	color: #2196F3;
 	float: right;
 	margin-top:18px;
 	margin-left: 0;
@@ -3065,13 +3373,96 @@ html,body{
 	color:#2192f8;
 	padding:6px 0;
 }
-.privateMessageChatModule .addPrivateMessageScroll .box .addPrivateMessageForm{margin-left:5px; margin-right: 5px;}
-.privateMessageChatModule .addPrivateMessageScroll .box .addPrivateMessageForm .messageContent{background: #ffffff;
-    border: 1px solid rgba(39,41,43,0.15);
-    outline: none; color: rgba(0,0,0,0.8);
-    border-radius: 0.28rem;line-height: 20px;font-size: 14px;width: 100%;}
+.privateMessageChatModule .addPrivateMessageScroll .box .addPrivateMessageForm{margin-left:10px; margin-right: 10px;margin-top: 8px;}
+.privateMessageChatModule .addPrivateMessageScroll .box .addPrivateMessageForm .messageContent{
+	box-sizing:border-box;/*防止百分百宽度和padding撑大*/
+    -o-box-sizing:border-box;
+    -ms-box-sizing:border-box;
+    -moz-box-sizing:border-box;
+    -webkit-box-sizing:border-box;
+	
+	background: #ffffff;
+    border: 1px solid #eee;
+    outline: none; 
+    color: rgba(0,0,0,0.8);
+    border-radius: 3px;
+    line-height: 24px;
+    font-size: 16px;
+    width: 100%;
+    padding: 6px;
+   }
 .privateMessageChatModule .addPrivateMessageScroll .box .addPrivateMessageForm .tips{line-height:30px; margin-left: 115px}
 .privateMessageChatModule .addPrivateMessageScroll .box .addPrivateMessageForm .tips span{color: red;}
+
+/* 私信底部输入 */
+.privateMessageEnter {
+    position: fixed;
+    z-index: 999;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: auto;
+}
+.privateMessageEnter .message-container {
+    display: flex;
+    box-sizing: content-box;
+    align-items: center;
+    height: 54px;
+    width: 100%;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+    padding-bottom: env(safe-area-inset-bottom);
+    border-bottom: none !important;
+    background-color: #fff;
+}
+.privateMessageEnter .message-container .messageContent-box {
+    height: 54px;
+    border-radius: 4px;
+    flex: 1;
+    height: 36px;
+    margin: 0 10px;
+    background-color: #f6f6f6;
+}
+.privateMessageEnter .message-container .messageContent-box .messageContent-icon{
+	margin-left: 8px;
+	font-size: 16px;
+	position: relative;
+	top: 2px;
+	color: #999aaa;
+}
+.privateMessageEnter .message-container .messageContent-box .messageContent-text {
+    line-height: 37px;
+    margin-left: 5px;
+    font-size: 15px;
+    color: #9c9c9c;
+    letter-spacing: 0;
+}
+.privateMessageEnter .message-container .privateMessage-info {
+    margin: 0 13px 0 0;
+    min-width: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: #555666;
+}
+.privateMessageEnter .message-container .privateMessage-info .message-count-icon {
+    color: #555666;
+    font-size: 16px;
+    position: relative;
+	top: 1px;
+}
+.privateMessageEnter .message-container .privateMessage-info .message-count-text {
+    color: #555666;
+    font-size: 16px;
+}
+
+
+
+
+
+
 
 
 /** 系统通知 **/
@@ -3364,13 +3755,20 @@ html,body{
 }
 .followModule .followList .item .main {
 	padding: 0 8px 0 8px;
-	font-size: 16px;
-	line-height: 26px;
-	margin: 0 0 10px
+	margin: 5px 0 23px;
+	position: relative;
 }
-.followModule .followList .item .main .content {
-	margin-bottom: 10px;
-	color:#222;
+.followModule .followList .item .main .avatarBox{
+	display:inline-block;border-radius:100%;
+	position: absolute;top: -5px;
+}
+.followModule .followList .item .main .avatarBox img{
+	border-radius:100%;
+	width: 36px;
+}
+.followModule .followList .item .main .userName {
+	display:block;
+	color:#222;font-size: 16px;position: relative;top: 3px;padding-left: 50px;
 }
 
 /** 粉丝 **/
@@ -3411,13 +3809,20 @@ html,body{
 }
 .followerModule .followerList .item .main {
 	padding: 0 8px 0 8px;
-	font-size: 16px;
-	line-height: 26px;
-	margin: 0 0 10px
+	margin: 5px 0 23px;
+	position: relative;
 }
-.followerModule .followerList .item .main .content {
-	margin-bottom: 10px;
-	color:#222;
+.followerModule .followerList .item .main .avatarBox{
+	display:inline-block;border-radius:100%;
+	position: absolute;top: -5px;
+}
+.followerModule .followerList .item .main .avatarBox img{
+	border-radius:100%;
+	width: 36px;
+}
+.followerModule .followerList .item .main .userName {
+	display:block;
+	color:#222;font-size: 16px;position: relative;top: 3px;padding-left: 50px;
 }
 
 /** 话题取消隐藏用户列表 **/

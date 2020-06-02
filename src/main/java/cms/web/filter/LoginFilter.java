@@ -85,7 +85,11 @@ public class LoginFilter implements Filter {
 						isJump = true;
 					}else if(accessToken.equals(refreshUser.getAccessToken())){
 						//令牌续期
-						oAuthManage.tokenRenewal(refreshToken,refreshUser,request,response);
+						boolean flag = oAuthManage.tokenRenewal(refreshToken,refreshUser,request,response);
+						
+						if(!flag){//如果续期不成功
+							isJump = true;
+						}
 					}else{
 						isJump = true;
 					}

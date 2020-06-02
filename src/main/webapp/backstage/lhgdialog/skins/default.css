@@ -12,7 +12,8 @@ body{ _margin:0; }/*IE6 BUG*/
 .ui_lock_scroll body{ overflow:hidden; }
 
 /*结构层*/
-.ui_content,.ui_title,.ui_buttons input{ font:12px/1.333 tahoma,arial,\5b8b\4f53,sans-serif; }
+/*.ui_content,.ui_title,.ui_buttons input{ font:12px/1.333 tahoma,arial,\5b8b\4f53,sans-serif; }*/
+.ui_content,.ui_buttons input{ font:12px/1.333 tahoma,arial,\5b8b\4f53,sans-serif; }
 table.ui_border,table.ui_dialog{ width:auto;border-spacing:0;*border-collapse:collapse; }
 .ui_border td,.ui_dialog td{ padding:0; }
 .ui_dialog{ background:#FFF; }
@@ -54,7 +55,7 @@ table.ui_border,table.ui_dialog{ width:auto;border-spacing:0;*border-collapse:co
 
 /*标题栏样式   #46a0e1改为#feffff,#3280bf改为#ecf1f6 */
 .ui_title_bar{ position:relative;height:100%;border-bottom:1px solid #bfe3ff; }
-.ui_title{ height:26px;line-height:26px;font-size:14px;font-weight:bold;color:#DDD;padding-left:7px;border-bottom:1px solid #bfe3ff;
+.ui_title{ height:30px;line-height:32px;font-size:16px;color:#ccc;padding-left:7px;border-bottom:1px solid #bfe3ff;
 background:linear-gradient(top,#feffff,#ecf1f6);
 background:-webkit-gradient(linear,0% 0%, 0% 100%,from(#feffff),to(#ecf1f6)); 
 background:-moz-linear-gradient(top,#feffff,#ecf1f6); 
@@ -64,15 +65,15 @@ filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#feffff',endCol
  
 
  
-.ui_state_focus .ui_title{ color:#333;text-shadow:0 1px 0 #333; }
-.ui_state_drag .ui_title { border-bottom:1px solid #82bee6;text-shadow: 0 -1px 0 #333;
+.ui_state_focus .ui_title{ color:#333; }/*text-shadow:0 1px 0 #333;*/
+.ui_state_drag .ui_title { border-bottom:1px solid #82bee6;/*text-shadow: 0 -1px 0 #333;*/
 background:linear-gradient(top,#ecf1f6,#feffff); 
 background:-moz-linear-gradient(top,#ecf1f6,#feffff); 
 background:-webkit-gradient(linear,0% 0%, 0% 100%,from(#ecf1f6),to(#feffff));
 filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ecf1f6',endColorstr='#feffff'); }
 
 /*标题纯CSS按钮定位部分  删除.ui_res_t{ background:#3d8cce; }*/
-.ui_title_buttons{ top:3px;right:5px; }
+.ui_title_buttons{ top:5px;right:5px; }
 .ui_min,.ui_max,.ui_close,.ui_res{ color:#919191;font-size:22px;width:22px;height:22px;line-height:18px; }
 .ui_min_b{ top:10px;left:5px;width:12px;height:2px;border-bottom:2px solid #919191; }
 .ui_max_b{ top:5px;left:5px;width:10px;height:7px; }

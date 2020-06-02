@@ -7,10 +7,10 @@
 <#if pageView.records?exists && topicRelated_comment_page.records?size gt 0> 
 	
 	<div class="commentModule" >
-		<ol class="commentlist">
+		<ol class="commentList">
 			<!-- #comment-## -->
 			<#list pageView.records as comment>
-				<div class="comment" id="anchor_${comment.id}">
+				<div class="commentInfo" id="anchor_${comment.id}">
 					<div class="comment-author">
 						<a href="user/control/home?userName=${comment.userName}">
 						<#if comment.avatarName != null>

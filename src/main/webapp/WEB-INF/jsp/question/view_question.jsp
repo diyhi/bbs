@@ -8,6 +8,7 @@
 <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="_csrf_token" content="${_csrf.token}"/>
 <meta name="_csrf_header" content="${_csrf.headerName}"/>
+<link href="backstage/prism/default-block/prism.css"  type="text/css" rel="stylesheet"/>
 <link href="backstage/css/list.css" type="text/css" rel="stylesheet"/>
 <link href="backstage/css/table.css" type="text/css" rel="stylesheet"/>
 <link rel="stylesheet" href="backstage/layer/skin/layer.css"  type="text/css" />
@@ -18,12 +19,11 @@
 <script charset="utf-8" src="backstage/kindeditor/kindeditor-min.js"></script>
 <script type="text/javascript" src="backstage/js/json3.js"></script>
 <script type="text/javascript" src="backstage/lhgdialog/lhgcore.lhgdialog.min.js"></script>
-<link rel="stylesheet" href="backstage/syntaxhighlighter/styles/shCoreDefault.css"  type="text/css" />
-<script language="JavaScript" src="backstage/syntaxhighlighter/scripts/shCore.js" type="text/javascript"></script>
-<script language="javascript" src="backstage/syntaxhighlighter/scripts/shBrushXml.js" type="text/javascript" ></script>
-<script language="javascript" src="backstage/syntaxhighlighter/scripts/shBrushJScript.js" type="text/javascript" ></script>
-<script language="javascript" src="backstage/syntaxhighlighter/scripts/shBrushCss.js" type="text/javascript"></script>
-<script language="javascript" src="backstage/syntaxhighlighter/scripts/shBrushJava.js" type="text/javascript"></script>
+<script type="text/javascript" src="backstage/jquery/jquery.letterAvatar.js" language="javascript"></script>
+
+<script type="text/javascript" src="backstage/prism/default-block/prism.js" language="javascript"></script>
+<script type="text/javascript" src="backstage/prism/default-block/clipboard.min.js" language="javascript"></script>
+
 
 <script type="text/javascript" >
 //审核问题
@@ -529,28 +529,58 @@ $(function() {
 	<c:if test="${param.origin == 40 }">
 		<input class="functionButton" type="button" onClick="javascript:window.location.href='${config:url(pageContext.request)}control/favorite/list${config:suffix()}?userName=${param.userName}&id=${param.id}&queryState=${param.queryState}&jumpStatus=${param.jumpStatus}&userPage=${param.userPage}&page=${param.favoritePage}'" value="返回">
 	</c:if>
+	
+	<!-- 来自问题搜索 -->
+	<c:if test="${param.origin == 100 }">
+		<input class="functionButton" type="button" onClick="javascript:window.parent.callbackFrame();" value="返回">
+	</c:if>
 </div>
 
-<TABLE class="t-list-table" cellSpacing="1" cellPadding="0" width="100%" border="0" style="table-layout:fixed;">
+<TABLE class="t-list-table" cellSpacing="1" cellPadding="0" width="100%" border="0">
 	<THEAD class="t-list-thead"><!-- 表格使用table-layout:fixed;会让表的布局宽度以第一行为准 -->
-		<TR style="height:0px;padding:0"> 
-			<TH style="width:20%;height:0px;"></TH> 
-			<TH style="width:80%;height:0px;"></TH>
-		</TR> 
 		<TR>
 			<TH colspan="2">${question.title}</TH>
 		</TR>
 	</THEAD>
 	<TBODY class="t-list-tbody" align="center">
-		<TR class="noDiscolor">
-		  	<TD>
-		  		${question.userName}
-		  		<c:if test="${question.isStaff == true}"><span style="color: green;">[员工]</span></c:if>
+		<TR class="noDiscolor" >
+		  	<TD width="180px" valign="top">
+		  		<div class="userInfo">
+					<div class="author">
+						<c:if test="${question.avatarName != null}">
+							<img src="${question.avatarPath}${question.avatarName}" >
+						</c:if>
+						<c:if test="${question.avatarName == null}">
+							<img avatar="${(question.nickname != null && question.nickname != '') ? question.nickname : question.userName}" >
+						</c:if>
+					</div>
+					<p class="name">
+						${question.userName}
+					</p>
+					<c:if test="${question.nickname != null && question.nickname != ''}">
+						<p class="nickname">
+							呢称：${question.nickname}
+						</p>
+					</c:if>
+					<c:if test="${question.userRoleNameList != null && fn:length(question.userRoleNameList) >0}">
+						<div class="role">
+							<c:forEach items="${question.userRoleNameList}" var="roleName">
+								<i class="userRoleName">${roleName}</i>
+							</c:forEach>
+						</div>
+					</c:if>
+					
+					<c:if test="${question.isStaff == true}">
+						<div class="role">
+							<i class="staff">员工</i>	
+						</div>
+					</c:if>	  		
+		  		</div>
 		  	</TD>
-		    <TD>
-		    	 <TABLE  cellSpacing="2" cellPadding="0" width="99%"  border="0">
+		    <TD valign="top">
+		    	 <TABLE  cellSpacing="2" cellPadding="0" width="100%"  border="0">
 					<TR class="noDiscolor">
-						<TD width="40%" style="BORDER-BOTTOM: #bfe3ff 1px dotted;" align="left"><fmt:formatDate value="${question.postTime}" pattern="yyyy-MM-dd HH:mm:ss" /></TD>
+						<TD width="40%" style="BORDER-BOTTOM: #bfe3ff 1px dotted;line-height: 28px;" align="left"><fmt:formatDate value="${question.postTime}" pattern="yyyy-MM-dd HH:mm:ss" /></TD>
 						<TD width="60%" style="BORDER-BOTTOM: #bfe3ff 1px dotted" align="right">${question.ip}&nbsp;${question.ipAddress}</TD>
 					</TR>	
 				</TABLE>
@@ -566,8 +596,13 @@ $(function() {
 	                	</div>
 	                </div>
 				</c:if>
+				<div class="questionTag">
+					<c:forEach items="${question.questionTagAssociationList}" var="questionTag">
+						<span  class="tag">${questionTag.questionTagName}</span>	
+					</c:forEach>
+		        </div>
 				<enhance:out escapeXml="false">
-					<div class="comment">${question.content}</div>
+					<div class="richTextContent" style="min-height: 200px;">${question.content}</div>
 				</enhance:out>
 				<div class="appendQuestionModule" >
 					<c:forEach items="${question.appendQuestionItemList}" var="appendQuestionItem" varStatus="status">
@@ -584,12 +619,12 @@ $(function() {
 						</div>
 					</c:forEach>
 				</div>
-				<TABLE  cellSpacing="2" cellPadding="0" width="99%"  border="0">
+				<TABLE  cellSpacing="2" cellPadding="0" width="100%"  border="0">
 					<TR class="noDiscolor">
-						<TD width="50%" style="border-top: #bfe3ff 1px dotted;" align="left">
+						<TD width="50%" style="border-top: #bfe3ff 1px dotted;line-height: 28px;padding-top: 8px;" align="left">
 							查看总数：${question.viewTotal}&nbsp;&nbsp;&nbsp;&nbsp;答案总数：${question.answerTotal}
 						</TD>
-						<TD width="50%" style="border-top: #bfe3ff 1px dotted;" align="right">
+						<TD width="50%" style="border-top: #bfe3ff 1px dotted;line-height: 28px;padding-top: 8px;" align="right">
 							<c:if test="${question.status == 10}">
 								<A onclick="javascript:if(window.confirm('确定审核通过吗? ')){auditQuestion('${question.id}');return false;}else{return false};" hidefocus="true" href="#" ondragstart= "return false">立即审核</A>&nbsp;&nbsp;
 							</c:if>
@@ -611,11 +646,40 @@ $(function() {
   <TBODY class="t-list-tbody" align="center">
    <c:forEach items="${pageView.records}" var="entry" varStatus="status">
 	  <TR id="anchor_${entry.id}" class="noDiscolor">
-	  	<TD width="20%">
-	  		${entry.userName}
-	  		<c:if test="${entry.isStaff == true}"><span style="color: green;">[员工]</span></c:if>
+	  	<TD width="180px" valign="top">
+	  		<div class="userInfo">
+				<div class="author">
+					<c:if test="${entry.avatarName != null}">
+						<img src="${entry.avatarPath}${entry.avatarName}" >
+					</c:if>
+					<c:if test="${entry.avatarName == null}">
+						<img avatar="${(entry.nickname != null && entry.nickname != '') ? entry.nickname : entry.userName}" >
+					</c:if>
+				</div>
+				<p class="name">
+					${entry.userName}
+				</p>
+				<c:if test="${entry.nickname != null && entry.nickname != ''}">
+					<p class="nickname">
+						呢称：${entry.nickname}
+					</p>
+				</c:if>
+				<c:if test="${entry.userRoleNameList != null && fn:length(entry.userRoleNameList) >0}">
+					<div class="role">
+						<c:forEach items="${entry.userRoleNameList}" var="roleName">
+							<i class="userRoleName">${roleName}</i>
+						</c:forEach>
+					</div>
+				</c:if>
+				
+				<c:if test="${entry.isStaff == true}">
+					<div class="role">
+						<i class="staff">员工</i>	
+					</div>
+				</c:if>	  		
+	  		</div>
 	  	</TD>
-	    <TD width="80%">
+	    <TD valign="top" style="height: 100%;">
 	    	 <TABLE  cellSpacing="2" cellPadding="0" width="99%"  border="0">
 				<TR class="noDiscolor">
 					<TD width="40%" style="BORDER-BOTTOM: #bfe3ff 1px dotted;" align="left"><fmt:formatDate value="${entry.postTime}" pattern="yyyy-MM-dd HH:mm:ss" /></TD>
@@ -623,11 +687,12 @@ $(function() {
 				</TR>	
 			</TABLE>
 			<enhance:out escapeXml="false">
-			<div class="comment">${entry.content}</div>
+			<div class="richTextContent" style="min-height: 180px;">${entry.content}</div>
 			</enhance:out>
-			<div>
-				<span style="color: black;"><strong style="color: #666">--- 共有 ${entry.totalReply} 条回复 --- </strong></span>
-				<TABLE  cellSpacing="2" cellPadding="0" width="99%"  border="0">
+			<c:if test="${entry.answerReplyList != null && fn:length(entry.answerReplyList) >0}">
+			<div style="background: #fbfbfb;margin-left: 8px; margin-right: 8px;">
+				<span style="color: black;"><strong style="color: #666;line-height: 30px;">--- 共有 ${entry.totalReply} 条回复 --- </strong></span>
+				<TABLE  cellSpacing="2" cellPadding="0" width="100%"  border="0">
 					<c:forEach items="${entry.answerReplyList}" var="reply">
 						<TR class="noDiscolor">
 							<TD width="15%" align="right">
@@ -652,13 +717,14 @@ $(function() {
 					</c:forEach>
 				</TABLE>
 			</div>
+			</c:if>
 			<TABLE  cellSpacing="2" cellPadding="0" width="99%"  border="0">
 				<TR class="noDiscolor">
-					<TD width="50%" style="border-top: #bfe3ff 1px dotted;" align="left">
+					<TD width="50%" style="border-top: #bfe3ff 1px dotted;line-height: 28px;padding-top: 8px;" align="left">
 						<A hidefocus="true" onClick="showAddReply('${entry.id}',${pageView.currentpage}); return false" href="#" ondragstart= "return false">回复</A>&nbsp;&nbsp;
 						
 					</TD>
-					<TD width="50%" style="border-top: #bfe3ff 1px dotted;" align="right">
+					<TD width="50%" style="border-top: #bfe3ff 1px dotted;line-height: 28px;padding-top: 8px; padding-right: 6px;" align="right">
 						<c:if test="${entry.status == 10}">
 							<A onclick="javascript:if(window.confirm('确定通过吗? ')){auditAnswer('${entry.id}');return false;}else{return false};" hidefocus="true" href="#" ondragstart= "return false">立即审核</A>&nbsp;&nbsp;
 						</c:if>
@@ -685,7 +751,7 @@ $(function() {
 
 
 
-<TABLE class="t-table" cellSpacing="1" cellPadding="2" width="100%" border="0" style="margin-top: 34px;">
+<TABLE class="t-table" cellSpacing="1" cellPadding="2" width="100%" border="0" style="margin-top: 38px;">
   <TBODY>
 
   <TR>
@@ -729,8 +795,8 @@ $(function() {
 	
 		editor = K.create('textarea[name="content"]', {
 			basePath : '${config:url(pageContext.request)}backstage/kindeditor/',//指定编辑器的根目录路径
-			themeType : 'style :darkGray',//深灰主题 加冒号的是主题样式文件名称同时也是主题目录
-		//	autoHeightMode : true,//值为true，并引入autoheight.js插件时自动调整高度
+			themeType : 'style :minimalist',//极简主题 加冒号的是主题样式文件名称同时也是主题目录
+			autoHeightMode : true,//值为true，并引入autoheight.js插件时自动调整高度
 			formatUploadUrl :false,//false时不会自动格式化上传后的URL
 			resizeType : 1,//2或1或0，2时可以拖动改变宽度和高度，1时只能改变高度，0时不能拖动。默认值: 2 
 			allowPreviewEmoticons : true,//true或false，true时鼠标放在表情上可以预览表情
@@ -758,29 +824,78 @@ $(function() {
 
 
 
+<!-- 代码高亮显示 -->
 <script type="text/javascript">
-	$(".lang-xml").each(function(index, element) {
-		$(this).attr("class","brush: xml");
+	//代码语言类
+	function languageClassName(originalClass, newClass) {
+		var o = new Object()
+		o.originalClass = originalClass;//原始样式标签名称
+		o.newClass = newClass;//新样式标签名称
+		return o;
+	}
+
+	$(document).ready(function(){
+	    //代码语言映射集合
+	    var languageMapping_arr = new Array();
+		var languageClassName_xml = languageClassName("lang-xml","language-xml");
+	    languageMapping_arr.push(languageClassName_xml);
+	    var languageClassName_css = languageClassName("lang-css","language-css");
+	    languageMapping_arr.push(languageClassName_css);
+	    var languageClassName_html = languageClassName("lang-html","language-html");
+	    languageMapping_arr.push(languageClassName_html);
+	    var languageClassName_js = languageClassName("lang-js","language-JavaScript");
+	    languageMapping_arr.push(languageClassName_js);
+	    var languageClassName_java = languageClassName("lang-java","language-java");
+	    languageMapping_arr.push(languageClassName_java);
+	    var languageClassName_pl = languageClassName("lang-pl","language-perl");
+	    languageMapping_arr.push(languageClassName_pl);
+	    var languageClassName_py = languageClassName("lang-py","language-python");
+	    languageMapping_arr.push(languageClassName_py);
+	    var languageClassName_rb = languageClassName("lang-rb","language-ruby");
+	    languageMapping_arr.push(languageClassName_rb);
+	    var languageClassName_vb = languageClassName("lang-vb","language-VB.Net");
+	    languageMapping_arr.push(languageClassName_vb);  
+	    var languageClassName_cpp = languageClassName("lang-cpp","language-C++");
+	    languageMapping_arr.push(languageClassName_cpp);  
+	    var languageClassName_cs = languageClassName("lang-cs","language-C#");
+	    languageMapping_arr.push(languageClassName_cs);  
+	    var languageClassName_bsh = languageClassName("lang-bsh","language-Bash + Shell");
+	    languageMapping_arr.push(languageClassName_bsh);  
+	      
+	    
+	    var doc_pre = $(".richTextContent").find('pre[class^="prettyprint"]');
+	    doc_pre.each(function(){
+	        var class_val = $(this).attr('class');
+	      	var lan_class = "";
+	        var class_arr = new Array();
+	        class_arr = class_val.split(' ');
+	        for(var i=0; i<class_arr.length; i++){
+	        	var className = $.trim(class_arr[i]);
+	        	
+	        	if(className != null && className != ""){
+	        		if (className.lastIndexOf('lang-', 0) === 0) {
+	        			lan_class = className;
+			            break;
+			        }
+	        	}	
+	        }
+	        
+	        for(var i=0; i<languageMapping_arr.length; i++){
+		    	var languageMapping = languageMapping_arr[i];
+		    	if(languageMapping.originalClass == lan_class){
+			    	var pre_content = '<code>'+$(this).html()+'</code>';
+			        $(this).html(pre_content);
+			        $(this).attr("class",'line-numbers '+languageMapping.newClass);
+		    	}
+		    }
+		    if(lan_class == ""){
+		    	var pre_content = '<code>'+$(this).html()+'</code>';
+			    $(this).html(pre_content);
+			    $(this).attr("class",'line-numbers language-markup');
+		    }
+	    });
 	});
-	$(".lang-css").each(function(index, element) {
-		$(this).attr("class","brush: css");
-	});
-	$(".lang-html").each(function(index, element) {
-		$(this).attr("class","brush: xml");
-	});
-	$(".lang-js").each(function(index, element) {
-		$(this).attr("class","brush: js");
-	});
-	$(".lang-java").each(function(index, element) {
-		$(this).attr("class","brush: java");
-	});
-	SyntaxHighlighter.all();
-	SyntaxHighlighter.defaults['toolbar'] = false;//去掉右上角问号图标
-	
 </script>
-
-
-
 
 
 

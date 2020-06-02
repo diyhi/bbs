@@ -8,6 +8,7 @@
 <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="_csrf_token" content="${_csrf.token}"/>
 <meta name="_csrf_header" content="${_csrf.headerName}"/>
+<link href="backstage/prism/default-block/prism.css"  type="text/css" rel="stylesheet"/>
 <link href="backstage/css/list.css" type="text/css" rel="stylesheet"/>
 <link href="backstage/css/table.css" type="text/css" rel="stylesheet"/>
 <link rel="stylesheet" href="backstage/layer/skin/layer.css"  type="text/css" />
@@ -21,12 +22,12 @@
 <script charset="utf-8" src="backstage/kindeditor/kindeditor-min.js"></script>
 <script type="text/javascript" src="backstage/js/json3.js"></script>
 <script type="text/javascript" src="backstage/lhgdialog/lhgcore.lhgdialog.min.js"></script>
-<link rel="stylesheet" href="backstage/syntaxhighlighter/styles/shCoreDefault.css"  type="text/css" />
-<script language="JavaScript" src="backstage/syntaxhighlighter/scripts/shCore.js" type="text/javascript"></script>
-<script language="javascript" src="backstage/syntaxhighlighter/scripts/shBrushXml.js" type="text/javascript" ></script>
-<script language="javascript" src="backstage/syntaxhighlighter/scripts/shBrushJScript.js" type="text/javascript" ></script>
-<script language="javascript" src="backstage/syntaxhighlighter/scripts/shBrushCss.js" type="text/javascript"></script>
-<script language="javascript" src="backstage/syntaxhighlighter/scripts/shBrushJava.js" type="text/javascript"></script>
+<script type="text/javascript" src="backstage/jquery/jquery.letterAvatar.js" language="javascript"></script>
+
+<script type="text/javascript" src="backstage/prism/default-block/prism.js" language="javascript"></script>
+<script type="text/javascript" src="backstage/prism/default-block/clipboard.min.js" language="javascript"></script>
+
+
 
 <script type="text/javascript" >
 //审核话题
@@ -98,44 +99,6 @@ function auditReply(replyId){
 }
 
 
-
-//添加媒体处理任务
-function addMediaProcessQueue(topicId){
-	var parameter = "&id="+topicId;
-	parameter += "&module=10";
-	var csrf =  getCsrf();
-	parameter += "&_csrf_token="+csrf.token;
-	parameter += "&_csrf_header="+csrf.header;
-	//删除第一个&号,防止因为多了&号而出现警告: Parameters: Invalid chunk ignored.信息
-	if(parameter.indexOf("&") == 0){
-		parameter = parameter.substring(1,parameter.length);
-	}
-	
-	post_request(function(value){
-		if(value == "1"){
-			layer.msg('添加成功', 
-				{
-				  time: 3000 //3秒关闭（如果不配置，默认是3秒）
-				},function(){
-					//关闭后的操作
-					
-				}
-			);
-		}else{
-			layer.msg('添加失败', 
-				{
-				  time: 3000 //3秒关闭（如果不配置，默认是3秒）
-				},function(){
-					//关闭后的操作
-					
-				}
-			);
-		}
-	},
-		"${config:url(pageContext.request)}control/mediaProcessQueue/manage${config:suffix()}?method=addMediaProcessQueue&timestamp=" + new Date().getTime(), true,parameter);
-		
-	
-}
 
 //显示修改话题页
 function showUpdateTopic(topicId){
@@ -358,38 +321,69 @@ $(function() {
 	</c:if>
 </div>
 
-<TABLE class="t-list-table" cellSpacing="1" cellPadding="0" width="100%" border="0" style="table-layout:fixed;">
-	<THEAD class="t-list-thead"><!-- 表格使用table-layout:fixed;会让表的布局宽度以第一行为准 -->
-		<TR style="height:0px;padding:0"> 
-			<TH style="width:20%;height:0px;"></TH> 
-			<TH style="width:80%;height:0px;"></TH>
-		</TR> 
+<TABLE class="t-list-table" cellSpacing="1" cellPadding="0" width="100%" border="0" >
+	<THEAD class="t-list-thead">
 		<TR>
-			<TH colspan="2">${topic.title}</TH>
+			<TH colspan="2" >${topic.title}</TH>
 		</TR>
 	</THEAD>
 	<TBODY class="t-list-tbody" align="center">
-		<TR class="noDiscolor">
-		  	<TD>
-		  		${topic.userName}
-		  		<c:if test="${topic.isStaff == true}"><span style="color: green;">[员工]</span></c:if>
+		<TR class="noDiscolor" >
+		  	<TD width="180px" valign="top">
+		  		<div class="userInfo">
+					<div class="author">
+						<c:if test="${topic.avatarName != null}">
+							<img src="${topic.avatarPath}${topic.avatarName}" >
+						</c:if>
+						<c:if test="${topic.avatarName == null}">
+							<img avatar="${(topic.nickname != null && topic.nickname != '') ? topic.nickname : topic.userName}" >
+						</c:if>
+					</div>
+					<p class="name">
+						${topic.userName}
+					</p>
+					<c:if test="${topic.nickname != null && topic.nickname != ''}">
+						<p class="nickname">
+							呢称：${topic.nickname}
+						</p>
+					</c:if>
+					<c:if test="${topic.userRoleNameList != null && fn:length(topic.userRoleNameList) >0}">
+						<div class="role">
+							<c:forEach items="${topic.userRoleNameList}" var="roleName">
+								<i class="userRoleName">${roleName}</i>
+							</c:forEach>
+						</div>
+					</c:if>
+					
+					<c:if test="${topic.isStaff == true}">
+						<div class="role">
+							<i class="staff">员工</i>	
+						</div>
+					</c:if>	  		
+		  		</div>
 		  	</TD>
-		    <TD>
-		    	 <TABLE  cellSpacing="2" cellPadding="0" width="99%"  border="0">
+		    <TD valign="top">
+		    	<TABLE  cellSpacing="2" cellPadding="0" width="100%"  border="0">
 					<TR class="noDiscolor">
-						<TD width="40%" style="BORDER-BOTTOM: #bfe3ff 1px dotted;" align="left"><fmt:formatDate value="${topic.postTime}" pattern="yyyy-MM-dd HH:mm:ss" /></TD>
-						<TD width="60%" style="BORDER-BOTTOM: #bfe3ff 1px dotted" align="right">${topic.ip}&nbsp;${topic.ipAddress}</TD>
+						<TD width="40%" style="BORDER-BOTTOM: #bfe3ff 1px dotted;line-height: 28px;" align="left"><fmt:formatDate value="${topic.postTime}" pattern="yyyy-MM-dd HH:mm:ss" /></TD>
+						<TD width="60%" style="BORDER-BOTTOM: #bfe3ff 1px dotted;" align="right">${topic.ip}&nbsp;${topic.ipAddress}</TD>
 					</TR>	
 				</TABLE>
+				<div class="topicTag">
+					<span class="tag">${topic.tagName}</span>
+					<c:forEach items="${topic.userRoleNameList}" var="roleName">
+						<span  class="userRoleName">${roleName}</span>	
+					</c:forEach>
+				</div>
 				<enhance:out escapeXml="false">
-					<div class="comment topicContent">${topic.content}</div>
+					<div class="richTextContent topicContent" style="min-height: 200px;">${topic.content}</div>
 				</enhance:out>
-				<TABLE  cellSpacing="2" cellPadding="0" width="99%"  border="0">
+				<TABLE  cellSpacing="2" cellPadding="0" width="100%"  border="0">
 					<TR class="noDiscolor">
-						<TD width="50%" style="border-top: #bfe3ff 1px dotted;" align="left">
+						<TD width="40%" style="border-top: #bfe3ff 1px dotted;line-height: 28px;padding-top: 8px;" align="left">
 							查看总数：${topic.viewTotal}&nbsp;&nbsp;&nbsp;&nbsp;评论总数：${topic.commentTotal}
 						</TD>
-						<TD width="50%" style="border-top: #bfe3ff 1px dotted;" align="right">
+						<TD width="60%" style="border-top: #bfe3ff 1px dotted;line-height: 28px;padding-top: 8px;" align="right">
 							<c:if test="${topic.status == 10}">
 								<A onclick="javascript:if(window.confirm('确定审核通过吗? ')){auditTopic('${topic.id}');return false;}else{return false};" hidefocus="true" href="#" ondragstart= "return false">立即审核</A>&nbsp;&nbsp;
 							</c:if>
@@ -413,12 +407,41 @@ $(function() {
   <TBODY class="t-list-tbody" align="center">
    <c:forEach items="${pageView.records}" var="entry" varStatus="status">
 	  <TR id="anchor_${entry.id}" class="noDiscolor">
-	  	<TD width="20%">
-	  		${entry.userName}
-	  		<c:if test="${entry.isStaff == true}"><span style="color: green;">[员工]</span></c:if>
+	  	<TD width="180px" valign="top">
+	  		<div class="userInfo">
+				<div class="author">
+					<c:if test="${entry.avatarName != null}">
+						<img src="${entry.avatarPath}${entry.avatarName}" >
+					</c:if>
+					<c:if test="${entry.avatarName == null}">
+						<img avatar="${(entry.nickname != null && entry.nickname != '') ? entry.nickname : entry.userName}" >
+					</c:if>
+				</div>
+				<p class="name">
+					${entry.userName}
+				</p>
+				<c:if test="${entry.nickname != null && entry.nickname != ''}">
+					<p class="nickname">
+						呢称：${entry.nickname}
+					</p>
+				</c:if>
+				<c:if test="${entry.userRoleNameList != null && fn:length(entry.userRoleNameList) >0}">
+					<div class="role">
+						<c:forEach items="${entry.userRoleNameList}" var="roleName">
+							<i class="userRoleName">${roleName}</i>
+						</c:forEach>
+					</div>
+				</c:if>
+				
+				<c:if test="${entry.isStaff == true}">
+					<div class="role">
+						<i class="staff">员工</i>	
+					</div>
+				</c:if>	  		
+	  		</div>
 	  	</TD>
-	    <TD width="80%">
-	    	 <TABLE  cellSpacing="2" cellPadding="0" width="99%"  border="0">
+	    <TD valign="top" style="height: 100%;">
+	    	 <TABLE  cellSpacing="2" cellPadding="0" width="99%"  border="0" >
 				<TR class="noDiscolor">
 					<TD width="40%" style="BORDER-BOTTOM: #bfe3ff 1px dotted;" align="left"><fmt:formatDate value="${entry.postTime}" pattern="yyyy-MM-dd HH:mm:ss" /></TD>
 					<TD width="60%" style="BORDER-BOTTOM: #bfe3ff 1px dotted" align="right">${entry.ip}&nbsp;${entry.ipAddress}&nbsp;&nbsp;&nbsp;&nbsp;${pageView.firstResult+status.count}楼 </TD>
@@ -447,11 +470,12 @@ $(function() {
 			 -->
 			 
 			</div>
-			<div class="comment">${entry.content}</div>
+			<div class="richTextContent" style="min-height: 180px;">${entry.content}</div>
 			</enhance:out>
-			<div>
-				<span style="color: black;"><strong style="color: #666">--- 共有 ${entry.totalReply} 条回复 --- </strong></span>
-				<TABLE  cellSpacing="2" cellPadding="0" width="99%"  border="0">
+			<c:if test="${entry.replyList != null && fn:length(entry.replyList) >0}">
+			<div style="background: #fbfbfb;margin-left: 8px; margin-right: 8px;">
+				<span style="color: black;"><strong style="color: #666;line-height: 30px;">--- 共有 ${entry.totalReply} 条回复 --- </strong></span>
+				<TABLE  cellSpacing="2" cellPadding="0" width="100%"  border="0" >
 					<c:forEach items="${entry.replyList}" var="reply">
 						<TR class="noDiscolor">
 							<TD width="15%" align="right">
@@ -476,13 +500,14 @@ $(function() {
 					</c:forEach>
 				</TABLE>
 			</div>
-			<TABLE  cellSpacing="2" cellPadding="0" width="99%"  border="0">
+			</c:if>
+			<TABLE  cellSpacing="2" cellPadding="0" width="99%"  border="0" >
 				<TR class="noDiscolor">
-					<TD width="50%" style="border-top: #bfe3ff 1px dotted;" align="left">
+					<TD width="50%" style="border-top: #bfe3ff 1px dotted;line-height: 28px;padding-top: 8px;" align="left">
 						<A hidefocus="true" onClick="showAddReply('${entry.id}',${pageView.currentpage}); return false" href="#" ondragstart= "return false">回复</A>&nbsp;&nbsp;
 						<A hidefocus="true" onClick="showQuote('${entry.id}'); return false" href="#" ondragstart= "return false">引用</A>
 					</TD>
-					<TD width="50%" style="border-top: #bfe3ff 1px dotted;" align="right">
+					<TD width="50%" style="border-top: #bfe3ff 1px dotted;line-height: 28px;padding-top: 8px; padding-right: 6px;" align="right">
 						<c:if test="${entry.status == 10}">
 							<A onclick="javascript:if(window.confirm('确定发布吗? ')){auditComment('${entry.id}');return false;}else{return false};" hidefocus="true" href="#" ondragstart= "return false">立即审核</A>&nbsp;&nbsp;
 						</c:if>
@@ -503,7 +528,7 @@ $(function() {
 
 <form:form>
 
-<TABLE class="t-table" cellSpacing="1" cellPadding="2" width="100%" border="0" style="margin-top: 34px;">
+<TABLE class="t-table" cellSpacing="1" cellPadding="2" width="100%" border="0" style="margin-top: 38px;">
   <TBODY>
 
   <TR>
@@ -547,8 +572,8 @@ $(function() {
 	
 		editor = K.create('textarea[name="content"]', {
 			basePath : '${config:url(pageContext.request)}backstage/kindeditor/',//指定编辑器的根目录路径
-			themeType : 'style :darkGray',//深灰主题 加冒号的是主题样式文件名称同时也是主题目录
-		//	autoHeightMode : true,//值为true，并引入autoheight.js插件时自动调整高度
+			themeType : 'style :minimalist',//极简主题 加冒号的是主题样式文件名称同时也是主题目录
+			autoHeightMode : true,//值为true，并引入autoheight.js插件时自动调整高度
 			formatUploadUrl :false,//false时不会自动格式化上传后的URL
 			resizeType : 1,//2或1或0，2时可以拖动改变宽度和高度，1时只能改变高度，0时不能拖动。默认值: 2 
 			allowPreviewEmoticons : true,//true或false，true时鼠标放在表情上可以预览表情
@@ -576,25 +601,77 @@ $(function() {
 
 
 
+<!-- 代码高亮显示 -->
 <script type="text/javascript">
-	$(".lang-xml").each(function(index, element) {
-		$(this).attr("class","brush: xml");
+	//代码语言类
+	function languageClassName(originalClass, newClass) {
+		var o = new Object()
+		o.originalClass = originalClass;//原始样式标签名称
+		o.newClass = newClass;//新样式标签名称
+		return o;
+	}
+
+	$(document).ready(function(){
+	    //代码语言映射集合
+	    var languageMapping_arr = new Array();
+		var languageClassName_xml = languageClassName("lang-xml","language-xml");
+	    languageMapping_arr.push(languageClassName_xml);
+	    var languageClassName_css = languageClassName("lang-css","language-css");
+	    languageMapping_arr.push(languageClassName_css);
+	    var languageClassName_html = languageClassName("lang-html","language-html");
+	    languageMapping_arr.push(languageClassName_html);
+	    var languageClassName_js = languageClassName("lang-js","language-JavaScript");
+	    languageMapping_arr.push(languageClassName_js);
+	    var languageClassName_java = languageClassName("lang-java","language-java");
+	    languageMapping_arr.push(languageClassName_java);
+	    var languageClassName_pl = languageClassName("lang-pl","language-perl");
+	    languageMapping_arr.push(languageClassName_pl);
+	    var languageClassName_py = languageClassName("lang-py","language-python");
+	    languageMapping_arr.push(languageClassName_py);
+	    var languageClassName_rb = languageClassName("lang-rb","language-ruby");
+	    languageMapping_arr.push(languageClassName_rb);
+	    var languageClassName_vb = languageClassName("lang-vb","language-VB.Net");
+	    languageMapping_arr.push(languageClassName_vb);  
+	    var languageClassName_cpp = languageClassName("lang-cpp","language-C++");
+	    languageMapping_arr.push(languageClassName_cpp);  
+	    var languageClassName_cs = languageClassName("lang-cs","language-C#");
+	    languageMapping_arr.push(languageClassName_cs);  
+	    var languageClassName_bsh = languageClassName("lang-bsh","language-Bash + Shell");
+	    languageMapping_arr.push(languageClassName_bsh);  
+	      
+	    
+	    var doc_pre = $(".richTextContent").find('pre[class^="prettyprint"]');
+	    doc_pre.each(function(){
+	        var class_val = $(this).attr('class');
+	      	var lan_class = "";
+	        var class_arr = new Array();
+	        class_arr = class_val.split(' ');
+	        for(var i=0; i<class_arr.length; i++){
+	        	var className = $.trim(class_arr[i]);
+	        	
+	        	if(className != null && className != ""){
+	        		if (className.lastIndexOf('lang-', 0) === 0) {
+	        			lan_class = className;
+			            break;
+			        }
+	        	}	
+	        }
+	        
+	        for(var i=0; i<languageMapping_arr.length; i++){
+		    	var languageMapping = languageMapping_arr[i];
+		    	if(languageMapping.originalClass == lan_class){
+			    	var pre_content = '<code>'+$(this).html()+'</code>';
+			        $(this).html(pre_content);
+			        $(this).attr("class",'line-numbers '+languageMapping.newClass);
+		    	}
+		    }
+		    if(lan_class == ""){
+		    	var pre_content = '<code>'+$(this).html()+'</code>';
+			    $(this).html(pre_content);
+			    $(this).attr("class",'line-numbers language-markup');
+		    }
+	    });
 	});
-	$(".lang-css").each(function(index, element) {
-		$(this).attr("class","brush: css");
-	});
-	$(".lang-html").each(function(index, element) {
-		$(this).attr("class","brush: xml");
-	});
-	$(".lang-js").each(function(index, element) {
-		$(this).attr("class","brush: js");
-	});
-	$(".lang-java").each(function(index, element) {
-		$(this).attr("class","brush: java");
-	});
-	SyntaxHighlighter.all();
-	SyntaxHighlighter.defaults['toolbar'] = false;//去掉右上角问号图标
-	
 </script>
 
 

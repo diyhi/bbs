@@ -16,6 +16,7 @@
 	<script language="javascript" src="${commonPath}js/ajax.js" type="text/javascript"></script>
 	<script language="javascript" src="${commonPath}js/json2.js" type="text/javascript"></script>
 	<script language="javascript" src="${commonPath}js/jquery/jquery.min.js" type="text/javascript"></script>
+	<script type="text/javascript" src="${commonPath}js/jquery/jquery.letterAvatar.js" language="javascript"></script>
 	<link href="${commonPath}js/layer/skin/default/layer.css"  type="text/css" rel="stylesheet"/>
 	<script type="text/javascript" src="${commonPath}js/layer/layer.js" language="javascript"></script>
 </head>
@@ -87,8 +88,8 @@ function deleteFollow(followId){
 			<TABLE class="dataList" width="100%">
 				<THEAD>
 					<TR class="dataThead">
-						<TH width="50%">用户</TH>	
-						<TH width="30%">关注时间</TH>	
+						<TH width="60%">用户</TH>	
+						<TH width="20%">关注时间</TH>	
 						<TH width="20%">操作</TH>
 					</TR>
 				</THEAD>
@@ -96,11 +97,23 @@ function deleteFollow(followId){
 		    		<#if pageView.records?exists && pageView.records?size gt 0 >    
 					<#list pageView.records as follow>
 					<TR>
-						<TD class="dataTD">
-							<a href="user/control/home?userName=${follow.friendUserName}" target="_blank" class="link">
+						<TD class="dataTD followModule" style="text-align: left! important;">
+							<div class="avatarBox">
+								<a href="user/control/home?userName=${follow.friendUserName}" target="_blank" class="link">
+									<#if follow.friendAvatarName != null && follow.friendAvatarName != ''>    
+										<img src="${follow.friendAvatarPath}100x100/${follow.friendAvatarName}" >
+						            </#if> 
+						            
+						        	<#if follow.friendAvatarName == null || follow.friendAvatarName == ''>    
+										<!-- 首字符头像-->
+						         		<img avatar="${(follow.friendNickname != null && follow.friendNickname??) ?string(follow.friendNickname , follow.friendUserName)}" >
+						            </#if> 
+								</a>
+							</div>
+							<a href="user/control/home?userName=${follow.friendUserName}" target="_blank" class="link userName">
 								${follow.friendUserName}
 								<#if follow.friendNickname != null && follow.friendNickname??>    
-									(${follow.friendNickname})
+									（呢称：${follow.friendNickname}）
 								</#if> 
 							</a>
 						</TD>

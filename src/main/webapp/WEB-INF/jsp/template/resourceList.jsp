@@ -147,7 +147,13 @@ function createRowHtml(nodeId,parentId,resource,dirName){
 	rowHtml +="</td>";
 	rowHtml +="<td align=\"center\">";
 	if(resource.leaf == true){
-		rowHtml +="<a href=\"#\" onclick=\"javascript:show('"+nodeId+"','"+resource.id+"');return false;\" hidefocus=\"true\" ondragstart= \"return false\">查看</a>&nbsp";
+		if (/\.(js|css|JS|CSS)$/.test(resource.id)) {  
+			rowHtml +="<a href=\"#\" onclick=\"javascript:show('"+nodeId+"','"+resource.id+"');return false;\" hidefocus=\"true\" ondragstart= \"return false\">编辑</a>&nbsp";
+		
+		}else{
+			rowHtml +="<a href=\"#\" onclick=\"javascript:show('"+nodeId+"','"+resource.id+"');return false;\" hidefocus=\"true\" ondragstart= \"return false\">查看</a>&nbsp";
+		
+		}
 		rowHtml +="<a href=\"control/resource/manage.htm?method=download&resourceId="+resource.id+"&dirName="+dirName+"\"  hidefocus=\"true\" ondragstart= \"return false\">下载</a>&nbsp";
 	}else{
 		rowHtml +="<a href=\"#\" onclick=\"javascript:upload('"+nodeId+"','"+resource.id+"');return false;\" hidefocus=\"true\" ondragstart= \"return false\">上传文件</a>&nbsp";
@@ -170,7 +176,7 @@ function show(nodeId,resourceId) {
 
     	var url = basePath+"control/resource/manage.htm?method=showFileUI&"+data+"&timestamp="+ new Date().getTime();
     	//在全局显示
-    	window.parent.loadFrame(url,"显示");
+    	window.parent.loadFrame(url,"编辑");
 		/**
 		var data = "dirName=" + getUrlParam("dirName")+"&resourceId="+encodeURIComponent(resourceId);//获取URL参数
 

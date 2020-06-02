@@ -11,7 +11,7 @@ KindEditor.plugin('hide', function(K) {
 	 * html html内容
 	 * tag 标签名称
 	 * className css样式名称
-	 * inputValue 替换标签值 
+	 * inputValue 替换标签值
 	 */
 	function replaceTab(html,tag,className,inputValue,description){
 		var node = document.createElement("div");
@@ -132,6 +132,14 @@ KindEditor.plugin('hide', function(K) {
 			yesBtn : {
 				name : self.lang('yes'),
 				click : function(e) {
+					
+					//截断样式
+					var _wrapper = K("<span></span>", self.cmd.doc);//插入指定的HTML内容到光标处。
+					_wrapper.html("&#8203;");//&#8203;是零宽空格字符
+					self.cmd.range.insertNode(_wrapper[0]).selectNodeContents(_wrapper[0]);
+					self.cmd.select();
+					self.cmd.removeformat();//删除格式。
+					
 					
 					html = "";
 					var password = K.trim(passwordBox.val()),
@@ -263,6 +271,7 @@ KindEditor.plugin('hide', function(K) {
 		pointBox = K('[name="inputValue_40"]', div),//积分
 		amountBox = K('[name="inputValue_50"]', div);//金额
 		tabIndexBox = 0;
+		
 
 		var tabs;
 		tabs = K.tabs({
@@ -351,7 +360,8 @@ KindEditor.plugin('hide', function(K) {
 			}
 			
 		}
-	
+		
+		
 		tabs.select(tabIndex);
 
 		K('.tab'+(tabIndex+1), div).show();

@@ -10,8 +10,10 @@ import cms.bean.PageView;
 import cms.bean.QueryResult;
 import cms.bean.follow.Follow;
 import cms.bean.follow.Follower;
+import cms.bean.user.User;
 import cms.service.follow.FollowService;
 import cms.service.setting.SettingService;
+import cms.service.user.UserService;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class FollowAction {
 	@Resource FollowService followService;
 	@Resource SettingService settingService;
+	@Resource UserService userService;
 	/**
 	 * 关注列表
 	 * @param model
@@ -49,6 +52,18 @@ public class FollowAction {
 			int firstIndex = (pageForm.getPage()-1)*pageView.getMaxresult();
 			
 			QueryResult<Follow> qr = followService.findFollowByUserName(id,userName,firstIndex,pageView.getMaxresult());
+			if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
+				for(Follow follow : qr.getResultlist()){
+					User user = userService.findUserByUserName(follow.getFriendUserName());
+					if(user != null){
+						follow.setFriendNickname(user.getNickname());
+						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
+							follow.setFriendAvatarPath(user.getAvatarPath());
+							follow.setFriendAvatarName(user.getAvatarName());
+						}		
+					}
+				}
+			}
 			//将查询结果集传给分页List
 			pageView.setQueryResult(qr);
 			model.addAttribute("pageView", pageView);
@@ -81,6 +96,18 @@ public class FollowAction {
 			int firstIndex = (pageForm.getPage()-1)*pageView.getMaxresult();
 			
 			QueryResult<Follower> qr = followService.findFollowerByUserName(id,userName,firstIndex,pageView.getMaxresult());
+			if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
+				for(Follower follower : qr.getResultlist()){
+					User user = userService.findUserByUserName(follower.getFriendUserName());
+					if(user != null){
+						follower.setFriendNickname(user.getNickname());
+						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
+							follower.setFriendAvatarPath(user.getAvatarPath());
+							follower.setFriendAvatarName(user.getAvatarName());
+						}		
+					}
+				}
+			}
 			//将查询结果集传给分页List
 			pageView.setQueryResult(qr);
 			model.addAttribute("pageView", pageView);

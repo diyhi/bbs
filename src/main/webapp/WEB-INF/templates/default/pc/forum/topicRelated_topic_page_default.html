@@ -63,7 +63,10 @@
 					                	<div class="tm-m-photos topic_thumbnail_${topic.id}">
 											<ul class="tm-m-photos-thumb">
 												<#list topic.imageInfoList as imageInfo>
-													<li data-src="${imageInfo.path}${imageInfo.name}"><div class="img" style="background-image: url(${imageInfo.path}120x120/${imageInfo.name})"></div> <b class="tm-photos-arrow"></b> </li>
+													<#-- 图片最多显示8张 -->
+													<#if imageInfo_index lt 8>
+														<li data-src="${imageInfo.path}${imageInfo.name}"><div class="img" style="background-image: url(${imageInfo.path}240x240/${imageInfo.name})"></div> <b class="tm-photos-arrow"></b> </li>
+													</#if>
 												</#list>
 											</ul>
 											<div class="tm-m-photo-viewer transition1 topic_original_${topic.id}"> 
@@ -125,7 +128,31 @@
 	</div>
 </div>
 
+<style>
+/** 半透明提示层 **/
+.hideTag-class .layui-layer-content{
+	background-color: rgba(0,0,0,0.6);
+}
+.hideTag-class .layui-layer-content .layui-layer-TipsG {
+	position: absolute;
+	width: 0;
+	height: 0;
+	border-width: 5px;
+	*overflow: hidden;
+	
+	border-style: dashed;
+ 	border-color:rgba(0,0,0,0.6) transparent transparent transparent;
+	margin-bottom: -2px;
+	margin-bottom: 3px\0;
+	*margin-bottom: 3px;
+}
 
+.hideTag-class .layui-layer-content .layui-layer-TipsT {
+	left: 7px;
+	border-right-style: solid;
+	border-right-color: rgba(0,0,0,0.6);
+}
+</style>
 
 
 <script type="text/javascript">

@@ -15,12 +15,21 @@
 	<script language="javascript" src="${commonPath}js/tool.js" type="text/javascript"></script>
 	<script language="javascript" src="${commonPath}js/ajax.js" type="text/javascript"></script>
 	<script language="javascript" src="${commonPath}js/json2.js" type="text/javascript"></script>
+	<script type="text/javascript" src="${commonPath}js/jquery/jquery.min.js" language="javascript"></script>
+	<link href="${commonPath}js/layer/skin/default/layer.css"  type="text/css" rel="stylesheet"/>
+	<script type="text/javascript" src="${commonPath}js/layer/layer.js" language="javascript"></script>
 </head>
 <script type="text/javascript" language="javascript"> 
 	//确认提交
 	function sureSubmit(objForm){
 		if(allVerification() == false){
-			alert("请填好资料再提交");
+			//需引入layer
+     		layer.msg('请填好资料再提交', {
+				time: 3000 //3秒关闭（如果不配置，默认是3秒）
+				},function(){//关闭后的操作
+						
+				}
+			);
 			return;
 		}
 
@@ -43,7 +52,13 @@
 	function ajaxSubmit(){
 	
 		if(allVerification() == false){
-			alert("请填好资料再提交");
+			//需引入layer
+     		layer.msg('请填好资料再提交', {
+				time: 3000 //3秒关闭（如果不配置，默认是3秒）
+				},function(){//关闭后的操作
+						
+				}
+			);
 			return;
 		}
 	
@@ -530,6 +545,7 @@
 							<td><input type="text" id="email" name="email" class="inputBox formText" autocomplete="off" size="25" maxlength="20" value="<#if user??>${user.email}</#if>" onBlur="verification(this.id)"/></td>
 							<td>
 								<span id="email_error" class="error">${(error['email'])!}</span> 
+								<span class="help">没有可不填写</span>
 							</td>
 						</tr>
 					</table>
@@ -548,19 +564,25 @@
 								<#if userCustom.chooseType ==2>
 									<#if userCustom.itemValue?has_content>
 										<#list userCustom.itemValue?keys as itemValue>
-										<#-- 选中项 -->
-										<#assign _checked = "">
-										<#list userCustom.userInputValueList as userInputValue>
-											<#if userInputValue.options == itemValue>
-												<#assign _checked=" checked='checked'">
+											<#-- 选中项 -->
+											<#assign _checked = "">
+											<#list userCustom.userInputValueList as userInputValue>
+												<#if userInputValue.options == itemValue>
+													<#assign _checked=" checked='checked'">
+												</#if>
+											</#list>
+											
+											<#-- 默认选第一项 -->
+											<#if itemValue_index == 0  && userCustom.userInputValueList?exists && userCustom.userInputValueList?size == 0> 
+											<#assign _checked = " checked='checked'">
 											</#if>
-										</#list>
+
+											<label>
+												<input type="radio" class="formRadio" name="userCustom_${userCustom.id}" value="${itemValue}" ${_checked}>
+								                <span class="formRadio-core"></span>
+												<span class="formRadio-text">${userCustom.itemValue[itemValue]}</span> 
+											</label>
 										
-										<#-- 默认选第一项 -->
-										<#if itemValue_index == 0  && userCustom.userInputValueList?exists && userCustom.userInputValueList?size == 0> 
-										<#assign _checked = " checked='checked'">
-										</#if>
-										<input type="radio" name="userCustom_${userCustom.id}" value="${itemValue}" ${_checked} >${userCustom.itemValue[itemValue]}
 										</#list>
 									</#if>
 								</#if>
@@ -574,12 +596,16 @@
 													<#assign _checked=" checked='checked'">
 												</#if>
 											</#list>
-											<input type="checkbox" name="userCustom_${userCustom.id}" value="${itemValue}" ${_checked}>${userCustom.itemValue[itemValue]}
+											<label>
+												<input type="checkbox" class="formCheckbox" name="userCustom_${userCustom.id}" value="${itemValue}" ${_checked}>
+												<span class="formCheckbox-core"></span>
+												<span class="formCheckbox-text">${userCustom.itemValue[itemValue]}</span>
+											</label>
 										</#list>
 									</#if>
 								</#if>
 								<#if userCustom.chooseType ==4>
-									<select name="userCustom_${userCustom.id}" <#if userCustom.multiple == true> multiple='multiple'</#if> <#if userCustom.selete_size != null> size='${userCustom.selete_size}'</#if>>
+									<select class="formSelect" name="userCustom_${userCustom.id}" <#if userCustom.multiple == true> multiple='multiple'</#if> <#if userCustom.selete_size != null> size='${userCustom.selete_size}'</#if>>
 										<#if userCustom.itemValue?has_content>
 										<#list userCustom.itemValue?keys as itemValue>
 											<#assign _selected = "">
@@ -594,7 +620,7 @@
 									</select>
 								</#if>
 								<#if userCustom.chooseType ==5>
-									<textarea name="userCustom_${userCustom.id}" rows="${userCustom.rows}" cols="${userCustom.cols}"><#list userCustom.userInputValueList as userInputValue>${userInputValue.content}</#list></textarea>
+									<textarea class="formTextarea" name="userCustom_${userCustom.id}" rows="${userCustom.rows}" cols="${userCustom.cols}"><#list userCustom.userInputValueList as userInputValue>${userInputValue.content}</#list></textarea>
 								</#if>
 							</td>
 							<td>
@@ -620,7 +646,7 @@
 								</td>
 								<td>
 									<img id="captcha" src="captcha/${captchaKey!}.jpg" onClick="replaceCaptcha()"/>
-									<span id="captchaValue_error" class="error">${(error['captchaValue'])!}</span> 
+									<span id="captchaValue_error" class="error" style="position: relative;top: -16px;">${(error['captchaValue'])!}</span> 
 								</td>
 							</tr>
 						</table>
@@ -633,7 +659,13 @@
 						<!-- 
 						<span class="submitButton"><INPUT type="button" value="ajax提交" onClick="javascript:ajaxSubmit();"></span>
 						 -->
-						<input type="checkbox" name="agreebbrule"  checked="checked" /> <label for="agreebbrule">同意<a href="agreement.htm" target="_blank">网站服务条款</a></label>
+						<span class="agreement">
+							<label>
+								<input type="checkbox" class="formCheckbox" name="agreebbrule"  checked="checked">
+								<span class="formCheckbox-core"></span>
+								<span class="formCheckbox-text">同意<a href="agreement.htm" target="_blank">网站服务条款</a></span>
+							</label>
+						</span>
 						<span id="token_error" class="error">${error['token']}</span>  
 					</div>
 				</div>

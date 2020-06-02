@@ -199,14 +199,18 @@ public class QuestionFormAction {
 			
 		}
 		
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		
 		//悬赏金额
 		BigDecimal rewardAmount = new BigDecimal("0.00");
 		//悬赏积分
 		Long rewardPoint = 0L;
 		
+		
 		User user = userService.findUserByUserName(accessUser.getUserName());//查询用户数据
 		if(user != null){
 			if(amount != null && !"".equals(amount.trim())){
+				
 				if(amount.trim().length()>12){
 					error.put("amount", ErrorView._220.name());//不能超过12位数字
 				}else{
@@ -220,6 +224,26 @@ public class QuestionFormAction {
 						if(_rewardAmount.compareTo(new BigDecimal("0")) <0){
 							error.put("amount",ErrorView._225.name());//不能小于0
 						}
+						if(systemSetting.getQuestionRewardAmountMax() != null ){
+							if(systemSetting.getQuestionRewardAmountMax().compareTo(new BigDecimal("0")) ==0){
+								error.put("amount",ErrorView._229.name());//不允许悬赏金额
+							
+							}else if(systemSetting.getQuestionRewardAmountMax().compareTo(new BigDecimal("0")) >0){
+								if(_rewardAmount.compareTo(systemSetting.getQuestionRewardAmountMin()) <0){
+									error.put("amount",ErrorView._230.name());//不能小于悬赏金额下限
+								}
+								if(_rewardAmount.compareTo(systemSetting.getQuestionRewardAmountMax()) >0){
+									error.put("amount",ErrorView._231.name());//不能大于悬赏金额上限
+								}
+							}
+						}else{
+							if(_rewardAmount.compareTo(systemSetting.getQuestionRewardAmountMin()) <0){
+								error.put("amount",ErrorView._230.name());//不能小于悬赏金额下限
+							}
+						}
+						
+						
+						
 						if(error.size() ==0){
 							rewardAmount = _rewardAmount;
 						}
@@ -245,6 +269,26 @@ public class QuestionFormAction {
 							error.put("point",ErrorView._225.name());//不能小于0
 							
 						}
+						if(systemSetting.getQuestionRewardPointMax() != null ){
+							if(systemSetting.getQuestionRewardPointMax().equals(0L)){
+								error.put("point",ErrorView._232.name());//不允许悬赏积分
+							
+							}else if(systemSetting.getQuestionRewardPointMax() >0L){
+								if(_rewardPoint < systemSetting.getQuestionRewardPointMin()){
+									error.put("point",ErrorView._233.name());//不能小于悬赏积分下限
+								}
+								if(_rewardPoint > systemSetting.getQuestionRewardPointMax()){
+									error.put("point",ErrorView._234.name());//不能大于悬赏积分上限
+								}
+							}
+						}else{
+							if(_rewardPoint < systemSetting.getQuestionRewardPointMin()){
+								error.put("point",ErrorView._233.name());//不能小于悬赏积分下限
+							}
+						}
+						
+						
+						
 						if(error.size() ==0){
 							rewardPoint = _rewardPoint;
 						}
@@ -254,13 +298,8 @@ public class QuestionFormAction {
 				}	
 			}
 		}
-		
-		
-		
-		
-		
-		
-		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+			
+
 		
 		
 		//如果全局不允许提交问题
@@ -391,7 +430,7 @@ public class QuestionFormAction {
 			
 			
 			//不含标签内容
-			String text = textFilterManage.filterText(value);
+			String text = textFilterManage.filterText(textFilterManage.specifyHtmlTagToText(value));
 			//清除空格&nbsp;
 			String trimSpace = cms.utils.StringUtil.replaceSpace(text).trim();
 			//摘要

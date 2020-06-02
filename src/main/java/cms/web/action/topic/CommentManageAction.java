@@ -535,7 +535,7 @@ public class CommentManageAction {
 					quote.setCommentId(comment.getId());
 					quote.setIsStaff(comment.getIsStaff());
 					quote.setUserName(comment.getUserName());
-					quote.setContent(textFilterManage.filterText(comment.getContent()));
+					quote.setContent(textFilterManage.filterText(textFilterManage.specifyHtmlTagToText(comment.getContent())));
 					old_quoteList.add(quote);
 					
 					//自定义评论

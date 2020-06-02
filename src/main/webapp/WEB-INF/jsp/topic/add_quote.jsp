@@ -16,6 +16,10 @@
 <script language="javascript" src="backstage/js/ajax.js" type="text/javascript"></script>
 <script charset="utf-8" src="backstage/kindeditor/kindeditor-min.js"></script>
 <script type="text/javascript" src="backstage/js/json3.js"></script>
+
+<link href="backstage/prism/default-block/prism.css"  type="text/css" rel="stylesheet"/>
+<script type="text/javascript" src="backstage/prism/default-block/prism.js" language="javascript"></script>
+<script type="text/javascript" src="backstage/prism/default-block/clipboard.min.js" language="javascript"></script>
 </HEAD>
 
 <script>
@@ -32,8 +36,8 @@
 	
 		editor = K.create('textarea[name="content"]', {
 			basePath : '${config:url(pageContext.request)}backstage/kindeditor/',//指定编辑器的根目录路径
-			themeType : 'style :darkGray',//深灰主题 加冒号的是主题样式文件名称同时也是主题目录
-		//	autoHeightMode : true,//值为true，并引入autoheight.js插件时自动调整高度
+			themeType : 'style :minimalist',//极简主题 加冒号的是主题样式文件名称同时也是主题目录
+			autoHeightMode : true,//值为true，并引入autoheight.js插件时自动调整高度
 			formatUploadUrl :false,//false时不会自动格式化上传后的URL
 			resizeType : 1,//2或1或0，2时可以拖动改变宽度和高度，1时只能改变高度，0时不能拖动。默认值: 2 
 			allowPreviewEmoticons : true,//true或false，true时鼠标放在表情上可以预览表情
@@ -138,7 +142,7 @@ function sureSubmit(){
 			</c:forEach>
 			${content}
 		</div>
-		<div class="comment">${comment.content}</div>
+		<div class="richTextContent">${comment.content}</div>
 		</enhance:out>    	
     </TD>
    </TR>
@@ -157,4 +161,78 @@ function sureSubmit(){
 </TBODY></TABLE>
 </DIV>
 </form:form>
+
+
+<!-- 代码高亮显示 -->
+<script type="text/javascript">
+	//代码语言类
+	function languageClassName(originalClass, newClass) {
+		var o = new Object()
+		o.originalClass = originalClass;//原始样式标签名称
+		o.newClass = newClass;//新样式标签名称
+		return o;
+	}
+
+	$(document).ready(function(){
+	    //代码语言映射集合
+	    var languageMapping_arr = new Array();
+		var languageClassName_xml = languageClassName("lang-xml","language-xml");
+	    languageMapping_arr.push(languageClassName_xml);
+	    var languageClassName_css = languageClassName("lang-css","language-css");
+	    languageMapping_arr.push(languageClassName_css);
+	    var languageClassName_html = languageClassName("lang-html","language-html");
+	    languageMapping_arr.push(languageClassName_html);
+	    var languageClassName_js = languageClassName("lang-js","language-JavaScript");
+	    languageMapping_arr.push(languageClassName_js);
+	    var languageClassName_java = languageClassName("lang-java","language-java");
+	    languageMapping_arr.push(languageClassName_java);
+	    var languageClassName_pl = languageClassName("lang-pl","language-perl");
+	    languageMapping_arr.push(languageClassName_pl);
+	    var languageClassName_py = languageClassName("lang-py","language-python");
+	    languageMapping_arr.push(languageClassName_py);
+	    var languageClassName_rb = languageClassName("lang-rb","language-ruby");
+	    languageMapping_arr.push(languageClassName_rb);
+	    var languageClassName_vb = languageClassName("lang-vb","language-VB.Net");
+	    languageMapping_arr.push(languageClassName_vb);  
+	    var languageClassName_cpp = languageClassName("lang-cpp","language-C++");
+	    languageMapping_arr.push(languageClassName_cpp);  
+	    var languageClassName_cs = languageClassName("lang-cs","language-C#");
+	    languageMapping_arr.push(languageClassName_cs);  
+	    var languageClassName_bsh = languageClassName("lang-bsh","language-Bash + Shell");
+	    languageMapping_arr.push(languageClassName_bsh);  
+	      
+	    
+	    var doc_pre = $(".richTextContent").find('pre[class^="prettyprint"]');
+	    doc_pre.each(function(){
+	        var class_val = $(this).attr('class');
+	      	var lan_class = "";
+	        var class_arr = new Array();
+	        class_arr = class_val.split(' ');
+	        for(var i=0; i<class_arr.length; i++){
+	        	var className = $.trim(class_arr[i]);
+	        	
+	        	if(className != null && className != ""){
+	        		if (className.lastIndexOf('lang-', 0) === 0) {
+	        			lan_class = className;
+			            break;
+			        }
+	        	}	
+	        }
+	        
+	        for(var i=0; i<languageMapping_arr.length; i++){
+		    	var languageMapping = languageMapping_arr[i];
+		    	if(languageMapping.originalClass == lan_class){
+			    	var pre_content = '<code>'+$(this).html()+'</code>';
+			        $(this).html(pre_content);
+			        $(this).attr("class",'line-numbers '+languageMapping.newClass);
+		    	}
+		    }
+		    if(lan_class == ""){
+		    	var pre_content = '<code>'+$(this).html()+'</code>';
+			    $(this).html(pre_content);
+			    $(this).attr("class",'line-numbers language-markup');
+		    }
+	    });
+	});
+</script>
 </BODY></HTML>

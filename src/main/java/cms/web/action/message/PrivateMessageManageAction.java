@@ -96,10 +96,18 @@ public class PrivateMessageManageAction {
 						User friend_user = userMap.get(privateMessage.getFriendUserId());
 						if(friend_user != null){
 							privateMessage.setFriendUserName(friend_user.getUserName());//私信对方用户名称
+							if(friend_user.getAvatarName() != null && !"".equals(friend_user.getAvatarName().trim())){
+								privateMessage.setFriendAvatarPath(friend_user.getAvatarPath());//私信对方头像路径
+								privateMessage.setFriendAvatarName(friend_user.getAvatarName());//私信对方头像名称
+							}
 						}
 						User sender_user = userMap.get(privateMessage.getSenderUserId());
 						if(sender_user != null){
 							privateMessage.setSenderUserName(sender_user.getUserName());//私信发送者用户名称
+							if(sender_user.getAvatarName() != null && !"".equals(sender_user.getAvatarName().trim())){
+								privateMessage.setSenderAvatarPath(sender_user.getAvatarPath());//发送者头像路径
+								privateMessage.setSenderAvatarName(sender_user.getAvatarName());//发送者头像名称
+							}
 						}
 						
 					}
@@ -179,10 +187,18 @@ public class PrivateMessageManageAction {
 						
 						if(friend_user != null){
 							privateMessage.setFriendUserName(friend_user.getUserName());//私信对方用户名称
+							if(friend_user.getAvatarName() != null && !"".equals(friend_user.getAvatarName().trim())){
+								privateMessage.setFriendAvatarPath(friend_user.getAvatarPath());//私信对方头像路径
+								privateMessage.setFriendAvatarName(friend_user.getAvatarName());//私信对方头像名称
+							}
 						}
 						User sender_user = userMap.get(privateMessage.getSenderUserId());
 						if(sender_user != null){
 							privateMessage.setSenderUserName(sender_user.getUserName());//私信发送者用户名称
+							if(sender_user.getAvatarName() != null && !"".equals(sender_user.getAvatarName().trim())){
+								privateMessage.setSenderAvatarPath(sender_user.getAvatarPath());//发送者头像路径
+								privateMessage.setSenderAvatarName(sender_user.getAvatarName());//发送者头像名称
+							}
 						}
 						
 					}

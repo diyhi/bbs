@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 
 
+
 /**
  * 引用
  *
@@ -23,6 +24,10 @@ public class Quote implements Serializable{
 	private String userName;
 	/** 呢称 **/
 	private String nickname;
+	/** 头像路径 **/
+	private String avatarPath;
+	/** 头像名称 **/
+	private String avatarName;
 	/** 评论内容 **/
 	private String content;
 	public Long getCommentId() {
@@ -66,6 +71,18 @@ public class Quote implements Serializable{
 	}
 	public void setNickname(String nickname) {
 		this.nickname = nickname;
+	}
+	public String getAvatarPath() {
+		return avatarPath;
+	}
+	public void setAvatarPath(String avatarPath) {
+		this.avatarPath = avatarPath;
+	}
+	public String getAvatarName() {
+		return avatarName;
+	}
+	public void setAvatarName(String avatarName) {
+		this.avatarName = avatarName;
 	}
 	
 	

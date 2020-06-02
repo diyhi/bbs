@@ -12,7 +12,8 @@
 <link href="backstage/css/table.css" type="text/css" rel="stylesheet"/>
 <script language="javascript" src="backstage/js/Tool.js" type="text/javascript"></script>
 <script language="javascript" src="backstage/js/ajax.js" type="text/javascript"></script>
-
+<script src="backstage/jquery/jquery.min.js" language="javascript" type="text/javascript"></script>
+<script language="javascript" src="backstage/jquery/jquery.letterAvatar.js" type="text/javascript"></script>
 <script type="text/javascript">
 
 //删除私信
@@ -72,10 +73,26 @@ function deletePrivateMessage(userId,friendUserId){
     <TH>发送时间</TH>
     <TH>操作</TH>
     </TR></THEAD>
-  <TBODY class="t-list-tbody" align="center">
+  <TBODY class="t-list-tbody privateMessageModule" align="center">
    <c:forEach items="${pageView.records}" var="entry">
 	  <TR >
-	    <TD width="15%">${entry.friendUserName}</TD>
+	    <TD width="15%" style="text-align: left! important;">
+	    	<div class="avatarBox">
+				<c:if test="${entry.friendAvatarName != null && entry.friendAvatarName != ''}">
+					<img src="${entry.friendAvatarPath}100x100/${entry.friendAvatarName}" >
+				</c:if>
+	            <c:if test="${entry.friendAvatarName == null || entry.friendAvatarName == ''}">
+	            	<!-- 首字符头像-->
+	         		<img avatar="${(entry.friendNickname != null && entry.friendNickname !='') ? entry.friendNickname : entry.friendUserName}" >
+	            </c:if>
+			</div>
+			<span class="userName">
+		    	${entry.friendUserName}
+		    	<c:if test="${entry.friendNickname != null && entry.friendNickname != ''}">
+		    		（呢称：${entry.friendNickname}）
+		    	</c:if>
+	    	</span>
+	    </TD>
 	    <TD width="55%"><enhance:out escapeXml="false">${entry.messageContent}</enhance:out></TD>
 	    <TD width="15%"><fmt:formatDate value="${entry.sendTime}"  pattern="yyyy-MM-dd HH:mm:ss"/></TD>
 	    <TD width="15%">

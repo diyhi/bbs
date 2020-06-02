@@ -34,21 +34,17 @@ cursor:pointer;background:url(backstage/images/tab_2.gif) no-repeat;color:#33333
 background:url(backstage/images/tab_3.gif) no-repeat;color:#000;display:block;font-size:14px;font-weight:bold;height:28px;position:relative;margin-bottom:-4px;margin-top:-8px;padding-top:6px;width:117px;
 }
 </style>
-
 <style type="text/css">
 .CodeMirror {border-top: 1px solid #BFE3FF; border-bottom: 1px solid #BFE3FF; }
 
 </style>
-<link rel="stylesheet" href="backstage/codeMirror/lib/util/simple-hint.css">
-<link rel="stylesheet" href="backstage/codeMirror/lib/codemirror.css">
+<link href="backstage/codeMirror/lib/codemirror.css" rel="stylesheet" >
 <script src="backstage/codeMirror/lib/codemirror.js"></script>
-<script src="backstage/codeMirror/lib/util/closetag.js"></script>
 <script src="backstage/codeMirror/mode/xml/xml.js"></script>
 <script src="backstage/codeMirror/mode/javascript/javascript.js"></script>
 <script src="backstage/codeMirror/mode/css/css.js"></script>
 <script src="backstage/codeMirror/mode/htmlmixed/htmlmixed.js"></script>
-<script src="backstage/codeMirror/lib/util/simple-hint.js"></script>
-<script src="backstage/codeMirror/lib/util/javascript-hint.js"></script>
+<script src="backstage/codeMirror/mode/vue/vue.js"></script>
 
 
 <script language="JavaScript" type="text/javascript">
@@ -142,52 +138,32 @@ background:url(backstage/images/tab_3.gif) no-repeat;color:#000;display:block;fo
   </body>
 
   
-  <script>
-  /**
-      var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
-        lineNumbers: true,
-        mode: "application/x-ejs",
+<script type="text/javascript">
+	CodeMirror.commands.autocomplete = function(cm) {
+		CodeMirror.simpleHint(cm, CodeMirror.javascriptHint); 
+	};
+	      
+    var editor_pc = CodeMirror.fromTextArea(document.getElementById("pc_code"), {
+      	lineNumbers: true,
+        mode: 'text/html',
         indentUnit: 4,
+        extraKeys: {"Alt-/": "autocomplete"},
         indentWithTabs: true,
-        enterMode: "keep",
-        tabMode: "shift"
-      });
-    //  editor.toTextArea();  //经过转义的数据,有错
-	//	editor.getTextArea().value;//未经过转义的字符,有错
-//	alert(document.getElementById("code").value);**/
+        autoCloseTags: true,
+    });
+    editor_pc.setSize("100%","100%");//设置自适应高度 
+	
+	var editor_wap = CodeMirror.fromTextArea(document.getElementById("wap_code"), {
+      	lineNumbers: true,/*是否在编辑器左侧显示行号*/
+        mode: 'text/html',
+        indentUnit: 4,/* 缩进单位，值为空格数，默认为2 */
+        extraKeys: {"Alt-/": "autocomplete"},/*给编辑器绑定快捷键*/
+        indentWithTabs: true,/* 在缩进时，是否需要把 n*tab宽度个空格替换成n个tab字符，默认为false  */
+        autoCloseTags: true,
+    });
+    editor_wap.setSize("100%","100%");//设置自适应高度 
 
-
-	  CodeMirror.commands.autocomplete = function(cm) {
-        CodeMirror.simpleHint(cm, CodeMirror.javascriptHint);
-     //  CodeMirror.simpleHint(cm, CodeMirror.coffeescriptHint); 
-     	
-        
-      };
-      if(document.getElementById("pc_code") != null){
-    	  var editor = CodeMirror.fromTextArea(document.getElementById("pc_code"), {
-    	      	lineNumbers: true,
-    	        mode: 'text/html',
-    	        indentUnit: 4,
-    	        extraKeys: {"Alt-/": "autocomplete"},
-    	        indentWithTabs: true,
-    	        autoCloseTags: true
-    	      });
-    	  
-      }
-      
-      
-      if(document.getElementById("wap_code") != null){
-    	  CodeMirror.fromTextArea(document.getElementById("wap_code"), {
-          	lineNumbers: true,
-            mode: 'text/html',
-            indentUnit: 4,
-            extraKeys: {"Alt-/": "autocomplete"},
-            indentWithTabs: true,
-            autoCloseTags: true
-          });
-      }
-      
-    </script>
+</script>
     <script type="text/javascript">
 	
 		var exampleCode_arr = document.getElementsByName("exampleCode")
@@ -195,15 +171,16 @@ background:url(backstage/images/tab_3.gif) no-repeat;color:#000;display:block;fo
 			for(var i=0;i<exampleCode_arr.length;i++){
 				var exampleCode = exampleCode_arr[i];
 				//演示代码高亮
-				 var editor = CodeMirror.fromTextArea(exampleCode, {
-			   	      	lineNumbers: true,/*是否在编辑器左侧显示行号*/
-			   	        mode: 'text/html',
-			   	        indentUnit: 4,/* 缩进单位，值为空格数，默认为2 */
-			   	        extraKeys: {"Alt-/": "autocomplete"},/*给编辑器绑定快捷键*/
-			   	        indentWithTabs: true,/* 在缩进时，是否需要把 n*tab宽度个空格替换成n个tab字符，默认为false  */
-			   	        autoCloseTags: true,
-			   	        readOnly:true/* 只读 */
-			   	      });
+				var editor = CodeMirror.fromTextArea(exampleCode, {
+		   	      	lineNumbers: true,/*是否在编辑器左侧显示行号*/
+		   	        mode: 'text/html',
+		   	        indentUnit: 4,/* 缩进单位，值为空格数，默认为2 */
+		   	        extraKeys: {"Alt-/": "autocomplete"},/*给编辑器绑定快捷键*/
+		   	        indentWithTabs: true,/* 在缩进时，是否需要把 n*tab宽度个空格替换成n个tab字符，默认为false  */
+		   	        autoCloseTags: true,
+		   	        readOnly:true/* 只读 */
+			   	});
+			   	editor.setSize("100%","100%");//设置自适应高度 
 			}
 		}
 	</script>

@@ -14,7 +14,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -68,6 +67,7 @@ import cms.web.action.TextFilterManage;
 import cms.web.action.fileSystem.FileManage;
 import cms.web.action.mediaProcess.MediaProcessQueueManage;
 import cms.web.action.user.UserManage;
+import cms.web.action.user.UserRoleManage;
 
 
 /**
@@ -94,6 +94,7 @@ public class TopicManageAction {
 	
 	@Resource UserManage userManage;
 	@Resource UserService userService;
+	@Resource UserRoleManage userRoleManage;
 	
 	@Resource MediaProcessService mediaProcessService;
 	@Resource MediaProcessQueueManage mediaProcessQueueManage;
@@ -149,8 +150,30 @@ public class TopicManageAction {
 					topic.setContent(content);
 				}
 				
+				if(topic.getIsStaff() == false){//会员
+					User user = userManage.query_cache_findUserByUserName(topic.getUserName());
+					if(user != null){
+						topic.setNickname(user.getNickname());
+						topic.setAvatarPath(user.getAvatarPath());
+						topic.setAvatarName(user.getAvatarName());
+						
+						List<String> userRoleNameList = userRoleManage.queryUserRoleName(user.getUserName());
+						if(userRoleNameList != null && userRoleNameList.size() >0){
+							topic.setUserRoleNameList(userRoleNameList);//用户角色名称集合
+						}
+					}
+					
+				}
 				
+				List<String> topic_roleNameList = userRoleManage.queryAllowViewTopicRoleName(topic.getTagId());
+				if(topic_roleNameList != null && topic_roleNameList.size() >0){
+					topic.setAllowRoleViewList(topic_roleNameList);
+				}
 				
+				Tag tag = tagService.findById(topic.getTagId());
+				if(tag != null){
+					topic.setTagName(tag.getName());
+				}
 				model.addAttribute("topic", topic);
 				
 				model.addAttribute("availableTag", commentManage.availableTag());
@@ -234,7 +257,7 @@ public class TopicManageAction {
 					A:for(Long quoteUpdateId : quoteUpdateIdList){
 						for(Comment comment : commentList){
 							if(comment.getId().equals(quoteUpdateId)){
-								new_quoteList.put(comment.getId(), textFilterManage.filterText(comment.getContent()));
+								new_quoteList.put(comment.getId(), textFilterManage.filterText(textFilterManage.specifyHtmlTagToText(comment.getContent())));
 								continue A;
 							}
 						}
@@ -249,13 +272,26 @@ public class TopicManageAction {
 					List<Comment> quote_commentList = commentService.findByCommentIdList(query_quoteUpdateIdList);
 					if(quote_commentList != null && quote_commentList.size() >0){
 						for(Comment comment : quote_commentList){
-							new_quoteList.put(comment.getId(), textFilterManage.filterText(comment.getContent()));
+							new_quoteList.put(comment.getId(), textFilterManage.filterText(textFilterManage.specifyHtmlTagToText(comment.getContent())));
 						}
 					}
 				}
 
+				Map<String,List<String>> userRoleNameMap = new HashMap<String,List<String>>();//用户角色名称 key:用户名称Id 角色名称集合
 				if(commentList != null && commentList.size() >0){
 					for(Comment comment : commentList){
+						if(comment.getIsStaff() == false){//会员
+							User user = userManage.query_cache_findUserByUserName(comment.getUserName());
+							if(user != null){
+								comment.setNickname(user.getNickname());
+								comment.setAvatarPath(user.getAvatarPath());
+								comment.setAvatarName(user.getAvatarName());
+								userRoleNameMap.put(comment.getUserName(), null);
+							}
+							
+						}
+						
+						
 						commentIdList.add(comment.getId());
 						if(comment.getQuote() != null && !"".equals(comment.getQuote().trim())){
 							//旧引用
@@ -272,6 +308,14 @@ public class TopicManageAction {
 					}
 				}
 				
+				if(userRoleNameMap != null && userRoleNameMap.size() >0){
+					for (Map.Entry<String, List<String>> entry : userRoleNameMap.entrySet()) {
+						List<String> roleNameList = userRoleManage.queryUserRoleName(entry.getKey());
+						entry.setValue(roleNameList);
+					}
+				}
+				
+				
 				if(commentIdList != null && commentIdList.size() >0){
 					List<Reply> replyList = commentService.findReplyByCommentId(commentIdList);
 					if(replyList != null && replyList.size() >0){
@@ -285,7 +329,20 @@ public class TopicManageAction {
 						}
 					}
 				}
-				
+				if(commentList != null && commentList.size() >0){
+					for(Comment comment : commentList){
+						//用户角色名称集合
+						for (Map.Entry<String, List<String>> entry : userRoleNameMap.entrySet()) {
+							if(entry.getKey().equals(comment.getUserName())){
+								List<String> roleNameList = entry.getValue();
+								if(roleNameList != null && roleNameList.size() >0){
+									comment.setUserRoleNameList(roleNameList);
+								}
+								break;
+							}
+						}
+					}
+				}
 				
 				//将查询结果集传给分页List
 				pageView.setQueryResult(qr);
@@ -409,7 +466,7 @@ public class TopicManageAction {
 				String new_content = textFilterManage.deleteHiddenTag(value);
 
 				//不含标签内容
-				String text = textFilterManage.filterText(new_content);
+				String text = textFilterManage.filterText(textFilterManage.specifyHtmlTagToText(new_content));
 				//清除空格&nbsp;
 				String trimSpace = cms.utils.StringUtil.replaceSpace(text).trim();
 				//摘要
@@ -449,9 +506,6 @@ public class TopicManageAction {
 						
 						beforeImageList.add(imageInfo);
 						
-						if(i ==2){//只添加3张图片
-							break;
-						}
 					}
 					topic.setImage(JsonUtils.toJSONString(beforeImageList));
 					
@@ -945,7 +999,7 @@ public class TopicManageAction {
 					
 					
 					//不含标签内容
-					String text = textFilterManage.filterText(new_content);
+					String text = textFilterManage.filterText(textFilterManage.specifyHtmlTagToText(new_content));
 					
 					
 					//清除空格&nbsp;
@@ -982,10 +1036,7 @@ public class TopicManageAction {
 							imageInfo.setPath(FileUtil.getFullPath(other_imageNameList.get(i)));
 							
 							beforeImageList.add(imageInfo);
-							
-							if(i ==2){//只添加3张图片
-								break;
-							}
+					
 						}
 						topic.setImage(JsonUtils.toJSONString(beforeImageList));
 						

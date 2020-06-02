@@ -9,7 +9,8 @@
 <LINK href="backstage/css/list.css" type="text/css" rel="stylesheet">
 <LINK href="backstage/css/table.css" type="text/css" rel="stylesheet">
 <script type="text/javascript" src="backstage/js/Tool.js" charset="UTF-8"></script>
-
+<script src="backstage/jquery/jquery.min.js" language="javascript" type="text/javascript"></script>
+<script language="javascript" src="backstage/jquery/jquery.letterAvatar.js" type="text/javascript"></script>
 </HEAD>
 <BODY>
 
@@ -28,11 +29,25 @@
     <TH>用户</TH>
     <TH>关注时间</TH>
   </TR></THEAD>
-  <TBODY class="t-list-tbody" align="center">
+  <TBODY class="t-list-tbody followModule" align="center">
    <c:forEach items="${pageView.records}" var="entry">
 	  <TR > 
-	    <TD width="70%">
-	    	${entry.friendUserName}
+	    <TD width="70%" style="text-align: left! important;">
+	    	<div class="avatarBox">
+				<c:if test="${entry.friendAvatarName != null && entry.friendAvatarName != ''}">
+					<img src="${entry.friendAvatarPath}100x100/${entry.friendAvatarName}" >
+				</c:if>
+	            <c:if test="${entry.friendAvatarName == null || entry.friendAvatarName == ''}">
+	            	<!-- 首字符头像-->
+	         		<img avatar="${(entry.friendNickname != null && entry.friendNickname !='') ? entry.friendNickname : entry.friendUserName}" >
+	            </c:if>
+			</div>
+			<span class="userName">
+		    	${entry.friendUserName}
+		    	<c:if test="${entry.friendNickname != null && entry.friendNickname != ''}">
+		    		（呢称：${entry.friendNickname}）
+		    	</c:if>
+	    	</span>
 	    </TD>
 	    <TD width="30%">
 	    	<fmt:formatDate value="${entry.addtime}"  pattern="yyyy-MM-dd HH:mm:ss"/>

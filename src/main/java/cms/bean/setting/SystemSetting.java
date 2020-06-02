@@ -1,6 +1,7 @@
 package cms.bean.setting;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -110,6 +111,18 @@ public class SystemSetting implements Serializable{
 	/** 实名用户才允许提交答案 **/
 	private boolean realNameUserAllowAnswer = false;
 
+	/** 问题悬赏积分下限 **/
+	private Long questionRewardPointMin = 0L;
+	/** 问题悬赏积分上限 空为无限制 0则不允许悬赏积分 **/
+	private Long questionRewardPointMax;
+	
+	/** 问题悬赏金额下限 **/
+	@Column(nullable=false,precision=12, scale=2)
+	private BigDecimal questionRewardAmountMin = new BigDecimal("0");
+	/** 问题悬赏金额上限 空为无限制 0则不允许悬赏金额 **/
+	@Column(precision=12, scale=2)
+	private BigDecimal questionRewardAmountMax;
+	
 	
 	/** 解锁话题隐藏内容平台分成比例 默认0% **/
 	private Integer topicUnhidePlatformShareProportion = 0;
@@ -618,6 +631,38 @@ public class SystemSetting implements Serializable{
 
 	public void setQuestionRewardPlatformShareProportion(Integer questionRewardPlatformShareProportion) {
 		this.questionRewardPlatformShareProportion = questionRewardPlatformShareProportion;
+	}
+
+	public Long getQuestionRewardPointMin() {
+		return questionRewardPointMin;
+	}
+
+	public void setQuestionRewardPointMin(Long questionRewardPointMin) {
+		this.questionRewardPointMin = questionRewardPointMin;
+	}
+
+	public Long getQuestionRewardPointMax() {
+		return questionRewardPointMax;
+	}
+
+	public void setQuestionRewardPointMax(Long questionRewardPointMax) {
+		this.questionRewardPointMax = questionRewardPointMax;
+	}
+
+	public BigDecimal getQuestionRewardAmountMin() {
+		return questionRewardAmountMin;
+	}
+
+	public void setQuestionRewardAmountMin(BigDecimal questionRewardAmountMin) {
+		this.questionRewardAmountMin = questionRewardAmountMin;
+	}
+
+	public BigDecimal getQuestionRewardAmountMax() {
+		return questionRewardAmountMax;
+	}
+
+	public void setQuestionRewardAmountMax(BigDecimal questionRewardAmountMax) {
+		this.questionRewardAmountMax = questionRewardAmountMax;
 	}
 
 

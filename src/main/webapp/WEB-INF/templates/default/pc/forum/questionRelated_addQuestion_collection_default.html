@@ -21,16 +21,37 @@
 					<input type="text" id="title" name="title" class="formText" size="90" value="${question.title}" alt="标题" title="标题" placeholder="标题"/>
 					<span id="${identificationNumber}_title_error" class="error" name="error">${(error['title'])!}</span>
 				</div>
+				<#if returnValue['questionRewardAmountMax'] == null ||  (returnValue['questionRewardAmountMax'] != null && returnValue['questionRewardAmountMax'] gt 0)>	
 				<div class="item">
 					<input type="text" id="amount" name="amount" class="formText" size="10" maxlength="8" value="${question.amount}" alt="悬赏金额" title="悬赏金额" placeholder="悬赏金额"/><span class="unit">元</span>
 					<span id="${identificationNumber}_amount_error" class="error" name="error">${(error['amount'])!}</span>
-					<span class="help" >悬赏金额不能超过 ${returnValue['maxDeposit']} 元</span>
+					<span class="help" >
+						<#if returnValue['questionRewardAmountMin'] gt 0>	
+							悬赏金额不能少于 ${returnValue['questionRewardAmountMin']} 元；
+						</#if>	
+						<#if returnValue['questionRewardAmountMax'] != null && returnValue['questionRewardAmountMax'] gt 0>	
+							悬赏金额不能超过${returnValue['questionRewardAmountMax']} 元；
+						</#if>	
+						用户共有金额 ${returnValue['maxDeposit']} 元
+					</span>
 				</div>
+				</#if>
+					
+				<#if returnValue['questionRewardPointMax'] == null ||  (returnValue['questionRewardPointMax'] != null && returnValue['questionRewardPointMax'] gt 0)>		
 				<div class="item">
 					<input type="text" id="point" name="point" class="formText" size="10" maxlength="8" value="${question.amount}" alt="悬赏积分" title="悬赏积分" placeholder="悬赏积分"/><span class="unit">积分</span>
 					<span id="${identificationNumber}_point_error" class="error" name="error">${(error['point'])!}</span>
-					<span class="help" >悬赏积分不能超过 ${returnValue['maxPoint']}</span>
+					<span class="help" >
+						<#if returnValue['questionRewardPointMin'] gt 0>	
+							悬赏积分不能少于${returnValue['questionRewardPointMin']}；
+						</#if>	
+						<#if returnValue['questionRewardPointMax'] gt 0>	
+							悬赏积分不能超过${returnValue['questionRewardPointMax']}；
+						</#if>	
+						用户共有积分 ${returnValue['maxPoint']}
+					</span>
 				</div>
+				</#if>	
 				<div class="questionTag">
 					<#list question.questionTagAssociationList as questionTagAssociation>
 		    			<a class="btn mr" data-tagId="${questionTagAssociation.questionTagId}" href="javascript:;">${questionTagAssociation.questionTagName}<span class="ml">×</span><input type="hidden" name="tagId" value="${questionTagAssociation.questionTagId}"></a>
@@ -458,7 +479,7 @@
 					        				//需引入layer
 					        				layer.msg('提交成功,3秒后自动跳转到问题列表页', 
 												{
-												  time: 300000 //3秒关闭（如果不配置，默认是3秒）
+												  time: 3000 //3秒关闭（如果不配置，默认是3秒）
 												},function(){//关闭后的操作
 													//跳转页面
 					        						window.location.href="askList"; 

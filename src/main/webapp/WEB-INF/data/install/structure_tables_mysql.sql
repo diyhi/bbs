@@ -1363,6 +1363,10 @@ CREATE TABLE `systemsetting` (
   `realNameUserAllowQuestion` bit(1) NOT NULL,
   `maxQuestionTagQuantity` int(11) DEFAULT NULL,
   `questionRewardPlatformShareProportion` int(11) DEFAULT NULL,
+  `questionRewardAmountMax` decimal(12,2) DEFAULT NULL,
+  `questionRewardAmountMin` decimal(12,2) NOT NULL,
+  `questionRewardPointMax` bigint(20) DEFAULT NULL,
+  `questionRewardPointMin` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

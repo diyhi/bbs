@@ -108,8 +108,8 @@ function initKindEditor(id){
 		
 		editor = K.create('textarea[name="content"]', {
 			basePath : '${config:url(pageContext.request)}backstage/kindeditor/',//指定编辑器的根目录路径
-			themeType : 'style :darkGray',//深灰主题 加冒号的是主题样式文件名称同时也是主题目录
-		//	autoHeightMode : true,//值为true，并引入autoheight.js插件时自动调整高度
+			themeType : 'style :minimalist',//极简主题 加冒号的是主题样式文件名称同时也是主题目录
+			autoHeightMode : true,//值为true，并引入autoheight.js插件时自动调整高度
 			formatUploadUrl :false,//false时不会自动格式化上传后的URL
 			resizeType : 1,//2或1或0，2时可以拖动改变宽度和高度，1时只能改变高度，0时不能拖动。默认值: 2 
 			allowPreviewEmoticons : true,//true或false，true时鼠标放在表情上可以预览表情

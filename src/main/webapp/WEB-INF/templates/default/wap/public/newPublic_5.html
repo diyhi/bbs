@@ -74,26 +74,31 @@
 				         	
 				        </div>
 				    	<div class="topInfo">                                   
-				            <span class="bLeft">
-				                <div class="tagName">{{topic.tagName}}</div>
-				            </span>
-				            <p class="bRight">
-				            	<i class="cms-commentCount " style="font-size: 12px;"></i><span style="margin-left: 2px;margin-right: 5px;">{{topic.commentTotal}}</span>
-				            	<i class="cms-view " style="font-size: 12px;"></i><span style="margin-left: 2px;">{{topic.viewTotal}}</span>
-				            </p> 
+				            <div class="top-box">
+				            	<router-link class="userName" tag="span" :to="{path: '/user/control/home', query: {userName: topic.userName}}">
+					            	{{topic.nickname != null && topic.nickname != '' ? topic.nickname : topic.userName}}
+					            </router-link>
+				            	<span class="staff" v-if="topic.isStaff">官方人员</span>
+				            	<span class="userRoleName" v-for="roleName in topic.userRoleNameList">{{roleName}}</span>
+				            </div>
+				            <div class="bottom-box">
+				            	<i class="time">{{topic.postTime}}</i>
+				            </div>
+				            
 				        </div>
 				        <div class="clearfix"></div>
 				      
 				      	<div class="title">
 				      		<router-link  tag="span" :to="{path: '/thread', query: {topicId: topic.id}}" >{{topic.title}}</router-link>
 				      		<i class="topicRoleName" v-for="(roleName,index) in topic.allowRoleViewList" >{{roleName}}</i>
+				      		
 				      		<span :class="'hideTagType hide_'+key"  v-for="(value, key) in topic.hideTagTypeMap">
                       			<span class="circle point" v-if="value==true"><i class="cms-unlock-solid" ></i></span>
                       			<span class="circle" v-if="value==false"><i class="cms-lock-solid" ></i></span>
-	                      	</span> 
+	                      	</span>
 				      	</div>
 				      	
-				        <div class="summary" v-if="topic.imageInfoList.length ==0 || topic.mediaInfoList.length ==0">
+				        <div class="summary" v-if="topic.imageInfoList.length ==0 && topic.mediaInfoList.length ==0">
 							<span>{{topic.summary}}</span>
 						</div>
 						<div class="videoInfo" v-if="topic.mediaInfoList.length > 0" >
@@ -104,27 +109,28 @@
 														
 							</player>
 						</div>
-				        <div class="picInfo" v-if="topic.imageInfoList.length >0 && topic.mediaInfoList.length ==0" v-viewer="pictureOptions">
-				        	<span v-for="(imageInfo,index) in topic.imageInfoList" class="imageBox" >
-					        	<div class="img" v-lazy:background-image="imageInfo.path+'120x120/'+imageInfo.name" >
-					        		<img :src="$store.state.commonPath+'images/null.gif'" :key="index":data-src="imageInfo.path+imageInfo.name" >
+				       
+						
+						<div class="imageInfo" v-if="topic.imageInfoList.length >0 && topic.mediaInfoList.length ==0" v-viewer="pictureOptions">
+							<div class="image-box">
+								<div class="image-box image-column">
+									<!-- 图片最多显示6个 -->
+									<div v-for="(imageInfo,index) in topic.imageInfoList" v-if="index <6" class="image" v-lazy:background-image="imageInfo.path+'240x240/'+imageInfo.name" >
+										<img class="zoom" :src="$store.state.commonPath+'images/null.gif'" :key="index":data-src="imageInfo.path+imageInfo.name" >
+										<div class="ratio" ></div>
+									</div>
 								</div>
-					        	
-					        </span>
-				        
-							<!--
-								<div class="img" v-lazy:background-image="imageInfo.path+'120x120/'+imageInfo.name"></div>-->
-							
-							
+							</div>
 						</div>
 						
 						<div class="detailInfo">                                   
 				            <span class="bLeft">
-				                <div class="userName">{{topic.nickname != null && topic.nickname != '' ? topic.nickname : topic.userName}}</div>
+				                <div class="tagName">{{topic.tagName}}</div>
 				            </span>
 				            <p class="bRight">
-				            	<i class="time">{{topic.postTime}}</i>
-				            </p> 
+				            	<i class="cms-commentCount " style="font-size: 12px;"></i><span style="margin-left: 2px;margin-right: 5px;">{{topic.commentTotal}}</span>
+				            	<i class="cms-view " style="font-size: 12px;"></i><span style="margin-left: 2px;">{{topic.viewTotal}}</span>
+				            </p>
 				        </div>
 				    </div>
 				    <div class="topicPage page">
@@ -138,9 +144,6 @@
 			<div v-show="show_editor">
 				<mt-header fixed title="发表话题" style="background: #fafafa; color: #000000;font-size: 14px">
 			    	<mt-button icon="back" @click.native="showTopicList(true)" slot="left" >返回</mt-button>
-			    	<router-link to="/index" slot="right" >
-			    		<span class="cms-home" style="font-size: 18px;"></span>
-					</router-link>
 				</mt-header> 
 				<div class="addTopicScroll">
 					<div class="box" >
@@ -183,7 +186,7 @@
 								    </p>
 						        </li>
 						      
-						        <li style="margin-left: 10px;margin-right: 10px; margin-top: 10px; padding-bottom: 10px;">
+						        <li style="margin-left: 5px;margin-right: 5px; margin-top: 10px; padding-bottom: 10px;">
 									<mt-button  type="primary" size="large"  @click.native="addTopic">提交</mt-button>
 									<p class="tips">
 								    	<span>{{error.topic}}</span>	
@@ -198,7 +201,7 @@
 			<!-- 标签选择 -->
 			<mt-popup v-model="popup_tag" position="bottom" style="width: 100%; height: 70%;">
 				<mt-picker :slots="tagSlots" @change="onTagChange" value-key="name" ></mt-picker>
-				<mt-tabbar fixed style='height:40px;margin-left: 3px;margin-right: 3px;'>
+				<mt-tabbar fixed style='height:40px;margin-left: 3px;margin-right: 3px;padding-bottom:5px; '>
 					<mt-button type="primary" size="large" @click.native="popup_tag = false" >确定</mt-button> 
 				</mt-tabbar>
 			</mt-popup>
@@ -235,46 +238,66 @@
 				</router-link>
 			</mt-header>
 			<div class="topicContentModule">
-				<div class="topicDetail">
-					<div class="head">
+				<div class="head-box">
+					<div class="userInfo clearfix">                                   
 						<!-- router-link渲染成<div>标签 -->
 				    	<router-link class="avatarBox"  tag="div" :to="{path: '/user/control/home', query: {userName: topic.userName}}">
 				        	<img :src="topic.avatarPath+'100x100/'+topic.avatarName" v-if="topic.avatarName != null && topic.avatarName != ''">
 				            <!-- 首字符头像-->
 				         	<img ref="topicUserAvatar"  v-if="topic.avatarName == null || topic.avatarName == ''">
 				        </router-link>
+			            <div class="left">
+			                <div class="topInfo">                                   
+					            <div class="top-box">
+					            	<router-link class="userName" tag="span" :to="{path: '/user/control/home', query: {userName: topic.userName}}">
+					            		{{topic.nickname != null && topic.nickname != '' ? topic.nickname : topic.userName}}
+					            	</router-link>
+					            	<span class="staff" v-if="topic.isStaff">官方人员</span>
+					            	<span class="userRoleName" v-for="roleName in topic.userRoleNameList">{{roleName}}</span>
+					            </div>
+					            <div class="bottom-box">
+					            	<i class="time">{{topic.postTime}}</i>
+					            </div>
+					        </div>
+			            </div>
+			            <div class="right">
+			            	<div class="button" v-if="topic.isStaff == false">
+								<mt-button type="primary" :disabled="following" plain style="height: 28px;font-size: 16px;" @click.native="addFollow(topic.userName)">{{following == true ? '已关注':'关注'}}</mt-button>
+							</div>
+			            </div>
+			        </div>
+				</div>
+				
+				<div class="topicDetail">
+					<div class="head">
 				    	<h1>
 				    		{{topic.title}}
 				    	</h1>
 				    	<div class="info clearfix">                                 
-				            <span class="bLeft">
-				            	 <!--router-link渲染成<div>标签-->
-						    	<router-link class="userName"  tag="div" :to="{path: '/user/control/home', query: {userName: topic.userName}}">
-						           {{topic.nickname != null && topic.nickname != '' ? topic.nickname : topic.userName}}
-						        </router-link>
-				                <i class="time">{{topic.postTime}}</i>
+				            <span class="left">
+				            	 <div class="tagName">{{topic.tagName}}</div>
 				            </span>
-				            <p class="bRight">
-				            	<span class="cms-commentCount" style="font-size: 12px;color: #aaa;"></span>{{topic.commentTotal}} 
-								<span class="cms-view" style="font-size: 12px;margin-right: 1px;color: #aaa;margin-left: 10px;"></span>{{topic.viewTotal}}
+				            <p class="right">
+								<span class="editTopic" v-if="topic.userName == $store.state.user.userName">
+									<router-link tag="span" :to="{path: '/user/editTopic', query: {topicId: topic.id}}" ><i class="editTopic-icon cms-pencil-alt" ></i>编辑</router-link>
+								</span>
+					
+				            	<span class="count-icon cms-commentCount" ></span>{{topic.commentTotal}} 
+								<span class="view-icon cms-view" ></span>{{topic.viewTotal}}
 				            </p>
 				        </div> 
 					</div>
-					
-					
+				
 					<div class="main" v-viewer="pictureOptions" >
 						<div v-if="topic.lastUpdateTime != null" class="lastUpdateTime" >最后修改时间：{{topic.lastUpdateTime}}</div>
 						<!-- 内容 v-lazy-container为延迟加载-->
 						<component v-lazy-container="{ selector: 'img'}" v-bind:is ="hideTagComponent(topic.content)" v-bind="$props" /> 
 						
 					</div>
-					
-					
-					
 					<div class="operating">
 						<div class="bottomInfo">
-							<mt-button type="default" plain @click.native="addFavorite(topic.id);"  :disabled="alreadyCollected">{{alreadyCollected == true ? '已收藏':'收藏'}} ({{favoriteCount}})</mt-button>
-						 	<mt-button type="default" plain @click.native="addLike(topic.id);"  :disabled="alreadyLiked">{{alreadyLiked == true ? '已点赞':'赞'}} ({{likeCount}})</mt-button>
+							<mt-button type="default" plain @click.native="addFavorite(topic.id);"  :disabled="alreadyCollected" style="border: 1px solid #eee;color: #a9a9a9;border-radius: 6px;height: 36px;font-size: 16px;"><span class="cms-favorites icon"></span>{{favoriteCount}}{{alreadyCollected == true ? '已收藏':'收藏'}}</mt-button>
+						 	<mt-button type="default" plain @click.native="addLike(topic.id);"  :disabled="alreadyLiked" style="border: 1px solid #eee;color: #a9a9a9;border-radius: 6px;height: 36px;font-size: 16px;"><span class="cms-thumb-up icon"></span>{{likeCount}}{{alreadyLiked == true ? '已赞':'赞'}}</mt-button>
 						
 						</div>
 					</div> 
@@ -294,8 +317,9 @@
 						    	<router-link tag="h2" class="clearfix" :to="{path: '/user/control/home', query: {userName: comment.userName}}">
 						        	<div class="userName">{{comment.nickname != null && comment.nickname != '' ? comment.nickname : comment.userName}}</div>
 						        	<div class="userTag">
-								        <i class="master" v-if="comment.userName == topic.userName && comment.isStaff == topic.isStaff">楼主</i>
+								        <i class="staff" v-if="comment.isStaff">官方人员</i>
 								        <i class="userRoleName" v-for="roleName in comment.userRoleNameList" >{{roleName}}</i>
+								        <i class="master" v-if="comment.userName == topic.userName && comment.isStaff == topic.isStaff">作者</i>
 							        </div>
 						        </router-link>
 	                        	
@@ -337,7 +361,7 @@
 									           {{reply.nickname != null && reply.nickname != '' ? reply.nickname : reply.userName}}
 									        </router-link>
 									        <div class="userTag">
-										        <i class="master" v-if="reply.userName == topic.userName && reply.isStaff == topic.isStaff">楼主</i>
+										        <i class="master" v-if="reply.userName == topic.userName && reply.isStaff == topic.isStaff">作者</i>
 									        </div>  
 											<span class="time">
 												<span @click="editReplyUI(reply.id)" v-if="reply.userName == $store.state.user.userName"><span class="cms-pencil-alt" style="font-size: 10px;margin-right: 1px;"></span>编辑</span>
@@ -370,11 +394,13 @@
 				    	<span class="count">{{currentpage}}/{{totalpage}}</span>       
 				    	<router-link :to="{path: '/thread', query: {topicId: topicId,page: next}}" :class="next != ''? 'selected' : 'no'">下一页</router-link>
 				    </div>
+				    
+				    <div style="margin-left: 10px;margin-right: 10px; margin-top: 10px; margin-bottom: 10px;">
+						<mt-button  type="primary" size="large"  @click.native="addCommentUI">发表评论</mt-button>
+					</div>
 				</div>
 				
-				<div style="margin-left: 10px;margin-right: 10px; margin-top: 10px; margin-bottom: 10px;">
-					<mt-button  type="primary" size="large"  @click.native="addCommentUI">发表评论</mt-button>
-				</div>
+				
 				
 				<!-- 发表回复 -->
 				<mt-popup v-model="popup_reply" position="right" style="width: 100%;height: 100%;">
@@ -408,7 +434,7 @@
 									    </p>
 							        </li>
 							       
-							        <li style="margin-left: 10px;margin-right: 10px; margin-top: 10px; ">
+							        <li style="margin-left: 5px;margin-right: 5px; margin-top: 10px; ">
 										<mt-button  type="primary" size="large"  @click.native="addReply">提交</mt-button>
 										<p class="tips">
 									    	<span>{{error.reply}}</span>	
@@ -454,7 +480,7 @@
 									    </p>
 							        </li>
 							       
-							        <li style="margin-left: 10px;margin-right: 10px; margin-top: 10px; ">
+							        <li style="margin-left: 5px;margin-right: 5px; margin-top: 10px; ">
 										<mt-button  type="primary" size="large"  @click.native="editReply">提交</mt-button>
 										<p class="tips">
 									    	<span>{{error.editReply}}</span>	
@@ -500,7 +526,7 @@
 								    	<span>{{error.captchaValue}}</span>	
 								    </p>
 						        </li>
-						        <li style="margin-left: 10px;margin-right: 10px; margin-top: 10px; padding-bottom: 10px; ">
+						        <li style="margin-left: 5px;margin-right: 5px; margin-top: 10px; padding-bottom: 10px; ">
 									<mt-button  type="primary" size="large"  @click.native="addComment">提交</mt-button>
 									<p class="tips">
 								    	<span>{{error.comment}}</span>	
@@ -552,7 +578,7 @@
 								    </p>
 						        </li>
 						       
-						        <li style="margin-left: 10px;margin-right: 10px; margin-top: 10px; padding-bottom: 10px;">
+						        <li style="margin-left: 5px;margin-right: 5px; margin-top: 10px; padding-bottom: 10px;">
 									<mt-button  type="primary" size="large"  @click.native="addQuote">提交</mt-button>
 									<p class="tips">
 								    	<span>{{error.quote}}</span>
@@ -600,7 +626,7 @@
 								    </p>
 						        </li>
 						       
-						        <li style="margin-left: 10px;margin-right: 10px; margin-top: 10px; padding-bottom: 10px;">
+						        <li style="margin-left: 5px;margin-right: 5px; margin-top: 10px; padding-bottom: 10px;">
 									<mt-button  type="primary" size="large"  @click.native="editComment">提交</mt-button>
 									<p class="tips">
 								    	<span>{{error.editComment}}</span>	
@@ -654,18 +680,24 @@
 			            <img :src="question.avatarPath+'100x100/'+question.avatarName" v-if="question.avatarName != null && question.avatarName != ''">
 			            <!-- 首字符头像-->
 				        <img :ref="'questionAvatarData_'+question.id"  v-if="question.avatarName == null || question.avatarName == ''">
-				         	
+			         	
 			        </div>
-			    	<div class="topInfo">
-			    		<span class="bLeft">
-				        	<div class="tagName" v-for="questionTagAssociation in question.questionTagAssociationList" >{{questionTagAssociation.questionTagName}}</div>
-				        </span>
-			            <p class="bRight">
-			            	<i class="cms-commentCount " style="font-size: 12px;"></i><span style="margin-left: 2px;margin-right: 5px;">{{question.answerTotal}}</span>
-			            	<i class="cms-view " style="font-size: 12px;"></i><span style="margin-left: 2px;">{{question.viewTotal}}</span>
-			            </p> 
+			    	<div class="topInfo">                                   
+			            <div class="top-box">
+			            	<router-link class="userName" tag="span" :to="{path: '/user/control/home', query: {userName: question.userName}}">
+				            	{{question.nickname != null && question.nickname != '' ? question.nickname : question.userName}}
+				            </router-link>
+			            	<span class="staff" v-if="question.isStaff">官方人员</span>
+			            	<span class="userRoleName" v-for="roleName in question.userRoleNameList">{{roleName}}</span>
+			            </div>
+			            <div class="bottom-box">
+			            	<i class="time">{{question.postTime}}</i>
+			            </div>
+			            <div class="solve">
+			            	<span class="adoption" v-if="question.adoptionAnswerId >0">解决</span>
+			            </div>
 			        </div>
-			        <div class="clearfix"></div>
+				    <div class="clearfix"></div>
 			      
 			      	<div class="title">
 			      		 <router-link tag="span" :to="{path: '/question', query: {questionId: question.id}}" >{{question.title}}</router-link>
@@ -685,13 +717,15 @@
 	                	</div>
 	                </div>
 					
-					<div class="detailInfo">                                   
+					<div class="detailInfo clearfix">    
+						<!-- 由CSS限制标签显示数量，超出50%隐藏 -->                               
 			            <span class="bLeft">
-			                <div class="userName">{{question.nickname != null && question.nickname != '' ? question.nickname : question.userName}}</div>
+			                <div class="tagName" v-for="questionTagAssociation in question.questionTagAssociationList" >{{questionTagAssociation.questionTagName}}</div>
 			            </span>
 			            <p class="bRight">
-			            	<i class="time">{{question.postTime}}</i>
-			            </p> 
+			            	<i class="cms-commentCount " style="font-size: 12px;"></i><span style="margin-left: 2px;margin-right: 5px;">{{question.answerTotal}}</span>
+			            	<i class="cms-view " style="font-size: 12px;"></i><span style="margin-left: 2px;">{{question.viewTotal}}</span>
+			            </p>
 			        </div>
 			    </div>
 			    <div class="questionPage page">
@@ -743,30 +777,54 @@
 			</mt-header>
 			
 			<div class="questionContentModule">
-				<div class="questionDetail">
-					<div class="head">
+				<div class="head-box">
+					<div class="userInfo clearfix">                                   
 						<!-- router-link渲染成<div>标签-->
 				    	<router-link class="avatarBox"  tag="div" :to="{path: '/user/control/home', query: {userName: question.userName}}">
 				        	<img :src="question.avatarPath+'100x100/'+question.avatarName" v-if="question.avatarName != null && question.avatarName != ''">
 				            <!-- 首字符头像-->
 				         	<img ref="questionUserAvatar"  v-if="question.avatarName == null || question.avatarName == ''">
 				        </router-link>
+			            <div class="left">
+			                <div class="topInfo">                                   
+					            <div class="top-box">
+					            	<router-link class="userName" tag="span" :to="{path: '/user/control/home', query: {userName: question.userName}}">
+					            		{{question.nickname != null && question.nickname != '' ? question.nickname : question.userName}}
+					            	</router-link>
+					            	<span class="staff" v-if="question.isStaff">官方人员</span>
+					            	<span class="userRoleName" v-for="roleName in question.userRoleNameList">{{roleName}}</span>
+					            </div>
+					            <div class="bottom-box">
+					            	<i class="time">{{question.postTime}}</i>
+					            </div>
+					        </div>
+			            </div>
+			            <div class="right">
+			            	<div class="button" v-if="question.isStaff == false">
+			            	
+								<mt-button type="primary" :disabled="following" plain style="height: 28px;font-size: 16px;" @click.native="addFollow(question.userName)">{{following == true ? '已关注':'关注'}}</mt-button>
+							 
+							</div>
+			            </div>
+			        </div>
+				</div>
+				<div class="questionDetail">
+					<div class="head">
 				    	<h1>
 				    		{{question.title}}
 				    	</h1>
-				    	<div class="info clearfix">                                   
-				            <span class="bLeft">
-				            	<!-- router-link渲染成<div>标签-->
-						    	<router-link class="userName"  tag="div" :to="{path: '/user/control/home', query: {userName: question.userName}}">
-						           {{question.nickname != null && question.nickname != '' ? question.nickname : question.userName}}
-						        </router-link>
-				                <i class="time">{{question.postTime}}</i>
+				    	<div class="info clearfix">                                 
+				            <span class="left">
+				            	<div class="tagName" v-for="questionTagAssociation in question.questionTagAssociationList" >{{questionTagAssociation.questionTagName}}</div>
 				            </span>
-				            <p class="bRight">
-				            	<span class="cms-commentCount" style="font-size: 12px;color: #aaa;"></span>{{question.answerTotal}} 
-								<span class="cms-view" style="font-size: 12px;margin-right: 1px;color: #aaa;margin-left: 10px;"></span>{{question.viewTotal}}
-				            </p> 
-				        </div>
+				            <p class="right">
+				            	<span class="appendQuestion" v-if="question.userName == $store.state.user.userName">
+									<router-link tag="span" :to="{path: '/user/appendQuestion', query: {questionId: question.id}}"><i class="appendQuestion-icon cms-pencil-alt" ></i>追加</router-link>
+								</span>
+				            	<span class="count-icon cms-commentCount" ></span>{{question.answerTotal}} 
+								<span class="view-icon cms-view" ></span>{{question.viewTotal}}
+				            </p>
+				        </div> 
 					</div>
 					<div class="main"> 
 					 
@@ -803,7 +861,8 @@
 						</div>	
 						<div class="operating">
 							<div class="bottomInfo">
-								<mt-button type="default" plain @click.native="addFavorite(question.id);"  :disabled="alreadyFavoriteQuestion">{{alreadyFavoriteQuestion == true ? '已收藏':'收藏'}} ({{questionFavoriteCount}})</mt-button>
+								<mt-button type="default" plain @click.native="addFavorite(question.id);"  :disabled="alreadyFavoriteQuestion" style="border: 1px solid #eee;color: #a9a9a9;border-radius: 6px;height: 36px;font-size: 16px;"><span class="cms-favorites icon"></span>{{questionFavoriteCount}}{{alreadyFavoriteQuestion == true ? '已收藏':'收藏'}}</mt-button>
+						 	
 							</div>
 						</div>
 					</div>
@@ -826,8 +885,9 @@
 						    	<router-link tag="h2" class="clearfix" :to="{path: '/user/control/home', query: {userName: answer.userName}}">
 						        	<div class="userName">{{answer.nickname != null && answer.nickname != '' ? answer.nickname : answer.userName}}</div>
 						        	<div class="userTag">
-								        <i class="master" v-if="answer.userName == question.userName && answer.isStaff == question.isStaff">作者</i>
+								    	<i class="staff" v-if="answer.isStaff">官方人员</i>
 								        <i class="userRoleName" v-for="roleName in answer.userRoleNameList" >{{roleName}}</i>
+								        <i class="master" v-if="answer.userName == question.userName && answer.isStaff == question.isStaff">作者</i>
 							        </div>
 						        </router-link>
 	                        	
@@ -889,11 +949,13 @@
 				    	<span class="count">{{currentpage}}/{{totalpage}}</span>       
 				    	<router-link :to="{path: '/question', query: {questionId: questionId,page: next}}" :class="next != ''? 'selected' : 'no'">下一页</router-link>
 				    </div>
+				    
+				    <div style="margin-left: 10px;margin-right: 10px; margin-top: 10px;margin-bottom: 10px; ">
+						<mt-button  type="primary" size="large"  @click.native="addAnswerUI">回答问题</mt-button>
+					</div>
 				</div>
 				
-				<div style="margin-left: 10px;margin-right: 10px; margin-top: 10px;margin-bottom: 10px; ">
-					<mt-button  type="primary" size="large"  @click.native="addAnswerUI">回答问题</mt-button>
-				</div>
+				
 				
 				<!-- 发表回复-->
 				<mt-popup v-model="popup_reply" position="right" style="width: 100%;height: 100%;">
@@ -927,7 +989,7 @@
 									    </p>
 							        </li>
 							       
-							        <li style="margin-left: 10px;margin-right: 10px; margin-top: 10px; ">
+							        <li style="margin-left: 5px;margin-right: 5px; margin-top: 10px; ">
 										<mt-button  type="primary" size="large"  @click.native="addReply">提交</mt-button>
 										<p class="tips">
 									    	<span>{{error.reply}}</span>	
@@ -973,7 +1035,7 @@
 								    	<span>{{error.captchaValue}}</span>	
 								    </p>
 						        </li>
-						        <li style="margin-left: 10px;margin-right: 10px; margin-top: 10px; padding-bottom: 10px; ">
+						        <li style="margin-left: 5px;margin-right: 5px; margin-top: 10px; padding-bottom: 10px; ">
 									<mt-button  type="primary" size="large"  @click.native="addAnswer">提交</mt-button>
 									<p class="tips">
 								    	<span>{{error.answer}}</span>	
@@ -1012,22 +1074,26 @@
 							    	<span>{{error.questionTitle}}</span>	
 							    </p>
 							</li>
-							<li>
+							<li v-if="questionRewardAmountMax == null || (questionRewardAmountMax != null && questionRewardAmountMax >0)">
 								<mt-field v-model.trim="questionAmount" label="悬赏金额" placeholder="悬赏金额" type="text" :attr="{ maxlength: 8 }"></mt-field>
 								<p class="tips">
 							    	<span>{{error.questionAmount}}</span>	
 							    </p>
 							    <p class="help">
-							    	<span>悬赏金额不能超过 {{maxDeposit}} 元</span>	
-							    </p>
+							    	<span v-if="questionRewardAmountMin >0">悬赏金额不能少于 {{questionRewardAmountMin}} 元；</span>	
+							    	<span v-if="questionRewardAmountMax != null && questionRewardAmountMax >0">悬赏金额不能超过 {{questionRewardAmountMax}} 元；</span>	
+							    	<span>用户共有金额 {{maxDeposit}} 元</span>	
+							    </p>	    
 							</li>
-							<li>
+							<li v-if="questionRewardPointMax == null || (questionRewardPointMax != null && questionRewardPointMax >0)">
 								<mt-field v-model.trim="questionPoint" label="悬赏积分" placeholder="悬赏积分" type="number"></mt-field>
 								<p class="tips">
 							    	<span>{{error.questionPoint}}</span>	
 							    </p>
 							    <p class="help">
-							    	<span>悬赏积分不能超过 {{maxPoint}}</span>	
+							    	<span v-if="questionRewardPointMin >0">悬赏积分不能少于 {{questionRewardPointMin}} ；</span>	
+							    	<span v-if="questionRewardPointMax != null && questionRewardPointMax >0">悬赏积分不能超过 {{questionRewardPointMax}}；</span>	
+							    	<span>用户共有积分 {{maxPoint}}</span>	
 							    </p>
 							</li>
 					        <li>
@@ -1074,7 +1140,7 @@
 							    </p>
 					        </li>
 					      
-					        <li style="margin-left: 10px;margin-right: 10px; margin-top: 10px; padding-bottom: 10px;">
+					        <li style="margin-left: 5px;margin-right: 5px; margin-top: 10px; padding-bottom: 10px;">
 								<mt-button  type="primary" size="large"  @click.native="addQuestion">提交</mt-button>
 								<p class="tips">
 							    	<span>{{error.question}}</span>	
@@ -1147,7 +1213,7 @@
 							    </p>
 					        </li>
 					      
-					        <li style="margin-left: 10px;margin-right: 10px; margin-top: 10px; padding-bottom: 10px;">
+					        <li style="margin-left: 5px;margin-right: 5px; margin-top: 10px; padding-bottom: 10px;">
 								<mt-button  type="primary" size="large"  @click.native="appendQuestion">提交</mt-button>
 								<p class="tips">
 							    	<span>{{error.question}}</span>	
@@ -1180,8 +1246,8 @@
 	    		<span class="cms-home" style="font-size: 18px;"></span>
 			</router-link>
 		</mt-header>
-		<div style=" position:relative; margin-left: 60px; margin-right: 60px;margin-top: 3px;">
-			<div style="background-color:transparent; width:100%; position: absolute; ">
+		<div style=" position:relative; margin-left: 60px; margin-right: 60px;">
+			<div style="background-color:transparent; width:100%; position: absolute; top: 3px;">
 				<searchbar-component></searchbar-component>
 			</div>
 		</div>
@@ -1194,49 +1260,74 @@
 				            <!-- 首字符头像-->
 				         	<img :ref="'searchResultTopicAvatarData_'+searchResult.topic.id"  v-if="searchResult.topic.avatarName == null || searchResult.topic.avatarName == ''">
 				        </div>
-				        
-				        <div class="title">
-				        	<span class="module">话题</span>
-				        	<router-link  tag="span" :to="{path: '/thread', query: {topicId: searchResult.topic.id}}" v-html="searchResult.topic.title"></router-link>
-				        	<i class="topicRoleName" v-for="(roleName,index) in searchResult.topic.allowRoleViewList" >{{roleName}}</i>
+				    	<div class="topInfo">                                   
+				            <div class="top-box">
+				            	<router-link class="userName" tag="span" :to="{path: '/user/control/home', query: {userName: searchResult.topic.userName}}">
+					            	{{searchResult.topic.nickname != null && searchResult.topic.nickname != '' ? searchResult.topic.nickname : searchResult.topic.userName}}
+					            </router-link>
+				            	<span class="staff" v-if="searchResult.topic.isStaff">官方人员</span>
+				            	<span class="userRoleName" v-for="roleName in searchResult.topic.userRoleNameList">{{roleName}}</span>
+				            </div>
+				            <div class="bottom-box">
+				            	<i class="time">{{searchResult.topic.postTime}}</i>
+				            </div>
+				            
 				        </div>
-				       
+				        <div class="clearfix"></div>
+				      
+				      	<div class="title">
+				      		<router-link  tag="span" :to="{path: '/thread', query: {topicId: searchResult.topic.id}}" v-html="searchResult.topic.title"></router-link>
+				        	<i class="topicRoleName" v-for="(roleName,index) in searchResult.topic.allowRoleViewList" >{{roleName}}</i>
+				      	</div>
 				        <div class="content">
 				            <span v-html="searchResult.topic.content"></span>
 				        </div>
 				        <div class="detailInfo">                                   
 				            <span class="bLeft">
-				                <div class="userName">{{searchResult.topic.nickname != null && searchResult.topic.nickname != '' ? searchResult.topic.nickname : searchResult.topic.userName}}</div>
+				                <div class="module">话题</div>
 				            </span>
 				            <p class="bRight">
-				            	<i class="time">{{searchResult.topic.postTime}}</i>
-				            </p> 
+				            	<i class="cms-commentCount " style="font-size: 12px;"></i><span style="margin-left: 2px;margin-right: 5px;">{{searchResult.topic.commentTotal}}</span>
+				            	<i class="cms-view " style="font-size: 12px;"></i><span style="margin-left: 2px;">{{searchResult.topic.viewTotal}}</span>
+				            </p>
 				        </div>
 			        </div>
 			        
 			        <div v-if="searchResult.indexModule == 20">
 				    	<div class="avatarBox">
-				            <img :src="searchResult.question.avatarPath+'100x100/'+searchResult.question.avatarName" v-if="searchResult.question.avatarName != null && searchResult.question.avatarName != ''">
+				             <img :src="searchResult.question.avatarPath+'100x100/'+searchResult.question.avatarName" v-if="searchResult.question.avatarName != null && searchResult.question.avatarName != ''">
 				            <!-- 首字符头像-->
 				         	<img :ref="'searchResultQuestionAvatarData_'+searchResult.question.id"  v-if="searchResult.question.avatarName == null || searchResult.question.avatarName == ''">
+				    	</div>
+				    	<div class="topInfo">                                   
+				            <div class="top-box">
+				            	<router-link class="userName" tag="span" :to="{path: '/user/control/home', query: {userName: searchResult.question.userName}}">
+					            	{{searchResult.question.nickname != null && searchResult.question.nickname != '' ? searchResult.question.nickname : searchResult.question.userName}}
+					            </router-link>
+				            	<span class="staff" v-if="searchResult.question.isStaff">官方人员</span>
+				            	<span class="userRoleName" v-for="roleName in searchResult.question.userRoleNameList">{{roleName}}</span>
+				            </div>
+				            <div class="bottom-box">
+				            	<i class="time">{{searchResult.question.postTime}}</i>
+				            </div>
+				            
+				        </div>
+				        <div class="clearfix"></div>
 				      
-				        </div>
-				        
-				        <div class="title">
-				        	<span class="module">问题</span>
-				        	<router-link  tag="span" :to="{path: '/question', query: {questionId: searchResult.question.id}}" v-html="searchResult.question.title"></router-link>
-				        </div>
-				       
-				        <div class="content">
+				      	<div class="title">
+				      		<router-link  tag="span" :to="{path: '/question', query: {questionId: searchResult.question.id}}" v-html="searchResult.question.title"></router-link>
+				      	</div>
+				      	<div class="content">
 				            <span v-html="searchResult.question.content"></span>
 				        </div>
-				        <div class="detailInfo">                                   
+				    	<div class="detailInfo">                                   
 				            <span class="bLeft">
-				                <div class="userName">{{searchResult.question.nickname != null && searchResult.question.nickname != '' ? searchResult.question.nickname : searchResult.question.userName}}</div>
+				                <div class="module">问题</div>
 				            </span>
 				            <p class="bRight">
-				            	<i class="time">{{searchResult.question.postTime}}</i>
-				            </p> 
+				            	<i class="cms-commentCount " style="font-size: 12px;"></i><span style="margin-left: 2px;margin-right: 5px;">{{searchResult.question.commentTotal}}</span>
+				            	<i class="cms-view " style="font-size: 12px;"></i><span style="margin-left: 2px;">{{searchResult.question.viewTotal}}</span>
+				            </p>
 				        </div>
 			        </div>
 			    </div>
@@ -1340,7 +1431,7 @@
 		        		<mt-switch v-model="agreement"></mt-switch>
 		        	</mt-cell>
 		        </li> 
-		        <li>
+		        <li style="margin-left: 5px;margin-right: 5px; margin-top: 10px; padding-bottom: 10px;">
 		        	
 		        	<mt-button  type="primary" size="large" @click.native="addUser">提交</mt-button>
 		        	<p class="tips">
@@ -1408,7 +1499,7 @@
 					    </p>
 			        </li>
 			        
-			        <li>
+			        <li  style="margin-left: 5px;margin-right: 5px; margin-top: 10px; padding-bottom: 10px;">
 			        	<mt-button  type="primary" size="large" @click.native="submitData">提交</mt-button>
 			        </li> 
 				</ul>
@@ -1472,7 +1563,7 @@
 					    </p>
 			        </li>
 			        
-			        <li>
+			        <li  style="margin-left: 5px;margin-right: 5px; margin-top: 10px; padding-bottom: 10px;">
 			        	<mt-button  type="primary" size="large" @click.native="submitData">提交</mt-button>
 			        </li> 
 				</ul>
@@ -1523,7 +1614,7 @@
 		        </mt-cell>
 	        	
 	        </li>
-	        <li>
+	        <li style="margin-left: 5px;margin-right: 5px; margin-top: 10px; padding-bottom: 10px;">
 	        	<mt-button  type="primary" size="large" @click.native="submitData">登录</mt-button>
 	        </li> 
 	        <li>
@@ -1559,11 +1650,11 @@
 		        <i class="avatarImg" v-if="user.avatarName != null && user.avatarName != ''"><img :src="avatarUrl"></i>
 		        <p class="userName">{{user.userName}} <i class="userRoleName" v-for="(roleName,index) in user.userRoleNameList" >{{roleName}}</i></p>
 		        <p class="nickname" v-if="user.nickname != null && user.nickname != ''">{{user.nickname}}</p>
-		        <p class="grade" >{{user.gradeName}}</p>
+		        <p class="grade" v-if="user.isStaff == false">{{user.gradeName}}</p>
 		        
 		       
 		      
-		        <span class="privateMessageBox" v-if="user.userName != $store.state.user.userName">
+		        <span class="privateMessageBox" v-if="user.userName != null && user.userName != $store.state.user.userName ">
 		        	<div class="followButton" @click="addFollow(user.userName)">{{following == true ? '已关注':'关注'}}</div>
 		        	
 		        
@@ -2175,7 +2266,7 @@
 			    	<span>{{customError[index]}}</span>
 			    </p>
 	        </li> 	
-	        <li>
+	        <li  style="margin-left: 5px;margin-right: 5px; margin-top: 10px; padding-bottom: 10px;">
 	        	
 	        	<mt-button  type="primary" size="large" @click.native="submitData">提交</mt-button>
 	        </li>
@@ -2248,7 +2339,7 @@
 					    	<span>{{error.captchaValue}}</span>	
 					    </p>
 			        </li>
-					<li>
+					<li style="margin-left: 5px;margin-right: 5px; margin-top: 10px; padding-bottom: 10px;">
 						<mt-button  type="primary" size="large" @click.native="submitData">提交</mt-button>
 					</li>
 				
@@ -2277,7 +2368,7 @@
 						<mt-field v-model.trim="smsCode"  label="手机校验码" placeholder="短信验证码"  type="text">
 							
 						</mt-field>
-						<div style="position: absolute;right: 0px;margin-top: -45px; margin-right: 5px;">
+						<div style="position: absolute;right: 5px;margin-top: -45px; margin-right: 5px;">
 							<mt-button  type="default"  @click.native="getSmsCode" :disabled="button.disabled">{{button.text}}</mt-button>
 						</div>
 						<p class="successInfo">
@@ -2292,7 +2383,7 @@
 			        	<mt-field v-model.trim="captchaValue"  @change.native="validation_captchaValue" label="验证码" placeholder="请输入验证码"  type="text">
 							
 						</mt-field>
-						<div style="position: absolute;right: 0px;margin-top: -45px;">
+						<div style="position: absolute;right: 5px;margin-top: -45px;">
 							<img :src="imgUrl" @click="replaceCaptcha" height="45px" width="120px" >
 						</div>
 						
@@ -2300,7 +2391,7 @@
 					    	<span>{{error.captchaValue}}</span>	
 					    </p>
 			        </li>
-					<li>
+					<li style="margin-left: 5px;margin-right: 5px; margin-top: 10px; padding-bottom: 10px;">
 						<mt-button  type="primary" size="large" @click.native="submitData">下一步</mt-button>
 					</li>
 				
@@ -2356,7 +2447,7 @@
 					    	<span>{{error.captchaValue}}</span>	
 					    </p>
 			        </li>
-					<li>
+					<li  style="margin-left: 5px;margin-right: 5px; margin-top: 10px; padding-bottom: 10px;">
 						<mt-button  type="primary" size="large" @click.native="submitData">提交</mt-button>
 					</li>
 				
@@ -2441,9 +2532,6 @@
 		<div class="privateMessageChatModule" >
 			<div class="headInfo">
 				<div class="title">{{friendUserNameTitle}}</div>
-
-				<div class="button"><mt-button type="primary"  @click.native="addPrivateMessageUI();" style="height: 28px;font-size: 16px;">发私信</mt-button></div>
-				
 			</div>
 			<mt-loadmore :top-method="queryPrivateMessageChat" :bottom-all-loaded="loading"  ref="loadmore" :top-pull-text='topText'>    
 
@@ -2511,10 +2599,30 @@
 			</div>
 			 -->
 			 
-			 
+			
+			
+			<div class="privateMessageEnter">
+				<div class="message-container" @click="addPrivateMessageUI();" >
+					<div class="messageContent-box">
+						<span class="cms-pencil messageContent-icon"></span>
+						<span class="messageContent-text" v-if="messageContent == null || messageContent == ''">我想说的话...</span>
+						<span class="messageContent-text" v-if="messageContent != null && messageContent != ''">{{messageContent}}</span>
+					</div>
+					<div class="privateMessage-info">
+						<span>
+							<span>
+								<i class="cms-commentCount message-count-icon"></i>
+							</span>
+							<span class="message-count-text">{{totalrecord}}</span>
+						</span>
+					</div>
+				</div>
+			</div>
+			
+
 			 
 			<!-- 发私信 -->
-			<mt-popup v-model="popup_privateMessage" position="right" style="width: 100%;height: 100%;">
+			<mt-popup v-model="popup_privateMessage" position="bottom" style="width: 100%;height: 100%;">
 			
 				<mt-header fixed title="发私信" style="background: #fafafa; color: #000000;font-size: 14px">
 			    	<mt-button icon="back" @click.native="popup_privateMessage = false" slot="left" >返回</mt-button>
@@ -2550,7 +2658,7 @@
 								    	<span>{{error.captchaValue}}</span>	
 								    </p>
 						        </li>
-						        <li style="margin-left: 10px;margin-right: 10px; margin-top: 10px; padding-bottom: 10px; ">
+						        <li style="margin-top: 10px; padding-bottom: 10px; ">
 									<mt-button  type="primary" size="large"  @click.native="addPrivateMessage">提交</mt-button>
 									<p class="tips">
 								    	<span>{{error.privateMessage}}</span>	
@@ -2948,10 +3056,17 @@
 			                <span class="operating"><span class="delete-btn"  @click="deleteFollow(follow.id)"><span class="cms-trash" style="font-size: 11px;margin-right: 1px;"></span>删除</span></span>                     
 			            </div>
 			            <div class="main">
-			            	<!-- router-link渲染成<p>标签-->
-			            	<router-link tag="p" class="content" :to="{path: '/user/control/home', query: {userName: follow.friendUserName}}">
-								{{follow.friendUserName}}<span v-if="follow.friendNickname != null && follow.friendNickname != ''">({{follow.friendNickname}})</span>
-							</router-link>                        
+			            	<!-- router-link渲染成<div>标签 -->
+					    	<router-link class="avatarBox"  tag="span" :to="{path: '/user/control/home', query: {userName: follow.friendUserName}}">
+					        	<img :src="follow.friendAvatarPath+'100x100/'+follow.friendAvatarName" v-if="follow.friendAvatarName != null && follow.friendAvatarName != ''">
+					            <!-- 首字符头像-->
+					         	<img :ref="'followUserAvatarData_'+follow.id"  v-if="follow.friendAvatarName == null || follow.friendAvatarName == ''">
+					        </router-link>
+			            
+			            	<!-- router-link渲染成<p>标签 --> 
+			            	<router-link tag="span" class="userName" :to="{path: '/user/control/home', query: {userName: follow.friendUserName}}">
+								{{follow.friendUserName}}<span v-if="follow.friendNickname != null && follow.friendNickname != ''"> （呢称：{{follow.friendNickname}}）</span>
+							</router-link>               
 						</div>
 					</div>
 				</div>
@@ -2978,11 +3093,19 @@
 			                    <h2>{{follower.addtime}}</h2>
 			                </span>
 			            </div>
+			            
 			            <div class="main">
-			            	<!-- router-link渲染成<p>标签-->
-			            	<router-link tag="p" class="content" :to="{path: '/user/control/home', query: {userName: follower.friendUserName}}">
-								{{follower.friendUserName}}<span v-if="follower.friendNickname != null && follower.friendNickname != ''">({{follower.friendNickname}})</span>
-							</router-link>                        
+			            	<!-- router-link渲染成<div>标签 -->
+					    	<router-link class="avatarBox"  tag="span" :to="{path: '/user/control/home', query: {userName: follower.friendUserName}}">
+					        	<img :src="follower.friendAvatarPath+'100x100/'+follower.friendAvatarName" v-if="follower.friendAvatarName != null && follower.friendAvatarName != ''">
+					            <!-- 首字符头像-->
+					         	<img :ref="'followerUserAvatarData_'+follower.id"  v-if="follower.friendAvatarName == null || follower.friendAvatarName == ''">
+					        </router-link>
+			            
+			            	<!-- router-link渲染成<p>标签 --> 
+			            	<router-link tag="span" class="userName" :to="{path: '/user/control/home', query: {userName: follower.friendUserName}}">
+								{{follower.friendUserName}}<span v-if="follower.friendNickname != null && follower.friendNickname != ''"> （呢称：{{follower.friendNickname}}）</span>
+							</router-link>               
 						</div>
 					</div>
 				</div>
@@ -3297,7 +3420,7 @@
 							    </p>
 					        </li>
 					      
-					        <li style="margin-left: 10px;margin-right: 10px; margin-top: 10px; padding-bottom: 10px;">
+					        <li style="margin-left: 5px;margin-right: 5px; margin-top: 10px; padding-bottom: 10px;">
 								<mt-button  type="primary" size="large"  @click.native="editTopic">提交</mt-button>
 								<p class="tips">
 							    	<span>{{error.topic}}</span>	
@@ -3320,7 +3443,7 @@
 <template id="bottomTab-template">
 	<div>
 		<!-- 底部选项卡 -->
-		<mt-tabbar  v-model="bottomTab" @click.native="selected" fixed style="height:45px;">
+		<mt-tabbar  v-model="bottomTab" @click.native="selected($event)" fixed style="height:46px;">
 			<mt-tab-item id="index">
 				<span class="cms-home" style="font-size: 20px;"></span>
 		    	<div style="margin-top: 3px;">首页</div>
@@ -3359,16 +3482,16 @@
 <script src="${commonPath}js/v-viewer/viewer.min.js?1" type="text/javascript"></script> 
 <script src="${commonPath}js/v-viewer/v-viewer.min.js" type="text/javascript"></script> 
 
-<link href="${baseURL}${commonPath}css/common.css?ffcfdd3" type="text/css" rel="stylesheet">
+<link href="${baseURL}${commonPath}css/common.css?ffcgfsdd3" type="text/css" rel="stylesheet">
 <script src="${commonPath}js/better-scroll.min.js?2d" type="text/javascript"></script> 
 <script src="${commonPath}js/DPlayer/hls.min.js" type="text/javascript"></script>
 <script src="${commonPath}js/DPlayer/DPlayer.min.js" type="text/javascript"></script>
 
 <script src="${commonPath}js/vue-cropper.js" type="text/javascript"></script>
  <script src="${commonPath}js/v-readmore.min.js" type="text/javascript"></script>
-<script src="${commonPath}js/wangeditor/wangEditor.min.js?6" type="text/javascript"></script>
+<script src="${commonPath}js/wangeditor/wangEditor.min.js?5" type="text/javascript"></script>
 <script src="${commonPath}js/vue-lazyload.js" type="text/javascript"></script> 
-<script src="${commonPath}js/main.js?66ggdfdd3cgdd" type="text/javascript"></script>
+<script src="${commonPath}js/main.js?fdfdgdpdd3cdgd" type="text/javascript"></script>
 
 
 
@@ -3415,6 +3538,11 @@ image[lazy=loading] {
 .mint-searchbar-cancel{
 	margin-right: 10px;
 }
+.mint-search {
+    height: 100%;
+    /* height: 100vh; */
+    overflow: hidden;
+}
 
 /* 底部导航栏选中背景色 */
 .mint-tabbar > .mint-tab-item.is-selected{
@@ -3429,8 +3557,10 @@ image[lazy=loading] {
  */
 
 .editor-toolbar {
-    border-left: 1px solid #ddd; border-top: 1px solid #ddd; border-right: 1px solid #ddd;border-radius:3px 3px 0px 0px;
-    background-color: #fff;height: 30px;line-height: 24px;font-size: 14px;
+	/**
+    border-left: 1px solid #ddd; border-top: 1px solid #ddd; border-right: 1px solid #ddd;**/
+    border-radius:3px 3px 0px 0px;
+    background-color: #fff;height: 40px;line-height: 40px;font-size: 15px;
 }
 .editor-text {
     border: 1px solid #ddd;
@@ -3438,7 +3568,7 @@ image[lazy=loading] {
 	display: table;
 	width: 100%;
 	height: 200px;
-    
+    font-size: 15px;
 }
 .editor-text img{
    max-width:100%;

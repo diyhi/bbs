@@ -64,6 +64,7 @@ import cms.web.action.fileSystem.FileManage;
 import cms.web.action.payment.PaymentManage;
 import cms.web.action.user.PointManage;
 import cms.web.action.user.UserManage;
+import cms.web.action.user.UserRoleManage;
 
 
 /**
@@ -88,6 +89,9 @@ public class QuestionManageAction {
 	@Resource FileManage fileManage;
 	@Resource PointManage pointManage;
 	@Resource PaymentManage paymentManage;
+	@Resource UserRoleManage userRoleManage;
+	
+	
 	/**
 	 * 问题   查看
 	 * @param questionId
@@ -119,6 +123,38 @@ public class QuestionManageAction {
 				List<AppendQuestionItem> appendQuestionItemList = JsonUtils.toGenericObject(_appendContent+"]", new TypeReference< List<AppendQuestionItem> >(){});
 				question.setAppendQuestionItemList(appendQuestionItemList);
 				
+			
+				if(question.getIsStaff() == false){//会员
+					User user = userManage.query_cache_findUserByUserName(question.getUserName());
+					if(user != null){
+						question.setNickname(user.getNickname());
+						question.setAvatarPath(user.getAvatarPath());
+						question.setAvatarName(user.getAvatarName());
+						
+						List<String> userRoleNameList = userRoleManage.queryUserRoleName(user.getUserName());
+						if(userRoleNameList != null && userRoleNameList.size() >0){
+							question.setUserRoleNameList(userRoleNameList);//用户角色名称集合
+						}
+					}
+					
+				}
+				List<QuestionTag> questionTagList = questionTagService.findAllQuestionTag();
+				
+				if(questionTagList != null && questionTagList.size() >0){
+					List<QuestionTagAssociation> questionTagAssociationList = questionService.findQuestionTagAssociationByQuestionId(question.getId());
+					if(questionTagAssociationList != null && questionTagAssociationList.size() >0){
+						for(QuestionTag questionTag : questionTagList){
+							for(QuestionTagAssociation questionTagAssociation : questionTagAssociationList){
+								if(questionTagAssociation.getQuestionTagId().equals(questionTag.getId())){
+									questionTagAssociation.setQuestionTagName(questionTag.getName());
+									question.addQuestionTagAssociation(questionTagAssociation);
+									break;
+								}
+							}
+						}
+					}
+					question.setQuestionTagAssociationList(questionTagAssociationList);
+				}
 				
 				model.addAttribute("question", question);
 				
@@ -178,6 +214,47 @@ public class QuestionManageAction {
 					}
 				}
 				
+				Map<String,List<String>> userRoleNameMap = new HashMap<String,List<String>>();//用户角色名称 key:用户名称Id 角色名称集合
+				if(answerList != null && answerList.size() >0){
+					for(Answer answer : answerList){
+						if(answer.getIsStaff() == false){//会员
+							User user = userManage.query_cache_findUserByUserName(answer.getUserName());
+							if(user != null){
+								answer.setNickname(user.getNickname());
+								answer.setAvatarPath(user.getAvatarPath());
+								answer.setAvatarName(user.getAvatarName());
+								userRoleNameMap.put(answer.getUserName(), null);
+							}
+						}
+						
+						if(answer.getIp() != null && !"".equals(answer.getIp().trim())){
+							answer.setIpAddress(IpAddress.queryAddress(answer.getIp()));
+						}
+					}
+					
+				}
+				
+				if(userRoleNameMap != null && userRoleNameMap.size() >0){
+					for (Map.Entry<String, List<String>> entry : userRoleNameMap.entrySet()) {
+						List<String> roleNameList = userRoleManage.queryUserRoleName(entry.getKey());
+						entry.setValue(roleNameList);
+					}
+				}
+				if(answerList != null && answerList.size() >0){
+					for(Answer answer : answerList){
+						answerIdList.add(answer.getId());	
+						//用户角色名称集合
+						for (Map.Entry<String, List<String>> entry : userRoleNameMap.entrySet()) {
+							if(entry.getKey().equals(answer.getUserName())){
+								List<String> roleNameList = entry.getValue();
+								if(roleNameList != null && roleNameList.size() >0){
+									answer.setUserRoleNameList(roleNameList);
+								}
+								break;
+							}
+						}
+					}
+				}
 				
 				if(answerIdList != null && answerIdList.size() >0){
 					List<AnswerReply> answerReplyList = answerService.findReplyByAnswerId(answerIdList);
@@ -310,7 +387,7 @@ public class QuestionManageAction {
 			
 			
 			//不含标签内容
-			String text = textFilterManage.filterText(value);
+			String text = textFilterManage.filterText(textFilterManage.specifyHtmlTagToText(value));
 			//清除空格&nbsp;
 			String trimSpace = cms.utils.StringUtil.replaceSpace(text).trim();
 			//摘要
@@ -1155,7 +1232,7 @@ public class QuestionManageAction {
 
 					
 					//不含标签内容
-					String text = textFilterManage.filterText(value);
+					String text = textFilterManage.filterText(textFilterManage.specifyHtmlTagToText(value));
 					
 					
 					//清除空格&nbsp;

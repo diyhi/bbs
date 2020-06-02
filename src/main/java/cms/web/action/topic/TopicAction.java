@@ -200,7 +200,7 @@ public class TopicAction {
 		int firstindex = (pageForm.getPage()-1)*pageView.getMaxresult();
 	
 		if(dataSource.equals(1)){//lucene索引
-			QueryResult<Topic> qr = topicLuceneManage.findIndexByCondition(pageView.getCurrentpage(), pageView.getMaxresult(), _keyword, _tagId, _userName, _start_postTime, _end_postTime, null, 1,true);
+			QueryResult<Topic> qr = topicLuceneManage.findIndexByCondition(pageView.getCurrentpage(), pageView.getMaxresult(), _keyword, _tagId, _userName, _start_postTime, _end_postTime, null, 1);
 
 			if(qr.getResultlist() != null && qr.getResultlist().size() >0){
 				List<Long> topicIdList =  new ArrayList<Long>();//话题Id集合

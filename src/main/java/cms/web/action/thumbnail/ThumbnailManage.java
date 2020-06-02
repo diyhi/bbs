@@ -274,7 +274,7 @@ public class ThumbnailManage {
 			// TODO Auto-generated catch block
 		//	e.printStackTrace();
 			if (logger.isErrorEnabled()) {
-	            logger.error("生成缩略图",e);
+				logger.error("生成缩略图异常"+sourcePath.getAbsolutePath(),e);
 	        }
 		}finally {	
 			if(inStream != null){

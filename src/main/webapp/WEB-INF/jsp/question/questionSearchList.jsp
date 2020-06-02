@@ -276,7 +276,7 @@ function cancelTag(){
 	    </TD>
 	    <TD width="6%">${entry.sort}</TD>
 	    <TD width="8%">	    		
-			<a href='javascript:;' onClick="javascript:window.parent.loadQuestion('问题修改','${config:url(pageContext.request)}control/question/manage${config:suffix()}?method=edit&questionId=${entry.id }&timestamp='+ new Date().getTime())">修改</a>&nbsp;
+			<a href='javascript:;' onClick="javascript:window.parent.loadFrame('${config:url(pageContext.request)}control/question/manage${config:suffix()}?method=view&questionId=${entry.id}&origin=100&timestamp='+ new Date().getTime(),'问题查看')">查看</a>&nbsp;
 			<a href="#" onclick="javascript:if(window.confirm('确定删除吗? ')){deleteQuestion('${entry.id }');return false;}else{return false};" hidefocus="true" ondragstart= "return false">删除</a>
 	    </TD>
 	  </TR>

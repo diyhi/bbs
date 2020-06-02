@@ -1,501 +1,217 @@
-// Initiate ModeTest and set defaults
-var MT = ModeTest;
-MT.modeName = 'css';
-MT.modeOptions = {};
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: https://codemirror.net/LICENSE
 
-// Requires at least one media query
-MT.testMode(
-  'atMediaEmpty',
-  '@media { }',
-  [
-    'def', '@media',
-    null, ' ',
-    'error', '{',
-    null, ' }'
-  ]
-);
+(function() {
+  var mode = CodeMirror.getMode({indentUnit: 2}, "css");
+  function MT(name) { test.mode(name, mode, Array.prototype.slice.call(arguments, 1)); }
 
-MT.testMode(
-  'atMediaMultiple',
-  '@media not screen and (color), not print and (color) { }',
-  [
-    'def', '@media',
-    null, ' ',
-    'keyword', 'not',
-    null, ' ',
-    'attribute', 'screen',
-    null, ' ',
-    'operator', 'and',
-    null, ' (',
-    'property', 'color',
-    null, '), ',
-    'keyword', 'not',
-    null, ' ',
-    'attribute', 'print',
-    null, ' ',
-    'operator', 'and',
-    null, ' (',
-    'property', 'color',
-    null, ') { }'
-  ]
-);
+  // Error, because "foobarhello" is neither a known type or property, but
+  // property was expected (after "and"), and it should be in parentheses.
+  MT("atMediaUnknownType",
+     "[def @media] [attribute screen] [keyword and] [error foobarhello] { }");
 
-MT.testMode(
-  'atMediaCheckStack',
-  '@media screen { } foo { }',
-  [
-    'def', '@media',
-    null, ' ',
-    'attribute', 'screen',
-    null, ' { } ',
-    'tag', 'foo',
-    null, ' { }'
-  ]
-);
+  // Soft error, because "foobarhello" is not a known property or type.
+  MT("atMediaUnknownProperty",
+     "[def @media] [attribute screen] [keyword and] ([error foobarhello]) { }");
 
-MT.testMode(
-  'atMediaCheckStack',
-  '@media screen (color) { } foo { }',
-  [
-    'def', '@media',
-    null, ' ',
-    'attribute', 'screen',
-    null, ' (',
-    'property', 'color',
-    null, ') { } ',
-    'tag', 'foo',
-    null, ' { }'
-  ]
-);
+  // Make sure nesting works with media queries
+  MT("atMediaMaxWidthNested",
+     "[def @media] [attribute screen] [keyword and] ([property max-width]: [number 25px]) { [tag foo] { } }");
 
-MT.testMode(
-  'atMediaCheckStackInvalidAttribute',
-  '@media foobarhello { } foo { }',
-  [
-    'def', '@media',
-    null, ' ',
-    'attribute error', 'foobarhello',
-    null, ' { } ',
-    'tag', 'foo',
-    null, ' { }'
-  ]
-);
+  MT("atMediaFeatureValueKeyword",
+     "[def @media] ([property orientation]: [keyword landscape]) { }");
 
-// Error, because "and" is only allowed immediately preceding a media expression
-MT.testMode(
-  'atMediaInvalidAttribute',
-  '@media foobarhello { }',
-  [
-    'def', '@media',
-    null, ' ',
-    'attribute error', 'foobarhello',
-    null, ' { }'
-  ]
-);
+  MT("atMediaUnknownFeatureValueKeyword",
+     "[def @media] ([property orientation]: [error upsidedown]) { }");
 
-// Error, because "and" is only allowed immediately preceding a media expression
-MT.testMode(
-  'atMediaInvalidAnd',
-  '@media and screen { }',
-  [
-    'def', '@media',
-    null, ' ',
-    'error', 'and',
-    null, ' ',
-    'attribute', 'screen',
-    null, ' { }'
-  ]
-);
+  MT("atMediaUppercase",
+     "[def @MEDIA] ([property orienTAtion]: [keyword landScape]) { }");
 
-// Error, because "not" is only allowed as the first item in each media query
-MT.testMode(
-  'atMediaInvalidNot',
-  '@media screen not (not) { }',
-  [
-    'def', '@media',
-    null, ' ',
-    'attribute', 'screen',
-    null, ' ',
-    'error', 'not',
-    null, ' (',
-    'error', 'not',
-    null, ') { }'
-  ]
-);
+  MT("tagSelector",
+     "[tag foo] { }");
 
-// Error, because "only" is only allowed as the first item in each media query
-MT.testMode(
-  'atMediaInvalidOnly',
-  '@media screen only (only) { }',
-  [
-    'def', '@media',
-    null, ' ',
-    'attribute', 'screen',
-    null, ' ',
-    'error', 'only',
-    null, ' (',
-    'error', 'only',
-    null, ') { }'
-  ]
-);
+  MT("classSelector",
+     "[qualifier .foo-bar_hello] { }");
 
-// Error, because "foobarhello" is neither a known type or property, but
-// property was expected (after "and"), and it should be in parenthese.
-MT.testMode(
-  'atMediaUnknownType',
-  '@media screen and foobarhello { }',
-  [
-    'def', '@media',
-    null, ' ',
-    'attribute', 'screen',
-    null, ' ',
-    'operator', 'and',
-    null, ' ',
-    'error', 'foobarhello',
-    null, ' { }'
-  ]
-);
+  MT("idSelector",
+     "[builtin #foo] { [error #foo] }");
 
-// Error, because "color" is not a known type, but is a known property, and
-// should be in parentheses.
-MT.testMode(
-  'atMediaInvalidType',
-  '@media screen and color { }',
-  [
-    'def', '@media',
-    null, ' ',
-    'attribute', 'screen',
-    null, ' ',
-    'operator', 'and',
-    null, ' ',
-    'error', 'color',
-    null, ' { }'
-  ]
-);
+  MT("tagSelectorUnclosed",
+     "[tag foo] { [property margin]: [number 0] } [tag bar] { }");
 
-// Error, because "print" is not a known property, but is a known type,
-// and should not be in parenthese.
-MT.testMode(
-  'atMediaInvalidProperty',
-  '@media screen and (print) { }',
-  [
-    'def', '@media',
-    null, ' ',
-    'attribute', 'screen',
-    null, ' ',
-    'operator', 'and',
-    null, ' (',
-    'error', 'print',
-    null, ') { }'
-  ]
-);
+  MT("tagStringNoQuotes",
+     "[tag foo] { [property font-family]: [variable hello] [variable world]; }");
 
-// Soft error, because "foobarhello" is not a known property or type.
-MT.testMode(
-  'atMediaUnknownProperty',
-  '@media screen and (foobarhello) { }',
-  [
-    'def', '@media',
-    null, ' ',
-    'attribute', 'screen',
-    null, ' ',
-    'operator', 'and',
-    null, ' (',
-    'property error', 'foobarhello',
-    null, ') { }'
-  ]
-);
+  MT("tagStringDouble",
+     "[tag foo] { [property font-family]: [string \"hello world\"]; }");
 
-MT.testMode(
-  'tagSelector',
-  'foo { }',
-  [
-    'tag', 'foo',
-    null, ' { }'
-  ]
-);
+  MT("tagStringSingle",
+     "[tag foo] { [property font-family]: [string 'hello world']; }");
 
-MT.testMode(
-  'classSelector',
-  '.foo-bar_hello { }',
-  [
-    'qualifier', '.foo-bar_hello',
-    null, ' { }'
-  ]
-);
+  MT("tagColorKeyword",
+     "[tag foo] {",
+     "  [property color]: [keyword black];",
+     "  [property color]: [keyword navy];",
+     "  [property color]: [keyword yellow];",
+     "}");
 
-MT.testMode(
-  'idSelector',
-  '#foo { #foo }',
-  [
-    'builtin', '#foo',
-    null, ' { ',
-    'error', '#foo',
-    null, ' }'
-  ]
-);
+  MT("tagColorHex3",
+     "[tag foo] { [property background]: [atom #fff]; }");
 
-MT.testMode(
-  'tagSelectorUnclosed',
-  'foo { margin: 0 } bar { }',
-  [
-    'tag', 'foo',
-    null, ' { ',
-    'property', 'margin',
-    'operator', ':',
-    null, ' ',
-    'number', '0',
-    null, ' } ',
-    'tag', 'bar',
-    null, ' { }'
-  ]
-);
+  MT("tagColorHex4",
+     "[tag foo] { [property background]: [atom #ffff]; }");
 
-MT.testMode(
-  'tagStringNoQuotes',
-  'foo { font-family: hello world; }',
-  [
-    'tag', 'foo',
-    null, ' { ',
-    'property', 'font-family',
-    'operator', ':',
-    null, ' ',
-    'variable-2', 'hello',
-    null, ' ',
-    'variable-2', 'world',
-    null, '; }'
-  ]
-);
+  MT("tagColorHex6",
+     "[tag foo] { [property background]: [atom #ffffff]; }");
 
-MT.testMode(
-  'tagStringDouble',
-  'foo { font-family: "hello world"; }',
-  [
-    'tag', 'foo',
-    null, ' { ',
-    'property', 'font-family',
-    'operator', ':',
-    null, ' ',
-    'string', '"hello world"',
-    null, '; }'
-  ]
-);
+  MT("tagColorHex8",
+     "[tag foo] { [property background]: [atom #ffffffff]; }");
 
-MT.testMode(
-  'tagStringSingle',
-  'foo { font-family: \'hello world\'; }',
-  [
-    'tag', 'foo',
-    null, ' { ',
-    'property', 'font-family',
-    'operator', ':',
-    null, ' ',
-    'string', '\'hello world\'',
-    null, '; }'
-  ]
-);
+  MT("tagColorHex5Invalid",
+     "[tag foo] { [property background]: [atom&error #fffff]; }");
 
-MT.testMode(
-  'tagColorKeyword',
-  'foo { color: black; }',
-  [
-    'tag', 'foo',
-    null, ' { ',
-    'property', 'color',
-    'operator', ':',
-    null, ' ',
-    'keyword', 'black',
-    null, '; }'
-  ]
-);
+  MT("tagColorHexInvalid",
+     "[tag foo] { [property background]: [atom&error #ffg]; }");
 
-MT.testMode(
-  'tagColorHex3',
-  'foo { background: #fff; }',
-  [
-    'tag', 'foo',
-    null, ' { ',
-    'property', 'background',
-    'operator', ':',
-    null, ' ',
-    'atom', '#fff',
-    null, '; }'
-  ]
-);
+  MT("tagNegativeNumber",
+     "[tag foo] { [property margin]: [number -5px]; }");
 
-MT.testMode(
-  'tagColorHex6',
-  'foo { background: #ffffff; }',
-  [
-    'tag', 'foo',
-    null, ' { ',
-    'property', 'background',
-    'operator', ':',
-    null, ' ',
-    'atom', '#ffffff',
-    null, '; }'
-  ]
-);
+  MT("tagPositiveNumber",
+     "[tag foo] { [property padding]: [number 5px]; }");
 
-MT.testMode(
-  'tagColorHex4',
-  'foo { background: #ffff; }',
-  [
-    'tag', 'foo',
-    null, ' { ',
-    'property', 'background',
-    'operator', ':',
-    null, ' ',
-    'atom error', '#ffff',
-    null, '; }'
-  ]
-);
+  MT("tagVendor",
+     "[tag foo] { [meta -foo-][property box-sizing]: [meta -foo-][atom border-box]; }");
 
-MT.testMode(
-  'tagColorHexInvalid',
-  'foo { background: #ffg; }',
-  [
-    'tag', 'foo',
-    null, ' { ',
-    'property', 'background',
-    'operator', ':',
-    null, ' ',
-    'atom error', '#ffg',
-    null, '; }'
-  ]
-);
+  MT("tagBogusProperty",
+     "[tag foo] { [property&error barhelloworld]: [number 0]; }");
 
-MT.testMode(
-  'tagNegativeNumber',
-  'foo { margin: -5px; }',
-  [
-    'tag', 'foo',
-    null, ' { ',
-    'property', 'margin',
-    'operator', ':',
-    null, ' ',
-    'number', '-5px',
-    null, '; }'
-  ]
-);
+  MT("tagTwoProperties",
+     "[tag foo] { [property margin]: [number 0]; [property padding]: [number 0]; }");
 
-MT.testMode(
-  'tagPositiveNumber',
-  'foo { padding: 5px; }',
-  [
-    'tag', 'foo',
-    null, ' { ',
-    'property', 'padding',
-    'operator', ':',
-    null, ' ',
-    'number', '5px',
-    null, '; }'
-  ]
-);
+  MT("tagTwoPropertiesURL",
+     "[tag foo] { [property background]: [variable&callee url]([string //example.com/foo.png]); [property padding]: [number 0]; }");
 
-MT.testMode(
-  'tagVendor',
-  'foo { -foo-box-sizing: -foo-border-box; }',
-  [
-    'tag', 'foo',
-    null, ' { ',
-    'meta', '-foo-',
-    'property', 'box-sizing',
-    'operator', ':',
-    null, ' ',
-    'meta', '-foo-',
-    'string-2', 'border-box',
-    null, '; }'
-  ]
-);
+  MT("indent_tagSelector",
+     "[tag strong], [tag em] {",
+     "  [property background]: [variable&callee rgba](",
+     "    [number 255], [number 255], [number 0], [number .2]",
+     "  );",
+     "}");
 
-MT.testMode(
-  'tagBogusProperty',
-  'foo { barhelloworld: 0; }',
-  [
-    'tag', 'foo',
-    null, ' { ',
-    'property error', 'barhelloworld',
-    'operator', ':',
-    null, ' ',
-    'number', '0',
-    null, '; }'
-  ]
-);
+  MT("indent_atMedia",
+     "[def @media] {",
+     "  [tag foo] {",
+     "    [property color]:",
+     "      [keyword yellow];",
+     "  }",
+     "}");
 
-MT.testMode(
-  'tagTwoProperties',
-  'foo { margin: 0; padding: 0; }',
-  [
-    'tag', 'foo',
-    null, ' { ',
-    'property', 'margin',
-    'operator', ':',
-    null, ' ',
-    'number', '0',
-    null, '; ',
-    'property', 'padding',
-    'operator', ':',
-    null, ' ',
-    'number', '0',
-    null, '; }'
-  ]
-);
-//
-//MT.testMode(
-//  'tagClass',
-//  '@media only screen and (min-width: 500px), print {foo.bar#hello { color: black !important; background: #f00; margin: -5px; padding: 5px; -foo-box-sizing: border-box; } /* world */}',
-//  [
-//    'def', '@media',
-//    null, ' ',
-//    'keyword', 'only',
-//    null, ' ',
-//    'attribute', 'screen',
-//    null, ' ',
-//    'operator', 'and',
-//    null, ' ',
-//    'bracket', '(',
-//    'property', 'min-width',
-//    'operator', ':',
-//    null, ' ',
-//    'number', '500px',
-//    'bracket', ')',
-//    null, ', ',
-//    'attribute', 'print',
-//    null, ' {',
-//    'tag', 'foo',
-//    'qualifier', '.bar',
-//    'header', '#hello',
-//    null, ' { ',
-//    'property', 'color',
-//    'operator', ':',
-//    null, ' ',
-//    'keyword', 'black',
-//    null, ' ',
-//    'keyword', '!important',
-//    null, '; ',
-//    'property', 'background',
-//    'operator', ':',
-//    null, ' ',
-//    'atom', '#f00',
-//    null, '; ',
-//    'property', 'padding',
-//    'operator', ':',
-//    null, ' ',
-//    'number', '5px',
-//    null, '; ',
-//    'property', 'margin',
-//    'operator', ':',
-//    null, ' ',
-//    'number', '-5px',
-//    null, '; ',
-//    'meta', '-foo-',
-//    'property', 'box-sizing',
-//    'operator', ':',
-//    null, ' ',
-//    'string-2', 'border-box',
-//    null, '; } ',
-//    'comment', '/* world */',
-//    null, '}'
-//  ]
-//);
+  MT("indent_comma",
+     "[tag foo] {",
+     "  [property font-family]: [variable verdana],",
+     "    [atom sans-serif];",
+     "}");
+
+  MT("indent_parentheses",
+     "[tag foo]:[variable-3 before] {",
+     "  [property background]: [variable&callee url](",
+     "[string     blahblah]",
+     "[string     etc]",
+     "[string   ]) [keyword !important];",
+     "}");
+
+  MT("font_face",
+     "[def @font-face] {",
+     "  [property font-family]: [string 'myfont'];",
+     "  [error nonsense]: [string 'abc'];",
+     "  [property src]: [variable&callee url]([string http://blah]),",
+     "    [variable&callee url]([string http://foo]);",
+     "}");
+
+  MT("empty_url",
+     "[def @import] [variable&callee url]() [attribute screen];");
+
+  MT("parens",
+     "[qualifier .foo] {",
+     "  [property background-image]: [variable&callee fade]([atom #000], [number 20%]);",
+     "  [property border-image]: [variable&callee linear-gradient](",
+     "    [atom to] [atom bottom],",
+     "    [variable&callee fade]([atom #000], [number 20%]) [number 0%],",
+     "    [variable&callee fade]([atom #000], [number 20%]) [number 100%]",
+     "  );",
+     "}");
+
+  MT("css_variable",
+     ":[variable-3 root] {",
+     "  [variable-2 --main-color]: [atom #06c];",
+     "}",
+     "[tag h1][builtin #foo] {",
+     "  [property color]: [variable&callee var]([variable-2 --main-color]);",
+     "}");
+
+  MT("blank_css_variable",
+     ":[variable-3 root] {",
+     "  [variable-2 --]: [atom #06c];",
+     "}",
+     "[tag h1][builtin #foo] {",
+     "  [property color]: [variable&callee var]([variable-2 --]);",
+     "}");
+
+  MT("supports",
+     "[def @supports] ([keyword not] (([property text-align-last]: [atom justify]) [keyword or] ([meta -moz-][property text-align-last]: [atom justify])) {",
+     "  [property text-align-last]: [atom justify];",
+     "}");
+
+   MT("document",
+      "[def @document] [variable&callee url]([string http://blah]),",
+      "  [variable&callee url-prefix]([string https://]),",
+      "  [variable&callee domain]([string blah.com]),",
+      "  [variable&callee regexp]([string \".*blah.+\"]) {",
+      "    [builtin #id] {",
+      "      [property background-color]: [keyword white];",
+      "    }",
+      "    [tag foo] {",
+      "      [property font-family]: [variable Verdana], [atom sans-serif];",
+      "    }",
+      "}");
+
+   MT("document_url",
+      "[def @document] [variable&callee url]([string http://blah]) { [qualifier .class] { } }");
+
+   MT("document_urlPrefix",
+      "[def @document] [variable&callee url-prefix]([string https://]) { [builtin #id] { } }");
+
+   MT("document_domain",
+      "[def @document] [variable&callee domain]([string blah.com]) { [tag foo] { } }");
+
+   MT("document_regexp",
+      "[def @document] [variable&callee regexp]([string \".*blah.+\"]) { [builtin #id] { } }");
+
+   MT("counter-style",
+      "[def @counter-style] [variable binary] {",
+      "  [property system]: [atom numeric];",
+      "  [property symbols]: [number 0] [number 1];",
+      "  [property suffix]: [string \".\"];",
+      "  [property range]: [atom infinite];",
+      "  [property speak-as]: [atom numeric];",
+      "}");
+
+   MT("counter-style-additive-symbols",
+      "[def @counter-style] [variable simple-roman] {",
+      "  [property system]: [atom additive];",
+      "  [property additive-symbols]: [number 10] [variable X], [number 5] [variable V], [number 1] [variable I];",
+      "  [property range]: [number 1] [number 49];",
+      "}");
+
+   MT("counter-style-use",
+      "[tag ol][qualifier .roman] { [property list-style]: [variable simple-roman]; }");
+
+   MT("counter-style-symbols",
+      "[tag ol] { [property list-style]: [variable&callee symbols]([atom cyclic] [string \"*\"] [string \"\\2020\"] [string \"\\2021\"] [string \"\\A7\"]); }");
+
+  MT("comment-does-not-disrupt",
+     "[def @font-face] [comment /* foo */] {",
+     "  [property src]: [variable&callee url]([string x]);",
+     "  [property font-family]: [variable One];",
+     "}")
+})();

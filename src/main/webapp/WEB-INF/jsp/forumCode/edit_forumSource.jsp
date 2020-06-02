@@ -6,6 +6,7 @@
 <base href="${config:url(pageContext.request)}">
 <TITLE>版块代码管理 修改</TITLE>
 <META http-equiv="Content-Type" content="text/html" charset="UTF-8">
+<link href="backstage/prism/default-block/prism.css"  type="text/css" rel="stylesheet"/>
 <LINK href="backstage/css/list.css" type="text/css" rel="stylesheet">
 <LINK href="backstage/css/table.css" type="text/css" rel="stylesheet">
 
@@ -39,27 +40,17 @@ background:url(backstage/images/tab_3.gif) no-repeat;color:#000;display:block;fo
 .CodeMirror {border-top: 1px solid #BFE3FF; border-bottom: 1px solid #BFE3FF; }
 
 </style>
-<link rel="stylesheet" href="backstage/codeMirror/lib/util/simple-hint.css">
-<link rel="stylesheet" href="backstage/codeMirror/lib/codemirror.css">
+
+
+<link href="backstage/codeMirror/lib/codemirror.css" rel="stylesheet" >
 <script src="backstage/codeMirror/lib/codemirror.js"></script>
-<script src="backstage/codeMirror/lib/util/closetag.js"></script>
 <script src="backstage/codeMirror/mode/xml/xml.js"></script>
 <script src="backstage/codeMirror/mode/javascript/javascript.js"></script>
 <script src="backstage/codeMirror/mode/css/css.js"></script>
 <script src="backstage/codeMirror/mode/htmlmixed/htmlmixed.js"></script>
-<script src="backstage/codeMirror/lib/util/simple-hint.js"></script>
-<script src="backstage/codeMirror/lib/util/javascript-hint.js"></script>
+<script src="backstage/codeMirror/mode/vue/vue.js"></script>
 
 
-<link rel="stylesheet" href="backstage/syntaxhighlighter/styles/shCoreDefault.css"  type="text/css" />
-<script language="JavaScript" src="backstage/syntaxhighlighter/scripts/shCore.js" type="text/javascript"></script>
-<script language="javascript" src="backstage/syntaxhighlighter/scripts/shBrushJScript.js" type="text/javascript" ></script>
-<script language="javascript" src="backstage/syntaxhighlighter/scripts/shBrushCss.js" type="text/javascript"></script>
-<script type="text/javascript">
-	SyntaxHighlighter.all();
-	SyntaxHighlighter.defaults['toolbar'] = false;//去掉右上角问号图标
-	
-</script>
 <script language="JavaScript" type="text/javascript">
 	function sureSubmit(objForm){
 		//按钮设置 disabled="disabled"
@@ -132,70 +123,57 @@ background:url(backstage/images/tab_3.gif) no-repeat;color:#000;display:block;fo
   </body>
 
   
-  <script>
-  /**
-      var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
-        lineNumbers: true,
-        mode: "application/x-ejs",
-        indentUnit: 4,
-        indentWithTabs: true,
-        enterMode: "keep",
-        tabMode: "shift"
-      });
-    //  editor.toTextArea();  //经过转义的数据,有错
-	//	editor.getTextArea().value;//未经过转义的字符,有错
-//	alert(document.getElementById("code").value);**/
-
-
-	  CodeMirror.commands.autocomplete = function(cm) {
-        CodeMirror.simpleHint(cm, CodeMirror.javascriptHint);
-     //  CodeMirror.simpleHint(cm, CodeMirror.coffeescriptHint); 
-     	
-        
-      };
-      
-      var editor = CodeMirror.fromTextArea(document.getElementById("pc_code"), {
+<script type="text/javascript">
+	CodeMirror.commands.autocomplete = function(cm) {
+		CodeMirror.simpleHint(cm, CodeMirror.javascriptHint); 
+	};
+	      
+    var editor_pc = CodeMirror.fromTextArea(document.getElementById("pc_code"), {
       	lineNumbers: true,
         mode: 'text/html',
         indentUnit: 4,
         extraKeys: {"Alt-/": "autocomplete"},
         indentWithTabs: true,
-        autoCloseTags: true
-      });
-      
-      CodeMirror.fromTextArea(document.getElementById("wap_code"), {
-        	lineNumbers: true,
-          mode: 'text/html',
-          indentUnit: 4,
-          extraKeys: {"Alt-/": "autocomplete"},
-          indentWithTabs: true,
-          autoCloseTags: true
-        });
-    </script>
-    <script type="text/javascript">
+        autoCloseTags: true,
+    });
+    editor_pc.setSize("100%","100%");//设置自适应高度 
 	
-		var exampleCode_arr = document.getElementsByName("exampleCode")
-		if(exampleCode_arr != null && exampleCode_arr.length >0){
-			for(var i=0;i<exampleCode_arr.length;i++){
-				var exampleCode = exampleCode_arr[i];
-				//演示代码高亮
-				 var editor = CodeMirror.fromTextArea(exampleCode, {
-			   	      	lineNumbers: true,/*是否在编辑器左侧显示行号*/
-			   	        mode: 'text/html',
-			   	        indentUnit: 4,/* 缩进单位，值为空格数，默认为2 */
-			   	        extraKeys: {"Alt-/": "autocomplete"},/*给编辑器绑定快捷键*/
-			   	        indentWithTabs: true,/* 在缩进时，是否需要把 n*tab宽度个空格替换成n个tab字符，默认为false  */
-			   	        autoCloseTags: true,
-			   	        readOnly:true/* 只读 */
-			   	      });
-			}
+	var editor_wap = CodeMirror.fromTextArea(document.getElementById("wap_code"), {
+      	lineNumbers: true,/*是否在编辑器左侧显示行号*/
+        mode: 'text/html',
+        indentUnit: 4,/* 缩进单位，值为空格数，默认为2 */
+        extraKeys: {"Alt-/": "autocomplete"},/*给编辑器绑定快捷键*/
+        indentWithTabs: true,/* 在缩进时，是否需要把 n*tab宽度个空格替换成n个tab字符，默认为false  */
+        autoCloseTags: true,
+    });
+    editor_wap.setSize("100%","100%");//设置自适应高度 
+
+</script>
+<script type="text/javascript">
+
+	var exampleCode_arr = document.getElementsByName("exampleCode")
+	if(exampleCode_arr != null && exampleCode_arr.length >0){
+		for(var i=0;i<exampleCode_arr.length;i++){
+			var exampleCode = exampleCode_arr[i];
+			//演示代码高亮
+			var editor = CodeMirror.fromTextArea(exampleCode, {
+	   	      	lineNumbers: true,/*是否在编辑器左侧显示行号*/
+	   	        mode: 'text/html',
+	   	        indentUnit: 4,/* 缩进单位，值为空格数，默认为2 */
+	   	        extraKeys: {"Alt-/": "autocomplete"},/*给编辑器绑定快捷键*/
+	   	        indentWithTabs: true,/* 在缩进时，是否需要把 n*tab宽度个空格替换成n个tab字符，默认为false  */
+	   	        autoCloseTags: true,
+	   	        readOnly:true/* 只读 */
+		   	});
+		   	editor.setSize("100%","100%");//设置自适应高度 
 		}
-		
+	}
 	
-	
-	
-	
-	</script>
+
+
+
+
+</script>
 	
     <script type="text/javascript"> 
 	var tab = document.getElementById('tabs').getElementsByTagName('div');

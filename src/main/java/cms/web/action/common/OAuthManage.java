@@ -142,73 +142,73 @@ public class OAuthManage {
 	 * @param refreshUser 刷新令牌
 	 * @param request
 	 * @param response
+	 * @return 返回true表示续期成功
 	 */
-	public void tokenRenewal(String oldRefreshToken,RefreshUser refreshUser,HttpServletRequest request,HttpServletResponse response){
+	public boolean tokenRenewal(String oldRefreshToken,RefreshUser refreshUser,HttpServletRequest request,HttpServletResponse response){
 		UserState userState = userManage.query_userState(refreshUser.getUserName().trim());//用户状态
 		if(userState == null || !userState.getSecurityDigest().equals(refreshUser.getSecurityDigest())){
-			return;
+			return false;
 		}
 		
 		//访问令牌续期
 		String new_accessToken = UUIDUtil.getUUID32();
 		String new_refreshToken = UUIDUtil.getUUID32();
 		
-		//呢称
-		String nickname = null;
-		//头像路径
-		String avatarPath = null;
-		//头像名称
-		String avatarName = null;
+		
 		User user = userManage.query_cache_findUserById(refreshUser.getUserId());
 		if(user != null){
-			avatarPath = user.getAvatarPath();
-			avatarName = user.getAvatarName();
-			nickname = user.getNickname();
+			//呢称
+			String nickname = user.getNickname();
+			//头像路径
+			String avatarPath = user.getAvatarPath();
+			//头像名称
+			String avatarName = user.getAvatarName();
+			
+			oAuthManage.addAccessToken(new_accessToken, new AccessUser(refreshUser.getUserId(),refreshUser.getUserName(),nickname,avatarPath,avatarName, refreshUser.getSecurityDigest(),refreshUser.isRememberMe(),refreshUser.getOpenId()));
+			refreshUser.setAccessToken(new_accessToken);
+			oAuthManage.addRefreshToken(new_refreshToken, refreshUser);
+			
+			if(refreshUser.getOpenId() != null && !"".equals(refreshUser.getOpenId().trim())){
+				//第三方openId
+				oAuthManage.addOpenId(refreshUser.getOpenId(),new_refreshToken);
+			}
+			
+			
+			//将旧的刷新令牌的accessToken设为0
+			oAuthManage.addRefreshToken(oldRefreshToken, new RefreshUser("0",refreshUser.getUserId(),refreshUser.getUserName(),nickname,avatarPath,avatarName,refreshUser.getSecurityDigest(),refreshUser.isRememberMe(),refreshUser.getOpenId()));
+			AccessUserThreadLocal.set(new AccessUser(refreshUser.getUserId(),refreshUser.getUserName(),nickname,avatarPath,avatarName,refreshUser.getSecurityDigest(),refreshUser.isRememberMe(),refreshUser.getOpenId()));
+			
+			
+			
+			
+			
+			//存放时间 单位/秒
+			int maxAge = 0;
+			if(refreshUser.isRememberMe()){
+				maxAge = WebUtil.cookieMaxAge;//默认Cookie有效期
+			}
+			
+			//将访问令牌添加到Cookie
+			WebUtil.addCookie(response, "cms_accessToken", new_accessToken, maxAge);
+			//将刷新令牌添加到Cookie
+			WebUtil.addCookie(response, "cms_refreshToken", new_refreshToken, maxAge);
+			
+			//写入登录日志
+			UserLoginLog userLoginLog = new UserLoginLog();
+			userLoginLog.setId(userLoginLogManage.createUserLoginLogId(user.getId()));
+			userLoginLog.setIp(IpAddress.getClientIpAddress(request));
+			userLoginLog.setTypeNumber(20);//续期
+			userLoginLog.setUserId(user.getId());
+			userLoginLog.setLogonTime(new Date());
+			Object new_userLoginLog = userLoginLogManage.createUserLoginLogObject(userLoginLog);
+			userService.saveUserLoginLog(new_userLoginLog);
+			return true;
 		}
 		
 		
 		
 		
-		oAuthManage.addAccessToken(new_accessToken, new AccessUser(refreshUser.getUserId(),refreshUser.getUserName(),nickname,avatarPath,avatarName, refreshUser.getSecurityDigest(),refreshUser.isRememberMe(),refreshUser.getOpenId()));
-		refreshUser.setAccessToken(new_accessToken);
-		oAuthManage.addRefreshToken(new_refreshToken, refreshUser);
-		
-		if(refreshUser.getOpenId() != null && !"".equals(refreshUser.getOpenId().trim())){
-			//第三方openId
-			oAuthManage.addOpenId(refreshUser.getOpenId(),new_refreshToken);
-		}
-		
-		
-		//将旧的刷新令牌的accessToken设为0
-		oAuthManage.addRefreshToken(oldRefreshToken, new RefreshUser("0",refreshUser.getUserId(),refreshUser.getUserName(),nickname,avatarPath,avatarName,refreshUser.getSecurityDigest(),refreshUser.isRememberMe(),refreshUser.getOpenId()));
-		AccessUserThreadLocal.set(new AccessUser(refreshUser.getUserId(),refreshUser.getUserName(),nickname,avatarPath,avatarName,refreshUser.getSecurityDigest(),refreshUser.isRememberMe(),refreshUser.getOpenId()));
-		
-		
-		
-		
-		
-		//存放时间 单位/秒
-		int maxAge = 0;
-		if(refreshUser.isRememberMe()){
-			maxAge = WebUtil.cookieMaxAge;//默认Cookie有效期
-		}
-		
-		//将访问令牌添加到Cookie
-		WebUtil.addCookie(response, "cms_accessToken", new_accessToken, maxAge);
-		//将刷新令牌添加到Cookie
-		WebUtil.addCookie(response, "cms_refreshToken", new_refreshToken, maxAge);
-		
-		//写入登录日志
-		UserLoginLog userLoginLog = new UserLoginLog();
-		userLoginLog.setId(userLoginLogManage.createUserLoginLogId(user.getId()));
-		userLoginLog.setIp(IpAddress.getClientIpAddress(request));
-		userLoginLog.setTypeNumber(20);//续期
-		userLoginLog.setUserId(user.getId());
-		userLoginLog.setLogonTime(new Date());
-		Object new_userLoginLog = userLoginLogManage.createUserLoginLogObject(userLoginLog);
-		userService.saveUserLoginLog(new_userLoginLog);
+		return false;
 	}
-    
-    
 
 }

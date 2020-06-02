@@ -147,7 +147,7 @@ html,body{
 	min-height: 100%;
 	
 	height: auto;
-	display: -webkit-box;
+	display: -webkit-box;/** display: box;和prism.js插件代码行高垂直对齐有冲突 **/
 	display: box;
 	display: -moz-box;
 	display: -ms-flexbox;
@@ -268,6 +268,125 @@ html,body{
 } 
 /* 表单 select */
 .formSelect{height:30px; line-height:30px; padding:2px 4px;border:1px solid;border-color:#e0e0e0 #e0e0e0 #e0e0e0 #e0e0e0;background:#fff;border-radius:3px;margin-right: 1px;}
+
+/* 表单 radio */
+.formRadio {
+    display: none;
+}
+.formRadio:checked + .formRadio-core {
+    background-color: #30aff7;
+    border-color: #30aff7;
+}
+.formRadio:checked + .formRadio-core::after {
+    background-color: #fff;
+    -webkit-transform: scale(1);
+            transform: scale(1);
+}
+.formRadio[disabled] + .formRadio-core {
+    background-color: #d9d9d9;
+    border-color: #ccc;
+}
+.formRadio-core {
+    box-sizing: border-box;
+    display: inline-block;
+    background-color: #fff;
+    border-radius: 100%;
+    border: 1px solid #ccc;
+    position: relative;
+    width: 22px;
+    height: 22px;
+    vertical-align: middle;
+}
+.formRadio-core::after {
+    content: " ";
+    border-radius: 100%;
+    top: 6px;
+    left: 6px;
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    -webkit-transition: -webkit-transform .2s;
+    transition: -webkit-transform .2s;
+    transition: transform .2s;
+    transition: transform .2s, -webkit-transform .2s;
+    -webkit-transform: scale(0);
+            transform: scale(0);
+}
+.formRadio-text{
+	vertical-align: middle;
+    margin-right: 6px;
+}
+
+/* 表单 checkbox */
+.formCheckbox {
+    display: none;
+}
+.formCheckbox:checked + .formCheckbox-core {
+    background-color: #30aff7;
+    border-color: #30aff7;
+}
+.formCheckbox-core {
+    display: inline-block;
+    background-color: #fff;
+    border-radius: 100%;
+    border: 1px solid #ccc;
+    position: relative;
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+}
+.formCheckbox:checked + .formCheckbox-core::after {
+    border-color: #fff;
+    -webkit-transform: rotate(45deg) scale(1);
+    transform: rotate(45deg) scale(1);
+}
+.formCheckbox-core::after {
+    border: 2px solid transparent;
+    border-left: 0;
+    border-top: 0;
+    content: " ";
+    top: 4px;
+    left: 7px;
+    position: absolute;
+    width: 4px;
+    height: 8px;
+    -webkit-transform: rotate(45deg) scale(0);
+    transform: rotate(45deg) scale(0);
+    -webkit-transition: -webkit-transform .2s;
+    transition: -webkit-transform .2s;
+    transition: transform .2s;
+    transition: transform .2s, -webkit-transform .2s;
+}
+.formCheckbox-text {
+    vertical-align: middle;
+    margin-right: 6px;
+}
+/* 表单 textarea */
+.formTextarea {
+	line-height: 24px;
+    border-radius: 2px;
+    border: 1px solid #e6e6e6;
+	vertical-align: top;
+	font-size: 14px;
+    resize: vertical;
+	padding: 3px 3px;
+    background: #ffffff;
+    outline: none;
+    color: rgba(0,0,0,0.8);
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: rgba(255,255,255,0);
+    -webkit-box-shadow: 0em 0em 0em 0em transparent inset;
+    box-shadow: 0em 0em 0em 0em transparent inset;
+    -webkit-transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    -webkit-transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, -webkit-box-shadow 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, -webkit-box-shadow 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, -webkit-box-shadow 0.2s ease;
+}
+
+
+
+
 
 
 .headerModule {
@@ -606,7 +725,7 @@ html,body{
 .topicModule .topic-box .topicList .topicItem .content .title {
 	margin: 0 5px 0 0;
 	font-size: 18px;
-	line-height: 28px;
+	line-height: 32px;
 	
 }
 .topicModule .topic-box .topicList .topicItem .content .title a{
@@ -708,10 +827,10 @@ html,body{
 	position: relative;
 }
 .topicModule .topic-box .topicList .topicItem .content .detail .tm-m-photos{
-	margin-top: 4px;
+	margin-top: 8px;
 }
 .topicModule .topic-box .topicList .topicItem .content .detail .videoInfo{
-	margin: 3px 5px 0 0;
+	margin: 8px 5px 0 0;
 	
 	
 }
@@ -721,7 +840,8 @@ html,body{
 	height: 180px;
 	display: block;
 	float: left;
-	margin-right: 5px;
+	margin-right: 8px;
+	margin-bottom: 8px;
 	background: #000;
 	position: relative;
 	text-align: center;
@@ -777,7 +897,7 @@ html,body{
 
 
 .topicModule .topic-box .topicList .topicItem .content .detail .summary{
-	margin: 3px 50px 0 0;
+	margin: 0px 50px 0 0;
 	font-size: 15px;
 	line-height: 28px;
 	font-weight:normal;
@@ -786,7 +906,7 @@ html,body{
 }
 .topicModule .topic-box .topicList .topicItem .statistic {
 	position:absolute;
-	top:48px;
+	top:17px;
 	right:0px;
 	font-size: 14px;
 	color: #c4c4c4;
@@ -1084,6 +1204,9 @@ html,body{
 .topicContentModule .left .topic-wrap .topicBox .topicContent hide .submit-box{margin: auto; margin-top: 10px;margin-bottom:18px; border:#888888 solid 2px; width:96px; height:26px; overflow:hidden; border-radius: 2px;}
 .topicContentModule .left .topic-wrap .topicBox .topicContent hide .submit-box .button{ width:96px; height:26px; line-height:28px; border:0; background:#888888; font-size:16px; color:#fff; float:right; font-weight:bold; cursor:pointer;text-decoration: none; outline: none}
 .topicContentModule .left .topic-wrap .topicBox .topicContent hide .submit-box .button:hover{background:#808080;}
+/* 自动换行 */
+.topicContentModule .left .topic-wrap .topicBox .topicContent pre{white-space:pre-wrap;}
+
 
 .topicContentModule .right{
 	float: right;
@@ -1207,10 +1330,10 @@ html,body{
 	background: #fff;
 	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
 }
-.commentModule .commentlist{list-style:none;font-size: 15px;}
-.commentModule .commentlist .comment{padding:15px 0 5px 77px;border-bottom:1px solid #f1f1f1;}
-.commentModule .commentlist .comment-author{position:relative;color:#999}
-.commentModule .commentlist .comment-author img{
+.commentModule .commentList{list-style:none;font-size: 15px;}
+.commentModule .commentList .commentInfo{padding:15px 0 5px 77px;border-bottom:1px solid #f1f1f1;}
+.commentModule .commentList .commentInfo .comment-author{position:relative;color:#999}
+.commentModule .commentList .commentInfo .comment-author img{
 	width:60px;
 	height:60px;
 	position:absolute;
@@ -1221,8 +1344,8 @@ html,body{
 	display:block;
 	behavior: url(common/default/pc/js/css3pie/PIE.htc);  /*通知IE浏览器调用脚本作用于当前类*/
 }
-.commentModule .commentlist cite{font-style:normal;}
-.commentModule .commentlist .userRoleName{
+.commentModule .commentList .comment-author cite{font-style:normal;}
+.commentModule .commentList .comment-author .userRoleName{
 	white-space:nowrap; 
 	color:#e2b46e;
 	background-color:#f8e7c4;
@@ -1230,7 +1353,7 @@ html,body{
 	padding:0 5px;
 	font-size: 12px;
 }
-.commentModule .commentlist .staff{
+.commentModule .commentList .comment-author .staff{
 	white-space:nowrap; 
 	color:#15d327;
 	background-color:#cafcc7;
@@ -1238,23 +1361,24 @@ html,body{
 	padding:0 5px;
 	font-size: 12px;
 }
-.commentModule .commentlist .commentTime{margin-top:2px; margin-bottom:5px;color:#999;font-size: 13px;}
-.commentModule .commentlist .commentTime a{color:#999;}
-.commentModule .commentlist .comment .commentContent{padding:0px;word-wrap:break-word;color:#666;font-size: 15px;margin-top: 20px;line-height: 26px;}
+.commentModule .commentList .commentInfo .commentTime{margin-top:3px; margin-bottom:5px;color:#999;font-size: 13px;}
+.commentModule .commentList .commentInfo .commentTime a{color:#999;}
+.commentModule .commentList .commentInfo .commentContent{padding:0px;word-wrap:break-word;color:#666;font-size: 15px;margin-top: 20px;line-height: 26px;}
 /* 评论图片尺寸 */
-.commentModule .commentlist .comment .commentContent img {max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;}
+.commentModule .commentList .commentInfo .commentContent img {max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;}
+/* 自动换行 */
+.commentModule .commentList .commentInfo .commentContent pre{white-space:pre-wrap;}
 
-
-.commentModule .commentlist .quote{
+.commentModule .commentList .quote{
 	padding:5px 8px;border-bottom:none;text-align: left;color: 666;margin-top: 20px;
 }
-.commentModule .commentlist .quote div{
+.commentModule .commentList .quote div{
 	background:#fbfbfb;padding:6px 8px 8px 8px;border:1px solid #ebebeb;line-height:140%;margin-bottom:6px;line-height: 28px;border-radius: 3px;
 }
-.commentModule .commentlist .quote div span{
+.commentModule .commentList .quote div span{
 	color:#aaa;font-size:15px;height: 30px;
 }
-.commentModule .commentlist .replyList {
+.commentModule .commentList .replyList {
 	padding: 10px 0 0px;
 	margin-left: 36px;
 	margin-right:10px;
@@ -1264,7 +1388,7 @@ html,body{
 	margin-top: 20px;
 	background: #fbfbfb;
 }
-.commentModule .commentlist .replyList:before {
+.commentModule .commentList .replyList:before {
 	position: absolute;
 	display: block;
 	width: 16px;
@@ -1280,7 +1404,7 @@ html,body{
 	top: -4px;
 	left: 60px
 }
-.commentModule .commentlist .replyList .box li {
+.commentModule .commentList .replyList .box li {
 	*zoom: 1;
 	margin-bottom: 10px;
 	border-bottom: 1px solid #f1f1f1;
@@ -1288,49 +1412,65 @@ html,body{
 	margin-left: 10px;
 	margin-right:10px;
 }
-.commentModule .commentlist .replyList .box li:last-child{
+.commentModule .commentList .replyList .box li:last-child{
 	border-bottom: 1px solid #fff;
 	
 }
-.commentModule .commentlist .replyList .box li:before,
-.commentModule .commentlist .replyList .box li:after {
+.commentModule .commentList .replyList .box li:before,
+.commentModule .commentList .replyList .box li:after {
 	content: "";
 	display: table;
 	font: 0/0 a
 }
-.commentModule .commentlist .replyList .box li:after {
+.commentModule .commentList .replyList .box li:after {
 	clear: both;
 }
-.commentModule .commentlist .replyList .box li .reply-top{
+.commentModule .commentList .replyList .box li .reply-top{
 	position:relative;
 }
 
 
-.commentModule .commentlist .replyList .box li .reply-top .avatarBox{
+.commentModule .commentList .replyList .box li .reply-top .avatarBox{
 	position:absolute;border-radius:100%;
 	left: 0px;
 }
-.commentModule .commentlist .replyList .box li .reply-top .avatarBox img{
+.commentModule .commentList .replyList .box li .reply-top .avatarBox img{
 	border-radius:100%;
 	width: 38px;
 	height: 38px;
 	margin-top: -2px;
 }
-.commentModule .commentlist .replyList .box li .reply-top .userName {
+.commentModule .commentList .replyList .box li .reply-top .userName {
 	color:#aaa;margin-left: 48px;margin-top:6px;
 
 	float: left;
 }
-.commentModule .commentlist .replyList .box li .reply-top .userTag{
+.commentModule .commentList .replyList .box li .reply-top .userTag{
 	float: left;margin-left:4px; margin-top: 6px;
 }
-.commentModule .commentlist .replyList .box li .reply-top .time {
+.commentModule .commentList .replyList .box li .reply-top .userTag .userRoleName{
+	white-space:nowrap; 
+	color:#e2b46e;
+	background-color:#f8e7c4;
+	border-radius:4px;
+	padding:0 5px;
+	font-size: 12px;
+}
+.commentModule .commentList .replyList .box li .reply-top .userTag .staff{
+	white-space:nowrap; 
+	color:#15d327;
+	background-color:#cafcc7;
+	border-radius:4px;
+	padding:0 5px;
+	font-size: 12px;
+}
+.commentModule .commentList .replyList .box li .reply-top .time {
 	float: right;
 	color:#aaa;
 	font-size: 13px;
 	margin-top: 6px;
 }
-.commentModule .commentlist .replyList .box li .replyContent{
+.commentModule .commentList .replyList .box li .replyContent{
 	font-size: 15px;
 	line-height:26px;
 	color:#666;
@@ -1339,17 +1479,17 @@ html,body{
 	padding-bottom: 8px;
 	
 }
-.commentModule .commentlist .tipBottom {
+.commentModule .commentList .tipBottom {
 	font-size: 13px;
 	color: #aaa;
 	margin: 15px 10px 5px 50px;
 	text-align: right;
 }
-.commentModule .commentlist .tipBottom .a-toolbar {
+.commentModule .commentList .tipBottom .a-toolbar {
 	display: block;
 	width: 100%;
 }
-.commentModule .commentlist .tipBottom .a-toolbar a {
+.commentModule .commentList .tipBottom .a-toolbar a {
 	color: #aaa;
 }
 .commentPage {
@@ -1368,7 +1508,7 @@ html,body{
 
 
 /* 回复评论  */
-.commentModule .commentlist .commentReply-post{
+.commentModule .commentList .commentReply-post{
 	margin-top: 5px;
 	margin-left: 36px;
 	margin-right:10px;
@@ -2095,7 +2235,7 @@ html,body{
 
 
 
-/* 添加答案模块(未登录) */
+/* 添加评论模块(未登录) */
 .addCommentModule{
 	margin-top:10px;
 }
@@ -2262,15 +2402,34 @@ html,body{
 .addFeedbackModule .box .item .submit{
 	margin-top: 20px;margin-left: 100px;width: 300px;
 }
+
+.addFeedbackModulePrompt{
+	margin-top:10px;
+}
+.addFeedbackModulePrompt .disableForm-wrap{
+	background: #fff;
+	padding:15px 15px 15px 15px;
+}
+.addFeedbackModulePrompt .respond {background: #f6f6f6;border-radius:4px;line-height: 40px;text-align:center;}
+.addFeedbackModulePrompt .respond p {font-size:15px;padding:8px;overflow:hidden;color: #aaaaaa}
+
+
+/**
 .addFeedbackModule .prompt{
 	padding: 50px 10px 10px 10px;
 	position: relative;
 	padding-bottom:0;
 }
+.addFeedbackModule .disableForm-wrap{
+	background: #fff;
+	padding:15px 0px 15px 0px;
+}
+.addFeedbackModule .disableForm-wrap .respond {background: #f6f6f6;border-radius:4px;line-height: 40px;text-align:center;}
+.commentReply-disableFormModule .disableForm-wrap .respond p {font-size:15px;padding:8px;overflow:hidden;color: #aaaaaa}
 .addFeedbackModule .prompt .respond {margin-bottom:20px}
 .addFeedbackModule .prompt .respond p label{width:auto;padding:0 0 0 5px;}
 .addFeedbackModule .prompt .respond h2{font-size:12px;margin-top:15px;border:none}
-
+**/
 
 
 /* 友情链接 */
@@ -2328,9 +2487,23 @@ html,body{
 }
 
 /** 注册 **/
-.registerModule{padding:10px;}
-.registerModule h2{height: 46px;border-bottom: 1px solid #f1f1f1; text-align:center; font-size: 16px;line-height: 38px;margin-bottom: 20px;}
-.registerModule .item{margin:0 auto;width: 650px;}
+.registerModule{padding:10px 10px 30px 10px;}
+.registerModule h2{
+	height: 50px;
+	line-height: 38px;
+	border-bottom: 1px solid #f1f1f1; 
+	text-align:center;
+	margin-bottom: 20px;
+	font-weight: 600;
+    font-size: 20px;
+    color: #999;
+}
+.registerModule .item{
+	/**
+	margin:0 auto;**/
+	width: 650px;
+	margin-left: 350px;
+}
 .registerModule .item a{color:#35b5ff;}
 .registerModule .item .required{color: red;}
 .registerModule .item th{width:10em;text-align:right;vertical-align:top;line-height:24px;padding:10px 2px;color: #777; font-weight: normal; font-size: 14px;}
@@ -2345,7 +2518,9 @@ html,body{
 .registerModule .item .registerSubmit{
 	margin-top: 20px;margin-left: 100px;width: 300px;
 }
-
+.registerModule .agreement{
+	margin-left: 8px;
+}
 /* 登录 */
 .loginModule{background: #fff;padding:15px 25px 35px 15px;width:600px;color:#6e6e6e;margin:80px auto; border:1px solid #eef2f4; box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);}
 .loginModule a,.loginModule a:hover{color:#1a66b3;}
@@ -3006,7 +3181,7 @@ html,body{
     content: "";
     position: absolute;
     border-style: solid;
-    border-color:  transparent transparent transparent #d4e9f9;
+    border-color:  transparent transparent transparent #e5f3ff;
     border-width: 10px;
     left:5px;
 }
@@ -3018,8 +3193,9 @@ html,body{
 	border-radius: 10px;
 	position: relative;
 	max-width: 94%;
-	background: #d4e9f9;
-	border-color: #d4e9f9;
+	background: #e5f3ff;
+	border-color: #e5f3ff;
+	color: #2196F3;
 	float: right;
 	margin-top:22px;
 	margin-left: 0;
@@ -3404,6 +3580,7 @@ html,body{
 .editUserModule{
 	margin-left: 150px;
 	width: 900px;
+	padding-bottom: 30px;
 }
 
 /** 修改用户头像 **/
@@ -4345,8 +4522,8 @@ html,body{
 }
 .askListModule .question-box .questionList .questionItem .content .info .userRoleName{
 	white-space:nowrap;
-	color:#fff;
-	background-color:#ffcc00;
+	color:#feb21a;
+	background-color:#ffedba;
 	border-radius:4px;
 	padding:0 5px;
 	font-size: 12px;
@@ -4690,7 +4867,10 @@ html,body{
 .questionContentModule .left .question-wrap .questionBox .content img{
 	max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;
 	cursor: -webkit-zoom-in;
-	cursor: zoom-in;}
+	cursor: zoom-in;
+}
+/* 自动换行 */
+.questionContentModule .left .question-wrap .questionBox .content pre{white-space:pre-wrap;}
 .questionContentModule .left .question-wrap .questionBox .appendBox{
 	margin-top:25px;
 	position:relative;
@@ -4779,8 +4959,8 @@ html,body{
 }
 .questionContentModule .right .userInfo-wrap .userInfo .role .userRoleName{
 	white-space:nowrap; 
-	color:#fff;
-	background-color:#ffcc00;
+	color:#feb21a;
+	background-color:#ffedba;
 	border-radius:4px;
 	padding:1px 5px;
 	font-size: 13px;
@@ -4861,13 +5041,13 @@ html,body{
 	background: #fff;
 	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
 }
-.answerModule .answerlist{list-style:none;font-size: 15px;}
-.answerModule .answerlist .answer{padding:15px 0 5px 77px;border-bottom:1px solid #f1f1f1;}
-.answerModule .answerlist .active{
+.answerModule .answerList{list-style:none;font-size: 15px;}
+.answerModule .answerList .answer{padding:15px 0 5px 77px;border-bottom:1px solid #f1f1f1;}
+.answerModule .answerList .active{
 	position:relative;
 	
 }
-.answerModule .answerlist .active:before{
+.answerModule .answerList .active:before{
 	content: " ";
 	position: absolute;
 	top: 0px;
@@ -4875,11 +5055,11 @@ html,body{
 	bottom:0px;
 	border-left: 5px solid #fe9d2d;
 }
-.answerModule .answerlist .answer .adoption{
+.answerModule .answerList .answer .adoption{
 	display: none;
 	position: absolute;
 }
-.answerModule .answerlist .active .adoption{
+.answerModule .answerList .active .adoption{
 	display: inline;
 	position: absolute;
 	right: 0px;
@@ -4928,8 +5108,8 @@ html,body{
 .ribbon-wrapper .ribbon:after {
 	right: 0; 
 }
-.answerModule .answerlist .answer-author{position:relative;color:#999}
-.answerModule .answerlist .answer-author img{
+.answerModule .answerList .answer-author{position:relative;color:#999}
+.answerModule .answerList .answer-author img{
 	width:60px;
 	height:60px;
 	position:absolute;
@@ -4939,38 +5119,38 @@ html,body{
 	border-radius:50%;
 	display:block;
 }
-.answerModule .answerlist .adoption-post-box{
+.answerModule .answerList .adoption-post-box{
 	position: absolute;
 	top: 80px;
 	left:-53px;
 }
-.answerModule .answerlist .adoption-post{
+.answerModule .answerList .adoption-post{
 	color: #ccc;
 	cursor: pointer;
 	text-align: center;
 }
-.answerModule .answerlist .adoption-post i{
+.answerModule .answerList .adoption-post i{
 	font-size: 20px
 }
-.answerModule .answerlist .adoption-post:hover i {
+.answerModule .answerList .adoption-post:hover i {
 	color: #32aa66;/** #999 **/
 }
-.answerModule .answerlist .adoption-post:hover span {
+.answerModule .answerList .adoption-post:hover span {
 	color: #32aa66;/** #999 **/
 }
-.answerModule .answerlist .adoption-post span{
+.answerModule .answerList .adoption-post span{
 	font-size: 13px
 }
-.answerModule .answerlist cite{font-style:normal;}
-.answerModule .answerlist .userRoleName{
+.answerModule .answerList cite{font-style:normal;}
+.answerModule .answerList .userRoleName{
 	white-space:nowrap; 
-	color:#fff;
-	background-color:#ffcc00;
+	color:#feb21a;
+	background-color:#ffedba;
 	border-radius:4px;
 	padding:0 5px;
 	font-size: 12px;
 }
-.answerModule .answerlist .staff{
+.answerModule .answerList .staff{
 	white-space:nowrap; 
 	color:#15d327;
 	background-color:#cafcc7;
@@ -4978,31 +5158,34 @@ html,body{
 	padding:0 5px;
 	font-size: 12px;
 }
-.answerModule .answerlist .answerTime{margin-bottom:5px;color:#999;font-size: 13px;}
-.answerModule .answerlist .answerTime a{color:#999;}
+.answerModule .answerList .answerTime{margin-top:3px; margin-bottom:5px;color:#999;font-size: 13px;}
+.answerModule .answerList .answerTime a{color:#999;}
 
-.answerModule .answerlist .answer .answerContent{padding:0px;word-wrap:break-word;color:#666;font-size: 15px;margin-top: 20px;line-height: 26px;}
-.answerModule .answerlist .answer .answerContent img {max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;}
-.answerModule .answerlist .tipBottom {
+.answerModule .answerList .answer .answerContent{padding:0px;word-wrap:break-word;color:#666;font-size: 15px;margin-top: 20px;line-height: 26px;}
+.answerModule .answerList .answer .answerContent img {max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;}
+/* 自动换行 */
+.answerModule .answerList .answer .answerContent pre{white-space:pre-wrap;}
+
+.answerModule .answerList .tipBottom {
 	font-size: 13px;
 	color: #aaa;
 	margin: 15px 10px 5px 50px;
 	text-align: right;
 }
-.answerModule .answerlist .tipBottom .a-toolbar {
+.answerModule .answerList .tipBottom .a-toolbar {
 	display: block;
 	width: 100%;
 }
-.answerModule .answerlist .tipBottom .a-toolbar a {
+.answerModule .answerList .tipBottom .a-toolbar a {
 	color: #aaa;
 }
-.answerModule .answerlist .tipBottom .a-toolbar .separationLine{
+.answerModule .answerList .tipBottom .a-toolbar .separationLine{
 	margin-left: 5px; margin-right: 5px;color: #ccc;
 }
 .answerPage {
 	margin-top: 20px;margin-right:8px;height: 52px;
 }
-.answerModule .answerlist .replyList {
+.answerModule .answerList .replyList {
 	padding: 10px 0 0px;
 	margin-left: 36px;
 	margin-right:10px;
@@ -5012,7 +5195,7 @@ html,body{
 	margin-top: 20px;
 	background: #fafbfc;
 }
-.answerModule .answerlist .replyList:before {
+.answerModule .answerList .replyList:before {
 	position: absolute;
 	display: block;
 	width: 16px;
@@ -5028,7 +5211,7 @@ html,body{
 	top: -4px;
 	left: 60px
 }
-.answerModule .answerlist .replyList .box li {
+.answerModule .answerList .replyList .box li {
 	*zoom: 1;
 	margin-bottom: 10px;
 	border-bottom: 1px solid #f1f1f1;
@@ -5036,49 +5219,49 @@ html,body{
 	margin-left: 10px;
 	margin-right:10px;
 }
-.answerModule .answerlist .replyList .box li:last-child{
+.answerModule .answerList .replyList .box li:last-child{
 	border-bottom: 1px solid #fff;
 	
 }
-.answerModule .answerlist .replyList .box li:before,
-.answerModule .answerlist .replyList .box li:after {
+.answerModule .answerList .replyList .box li:before,
+.answerModule .answerList .replyList .box li:after {
 	content: "";
 	display: table;
 	font: 0/0 a
 }
-.answerModule .answerlist .replyList .box li:after {
+.answerModule .answerList .replyList .box li:after {
 	clear: both;
 }
-.answerModule .answerlist .replyList .box li .reply-top{
+.answerModule .answerList .replyList .box li .reply-top{
 	position:relative;
 }
 
 
-.answerModule .answerlist .replyList .box li .reply-top .avatarBox{
+.answerModule .answerList .replyList .box li .reply-top .avatarBox{
 	position:absolute;border-radius:100%;
 	left: 0px;
 }
-.answerModule .answerlist .replyList .box li .reply-top .avatarBox img{
+.answerModule .answerList .replyList .box li .reply-top .avatarBox img{
 	border-radius:100%;
 	width: 38px;
 	height: 38px;
 	margin-top: -2px;
 }
-.answerModule .answerlist .replyList .box li .reply-top .userName {
+.answerModule .answerList .replyList .box li .reply-top .userName {
 	color:#aaa;margin-left: 48px;margin-top:6px;
 
 	float: left;
 }
-.answerModule .answerlist .replyList .box li .reply-top .userTag{
+.answerModule .answerList .replyList .box li .reply-top .userTag{
 	float: left;margin-left:4px; margin-top: 6px;
 }
-.answerModule .answerlist .replyList .box li .reply-top .time {
+.answerModule .answerList .replyList .box li .reply-top .time {
 	float: right;
 	color:#aaa;
 	font-size: 13px;
 	margin-top: 6px;
 }
-.answerModule .answerlist .replyList .box li .replyContent{
+.answerModule .answerList .replyList .box li .replyContent{
 	font-size: 15px;
 	line-height:26px;
 	color:#666;
@@ -5088,7 +5271,7 @@ html,body{
 	
 }
 /* 回复答案  */
-.answerModule .answerlist .answerReply-post{
+.answerModule .answerList .answerReply-post{
 	margin-top: 5px;
 	margin-left: 36px;
 	margin-right:10px;
@@ -5739,6 +5922,39 @@ html,body{
 .addAnswerModule .respond p {font-size:15px;padding:8px;overflow:hidden;color: #aaaaaa}
 .addAnswerModule .respond a{color: #26a2ff;}
 
+/* 关注 */
+.followModule{
+	position: relative;
+}
+.followModule .avatarBox{
+	display:inline-block;border-radius:100%;
+	padding-top: 8px;
+	margin-left: 3px;
+}
+.followModule .avatarBox img{
+	border-radius:100%;
+	width: 36px;
+}
+.followModule .userName {
+	font-size: 16px;position: relative;top: -12px;padding-left: 5px;
+}
+/* 粉丝 */
+.followerModule{
+	position: relative;
+}
+.followerModule .avatarBox{
+	display:inline-block;border-radius:100%;
+	padding-top: 8px;
+	margin-left: 3px;
+}
+.followerModule .avatarBox img{
+	border-radius:100%;
+	width: 36px;
+}
+.followerModule .userName {
+	font-size: 16px;position: relative;top: -12px;padding-left: 5px;
+}
+
 
 /* 数据表格 */
 .dataTable {
@@ -5779,7 +5995,7 @@ html,body{
 }
 .blankTableModule .blankTable .required{color: red; }
 .blankTableModule .blankTable .error {color: red;margin-left: 2px;}
-.blankTableModule .blankTable .help {color: #9e9e9e; margin-left: 2px;}
+.blankTableModule .blankTable .help {color: #9e9e9e; margin-left: 2px;vertical-align: middle;}
 
 
 
@@ -5802,29 +6018,6 @@ html,body{
 }
 
 
-/** 半透明提示层 **/
-.hideTag-class .layui-layer-content{
-	background-color: rgba(0,0,0,0.7);
-}
-.hideTag-class .layui-layer-content .layui-layer-TipsG {
-	position: absolute;
-	width: 0;
-	height: 0;
-	border-width: 5px;
-	*overflow: hidden;
-	
-	border-style: dashed;
- 	border-color:rgba(0,0,0,0.7) transparent transparent transparent;
-	margin-bottom: -2px;
-	margin-bottom: 3px\0;
-	*margin-bottom: 3px;
-}
-
-.hideTag-class .layui-layer-content .layui-layer-TipsT {
-	left: 7px;
-	border-right-style: solid;
-	border-right-color: rgba(0,0,0,0.7);
-}
 
 
 /* 页脚 border-top: 1px solid #e1e1e1; */

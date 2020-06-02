@@ -452,8 +452,8 @@ public class Question_TemplateManage {
 		
 		User user = userManage.query_cache_findUserByUserName(accessUser.getUserName());
 		if(user != null){
-			value.put("maxDeposit",user.getDeposit());//允许使用的预存款
-			value.put("maxPoint",user.getPoint());//允许使用的积分
+			value.put("maxDeposit",user.getDeposit());//用户共有预存款
+			value.put("maxPoint",user.getPoint());//用户共有积分
 		}
 		
 		SystemSetting systemSetting = settingService.findSystemSetting_cache();
@@ -464,6 +464,12 @@ public class Question_TemplateManage {
 		}else{
 			value.put("allowQuestion",true);//允许提交问题
 		}
+		value.put("questionRewardPointMin",systemSetting.getQuestionRewardPointMin());
+		value.put("questionRewardPointMax",systemSetting.getQuestionRewardPointMax());
+		value.put("questionRewardAmountMin",systemSetting.getQuestionRewardAmountMin());
+		value.put("questionRewardAmountMax",systemSetting.getQuestionRewardAmountMax());
+		
+		
 		value.put("maxQuestionTagQuantity", systemSetting.getMaxQuestionTagQuantity());//提交问题最多可选择标签数量
 		
 		value.put("availableTag", questionManage.availableTag());//问题编辑器允许使用标签

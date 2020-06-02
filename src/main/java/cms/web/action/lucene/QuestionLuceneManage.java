@@ -112,6 +112,7 @@ public class QuestionLuceneManage {
 							questionContent += appendQuestionItem.getContent();
 						}
 					}
+					questionContent = textFilterManage.filterText(questionContent.trim());
 					//内容
 					Field content = new TextField("content",questionContent,Field.Store.YES);
 					content.setTokenStream(analyzer_content.tokenStream("content",questionContent));
@@ -208,7 +209,7 @@ public class QuestionLuceneManage {
 	 */
 	public QueryResult<Question> findIndexByCondition(int firstIndex, int maxResult,
 			String keyword,Long tagId, String userName,
-			Date minPostTime, Date maxPostTime,Integer status,int sortCondition,boolean isHide){
+			Date minPostTime, Date maxPostTime,Integer status,int sortCondition){
 		QueryResult<Question> qr = new QueryResult<Question>();
 		//存储符合条件的记录   
 	    List<Question> questionList = new ArrayList<Question>();  
@@ -338,13 +339,7 @@ public class QuestionLuceneManage {
 		            }
 					
 					String _content = targetDoc.get("content");
-					if (_content != null && !"".equals(_content)) { 
-						if(isHide){//如果显示隐藏内容
-							_content = textFilterManage.filterText(_content);
-						}else{
-							_content = textFilterManage.filterHideText(_content);
-						}
-						
+					if (_content != null && !"".equals(_content)) { 					
 		                TokenStream tokenStream = analyzer_keyword.tokenStream("content",new StringReader(_content));    
 		                String highLightText = highlighter.getBestFragment(tokenStream, _content);//高亮显示  
 		                if(highLightText != null && !"".equals(highLightText)){

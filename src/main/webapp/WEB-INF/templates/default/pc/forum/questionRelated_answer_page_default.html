@@ -7,7 +7,7 @@
 <#if pageView.records?exists && questionRelated_answer_page.records?size gt 0> 
 	
 	<div class="answerModule" >
-		<ol class="answerlist">
+		<ol class="answerList">
 			<#list pageView.records as answer>
 				<div class="answer <#if answer.adoption == true> active</#if>" id="anchor_${answer.id}">
 					<div class="answer-author">

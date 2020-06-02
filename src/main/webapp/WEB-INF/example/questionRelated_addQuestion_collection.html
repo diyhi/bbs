@@ -13,10 +13,10 @@
 	 <tbody> 
 		<tr> 
 		<tr> 
-			<td rowspan="4">questionRelated_addQuestion_collection</td> 
-			<td rowspan="4">Map&ltString,Object></td>
+			<td rowspan="10">questionRelated_addQuestion_collection</td> 
+			<td rowspan="10">Map&ltString,Object></td>
 			<td>键参数：availableTag<br>值内容说明：问题编辑器允许使用标签(配合KindEditor编辑器使用)<br>值类型：JSON格式List&ltString></td>
-			<td rowspan="4">添加问题界面显示返回值</td> 
+			<td rowspan="10">添加问题界面显示返回值</td> 
 		</tr>
 		<tr> 
 			<td>键参数：captchaKey<br>值内容说明：验证码编号 (根据'全站设置 - 基本设置 - 担交问题每分钟提交超过'参数计算是否含有值)<br>值类型：String </td>
@@ -27,7 +27,24 @@
 		<tr> 
 			<td>键参数：maxQuestionTagQuantity<br>值内容说明：提交问题最多可选择标签数量<br>值类型：Integer</td>
 		</tr>
-		
+		<tr> 
+			<td>键参数：maxDeposit<br>值内容说明：用户共有预存款<br>值类型：BigDecimal</td>
+		</tr>
+		<tr> 
+			<td>键参数：maxPoint<br>值内容说明：用户共有积分<br>值类型：Long</td>
+		</tr>
+		<tr> 
+			<td>键参数：questionRewardPointMin<br>值内容说明：问题悬赏积分下限<br>值类型：Long</td>
+		</tr>
+		<tr> 
+			<td>键参数：questionRewardPointMax<br>值内容说明：问题悬赏积分上限；空为无限制 0则不允许悬赏积分<br>值类型：Long</td>
+		</tr>
+		<tr> 
+			<td>键参数：questionRewardAmountMin<br>值内容说明：问题悬赏金额下限<br>值类型：BigDecimal</td>
+		</tr>
+		<tr> 
+			<td>键参数：questionRewardAmountMax<br>值内容说明：问题悬赏金额上限；空为无限制 0则不允许悬赏金额<br>值类型：BigDecimal</td>
+		</tr>
 	</tbody> 
 </table>
 

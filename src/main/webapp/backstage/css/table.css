@@ -18,15 +18,34 @@
 	padding-left: 5px; background-color: #ffffff;
 	
 }
+
 .t-content-frame {
 	padding-left: 5px; background-color: #ffffff;border:red 1px solid;
 	
 }
 .t-header {
-	background-color: #ffffff; text-align: center;background-image: url(../images/pop_header.png);
+	background-color: #ffffff; 
+	text-align: center;
+	/**background-image: url(../images/pop_header.png);**/
+	background: -webkit-gradient(rgba(255,255,255,1) 0% ,rgba(244,244,244,1) 100%);
+    background: -webkit-linear-gradient(rgba(255,255,255,1) 0% ,rgba(244,244,244,1) 100%);
+    background: -moz-linear-gradient(rgba(255,255,255,1) 0% ,rgba(244,244,244,1) 100%);
+    background: -o-linear-gradient(rgba(255,255,255,1) 0% ,rgba(244,244,244,1) 100%);
+    background: -ms-linear-gradient(rgba(255,255,255,1) 0% ,rgba(244,244,244,1) 100%);
+    background: linear-gradient(rgba(255,255,255,1) 0% ,rgba(244,244,244,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType = 0, startColorstr = #ffffffff, endColorstr = #fff4f4f4);/*颜色格式为 #AARRGGBB  RR 指定红色值， GG 指定绿色值， BB 指定蓝色值, AA 指定透明度(00 是完全透明, FF 是完全不透明)。超出取值范围的值将被恢复为默认值 */
 }
 .t-thead TH {
-	font-weight:normal;border-bottom: #BFE3FF 1px dotted;background-image: url(../images/pop_header.png);
+	font-weight:normal;
+	border-bottom: #BFE3FF 1px dotted;
+	/**background-image: url(../images/pop_header.png);**/
+	background: -webkit-gradient(rgba(255,255,255,1) 0% ,rgba(244,244,244,1) 100%);
+    background: -webkit-linear-gradient(rgba(255,255,255,1) 0% ,rgba(244,244,244,1) 100%);
+    background: -moz-linear-gradient(rgba(255,255,255,1) 0% ,rgba(244,244,244,1) 100%);
+    background: -o-linear-gradient(rgba(255,255,255,1) 0% ,rgba(244,244,244,1) 100%);
+    background: -ms-linear-gradient(rgba(255,255,255,1) 0% ,rgba(244,244,244,1) 100%);
+    background: linear-gradient(rgba(255,255,255,1) 0% ,rgba(244,244,244,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType = 0, startColorstr = #ffffffff, endColorstr = #fff4f4f4);/*颜色格式为 #AARRGGBB  RR 指定红色值， GG 指定绿色值， BB 指定蓝色值, AA 指定透明度(00 是完全透明, FF 是完全不透明)。超出取值范围的值将被恢复为默认值 */
 }
 .t-button {
 	background-color: #ffffff; text-align: center;
@@ -50,17 +69,25 @@
 	color: #555;
 }
 .t-list-thead TH {
-	background-image: url(../images/blue_skin_bg.png); height: 30px;
+	/**background-image: url(../images/blue_skin_bg.png);**/
+	height:32px;
+	background: -webkit-gradient(rgba(255,255,255,1) 0% ,rgba(239,244,247,1) 100%);
+    background: -webkit-linear-gradient(rgba(255,255,255,1) 0% ,rgba(239,244,247,1) 100%);
+    background: -moz-linear-gradient(rgba(255,255,255,1) 0% ,rgba(239,244,247,1) 100%);
+    background: -o-linear-gradient(rgba(255,255,255,1) 0% ,rgba(239,244,247,1) 100%);
+    background: -ms-linear-gradient(rgba(255,255,255,1) 0% ,rgba(239,244,247,1) 100%);
+    background: linear-gradient(rgba(255,255,255,1) 0% ,rgba(239,244,247,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType = 0, startColorstr = #ffffffff, endColorstr = #ffeff4f7);/*颜色格式为 #AARRGGBB  RR 指定红色值， GG 指定绿色值， BB 指定蓝色值, AA 指定透明度(00 是完全透明, FF 是完全不透明)。超出取值范围的值将被恢复为默认值 */
 }
 
 .t-list-thead-dotted TH{
-	border-bottom: #EEEEEE 1px solid;height: 28px;
+	border-bottom: #EEEEEE 1px solid;height: 30px;
 }
 .t-list-tbody {
 	background-color: #ffffff; table-layout:fixed; word-break : break-all; word-wrap : break-word ;
 }
 .t-list-tbody TR {
-	height: 28px;
+	height: 30px;
 	line-height: 20px;
 	onmouseover: expression(onmouseover=function (){this.style.borderColor ='blue'; this.style.backgroundColor ='#ECF7FE'});
 	onmouseout: expression(onmouseout=function (){this.style.borderColor='';this.style.backgroundColor =''});
@@ -68,6 +95,10 @@
 .t-list-tbody > tr:hover{background-color: #ECF7FE;}
 .t-list-tbody > tr:hover td{background:none; }
 .t-list-tbody .noDiscolor:hover{background-color: transparent;}
+.t-list-tbody TD{
+	padding: 2px 3px;
+}
+
 
 .t-list-table {
 	margin: 5px auto 0px; background-color: #BFE3FF;
@@ -87,30 +118,141 @@
 	padding-left: 5px; background-color: #ffffff; text-align: center
 }
 
-.comment{
-	margin-left:5px;margin-right:5px;margin-top: 5px;margin-bottom: 5px;text-align: left; *width: 600px;/*IE 6和7*/ 
+
+.t-list-tbody TD .userInfo {
+	padding: 20px 0 20px 0;
+	margin-left:8px;
+	margin-right:8px;
+	height: auto;
+	overflow: hidden;
+	position: relative;
 }
-.comment img{
-	max-width:100%;height:auto;border:none;background:none;margin:0;padding:0; 
+.t-list-tbody TD.userInfo .author{
+	text-align: center;
 }
-.comment iframe{
-	width:100%; height: 550px;padding:10px 0px; 
+.t-list-tbody TD .userInfo .author img{
+	width: 120px;
+    height: 120px;
+    border-radius: 3px;
 }
-.comment video{
-	width:100%; height: 550px;padding:10px 0px; outline:none;
+.t-list-tbody TD .userInfo .name{
+ font-size: 16px;
+  text-align: center;
+  color: #333333;	
+  margin:14px 0 4px 0;
 }
-.quote{
-	padding:5px 8px;border-bottom:none;text-align: left;
+.t-list-tbody TD .userInfo .nickname{
+ font-size: 15px;
+  text-align: center;
+  color: #888;	
+  margin:14px 0 4px 0;
 }
-.quote div{
-	background:#ffe;padding:3px;border:1px solid #aaa;line-height:140%;margin-bottom:5px;
+.t-list-tbody TD .userInfo .role{
+	text-align: center;
 }
-.quote div span{
-	color:#666666;font-size:13px;
+.t-list-tbody TD .userInfo .role .userRoleName{
+	white-space:nowrap; 
+	color:#e2b46e;
+	background-color:#f8e7c4;
+	border-radius:4px;
+	padding:1px 5px;
+	font-size: 13px;
+	font-style:normal;
+}
+.t-list-tbody TD .userInfo .role .staff{
+	white-space:nowrap; 
+	color:#15d327;
+	background-color:#cafcc7;
+	border-radius:4px;
+	padding:1px 5px;
+	font-size: 13px;
+	font-style:normal;
 }
 
+.t-list-tbody TD .topicTag{
+	padding-top:5px;
+	margin-left:5px;
+	padding-bottom:5px;
+	text-align: left;
+}
+.t-list-tbody TD .topicTag .tag{
+	display: inline-block;
+    font-size: 13px;
+    line-height: 14px;
+    padding: 6px 8px 6px 8px;
+    margin-right: 5px;
+    border-radius: 3px;
+    color: #555;
+    background-color: #f5f5f5;
+    position:relative;
+}
+.t-list-tbody TD .topicTag .tag:hover {
+    background-color: #ebebeb;
+    color: #555;
+    text-decoration: none;
+}
+.t-list-tbody TD .topicTag .userRoleName{
+	display: inline-block;
+    font-size: 13px;
+    line-height: 14px;
+    padding: 6px 8px 6px 8px;
+    margin-right: 5px;
+    border-radius: 3px;
+    color:#fff;
+	background-color:#ffcc00;
+    position:relative;
+}
+.t-list-tbody TD .questionTag{
+	padding-top:5px;
+	margin-left:5px;
+	padding-bottom:5px;
+	text-align: left;
+}
+.t-list-tbody TD .questionTag .tag{
+	display: inline-block;
+    font-size: 14px;
+    line-height: 14px;
+    padding: 6px 8px 6px 8px;
+    margin-right: 5px;
+    border-radius: 3px;
+    color: #2196F3;
+    background-color: #e5f3ff;
+    position:relative;
+}
+.t-list-tbody TD .questionTag .tag:hover {
+    background-color: #d8edff;
+    color: #2196F3;
+    text-decoration: none;
+}
+
+.richTextContent{
+	margin-left:5px;margin-right:5px;margin-top: 5px;margin-bottom: 5px;text-align: left; *width: 600px;/*IE 6和7*/ 
+}
+/* 自动换行 */
+.richTextContent pre{white-space:pre-wrap;}
+.richTextContent img{
+	max-width:100%;height:auto;border:none;background:none;margin:0;padding:0; 
+}
+.richTextContent iframe{
+	width:100%; height: 550px;padding:10px 0px; 
+}
+.richTextContent video{
+	width:100%; height: 550px;padding:10px 0px; outline:none;
+}
+
+.quote{
+	padding:5px 8px;border-bottom:none;text-align: left;color: 666;margin-top: 20px;
+}
+.quote div{
+	background:#fbfbfb;padding:6px 8px 8px 8px;border:1px solid #ebebeb;line-height:140%;margin-bottom:6px;line-height: 28px;border-radius: 3px;
+}
+.quote div span{
+	color:#aaa;font-size:15px;height: 30px;
+}
+
+
 /* 隐藏标签 IE8以下浏览器不支持自定义标签，需要在页头<head>标签内执行document.createElement('player') */
-.comment player{
+.richTextContent player{
 	width: 100%;
 	height: 576px;
 	display: block;
@@ -147,7 +289,7 @@
 	filter:alpha(opacity=70);
 	text-align: center;
 }
-.comment hide {
+.richTextContent hide {
 	border: 0;
 	border-left: 3px solid #06b5ff;
 	margin-left: 10px;
@@ -156,7 +298,7 @@
 	display: block;
 	margin: 30px 0px 0px 0px;
 }
-.comment .inputValue_10:before {
+.richTextContent .inputValue_10:before {
 	content: '密码: ' attr(input-value) '';
 	color: #06b5ff;
 	font-size:14px;
@@ -164,7 +306,7 @@
 	margin-top: -30px;
 	line-height: 30px;
 }
-.comment .inputValue_20:before {
+.richTextContent .inputValue_20:before {
 	content: '回复话题可见';
 	color: #06b5ff;
 	font-size:14px;
@@ -172,7 +314,7 @@
 	margin-top: -30px;
 	line-height: 30px;
 }
-.comment .inputValue_30:before {
+.richTextContent .inputValue_30:before {
 	content: '达到等级 ' attr(description) ' 可见';
 	color: #06b5ff;
 	font-size:14px;
@@ -180,7 +322,7 @@
 	margin-top: -30px;
 	line-height: 30px;
 }
-.comment .inputValue_40:before {
+.richTextContent .inputValue_40:before {
 	content: '需要支付 ' attr(input-value) ' 积分可见';
 	color: #06b5ff;
 	font-size:14px;
@@ -188,7 +330,7 @@
 	margin-top: -30px;
 	line-height: 30px;
 }
-.comment .inputValue_50:before {
+.richTextContent .inputValue_50:before {
 	content: '需要支付 ' attr(input-value) ' 元费用可见';
 	color: #06b5ff;
 	font-size:14px;
@@ -639,11 +781,10 @@ filter:alpha(opacity: 0);
 .rewardModule{
 	background: #fcf3e6;
 	border-radius:3px;
-	margin: 6px 8px;
+	margin: 6px 6px;
 }
 .rewardModule .rewardInfo{
-	
-	padding: 10px 10px;color: #e2b46d;font-size: 14px;
+	padding: 10px 10px 8px 10px;color: #e2b46d;font-size: 15px;
 }
 .rewardModule .rewardInfo .symbol{
 	font-family:Arial;font-weight:normal; vertical-align: middle; display:inline-block;margin-left: 5px;color: #cca558;
@@ -654,7 +795,70 @@ filter:alpha(opacity: 0);
 .rewardModule .rewardInfo .point{
 	color: #cca558; margin-right: 5px;font-weight: 700;font-size: 16px;
 }
-
+/* 关注 */
+.followModule{
+	position: relative;
+}
+.followModule .avatarBox{
+	display:inline-block;border-radius:100%;
+	padding-top: 6px;
+	margin-left: 3px;
+}
+.followModule .avatarBox img{
+	border-radius:100%;
+	width: 36px;
+}
+.followModule .userName {
+	font-size: 14px;position: relative;top: -12px;padding-left: 5px;
+}
+/* 粉丝 */
+.followerModule{
+	position: relative;
+}
+.followerModule .avatarBox{
+	display:inline-block;border-radius:100%;
+	padding-top: 6px;
+	margin-left: 3px;
+}
+.followerModule .avatarBox img{
+	border-radius:100%;
+	width: 36px;
+}
+.followerModule .userName {
+	font-size: 14px;position: relative;top: -12px;padding-left: 5px;
+}
+/* 私信列表 */
+.privateMessageModule{
+	position: relative;
+}
+.privateMessageModule .avatarBox{
+	display:inline-block;border-radius:100%;
+	padding-top: 6px;
+	margin-left: 3px;
+}
+.privateMessageModule .avatarBox img{
+	border-radius:100%;
+	width: 36px;
+}
+.privateMessageModule .userName {
+	font-size: 14px;position: relative;top: -12px;padding-left: 5px;
+}
+/* 私信对话列表 */
+.privateMessageChatModule{
+	position: relative;
+}
+.privateMessageChatModule .avatarBox{
+	display:inline-block;border-radius:100%;
+	padding-top: 6px;
+	margin-left: 3px;
+}
+.privateMessageChatModule .avatarBox img{
+	border-radius:100%;
+	width: 36px;
+}
+.privateMessageChatModule .userName {
+	font-size: 14px;position: relative;top: -12px;padding-left: 5px;
+}
 
 /* 编辑器表格 */
 .exampleTable{

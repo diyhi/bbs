@@ -2329,6 +2329,7 @@ _extend(KRange, {
 		if (children.length > 0) {
 			return this.setStartBefore(children[0]).setEndAfter(children[children.length - 1]);
 		}
+
 		return this.setStart(node, 0).setEnd(node, 0);
 	},
 	collapse : function(toStart) {
@@ -4078,7 +4079,7 @@ function _elementVal(knode, val) {
 	if (knode.hasVal()) {
 		if (val === undefined) {
 			var html = knode.val();
-			html = html.replace(/(<(?:p|p\s[^>]*)>) *(<\/p>)/ig, '');
+			html = html.replace(/(<(?:p|p\s[^>]*)>) *(<\/p>)/ig, '');//去除内容为空的p标签
 			return html;
 		}
 		return knode.val(val);
@@ -5169,8 +5170,8 @@ function _bindNewlineEvent() {
 	if (_OPERA && _V < 9) {
 		return;
 	}
-	var brSkipTagMap = _toMap('h1,h2,h3,h4,h5,h6,pre,li'),
-		pSkipTagMap = _toMap('p,h1,h2,h3,h4,h5,h6,pre,li,blockquote');
+	var brSkipTagMap = _toMap('h1,h2,h3,h4,h5,h6,pre,hide,li'),
+		pSkipTagMap = _toMap('p,h1,h2,h3,h4,h5,h6,pre,hide,li,blockquote');
 	function getAncestorTagName(range) {
 		var ancestor = K(range.commonAncestor());
 		while (ancestor) {
@@ -5181,6 +5182,23 @@ function _bindNewlineEvent() {
 		}
 		return ancestor.name;
 	}
+	//获取Range范围的pre和hide标签
+	function getRangeTag(range) {
+		var ancestor = K(range.commonAncestor());
+		
+		while (ancestor) {
+			if (ancestor.type == 1 && !ancestor.isStyle()) {
+				break;
+			}
+			if(ancestor.name == 'pre' || ancestor.name =='hide'){
+				break;
+			}
+			ancestor = ancestor.parent();
+		}
+		return ancestor;
+	}
+	
+	//回车按下
 	K(doc).keydown(function(e) {
 		if (e.which != 13 || e.shiftKey || e.ctrlKey || e.altKey) {
 			return;
@@ -5190,17 +5208,92 @@ function _bindNewlineEvent() {
 		if (tagName == 'marquee' || tagName == 'select') {
 			return;
 		}
-
+		
 		
 		if (newlineTag === 'br' && !brSkipTagMap[tagName]) {
 			e.preventDefault();
 			self.insertHtml('<br />' + (_IE && _V < 9 ? '' : '\u200B'));
 			return;
 		}
+
+		//处理回车跳不出标签
+		var rangeTag = getRangeTag(self.cmd.range);
+		if (rangeTag.name == 'pre' || rangeTag.name == 'hide'){
+			//selectNodeContents(node)将Node的子节点的开始位置和结束位置分别设置成Range的开始位置和结束位置。对于文本节点和无结束符的元素，相当于使用selectNode。
+			//collapse(toStart)折叠KRange，当toStart为true时向前折叠，false时向后折叠。
+			self.cmd.range.selectNodeContents(rangeTag).collapse(false);
+			self.cmd.select();
+
+			//self.cmd.range.selectNodeContents(self.cmd.doc.body).collapse(false);
+			//self.cmd.select();
+			
+			if(self.cmd.range.startOffset == 0 && self.cmd.range.endOffset ==0){//如果输入内容为空
+				self.cmd.range.insertNode(doc.createTextNode('\u200B'));
+				self.cmd.select();
+				setTimeout(function() {
+					self.cmd.selection();
+					
+					var nullTag = getRangeTag(self.cmd.range);
+					nullTag.remove(true);
+				}, 4);
+			}else{
+				setTimeout(function() {
+					self.cmd.selection();
+					
+					var nullTag = getRangeTag(self.cmd.range);
+					nullTag.remove(true);
+					
+				}, 4);
+				
+			}
+			
+			
+			
+			return;
+		}
+		
+		//含有节点
+		var containsNode = "";
+		K(self.cmd.range.commonAncestor()).scan(function(node) {
+			if(K(node).name == "pre" || K(node).name == "hide"){
+				containsNode = K(node).name;
+			}
+		});
+		
+		if (containsNode != ""){
+			if(self.cmd.range.startOffset == 0 && self.cmd.range.endOffset ==0){//如果输入内容为空
+		//	if(self.cmd.range.html() == ''){//如果输入内容为空
+				setTimeout(function() {
+					self.cmd.selection();
+					
+					var nullTag = getRangeTag(self.cmd.range);
+					nullTag.remove(true);
+					
+				}, 4);
+				
+			}else{
+				e.preventDefault();
+				self.insertHtml('<br />' + (_IE && _V < 9 ? '' : '\u200B'));
+			}
+			
+			
+			return;
+		}
+
+		
+		//self.insertHtml('<p></p>');
+		//self.appendHtml('<p></p>');
+		//e.preventDefault();
+		//self.insertHtml('<br />' + (_IE && _V < 9 ? '' : '\u200B'));
+		
+		
+		
 		if (!pSkipTagMap[tagName]) {
-			_nativeCommand(doc, 'formatblock', '<p>');
+			_nativeCommand(doc, 'formatblock', '<p>');//设置当前块的标签名
 		}
 	});
+	
+	//回车弹起
 	K(doc).keyup(function(e) {
 		if (e.which != 13 || e.shiftKey || e.ctrlKey || e.altKey) {
 			return;
@@ -5223,9 +5316,8 @@ function _bindNewlineEvent() {
 		var tagName = getAncestorTagName(self.cmd.range);
 		if (tagName == 'marquee' || tagName == 'select') {
 			return;
-		}
-
-		
+		}		
+		/**
 		//处理回车跳不出标签
 		if(tagName == 'hide'){
 			var hide = self.cmd.commonAncestor('hide');
@@ -5235,11 +5327,11 @@ function _bindNewlineEvent() {
 		if(tagName == 'pre'){
 			var pre = self.cmd.commonAncestor('pre');
 			pre.remove(true);
-		}
+		}**/
 		
-		if (!pSkipTagMap[tagName]) {
-			_nativeCommand(doc, 'formatblock', '<p>');
-		}
+		//if (!pSkipTagMap[tagName]) {
+		//	_nativeCommand(doc, 'formatblock', '<p>');//设置当前块的标签名
+		//}
 	});
 }
 function _bindTabEvent() {
@@ -6441,7 +6533,7 @@ _plugin('core', function(K) {
 				html = html.replace(/(<br>)\1/ig, '$1');
 			}
 			if (self.pasteType === 2) {
-				html = html.replace(/(<(?:p|p\s[^>]*)>) *(<\/p>)/ig, '');
+				html = html.replace(/(<(?:p|p\s[^>]*)>) *(<\/p>)/ig, '');//去除内容为空的p标签
 				if (/schemas-microsoft-com|worddocument|mso-\w+/i.test(html)) {
 					html = _clearMsWord(html, self.filterMode ? self.htmlTags : K.options.htmlTags);
 				} else {
@@ -6466,6 +6558,7 @@ _plugin('core', function(K) {
 			}
 			self.insertHtml(html, true);
 		}
+		//粘贴事件
 		K(doc.body).bind('paste', function(e){
 			if (self.pasteType === 0) {
 				e.stop();
@@ -6474,6 +6567,9 @@ _plugin('core', function(K) {
 			if (pasting) {
 				return;
 			}
+			//获取滚动条位置
+			var sTop= document.body.scrollTop + document.documentElement.scrollTop;
+			
 			pasting = true;
 			K('div.' + cls, doc).remove();
 			cmd = self.cmd.selection();
@@ -6504,6 +6600,12 @@ _plugin('core', function(K) {
 				movePastedData();
 				pasting = false;
 			}, 0);
+			
+			//设置滚动条位置
+			setTimeout(function() {
+				window.scrollTo(0,sTop);
+			}, 0);
+			
 		});
 	});
 	self.beforeGetHtml(function(html) {
@@ -7242,7 +7344,7 @@ KindEditor.plugin('clearhtml', function(K) {
 /*******************************************************************************
 * KindEditor - WYSIWYG HTML Editor for Internet
 * Copyright (C) 2006-2011 kindsoft.net
-*
+* 插入程序代码
 * @author Roddy <luolonghao@gmail.com>
 * @site http://www.kindsoft.net/
 * @licence http://www.kindsoft.net/license.php
@@ -7283,6 +7385,15 @@ KindEditor.plugin('code', function(K) {
 				yesBtn : {
 					name : self.lang('yes'),
 					click : function(e) {
+
+						//截断样式
+						var _wrapper = K("<span></span>", self.cmd.doc);//插入指定的HTML内容到光标处。
+						_wrapper.html("&#8203;");//&#8203;是零宽空格字符
+						self.cmd.range.insertNode(_wrapper[0]).selectNodeContents(_wrapper[0]);
+						self.cmd.select();
+						self.cmd.removeformat();//删除格式。
+						
+						
 						var type = K('.ke-code-type', dialog.div).val(),
 							code = textarea.val(),
 							cls = type === '' ? '' :  ' lang-' + type,
@@ -7441,7 +7552,7 @@ KindEditor.plugin('emoticons', function(K) {
 /*******************************************************************************
 * KindEditor - WYSIWYG HTML Editor for Internet
 * Copyright (C) 2006-2011 kindsoft.net
-*
+* 
 * @author Roddy <luolonghao@gmail.com>
 * @site http://www.kindsoft.net/
 * @licence http://www.kindsoft.net/license.php
@@ -9064,7 +9175,7 @@ KindEditor.plugin('quickformat', function(K) {
 /*******************************************************************************
 * KindEditor - WYSIWYG HTML Editor for Internet
 * Copyright (C) 2006-2011 kindsoft.net
-*
+* 表格
 * @author Roddy <luolonghao@gmail.com>
 * @site http://www.kindsoft.net/
 * @licence http://www.kindsoft.net/license.php

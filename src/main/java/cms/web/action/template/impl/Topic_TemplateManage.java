@@ -1005,7 +1005,7 @@ public class Topic_TemplateManage {
 			A:for(Long quoteUpdateId : quoteUpdateIdList){
 				for(Comment comment : commentList){
 					if(comment.getId().equals(quoteUpdateId)){
-						new_quoteList.put(comment.getId(), textFilterManage.filterText(comment.getContent()));
+						new_quoteList.put(comment.getId(), textFilterManage.filterText(textFilterManage.specifyHtmlTagToText(comment.getContent())));
 						continue A;
 					}
 				}
@@ -1025,7 +1025,7 @@ public class Topic_TemplateManage {
 			List<Comment> quote_commentList = commentService.findByCommentIdList(query_quoteUpdateIdList);
 			if(quote_commentList != null && quote_commentList.size() >0){
 				for(Comment comment : quote_commentList){
-					new_quoteList.put(comment.getId(), textFilterManage.filterText(comment.getContent()));
+					new_quoteList.put(comment.getId(), textFilterManage.filterText(textFilterManage.specifyHtmlTagToText(comment.getContent())));
 				}
 			}
 		}
@@ -1047,6 +1047,9 @@ public class Topic_TemplateManage {
 							if(quote.getIsStaff() == false){//会员
 								User user = userManage.query_cache_findUserByUserName(quote.getUserName());
 								quote.setNickname(user.getNickname());
+								quote.setAvatarPath(user.getAvatarPath());
+								quote.setAvatarName(user.getAvatarName());
+
 							}
 						}
 					}
@@ -1176,7 +1179,7 @@ public class Topic_TemplateManage {
 		
 		if(commentId != null && commentId >0L){
 			Comment comment = commentService.findByCommentId(commentId);
-			value.put("quoteContent", textFilterManage.filterText(comment.getContent()));//引用内容
+			value.put("quoteContent", textFilterManage.filterText(textFilterManage.specifyHtmlTagToText(comment.getContent())));//引用内容
 		}
 		SystemSetting systemSetting = settingService.findSystemSetting_cache();
 		

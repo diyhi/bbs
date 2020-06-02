@@ -755,7 +755,7 @@ public class UserManageAction {
 							//	default:
 							}
 						}else{
-							if(userCustom.isRequired() == true){//是否必填	
+							if(userCustom.isRequired() == true && user.getType() <=30){//是否必填	
 								error.put("userCustom_"+userCustom.getId(), "必填项");
 							}
 							
@@ -774,13 +774,13 @@ public class UserManageAction {
 								userInputValueList.add(userInputValue);
 								
 							}else{
-								if(userCustom.isRequired() == true){//是否必填	
+								if(userCustom.isRequired() == true && user.getType() <=30){//是否必填	
 									error.put("userCustom_"+userCustom.getId(), "必填项");
 								}
 							}
 							
 						}else{
-							if(userCustom.isRequired() == true){//是否必填	
+							if(userCustom.isRequired() == true && user.getType() <=30){//是否必填	
 								error.put("userCustom_"+userCustom.getId(), "必填项");
 							}
 						}
@@ -804,12 +804,12 @@ public class UserManageAction {
 								}
 							}
 						}else{
-							if(userCustom.isRequired() == true){//是否必填	
+							if(userCustom.isRequired() == true && user.getType() <=30){//是否必填	
 								error.put("userCustom_"+userCustom.getId(), "必填项");
 							}
 						}
 						if(userInputValueList.size() == 0){
-							if(userCustom.isRequired() == true){//是否必填	
+							if(userCustom.isRequired() == true && user.getType() <=30){//是否必填	
 								error.put("userCustom_"+userCustom.getId(), "必填项");
 							}
 						}
@@ -833,12 +833,12 @@ public class UserManageAction {
 								}
 							}
 						}else{
-							if(userCustom.isRequired() == true){//是否必填	
+							if(userCustom.isRequired() == true && user.getType() <=30){//是否必填	
 								error.put("userCustom_"+userCustom.getId(), "必填项");
 							}
 						}
 						if(userInputValueList.size() == 0){
-							if(userCustom.isRequired() == true){//是否必填	
+							if(userCustom.isRequired() == true && user.getType() <=30){//是否必填	
 								error.put("userCustom_"+userCustom.getId(), "必填项");
 							}
 						}
@@ -853,7 +853,7 @@ public class UserManageAction {
 							userInputValueList.add(userInputValue);
 							
 						}else{
-							if(userCustom.isRequired() == true){//是否必填	
+							if(userCustom.isRequired() == true && user.getType() <=30){//是否必填	
 								error.put("userCustom_"+userCustom.getId(), "必填项");
 							}
 						}
@@ -912,6 +912,16 @@ public class UserManageAction {
 				new_user.setAnswer(user.getAnswer());
 			}
 			
+		}else{
+			new_user.setPassword(user.getPassword());
+			if(user.getSecurityDigest() != null && !"".equals(user.getSecurityDigest())){
+				new_user.setSecurityDigest(user.getSecurityDigest());
+			}else{
+				new_user.setSecurityDigest(new Date().getTime());
+			}
+			
+			new_user.setIssue(user.getIssue());
+			new_user.setAnswer(user.getAnswer());
 		}
 		
 		if(formbean.getEmail() != null && !"".equals(formbean.getEmail().trim())){//邮箱

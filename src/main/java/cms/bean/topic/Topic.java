@@ -67,7 +67,7 @@ public class Topic implements Serializable{
 	@Transient
 	private String ipAddress;
 	
-	/** 前3张图片 List<ImageInfo>json格式 **/
+	/** 图片 List<ImageInfo>json格式 **/
 	@Lob
 	private String image;
 	@Transient
