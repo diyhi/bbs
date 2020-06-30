@@ -172,7 +172,10 @@ public class TopicFormAction {
 		
 		
 		Map<String,String> error = new HashMap<String,String>();
-		
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.getCloseSite().equals(2)){
+			error.put("topic", ErrorView._21.name());//只读模式不允许提交数据
+		}
 			
 		
 		//判断令牌
@@ -224,7 +227,6 @@ public class TopicFormAction {
 			
 		}
 		
-		SystemSetting systemSetting = settingService.findSystemSetting_cache();
 		
 		
 		//如果全局不允许提交话题
@@ -709,6 +711,10 @@ public class TopicFormAction {
 		
 		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
 		Map<String,String> error = new HashMap<String,String>();
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.getCloseSite().equals(2)){
+			error.put("topic", ErrorView._21.name());//只读模式不允许提交数据
+		}
 		
 		//判断令牌
 		if(token != null && !"".equals(token.trim())){	
@@ -758,7 +764,6 @@ public class TopicFormAction {
 			}
 			
 		}
-		SystemSetting systemSetting = settingService.findSystemSetting_cache();
 		
 		//旧前3张图片地址
 		List<ImageInfo> oldBeforeImageList = new ArrayList<ImageInfo>();
@@ -1365,216 +1370,225 @@ public class TopicFormAction {
 	  	AccessUser accessUser = AccessUserThreadLocal.get();
 		boolean flag = true;
 		
-		//如果全局不允许提交话题
-		if(systemSetting.isAllowTopic() == false){
-			flag = false;
-		}
 		
-		//如果实名用户才允许提交话题
-		if(systemSetting.isRealNameUserAllowTopic() == true){
-			User _user = userManage.query_cache_findUserByUserName(accessUser.getUserName());
-			if(_user.isRealNameAuthentication() == false){
+		
+		if(systemSetting.getCloseSite().equals(2)){
+			errorMessage = "只读模式不允许提交数据";
+		}else{
+			//如果全局不允许提交话题
+			if(systemSetting.isAllowTopic() == false){
 				flag = false;
 			}
+			
+			//如果实名用户才允许提交话题
+			if(systemSetting.isRealNameUserAllowTopic() == true){
+				User _user = userManage.query_cache_findUserByUserName(accessUser.getUserName());
+				if(_user.isRealNameAuthentication() == false){
+					flag = false;
+				}
+			}
+			if(flag){
+				DateTime dateTime = new DateTime();     
+				String date = dateTime.toString("yyyy-MM-dd");
+
+				if(file != null && !file.isEmpty()){
+					EditorTag editorSiteObject = settingManage.readTopicEditorTag();
+					if(editorSiteObject != null){
+						if(dir.equals("image")){
+							//是否有当前功能操作权限
+							boolean flag_permission = userRoleManage.isPermission(ResourceEnum._2002000,null);
+							if(flag_permission){
+								if(editorSiteObject.isImage()){//允许上传图片
+									//上传文件编号
+									String fileNumber = "b"+accessUser.getUserId();
+									
+									//当前文件名称
+									String fileName = file.getOriginalFilename();
+									
+									//文件大小
+									Long size = file.getSize();
+									//取得文件后缀
+									String suffix = FileUtil.getExtension(fileName).toLowerCase();
+									
+									//允许上传图片格式
+									List<String> imageFormat = editorSiteObject.getImageFormat();
+									//允许上传图片大小
+									long imageSize = editorSiteObject.getImageSize();
+									
+									//验证文件类型
+									boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),imageFormat);
+									
+									if(authentication ){
+										if(size/1024 <= imageSize){
+											//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
+											String pathDir = "file"+File.separator+"topic"+File.separator + date +File.separator +"image"+ File.separator;
+											//文件锁目录
+											String lockPathDir = "file"+File.separator+"topic"+File.separator+"lock"+File.separator;
+											//构建文件名称
+											String newFileName = UUIDUtil.getUUID32()+ fileNumber+"." + suffix;
+											
+											//生成文件保存目录
+											fileManage.createFolder(pathDir);
+											//生成锁文件保存目录
+											fileManage.createFolder(lockPathDir);
+											//生成锁文件
+											fileManage.addLock(lockPathDir,date +"_image_"+newFileName);
+											//保存文件
+											fileManage.writeFile(pathDir, newFileName,file.getBytes());
+											//上传成功
+											returnJson.put("error", 0);//0成功  1错误
+											returnJson.put("url", "file/topic/"+date+"/image/"+newFileName);
+											return JsonUtils.toJSONString(returnJson);
+										}else{
+											errorMessage = "文件超出允许上传大小";
+										}
+									}else{
+										errorMessage = "当前文件类型不允许上传";
+									}
+								}else{
+									errorMessage = "不允许上传文件";
+								}
+							}else{
+								errorMessage = "权限不足";
+							}
+							
+							
+							
+						}else if(dir.equals("file")){
+							//是否有当前功能操作权限
+							boolean flag_permission = userRoleManage.isPermission(ResourceEnum._2003000,null);
+							if(flag_permission){
+								if(editorSiteObject.isFile()){//允许上传文件
+									//上传文件编号
+									String fileNumber = "b"+accessUser.getUserId();
+									
+									//当前文件名称
+									String fileName = file.getOriginalFilename();
+									
+									//文件大小
+									Long size = file.getSize();
+									//取得文件后缀
+									String suffix = FileUtil.getExtension(fileName).toLowerCase();
+									
+									//允许上传文件格式
+									List<String> imageFormat = editorSiteObject.getFileFormat();
+									//允许上传文件大小
+									long fileSize = editorSiteObject.getFileSize();
+									
+									//验证文件类型
+									boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),imageFormat);
+									
+									if(authentication ){
+										if(size/1024 <= fileSize){
+											//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
+											String pathDir = "file"+File.separator+"topic"+File.separator + date +File.separator +"file"+ File.separator;
+											//文件锁目录
+											String lockPathDir = "file"+File.separator+"topic"+File.separator+"lock"+File.separator;
+											//构建文件名称
+											String newFileName = UUIDUtil.getUUID32()+ fileNumber+"." + suffix;
+											
+											//生成文件保存目录
+											fileManage.createFolder(pathDir);
+											//生成锁文件保存目录
+											fileManage.createFolder(lockPathDir);
+											//生成锁文件
+											fileManage.addLock(lockPathDir,date +"_file_"+newFileName);
+											//保存文件
+											fileManage.writeFile(pathDir, newFileName,file.getBytes());
+											//上传成功
+											returnJson.put("error", 0);//0成功  1错误
+											returnJson.put("url", "file/topic/"+date+"/file/"+newFileName);
+											returnJson.put("title", file.getOriginalFilename());//旧文件名称
+											return JsonUtils.toJSONString(returnJson);
+										}else{
+											errorMessage = "文件超出允许上传大小";
+										}
+									}else{
+										errorMessage = "当前文件类型不允许上传";
+									}
+								}else{
+									errorMessage = "不允许上传文件";
+								}
+							}else{
+								errorMessage = "权限不足";
+							}
+							
+						}else if(dir.equals("media")){	
+							//是否有当前功能操作权限
+							boolean flag_permission = userRoleManage.isPermission(ResourceEnum._2004000,null);
+							if(flag_permission){
+								if(editorSiteObject.isUploadVideo()){//允许上传视频
+									//上传文件编号
+									String fileNumber = "b"+accessUser.getUserId();
+									
+									//当前文件名称
+									String fileName = file.getOriginalFilename();
+									
+									//文件大小
+									Long size = file.getSize();
+									//取得文件后缀
+									String suffix = FileUtil.getExtension(fileName).toLowerCase();
+									
+									//允许上传视频格式
+									List<String> imageFormat = editorSiteObject.getVideoFormat();
+									//允许上传视频大小
+									long fileSize = editorSiteObject.getVideoSize();
+									
+									//验证视频类型
+									boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),imageFormat);
+									
+									if(authentication ){
+										if(size/1024 <= fileSize){
+											//文件保存目录;分多目录主要是为了分散文件目录,提高检索速度
+											String pathDir = "file"+File.separator+"topic"+File.separator + date +File.separator +"media"+ File.separator;
+											//文件锁目录
+											String lockPathDir = "file"+File.separator+"topic"+File.separator+"lock"+File.separator;
+											//构建文件名称
+											String newFileName = UUIDUtil.getUUID32()+ fileNumber+"." + suffix;
+											
+											//生成文件保存目录
+											fileManage.createFolder(pathDir);
+											//生成锁文件保存目录
+											fileManage.createFolder(lockPathDir);
+											//生成锁文件
+											fileManage.addLock(lockPathDir,date +"_media_"+newFileName);
+											//保存文件
+											fileManage.writeFile(pathDir, newFileName,file.getBytes());
+											//上传成功
+											returnJson.put("error", 0);//0成功  1错误
+											returnJson.put("url", "file/topic/"+date+"/media/"+newFileName);
+											returnJson.put("title", file.getOriginalFilename());//旧文件名称
+											return JsonUtils.toJSONString(returnJson);
+										}else{
+											errorMessage = "文件超出允许上传大小";
+										}
+									}else{
+										errorMessage = "当前视频类型不允许上传";
+									}
+								}else{
+									errorMessage = "不允许上传文件";
+								}
+							}else{
+								errorMessage = "权限不足";
+							}
+							
+						}else{
+							errorMessage = "缺少dir参数";
+						}
+					}else{
+						errorMessage = "读取话题编辑器允许使用标签失败";
+					}	
+				}else{
+					errorMessage = "文件内容不能为空";
+				}
+			}else{
+				errorMessage = "不允许发表话题";
+			}
 		}
 		
-		if(flag){
-			DateTime dateTime = new DateTime();     
-			String date = dateTime.toString("yyyy-MM-dd");
-
-			if(file != null && !file.isEmpty()){
-				EditorTag editorSiteObject = settingManage.readTopicEditorTag();
-				if(editorSiteObject != null){
-					if(dir.equals("image")){
-						//是否有当前功能操作权限
-						boolean flag_permission = userRoleManage.isPermission(ResourceEnum._2002000,null);
-						if(flag_permission){
-							if(editorSiteObject.isImage()){//允许上传图片
-								//上传文件编号
-								String fileNumber = "b"+accessUser.getUserId();
-								
-								//当前文件名称
-								String fileName = file.getOriginalFilename();
-								
-								//文件大小
-								Long size = file.getSize();
-								//取得文件后缀
-								String suffix = FileUtil.getExtension(fileName).toLowerCase();
-								
-								//允许上传图片格式
-								List<String> imageFormat = editorSiteObject.getImageFormat();
-								//允许上传图片大小
-								long imageSize = editorSiteObject.getImageSize();
-								
-								//验证文件类型
-								boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),imageFormat);
-								
-								if(authentication ){
-									if(size/1024 <= imageSize){
-										//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
-										String pathDir = "file"+File.separator+"topic"+File.separator + date +File.separator +"image"+ File.separator;
-										//文件锁目录
-										String lockPathDir = "file"+File.separator+"topic"+File.separator+"lock"+File.separator;
-										//构建文件名称
-										String newFileName = UUIDUtil.getUUID32()+ fileNumber+"." + suffix;
-										
-										//生成文件保存目录
-										fileManage.createFolder(pathDir);
-										//生成锁文件保存目录
-										fileManage.createFolder(lockPathDir);
-										//生成锁文件
-										fileManage.addLock(lockPathDir,date +"_image_"+newFileName);
-										//保存文件
-										fileManage.writeFile(pathDir, newFileName,file.getBytes());
-										//上传成功
-										returnJson.put("error", 0);//0成功  1错误
-										returnJson.put("url", "file/topic/"+date+"/image/"+newFileName);
-										return JsonUtils.toJSONString(returnJson);
-									}else{
-										errorMessage = "文件超出允许上传大小";
-									}
-								}else{
-									errorMessage = "当前文件类型不允许上传";
-								}
-							}else{
-								errorMessage = "不允许上传文件";
-							}
-						}else{
-							errorMessage = "权限不足";
-						}
-						
-						
-						
-					}else if(dir.equals("file")){
-						//是否有当前功能操作权限
-						boolean flag_permission = userRoleManage.isPermission(ResourceEnum._2003000,null);
-						if(flag_permission){
-							if(editorSiteObject.isFile()){//允许上传文件
-								//上传文件编号
-								String fileNumber = "b"+accessUser.getUserId();
-								
-								//当前文件名称
-								String fileName = file.getOriginalFilename();
-								
-								//文件大小
-								Long size = file.getSize();
-								//取得文件后缀
-								String suffix = FileUtil.getExtension(fileName).toLowerCase();
-								
-								//允许上传文件格式
-								List<String> imageFormat = editorSiteObject.getFileFormat();
-								//允许上传文件大小
-								long fileSize = editorSiteObject.getFileSize();
-								
-								//验证文件类型
-								boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),imageFormat);
-								
-								if(authentication ){
-									if(size/1024 <= fileSize){
-										//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
-										String pathDir = "file"+File.separator+"topic"+File.separator + date +File.separator +"file"+ File.separator;
-										//文件锁目录
-										String lockPathDir = "file"+File.separator+"topic"+File.separator+"lock"+File.separator;
-										//构建文件名称
-										String newFileName = UUIDUtil.getUUID32()+ fileNumber+"." + suffix;
-										
-										//生成文件保存目录
-										fileManage.createFolder(pathDir);
-										//生成锁文件保存目录
-										fileManage.createFolder(lockPathDir);
-										//生成锁文件
-										fileManage.addLock(lockPathDir,date +"_file_"+newFileName);
-										//保存文件
-										fileManage.writeFile(pathDir, newFileName,file.getBytes());
-										//上传成功
-										returnJson.put("error", 0);//0成功  1错误
-										returnJson.put("url", "file/topic/"+date+"/file/"+newFileName);
-										returnJson.put("title", file.getOriginalFilename());//旧文件名称
-										return JsonUtils.toJSONString(returnJson);
-									}else{
-										errorMessage = "文件超出允许上传大小";
-									}
-								}else{
-									errorMessage = "当前文件类型不允许上传";
-								}
-							}else{
-								errorMessage = "不允许上传文件";
-							}
-						}else{
-							errorMessage = "权限不足";
-						}
-						
-					}else if(dir.equals("media")){	
-						//是否有当前功能操作权限
-						boolean flag_permission = userRoleManage.isPermission(ResourceEnum._2004000,null);
-						if(flag_permission){
-							if(editorSiteObject.isUploadVideo()){//允许上传视频
-								//上传文件编号
-								String fileNumber = "b"+accessUser.getUserId();
-								
-								//当前文件名称
-								String fileName = file.getOriginalFilename();
-								
-								//文件大小
-								Long size = file.getSize();
-								//取得文件后缀
-								String suffix = FileUtil.getExtension(fileName).toLowerCase();
-								
-								//允许上传视频格式
-								List<String> imageFormat = editorSiteObject.getVideoFormat();
-								//允许上传视频大小
-								long fileSize = editorSiteObject.getVideoSize();
-								
-								//验证视频类型
-								boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),imageFormat);
-								
-								if(authentication ){
-									if(size/1024 <= fileSize){
-										//文件保存目录;分多目录主要是为了分散文件目录,提高检索速度
-										String pathDir = "file"+File.separator+"topic"+File.separator + date +File.separator +"media"+ File.separator;
-										//文件锁目录
-										String lockPathDir = "file"+File.separator+"topic"+File.separator+"lock"+File.separator;
-										//构建文件名称
-										String newFileName = UUIDUtil.getUUID32()+ fileNumber+"." + suffix;
-										
-										//生成文件保存目录
-										fileManage.createFolder(pathDir);
-										//生成锁文件保存目录
-										fileManage.createFolder(lockPathDir);
-										//生成锁文件
-										fileManage.addLock(lockPathDir,date +"_media_"+newFileName);
-										//保存文件
-										fileManage.writeFile(pathDir, newFileName,file.getBytes());
-										//上传成功
-										returnJson.put("error", 0);//0成功  1错误
-										returnJson.put("url", "file/topic/"+date+"/media/"+newFileName);
-										returnJson.put("title", file.getOriginalFilename());//旧文件名称
-										return JsonUtils.toJSONString(returnJson);
-									}else{
-										errorMessage = "文件超出允许上传大小";
-									}
-								}else{
-									errorMessage = "当前视频类型不允许上传";
-								}
-							}else{
-								errorMessage = "不允许上传文件";
-							}
-						}else{
-							errorMessage = "权限不足";
-						}
-						
-					}else{
-						errorMessage = "缺少dir参数";
-					}
-				}else{
-					errorMessage = "读取话题编辑器允许使用标签失败";
-				}	
-			}else{
-				errorMessage = "文件内容不能为空";
-			}
-		}else{
-			errorMessage = "不允许发表话题";
-		}
+		
+		
+		
 		
 
 		
@@ -1611,7 +1625,10 @@ public class TopicFormAction {
 		
 		
 		Map<String,String> error = new HashMap<String,String>();
-		
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.getCloseSite().equals(2)){
+			error.put("topicUnhide", ErrorView._21.name());//只读模式不允许提交数据
+		}
 			
 		
 		//判断令牌

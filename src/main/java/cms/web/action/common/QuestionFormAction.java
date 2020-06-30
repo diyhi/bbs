@@ -147,7 +147,10 @@ public class QuestionFormAction {
 		
 		
 		Map<String,String> error = new HashMap<String,String>();
-		
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.getCloseSite().equals(2)){
+			error.put("question", ErrorView._21.name());//只读模式不允许提交数据
+		}
 			
 		
 		//判断令牌
@@ -198,8 +201,6 @@ public class QuestionFormAction {
 			}
 			
 		}
-		
-		SystemSetting systemSetting = settingService.findSystemSetting_cache();
 		
 		//悬赏金额
 		BigDecimal rewardAmount = new BigDecimal("0.00");
@@ -747,7 +748,10 @@ public class QuestionFormAction {
 		
 		
 		Map<String,String> error = new HashMap<String,String>();
-		
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.getCloseSite().equals(2)){
+			error.put("question", ErrorView._21.name());//只读模式不允许提交数据
+		}
 			
 		
 		//判断令牌
@@ -798,8 +802,6 @@ public class QuestionFormAction {
 			}
 			
 		}
-		
-		SystemSetting systemSetting = settingService.findSystemSetting_cache();
 		
 		
 		//如果全局不允许提交问题
@@ -1091,98 +1093,105 @@ public class QuestionFormAction {
 	  	AccessUser accessUser = AccessUserThreadLocal.get();
 		boolean flag = true;
 		
-		//如果全局不允许提交问题
-		if(systemSetting.isAllowQuestion() == false){
-			flag = false;
-		}
-		
-		//如果实名用户才允许提交问题
-		if(systemSetting.isRealNameUserAllowQuestion() == true){
-			User _user = userManage.query_cache_findUserByUserName(accessUser.getUserName());
-			if(_user.isRealNameAuthentication() == false){
+		if(systemSetting.getCloseSite().equals(2)){
+			errorMessage = "只读模式不允许提交数据";
+		}else{
+			//如果全局不允许提交问题
+			if(systemSetting.isAllowQuestion() == false){
 				flag = false;
 			}
-		}
-		
-		if(flag){
-			DateTime dateTime = new DateTime();     
-			String date = dateTime.toString("yyyy-MM-dd");
+			
+			//如果实名用户才允许提交问题
+			if(systemSetting.isRealNameUserAllowQuestion() == true){
+				User _user = userManage.query_cache_findUserByUserName(accessUser.getUserName());
+				if(_user.isRealNameAuthentication() == false){
+					flag = false;
+				}
+			}
+			if(flag){
+				DateTime dateTime = new DateTime();     
+				String date = dateTime.toString("yyyy-MM-dd");
 
-			if(file != null && !file.isEmpty()){
-				EditorTag editorSiteObject = settingManage.readQuestionEditorTag();
-				if(editorSiteObject != null){
-					if(dir.equals("image")){
-						//是否有当前功能操作权限
-						boolean flag_permission = userRoleManage.isPermission(ResourceEnum._2002000,null);
-						if(flag_permission){
-							if(editorSiteObject.isImage()){//允许上传图片
-								//上传文件编号
-								String fileNumber = "b"+accessUser.getUserId();
-								
-								//当前文件名称
-								String fileName = file.getOriginalFilename();
-								
-								//文件大小
-								Long size = file.getSize();
-								//取得文件后缀
-								String suffix = FileUtil.getExtension(fileName).toLowerCase();
-								
-								//允许上传图片格式
-								List<String> imageFormat = editorSiteObject.getImageFormat();
-								//允许上传图片大小
-								long imageSize = editorSiteObject.getImageSize();
-								
-								//验证文件类型
-								boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),imageFormat);
-								
-								if(authentication ){
-									if(size/1024 <= imageSize){
-										//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
-										String pathDir = "file"+File.separator+"question"+File.separator + date +File.separator +"image"+ File.separator;
-										//文件锁目录
-										String lockPathDir = "file"+File.separator+"question"+File.separator+"lock"+File.separator;
-										//构建文件名称
-										String newFileName = UUIDUtil.getUUID32()+ fileNumber+"." + suffix;
-										
-										//生成文件保存目录
-										fileManage.createFolder(pathDir);
-										//生成锁文件保存目录
-										fileManage.createFolder(lockPathDir);
-										//生成锁文件
-										fileManage.addLock(lockPathDir,date +"_image_"+newFileName);
-										//保存文件
-										fileManage.writeFile(pathDir, newFileName,file.getBytes());
-										//上传成功
-										returnJson.put("error", 0);//0成功  1错误
-										returnJson.put("url", "file/question/"+date+"/image/"+newFileName);
-										return JsonUtils.toJSONString(returnJson);
+				if(file != null && !file.isEmpty()){
+					EditorTag editorSiteObject = settingManage.readQuestionEditorTag();
+					if(editorSiteObject != null){
+						if(dir.equals("image")){
+							//是否有当前功能操作权限
+							boolean flag_permission = userRoleManage.isPermission(ResourceEnum._2002000,null);
+							if(flag_permission){
+								if(editorSiteObject.isImage()){//允许上传图片
+									//上传文件编号
+									String fileNumber = "b"+accessUser.getUserId();
+									
+									//当前文件名称
+									String fileName = file.getOriginalFilename();
+									
+									//文件大小
+									Long size = file.getSize();
+									//取得文件后缀
+									String suffix = FileUtil.getExtension(fileName).toLowerCase();
+									
+									//允许上传图片格式
+									List<String> imageFormat = editorSiteObject.getImageFormat();
+									//允许上传图片大小
+									long imageSize = editorSiteObject.getImageSize();
+									
+									//验证文件类型
+									boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),imageFormat);
+									
+									if(authentication ){
+										if(size/1024 <= imageSize){
+											//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
+											String pathDir = "file"+File.separator+"question"+File.separator + date +File.separator +"image"+ File.separator;
+											//文件锁目录
+											String lockPathDir = "file"+File.separator+"question"+File.separator+"lock"+File.separator;
+											//构建文件名称
+											String newFileName = UUIDUtil.getUUID32()+ fileNumber+"." + suffix;
+											
+											//生成文件保存目录
+											fileManage.createFolder(pathDir);
+											//生成锁文件保存目录
+											fileManage.createFolder(lockPathDir);
+											//生成锁文件
+											fileManage.addLock(lockPathDir,date +"_image_"+newFileName);
+											//保存文件
+											fileManage.writeFile(pathDir, newFileName,file.getBytes());
+											//上传成功
+											returnJson.put("error", 0);//0成功  1错误
+											returnJson.put("url", "file/question/"+date+"/image/"+newFileName);
+											return JsonUtils.toJSONString(returnJson);
+										}else{
+											errorMessage = "文件超出允许上传大小";
+										}
 									}else{
-										errorMessage = "文件超出允许上传大小";
+										errorMessage = "当前文件类型不允许上传";
 									}
 								}else{
-									errorMessage = "当前文件类型不允许上传";
+									errorMessage = "不允许上传文件";
 								}
 							}else{
-								errorMessage = "不允许上传文件";
+								errorMessage = "权限不足";
 							}
+							
+							
+							
 						}else{
-							errorMessage = "权限不足";
+							errorMessage = "缺少dir参数";
 						}
-						
-						
-						
 					}else{
-						errorMessage = "缺少dir参数";
-					}
+						errorMessage = "读取话题编辑器允许使用标签失败";
+					}	
 				}else{
-					errorMessage = "读取话题编辑器允许使用标签失败";
-				}	
+					errorMessage = "文件内容不能为空";
+				}
 			}else{
-				errorMessage = "文件内容不能为空";
+				errorMessage = "不允许发表问题";
 			}
-		}else{
-			errorMessage = "不允许发表问题";
 		}
+		
+		
+		
+		
 		
 
 		
@@ -1213,7 +1222,10 @@ public class QuestionFormAction {
 
 		
 		Map<String,String> error = new HashMap<String,String>();
-		
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.getCloseSite().equals(2)){
+			error.put("adoptionAnswer", ErrorView._21.name());//只读模式不允许提交数据
+		}
 			
 		
 		//判断令牌

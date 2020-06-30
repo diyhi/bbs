@@ -16,7 +16,6 @@ import org.queryString.util.UrlEncoded;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import cms.bean.template.Forum;
 import cms.bean.template.Layout;

@@ -373,6 +373,7 @@ K.options = {
 			'.font-weight', '.font-style', '.text-decoration', '.vertical-align', '.text-indent', '.margin-left'
 		],
 		pre : ['id', 'class'],
+		code : [],
 		hr : ['id', 'class', '.page-break-after'],
 		'br,tbody,tr,strong,b,sub,sup,em,i,u,strike,s,del' : ['id', 'class'],
 
@@ -2502,6 +2503,7 @@ _extend(KRange, {
 	html : function() {
 		return K(this.cloneContents()).outer();
 	},
+	
 	down : function() {
 		var self = this;
 		function downPos(node, pos, isStart) {
@@ -4233,6 +4235,7 @@ _extend(KEdit, KWidget, {
 	},
 	html : function(val, isFull) {
 		var self = this, doc = self.doc;
+		
 		if (self.designMode) {
 			var body = doc.body;
 			if (val === undefined) {
@@ -5170,8 +5173,8 @@ function _bindNewlineEvent() {
 	if (_OPERA && _V < 9) {
 		return;
 	}
-	var brSkipTagMap = _toMap('h1,h2,h3,h4,h5,h6,pre,hide,li'),
-		pSkipTagMap = _toMap('p,h1,h2,h3,h4,h5,h6,pre,hide,li,blockquote');
+	var brSkipTagMap = _toMap('h1,h2,h3,h4,h5,h6,pre,code,hide,li'),
+		pSkipTagMap = _toMap('p,h1,h2,h3,h4,h5,h6,pre,code,hide,li,blockquote');
 	function getAncestorTagName(range) {
 		var ancestor = K(range.commonAncestor());
 		while (ancestor) {
@@ -5190,7 +5193,7 @@ function _bindNewlineEvent() {
 			if (ancestor.type == 1 && !ancestor.isStyle()) {
 				break;
 			}
-			if(ancestor.name == 'pre' || ancestor.name =='hide'){
+			if(ancestor.name == 'pre' || ancestor.name == 'code' || ancestor.name =='hide'){
 				break;
 			}
 			ancestor = ancestor.parent();
@@ -5215,21 +5218,29 @@ function _bindNewlineEvent() {
 			self.insertHtml('<br />' + (_IE && _V < 9 ? '' : '\u200B'));
 			return;
 		}
-
+	
 		//处理回车跳不出标签
 		var rangeTag = getRangeTag(self.cmd.range);
-		if (rangeTag.name == 'pre' || rangeTag.name == 'hide'){
+		if (rangeTag.name == 'pre' || rangeTag.name == 'code' || rangeTag.name == 'hide'){
 			//selectNodeContents(node)将Node的子节点的开始位置和结束位置分别设置成Range的开始位置和结束位置。对于文本节点和无结束符的元素，相当于使用selectNode。
 			//collapse(toStart)折叠KRange，当toStart为true时向前折叠，false时向后折叠。
 			self.cmd.range.selectNodeContents(rangeTag).collapse(false);
 			self.cmd.select();
-
+			
+			
 			//self.cmd.range.selectNodeContents(self.cmd.doc.body).collapse(false);
 			//self.cmd.select();
 			
-			if(self.cmd.range.startOffset == 0 && self.cmd.range.endOffset ==0){//如果输入内容为空
+		//	if(self.cmd.range.startOffset == 0 && self.cmd.range.endOffset ==0){//如果输入内容为空
+			if(self.cmd.range.html() == ''){//如果输入内容为空
+				if(rangeTag.name == 'code'){//如果是code标签，则选中父节点
+					self.cmd.range.selectNodeContents(rangeTag.parent()).collapse(false);
+					self.cmd.select();
+					
+				}
+				
 				self.cmd.range.insertNode(doc.createTextNode('\u200B'));
-				self.cmd.select();
+				
 				setTimeout(function() {
 					self.cmd.selection();
 					
@@ -5237,6 +5248,11 @@ function _bindNewlineEvent() {
 					nullTag.remove(true);
 				}, 4);
 			}else{
+				if(rangeTag.name == 'code'){//如果是code标签，则选中父节点
+					self.cmd.range.selectNodeContents(rangeTag.parent()).collapse(false);
+					self.cmd.select();
+					
+				}
 				setTimeout(function() {
 					self.cmd.selection();
 					
@@ -5255,14 +5271,18 @@ function _bindNewlineEvent() {
 		//含有节点
 		var containsNode = "";
 		K(self.cmd.range.commonAncestor()).scan(function(node) {
-			if(K(node).name == "pre" || K(node).name == "hide"){
+			if(K(node).name == "pre" || K(node).name == "code" || K(node).name == "hide"){
 				containsNode = K(node).name;
 			}
 		});
-		
 		if (containsNode != ""){
 			if(self.cmd.range.startOffset == 0 && self.cmd.range.endOffset ==0){//如果输入内容为空
 		//	if(self.cmd.range.html() == ''){//如果输入内容为空
+				if(rangeTag.name == 'code'){//如果是code标签，则选中父节点
+					self.cmd.range.selectNodeContents(containsNode.parent()).collapse(false);
+					self.cmd.select();
+					
+				}
 				setTimeout(function() {
 					self.cmd.selection();
 					
@@ -5847,6 +5867,11 @@ KEditor.prototype = {
 		}
 		return self;
 	},
+	bodyHtml : function() {
+		var self = this, edit = self.edit,
+		body = edit.doc.body;
+		return body.innerHTML;
+	},
 	fullHtml : function() {
 		return this.isCreated ? this.edit.html(undefined, true) : '';
 	},
@@ -5900,7 +5925,6 @@ KEditor.prototype = {
 		return self;
 	},
 	insertHtml : function(val, quickMode) {
-		
 		if (!this.isCreated) {
 			return this;
 		}
@@ -6620,11 +6644,13 @@ _plugin('core', function(K) {
 				return $0;
 			});
 		}
-		return html.replace(/(<(?:noscript|noscript\s[^>]*)>)([\s\S]*?)(<\/noscript>)/ig, function($0, $1, $2, $3) {
+		return html.replace(/(<(?:noscript|noscript\s[^>]*)>)([\s\S]*?)(<\/noscript>)/ig, function($0, $1, $2, $3, $4) {
 			return $1 + _unescape($2).replace(/\s+/g, ' ') + $3;
 		})
 		
-		
+		.replace(/<article\s+[^>]*type="([^"]*)"[^>]*>([\s\S]*?)<\/article>/ig, function(full, attr, code) {//将self.beforeSetHtml方法加入的<article>标签删除
+			return code;
+		})
 		.replace(/<img[^>]*class="?ke-(flash|rm|media|video)"?[^>]*>/ig, function(full) {//视频
 			var imgAttrs = _getAttrList(full);
 			var styles = _getCssList(imgAttrs.style || '');
@@ -6657,6 +6683,7 @@ _plugin('core', function(K) {
 			attrs.height = _undef(imgAttrs.height, height);
 			return _embedVideo(attrs);
 		})
+		
 		.replace(/<img[^>]*class="?ke-anchor"?[^>]*>/ig, function(full) {
 			var imgAttrs = _getAttrList(full);
 			return '<a name="' + unescape(imgAttrs['data-ke-name']) + '"></a>';
@@ -6731,6 +6758,12 @@ _plugin('core', function(K) {
 				return full;
 			}
 			return _addClassToTag(full, 'ke-zeroborder');
+		})
+		.replace(/(<(?:hide|hide\s[^>]*)>)([\s\S]*?)(<\/hide>)/ig, function($0, $1, $2, $3) {
+			//因为<p>标签包裹<pre>等块元素时会被浏览器截断，<hide>标签内含的<pre>在“<p><hide>aaa<pre>bbb</pre>ccc</hide></p>”被浏览器执行node.innerHTML后变为“<p><hide>aaa</hide></p><pre>bbb</pre>ccc<p></p>”,发生错位。 
+			//我们将<hide>标签用块元素<article>包裹,让<hide>的父级<p>标签自动截断,保护<hide>标签内的<pre>标签不会由截断产生错位。正确结果为“<p></p><hide>aaa<pre>bbb</pre>ccc</hide><p></p>”
+			//本正则和方法self.beforeGetHtml配合使用
+			return '<article type="__kindeditor_temp_pre__">' +$1 + $2 + $3 + '</article>';
 		});
 	});
 });
@@ -7362,20 +7395,24 @@ KindEditor.plugin('code', function(K) {
 				'<option value="js">JavaScript</option>',
 				'<option value="html">HTML</option>',
 				'<option value="css">CSS</option>',
-				'<option value="php">PHP</option>',
-				'<option value="pl">Perl</option>',
-				'<option value="py">Python</option>',
-				'<option value="rb">Ruby</option>',
 				'<option value="java">Java</option>',
-				'<option value="vb">ASP/VB</option>',
+				'<option value="py">Python</option>',
+				'<option value="php">PHP</option>',
 				'<option value="cpp">C/C++</option>',
+				'<option value="bsh">Shell</option>',
+				'<option value="go">Go</option>',
+				'<option value="rb">Ruby</option>',
+				'<option value="pl">Perl</option>',
 				'<option value="cs">C#</option>',
 				'<option value="xml">XML</option>',
-				'<option value="bsh">Shell</option>',
-				'<option value="">Other</option>',
+				'<option value="">其它</option>',
 				'</select>',
 				'</div>',
 				'<textarea class="ke-textarea" style="width:408px;height:260px;"></textarea>',
+				//提示
+				'<div style="color: #747474;position: absolute;left: 21px;bottom: 18px;">',
+				'提示：Shift + 回车 换行不换段',
+				'</div>',
 				'</div>'].join(''),
 			dialog = self.createDialog({
 				name : name,
@@ -7385,25 +7422,42 @@ KindEditor.plugin('code', function(K) {
 				yesBtn : {
 					name : self.lang('yes'),
 					click : function(e) {
-
-						//截断样式
-						var _wrapper = K("<span></span>", self.cmd.doc);//插入指定的HTML内容到光标处。
-						_wrapper.html("&#8203;");//&#8203;是零宽空格字符
-						self.cmd.range.insertNode(_wrapper[0]).selectNodeContents(_wrapper[0]);
-						self.cmd.select();
-						self.cmd.removeformat();//删除格式。
 						
+						var ancestor = K(self.cmd.range.commonAncestor());
+						if(ancestor.name != "body" && ancestor.name != "hide" && ancestor.name != "pre" && ancestor.name != "code"){
+							//截断样式
+							var _wrapper = K("<span></span>", self.cmd.doc);//插入指定的HTML内容到光标处。
+							_wrapper.html("&#8203;");//&#8203;是零宽空格字符
+							self.cmd.range.insertNode(_wrapper[0]).selectNodeContents(_wrapper[0]);
+							self.cmd.select();
+							self.cmd.removeformat();//删除格式。
+						}
 						
 						var type = K('.ke-code-type', dialog.div).val(),
 							code = textarea.val(),
 							cls = type === '' ? '' :  ' lang-' + type,
-							html = '<pre class="prettyprint' + cls + '">\n' + K.escape(code) + '</pre> ';
+							html = '<pre class="prettyprint' + cls + '"><code>' + K.escape(code) + '</code></pre> ';
 						if (K.trim(code) === '') {
 							K.popupMessage(lang.pleaseInput);
 							textarea[0].focus();
 							return;
 						}
-						self.insertHtml(html).hideDialog().focus();
+					//	self.insertHtml(html).hideDialog().focus();
+						self.hideDialog();
+						
+						
+						var codeNode =  K(html, self.cmd.doc);//在光标处插入节点
+						self.cmd.range.insertNode(codeNode[0]).selectNodeContents(codeNode[0]).collapse(false);
+						self.cmd.select();
+						
+						/**
+						setTimeout(function() {
+							//选中焦点
+							var ancestor2 = K(self.cmd.range.commonAncestor());
+							self.cmd.range.selectNodeContents(ancestor2);
+							self.cmd.select();
+						}, 4);**/
+						
 					}
 				}
 			}),

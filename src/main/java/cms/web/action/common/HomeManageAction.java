@@ -797,7 +797,10 @@ public class HomeManageAction {
 		
 		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
 		Map<String,String> error = new HashMap<String,String>();//错误
-		
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.getCloseSite().equals(2)){
+			error.put("user", ErrorView._21.name());//只读模式不允许提交数据
+		}
 		
 		//获取登录用户
 	  	AccessUser accessUser = AccessUserThreadLocal.get();
@@ -1271,7 +1274,10 @@ public class HomeManageAction {
 				
 				
 		Map<String,String> error = new HashMap<String,String>();//错误
-
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.getCloseSite().equals(2)){
+			error.put("imgFile", ErrorView._21.name());//只读模式不允许提交数据
+		}
 		//获取登录用户
 	  	AccessUser accessUser = AccessUserThreadLocal.get();
 		
@@ -1599,7 +1605,10 @@ public class HomeManageAction {
 		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
 	
 	    Map<String,String> error = new HashMap<String,String>();
-	    
+	    SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.getCloseSite().equals(2)){
+			error.put("smsCode", ErrorView._21.name());//只读模式不允许提交数据
+		}
 	    //获取登录用户
 	  	AccessUser accessUser = AccessUserThreadLocal.get();
 	   
@@ -1773,7 +1782,10 @@ public class HomeManageAction {
 	    if(module == null || module <1 || module >3){
 	    	error.put("message", "模块错误");
 	    }
-	   
+	    SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.getCloseSite().equals(2)){
+			error.put("message", ErrorView._21.name());//只读模式不允许提交数据
+		}
 	    
 	    //验证验证码
   		if(captchaKey != null && !"".equals(captchaKey.trim())){
@@ -1923,7 +1935,10 @@ public class HomeManageAction {
 		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
 	    
 	    Map<String,String> error = new HashMap<String,String>();
-	    
+	    SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.getCloseSite().equals(2)){
+			error.put("smsCode", ErrorView._21.name());//只读模式不允许提交数据
+		}
 	    //获取登录用户
 	  	AccessUser accessUser = AccessUserThreadLocal.get();
 	   
@@ -2075,7 +2090,10 @@ public class HomeManageAction {
 		
 		
 	    Map<String,String> error = new HashMap<String,String>();
-	    
+	    SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.getCloseSite().equals(2)){
+			error.put("smsCode", ErrorView._21.name());//只读模式不允许提交数据
+		}
 	    //获取登录用户
 	  	AccessUser accessUser = AccessUserThreadLocal.get();
 	   
@@ -2611,7 +2629,10 @@ public class HomeManageAction {
 		
 		
 		Map<String,String> error = new HashMap<String,String>();
-		
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.getCloseSite().equals(2)){
+			error.put("privateMessage", ErrorView._21.name());//只读模式不允许提交数据
+		}
 			
 		
 		//判断令牌
@@ -2830,7 +2851,10 @@ public class HomeManageAction {
 		
 		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
 		Map<String,String> error = new HashMap<String,String>();//错误
-		
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.getCloseSite().equals(2)){
+			error.put("privateMessage", ErrorView._21.name());//只读模式不允许提交数据
+		}
 		
 		//判断令牌
 		if(token != null && !"".equals(token.trim())){	
@@ -3082,7 +3106,10 @@ public class HomeManageAction {
 		
 		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
 		Map<String,String> error = new HashMap<String,String>();//错误
-		
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.getCloseSite().equals(2)){
+			error.put("systemNotify", ErrorView._21.name());//只读模式不允许提交数据
+		}
 		
 		//判断令牌
 		if(token != null && !"".equals(token.trim())){	
@@ -3373,7 +3400,10 @@ public class HomeManageAction {
 		
 		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
 		Map<String,String> error = new HashMap<String,String>();//错误
-		
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.getCloseSite().equals(2)){
+			error.put("remind", ErrorView._21.name());//只读模式不允许提交数据
+		}
 		
 		//判断令牌
 		if(token != null && !"".equals(token.trim())){	
@@ -3654,7 +3684,10 @@ public class HomeManageAction {
 		
 		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
 		Map<String,String> error = new HashMap<String,String>();//错误
-		
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.getCloseSite().equals(2)){
+			error.put("favorite", ErrorView._21.name());//只读模式不允许提交数据
+		}
 		
 		//判断令牌
 		if(token != null && !"".equals(token.trim())){	
@@ -4085,7 +4118,7 @@ public class HomeManageAction {
 						}
 						Comment quoteComment = commentManage.query_cache_findByCommentId(userDynamic.getQuoteCommentId());
 						if(quoteComment != null && quoteComment.getStatus().equals(20)){
-							userDynamic.setQuoteCommentContent(textFilterManage.filterText(quoteComment.getContent()));
+							userDynamic.setQuoteCommentContent(textFilterManage.filterText(textFilterManage.specifyHtmlTagToText(quoteComment.getContent())));
 						}
 					}
 					if(userDynamic.getModule().equals(400)){//回复
@@ -4265,7 +4298,10 @@ public class HomeManageAction {
 		
 		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
 		Map<String,String> error = new HashMap<String,String>();//错误
-		
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.getCloseSite().equals(2)){
+			error.put("like", ErrorView._21.name());//只读模式不允许提交数据
+		}
 		
 		//判断令牌
 		if(token != null && !"".equals(token.trim())){	
@@ -4489,7 +4525,10 @@ public class HomeManageAction {
 		
 		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
 		Map<String,String> error = new HashMap<String,String>();//错误
-		
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.getCloseSite().equals(2)){
+			error.put("follow", ErrorView._21.name());//只读模式不允许提交数据
+		}
 		
 		//判断令牌
 		if(token != null && !"".equals(token.trim())){	

@@ -100,6 +100,7 @@ function auditReply(replyId){
 
 
 
+
 //显示修改话题页
 function showUpdateTopic(topicId){
 	var url ="${config:url(pageContext.request)}control/topic/manage${config:suffix()}?method=edit&topicId="+topicId+"&timestamp=" + new Date().getTime();
@@ -555,7 +556,18 @@ $(function() {
 </BODY>
 
 <script>
-	KindEditor.options.cssData = 'body { font-size: 14px; }';
+	// 指定编辑器iframe document的CSS数据，用于设置可视化区域的样式。 单冒号(:)用于CSS3伪类，双冒号(::)用于CSS3伪元素。伪元素由双冒号和伪元素名称组成。双冒号是在当前规范中引入的，用于区分伪类和伪元素。但是伪类兼容现存样式，浏览器需要同时支持旧的伪类，比如:first-line、:first-letter、:before、:after等
+    KindEditor.options.cssData = ""+
+		//突出编辑框的代码
+	".ke-content .prettyprint {"+
+		"min-height:20px;"+
+		"background:#f8f8f8;"+
+		"border:1px solid #ddd;"+
+		"padding:5px;"+
+	"}"+//默认字体大小
+	"body {"+
+		"font-size: 14px;"+
+	"}";
 	var availableTag = ['source', '|'];
 	var editor;
 	KindEditor.ready(function(K) {
@@ -630,8 +642,8 @@ $(function() {
 	    languageMapping_arr.push(languageClassName_py);
 	    var languageClassName_rb = languageClassName("lang-rb","language-ruby");
 	    languageMapping_arr.push(languageClassName_rb);
-	    var languageClassName_vb = languageClassName("lang-vb","language-VB.Net");
-	    languageMapping_arr.push(languageClassName_vb);  
+	    var languageClassName_go = languageClassName("lang-go","language-Go");
+	    languageMapping_arr.push(languageClassName_go);  
 	    var languageClassName_cpp = languageClassName("lang-cpp","language-C++");
 	    languageMapping_arr.push(languageClassName_cpp);  
 	    var languageClassName_cs = languageClassName("lang-cs","language-C#");
@@ -660,14 +672,14 @@ $(function() {
 	        for(var i=0; i<languageMapping_arr.length; i++){
 		    	var languageMapping = languageMapping_arr[i];
 		    	if(languageMapping.originalClass == lan_class){
-			    	var pre_content = '<code>'+$(this).html()+'</code>';
-			        $(this).html(pre_content);
+			    //	var pre_content = '<code>'+$(this).html()+'</code>';
+			        $(this).html($(this).html());
 			        $(this).attr("class",'line-numbers '+languageMapping.newClass);
 		    	}
 		    }
 		    if(lan_class == ""){
-		    	var pre_content = '<code>'+$(this).html()+'</code>';
-			    $(this).html(pre_content);
+		    //	var pre_content = '<code>'+$(this).html()+'</code>';
+			    $(this).html($(this).html());
 			    $(this).attr("class",'line-numbers language-markup');
 		    }
 	    });

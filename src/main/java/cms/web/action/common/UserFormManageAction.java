@@ -25,6 +25,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import cms.bean.ErrorView;
+import cms.bean.setting.AllowRegisterAccount;
 import cms.bean.setting.SystemSetting;
 import cms.bean.thirdParty.WeiXinOpenId;
 import cms.bean.user.AccessUser;
@@ -228,6 +229,10 @@ public class UserFormManageAction {
 		User user = new User();
 		
 		Map<String,String> error = new HashMap<String,String>();
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.getCloseSite().equals(2)){
+			error.put("register", ErrorView._21.name());//只读模式不允许提交数据
+		}
 		
 		//判断令牌
 		if(token != null && !"".equals(token.trim())){	
@@ -247,14 +252,11 @@ public class UserFormManageAction {
 		//用户自定义注册功能项参数
 		List<UserCustom> userCustomList = userCustomService.findAllUserCustom_cache();
 		
-		//验证码
-		SystemSetting systemSetting = settingService.findSystemSetting_cache();
-		//如果不允许注册
-		if(systemSetting.isAllowRegister() == false){
-			error.put("register", ErrorView._862.name());//不允许注册
-		}else{
-			
-			
+		
+		//读取允许注册账号类型
+		AllowRegisterAccount allowRegisterAccount =  settingManage.readAllowRegisterAccount();
+
+		if(allowRegisterAccount != null && allowRegisterAccount.isLocal()){
 			if(systemSetting.isRegisterCaptcha()){//如果注册需要验证码
 				isCaptcha = true;
 				//验证验证码
@@ -528,6 +530,8 @@ public class UserFormManageAction {
 			
 			user.setRegistrationDate(new Date());	
 			
+		}else{//如果不允许注册
+			error.put("register", ErrorView._862.name());//不允许注册
 		}
 
 		if(error.size() == 0){
@@ -1490,7 +1494,10 @@ public class UserFormManageAction {
 
 		
 		Map<String,String> error = new HashMap<String,String>();
-
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.getCloseSite().equals(2)){
+			error.put("user", ErrorView._21.name());//只读模式不允许提交数据
+		}
 		//判断令牌
 		if(token != null && !"".equals(token.trim())){	
 			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌

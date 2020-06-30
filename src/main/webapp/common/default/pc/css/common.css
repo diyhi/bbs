@@ -174,10 +174,10 @@ html,body{
 
 /*分页*/
 .pg {
-	float: right;line-height: 30px;font-size: 13px;
+	float: right;line-height: 34px;font-size: 14px;
 }
 .pg A {
-	border: #ebebeb 1px solid; border-radius: 2px; padding-bottom: 0px; background-color: #fff; padding-left: 10px; padding-right: 10px; display: inline; background-repeat: no-repeat; float: left; height: 30px; color: #333; margin-left: 4px; overflow: hidden; text-decoration: none; padding-top: 0px;
+	border: #ebebeb 1px solid; border-radius: 2px; padding-bottom: 0px; background-color: #fff; padding-left: 10px; padding-right: 10px; display: inline; background-repeat: no-repeat; float: left; height: 32px; color: #333; margin-left: 4px; overflow: hidden; text-decoration: none; padding-top: 0px;
 	
 }
 .pg A.prev {
@@ -193,25 +193,26 @@ html,body{
 }
 .pg LABEL {border-radius: 2px;
 	border: #ebebeb 1px solid; 
-	padding-bottom: 0px; background-color: #fff; padding-left: 10px; padding-right: 10px; display: inline; background-repeat: no-repeat; float: left; height: 30px; color: #333; margin-left: 4px; overflow: hidden; text-decoration: none; padding-top: 0px;
+	padding-top: 0px;padding-bottom: 0px; background-color: #fff; padding-left: 10px; padding-right: 10px; display: inline; background-repeat: no-repeat; float: left; height: 32px; color: #333; margin-left: 4px; overflow: hidden; text-decoration: none; 
 	
 }
 .pg LABEL .pg_input {
-	padding:0;width:25px;height:15px;line-height:15px;margin-bottom: 3px;*margin-bottom: 0px;border: #dfdfdf 1px solid;
+	padding:1px;width:25px;height:16px;line-height:16px;margin-bottom: 3px;*margin-bottom: 0px;border: #dfdfdf 1px solid;
+	position: relative;top: -2px;
 }
 .pg STRONG {
 	border: #ebebeb 1px solid; 
-	border-radius: 2px; padding-bottom: 0px; background-color: #fff; padding-left: 10px; padding-right: 10px; display: inline; background-repeat: no-repeat; float: left; height: 30px; color: #666; margin-left: 4px; overflow: hidden; 
+	border-radius: 2px; padding-bottom: 0px; background-color: #fff; padding-left: 10px; padding-right: 10px; display: inline; background-repeat: no-repeat; float: left; height: 32px; color: #666; margin-left: 4px; overflow: hidden; 
 	background-color: #f5f5f5;text-decoration: none; padding-top: 0px;
 }
 .pg span.count {
 	border: #ebebeb 1px solid; 
-	border-radius: 2px; padding-bottom: 0px; background-color: #fff; padding-left: 10px; padding-right: 10px; display: inline; background-repeat: no-repeat; float: left; height: 30px; color: #333; margin-left: 4px; overflow: hidden; 
+	border-radius: 2px; padding-bottom: 0px; background-color: #fff; padding-left: 10px; padding-right: 10px; display: inline; background-repeat: no-repeat; float: left; height: 32px; color: #333; margin-left: 4px; overflow: hidden; 
 	text-decoration: none; padding-top: 0px;
 }
 
 /*功能按钮  F7F7F7 */
-.functionButton{ display:inline-block; vertical-align:middle; padding:1px 0; margin:0 1px; background:#dddddd; *margin-top: -12px;}
+.functionButton{ display:inline-block; vertical-align:middle; padding:1px 0; margin:0 1px; background:#dddddd; *margin-top: -12px;outline: none;}
 .functionButton span,
 .functionButton input{ float:left; display:inline; margin:0 -1px; height:30px; line-height:30px; padding:0 18px; font-size:16px; border:0; overflow:visible; background:#dddddd; color:#5a5a5a; cursor:pointer; outline: none;}
 .functionButton:hover,
@@ -219,7 +220,7 @@ html,body{
 .functionButton:hover input{background:#f6f6f6;outline: none;}
 
 /*提交按钮*/
-.submitButton{ display:inline-block; vertical-align:middle; padding:1px 0; margin:0 1px; background:#30aff7;}
+.submitButton{ display:inline-block; vertical-align:middle; padding:1px 0; margin:0 1px; background:#30aff7;outline: none;}
 .submitButton span,
 .submitButton input{ float:left; display:inline; margin:0 -1px; height:32px; line-height:32px; padding:0 24px; font-size:18px; border:0; overflow:visible; background:#30aff7; color:#fff; cursor:pointer; }
 .submitButton:hover,
@@ -239,6 +240,7 @@ html,body{
 	border:1px solid #0191e4;
 	padding:1px;
 	display:inline-block;
+	outline: none;
 }
 
 .blue_btn{
@@ -259,7 +261,7 @@ html,body{
 }
 
 /* 表单 text */
-.formText{height:24px; line-height:24px; padding:2px 4px;border:1px solid;border-color:#e0e0e0 #e0e0e0 #e0e0e0 #e0e0e0;background:#fff;border-radius:3px;}
+.formText{height:24px; line-height:24px; padding:2px 4px;border:1px solid;border-color:#e0e0e0 #e0e0e0 #e0e0e0 #e0e0e0;background:#fff;border-radius:3px;outline: none;}
 .formText:disabled{  
     border: 1px solid #e6e6e6;  
     background-color: #fbfbfb;  
@@ -267,7 +269,7 @@ html,body{
     border-radius:2px;
 } 
 /* 表单 select */
-.formSelect{height:30px; line-height:30px; padding:2px 4px;border:1px solid;border-color:#e0e0e0 #e0e0e0 #e0e0e0 #e0e0e0;background:#fff;border-radius:3px;margin-right: 1px;}
+.formSelect{height:30px; line-height:30px; padding:2px 4px;border:1px solid;border-color:#e0e0e0 #e0e0e0 #e0e0e0 #e0e0e0;background:#fff;border-radius:3px;margin-right: 1px;outline: none;}
 
 /* 表单 radio */
 .formRadio {
@@ -1361,6 +1363,16 @@ html,body{
 	padding:0 5px;
 	font-size: 12px;
 }
+.commentModule .commentList .comment-author .master{
+	white-space:nowrap;
+	color:#fff;
+	background-color:#4cc8ff;
+	border-radius:4px;
+	padding:0px 5px;
+	font-size: 12px;
+	font-style: normal;
+	font-weight: normal;
+}
 .commentModule .commentList .commentInfo .commentTime{margin-top:3px; margin-bottom:5px;color:#999;font-size: 13px;}
 .commentModule .commentList .commentInfo .commentTime a{color:#999;}
 .commentModule .commentList .commentInfo .commentContent{padding:0px;word-wrap:break-word;color:#666;font-size: 15px;margin-top: 20px;line-height: 26px;}
@@ -1372,11 +1384,21 @@ html,body{
 .commentModule .commentList .quote{
 	padding:5px 8px;border-bottom:none;text-align: left;color: 666;margin-top: 20px;
 }
-.commentModule .commentList .quote div{
-	background:#fbfbfb;padding:6px 8px 8px 8px;border:1px solid #ebebeb;line-height:140%;margin-bottom:6px;line-height: 28px;border-radius: 3px;
+.commentModule .commentList .quote .quoteComment{
+	background:#fbfbfb;padding:5px 8px 8px 8px;border:1px solid #ebebeb;line-height:140%;margin-bottom:6px;line-height: 28px;border-radius: 3px;
 }
-.commentModule .commentList .quote div span{
-	color:#aaa;font-size:15px;height: 30px;
+.commentModule .commentList .quote .quoteComment .userName{
+	color:#aaa;font-size:15px;height: 30px;position: relative;margin-left: 26px;
+}
+.commentModule .commentList .quote .quoteComment .avatarBox{
+	position:absolute;display:inline-block;border-radius:100%;
+	left: -26px;top:-1px;
+	
+}
+.commentModule .commentList .quote .quoteComment .avatarBox img{
+	border-radius:100%;
+	width: 22px;
+	
 }
 .commentModule .commentList .replyList {
 	padding: 10px 0 0px;
@@ -1463,6 +1485,16 @@ html,body{
 	border-radius:4px;
 	padding:0 5px;
 	font-size: 12px;
+}
+.commentModule .commentList .replyList .box li .reply-top .userTag .master{
+	white-space:nowrap;
+	color:#fff;
+	background-color:#4cc8ff;
+	border-radius:4px;
+	padding:0px 5px;
+	font-size: 12px;
+	font-style: normal;
+	font-weight: normal;
 }
 .commentModule .commentList .replyList .box li .reply-top .time {
 	float: right;
@@ -3746,6 +3778,8 @@ html,body{
 .userDynamicModule .userDynamicList .userDynamic .topicContent iframe{
 	width:100%; height: 550px;padding:10px 0px; 
 }
+/* 自动换行 */
+.userDynamicModule .userDynamicList .userDynamic .topicContent pre{white-space:pre-wrap;}
 /* 隐藏标签 IE8以下浏览器不支持自定义标签，需要在页头<head>标签内执行document.createElement('player') */
 .userDynamicModule .userDynamicList .userDynamic .topicContent player{
 	width: 480px;
@@ -5133,10 +5167,10 @@ html,body{
 	font-size: 20px
 }
 .answerModule .answerList .adoption-post:hover i {
-	color: #32aa66;/** #999 **/
+	color: #6cbd45;/** #999 **/
 }
 .answerModule .answerList .adoption-post:hover span {
-	color: #32aa66;/** #999 **/
+	color: #6cbd45;/** #999 **/
 }
 .answerModule .answerList .adoption-post span{
 	font-size: 13px
@@ -5157,6 +5191,16 @@ html,body{
 	border-radius:4px;
 	padding:0 5px;
 	font-size: 12px;
+}
+.answerModule .answerList .master{
+	white-space:nowrap;
+	color:#fff;
+	background-color:#4cc8ff;
+	border-radius:4px;
+	padding:0px 5px;
+	font-size: 12px;
+	font-style: normal;
+	font-weight: normal;
 }
 .answerModule .answerList .answerTime{margin-top:3px; margin-bottom:5px;color:#999;font-size: 13px;}
 .answerModule .answerList .answerTime a{color:#999;}
@@ -5255,6 +5299,7 @@ html,body{
 .answerModule .answerList .replyList .box li .reply-top .userTag{
 	float: left;margin-left:4px; margin-top: 6px;
 }
+
 .answerModule .answerList .replyList .box li .reply-top .time {
 	float: right;
 	color:#aaa;
@@ -5431,6 +5476,173 @@ html,body{
 }
 .answerReply-disableFormModule .disableForm-wrap .respond {background: #f6f6f6;border-radius:4px;line-height: 40px;text-align:center;}
 .answerReply-disableFormModule .disableForm-wrap .respond p {font-size:15px;padding:8px;overflow:hidden;color: #aaaaaa}
+
+/* 修改答案回复  */
+.answerModule .answerlist .editAnswerReply-post{
+	margin-top: 5px;
+	margin-left: 36px;
+	margin-right:10px;
+}
+.editAnswerReply-formModule {
+	margin-top:30px;
+	margin-left: 10px;
+	margin-right:10px;
+	margin-bottom:10px;
+}
+.editAnswerReply-formModule .editReply-wrap{
+	position: relative;
+	padding:0px 9px 50px 1px;
+}
+.editAnswerReply-formModule .editReply-wrap .reply-textarea{
+	line-height: 24px;
+    border-radius: 2px;
+    border: 1px solid #e6e6e6;
+	vertical-align: top;
+	font-size: 14px;
+    resize: vertical;
+	padding: 3px 3px;
+    background: #ffffff;
+    outline: none;
+    color: rgba(0,0,0,0.8);
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: rgba(255,255,255,0);
+    -webkit-box-shadow: 0em 0em 0em 0em transparent inset;
+    box-shadow: 0em 0em 0em 0em transparent inset;
+    -webkit-transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    -webkit-transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, -webkit-box-shadow 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, -webkit-box-shadow 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, -webkit-box-shadow 0.2s ease;
+	height:150px;
+	width: 100%;
+	
+}
+.editAnswerReply-formModule .editReply-wrap .form-action {
+	 padding-left: 0px; padding-right: 0px; padding-top: 8px;margin-bottom: 12px;
+}
+.editAnswerReply-formModule .editReply-wrap .error {
+	color: red;
+}
+.editAnswerReply-formModule .editReply-wrap .replySubmit {
+	height: 38px;
+	float: left;
+	margin-right: 10px;
+	position: relative;
+	z-index: 2
+}
+
+.editAnswerReply-formModule .editReply-wrap .submitButton-box{
+	margin-right: 5px;
+}
+.editAnswerReply-formModule .editReply-wrap .submitButton-box .submitButton{
+	color: #fff;
+    border-color: #30aff7;
+    outline: none;
+    display: inline-block;
+    padding: 1px 16px;
+    font-size: 16px;
+    line-height: 32px;
+    text-align: center;
+    cursor: pointer;
+    background: #30aff7;
+    border: 1px solid;
+    border-radius: 3px;
+    margin: 0;
+	
+}
+.editAnswerReply-formModule .editReply-wrap .submitButton-box .submitButton:hover {  
+    background: #45b6f7;  
+} 
+.editAnswerReply-formModule .editReply-wrap .submitButton-box .submitButton:disabled{  
+    border: 1px solid #e6e6e6;  
+    background-color: #fbfbfb;  
+    color:#c9c9c9;
+    margin-top: -1px;
+    margin-bottom: -1px;
+    border-radius:2px;
+}
+.editAnswerReply-formModule .editReply-wrap .cancelButton-box{
+	position: relative;top: 1px;
+}
+.editAnswerReply-formModule .editReply-wrap .cancelButton-box .cancelButton{
+	color: #30aff7;
+    border-color: #30aff7;
+    outline: none;
+    display: inline-block;
+    padding: 0 16px;
+    font-size: 16px;
+    line-height: 32px;
+    text-align: center;
+    cursor: pointer;
+    background: none;
+    border: 1px solid;
+    border-radius: 3px;
+    margin: 0;
+	
+}
+.editAnswerReply-formModule .editReply-wrap .cancelButton-box .cancelButton:hover {  
+    background: #e2f2ff;  
+} 
+.editAnswerReply-formModule .editReply-wrap .captchaModule{
+	float: left;margin-top: 1px;
+}
+.editAnswerReply-formModule .editReply-wrap .captchaModule .captcha_div{
+	height: 38px;line-height:38px;
+}
+.editAnswerReply-formModule .editReply-wrap .captchaModule .captchaBox{
+	height:33px;
+	border:1px solid #e6e6e6;
+	width:85px;
+	float: left;;
+	border-radius:2px;
+}
+.editAnswerReply-formModule .editReply-wrap .captchaModule .captchaBox input{
+	position: relative;  
+	background-image:url(../images/null.gif);
+	background-color:transparent;
+	outline: none; 
+	float:left;
+	height:32px; 
+	width:85px;
+	line-height:30px;
+	border:0;
+	color:#333;
+	padding:0 5px;
+	font-size:18px; 
+}
+.editAnswerReply-formModule .editReply-wrap .captchaModule .promptTag {
+	float:left; 
+	font-size:14px; 
+	height:22px; 
+	line-height:22px; 
+	cursor:text; 
+	margin-top:6px;
+	margin-left:-74px; 
+	color:#B0B0B0;
+}
+.editAnswerReply-formModule .editReply-wrap .captchaModule .captcha_div .captchaImage{width:100px;height:32px;float: left;margin:0 15px 0 5px;}
+.editAnswerReply-formModule .editReply-wrap .captchaModule .captcha_div .captchaImage img{width:100px;height:34px;outline:none;}
+.editAnswerReply-formModule .editReply-wrap .captchaModule .tips{
+	padding-left:10px;height: 18px;line-height: 18px;
+}
+.editAnswerReply-formModule .editReply-wrap .captchaModule .tips span{
+	color: red;
+}
+.editAnswerReply-disableFormModule{
+	margin-top:30px;
+	margin-left: 10px;
+	margin-right:10px;
+	margin-bottom:10px;
+}
+.editAnswerReply-disableFormModule .disableForm-wrap{
+	background: #fff;
+	border-radius:3px;
+	padding:15px 0px 15px 0px;
+}
+.editAnswerReply-disableFormModule .disableForm-wrap .respond {border-radius:4px;line-height: 40px;text-align:center;}
+.editAnswerReply-disableFormModule .disableForm-wrap .respond p {font-size:15px;padding:8px;overflow:hidden;color: #aaaaaa}
+
+
 
 /** 相似问题 **/
 .likeQuestionModule{
@@ -5922,6 +6134,161 @@ html,body{
 .addAnswerModule .respond p {font-size:15px;padding:8px;overflow:hidden;color: #aaaaaa}
 .addAnswerModule .respond a{color: #26a2ff;}
 
+/* 修改答案  */
+.answerModule .answerList .editAnswer-post{
+	margin-top: 5px;
+	margin-left: 36px;
+	margin-right:10px;
+}
+.editAnswer-formModule {
+	margin-top:50px;
+	
+}
+.editAnswer-formModule .editAnswer-wrap{
+	position: relative;
+	padding:6px 20px 50px 20px;
+	background: #f9f9f9;
+}
+.editAnswer-formModule .editAnswer-wrap .head .icon{
+	position: absolute;font-size: 50px;top: -38px;left: -42px;color: #f9f9f9;
+}
+.editAnswer-formModule .editAnswer-wrap .editAnswer-textarea{
+	width:100%;visibility:hidden;height: 200px;
+}
+.editAnswer-formModule .editAnswer-wrap .promptInfo{
+	position: absolute;
+	right:15px;
+	bottom:32px;
+}
+.editAnswer-formModule .editAnswer-wrap .promptInfo h2{
+	font-size: 16px;
+	color: #ccc;
+}
+.editAnswer-formModule .editAnswer-wrap .form-action {
+	 padding-left: 0px; padding-right: 0px; padding-top: 8px;margin-bottom: 12px;
+}
+.editAnswer-formModule .editAnswer-wrap .error {
+	color: red;
+}
+.editAnswer-formModule .editAnswer-wrap .editAnswerSubmit {
+	height: 38px;
+	float: left;
+	margin-right: 10px;
+	position: relative;
+	z-index: 2
+}
+
+.editAnswer-formModule .editAnswer-wrap .submitButton-box{
+	margin-right: 5px;
+}
+.editAnswer-formModule .editAnswer-wrap .submitButton-box .submitButton{
+	color: #fff;
+    border-color: #30aff7;
+    outline: none;
+    display: inline-block;
+    padding: 1px 16px;
+    font-size: 16px;
+    line-height: 32px;
+    text-align: center;
+    cursor: pointer;
+    background: #30aff7;
+    border: 1px solid;
+    border-radius: 3px;
+    margin: 0;
+	
+}
+.editAnswer-formModule .editAnswer-wrap .submitButton-box .submitButton:hover {  
+    background: #45b6f7;  
+} 
+.editAnswer-formModule .editAnswer-wrap .submitButton-box .submitButton:disabled{  
+    border: 1px solid #e6e6e6;  
+    background-color: #fbfbfb;  
+    color:#c9c9c9;
+    margin-top: -1px;
+    margin-bottom: -1px;
+    border-radius:2px;
+}
+.editAnswer-formModule .editAnswer-wrap .cancelButton-box{
+	position: relative;top: 1px;
+}
+.editAnswer-formModule .editAnswer-wrap .cancelButton-box .cancelButton{
+	color: #30aff7;
+    border-color: #30aff7;
+    outline: none;
+    display: inline-block;
+    padding: 0 16px;
+    font-size: 16px;
+    line-height: 32px;
+    text-align: center;
+    cursor: pointer;
+    background: none;
+    border: 1px solid;
+    border-radius: 3px;
+    margin: 0;
+	
+}
+.editAnswer-formModule .editAnswer-wrap .cancelButton-box .cancelButton:hover {  
+    background: #e2f2ff;  
+} 
+.editAnswer-formModule .editAnswer-wrap .captchaModule{
+	float: left;margin-top: 1px;
+}
+.editAnswer-formModule .editAnswer-wrap .captchaModule .captcha_div{
+	height: 38px;line-height:38px;
+}
+.editAnswer-formModule .editAnswer-wrap .captchaModule .captchaBox{
+	height:33px;
+	border:1px solid #e6e6e6;
+	width:85px;
+	float: left;;
+	border-radius:2px;
+}
+.editAnswer-formModule .editAnswer-wrap .captchaModule .captchaBox input{
+	position: relative;  
+	background-image:url(../images/null.gif);
+	background-color:transparent;
+	outline: none; 
+	float:left;
+	height:32px; 
+	width:85px;
+	line-height:30px;
+	border:0;
+	color:#333;
+	padding:0 5px;
+	font-size:18px; 
+}
+.editAnswer-formModule .editAnswer-wrap .captchaModule .promptTag {
+	float:left; 
+	font-size:14px; 
+	height:22px; 
+	line-height:22px; 
+	cursor:text; 
+	margin-top:6px;
+	margin-left:-74px; 
+	color:#B0B0B0;
+}
+.editAnswer-formModule .editAnswer-wrap .captchaModule .captcha_div .captchaImage{width:100px;height:32px;float: left;margin:0 15px 0 5px;}
+.editAnswer-formModule .editAnswer-wrap .captchaModule .captcha_div .captchaImage img{width:100px;height:34px;outline:none;}
+.editAnswer-formModule .editAnswer-wrap .captchaModule .tips{
+	padding-left:10px;height: 18px;line-height: 18px;
+}
+.editAnswer-formModule .editAnswer-wrap .captchaModule .tips span{
+	color: red;
+}
+
+
+.editAnswer-disableFormModule{
+	margin-top:10px;
+}
+.editAnswer-disableFormModule .disableForm-wrap{
+	background: #fff;
+	padding:15px 0px 15px 0px;
+}
+.editAnswer-disableFormModule .disableForm-wrap .respond {background: #f6f6f6;border-radius:4px;line-height: 40px;text-align:center;}
+.editAnswer-disableFormModule .disableForm-wrap .respond p {font-size:15px;padding:8px;overflow:hidden;color: #aaaaaa}
+
+
+
 /* 关注 */
 .followModule{
 	position: relative;
@@ -6016,7 +6383,6 @@ html,body{
 	min-width: 0;
 	*height: 2px;
 }
-
 
 
 

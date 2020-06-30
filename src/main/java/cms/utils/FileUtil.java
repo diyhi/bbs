@@ -374,12 +374,12 @@ public class FileUtil {
 		return systemPath;
 	}
 	/**  
-     * 重命名文件或文件夹  
+     * 重命名文件或文件夹（本方法在windows系统下有可能不成功）
      *  
      * @param resFilePath 源文件路径  
      * @param newFileName 重命名  
      * @return 操作成功标识  
-     */   
+     */  
     public static boolean renameFile(String resFilePath, String newFileName) {
     	File resFile = new File(PathUtil.path()+File.separator+resFilePath);
         //源文件父路径
@@ -387,7 +387,32 @@ public class FileUtil {
         File newFile = new File(resParentPath+File.separator+newFileName);   
         return resFile.renameTo(newFile);   
     } 
-    
+    /**  
+     * 重命名文件夹  
+     *  
+     * @param resFilePath 源文件路径  
+     * @param newFileName 重命名  
+     * @return 操作成功标识  
+     */   
+    public static boolean renameDirectory(String resFilePath, String newFileName) {
+    	File resFile = new File(PathUtil.path()+File.separator+resFilePath);
+        //源文件父路径
+        String resParentPath = resFile.getParent();   
+        File newFile = new File(resParentPath+File.separator+newFileName);   
+       
+        //移动文件夹,并重新命名
+        try {
+			FileUtils.moveDirectory(resFile,newFile);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+			if (logger.isErrorEnabled()) {
+	            logger.error("移动文件错误。源路径："+resFile.getAbsoluteFile()+" 目标路径："+newFile.getAbsolutePath(),e);
+	        }
+			return false;
+		} 
+        return true;
+    }
     /**  
      * 复制目录
      *  

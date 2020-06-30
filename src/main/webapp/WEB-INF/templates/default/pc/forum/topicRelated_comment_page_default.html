@@ -30,6 +30,10 @@
 							<#if comment.isStaff>
 								<span class="staff">官方人员</span>
 							</#if>
+							<#if comment.userName == topic.userName && comment.isStaff == topic.isStaff>
+								<span class="master">作者</span>
+							</#if>
+							
 						</cite> 
 					</div>
 					<div class="commentTime">${comment.postTime}</div>
@@ -37,7 +41,8 @@
 					<div class="quote">
 						<#assign quoteContent = ""> 
 						<#list comment.quoteList as quote>
-							<#assign quoteContent = "<div>"+quoteContent+"<span>"+"<a href='user/control/home?userName="+quote.userName+"'>"+(quote.nickname != null && quote.nickname??) ?string(quote.nickname , quote.userName)+"</a>"+"&nbsp;的评论：</span><br/>"+quote.content+"</div>"> 
+							<#assign avatarHtml = "<a class='avatarBox' href='user/control/home?userName="+quote.userName+"'>"+(quote.avatarName != null && quote.avatarName??) ?string("<img src='"+quote.avatarPath+"100x100/"+quote.avatarName+"'>" , "<img avatar='"+(quote.nickname != null && quote.nickname??) ?string(quote.nickname , quote.userName)+"'>")+"</a>"> 
+							<#assign quoteContent = "<div class='quoteComment'>"+quoteContent+"<span class='userName'>"+avatarHtml+"<a href='user/control/home?userName="+quote.userName+"'>"+(quote.nickname != null && quote.nickname??) ?string(quote.nickname , quote.userName)+"</a>"+"&nbsp;的评论：</span><br/>"+quote.content+"</div>"> 
 						</#list>
 						<#noescape>${quoteContent}</#noescape>
 					</div>
@@ -62,11 +67,6 @@
 									    	<a class="userName" href="user/control/home?userName=${reply.userName}">
 												${(reply.nickname != null && reply.nickname??) ?string(reply.nickname , reply.userName)}
 											</a>
-											<#if reply.isStaff>
-												<div class="userTag">
-										        	<span class="staff">官方人员</span>
-									        	</div>
-											</#if>
 											
 											<#if reply.userRoleNameList?size gt 0>
 												<div class="userTag">
@@ -75,7 +75,16 @@
 													</#list>
 												</div>
 											</#if> 
-											
+											<#if reply.isStaff>
+												<div class="userTag">
+										        	<span class="staff">官方人员</span>
+									        	</div>
+											</#if>
+											<#if reply.userName == topic.userName && reply.isStaff == topic.isStaff>
+												<div class="userTag">
+													<span class="master">作者</span>
+												</div>
+											</#if>
 											<span class="time">
 												<#if systemUser != null && reply.userName ==  systemUser.userName>
 													<a href="javascript:" onclick="editReplyLayer('${reply.id}','${(reply.nickname != null && reply.nickname??) ?string(reply.nickname , reply.userName)}');">编辑</a>&nbsp;

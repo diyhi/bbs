@@ -1,16 +1,25 @@
 package cms.web.action.upgrade;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.annotation.Resource;
 
 import cms.bean.upgrade.UpgradeLog;
 import cms.bean.upgrade.UpgradeSystem;
 import cms.service.upgrade.UpgradeService;
+import cms.utils.FileUtil;
 import cms.utils.JsonUtils;
+import cms.utils.SHA;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.cache.annotation.CacheEvict;
@@ -96,7 +105,53 @@ public class UpgradeManage {
 		}
 	}
 	
-	
+	/**
+	 * 获取所有文件夹的签名
+	 * @param directoryPath 目录路径
+	 * @return
+	 */
+	public String getFileSignature(String directoryPath){
+		StringBuffer signature = new StringBuffer("");
+		
+		String[] extensions = null;//后缀名{"doc", "pdf"}
+		boolean recursive = true;//是否递归
+		//文件路径
+		Set<String> absolutePathList = new TreeSet<String>();
+		
+		
+		//排除路径
+        String excludeDirectoryPath  = new File(directoryPath+"signature.pem").getAbsolutePath();
+        
+		
+		
+		Collection<File> files = FileUtils.listFiles(new File(directoryPath), extensions, recursive);
+		// 迭代输出
+		for (Iterator<File> iterator = files.iterator(); iterator.hasNext();) {
+		    File file = iterator.next();
+		    if (file.exists() && file.isFile()) {
+		    	if(file.getAbsolutePath() != null && !"".equals(file.getAbsolutePath().trim())){
+		    		//排除signature.pem文件
+		    		if(!StringUtils.startsWithIgnoreCase(file.getAbsolutePath(), excludeDirectoryPath)){//判断开始部分是否与二参数相同。不区分大小写
+		    			absolutePathList.add(file.getAbsolutePath());
+		    		}
+		    		
+		    	}
+		    }
+		}
+		if(absolutePathList != null && absolutePathList.size() >0){
+			for(String absolutePath :absolutePathList){
+				
+				signature.append(SHA.sha256Hex(new File(FileUtil.normalize(absolutePath))));
+			}
+		}
+		if(signature.toString() != null && !"".equals(signature.toString())){
+			//文件SHA-256信息摘要
+			return SHA.sha256Hex(signature.toString());
+			
+		}
+		
+		return null;
+	}
 	
 	/**
 	 * 查询/添加任务运行标记

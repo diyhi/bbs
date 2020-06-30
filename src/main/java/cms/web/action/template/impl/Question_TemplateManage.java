@@ -789,7 +789,66 @@ public class Question_TemplateManage {
 		return value;
 	}
 	
-	
+	/**
+	 * 答案  -- 修改
+	 * @param forum
+	 */
+	public Map<String,Object> editAnswer_collection(Forum forum,Map<String,Object> parameter,Map<String,Object> runtimeParameter){
+		Map<String,Object> value = new HashMap<String,Object>();
+		
+		Long answerId = null;
+		AccessUser accessUser = null;
+		//获取运行时参数
+		if(runtimeParameter != null && runtimeParameter.size() >0){		
+			for(Map.Entry<String,Object> paramIter : runtimeParameter.entrySet()) {
+				if("accessUser".equals(paramIter.getKey())){
+					accessUser = (AccessUser)paramIter.getValue();
+				}
+			}
+		}
+		if(accessUser != null){
+			boolean captchaKey = captchaManage.answer_isCaptcha(accessUser.getUserName());//验证码标记
+			if(captchaKey ==true){
+				value.put("captchaKey",UUIDUtil.getUUID32());//是否有验证码
+			}
+		}
+		
+		//获取参数
+		if(parameter != null && parameter.size() >0){		
+			for(Map.Entry<String,Object> paramIter : parameter.entrySet()) {
+				if("answerId".equals(paramIter.getKey())){
+					if(Verification.isNumeric(paramIter.getValue().toString())){
+						if(paramIter.getValue().toString().length() <=18){
+							answerId = Long.parseLong(paramIter.getValue().toString());	
+						}
+					}
+				}
+			}
+		}
+		
+		if(accessUser != null && answerId != null && answerId >0L){
+			Answer answer = answerManage.query_cache_findByAnswerId(answerId);//查询缓存
+			if(answer != null && answer.getStatus() <100 && answer.getUserName().equals(accessUser.getUserName())){
+				answer.setIpAddress(null);//IP地址不显示
+
+				value.put("answer",answer);
+				
+				
+			}
+		}
+		
+
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		
+		//如果全局不允许提交答案
+		if(systemSetting.isAllowAnswer() == false){
+			value.put("allowAnswer",false);//不允许提交答案
+		}else{
+			value.put("allowAnswer",true);//允许提交答案
+		}
+		value.put("availableTag", answerManage.availableTag());//答案编辑器允许使用标签
+		return value;
+	}
 	
 	/**
 	 * 答案  -- 回复添加
@@ -823,7 +882,67 @@ public class Question_TemplateManage {
 		}
 		return value;
 	}
+	/**
+	 * 答案  -- 回复修改
+	 * @param forum
+	 */
+	public Map<String,Object> editAnswerReply_collection(Forum forum,Map<String,Object> parameter,Map<String,Object> runtimeParameter){
+		Map<String,Object> value = new HashMap<String,Object>();
+		
+		Long replyId = null;
+		AccessUser accessUser = null;
+		//获取运行时参数
+		if(runtimeParameter != null && runtimeParameter.size() >0){		
+			for(Map.Entry<String,Object> paramIter : runtimeParameter.entrySet()) {
+				if("accessUser".equals(paramIter.getKey())){
+					accessUser = (AccessUser)paramIter.getValue();
+				}
+			}
+		}
+		
+		if(accessUser != null){
+			boolean captchaKey = captchaManage.answer_isCaptcha(accessUser.getUserName());//验证码标记
+			if(captchaKey ==true){
+				value.put("captchaKey",UUIDUtil.getUUID32());//验证码key
+			}
+		}
+		
+		
+		//获取参数
+		if(parameter != null && parameter.size() >0){		
+			for(Map.Entry<String,Object> paramIter : parameter.entrySet()) {
+				if("replyId".equals(paramIter.getKey())){
+					if(Verification.isNumeric(paramIter.getValue().toString())){
+						if(paramIter.getValue().toString().length() <=18){
+							replyId = Long.parseLong(paramIter.getValue().toString());	
+						}
+					}
+				}
+			}
+		}
+		
+		if(accessUser != null && replyId != null && replyId >0L){
+			AnswerReply answerReply = answerManage.query_cache_findReplyByReplyId(replyId);//查询缓存
+			if(answerReply != null && answerReply.getStatus() <100 && answerReply.getUserName().equals(accessUser.getUserName())){
+				answerReply.setIpAddress(null);//IP地址不显示
 	
+				value.put("reply",answerReply);
+				
+				
+			}
+		}
+				
+		
+		
+		//如果全局不允许提交答案
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.isAllowAnswer()){
+			value.put("allowReply",true);//允许提交回复
+		}else{
+			value.put("allowReply",false);//不允许提交回复
+		}
+		return value;
+	}
 	
 	/**
 	 * 采纳答案

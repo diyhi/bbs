@@ -21,12 +21,14 @@ import cms.bean.ErrorView;
 import cms.bean.like.Like;
 import cms.bean.like.TopicLike;
 import cms.bean.message.Remind;
+import cms.bean.setting.SystemSetting;
 import cms.bean.topic.Topic;
 import cms.bean.user.AccessUser;
 import cms.bean.user.ResourceEnum;
 import cms.bean.user.User;
 import cms.service.like.LikeService;
 import cms.service.message.RemindService;
+import cms.service.setting.SettingService;
 import cms.service.template.TemplateService;
 import cms.utils.Base64;
 import cms.utils.JsonUtils;
@@ -60,6 +62,9 @@ public class LikeFormAction {
 	
 	@Resource CSRFTokenManage csrfTokenManage;
 	@Resource TopicManage topicManage;
+	@Resource SettingService settingService;
+	
+	
 	/**
 	 * 点赞   添加
 	 * @param model
@@ -79,7 +84,10 @@ public class LikeFormAction {
 		
 		
 		Map<String,String> error = new HashMap<String,String>();
-		
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.getCloseSite().equals(2)){
+			error.put("topicLike", ErrorView._21.name());//只读模式不允许提交数据
+		}
 			
 		
 		//判断令牌

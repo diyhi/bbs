@@ -41,6 +41,9 @@
 							<#if answer.isStaff>
 								<span class="staff">官方人员</span>
 							</#if>
+							<#if answer.userName == question.userName && answer.isStaff == question.isStaff>
+								<span class="master">作者</span>
+							</#if>
 						</cite> 
 					</div>
 					<div class="answerTime">${answer.postTime}</div>
@@ -73,22 +76,29 @@
 									    	<a class="userName" href="user/control/home?userName=${reply.userName}">
 												${(reply.nickname != null && reply.nickname??) ?string(reply.nickname , reply.userName)}
 											</a>
-											<#if reply.isStaff>
-												<div class="userTag">
-										        	<span class="staff">官方人员</span>
-									        	</div>
-											</#if>
-											<#if reply.userRoleNameList?size gt 0>
-												<div class="userTag">
+											<div class="userTag">
+												<#if reply.userRoleNameList?size gt 0>
 													<#list reply.userRoleNameList as roleName>
 														<span class="userRoleName">${roleName}</span>
 													</#list>
-												</div>
-											</#if>
-											<span class="time">${reply.postTime}</span>
+												</#if>
+												<#if reply.isStaff>
+											        <span class="staff">官方人员</span>
+												</#if>
+												<#if reply.userName == question.userName && reply.isStaff == question.isStaff>
+													<span class="master">作者</span>
+												</#if>
+											</div>
+											<span class="time">
+												<#if systemUser != null && reply.userName ==  systemUser.userName>
+													<a href="javascript:" onclick="editReplyLayer('${reply.id}','${(reply.nickname != null && reply.nickname??) ?string(reply.nickname , reply.userName)}');">编辑</a>&nbsp;
+												</#if>
+												${reply.postTime}
+											</span>
 										</div>
 										<div style="clear:both; height: 0; line-height: 0; font-size: 0;"></div>
 										<div class="replyContent">${reply.content}</div>
+										<div id="editAnswerReply-post_${reply.id}" ></div>
 									</li>
 								</#list>
 							</ul>
@@ -97,10 +107,15 @@
 					<div id="answerReply-post_${answer.id}" class="answerReply-post">
 					
 					</div>
+					<div id="editAnswer-post_${answer.id}" class="editAnswer-post">
 					
+					</div>
 					
 					<div class="tipBottom">
 						<span class="a-toolbar">
+							<#if systemUser != null && answer.userName ==  systemUser.userName>
+								<a href="javascript:" onclick="editAnswerLayer('${answer.id}','${(answer.nickname != null && answer.nickname??) ?string(answer.nickname , answer.userName)}');">编辑</a>&nbsp;|
+							</#if>
 							<a href="javascript:" onclick="replyLayer('${answer.id}','${(answer.nickname != null && answer.nickname??) ?string(answer.nickname , answer.userName)}');">回复</a>
 							<!-- 是否登录 -->
 							<input type="hidden" id="isLogin" value="<#if systemUser != null>true<#else>false</#if>">
@@ -175,5 +190,87 @@ function replyLayer(answerId,userName){
 function cancelReply(answerId){
 	$("#answerReply-post_"+answerId).html("");
 }
+
+
+
+//修改答案弹出层
+function editAnswerLayer(answerId,userName){
+	//判断是否已登录
+	var isLogin = document.getElementById("isLogin").value;
+	if(isLogin == "false"){
+		layer.open({
+		    type: 1, 
+		    title:"提示",
+		    content: "<div style='line-height: 36px; font-size: 15px;text-align:center; margin-left: 8px;margin-right: 8px;'>请先登录</div>", 
+		    area: ['260px', '120px'],//宽高
+			success: function(layero, index){
+				 
+			}
+		});
+		return false;
+	}
+	
+	var parameter = "";//URI参数
+	parameter += "answerId="+answerId;
+	
+	
+	//修改答案页面
+	get_request(function(value){
+		if(value != ""){
+			$("#editAnswer-post_"+answerId).html(value);
+		}
+	},
+	getBasePath()+"user/editAnswer.htm?"+parameter+"&timestamp=" + new Date().getTime(), true);
+
+
+
+}
+function cancelEditAnswer(answerId){
+	$("#editAnswer-post_"+answerId).html("");
+}
+
+
+
+//修改回复展开层
+function editReplyLayer(replyId,userName){
+	//判断是否已登录
+	var isLogin = document.getElementById("isLogin").value;
+	if(isLogin == "false"){
+		layer.open({
+		    type: 1, 
+		    title:"提示",
+		    content: "<div style='line-height: 36px; font-size: 15px;text-align:center; margin-left: 8px;margin-right: 8px;'>请先登录</div>", 
+		    area: ['260px', '120px'],//宽高
+			success: function(layero, index){
+				 
+			}
+		});
+		return false;
+	}
+	
+	$("#editAnswerReply-replyContent_"+replyId).hide();
+	$("#editAnswerReply-post_"+replyId).show();
+	
+	var parameter = "";//URI参数
+	parameter += "replyId="+replyId;
+	
+	
+	
+	//回复页面
+	get_request(function(value){
+		if(value != ""){
+			$("#editAnswerReply-post_"+replyId).html(value);
+		}
+	},
+	getBasePath()+"user/editAnswerReply?"+parameter+"&timestamp=" + new Date().getTime(), true);
+	
+}
+function cancelEditReply(replyId){
+	$("#editAnswerReply-replyContent_"+replyId).show();
+	$("#editAnswerReply-editContent_"+replyId).hide();
+	$("#editAnswerReply-post_"+replyId).html("");
+}
+
+
 </script> 
 

@@ -62,6 +62,7 @@ function addTag(id,name){
 function sureSubmit(objForm){
 	//按钮设置 disabled="disabled"
 	document.getElementById("submitForm").disabled=true;
+	//alert(document.getElementById("content").value);
 
 	objForm.submit();
 } 
@@ -106,7 +107,7 @@ hide {
 <TABLE class="t-table" cellSpacing="1" cellPadding="2" width="100%" border="0">
   <TBODY>
   <TR>
-  	<TD class="t-label t-label-h" width="12%">标题：</TD>
+  	<TD class="t-label t-label-h" width="12%">标题：<div id="www"></div></TD>
     <TD class="t-content" width="88%">
     	<input type="text" class="form-text" name="title" size="50" value="${topic.title}">
 		<SPAN class="span-text">${error["title"]}</SPAN>
@@ -225,6 +226,7 @@ function initKindEditor(){
 		"line-height: 30px;"+
 	"}"+//突出编辑框的代码
 	".ke-content .prettyprint {"+
+		"min-height:20px;"+
 		"background:#f8f8f8;"+
 		"border:1px solid #ddd;"+
 		"padding:5px;"+

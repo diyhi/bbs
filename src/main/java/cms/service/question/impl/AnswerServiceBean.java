@@ -2,6 +2,7 @@ package cms.service.question.impl;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -185,7 +186,24 @@ public class AnswerServiceBean extends DaoSupport<Answer> implements AnswerServi
 		.setParameter(4, answerId);
 		return query.executeUpdate();
 	}
-	
+	/**
+	 * 修改答案
+	 * @param answerId 答案Id
+	 * @param content 内容
+	 * @param status 状态
+	 * @param lastUpdateTime 最后修改时间
+	 * @param userName 用户名称
+	 * @return
+	 */
+	public Integer updateAnswer(Long answerId,String content,Integer status,Date lastUpdateTime,String userName){
+		Query query = em.createQuery("update Answer o set o.content=?1,o.userName=?2,o.status=?3,o.lastUpdateTime=?4 where o.id=?5")
+		.setParameter(1, content)
+		.setParameter(2, userName)
+		.setParameter(3, status)
+		.setParameter(4, lastUpdateTime)
+		.setParameter(5, answerId);
+		return query.executeUpdate();
+	}
 	/**
 	 * 修改答案状态
 	 * @param answerId 答案Id
@@ -510,6 +528,25 @@ public class AnswerServiceBean extends DaoSupport<Answer> implements AnswerServi
 		.setParameter(2, userName)
 		.setParameter(3, status)
 		.setParameter(4, answerReplyId);
+		int i = query.executeUpdate();
+		return i;
+	} 
+	/**
+	 * 修改回复
+	 * @param replyId 回复Id
+	 * @param content 回复内容
+	 * @param userName 用户名称
+	 * @param status 状态
+	 * @param lastUpdateTime 最后修改时间
+	 * @return
+	*/
+	public Integer updateReply(Long replyId,String content,String userName,Integer status,Date lastUpdateTime){
+		Query query = em.createQuery("update AnswerReply o set o.content=?1,o.userName=?2,o.status=?3,o.status=?4 where o.id=?5")
+		.setParameter(1, content)
+		.setParameter(2, userName)
+		.setParameter(3, status)
+		.setParameter(4, status)
+		.setParameter(5, replyId);
 		int i = query.executeUpdate();
 		return i;
 	} 

@@ -283,6 +283,7 @@ function initKindEditor(){
 		"line-height: 30px;"+
 	"}"+//突出编辑框的代码
 	".ke-content .prettyprint {"+
+		"min-height:20px;"+
 		"background:#f8f8f8;"+
 		"border:1px solid #ddd;"+
 		"padding:5px;"+

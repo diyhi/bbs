@@ -2,6 +2,7 @@ package cms.service.question;
 
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 import cms.bean.platformShare.QuestionRewardPlatformShare;
@@ -72,6 +73,16 @@ public interface AnswerService  extends DAO<Answer>{
 	 * @return
 	 */
 	public Integer updateAnswer(Long answerId,String content,Integer status,String userName);
+	/**
+	 * 修改答案
+	 * @param answerId 答案Id
+	 * @param content 内容
+	 * @param status 状态
+	 * @param lastUpdateTime 最后修改时间
+	 * @param userName 用户名称
+	 * @return
+	 */
+	public Integer updateAnswer(Long answerId,String content,Integer status,Date lastUpdateTime,String userName);
 	/**
 	 * 采纳答案
 	 * @param questionId 问题Id
@@ -170,6 +181,16 @@ public interface AnswerService  extends DAO<Answer>{
 	 * @return
 	*/
 	public Integer updateReply(Long answerReplyId,String content,String userName,Integer status);
+	/**
+	 * 修改回复
+	 * @param replyId 回复Id
+	 * @param content 回复内容
+	 * @param userName 用户名称
+	 * @param status 状态
+	 * @param lastUpdateTime 最后修改时间
+	 * @return
+	*/
+	public Integer updateReply(Long replyId,String content,String userName,Integer status,Date lastUpdateTime);
 	/**
 	 * 修改回复状态
 	 * @param answerReplyId 回复Id

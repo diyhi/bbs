@@ -214,7 +214,16 @@
 							}
 							//获取URL中的话题Id
 							var topicId = getUrlParam("topicId");
-							KindEditor.options.cssData = 'body { font-size: 14px; }';
+							KindEditor.options.cssData = ""+
+							".ke-content .prettyprint {"+
+								"background:#f8f8f8;"+
+								"border:1px solid #ddd;"+
+								"padding:5px;"+
+								"white-space:pre-wrap;"+
+							"}"+//默认字体大小
+							"body {"+
+								"font-size: 14px;"+
+							"}";
 							var editor = KindEditor.create('textarea[id="${identificationNumber}_editCommentContent"]', {
 								themeType : 'style :minimalist customization',//极简主题 加冒号的是主题样式文件名称同时也是主题目录
 								basePath : '${commonPath}js/kindeditor/',//指定编辑器的根目录路径

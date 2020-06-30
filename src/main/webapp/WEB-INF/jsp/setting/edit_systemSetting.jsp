@@ -139,7 +139,7 @@ function setCloseSitePrompt(obj){
 	if(obj.value == '1'){
 		document.getElementById("td_closeSitePrompt").style.display = "none";
 	}else if(obj.value == '2'){
-		document.getElementById("td_closeSitePrompt").style.display = "";
+		document.getElementById("td_closeSitePrompt").style.display = "none";
 	}else if(obj.value == '3'){
 		document.getElementById("td_closeSitePrompt").style.display = "";
 	}
@@ -214,12 +214,15 @@ function setAllowFilterWord(obj){
 			    		<form:radiobutton path="closeSite" value="1" onclick="setCloseSitePrompt(this);"/>打开
 			    	</label>
 			    	<label>
+			    		<form:radiobutton path="closeSite" value="2" onclick="setCloseSitePrompt(this);"/>只读模式
+			    	</label>
+			    	<label>
 			    		<form:radiobutton path="closeSite" value="3" onclick="setCloseSitePrompt(this);"/>全站关闭
 			    	</label>
 			    	<web:errors path="closeSite" cssStyle="color: red;"/>
 			    </TD>
 			</TR>
-			<TR id="td_closeSitePrompt" <c:if test="${systemSetting.closeSite == 1}"> style='display: none;'</c:if>>
+			<TR id="td_closeSitePrompt" <c:if test="${systemSetting.closeSite == 1 || systemSetting.closeSite == 2}"> style='display: none;'</c:if>>
 			    <TD class="t-label t-label-h" width="20%">关闭站点提示信息：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">
 			    	<textarea class="form-textarea" name="closeSitePrompt" rows="8" cols="80">${systemSetting.closeSitePrompt}</textarea>
@@ -242,15 +245,12 @@ function setAllowFilterWord(obj){
 			    </TD>
 			</TR>
 			<TR>
-			    <TD class="t-label t-label-h" width="20%">是否允许注册：</TD>
+			    <TD class="t-label t-label-h" width="20%">允许注册账号类型：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">
-			    	<label>
-			    		<form:radiobutton path="allowRegister" value="true"/>允许
-			    	</label>
-			    	<label>
-			    		<form:radiobutton path="allowRegister" value="false"/>禁止	
-			    	</label>
-			    	<web:errors path="allowRegister" cssStyle="color: red;"/>
+			    	<label><form:checkbox path="allowRegisterAccountObject.local" />本地账号密码用户</label>
+			    	<label><form:checkbox path="allowRegisterAccountObject.weChat" />微信用户</label>
+
+			    	<web:errors path="allowRegisterAccount" cssStyle="color: red;"/>
 			    </TD>
 			</TR>
 			<TR>
@@ -786,6 +786,13 @@ function setAllowFilterWord(obj){
 			    </TD>
 			</TR>
 			<TR>
+			    <TD class="t-label t-label-h" width="20%">代码<span class="toolbar-icon-url icon-code"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="topicEditorTagObject.code" value="true"/>打开</label>
+			    	<label><form:radiobutton path="topicEditorTagObject.code" value="false"/>关闭</label>
+			    </TD>
+			</TR>
+			<TR>
 			    <TD class="t-label t-label-h" width="20%">插入表情<span class="toolbar-icon-url icon-emoticons"></span>：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">
 			    	<label><form:radiobutton path="topicEditorTagObject.emoticons" value="true"/>打开</label>
@@ -1029,6 +1036,13 @@ function setAllowFilterWord(obj){
 			    </TD>
 			</TR>
 			<TR>
+			    <TD class="t-label t-label-h" width="20%">代码<span class="toolbar-icon-url icon-code"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="editorTagObject.code" value="true"/>打开</label>
+			    	<label><form:radiobutton path="editorTagObject.code" value="false"/>关闭</label>
+			    </TD>
+			</TR>
+			<TR>
 			    <TD class="t-label t-label-h" width="20%">插入表情<span class="toolbar-icon-url icon-emoticons"></span>：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">
 			    	<label><form:radiobutton path="editorTagObject.emoticons" value="true"/>打开</label>
@@ -1170,6 +1184,13 @@ function setAllowFilterWord(obj){
 			    <TD class="t-content" width="80%" colSpan="3">
 			    	<label><form:radiobutton path="questionEditorTagObject.insertorderedlist" value="true"/>打开</label>
 			    	<label><form:radiobutton path="questionEditorTagObject.insertorderedlist" value="false"/>关闭</label>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">代码<span class="toolbar-icon-url icon-code"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="questionEditorTagObject.code" value="true"/>打开</label>
+			    	<label><form:radiobutton path="questionEditorTagObject.code" value="false"/>关闭</label>
 			    </TD>
 			</TR>
 			<TR>
@@ -1334,6 +1355,13 @@ function setAllowFilterWord(obj){
 			    <TD class="t-content" width="80%" colSpan="3">
 			    	<label><form:radiobutton path="answerEditorTagObject.insertunorderedlist" value="true"/>打开</label>
 			    	<label><form:radiobutton path="answerEditorTagObject.insertunorderedlist" value="false"/>关闭</label>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">代码<span class="toolbar-icon-url icon-code"></span>：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<label><form:radiobutton path="answerEditorTagObject.code" value="true"/>打开</label>
+			    	<label><form:radiobutton path="answerEditorTagObject.code" value="false"/>关闭</label>
 			    </TD>
 			</TR>
 			<TR>

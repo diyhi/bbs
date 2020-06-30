@@ -23,12 +23,14 @@ import cms.bean.membershipCard.MembershipCard;
 import cms.bean.membershipCard.MembershipCardOrder;
 import cms.bean.membershipCard.Specification;
 import cms.bean.payment.PaymentLog;
+import cms.bean.setting.SystemSetting;
 import cms.bean.user.AccessUser;
 import cms.bean.user.PointLog;
 import cms.bean.user.User;
 import cms.bean.user.UserRole;
 import cms.bean.user.UserRoleGroup;
 import cms.service.membershipCard.MembershipCardService;
+import cms.service.setting.SettingService;
 import cms.service.template.TemplateService;
 import cms.service.user.UserRoleService;
 import cms.service.user.UserService;
@@ -63,6 +65,9 @@ public class MembershipCardFormAction {
 	@Resource PaymentManage paymentManage;
 	@Resource CSRFTokenManage csrfTokenManage;
 	@Resource UserService userService;
+	@Resource SettingService settingService;
+	
+	
 	/**
 	 * 购买会员卡   添加
 	 * @param model
@@ -81,6 +86,11 @@ public class MembershipCardFormAction {
 		
 		
 		Map<String,String> error = new HashMap<String,String>();
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.getCloseSite().equals(2)){
+			error.put("membershipCard", ErrorView._21.name());//只读模式不允许提交数据
+		}
+		
 		//购买数量
 		int quantity =1;
 		

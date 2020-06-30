@@ -4,6 +4,7 @@ package cms.web.action.upgrade;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -43,6 +44,7 @@ import cms.utils.FileSize;
 import cms.utils.FileUtil;
 import cms.utils.JsonUtils;
 import cms.utils.PathUtil;
+import cms.utils.RsaUtil;
 import cms.utils.ZipCallback;
 import cms.utils.ZipUtil;
 import cms.web.action.TextFilterManage;
@@ -341,17 +343,55 @@ public class UpgradeManageAction {
 							upgradeLog.setContent("解压升级包到临时目录成功");
 							String upgradeLog_json = JsonUtils.toJSONString(upgradeLog);
 							upgradeSystem.setUpgradeLog("["+upgradeLog_json+",");
-							try {
-								upgradeService.save(upgradeSystem);
-								returnValue.put("upgradeId", newSystemVersion);
-							} catch (Exception e) {
-								error.put("upgradeNow", "升级错误");
-								//e.printStackTrace();
-								if (logger.isErrorEnabled()) {
-						            logger.error("升级错误",e);
-						        }
+							
+							
+							if(error.size()==0){
+								//验证升级包签名
+								
+								String publicKey_str = RsaUtil.readPublicKeyFile();//读取公钥文件
+								if(publicKey_str != null && !"".equals(publicKey_str.trim())){//如果有公钥文件
+									//签名字符
+									String sign_str = "";
+									File file = new File(temp_path+directoryParameter.getFirstDirectory()+File.separator+"signature.pem");
+						     		if(file != null && file.exists()){
+						     			sign_str = FileUtils.readFileToString(file, "utf-8");
+						     		}
+									if(sign_str != null && !"".equals(sign_str.trim())){
+										PublicKey publicKey = RsaUtil.getPublicKey(publicKey_str.trim());
+										//公钥解密
+										String decrypt = RsaUtil.decryptData(sign_str.trim(), publicKey);
+										String sign = upgradeManage.getFileSignature(temp_path+directoryParameter.getFirstDirectory()+File.separator);
+										if(sign != null && decrypt != null && !"".equals(sign.trim()) && sign.equals(decrypt)){
+											UpgradeLog upgradeLog2 = new UpgradeLog();
+											upgradeLog2.setTime(new Date());
+											upgradeLog2.setGrade(1);
+											upgradeLog2.setContent("验证签名成功 "+sign);
+											String upgradeLog_json2 = JsonUtils.toJSONString(upgradeLog2);
+											upgradeSystem.setUpgradeLog(upgradeSystem.getUpgradeLog()+upgradeLog_json2+",");
+										}else{
+											error.put("upgradeNow", "验证签名失败");
+										}
+									}else{
+										error.put("upgradeNow", "读取签名失败");
+									}
+									
+								}
 							}
-							 
+							
+							
+							
+							if(error.size()==0){
+								try {
+									upgradeService.save(upgradeSystem);
+									returnValue.put("upgradeId", newSystemVersion);
+								} catch (Exception e) {
+									error.put("upgradeNow", "升级错误");
+									//e.printStackTrace();
+									if (logger.isErrorEnabled()) {
+							            logger.error("升级错误",e);
+							        }
+								}
+							}
 						} catch (IOException e) {
 							error.put("upgradeNow", "读取配置文件失败");
 						//	e.printStackTrace();
@@ -428,7 +468,7 @@ public class UpgradeManageAction {
 						
 						if(!"cms".equals(current_dir)){
 							//重命名文件夹名称,和使用的目录名称一致
-							boolean flag = FileUtil.renameFile(resDirPath, current_dir);
+							boolean flag = FileUtil.renameDirectory(resDirPath, current_dir);
 							if(flag){
 								upgradeService.addLog(upgradeId, JsonUtils.toJSONString(new UpgradeLog(new Date(),"重命名临时文件夹成功",1))+",");
 								

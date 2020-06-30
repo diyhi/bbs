@@ -76,7 +76,10 @@ public class FeedbackFormAction {
 		
 		Map<String,String> error = new HashMap<String,String>();
 		
-			
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.getCloseSite().equals(2)){
+			error.put("feedback", ErrorView._21.name());//只读模式不允许提交数据
+		}
 		
 		//判断令牌
 		if(token != null && !"".equals(token.trim())){	
@@ -122,8 +125,6 @@ public class FeedbackFormAction {
 		}
 
 		Feedback feedback = new Feedback();
-		
-		SystemSetting systemSetting = settingService.findSystemSetting_cache();
 		
 		
 		

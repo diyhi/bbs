@@ -679,7 +679,6 @@ html,body{
 .topicContentModule .topicDetail .main hide .submit-box .button{ width:96px; height:26px; line-height:28px; border:0; background:#888888; font-size:16px; color:#fff; float:right; font-weight:bold; cursor:pointer;text-decoration: none; outline: none}
 .topicContentModule .topicDetail .main hide .submit-box .button:hover{background:#808080;}
 
-
 .topicContentModule .topicDetail .main player{
 	display: block;
 	margin-top: 8px;
@@ -787,7 +786,7 @@ html,body{
 .topicContentModule .commentList .item .head .userTag .master{
 	white-space:nowrap;
 	color:#fff;
-	background-color:#26a2ff;
+	background-color:#4cc8ff;
 	border-radius:4px;
 	padding:1px 5px;
 	font-size: 12px;
@@ -937,12 +936,22 @@ html,body{
 	font-style:normal;
 	margin-left:5px;
 	color:#fff;
-	background-color:#26a2ff;
+	background-color:#4cc8ff;
 	border-radius:4px;
 	padding:1px 5px 0px;
 	font-size: 12px;
 }
-
+.topicContentModule .commentList .replyList .box li .reply-top .userTag .staff{
+	margin-left:5px;
+	white-space:nowrap;
+	color:#15d327;
+	background-color:#cafcc7;
+	border-radius:4px;
+	padding:1px 5px;
+	font-size: 12px;
+	font-style: normal;
+	font-weight: normal;
+}
 
 .topicContentModule .commentList .replyList .box li .reply-top .time {
 	float: right;
@@ -1526,7 +1535,7 @@ html,body{
 
 	white-space:nowrap;
 	color:#fff;
-	background-color:#26a2ff;
+	background-color:#4cc8ff;
 	border-radius:4px;
 	padding:1px 5px;
 	font-size: 12px;
@@ -1719,7 +1728,7 @@ html,body{
 	font-style:normal;
 	margin-left:5px;
 	color:#fff;
-	background-color:#26a2ff;
+	background-color:#4cc8ff;
 	border-radius:4px;
 	padding:1px 5px 0px;
 	font-size: 12px;
@@ -1762,6 +1771,11 @@ html,body{
 .questionContentModule .answerList .item .bottomInfo .toolbar {
 	height: 100%;
 	margin-right:4px;
+}
+.questionContentModule .answerList .item .bottomInfo .toolbar .edit-btn{
+	color: #999;
+	font-size: 14px;
+	margin-right: 30px;
 }
 .questionContentModule .answerList .item .bottomInfo .toolbar .quote-btn{
 	color: #999;
@@ -1811,6 +1825,43 @@ html,body{
 .questionContentModule .addReplyScroll .box .addReplyForm{margin-left:5px; margin-right: 5px;}
 .questionContentModule .addReplyScroll .box .addReplyForm .tips{line-height:30px; margin-left: 115px}
 .questionContentModule .addReplyScroll .box .addReplyForm .tips span{color: red;}
+
+
+.questionContentModule .editAnswerScroll {
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    right:0;
+    margin-bottom: 0;
+    border-bottom: none;
+    -webkit-overflow-scrolling: touch;
+    overflow-scrolling: touch;
+}
+.questionContentModule .editAnswerScroll .box{
+	padding-top: 40px;
+}
+.questionContentModule .editAnswerScroll .box .editAnswerForm{margin-left:5px; margin-right: 5px;}
+.questionContentModule .editAnswerScroll .box .editAnswerForm .tips{line-height:30px; margin-left: 115px}
+.questionContentModule .editAnswerScroll .box .editAnswerForm .tips span{color: red;}
+.questionContentModule .editAnswerScroll .box .editAnswerForm .w-e-text pre{white-space:pre-wrap;}
+.questionContentModule .editReplyScroll {
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    right:0;
+    margin-bottom: 0;
+    border-bottom: none;
+    -webkit-overflow-scrolling: touch;
+    overflow-scrolling: touch;
+}
+.questionContentModule .editReplyScroll .box{
+	padding-top: 40px;
+}
+.questionContentModule .editReplyScroll .box .editReplyForm{margin-left:5px; margin-right: 5px;}
+.questionContentModule .editReplyScroll .box .editReplyForm .tips{line-height:30px; margin-left: 115px}
+.questionContentModule .editReplyScroll .box .editReplyForm .tips span{color: red;}
+
+
 
 
 /** 提问题 **/
@@ -1941,11 +1992,13 @@ html,body{
 }
 .selectQuestionTagModule .box .questionTagNavigation .nav .nav-item .nav-link {
 	border-radius: 3px;
-	padding: 4px 8px;
 	border: 1px solid #42a5f5;
 	color: #42a5f5;
 	background-color: #fff;
-
+	height:28px;
+	line-height:28px;
+	padding-left:8px;
+	padding-right:8px;
 	display: inline-block;
 }
 
@@ -1953,8 +2006,31 @@ html,body{
 	color: #42a5f5;
 	background-color: #e7f5fe;
 }
+.selectQuestionTagModule .box .questionTagNavigation .nav .nav-item .selected{
+	position: relative;
+    transition: all 0.5s ease;
+}
+.selectQuestionTagModule .box .questionTagNavigation .nav .nav-item .selected:after {
+	content: '✔';
+	height: 0px;
+	width: 0px;
+	position: absolute;
+	bottom: -4px;
+	right: -4px;
+	color:#fff;
+    line-height: 6px;
+    border: 10px solid;
+    border-color: transparent #42a5f5 #42a5f5 transparent;
+    /**对号大小,设置小于12px的文字*/
+    display: inline-block;
+    font-size: 12px;
+    -webkit-text-size-adjust:none;
+    -webkit-transform : scale(0.6,0.6);/*缩放指定dom，但必须是block级*/
+    
+}
+
 .selectQuestionTagModule .box .questionTagNavigation .nav a {
-	color: #6c757d
+	color: #6c757d;
 }
 
 .selectQuestionTagModule .box .questionTagNavigation .tab-content{
@@ -1964,19 +2040,39 @@ html,body{
 .selectQuestionTagModule .box .questionTagNavigation .child-tag {
 	display: inline-block;
 	font-size: 14px;
-	padding: 0 8px;
-	height: 26px;
-	line-height: 26px;
+	padding: 0px 8px;
+	height: 28px;
+	line-height: 28px;
 	border-radius: 3px;
 	background-color: #e1f0ff;
 	color:#359ff5;
 	margin-right: 8px;
 	margin-bottom: 8px;
 }
-.selectQuestionTagModule .box .questionTagNavigation .child-tag:hover {
-	text-decoration: none;
-	background-color: #a2d7fe;
+.selectQuestionTagModule .box .questionTagNavigation .selected{
+	position: relative;
+    transition: all 0.5s ease;
 }
+.selectQuestionTagModule .box .questionTagNavigation .selected:after {
+	content: '✔';
+	height: 0px;
+	width: 0px;
+	position: absolute;
+	bottom: -3px;
+	right: -3px;
+	color: #42a5f5;
+    line-height: 6px;
+    border: 10px solid;
+    border-color: transparent transparent transparent transparent;
+    /**对号大小,设置小于12px的文字*/
+    display: inline-block;
+    font-size: 12px;
+    -webkit-text-size-adjust:none;
+    -webkit-transform : scale(0.6,0.6);/*缩放指定dom，但必须是block级*/
+    
+}
+
+
 
 /** 追加问题 **/
 .appendQuestionModule{
@@ -2230,19 +2326,31 @@ html,body{
 
 
 /* 用户中心页头 */
-.homeModule{padding-bottom: 45px;}
-
-.homeModule .homeHeader{position:relative;height:100px;background:center center no-repeat;background-size:cover;-webkit-user-select:none;background-color:#26a2ff;}
+.homeModule{padding-bottom: 45px;background: #fcfcfc;}
+.homeModule .homeHeader{
+    position: relative;
+    overflow: hidden;
+    background: -webkit-gradient(linear,left top,right top,from(#0396FF),to(#8dcfff));
+    background: -webkit-linear-gradient(left,#0396FF,#8dcfff);
+    background: -webkit-gradient(linear, left top, right top, from(#0396FF), to(#8dcfff));
+    background: -webkit-linear-gradient(left, #0396FF, #8dcfff);
+    background: linear-gradient(90deg,#0396FF,#8dcfff);
+    box-sizing: border-box;
+    min-height: 110px;
+    /**border-radius: 0 0 300px 300px/0 0 20px 20px;
+	box-shadow: 0 2px 4px rgba(38,162,255,.4);**/
+	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
+}
 .homeModule .homeHeader .user{padding-left:100px;padding-top:15px;font-size:12px;font-weight:bold;color:#fff;-webkit-user-select:none;line-height:30px; }
 .homeModule .homeHeader .user .avatar{position:absolute;left:10px;top:15px;display:inline-block;background-size:212px 645px;font-size:74px;}
 
 .homeModule .homeHeader .user .avatarImg{
-	position:absolute;left:10px;top:10px;display:inline-block;border-radius:100%;
+	position:absolute;left:15px;top:15px;display:inline-block;border-radius:100%;
 	
 }
 .homeModule .homeHeader .user .avatarImg img{
 	border-radius:100%;box-shadow: 0 0 0 1px #26a2ff,0 0 0 2px #fff;
-	width: 80px;
+	width: 72px;
 }
 
 
@@ -2252,8 +2360,8 @@ html,body{
 	font-style:normal;
 	margin-left:5px;
 	white-space:nowrap; 
-	color:#feb21a;
-	background-color:#ffedba;
+	color:#fff;
+	background-color:#FBBC05;
 	border-radius:4px;
 	padding:2px 5px 0px;
 	font-size: 14px;
@@ -2262,7 +2370,7 @@ html,body{
 .homeModule .homeHeader .privateMessageBox{
 	position: absolute;right: 5px;bottom: 5px;
 }
-.privateMessageButton{
+.homeModule .privateMessageButton{
 	color: #fff;
     border-color: #fff;
     outline: none;
@@ -2278,13 +2386,13 @@ html,body{
     margin: 0;
 	
 }
-.privateMessageButton:hover {  
+.homeModule .privateMessageButton:hover {  
     background: #0b90f6;  
 } 
-.followButton:hover {  
+.homeModule .followButton:hover {  
     background: #0b90f6;  
 }  
-.followButton{
+.homeModule .followButton{
 	color: #fff;
     border-color: #fff;
     outline: none;
@@ -2301,10 +2409,100 @@ html,body{
 	
 }
 
+/* 快捷标签 */
+.homeModule .quickTag{
+	height:70px;width:100%;background:#fff;box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
+}
+.homeModule .quickTag .item{
+	position:relative;float:left;width:25%; text-align:center;font-size: 14px;color: #666;
+}
+.homeModule .quickTag .item i{
+	display:block;margin:10px auto 5px;font-size:27px;
+}
+.homeModule .quickTag .item .total{
+	font-size:18px;font-style:normal;line-height: 26px;
+}
+.homeModule .quickTag .item .number{position:absolute; top: 8px;left: 55%;}
+
+/* 用户中心菜单 */
+.homeModule .homeMenu{
+    background: #fff;
+    margin-top:10px; 
+    box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
+}
+.homeModule .homeMenu .container{
+    overflow: hidden;
+    position: relative;
+}
+.homeModule .homeMenu .container .item{
+    padding: 14px 0 8px;
+    text-align: center;
+    height: 88px;
+    box-sizing: border-box;
+    float: left;
+    width: 25%;
+    position: relative;
+}
+.homeModule .homeMenu .container .item .icon{
+    display: block;
+    font-size:26px;
+    color: #26a2ff;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    position: relative;
+}
+.homeModule .homeMenu .container .item .name{
+    font-size: 14px;
+    color: #555;
+    line-height: 20px;
+    text-align: center;
+}
+/* 用户设置 */
+.homeModule .userSettingInfo{
+	padding-top: 40px;padding-bottom: 5px;margin-left: 3px;margin-right: 3px;
+}
+.updateAvatarInfo .screenshot{
+    width: 300px;
+    height: 300px;
+    margin: 50px auto 20px auto;
+}
+
+.updateAvatarInfo .selectImage-btn {
+    padding: 0px 15px; margin-right: 10px;
+    line-height:40px;
+    overflow: visible;
+}
+/* 会员卡链接 */
+.homeModule .membershipCard{
+	margin-top:10px;
+	padding-top:10px;
+	padding-bottom:10px;
+	background:#fff; box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
+}
+.homeModule .membershipCard .link {
+	margin-left:10px;
+	margin-right:10px;
+	display: block;
+	color: #fff;
+	background: #f9f4ed;
+	height: 80px;
+	line-height: 80px;
+	border-radius: 8px;
+}
+
+.homeModule .membershipCard .title {
+	font-size: 26px;
+	letter-spacing: 0;
+	text-align: center;
+	font-weight: 700;
+	color: #bb8b51;
+}
 
 /** 动态 **/
 .homeModule .userDynamicList {
-	width: 100%;margin-top: 5px;
+	width: 100%;
+	margin-top:10px;
+	background:#fff; box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
 }
 .homeModule .userDynamicList .item {
 	border-bottom: 1px solid #eee;
@@ -2619,7 +2817,7 @@ html,body{
 	text-align: left;
 }
 .homeModule .userDynamicList .item .bottomInfo {
-	height: 22px;
+	height: 26px;
 	overflow: hidden;
 	text-align: left;
 	margin-left: 38px;
@@ -2650,94 +2848,7 @@ html,body{
     -webkit-overflow-scrolling: touch;
     overflow-scrolling: touch;
 }
-/* 用户设置 */
-.homeModule .userSettingInfo{
-	padding-top: 40px;padding-bottom: 5px;margin-left: 3px;margin-right: 3px;
-}
 
-/* 快捷标签 */
-.homeModule .quickTag{
-	height:70px;width:100%;
-}
-.homeModule .quickTag .item{
-	position:relative;float:left;width:25%; background:#fff;text-align:center;
-}
-.homeModule .quickTag .item i{
-	display:block;margin:10px auto 5px;font-size:27px;
-}
-.homeModule .quickTag .item .total{
-	font-size:16px;font-style:normal;line-height: 26px;
-}
-.homeModule .quickTag .item .number{position:absolute; top: 8px;left: 55%;}
-
-/* 用户中心菜单表格 */
-.homeModule .homeMenuTable{
-	width:100%;
-	display:table;
-	table-layout: fixed;
-}
-.homeModule .homeMenuTable ul{
-	
-}
-.homeModule .homeMenuTable li{
-	width:25%;
-	text-align: center;
-	float:left;
-	margin-left: -1px;/**行容器设置负margin撑开**/
-	border-bottom:1px solid #dfe0e1;
-	line-height: 70px;
-	height:70px;
-	padding-top: 20px;
-}
-.homeModule .homeMenuTable .topLine{
-	border-top:8px solid #dfe0e1;
-}
-.homeModule .homeMenuTable .bottomLine{
-	border-bottom:8px solid #dfe0e1;
-}
-.homeModule .homeMenuTable .name{margin-top: 10px;display:inline-block; }
-.homeModule .homeMenuTable .rightLine{
-	border-right:1px solid #dfe0e1;
-}
-.homeModule .homeMenuTable .menuLink{
-	width:25%;background:#fff;
-}
-.homeModule .homeMenuTable .menuLink i{
-	display:block;position: absolute;margin:5px auto;font-size:27px;width:25%;
-	/**display:block;margin:1px auto 5px;font-size:27px;**/
-}
-
-.updateAvatarInfo .screenshot{
-        width: 300px;
-        height: 300px;
-        margin: 50px auto 20px auto;
-}
-
-.updateAvatarInfo .selectImage-btn {
-        padding: 0px 15px; margin-right: 10px;
-      	line-height:40px;
-        overflow: visible;
-      }
-/* 会员卡链接 */
-.homeModule .membershipCard{
-	margin: 10px;
-}
-.homeModule .membershipCard .link {
-	display: block;
-	color: #fff;
-	background: #f9f4ed;
-	height: 80px;
-	line-height: 80px;
-	border-radius: 8px;
-}
-
-.homeModule .membershipCard .title {
-	font-size: 26px;
-	letter-spacing: 0;
-	text-align: center;
-	font-weight: 700;
-	color: #bb8b51;
-}
 
 
 /** 我的话题 **/

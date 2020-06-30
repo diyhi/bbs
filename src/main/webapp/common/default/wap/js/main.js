@@ -500,7 +500,12 @@ var index_component = Vue.extend({
 							_self.tagList = tagList;
 							//滚动
 							_self.$nextTick(function() {
-								_self.initScroll();
+								if (!_self.scroll) {
+									_self.initScroll();
+						        }else{
+						        	// 复用Bscroll
+						        	_self.scroll.refresh();
+						        }
 							});
 							
 							if(_self.tagSlots[0].values == null || _self.tagSlots[0].values.length == 0){//第一次打开时设置值
@@ -546,8 +551,9 @@ var index_component = Vue.extend({
 						var availableTagList = $.parseJSON(returnValue[key]);
 						for(var i=0; i<availableTagList.length; i++){
 							var _availableTag = availableTagList[i];
-							
-							if(_availableTag == "forecolor"){//文字颜色
+							if(_availableTag == "code"){//代码
+								editorIconList.push("code");
+							}else if(_availableTag == "forecolor"){//文字颜色
 							//	editorIconList.push("foreColor");
 							}else if(_availableTag == "hilitecolor"){//文字背景
 							//	editorIconList.push("backColor");
@@ -691,7 +697,6 @@ var index_component = Vue.extend({
 		//	_self.topicContent = "<div style='text-align: center; height: expression(alert('test xss'));'>fdfd</div>";//
 		//	_self.topicContent = "<div style='text-align: center; height: expre\ssion(alert('test xss'));'>fdfd</div>";//
 			
-			
 			var parameter = "&tagId=" + _self.topicTagId; //提交参数
 			if (_self.topicTitle != null && _self.topicTitle != "") {
 				parameter += "&title=" + encodeURIComponent(_self.topicTitle);
@@ -699,6 +704,7 @@ var index_component = Vue.extend({
 			//if (_self.topicContent != null && _self.topicContent != "") {
 			//	parameter += "&content=" + encodeURIComponent(_self.topicContent);
 			//}
+			
 			parameter += "&content=" + encodeURIComponent(_self.topicEditor.txt.html());
 			
 			
@@ -1071,6 +1077,7 @@ var thread_component = Vue.extend({
 					},
 					mounted :function () {
 						this.resumePlayerNodeData();
+						this.resumeCodeNodeData();
 					},
 					props: this.$options.props, // re-use current props definitions
 					methods: {
@@ -1175,6 +1182,13 @@ var thread_component = Vue.extend({
 					        		}
 					        	}
 				        	});
+				        },
+				        //恢复代码节点数据(vue组件切换时会自动刷新数据，代码框在组件生成数据内容之后插入，组件刷新数据时代码框会消失，组件刷新后需要重新渲染)
+				        resumeCodeNodeData : function(){
+				        	var _self = this;
+				        	_self.$nextTick(function() {
+				        		_self.$parent.renderCode();
+				        	});
 				        }
 				    }
 				};
@@ -1243,6 +1257,12 @@ var thread_component = Vue.extend({
 								setTimeout(function() {
 									_self.renderVideoPlayer();//渲染视频播放器
 								}, 30);
+								
+								setTimeout(function() {
+									//渲染代码
+									_self.renderCode();
+								}, 30);
+								
 							});
 							
 							//生成首字符头像
@@ -1344,7 +1364,12 @@ var thread_component = Vue.extend({
 			}
 			
 		},
-		
+		//渲染代码
+		renderCode : function() {
+			var _self = this;
+			
+			Prism.highlightAll();
+		},
 		
 		
 		//递归绑定节点参数
@@ -1429,10 +1454,35 @@ var thread_component = Vue.extend({
 	            		
 	            		var id = "player_"+random+"_"+i;
 	            		childNode.setAttribute("id",id);//设置Id
-	            		this.playerIdList.push(id);
-
+	            		this.playerIdList.push(id);	
+	            	}
+	            	//处理代码标签
+	            	if(childNode.nodeName.toLowerCase() == "pre" ){
+	            		var pre_html = childNode.innerHTML;
+	            		var class_val = childNode.className;
+	            		var lan_class = "";
 	            		
+	        	        var class_arr = new Array();
+	        	        class_arr = class_val.split(' ');
+	        	        
+	        	        for(var k=0; k<class_arr.length; k++){
+	        	        	var className = class_arr[k].trim();
+	        	        	
+	        	        	if(className != null && className != ""){
+	        	        		if (className.lastIndexOf('lang-', 0) === 0) {
+	        	        			lan_class = className;
+	        			            break;
+	        			        }
+	        	        	}
+	        	        }
+	        	       
+	        	        childNode.className = "line-numbers "+getLanguageClassName(lan_class);
 	            		
+	            		var nodeHtml = "";
+            		//	nodeHtml += '<code>';
+            			nodeHtml += 	pre_html
+            		//	nodeHtml += '</code>';
+            			childNode.innerHTML = nodeHtml;
 	            		
 	            	}
 	            	
@@ -1440,6 +1490,8 @@ var thread_component = Vue.extend({
 	            }
 	        }
 	    },
+	    
+	    
 		
 	    //查询是否已经关注该用户
   		queryFollowing : function() {
@@ -1926,7 +1978,9 @@ var thread_component = Vue.extend({
 						for(var i=0; i<availableTagList.length; i++){
 							var _availableTag = availableTagList[i];
 							
-							if(_availableTag == "forecolor"){//文字颜色
+							if(_availableTag == "code"){//代码
+								editorIconList.push("code");
+							}else if(_availableTag == "forecolor"){//文字颜色
 							//	editorIconList.push("foreColor");
 							}else if(_availableTag == "hilitecolor"){//文字背景
 							//	editorIconList.push("backColor");
@@ -2156,7 +2210,9 @@ var thread_component = Vue.extend({
 						for(var i=0; i<availableTagList.length; i++){
 							var _availableTag = availableTagList[i];
 							
-							if(_availableTag == "forecolor"){//文字颜色
+							if(_availableTag == "code"){//代码
+								editorIconList.push("code");
+							}else if(_availableTag == "forecolor"){//文字颜色
 							//	editorIconList.push("foreColor");
 							}else if(_availableTag == "hilitecolor"){//文字背景
 							//	editorIconList.push("backColor");
@@ -2579,7 +2635,9 @@ var thread_component = Vue.extend({
 						for(var i=0; i<availableTagList.length; i++){
 							var _availableTag = availableTagList[i];
 							
-							if(_availableTag == "forecolor"){//文字颜色
+							if(_availableTag == "code"){//代码
+								editorIconList.push("code");
+							}else if(_availableTag == "forecolor"){//文字颜色
 							//	editorIconList.push("foreColor");
 							}else if(_availableTag == "hilitecolor"){//文字背景
 							//	editorIconList.push("backColor");
@@ -3250,7 +3308,12 @@ var askList_component = Vue.extend({
 					}
 					//滚动
 					_self.$nextTick(function() {
-						_self.initScroll();
+						if (!_self.scroll) {
+							_self.initScroll();
+				        }else{
+				        	// 复用Bscroll
+				        	_self.scroll.refresh();
+				        }
 					});
 				}
 			});
@@ -3307,13 +3370,18 @@ var question_component = Vue.extend({
 			next: '',//下一页
 			replyExpandOrShrink : [], //回复展开/收缩 map格式 key:答案Id value:是否展开
 			
-			show_question:true,//问题内容显示/隐藏
 			show_answerEditor:false,//添加答案富文本编辑器显示/隐藏
+			show_editAnswerEditor:false,//修改答案富文本编辑器显示/隐藏
+			show_editReplyEditor:false,//修改回复富文本编辑器显示/隐藏
+			show_question:true,//问题内容显示/隐藏
 			
 			popup_reply : false, //发表回复弹出层
+			popup_editReply : false, //修改回复弹出层
 			answerContent:'',//发表答案内容
 			replyAnswerId :'',//回复答案Id
 			replyContent:'',//发表回复内容
+			editReplyId :'',//修改回复Id
+			editReplyContent:'',//修改回复内容
 			
 			showCaptcha : false, //发表答案/发表回复是否显示验证码
 			imgUrl : '', //验证码图片
@@ -3327,6 +3395,7 @@ var question_component = Vue.extend({
 				reply: '',
 			},
 			answerEditor : '',//答案富文本编辑器
+			editAnswerEditor : '',//修改答案富文本编辑器
 			
 			alreadyFavoriteQuestion :false,//用户是否已经收藏问题
 			questionFavoriteCount : 0,//问题用户收藏总数
@@ -3389,8 +3458,20 @@ var question_component = Vue.extend({
 			return function (html) {
 				return {
 					template: "<div>"+ html +"</div>", // use content as template for this component 必须用<div>标签包裹，否则会有部分内容不显示
+					mounted :function () {
+					//	this.resumeCodeNodeData();
+					},
 					props: this.$options.props, // re-use current props definitions
-					
+					methods: {
+						/**
+				        //恢复代码节点数据(vue组件切换时会自动刷新数据，代码框在组件生成数据内容之后插入，组件刷新数据时代码框会消失，组件刷新后需要重新渲染)
+				        resumeCodeNodeData : function(){
+				        	var _self = this;
+				        	_self.$nextTick(function() {
+				        		_self.$parent.renderCode();
+				        	});
+				        }**/
+				    }
 				};
 			};	
 		},
@@ -3400,6 +3481,12 @@ var question_component = Vue.extend({
 		showQuestion : function(back){
 		    this.show_question = true;//显示问题页
 		    this.show_answerEditor = false;//隐藏答案富文本编辑器
+		    this.show_editAnswerEditor = false;//隐藏修改答案富文本编辑器
+		    this.show_editReplyEditor = false;//隐藏修改回复富文本编辑器
+		    
+	
+		    
+		    
 		    //判断浏览器是否支持popstate
 			if (window.history && window.history.pushState && back) {
 				//后退
@@ -3448,6 +3535,16 @@ var question_component = Vue.extend({
 							
 							_self.question = question;
 							
+							
+							
+							_self.$nextTick(function() {
+								setTimeout(function() {
+									//渲染代码
+									_self.renderCode();
+								}, 30);
+								
+							});
+							
 							//生成首字符头像
 							_self.$nextTick(function() {
 								if(_self.question.avatarName == null || _self.question.avatarName == ''){
@@ -3468,7 +3565,12 @@ var question_component = Vue.extend({
 			});
 			
 		},
-		
+		//渲染代码
+		renderCode : function() {
+			var _self = this;
+			
+			Prism.highlightAll();
+		},
 		
 		//递归绑定节点参数
 		bindNode : function(node) {
@@ -3495,6 +3597,36 @@ var question_component = Vue.extend({
             			childNode.setAttribute("data-src",src);
 	            	}
 	            	
+	            	//处理代码标签
+	            	if(childNode.nodeName.toLowerCase() == "pre" ){
+	            		var pre_html = childNode.innerHTML;
+	            		var class_val = childNode.className;
+	            		var lan_class = "";
+	            		
+	        	        var class_arr = new Array();
+	        	        class_arr = class_val.split(' ');
+	        	        
+	        	        for(var k=0; k<class_arr.length; k++){
+	        	        	var className = class_arr[k].trim();
+	        	        	
+	        	        	if(className != null && className != ""){
+	        	        		if (className.lastIndexOf('lang-', 0) === 0) {
+	        	        			lan_class = className;
+	        			            break;
+	        			        }
+	        	        	}
+	        	        }
+	        	       
+	        	        childNode.className = "line-numbers "+getLanguageClassName(lan_class);
+	            		
+	            		
+	            		var nodeHtml = "";
+            		//	nodeHtml += '<code>';
+            			nodeHtml += 	pre_html
+            		//	nodeHtml += '</code>';
+            			childNode.innerHTML = nodeHtml;
+	            		
+	            	}
 	            	this.bindNode(childNode);
 	            }
 	        }
@@ -3519,6 +3651,12 @@ var question_component = Vue.extend({
   								_self.following = following;
   							}
   						}
+  						_self.$nextTick(function() {
+  							setTimeout(function() {
+  								//渲染代码
+  								_self.renderCode();
+  							}, 30);
+  						});
   					}
   				});
   				
@@ -3612,6 +3750,13 @@ var question_component = Vue.extend({
 							_self.alreadyFavoriteQuestion = alreadyFavoriteQuestion;
 						}
 					}
+				},
+				beforeSend : function beforeSend(XMLHttpRequest) {
+					//本空方法不要删除，用来覆盖全局回调默认的旋转进度条
+					
+				},
+				complete : function complete(XMLHttpRequest, textStatus) {
+					//本空方法不要删除，用来覆盖全局回调默认的旋转进度条
 				}
 			});
 		},
@@ -3632,6 +3777,19 @@ var question_component = Vue.extend({
 							_self.questionFavoriteCount = count;
 						}
 					}
+					_self.$nextTick(function() {
+						setTimeout(function() {
+							//渲染代码
+							_self.renderCode();
+						}, 30);
+					});
+				},
+				beforeSend : function beforeSend(XMLHttpRequest) {
+					//本空方法不要删除，用来覆盖全局回调默认的旋转进度条
+					
+				},
+				complete : function complete(XMLHttpRequest, textStatus) {
+					//本空方法不要删除，用来覆盖全局回调默认的旋转进度条
 				}
 			});
 		},
@@ -3800,6 +3958,12 @@ var question_component = Vue.extend({
 						});
 						
 					}
+					_self.$nextTick(function() {
+						setTimeout(function() {
+							//渲染代码
+							_self.renderCode();
+						}, 30);
+					});
 				}
 			});
 		},
@@ -3825,6 +3989,8 @@ var question_component = Vue.extend({
 			
 			_self.show_question = false;//隐藏问题页
 			_self.show_answerEditor = true;//显示问题富文本编辑器
+			_self.show_editAnswerEditor = false;//隐藏修改答案富文本编辑器
+			_self.show_editReplyEditor = false;//隐藏修改回复富文本编辑器
 			//判断浏览器是否支持popstate
 			if (window.history && window.history.pushState) {
 				// 向历史记录中插入了当前页
@@ -3842,7 +4008,9 @@ var question_component = Vue.extend({
 						for(var i=0; i<availableTagList.length; i++){
 							var _availableTag = availableTagList[i];
 							
-							if(_availableTag == "forecolor"){//文字颜色
+							if(_availableTag == "code"){//代码
+								editorIconList.push("code");
+							}else if(_availableTag == "forecolor"){//文字颜色
 							//	editorIconList.push("foreColor");
 							}else if(_availableTag == "hilitecolor"){//文字背景
 							//	editorIconList.push("backColor");
@@ -4041,7 +4209,244 @@ var question_component = Vue.extend({
 				}
 			});
 		},
+		//修改答案界面
+		editAnswerUI : function(answerId) {
+			var _self = this;
+			_self.show_question = false;//隐藏问题页
+			_self.show_answerEditor = false;//隐藏问题富文本编辑器
+			_self.show_editAnswerEditor = true;//隐藏修改答案富文本编辑器
+			_self.show_editReplyEditor = false;//隐藏修改回复富文本编辑器
+			//判断浏览器是否支持popstate
+			if (window.history && window.history.pushState) {
+				// 向历史记录中插入了当前页
+		        history.pushState(null, null, document.URL);
+			}
+			
+			//查询引用答案页
+			_self.queryEditAnswer(answerId,function (returnValue){
+				
+				//编辑器图标
+				var editorIconList = new Array();
+				for (var key in returnValue) {
+					if (key == "availableTag") {//问题编辑器允许使用标签
+						var availableTagList = $.parseJSON(returnValue[key]);
+						for(var i=0; i<availableTagList.length; i++){
+							var _availableTag = availableTagList[i];
+							
+							if(_availableTag == "code"){//代码
+								editorIconList.push("code");
+							}else if(_availableTag == "forecolor"){//文字颜色
+							//	editorIconList.push("foreColor");
+							}else if(_availableTag == "hilitecolor"){//文字背景
+							//	editorIconList.push("backColor");
+							}else if(_availableTag == "bold"){//粗体
+								editorIconList.push("bold");
+							}else if(_availableTag == "italic"){//斜体
+								editorIconList.push("italic");
+							}else if(_availableTag == "underline"){//下划线
+								editorIconList.push("underline");
+							}else if(_availableTag == "link"){//插入链接
+								editorIconList.push("link");
+							}else if(_availableTag == "emoticons"){//插入表情
+								editorIconList.push("emoticon");
+							}else if(_availableTag == "image"){//图片
+								editorIconList.push("image");
+							}else if(_availableTag == "insertfile"){//文件
+								editorIconList.push("file");
+							}
+						}
+					}
+				}
+				_self.$refs.editAnswerContentEditorToolbar.innerHTML = "";
+				_self.$refs.editAnswerContentEditorText.innerHTML = "";
+				//创建编辑器
+				_self.editAnswerEditor = createEditor(_self.$refs.editAnswerContentEditorToolbar,_self.$refs.editAnswerContentEditorText,_self.$store.state.commonPath,editorIconList,null,'user/control/answer/uploadImage?questionId='+_self.questionId,_self,"editAnswerContent");
+				_self.editAnswerEditor.txt.html(_self.editAnswerContent);//初始化内容
+			});
+			
+			
+		},
 		
+		//查询修改答案页
+		queryEditAnswer : function(answerId,callback) {
+			var _self = this;
+
+			//清空表单
+			_self.editAnswerId = '';//修改答案Id
+			_self.editAnswerContent = ''; //修改答案内容
+			_self.showCaptcha = false, //是否显示验证码
+			_self.imgUrl = ''; //验证码图片
+			_self.captchaKey = ''; //验证码key
+			_self.captchaValue = ''; //验证码value
+
+
+			//清空所有错误
+			_self.error.editAnswerContent = "";
+			_self.error.captchaValue = "";
+			_self.error.editAnswer = "";
+			
+			
+			var parameter = "&answerId=" + answerId; //提交参数
+			
+			$.ajax({
+				type : "GET",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "queryEditAnswer",
+				data : parameter,
+				success : function success(result) {
+					if (result != "") {
+						var returnValue = $.parseJSON(result);
+						if (returnValue != null) {
+							for (var key in returnValue) {
+								if (key == "answer") {
+									
+									_self.editAnswerId = answerId;
+									_self.editAnswerContent =  returnValue[key].content;
+								}if (key == "allowAnswer") {
+									if(returnValue[key] == false){
+										_self.showQuestion(true);//显示问题内容界面
+										_self.$toast({
+											message : "不允许修改答案",
+											duration : 3000,
+										});
+									}	
+								}else if (key == "captchaKey") {
+									//显示验证码
+									var value_captchaKey = returnValue[key];
+									_self.showCaptcha = true;
+									_self.captchaKey = value_captchaKey;
+									_self.imgUrl = "captcha/" + value_captchaKey + ".jpg";
+									//设置验证码图片
+									_self.replaceCaptcha();
+								}
+							}
+							//回调
+							callback(returnValue);
+						}
+						
+					}
+				}
+			});
+		},
+		
+		//修改答案
+		editAnswer : function(event) {
+		//	if (!event._constructed) { //如果不存在这个属性,则不执行下面的函数
+		//		return;
+		//	}
+			var _self = this;
+			//清空所有错误
+			_self.error.editAnswerContent = "";
+			_self.error.editAnswer = "";
+			_self.error.captchaValue = "";
+
+			
+			var parameter = "&answerId=" + _self.editAnswerId; //提交参数
+
+			parameter += "&content=" + encodeURIComponent(_self.editAnswerEditor.txt.html());
+			//验证码Key
+			parameter += "&captchaKey=" + encodeURIComponent(_self.captchaKey);
+
+			//验证码值
+			parameter += "&captchaValue=" + encodeURIComponent(_self.captchaValue.trim());
+
+			//令牌
+			parameter += "&token=" + _self.$store.state.token;
+
+			$.ajax({
+				type : "POST",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "user/control/answer/edit",
+				data : parameter,
+				success : function success(result) {
+					if (result != "") {
+						var returnValue = $.parseJSON(result);
+
+						var value_success = "";
+						var value_error = null;
+						var value_captchaKey = null;
+
+						for (var key in returnValue) {
+							if (key == "success") {
+								value_success = returnValue[key];
+							} else if (key == "error") {
+								value_error = returnValue[key];
+							} else if (key == "captchaKey") {
+								//显示验证码
+								value_captchaKey = returnValue[key];
+							}
+						}
+						
+						_self.show_question = true;//隐藏问题页
+						_self.show_answerEditor = false;//隐藏问题富文本编辑器
+						_self.show_editAnswerEditor = false;//隐藏修改答案富文本编辑器
+						_self.show_editReplyEditor = false;//隐藏修改回复富文本编辑器
+
+						//提交成功
+						if (value_success == "true") {
+							
+							_self.$toast({
+								message : "提交成功",
+								duration : 3000,
+							});
+							_self.showQuestion(true);//显示问题内容界面
+
+							
+							//清空分页数据
+							_self.answerList = []; //问题列表
+							_self.editAnswerContent = '';//清空引用答案内容
+							_self.editAnswerEditor.txt.clear();//清空编辑器内容
+						//	_self.currentpage = 1; //当前页码
+						//	_self.totalpage = 1; //总页数
+						//	_self.on = '';//上一页
+						//	_self.next = '';//下一页
+						
+							//查询答案列表
+							_self.queryAnswerList();
+							
+						} else {
+							//显示错误
+							if (value_error != null) {
+								//有错误时清除验证码
+								_self.captchaValue = "";
+								var error_html = "";
+								for (var error in value_error) {
+									if (error != "") {
+										if (error == "content") {
+											_self.error.editAnswerContent = value_error[error];
+										} else if (error == "editAnswer") {
+											_self.error.editAnswer = value_error[error];
+										}  else if (error == "captchaValue") {
+											_self.error.captchaValue = value_error[error];
+										} else if (error == "token") {
+											//如果令牌错误
+											_self.$toast({
+												message : "页面已过期，3秒后自动刷新",
+												duration : 3000,
+											});
+											setTimeout(function() {
+												//刷新当前页面
+												window.location.reload();
+											}, 3000);
+										}
+									}
+								}
+							}
+
+							if (value_captchaKey != null) {
+								_self.showCaptcha = true;
+								_self.captchaKey = value_captchaKey;
+								_self.imgUrl = "captcha/" + value_captchaKey + ".jpg";
+								//设置验证码图片
+								_self.replaceCaptcha();
+							}
+						}
+					}
+				}
+			});
+		},
 		
 		
 		//回复界面
@@ -4226,6 +4631,192 @@ var question_component = Vue.extend({
 				}
 			});
 		},
+		
+		//修改回复界面
+		editReplyUI : function(replyId) {
+			this.popup_editReply = true;
+
+			//修改回复页
+			this.queryEditReply(replyId);
+		},
+		//修改回复页
+		queryEditReply : function(replyId) {
+			var _self = this;
+
+			//清空表单
+			_self.editReplyId = '';//回复Id
+			_self.editReplyContent = ''; //修改回复内容
+			_self.showCaptcha = false, //是否显示验证码
+			_self.imgUrl = ''; //验证码图片
+			_self.captchaKey = ''; //验证码key
+			_self.captchaValue = ''; //验证码value
+
+
+			//清空所有错误
+			_self.error.editReplyContent = "";
+			_self.error.captchaValue = "";
+			_self.error.editReply = "";
+			
+			
+			var parameter = "&replyId=" + replyId; //提交参数
+			
+			$.ajax({
+				type : "GET",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "queryEditAnswerReply",
+				data : parameter,
+				success : function success(result) {
+					if (result != "") {
+						
+						var returnValue = $.parseJSON(result);
+						if (returnValue != null) {
+							for (var key in returnValue) {
+								if (key == "allowReply") {
+									if(returnValue[key] == false){
+										_self.popup_reply = false;
+										_self.$toast({
+											message : "不允许修改回复",
+											duration : 3000,
+										});
+									}	
+								}else if (key == "reply") {
+									_self.editReplyId = replyId;
+									_self.editReplyContent =  returnValue[key].content;
+								}else if (key == "captchaKey") {
+									//显示验证码
+									var value_captchaKey = returnValue[key];
+									_self.showCaptcha = true;
+									_self.captchaKey = value_captchaKey;
+									_self.imgUrl = "captcha/" + value_captchaKey + ".jpg";
+									//设置验证码图片
+									_self.replaceCaptcha();
+								}
+							}
+						}
+						
+						//滚动
+						_self.$nextTick(function() {
+							_self.initScroll(_self.$refs.editReplyFormScroll);
+
+						});
+					}
+				}
+			});
+		},
+		//修改回复
+		editReply : function(event) {
+		//	if (!event._constructed) { //如果不存在这个属性,则不执行下面的函数
+		//		return;
+		//	}
+			var _self = this;
+			//清空所有错误
+			_self.error.editReplyContent = "";
+			_self.error.editReply = "";
+			_self.error.captchaValue = "";
+
+			
+			var parameter = "&replyId=" + _self.editReplyId; //提交参数
+			if (_self.editReplyContent != null && _self.editReplyContent != "") {
+				parameter += "&content=" + encodeURIComponent(_self.editReplyContent);
+			}
+			
+			//验证码Key
+			parameter += "&captchaKey=" + encodeURIComponent(_self.captchaKey);
+
+			//验证码值
+			parameter += "&captchaValue=" + encodeURIComponent(_self.captchaValue.trim());
+
+			//令牌
+			parameter += "&token=" + _self.$store.state.token;
+			
+			$.ajax({
+				type : "POST",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "user/control/answer/editReply",
+				data : parameter,
+				success : function success(result) {
+					if (result != "") {
+						var returnValue = $.parseJSON(result);
+
+						var value_success = "";
+						var value_error = null;
+						var value_captchaKey = null;
+
+						for (var key in returnValue) {
+							if (key == "success") {
+								value_success = returnValue[key];
+							} else if (key == "error") {
+								value_error = returnValue[key];
+							} else if (key == "captchaKey") {
+								//显示验证码
+								value_captchaKey = returnValue[key];
+							}
+						}
+
+						//提交成功
+						if (value_success == "true") {
+							_self.$toast({
+								message : "提交成功",
+								duration : 3000,
+							});
+							_self.popup_editReply = false;
+
+							
+							//清空分页数据
+							_self.answerList = []; //问题列表
+							
+						//	_self.currentpage = 1; //当前页码
+						//	_self.totalpage = 1; //总页数
+						//	_self.on = '';//上一页
+						//	_self.next = '';//下一页
+						
+							//查询答案列表
+							_self.queryAnswerList();
+							
+						} else {
+							//显示错误
+							if (value_error != null) {
+								//有错误时清除验证码
+								_self.captchaValue = "";
+								var error_html = "";
+								for (var error in value_error) {
+									if (error != "") {
+										if (error == "content") {
+											_self.error.replyContent = value_error[error];
+										} else if (error == "reply") {
+											_self.error.reply = value_error[error];
+										}  else if (error == "captchaValue") {
+											_self.error.captchaValue = value_error[error];
+										} else if (error == "token") {
+											//如果令牌错误
+											_self.$toast({
+												message : "页面已过期，3秒后自动刷新",
+												duration : 3000,
+											});
+											setTimeout(function() {
+												//刷新当前页面
+												window.location.reload();
+											}, 3000);
+										}
+									}
+								}
+							}
+
+							if (value_captchaKey != null) {
+								_self.showCaptcha = true;
+								_self.captchaKey = value_captchaKey;
+								_self.imgUrl = "captcha/" + value_captchaKey + ".jpg";
+								//设置验证码图片
+								_self.replaceCaptcha();
+							}
+						}
+					}
+				}
+			});
+		},
+		
 		
 		
 		//采纳答案
@@ -4445,9 +5036,9 @@ var addQuestion_component = Vue.extend({
 		//显示标签界面
 		showTagUI : function() {
 			var _self = this;
-			
 			_self.popup_allTag = true;
 			_self.queryAllTag();
+			
 		},
 		
 
@@ -4485,7 +5076,13 @@ var addQuestion_component = Vue.extend({
 					}
 					//滚动
 					_self.$nextTick(function() {
-						_self.initScroll();
+						if (!_self.scroll) {
+							_self.initScroll();
+				        }else{
+				        	// 复用Bscroll
+				        	_self.scroll.refresh();
+				        }
+						
 					});
 				}
 			});
@@ -4517,6 +5114,19 @@ var addQuestion_component = Vue.extend({
 		},
 		//选中标签
 		selectedTag : function(childQuestionTag) {
+			//判断是否重复选择,如果重复则取消选择
+			if(this.selectedTagList != null && this.selectedTagList.length >0){
+				for(var i=0; i<this.selectedTagList.length; i++){
+					var selectedTag = this.selectedTagList[i];
+					if(selectedTag.id == childQuestionTag.id){
+						//删除标签
+						this.deleteTag(selectedTag.id);
+						return;
+					}
+				}
+				
+			}
+			
 			//如果超过最大允许选择数量
 			if(this.selectedTagList.length >= this.maxQuestionTagQuantity){
 				this.$toast({
@@ -4526,21 +5136,7 @@ var addQuestion_component = Vue.extend({
 				});
 				return;
 			}
-			
-			
-			//判断是否重复选择
-			if(this.selectedTagList != null && this.selectedTagList.length >0){
-				for(var i=0; i<this.selectedTagList.length; i++){
-					var selectedTag = this.selectedTagList[i];
-					if(selectedTag.id == childQuestionTag.id){
-						
-						return;
-					}
-				}
-				
-			}
-			
-			
+
 			var o = new Object();
 			o.id = childQuestionTag.id;
 			o.name = childQuestionTag.name;
@@ -4563,6 +5159,38 @@ var addQuestion_component = Vue.extend({
 				
 			}
 		
+		},
+		//选中一级标签样式
+		selectedTagClass : function(questionTagId) {
+			var className = "nav-link";
+			if(this.selectedFirstTagId == questionTagId){
+				className += " active";
+				
+			}
+			if(this.selectedTagList != null && this.selectedTagList.length >0){
+				for(var i=0; i<this.selectedTagList.length; i++){
+					var selectedTag = this.selectedTagList[i];
+					if(selectedTag.id == questionTagId){
+						className += " selected";
+					}
+				}
+				
+			}
+			return className;
+		},
+		
+		//选中二级标签样式
+		selectedChildTagClass : function(questionTagId) {
+			if(this.selectedTagList != null && this.selectedTagList.length >0){
+				for(var i=0; i<this.selectedTagList.length; i++){
+					var selectedTag = this.selectedTagList[i];
+					if(selectedTag.id == questionTagId){
+						return "child-tag selected";
+					}
+				}
+				
+			}
+			return "child-tag";
 		},
 		
 		
@@ -4634,7 +5262,9 @@ var addQuestion_component = Vue.extend({
 								for(var i=0; i<availableTagList.length; i++){
 									var _availableTag = availableTagList[i];
 									
-									if(_availableTag == "forecolor"){//文字颜色
+									if(_availableTag == "code"){//代码
+										editorIconList.push("code");
+									}else if(_availableTag == "forecolor"){//文字颜色
 									//	editorIconList.push("foreColor");
 									}else if(_availableTag == "hilitecolor"){//文字背景
 									//	editorIconList.push("backColor");
@@ -4929,7 +5559,9 @@ var appendQuestion_component = Vue.extend({
 								for(var i=0; i<availableTagList.length; i++){
 									var _availableTag = availableTagList[i];
 									
-									if(_availableTag == "forecolor"){//文字颜色
+									if(_availableTag == "code"){//代码
+										editorIconList.push("code");
+									}else if(_availableTag == "forecolor"){//文字颜色
 									//	editorIconList.push("foreColor");
 									}else if(_availableTag == "hilitecolor"){//文字背景
 									//	editorIconList.push("backColor");
@@ -6648,9 +7280,11 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 //用户中心页
 var home_component = Vue.extend({
+	name: 'home',//组件名称，keep-alive缓存需要本参数
 	template : '#home-template',
 	data : function data() {
 		return {
+			userName : '', //用户名称 从URL中获取
 			user : '', //用户
 			avatarUrl: '',//头像URL
 			followerCount:0,//用户粉丝总数
@@ -6701,17 +7335,40 @@ var home_component = Vue.extend({
 		    
 		    videoPlayerBind: [],//视频播放器绑定Id集合
 			videoPlayerList: [],//视频播放器集合
+			
+		    playerNodeList: [],//视频节点对象集合
+			
+			userDynamicListRequestCount:0, //'用户动态集合'请求数量
+			lastRequestGroup:[] //最后一组请求
 		}
 	},
 	created : function created() {
 		//用户中心页由this.scrollQueryUserDynamicList()进行初始化
+
+		this.userName = getUrlParam("userName");
 		
-	//	this.loadHome();
-		
+		//this.loadHome(function (){});
+		//设置缓存
+		this.$store.commit('setCacheComponents',  ['home']);
 		//查询消息
 		this.unreadMessageCount();
 		
 	}, 
+	beforeRouteLeave: function (to, from, next) {
+		if (to.path == '/thread' || to.path == '/question') {//前往的URI路径需要缓存组件，其他情况下不需要缓存
+			this.$store.commit('setCacheComponents',  ['home']);
+		} else {
+			this.$store.commit('setCacheComponents',  []);
+		}
+		next();
+	},
+	activated: function () {//当再次进入（前进或者后退）时，触发 (keepAlive缓存机制才会触发的钩子函数)
+		
+		this.loading=false;//打开自动加载
+    },
+    deactivated: function () {//退出时触发 (keepAlive缓存机制才会触发的钩子函数)
+    	this.loading=true;//关闭自动加载  从话题详细页或问题详细页返回时会自动执行v-infinite-scroll,需预先关闭自动加载
+    },
 	beforeDestroy : function() {
 		for(var i =0; i<this.videoPlayerList.length; i++){
 			var videoPlayer = this.videoPlayerList[i];
@@ -6753,8 +7410,16 @@ var home_component = Vue.extend({
 					
 					data : function data() {
 						return {
-							hide_passwordList :[],//话题隐藏密码
+							hide_passwordList :[]//话题隐藏密码
 						};
+					},
+					created :function () {
+						if(this.$parent.$parent.userDynamicListRequestCount == 0){;
+							this.$parent.$parent.lastRequestGroup.push(1);//1无实际意义，只是填充数组
+						}
+					},
+					mounted :function () {
+						this.resumeCodeNodeData();
 					},
 					props: this.$options.props, // re-use current props definitions
 					methods: {
@@ -6854,6 +7519,7 @@ var home_component = Vue.extend({
 				  			if(_self.$parent.$parent.videoPlayerBind.contains(playerId)){
 				  				return;
 				  			}
+				  			
 				  			var player = document.getElementById(playerId);
 				  			
 				  			if(url == ""){
@@ -6895,7 +7561,33 @@ var home_component = Vue.extend({
 				  				
 				  			}
 				  			
+				  			//添加播放器节点数据
+							if(_self.$parent.$parent.videoPlayerList.length >0){
+								
+								for(var i=0; i< _self.$parent.$parent.videoPlayerBind.length; i++){
+							    	var playerId = _self.$parent.$parent.videoPlayerBind[i];
+							    	var node = document.getElementById(playerId);//节点对象
+							    	_self.$parent.$parent.playerNodeList.push(node);
+							    }
+							}
 				  		},
+				  		
+				  		//恢复代码节点数据(vue组件切换时会自动刷新数据，代码框在组件生成数据内容之后插入，组件刷新数据时代码框会消失，组件刷新后需要重新渲染)
+				        resumeCodeNodeData : function(){
+				        	var _self = this;
+				        	
+				        	_self.$nextTick(function() {
+				        		var requestCount = _self.$parent.$parent.userDynamicListRequestCount;//现有正在进行的请求数量
+					        	//所有ajax请求执行完再渲染
+				        		if(requestCount ==0 && this.$parent.$parent.lastRequestGroup.length>0){
+				        			this.$parent.$parent.lastRequestGroup.length = 0;//清空数组
+				        			//渲染高亮 
+				        			_self.$parent.$parent.renderCode();//调用父组件方法
+					        		
+					        	}
+				        	});
+				        }
+				  		
 				    }
 				};
 			};	
@@ -7114,11 +7806,9 @@ var home_component = Vue.extend({
 		loadHome : function(callback) {
 			var _self = this;
 			var data = "";
-			var userName = getUrlParam("userName");//用户名称
-			if(userName != null){
-				data = "&userName=" + userName;
+			if(_self.userName != null && _self.userName != ""){
+				data = "&userName=" + _self.userName;
 			}
-			
 			$.ajax({
 				type : "GET",
 				cache : false,
@@ -7150,9 +7840,8 @@ var home_component = Vue.extend({
 		queryFollowerCount : function() {
 			var _self = this;
 			var data = "";
-			var userName = getUrlParam("userName");//用户名称
-			if(userName != null){
-				data = "&userName=" + userName;
+			if(_self.userName != null && _self.userName != ""){//用户名称
+				data = "&userName=" + _self.userName;
 			}else{
 				data = "userName=" + _self.user.userName; //提交参数
 			}
@@ -7170,6 +7859,13 @@ var home_component = Vue.extend({
 							_self.followerCount = count;
 						}
 					}
+				},
+				beforeSend : function beforeSend(XMLHttpRequest) {
+					//本空方法不要删除，用来覆盖全局回调默认的旋转进度条
+					
+				},
+				complete : function complete(XMLHttpRequest, textStatus) {
+					//本空方法不要删除，用来覆盖全局回调默认的旋转进度条
 				}
 			});
 		},
@@ -7191,16 +7887,22 @@ var home_component = Vue.extend({
 		//滚动加载查询动态列表
 		scrollQueryUserDynamicList : function() {
 			var _self = this;
-			//因为v-infinite-scroll标签会在打开页面立即运行，并且动态列表需要用户信息，所以在这里调用查询用户中心页面
-			if(_self.user == ""){
-				_self.loadHome(function (){
+			if(_self.user != null && _self.user != '' && _self.user.userName == _self.$store.state.user.userName){//如果查询用户自已的动态，则不显示
+				return;
+			}
+			
+			_self.loadHome(function (){
+				if(_self.user != null && _self.user != ''){
 					if(_self.user.userName == _self.$store.state.user.userName){//如果查询用户自已的动态，则不显示
 						return;
 					}
-					
+					//因为v-infinite-scroll标签会在打开页面立即运行，并且动态列表需要用户信息，所以在这里调用查询用户中心页面
 					_self.queryUserDynamicList();
-				});
-			}
+				}
+				
+				
+				
+			});
 		},
 		
 		
@@ -7213,9 +7915,8 @@ var home_component = Vue.extend({
 				_self.totalpage = 0;
 				_self.loading = true;
 				var data = "page=" + (_self.currentpage + 1); //提交参数
-				var userName = getUrlParam("userName");//用户名称
-				if(userName != null){
-					data += "&userName=" + userName;
+				if(_self.userName != null && _self.userName != ""){//用户名称
+					data += "&userName=" + _self.userName;
 				}
 				$.ajax({
 					type : "GET",
@@ -7241,23 +7942,42 @@ var home_component = Vue.extend({
 										_self.hidePasswordIndex = 0;
 										_self.bindNode(contentNode,userDynamic.topicId);
 										userDynamic.topicContent = contentNode.innerHTML;
+										_self.userDynamicListRequestCount = _self.userDynamicListRequestCount+2; //增加'话题收藏数量'和'点赞数量'两个请求
 										
 										
-										//话题收藏数量
-										_self.queryFavoriteCount(userDynamic.topicId,_self.favoriteCountGroup.length-1,function(index,count) {
-											if(count != null && count != ''){
-												_self.$set(_self.favoriteCountGroup, index, parseInt(count));
-											}
+										var favoriteObject = new Object(); 
+										favoriteObject.topicId = userDynamic.topicId; 
+										favoriteObject.index = _self.favoriteCountGroup.length-1; 
+										
+										
+										setTimeout(function(favoriteObject) {
+											//话题收藏数量
+											_self.queryFavoriteCount(favoriteObject.topicId,favoriteObject.index,function(index,count) {
+												if(count != null && count != ''){
+													_self.userDynamicListRequestCount = _self.userDynamicListRequestCount-1; //减少一个请求
+													_self.$set(_self.favoriteCountGroup, index, parseInt(count));
+												}
+												
+											});
+										}, 0,favoriteObject);
+										
+										
+										var likeObject = new Object(); 
+										likeObject.topicId = userDynamic.topicId; 
+										likeObject.index = _self.likeCountGroup.length-1;
+										_self.$nextTick(function() {
+											setTimeout(function(likeObject) {
+												//点赞数量
+												_self.queryLikeCount(likeObject.topicId,likeObject.index,function(index,count) {
+													if(count != null && count != ''){
+														_self.userDynamicListRequestCount = _self.userDynamicListRequestCount-1; //减少一个请求
+														_self.$set(_self.likeCountGroup, index, parseInt(count));
+													}
+													
+												});
 											
+											}, 0,likeObject);
 										});
-										//点赞数量
-										_self.queryLikeCount(userDynamic.topicId,_self.likeCountGroup.length-1,function(index,count) {
-											if(count != null && count != ''){
-												_self.$set(_self.likeCountGroup, index, parseInt(count));
-											}
-											
-										});
-										
 										
 									}else if(userDynamic.module == 200){
 										//处理图片标签
@@ -7266,13 +7986,22 @@ var home_component = Vue.extend({
 										_self.bindNode(contentNode,null);
 										userDynamic.commentContent = contentNode.innerHTML;
 									}else if(userDynamic.module == 500){
-										//问题收藏数量
-										_self.queryQuestionFavoriteCount(userDynamic.questionId,_self.questionFavoriteCountGroup.length-1,function(index,count) {
-											if(count != null && count != ''){
-												_self.$set(_self.questionFavoriteCountGroup, index, parseInt(count));
-											}
-											
-										});
+										_self.userDynamicListRequestCount = _self.userDynamicListRequestCount+1; //增加'问题收藏数量'一个请求
+										var favoriteObject = new Object(); 
+										favoriteObject.question = userDynamic.questionId; 
+										favoriteObject.index = _self.questionFavoriteCountGroup.length-1;
+
+										setTimeout(function(favoriteObject) {
+											//问题收藏数量
+											_self.queryQuestionFavoriteCount(favoriteObject.questionId,favoriteObject.index,function(index,count) {
+												if(count != null && count != ''){
+													_self.userDynamicListRequestCount = _self.userDynamicListRequestCount-1; //减少一个请求
+													_self.$set(_self.questionFavoriteCountGroup, index, parseInt(count));
+												}
+												
+											});
+										}, 0,favoriteObject);
+										
 										//处理图片标签
 										var contentNode = document.createElement("div");
 										contentNode.innerHTML = userDynamic.questionContent;
@@ -7294,8 +8023,7 @@ var home_component = Vue.extend({
 								
 								_self.userDynamicList.push.apply(_self.userDynamicList, new_userDynamicList); //合并两个数组
 								
-								
-								
+							
 								//生成首字符头像
 								_self.$nextTick(function() {
 									if (new_userDynamicList != null && new_userDynamicList.length > 0) {
@@ -7311,12 +8039,11 @@ var home_component = Vue.extend({
 									}
 								});
 								
+								
 							}
 							
 							_self.currentpage = pageView.currentpage;
 							_self.totalpage = pageView.totalpage;
-							
-							
 						}
 					},
 					complete : function complete(XMLHttpRequest, textStatus) {
@@ -7432,16 +8159,50 @@ var home_component = Vue.extend({
 	    				childNode.appendChild(dom);
 	    			
 	            	}
-	            	
+	            	//处理代码标签
+	            	if(childNode.nodeName.toLowerCase() == "pre" ){
+	            		var pre_html = childNode.innerHTML;
+	            		var class_val = childNode.className;
+	            		var lan_class = "";
+	            		
+	        	        var class_arr = new Array();
+	        	        class_arr = class_val.split(' ');
+	        	        
+	        	        for(var k=0; k<class_arr.length; k++){
+	        	        	var className = class_arr[k].trim();
+	        	        	
+	        	        	if(className != null && className != ""){
+	        	        		if (className.lastIndexOf('lang-', 0) === 0) {
+	        	        			lan_class = className;
+	        			            break;
+	        			        }
+	        	        	}
+	        	        }
+	        	       
+	        	        childNode.className = "line-numbers "+getLanguageClassName(lan_class);
+	            		
+	            		
+	            		var nodeHtml = "";
+            		//	nodeHtml += '<code>';
+            			nodeHtml += 	pre_html
+            		//	nodeHtml += '</code>';
+            			childNode.innerHTML = nodeHtml;
+	            		
+	            	}
 	            	
 	            	
 	            	this.bindNode(childNode,topicId);
 	            }
 	        }
 	    },
+
 	    
-	    
-	    
+	    //渲染代码
+	  	renderCode : function() {
+  			var _self = this;
+  			
+  			Prism.highlightAll();
+	  	},
 	    
 	   
 	    
@@ -7465,6 +8226,13 @@ var home_component = Vue.extend({
 						//	_self.favoriteCount = count;
 						}
 					}
+				},
+				beforeSend : function beforeSend(XMLHttpRequest) {
+					//本空方法不要删除，用来覆盖全局回调默认的旋转进度条
+					
+				},
+				complete : function complete(XMLHttpRequest, textStatus) {
+					//本空方法不要删除，用来覆盖全局回调默认的旋转进度条
 				}
 			});
 		},
@@ -7489,6 +8257,13 @@ var home_component = Vue.extend({
 						//	_self.favoriteCount = count;
 						}
 					}
+				},
+				beforeSend : function beforeSend(XMLHttpRequest) {
+					//本空方法不要删除，用来覆盖全局回调默认的旋转进度条
+					
+				},
+				complete : function complete(XMLHttpRequest, textStatus) {
+					//本空方法不要删除，用来覆盖全局回调默认的旋转进度条
 				}
 			});
 		},
@@ -7512,6 +8287,13 @@ var home_component = Vue.extend({
 						//	_self.favoriteCount = count;
 						}
 					}
+				},
+				beforeSend : function beforeSend(XMLHttpRequest) {
+					//本空方法不要删除，用来覆盖全局回调默认的旋转进度条
+					
+				},
+				complete : function complete(XMLHttpRequest, textStatus) {
+					//本空方法不要删除，用来覆盖全局回调默认的旋转进度条
 				}
 			});
 		},
@@ -11723,7 +12505,7 @@ var editTopic_component = Vue.extend({
 								if (key == "allowTopic") {
 									if(returnValue[key] == false){
 										_self.$toast({
-											message : "修改话题功能未开放",
+											message : "不允许修改话题",
 											duration : 3000,
 										});
 									}	
@@ -11761,7 +12543,9 @@ var editTopic_component = Vue.extend({
 								for(var i=0; i<availableTagList.length; i++){
 									var _availableTag = availableTagList[i];
 									
-									if(_availableTag == "forecolor"){//文字颜色
+									if(_availableTag == "code"){//代码
+										editorIconList.push("code");
+									}else if(_availableTag == "forecolor"){//文字颜色
 									//	editorIconList.push("foreColor");
 									}else if(_availableTag == "hilitecolor"){//文字背景
 									//	editorIconList.push("backColor");
@@ -12747,7 +13531,33 @@ function getWeiXinOpenId() {
 	}
 	
 }
-
+//获取代码语言
+function getLanguageClassName(languageCode) {
+	var language_arr = new Array();
+	language_arr.push("lang-xml_language-xml");
+	language_arr.push("lang-css_language-css");
+	language_arr.push("lang-html_language-html");
+	language_arr.push("lang-js_language-JavaScript");
+	language_arr.push("lang-java_language-java");
+	language_arr.push("lang-pl_language-perl");
+	language_arr.push("lang-py_language-python");
+	language_arr.push("lang-rb_language-ruby");
+	language_arr.push("lang-go_language-Go");
+	language_arr.push("lang-cpp_language-C++");
+	language_arr.push("lang-cs_language-C#");
+	language_arr.push("lang-bsh_language-Bash + Shell");
+		
+	for(var k=0; k<language_arr.length; k++){
+		var language = language_arr[k];
+		var class_arr = new Array();
+		class_arr = language.split('_');
+		if(languageCode == class_arr[0]){
+			
+			return class_arr[1];
+		}
+	}
+	return "language-markup";
+}
 
 
 //创建富文本编辑器

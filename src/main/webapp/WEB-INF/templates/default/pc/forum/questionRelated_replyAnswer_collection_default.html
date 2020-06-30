@@ -14,7 +14,7 @@
 				<textarea class="reply-textarea" onfocus="" id="${identificationNumber}_replyAnswerContent" name="content" placeholder="写下您的回复"></textarea>
 				
 				<span id="${identificationNumber}_content_error" class="error">${(error['content'])!}</span> 
-				<span id="${identificationNumber}_reply_error" class="error">${error['answerReply']}</span>
+				<span id="${identificationNumber}_answerReply_error" class="error">${error['answerReply']}</span>
 				<div class="form-action">
 					<#-- 获取评论Id -->
 					<input type="hidden" id="${identificationNumber}_answerId" name="answerId" value="${url_answerId}">

@@ -4,6 +4,7 @@ import java.util.Date;
 
 import javax.annotation.Resource;
 
+import cms.bean.setting.AllowRegisterAccount;
 import cms.bean.setting.EditorTag;
 import cms.bean.setting.SystemSetting;
 import cms.service.setting.SettingService;
@@ -98,6 +99,18 @@ public class SettingManage {
 	public void executeDeleteUserLoginLogData(Date endTime){
 		userService.deleteUserLoginLog(endTime);
 	}
+	
+	/**
+	 * 读取允许注册账号类型
+	 * @return
+	*/
+	public AllowRegisterAccount readAllowRegisterAccount(){
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.getAllowRegisterAccount() != null && !"".equals(systemSetting.getAllowRegisterAccount().trim())){
+			return JsonUtils.toObject(systemSetting.getAllowRegisterAccount(), AllowRegisterAccount.class);
+		}
+		return null;
+	} 
 	
 	/**
 	 * 读取话题编辑器允许使用标签

@@ -23,6 +23,7 @@ import cms.bean.payment.Bank;
 import cms.bean.payment.OnlinePaymentInterface;
 import cms.bean.payment.PaymentLog;
 import cms.bean.payment.PaymentVerificationLog;
+import cms.bean.setting.SystemSetting;
 import cms.bean.user.AccessUser;
 import cms.bean.user.User;
 import cms.service.payment.PaymentService;
@@ -66,7 +67,7 @@ public class PaymentFormAction {
 	@Resource UserGradeService userGradeService;
 	@Resource PaymentService paymentService;
 	@Resource SettingService siteService;
-	
+	@Resource SettingService settingService;
 	@Resource AccessSourceDeviceManage accessSourceDeviceManage;
 
 	@Resource OnlinePaymentInterfaceManage onlinePaymentInterfaceManage;
@@ -240,6 +241,12 @@ public class PaymentFormAction {
 		if(!number.contains(paymentModule)){
 			error.put("message", "支付模块参数错误");
 		}
+		
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.getCloseSite().equals(2)){
+			error.put("message", ErrorView._21.name());//只读模式不允许提交数据
+		}
+		
 		//判断令牌
 		if(token != null && !"".equals(token.trim())){	
 			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌

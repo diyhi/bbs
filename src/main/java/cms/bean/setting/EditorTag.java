@@ -42,6 +42,9 @@ public class EditorTag implements Serializable{
 	private boolean insertorderedlist = false;
 	/** 项目符号 **/
 	private boolean insertunorderedlist = false;
+	/** 代码 **/
+	private boolean code = false;
+	
 	/** 插入表情 **/
 	private boolean emoticons = false;
 	/** 允许上传图片 **/
@@ -316,6 +319,14 @@ public class EditorTag implements Serializable{
 
 	public void setFullscreen(boolean fullscreen) {
 		this.fullscreen = fullscreen;
+	}
+
+	public boolean isCode() {
+		return code;
+	}
+
+	public void setCode(boolean code) {
+		this.code = code;
 	}
 
 }

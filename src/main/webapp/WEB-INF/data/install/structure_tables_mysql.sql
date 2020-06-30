@@ -14,6 +14,7 @@ CREATE TABLE `answer` (
   `status` int(11) DEFAULT NULL,
   `userName` varchar(30) DEFAULT NULL,
   `adoption` bit(1) DEFAULT NULL,
+  `lastUpdateTime` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `answer_1_idx` (`questionId`,`status`,`adoption`),
   KEY `answer_2_idx` (`userName`,`isStaff`)
@@ -33,6 +34,7 @@ CREATE TABLE `answerreply` (
   `questionId` bigint(20) DEFAULT NULL,
   `status` int(11) DEFAULT NULL,
   `userName` varchar(30) DEFAULT NULL,
+  `lastUpdateTime` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `answerReply_1_idx` (`answerId`,`status`),
   KEY `answerReply_2_idx` (`questionId`),
@@ -1312,7 +1314,6 @@ CREATE TABLE `systemnotify` (
 
 CREATE TABLE `systemsetting` (
   `id` int(11) NOT NULL,
-  `allowRegister` bit(1) NOT NULL,
   `backstagePageNumber` int(11) DEFAULT NULL,
   `closeSite` int(11) DEFAULT NULL,
   `closeSitePrompt` longtext,
@@ -1367,6 +1368,7 @@ CREATE TABLE `systemsetting` (
   `questionRewardAmountMin` decimal(12,2) NOT NULL,
   `questionRewardPointMax` bigint(20) DEFAULT NULL,
   `questionRewardPointMin` bigint(20) DEFAULT NULL,
+  `allowRegisterAccount` longtext,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

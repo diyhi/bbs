@@ -304,8 +304,8 @@
 	    languageMapping_arr.push(languageClassName_py);
 	    var languageClassName_rb = languageClassName("lang-rb","language-ruby");
 	    languageMapping_arr.push(languageClassName_rb);
-	    var languageClassName_vb = languageClassName("lang-vb","language-VB.Net");
-	    languageMapping_arr.push(languageClassName_vb);  
+	    var languageClassName_go = languageClassName("lang-go","language-Go");
+	    languageMapping_arr.push(languageClassName_go);  
 	    var languageClassName_cpp = languageClassName("lang-cpp","language-C++");
 	    languageMapping_arr.push(languageClassName_cpp);  
 	    var languageClassName_cs = languageClassName("lang-cs","language-C#");
@@ -334,14 +334,14 @@
 	        for(var i=0; i<languageMapping_arr.length; i++){
 		    	var languageMapping = languageMapping_arr[i];
 		    	if(languageMapping.originalClass == lan_class){
-			    	var pre_content = '<code>'+$(this).html()+'</code>';
-			        $(this).html(pre_content);
+			    //	var pre_content = '<code>'+$(this).html()+'</code>';
+			        $(this).html($(this).html());
 			        $(this).attr("class",'line-numbers '+languageMapping.newClass);
 		    	}
 		    }
 		    if(lan_class == ""){
-		    	var pre_content = '<code>'+$(this).html()+'</code>';
-			    $(this).html(pre_content);
+		    //	var pre_content = '<code>'+$(this).html()+'</code>';
+			    $(this).html($(this).html());
 			    $(this).attr("class",'line-numbers language-markup');
 		    }
 	    });

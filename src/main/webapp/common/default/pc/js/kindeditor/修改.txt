@@ -143,4 +143,8 @@ var uploadbutton = K.uploadbutton({
 			width: 60,	
 				
 将width: 60,改为width: 70,			
+			
+			
+		
+		
 		

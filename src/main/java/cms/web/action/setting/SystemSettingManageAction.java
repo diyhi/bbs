@@ -17,6 +17,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import cms.bean.setting.AllowRegisterAccount;
 import cms.bean.setting.EditorTag;
 import cms.bean.setting.SystemNode;
 import cms.bean.setting.SystemSetting;
@@ -84,6 +85,13 @@ public class SystemSettingManageAction {
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		SystemSetting systemSite = settingService.findSystemSetting();
 	
+		if(systemSite.getAllowRegisterAccount() != null && !"".equals(systemSite.getAllowRegisterAccount().trim())){
+			AllowRegisterAccount allowRegisterAccount = JsonUtils.toObject(systemSite.getAllowRegisterAccount(), AllowRegisterAccount.class);
+			if(allowRegisterAccount != null){
+				systemSite.setAllowRegisterAccountObject(allowRegisterAccount);
+			}
+		}
+		
 		if(systemSite.getEditorTag() != null && !"".equals(systemSite.getEditorTag().trim())){
 			EditorTag editorTag = JsonUtils.toObject(systemSite.getEditorTag(), EditorTag.class);
 			if(editorTag != null){
@@ -146,6 +154,7 @@ public class SystemSettingManageAction {
 			model.addAttribute("videoUploadFormatList",videoUploadFormatList);
 			return "jsp/setting/edit_systemSetting";
 		}
+		formbean.setAllowRegisterAccount(JsonUtils.toJSONString(formbean.getAllowRegisterAccountObject()));
 		formbean.setTopicEditorTag(JsonUtils.toJSONString(formbean.getTopicEditorTagObject()));
 		formbean.setEditorTag(JsonUtils.toJSONString(formbean.getEditorTagObject()));
 		formbean.setQuestionEditorTag(JsonUtils.toJSONString(formbean.getQuestionEditorTagObject()));

@@ -28,7 +28,7 @@ public class SystemSetting implements Serializable{
 	/** 站点描述(description) **/
 	private String description= "";
 	
-	/** 关闭站点 1.打开 3.全站关闭**/
+	/** 关闭站点 1.打开 2.只读模式 3.全站关闭**/
 	private Integer closeSite = 1;
 	/** 关闭站点提示信息 **/
 	@Lob
@@ -37,9 +37,14 @@ public class SystemSetting implements Serializable{
 	/** 支持访问设备 1.自动识别终端 2.电脑端 3.移动端 **/
 	private Integer supportAccessDevice = 1;
 	
-	/** 是否允许注册 **/
-	private boolean allowRegister = true;
-	
+	/** 是否允许注册
+	private boolean allowRegister = true; **/
+	/** 允许注册账号类型 json AllowRegisterAccount格式数据**/
+	@Lob
+	private String allowRegisterAccount;
+	@Transient
+	private AllowRegisterAccount allowRegisterAccountObject = new AllowRegisterAccount();
+
 	/** 注册是否需要验证码 **/
 	private boolean registerCaptcha = true;
 
@@ -240,12 +245,12 @@ public class SystemSetting implements Serializable{
 		this.supportAccessDevice = supportAccessDevice;
 	}
 
-	public boolean isAllowRegister() {
-		return allowRegister;
+	public String getAllowRegisterAccount() {
+		return allowRegisterAccount;
 	}
 
-	public void setAllowRegister(boolean allowRegister) {
-		this.allowRegister = allowRegister;
+	public void setAllowRegisterAccount(String allowRegisterAccount) {
+		this.allowRegisterAccount = allowRegisterAccount;
 	}
 
 	public boolean isRegisterCaptcha() {
@@ -663,6 +668,14 @@ public class SystemSetting implements Serializable{
 
 	public void setQuestionRewardAmountMax(BigDecimal questionRewardAmountMax) {
 		this.questionRewardAmountMax = questionRewardAmountMax;
+	}
+
+	public AllowRegisterAccount getAllowRegisterAccountObject() {
+		return allowRegisterAccountObject;
+	}
+
+	public void setAllowRegisterAccountObject(AllowRegisterAccount allowRegisterAccountObject) {
+		this.allowRegisterAccountObject = allowRegisterAccountObject;
 	}
 
 

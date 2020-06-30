@@ -21,11 +21,13 @@ import cms.bean.ErrorView;
 import cms.bean.follow.Follow;
 import cms.bean.follow.Follower;
 import cms.bean.message.Remind;
+import cms.bean.setting.SystemSetting;
 import cms.bean.user.AccessUser;
 import cms.bean.user.ResourceEnum;
 import cms.bean.user.User;
 import cms.service.follow.FollowService;
 import cms.service.message.RemindService;
+import cms.service.setting.SettingService;
 import cms.service.template.TemplateService;
 import cms.utils.Base64;
 import cms.utils.JsonUtils;
@@ -58,6 +60,8 @@ public class FollowFormAction {
 	@Resource FollowManage followManage;
 	@Resource FollowerManage followerManage;
 	@Resource CSRFTokenManage csrfTokenManage;
+	@Resource SettingService settingService;
+	
 	/**
 	 * 关注   添加
 	 * @param model
@@ -78,7 +82,10 @@ public class FollowFormAction {
 		
 		Map<String,String> error = new HashMap<String,String>();
 		
-			
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.getCloseSite().equals(2)){
+			error.put("follow", ErrorView._21.name());//只读模式不允许提交数据
+		}
 		
 		//判断令牌
 		if(token != null && !"".equals(token.trim())){	

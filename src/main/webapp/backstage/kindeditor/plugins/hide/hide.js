@@ -52,9 +52,33 @@ KindEditor.plugin('hide', function(K) {
         }
     }
 	
+	/**
+	 * 处理html前
+	 */
+	function processHtmlBefore(html){
+		return html.replace(/(<(?:hide|hide\s[^>]*)>)([\s\S]*?)(<\/hide>)/ig, function($0, $1, $2, $3) {
+			//因为<p>标签包裹<pre>等块元素时会被浏览器截断，<hide>标签内含的<pre>在“<p><hide>aaa<pre>bbb</pre>ccc</hide></p>”被浏览器执行node.innerHTML后变为“<p><hide>aaa</hide></p><pre>bbb</pre>ccc<p></p>”,发生错位。 
+			//我们将<hide>标签用块元素<article>包裹,让<hide>的父级<p>标签自动截断,保护<hide>标签内的<pre>标签不会由截断产生错位。正确结果为“<p></p><hide>aaa<pre>bbb</pre>ccc</hide><p></p>”
+			//本正则和方法self.beforeGetHtml配合使用
+			return '<article type="__kindeditor_temp_pre__">' +$1 + $2 + $3 + '</article>';
+		});
+		
+	}
+	/**
+	 * 处理html后
+	 */
+	function processHtmlAfter(html){
+		return html.replace(/<article\s+[^>]*type="([^"]*)"[^>]*>([\s\S]*?)<\/article>/ig, function(full, attr, code) {//将self.beforeSetHtml方法加入的<article>标签删除
+			return code;
+		});
+	}
+	
+	
 
     // 点击图标时执行
 	self.plugin.hideDialog = function(options) {
+		
+		
 		var userGradeHtml = "";
 		if(userGradeList != null && userGradeList.length >0){
 			userGradeHtml += '<select id="inputValue_30" name="inputValue_30" >';
@@ -65,6 +89,8 @@ KindEditor.plugin('hide', function(K) {
 			}
 			userGradeHtml += '</select> 以上可见';
 		}
+		
+		
 		
 		var lang = self.lang(name + '.'),
 		selectedNode = options.selectedNode,
@@ -116,7 +142,7 @@ KindEditor.plugin('hide', function(K) {
 					'</div>',
 					'<div>',
 						//提示
-						'<div style="color: #747474">',
+						'<div style="color: #747474;position: absolute;left: 21px;bottom: 18px;">',
 						'提示：Shift + 回车 换行不换段',
 						'</div>',
 					'</div>',
@@ -132,6 +158,19 @@ KindEditor.plugin('hide', function(K) {
 			yesBtn : {
 				name : self.lang('yes'),
 				click : function(e) {
+					
+					
+					var ancestor = K(self.cmd.range.commonAncestor());
+					if(ancestor.name != "body" && ancestor.name != "hide" && ancestor.name != "pre" && ancestor.name != "code"){
+						//截断样式
+						var _wrapper = K("<span></span>", self.cmd.doc);//插入指定的HTML内容到光标处。
+						_wrapper.html("&#8203;");//&#8203;是零宽空格字符
+						self.cmd.range.insertNode(_wrapper[0]).selectNodeContents(_wrapper[0]);
+						self.cmd.select();
+						self.cmd.removeformat();//删除格式。
+					}
+					
+					var bookmark = self.cmd.range.createBookmark(true);//通过在光标处插入指定标签<span id="#__kindeditor_bookmark_start_1__"></span>标记，用于DOM操作后恢复之前光标位置
 					
 					html = "";
 					var password = K.trim(passwordBox.val()),
@@ -184,6 +223,34 @@ KindEditor.plugin('hide', function(K) {
 							return;
 						}
 					}
+					
+					var htmlValue = processHtmlBefore(self.bodyHtml());
+					if(tabIndexBox == 0){//输入密码可见
+						//替换标签
+						htmlValue = replaceTab(htmlValue,"hide","inputValue_10",""+password+"");
+						
+					}else if(tabIndexBox == 1){//回复话题可见
+						
+					}else if(tabIndexBox == 2){//达到等级可见
+						//替换标签
+						htmlValue = replaceTab(htmlValue,"hide","inputValue_30",""+grade+"",""+gradeTag+"");
+						
+					}else if(tabIndexBox == 3){//积分购买可见
+						htmlValue = replaceTab(htmlValue,"hide","inputValue_40",""+point+""); 
+						
+					}else if(tabIndexBox == 4){//余额购买可见
+						htmlValue = replaceTab(htmlValue,"hide","inputValue_50",""+amount+""); 
+						
+					}
+					if(tabIndexBox == 0 || tabIndexBox == 2 || tabIndexBox == 3 || tabIndexBox == 4){
+						self.html(processHtmlAfter(htmlValue));
+					}
+
+					self.cmd.range.moveToBookmark(bookmark);
+					self.cmd.select();
+					self.addBookmark();
+					//self.focus();
+					
 	
 					
 					if(selectedNode != null){//更新
@@ -222,30 +289,21 @@ KindEditor.plugin('hide', function(K) {
 						}else if(tabIndexBox == 4){//余额购买可见
 							html = "<hide class='inputValue_50' hide-type='50' input-value='"+amount+"'></hide>";
 						}
-						self.insertHtml(html).hideDialog();
+					//	self.insertHtml(html).hideDialog().focus();
+						self.hideDialog();
+
+						var hideNode =  K(html, self.cmd.doc);//在光标处插入节点
+						self.cmd.range.insertNode(hideNode[0]).selectNodeContents(hideNode[0]).collapse(false);
 						
+						self.cmd.select();
+						self.cmd.range.insertNode(self.cmd.doc.createTextNode('\u200B'));
+						self.focus();
 					}
 					
-					if(tabIndexBox == 0){//输入密码可见
-						//替换标签
-						var htmlValue = replaceTab(self.html(),"hide","inputValue_10",""+password+"");
-						self.html(htmlValue);
-					}else if(tabIndexBox == 1){//回复话题可见
-						
-					}else if(tabIndexBox == 2){//达到等级可见
-						//替换标签
-						var htmlValue = replaceTab(self.html(),"hide","inputValue_30",""+grade+"",""+gradeTag+"");
-						self.html(htmlValue);
-					}else if(tabIndexBox == 3){//积分购买可见
-						var htmlValue = replaceTab(self.html(),"hide","inputValue_40",""+point+""); 
-						self.html(htmlValue);
-					}else if(tabIndexBox == 4){//余额购买可见
-						var htmlValue = replaceTab(self.html(),"hide","inputValue_50",""+amount+""); 
-						self.html(htmlValue);
-					}
-
 					
 				},
+				
+				
 				beforeRemove : function() {
 					passwordBox.unbind();//移除所有事件函数
 					gradeBox.unbind();
@@ -254,6 +312,7 @@ KindEditor.plugin('hide', function(K) {
 					
 				}
 			}
+			
 		}),
 		div = dialog.div;
 		
@@ -386,6 +445,7 @@ KindEditor.plugin('hide', function(K) {
 	
 	//self.clickToolbar(name, self.plugin.hide.edit);
 	self.clickToolbar(name, function() {
+		
 		self.plugin.hideDialog({
 			selectedNode: null,
 			hideInputValue : '',
@@ -395,6 +455,7 @@ KindEditor.plugin('hide', function(K) {
 			hidePoint : '',
 			hideAmount : ''	
 		});
+		
 	});
 	
 

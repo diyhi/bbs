@@ -185,8 +185,7 @@ public class TemplateMain {
 				Map<String,Object> value = topic_TemplateManage.editCommentReply_collection(forum, submitParameter,runtimeParameter);
 				return value;
 			}
-		}
-		if(forum.getForumChildType().equals("问题标签列表")){
+		}else if(forum.getForumChildType().equals("问题标签列表")){
 			if(forum.getDisplayType().equals("collection")){//集合
 				List<QuestionTag> value = questionTag_TemplateManage.questionTag_collection(forum, submitParameter,runtimeParameter);
 				return value;
@@ -221,9 +220,19 @@ public class TemplateMain {
 				Map<String,Object> value = question_TemplateManage.addAnswer_collection(forum, submitParameter,runtimeParameter);
 				return value;
 			}
+		}else if(forum.getForumChildType().equals("修改答案")){
+			if(forum.getDisplayType().equals("collection")){//集合
+				Map<String,Object> value = question_TemplateManage.editAnswer_collection(forum, submitParameter,runtimeParameter);
+				return value;
+			}
 		}else if(forum.getForumChildType().equals("回复答案")){
 			if(forum.getDisplayType().equals("collection")){//集合
 				Map<String,Object> value = question_TemplateManage.replyAnswer_collection(forum, submitParameter,runtimeParameter);
+				return value;
+			}
+		}else if(forum.getForumChildType().equals("修改答案回复")){
+			if(forum.getDisplayType().equals("collection")){//集合
+				Map<String,Object> value = question_TemplateManage.editAnswerReply_collection(forum, submitParameter,runtimeParameter);
 				return value;
 			}
 		}else if(forum.getForumChildType().equals("采纳答案")){

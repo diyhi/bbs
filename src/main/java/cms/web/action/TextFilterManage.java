@@ -110,6 +110,11 @@ public class TextFilterManage {
 			whitelist.addTags("ul","li","div","br")
 			.addAttributes("div", "align");
 		}
+		if(editorTag == null || editorTag.isCode()){//代码
+			//代码
+			whitelist.addTags("pre")
+			.addAttributes("pre","class");
+		}
 		if(editorTag == null){
 			//增加缩进
 			whitelist.addTags("blockquote");
@@ -131,9 +136,6 @@ public class TextFilterManage {
 			.addAttributes("h5","style","align")
 			.addAttributes("h6","style","align");
 			
-			//代码
-			whitelist.addTags("pre")
-			.addAttributes("pre","class");
 			
 		}
 		if(editorTag == null || editorTag.isFontname()){//字体
@@ -624,10 +626,51 @@ public class TextFilterManage {
 		//转义pre标签内容 注意：前端富文本编辑器默认会自动转义，这里转义是为了防止前端绕过转义而导致某些JavaScript高亮插件显示错位，像&nbsp;这种空格标签前端不转义就不能显示本字符
 		Elements elements = doc.select("pre");  
 		for (Element element : elements) {
+			Elements childrenElements = element.children();
+			
+			
+			//子标签是否为<code>
+			if(childrenElements != null && childrenElements.size() >0){
+				for (Element childrenElement : childrenElements) {
+					if("code".equalsIgnoreCase(childrenElement.tagName())){
+						//移除匹配的元素但保留他们的内容
+						childrenElement.unwrap();  
+					}
+			    }
+			}
+			
+			Elements allElements = element.getAllElements();//所有子节点
+			if(allElements != null && allElements.size() >0){
+				for (Element childrenElement : allElements) {
+					if("br".equalsIgnoreCase(childrenElement.tagName())){//br标签转为换行符 wangEditor.js换行会生成<br>标签
+						
+						childrenElement.append("\n");
+						childrenElement.unwrap();
+					}
+					if("span".equalsIgnoreCase(childrenElement.tagName())){//删除没内容的<span>标签 kindeditor.js粘贴代码时会产生空白<span>标签
+						childrenElement.append("\n");
+						
+						String content = childrenElement.html();
+						if("".equals(content)){//如果内容为空
+							childrenElement.append("	");//Tab键
+						}
+						
+						childrenElement.unwrap(); //移除匹配的元素但保留他们的内容
+					}
+				}
+			}
+			
+			
+			
 			String htmlData = element.html();
 			if(htmlData != null && !"".equals(htmlData.trim())){
-				element.html(HtmlEscape.escapeSymbol(element.html()));//仅转义小于号和大于号
+				htmlData = HtmlEscape.escapeSymbol(element.html());//仅转义小于号和大于号
 			}
+			
+			//清空元素的内容
+			element.empty();
+			
+			element.prependElement("code").html(htmlData);
 		}
 		
 		//prettyPrint(是否重新格式化)、outline(是否强制所有标签换行)、indentAmount(缩进长度)    doc.outputSettings().indentAmount(0).prettyPrint(false);

@@ -1,11 +1,8 @@
 package cms.web.action.common;
 
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -25,10 +22,12 @@ import cms.bean.favorite.Favorites;
 import cms.bean.favorite.QuestionFavorite;
 import cms.bean.favorite.TopicFavorite;
 import cms.bean.question.Question;
+import cms.bean.setting.SystemSetting;
 import cms.bean.topic.Topic;
 import cms.bean.user.AccessUser;
 import cms.bean.user.ResourceEnum;
 import cms.service.favorite.FavoriteService;
+import cms.service.setting.SettingService;
 import cms.service.template.TemplateService;
 import cms.utils.Base64;
 import cms.utils.JsonUtils;
@@ -60,6 +59,8 @@ public class FavoriteFormAction {
 	@Resource CSRFTokenManage csrfTokenManage;
 	@Resource TopicManage topicManage;
 	@Resource QuestionManage questionManage;
+	@Resource SettingService settingService;
+	
 	/**
 	 * 收藏夹   添加
 	 * @param model
@@ -82,7 +83,10 @@ public class FavoriteFormAction {
 		
 		Map<String,String> error = new HashMap<String,String>();
 		
-			
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.getCloseSite().equals(2)){
+			error.put("favorites", ErrorView._21.name());//只读模式不允许提交数据
+		}
 		
 		//判断令牌
 		if(token != null && !"".equals(token.trim())){	

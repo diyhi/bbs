@@ -65,6 +65,9 @@ public class Answer implements Serializable{
 	/** 回答时间 **/
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date postTime = new Date();
+	/** 最后修改时间 **/
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date lastUpdateTime;
 	
 	/** 用户角色名称集合 **/
 	@Transient
@@ -219,6 +222,14 @@ public class Answer implements Serializable{
 
 	public void setAdoption(Boolean adoption) {
 		this.adoption = adoption;
+	}
+
+	public Date getLastUpdateTime() {
+		return lastUpdateTime;
+	}
+
+	public void setLastUpdateTime(Date lastUpdateTime) {
+		this.lastUpdateTime = lastUpdateTime;
 	}
 	
 	

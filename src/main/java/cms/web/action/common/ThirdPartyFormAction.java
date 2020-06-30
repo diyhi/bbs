@@ -19,6 +19,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 
 import cms.bean.ErrorView;
+import cms.bean.setting.AllowRegisterAccount;
+import cms.bean.setting.SystemSetting;
 import cms.bean.thirdParty.WeChatConfig;
 import cms.bean.thirdParty.WeiXinOpenId;
 import cms.bean.thirdParty.WeiXinUserInfo;
@@ -37,6 +39,7 @@ import cms.utils.WebUtil;
 import cms.utils.threadLocal.AccessUserThreadLocal;
 import cms.web.action.AccessSourceDeviceManage;
 import cms.web.action.CSRFTokenManage;
+import cms.web.action.setting.SettingManage;
 import cms.web.action.template.TemplateMain;
 import cms.web.action.thirdParty.ThirdPartyManage;
 import cms.web.action.user.UserLoginLogManage;
@@ -61,7 +64,7 @@ public class ThirdPartyFormAction {
 	@Resource UserManage userManage;
 	@Resource UserLoginLogManage userLoginLogManage;
 	@Resource OAuthManage oAuthManage;
-	
+	@Resource SettingManage settingManage;
 	
 	/**
 	 * 查询微信openid
@@ -300,31 +303,49 @@ public class ThirdPartyFormAction {
 		User user = userService.findUserByPlatformUserId(platformUserId);
 		
 		
-		if(user == null){//用户不存在，执行注册
-			user = new User();
-			user.setUserName(userManage.queryUserIdentifier(40)+"-"+UUIDUtil.getUUID22());//会员用户名
-			user.setSalt(UUIDUtil.getUUID32());//盐值
-			user.setSecurityDigest(new Date().getTime());//安全摘要
-			user.setAllowUserDynamic(true);//是否允许显示用户动态
-			user.setRealNameAuthentication(false);//是否实名认证
-			user.setRegistrationDate(new Date());//注册日期
-			user.setPoint(0L);//当前积分
-			user.setDeposit(new BigDecimal("0"));//当前预存款
-			user.setType(40);//用户类型 40:微信用户
-			user.setPlatformUserId(platformUserId);//平台用户Id 
-			user.setState(1);//用户状态    1:正常用户
-			user.setUserVersion(0);//版本号
-			
-			
-			try {
-				userService.saveUser(user,null,null);
-			} catch (Exception e) {
-				error.put("register", ErrorView._823.name());//注册会员出错
-				// TODO Auto-generated catch block
-				//e.printStackTrace();
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.getCloseSite().equals(2)){
+			error.put("weiXinUserInfo", ErrorView._21.name());//只读模式不允许提交数据
+		}else{
+			if(user == null){//用户不存在，执行注册
+				
+				//读取允许注册账号类型
+				AllowRegisterAccount allowRegisterAccount =  settingManage.readAllowRegisterAccount();
+
+				if(allowRegisterAccount != null && allowRegisterAccount.isWeChat()){
+					user = new User();
+					user.setUserName(userManage.queryUserIdentifier(40)+"-"+UUIDUtil.getUUID22());//会员用户名
+					user.setSalt(UUIDUtil.getUUID32());//盐值
+					user.setSecurityDigest(new Date().getTime());//安全摘要
+					user.setAllowUserDynamic(true);//是否允许显示用户动态
+					user.setRealNameAuthentication(false);//是否实名认证
+					user.setRegistrationDate(new Date());//注册日期
+					user.setPoint(0L);//当前积分
+					user.setDeposit(new BigDecimal("0"));//当前预存款
+					user.setType(40);//用户类型 40:微信用户
+					user.setPlatformUserId(platformUserId);//平台用户Id 
+					user.setState(1);//用户状态    1:正常用户
+					user.setUserVersion(0);//版本号
+					
+					
+					try {
+						userService.saveUser(user,null,null);
+					} catch (Exception e) {
+						error.put("register", ErrorView._823.name());//注册会员出错
+						// TODO Auto-generated catch block
+						//e.printStackTrace();
+					}
+				}else{//如果不允许注册
+					error.put("register", ErrorView._862.name());//不允许注册
+					
+					
+				}
+				
+				
 			}
-			
 		}
+		
+		
 			
 		
 		//自动登录

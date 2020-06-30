@@ -316,9 +316,9 @@
 								<!-- router-link渲染成<h2>标签-->
 						    	<router-link tag="h2" class="clearfix" :to="{path: '/user/control/home', query: {userName: comment.userName}}">
 						        	<div class="userName">{{comment.nickname != null && comment.nickname != '' ? comment.nickname : comment.userName}}</div>
-						        	<div class="userTag">
-								        <i class="staff" v-if="comment.isStaff">官方人员</i>
+						        	<div class="userTag">	        
 								        <i class="userRoleName" v-for="roleName in comment.userRoleNameList" >{{roleName}}</i>
+								        <i class="staff" v-if="comment.isStaff">官方人员</i>
 								        <i class="master" v-if="comment.userName == topic.userName && comment.isStaff == topic.isStaff">作者</i>
 							        </div>
 						        </router-link>
@@ -361,6 +361,7 @@
 									           {{reply.nickname != null && reply.nickname != '' ? reply.nickname : reply.userName}}
 									        </router-link>
 									        <div class="userTag">
+									        	<i class="staff" v-if="reply.isStaff">官方人员</i>
 										        <i class="master" v-if="reply.userName == topic.userName && reply.isStaff == topic.isStaff">作者</i>
 									        </div>  
 											<span class="time">
@@ -885,8 +886,8 @@
 						    	<router-link tag="h2" class="clearfix" :to="{path: '/user/control/home', query: {userName: answer.userName}}">
 						        	<div class="userName">{{answer.nickname != null && answer.nickname != '' ? answer.nickname : answer.userName}}</div>
 						        	<div class="userTag">
-								    	<i class="staff" v-if="answer.isStaff">官方人员</i>
 								        <i class="userRoleName" v-for="roleName in answer.userRoleNameList" >{{roleName}}</i>
+								        <i class="staff" v-if="answer.isStaff">官方人员</i>
 								        <i class="master" v-if="answer.userName == question.userName && answer.isStaff == question.isStaff">作者</i>
 							        </div>
 						        </router-link>
@@ -923,7 +924,11 @@
 									        <div class="userTag">
 										        <i class="master" v-if="reply.userName == question.userName && reply.isStaff == question.isStaff">作者</i>
 									        </div>  
-											<span class="time">{{reply.postTime}}</span>
+											<span class="time">
+												<span @click="editReplyUI(reply.id)" v-if="reply.userName == $store.state.user.userName"><span class="cms-pencil-alt" style="font-size: 10px;margin-right: 1px;"></span>编辑</span>
+											
+												{{reply.postTime}}
+											</span>
 										</div>
 										<div style="clear:both; height: 0; line-height: 0; font-size: 0;"></div>
 										<div class="replyContent">{{reply.content}}</div>
@@ -939,6 +944,8 @@
 						</div>
 						<div class="bottomInfo">
 							<div class="toolbar">
+								<span class="edit-btn"  @click="editAnswerUI(answer.id)" v-if="answer.userName == $store.state.user.userName"><span class="cms-pencil-alt" style="font-size: 10px;margin-right: 1px;"></span>编辑</span>
+								
 								<span class="quote-btn"  @click="adoptionAnswer(answer.id)" v-if="question.userName == $store.state.user.userName && question.adoptionAnswerId == 0"><span class="cms-check-circle-solid" style="font-size: 10px;margin-right: 1px;"></span>采纳</span>
 								<span class="reply-btn"  @click="addReplyUI(answer.id)"><span class="cms-reply" style="font-size: 11px;margin-right: 1px;"></span>回复</span>
 							</div>
@@ -1001,6 +1008,51 @@
 						</div>
 					</div>
 				</mt-popup> 
+				
+				<!-- 修改回复 -->
+				<mt-popup v-model="popup_editReply" position="right" style="width: 100%;height: 100%;">
+					<mt-header fixed title="修改回复" style="background: #fafafa; color: #000000;font-size: 14px">
+				    	<mt-button icon="back" @click.native="popup_editReply = false" slot="left" >返回</mt-button>
+				    	<router-link to="/index" slot="right" @click.native="popup_editReply = false" >
+				    		<span class="cms-home" style="font-size: 18px;"></span>
+						</router-link>
+					</mt-header> 
+					<div ref="editReplyFormScroll" class="editReplyScroll">
+						<div class="box" >
+							<div class="editReplyForm" >
+								<ul>
+									<li>
+										<mt-field v-model.trim="editReplyContent" label="回复" placeholder="输入回复内容" type="textarea" rows="5" ></mt-field>
+										<p class="tips">
+									    	<span>{{error.editReplyContent}}</span>	
+									    </p>
+									</li>
+									
+									<li v-if="showCaptcha" >
+							        	<input type="hidden" v-model="captchaKey">
+							        	<mt-field v-model.trim="captchaValue"  @change.native="validation_captchaValue" label="验证码" placeholder="请输入验证码"  type="text">
+											
+										</mt-field>
+										<div style="position: absolute;right: 0px;margin-top: -45px; ">
+											<img :src="imgUrl" @click="replaceCaptcha" height="45px" width="120px" >
+										</div>
+										<p class="tips">
+									    	<span>{{error.captchaValue}}</span>	
+									    </p>
+							        </li>
+							       
+							        <li style="margin-left: 5px;margin-right: 5px; margin-top: 10px; ">
+										<mt-button  type="primary" size="large"  @click.native="editReply">提交</mt-button>
+										<p class="tips">
+									    	<span>{{error.editReply}}</span>	
+									    </p>
+										
+									</li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</mt-popup>
 			</div>
 		</div>
 		<!-- 发表答案 -->
@@ -1048,7 +1100,53 @@
 				</div>
 			</div>
 		</div>
-
+		<!-- 修改答案 -->
+		<div v-show="show_editAnswerEditor" >
+			<mt-header fixed title="修改答案" style="background: #fafafa; color: #000000;font-size: 14px">
+			    <mt-button icon="back" @click.native="showQuestion(true)" slot="left" >返回</mt-button>
+			    <router-link to="/index" slot="right">
+			    	<span class="cms-home" style="font-size: 18px;"></span>
+				</router-link>
+			</mt-header> 
+			<div class="questionContentModule"  style="margin-top: -40px;">
+				<div class="editAnswerScroll">
+					<div class="box" >
+						<div class="editAnswerForm" >
+							<ul>
+								<li>
+									<div ref="editAnswerContentEditorToolbar" class="editor-toolbar"></div>
+									<div ref="editAnswerContentEditorText"  class="editor-text"></div>
+									<p class="tips">
+								    	<span>{{error.editAnswerContent}}</span>	
+								    </p>
+								</li>
+								
+								<li v-if="showCaptcha" >
+						        	<input type="hidden" v-model="captchaKey">
+						        	<mt-field v-model.trim="captchaValue"  @change.native="validation_captchaValue" label="验证码" placeholder="请输入验证码"  type="text">
+										
+									</mt-field>
+									<div style="position: absolute;right: 0px;margin-top: -45px; ">
+										<img :src="imgUrl" @click="replaceCaptcha" height="45px" width="120px" >
+									</div>
+									<p class="tips">
+								    	<span>{{error.captchaValue}}</span>	
+								    </p>
+						        </li>
+						       
+						        <li style="margin-left: 5px;margin-right: 5px; margin-top: 10px; padding-bottom: 10px;">
+									<mt-button  type="primary" size="large"  @click.native="editAnswer">提交</mt-button>
+									<p class="tips">
+								    	<span>{{error.editAnswer}}</span>	
+								    </p>
+									
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
  
 	 	
 	</div>
@@ -1162,13 +1260,13 @@
 					<div class="questionTagNavigation">
 	            		<ul class="nav">
 	            			<li class="nav-item" v-for="questionTag in allTagList" >
-	            				<span :class="questionTag.id == selectedFirstTagId ? 'nav-link active' : 'nav-link'"  @click="selectChildTag(questionTag.id)" >{{questionTag.name}}</span>
+	            				<span :class="selectedTagClass(questionTag.id)"  @click="selectChildTag(questionTag.id)" >{{questionTag.name}}</span>
 							</li>
 	            		</ul>
 	            		<!-- 二级标签 -->
 						<div class="tab-content">
 							<div class="tab-pane">
-								<span class="child-tag" @click="selectedTag(childQuestionTag)"  v-for="childQuestionTag in childTagList" >{{childQuestionTag.name}}</span>
+								<span :class="selectedChildTagClass(childQuestionTag.id)" @click="selectedTag(childQuestionTag)"  v-for="childQuestionTag in childTagList" >{{childQuestionTag.name}}</span>
 							</div>
 						</div>
 					</div>
@@ -1673,83 +1771,92 @@
 	        <span class="item"><i class="total">{{followerCount}}</i>粉丝</span>
 	    </div>
 	   
-	    
+	    <div class="homeMenu" v-if="user.userName == $store.state.user.userName">
+	    	<div class="container clearfix">	
+		    	<router-link to="/user/control/topicList"  class="item" tag="div">
+		    		<div class="icon cms-topic" ></div> 
+		    		<span class="name">我的话题</span>
+		    	</router-link>
+		    	<router-link to="/user/control/commentList" class="item" tag="div">
+		    		<div class="icon cms-comment" ></div> 
+		    		<span class="name">我的评论</span>
+		    	</router-link>
+		    	<router-link to="/user/control/replyList" class="item" tag="div">
+		    		<div class="icon cms-reply" ></div> 
+		    		<span class="name">我的回复</span>
+		    	</router-link>
+		    	<router-link to="/user/control/questionList" class="item" tag="div">
+		    		<div class="icon cms-help-alt" ></div> 
+		    		<span class="name">我的问题</span>
+		    	</router-link>
+		    	<router-link  to="/user/control/answerList" class="item" tag="div">
+		    		<div class="icon cms-info-alt" ></div> 
+		    		<span class="name">我的答案</span>
+		    	</router-link>
+		    	<router-link to="/user/control/answerReplyList"  class="item" tag="div">
+		    		<div class="icon cms-reply" ></div> 
+		    		<span class="name">我的答案回复</span>
+		    	</router-link>
+		    	<router-link to="/user/control/favoriteList"  class="item" tag="div">
+		    		<div class="icon cms-favorites" ></div> 
+		    		<span class="name">收藏夹</span>
+		    	</router-link>
+		    	<router-link to="/user/control/likeList" class="item" tag="div">
+		    		<div class="icon cms-thumb-up" ></div> 
+		    		<span class="name">点赞</span>
+		    	</router-link>
+				<router-link to="/user/control/followList" class="item" tag="div">
+		    		<div class="icon cms-heart" ></div> 
+		    		<span class="name">关注</span>
+		    	</router-link>
+		    	<router-link to="/user/control/followerList"  class="item" tag="div">
+		    		<div class="icon cms-follower" ></div> 
+		    		<span class="name">粉丝</span>
+		    	</router-link>
+		    	<router-link to="/user/control/privateMessageList" class="item" tag="div">
+		    		<div class="icon cms-email" ><span class="badge" style="position: absolute; right: 20px;" v-show="$store.state.privateMessage_badge"></span></div> 
+		    		<span class="name">私信</span>
+		    	</router-link>
+		    	<router-link to="/user/control/remindList" class="item" tag="div">
+		    		<div class="icon cms-bell" ><span class="badge" style="position: absolute;right: 20px;" v-show="$store.state.remind_badge"></span></div> 
+		    		<span class="name">提醒</span>
+		    	</router-link>
+		    	<router-link to="/user/control/systemNotifyList" class="item" tag="div">
+		    		<div class="icon cms-announcement" ><span class="badge" style="position: absolute;right: 20px;" v-show="$store.state.systemNotify_badge"></span></div> 
+		    		<span class="name">系统通知</span>
+		    	</router-link>
+		    	<router-link to="/user/control/membershipCardOrderList" class="item" tag="div">
+		    		<div class="icon cms-order" ></div> 
+		    		<span class="name">会员卡订单</span>
+		    	</router-link>
+		    	<router-link to="/user/control/balance" class="item" tag="div">
+		    		<div class="icon cms-deposit" ></div> 
+		    		<span class="name">余额</span>
+		    	</router-link>
+		    	<router-link to="/user/control/editUser" class="item" tag="div">
+		    		<div class="icon cms-pencil-alt" ></div> 
+		    		<span class="name">修改账户</span>
+		    	</router-link>
+		    	<router-link to="/user/control/realNameAuthentication"  class="item" tag="div">
+		    		<div class="icon cms-realNameAuthentication" ></div> 
+		    		<span class="name">实名认证</span>
+		    	</router-link>
+		    	<router-link to="/user/control/point"  class="item" tag="div">
+		    		<div class="icon cms-point" ></div> 
+		    		<span class="name">积分记录</span>
+		    	</router-link>
+		    	<router-link to="/user/control/userLoginLogList" class="item" tag="div">
+		    		<div class="icon cms-login" ></div> 
+		    		<span class="name">登录日志</span>
+		    	</router-link>
+		    	<div  class="item" >
+		    		<div class="icon " ></div> 
+		    		<span class="name"></span>
+		    	</div>
+	    	</div>
+	    </div>
 	
-		<div class="homeMenuTable" v-if="user.userName == $store.state.user.userName">
-			<ul>
-				<li class="topLine rightLine">
-		        	<router-link to="/user/control/topicList" class="menuLink"><i class="cms-topic" style="font-size: 31px;"></i><span class="name">我的话题</span></router-link>
-		        </li>
-		        <li class="topLine rightLine">
-		        	<router-link to="/user/control/commentList" class="menuLink"><i class="cms-comment"></i><span class="name">我的评论</span></router-link>
-		        </li>
-		        <li class="topLine rightLine">
-		        	<router-link to="/user/control/replyList" class="menuLink"><i class="cms-reply"></i><span class="name">我的回复</span></router-link>
-		        </li>
-		         <li class="topLine">
-		        	<router-link to="/user/control/questionList" class="menuLink"><i class="cms-help-alt"></i><span class="name">我的问题</span></router-link>
-		        </li>
-			</ul>
-			<ul>
-				<li class="rightLine">
-		        	<router-link to="/user/control/answerList" class="menuLink"><i class="cms-info-alt" ></i><span class="name">我的答案</span></router-link>
-		        </li>
-		        <li class="rightLine">
-		        	<router-link to="/user/control/answerReplyList" class="menuLink"><i class="cms-reply"></i><span class="name">我的答案回复</span></router-link>
-		        </li>
-		        <li class="rightLine">
-		        	<router-link to="/user/control/favoriteList" class="menuLink"><i class="cms-favorites"></i><span class="name">收藏夹</span></router-link>
-		        </li>
-		         <li>
-		        	<router-link to="/user/control/likeList" class="menuLink"><i class="cms-thumb-up"></i><span class="name">点赞</span></router-link>
-		        </li>
-			</ul>
-			<ul>
-		        <li class="rightLine">
-		        	<router-link to="/user/control/followList" class="menuLink"><i class="cms-heart"></i><span class="name">关注</span></router-link>
-		        </li>
-		        <li class="rightLine">
-		        	<router-link to="/user/control/followerList" class="menuLink"><i class="cms-follower"></i><span class="name">粉丝</span></router-link>
-		        </li>
-		        <li class="rightLine">
-		        	<router-link to="/user/control/privateMessageList" class="menuLink"><i class="cms-email"></i><span class="name">私信</span><span class="badge" style="position: absolute;" v-show="$store.state.privateMessage_badge"></span></router-link>
-		        </li>
-		        <li>
-		        	<router-link to="/user/control/remindList" class="menuLink"><i class="cms-bell"></i><span class="name">提醒</span><span class="badge" style="position: absolute;" v-show="$store.state.remind_badge"></span></router-link>
-		        </li>
-		        
-				
-		       
-			</ul>
-			<ul>
-		        <li class="rightLine">
-		        	<router-link to="/user/control/systemNotifyList" class="menuLink"><i class="cms-announcement"></i><span class="name">系统通知</span><span class="badge" style="position: absolute;" v-show="$store.state.systemNotify_badge"></span></router-link>
-		        </li>
-		        <li class="rightLine">
-		        	<router-link to="/user/control/membershipCardOrderList" class="menuLink"><i class="cms-order"></i><span class="name">会员卡订单</span></router-link>
-		        </li>
-		        <li class="rightLine">
-		        	<router-link to="/user/control/balance" class="menuLink"><i class="cms-deposit"></i><span class="name">余额</span></router-link>
-		        </li>
-		        <li>
-		        	<router-link to="/user/control/editUser" class="menuLink"><i class="cms-pencil-alt"></i><span class="name">修改个人信息</span></router-link>
-		        </li>
-			</ul>
-			<ul>
-		        <li class="bottomLine rightLine">
-		        	<router-link to="/user/control/realNameAuthentication" class="menuLink"><i class="cms-realNameAuthentication"></i><span class="name">实名认证</span></router-link>
-		        </li>
-		        <li class="bottomLine rightLine">
-		        	<router-link to="/user/control/point" class="menuLink"><i class="cms-point"></i><span class="name">积分记录</span></router-link>
-		        </li>
-		        <li class="bottomLine rightLine">
-		        	<router-link to="/user/control/userLoginLogList" class="menuLink"><i class="cms-login"></i><span class="name">登录日志</span></router-link>
-		        </li>
-		        <li class="bottomLine">
-		        	
-		        </li>
-			</ul>
-		</div>
+		
 		<div class="membershipCard" v-if="user.userName == $store.state.user.userName">
 			<router-link to="/membershipCardList" class="link">
 				<div class="title">会员卡</div>
@@ -1757,7 +1864,7 @@
 		</div>
 		
 		<!-- 动态内容 -->
-		<div class="userDynamicList" v-infinite-scroll="scrollQueryUserDynamicList" infinite-scroll-disabled="loading" infinite-scroll-distance="10">
+		<div class="userDynamicList" v-infinite-scroll="scrollQueryUserDynamicList" infinite-scroll-disabled="loading" infinite-scroll-distance="10" >
 			<div class="item" v-for="(userDynamic,index) in userDynamicList" >
 				<div class="head">
 					<!-- router-link渲染成<div>标签-->
@@ -1807,6 +1914,7 @@
 							{{userDynamic.questionTitle}}
 						</router-link>
 					</div>	
+					
 					<!-- 内容 -->
 					<v-readmore>
 						<div class="topicContent" v-if="userDynamic.module == 100" ><component v-lazy-container="{ selector: 'img'}" v-bind:is ="hideTagComponent(userDynamic.topicContent)" v-bind="$props" /></div>
@@ -1835,7 +1943,7 @@
 	            	</v-readmore>  
 	            	<v-readmore>
 	            		<div class="replyContent" v-if="userDynamic.module == 700" >{{userDynamic.answerReplyContent}}</div> 
-	            	</v-readmore>                    
+	            	</v-readmore>        
 				</div>
 				
 				<div class="bottomInfo">
@@ -3482,16 +3590,21 @@
 <script src="${commonPath}js/v-viewer/viewer.min.js?1" type="text/javascript"></script> 
 <script src="${commonPath}js/v-viewer/v-viewer.min.js" type="text/javascript"></script> 
 
-<link href="${baseURL}${commonPath}css/common.css?ffcgfsdd3" type="text/css" rel="stylesheet">
+<link href="${baseURL}${commonPath}css/common.css?fssddddd3" type="text/css" rel="stylesheet">
 <script src="${commonPath}js/better-scroll.min.js?2d" type="text/javascript"></script> 
 <script src="${commonPath}js/DPlayer/hls.min.js" type="text/javascript"></script>
 <script src="${commonPath}js/DPlayer/DPlayer.min.js" type="text/javascript"></script>
 
 <script src="${commonPath}js/vue-cropper.js" type="text/javascript"></script>
  <script src="${commonPath}js/v-readmore.min.js" type="text/javascript"></script>
-<script src="${commonPath}js/wangeditor/wangEditor.min.js?5" type="text/javascript"></script>
+<script src="${commonPath}js/wangeditor/wangEditor.min.js?5sdd" type="text/javascript"></script>
 <script src="${commonPath}js/vue-lazyload.js" type="text/javascript"></script> 
-<script src="${commonPath}js/main.js?fdfdgdpdd3cdgd" type="text/javascript"></script>
+
+<link href="${baseURL}${commonPath}js/prism/default-block/prism.css" type="text/css" rel="stylesheet">
+<script src="${commonPath}js/prism/default-block/prism.js" type="text/javascript"></script> 
+<script src="${commonPath}js/prism/default-block/clipboard.min.js" type="text/javascript"></script> 
+
+<script src="${commonPath}js/main.js?fdddfsc" type="text/javascript"></script>
 
 
 

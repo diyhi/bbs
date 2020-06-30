@@ -371,6 +371,7 @@
 	padding-right: 12px;	
 	margin-top: 4px;
 	margin-bottom: 4px;
+	outline: none;
 } 
 .functionButton:disabled{  
 	border: 1px solid #42a5f5;
@@ -394,7 +395,7 @@
   *margin-right: .3em;
   margin-top: 2px;
   margin-bottom: 2px;
- 	outline: none;
+  outline: none;
   padding: 1px 10px 0px 10px;
   *padding: 1px 10px;
   width: auto;
@@ -449,7 +450,7 @@
 } 
 
 /*提交按钮*/
-.submitButton{ display:inline-block; vertical-align:middle; padding:1px 0; margin:0 1px; background:#1e9fff;}
+.submitButton{ display:inline-block; vertical-align:middle; padding:1px 0; margin:0 1px; background:#1e9fff;outline: none;}
 .submitButton span,
 .submitButton input{ float:left; display:inline; margin:0 -1px; height:30px; line-height:30px; padding:0 18px; font-size:18px; border:0; overflow:visible; background:#1e9fff; color:#fff; cursor:pointer; font-family:Microsoft Yahei,simsun,sans-serif;}
 .submitButton:hover,
@@ -465,7 +466,7 @@
 } 
 
 /*提交按钮*/
-.submitButton2{ display:inline-block; vertical-align:middle; padding:1px 0; margin:0 1px; background:#1e9fff;}
+.submitButton2{ display:inline-block; vertical-align:middle; padding:1px 0; margin:0 1px; background:#1e9fff;outline: none;}
 .submitButton2 span,
 .submitButton2 input{ float:left; display:inline; margin:0 -1px; height:24px; line-height:24px; padding:0 14px; font-size:14px; border:0; overflow:visible; background:#1e9fff; color:#fff; cursor:pointer;font-family:Microsoft Yahei,simsun,sans-serif;}
 .submitButton2:hover,
@@ -547,6 +548,7 @@ line-height:24px;
 font-family:Microsoft Yahei,simsun,sans-serif;
 cursor: pointer;
 text-align: center;
+outline: none;
 }
 .fileButtonPic em {
 background:url(../images/plus_sign.png) 0 0;
