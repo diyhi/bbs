@@ -111,6 +111,9 @@ public class Topic implements Serializable{
 	@Transient
 	private LinkedHashMap<Integer,Boolean> hideTagTypeMap = new LinkedHashMap<Integer,Boolean>();
 	
+	/** 发红包Id **/
+	@Column(length=32)
+	private String giveRedEnvelopeId;
 	
 	/** 是否为员工 true:员工  false:会员 **/
 	private Boolean isStaff = false;
@@ -281,6 +284,12 @@ public class Topic implements Serializable{
 	}
 	public void setMediaInfoList(List<MediaInfo> mediaInfoList) {
 		this.mediaInfoList = mediaInfoList;
+	}
+	public String getGiveRedEnvelopeId() {
+		return giveRedEnvelopeId;
+	}
+	public void setGiveRedEnvelopeId(String giveRedEnvelopeId) {
+		this.giveRedEnvelopeId = giveRedEnvelopeId;
 	}
 	
 }

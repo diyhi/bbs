@@ -30,12 +30,71 @@
 							</div>
 							<div style="float:left;">
 								
-								<input type="text" id="title" name="title" class="formText" size="90" value="${topic.title}" alt="标题" title="标题"/>
+								<input type="text" id="title" name="title" class="formText" size="90" value="${topic.title}" alt="标题" title="标题" placeholder="标题"/>
 								<span id="${identificationNumber}_title_error" class="error" name="error">${(error['title'])!}</span>
 							</div>
+							<#if returnValue['giveRedEnvelopeAmountMax'] == null ||  (returnValue['giveRedEnvelopeAmountMax'] != null && returnValue['giveRedEnvelopeAmountMax'] gt 0)>	
+								<div class="redEnvelope" onclick="redEnvelopeFormLayer()">
+									<span class="txt">红包</span>
+									<i class="icon cms-angle-down"></i>
+								</div>
+							</#if>	
 						</div>
-		
-						<p><textarea class="textarea" onfocus="" id="topicContent" name="content" >${topic.content}</textarea></p>
+						<div id="type_layer" style="height: 40px;display: none;">
+							<label onclick="selectRedEnvelopeType()">
+								<input type="radio" class="formRadio" name="type" value="20" <#if giveRedEnvelope.type ==20> checked='checked'</#if>>
+				                <span class="formRadio-core"></span>
+								<span class="formRadio-text">随机金额红包</span> 
+							</label>
+							<label onclick="selectRedEnvelopeType()">
+								<input type="radio" class="formRadio" name="type" value="30" <#if giveRedEnvelope.type ==30> checked='checked'</#if>>
+				                <span class="formRadio-core"></span>
+								<span class="formRadio-text">固定金额红包</span> 
+							</label>
+						</div>
+						<div id="totalAmount_layer"  style="height: 40px;display: none;">
+							<span class="text" >红包总金额</span>
+							<input type="text" id="totalAmount" name="totalAmount" oninput="totalAmountCalculate(this)" class="formText" size="10" maxlength="10" value="${giveRedEnvelope.totalAmount}" alt="金额" title="金额" placeholder="金额"/>
+							<span class="text" >元</span>
+							<span id="${identificationNumber}_totalAmount_error" class="error" name="error">${(error['totalAmount'])!}</span>
+							<span class="help" >
+								<#if returnValue['giveRedEnvelopeAmountMin'] gt 0>	
+									合计总金额不能少于 ${returnValue['giveRedEnvelopeAmountMin']} 元；
+								</#if>	
+								<#if returnValue['giveRedEnvelopeAmountMax'] != null && returnValue['giveRedEnvelopeAmountMax'] gt 0>	
+									合计总金额不能超过${returnValue['giveRedEnvelopeAmountMax']} 元；
+								</#if>	
+								用户共有金额 ${returnValue['deposit']} 元
+							</span>
+						</div>
+						<div id="singleAmount_layer"  style="height: 40px;display: none;">
+							<span class="text" >单个红包金额</span>
+							<input type="text" id="singleAmount" name="singleAmount" oninput="singleAmountCalculate()" class="formText" size="10" maxlength="8" value="${giveRedEnvelope.singleAmount}" alt="金额" title="金额" placeholder="金额"/>
+							<span class="text" >元</span>
+							<span id="${identificationNumber}_singleAmount_error" class="error" name="error">${(error['singleAmount'])!}</span>
+							<span class="help" >
+								<#if returnValue['giveRedEnvelopeAmountMin'] gt 0>	
+									合计总金额不能少于 ${returnValue['giveRedEnvelopeAmountMin']} 元；
+								</#if>	
+								<#if returnValue['giveRedEnvelopeAmountMax'] != null && returnValue['giveRedEnvelopeAmountMax'] gt 0>	
+									合计总金额不能超过${returnValue['giveRedEnvelopeAmountMax']} 元；
+								</#if>	
+								用户共有金额 ${returnValue['deposit']} 元
+							</span>
+						</div>
+						<div id="giveQuantity_layer"  style="height: 40px;display: none;">
+							<input type="text" id="giveQuantity" name="giveQuantity" oninput="singleAmountCalculate()" class="formText" size="5" maxlength="3" value="${giveRedEnvelope.giveQuantity}" alt="数量" title="数量" placeholder="数量"/>
+							<span class="text" >个红包</span>
+							<span id="${identificationNumber}_giveQuantity_error" class="error" name="error">${(error['giveQuantity'])!}</span>
+						</div>
+						<div id="count_layer"  style="height: 40px;display: none;">
+							<span class="text" >合计总金额</span>
+							<span id="totalAmountView" class="text" style="font-size: 18px;">0.00</span>
+							<span id="${identificationNumber}_redEnvelopeLimit_error" class="error" name="error">${(error['redEnvelopeLimit'])!}</span>
+						</div>
+						<div>
+							<textarea class="textarea" onfocus="" id="topicContent" name="content" >${topic.content}</textarea>
+						</div>
 						
 						<span id="${identificationNumber}_content_error" class="error" name="error">${(error['content'])!}</span> 
 						<span id="${identificationNumber}_topic_error" class="error" name="error">${error['topic']}</span>
@@ -74,7 +133,116 @@
 							</div>
 							</#if>
 						</div>
-						
+						<script language="javascript" type="text/javascript">
+							//显示/隐藏红包表单层
+							function redEnvelopeFormLayer(){
+								var layer = document.getElementById("type_layer").style.display;
+								if(layer == "none"){//执行显示
+									document.getElementById("type_layer").style.display = "";
+									document.getElementById("giveQuantity_layer").style.display = "";
+									document.getElementById("count_layer").style.display = "";
+									var type_radio = document.getElementsByName("type");
+									var selectedValue = "";
+									for (var i=0; i<type_radio.length; i++) {
+										var type = type_radio[i];
+										if (type.checked) {
+											selectedValue = parseInt(type.value);
+										}
+									}
+									//如果没选中值，则默认选第一个
+									if(selectedValue == ""){
+										selectedValue = 20;
+										type_radio[0].checked = true;
+									}
+									
+									if(selectedValue == 20){
+										document.getElementById("totalAmount_layer").style.display = "";
+										document.getElementById("singleAmount_layer").style.display = "none";
+									}else if(selectedValue == 30){
+										document.getElementById("totalAmount_layer").style.display = "none";
+										document.getElementById("singleAmount_layer").style.display = "";
+									}
+									
+									
+								}else{//执行隐藏
+									document.getElementById("type_layer").style.display = "none";
+									document.getElementById("totalAmount_layer").style.display = "none";
+									document.getElementById("singleAmount_layer").style.display = "none";
+									document.getElementById("giveQuantity_layer").style.display = "none";
+									document.getElementById("count_layer").style.display = "none";
+								}
+							}
+							//选择红包类型
+							function selectRedEnvelopeType(){
+								var type_radio = document.getElementsByName("type");
+								for (var i=0; i<type_radio.length; i++) {
+									var type = type_radio[i];
+									if (type.checked) {
+										var selectedValue = parseInt(type.value);
+										if(selectedValue == 20){
+											document.getElementById("totalAmount_layer").style.display = "";
+											document.getElementById("singleAmount_layer").style.display = "none";
+											totalAmountCalculate(document.getElementById("totalAmount"));
+										}else if(selectedValue == 30){
+											document.getElementById("totalAmount_layer").style.display = "none";
+											document.getElementById("singleAmount_layer").style.display = "";
+											singleAmountCalculate(document.getElementById("singleAmount"));
+										}
+									}
+								}
+							
+							}
+							
+							//总金额计算
+							function totalAmountCalculate(obj){
+								var selectedValue = 0;
+								var type_radio = document.getElementsByName("type");
+								for (var i=0; i<type_radio.length; i++) {
+									var type = type_radio[i];
+									if (type.checked) {
+										var selectedValue = parseInt(type.value);
+									}
+								}
+								if(selectedValue == 20){
+									var value =obj.value;
+									//金额 只允许正数  正则判断最多10位小数
+									var exp = /(^[1-9]([0-9]+)?(\.[0-9]{1,10})?$)|(^(0){1}$)|(^[0-9]\.[0-9]([0-9])?$)/;
+									if(exp.test(value.trim())) {
+										var amount = calc_add(obj.value.trim(), 0, 2);
+										document.getElementById("totalAmountView").innerHTML = amount;
+									}else{
+										document.getElementById("totalAmountView").innerHTML = "0.00";
+									}
+								}
+							}
+							//单个红包金额计算
+							function singleAmountCalculate(obj){
+								var selectedValue = 0;
+								var type_radio = document.getElementsByName("type");
+								for (var i=0; i<type_radio.length; i++) {
+									var type = type_radio[i];
+									if (type.checked) {
+										var selectedValue = parseInt(type.value);
+									}
+								}
+								if(selectedValue == 30){
+									var singleAmount = document.getElementById("singleAmount").value;
+									var giveQuantity = document.getElementById("giveQuantity").value;
+									//金额 只允许正数  正则判断最多10位小数
+									var exp_singleAmount = /(^[1-9]([0-9]+)?(\.[0-9]{1,10})?$)|(^(0){1}$)|(^[0-9]\.[0-9]([0-9])?$)/;
+									//数量 正整数
+									var exp_giveQuantity = /^\+?[1-9][0-9]*$/;
+									if(exp_singleAmount.test(singleAmount.trim()) && exp_giveQuantity.test(giveQuantity.trim())) {
+										var amount = calc_multiply(singleAmount.trim(), giveQuantity.trim(), 2);
+										document.getElementById("totalAmountView").innerHTML = amount;
+									}else{
+										document.getElementById("totalAmountView").innerHTML = "0.00";
+									}
+								}
+							
+								
+							}
+						</script>
 						<script language="javascript" type="text/javascript">
 							//点击输入框提示 
 							function inputBoxTip_click(obj){
@@ -152,6 +320,29 @@
 								if(verificationCode() == true){
 								
 									var parameter = "";
+									
+									
+									//显示红包表单层
+									var type_layer = document.getElementById("type_layer").style.display;
+									if(type_layer != "none"){
+										var type_radio = document.getElementsByName("type");
+										var selectedValue = "";
+										for (var i=0; i<type_radio.length; i++) {
+											var type = type_radio[i];
+											if (type.checked) {
+												selectedValue = parseInt(type.value);
+											}
+										}
+										var totalAmount = document.getElementById("totalAmount").value;
+										var singleAmount = document.getElementById("singleAmount").value;
+										var giveQuantity = document.getElementById("giveQuantity").value;
+										
+										parameter += "&type="+encodeURIComponent(selectedValue);
+										parameter += "&totalAmount="+encodeURIComponent(totalAmount);
+										parameter += "&singleAmount="+encodeURIComponent(singleAmount);
+										parameter += "&giveQuantity="+encodeURIComponent(giveQuantity);
+									}
+									
 		
 									//获取令牌
 									parameter += "&token="+document.getElementById("token").value;

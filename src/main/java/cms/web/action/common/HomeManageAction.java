@@ -2,6 +2,7 @@ package cms.web.action.common;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -53,6 +54,8 @@ import cms.bean.question.AnswerReply;
 import cms.bean.question.Question;
 import cms.bean.question.QuestionTag;
 import cms.bean.question.QuestionTagAssociation;
+import cms.bean.redEnvelope.GiveRedEnvelope;
+import cms.bean.redEnvelope.ReceiveRedEnvelope;
 import cms.bean.setting.SystemSetting;
 import cms.bean.topic.Comment;
 import cms.bean.topic.HideTagType;
@@ -85,6 +88,7 @@ import cms.service.payment.PaymentService;
 import cms.service.question.AnswerService;
 import cms.service.question.QuestionService;
 import cms.service.question.QuestionTagService;
+import cms.service.redEnvelope.RedEnvelopeService;
 import cms.service.setting.SettingService;
 import cms.service.template.TemplateService;
 import cms.service.topic.CommentService;
@@ -122,6 +126,7 @@ import cms.web.action.message.SubscriptionSystemNotifyManage;
 import cms.web.action.message.SystemNotifyManage;
 import cms.web.action.question.AnswerManage;
 import cms.web.action.question.QuestionManage;
+import cms.web.action.redEnvelope.RedEnvelopeManage;
 import cms.web.action.setting.SettingManage;
 import cms.web.action.sms.SmsManage;
 import cms.web.action.topic.CommentManage;
@@ -201,6 +206,8 @@ public class HomeManageAction {
 	@Resource QuestionTagService questionTagService;
 	@Resource AnswerService answerService;
 	@Resource MediaProcessQueueManage mediaProcessQueueManage;
+	@Resource RedEnvelopeService redEnvelopeService;
+	@Resource RedEnvelopeManage redEnvelopeManage;
 	
 	
 	//?  匹配任何单字符
@@ -4989,11 +4996,202 @@ public class HomeManageAction {
 	
 	
 	
+	/**
+	 * 发红包列表
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/user/control/giveRedEnvelopeList",method=RequestMethod.GET) 
+	public String giveRedEnvelopeListUI(ModelMap model,PageForm pageForm,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		
+		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+		
+		//获取登录用户
+	  	AccessUser accessUser = AccessUserThreadLocal.get();
+	  	
+	  	
+		//调用分页算法代码
+		PageView<GiveRedEnvelope> pageView = new PageView<GiveRedEnvelope>(settingService.findSystemSetting_cache().getForestagePageNumber(),pageForm.getPage(),10,request.getRequestURI(),request.getQueryString());
+		//当前页
+		int firstIndex = (pageForm.getPage()-1)*pageView.getMaxresult();
+		
+		
+		StringBuffer jpql = new StringBuffer("");
+		//存放参数值
+		List<Object> params = new ArrayList<Object>();
+
+		
+		jpql.append(" and o.userId=?"+ (params.size()+1));
+		params.add(accessUser.getUserId());
+		
+		//删除第一个and
+		String _jpql = org.apache.commons.lang3.StringUtils.difference(" and", jpql.toString());
+		
+		
+		//排序
+		LinkedHashMap<String,String> orderby = new LinkedHashMap<String,String>();
+		
+		orderby.put("giveTime", "desc");//根据giveTime字段降序排序
+		QueryResult<GiveRedEnvelope> qr = redEnvelopeService.getScrollData(GiveRedEnvelope.class,firstIndex, pageView.getMaxresult(),_jpql, params.toArray(),orderby);
+		
+		if(qr.getResultlist() != null && qr.getResultlist().size() >0){
+			for(GiveRedEnvelope giveRedEnvelope : qr.getResultlist()){
+				if(giveRedEnvelope.getBindTopicId() != null && giveRedEnvelope.getBindTopicId() >0L){
+					Topic topic = topicManage.queryTopicCache(giveRedEnvelope.getBindTopicId());//查询缓存
+					if(topic != null){
+						giveRedEnvelope.setBindTopicTitle(topic.getTitle());
+					}
+					
+				}
+				
+			}
+			
+		}
+		
+		//将查询结果集传给分页List
+		pageView.setQueryResult(qr);		
+    	
+		model.addAttribute("pageView", pageView);
+		
+		if(isAjax){
+			WebUtil.writeToWeb(JsonUtils.toJSONString(pageView), "json", response);
+			return null;
+		}else{
+			String dirName = templateService.findTemplateDir_cache();
+		    return "templates/"+dirName+"/"+accessSourceDeviceManage.accessDevices(request)+"/giveRedEnvelopeList";	
+		}
+	}
 	
 	
+	/**
+	 * 发红包金额分配列表
+	 * @param model
+	 * @param pageForm
+	 * @param giveRedEnvelopeId 发红包Id
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/user/control/redEnvelopeAmountDistributionList",method=RequestMethod.GET) 
+	public String redEnvelopeAmountDistributionUI(ModelMap model,PageForm pageForm,String giveRedEnvelopeId,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
+	    
+		//获取登录用户
+	  	AccessUser accessUser = AccessUserThreadLocal.get();
+	  	
+		//调用分页算法代码
+		PageView<ReceiveRedEnvelope> pageView = new PageView<ReceiveRedEnvelope>(settingService.findSystemSetting_cache().getForestagePageNumber(),pageForm.getPage(),10,request.getRequestURI(),request.getQueryString());
+		//当前页
+		int firstindex = (pageForm.getPage()-1)*pageView.getMaxresult();
+		if(giveRedEnvelopeId != null && !"".equals(giveRedEnvelopeId.trim())){
+			GiveRedEnvelope giveRedEnvelope = redEnvelopeService.findById(giveRedEnvelopeId);
+			if(giveRedEnvelope != null && giveRedEnvelope.getUserId().equals(accessUser.getUserId())){
+				//排序
+				boolean sort = false;//true:正序 false:倒序
+				
+				QueryResult<ReceiveRedEnvelope> qr = redEnvelopeManage.queryReceiveRedEnvelopeByCondition(giveRedEnvelope,false,firstindex, pageView.getMaxresult(),sort);
+				    
+				if(giveRedEnvelope.getBindTopicId() != null && giveRedEnvelope.getBindTopicId() >0L){
+					Topic topic = topicManage.queryTopicCache(giveRedEnvelope.getBindTopicId());//查询缓存
+					if(topic != null){
+						giveRedEnvelope.setBindTopicTitle(topic.getTitle());
+					}
+					
+				}
+		
+				//将查询结果集传给分页List
+				pageView.setQueryResult(qr);
+				model.addAttribute("pageView", pageView);	
+				model.addAttribute("giveRedEnvelope", giveRedEnvelope);
+				
+				returnValue.put("pageView", pageView);
+				returnValue.put("giveRedEnvelope", giveRedEnvelope);
+			}
+		}
+		
+		if(isAjax){
+			WebUtil.writeToWeb(JsonUtils.toJSONString(returnValue), "json", response);
+			return null;
+		}else{
+			String dirName = templateService.findTemplateDir_cache();
+		    return "templates/"+dirName+"/"+accessSourceDeviceManage.accessDevices(request)+"/redEnvelopeAmountDistributionList";	
+		}
+	}
 	
 	
-	
-	
+	/**
+	 * 收红包列表
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/user/control/receiveRedEnvelopeList",method=RequestMethod.GET) 
+	public String receiveRedEnvelopeUI(ModelMap model,PageForm pageForm,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		
+		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+		
+		//获取登录用户
+	  	AccessUser accessUser = AccessUserThreadLocal.get();
+	  	
+	  	
+	  //调用分页算法代码
+  		PageView<ReceiveRedEnvelope> pageView = new PageView<ReceiveRedEnvelope>(settingService.findSystemSetting_cache().getForestagePageNumber(),pageForm.getPage(),10,request.getRequestURI(),request.getQueryString());
+		//当前页
+  		int firstIndex = (pageForm.getPage()-1)*pageView.getMaxresult();
+  		
+  		
+		QueryResult<ReceiveRedEnvelope> qr = redEnvelopeService.findReceiveRedEnvelopeByUserId(accessUser.getUserId(), firstIndex, pageView.getMaxresult());
+		//将查询结果集传给分页List
+		pageView.setQueryResult(qr);
+		
+		if(qr.getResultlist() != null && qr.getResultlist().size() >0){
+			for(ReceiveRedEnvelope receiveRedEnvelope : qr.getResultlist()){
+				User user = userManage.query_cache_findUserById(receiveRedEnvelope.getGiveUserId());
+        		if(user != null){
+        			receiveRedEnvelope.setGiveNickname(user.getNickname());
+        			receiveRedEnvelope.setGiveUserName(user.getUserName());
+        			if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
+        				receiveRedEnvelope.setGiveAvatarPath(user.getAvatarPath());
+        				receiveRedEnvelope.setGiveAvatarName(user.getAvatarName());
+        			}		
+        		}
+        		
+        		//如果红包还没拆，则执行拆红包
+  				if(receiveRedEnvelope.getAmount() != null && receiveRedEnvelope.getAmount().compareTo(new BigDecimal("0")) ==0 && user != null){
+  					GiveRedEnvelope giveRedEnvelope = redEnvelopeService.findById(receiveRedEnvelope.getGiveRedEnvelopeId());
+  					if(giveRedEnvelope != null){
+  						//查询用户领取到的红包金额
+      				    BigDecimal amount = redEnvelopeManage.queryReceiveRedEnvelopeAmount(giveRedEnvelope,user.getId());
+      					if(amount != null && amount.compareTo(new BigDecimal("0")) >0 ){
+      						redEnvelopeManage.unwrapRedEnvelope(receiveRedEnvelope,amount,user.getId(),user.getUserName());
+      					}
+  					}
+  					
+  				}
+        		
+			}
+		}
+  		
+		
+		
+		model.addAttribute("pageView", pageView);
+		
+		if(isAjax){
+			WebUtil.writeToWeb(JsonUtils.toJSONString(pageView), "json", response);
+			return null;
+		}else{
+			String dirName = templateService.findTemplateDir_cache();
+		    return "templates/"+dirName+"/"+accessSourceDeviceManage.accessDevices(request)+"/receiveRedEnvelopeList";	
+		}
+	}
 	
 }

@@ -517,8 +517,39 @@ public class TemplateManage {
 		layout_questionFavoriteList.setReferenceCode("user/control/questionFavoriteList");
 		layoutList.add(layout_questionFavoriteList);
 		
+		//发红包列表
+		Layout layout_giveRedEnvelopeList = new Layout();
+		layout_giveRedEnvelopeList.setId(UUIDUtil.getUUID32());
+		layout_giveRedEnvelopeList.setName("发红包列表");
+		layout_giveRedEnvelopeList.setDirName(dirName);
+		layout_giveRedEnvelopeList.setLayoutFile("giveRedEnvelopeList.html");
+		layout_giveRedEnvelopeList.setType(1);//默认页
+		layout_giveRedEnvelopeList.setSort(2200);//排序
+		layout_giveRedEnvelopeList.setReferenceCode("user/control/giveRedEnvelopeList");
+		layoutList.add(layout_giveRedEnvelopeList);
+	
+		//发红包金额分配列表
+		Layout layout_redEnvelopeAmountDistributionList = new Layout();
+		layout_redEnvelopeAmountDistributionList.setId(UUIDUtil.getUUID32());
+		layout_redEnvelopeAmountDistributionList.setName("发红包金额分配列表");
+		layout_redEnvelopeAmountDistributionList.setDirName(dirName);
+		layout_redEnvelopeAmountDistributionList.setLayoutFile("redEnvelopeAmountDistributionList.html");
+		layout_redEnvelopeAmountDistributionList.setType(1);//默认页
+		layout_redEnvelopeAmountDistributionList.setSort(2300);//排序
+		layout_redEnvelopeAmountDistributionList.setReferenceCode("user/control/redEnvelopeAmountDistributionList");
+		layoutList.add(layout_redEnvelopeAmountDistributionList);
 		
-		
+		//收红包列表
+		Layout layout_receiveRedEnvelopeList = new Layout();
+		layout_receiveRedEnvelopeList.setId(UUIDUtil.getUUID32());
+		layout_receiveRedEnvelopeList.setName("收红包列表");
+		layout_receiveRedEnvelopeList.setDirName(dirName);
+		layout_receiveRedEnvelopeList.setLayoutFile("receiveRedEnvelopeList.html");
+		layout_receiveRedEnvelopeList.setType(1);//默认页
+		layout_receiveRedEnvelopeList.setSort(2400);//排序
+		layout_receiveRedEnvelopeList.setReferenceCode("user/control/receiveRedEnvelopeList");
+		layoutList.add(layout_receiveRedEnvelopeList);
+				
 		return layoutList;
 	}
 	

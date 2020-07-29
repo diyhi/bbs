@@ -508,7 +508,7 @@ public class QuestionFormAction {
 				reward_paymentLog = new PaymentLog();
 				reward_paymentLog.setPaymentRunningNumber(paymentManage.createRunningNumber(accessUser.getUserId()));//支付流水号
 				reward_paymentLog.setPaymentModule(90);//支付模块 90.悬赏金额
-				reward_paymentLog.setParameterId(question.getId());//参数Id 
+				reward_paymentLog.setSourceParameterId(String.valueOf(question.getId()));//参数Id 
 				reward_paymentLog.setOperationUserType(2);//操作用户类型  0:系统  1: 员工  2:会员
 				reward_paymentLog.setOperationUserName(accessUser.getUserName());//操作用户名称  0:系统  1: 员工  2:会员
 				reward_paymentLog.setAmountState(2);//金额状态  1:账户存入  2:账户支出 
@@ -1343,7 +1343,7 @@ public class QuestionFormAction {
 						String paymentRunningNumber = paymentManage.createRunningNumber(user.getId());
 						reward_paymentLog.setPaymentRunningNumber(paymentRunningNumber);//支付流水号
 						reward_paymentLog.setPaymentModule(100);//支付模块 100.采纳答案
-						reward_paymentLog.setParameterId(answer.getId());//参数Id 
+						reward_paymentLog.setSourceParameterId(String.valueOf(answer.getId()));//参数Id 
 						reward_paymentLog.setOperationUserType(2);//操作用户类型  0:系统  1: 员工  2:会员
 						reward_paymentLog.setOperationUserName(accessUser.getUserName());//操作用户名称  0:系统  1: 员工  2:会员
 						reward_paymentLog.setAmountState(1);//金额状态  1:账户存入  2:账户支出 

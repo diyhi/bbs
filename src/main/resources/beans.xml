@@ -453,6 +453,11 @@ http://www.springframework.org/schema/task http://www.springframework.org/schema
         <!-- 问题收藏分表数量 -->
         <property name="tableQuantity" value="4" />    
     </bean>
+    <!-- 创建收红包配置 -->
+    <bean id="receiveRedEnvelopeConfig" class="cms.web.action.redEnvelope.ReceiveRedEnvelopeConfig" >
+        <!-- 收红包分表数量 -->
+        <property name="tableQuantity" value="4" />    
+    </bean>
     
    	<!-- 让普通的java类获取spring 的bean配置 -->
    	<bean id="SpringConfigTool" class="cms.utils.SpringConfigTool"></bean>

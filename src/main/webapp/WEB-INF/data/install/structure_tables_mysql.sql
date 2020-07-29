@@ -300,6 +300,31 @@ CREATE TABLE `forum` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 #
+# Structure for table "giveredenvelope"
+#
+
+CREATE TABLE `giveredenvelope` (
+  `id` varchar(32) NOT NULL,
+  `bindTopicId` bigint(20) DEFAULT NULL,
+  `distributionAmountGroup` longtext,
+  `giveQuantity` int(11) DEFAULT NULL,
+  `giveTime` datetime DEFAULT NULL,
+  `grabRedEnvelopeUserIdGroup` longtext,
+  `remainingQuantity` int(11) DEFAULT NULL,
+  `singleAmount` decimal(12,2) DEFAULT NULL,
+  `totalAmount` decimal(12,2) DEFAULT NULL,
+  `type` int(11) DEFAULT NULL,
+  `userId` bigint(20) DEFAULT NULL,
+  `wishes` varchar(150) DEFAULT NULL,
+  `version` int(11) DEFAULT NULL,
+  `refundAmount` decimal(12,2) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `giveRedEnvelope_1_idx` (`bindTopicId`),
+  KEY `giveRedEnvelope_2_idx` (`userId`,`giveTime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+#
 # Structure for table "help"
 #
 
@@ -344,7 +369,7 @@ CREATE TABLE `layout` (
   `forumData` int(11) DEFAULT NULL,
   `layoutFile` varchar(40) DEFAULT NULL,
   `name` varchar(100) DEFAULT NULL,
-  `referenceCode` varchar(40) DEFAULT NULL,
+  `referenceCode` varchar(100) DEFAULT NULL,
   `returnData` int(11) DEFAULT NULL,
   `sort` int(11) DEFAULT NULL,
   `type` int(11) DEFAULT NULL,
@@ -517,12 +542,12 @@ CREATE TABLE `paymentlog_0` (
   `interfaceProduct` int(11) DEFAULT NULL,
   `operationUserName` varchar(50) DEFAULT NULL,
   `operationUserType` int(11) DEFAULT NULL,
-  `parameterId` bigint(20) DEFAULT NULL,
   `paymentModule` int(11) DEFAULT NULL,
   `remark` longtext,
   `times` datetime DEFAULT NULL,
   `tradeNo` varchar(255) DEFAULT NULL,
   `userName` varchar(30) DEFAULT NULL,
+  `sourceParameterId` varchar(150) DEFAULT NULL,
   PRIMARY KEY (`paymentRunningNumber`),
   KEY `paymentlog_idx` (`userName`,`times`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -538,12 +563,12 @@ CREATE TABLE `paymentlog_1` (
   `interfaceProduct` int(11) DEFAULT NULL,
   `operationUserName` varchar(50) DEFAULT NULL,
   `operationUserType` int(11) DEFAULT NULL,
-  `parameterId` bigint(20) DEFAULT NULL,
   `paymentModule` int(11) DEFAULT NULL,
   `remark` longtext,
   `times` datetime DEFAULT NULL,
   `tradeNo` varchar(255) DEFAULT NULL,
   `userName` varchar(30) DEFAULT NULL,
+  `sourceParameterId` varchar(150) DEFAULT NULL,
   PRIMARY KEY (`paymentRunningNumber`),
   KEY `paymentlog_idx` (`userName`,`times`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -559,12 +584,12 @@ CREATE TABLE `paymentlog_2` (
   `interfaceProduct` int(11) DEFAULT NULL,
   `operationUserName` varchar(50) DEFAULT NULL,
   `operationUserType` int(11) DEFAULT NULL,
-  `parameterId` bigint(20) DEFAULT NULL,
   `paymentModule` int(11) DEFAULT NULL,
   `remark` longtext,
   `times` datetime DEFAULT NULL,
   `tradeNo` varchar(255) DEFAULT NULL,
   `userName` varchar(30) DEFAULT NULL,
+  `sourceParameterId` varchar(150) DEFAULT NULL,
   PRIMARY KEY (`paymentRunningNumber`),
   KEY `paymentlog_idx` (`userName`,`times`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -580,15 +605,16 @@ CREATE TABLE `paymentlog_3` (
   `interfaceProduct` int(11) DEFAULT NULL,
   `operationUserName` varchar(50) DEFAULT NULL,
   `operationUserType` int(11) DEFAULT NULL,
-  `parameterId` bigint(20) DEFAULT NULL,
   `paymentModule` int(11) DEFAULT NULL,
   `remark` longtext,
   `times` datetime DEFAULT NULL,
   `tradeNo` varchar(255) DEFAULT NULL,
   `userName` varchar(30) DEFAULT NULL,
+  `sourceParameterId` varchar(150) DEFAULT NULL,
   PRIMARY KEY (`paymentRunningNumber`),
   KEY `paymentlog_idx` (`userName`,`times`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 
 #
 # Structure for table "paymentverificationlog"
@@ -920,6 +946,71 @@ CREATE TABLE `questiontagassociation` (
   KEY `questionTagAssociation_1_idx` (`questionId`),
   KEY `questionTagAssociation_2_idx` (`questionTagId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "receiveredenvelope_0"
+#
+
+CREATE TABLE `receiveredenvelope_0` (
+  `id` varchar(80) NOT NULL,
+  `amount` decimal(12,2) DEFAULT NULL,
+  `giveRedEnvelopeId` varchar(32) DEFAULT NULL,
+  `giveUserId` bigint(20) DEFAULT NULL,
+  `receiveTime` datetime DEFAULT NULL,
+  `receiveUserId` bigint(20) DEFAULT NULL,
+  `version` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `receiveRedEnvelope_1_idx` (`receiveUserId`,`receiveTime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "receiveredenvelope_1"
+#
+
+CREATE TABLE `receiveredenvelope_1` (
+  `id` varchar(80) NOT NULL,
+  `amount` decimal(12,2) DEFAULT NULL,
+  `giveRedEnvelopeId` varchar(32) DEFAULT NULL,
+  `giveUserId` bigint(20) DEFAULT NULL,
+  `receiveTime` datetime DEFAULT NULL,
+  `receiveUserId` bigint(20) DEFAULT NULL,
+  `version` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `receiveRedEnvelope_1_idx` (`receiveUserId`,`receiveTime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "receiveredenvelope_2"
+#
+
+CREATE TABLE `receiveredenvelope_2` (
+  `id` varchar(80) NOT NULL,
+  `amount` decimal(12,2) DEFAULT NULL,
+  `giveRedEnvelopeId` varchar(32) DEFAULT NULL,
+  `giveUserId` bigint(20) DEFAULT NULL,
+  `receiveTime` datetime DEFAULT NULL,
+  `receiveUserId` bigint(20) DEFAULT NULL,
+  `version` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `receiveRedEnvelope_1_idx` (`receiveUserId`,`receiveTime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "receiveredenvelope_3"
+#
+
+CREATE TABLE `receiveredenvelope_3` (
+  `id` varchar(80) NOT NULL,
+  `amount` decimal(12,2) DEFAULT NULL,
+  `giveRedEnvelopeId` varchar(32) DEFAULT NULL,
+  `giveUserId` bigint(20) DEFAULT NULL,
+  `receiveTime` datetime DEFAULT NULL,
+  `receiveUserId` bigint(20) DEFAULT NULL,
+  `version` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `receiveRedEnvelope_1_idx` (`receiveUserId`,`receiveTime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 
 #
 # Structure for table "remind_0"
@@ -1369,6 +1460,8 @@ CREATE TABLE `systemsetting` (
   `questionRewardPointMax` bigint(20) DEFAULT NULL,
   `questionRewardPointMin` bigint(20) DEFAULT NULL,
   `allowRegisterAccount` longtext,
+  `giveRedEnvelopeAmountMax` decimal(12,2) DEFAULT NULL,
+  `giveRedEnvelopeAmountMin` decimal(12,2) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -1500,6 +1593,7 @@ CREATE TABLE `topic` (
   `summary` longtext,
   `sort` int(11) DEFAULT NULL,
   `lastUpdateTime` datetime DEFAULT NULL,
+  `giveRedEnvelopeId` varchar(32) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `topic_idx` (`tagId`,`status`),
   KEY `topic_3_idx` (`userName`,`postTime`),

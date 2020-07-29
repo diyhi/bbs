@@ -62,6 +62,8 @@ Vue.use(VueViewer.default);
 //延迟加载(因为mint-ui自带的版本不支持v-lazy-container属性，所以重新引入)
 Vue.use(VueLazyload);
 
+//气泡提示
+Vue.use(VTooltip);
 
 //定时查询消息
 Vue.prototype.unreadMessageCount = function (){
@@ -169,6 +171,11 @@ var index_component = Vue.extend({
 				topicContent: '',
 				captchaValue : '',
 				topic: '',
+				
+				totalAmount: '',
+				singleAmount: '',
+				giveQuantity: '',
+				redEnvelopeLimit: ''
 			},
 			
 			
@@ -201,7 +208,21 @@ var index_component = Vue.extend({
 			videoPlayerList: [],//视频播放器集合
 			
 			placeholder_DPlayer:'',//占位播放器
-			lastPlayerId:''//最后运行的播放Id
+			lastPlayerId:'',//最后运行的播放Id
+
+			showRedEnvelope:false,//显示发红包
+			
+			deposit:'',//用户共有预存款
+			giveRedEnvelopeAmountMin:'',//发红包金额下限
+			giveRedEnvelopeAmountMax:'',//发红包金额上限 空为无限制 0则不允许发红包
+			
+			redEnvelope_layer:false,//显示/隐藏红包层
+			giveRedEnvelope_type:'', //发红包类型
+		    giveRedEnvelope_totalAmount:'',//红包总金额
+		    giveRedEnvelope_singleAmount:'',//红包单个金额
+		    giveRedEnvelope_giveQuantity:'',//红包数量
+		    giveRedEnvelope_totalAmountView:'0'//红包合计总金额
+		    
 		};
 	},
 	
@@ -520,6 +541,73 @@ var index_component = Vue.extend({
 				}
 			});
 		},
+		
+		
+		//显示/隐藏红包表单层
+		redEnvelopeFormLayer : function() {
+			var _self = this;
+			
+			if(_self.redEnvelope_layer == false){
+				_self.redEnvelope_layer = true;
+				
+				//如果没选中值，则默认选第一个
+				if(_self.giveRedEnvelope_type == ""){
+					_self.giveRedEnvelope_type = 20;
+				}
+				
+			}else{
+				_self.redEnvelope_layer = false;
+			}
+		},
+		
+		//选择红包类型
+		selectRedEnvelopeType : function() {
+			var _self = this;
+			
+			if(_self.giveRedEnvelope_type == 20){//随机
+				_self.totalAmountCalculate();
+				
+			}else if(_self.giveRedEnvelope_type == 30){//固定
+				_self.singleAmountCalculate();
+				
+			}
+			
+		},
+		//总金额计算
+		totalAmountCalculate : function() {
+			var _self = this;
+			
+			if(_self.giveRedEnvelope_type == 20){//随机
+				var exp = /(^[1-9]([0-9]+)?(\.[0-9]{1,10})?$)|(^(0){1}$)|(^[0-9]\.[0-9]([0-9])?$)/;
+				if(exp.test(_self.giveRedEnvelope_totalAmount.trim())) {
+					var amount = calc_add(_self.giveRedEnvelope_totalAmount.trim(), 0, 2);
+					_self.giveRedEnvelope_totalAmountView = amount;
+				}else{
+					_self.giveRedEnvelope_totalAmountView = 0.00;
+				}
+				
+			}
+		},
+		//单个红包金额计算
+		singleAmountCalculate : function() {
+			var _self = this;
+			
+			if(_self.giveRedEnvelope_type == 30){//固定
+				
+				//金额 只允许正数  正则判断最多10位小数
+				var exp_singleAmount = /(^[1-9]([0-9]+)?(\.[0-9]{1,10})?$)|(^(0){1}$)|(^[0-9]\.[0-9]([0-9])?$)/;
+				//数量 正整数
+				var exp_giveQuantity = /^\+?[1-9][0-9]*$/;
+				if(exp_singleAmount.test(_self.giveRedEnvelope_singleAmount.trim()) && exp_giveQuantity.test(_self.giveRedEnvelope_giveQuantity.trim())) {
+					var amount = calc_multiply(_self.giveRedEnvelope_singleAmount.trim(), _self.giveRedEnvelope_giveQuantity.trim(), 2);
+					_self.giveRedEnvelope_totalAmountView = amount;
+				}else{
+					_self.giveRedEnvelope_totalAmountView = 0.00;
+				}
+			}
+			
+		},
+		
 		//发表话题界面
 		addTopicUI : function() {
 			var _self = this;
@@ -630,6 +718,15 @@ var index_component = Vue.extend({
 			_self.imgUrl = ''; //发表话题验证码图片
 			_self.captchaKey = ''; //发表话题验证码key
 			_self.captchaValue = ''; //发表话题验证码value
+			
+			_self.giveRedEnvelope_type = ''; //发红包类型
+			_self.giveRedEnvelope_totalAmount = '';//红包总金额
+			_self.giveRedEnvelope_singleAmount = '';//红包单个金额
+			_self.giveRedEnvelope_giveQuantity = '';//红包数量
+			_self.giveRedEnvelope_totalAmountView = 0;//红包合计总金额
+			
+			
+			
 
 			//清空标签数据
 			_self.tagSlots[0].values = [];
@@ -642,6 +739,12 @@ var index_component = Vue.extend({
 			_self.error.topicContent = "";
 			_self.error.captchaValue = "";
 			_self.error.topic = "";
+			
+			_self.totalAmount = "";
+			_self.singleAmount = "";
+			_self.giveQuantity = "";
+			_self.redEnvelopeLimit = "";
+			
 			
 			$.ajax({
 				type : "GET",
@@ -660,7 +763,18 @@ var index_component = Vue.extend({
 											message : "发表话题功能未开放",
 											duration : 3000,
 										});
-									}	
+									}
+								}else if (key == "deposit") {	
+									_self.deposit = returnValue[key];
+								}else if (key == "giveRedEnvelopeAmountMin") {	
+									_self.giveRedEnvelopeAmountMin = returnValue[key];
+								}else if (key == "giveRedEnvelopeAmountMax") {	
+									var giveRedEnvelopeAmountMax = returnValue[key];
+									_self.giveRedEnvelopeAmountMax = giveRedEnvelopeAmountMax;
+									if(giveRedEnvelopeAmountMax == null || (giveRedEnvelopeAmountMax != null && giveRedEnvelopeAmountMax >0)){
+										//显示发红包
+										_self.showRedEnvelope = true;
+									}
 								}else if (key == "captchaKey") {
 									//显示验证码
 									var value_captchaKey = returnValue[key];
@@ -670,6 +784,7 @@ var index_component = Vue.extend({
 									//设置验证码图片
 									_self.replaceCaptcha();
 								}
+								
 							}
 							//回调
 							callback(returnValue);
@@ -694,6 +809,11 @@ var index_component = Vue.extend({
 			_self.error.topic = "";
 			_self.error.captchaValue = "";
 			
+			_self.error.totalAmount = "";
+			_self.error.singleAmount = "";
+			_self.error.giveQuantity = "";
+			_self.error.redEnvelopeLimit = "";
+			
 		//	_self.topicContent = "<div style='text-align: center; height: expression(alert('test xss'));'>fdfd</div>";//
 		//	_self.topicContent = "<div style='text-align: center; height: expre\ssion(alert('test xss'));'>fdfd</div>";//
 			
@@ -706,6 +826,16 @@ var index_component = Vue.extend({
 			//}
 			
 			parameter += "&content=" + encodeURIComponent(_self.topicEditor.txt.html());
+			
+			//如果显示红包表单
+			if(_self.redEnvelope_layer){
+				parameter += "&type=" + _self.giveRedEnvelope_type;//发红包类型
+				
+				parameter += "&totalAmount=" + encodeURIComponent(_self.giveRedEnvelope_totalAmount);//红包总金额
+				parameter += "&singleAmount=" + encodeURIComponent(_self.giveRedEnvelope_singleAmount);//单个红包金额
+				parameter += "&giveQuantity=" + encodeURIComponent(_self.giveRedEnvelope_giveQuantity);//红包数量
+
+			}
 			
 			
 			//验证码Key
@@ -773,9 +903,17 @@ var index_component = Vue.extend({
 											_self.error.topicTagId = value_error[error];
 										}else if (error == "content") {
 											_self.error.topicContent = value_error[error];
-										} else if (error == "topic") {
+										}else if (error == "topic") {
 											_self.error.topic = value_error[error];
-										}  else if (error == "captchaValue") {
+										}else if (error == "totalAmount") {
+											_self.error.totalAmount = value_error[error];
+										}else if (error == "singleAmount") {
+											_self.error.singleAmount = value_error[error];
+										}else if (error == "giveQuantity") {
+											_self.error.giveQuantity = value_error[error];
+										}else if (error == "redEnvelopeLimit") {
+											_self.error.redEnvelopeLimit = value_error[error];
+										} else if (error == "captchaValue") {
 											_self.error.captchaValue = value_error[error];
 										} else if (error == "token") {
 											//如果令牌错误
@@ -791,6 +929,7 @@ var index_component = Vue.extend({
 									}
 								}
 							}
+							
 
 							if (value_captchaKey != null) {
 								_self.showCaptcha = true;
@@ -965,9 +1104,7 @@ var thread_component = Vue.extend({
 				editComment: '',
 				editReply: '',
 				editCommentContent : '',
-				editReplyContent: '',
-				
-				
+				editReplyContent: ''
 			},
 			commentEditor : '',//评论富文本编辑器
 			quoteEditor: '',//引用评论富文本编辑器
@@ -998,7 +1135,15 @@ var thread_component = Vue.extend({
 		    playerObjectList: [],//视频播放对象集合
 		    playerNodeList: [],//视频节点对象集合
 		    
-		    following:false//是否已经关注该用户
+		    following:false,//是否已经关注该用户
+		    
+		    giveRedEnvelope: '',//发红包
+		    receiveRedEnvelopeList:[],//领取红包用户集合
+		    selectedReceiveRedEnvelopeId:'',//选中领取红包用户
+		    receiveRedEnvelopeCurrentPage:0,//领取红包用户当前页
+		    receiveRedEnvelope_more:false//是否显示更多领取红包用户
+		    
+		    
 		};
 	},
 	
@@ -1279,12 +1424,195 @@ var thread_component = Vue.extend({
 							
 							//查询是否已经关注该用户
 							_self.queryFollowing();
+							
+							//查询发红包
+							if(topic.giveRedEnvelopeId != null && topic.giveRedEnvelopeId !=''){
+								_self.queryGiveRedEnvelope(topic.giveRedEnvelopeId);
+								
+							}
 						}
 					}
 				}
 			});
 		},
 		
+		//查询发红包
+		queryGiveRedEnvelope : function(giveRedEnvelopeId) {
+			var _self = this;
+			
+			var data = "giveRedEnvelopeId=" + giveRedEnvelopeId; //提交参数
+			$.ajax({
+				type : "GET",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "queryGiveRedEnvelope",
+				data : data,
+				success : function success(result) {
+					if (result != "") {
+						var giveRedEnvelope = $.parseJSON(result);
+						if (giveRedEnvelope != null) {
+							_self.giveRedEnvelope  = giveRedEnvelope;
+							
+							//生成首字符头像
+							_self.$nextTick(function() {
+								if(_self.giveRedEnvelope.avatarName == null || _self.giveRedEnvelope.avatarName == ''){
+									var char = (_self.giveRedEnvelope.nickname != null && _self.giveRedEnvelope.nickname !="") ? _self.giveRedEnvelope.nickname : _self.giveRedEnvelope.userName;
+									//元素的实际宽度
+									var width= _self.$refs.giveRedEnvelopeUserAvatar.offsetWidth;
+									_self.$refs.giveRedEnvelopeUserAvatar.src = letterAvatar(char, width);	
+									
+									
+								}
+							});
+							
+							//查询领取红包用户列表
+							_self.queryReceiveRedEnvelopeUserList(1);
+						}
+					}
+				}
+			})
+		},
+		//查询领取红包用户列表(追加)
+		queryReceiveRedEnvelopeUserList : function(page) {
+			var _self = this;
+			if(_self.giveRedEnvelope == null || _self.giveRedEnvelope == ''){
+				return;
+			}
+			
+			var data = "giveRedEnvelopeId=" + _self.giveRedEnvelope.id+"&page="+page; //提交参数
+			$.ajax({
+				type : "GET",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "queryReceiveRedEnvelopeUser",
+				data : data,
+				success : function success(result) {
+					if (result != "") {
+						var pageView = $.parseJSON(result);
+						if (pageView != null) {
+							if(pageView.records != null && pageView.records.length >0){
+								var receiveRedEnvelopeList = pageView.records;
+								if (receiveRedEnvelopeList != null && receiveRedEnvelopeList.length > 0) {
+									for(var i=0;i<receiveRedEnvelopeList.length; i++){
+										_self.receiveRedEnvelopeList.push(receiveRedEnvelopeList[i]);
+									}
+								}
+								
+								
+								
+								
+								//生成首字符头像
+								_self.$nextTick(function() {
+									if (receiveRedEnvelopeList != null && receiveRedEnvelopeList.length > 0) {
+										for(var i=0;i<receiveRedEnvelopeList.length; i++){
+											var receiveRedEnvelope = receiveRedEnvelopeList[i];
+											if(receiveRedEnvelope.receiveAvatarName == null || receiveRedEnvelope.receiveAvatarName == ''){
+												var char = (receiveRedEnvelope.receiveNickname != null && receiveRedEnvelope.receiveNickname !="") ? receiveRedEnvelope.receiveNickname : receiveRedEnvelope.receiveUserName;
+												//元素的实际宽度
+												var width= _self.$refs['redEnvelopeAvatarData_'+receiveRedEnvelope.id][0].offsetWidth;
+												_self.$refs['redEnvelopeAvatarData_'+receiveRedEnvelope.id][0].src = letterAvatar(char, width);
+												
+												
+											}
+											
+										}
+									}
+								});
+								//显示更多
+								if(parseInt(pageView.totalrecord) != _self.receiveRedEnvelopeList.length){
+									
+									_self.receiveRedEnvelope_more = true;
+								}else{
+									_self.receiveRedEnvelope_more = false;
+								}
+								_self.receiveRedEnvelopeCurrentPage = pageView.currentpage;
+								
+							}
+							
+						}
+					}
+				}
+			})
+		
+		},
+		//选择领取红包用户
+		selectReceiveRedEnvelopeUser : function(receiveRedEnvelopeId) {
+			var _self = this;
+			_self.selectedReceiveRedEnvelopeId = receiveRedEnvelopeId;
+		},
+		//抢红包
+		grabRedEnvelope : function(giveRedEnvelopeId) {
+			var _self = this;
+			
+			var parameter = "&giveRedEnvelopeId=" + giveRedEnvelopeId;
+
+			//	alert(parameter);
+			//令牌
+			parameter += "&token=" + _self.$store.state.token;
+			$.ajax({
+				type : "POST",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "user/control/redEnvelope/addReceiveRedEnvelope",
+				data : parameter,
+				success : function success(result) {
+					if (result != "") {
+
+						var returnValue = $.parseJSON(result);
+
+						var value_success = "";
+						var value_error = null;
+						var value_receiveRedEnvelopeAmount = 0;
+						
+						for (var key in returnValue) {
+							if (key == "success") {
+								value_success = returnValue[key];
+							} else if (key == "receiveRedEnvelopeAmount") {
+								value_receiveRedEnvelopeAmount = returnValue[key];
+							} else if (key == "error") {
+								value_error = returnValue[key];
+							}
+						}
+
+						//抢红包成功
+						if (value_success == "true") {
+							_self.$toast({
+								message : "抢到 "+value_receiveRedEnvelopeAmount+" 元红包",
+								duration : 5000,
+								className : "mint-ui-toast",
+							});
+
+							setTimeout(function() {
+							//	_self.receiveRedEnvelopeList.length = 0;//清空数组
+								//查询领取红包用户列表
+							//	_self.queryReceiveRedEnvelopeUserList(1);
+							}, 1000);
+							
+						} else {
+							//显示错误
+							if (value_error != null) {
+
+
+								var htmlContent = "";
+								var count = 0;
+								for (var errorKey in value_error) {
+									if(errorKey == "systemInfo"){//如果弹出系统繁忙则不显示
+										return;
+									}
+									
+									
+									var errorValue = value_error[errorKey];
+									count++;
+									htmlContent += count + ". " + errorValue + "<br>";
+								}
+								_self.$messagebox('提示', htmlContent);
+
+							}
+						}
+					}
+				}
+			});
+		},
 		//清空播放器
 		clearVideoPlayer : function() {
 			var _self = this;
@@ -8378,6 +8706,10 @@ var topicList_component = Vue.extend({
 			totalpage : 1, //总页数
 			on: '',//上一页
 			next: '',//下一页
+			
+			operating: false,//是否显示操作页面
+			operatingData: '',//弹出操作菜单
+	
 		}
 	},
 	created : function created() {
@@ -8391,6 +8723,7 @@ var topicList_component = Vue.extend({
 			|| to.path == '/user/control/topicUnhideList' 
 			|| to.path == '/user/control/topicFavoriteList' 
 			|| to.path == '/user/control/topicLikeList' 
+			|| to.path == '/user/control/redEnvelopeAmountDistributionList' 
 			|| to.path == '/user/editTopic') {//前往的URI路径需要缓存组件，其他情况下不需要缓存
 			this.$store.commit('setCacheComponents',  ['topicList']);
 		} else {
@@ -8408,6 +8741,84 @@ var topicList_component = Vue.extend({
 		this.initialization();
 	},
 	methods : {
+		//操作界面
+		operatingUI : function(topicId,giveRedEnvelopeId,title) {
+			var _self = this;
+			_self.operating = true;
+			var operatingData = new Array();
+			operatingData.push({
+							name: title,
+							module : 0, //模块 标题
+							id : topicId
+				   	});
+			
+			operatingData.push({
+				        name: '解锁隐藏标签用户', 
+				        method : _self.operatingAction,	// 调用methods中的函数
+							module : 10, //模块
+							id : topicId
+						});
+			
+			operatingData.push({
+							name: '收藏用户', 
+							method : _self.operatingAction,	// 调用methods中的函数
+							module : 20, //模块
+							id : topicId
+						});
+			
+			operatingData.push({
+							name: '点赞用户', 
+							method : _self.operatingAction,	// 调用methods中的函数
+							module : 30, //模块
+							id : topicId
+						});
+			if(giveRedEnvelopeId != null && giveRedEnvelopeId != ''){
+				operatingData.push({
+					name: '红包', 
+					method : _self.operatingAction,	// 调用methods中的函数
+					module : 40, //模块
+					id : topicId,
+					giveRedEnvelopeId : giveRedEnvelopeId
+				});
+			}
+			
+			operatingData.push({
+							name: '编辑', 
+							method : _self.operatingAction,	// 调用methods中的函数
+							module : 50, //模块
+							id : topicId
+						});
+			
+			_self.operatingData = operatingData;
+
+		},
+		
+		
+		//操作动作
+		operatingAction : function(obj) {
+			var _self = this;
+			var module = obj.module;//模块
+			var topicId = obj.id;//话题Id
+			var giveRedEnvelopeId = obj.giveRedEnvelopeId;//红包Id
+			
+			if(module == 10){//
+				_self.$router.push({ path: '/user/control/topicUnhideList',query: {topicId: topicId}});
+				
+			}else if(module == 20){
+				_self.$router.push({ path: '/user/control/topicFavoriteList',query: {topicId: topicId}});
+				
+			}else if(module == 30){
+				_self.$router.push({ path: '/user/control/topicLikeList',query: {topicId: topicId}});
+				
+			}else if(module == 40){
+				
+				_self.$router.push({ path: '/user/control/redEnvelopeAmountDistributionList',query: {giveRedEnvelopeId: giveRedEnvelopeId}});
+			}else if(module == 50){
+				
+				_self.$router.push({ path: '/user/editTopic',query: {topicId: topicId}});
+			}
+			
+		},
 		
 		//查询话题列表
 		queryTopicList : function() {
@@ -8426,6 +8837,15 @@ var topicList_component = Vue.extend({
 						var new_topicList = pageView.records;
 						if (new_topicList != null && new_topicList.length > 0) {
 							_self.topicList = new_topicList;
+							
+							//for(var i=0; i<new_topicList.length; i++){
+							//	var topic = new_topicList[i];
+								
+							//}
+							
+							
+							
+							
 						}
 						_self.currentpage = pageView.currentpage;
 						_self.totalpage = pageView.totalpage;
@@ -8985,6 +9405,7 @@ var editUser_component = Vue.extend({
 				oldPassword : '',
 				password : '',
 				confirmPassword : '',
+				user : '',
 			},
 			customError : [] //用户自定义注册功能项错误提示
 		}
@@ -9243,6 +9664,8 @@ var editUser_component = Vue.extend({
 									_self.error.oldPassword = errorValue;
 								}else if(error == "password"){
 									_self.error.password = errorValue;
+								}else if(error == "user"){
+									_self.error.user = errorValue;
 								}
 								
 								for (var i = 0; i < _self.userCustomList.length; i++) {
@@ -10336,7 +10759,7 @@ var userLoginLog_component = Vue.extend({
 		}
 	},
 	created : function created() {
-		this.queryUserLoginLog();
+		//this.queryUserLoginLog();
 	},
 	methods : {
 		//查询登录日志页
@@ -10372,6 +10795,7 @@ var userLoginLog_component = Vue.extend({
 					}
 				});
 			}
+			
 		}
 	}
 });
@@ -12769,6 +13193,296 @@ var editTopic_component = Vue.extend({
 });
 
 
+//发红包话题
+var giveRedEnvelopeList_component = Vue.extend({
+	name: 'giveRedEnvelopeList',//组件名称，keep-alive缓存需要本参数
+	template : '#giveRedEnvelopeList-template',
+	data : function data() {
+		return {
+			giveRedEnvelopeList : [], //话题集合
+			loading : false, //加载中
+			currentpage : 0, //当前页码
+			totalpage : 1, //总页数
+			on: '',//上一页
+			next: '',//下一页
+			
+			operating: false,//是否显示操作页面
+			operatingData: '',//弹出操作菜单
+	
+		}
+	},
+	created : function created() {
+		//初始化
+		this.initialization();
+		//设置缓存
+		this.$store.commit('setCacheComponents',  ['giveRedEnvelopeList']);
+	},
+	beforeRouteLeave: function (to, from, next) {
+		if (to.path == '/thread'
+			|| to.path == '/user/control/redEnvelopeAmountDistributionList') {//前往的URI路径需要缓存组件，其他情况下不需要缓存
+			this.$store.commit('setCacheComponents',  ['giveRedEnvelopeList']);
+		} else {
+			this.$store.commit('setCacheComponents',  []);
+		}
+		next();
+	},
+
+	//在当前路由改变，但是该组件被复用时调用
+	beforeRouteUpdate : function beforeRouteUpdate(to, from, next) {
+		next(true);
+		//重置data
+		Object.assign(this.$data, this.$options.data());
+		//初始化
+		this.initialization();
+	},
+	methods : {	
+		//查询发红包列表
+		queryGiveRedEnvelopeList : function() {
+			var _self = this;
+			var data = "";
+			data += "&page=" + _self.currentpage; //提交参数
+			$.ajax({
+				type : "GET",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "user/control/giveRedEnvelopeList",
+				data : data,
+				success : function success(result) {
+					if (result != "") {
+						var pageView = $.parseJSON(result);
+						var new_giveRedEnvelopeList = pageView.records;
+						if (new_giveRedEnvelopeList != null && new_giveRedEnvelopeList.length > 0) {
+							_self.giveRedEnvelopeList = new_giveRedEnvelopeList;
+					
+						}
+						_self.currentpage = pageView.currentpage;
+						_self.totalpage = pageView.totalpage;
+						if(pageView.currentpage != 1){
+							_self.on = pageView.currentpage-1;
+						}else{
+							_self.on = '';
+						}
+						if(pageView.pageindex.endindex >0 && pageView.currentpage != pageView.totalpage && pageView.records.length > 0){
+							
+							_self.next = pageView.currentpage+1;
+						}else{
+							_self.next = '';
+						}
+						
+					}
+				}
+			});
+			
+		},
+		//跳转红包金额分配
+		toRedEnvelopeAmountDistribution : function(giveRedEnvelopeId) {
+			//我的
+			this.$router.push({
+				path : '/user/control/redEnvelopeAmountDistributionList', 
+				query: {giveRedEnvelopeId: giveRedEnvelopeId}
+			});
+			
+		},
+		//初始化
+		initialization : function() {
+			var page = getUrlParam("page");//当前标签
+			if(page != null){
+				this.currentpage = parseInt(page);//当前页码
+			}
+			
+			//查询发红包列表
+			this.queryGiveRedEnvelopeList();
+		},
+		
+	},
+});
+
+
+
+//发红包金额分配
+var redEnvelopeAmountDistributionList_component = Vue.extend({
+	template : '#redEnvelopeAmountDistributionList-template',
+	data : function data() {
+		return {
+			receiveRedEnvelopeList : [], //发红包金额分配集合
+			loading : false, //加载中
+			currentpage : 0, //当前页码
+			totalpage : 1, //总页数
+			giveRedEnvelopeId: '',//发红包Id
+			giveRedEnvelope: ''//发红包
+		}
+	},
+	created : function created() {
+		var giveRedEnvelopeId = getUrlParam("giveRedEnvelopeId");//当前标签
+		if(giveRedEnvelopeId != null){
+			this.giveRedEnvelopeId = giveRedEnvelopeId;//发红包Id
+		}
+		this.queryRedEnvelopeAmountDistributionList();
+	},
+	methods : {
+		//查询发红包金额分配分页
+		queryRedEnvelopeAmountDistributionList : function() {
+			var _self = this;
+			
+			if (_self.currentpage < _self.totalpage) {
+				
+				//先改总页数为0，避免请求为空时死循环
+				_self.totalpage = 0;
+				_self.loading = true;
+				var data = "page=" + (_self.currentpage + 1)+"&giveRedEnvelopeId="+_self.giveRedEnvelopeId; //提交参数
+				$.ajax({
+					type : "GET",
+					cache : false,
+					async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+					url : "user/control/redEnvelopeAmountDistributionList",
+					data : data,
+					success : function success(result) {
+						if (result != "") {
+							var returnValue = $.parseJSON(result);
+							var giveRedEnvelope = null;
+							var pageView = null;
+							
+							if(returnValue != null){
+								for (var key in returnValue) {
+									if(key == "giveRedEnvelope"){
+										giveRedEnvelope = returnValue[key];
+										
+									}else if(key == "pageView"){
+										pageView = returnValue[key];
+										
+									}
+									
+									
+								}
+							}
+							if(giveRedEnvelope != null){
+								_self.giveRedEnvelope = giveRedEnvelope;
+							}
+							if(pageView != null){
+								
+								var new_receiveRedEnvelopeList = pageView.records;
+								if (new_receiveRedEnvelopeList != null && new_receiveRedEnvelopeList.length > 0) {
+									_self.receiveRedEnvelopeList.push.apply(_self.receiveRedEnvelopeList, new_receiveRedEnvelopeList); //合并两个数组
+									
+									//生成首字符头像
+									_self.$nextTick(function() {
+										if (new_receiveRedEnvelopeList != null && new_receiveRedEnvelopeList.length > 0) {
+											for(var i=0;i<new_receiveRedEnvelopeList.length; i++){
+												var receiveRedEnvelope = new_receiveRedEnvelopeList[i];
+												if(receiveRedEnvelope.receiveAvatarName == null || receiveRedEnvelope.receiveAvatarName == ''){
+													var char = (receiveRedEnvelope.receiveNickname != null && receiveRedEnvelope.receiveNickname !="") ? receiveRedEnvelope.receiveNickname : receiveRedEnvelope.receiveUserName;
+													//元素的实际宽度
+													var width= _self.$refs['receiveRedEnvelopeAvatarData_'+receiveRedEnvelope.id][0].offsetWidth;
+													_self.$refs['receiveRedEnvelopeAvatarData_'+receiveRedEnvelope.id][0].src = letterAvatar(char, width);	
+												}
+											}
+										}
+									});
+									
+								}
+								_self.currentpage = pageView.currentpage;
+								_self.totalpage = pageView.totalpage;
+							}
+							
+						}
+					},
+					complete : function complete(XMLHttpRequest, textStatus) {
+						_self.loading = false;
+						//需手动调用设置的全局complete
+						$.ajaxSettings.complete(XMLHttpRequest, textStatus);
+					}
+				});
+			}
+		},
+		
+		
+		
+		
+		
+	}
+});
+
+//收红包
+var receiveRedEnvelopeList_component = Vue.extend({
+	template : '#receiveRedEnvelopeList-template',
+	data : function data() {
+		return {
+			receiveRedEnvelopeList : [], //收红包集合
+			loading : false, //加载中
+			currentpage : 0, //当前页码
+			totalpage : 1, //总页数
+		}
+	},
+	created : function created() {
+		
+	},
+	methods : {
+		//查询收红包分页
+		queryReceiveRedEnvelopeList : function() {
+			var _self = this;
+			
+			if (_self.currentpage < _self.totalpage) {
+				
+				//先改总页数为0，避免请求为空时死循环
+				_self.totalpage = 0;
+				_self.loading = true;
+				var data = "page=" + (_self.currentpage + 1); //提交参数
+				$.ajax({
+					type : "GET",
+					cache : false,
+					async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+					url : "user/control/receiveRedEnvelopeList",
+					data : data,
+					success : function success(result) {
+						if (result != "") {
+							var pageView = $.parseJSON(result);
+							
+							var new_receiveRedEnvelopeList = pageView.records;
+							if (new_receiveRedEnvelopeList != null && new_receiveRedEnvelopeList.length > 0) {
+								_self.receiveRedEnvelopeList.push.apply(_self.receiveRedEnvelopeList, new_receiveRedEnvelopeList); //合并两个数组
+								
+								//生成首字符头像
+								_self.$nextTick(function() {
+									if (new_receiveRedEnvelopeList != null && new_receiveRedEnvelopeList.length > 0) {
+										for(var i=0;i<new_receiveRedEnvelopeList.length; i++){
+											var receiveRedEnvelope = new_receiveRedEnvelopeList[i];
+											if(receiveRedEnvelope.giveAvatarName == null || receiveRedEnvelope.giveAvatarName == ''){
+												var char = (receiveRedEnvelope.giveNickname != null && receiveRedEnvelope.giveNickname !="") ? receiveRedEnvelope.giveNickname : receiveRedEnvelope.giveUserName;
+												
+												//元素的实际宽度
+												var width= _self.$refs['receiveRedEnvelopeAvatarData_'+receiveRedEnvelope.id][0].offsetWidth;
+												_self.$refs['receiveRedEnvelopeAvatarData_'+receiveRedEnvelope.id][0].src = letterAvatar(char, width);	
+											}
+										}
+									}
+								});
+								
+							}
+							_self.currentpage = pageView.currentpage;
+							_self.totalpage = pageView.totalpage;
+							
+							
+						}
+					},
+					complete : function complete(XMLHttpRequest, textStatus) {
+						_self.loading = false;
+						//需手动调用设置的全局complete
+						$.ajaxSettings.complete(XMLHttpRequest, textStatus);
+					}
+				});
+			}
+		},
+		
+		
+		
+		
+		
+	}
+});
+
+
+
+
 /**------------------------------------------- 公共组件 ------------------------------------------------**/
 
 //底部选项卡
@@ -12897,6 +13611,9 @@ var routes = [
 	{path : '/membershipCardList',component : membershipCardList_component}, //会员卡列表
 	{path : '/membershipCard',component : membershipCard_component}, //会员卡
 	{path : '/user/editTopic',component : editTopic_component}, //修改话题
+	{path : '/user/control/giveRedEnvelopeList',component : giveRedEnvelopeList_component}, //发红包
+	{path : '/user/control/redEnvelopeAmountDistributionList',component : redEnvelopeAmountDistributionList_component}, //发红包金额分配
+	{path : '/user/control/receiveRedEnvelopeList',component : receiveRedEnvelopeList_component}, //收红包
 	
 	{path : '*',redirect : '/index'} //其余路由重定向至首页
 ];

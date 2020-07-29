@@ -160,6 +160,12 @@ html,body{
 .tagModule .box .tagList .selected{
 	border:1px solid #26a2ff; background-color: #e5f3ff;
 }
+.tagModule .box .tagList .icon{
+	margin-right: 4px;
+	position: relative;
+	top: 1px;
+}
+
 
 
 /** 问题标签 **/
@@ -275,6 +281,12 @@ html,body{
 	position: relative;
 	top: -1px;
 	
+}
+.indexModule .topicList .item .title .redEnvelope{
+	font-size: 20px;
+	position:relative;
+    top:4px;
+    color: #ff483a;
 }
 .indexModule .topicList .item .title .hideTagType{
 	font-size:0;/*父级元素设置font-size:0; 解决 display:inline-block两个元素之间的默认空格 */
@@ -510,6 +522,7 @@ html,body{
 .indexModule .addTopicScroll .box .addTopicForm{margin-left:5px; margin-right: 5px;}
 .indexModule .addTopicScroll .box .addTopicForm .tips{line-height:30px; margin-left: 115px}
 .indexModule .addTopicScroll .box .addTopicForm .tips span{color: red;}
+.indexModule .addTopicScroll .box .addTopicForm .help{line-height:30px; margin-left: 115px;color: #747474;font-size: 13px;}
 .indexModule .addTopicScroll .box .addTopicForm .tag{
 	position: relative;min-height:40px;margin-top: 10px;
 }
@@ -520,7 +533,18 @@ html,body{
 	font-size: 16px;line-height: 30px;margin-left: 70px; margin-right: 20px;
 }
 .indexModule .addTopicScroll .box .addTopicForm .sign{position:relative;display:inline-block;width: 100%;min-height: 34px;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box; }
-.indexModule .addTopicScroll .box .addTopicForm .sign:after{content:'';width:16px;height:16px;border-top:2px solid #e3e3e3;border-right:2px solid #e3e3e3;transform:translateY(-50%) rotate(45deg);-ms-transform:translateY(-50%) rotate(45deg);-webkit-transform:translateY(-50%) rotate(45deg);top:50%;right:15px;position:absolute;}
+.indexModule .addTopicScroll .box .addTopicForm .sign:after{content:'';width:16px;height:16px;border-top:2px solid #e3e3e3;border-right:2px solid #e3e3e3;transform:translateY(-50%) rotate(45deg);-ms-transform:translateY(-50%) rotate(45deg);-webkit-transform:translateY(-50%) rotate(45deg);top:50%;right:15px;position:absolute;pointer-events: none;}
+
+.indexModule .addTopicScroll .box .addTopicForm .item{
+	
+}
+.indexModule .addTopicScroll .box .addTopicForm .item .tag .name{
+	margin-left: 120px;
+}
+.indexModule .addTopicScroll .box .addTopicForm .richText{
+	position:relative;
+}
+
 
 
 /** 话题内容 **/
@@ -569,6 +593,156 @@ html,body{
 .topicContentModule .head-box .userInfo .right{float:right!important;}
 .topicContentModule .head-box .userInfo .right .button{
 	margin-top: 7px;margin-right: 0px;
+}
+/* 红包 */
+.topicContentModule .receiveRedEnvelope{
+	margin-top:10px;
+	padding-bottom:2px;
+	overflow: hidden;
+	zoom: 1;
+	background: #fff;
+	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
+	
+}
+.topicContentModule .receiveRedEnvelope .redEnvelope {
+	margin-bottom:10px;padding:20px 15px 20px;margin:0 auto; width:150px;
+}
+.topicContentModule .receiveRedEnvelope .redEnvelope .box {
+	border-radius: 16px;
+	background-color: #ff483a;
+	overflow: hidden;
+	position: relative;
+	color: #FFFFFF;
+}
+.topicContentModule .receiveRedEnvelope .redEnvelope .box .head {
+	border-bottom-right-radius: 100%;
+	border-bottom-left-radius: 100%;
+	width: 150%;
+	border-bottom: 2px solid #e03d19;
+	background-image: linear-gradient(-180deg, #ff583f 0%, #ff483a 100%);
+	position: relative;
+	left: 50%;
+	transform: translateX(-50%);
+	min-height: 40px;
+}
+.topicContentModule .receiveRedEnvelope .redEnvelope .box .body {
+	padding-top: 20px;margin:0 auto;
+}
+.topicContentModule .receiveRedEnvelope .redEnvelope .box .body .avatarBox{
+	border-radius:100%;
+	margin-top: 40px;text-align: center;
+}
+.topicContentModule .receiveRedEnvelope .redEnvelope .box .body .avatarBox img{
+	border-radius:100%;
+	width: 32px;
+}
+
+
+.topicContentModule .receiveRedEnvelope .redEnvelope .box .body .content{
+	margin-bottom:10px;
+	color:#fed68e;font-size:16px;height: 30px;position: relative;text-align: center;
+}
+
+.topicContentModule .receiveRedEnvelope .redEnvelope .box .btn{
+	border:none;
+	position: absolute;
+	top:15px;
+	left: 50%;
+	transform: translateX(-50%);
+	background-color: #fed848;
+	width: 46px;
+	height: 46px;
+	line-height: 46px;
+	text-align: center;
+	font-size: 30px;
+	color:#dc972e;
+	border-radius: 100%;
+	cursor: pointer;
+	transition: transform 0.3s;
+	transform-origin:0 50%;
+	
+	-moz-user-select:none; /*火狐*/
+    -webkit-user-select:none; /*webkit浏览器*/
+    -khtml-user-select:none; /*早期浏览器*/
+    user-select:none;
+}
+.topicContentModule .receiveRedEnvelope .redEnvelope .box .btn:hover {
+    transform: scale(1.2) translateX(-50%) ;/* perspective(1px) translate3d(0,0,0) */
+    -webkit-transform-style: preserve-3d;
+	-webkit-backface-visibility: hidden;
+	-moz-backface-visibility: hidden;
+	-ms-backface-visibility: hidden;
+}
+.topicContentModule .receiveRedEnvelope .redEnvelope .box .open-btn{
+	border:none;
+	position: absolute;
+	top:13px;
+	left: 50%;
+	transform: translateX(-50%);
+	background-color: #fed848;
+	width: 50px;
+	height: 50px;
+	line-height: 50px;
+	text-align: center;
+	font-size: 18px;
+	color:#dc972e;
+	border-radius: 100%;
+	cursor: pointer;
+	transition: transform 0.3s;
+	transform-origin:0 50%;
+}
+.topicContentModule .receiveRedEnvelope .receiveRedEnvelopeUser{
+	margin-left: 25px;padding-bottom: 15px;margin-right: 25px;position:relative;
+}
+.topicContentModule .receiveRedEnvelope .receiveRedEnvelopeUser .box{
+	text-align: center;margin-left: -10px;
+}
+.topicContentModule .receiveRedEnvelope .receiveRedEnvelopeUser .avatar {
+    width: 32px;
+    height: 32px;
+    line-height: 32px;
+    margin-bottom:8px;
+    
+    display: inline-block;
+    
+    background: #fff no-repeat center/cover;
+    position: relative;
+    text-align: center;
+    color: #fff;
+    vertical-align: bottom;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+	border-radius: 50%;
+	box-shadow: 0 0 0 1px rgba(0,0,0,.1);
+}
+.topicContentModule .receiveRedEnvelope .receiveRedEnvelopeUser .avatar {
+    margin-right: -15px !important;
+}
+.topicContentModule .receiveRedEnvelope .receiveRedEnvelopeUser .active{
+    margin-right: -3px !important;
+    transition-duration:0.3s;
+}
+.topicContentModule .receiveRedEnvelope .receiveRedEnvelopeUser .more {
+    width:20px; height:14px; position: absolute;left: 0; right: 0; bottom: 5px;
+    margin: auto;
+}
+.topicContentModule .receiveRedEnvelope .receiveRedEnvelopeUser .more .icon {
+   font-size: 15px; color: #26a2ff;
+}
+.topicContentModule .receiveRedEnvelope .noRedEnvelope{margin-bottom:10px;padding:20px 15px 20px;margin:0 auto; width:220px;}
+
+.topicContentModule .receiveRedEnvelope .noRedEnvelope .box {
+	border-radius: 16px;
+	background-color: #ff483a;
+	overflow: hidden;
+	position: relative;
+	color: #FFFFFF;
+}
+.topicContentModule .receiveRedEnvelope .noRedEnvelope .box .content{
+	color:#fed68e;font-size:16px;height: 60px;line-height:60px; position: relative;text-align: center;
 }
 
 .topicContentModule .topicDetail {
@@ -2877,7 +3051,7 @@ html,body{
 	color:#aaa;
 }
 .topicListModule .topicList .item .topInfo .bRight .status{font-size:13px;padding-right: 5px;}
-.topicListModule .topicList .item .topInfo .bRight .fast{font-size:13px;padding-right: 5px;}
+.topicListModule .topicList .item .topInfo .bRight .fast{font-size:12px;padding-left: 5px;}
 
 .topicListModule .topicList .item .topInfo .bRight .time{font-style:normal;}
 .topicListModule .topicList .item .title{
@@ -3092,7 +3266,8 @@ html,body{
 
 /** 积分记录 **/
 .pointModule{
-	padding-top: 40px;padding-bottom: 2px;
+	padding-top: 40px;
+	padding-bottom: 40px;/*没此属性UC浏览器无法下拉加载*/
 }
 .pointModule .pointList .remark{
 	margin-left: 10px;line-height: 18px;margin-bottom: 2px;color:#878787;font-size: 12px;margin-right: 10px;
@@ -3168,13 +3343,16 @@ html,body{
 
 /** 登录日志 **/
 .userLoginLogModule{
-	padding-top: 40px;padding-bottom: 2px;
+	padding-top: 40px;
+	padding-bottom: 40px;/*没此属性UC浏览器无法下拉加载*/
+	
 }
 
 
 /** 私信 **/
 .privateMessageModule{
-	padding-top: 40px;padding-bottom: 2px;
+	padding-top: 40px;
+	padding-bottom: 40px;/*没此属性UC浏览器无法下拉加载*/
 }
 .privateMessageModule .privateMessageList {
 	width: 100%;
@@ -3578,7 +3756,8 @@ html,body{
 
 /** 系统通知 **/
 .systemNotifyModule{
-	padding-top: 40px;padding-bottom: 2px;
+	padding-top: 40px;
+	padding-bottom: 40px;/*没此属性UC浏览器无法下拉加载*/
 }
 .systemNotifyModule .systemNotifyList {
 	width: 100%;
@@ -3637,7 +3816,8 @@ html,body{
 
 /** 提醒 **/
 .remindModule{
-	padding-top: 40px;padding-bottom: 2px;
+	padding-top: 40px;
+	padding-bottom: 40px;/*没此属性UC浏览器无法下拉加载*/
 }
 .remindModule .remindList {
 	width: 100%;
@@ -3717,7 +3897,8 @@ html,body{
 
 /** 收藏夹 **/
 .favoriteModule{
-	padding-top: 40px;padding-bottom: 2px;
+	padding-top: 40px;
+	padding-bottom: 40px;/*没此属性UC浏览器无法下拉加载*/
 }
 .favoriteModule .favoriteList {
 	width: 100%;
@@ -3783,7 +3964,8 @@ html,body{
 
 /** 点赞 **/
 .likeModule{
-	padding-top: 40px;padding-bottom: 2px;
+	padding-top: 40px;
+	padding-bottom: 40px;/*没此属性UC浏览器无法下拉加载*/
 }
 .likeModule .likeList {
 	width: 100%;
@@ -3830,7 +4012,8 @@ html,body{
 
 /** 关注 **/
 .followModule{
-	padding-top: 40px;padding-bottom: 2px;
+	padding-top: 40px;
+	padding-bottom: 40px;/*没此属性UC浏览器无法下拉加载*/
 }
 .followModule .followList {
 	width: 100%;
@@ -3884,7 +4067,8 @@ html,body{
 
 /** 粉丝 **/
 .followerModule{
-	padding-top: 40px;padding-bottom: 2px;
+	padding-top: 40px;
+	padding-bottom: 40px;/*没此属性UC浏览器无法下拉加载*/
 }
 .followerModule .followerList {
 	width: 100%;
@@ -3938,12 +4122,14 @@ html,body{
 
 /** 话题取消隐藏用户列表 **/
 .topicUnhideListModule{
-	padding-top: 40px;padding-bottom: 2px;
+	padding-top: 40px;
+	padding-bottom: 40px;/*没此属性UC浏览器无法下拉加载*/
 }
 
 /** 会员卡订单 **/
 .membershipCardOrderListModule{
-	padding-top: 40px;padding-bottom: 2px;
+	padding-top: 40px;
+	padding-bottom: 40px;/*没此属性UC浏览器无法下拉加载*/
 }
 .membershipCardOrderListModule .membershipCardOrderList {
 	width: 100%;
@@ -4020,7 +4206,8 @@ html,body{
 
 /** 余额 **/
 .balanceModule{
-	padding-top: 40px;padding-bottom: 2px;
+	padding-top: 40px;
+	padding-bottom: 40px;/*没此属性UC浏览器无法下拉加载*/
 }
 .balanceModule .deposit{
 	height: 80px;
@@ -4398,3 +4585,242 @@ html,body{
 }
 .editTopicModule .topicScroll .box .topicForm .sign{position:relative;display:inline-block;width: 100%;min-height: 34px;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box; }
 .editTopicModule .topicScroll .box .topicForm .sign:after{content:'';width:16px;height:16px;border-top:2px solid #e3e3e3;border-right:2px solid #e3e3e3;transform:translateY(-50%) rotate(45deg);-ms-transform:translateY(-50%) rotate(45deg);-webkit-transform:translateY(-50%) rotate(45deg);top:50%;right:15px;position:absolute;}
+
+
+/** 发红包 **/
+.giveRedEnvelopeListModule{
+	padding-top: 40px;padding-bottom: 2px;
+}
+.giveRedEnvelopeListModule .giveRedEnvelopeList {margin-top: 3px;}
+.giveRedEnvelopeListModule .giveRedEnvelopeList .item{position:relative;}
+.giveRedEnvelopeListModule .giveRedEnvelopeList .item .topInfo{height:24px;line-height:24px;padding:5px 10px 0px 10px;}
+.giveRedEnvelopeListModule .giveRedEnvelopeList .item .topInfo .bLeft{float:left!important;display:inline-block;}
+.giveRedEnvelopeListModule .giveRedEnvelopeList .item .topInfo .bLeft .type{
+	background-color: #f5f5f5;
+    font-size: 12px;
+    line-height: 12px;
+    display: inline-block;
+    padding: 4px 4px 4px 4px;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+    text-decoration: none;
+    color: #999;
+}
+.giveRedEnvelopeListModule .giveRedEnvelopeList .item .topInfo .bRight{float:right!important;font-size:14px;color:#aaa;}
+.giveRedEnvelopeListModule .giveRedEnvelopeList .item .topInfo .bRight .time{font-style:normal;}
+.giveRedEnvelopeListModule .giveRedEnvelopeList .item .title{
+	position:relative;
+	color:#222;
+	padding:10px 135px 0px 10px;
+	min-height:20px;
+    max-height:48px;
+	font-size:16px;
+    line-height:24px;
+    display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+	overflow: hidden;
+}
+.giveRedEnvelopeListModule .giveRedEnvelopeList .item .redEnvelopeAmountDistribution{
+	position: absolute;right: 10px;top: 34px;
+}
+.giveRedEnvelopeListModule .giveRedEnvelopeList .item .redEnvelopeAmountDistribution .icon{
+	margin-right: 4px;position: relative;top: 1px;
+}
+.giveRedEnvelopeListModule .giveRedEnvelopeList .item .redEnvelopeInfo{
+	margin-top:8px;
+	margin-left:8px;
+	margin-right:8px;
+	border-bottom:1px solid #eee;
+}
+.giveRedEnvelopeListModule .giveRedEnvelopeList .item .redEnvelopeInfo .details {
+	float: left;font-size: 14px;;line-height: 30px;color: #999;margin-left: -8px;
+}
+.giveRedEnvelopeListModule .giveRedEnvelopeList .item .redEnvelopeInfo .details .text{
+	line-height: 28px;
+	margin-left: 8px;
+}
+.giveRedEnvelopeListModule .giveRedEnvelopeList .item .redEnvelopeInfo .details .val{
+	margin-left: 8px;margin-right: 20px;
+}
+.giveRedEnvelopeListModule .giveRedEnvelopeList .giveRedEnvelopePage{
+	padding-top: 5px;padding-bottom: 10px;
+}
+
+
+/** 发红包金额分配 **/
+.redEnvelopeAmountDistributionListModule{
+	padding-top: 40px;
+	padding-bottom: 40px;/*没此属性UC浏览器无法下拉加载*/
+}
+.redEnvelopeAmountDistributionListModule .redEnvelopeAmountDistributionList {
+	width: 100%;
+}
+.redEnvelopeAmountDistributionListModule .redEnvelopeAmountDistributionList .giveRedEnvelope{
+	min-height:80px;
+	margin-top:8px;
+	margin-left: 8px;
+	margin-right: 8px;
+	margin-bottom: 8px;
+	border-radius: 8px;
+	background: #fcfcfc;
+}
+.redEnvelopeAmountDistributionListModule .redEnvelopeAmountDistributionList .giveRedEnvelope .topInfo{height:24px;line-height:24px;padding:5px 10px 0px 10px;}
+.redEnvelopeAmountDistributionListModule .redEnvelopeAmountDistributionList .giveRedEnvelope .topInfo .bLeft{float:left!important;display:inline-block;}
+.redEnvelopeAmountDistributionListModule .redEnvelopeAmountDistributionList .giveRedEnvelope .topInfo .bLeft .type{
+	background-color: #f1f1f1;
+    font-size: 12px;
+    line-height: 12px;
+    display: inline-block;
+    margin-top:2px;
+    padding: 4px 4px 4px 4px;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+    text-decoration: none;
+    color: #999;
+}
+.redEnvelopeAmountDistributionListModule .redEnvelopeAmountDistributionList .giveRedEnvelope .topInfo .bRight{float:right!important;font-size:14px;color:#aaa;}
+.redEnvelopeAmountDistributionListModule .redEnvelopeAmountDistributionList .giveRedEnvelope .topInfo .bRight .time{font-style:normal;}
+.redEnvelopeAmountDistributionListModule .redEnvelopeAmountDistributionList .giveRedEnvelope .title{
+	position:relative;
+	color:#222;
+	padding:10px 10px 0px 10px;
+    max-height:48px;
+	font-size:16px;
+    line-height:24px;
+    display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+	overflow: hidden;
+}
+.redEnvelopeAmountDistributionListModule .redEnvelopeAmountDistributionList .giveRedEnvelope .redEnvelopeInfo{
+	margin-top:8px;
+	margin-left:8px;
+	margin-right:8px;
+}
+.redEnvelopeAmountDistributionListModule .redEnvelopeAmountDistributionList .giveRedEnvelope .redEnvelopeInfo .details {
+	float: left;font-size: 14px;;line-height: 30px;color: #999;margin-left: -8px;
+}
+.redEnvelopeAmountDistributionListModule .redEnvelopeAmountDistributionList .giveRedEnvelope .redEnvelopeInfo .details .text{
+	line-height: 28px;
+	margin-left: 8px;
+}
+.redEnvelopeAmountDistributionListModule .redEnvelopeAmountDistributionList .giveRedEnvelope .redEnvelopeInfo .details .val{
+	margin-left: 8px;margin-right: 20px;
+}
+
+.redEnvelopeAmountDistributionListModule .redEnvelopeAmountDistributionList .item {
+	border-bottom: 1px solid #eee;
+	margin-left: 8px; 
+	margin-right: 8px;
+}
+.redEnvelopeAmountDistributionListModule .redEnvelopeAmountDistributionList .item .head {
+	min-height: 40px;
+	padding: 10px 0px 0px 0px;
+	margin: 0;
+	overflow: hidden;
+	position: relative;
+}
+.redEnvelopeAmountDistributionListModule .redEnvelopeAmountDistributionList .item .head .avatarBox{
+	position:absolute;display:inline-block;border-radius:100%;
+	left: 0px;top:8px;
+	
+}
+.redEnvelopeAmountDistributionListModule .redEnvelopeAmountDistributionList .item .head .avatarBox img{
+	border-radius:100%;
+	width: 36px;
+}
+
+.redEnvelopeAmountDistributionListModule .redEnvelopeAmountDistributionList .item .head .info {
+	display: block;
+	float: left;
+	margin-left: 44px;
+}
+.redEnvelopeAmountDistributionListModule .redEnvelopeAmountDistributionList .item .head .info h2 {
+	color:#aaa;
+	font-size:14px;
+	line-height: 16px;
+	font-weight:normal;
+}
+.redEnvelopeAmountDistributionListModule .redEnvelopeAmountDistributionList .item .head .info h2 .userName{
+	float: left;margin-right: 3px;
+}
+.redEnvelopeAmountDistributionListModule .redEnvelopeAmountDistributionList .item .head .time {
+	font-size: 12px;
+	color:#aaa;
+	margin-top: 5px;
+	line-height: 12px
+}
+.redEnvelopeAmountDistributionListModule .redEnvelopeAmountDistributionList .item .main {
+	color:#999;
+	font-size:22px;
+	line-height: 36px;
+	font-weight:bold;
+	margin-left: 44px;
+}
+
+/** 收红包 **/
+.receiveRedEnvelopeListModule{
+	padding-top: 40px;
+	padding-bottom: 40px;/*没此属性UC浏览器无法下拉加载*/
+}
+.receiveRedEnvelopeListModule .receiveRedEnvelopeListList {
+	width: 100%;
+}
+.receiveRedEnvelopeListModule .receiveRedEnvelopeListList .item {
+	border-bottom: 1px solid #eee;
+	margin-left: 8px; 
+	margin-right: 8px;
+}
+.receiveRedEnvelopeListModule .receiveRedEnvelopeListList .item .head {
+	min-height: 40px;
+	padding: 10px 0px 0px 0px;
+	margin: 0;
+	overflow: hidden;
+	position: relative;
+}
+.receiveRedEnvelopeListModule .receiveRedEnvelopeListList .item .head .avatarBox{
+	position:absolute;display:inline-block;border-radius:100%;
+	left: 0px;top:8px;
+	
+}
+.receiveRedEnvelopeListModule .receiveRedEnvelopeListList .item .head .avatarBox img{
+	border-radius:100%;
+	width: 36px;
+}
+.receiveRedEnvelopeListModule .receiveRedEnvelopeListList .item .head .info {
+	display: block;
+	float: left;
+	margin-left: 44px;
+}
+.receiveRedEnvelopeListModule .receiveRedEnvelopeListList .item .head .info h2 {
+	color:#aaa;
+	font-size:14px;
+	line-height: 16px;
+	font-weight:normal;
+}
+.receiveRedEnvelopeListModule .receiveRedEnvelopeListList .item .head .info h2 .userName{
+	float: left;margin-right: 3px;
+}
+.receiveRedEnvelopeListModule .receiveRedEnvelopeListList .item .head .time {
+	font-size: 12px;
+	color:#aaa;
+	margin-top: 5px;
+	line-height: 12px
+}
+.receiveRedEnvelopeListModule .receiveRedEnvelopeListList .item .main {
+	color:#999;
+	font-size:22px;
+	line-height: 36px;
+	font-weight:bold;
+	margin-left: 44px;
+}
+
+
+
+
+
+
+

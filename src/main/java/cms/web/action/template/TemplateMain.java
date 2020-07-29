@@ -17,6 +17,8 @@ import cms.bean.membershipCard.MembershipCard;
 import cms.bean.question.Answer;
 import cms.bean.question.Question;
 import cms.bean.question.QuestionTag;
+import cms.bean.redEnvelope.GiveRedEnvelope;
+import cms.bean.redEnvelope.ReceiveRedEnvelope;
 import cms.bean.template.Advert;
 import cms.bean.template.Column;
 import cms.bean.template.CustomHTML;
@@ -41,6 +43,7 @@ import cms.web.action.template.impl.Links_TemplateManage;
 import cms.web.action.template.impl.MembershipCard_TemplateManage;
 import cms.web.action.template.impl.QuestionTag_TemplateManage;
 import cms.web.action.template.impl.Question_TemplateManage;
+import cms.web.action.template.impl.RedEnvelope_TemplateManage;
 import cms.web.action.template.impl.System_TemplateManage;
 import cms.web.action.template.impl.Tag_TemplateManage;
 import cms.web.action.template.impl.Topic_TemplateManage;
@@ -80,7 +83,7 @@ public class TemplateMain {
 	@Resource CustomForum_TemplateManage customForum_TemplateManage;//自定义版块 -- 模板方法实现
 	@Resource System_TemplateManage system_TemplateManage;//系统部分 -- 模板方法实现
 	
-	
+	@Resource RedEnvelope_TemplateManage redEnvelope_TemplateManage;//红包 -- 模板方法实现
 	
 	/**
 	 * 公共模板处理
@@ -331,7 +334,26 @@ public class TemplateMain {
 				Map<String,Object> value = membershipCard_TemplateManage.buyMembershipCard_collection(forum, submitParameter, runtimeParameter);
 				return value;
 			}	
-		}else if(forum.getForumChildType().equals("添加在线留言")){
+		}
+		
+		else if(forum.getForumChildType().equals("发红包内容")){
+			if(forum.getDisplayType().equals("entityBean")){//实体对象
+				GiveRedEnvelope value =  redEnvelope_TemplateManage.content_entityBean(forum, submitParameter, runtimeParameter);
+				return value;
+			}	
+		}else if(forum.getForumChildType().equals("领取红包用户列表")){
+			if(forum.getDisplayType().equals("page")){//分页
+				PageView<ReceiveRedEnvelope> value = redEnvelope_TemplateManage.receiveRedEnvelopeUser_page(forum, submitParameter,runtimeParameter);
+				return value;
+			}	
+		}else if(forum.getForumChildType().equals("抢红包")){
+			if(forum.getDisplayType().equals("collection")){//集合
+				Map<String,Object> value = redEnvelope_TemplateManage.addReceiveRedEnvelope_collection(forum, submitParameter, runtimeParameter);
+				return value;
+			}	
+		}
+		
+		else if(forum.getForumChildType().equals("添加在线留言")){
 			if(forum.getDisplayType().equals("collection")){//集合
 				Map<String,Object> value = feedback_TemplateManage.addFeedback_collection(forum, submitParameter,runtimeParameter);
 				return value;

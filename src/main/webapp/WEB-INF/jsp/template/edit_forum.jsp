@@ -862,6 +862,32 @@ function delete_searchWord_row(rowId){
 		</TABLE>
 	</div>
 	
+	<!-- 红包部分--领取红包用户列表 分页 -->
+	<div id="related_receiveredenvelopeuser_分页" name="forumType_div" style="DISPLAY: none">
+		<enhance:out escapeXml="false">
+		<input type="hidden" id="page_Forum_RedEnvelopeRelated_ReceiveRedEnvelopeUser_Json" value="<c:out value="${page_Forum_RedEnvelopeRelated_ReceiveRedEnvelopeUser}"></c:out>">
+		</enhance:out>
+		<TABLE class="t-table" cellSpacing="1" cellPadding="2" width="100%" border="0">
+		 	<TBODY>
+				<TR>
+					<TD class="t-label t-label-h" width="16%">显示记录数：</TD>
+					<TD class=t-content width="84%" colSpan=3><INPUT class="form-text" maxLength=9 size=9 id=page_receiveRedEnvelopeUser_maxResult name=page_receiveRedEnvelopeUser_maxResult value="">
+					&nbsp;&nbsp;
+					<SPAN id= "error_page_receiveRedEnvelopeUser_maxResult" class="span-text"></SPAN>&nbsp;&nbsp;
+					</TD>
+				</TR>
+				<TR>
+					<TD class="t-label t-label-h" width="16%">排序：</TD>
+					<TD class=t-content width="84%" colSpan=3>
+						<SELECT class="form-select" id=page_receiveRedEnvelopeUser_sort name=page_receiveRedEnvelopeUser_sort>
+						<OPTION value="10" >按领取时间 新-&gt;旧</OPTION>
+						<OPTION value="20" >按领取时间 旧-&gt;新</OPTION>
+						</SELECT>
+					</TD>
+				</TR>
+			</TBODY>
+		</TABLE>
+	</div>
 	
 	<!-- 广告部分--图片广告 -->
 	<div id="related_image_集合" name="forumType_div" style="DISPLAY: none">
@@ -1301,6 +1327,35 @@ function echo_likeQuestion_collection(error_map){
 
 }
 
+//回显  红包部分--领取红包用户列表--分页
+function echo_receiveRedEnvelopeUser_page(error_map){
+	var page_Forum_RedEnvelopeRelated_ReceiveRedEnvelopeUser_Json = document.getElementById("page_Forum_RedEnvelopeRelated_ReceiveRedEnvelopeUser_Json").value;
+	if(page_Forum_RedEnvelopeRelated_ReceiveRedEnvelopeUser_Json != ""){
+		var page_Forum_RedEnvelopeRelated_ReceiveRedEnvelopeUser = JSON.parse(page_Forum_RedEnvelopeRelated_ReceiveRedEnvelopeUser_Json);
+		if(page_Forum_RedEnvelopeRelated_ReceiveRedEnvelopeUser != null){
+			
+			//显示记录数
+			if(page_Forum_RedEnvelopeRelated_ReceiveRedEnvelopeUser.receiveRedEnvelopeUser_maxResult != null){
+				document.getElementById("page_receiveRedEnvelopeUser_maxResult").value = page_Forum_RedEnvelopeRelated_ReceiveRedEnvelopeUser.receiveRedEnvelopeUser_maxResult;
+			}
+			//排序
+			var page_receiveRedEnvelopeUser_sort = document.getElementById("page_receiveRedEnvelopeUser_sort");
+			for(var i =0; i<page_receiveRedEnvelopeUser_sort.length; i++){    
+				if(page_receiveRedEnvelopeUser_sort[i].value == page_Forum_RedEnvelopeRelated_ReceiveRedEnvelopeUser.receiveRedEnvelopeUser_sort){
+					page_receiveRedEnvelopeUser_sort[i].selected = true;
+				}   
+    		}
+    		
+    		//显示错误提示
+			//每页显示记录数
+			if(error_map.get("page_receiveRedEnvelopeUser_maxResult") != null){
+				document.getElementById("error_page_receiveRedEnvelopeUser_maxResult").innerHTML = error_map.get("page_receiveRedEnvelopeUser_maxResult");
+			}
+		}
+	}
+
+}
+
 //回显  广告部分--轮播广告--单层
 function echo_image_collection(error_map){
 	//读取回显参数
@@ -1535,6 +1590,9 @@ function init(){
 	echo_answer_page(error_map);
 	//回显  问题部分--相似问题--集合
 	echo_likeQuestion_collection(error_map);
+	
+	//回显  红包部分--领取红包用户列表--分页
+	echo_receiveRedEnvelopeUser_page(error_map);
 	
 	//回显  广告部分--图片广告--集合
 	echo_image_collection(error_map);

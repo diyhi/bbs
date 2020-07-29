@@ -222,7 +222,8 @@ public class User implements Serializable{
 				DateTime dateTime = new DateTime(this.getRegistrationDate());     
 				String date = dateTime.toString("yyyy-MM-dd");
 				//头像路径
-				String _avatarPath = "file"+File.separator+"avatar"+File.separator + date +File.separator;
+				//String _avatarPath = "file"+File.separator+"avatar"+File.separator + date +File.separator;
+				String _avatarPath = "file/avatar/" + date +"/";
 				this.avatarPath = _avatarPath;
 			}
 		}

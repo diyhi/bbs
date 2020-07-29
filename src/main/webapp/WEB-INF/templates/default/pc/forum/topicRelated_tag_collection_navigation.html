@@ -1,19 +1,31 @@
 <#--  标签导航 -->
 <#--  适用话题列表 -->
 <#--  调用的页面需引入js/jquery/readmore2.js -->
+<#--  调用的页面需引入js/layer/layer.js -->
 <@function>
 	<div class="tabModule">
 		<div class="tab-box" >
 			<div id="tabNavigation">
 				<a href="${baseURI}" <#if url_tagId == ''> class='tab_current'<#else> class='tab'</#if>>全部</a>
 				<#list topicRelated_tag_collection as tag>	
-					<a href="?tagId=${tag.id}" <#if tag.id == url_tagId> class='tab_current'<#else> class='tab'</#if>>${tag.name}</a>
-				</#list>		
+					<#assign roleName = ''>
+					<#if tag.allowRoleViewList?? && tag.allowRoleViewList?size gt 0>
+						<#list tag.allowRoleViewList as name>	
+							<#assign roleName = roleName+' '+name>
+						</#list>
+					</#if>
+					<a href="?tagId=${tag.id}" <#if tag.id == url_tagId> class='tab_current'<#else> class='tab'</#if> data="${roleName}">
+						<#if tag.allowRoleViewList?? && tag.allowRoleViewList?size gt 0>
+							<i class="icon cms-chess-queen-solid" ></i>
+						</#if>
+						${tag.name}
+					</a>
+				</#list>	
 			</div>
 		</div>
 		<div id="tabNavigation_more" class="more"></div>
 	</div>	
-	<script type="text/javascript">
+<script type="text/javascript">
 	$(document).ready(function () {
 		//隐藏高度超过100px的内容
 		$('#tabNavigation').readmore({
@@ -29,5 +41,50 @@
 		
 		
 	});
-	</script>
+</script>
+
+
+
+<style>
+/** 半透明提示层 **/
+.hideTag-class .layui-layer-content{
+	background-color: rgba(0,0,0,0.6);
+}
+.hideTag-class .layui-layer-content .layui-layer-TipsG {
+	position: absolute;
+	width: 0;
+	height: 0;
+	border-width: 5px;
+	*overflow: hidden;
+	
+	border-style: dashed;
+ 	border-color:rgba(0,0,0,0.6) transparent transparent transparent;
+	margin-bottom: -2px;
+	margin-bottom: 3px\0;
+	*margin-bottom: 3px;
+}
+
+.hideTag-class .layui-layer-content .layui-layer-TipsT {
+	left: 7px;
+	border-right-style: solid;
+	border-right-color: rgba(0,0,0,0.6);
+}
+</style>
+<script type="text/javascript">
+var tab_tip_index = 0;
+$(".tab,.tab_current").on('mouseenter', this,function() {
+	var data = $(this).attr("data");
+	if(data != undefined && data != ''){
+		tab_tip_index = layer.tips(data, $(this), {
+			tips: 1,//[1, "rgba(0, 0, 0,0.5)"],
+			time: 5000,
+			skin: 'hideTag-class'
+		});
+	}
+}).on('mouseleave', this, function(){
+	layer.close(tab_tip_index);
+});
+</script>
+	
+	
 </@function>	

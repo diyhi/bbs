@@ -163,10 +163,13 @@ public class Question_TemplateManage {
 			}
 		}
 		
+		PageForm pageForm = new PageForm();
+		pageForm.setPage(page);
+		
 		//调用分页算法代码
-		PageView<Question> pageView = new PageView<Question>(maxResult,page,pageCount,requestURI,queryString);
+		PageView<Question> pageView = new PageView<Question>(maxResult,pageForm.getPage(),pageCount,requestURI,queryString);
 		//当前页
-		int firstIndex = (page-1)*pageView.getMaxresult();
+		int firstIndex = (pageForm.getPage()-1)*pageView.getMaxresult();
 
 		//执行查询
 		StringBuffer jpql = new StringBuffer("");
@@ -448,13 +451,14 @@ public class Question_TemplateManage {
 			if(captchaKey ==true){
 				value.put("captchaKey",UUIDUtil.getUUID32());//是否有验证码
 			}
+			User user = userManage.query_cache_findUserByUserName(accessUser.getUserName());
+			if(user != null){
+				value.put("maxDeposit",user.getDeposit());//用户共有预存款
+				value.put("maxPoint",user.getPoint());//用户共有积分
+			}
 		}
 		
-		User user = userManage.query_cache_findUserByUserName(accessUser.getUserName());
-		if(user != null){
-			value.put("maxDeposit",user.getDeposit());//用户共有预存款
-			value.put("maxPoint",user.getPoint());//用户共有积分
-		}
+		
 		
 		SystemSetting systemSetting = settingService.findSystemSetting_cache();
 		

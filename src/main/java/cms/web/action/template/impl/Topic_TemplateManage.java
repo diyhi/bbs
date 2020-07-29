@@ -167,11 +167,13 @@ public class Topic_TemplateManage {
 				}
 			}
 		}
+		PageForm pageForm = new PageForm();
+		pageForm.setPage(page);
 		
 		//调用分页算法代码
-		PageView<Topic> pageView = new PageView<Topic>(maxResult,page,pageCount,requestURI,queryString);
+		PageView<Topic> pageView = new PageView<Topic>(maxResult,pageForm.getPage(),pageCount,requestURI,queryString);
 		//当前页
-		int firstIndex = (page-1)*pageView.getMaxresult();
+		int firstIndex = (pageForm.getPage()-1)*pageView.getMaxresult();
 
 		//执行查询
 		StringBuffer jpql = new StringBuffer("");
@@ -469,9 +471,7 @@ public class Topic_TemplateManage {
 			if(topic != null){
 				//检查权限
 				userRoleManage.checkPermission(ResourceEnum._1001000,topic.getTagId());
-				
-				
-				
+
 				
 				if(ip != null){
 					topicManage.addView(topicId, ip);
@@ -716,7 +716,18 @@ public class Topic_TemplateManage {
 			if(captchaKey ==true){
 				value.put("captchaKey",UUIDUtil.getUUID32());//是否有验证码
 			}
+			
+			User user = userManage.query_cache_findUserByUserName(accessUser.getUserName());
+			if(user != null){
+				value.put("deposit",user.getDeposit());//用户共有预存款
+			}
 		}
+		
+		
+		
+		
+		
+		
 		
 		SystemSetting systemSetting = settingService.findSystemSetting_cache();
 		
@@ -726,6 +737,10 @@ public class Topic_TemplateManage {
 		}else{
 			value.put("allowTopic",true);//允许提交话题
 		}
+		
+		value.put("giveRedEnvelopeAmountMin",systemSetting.getGiveRedEnvelopeAmountMin());
+		value.put("giveRedEnvelopeAmountMax",systemSetting.getGiveRedEnvelopeAmountMax());
+		
 		value.put("availableTag", topicManage.availableTag());//话题编辑器允许使用标签
 		List<UserGrade> userGradeList = userGradeService.findAllGrade_cache();
 		value.put("userGradeList", JsonUtils.toJSONString(userGradeList));

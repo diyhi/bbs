@@ -270,7 +270,7 @@ public class QuestionServiceBean extends DaoSupport<Question> implements Questio
 			}
 		}
 		if(amount != null && amount.compareTo(new BigDecimal("0")) >0){//余额
-			paymentLog.setParameterId(question.getId());
+			paymentLog.setSourceParameterId(String.valueOf(question.getId()));
 			Object paymentLogObject = paymentManage.createPaymentLogObject(paymentLog);
 			//扣减用户预存款
 			int i = userService.subtractUserDeposit(question.getUserName(), amount, paymentLogObject);

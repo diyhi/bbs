@@ -110,6 +110,14 @@ public class ForumCodeManage {
 		childNode20.add(new ForumCodeNode(20003,"购买会员卡","membershipCardRelated_buyMembershipCard_",Arrays.asList(new String[]{"集合"})));
 		forumCodeNodeList.add(new ForumCodeNode(200,"会员卡",childNode20));//添加一级节点
 		
+		//红包
+		List<ForumCodeNode> childNode30 =  new ArrayList<ForumCodeNode>();//添加二级节点	 
+		childNode30.add(new ForumCodeNode(300001,"发红包内容","redEnvelopeRelated_giveRedEnvelopeContent_",Arrays.asList(new String[]{"实体对象"})));
+		childNode30.add(new ForumCodeNode(300002,"领取红包用户列表","redEnvelopeRelated_receiveRedEnvelopeUser_",Arrays.asList(new String[]{"分页"})));
+		childNode30.add(new ForumCodeNode(300003,"抢红包","redEnvelopeRelated_addReceiveRedEnvelope_",Arrays.asList(new String[]{"集合"})));
+		forumCodeNodeList.add(new ForumCodeNode(3000,"红包",childNode30));//添加一级节点
+		
+		
 		//在线留言
 		List<ForumCodeNode> childNode3 =  new ArrayList<ForumCodeNode>();//添加二级节点	
 		childNode3.add(new ForumCodeNode(3001,"添加在线留言","feedbackRelated_addFeedback_",Arrays.asList(new String[]{"集合"})));

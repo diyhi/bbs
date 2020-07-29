@@ -1199,7 +1199,7 @@ public class QuestionManageAction {
 					PaymentLog reward_paymentLog = new PaymentLog();
 					reward_paymentLog.setPaymentRunningNumber(paymentManage.createRunningNumber(user.getId()));//支付流水号
 					reward_paymentLog.setPaymentModule(110);//支付模块 110.调整赏金
-					reward_paymentLog.setParameterId(question.getId());//参数Id 
+					reward_paymentLog.setSourceParameterId(String.valueOf(question.getId()));//参数Id 
 					reward_paymentLog.setOperationUserType(1);//操作用户类型  0:系统  1: 员工  2:会员
 					reward_paymentLog.setOperationUserName(username);//操作用户名称  0:系统  1: 员工  2:会员
 					reward_paymentLog.setAmountState(changeAmountSymbol==true ? 2 :1);//金额状态  1:账户存入  2:账户支出 
@@ -1938,7 +1938,7 @@ public class QuestionManageAction {
 									PaymentLog reward_paymentLog = new PaymentLog();
 									reward_paymentLog.setPaymentRunningNumber(paymentManage.createRunningNumber(user.getId()));//支付流水号
 									reward_paymentLog.setPaymentModule(90);//支付模块 90.悬赏金额
-									reward_paymentLog.setParameterId(question.getId());//参数Id 
+									reward_paymentLog.setSourceParameterId(String.valueOf(question.getId()));//参数Id 
 									reward_paymentLog.setOperationUserType(1);//操作用户类型  0:系统  1: 员工  2:会员
 									reward_paymentLog.setOperationUserName(username);//操作用户名称  0:系统  1: 员工  2:会员
 									reward_paymentLog.setAmountState(1);//金额状态  1:账户存入  2:账户支出 

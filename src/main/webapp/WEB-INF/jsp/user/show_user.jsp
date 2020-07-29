@@ -799,6 +799,11 @@ function showDelta(obj,popId){
 	<input class="functionButton" type="button" onClick="javascript:window.location.href='${config:url(pageContext.request)}control/follow/list${config:suffix()}?userName=${user.userName}&id=${param.id}&queryState=${param.queryState}&jumpStatus=${param.jumpStatus}&userPage=${param.userPage}'" value="关注">
 	<input class="functionButton" type="button" onClick="javascript:window.location.href='${config:url(pageContext.request)}control/follower/list${config:suffix()}?userName=${user.userName}&id=${param.id}&queryState=${param.queryState}&jumpStatus=${param.jumpStatus}&userPage=${param.userPage}'" value="粉丝">
 	<input class="functionButton" type="button" onClick="javascript:window.location.href='${config:url(pageContext.request)}control/membershipCard/manage${config:suffix()}?method=membershipCardOrderList&userName=${user.userName}&id=${param.id}&queryState=${param.queryState}&jumpStatus=${param.jumpStatus}&userPage=${param.userPage}'" value="会员卡订单">
+	
+	<input class="functionButton" type="button" onClick="javascript:window.location.href='${config:url(pageContext.request)}control/redEnvelope/giveRedEnvelope/list${config:suffix()}?userName=${user.userName}&id=${param.id}&queryState=${param.queryState}&jumpStatus=${param.jumpStatus}&userPage=${param.userPage}'" value="发红包">
+	<input class="functionButton" type="button" onClick="javascript:window.location.href='${config:url(pageContext.request)}control/redEnvelope/receiveRedEnvelope/list${config:suffix()}?userName=${user.userName}&id=${param.id}&queryState=${param.queryState}&jumpStatus=${param.jumpStatus}&userPage=${param.userPage}'" value="收红包">
+	
+	
 	<input class="functionButton" type="button" onClick="javascript:window.location.href='${config:url(pageContext.request)}control/pointLog/list${config:suffix()}?userName=${user.userName}&id=${param.id}&queryState=${param.queryState}&jumpStatus=${param.jumpStatus}&userPage=${param.userPage}'" value="积分日志">
 	<input class="functionButton" type="button" onClick="javascript:window.location.href='${config:url(pageContext.request)}control/paymentLog/list${config:suffix()}?userName=${user.userName}&id=${param.id}&queryState=${param.queryState}&jumpStatus=${param.jumpStatus}&userPage=${param.userPage}'" value="支付日志">
 	<INPUT type="button" class="functionButton" value="充值" onClick="showDelta(this,'table_delta');">

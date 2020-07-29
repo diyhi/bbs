@@ -281,5 +281,20 @@ public class BeanFactoryPost implements BeanFactoryPostProcessor{
 				}	
 			}
 		}
+		BeanDefinition receiveRedEnvelope_bd = beanFactory.getBeanDefinition("receiveRedEnvelopeConfig");
+		if(receiveRedEnvelope_bd != null){
+			MutablePropertyValues mutablePropertyValues = receiveRedEnvelope_bd.getPropertyValues();
+			TypedStringValue typedStringValue = (TypedStringValue)mutablePropertyValues.getPropertyValue("tableQuantity").getValue();
+
+			//收红包分表数量
+			Integer tableQuantity = Integer.parseInt(typedStringValue.getValue());
+			if(tableQuantity >1){
+				for(int i =1; i<tableQuantity; i++){
+					
+					//初始化收红包bean
+					CreateBean.createReceiveRedEnvelopeBean(i);
+				}	
+			}
+		}
 	}
 }

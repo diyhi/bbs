@@ -176,7 +176,10 @@ function reductionTopic(){
    <c:forEach items="${pageView.records}" var="entry">
 	  <TR >
 	  	<TD width="3%"><INPUT type="checkbox" value="${entry.id}" id="topicId_${entry.id}" name="topicId" onclick="javascript:chooseSelectBox(this);"></TD>
-	    <TD width="24%">${entry.title}</TD>
+	    <TD width="24%">
+	    	${entry.title}
+	    	<c:if test="${entry.giveRedEnvelopeId != null && entry.giveRedEnvelopeId != ''}"><span style="color: #ff483a;">红包</span></c:if>
+	    </TD>
 	    <TD width="13%">${entry.tagName}</TD>
 	    <TD width="8%"><c:if test="${entry.status == 10 || entry.status == 110}"><span style="color:red;">待审核</span></c:if><c:if test="${entry.status == 20 || entry.status == 120}">已发布</c:if></TD>
 	    <TD width="8%"><c:if test="${entry.allow == true}">允许</c:if><c:if test="${entry.allow == false}"><span style="color: red;">禁止</span></c:if></TD>

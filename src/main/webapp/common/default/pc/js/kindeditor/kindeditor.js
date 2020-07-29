@@ -3598,6 +3598,7 @@ _extend(KCmd, {
 		if (val === '') {
 			return self;
 		}
+		
 		function pasteHtml(range, val) {
 
 			val = '<img id="__kindeditor_temp_tag__" width="0" height="0" style="display:none;" />' + val;
@@ -6483,7 +6484,31 @@ _plugin('core', function(K) {
 				},
 				cond : self.plugin['getSelected' + uName],
 				width : 150,
-				iconClass : val == 'edit' ? 'ke-icon-' + name : undefined
+				//iconClass : val == 'edit' ? 'ke-icon-' + name+"-"+val : undefined
+				iconClass : 'ke-icon-' + name+"-"+val
+			});
+		});
+		self.addContextmenu({ title : '-' });
+	});
+	self.plugin.getSelectedCode = function() {
+		return self.cmd.commonAncestor('pre');
+	};
+	//代码 右键
+	_each('code'.split(','), function(i, name) {
+		var uName = name.charAt(0).toUpperCase() + name.substr(1);
+		_each('edit'.split(','), function(j, val) {
+			self.addContextmenu({
+				title : self.lang(val + uName),
+				click : function() {
+					self.loadPlugin(name, function() {
+						
+						self.plugin[name][val]();
+						self.hideMenu();
+					});
+				},
+				cond : self.plugin['getSelected' + uName],
+				width : 150,
+				iconClass : 'ke-icon-' + name+"-"+val
 			});
 		});
 		self.addContextmenu({ title : '-' });
@@ -6532,6 +6557,24 @@ _plugin('core', function(K) {
 	self.afterCreate(function() {
 		var doc = self.edit.doc, cmd, bookmark, div,
 			cls = '__kindeditor_paste__', pasting = false;
+		
+		//获取选择范围内父标签为pre的标签名称
+		function getParentPreTagName(range) {
+			
+			var ancestor = K(range.commonAncestor());
+			while (ancestor) {
+				if(ancestor.name == 'pre'){
+					break;
+				}
+				ancestor = ancestor.parent();
+			}
+			if(ancestor != null){
+				return ancestor.name;
+			}
+			return "";
+		}
+		
+		
 		function movePastedData() {
 			cmd.range.moveToBookmark(bookmark);
 			cmd.select();
@@ -6556,35 +6599,51 @@ _plugin('core', function(K) {
 			if (_WEBKIT) {
 				html = html.replace(/(<br>)\1/ig, '$1');
 			}
-			if (self.pasteType === 2) {
-				html = html.replace(/(<(?:p|p\s[^>]*)>) *(<\/p>)/ig, '');//去除内容为空的p标签
-				if (/schemas-microsoft-com|worddocument|mso-\w+/i.test(html)) {
-					html = _clearMsWord(html, self.filterMode ? self.htmlTags : K.options.htmlTags);
-				} else {
-					html = _formatHtml(html, self.filterMode ? self.htmlTags : null);
-					html = self.beforeSetHtml(html);
-				}
-			}
-			if (self.pasteType === 1) {
+			
+			//获取选择范围内父标签为pre的标签名称
+			var tagName = getParentPreTagName(self.cmd.range);
+			
+			
+			if (tagName == 'pre') {//如果粘贴在pre标签内
 				html = html.replace(/&nbsp;/ig, ' ');
 				html = html.replace(/\n\s*\n/g, '\n');
 				html = html.replace(/<br[^>]*>/ig, '\n');
 				html = html.replace(/<\/p><p[^>]*>/ig, '\n');
 				html = html.replace(/<[^>]+>/g, '');
 				html = html.replace(/ {2}/g, ' &nbsp;');
-				if (self.newlineTag == 'p') {
-					if (/\n/.test(html)) {
-						html = html.replace(/^/, '<p>').replace(/$/, '<br /></p>').replace(/\n/g, '<br /></p><p>');
+			}else{
+				if (self.pasteType === 2) {//HTML粘贴
+					html = html.replace(/(<(?:p|p\s[^>]*)>) *(<\/p>)/ig, '');//去除内容为空的p标签
+					if (/schemas-microsoft-com|worddocument|mso-\w+/i.test(html)) {
+						html = _clearMsWord(html, self.filterMode ? self.htmlTags : K.options.htmlTags);
+					} else {
+						html = _formatHtml(html, self.filterMode ? self.htmlTags : null);
+						html = self.beforeSetHtml(html);
 					}
-				} else {
-					html = html.replace(/\n/g, '<br />$&');
+				}
+				if (self.pasteType === 1) {//纯文本粘贴
+					html = html.replace(/&nbsp;/ig, ' ');
+					html = html.replace(/\n\s*\n/g, '\n');
+					html = html.replace(/<br[^>]*>/ig, '\n');
+					html = html.replace(/<\/p><p[^>]*>/ig, '\n');
+					html = html.replace(/<[^>]+>/g, '');
+					html = html.replace(/ {2}/g, ' &nbsp;');
+					if (self.newlineTag == 'p') {
+						if (/\n/.test(html)) {
+							html = html.replace(/^/, '<p>').replace(/$/, '<br /></p>').replace(/\n/g, '<br /></p><p>');
+						}
+					} else {
+						html = html.replace(/\n/g, '<br />$&');
+					}
 				}
 			}
+			
+			
 			self.insertHtml(html, true);
 		}
 		//粘贴事件
 		K(doc.body).bind('paste', function(e){
-			if (self.pasteType === 0) {
+			if (self.pasteType === 0) {//禁止粘贴
 				e.stop();
 				return;
 			}
@@ -6598,6 +6657,7 @@ _plugin('core', function(K) {
 			K('div.' + cls, doc).remove();
 			cmd = self.cmd.selection();
 			bookmark = cmd.range.createBookmark();
+			
 			div = K('<div class="' + cls + '"></div>', doc).css({
 				position : 'absolute',
 				width : '1px',
@@ -6608,6 +6668,7 @@ _plugin('core', function(K) {
 				'white-space' : 'nowrap'
 			});
 			K(doc.body).append(div);
+			
 			if (_IE) {
 				var rng = cmd.range.get(true);
 				rng.moveToElementText(div[0]);
@@ -6885,6 +6946,7 @@ KindEditor.lang({
 	uploadError : '上传错误',
 	editHide : '隐藏标签属性',
 	deleteHide : '删除隐藏标签',
+	editCode : '修改语言',
 	'plainpaste.comment' : '请使用快捷键(Ctrl+V)把内容粘贴到下面的方框里。',
 	'wordpaste.comment' : '请使用快捷键(Ctrl+V)把内容粘贴到下面的方框里。',
 	'code.pleaseInput' : '请输入程序代码。',
@@ -7383,12 +7445,11 @@ KindEditor.plugin('clearhtml', function(K) {
 * @licence http://www.kindsoft.net/license.php
 *******************************************************************************/
 
-
-
 KindEditor.plugin('code', function(K) {
 	var self = this, name = 'code';
-	self.clickToolbar(name, function() {
-		var lang = self.lang(name + '.'),
+	self.plugin.code = {
+		add : function() {
+			var lang = self.lang(name + '.'),
 			html = ['<div style="padding:10px 20px;">',
 				'<div class="ke-dialog-row">',
 				'<select class="ke-code-type">',
@@ -7450,21 +7511,102 @@ KindEditor.plugin('code', function(K) {
 						self.cmd.range.insertNode(codeNode[0]).selectNodeContents(codeNode[0]).collapse(false);
 						self.cmd.select();
 						
-						/**
-						setTimeout(function() {
+						
+						//setTimeout(function() {
 							//选中焦点
-							var ancestor2 = K(self.cmd.range.commonAncestor());
-							self.cmd.range.selectNodeContents(ancestor2);
-							self.cmd.select();
-						}, 4);**/
+						//	var ancestor2 = K(self.cmd.range.commonAncestor());
+						//	self.cmd.range.selectNodeContents(ancestor2);
+						//	self.cmd.select();
+						//}, 4);
 						
 					}
 				}
 			}),
 			textarea = K('textarea', dialog.div);
-		textarea[0].focus();
-	});
+			textarea[0].focus();
+		},
+		edit : function() {
+			var lang = self.lang(name + '.');
+			var selectedNode = self.plugin.getSelectedCode();
+			var className = "";
+			
+			if(selectedNode.name == "pre"){
+				className = selectedNode.attr('class');//prettyprint lang-js
+				
+			}else if(selectedNode.parent().name == "pre"){
+				className = selectedNode.parent().attr('class');//prettyprint lang-js
+			}
+			
+			if(className == ""){
+				return;
+			}
+			
+			
+			var lang_list = new Array();
+			lang_list = className.split("-");
+			var selectedLang = "";
+			if(lang_list.length==2){
+				selectedLang = lang_list[1];
+			}
+			
+			var selectedHtml = ' selected = "selected"';
+			
+			var html = ['<div style="padding:10px 20px;">',
+						'<div class="ke-dialog-row">',
+						'<select class="ke-code-type">',
+						'<option value="js" '+(selectedLang == "js" ? selectedHtml :"")+'>JavaScript</option>',
+						'<option value="html" '+(selectedLang == "html" ? selectedHtml :"")+'>HTML</option>',
+						'<option value="css" '+(selectedLang == "css" ? selectedHtml :"")+'>CSS</option>',
+						'<option value="java" '+(selectedLang == "java" ? selectedHtml :"")+'>Java</option>',
+						'<option value="py" '+(selectedLang == "py" ? selectedHtml :"")+'>Python</option>',
+						'<option value="php" '+(selectedLang == "php" ? selectedHtml :"")+'>PHP</option>',
+						'<option value="cpp" '+(selectedLang == "cpp" ? selectedHtml :"")+'>C/C++</option>',
+						'<option value="bsh" '+(selectedLang == "bsh" ? selectedHtml :"")+'>Shell</option>',
+						'<option value="go" '+(selectedLang == "go" ? selectedHtml :"")+'>Go</option>',
+						'<option value="rb" '+(selectedLang == "rb" ? selectedHtml :"")+'>Ruby</option>',
+						'<option value="pl" '+(selectedLang == "pl" ? selectedHtml :"")+'>Perl</option>',
+						'<option value="cs" '+(selectedLang == "cs" ? selectedHtml :"")+'>C#</option>',
+						'<option value="xml" '+(selectedLang == "xml" ? selectedHtml :"")+'>XML</option>',
+						'<option value="" '+(selectedLang == "" ? selectedHtml :"")+'>其它</option>',
+						'</select>',
+						'</div>',
+						'</div>'].join('');
+			
+			var dialog = self.createDialog({
+				name : name,
+				width : 450,
+				title : "修改程序语言",
+				body : html,
+				yesBtn : {
+					name : self.lang('yes'),
+					click : function(e) {
+						
+						var type = K('.ke-code-type', dialog.div).val(),
+						code = textarea.val(),
+						cls = type === '' ? '' :  ' lang-' + type;
+						
+						
+						if(selectedNode.name == "pre"){
+							selectedNode.attr("class","prettyprint" + cls);//prettyprint lang-js
+							
+						}else if(selectedNode.parent().name == "pre"){
+							selectedNode.parent().attr("class","prettyprint" + cls);//prettyprint lang-js
+						}
+						
+						
+						
+						self.hideDialog();
+						
+					}
+				}
+			}),
+			textarea = K('textarea', dialog.div);
+		}
+	};
+	
+	self.clickToolbar(name, self.plugin.code.add);
 });
+
 
 /*******************************************************************************
 * KindEditor - WYSIWYG HTML Editor for Internet
@@ -9101,7 +9243,7 @@ KindEditor.plugin('pagebreak', function(K) {
 /*******************************************************************************
 * KindEditor - WYSIWYG HTML Editor for Internet
 * Copyright (C) 2006-2011 kindsoft.net
-*
+* 粘贴为无格式文本
 * @author Roddy <luolonghao@gmail.com>
 * @site http://www.kindsoft.net/
 * @licence http://www.kindsoft.net/license.php
@@ -9960,7 +10102,7 @@ KindEditor.plugin('template', function(K) {
 /*******************************************************************************
 * KindEditor - WYSIWYG HTML Editor for Internet
 * Copyright (C) 2006-2011 kindsoft.net
-*
+* 从Word粘贴
 * @author Roddy <luolonghao@gmail.com>
 * @site http://www.kindsoft.net/
 * @licence http://www.kindsoft.net/license.php

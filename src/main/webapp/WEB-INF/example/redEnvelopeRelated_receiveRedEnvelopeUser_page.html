@@ -1,0 +1,215 @@
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">返回值</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="20%">类型</th> 
+			<th width="50%">说明</th> 
+		</tr>
+	</thead> 
+	 <tbody> 
+		<tr> 
+			<td>redEnvelopeRelated_receiveRedEnvelopeUser_page</td> 
+			<td><a style="color: #317ee7" onclick="anchorJump('#anchor_10'); return false;">PageView</a></td>
+			<td>领取红包用户列表</td> 
+		</tr> 
+	</tbody> 
+</table>
+
+
+
+<table id="anchor_10" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">分页 PageView</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>records</td> 
+			<td>List&lt<a style="color: #317ee7" onclick="anchorJump('#anchor_20'); return false;">ReceiveRedEnvelope</a>></td>
+			<td>数据展示列表</td>
+		</tr>
+		<tr> 
+			<td>pageIndex</td> 
+			<td><a style="color: #317ee7" onclick="anchorJump('#anchor_30'); return false;">PageIndex</a></td>
+			<td>页码索引</td>
+		</tr>
+		<tr> 
+			<td>totalpage</td> 
+			<td>long</td>
+			<td>总页数</td>
+		</tr>
+		<tr> 
+			<td>maxresult</td> 
+			<td>long</td>
+			<td>每页显示记录数</td>
+		</tr>
+		<tr> 
+			<td>currentpage</td> 
+			<td>long</td>
+			<td>当前页</td>
+		</tr>
+		<tr> 
+			<td>pagecount</td> 
+			<td>long</td>
+			<td>页码显示总数</td>
+		</tr>
+		<tr> 
+			<td>onUrl</td> 
+			<td>String</td>
+			<td>上一页URL</td>
+		</tr>
+		<tr> 
+			<td>nextUrl</td> 
+			<td>String</td>
+			<td>下一页URL</td>
+		</tr>
+	</tbody> 
+</table>
+<table id="anchor_30" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">分页索引 PageIndex</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>startindex</td> 
+			<td>long</td>
+			<td>分页开始索引</td>
+		</tr>
+		<tr> 
+			<td>endindex</td> 
+			<td>long</td>
+			<td>分页结束索引</td>
+		</tr>
+	</tbody> 
+</table>
+<table id="anchor_20" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="4">收红包 ReceiveRedEnvelope</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%" colspan="2">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>id</td> 
+			<td>String</td>
+			<td colspan="2">Id</td>
+		</tr>
+		<tr> 
+			<td>receiveUserId</td> 
+			<td>Long</td>
+			<td colspan="2">收红包的用户Id</td>
+		</tr>
+		<tr> 
+			<td>receiveUserName</td> 
+			<td>String</td>
+			<td colspan="2">收红包的用户名称</td>
+		</tr>
+		<tr> 
+			<td>receiveAvatarPath</td> 
+			<td>String</td>
+			<td colspan="2">收红包的用户呢称</td>
+		</tr>
+		<tr> 
+			<td>receiveAvatarPath</td> 
+			<td>String</td>
+			<td>收红包的用户头像路径</td>
+			<td width="15%" rowspan="2">页面上显示200*200头像示例${receiveRedEnvelope.receiveAvatarPath}${receiveRedEnvelope.receiveAvatarName}   &nbsp;&nbsp;显示100*100头像示例${receiveRedEnvelope.receiveAvatarPath}100x100/${receiveRedEnvelope.receiveAvatarName}</td> 
+		</tr>
+		<tr> 
+			<td>receiveAvatarName</td> 
+			<td>String</td>
+			<td>收红包的用户头像名称</td>
+		</tr>
+		<tr> 
+			<td>giveRedEnvelopeId</td> 
+			<td>String</td>
+			<td colspan="2">发红包Id</td>
+		</tr>
+		<tr> 
+			<td>giveUserId</td> 
+			<td>Long</td>
+			<td colspan="2">发红包的用户Id</td>
+		</tr>
+		<tr> 
+			<td>receiveTime</td> 
+			<td>Date</td>
+			<td colspan="2">收取时间</td>
+		</tr>
+		<tr> 
+			<td>amount</td> 
+			<td>BigDecimal</td>
+			<td colspan="2">红包金额</td>
+		</tr>
+	</tbody> 
+</table>
+
+
+
+
+<table class="exampleTable" > 
+	<thead>
+		<tr> 
+			<th colspan="5">方法支持参数</th>
+		</tr>
+		<tr> 
+			<th width="30%">参数</th> 
+			<th width="20%">类型</th> 
+			<th width="10%">是否必填</th> 
+			<th width="40%" colspan="2">说明</th> 
+		</tr> 
+	</thead> 
+	 <tbody> 
+		<tr> 
+			<td>giveRedEnvelopeId</td> 
+			<td>String</td>
+			<td>是</td>
+			<td>发红包Id</td> 
+		</tr>
+		<tr> 
+			<td>page</td> 
+			<td>Long</td>
+			<td>否</td>
+			<td>页码</td> 
+		</tr>
+	</tbody> 
+</table>
+<h2 style="margin:0;padding:0; margin-top: 10px;">示例</h2>
+<textarea name="exampleCode">
+<#--可接收参数 giveRedEnvelopeId:发红包Id  page:分页-->
+<@function giveRedEnvelopeId="${url_giveRedEnvelopeId}" page="${url_page}" >
+	<#assign pageView =redEnvelopeRelated_receiveRedEnvelopeUser_page>
+	<#if pageView.records?exists>
+		<#list pageView.records as receiveRedEnvelope>
+
+			<#-- 红包金额 -->
+			${receiveRedEnvelope.amount}
+			<#-- 收取时间 -->
+			${receiveRedEnvelope.receiveTime}
+	
+
+			
+		</#list>
+	</#if>	
+</@function>
+</textarea>

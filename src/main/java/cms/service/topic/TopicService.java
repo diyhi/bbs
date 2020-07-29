@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 import cms.bean.QueryResult;
+import cms.bean.payment.PaymentLog;
 import cms.bean.platformShare.TopicUnhidePlatformShare;
+import cms.bean.redEnvelope.GiveRedEnvelope;
 import cms.bean.topic.Topic;
 import cms.bean.topic.TopicUnhide;
 import cms.service.besa.DAO;
@@ -68,8 +70,12 @@ public interface TopicService extends DAO<Topic>{
 	/**
 	 * 保存话题
 	 * @param topic
+	 * @param giveRedEnvelope 发红包
+	 * @param userName 用户名称
+	 * @param amount 扣减用户预存款
+	 * @param paymentLog 支付日志
 	 */
-	public void saveTopic(Topic topic);
+	public void saveTopic(Topic topic,GiveRedEnvelope giveRedEnvelope,String userName,BigDecimal amount,PaymentLog paymentLog);
 	/**
 	 * 修改话题
 	 * @param topic
@@ -104,9 +110,13 @@ public interface TopicService extends DAO<Topic>{
 	/**
 	 * 删除话题
 	 * @param topicId 话题Id
+	 * @param giveRedEnvelope 发红包
+	 * @param userName 用户名称
+	 * @param amount 返还用户金额
+	 * @param paymentLogObject 支付日志
 	 * @return
 	 */
-	public Integer deleteTopic(Long topicId);
+	public Integer deleteTopic(Long topicId,GiveRedEnvelope giveRedEnvelope,String userName,BigDecimal amount,Object paymentLogObject);
 	/**
 	 * 增加展示次数
 	 * @param countMap key: 话题Id value:展示次数

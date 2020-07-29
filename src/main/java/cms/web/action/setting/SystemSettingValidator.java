@@ -171,7 +171,7 @@ public class SystemSettingValidator implements Validator{
 				}
 			}
 		}
-		//问题悬赏积分下限
+		//问题悬赏金额下限
 		if(systemSetting.getQuestionRewardAmountMin() != null){
 			if(systemSetting.getQuestionRewardAmountMin().compareTo(new BigDecimal("0")) <0){
 				errors.rejectValue("questionRewardAmountMin","errors.required", new String[]{"必须大于或等于0"},"");
@@ -189,7 +189,30 @@ public class SystemSettingValidator implements Validator{
 			}
 			if(systemSetting.getQuestionRewardAmountMax().compareTo(new BigDecimal("0")) >0 && systemSetting.getQuestionRewardAmountMin() != null){
 				if(systemSetting.getQuestionRewardAmountMin().compareTo(systemSetting.getQuestionRewardAmountMax()) >=0){
-					errors.rejectValue("questionRewardAmountMax","errors.required", new String[]{"不能小于或等于问题悬赏积分下限"},"");
+					errors.rejectValue("questionRewardAmountMax","errors.required", new String[]{"不能小于或等于问题悬赏金额下限"},"");
+				}
+			}
+		}
+		
+		//发红包金额下限
+		if(systemSetting.getGiveRedEnvelopeAmountMin() != null){
+			if(systemSetting.getGiveRedEnvelopeAmountMin().compareTo(new BigDecimal("0.01")) <0){
+				errors.rejectValue("giveRedEnvelopeAmountMin","errors.required", new String[]{"必须大于或等于0.01"},"");
+			}
+		}else{
+			errors.rejectValue("giveRedEnvelopeAmountMin","errors.required", new String[]{"不能为空"},"");
+		}
+		//发红包金额上限
+		if(systemSetting.getGiveRedEnvelopeAmountMax() != null){
+			if(systemSetting.getGiveRedEnvelopeAmountMax().compareTo(new BigDecimal("0")) <0){
+				errors.rejectValue("giveRedEnvelopeAmountMax","errors.required", new String[]{"必须大于或等于0"},"");
+			}
+			if(systemSetting.getGiveRedEnvelopeAmountMax().compareTo(new BigDecimal("99999999")) >0){
+				errors.rejectValue("giveRedEnvelopeAmountMax","errors.required", new String[]{"不能大于99999999"},"");
+			}
+			if(systemSetting.getGiveRedEnvelopeAmountMax().compareTo(new BigDecimal("0")) >0 && systemSetting.getGiveRedEnvelopeAmountMin() != null){
+				if(systemSetting.getGiveRedEnvelopeAmountMin().compareTo(systemSetting.getGiveRedEnvelopeAmountMax()) >0){
+					errors.rejectValue("giveRedEnvelopeAmountMax","errors.required", new String[]{"不能小于发红包金额下限"},"");
 				}
 			}
 		}

@@ -170,9 +170,6 @@
 .fa-insertunorderedlist:before {
   content: "\e90b";
 }
-.fa-hide:before {
-  content: "\e919";
-}
 .fa-baidumap:before {
   content: "\e90c";
 }
@@ -203,9 +200,6 @@
 .fa-superscript:before {
   content: "\e911";
 }
-.fa-code:before {
-  content: "\e923";
-}
 .fa-fontsize:before {
   content: "\e924";
 }
@@ -221,3 +215,19 @@
 .fa-media:before {
   content: "\e920";
 }
+.fa-hide:before {
+  content: "\e919";
+}
+.fa-hide-edit:before {
+  content: "\e998";
+}
+.fa-hide-delete:before {
+  content: "\e999";
+}
+.fa-code:before {
+  content: "\e923";
+}
+.fa-code-edit:before {
+  content: "\e998";
+}
+

@@ -1,6 +1,7 @@
 package cms.web.action.topic;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -31,6 +32,8 @@ import cms.bean.PageForm;
 import cms.bean.PageView;
 import cms.bean.QueryResult;
 import cms.bean.mediaProcess.MediaProcessQueue;
+import cms.bean.payment.PaymentLog;
+import cms.bean.redEnvelope.GiveRedEnvelope;
 import cms.bean.setting.SystemSetting;
 import cms.bean.staff.SysUsers;
 import cms.bean.thumbnail.Thumbnail;
@@ -45,6 +48,7 @@ import cms.bean.topic.TopicIndex;
 import cms.bean.user.User;
 import cms.bean.user.UserGrade;
 import cms.service.mediaProcess.MediaProcessService;
+import cms.service.redEnvelope.RedEnvelopeService;
 import cms.service.setting.SettingService;
 import cms.service.thumbnail.ThumbnailService;
 import cms.service.topic.CommentService;
@@ -66,6 +70,8 @@ import cms.web.action.SystemException;
 import cms.web.action.TextFilterManage;
 import cms.web.action.fileSystem.FileManage;
 import cms.web.action.mediaProcess.MediaProcessQueueManage;
+import cms.web.action.payment.PaymentManage;
+import cms.web.action.redEnvelope.RedEnvelopeManage;
 import cms.web.action.user.UserManage;
 import cms.web.action.user.UserRoleManage;
 
@@ -98,7 +104,9 @@ public class TopicManageAction {
 	
 	@Resource MediaProcessService mediaProcessService;
 	@Resource MediaProcessQueueManage mediaProcessQueueManage;
-	
+	@Resource RedEnvelopeService redEnvelopeService;
+	@Resource PaymentManage paymentManage;
+	@Resource RedEnvelopeManage redEnvelopeManage;
 	/**
 	 * 话题   查看
 	 * @param topicId
@@ -174,9 +182,17 @@ public class TopicManageAction {
 				if(tag != null){
 					topic.setTagName(tag.getName());
 				}
+				
+				if(topic.getGiveRedEnvelopeId() != null && !"".equals(topic.getGiveRedEnvelopeId())){//红包
+					GiveRedEnvelope giveRedEnvelope = redEnvelopeService.findById(topic.getGiveRedEnvelopeId());
+					model.addAttribute("giveRedEnvelope", giveRedEnvelope);
+				}
+				
+				
 				model.addAttribute("topic", topic);
 				
 				model.addAttribute("availableTag", commentManage.availableTag());
+				
 				
 				PageForm pageForm = new PageForm();
 				pageForm.setPage(page);
@@ -532,7 +548,7 @@ public class TopicManageAction {
 		if(error != null && error.size() >0){
 			model.addAttribute("error", error);
 		}else{
-			topicService.saveTopic(topic);
+			topicService.saveTopic(topic,null,null,null,null);
 			topicManage.delete_cache_markUpdateTopicStatus(topic.getId());//删除 标记修改话题状态
 			//更新索引
 			topicIndexService.addTopicIndex(new TopicIndex(String.valueOf(topic.getId()),1));
@@ -1388,6 +1404,14 @@ public class TopicManageAction {
 			Boolean isTopicList,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
+		
+		String username = "";//用户名称
+		String userId = "";//用户Id
+		Object principal  =  SecurityContextHolder.getContext().getAuthentication().getPrincipal(); 
+		if(principal instanceof SysUsers){
+			userId =((SysUsers)principal).getUserId();
+			username =((SysUsers)principal).getUserAccount();
+		}
 		if(topicId != null && topicId.length >0){
 			List<Long> topicIdList = new ArrayList<Long>();
 			for(Long l :topicId){
@@ -1412,10 +1436,48 @@ public class TopicManageAction {
 							topicIndexService.addTopicIndex(new TopicIndex(String.valueOf(topic.getId()),2));
 							topicManage.deleteTopicCache(topic.getId());//删除缓存
 						}else{//物理删除
+							GiveRedEnvelope giveRedEnvelope = null;
+							String userName = null;
+							BigDecimal amount = null;
+							Object paymentLogObject = null;
+							
+							if(topic.getGiveRedEnvelopeId() != null && !"".equals(topic.getGiveRedEnvelopeId())){
+								giveRedEnvelope = redEnvelopeService.findById(topic.getGiveRedEnvelopeId());
+								if(giveRedEnvelope != null && (giveRedEnvelope.getRefundAmount() == null || giveRedEnvelope.getRefundAmount().compareTo(new BigDecimal("0"))==0)){
+									User user = userManage.query_cache_findUserById(giveRedEnvelope.getUserId());
+									BigDecimal refundAmount = redEnvelopeManage.refundAmount(giveRedEnvelope);
+									
+									if(user != null && refundAmount.compareTo(new BigDecimal("0")) >0){
+										
+										PaymentLog paymentLog = new PaymentLog();
+										paymentLog.setPaymentRunningNumber(paymentManage.createRunningNumber(user.getId()));//支付流水号
+										paymentLog.setPaymentModule(140);//支付模块 140.话题返还红包
+										paymentLog.setSourceParameterId(topic.getGiveRedEnvelopeId());//参数Id 
+										paymentLog.setOperationUserType(1);//操作用户类型  0:系统  1: 员工  2:会员
+										paymentLog.setOperationUserName(username);//操作用户名称
+										paymentLog.setAmountState(1);//金额状态  1:账户存入  2:账户支出 
+										paymentLog.setAmount(refundAmount);//金额
+										paymentLog.setInterfaceProduct(0);//接口产品
+										paymentLog.setUserName(user.getUserName());//用户名称
+										paymentLog.setTimes(new Date());
+										paymentLog.setSourceParameterId(giveRedEnvelope.getId());
+										//金额日志
+										paymentLogObject = paymentManage.createPaymentLogObject(paymentLog);
+										
+										
+										userName = user.getUserName();
+										amount = refundAmount;
+									}
+									
+								}
+								
+								
+							}
+							
 							
 							String fileNumber = topicManage.generateFileNumber(topic.getUserName(), topic.getIsStaff());
 							
-							int i = topicService.deleteTopic(topic.getId());
+							int i = topicService.deleteTopic(topic.getId(),giveRedEnvelope,userName,amount,paymentLogObject);
 							
 							if(i>0){
 								//根据话题Id删除用户动态(话题下的评论和回复也同时删除)
@@ -1425,7 +1487,10 @@ public class TopicManageAction {
 							topicManage.deleteTopicCache(topic.getId());//删除缓存
 							
 							topicManage.delete_cache_markUpdateTopicStatus(topic.getId());//删除 标记修改话题状态
-							
+							if(topic.getGiveRedEnvelopeId() != null && !"".equals(topic.getGiveRedEnvelopeId())){
+								//删除缓存
+						    	redEnvelopeManage.delete_cache_findById(topic.getGiveRedEnvelopeId());
+							}
 							
 							//更新索引
 							topicIndexService.addTopicIndex(new TopicIndex(String.valueOf(topic.getId()),3));

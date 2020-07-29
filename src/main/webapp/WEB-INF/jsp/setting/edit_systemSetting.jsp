@@ -605,6 +605,25 @@ function setAllowFilterWord(obj){
 			    	<web:errors path="questionRewardPlatformShareProportion" cssStyle="color: red;"/>
 			    </TD>
 			</TR>
+			
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">发红包总金额下限：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<input class="form-text" name="giveRedEnvelopeAmountMin" maxlength="12" size="12" value="${systemSetting.giveRedEnvelopeAmountMin}"/>
+			    	<span class="span-help">0.01至99999999之间的金额</span>
+			    	<web:errors path="giveRedEnvelopeAmountMin" cssStyle="color: red;"/>
+			    </TD>
+			</TR>
+			<TR>
+			    <TD class="t-label t-label-h" width="20%">发红包总金额上限：</TD>
+			    <TD class="t-content" width="80%" colSpan="3">
+			    	<input class="form-text" name="giveRedEnvelopeAmountMax" maxlength="12" size="12" value="${systemSetting.giveRedEnvelopeAmountMax}"/>
+			    	<span class="span-help">空为无限制 0则不允许发红包</span>
+			    	<web:errors path="giveRedEnvelopeAmountMax" cssStyle="color: red;"/>
+			    </TD>
+			</TR>
+			
+			
 			<TR>
 			    <TD class="t-label t-label-h" width="20%">敏感词过滤：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">

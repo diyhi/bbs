@@ -82,9 +82,10 @@
 		                </div>
 		                <!-- topicId属性用来支持JS获取隐藏内容 -->
 						<div class="topicContent" topicId="${topic.id}">
-							 <#if topic.lastUpdateTime != null>
+							<#if topic.lastUpdateTime != null>
 								<div class="lastUpdateTime">最后修改时间：${topic.lastUpdateTime}</div>
 							</#if>
+
 		                	<#noescape>${topic.content}</#noescape>
 							
 							
@@ -262,6 +263,12 @@
 						</#if>
 					</div>
 				</div>
+				
+				<#-- 引入红包 -->
+				<@include action="${redEnvelopeRelated_giveRedEnvelopeContent_1}" giveRedEnvelopeId="${topic.giveRedEnvelopeId}"/>
+				
+				<@include action="${redEnvelopeRelated_receiveRedEnvelopeUser_1}" giveRedEnvelopeId="${topic.giveRedEnvelopeId}"/>
+				
 				
 				<#-- 引入相似问题 -->
 				<@include action="${topicRelated_likeTopic_1}" topicId="${topic.id}"/>

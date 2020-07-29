@@ -39,11 +39,11 @@ public class CommentManage {
 			boolean area_3 = false;
 			
 			tag.add("source");
+		//	tag.add("|");
 			if(editor.isCode()){//代码
 				tag.add("code");
 				area_1 = true;
 			}
-		//	tag.add("|");
 			if(editor.isFontname()){//字体
 				tag.add("fontname");
 				area_1 = true;

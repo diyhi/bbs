@@ -115,8 +115,11 @@ public class UpgradeManage {
 		
 		String[] extensions = null;//后缀名{"doc", "pdf"}
 		boolean recursive = true;//是否递归
-		//文件路径
-		Set<String> absolutePathList = new TreeSet<String>();
+		
+		
+		//文件名称签名集合
+		Set<String> fileNameSignList = new TreeSet<String>();
+				
 		
 		
 		//排除路径
@@ -132,18 +135,18 @@ public class UpgradeManage {
 		    	if(file.getAbsolutePath() != null && !"".equals(file.getAbsolutePath().trim())){
 		    		//排除signature.pem文件
 		    		if(!StringUtils.startsWithIgnoreCase(file.getAbsolutePath(), excludeDirectoryPath)){//判断开始部分是否与二参数相同。不区分大小写
-		    			absolutePathList.add(file.getAbsolutePath());
+		    			fileNameSignList.add(SHA.sha256Hex(new File(FileUtil.normalize(file.getAbsolutePath()))));
 		    		}
 		    		
 		    	}
 		    }
 		}
-		if(absolutePathList != null && absolutePathList.size() >0){
-			for(String absolutePath :absolutePathList){
-				
-				signature.append(SHA.sha256Hex(new File(FileUtil.normalize(absolutePath))));
+		if(fileNameSignList != null && fileNameSignList.size() >0){
+			for(String fileNameSign :fileNameSignList){
+				signature.append(fileNameSign);
 			}
 		}
+		
 		if(signature.toString() != null && !"".equals(signature.toString())){
 			//文件SHA-256信息摘要
 			return SHA.sha256Hex(signature.toString());

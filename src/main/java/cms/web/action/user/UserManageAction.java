@@ -1966,7 +1966,7 @@ public class UserManageAction {
 									PaymentLog paymentLog = new PaymentLog();
 									paymentLog.setPaymentRunningNumber(paymentVerificationLog.getId());//支付流水号
 									paymentLog.setPaymentModule(paymentVerificationLog.getPaymentModule());//支付模块 5.用户充值
-									paymentLog.setParameterId(paymentVerificationLog.getParameterId());//参数Id 
+									paymentLog.setSourceParameterId(String.valueOf(paymentVerificationLog.getParameterId()));//参数Id 
 									paymentLog.setOperationUserType(1);//操作用户类型  0:系统  1: 员工  2:会员
 									paymentLog.setOperationUserName(staffName);
 									
@@ -2050,7 +2050,7 @@ public class UserManageAction {
 						PaymentLog paymentLog = new PaymentLog();
 						paymentLog.setPaymentRunningNumber(paymentManage.createRunningNumber(user.getId()));//支付流水号
 						paymentLog.setPaymentModule(5);//支付模块 5.用户充值
-						paymentLog.setParameterId(user.getId());//参数Id 
+						paymentLog.setSourceParameterId(String.valueOf(user.getId()));//参数Id 
 						paymentLog.setOperationUserType(1);//操作用户类型  0:系统  1: 员工  2:会员
 						paymentLog.setOperationUserName(staffName);
 						

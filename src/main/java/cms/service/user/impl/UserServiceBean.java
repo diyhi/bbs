@@ -35,6 +35,7 @@ import cms.service.message.SystemNotifyService;
 import cms.service.payment.PaymentService;
 import cms.service.question.AnswerService;
 import cms.service.question.QuestionService;
+import cms.service.redEnvelope.RedEnvelopeService;
 import cms.service.user.UserGradeService;
 import cms.service.user.UserRoleService;
 import cms.service.user.UserService;
@@ -73,6 +74,8 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 	@Resource PaymentService paymentService;
 	@Resource QuestionService questionService;
 	@Resource AnswerService answerService;
+	@Resource RedEnvelopeService redEnvelopeService;
+	
 	
 	/**
 	 * 根据条件分页查询用户名称
@@ -664,6 +667,13 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 		answerService.deleteAnswerReply(userNameList);
 		//删除问题标签关联
 		questionService.deleteQuestionTagAssociationByUserId(userNameList);
+		
+		//删除发红包
+		redEnvelopeService.deleteGiveRedEnvelope(idList);
+		
+		//删除收红包
+		redEnvelopeService.deleteReceiveRedEnvelope(idList);
+		
 		return j;
 	}
 	/**

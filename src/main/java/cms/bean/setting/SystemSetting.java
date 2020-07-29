@@ -128,6 +128,13 @@ public class SystemSetting implements Serializable{
 	@Column(precision=12, scale=2)
 	private BigDecimal questionRewardAmountMax;
 	
+	/** 发红包金额下限 **/
+	@Column(nullable=false,precision=12, scale=2)
+	private BigDecimal giveRedEnvelopeAmountMin = new BigDecimal("0.01");
+	/** 发红包金额上限 空为无限制 0则不允许发红包 **/
+	@Column(precision=12, scale=2)
+	private BigDecimal giveRedEnvelopeAmountMax;
+	
 	
 	/** 解锁话题隐藏内容平台分成比例 默认0% **/
 	private Integer topicUnhidePlatformShareProportion = 0;
@@ -676,6 +683,22 @@ public class SystemSetting implements Serializable{
 
 	public void setAllowRegisterAccountObject(AllowRegisterAccount allowRegisterAccountObject) {
 		this.allowRegisterAccountObject = allowRegisterAccountObject;
+	}
+
+	public BigDecimal getGiveRedEnvelopeAmountMin() {
+		return giveRedEnvelopeAmountMin;
+	}
+
+	public void setGiveRedEnvelopeAmountMin(BigDecimal giveRedEnvelopeAmountMin) {
+		this.giveRedEnvelopeAmountMin = giveRedEnvelopeAmountMin;
+	}
+
+	public BigDecimal getGiveRedEnvelopeAmountMax() {
+		return giveRedEnvelopeAmountMax;
+	}
+
+	public void setGiveRedEnvelopeAmountMax(BigDecimal giveRedEnvelopeAmountMax) {
+		this.giveRedEnvelopeAmountMax = giveRedEnvelopeAmountMax;
 	}
 
 

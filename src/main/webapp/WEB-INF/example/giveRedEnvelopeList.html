@@ -1,0 +1,231 @@
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">页面访问</th>
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td  width="30%">请求路径</td> 
+			<td  width="70%" colspan="2">user/control/giveRedEnvelopeList.htm</td>
+		</tr>
+		<tr> 
+			<td>请求方式</td> 
+			<td colspan="2">GET</td>
+		</tr> 
+		<tr> 
+			<td>请求参数</td> 
+			<td>页码</td> 
+			<td>
+				变量：page<br>
+				类型：Integer<br>
+				是否必填：否
+			</td>
+		</tr>
+		<tr> 
+			<td width="30%" >返回值</td> 
+			<td width="30%" >发红包分页</td> 
+			<td width="40%" >
+				变量：pageView<br>
+				类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_10'); return false;">PageView</a>
+			</td>
+		</tr>
+	</tbody> 
+</table>
+
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">页面访问 - AJAX方式</th>
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td  width="30%">请求路径</td> 
+			<td  width="70%" colspan="2">user/control/giveRedEnvelopeList.htm</td>
+		</tr>
+		<tr> 
+			<td>请求方式</td> 
+			<td colspan="2">GET</td>
+		</tr>
+		<tr> 
+			<td>自定义请求头</td> 
+			<td colspan="2">协议头：X-Requested-With  值：XMLHttpRequest</td>
+		</tr>
+		<tr> 
+			<td>请求参数</td> 
+			<td>页码</td> 
+			<td>
+				变量：page<br>
+				类型：Integer<br>
+				是否必填：否
+			</td>
+		</tr>
+		<tr> 
+			<td width="30%" >请求成功返回</td> 
+			<td width="30%" >JSON格式值 类型:<a style="color: #317ee7" onclick="anchorJump('#anchor_10'); return false;">PageView</a></td>
+			<td width="40%">值内容说明：发红包分页</td> 
+		</tr>	
+	</tbody> 
+</table>
+
+<table id="anchor_10" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">分页 PageView</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>records</td> 
+			<td>List&lt<a style="color: #317ee7" onclick="anchorJump('#anchor_20'); return false;">GiveRedEnvelope</a>></td>
+			<td>数据展示列表</td>
+		</tr>
+		<tr> 
+			<td>pageIndex</td> 
+			<td><a style="color: #317ee7" onclick="anchorJump('#anchor_30'); return false;">PageIndex</a></td>
+			<td>页码索引</td>
+		</tr>
+		<tr> 
+			<td>totalpage</td> 
+			<td>long</td>
+			<td>总页数</td>
+		</tr>
+		<tr> 
+			<td>maxresult</td> 
+			<td>long</td>
+			<td>每页显示记录数</td>
+		</tr>
+		<tr> 
+			<td>currentpage</td> 
+			<td>long</td>
+			<td>当前页</td>
+		</tr>
+		<tr> 
+			<td>pagecount</td> 
+			<td>long</td>
+			<td>页码显示总数</td>
+		</tr>
+		<tr> 
+			<td>onUrl</td> 
+			<td>String</td>
+			<td>上一页URL</td>
+		</tr>
+		<tr> 
+			<td>nextUrl</td> 
+			<td>String</td>
+			<td>下一页URL</td>
+		</tr>
+	</tbody> 
+</table>
+<table id="anchor_30" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">分页索引 PageIndex</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>startindex</td> 
+			<td>long</td>
+			<td>分页开始索引</td>
+		</tr>
+		<tr> 
+			<td>endindex</td> 
+			<td>long</td>
+			<td>分页结束索引</td>
+		</tr>
+	</tbody> 
+</table>
+<table id="anchor_20" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="4">发红包 GiveRedEnvelope</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%" colspan="2">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>id</td> 
+			<td>String</td>
+			<td colspan="2">发红包Id</td>
+		</tr>
+		<tr> 
+			<td>userId</td> 
+			<td>Long</td>
+			<td colspan="2">发红包的用户Id</td>
+		</tr>
+		<tr> 
+			<td>type</td> 
+			<td>Integer</td>
+			<td colspan="2">10.个人定向红包、20.公共随机红包(随机金额)、30.公共定额红包(固定金额)</td>
+		</tr>
+		<tr> 
+			<td>totalAmount</td> 
+			<td>BigDecimal</td>
+			<td colspan="2">总金额</td>
+		</tr>
+		<tr> 
+			<td>singleAmount</td> 
+			<td>BigDecimal</td>
+			<td colspan="2">单个红包金额 type=30时有值</td>
+		</tr>
+		<tr> 
+			<td>giveQuantity</td> 
+			<td>Integer</td>
+			<td colspan="2">发放数量</td>
+		</tr>
+		<tr> 
+			<td>bindTopicId</td> 
+			<td>Long</td>
+			<td colspan="2">绑定话题Id  -1表示空值</td>
+		</tr>
+		<tr> 
+			<td>bindTopicTitle</td> 
+			<td>String</td>
+			<td colspan="2">绑定话题标题</td>
+		</tr>
+		
+		<tr> 
+			<td>remainingQuantity</td> 
+			<td>Integer</td>
+			<td colspan="2">剩余数量</td>
+		</tr>
+		<tr> 
+			<td>giveTime</td> 
+			<td>Date</td>
+			<td colspan="2">发放时间</td>
+		</tr>
+	</tbody> 
+</table>
+
+
+
+<h2 style="margin:0;padding:0; margin-top: 10px;">示例</h2>
+<textarea name="exampleCode">
+<#if pageView.records?exists && pageView.records?size gt 0 >    
+	<#list pageView.records as giveRedEnvelope>
+		<#-- 总金额 -->
+		${giveRedEnvelope.totalAmount}
+		<#-- 发放时间 -->
+		${giveRedEnvelope.giveTime}
+	</#list>
+</#if> 
+<#if !pageView.records?exists || pageView.totalrecord == 0 > 
+	还没有私信
+</#if> 
+</textarea>

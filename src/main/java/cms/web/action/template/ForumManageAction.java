@@ -39,6 +39,7 @@ import cms.bean.template.Forum_CustomForumRelated_CustomHTML;
 import cms.bean.template.Forum_HelpRelated_Help;
 import cms.bean.template.Forum_QuestionRelated_LikeQuestion;
 import cms.bean.template.Forum_QuestionRelated_Question;
+import cms.bean.template.Forum_RedEnvelopeRelated_ReceiveRedEnvelopeUser;
 import cms.bean.template.Forum_SystemRelated_SearchWord;
 import cms.bean.template.Forum_TopicRelated_LikeTopic;
 import cms.bean.template.Forum_TopicRelated_Topic;
@@ -281,6 +282,12 @@ public class ForumManageAction{
 				if(forum.getForumChildType().equals("相似问题")){
 					if("collection".equals(forum.getDisplayType())){//集合
 						model.addAttribute("collection_Forum_QuestionRelated_LikeQuestion",forum.getFormValue());	
+					}
+				}
+				
+				if(forum.getForumChildType().equals("领取红包用户列表")){
+					if("page".equals(forum.getDisplayType())){//分页
+						model.addAttribute("page_Forum_RedEnvelopeRelated_ReceiveRedEnvelopeUser",forum.getFormValue());	
 					}
 				}
 				
@@ -538,7 +545,11 @@ public class ForumManageAction{
 							model.addAttribute("collection_Forum_QuestionRelated_LikeQuestion",forum.getFormValue());	
 						}
 					}
-					
+					if(forum.getForumChildType().equals("领取红包用户列表")){
+						if("page".equals(forum.getDisplayType())){//分页
+							model.addAttribute("page_Forum_RedEnvelopeRelated_ReceiveRedEnvelopeUser",forum.getFormValue());	
+						}
+					}
 					if(forum.getForumChildType().equals("在线帮助列表")){
 						if("monolayer".equals(forum.getDisplayType())){//单层
 							model.addAttribute("monolayer_Forum_HelpRelated_Help",forum.getFormValue());	
@@ -723,6 +734,12 @@ public class ForumManageAction{
 						model.addAttribute("collection_Forum_QuestionRelated_LikeQuestion",new_forum.getFormValue());	
 					}
 				}
+				if(forum.getForumChildType().equals("领取红包用户列表")){
+					if("page".equals(forum.getDisplayType())){//分页
+						model.addAttribute("page_Forum_RedEnvelopeRelated_ReceiveRedEnvelopeUser",new_forum.getFormValue());	
+					}
+				}
+				
 				
 				if(forum.getForumChildType().equals("在线帮助列表")){
 					if("monolayer".equals(forum.getDisplayType())){//单层
@@ -1441,7 +1458,33 @@ public class ForumManageAction{
 			}
 		}
 		
-		
+		Forum_RedEnvelopeRelated_ReceiveRedEnvelopeUser page_Forum_RedEnvelopeRelated_ReceiveRedEnvelopeUser = new Forum_RedEnvelopeRelated_ReceiveRedEnvelopeUser();
+		if(formbean.getForumChildType().equals("领取红包用户列表")){
+			if("page".equals(displayType)){//分页
+				String page_receiveRedEnvelopeUser_maxResult = request.getParameter("page_receiveRedEnvelopeUser_maxResult");//显示记录数
+				String page_receiveRedEnvelopeUser_sort = request.getParameter("page_receiveRedEnvelopeUser_sort");//排序
+				
+				
+				Integer receiveRedEnvelopeUser_maxResult = null;//显示记录数
+				
+				//显示记录数
+				if(page_receiveRedEnvelopeUser_maxResult != null && !"".equals(page_receiveRedEnvelopeUser_maxResult.trim())){	
+					boolean page_receiveRedEnvelopeUser_maxResult_Verification = Verification.isPositiveIntegerZero(page_receiveRedEnvelopeUser_maxResult.trim());//非负整数（正整数+ 0）
+					if(!page_receiveRedEnvelopeUser_maxResult_Verification){
+						forumError.put("page_receiveRedEnvelopeUser_maxResult", "请填写数字！");
+					}else{
+						receiveRedEnvelopeUser_maxResult = Integer.parseInt(page_receiveRedEnvelopeUser_maxResult.trim());
+					}
+				}
+			
+				
+				page_Forum_RedEnvelopeRelated_ReceiveRedEnvelopeUser.setReceiveRedEnvelopeUser_id(UUIDUtil.getUUID32());
+				page_Forum_RedEnvelopeRelated_ReceiveRedEnvelopeUser.setReceiveRedEnvelopeUser_maxResult(receiveRedEnvelopeUser_maxResult);//显示记录数
+				page_Forum_RedEnvelopeRelated_ReceiveRedEnvelopeUser.setReceiveRedEnvelopeUser_sort(Integer.parseInt(page_receiveRedEnvelopeUser_sort));
+				forum.setFormValue(JsonUtils.toJSONString(page_Forum_RedEnvelopeRelated_ReceiveRedEnvelopeUser));//加入表单值
+				
+			}
+		}
 		
 		//在线帮助
 		Forum_HelpRelated_Help monolayer_Forum_HelpRelated_Help = new Forum_HelpRelated_Help();

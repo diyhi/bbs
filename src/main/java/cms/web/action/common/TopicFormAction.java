@@ -32,6 +32,7 @@ import cms.bean.mediaProcess.MediaProcessQueue;
 import cms.bean.message.Remind;
 import cms.bean.payment.PaymentLog;
 import cms.bean.platformShare.TopicUnhidePlatformShare;
+import cms.bean.redEnvelope.GiveRedEnvelope;
 import cms.bean.setting.EditorTag;
 import cms.bean.setting.SystemSetting;
 import cms.bean.thumbnail.Thumbnail;
@@ -65,16 +66,19 @@ import cms.utils.IpAddress;
 import cms.utils.JsonUtils;
 import cms.utils.RefererCompare;
 import cms.utils.UUIDUtil;
+import cms.utils.Verification;
 import cms.utils.WebUtil;
 import cms.utils.threadLocal.AccessUserThreadLocal;
 import cms.web.action.AccessSourceDeviceManage;
 import cms.web.action.CSRFTokenManage;
+import cms.web.action.SystemException;
 import cms.web.action.TextFilterManage;
 import cms.web.action.fileSystem.FileManage;
 import cms.web.action.filterWord.SensitiveWordFilterManage;
 import cms.web.action.follow.FollowManage;
 import cms.web.action.message.RemindManage;
 import cms.web.action.payment.PaymentManage;
+import cms.web.action.redEnvelope.RedEnvelopeManage;
 import cms.web.action.setting.SettingManage;
 import cms.web.action.topic.TopicManage;
 import cms.web.action.user.PointManage;
@@ -122,6 +126,7 @@ public class TopicFormAction {
 	@Resource UserRoleManage userRoleManage;
 	@Resource PaymentManage paymentManage;
 	@Resource MediaProcessService mediaProcessService;
+	@Resource RedEnvelopeManage redEnvelopeManage;
 	
 	/**
 	 * 话题  添加
@@ -130,6 +135,10 @@ public class TopicFormAction {
 	 * @param tagName 标签名称
 	 * @param title 标题
 	 * @param content 内容
+	 * @param type 红包类型
+	 * @param totalAmount 总金额
+	 * @param singleAmount 单个金额
+	 * @param giveQuantity 发放数量
 	 * @param request
 	 * @param response
 	 * @return
@@ -137,11 +146,11 @@ public class TopicFormAction {
 	 */
 	@RequestMapping(value="/add", method=RequestMethod.POST)
 	public String add(ModelMap model,Long tagId,String title,String content,
+			Integer type,String totalAmount,String singleAmount,String giveQuantity,
 			String token,String captchaKey,String captchaValue,String jumpUrl,
 			RedirectAttributes redirectAttrs,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
-		
-		
+
 		//获取登录用户
 	  	AccessUser accessUser = AccessUserThreadLocal.get();
 		
@@ -243,6 +252,161 @@ public class TopicFormAction {
 			
 		}
 		
+		
+		//红包总金额
+		BigDecimal redEnvelope_totalAmount = new BigDecimal("0.00");
+		//单个红包金额
+		BigDecimal redEnvelope_singleAmount = new BigDecimal("0.00");
+		//红包发放数量
+		Integer redEnvelope_giveQuantity = 0;
+		
+		User user = userService.findUserByUserName(accessUser.getUserName());//查询用户数据
+		//红包
+		if(type != null && type >0 && user != null){
+			if(type.equals(20)){//红包类型 随机金额
+				if(totalAmount != null && !"".equals(totalAmount.trim())){
+					
+					if(totalAmount.trim().length()>12){
+						error.put("totalAmount", ErrorView._128.name());//不能超过12位数字
+					}else{
+						boolean amountVerification = totalAmount.trim().matches("(([1-9]{1}\\d*)|([0]{1}))(\\.(\\d){1,2})?$");//金额
+						if(amountVerification){
+							BigDecimal _totalAmount = new BigDecimal(totalAmount.trim());
+							if(_totalAmount.compareTo(user.getDeposit()) >0){
+								error.put("totalAmount", ErrorView._224.name());//不能大于账户预存款
+								
+							}
+							if(_totalAmount.compareTo(new BigDecimal("0")) <0){
+								error.put("totalAmount",ErrorView._225.name());//不能小于0
+							}
+							if(systemSetting.getGiveRedEnvelopeAmountMax() != null ){
+								if(systemSetting.getGiveRedEnvelopeAmountMax().compareTo(new BigDecimal("0")) ==0){
+									error.put("redEnvelopeLimit",ErrorView._131.name());//不允许发红包
+								
+								}else if(systemSetting.getGiveRedEnvelopeAmountMax().compareTo(new BigDecimal("0")) >0){
+									if(_totalAmount.compareTo(systemSetting.getGiveRedEnvelopeAmountMin()) <0){
+										error.put("redEnvelopeLimit",ErrorView._132.name());//不能小于发红包总金额下限
+									}
+									if(_totalAmount.compareTo(systemSetting.getGiveRedEnvelopeAmountMax()) >0){
+										error.put("redEnvelopeLimit",ErrorView._133.name());//不能大于发红包总金额上限
+									}
+								}
+							}else{
+								if(_totalAmount.compareTo(systemSetting.getGiveRedEnvelopeAmountMin()) <0){
+									error.put("redEnvelopeLimit",ErrorView._132.name());//不能小于发红包总金额下限
+								}
+							}
+							
+							
+							
+							if(error.size() ==0){
+								redEnvelope_totalAmount = _totalAmount;
+							}
+						}else{
+							error.put("totalAmount", ErrorView._127.name());//请填写总金额
+						}
+					}
+				}else{
+					error.put("totalAmount",ErrorView._134.name());//总金额不能为空
+				}
+				if(giveQuantity != null && !"".equals(giveQuantity.trim())){
+					if(giveQuantity.trim().length()>3){
+						error.put("giveQuantity", ErrorView._129.name());//不能超过3位数字
+					}else{
+						boolean verification = Verification.isPositiveInteger(giveQuantity.trim());//正整数
+						if(verification){
+							Integer _giveQuantity =Integer.parseInt(giveQuantity.trim());
+							
+							
+							if(error.size() ==0){
+								redEnvelope_giveQuantity = _giveQuantity;
+							}
+						}else{
+							error.put("giveQuantity",ErrorView._130.name());//请填写正整数
+						}
+					}	
+				}else{
+					error.put("giveQuantity",ErrorView._139.name());//不能为空
+				}
+				
+				if(error.size() ==0){
+					//按单个红包金额为0.01计算总金额
+					BigDecimal total = new BigDecimal("0.01").multiply(new BigDecimal(String.valueOf(redEnvelope_giveQuantity)));//最低单个红包金额为0.01元
+
+					if(total.compareTo(redEnvelope_totalAmount) >0){
+						error.put("giveQuantity",ErrorView._135.name());//拆分后最低单个红包金额不足0.01元
+					}
+				}
+				
+				
+			}else if(type.equals(30)){//红包类型 固定金额
+				if(singleAmount != null && !"".equals(singleAmount.trim())){
+					
+					if(singleAmount.trim().length()>12){
+						error.put("singleAmount", ErrorView._128.name());//不能超过12位数字
+					}else{
+						boolean amountVerification = singleAmount.trim().matches("(([1-9]{1}\\d*)|([0]{1}))(\\.(\\d){1,2})?$");//金额
+						if(amountVerification){
+							BigDecimal _singleAmount = new BigDecimal(singleAmount.trim());
+							if(_singleAmount.compareTo(new BigDecimal("0.01")) <0){
+								error.put("singleAmount",ErrorView._137.name());//不能小于0.01元
+							}
+							if(error.size() ==0){
+								redEnvelope_singleAmount = _singleAmount;
+							}
+						}else{
+							error.put("singleAmount", ErrorView._138.name());//请填写货币格式
+						}
+					}
+				}else{
+					error.put("singleAmount", ErrorView._136.name());//金额不能为空
+				}
+		
+				if(giveQuantity != null && !"".equals(giveQuantity.trim())){
+					if(giveQuantity.trim().length()>3){
+						error.put("giveQuantity", ErrorView._129.name());//不能超过3位数字
+					}else{
+						boolean verification = Verification.isPositiveInteger(giveQuantity.trim());//正整数
+						if(verification){
+							Integer _giveQuantity =Integer.parseInt(giveQuantity.trim());
+							//计算总金额
+							BigDecimal total = redEnvelope_singleAmount.multiply(new BigDecimal(String.valueOf(_giveQuantity)));
+
+							
+							
+							if(systemSetting.getGiveRedEnvelopeAmountMax() != null ){
+								if(systemSetting.getGiveRedEnvelopeAmountMax().compareTo(new BigDecimal("0")) ==0){
+									error.put("redEnvelopeLimit",ErrorView._131.name());//不允许发红包
+								
+								}else if(systemSetting.getGiveRedEnvelopeAmountMax().compareTo(new BigDecimal("0")) >0){
+									if(total.compareTo(systemSetting.getGiveRedEnvelopeAmountMin()) <0){
+										error.put("redEnvelopeLimit",ErrorView._132.name());//不能小于发红包总金额下限
+									}
+									if(total.compareTo(systemSetting.getGiveRedEnvelopeAmountMax()) >0){
+										error.put("redEnvelopeLimit",ErrorView._133.name());//不能大于发红包总金额上限
+									}
+								}
+							}else{
+								if(total.compareTo(systemSetting.getGiveRedEnvelopeAmountMin()) <0){
+									error.put("redEnvelopeLimit",ErrorView._132.name());//不能小于发红包总金额下限
+								}
+							}
+							
+							if(error.size() ==0){
+								redEnvelope_giveQuantity = _giveQuantity;
+								redEnvelope_totalAmount = total;
+							}
+						}else{
+							error.put("giveQuantity",ErrorView._130.name());//请填写正整数
+						}
+					}	
+					
+				}else{
+					error.put("giveQuantity",ErrorView._139.name());//不能为空
+					
+				}
+			}
+		}
 		
 		//图片地址
 		List<ImageInfo> beforeImageList = new ArrayList<ImageInfo>();
@@ -479,10 +643,65 @@ public class TopicFormAction {
 		
 			
 		if(error.size() == 0){
-			//保存评论
-			topicService.saveTopic(topic);
+			//发红包金额日志
+			PaymentLog giveRedEnvelope_paymentLog = null;
+			GiveRedEnvelope giveRedEnvelope = null;
+			if(redEnvelope_totalAmount.compareTo(new BigDecimal("0")) >0 && redEnvelope_giveQuantity >0){
+				if(type.equals(20)){//红包类型 20.公共随机红包(随机金额)
+					giveRedEnvelope = new GiveRedEnvelope();
+					
+					giveRedEnvelope.setId(UUIDUtil.getUUID32());
+					giveRedEnvelope.setUserId(user.getId());
+					giveRedEnvelope.setType(type);//类型
+					giveRedEnvelope.setTotalAmount(redEnvelope_totalAmount);//红包总金额
+					
+					giveRedEnvelope.setGiveQuantity(redEnvelope_giveQuantity);//红包发放数量
+					giveRedEnvelope.setRemainingQuantity(redEnvelope_giveQuantity);//剩余数量
+				//	giveRedEnvelope.setBindTopicId(topic.getId());/插入话题表后设置
+					giveRedEnvelope.setGiveTime(d);
+					giveRedEnvelope.setDistributionAmountGroup(JsonUtils.toJSONString( redEnvelopeManage.createRedEnvelopeAmount(redEnvelope_totalAmount,redEnvelope_giveQuantity)));
+					
+					
+				}else if(type.equals(30)){//红包类型 30.公共定额红包(固定金额)
+					giveRedEnvelope = new GiveRedEnvelope();
+					giveRedEnvelope.setId(UUIDUtil.getUUID32());
+					giveRedEnvelope.setUserId(user.getId());
+					giveRedEnvelope.setType(type);//类型
+					giveRedEnvelope.setTotalAmount(redEnvelope_totalAmount);//红包总金额
+					giveRedEnvelope.setSingleAmount(redEnvelope_singleAmount);//单个红包金额
+					giveRedEnvelope.setGiveQuantity(redEnvelope_giveQuantity);//红包发放数量
+					giveRedEnvelope.setRemainingQuantity(redEnvelope_giveQuantity);//剩余数量
+				//	giveRedEnvelope.setBindTopicId(topic.getId());//插入话题表后设置
+					giveRedEnvelope.setGiveTime(d);
+				}
+			}
+			if(giveRedEnvelope != null){
+				giveRedEnvelope_paymentLog = new PaymentLog();
+				giveRedEnvelope_paymentLog.setPaymentRunningNumber(paymentManage.createRunningNumber(accessUser.getUserId()));//支付流水号
+				giveRedEnvelope_paymentLog.setPaymentModule(120);//支付模块 120.发红包
+				giveRedEnvelope_paymentLog.setSourceParameterId(giveRedEnvelope.getId());//参数Id 
+				giveRedEnvelope_paymentLog.setOperationUserType(2);//操作用户类型  0:系统  1: 员工  2:会员
+				giveRedEnvelope_paymentLog.setOperationUserName(accessUser.getUserName());//操作用户名称  0:系统  1: 员工  2:会员
+				giveRedEnvelope_paymentLog.setAmountState(2);//金额状态  1:账户存入  2:账户支出 
+				giveRedEnvelope_paymentLog.setAmount(redEnvelope_totalAmount);//金额
+				giveRedEnvelope_paymentLog.setInterfaceProduct(0);//接口产品
+				giveRedEnvelope_paymentLog.setUserName(accessUser.getUserName());//用户名称
+				giveRedEnvelope_paymentLog.setTimes(d);
+				
+				topic.setGiveRedEnvelopeId(giveRedEnvelope.getId());//发红包Id
+			}
+			
+			try {
+				//保存话题
+				topicService.saveTopic(topic,giveRedEnvelope, user.getUserName(), redEnvelope_totalAmount, giveRedEnvelope_paymentLog);
+			} catch (SystemException e) {
+				error.put("topic", e.getMessage());//提交话题错误
+			}
+			
 			//更新索引
 			topicIndexService.addTopicIndex(new TopicIndex(String.valueOf(topic.getId()),1));
+			
+			
 			
 			PointLog pointLog = new PointLog();
 			pointLog.setId(pointManage.createPointLogId(accessUser.getUserId()));
@@ -538,6 +757,12 @@ public class TopicFormAction {
 				}
 				mediaProcessService.saveMediaProcessQueueList(mediaProcessQueueList);
 			}
+			
+			
+			
+			
+			
+			
 			
 			//删除图片锁
 			if(imageNameList != null && imageNameList.size() >0){
@@ -765,7 +990,7 @@ public class TopicFormAction {
 			
 		}
 		
-		//旧前3张图片地址
+		//旧图片地址
 		List<ImageInfo> oldBeforeImageList = new ArrayList<ImageInfo>();
 		//前3张图片地址
 		List<ImageInfo> beforeImageList = new ArrayList<ImageInfo>();
@@ -1846,7 +2071,7 @@ public class TopicFormAction {
 				PaymentLog paymentLog = new PaymentLog();
 				paymentLog.setPaymentRunningNumber(paymentManage.createRunningNumber(accessUser.getUserId()));//支付流水号
 				paymentLog.setPaymentModule(70);//支付模块 7.余额购买话题隐藏内容
-				paymentLog.setParameterId(topic.getId());//参数Id 
+				paymentLog.setSourceParameterId(String.valueOf(topic.getId()));//参数Id 
 				paymentLog.setOperationUserType(2);//操作用户类型  0:系统  1: 员工  2:会员
 				paymentLog.setOperationUserName(accessUser.getUserName());//操作用户名称  0:系统  1: 员工  2:会员
 				paymentLog.setAmountState(2);//金额状态  1:账户存入  2:账户支出 
@@ -1862,7 +2087,7 @@ public class TopicFormAction {
 					PaymentLog income_paymentLog = new PaymentLog();
 					income_paymentLog.setPaymentRunningNumber(paymentRunningNumber);//支付流水号
 					income_paymentLog.setPaymentModule(80);//支付模块 80.余额购买话题隐藏内容分成收入
-					income_paymentLog.setParameterId(topic.getId());//参数Id 
+					income_paymentLog.setSourceParameterId(String.valueOf(topic.getId()));//参数Id 
 					income_paymentLog.setOperationUserType(2);//操作用户类型  0:系统  1: 员工  2:会员
 					income_paymentLog.setOperationUserName(accessUser.getUserName());//操作用户名称  0:系统  1: 员工  2:会员
 					income_paymentLog.setAmountState(1);//金额状态  1:账户存入  2:账户支出 

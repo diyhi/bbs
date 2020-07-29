@@ -82,6 +82,12 @@
 									采纳答案
 								<#elseif paymentLog.paymentModule == 110>
 									调整赏金
+								<#elseif paymentLog.paymentModule == 120>
+									话题发红包
+								<#elseif paymentLog.paymentModule == 130>
+									话题收红包
+								<#elseif paymentLog.paymentModule == 140>
+									话题返还红包
 								</#if>
 							</TD>
 							<TD class="dataTD">${paymentLog.times}</TD>

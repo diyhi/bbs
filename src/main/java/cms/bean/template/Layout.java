@@ -30,7 +30,7 @@ public class Layout implements Serializable{
 	private String dirName;
 	
 	/** 生成模板引用代码 **/
-	@Column(length=40)
+	@Column(length=100)
 	private String referenceCode;
 	
 	/** 空白页返回数据     0:html   1: json**/

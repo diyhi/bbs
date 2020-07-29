@@ -1,0 +1,299 @@
+<#--  发红包内容 -->
+<#--  giveRedEnvelopeId 本模板由引入模块传参 -->
+<@function> 
+	<#assign giveRedEnvelope = redEnvelopeRelated_giveRedEnvelopeContent_entityBean>
+	<#if giveRedEnvelope != null && giveRedEnvelope?? >
+	<div class="redEnvelopeModule clearfix">
+		<#if giveRedEnvelope.remainingQuantity gt 0><!-- 还有未被领取的红包 -->
+			<div class="redEnvelope">
+				<div class="box">
+					<div class="head-bg">
+						<div class="head"></div>
+					</div>
+					<div class="body">
+						<div class="content">
+							<span class="avatarBox" >
+								<#if giveRedEnvelope.avatarName != null>
+									<img src="${giveRedEnvelope.avatarPath}${giveRedEnvelope.avatarName}" >
+								<#else>
+									<!--[if (IE)]><img src="${commonPath}images/min_avata.png"><![endif]-->
+									<!--[if !(IE)]><!--><img avatar="${(giveRedEnvelope.nickname != null && giveRedEnvelope.nickname??) ?string(giveRedEnvelope.nickname , giveRedEnvelope.userName)}" ><!--<![endif]-->
+								</#if>
+							</span>
+							<span>给大家发个红包</span>
+						</div>
+					</div>
+					<#if giveRedEnvelope.accessUserUnwrap == true>
+						<div id="open" class="open-btn" >已拆</div>
+					<#else>
+						<div id="notOpen" class="btn" onclick="grabRedEnvelope('${giveRedEnvelope.id}')">开</div>
+						<div id="open" class="open-btn" style="display: none;">已拆</div>
+					</#if>
+					
+				</div>
+			</div>
+		<#else>
+			<div class="noRedEnvelope">
+				<div class="box">
+					<div class="content">您来晚了，红包已被抢光</div>
+				</div>
+			</div>
+		</#if>
+		
+		<!-- 发红包Id -->
+		<input type="hidden" id="_giveRedEnvelopeId" value="${giveRedEnvelope.id}">
+		
+		<!-- 已领取红包用户 -->
+		<div class="receiveRedEnvelopeUser" style="display: none;">
+			
+			<div class="box"><!-- 
+				<img class="avatar redEnvelopeData" data="fff 获得 13.5元"  src="http://127.0.0.1:8080/cms/file/avatar/2018-12-15/100x100/72b81728316e437c87db4286237547d5.png">
+				<img class="avatar redEnvelopeData" data="fff 获得 23.5元"  src="http://127.0.0.1:8080/cms/file/avatar/2018-12-15/100x100/72b81728316e437c87db4286237547d5.png">
+				<img class="avatar redEnvelopeData" data="fff 获得 33.5元"  src="http://127.0.0.1:8080/cms/file/avatar/2018-12-15/100x100/72b81728316e437c87db4286237547d5.png">
+				<img class="avatar redEnvelopeData" data="fff 获得 23.5元"  src="http://127.0.0.1:8080/cms/file/avatar/2018-12-15/100x100/72b81728316e437c87db4286237547d5.png">
+				<img class="avatar redEnvelopeData" data="fff 获得 23.5元"  src="http://127.0.0.1:8080/cms/file/avatar/2018-12-15/100x100/72b81728316e437c87db4286237547d5.png">
+				<img class="avatar redEnvelopeData" data="fff 获得 23.5元"  src="http://127.0.0.1:8080/cms/file/avatar/2018-12-15/100x100/72b81728316e437c87db4286237547d5.png">
+				<img class="avatar redEnvelopeData" data="fff 获得 23.5元"  src="http://127.0.0.1:8080/cms/file/avatar/2018-12-15/100x100/72b81728316e437c87db4286237547d5.png">
+				<img class="avatar redEnvelopeData" data="fff 获得 23.5元"  src="http://127.0.0.1:8080/cms/file/avatar/2018-12-15/100x100/72b81728316e437c87db4286237547d5.png">
+				<img class="avatar redEnvelopeData" data="fff 获得 23.5元"  src="http://127.0.0.1:8080/cms/file/avatar/2018-12-15/100x100/72b81728316e437c87db4286237547d5.png">
+				<img class="avatar redEnvelopeData" data="fff 获得 23.5元"  src="http://127.0.0.1:8080/cms/file/avatar/2018-12-15/100x100/72b81728316e437c87db4286237547d5.png">
+				<img class="avatar redEnvelopeData" data="fff 获得 23.5元"  src="http://127.0.0.1:8080/cms/file/avatar/2018-12-15/100x100/72b81728316e437c87db4286237547d5.png">
+				<img class="avatar redEnvelopeData" data="fff 获得 23.5元"  src="http://127.0.0.1:8080/cms/file/avatar/2018-12-15/100x100/72b81728316e437c87db4286237547d5.png">
+ 					-->
+			</div>
+			<div class="more" style="display: none;">
+				<!-- <i class="icon cms-angle-down"></i>-->
+			</div>
+		</div>
+		<style>
+			/** 半透明提示层 **/
+			.hideTag-class .layui-layer-content{
+				background-color: rgba(0,0,0,0.6);
+			}
+			.hideTag-class .layui-layer-content .layui-layer-TipsG {
+				position: absolute;
+				width: 0;
+				height: 0;
+				border-width: 5px;
+				*overflow: hidden;
+				
+				border-style: dashed;
+			 	border-color:rgba(0,0,0,0.6) transparent transparent transparent;
+				margin-bottom: -2px;
+				margin-bottom: 3px\0;
+				*margin-bottom: 3px;
+			}
+			
+			.hideTag-class .layui-layer-content .layui-layer-TipsT {
+				left: 7px;
+				border-right-style: solid;
+				border-right-color: rgba(0,0,0,0.6);
+			}
+			</style>
+			<script type="text/javascript">
+				$(document).ready(function(){
+				     queryReceiveRedEnvelopeUser(0);
+				});
+				
+				//红包用户信息提示
+				var redEnvelope_tip_index = 0;
+			
+				//清除领取红包用户列表数据
+				function cleanReceiveRedEnvelopeUser(){
+					$(".receiveRedEnvelopeUser .box").empty();
+				}
+			
+				//查询领取红包用户列表
+				function queryReceiveRedEnvelopeUser(page){
+					var giveRedEnvelopeId = $("#_giveRedEnvelopeId").val();
+					if(giveRedEnvelopeId == null || giveRedEnvelopeId == ''){
+						return;
+					}
+					
+					
+			        $.ajax({
+						type:"GET",
+						cache:false,
+						async: true,//默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+						url : "queryReceiveRedEnvelopeUser?giveRedEnvelopeId="+giveRedEnvelopeId+"&page="+page,
+						//data: data, 
+						success:function(result) {
+							
+							
+							var base = "";
+							var els = document.getElementsByTagName('base');   
+						    for (var i = 0, len = els.length; i < len; i++) {   
+						        var href = els[i].href;   
+						        if (href) {   
+						            base = href;   
+						        }   
+						    } 
+
+							
+							
+							
+							
+							if(result.records != null && result.records.length >0){
+								var html = "";
+								var html_more = "";
+								var page = result.currentpage+1;
+								var totalrecord = result.totalrecord;
+								
+								
+								for(var i = 0; i<result.records.length; i++){
+									var receiveRedEnvelope = result.records[i];
+									var data = (receiveRedEnvelope.receiveNickname != null && receiveRedEnvelope.receiveNickname !='' ? receiveRedEnvelope.receiveNickname : receiveRedEnvelope.receiveUserName)+" 获得 "+receiveRedEnvelope.amount+" 元";
+									var image = receiveRedEnvelope.receiveAvatarPath+"100x100/"+receiveRedEnvelope.receiveAvatarName;
+									if(receiveRedEnvelope.receiveAvatarName != null){
+										html += "<img class='avatar redEnvelopeData' data='"+data+"' src='"+base+image+"'>";
+									
+									}else{
+										var avatar = (receiveRedEnvelope.receiveNickname != null && receiveRedEnvelope.receiveNickname !='' ? receiveRedEnvelope.receiveNickname : receiveRedEnvelope.receiveUserName);
+										
+										
+										html += "<img class='avatar redEnvelopeData' data='"+data+"' avatar='"+avatar+"'>";
+									}
+									
+									
+								}
+								html_more += "<i class='icon cms-angle-down' page='"+page+"'></i>";
+							
+								$(".receiveRedEnvelopeUser").show();
+								$(".receiveRedEnvelopeUser .box").append(html);
+								$(".receiveRedEnvelopeUser .more").html(html_more);
+								
+								
+								
+								
+								setTimeout(function () {
+									//生成头像
+									LetterAvatar.transform();
+									
+									
+									$(".redEnvelopeData").on('mouseenter', this,function() {
+										var data = $(this).attr("data");
+										if(data != undefined && data != ''){
+											redEnvelope_tip_index = layer.tips(data, $(this), {
+												tips: 1,//[1, "rgba(0, 0, 0,0.5)"],
+												time: 5000,
+												skin: 'hideTag-class'
+											});
+										}
+									}).on('mouseleave', this, function(){
+										layer.close(redEnvelope_tip_index);
+									});
+									
+									
+									$(".receiveRedEnvelopeUser .more .icon").on('click',this,function() {
+										var _page = $(this).attr("page");
+										if(_page != undefined && _page != ''){
+											queryReceiveRedEnvelopeUser(page);
+											
+										}
+									});
+									
+									var rows = $(".receiveRedEnvelopeUser .box").children(".redEnvelopeData").length;//元素行数
+									
+									if(totalrecord != rows){
+										$(".receiveRedEnvelopeUser .more").show();
+									}else{
+										$(".receiveRedEnvelopeUser .more").hide();
+									}
+									
+								}, 100);
+								
+								
+								
+							}
+						},
+						beforeSend: function(request){
+					    	//$("#load").show();
+					    },
+					    complete: function(XMLHttpRequest, textStatus){
+					    	//$("#load").hide();
+					    }
+					});
+				}
+			
+				
+				
+				//抢红包
+				function grabRedEnvelope(giveRedEnvelopeId){
+					var parameter = "";
+					parameter += "giveRedEnvelopeId="+giveRedEnvelopeId;
+					
+					//从meta标签获取令牌
+					parameter += "&token="+getCsrf();
+				   	//删除第一个&号,防止因为多了&号而出现警告: Parameters: Invalid chunk ignored.信息
+					if(parameter.indexOf("&") == 0){
+						parameter = parameter.substring(1,parameter.length);
+					}
+				   	post_request(function(value){
+						var data = JSON.parse(value);
+						var receiveRedEnvelopeAmount = 0;
+						var success = false;
+						for(var returnValue in data){
+							
+							if(returnValue == "success"){
+			        			
+			        			if(data[returnValue] == "true"){
+			        				success = true;
+			        			}
+			        			
+			        		}else if(returnValue == "receiveRedEnvelopeAmount"){
+			        			receiveRedEnvelopeAmount = data[returnValue];
+			        			
+			        		}else if(returnValue == "error"){
+			        			
+			        			var errorValue = data[returnValue];
+								var htmlValue = "";
+								var i = 0;
+								for(var error in errorValue){
+									if(error == "systemInfo"){//如果弹出系统繁忙则不显示
+			        					return;
+			        				}
+								
+								
+									if(error != ""){	
+										i++;
+										htmlValue += "&nbsp;&nbsp;"+i+"、"+errorValue[error]+"<br>";
+									}
+								}
+								
+								layer.open({
+								  type: 1,
+								  title: '错误', 
+								  skin: 'layui-layer-rim', //加上边框
+								  area: ['300px', '150px'], //宽高
+								  content: "<div style='line-height: 36px; font-size: 15px; margin-left: 8px;margin-right: 8px;'>"+htmlValue+"</div>"
+								});
+			        		}
+			        	}
+			        	
+			        	if(success){
+	        				layer.msg('抢到 '+receiveRedEnvelopeAmount+' 元红包', 
+								{
+								  time: 5000 //3秒关闭（如果不配置，默认是3秒）
+								},function(){
+									//关闭后的操作
+									
+								}
+							);
+							
+							document.getElementById("notOpen").style.display = "none";
+							document.getElementById("open").style.display = "";
+							
+							//清除领取红包用户列表数据
+							cleanReceiveRedEnvelopeUser();
+			        		//查询领取红包用户列表
+							queryReceiveRedEnvelopeUser(1);
+			        	}
+					},
+						"user/control/redEnvelope/addReceiveRedEnvelope?timestamp=" + new Date().getTime(), true,parameter);
+				
+				}
+			</script>
+		
+	</div>
+	</#if>
+</@function> 

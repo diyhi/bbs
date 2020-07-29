@@ -375,6 +375,9 @@ $(function() {
 					<c:forEach items="${topic.userRoleNameList}" var="roleName">
 						<span  class="userRoleName">${roleName}</span>	
 					</c:forEach>
+					<c:if test="${topic.giveRedEnvelopeId != null && topic.giveRedEnvelopeId != ''}">
+						<span class="redEnvelope">红包 ${giveRedEnvelope.totalAmount} 元</span>
+					</c:if>
 				</div>
 				<enhance:out escapeXml="false">
 					<div class="richTextContent topicContent" style="min-height: 200px;">${topic.content}</div>
@@ -388,8 +391,10 @@ $(function() {
 							<c:if test="${topic.status == 10}">
 								<A onclick="javascript:if(window.confirm('确定审核通过吗? ')){auditTopic('${topic.id}');return false;}else{return false};" hidefocus="true" href="#" ondragstart= "return false">立即审核</A>&nbsp;&nbsp;
 							</c:if>
-							
 							<A hidefocus="true"  href="control/topicLike/list${config:suffix()}?topicId=${topic.id}&visible=${param.visible}&topicPage=${param.topicPage}&userName=${param.userName}&id=${param.id}&queryState=${param.queryState}&jumpStatus=${param.jumpStatus}&userPage=${param.userPage}&commentPage=${param.commentPage}&replyPage=${param.replyPage}" ondragstart= "return false">点赞用户</A>&nbsp;&nbsp;
+							<c:if test="${topic.giveRedEnvelopeId != null && topic.giveRedEnvelopeId != ''}">
+								<A hidefocus="true"  href="control/redEnvelope/redEnvelopeAmountDistribution/list${config:suffix()}?giveRedEnvelopeId=${topic.giveRedEnvelopeId}&topicId=${topic.id}&visible=${param.visible}&topicPage=${param.topicPage}&userName=${param.userName}&id=${param.id}&queryState=${param.queryState}&jumpStatus=${param.jumpStatus}&userPage=${param.userPage}&commentPage=${param.commentPage}&replyPage=${param.replyPage}&origin=10" ondragstart= "return false">红包</A>&nbsp;&nbsp;
+							</c:if>
 							<A hidefocus="true"  href="control/topicFavorite/list${config:suffix()}?topicId=${topic.id}&visible=${param.visible}&topicPage=${param.topicPage}&userName=${param.userName}&id=${param.id}&queryState=${param.queryState}&jumpStatus=${param.jumpStatus}&userPage=${param.userPage}&commentPage=${param.commentPage}&replyPage=${param.replyPage}" ondragstart= "return false">收藏用户</A>&nbsp;&nbsp;
 							<A hidefocus="true"  href="control/topic/topicUnhideList${config:suffix()}?topicId=${topic.id}&visible=${param.visible}&topicPage=${param.topicPage}&userName=${param.userName}&id=${param.id}&queryState=${param.queryState}&jumpStatus=${param.jumpStatus}&userPage=${param.userPage}&commentPage=${param.commentPage}&replyPage=${param.replyPage}" ondragstart= "return false">取消隐藏用户</A>&nbsp;&nbsp;
 							<A hidefocus="true" onClick="showUpdateTopic('${topic.id}'); return false" href="#" ondragstart= "return false">修改</A>&nbsp;&nbsp;

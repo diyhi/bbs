@@ -89,13 +89,16 @@
 				        <div class="clearfix"></div>
 				      
 				      	<div class="title">
-				      		<router-link  tag="span" :to="{path: '/thread', query: {topicId: topic.id}}" >{{topic.title}}</router-link>
+				      		<router-link tag="span" :to="{path: '/thread', query: {topicId: topic.id}}" >{{topic.title}}</router-link>
 				      		<i class="topicRoleName" v-for="(roleName,index) in topic.allowRoleViewList" >{{roleName}}</i>
 				      		
 				      		<span :class="'hideTagType hide_'+key"  v-for="(value, key) in topic.hideTagTypeMap">
                       			<span class="circle point" v-if="value==true"><i class="cms-unlock-solid" ></i></span>
                       			<span class="circle" v-if="value==false"><i class="cms-lock-solid" ></i></span>
 	                      	</span>
+	                      	
+	                      	<span class="redEnvelope" alt="红包" title="红包" v-if="topic.giveRedEnvelopeId != null && topic.giveRedEnvelopeId != ''"><i class="cms-redEnvelope-1" ></i></span>
+	                      
 				      	</div>
 				      	
 				        <div class="summary" v-if="topic.imageInfoList.length ==0 && topic.mediaInfoList.length ==0">
@@ -164,8 +167,55 @@
 								    	<span>{{error.topicTagId}}</span>
 								    </p>
 						        </li>
-						        
+						        <li class="sign"  v-if="showRedEnvelope">
+						        	<div class="tag"  @click="redEnvelopeFormLayer()" >
+							        	<div class="title" >红包</div>
+							        	<div class="name" ></div>
+							        </div>
+						        </li>
+						        <div v-if="redEnvelope_layer">
+						        <li>
+						        	<mt-radio v-model="giveRedEnvelope_type" title="红包类型" :options="[{label: '随机金额红包',value: 20},{label: '固定金额红包',value: 30}]" @click="selectRedEnvelopeType()" ></mt-radio>
+		        				</li>
+		        				<li v-if="giveRedEnvelope_type == 20">
+						        	<mt-field v-model.trim="giveRedEnvelope_totalAmount" label="红包总金额" placeholder="输入金额" type="text" @input="totalAmountCalculate()"></mt-field>
+									<p class="tips">
+								    	<span>{{error.totalAmount}}</span>	
+								    </p>
+								    <p class="help">
+								    	<span v-if="giveRedEnvelopeAmountMin >0">合计总金额不能少于 {{giveRedEnvelopeAmountMin}} 元；</span>	
+								    	<span v-if="giveRedEnvelopeAmountMax != null && giveRedEnvelopeAmountMax >0">合计总金额不能超过 {{giveRedEnvelopeAmountMax}} 元；</span>	
+								    	<span>用户共有金额 {{deposit}} 元</span>	
+								    </p>
+								</li>
+								<li v-if="giveRedEnvelope_type == 30">
+						        	<mt-field v-model.trim="giveRedEnvelope_singleAmount" label="单个红包金额" placeholder="输入金额" type="text" @input="singleAmountCalculate()"></mt-field>
+									<p class="tips">
+								    	<span>{{error.singleAmount}}</span>	
+								    </p>
+								    <p class="help">
+								    	<span v-if="giveRedEnvelopeAmountMin >0">合计总金额不能少于 {{giveRedEnvelopeAmountMin}} 元；</span>	
+								    	<span v-if="giveRedEnvelopeAmountMax != null && giveRedEnvelopeAmountMax >0">合计总金额不能超过 {{giveRedEnvelopeAmountMax}} 元；</span>	
+								    	<span>用户共有金额 {{deposit}} 元</span>	
+								    </p>
+								</li>
 								<li>
+						        	<mt-field v-model.trim="giveRedEnvelope_giveQuantity" label="红包数量" placeholder="输入数量" type="text" @input="singleAmountCalculate()"></mt-field>
+									<p class="tips">
+								    	<span>{{error.giveQuantity}}</span>	
+								    </p>
+								</li>
+								<li class="item">
+						        	<div class="tag" >
+							        	<div class="title" >合计总金额</div>
+										<div class="name" >{{giveRedEnvelope_totalAmountView}}</div>
+							        </div>
+						        	<p class="tips">
+								    	<span>{{error.redEnvelopeLimit}}</span>
+								    </p>
+						        </li>
+						        </div>
+								<li class="richText">
 									<div ref="topicContentEditorToolbar" class="editor-toolbar"></div>
 									<div ref="topicContentEditorText"  class="editor-text"></div>
 									<p class="tips">
@@ -215,7 +265,10 @@
 				            <div>
 				            	<router-link :to="{path: '/index'}"  :class="tagId == '' ? 'selected' :''" @click.native="popup_allTag = false" >全部</router-link>     
 			                	
-			                	<router-link v-for="(tag,index) in tagList" :to="{path: '/index', query: {tagId: tag.id}}" :class="tagId == tag.id ? 'selected' :''" @click.native="popup_allTag = false" >{{tag.name}}</router-link>            
+			                	<router-link v-for="(tag,index) in tagList" :to="{path: '/index', query: {tagId: tag.id}}" :class="tagId == tag.id ? 'selected' :''" @click.native="popup_allTag = false" >
+			                		<i class="icon cms-chess-queen-solid" v-if="tag.allowRoleViewList.length >0"></i>
+			                		{{tag.name}}
+			                	</router-link>            
 				            
 				            </div> 
 				        </div> 
@@ -267,7 +320,45 @@
 			            </div>
 			        </div>
 				</div>
-				
+				<div class="receiveRedEnvelope" v-if="giveRedEnvelope != null && giveRedEnvelope != ''">
+					<div class="redEnvelope" v-if="giveRedEnvelope.remainingQuantity > 0">
+						<div class="box">
+							<div class="head-bg">
+								<div class="head"></div>
+							</div>
+							<div class="body">
+								<div class="avatarBox" >
+									<img :src="giveRedEnvelope.avatarPath+giveRedEnvelope.avatarName" v-if="giveRedEnvelope.avatarName != null && giveRedEnvelope.avatarName != ''">
+									<!-- 首字符头像-->
+				         			<img ref="giveRedEnvelopeUserAvatar"  v-if="giveRedEnvelope.avatarName == null || giveRedEnvelope.avatarName == ''">
+								</div>
+								<div class="content">给大家发个红包</div>
+							</div>
+							<div class="btn" v-if="giveRedEnvelope.accessUserUnwrap == false" @click="grabRedEnvelope(giveRedEnvelope.id)">开</div>
+							<div class="open-btn" v-if="giveRedEnvelope.accessUserUnwrap == true">已拆</div>
+						</div>
+					</div>
+					<div class="noRedEnvelope" v-if="giveRedEnvelope.remainingQuantity == 0">
+						<div class="box">
+							<div class="content">您来晚了，红包已被抢光</div>
+						</div>
+					</div>
+					
+					<!-- 已领红包用户 -->
+					<div class="receiveRedEnvelopeUser">
+						<div class="box" >
+							<span v-for="(receiveRedEnvelope,index) in receiveRedEnvelopeList" >
+								<img :class="(receiveRedEnvelope.id == selectedReceiveRedEnvelopeId) ? 'avatar active' : 'avatar'"  @click="selectReceiveRedEnvelopeUser(receiveRedEnvelope.id)"  v-tooltip="{ content: ''+(receiveRedEnvelope.receiveNickname != null && receiveRedEnvelope.receiveNickname !='' ? receiveRedEnvelope.receiveNickname : receiveRedEnvelope.receiveUserName)+' 获得 '+receiveRedEnvelope.amount+' 元', show: ((receiveRedEnvelope.id == selectedReceiveRedEnvelopeId) ? true : false),trigger: 'manual'}" :src="receiveRedEnvelope.receiveAvatarPath+'100x100/'+receiveRedEnvelope.receiveAvatarName" v-if="receiveRedEnvelope.receiveAvatarName != null && receiveRedEnvelope.receiveAvatarName != ''">
+								<img :class="(receiveRedEnvelope.id == selectedReceiveRedEnvelopeId) ? 'avatar active' : 'avatar'"  @click="selectReceiveRedEnvelopeUser(receiveRedEnvelope.id)"  v-tooltip="{ content: ''+(receiveRedEnvelope.receiveNickname != null && receiveRedEnvelope.receiveNickname !='' ? receiveRedEnvelope.receiveNickname : receiveRedEnvelope.receiveUserName)+' 获得 '+receiveRedEnvelope.amount+' 元', show: ((receiveRedEnvelope.id == selectedReceiveRedEnvelopeId) ? true : false),trigger: 'manual' }" :ref="'redEnvelopeAvatarData_'+receiveRedEnvelope.id"   v-if="receiveRedEnvelope.receiveAvatarName == null || receiveRedEnvelope.receiveAvatarName==''">
+
+							</span>
+						</div>
+						<div class="more" v-if="receiveRedEnvelope_more">
+							<i class="icon cms-angle-down" @click="queryReceiveRedEnvelopeUserList(receiveRedEnvelopeCurrentPage+1)"></i>
+						</div>
+					</div>
+				</div>
+					
 				<div class="topicDetail">
 					<div class="head">
 				    	<h1>
@@ -1833,6 +1924,14 @@
 		    		<div class="icon cms-deposit" ></div> 
 		    		<span class="name">余额</span>
 		    	</router-link>
+		    	<router-link to="/user/control/giveRedEnvelopeList" class="item" tag="div">
+		    		<div class="icon cms-redEnvelope-2" ></div> 
+		    		<span class="name">发红包</span>
+		    	</router-link>
+		    	<router-link to="/user/control/receiveRedEnvelopeList" class="item" tag="div">
+		    		<div class="icon cms-redEnvelope-2" ></div> 
+		    		<span class="name">收红包</span>
+		    	</router-link>
 		    	<router-link to="/user/control/editUser" class="item" tag="div">
 		    		<div class="icon cms-pencil-alt" ></div> 
 		    		<span class="name">修改账户</span>
@@ -2053,18 +2152,22 @@
 		</mt-header>
 		<div class="topicListModule">
 			<div class="topicList">
-			    <div class="item" v-for="topic in topicList" >
+			    <div class="item" v-for="(topic,index) in topicList" >
 			    	<div class="topInfo">                                   
 			            <span class="bLeft">
 			                <div class="tagName">{{topic.tagName}}</div>
 			            </span>
 			            <p class="bRight">
 			            	<span class="status" v-if="topic.status == 10">[待审核]</span>
+			            	<!-- 
 			            	<router-link class="fast cms-lock"  tag="span" :to="{path: '/user/control/topicUnhideList', query: {topicId: topic.id}}" ></router-link>
 			            	<router-link class="fast cms-favorites"  tag="span" :to="{path: '/user/control/topicFavoriteList', query: {topicId: topic.id}}" ></router-link>
 			            	<router-link class="fast cms-thumb-up"  tag="span" :to="{path: '/user/control/topicLikeList', query: {topicId: topic.id}}" ></router-link>
 			            	<router-link class="fast cms-pencil-alt"  tag="span" :to="{path: '/user/editTopic', query: {topicId: topic.id}}" ></router-link>
+			            	 -->
 			            	<i class="time">{{topic.postTime}}</i>
+			            	<span class="fast cms-ellipsis-v-solid" @click="operatingUI(topic.id,topic.giveRedEnvelopeId,topic.title)" ></span>
+			            	
 			            </p> 
 			        </div>
 			    	<!-- router-link渲染成<h2>标签-->
@@ -2078,6 +2181,9 @@
 			    	<router-link :to="{path: '/user/control/topicList', query: {page: next}}" :class="next != ''? 'selected' : 'no'">下一页</router-link>
 			    </div>
 			</div>
+			<!-- cancel-text 取消按钮的文本。若设为空字符串，则不显示取消按钮 -->
+			<mt-actionsheet :actions="operatingData" v-model="operating" cancel-text=""></mt-actionsheet>
+			
 		</div>
 	</div>
 </template>
@@ -2377,6 +2483,9 @@
 	        <li  style="margin-left: 5px;margin-right: 5px; margin-top: 10px; padding-bottom: 10px;">
 	        	
 	        	<mt-button  type="primary" size="large" @click.native="submitData">提交</mt-button>
+	        	<p class="tips">
+			    	<span>{{error.user}}</span>
+			    </p>
 	        </li>
 	        
 	        
@@ -2576,11 +2685,13 @@
 		</mt-header>
 		<div class="userLoginLogModule">
 			<div v-infinite-scroll="queryUserLoginLog" infinite-scroll-disabled="loading" infinite-scroll-distance="10">
+				<div>
 				<ul>
 					<li v-for="userLoginLog in userLoginLogList">
 						<mt-cell :title="userLoginLog.logonTime" :label="userLoginLog.ip" :value="userLoginLog.typeNumber == 10 ? '登录' :(userLoginLog.typeNumber == 20 ? '续期':'')"></mt-cell>
 					</li>
 				</ul>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -3311,6 +3422,9 @@
 			                    <span class="payment" v-if="paymentLog.paymentModule == 90">悬赏金额</span>
 			                    <span class="payment" v-if="paymentLog.paymentModule == 100">采纳答案</span>
 			                    <span class="payment" v-if="paymentLog.paymentModule == 110">调整赏金</span>
+			                    <span class="payment" v-if="paymentLog.paymentModule == 120">话题发红包</span>
+			                    <span class="payment" v-if="paymentLog.paymentModule == 130">话题收红包</span>
+			                    <span class="payment" v-if="paymentLog.paymentModule == 140">话题返还红包</span>
 			                </span>
 			                <span class="time" >
 			                	{{paymentLog.times}}
@@ -3546,6 +3660,164 @@
 </template>
 
 
+<!-- 发红包 -->
+<template id="giveRedEnvelopeList-template">
+	<div>
+		<mt-header fixed title="发红包" style="background: #fafafa; color: #000000;font-size: 14px">
+		    <mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
+		    <router-link to="/index" slot="right">
+		    	<span class="cms-home" style="font-size: 18px;"></span>
+			</router-link>
+		</mt-header>
+		<div class="giveRedEnvelopeListModule">
+			<div class="giveRedEnvelopeList">
+			    <div class="item" v-for="(giveRedEnvelope,index) in giveRedEnvelopeList" >
+			    	<div class="topInfo clearfix">                                   
+			            <span class="bLeft">
+			                <div class="type" v-if="giveRedEnvelope.type == 10">个人定向红包</div>
+			                <div class="type" v-if="giveRedEnvelope.type == 20">公共随机红包</div>
+			                <div class="type" v-if="giveRedEnvelope.type == 30">公共定额红包</div>      
+			            </span>
+			            <p class="bRight">
+			            	<i class="time">{{giveRedEnvelope.giveTime}}</i>
+			            </p> 
+			        </div>
+			        <span class="title" >
+				        <router-link  tag="span" :to="{path: '/thread', query: {topicId: giveRedEnvelope.bindTopicId}}" >
+				            {{giveRedEnvelope.bindTopicTitle}}
+				        </router-link>
+			        </span>
+			        <div class="redEnvelopeAmountDistribution clearfix">
+			        	<mt-button type="default"  @click.native="toRedEnvelopeAmountDistribution(giveRedEnvelope.id);"  plain style="border: 1px solid #eee;color: #a9a9a9;border-radius: 6px;height: 30px;font-size: 16px;"><span class="cms-redEnvelope-2 icon"></span>金额分配</mt-button>
+						 	
+			        </div>
+			        <div class="redEnvelopeInfo clearfix">
+			        	<div class="details"><span class="text">总金额:</span><span class="val">{{giveRedEnvelope.totalAmount}}元<span style="color: red;" v-if="giveRedEnvelope.refundAmount >0"> 返还{{giveRedEnvelope.refundAmount}}</span></span></div>
+			        	<div class="details"><span class="text">发放数量:</span><span class="val">{{giveRedEnvelope.giveQuantity}}</span></div>
+			        	<div class="details"><span class="text">已领取数量:</span><span class="val">{{giveRedEnvelope.giveQuantity - giveRedEnvelope.remainingQuantity}}</span></div>
+			        </div>
+			    </div>
+			    <div class="giveRedEnvelopePage page">
+			    	<router-link :to="{path: '/user/control/giveRedEnvelopeList', query: {page: on}}" :class="on != ''? 'selected' : 'no'">上一页</router-link>   	
+			    	<span class="count">{{currentpage}}/{{totalpage}}</span>       
+			    	<router-link :to="{path: '/user/control/giveRedEnvelopeList', query: {page: next}}" :class="next != ''? 'selected' : 'no'">下一页</router-link>
+			    </div>
+			</div>
+			
+		</div>
+	</div>
+</template>
+
+<!-- 发红包金额分配 -->
+<template id="redEnvelopeAmountDistributionList-template">
+	<div>
+		<mt-header fixed title="红包金额分配" style="background: #fafafa; color: #000000;font-size: 14px">
+	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
+	    	<router-link to="/index" slot="right">
+			    <span class="cms-home" style="font-size: 18px;"></span>
+			</router-link>
+		</mt-header>
+		<div class="redEnvelopeAmountDistributionListModule" >
+			<div class="redEnvelopeAmountDistributionList">
+				<div class="giveRedEnvelope" >
+					<div class="topInfo clearfix">                                   
+			            <span class="bLeft">
+			                <div class="type" v-if="giveRedEnvelope.type == 10">个人定向红包</div>
+			                <div class="type" v-if="giveRedEnvelope.type == 20">公共随机红包</div>
+			                <div class="type" v-if="giveRedEnvelope.type == 30">公共定额红包</div>      
+			            </span>
+			            <p class="bRight">
+			            	<i class="time">{{giveRedEnvelope.giveTime}}</i>
+			            </p> 
+			        </div>
+					<span class="title" >
+				        <router-link  tag="span" :to="{path: '/thread', query: {topicId: giveRedEnvelope.bindTopicId}}" >
+				            {{giveRedEnvelope.bindTopicTitle}}
+				        </router-link>
+			        </span>
+			        <div class="redEnvelopeInfo clearfix">
+			        	<div class="details"><span class="text">总金额:</span><span class="val">{{giveRedEnvelope.totalAmount}}元<span style="color: red;" v-if="giveRedEnvelope.refundAmount >0"> 返还{{giveRedEnvelope.refundAmount}}</span></span></div>
+			        	<div class="details"><span class="text">发放数量:</span><span class="val">{{giveRedEnvelope.giveQuantity}}</span></div>
+			        	<div class="details"><span class="text">已领取数量:</span><span class="val">{{giveRedEnvelope.giveQuantity - giveRedEnvelope.remainingQuantity}}</span></div>
+			        </div>
+					
+				</div>
+				<div class="clearfix"></div>
+				
+				<div v-infinite-scroll="queryRedEnvelopeAmountDistributionList" infinite-scroll-disabled="loading" infinite-scroll-distance="10">
+					<div class="item" v-for="receiveRedEnvelope in receiveRedEnvelopeList">
+			            <div class="head">
+							<!-- router-link渲染成<div>标签-->
+					    	<router-link class="avatarBox"  tag="div" :to="{path: '/user/control/home', query: {userName: receiveRedEnvelope.receiveUserName}}">
+					        	<img :src="receiveRedEnvelope.receiveAvatarPath+'100x100/'+receiveRedEnvelope.receiveAvatarName" v-if="receiveRedEnvelope.receiveAvatarName != null && receiveRedEnvelope.receiveAvatarName != ''">
+								<!-- 首字符头像-->
+				         		<img :ref="'receiveRedEnvelopeAvatarData_'+receiveRedEnvelope.id"  v-if="receiveRedEnvelope.receiveAvatarName == null || receiveRedEnvelope.receiveAvatarName == ''">
+				         	
+					        </router-link>
+							<span class="info" >
+								<!-- router-link渲染成<h2>标签-->
+						    	<router-link tag="h2" class="clearfix" :to="{path: '/user/control/home', query: {userName: receiveRedEnvelope.receiveUserName}}">
+						        	<div class="userName">{{receiveRedEnvelope.receiveNickname != null && receiveRedEnvelope.receiveNickname != '' ? receiveRedEnvelope.receiveNickname : receiveRedEnvelope.receiveUserName}}</div>
+						        </router-link>
+	                        	
+	                          	<div class="time clearfix">{{receiveRedEnvelope.receiveTime}}</div>
+	                        </span>                   
+	                    </div>
+			            
+			            <div class="main">
+			            	   {{receiveRedEnvelope.amount}}元
+						</div>
+			            
+					</div>
+				</div>
+				
+			</div>
+		</div>
+	</div>
+</template>
+
+<!-- 收红包 -->
+<template id="receiveRedEnvelopeList-template">
+	<div>
+		<mt-header fixed title="收红包" style="background: #fafafa; color: #000000;font-size: 14px">
+	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
+	    	<router-link to="/index" slot="right">
+			    <span class="cms-home" style="font-size: 18px;"></span>
+			</router-link>
+		</mt-header>
+		<div class="receiveRedEnvelopeListModule" >
+			<div class="receiveRedEnvelopeListList">
+				<div v-infinite-scroll="queryReceiveRedEnvelopeList" infinite-scroll-disabled="loading" infinite-scroll-distance="10">
+					<div class="item" v-for="receiveRedEnvelope in receiveRedEnvelopeList">
+			            <div class="head">
+							<!-- router-link渲染成<div>标签-->
+					    	<router-link class="avatarBox"  tag="div" :to="{path: '/user/control/home', query: {userName: receiveRedEnvelope.giveUserName}}">
+					        	<img :src="receiveRedEnvelope.giveAvatarPath+'100x100/'+receiveRedEnvelope.giveAvatarName" v-if="receiveRedEnvelope.giveAvatarName != null && receiveRedEnvelope.giveAvatarName != ''">
+								<!-- 首字符头像-->
+				         		<img :ref="'receiveRedEnvelopeAvatarData_'+receiveRedEnvelope.id"  v-if="receiveRedEnvelope.giveAvatarName == null || receiveRedEnvelope.giveAvatarName == ''">
+				         	
+					        </router-link>
+							<span class="info" >
+								<!-- router-link渲染成<h2>标签-->
+						    	<router-link tag="h2" class="clearfix" :to="{path: '/user/control/home', query: {userName: receiveRedEnvelope.giveUserName}}">
+						        	<div class="userName">{{receiveRedEnvelope.giveNickname != null && receiveRedEnvelope.giveNickname != '' ? receiveRedEnvelope.giveNickname : receiveRedEnvelope.giveUserName}}</div>
+						        </router-link>
+	                        	
+	                          	<div class="time clearfix">{{receiveRedEnvelope.receiveTime}}</div>
+	                        </span>                   
+	                    </div>
+			            
+			            <div class="main">
+			            	   {{receiveRedEnvelope.amount}}元
+						</div>
+			            
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>
+
 
 <!-- 公共模块 -->
 <template id="bottomTab-template">
@@ -3599,12 +3871,14 @@
  <script src="${commonPath}js/v-readmore.min.js" type="text/javascript"></script>
 <script src="${commonPath}js/wangeditor/wangEditor.min.js?5sdd" type="text/javascript"></script>
 <script src="${commonPath}js/vue-lazyload.js" type="text/javascript"></script> 
+<script src="${commonPath}js/v-tooltip/v-tooltip.min.js" type="text/javascript"></script> 
+<link href="${commonPath}js/v-tooltip/v-tooltip.css" type="text/css" rel="stylesheet">
 
 <link href="${baseURL}${commonPath}js/prism/default-block/prism.css" type="text/css" rel="stylesheet">
 <script src="${commonPath}js/prism/default-block/prism.js" type="text/javascript"></script> 
 <script src="${commonPath}js/prism/default-block/clipboard.min.js" type="text/javascript"></script> 
 
-<script src="${commonPath}js/main.js?fdddfsc" type="text/javascript"></script>
+<script src="${commonPath}js/main.js?fdddfdfsc" type="text/javascript"></script>
 
 
 
@@ -3668,6 +3942,17 @@ image[lazy=loading] {
 	padding: 17px 0 10px 0;
 }
  */
+
+/* mt-actionsheet */
+.mint-actionsheet-listitem, .mint-actionsheet-button {
+	padding-left:10px;
+	padding-right:10px;
+	overflow:hidden; /*超出的文本隐藏*/
+	text-overflow:ellipsis; /*溢出用省略号显示*/
+	white-space:nowrap; /*溢出不换行*/
+}
+ 
+ 
 
 .editor-toolbar {
 	/**

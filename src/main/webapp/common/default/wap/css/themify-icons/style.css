@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'themify';
-  src:  url('fonts/themify.eot?madfxu');
-  src:  url('fonts/themify.eot?madfxu#iefix') format('embedded-opentype'),
-    url('fonts/themify.ttf?madfxu') format('truetype'),
-    url('fonts/themify.woff?madfxu') format('woff'),
-    url('fonts/themify.svg?madfxu#themify') format('svg');
+  src:  url('fonts/themify.eot?cx51io');
+  src:  url('fonts/themify.eot?cx51io#iefix') format('embedded-opentype'),
+    url('fonts/themify.ttf?cx51io') format('truetype'),
+    url('fonts/themify.woff?cx51io') format('woff'),
+    url('fonts/themify.svg?cx51io#themify') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -13,7 +13,7 @@
 [class^="cms-"], [class*=" cms-"] {
   /* use !important to prevent issues with browser extensions that change fonts */
   font-family: 'themify' !important;
-  speak: none;
+  speak: never;
   font-style: normal;
   font-weight: normal;
   font-variant: normal;
@@ -25,41 +25,14 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.cms-append:before {
-  content: "\e914";
+.cms-ellipsis-v-solid:before {
+  content: "\e919";
 }
-.cms-unlock-solid:before {
-  content: "\e916";
+.cms-redEnvelope-2:before {
+  content: "\e900";
 }
-.cms-lock-solid:before {
-  content: "\e915";
-}
-.cms-quote-right-solid:before {
-  content: "\e912";
-}
-.cms-quote-left-solid:before {
-  content: "\e913";
-}
-.cms-chess-queen-solid:before {
-  content: "\e910";
-}
-.cms-trophy-solid:before {
-  content: "\e911";
-}
-.cms-check-circle-solid:before {
-  content: "\e90f";
-}
-.cms-angle-down:before {
-  content: "\e64b";
-}
-.cms-control-play:before {
-  content: "\e6ad";
-}
-.cms-info-alt:before {
-  content: "\e717";
-}
-.cms-help-alt:before {
-  content: "\e718";
+.cms-redEnvelope-1:before {
+  content: "\e901";
 }
 .cms-user:before {
   content: "\e602";
@@ -103,6 +76,9 @@
 .cms-themify-close:before {
   content: "\e646";
 }
+.cms-angle-down:before {
+  content: "\e64b";
+}
 .cms-themify-check:before {
   content: "\e64c";
 }
@@ -133,6 +109,9 @@
 .cms-home:before {
   content: "\e69b";
 }
+.cms-control-play:before {
+  content: "\e6ad";
+}
 .cms-clipboard:before {
   content: "\e6b4";
 }
@@ -142,51 +121,81 @@
 .cms-themify-favicon:before {
   content: "\e6d2";
 }
+.cms-info-alt:before {
+  content: "\e717";
+}
+.cms-help-alt:before {
+  content: "\e718";
+}
 .cms-email:before {
   content: "\e75a";
 }
 .cms-order:before {
-  content: "\e900";
-}
-.cms-follower:before {
-  content: "\e901";
-}
-.cms-topic:before {
   content: "\e902";
 }
-.cms-reply:before {
+.cms-follower:before {
   content: "\e903";
 }
-.cms-commentCount:before {
+.cms-topic:before {
   content: "\e904";
 }
-.cms-login:before {
+.cms-reply:before {
   content: "\e905";
 }
-.cms-point:before {
+.cms-commentCount:before {
   content: "\e906";
 }
-.cms-log:before {
+.cms-login:before {
   content: "\e907";
 }
-.cms-favorites:before {
+.cms-point:before {
   content: "\e908";
 }
-.cms-realNameAuthentication:before {
+.cms-log:before {
   content: "\e909";
 }
-.cms-quote:before {
+.cms-favorites:before {
   content: "\e90a";
 }
-.cms-user2:before {
+.cms-realNameAuthentication:before {
   content: "\e90b";
 }
-.cms-follow:before {
+.cms-quote:before {
   content: "\e90c";
 }
-.cms-deposit:before {
+.cms-user2:before {
   content: "\e90d";
 }
-.cms-recharge:before {
+.cms-follow3:before {
   content: "\e90e";
+}
+.cms-deposit:before {
+  content: "\e90f";
+}
+.cms-recharge:before {
+  content: "\e910";
+}
+.cms-check-circle-solid:before {
+  content: "\e911";
+}
+.cms-chess-queen-solid:before {
+  content: "\e912";
+}
+.cms-trophy-solid:before {
+  content: "\e913";
+}
+.cms-quote-right-solid:before {
+  content: "\e914";
+}
+.cms-quote-left-solid:before {
+  content: "\e915";
+}
+.cms-append:before {
+  content: "\e916";
+}
+.cms-lock-solid:before {
+  content: "\e917";
+}
+.cms-unlock-solid:before {
+  content: "\e918";
 }

@@ -164,8 +164,7 @@
 		overflowToDisk="true"
 		eternal="false"  timeToIdleSeconds="0" timeToLiveSeconds="20"
 		memoryStoreEvictionPolicy="LFU" />
-		
-	
+
 	<!-- 话题 - 话题缓存 -->		
 	<cache name="topicManage_cache_topic" maxElementsInMemory="99999999" 
 		overflowToDisk="true"
@@ -231,6 +230,17 @@
 	<cache name="answerManage_cache_answerCount" maxElementsInMemory="900000" 
 		overflowToDisk="true"
 		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
+	
+	<!-- 红包 - 根据Id查询发红包缓存 -->		
+	<cache name="redEnvelopeManage_cache_findById" maxElementsInMemory="99999999" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
+	<!-- 红包 - 根据Id查询收红包缓存 -->		
+	<cache name="redEnvelopeManage_cache_findByReceiveRedEnvelopeId" maxElementsInMemory="99999999" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="600" 
 		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
 	
 	

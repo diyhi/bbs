@@ -17,13 +17,16 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import cms.bean.QueryResult;
+import cms.bean.payment.PaymentLog;
 import cms.bean.platformShare.TopicUnhidePlatformShare;
+import cms.bean.redEnvelope.GiveRedEnvelope;
 import cms.bean.topic.HideTagType;
 import cms.bean.topic.Topic;
 import cms.bean.topic.TopicUnhide;
 import cms.service.besa.DaoSupport;
 import cms.service.favorite.FavoriteService;
 import cms.service.message.RemindService;
+import cms.service.redEnvelope.RedEnvelopeService;
 import cms.service.topic.TopicService;
 import cms.service.user.UserService;
 import cms.utils.ObjectConversion;
@@ -43,6 +46,8 @@ public class TopicServiceBean extends DaoSupport<Topic> implements TopicService{
 	@Resource FavoriteService favoriteService;
 	@Resource TopicUnhideConfig topicUnhideConfig;
 	@Resource UserService userService;
+	@Resource RedEnvelopeService redEnvelopeService;
+	
 	/**
 	 * 根据Id查询话题
 	 * @param topicId 话题Id
@@ -283,9 +288,19 @@ public class TopicServiceBean extends DaoSupport<Topic> implements TopicService{
 	/**
 	 * 保存话题
 	 * @param topic
+	 * @param giveRedEnvelope 发红包
+	 * @param userName 用户名称
+	 * @param amount 扣减用户预存款
+	 * @param paymentLog 支付日志
 	 */
-	public void saveTopic(Topic topic){
+	public void saveTopic(Topic topic,GiveRedEnvelope giveRedEnvelope,String userName,BigDecimal amount,PaymentLog paymentLog){
 		this.save(topic);
+		
+		if(giveRedEnvelope != null){
+			paymentLog.setSourceParameterId(String.valueOf(topic.getId()));
+			giveRedEnvelope.setBindTopicId(topic.getId());
+			redEnvelopeService.saveGiveRedEnvelope(giveRedEnvelope, userName, amount, paymentLog);
+		}
 	}
 	/**
 	 * 修改话题
@@ -381,9 +396,13 @@ public class TopicServiceBean extends DaoSupport<Topic> implements TopicService{
 	/**
 	 * 删除话题
 	 * @param topicId 话题Id
+	 * @param giveRedEnvelope 发红包
+	 * @param userName 用户名称
+	 * @param amount 返还用户金额
+	 * @param paymentLogObject 支付日志
 	 * @return
 	 */
-	public Integer deleteTopic(Long topicId){
+	public Integer deleteTopic(Long topicId,GiveRedEnvelope giveRedEnvelope,String userName,BigDecimal amount,Object paymentLogObject){
 		int i = 0;
 		Query delete = em.createQuery("delete from Topic o where o.id=?1")
 		.setParameter(1, topicId);
@@ -404,6 +423,11 @@ public class TopicServiceBean extends DaoSupport<Topic> implements TopicService{
 		
 		//删除收藏
 		favoriteService.deleteFavoriteByTopicId(topicId);
+		
+		if(paymentLogObject != null){
+			//返还红包
+			redEnvelopeService.refundRedEnvelope(giveRedEnvelope,userName,amount,paymentLogObject);
+		}
 		
 		return i;
 	}

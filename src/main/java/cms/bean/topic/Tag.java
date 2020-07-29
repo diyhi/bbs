@@ -1,12 +1,15 @@
 package cms.bean.topic;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 
 /**
@@ -27,6 +30,12 @@ public class Tag implements Serializable{
 	private String name;
 	/** 排序 **/
 	private Integer sort = 0;
+	
+	/** 标签下的话题允许查看的角色名称集合(默认角色除外) **/
+	@Transient
+	private List<String> allowRoleViewList = new ArrayList<String>();
+	
+	
 	public Long getId() {
 		return id;
 	}
@@ -44,6 +53,12 @@ public class Tag implements Serializable{
 	}
 	public void setSort(Integer sort) {
 		this.sort = sort;
+	}
+	public List<String> getAllowRoleViewList() {
+		return allowRoleViewList;
+	}
+	public void setAllowRoleViewList(List<String> allowRoleViewList) {
+		this.allowRoleViewList = allowRoleViewList;
 	}
 
 	

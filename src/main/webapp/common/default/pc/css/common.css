@@ -545,7 +545,7 @@ html,body{
 }
 .tabModule .tab-box .tab{
 	margin-top: 8px;
-	margin-bottom: 8px;
+	margin-bottom: 8px;display: block;
 }
 .tabModule .tab-box .tab:link,
 .tabModule .tab-box .tab:visited,
@@ -584,6 +584,18 @@ html,body{
     color: #fff;
     text-decoration: none;
 }
+.tabModule .tab-box .tab .icon{
+	margin-right: 2px;
+	position: relative;
+	top: 1px;
+	color: #999;
+}
+.tabModule .tab-box .tab_current .icon{
+	margin-right: 2px;
+	position: relative;
+	top: 1px;
+}
+
 .tabModule .more{
 	position: absolute;
 	top: 18px;
@@ -609,6 +621,10 @@ html,body{
 	font-size:15px;
 	margin-top: 10px;
 }
+
+
+
+
 
 /* 话题模块 */
 .topicModule{
@@ -746,6 +762,12 @@ html,body{
 	font-size: 13px;
 	position:relative;
     top:-1px;
+}
+.topicModule .topic-box .topicList .topicItem .content .title .redEnvelope{
+	font-size: 22px;
+	position:relative;
+    top:2px;
+    color: #ff483a;
 }
 .topicModule .topic-box .topicList .topicItem .content .title .hideTagType{
 	font-size:0;/*父级元素设置font-size:0; 解决 display：inline-block两个元素之间的默认空格 */
@@ -952,8 +974,24 @@ html,body{
 .topic-formModule .addTopic-wrap .form-action {
 	 padding-left: 0px; padding-right: 0px; padding-top: 8px;margin-bottom: 12px;
 }
+.topic-formModule .addTopic-wrap .text{
+	position: relative;top: 1px;
+}
+.topic-formModule .addTopic-wrap .redEnvelope{
+	position: absolute;right: 15px;top: 20px; cursor: pointer;
+}
+.topic-formModule .addTopic-wrap .redEnvelope:hover{color: #2196F3;}
+.topic-formModule .addTopic-wrap .redEnvelope .txt{
+	position: relative;top: -1px;font-size: 15px;
+}
+.topic-formModule .addTopic-wrap .redEnvelope .icon{
+	
+}
 .topic-formModule .addTopic-wrap .error {
-	color: red;
+	color: red;position: relative;top: 1px;
+}
+.topic-formModule .addTopic-wrap .help {
+	color: #747474;position: relative;top: 1px;margin-left: 3px;
 }
 .topic-formModule .addTopic-wrap .topicSubmit {
 	width: 70px;
@@ -1007,7 +1045,8 @@ html,body{
 .topic-formModule .addTopic-wrap .captchaModule .tips span{
 	color: red;
 }
-/* 添加答案模块(未登录) */
+
+/* 添加话题模块(未登录) */
 .addTopicModule{
 	margin-top:10px;
 }
@@ -2279,6 +2318,168 @@ html,body{
 .addCommentModule .respond {background: #f6f6f6;border-radius:4px;line-height: 40px;text-align:center;}
 .addCommentModule .respond p {font-size:15px;padding:8px;overflow:hidden;color: #aaaaaa}
 .addCommentModule .respond a{color: #26a2ff;}
+
+
+
+/* 红包 */
+.redEnvelopeModule{
+	margin-top: 10px;
+	background: #fff;
+	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
+}
+.redEnvelopeModule .redEnvelope{margin-bottom:10px;padding:20px 15px 20px;margin:0 auto; width:220px;}
+
+.redEnvelopeModule .redEnvelope .box {
+	border-radius: 16px;
+	background-color: #ff483a;
+	overflow: hidden;
+	position: relative;
+	color: #FFFFFF;
+}
+
+.redEnvelopeModule .redEnvelope .box .head {
+	border-bottom-right-radius: 100%;
+	border-bottom-left-radius: 100%;
+	width: 150%;
+	border-bottom: 2px solid #e03d19;
+	background-image: linear-gradient(-180deg, #ff583f 0%, #ff483a 100%);
+	position: relative;
+	left: 50%;
+	transform: translateX(-50%);
+	min-height: 90px;
+}
+.redEnvelopeModule .redEnvelope .box .body {
+	
+}/**
+.redEnvelopeModule .redEnvelope .box .content{
+	padding: 50px 0;
+	text-align: center;
+	color: #fff;
+}**/
+.redEnvelopeModule .redEnvelope .box .body .content{
+	margin-top:120px;
+	margin-bottom:50px;
+	color:#fed68e;font-size:18px;height: 30px;position: relative;margin-left: 76px;
+}
+.redEnvelopeModule .redEnvelope .box .body .content .avatarBox{
+	position:absolute;display:inline-block;border-radius:100%;
+	left: -56px;top:-10px;
+	
+}
+.redEnvelopeModule .redEnvelope .box .body .content .avatarBox img{
+	border-radius:100%;
+	width: 48px;
+}
+
+
+.redEnvelopeModule .redEnvelope .box .btn{
+	border:none;
+	position: absolute;
+	top:50px;
+	left: 50%;
+	transform: translateX(-50%);
+	background-color: #fed848;
+	width: 70px;
+	height: 70px;
+	line-height: 70px;
+	text-align: center;
+	font-size: 40px;
+	color:#dc972e;
+	border-radius: 100%;
+	cursor: pointer;
+	transition: transform 0.3s;
+	transform-origin:0 50%;
+	
+	-moz-user-select:none; /*火狐*/
+    -webkit-user-select:none; /*webkit浏览器*/
+    -ms-user-select:none; /*IE10*/
+    -khtml-user-select:none; /*早期浏览器*/
+    user-select:none;
+}
+.redEnvelopeModule .redEnvelope .box .btn:hover {
+    transform: scale(1.2) translateX(-50%) ;/* perspective(1px) translate3d(0,0,0) */
+    -webkit-transform-style: preserve-3d;
+	-webkit-backface-visibility: hidden;
+	-moz-backface-visibility: hidden;
+	-ms-backface-visibility: hidden;
+}
+.redEnvelopeModule .redEnvelope .box .open-btn{
+	border:none;
+	position: absolute;
+	top:50px;
+	left: 50%;
+	transform: translateX(-50%);
+	background-color: #fed848;
+	width: 70px;
+	height: 70px;
+	line-height: 70px;
+	text-align: center;
+	font-size: 24px;
+	color:#dc972e;
+	border-radius: 100%;
+	cursor: pointer;
+	transition: transform 0.3s;
+	transform-origin:0 50%;
+}
+
+
+.redEnvelopeModule .receiveRedEnvelopeUser{
+	margin-left: 25px;padding-bottom: 15px;margin-right: 25px;position: relative;
+}
+.redEnvelopeModule .receiveRedEnvelopeUser .box{
+	text-align: center;margin-left: -10px;
+}
+.redEnvelopeModule .receiveRedEnvelopeUser .avatar {
+    width: 32px;
+    height: 32px;
+    line-height: 32px;
+    margin-bottom:8px;
+    
+    display: inline-block;
+    
+    background: #fff no-repeat center/cover;
+    position: relative;
+    text-align: center;
+    color: #fff;
+    vertical-align: bottom;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+	border-radius: 50%;
+	box-shadow: 0 0 0 1px rgba(0,0,0,.1);
+}
+.redEnvelopeModule .receiveRedEnvelopeUser .avatar {
+    margin-right: -15px !important;
+}
+.redEnvelopeModule .receiveRedEnvelopeUser .avatar:hover {
+    margin-right: -4px !important;
+    transition-duration:0.3s;
+}
+.redEnvelopeModule .receiveRedEnvelopeUser .more {
+    width:20px; height:14px; position: absolute;left: 0; right: 0; bottom: 5px;
+    margin: auto;
+}
+.redEnvelopeModule .receiveRedEnvelopeUser .more .icon {
+   font-size: 15px;
+}
+.redEnvelopeModule .receiveRedEnvelopeUser .more .icon:hover{
+   color: #26a2ff;
+}
+.redEnvelopeModule .noRedEnvelope{margin-bottom:10px;padding:20px 15px 20px;margin:0 auto; width:220px;}
+
+.redEnvelopeModule .noRedEnvelope .box {
+	border-radius: 16px;
+	background-color: #ff483a;
+	overflow: hidden;
+	position: relative;
+	color: #FFFFFF;
+}
+.redEnvelopeModule .noRedEnvelope .box .content{
+	color:#fed68e;font-size:16px;height: 60px;line-height:60px; position: relative;text-align: center;
+}
+
 
 
 /* 相关话题 */
@@ -4277,6 +4478,13 @@ html,body{
 	height: 36px;
 	line-height: 36px;font-size: 16px;
 }
+
+/* 红包 */
+.redEnvelopeHeadModule{padding: 30px 0 30px 30px;background: #fff;position: relative;margin-bottom: 10px;
+	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
+}
+.redEnvelopeHeadModule .text{font-size: 16px; margin-right: 40px;}
+.redEnvelopeHeadModule .topic{display: block;font-size: 16px;margin-top: 10px;}
 
 
 /*修改话题*/
@@ -6386,6 +6594,7 @@ html,body{
 
 
 
+
 /* 页脚 border-top: 1px solid #e1e1e1; */
 .footer { min-width: 990px; 
 	background: #f7f6f6;
@@ -6403,7 +6612,6 @@ html,body{
 .footer .copyright a { font-family: Tahoma; margin-left: 16px; color: #999;}
 .footer .copyright a:hover { text-decoration: underline; }
 .footer .copyright span { margin-left: 17px; }
-
 
 
 

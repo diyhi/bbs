@@ -745,7 +745,7 @@ public class PaymentFormAction {
 				PaymentLog paymentLog = new PaymentLog();
 				paymentLog.setPaymentRunningNumber(paymentRunningNumber);//支付流水号
 				paymentLog.setPaymentModule(5);//支付模块 5.用户充值
-				paymentLog.setParameterId(paymentVerificationLog.getParameterId());//参数Id 
+				paymentLog.setSourceParameterId(String.valueOf(paymentVerificationLog.getParameterId()));//参数Id 
 				paymentLog.setOperationUserType(2);//用户类型  0:系统  1: 员工  2:会员
 				paymentLog.setOperationUserName(paymentVerificationLog.getUserName());//操作用户名称
 				paymentLog.setAmountState(1);//金额状态  1:账户存入  2:账户支出 

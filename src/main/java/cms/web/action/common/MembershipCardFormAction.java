@@ -278,7 +278,7 @@ public class MembershipCardFormAction {
 				PaymentLog paymentLog = new PaymentLog();
 				paymentLog.setPaymentRunningNumber(paymentManage.createRunningNumber(accessUser.getUserId()));//支付流水号
 				paymentLog.setPaymentModule(1);//支付模块 1.订单支付
-				paymentLog.setParameterId(membershipCardOrder.getOrderId());//参数Id 
+				paymentLog.setSourceParameterId(String.valueOf(membershipCardOrder.getOrderId()));//参数Id 
 				paymentLog.setOperationUserType(2);//操作用户类型  0:系统  1: 员工  2:会员
 				paymentLog.setOperationUserName(accessUser.getUserName());
 				

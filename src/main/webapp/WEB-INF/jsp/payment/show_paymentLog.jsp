@@ -41,6 +41,10 @@ function SureSubmit(objForm){
 	    	<c:if test="${paymentLog.paymentModule == 90}">悬赏金额</c:if>
 	    	<c:if test="${paymentLog.paymentModule == 100}">采纳答案</c:if>
 	    	<c:if test="${paymentLog.paymentModule == 110}">调整赏金</c:if>
+	    	<c:if test="${paymentLog.paymentModule == 120}">话题发红包</c:if>
+	    	<c:if test="${paymentLog.paymentModule == 130}">话题收红包</c:if>
+	    	<c:if test="${paymentLog.paymentModule == 140}">话题返还红包</c:if>
+	    	
 	    </TD>
 	  </TR>	
  	<TR>
@@ -75,12 +79,16 @@ function SureSubmit(objForm){
 	  <TR>
 	    <TD class="t-label t-label-h" width="12%">参数Id：</TD>
 	    <TD class="t-content" width="88%" >
-	    	<c:if test="${paymentLog.paymentModule == 1}">订单Id: ${paymentLog.parameterId}</c:if>
-	    	<c:if test="${paymentLog.paymentModule == 5}">用户Id: ${paymentLog.parameterId}</c:if>
-	    	<c:if test="${paymentLog.paymentModule == 70 || paymentLog.paymentModule == 80}">话题Id: ${paymentLog.parameterId}</c:if>	
-	    	<c:if test="${paymentLog.paymentModule == 90}">问题Id: ${paymentLog.parameterId}</c:if>	
-	    	<c:if test="${paymentLog.paymentModule == 100}">答案Id: ${paymentLog.parameterId}</c:if>	
-	    	<c:if test="${paymentLog.paymentModule == 110}">问题Id: ${paymentLog.parameterId}</c:if>	
+	    	<c:if test="${paymentLog.paymentModule == 1}">订单Id: ${paymentLog.sourceParameterId}</c:if>
+	    	<c:if test="${paymentLog.paymentModule == 5}">用户Id: ${paymentLog.sourceParameterId}</c:if>
+	    	<c:if test="${paymentLog.paymentModule == 70 || paymentLog.paymentModule == 80}">话题Id: ${paymentLog.sourceParameterId}</c:if>	
+	    	<c:if test="${paymentLog.paymentModule == 90}">问题Id: ${paymentLog.sourceParameterId}</c:if>	
+	    	<c:if test="${paymentLog.paymentModule == 100}">答案Id: ${paymentLog.sourceParameterId}</c:if>	
+	    	<c:if test="${paymentLog.paymentModule == 110}">问题Id: ${paymentLog.sourceParameterId}</c:if>	
+	    	<c:if test="${paymentLog.paymentModule == 120}">发红包Id: ${paymentLog.sourceParameterId}</c:if>
+	    	<c:if test="${paymentLog.paymentModule == 130}">收红包Id: ${paymentLog.sourceParameterId}</c:if>	
+	    	<c:if test="${paymentLog.paymentModule == 140}">发红包Id: ${paymentLog.sourceParameterId}</c:if>	
+	    	
 	    </TD>
 	  </TR>
 	  <TR>

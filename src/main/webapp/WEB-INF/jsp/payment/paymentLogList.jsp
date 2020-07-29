@@ -46,6 +46,10 @@
 	    	<c:if test="${entry.paymentModule == 90}">悬赏金额</c:if>
 	    	<c:if test="${entry.paymentModule == 100}">采纳答案</c:if>
 	    	<c:if test="${entry.paymentModule == 110}">调整赏金</c:if>
+	    	<c:if test="${entry.paymentModule == 120}">话题发红包</c:if>
+	    	<c:if test="${entry.paymentModule == 130}">话题收红包</c:if>
+	    	<c:if test="${entry.paymentModule == 140}">话题返还红包</c:if>
+	    	
 	    </TD>
 	    <TD width="12%">
 	    	<c:if test="${entry.interfaceProduct == -1}">员工操作</c:if>
