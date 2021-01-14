@@ -37,9 +37,9 @@ $.ajaxSettings = $.extend($.ajaxSettings, {
 			//弹出提示内容
 			Vue.$messagebox('权限不足', '您没有当前功能的操作权限');
 		}
-		
+		//XMLHttpRequest.getAllResponseHeaders().indexOf("jumppath") >= 0解决跨域上传文件时出现错误 Refused to get unsafe header "jumpPath" 注意参数小写
 		//请求完成后回调函数 (请求成功或失败时均调用)
-		if (XMLHttpRequest.getResponseHeader("jumpPath") != null && XMLHttpRequest.getResponseHeader("jumpPath") != "") {
+		if (XMLHttpRequest.getAllResponseHeaders().indexOf("jumppath") >= 0 && XMLHttpRequest.getResponseHeader("jumpPath") != null && XMLHttpRequest.getResponseHeader("jumpPath") != "") {
 			//session登陆超时登陆页面响应http头
 			//收到未登录标记，执行登录页面跳转
 			router.push({
@@ -1222,7 +1222,6 @@ var thread_component = Vue.extend({
 					},
 					mounted :function () {
 						this.resumePlayerNodeData();
-						this.resumeCodeNodeData();
 					},
 					props: this.$options.props, // re-use current props definitions
 					methods: {
@@ -1327,13 +1326,6 @@ var thread_component = Vue.extend({
 					        		}
 					        	}
 				        	});
-				        },
-				        //恢复代码节点数据(vue组件切换时会自动刷新数据，代码框在组件生成数据内容之后插入，组件刷新数据时代码框会消失，组件刷新后需要重新渲染)
-				        resumeCodeNodeData : function(){
-				        	var _self = this;
-				        	_self.$nextTick(function() {
-				        		_self.$parent.renderCode();
-				        	});
 				        }
 				    }
 				};
@@ -1403,10 +1395,6 @@ var thread_component = Vue.extend({
 									_self.renderVideoPlayer();//渲染视频播放器
 								}, 30);
 								
-								setTimeout(function() {
-									//渲染代码
-									_self.renderCode();
-								}, 30);
 								
 							});
 							
@@ -1692,13 +1680,6 @@ var thread_component = Vue.extend({
 			}
 			
 		},
-		//渲染代码
-		renderCode : function() {
-			var _self = this;
-			
-			Prism.highlightAll();
-		},
-		
 		
 		//递归绑定节点参数
 		bindNode : function(node) {
@@ -1806,11 +1787,26 @@ var thread_component = Vue.extend({
 	        	       
 	        	        childNode.className = "line-numbers "+getLanguageClassName(lan_class);
 	            		
-	            		var nodeHtml = "";
-            		//	nodeHtml += '<code>';
-            			nodeHtml += 	pre_html
-            		//	nodeHtml += '</code>';
-            			childNode.innerHTML = nodeHtml;
+	        	        var nodeHtml = "";
+
+            			//删除code节点
+            			var preChildNodeList = childNode.childNodes;
+            			for(var p = 0;p < preChildNodeList.length;p++){
+            				var preChildNode = preChildNodeList[p];
+            				if(preChildNode.nodeName.toLowerCase() == "code" ){
+            					nodeHtml += preChildNode.innerHTML;
+            					preChildNode.parentNode.removeChild(preChildNode);
+                			}
+            				
+            			}
+            			
+            			var dom = document.createElement('code');
+            			dom.className = "line-numbers "+getLanguageClassName(lan_class);
+	    				dom.innerHTML=nodeHtml;
+	    				
+	    				childNode.appendChild(dom);
+	    				//渲染代码
+	    				Prism.highlightElement(dom);
 	            		
 	            	}
 	            	
@@ -3173,6 +3169,77 @@ var thread_component = Vue.extend({
 			});
 		},
 		
+		//删除评论
+		deleteComment : function(commentId) {
+			var _self = this;
+			_self.$messagebox.confirm('确定删除评论?').then(function (action) {
+				var parameter = "&commentId=" + commentId;
+
+				//	alert(parameter);
+				//令牌
+				parameter += "&token=" + _self.$store.state.token;
+				$.ajax({
+					type : "POST",
+					cache : false,
+					async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+					url : "user/control/comment/delete",
+					data : parameter,
+					success : function success(result) {
+						if (result != "") {
+
+							var returnValue = $.parseJSON(result);
+
+							var value_success = "";
+							var value_error = null;
+
+							for (var key in returnValue) {
+								if (key == "success") {
+									value_success = returnValue[key];
+								} else if (key == "error") {
+									value_error = returnValue[key];
+								}
+							}
+
+							//加入成功
+							if (value_success == "true") {
+								_self.$toast({
+									message : "删除评论成功，3秒后自动刷新当前页面",
+									duration : 3000,
+									className : "mint-ui-toast",
+								});
+
+								setTimeout(function() {
+									//清空分页数据
+									_self.commentList = []; //评论列表
+									//查询评论列表
+									_self.queryCommentList();
+								}, 3000);
+								
+							} else {
+								//显示错误
+								if (value_error != null) {
+
+
+									var htmlContent = "";
+									var count = 0;
+									for (var errorKey in value_error) {
+										var errorValue = value_error[errorKey];
+										count++;
+										htmlContent += count + ". " + errorValue + "<br>";
+									}
+									_self.$messagebox('提示', htmlContent);
+
+								}
+							}
+						}
+					}
+				});
+			}).catch(function (err){//不捕获 Promise 的异常,若用户点击了取消按钮,会出现警告
+			    console.log(err);
+			});
+		},
+		
+		
 		
 		//修改回复界面
 		editReplyUI : function(replyId) {
@@ -3307,7 +3374,7 @@ var thread_component = Vue.extend({
 
 							
 							//清空分页数据
-							_self.commentList = []; //话题列表
+							_self.commentList = []; //评论列表
 							
 						//	_self.currentpage = 1; //当前页码
 						//	_self.totalpage = 1; //总页数
@@ -3358,7 +3425,76 @@ var thread_component = Vue.extend({
 				}
 			});
 		},
+		
+		//删除回复
+		deleteReply : function(replyId) {
+			var _self = this;
+			_self.$messagebox.confirm('确定删除回复?').then(function (action) {
+				var parameter = "&replyId=" + replyId;
 
+				//	alert(parameter);
+				//令牌
+				parameter += "&token=" + _self.$store.state.token;
+				$.ajax({
+					type : "POST",
+					cache : false,
+					async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+					url : "user/control/comment/deleteReply",
+					data : parameter,
+					success : function success(result) {
+						if (result != "") {
+
+							var returnValue = $.parseJSON(result);
+
+							var value_success = "";
+							var value_error = null;
+
+							for (var key in returnValue) {
+								if (key == "success") {
+									value_success = returnValue[key];
+								} else if (key == "error") {
+									value_error = returnValue[key];
+								}
+							}
+
+							//加入成功
+							if (value_success == "true") {
+								_self.$toast({
+									message : "删除回复成功，3秒后自动刷新当前页面",
+									duration : 3000,
+									className : "mint-ui-toast",
+								});
+
+								setTimeout(function() {
+									//清空分页数据
+									_self.commentList = []; //评论列表
+									//查询评论列表
+									_self.queryCommentList();
+								}, 3000);
+								
+							} else {
+								//显示错误
+								if (value_error != null) {
+
+
+									var htmlContent = "";
+									var count = 0;
+									for (var errorKey in value_error) {
+										var errorValue = value_error[errorKey];
+										count++;
+										htmlContent += count + ". " + errorValue + "<br>";
+									}
+									_self.$messagebox('提示', htmlContent);
+
+								}
+							}
+						}
+					}
+				});
+			}).catch(function (err){//不捕获 Promise 的异常,若用户点击了取消按钮,会出现警告
+			    console.log(err);
+			});
+		},
 		//更换验证码
 		replaceCaptcha : function replaceCaptcha(event) {
 			var _self = this;
@@ -3787,18 +3923,11 @@ var question_component = Vue.extend({
 				return {
 					template: "<div>"+ html +"</div>", // use content as template for this component 必须用<div>标签包裹，否则会有部分内容不显示
 					mounted :function () {
-					//	this.resumeCodeNodeData();
+					
 					},
 					props: this.$options.props, // re-use current props definitions
 					methods: {
-						/**
-				        //恢复代码节点数据(vue组件切换时会自动刷新数据，代码框在组件生成数据内容之后插入，组件刷新数据时代码框会消失，组件刷新后需要重新渲染)
-				        resumeCodeNodeData : function(){
-				        	var _self = this;
-				        	_self.$nextTick(function() {
-				        		_self.$parent.renderCode();
-				        	});
-				        }**/
+						
 				    }
 				};
 			};	
@@ -3862,16 +3991,7 @@ var question_component = Vue.extend({
 							
 							
 							_self.question = question;
-							
-							
-							
-							_self.$nextTick(function() {
-								setTimeout(function() {
-									//渲染代码
-									_self.renderCode();
-								}, 30);
-								
-							});
+				
 							
 							//生成首字符头像
 							_self.$nextTick(function() {
@@ -3893,12 +4013,7 @@ var question_component = Vue.extend({
 			});
 			
 		},
-		//渲染代码
-		renderCode : function() {
-			var _self = this;
-			
-			Prism.highlightAll();
-		},
+
 		
 		//递归绑定节点参数
 		bindNode : function(node) {
@@ -3948,11 +4063,26 @@ var question_component = Vue.extend({
 	        	        childNode.className = "line-numbers "+getLanguageClassName(lan_class);
 	            		
 	            		
-	            		var nodeHtml = "";
-            		//	nodeHtml += '<code>';
-            			nodeHtml += 	pre_html
-            		//	nodeHtml += '</code>';
-            			childNode.innerHTML = nodeHtml;
+	        	        var nodeHtml = "";
+
+            			//删除code节点
+            			var preChildNodeList = childNode.childNodes;
+            			for(var p = 0;p < preChildNodeList.length;p++){
+            				var preChildNode = preChildNodeList[p];
+            				if(preChildNode.nodeName.toLowerCase() == "code" ){
+            					nodeHtml += preChildNode.innerHTML;
+            					preChildNode.parentNode.removeChild(preChildNode);
+                			}
+            				
+            			}
+            			
+            			var dom = document.createElement('code');
+            			dom.className = "line-numbers "+getLanguageClassName(lan_class);
+	    				dom.innerHTML=nodeHtml;
+	    				
+	    				childNode.appendChild(dom);
+	    				//渲染代码
+	    				Prism.highlightElement(dom);
 	            		
 	            	}
 	            	this.bindNode(childNode);
@@ -3979,12 +4109,6 @@ var question_component = Vue.extend({
   								_self.following = following;
   							}
   						}
-  						_self.$nextTick(function() {
-  							setTimeout(function() {
-  								//渲染代码
-  								_self.renderCode();
-  							}, 30);
-  						});
   					}
   				});
   				
@@ -4105,12 +4229,6 @@ var question_component = Vue.extend({
 							_self.questionFavoriteCount = count;
 						}
 					}
-					_self.$nextTick(function() {
-						setTimeout(function() {
-							//渲染代码
-							_self.renderCode();
-						}, 30);
-					});
 				},
 				beforeSend : function beforeSend(XMLHttpRequest) {
 					//本空方法不要删除，用来覆盖全局回调默认的旋转进度条
@@ -4286,12 +4404,6 @@ var question_component = Vue.extend({
 						});
 						
 					}
-					_self.$nextTick(function() {
-						setTimeout(function() {
-							//渲染代码
-							_self.renderCode();
-						}, 30);
-					});
 				}
 			});
 		},
@@ -7664,16 +7776,16 @@ var home_component = Vue.extend({
 		    videoPlayerBind: [],//视频播放器绑定Id集合
 			videoPlayerList: [],//视频播放器集合
 			
-		    playerNodeList: [],//视频节点对象集合
+		    playerNodeList: []//视频节点对象集合
 			
-			userDynamicListRequestCount:0, //'用户动态集合'请求数量
-			lastRequestGroup:[] //最后一组请求
+			
 		}
 	},
 	created : function created() {
 		//用户中心页由this.scrollQueryUserDynamicList()进行初始化
 
 		this.userName = getUrlParam("userName");
+		
 		
 		//this.loadHome(function (){});
 		//设置缓存
@@ -7740,14 +7852,6 @@ var home_component = Vue.extend({
 						return {
 							hide_passwordList :[]//话题隐藏密码
 						};
-					},
-					created :function () {
-						if(this.$parent.$parent.userDynamicListRequestCount == 0){;
-							this.$parent.$parent.lastRequestGroup.push(1);//1无实际意义，只是填充数组
-						}
-					},
-					mounted :function () {
-						this.resumeCodeNodeData();
 					},
 					props: this.$options.props, // re-use current props definitions
 					methods: {
@@ -7900,21 +8004,7 @@ var home_component = Vue.extend({
 							}
 				  		},
 				  		
-				  		//恢复代码节点数据(vue组件切换时会自动刷新数据，代码框在组件生成数据内容之后插入，组件刷新数据时代码框会消失，组件刷新后需要重新渲染)
-				        resumeCodeNodeData : function(){
-				        	var _self = this;
-				        	
-				        	_self.$nextTick(function() {
-				        		var requestCount = _self.$parent.$parent.userDynamicListRequestCount;//现有正在进行的请求数量
-					        	//所有ajax请求执行完再渲染
-				        		if(requestCount ==0 && this.$parent.$parent.lastRequestGroup.length>0){
-				        			this.$parent.$parent.lastRequestGroup.length = 0;//清空数组
-				        			//渲染高亮 
-				        			_self.$parent.$parent.renderCode();//调用父组件方法
-					        		
-					        	}
-				        	});
-				        }
+				  		
 				  		
 				    }
 				};
@@ -8270,8 +8360,6 @@ var home_component = Vue.extend({
 										_self.hidePasswordIndex = 0;
 										_self.bindNode(contentNode,userDynamic.topicId);
 										userDynamic.topicContent = contentNode.innerHTML;
-										_self.userDynamicListRequestCount = _self.userDynamicListRequestCount+2; //增加'话题收藏数量'和'点赞数量'两个请求
-										
 										
 										var favoriteObject = new Object(); 
 										favoriteObject.topicId = userDynamic.topicId; 
@@ -8282,7 +8370,6 @@ var home_component = Vue.extend({
 											//话题收藏数量
 											_self.queryFavoriteCount(favoriteObject.topicId,favoriteObject.index,function(index,count) {
 												if(count != null && count != ''){
-													_self.userDynamicListRequestCount = _self.userDynamicListRequestCount-1; //减少一个请求
 													_self.$set(_self.favoriteCountGroup, index, parseInt(count));
 												}
 												
@@ -8298,7 +8385,6 @@ var home_component = Vue.extend({
 												//点赞数量
 												_self.queryLikeCount(likeObject.topicId,likeObject.index,function(index,count) {
 													if(count != null && count != ''){
-														_self.userDynamicListRequestCount = _self.userDynamicListRequestCount-1; //减少一个请求
 														_self.$set(_self.likeCountGroup, index, parseInt(count));
 													}
 													
@@ -8314,7 +8400,6 @@ var home_component = Vue.extend({
 										_self.bindNode(contentNode,null);
 										userDynamic.commentContent = contentNode.innerHTML;
 									}else if(userDynamic.module == 500){
-										_self.userDynamicListRequestCount = _self.userDynamicListRequestCount+1; //增加'问题收藏数量'一个请求
 										var favoriteObject = new Object(); 
 										favoriteObject.question = userDynamic.questionId; 
 										favoriteObject.index = _self.questionFavoriteCountGroup.length-1;
@@ -8323,7 +8408,6 @@ var home_component = Vue.extend({
 											//问题收藏数量
 											_self.queryQuestionFavoriteCount(favoriteObject.questionId,favoriteObject.index,function(index,count) {
 												if(count != null && count != ''){
-													_self.userDynamicListRequestCount = _self.userDynamicListRequestCount-1; //减少一个请求
 													_self.$set(_self.questionFavoriteCountGroup, index, parseInt(count));
 												}
 												
@@ -8511,11 +8595,26 @@ var home_component = Vue.extend({
 	            		
 	            		
 	            		var nodeHtml = "";
-            		//	nodeHtml += '<code>';
-            			nodeHtml += 	pre_html
-            		//	nodeHtml += '</code>';
-            			childNode.innerHTML = nodeHtml;
-	            		
+
+            			//删除code节点
+            			var preChildNodeList = childNode.childNodes;
+            			for(var p = 0;p < preChildNodeList.length;p++){
+            				var preChildNode = preChildNodeList[p];
+            				if(preChildNode.nodeName.toLowerCase() == "code" ){
+            					nodeHtml += preChildNode.innerHTML;
+            					preChildNode.parentNode.removeChild(preChildNode);
+                			}
+            				
+            			}
+            			
+            			var dom = document.createElement('code');
+            			dom.className = "line-numbers "+getLanguageClassName(lan_class);
+	    				dom.innerHTML=nodeHtml;
+	    				
+	    				childNode.appendChild(dom);
+	    				//渲染代码
+	    				Prism.highlightElement(dom);
+	    		
 	            	}
 	            	
 	            	
@@ -8524,15 +8623,6 @@ var home_component = Vue.extend({
 	        }
 	    },
 
-	    
-	    //渲染代码
-	  	renderCode : function() {
-  			var _self = this;
-  			
-  			Prism.highlightAll();
-	  	},
-	    
-	   
 	    
 		//查询话题用户收藏总数
 		queryFavoriteCount : function(topicId,index,callback) {
@@ -13629,6 +13719,7 @@ var store = new Vuex.Store({
 		contextPath : '', //系统虚拟目录
 		token : '', //令牌标记
 		weixin_oa_appid : '', //微信公众号应用唯一标识
+		fileStorageSystem : 0, //文件存储系统 0.本地系统 10.SeaweedFS 20.MinIO 30.阿里云OSS
 		user : {
 			userId : '',
 			userName : ''
@@ -13673,7 +13764,10 @@ var store = new Vuex.Store({
 		setWeixin_oa_appid : function setWeixin_oa_appid(state, appid) {
 			state.weixin_oa_appid = appid;
 		},
-		
+		//设置文件存储系统
+		setFileStorageSystem : function setFileStorageSystem(state, fileStorageSystem) {
+			state.fileStorageSystem = fileStorageSystem;
+		},
 		
 		//设置私信未读状态
 		setPrivateMessage_badge : function setPrivateMessage_badge(state, isShow) {
@@ -13815,6 +13909,7 @@ var vue = new Vue({
 			_self.$store.commit('setContextPath', getMetaTag().contextPath);
 			_self.$store.commit('setToken', getMetaTag().token);
 			_self.$store.commit('setWeixin_oa_appid', getMetaTag().weixin_oa_appid);
+			_self.$store.commit('setFileStorageSystem', getMetaTag().fileStorageSystem);
 			_self.$store.commit('setSystemUserId', getMetaTag().userId);
 			_self.$store.commit('setSystemUserName', getMetaTag().userName);
 			
@@ -13864,6 +13959,7 @@ function getMetaTag() {
 	var contextPath = "";
 	var token = "";
 	var weixin_oa_appid = "";
+	var fileStorageSystem = "";
 	var userId = "";
 	var userName = "";
 	
@@ -13884,6 +13980,9 @@ function getMetaTag() {
 		if (meta[i].name == "_weixin_oa_appid") {
 			weixin_oa_appid = meta[i].getAttribute("content");
 		}
+		if (meta[i].name == "_fileStorageSystem") {
+			fileStorageSystem = meta[i].getAttribute("content");
+		}
 		if (meta[i].name == "_userId") {
 			userId = meta[i].getAttribute("content");
 		}
@@ -13903,6 +14002,8 @@ function getMetaTag() {
 		token : token,
 		//微信公众号应用唯一标识
 		weixin_oa_appid : weixin_oa_appid,
+		//文件存储系统
+		fileStorageSystem : fileStorageSystem,
 		//登录用户Id
 		userId : userId,
 		//登录用户名称
@@ -14277,6 +14378,282 @@ function getLanguageClassName(languageCode) {
 }
 
 
+//富文本自定义上传  uploadImgServer：editor.customConfig.uploadImgServer  uploadFileName：editor.customConfig.uploadFileName  dir：image、file、media
+function editorCustomUpload(files, insert,uploadImgServer,uploadFileName,dir) {
+	if(store.state.fileStorageSystem == 10){//10.SeaweedFS
+		var fileServer = uploadImgServer;
+		
+		if (fileServer.indexOf('?') > 0) {
+			fileServer += '&';
+        } else {
+        	fileServer += '?';
+        }
+		fileServer +=  'dir='+dir;
+		fileServer +=  '&token='+store.state.token;
+        
+        
+        Array.prototype.forEach.call(files, function(file) {
+       // files.forEach(function(file) {
+        	fileServer +=  '&fileName='+encodeURIComponent(file.name);
+        	
+        	$.ajax({
+    			type : "POST",
+    			cache : false,
+    			async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+    			url : fileServer,
+    			success : function success(result) {
+    				if (result != "") {
+    					var returnValue = $.parseJSON(result);
+    					if(returnValue.error ==0){
+    				        var signingUrl = returnValue.url;
+    				        
+    				        
+    				        var beforeUrl = signingUrl.substring(0,signingUrl.indexOf("?"));
+    						//URL参数部分
+    						var urlParam = signingUrl.substring(signingUrl.indexOf("?")+1,signingUrl.length);
+
+    						var newFileName = "";
+    						//获取提交的参数
+    					    var data = new FormData();
+    						var urlParamArr = urlParam.split("&");
+    					    for(var i=0;i<urlParamArr.length;i++){
+    					        var paramArr = urlParamArr[i].split("=");
+    					        data.append(paramArr[0], decodeURIComponent(paramArr[1]));
+    					        if(paramArr[0] == "key"){
+    					        	newFileName = decodeURIComponent(paramArr[1]);
+    					        }
+    					    }
+    					    data.append("file", file);
+    				        
+    					    $.ajax({
+    			    			type : "POST",
+    			    			cache : false,
+    			    			async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+    			    			url : beforeUrl,
+    			    			data : data,
+    			    			contentType : false, // 不设置内容类型
+    			    			processData : false, // 不处理数据
+    			    			success : function success(result) {
+    			    				var url = beforeUrl+newFileName;
+    			    				
+    			    				var title = file.name;
+    			    				
+    							    // 上传代码返回结果之后，将文件插入到编辑器中
+    							    insert(url,title);
+    			    			}
+    			    		});
+    				    
+    			    	}else{
+    			    		//弹出提示内容
+    						Vue.$messagebox('错误', returnValue.message);
+    			    	} 
+    					
+    				}
+    			}
+    		});
+    	});
+	}else if(store.state.fileStorageSystem == 20){//20.MinIO
+		var fileServer = uploadImgServer;
+		
+		if (fileServer.indexOf('?') > 0) {
+			fileServer += '&';
+        } else {
+        	fileServer += '?';
+        }
+		fileServer +=  'dir='+dir;
+		fileServer +=  '&token='+store.state.token;
+        
+        
+        Array.prototype.forEach.call(files, function(file) {
+       // files.forEach(function(file) {
+        	fileServer +=  '&fileName='+encodeURIComponent(file.name);
+        	
+        	$.ajax({
+    			type : "POST",
+    			cache : false,
+    			async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+    			url : fileServer,
+    			success : function success(result) {
+    				if (result != "") {
+    					var returnValue = $.parseJSON(result);
+    					if(returnValue.error ==0){
+    				        var signingUrl = returnValue.url;
+    				        
+    				        
+    				        var beforeUrl = signingUrl.substring(0,signingUrl.indexOf("?"));
+    						//URL参数部分
+    						var urlParam = signingUrl.substring(signingUrl.indexOf("?")+1,signingUrl.length);
+
+    						var newFileName = "";
+    						//获取提交的参数
+    					    var data = new FormData();
+    						var urlParamArr = urlParam.split("&");
+    					    for(var i=0;i<urlParamArr.length;i++){
+    					        var paramArr = urlParamArr[i].split("=");
+    					        data.append(paramArr[0], decodeURIComponent(paramArr[1]));
+    					        if(paramArr[0] == "key"){
+    					        	newFileName = decodeURIComponent(paramArr[1]);
+    					        }
+    					    }
+    					    data.append("file", file);
+    				        
+    					    $.ajax({
+    			    			type : "POST",
+    			    			cache : false,
+    			    			async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+    			    			url : beforeUrl,
+    			    			data : data,
+    			    			contentType : false, // 不设置内容类型
+    			    			processData : false, // 不处理数据
+    			    			success : function success(result) {
+    			    				var url = beforeUrl+newFileName;
+    			    				
+    			    				var title = file.name;
+    			    				
+    							    // 上传代码返回结果之后，将文件插入到编辑器中
+    							    insert(url,title);
+    			    			}
+    			    		});
+    				    
+    			    	}else{
+    			    		//弹出提示内容
+    						Vue.$messagebox('错误', returnValue.message);
+    			    	} 
+    					
+    				}
+    			}
+    		});
+        	
+        	
+    	});
+	}else if(store.state.fileStorageSystem == 30){//30.阿里云OSS
+		var fileServer = uploadImgServer;
+		
+		if (fileServer.indexOf('?') > 0) {
+			fileServer += '&';
+        } else {
+        	fileServer += '?';
+        }
+		fileServer +=  'dir='+dir;
+		fileServer +=  '&token='+store.state.token;
+        
+        
+        Array.prototype.forEach.call(files, function(file) {
+       // files.forEach(function(file) {
+        	fileServer +=  '&fileName='+encodeURIComponent(file.name);
+        	
+        	$.ajax({
+    			type : "POST",
+    			cache : false,
+    			async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+    			url : fileServer,
+    			success : function success(result) {
+    				if (result != "") {
+    					var returnValue = $.parseJSON(result);
+    					if(returnValue.error ==0){
+    				        var signingUrl = returnValue.url;
+    				        
+    				        
+    				        var beforeUrl = signingUrl.substring(0,signingUrl.indexOf("?"));
+    						//URL参数部分
+    						var urlParam = signingUrl.substring(signingUrl.indexOf("?")+1,signingUrl.length);
+
+    						var newFileName = "";
+    						//获取提交的参数
+    					    var data = new FormData();
+    						var urlParamArr = urlParam.split("&");
+    					    for(var i=0;i<urlParamArr.length;i++){
+    					        var paramArr = urlParamArr[i].split("=");
+    					        data.append(paramArr[0], decodeURIComponent(paramArr[1]));
+    					        if(paramArr[0] == "key"){
+    					        	newFileName = decodeURIComponent(paramArr[1]);
+    					        }
+    					    }
+    					    data.append("file", file);
+    				        
+    					    $.ajax({
+    			    			type : "POST",
+    			    			cache : false,
+    			    			async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+    			    			url : beforeUrl,
+    			    			data : data,
+    			    			contentType : false, // 不设置内容类型
+    			    			processData : false, // 不处理数据
+    			    			success : function success(result) {
+    			    				var url = beforeUrl+newFileName;
+    			    				
+    			    				var title = file.name;
+    			    				
+    							    // 上传代码返回结果之后，将文件插入到编辑器中
+    							    insert(url,title);
+    			    			}
+    			    		});
+    				    
+    			    	}else{
+    			    		//弹出提示内容
+    						Vue.$messagebox('错误', returnValue.message);
+    			    	} 
+    					
+    				}
+    			}
+    		});
+        	
+        	
+    	});
+	}else{//本地
+		Array.prototype.forEach.call(files, function(file) {
+    	//files.forEach(function(file) {
+    		var formData = new FormData();
+    		formData.append(uploadFileName, file);//editor.customConfig.uploadFileName
+    		//令牌
+    		//	formData.append("token", store.state.token);
+    	    
+    		var fileServer = uploadImgServer;
+    		
+	    	if (fileServer.indexOf('?') > 0) {
+	    		fileServer += '&';
+	        } else {
+	        	fileServer += '?';
+	        }
+	    	fileServer +=  'dir='+dir;
+	    	
+			$.ajax({
+				type : "POST",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : fileServer,
+				data : formData,
+				contentType : false, // 不设置内容类型
+				processData : false, // 不处理数据
+				success : function success(result) {
+					if (result != "") {
+						var returnValue = $.parseJSON(result);
+						if(returnValue.error ==0){
+				    		// 举例：假如上传图片成功后，服务器端返回的是 {url:'....'} 这种格式，即可这样插入图片：
+					        var url = returnValue.url;
+					     // 上传代码返回结果之后，将图片插入到编辑器中
+					        var title = file.name;
+		    				
+						    // 上传代码返回结果之后，将文件插入到编辑器中
+						    insert(url,title);
+				    		// result 必须是一个 JSON 格式字符串！！！否则报错
+				    	}else{
+				    		//弹出提示内容
+							Vue.$messagebox('错误', returnValue.message);
+				    	} 
+						
+					}
+				}
+			});
+    		
+    	});
+    	
+		
+	}
+	
+}
+
+
 //创建富文本编辑器
 function createEditor(editorToolbar,editorText,commonPath,menus,userGradeList,imgPath,self,param) {
 	var E = window.wangEditor;
@@ -14427,101 +14804,75 @@ function createEditor(editorToolbar,editorText,commonPath,menus,userGradeList,im
     editor.customConfig.customUploadImg = function (files, insert) {
         // files 是 input 中选中的文件列表
         // insert 是获取图片 url 后，插入到编辑器的方法
-
-    	var formData = new FormData();
-    	files.forEach(function(file) {
-    		formData.append(editor.customConfig.uploadFileName, file);
-    	});
     	
-		//令牌
-	//	formData.append("token", store.state.token);
-    	
-    	var uploadImgServer = editor.customConfig.uploadImgServer;
-    	if (uploadImgServer.indexOf('?') > 0) {
-            uploadImgServer += '&';
-        } else {
-            uploadImgServer += '?';
-        }
-        uploadImgServer +=  'dir=image';
-    	
-		$.ajax({
-			type : "POST",
-			cache : false,
-			async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
-			url : uploadImgServer,
-			data : formData,
-			contentType : false, // 不设置内容类型
-			processData : false, // 不处理数据
-			success : function success(result) {
-				if (result != "") {
-					var returnValue = $.parseJSON(result);
-					if(returnValue.error ==0){
-			    		// 举例：假如上传图片成功后，服务器端返回的是 {url:'....'} 这种格式，即可这样插入图片：
-				        var url = returnValue.url;
-				     // 上传代码返回结果之后，将图片插入到编辑器中
-				        insert(url);
-			    		// result 必须是一个 JSON 格式字符串！！！否则报错
-			    	}else{
-			    		//弹出提示内容
-						Vue.$messagebox('错误', returnValue.message);
-			    	} 
-					
-				}
-			}
-		});
+    	editorCustomUpload(files, insert,editor.customConfig.uploadImgServer,editor.customConfig.uploadFileName,"image");
     	
     	
-    	
-        
     }
     
     //文件上传
     editor.customConfig.customUploadFile = function (files, insert) {
     	// files 是 input 中选中的文件列表
         // insert 是获取图片 url 后，插入到编辑器的方法
-    	var formData = new FormData();
-    	Array.prototype.forEach.call(files, function(file) {
-    		formData.append(editor.customConfig.uploadFileName, file);
-    		
-    	});
-		//令牌
-	//	formData.append("token", store.state.token);
-    	
-    	var uploadImgServer = editor.customConfig.uploadImgServer;
-    	if (uploadImgServer.indexOf('?') > 0) {
-            uploadImgServer += '&';
-        } else {
-            uploadImgServer += '?';
-        }
-        uploadImgServer +=  'dir=file';
     	
     	
-		$.ajax({
-			type : "POST",
-			cache : false,
-			async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
-			url : uploadImgServer,
-			data : formData,
-			contentType : false, // 不设置内容类型
-			processData : false, // 不处理数据
-			success : function success(result) {
-				if (result != "") {
-					var returnValue = $.parseJSON(result);
-					if(returnValue.error ==0){
-			    		// 举例：假如上传文件成功后，服务器端返回的是 {url:'....'} 这种格式，即可这样插入图片：
-				        var url = returnValue.url;
-				        var title = returnValue.title;
-				     // 上传代码返回结果之后，将文件插入到编辑器中
-				        insert(url,title);
-			    		// result 必须是一个 JSON 格式字符串！！！否则报错
-			    	}else{
-			    		//弹出提示内容
-						Vue.$messagebox('错误', returnValue.message);
-			    	} 
-					
+    	editorCustomUpload(files, insert,editor.customConfig.uploadImgServer,editor.customConfig.uploadFileName,"file");
+    	
+    	/**
+    	if(store.state.fileStorageSystem == 10){//10.SeaweedFS
+    	
+	    }else if(store.state.fileStorageSystem == 20){//20.MinIO
+			
+		}else if(store.state.fileStorageSystem == 30){//30.阿里云OSS
+			
+		}else{//本地
+			var formData = new FormData();
+	    	Array.prototype.forEach.call(files, function(file) {
+	    		formData.append(editor.customConfig.uploadFileName, file);
+	    		
+	    	});
+			//令牌
+		//	formData.append("token", store.state.token);
+	    	
+	    	var uploadImgServer = editor.customConfig.uploadImgServer;
+	    	if (uploadImgServer.indexOf('?') > 0) {
+	            uploadImgServer += '&';
+	        } else {
+	            uploadImgServer += '?';
+	        }
+	        uploadImgServer +=  'dir=file';
+	    	
+	    	
+			$.ajax({
+				type : "POST",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : uploadImgServer,
+				data : formData,
+				contentType : false, // 不设置内容类型
+				processData : false, // 不处理数据
+				success : function success(result) {
+					if (result != "") {
+						var returnValue = $.parseJSON(result);
+						if(returnValue.error ==0){
+				    		// 举例：假如上传文件成功后，服务器端返回的是 {url:'....'} 这种格式，即可这样插入图片：
+					        var url = returnValue.url;
+					        var title = returnValue.title;
+					     // 上传代码返回结果之后，将文件插入到编辑器中
+					        insert(url,title);
+				    		// result 必须是一个 JSON 格式字符串！！！否则报错
+				    	}else{
+				    		//弹出提示内容
+							Vue.$messagebox('错误', returnValue.message);
+				    	} 
+						
+					}
 				}
-			}
-		});
+			});
+		}
+    	**/
+    	
+    	
     	
     	
     },
@@ -14530,49 +14881,64 @@ function createEditor(editorToolbar,editorText,commonPath,menus,userGradeList,im
     	// files 是 input 中选中的文件列表
         // insert 是获取图片 url 后，插入到编辑器的方法
     	
-    	var formData = new FormData();
-    	Array.prototype.forEach.call(files, function(file) {
-    		formData.append(editor.customConfig.uploadFileName, file);
-    		
-    	});
-		//令牌
-	//	formData.append("token", store.state.token);
+    	editorCustomUpload(files, insert,editor.customConfig.uploadImgServer,editor.customConfig.uploadFileName,"media");
     	
-    	var uploadImgServer = editor.customConfig.uploadImgServer;
-    	if (uploadImgServer.indexOf('?') > 0) {
-            uploadImgServer += '&';
-        } else {
-            uploadImgServer += '?';
-        }
-        uploadImgServer +=  'dir=media';
-    	
-    	
-		$.ajax({
-			type : "POST",
-			cache : false,
-			async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
-			url : uploadImgServer,
-			data : formData,
-			contentType : false, // 不设置内容类型
-			processData : false, // 不处理数据
-			success : function success(result) {
-				if (result != "") {
-					var returnValue = $.parseJSON(result);
-					if(returnValue.error ==0){
-			    		// 举例：假如上传文件成功后，服务器端返回的是 {url:'....'} 这种格式，即可这样插入图片：
-				        var url = returnValue.url;
-				        var title = returnValue.title;
-				     // 上传代码返回结果之后，将文件插入到编辑器中
-				        insert(url,title);
-			    		// result 必须是一个 JSON 格式字符串！！！否则报错
-			    	}else{
-			    		//弹出提示内容
-						Vue.$messagebox('错误', returnValue.message);
-			    	} 
-					
+    	/**
+    	if(store.state.fileStorageSystem == 10){//10.SeaweedFS
+        	
+	    }else if(store.state.fileStorageSystem == 20){//20.MinIO
+			
+		}else if(store.state.fileStorageSystem == 30){//30.阿里云OSS
+			
+		}else{//本地
+			var formData = new FormData();
+	    	Array.prototype.forEach.call(files, function(file) {
+	    		formData.append(editor.customConfig.uploadFileName, file);
+	    		
+	    	});
+			//令牌
+		//	formData.append("token", store.state.token);
+	    	
+	    	var uploadImgServer = editor.customConfig.uploadImgServer;
+	    	if (uploadImgServer.indexOf('?') > 0) {
+	            uploadImgServer += '&';
+	        } else {
+	            uploadImgServer += '?';
+	        }
+	        uploadImgServer +=  'dir=media';
+	    	
+	    	
+			$.ajax({
+				type : "POST",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : uploadImgServer,
+				data : formData,
+				contentType : false, // 不设置内容类型
+				processData : false, // 不处理数据
+				success : function success(result) {
+					if (result != "") {
+						var returnValue = $.parseJSON(result);
+						if(returnValue.error ==0){
+				    		// 举例：假如上传文件成功后，服务器端返回的是 {url:'....'} 这种格式，即可这样插入图片：
+					        var url = returnValue.url;
+					        var title = returnValue.title;
+					     // 上传代码返回结果之后，将文件插入到编辑器中
+					        insert(url,title);
+				    		// result 必须是一个 JSON 格式字符串！！！否则报错
+				    	}else{
+				    		//弹出提示内容
+							Vue.$messagebox('错误', returnValue.message);
+				    	} 
+						
+					}
 				}
-			}
-		});
+			});
+		}
+    	
+    	**/
+    	
+    	
     	
     	
     }

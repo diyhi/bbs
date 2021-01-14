@@ -103,7 +103,6 @@ import cms.utils.FileUtil;
 import cms.utils.HtmlEscape;
 import cms.utils.IpAddress;
 import cms.utils.JsonUtils;
-import cms.utils.PathUtil;
 import cms.utils.RefererCompare;
 import cms.utils.SHA;
 import cms.utils.SecureLink;
@@ -283,7 +282,7 @@ public class HomeManageAction {
     			viewUser.setGradeName(new_user.getGradeName());//等级名称
     			viewUser.setMobile(new_user.getMobile());//绑定手机
     			viewUser.setRealNameAuthentication(new_user.isRealNameAuthentication());//是否实名认证
-    			viewUser.setAvatarPath(new_user.getAvatarPath());//头像路径
+    			viewUser.setAvatarPath(fileManage.fileServerAddress()+new_user.getAvatarPath());//头像路径
     			viewUser.setAvatarName(new_user.getAvatarName());//头像名称
     			
     			if(userRoleNameList != null && userRoleNameList.size() >0){
@@ -301,7 +300,7 @@ public class HomeManageAction {
       			other_user.setPoint(new_user.getPoint());//当前积分
       			other_user.setGradeId(new_user.getGradeId());//等级Id
       			other_user.setGradeName(new_user.getGradeName());//等级名称
-      			other_user.setAvatarPath(new_user.getAvatarPath());//头像路径
+      			other_user.setAvatarPath(fileManage.fileServerAddress()+new_user.getAvatarPath());//头像路径
       			other_user.setAvatarName(new_user.getAvatarName());//头像名称
       			if(userRoleNameList != null && userRoleNameList.size() >0){
       				other_user.setUserRoleNameList(userRoleNameList);//话题允许查看的角色名称集合
@@ -724,7 +723,7 @@ public class HomeManageAction {
 		viewUser.setPoint(user.getPoint());//当前积分
 		viewUser.setGradeId(user.getGradeId());//等级Id
 		viewUser.setGradeName(user.getGradeName());//将等级值设进等级参数里
-		viewUser.setAvatarPath(user.getAvatarPath());//头像路径
+		viewUser.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());//头像路径
 		viewUser.setAvatarName(user.getAvatarName());//头像名称
 		viewUser.setType(user.getType());
 		viewUser.setPlatformUserId(user.getPlatformUserId());
@@ -1176,8 +1175,8 @@ public class HomeManageAction {
 					boolean rememberMe = maxAge >0 ? true :false;
 					
 					
-					oAuthManage.addAccessToken(accessToken, new AccessUser(_user.getId(),_user.getUserName(),_user.getNickname(),_user.getAvatarPath(),_user.getAvatarName(),_user.getSecurityDigest(),rememberMe,accessUser.getOpenId()));
-					oAuthManage.addRefreshToken(refreshToken, new RefreshUser(accessToken,_user.getId(),_user.getUserName(),_user.getNickname(),_user.getAvatarPath(),_user.getAvatarName(),_user.getSecurityDigest(),rememberMe,accessUser.getOpenId()));
+					oAuthManage.addAccessToken(accessToken, new AccessUser(_user.getId(),_user.getUserName(),_user.getNickname(),fileManage.fileServerAddress()+_user.getAvatarPath(),_user.getAvatarName(),_user.getSecurityDigest(),rememberMe,accessUser.getOpenId()));
+					oAuthManage.addRefreshToken(refreshToken, new RefreshUser(accessToken,_user.getId(),_user.getUserName(),_user.getNickname(),fileManage.fileServerAddress()+_user.getAvatarPath(),_user.getAvatarName(),_user.getSecurityDigest(),rememberMe,accessUser.getOpenId()));
 					
 					//第三方openId
 					oAuthManage.addOpenId(accessUser.getOpenId(),refreshToken);
@@ -1186,7 +1185,7 @@ public class HomeManageAction {
 					WebUtil.addCookie(response, "cms_accessToken", accessToken, maxAge);
 					//将刷新令牌添加到Cookie
 					WebUtil.addCookie(response, "cms_refreshToken", refreshToken, maxAge);
-					AccessUserThreadLocal.set(new AccessUser(_user.getId(),_user.getUserName(),_user.getNickname(),_user.getAvatarPath(),_user.getAvatarName(),_user.getSecurityDigest(),rememberMe,accessUser.getOpenId()));
+					AccessUserThreadLocal.set(new AccessUser(_user.getId(),_user.getUserName(),_user.getNickname(),fileManage.fileServerAddress()+_user.getAvatarPath(),_user.getAvatarName(),_user.getSecurityDigest(),rememberMe,accessUser.getOpenId()));
 					
 					
 					
@@ -1425,7 +1424,7 @@ public class HomeManageAction {
 						fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
 
 						//生成100*100缩略图
-						fileManage.createImage(imgFile.getInputStream(),PathUtil.path()+File.separator+pathDir_100+newFileName,"png",100,100);
+						fileManage.createImage(imgFile.getInputStream(),pathDir_100+newFileName,"png",100,100);
 						
 					}
 				}else{//图片类型
@@ -1463,15 +1462,15 @@ public class HomeManageAction {
 								fileManage.writeFile(pathDir_100, newFileName,imgFile.getBytes());
 							}else{
 								//生成100*100缩略图
-								fileManage.createImage(imgFile.getInputStream(),PathUtil.path()+File.separator+pathDir_100+newFileName,suffix,100,100);
+								fileManage.createImage(imgFile.getInputStream(),pathDir_100+newFileName,suffix,100,100);
 								
 							}
 						}else{
 							//生成200*200缩略图
-							fileManage.createImage(imgFile.getInputStream(),PathUtil.path()+File.separator+pathDir+newFileName,suffix,x,y,width,height,200,200);
+							fileManage.createImage(imgFile.getInputStream(),pathDir+newFileName,suffix,x,y,width,height,200,200);
 
 							//生成100*100缩略图
-							fileManage.createImage(imgFile.getInputStream(),PathUtil.path()+File.separator+pathDir_100+newFileName,suffix,x,y,width,height,100,100);   
+							fileManage.createImage(imgFile.getInputStream(),pathDir_100+newFileName,suffix,x,y,width,height,100,100);   
 						}		
 						
 					}else{
@@ -2367,7 +2366,7 @@ public class HomeManageAction {
 						privateMessage.setFriendUserName(friend_user.getUserName());//私信对方用户名称
 						privateMessage.setFriendNickname(friend_user.getNickname());
 						if(friend_user.getAvatarName() != null && !"".equals(friend_user.getAvatarName().trim())){
-							privateMessage.setFriendAvatarPath(friend_user.getAvatarPath());//私信对方头像路径
+							privateMessage.setFriendAvatarPath(fileManage.fileServerAddress()+friend_user.getAvatarPath());//私信对方头像路径
 							privateMessage.setFriendAvatarName(friend_user.getAvatarName());//私信对方头像名称
 						}			
 					}
@@ -2376,7 +2375,7 @@ public class HomeManageAction {
 						privateMessage.setSenderUserName(sender_user.getUserName());//私信发送者用户名称
 						privateMessage.setSenderNickname(sender_user.getNickname());
 						if(sender_user.getAvatarName() != null && !"".equals(sender_user.getAvatarName().trim())){
-							privateMessage.setSenderAvatarPath(sender_user.getAvatarPath());//发送者头像路径
+							privateMessage.setSenderAvatarPath(fileManage.fileServerAddress()+sender_user.getAvatarPath());//发送者头像路径
 							privateMessage.setSenderAvatarName(sender_user.getAvatarName());//发送者头像名称
 						}
 					}
@@ -2491,7 +2490,7 @@ public class HomeManageAction {
 								privateMessage.setFriendUserName(friend_user.getUserName());//私信对方用户名称
 								privateMessage.setFriendNickname(friend_user.getNickname());
 								if(friend_user.getAvatarName() != null && !"".equals(friend_user.getAvatarName().trim())){
-									privateMessage.setFriendAvatarPath(friend_user.getAvatarPath());//私信对方头像路径
+									privateMessage.setFriendAvatarPath(fileManage.fileServerAddress()+friend_user.getAvatarPath());//私信对方头像路径
 									privateMessage.setFriendAvatarName(friend_user.getAvatarName());//私信对方头像名称
 								}
 							}
@@ -2500,7 +2499,7 @@ public class HomeManageAction {
 								privateMessage.setSenderUserName(sender_user.getUserName());//私信发送者用户名称
 								privateMessage.setSenderNickname(sender_user.getNickname());
 								if(sender_user.getAvatarName() != null && !"".equals(sender_user.getAvatarName().trim())){
-									privateMessage.setSenderAvatarPath(sender_user.getAvatarPath());//发送者头像路径
+									privateMessage.setSenderAvatarPath(fileManage.fileServerAddress()+sender_user.getAvatarPath());//发送者头像路径
 									privateMessage.setSenderAvatarName(sender_user.getAvatarName());//发送者头像名称
 								}
 							}
@@ -3363,7 +3362,7 @@ public class HomeManageAction {
 							remind.setSenderUserName(sender_user.getUserName());//发送者用户名称
 							remind.setSenderNickname(sender_user.getNickname());
 							if(sender_user.getAvatarName() != null && !"".equals(sender_user.getAvatarName().trim())){
-								remind.setSenderAvatarPath(sender_user.getAvatarPath());//发送者头像路径
+								remind.setSenderAvatarPath(fileManage.fileServerAddress()+sender_user.getAvatarPath());//发送者头像路径
 								remind.setSenderAvatarName(sender_user.getAvatarName());//发送者头像名称
 							}
 						}
@@ -3924,7 +3923,7 @@ public class HomeManageAction {
 					User user = userManage.query_cache_findUserByUserName(userDynamic.getUserName());
 					if(user != null){
 						userDynamic.setNickname(user.getNickname());
-						userDynamic.setAvatarPath(user.getAvatarPath());
+						userDynamic.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 						userDynamic.setAvatarName(user.getAvatarName());
 					}
 					
@@ -3949,10 +3948,15 @@ public class HomeManageAction {
 							String topicContentDigest_link = "";
 							String topicContentDigest_video = "";
 							
+							if(topicInfo.getContent() != null && !"".equals(topicInfo.getContent().trim())){
+								//处理富文本路径
+								topicInfo.setContent(fileManage.processRichTextFilePath(topicInfo.getContent(),"topic"));
+							}
 							//处理文件防盗链
 							if(topicInfo.getContent() != null && !"".equals(topicInfo.getContent().trim()) && systemSetting.getFileSecureLinkSecret() != null && !"".equals(systemSetting.getFileSecureLinkSecret().trim())){
+								List<String> serverAddressList = fileManage.fileServerAllAddress();
 								//解析上传的文件完整路径名称
-								Map<String,String> analysisFullFileNameMap = topicManage.query_cache_analysisFullFileName(topicInfo.getContent(),topicInfo.getId());
+								Map<String,String> analysisFullFileNameMap = topicManage.query_cache_analysisFullFileName(topicInfo.getContent(),topicInfo.getId(),serverAddressList);
 								if(analysisFullFileNameMap != null && analysisFullFileNameMap.size() >0){
 									
 									
@@ -3966,7 +3970,7 @@ public class HomeManageAction {
 									//生成处理'上传的文件完整路径名称'Id
 									String processFullFileNameId = topicManage.createProcessFullFileNameId(topicInfo.getId(),topicContentUpdateMark,newFullFileNameMap);
 									
-									topicInfo.setContent(topicManage.query_cache_processFullFileName(topicInfo.getContent(),"topic",newFullFileNameMap,processFullFileNameId));
+									topicInfo.setContent(topicManage.query_cache_processFullFileName(topicInfo.getContent(),"topic",newFullFileNameMap,processFullFileNameId,serverAddressList));
 									
 									topicContentDigest_link = cms.utils.MD5.getMD5(processFullFileNameId);
 								}
@@ -4114,6 +4118,10 @@ public class HomeManageAction {
 					if(userDynamic.getModule().equals(200)){//评论
 						Comment comment = commentManage.query_cache_findByCommentId(userDynamic.getCommentId());
 						if(comment != null){
+							if(comment.getContent() != null && !"".equals(comment.getContent().trim())){
+								//处理富文本路径
+								comment.setContent(fileManage.processRichTextFilePath(comment.getContent(),"comment"));
+							}
 							userDynamic.setCommentContent(comment.getContent());
 						}
 						
@@ -4121,6 +4129,10 @@ public class HomeManageAction {
 					if(userDynamic.getModule().equals(300)){//引用评论
 						Comment comment = commentManage.query_cache_findByCommentId(userDynamic.getCommentId());
 						if(comment != null){
+							if(comment.getContent() != null && !"".equals(comment.getContent().trim())){
+								//处理富文本路径
+								comment.setContent(fileManage.processRichTextFilePath(comment.getContent(),"comment"));
+							}
 							userDynamic.setCommentContent(comment.getContent());
 						}
 						Comment quoteComment = commentManage.query_cache_findByCommentId(userDynamic.getQuoteCommentId());
@@ -4139,6 +4151,10 @@ public class HomeManageAction {
 					if(userDynamic.getQuestionId() >0L){
 						Question questionInfo = questionManage.query_cache_findById(userDynamic.getQuestionId());//查询缓存
 						if(questionInfo != null){
+							if(questionInfo.getContent() != null && !"".equals(questionInfo.getContent().trim())){
+								//处理富文本路径
+								questionInfo.setContent(fileManage.processRichTextFilePath(questionInfo.getContent(),"question"));
+							}
 							userDynamic.setQuestionTitle(questionInfo.getTitle());
 							userDynamic.setQuestionViewTotal(questionInfo.getViewTotal());
 							userDynamic.setQuestionAnswerTotal(questionInfo.getAnswerTotal());
@@ -4149,6 +4165,10 @@ public class HomeManageAction {
 					if(userDynamic.getModule().equals(600)){//600.答案
 						Answer answer = answerManage.query_cache_findByAnswerId(userDynamic.getAnswerId());
 						if(answer != null){
+							if(answer.getContent() != null && !"".equals(answer.getContent().trim())){
+								//处理富文本路径
+								answer.setContent(fileManage.processRichTextFilePath(answer.getContent(),"answer"));
+							}
 							userDynamic.setAnswerContent(answer.getContent());
 						}
 						
@@ -4444,7 +4464,7 @@ public class HomeManageAction {
 				if(user != null){
 					follow.setFriendNickname(user.getNickname());
 					if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-						follow.setFriendAvatarPath(user.getAvatarPath());
+						follow.setFriendAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 						follow.setFriendAvatarName(user.getAvatarName());
 					}		
 				}
@@ -4498,7 +4518,7 @@ public class HomeManageAction {
 				if(user != null){
 					follower.setFriendNickname(user.getNickname());
 					if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-						follower.setFriendAvatarPath(user.getAvatarPath());
+						follower.setFriendAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 						follower.setFriendAvatarName(user.getAvatarName());
 					}		
 				}
@@ -5160,7 +5180,7 @@ public class HomeManageAction {
         			receiveRedEnvelope.setGiveNickname(user.getNickname());
         			receiveRedEnvelope.setGiveUserName(user.getUserName());
         			if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-        				receiveRedEnvelope.setGiveAvatarPath(user.getAvatarPath());
+        				receiveRedEnvelope.setGiveAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
         				receiveRedEnvelope.setGiveAvatarName(user.getAvatarName());
         			}		
         		}

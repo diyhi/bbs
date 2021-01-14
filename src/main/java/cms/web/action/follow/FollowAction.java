@@ -14,6 +14,7 @@ import cms.bean.user.User;
 import cms.service.follow.FollowService;
 import cms.service.setting.SettingService;
 import cms.service.user.UserService;
+import cms.web.action.fileSystem.FileManage;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -28,6 +29,8 @@ public class FollowAction {
 	@Resource FollowService followService;
 	@Resource SettingService settingService;
 	@Resource UserService userService;
+	@Resource FileManage fileManage;
+	
 	/**
 	 * 关注列表
 	 * @param model
@@ -58,7 +61,7 @@ public class FollowAction {
 					if(user != null){
 						follow.setFriendNickname(user.getNickname());
 						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-							follow.setFriendAvatarPath(user.getAvatarPath());
+							follow.setFriendAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 							follow.setFriendAvatarName(user.getAvatarName());
 						}		
 					}
@@ -102,7 +105,7 @@ public class FollowAction {
 					if(user != null){
 						follower.setFriendNickname(user.getNickname());
 						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-							follower.setFriendAvatarPath(user.getAvatarPath());
+							follower.setFriendAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 							follower.setFriendAvatarName(user.getAvatarName());
 						}		
 					}

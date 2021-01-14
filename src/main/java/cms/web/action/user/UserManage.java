@@ -84,10 +84,7 @@ public class UserManage {
 	}
 	
 	
-	
-	
-	
-	
+
 	/**
 	 * 查询用户状态
 	 * @param userName 用户名称

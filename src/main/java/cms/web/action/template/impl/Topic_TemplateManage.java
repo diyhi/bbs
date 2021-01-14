@@ -46,6 +46,7 @@ import cms.utils.UUIDUtil;
 import cms.utils.Verification;
 import cms.web.action.TextFilterManage;
 import cms.web.action.common.CaptchaManage;
+import cms.web.action.fileSystem.FileManage;
 import cms.web.action.lucene.TopicLuceneManage;
 import cms.web.action.mediaProcess.MediaProcessQueueManage;
 import cms.web.action.setting.SettingManage;
@@ -77,7 +78,7 @@ public class Topic_TemplateManage {
 	@Resource UserManage userManage;
 	@Resource UserGradeService userGradeService;
 	@Resource UserRoleManage userRoleManage;
-	
+	@Resource FileManage fileManage;
 	@Resource MediaProcessQueueManage mediaProcessQueueManage;
 	
 	/**
@@ -222,6 +223,9 @@ public class Topic_TemplateManage {
 			for(Topic topic : qr.getResultlist()){
 				//处理视频播放器标签
 				if(topic.getContent() != null && !"".equals(topic.getContent().trim())){
+					//处理富文本路径
+					topic.setContent(fileManage.processRichTextFilePath(topic.getContent(),"topic"));
+					
 					Integer topicContentUpdateMark = topicManage.query_cache_markUpdateTopicStatus(topic.getId(), Integer.parseInt(RandomStringUtils.randomNumeric(8)));
 					
 					//生成处理'视频播放器'Id
@@ -295,6 +299,9 @@ public class Topic_TemplateManage {
 					if(topic.getImage() != null && !"".equals(topic.getImage().trim())){
 						List<ImageInfo> imageInfoList = JsonUtils.toGenericObject(topic.getImage().trim(),new TypeReference< List<ImageInfo> >(){});
 						if(imageInfoList != null && imageInfoList.size() >0){
+							for(ImageInfo imageInfo : imageInfoList){
+								imageInfo.setPath(fileManage.fileServerAddress()+imageInfo.getPath());
+							}
 							topic.setImageInfoList(imageInfoList);
 						}
 					}
@@ -328,7 +335,7 @@ public class Topic_TemplateManage {
 					User user = userManage.query_cache_findUserByUserName(topic.getUserName());
 					if(user != null){
 						topic.setNickname(user.getNickname());
-						topic.setAvatarPath(user.getAvatarPath());
+						topic.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 						topic.setAvatarName(user.getAvatarName());
 					}
 					
@@ -507,7 +514,7 @@ public class Topic_TemplateManage {
 					user = userManage.query_cache_findUserByUserName(topic.getUserName());
 					if(user != null){
 						topic.setNickname(user.getNickname());
-						topic.setAvatarPath(user.getAvatarPath());
+						topic.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 						topic.setAvatarName(user.getAvatarName());
 						
 						List<String> userRoleNameList = userRoleManage.queryUserRoleName(user.getUserName());
@@ -529,17 +536,24 @@ public class Topic_TemplateManage {
 				//话题内容摘要MD5
 				String topicContentDigest_link = "";
 				String topicContentDigest_video = "";
+				if(topic.getContent() != null && !"".equals(topic.getContent().trim())){
+					//处理富文本路径
+					topic.setContent(fileManage.processRichTextFilePath(topic.getContent(),"topic"));
+				}
 				
 				//处理文件防盗链
 				if(topic.getContent() != null && !"".equals(topic.getContent().trim()) && systemSetting.getFileSecureLinkSecret() != null && !"".equals(systemSetting.getFileSecureLinkSecret().trim())){
+					List<String> serverAddressList = fileManage.fileServerAllAddress();
+					
+					
 					//解析上传的文件完整路径名称
-					Map<String,String> analysisFullFileNameMap = topicManage.query_cache_analysisFullFileName(topic.getContent(),topic.getId());
+					Map<String,String> analysisFullFileNameMap = topicManage.query_cache_analysisFullFileName(topic.getContent(),topic.getId(),serverAddressList);
 					if(analysisFullFileNameMap != null && analysisFullFileNameMap.size() >0){
 						
 						
 						Map<String,String> newFullFileNameMap = new HashMap<String,String>();//新的完整路径名称 key: 完整路径名称 value: 重定向接口
 						for (Map.Entry<String,String> entry : analysisFullFileNameMap.entrySet()) {
-
+							
 							newFullFileNameMap.put(entry.getKey(), SecureLink.createDownloadRedirectLink(entry.getKey(),entry.getValue(),topic.getTagId(),systemSetting.getFileSecureLinkSecret()));
 						}
 						
@@ -547,14 +561,14 @@ public class Topic_TemplateManage {
 						//生成处理'上传的文件完整路径名称'Id
 						String processFullFileNameId = topicManage.createProcessFullFileNameId(topicId,topicContentUpdateMark,newFullFileNameMap);
 						
-						topic.setContent(topicManage.query_cache_processFullFileName(topic.getContent(),"topic",newFullFileNameMap,processFullFileNameId));
+						topic.setContent(topicManage.query_cache_processFullFileName(topic.getContent(),"topic",newFullFileNameMap,processFullFileNameId,serverAddressList));
 						
 						topicContentDigest_link = cms.utils.MD5.getMD5(processFullFileNameId);
 					}
 					
 					
 				}
-				
+			
 				//处理视频播放器标签
 				if(topic.getContent() != null && !"".equals(topic.getContent().trim())){
 					Integer topicContentUpdateMark = topicManage.query_cache_markUpdateTopicStatus(topicId, Integer.parseInt(RandomStringUtils.randomNumeric(8)));
@@ -568,7 +582,6 @@ public class Topic_TemplateManage {
 					
 					topicContentDigest_video = cms.utils.MD5.getMD5(processVideoPlayerId);
 				}
-
 				
 				//处理隐藏标签
 				if(topic.getContent() != null && !"".equals(topic.getContent().trim())){
@@ -744,6 +757,8 @@ public class Topic_TemplateManage {
 		value.put("availableTag", topicManage.availableTag());//话题编辑器允许使用标签
 		List<UserGrade> userGradeList = userGradeService.findAllGrade_cache();
 		value.put("userGradeList", JsonUtils.toJSONString(userGradeList));
+		
+		value.put("fileSystem", fileManage.getFileSystem());
 		return value;
 	}
 	
@@ -788,6 +803,12 @@ public class Topic_TemplateManage {
 			Topic topic = topicManage.queryTopicCache(topicId);//查询缓存
 			if(topic != null && topic.getStatus() <100 && topic.getUserName().equals(accessUser.getUserName())){
 				topic.setIpAddress(null);//IP地址不显示
+				
+				if(topic.getContent() != null && !"".equals(topic.getContent().trim())){
+					//处理富文本路径
+					topic.setContent(fileManage.processRichTextFilePath(topic.getContent(),"topic"));
+				}
+				
 				List<Tag> tagList = tagService.findAllTag_cache();
 				if(tagList != null && tagList.size() >0){
 					for(Tag tag :tagList){
@@ -823,6 +844,7 @@ public class Topic_TemplateManage {
 		value.put("availableTag", topicManage.availableTag());//话题编辑器允许使用标签
 		List<UserGrade> userGradeList = userGradeService.findAllGrade_cache();
 		value.put("userGradeList", JsonUtils.toJSONString(userGradeList));
+		value.put("fileSystem", fileManage.getFileSystem());
 		return value;
 	}
 	
@@ -990,12 +1012,16 @@ public class Topic_TemplateManage {
 		Map<String,List<String>> userRoleNameMap = new HashMap<String,List<String>>();//用户角色名称 key:用户名称Id 角色名称集合
 		if(commentList != null && commentList.size() >0){
 			for(Comment comment : commentList){
+				if(comment.getContent() != null && !"".equals(comment.getContent().trim())){
+					//处理富文本路径
+					comment.setContent(fileManage.processRichTextFilePath(comment.getContent(),"comment"));
+				}
 				comment.setIpAddress(null);//IP地址不显示
 				if(comment.getIsStaff() == false){//会员
 					User user = userManage.query_cache_findUserByUserName(comment.getUserName());
 					if(user != null){
 						comment.setNickname(user.getNickname());
-						comment.setAvatarPath(user.getAvatarPath());
+						comment.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 						comment.setAvatarName(user.getAvatarName());
 						userRoleNameMap.put(comment.getUserName(), null);
 					}
@@ -1062,7 +1088,7 @@ public class Topic_TemplateManage {
 							if(quote.getIsStaff() == false){//会员
 								User user = userManage.query_cache_findUserByUserName(quote.getUserName());
 								quote.setNickname(user.getNickname());
-								quote.setAvatarPath(user.getAvatarPath());
+								quote.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 								quote.setAvatarName(user.getAvatarName());
 
 							}
@@ -1095,7 +1121,7 @@ public class Topic_TemplateManage {
 								User user = userManage.query_cache_findUserByUserName(reply.getUserName());
 								if(user != null){
 									reply.setNickname(user.getNickname());
-									reply.setAvatarPath(user.getAvatarPath());
+									reply.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 									reply.setAvatarName(user.getAvatarName());
 									
 									List<String> roleNameList = userRoleManage.queryUserRoleName(reply.getUserName());
@@ -1150,6 +1176,7 @@ public class Topic_TemplateManage {
 		}
 		
 		value.put("availableTag", commentManage.availableTag());//评论编辑器允许使用标签
+		value.put("fileSystem", fileManage.getFileSystem());
 		return value;
 	}
 	
@@ -1194,7 +1221,9 @@ public class Topic_TemplateManage {
 		
 		if(commentId != null && commentId >0L){
 			Comment comment = commentService.findByCommentId(commentId);
-			value.put("quoteContent", textFilterManage.filterText(textFilterManage.specifyHtmlTagToText(comment.getContent())));//引用内容
+			if(comment != null && comment.getStatus() <100){
+				value.put("quoteContent", textFilterManage.filterText(textFilterManage.specifyHtmlTagToText(comment.getContent())));//引用内容
+			}
 		}
 		SystemSetting systemSetting = settingService.findSystemSetting_cache();
 		
@@ -1205,6 +1234,7 @@ public class Topic_TemplateManage {
 			value.put("allowComment",false);//不允许提交评论
 		}
 		value.put("availableTag", commentManage.availableTag());//评论编辑器允许使用标签
+		value.put("fileSystem", fileManage.getFileSystem());
 		return value;
 	}
 	
@@ -1249,7 +1279,11 @@ public class Topic_TemplateManage {
 			Comment comment = commentManage.query_cache_findByCommentId(commentId);//查询缓存
 			if(comment != null && comment.getStatus() <100 && comment.getUserName().equals(accessUser.getUserName())){
 				comment.setIpAddress(null);//IP地址不显示
-
+				if(comment.getContent() != null && !"".equals(comment.getContent().trim())){
+					//处理富文本路径
+					comment.setContent(fileManage.processRichTextFilePath(comment.getContent(),"comment"));
+				}
+				
 				value.put("comment",comment);
 				
 				
@@ -1266,6 +1300,7 @@ public class Topic_TemplateManage {
 			value.put("allowComment",true);//允许提交评论
 		}
 		value.put("availableTag", commentManage.availableTag());//评论编辑器允许使用标签
+		value.put("fileSystem", fileManage.getFileSystem());
 		return value;
 	}
 	

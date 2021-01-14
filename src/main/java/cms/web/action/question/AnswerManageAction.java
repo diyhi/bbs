@@ -174,6 +174,10 @@ public class AnswerManageAction {
 		model.addAttribute("availableTag",answerManage.availableTag());
 		Answer answer = answerService.findByAnswerId(answerId);
 		if(answer != null){
+			if(answer.getContent() != null && !"".equals(answer.getContent().trim())){
+				//处理富文本路径
+				answer.setContent(fileManage.processRichTextFilePath(answer.getContent(),"answer"));
+			}
 			model.addAttribute("answer", answer);
 			String username = "";
 			Object obj  =  SecurityContextHolder.getContext().getAuthentication().getPrincipal(); 
@@ -181,6 +185,7 @@ public class AnswerManageAction {
 				username =((UserDetails)obj).getUsername();	
 			}
 			model.addAttribute("userName", username);
+			model.addAttribute("fileSystem", fileManage.getFileSystem());
 		}
 		return "jsp/question/edit_answer";
 	}
@@ -491,69 +496,130 @@ public class AnswerManageAction {
 	 * @param topicId 话题Id
 	 * @param userName 用户名称
 	 * @param isStaff 是否是员工   true:员工   false:会员
+	 * @param fileName 文件名称 预签名时有值
 	 */
 	@RequestMapping(params="method=uploadImage",method=RequestMethod.POST)
 	@ResponseBody//方式来做ajax,直接返回字符串
-	public String uploadImage(ModelMap model,Long questionId,String userName, Boolean isStaff,
+	public String uploadImage(ModelMap model,Long questionId,String userName, Boolean isStaff,String fileName,
 			MultipartFile imgFile, HttpServletResponse response) throws Exception {
 		
 		String number = questionManage.generateFileNumber(userName, isStaff);
 		
 		Map<String,Object> returnJson = new HashMap<String,Object>();
+		String errorMessage = "";
 		
-		//文件上传
-		if(imgFile != null && !imgFile.isEmpty() && questionId != null && questionId >0L && number != null && !"".equals(number.trim())){
-			EditorTag editorSiteObject = settingManage.readAnswerEditorTag();
-			if(editorSiteObject != null){
-				if(editorSiteObject.isImage()){//允许上传图片
-					//当前图片文件名称
-					String fileName = imgFile.getOriginalFilename();
-					//文件大小
-					Long size = imgFile.getSize();
-					//取得文件后缀
-					String suffix = fileName.substring(fileName.lastIndexOf('.')+1).toLowerCase();
-					
-					
-					//允许上传图片格式
-					List<String> imageFormat = editorSiteObject.getImageFormat();
-					//允许上传图片大小
-					long imageSize = editorSiteObject.getImageSize();
+		int fileSystem = fileManage.getFileSystem();
+		if(fileSystem ==10 || fileSystem == 20 || fileSystem == 30){//10.SeaweedFS 20.MinIO 30.阿里云OSS
+			if(fileName != null && !"".equals(fileName.trim()) && questionId != null && questionId >0L && number != null && !"".equals(number.trim())){
+				//取得文件后缀
+				String suffix = FileUtil.getExtension(fileName.trim()).toLowerCase();
+				EditorTag editorSiteObject = settingManage.readAnswerEditorTag();
+				if(editorSiteObject != null){
+					if(editorSiteObject.isImage()){//允许上传图片
+						//允许上传图片格式
+						List<String> imageFormat = editorSiteObject.getImageFormat();
+						//允许上传图片大小
+						long imageSize = editorSiteObject.getImageSize();
 
-					//验证文件类型
-					boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),imageFormat);
-					
-					if(authentication && size/1024 <= imageSize){
+						//验证文件类型
+						boolean authentication = FileUtil.validateFileSuffix(fileName.trim(),imageFormat);
 						
-						//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
-						String pathDir = "file"+File.separator+"answer"+File.separator + questionId + File.separator;
-						//文件锁目录
-						String lockPathDir = "file"+File.separator+"answer"+File.separator+"lock"+File.separator;
-						//构建文件名称
-						String newFileName = UUIDUtil.getUUID32()+ number+"." + suffix;
+						if(authentication){
+							
+							//文件锁目录
+							String lockPathDir = "file"+File.separator+"answer"+File.separator+"lock"+File.separator;
+							//构建文件名称
+							String newFileName = UUIDUtil.getUUID32()+ number+"." + suffix;
+							//生成锁文件
+							fileManage.addLock(lockPathDir,questionId+"_"+newFileName);
+							
+							String presigne = fileManage.createPresigned("file/answer/"+questionId+"/"+newFileName,imageSize);//创建预签名
+							
+							//上传成功
+							returnJson.put("error", 0);//0成功  1错误
+							returnJson.put("url", presigne);
+							
+							return JsonUtils.toJSONString(returnJson);
+							
+						}else{
+							errorMessage = "当前文件类型不允许上传";
+						}
 						
-						//生成文件保存目录
-						fileManage.createFolder(pathDir);
-						//生成锁文件保存目录
-						fileManage.createFolder(lockPathDir);
-						//生成锁文件
-						fileManage.addLock(lockPathDir,questionId+"_"+newFileName);
-						//保存文件
-						fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
-		
-						//上传成功
-						returnJson.put("error", 0);//0成功  1错误
-						returnJson.put("url", "file/answer/"+questionId+"/"+newFileName);
 						
-						return JsonUtils.toJSONString(returnJson);
+					}else{
+						errorMessage = "不允许上传图片";
 					}
 				}
+			}else{
+				errorMessage = "参数错误";
 			}
-			
+		
+		}else{//0.本地系统
+			//文件上传
+			if(imgFile != null && !imgFile.isEmpty() && questionId != null && questionId >0L && number != null && !"".equals(number.trim())){
+				EditorTag editorSiteObject = settingManage.readAnswerEditorTag();
+				if(editorSiteObject != null){
+					if(editorSiteObject.isImage()){//允许上传图片
+						//当前图片文件名称
+						String sourceFileName = imgFile.getOriginalFilename();
+						//文件大小
+						Long size = imgFile.getSize();
+						//取得文件后缀
+						String suffix = sourceFileName.substring(sourceFileName.lastIndexOf('.')+1).toLowerCase();
+						
+						
+						//允许上传图片格式
+						List<String> imageFormat = editorSiteObject.getImageFormat();
+						//允许上传图片大小
+						long imageSize = editorSiteObject.getImageSize();
+
+						//验证文件类型
+						boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),imageFormat);
+						
+						if(authentication){
+							if(size/1024 <= imageSize){
+								//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
+								String pathDir = "file"+File.separator+"answer"+File.separator + questionId + File.separator;
+								//文件锁目录
+								String lockPathDir = "file"+File.separator+"answer"+File.separator+"lock"+File.separator;
+								//构建文件名称
+								String newFileName = UUIDUtil.getUUID32()+ number+"." + suffix;
+								
+								//生成文件保存目录
+								fileManage.createFolder(pathDir);
+								//生成锁文件保存目录
+								fileManage.createFolder(lockPathDir);
+								//生成锁文件
+								fileManage.addLock(lockPathDir,questionId+"_"+newFileName);
+								//保存文件
+								fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
+				
+								//上传成功
+								returnJson.put("error", 0);//0成功  1错误
+								returnJson.put("url", fileManage.fileServerAddress()+"file/answer/"+questionId+"/"+newFileName);
+								
+								return JsonUtils.toJSONString(returnJson);
+							}else{
+								errorMessage = "图片大小超出"+size/1024+"K";
+							}
+						}else{
+							errorMessage = "不允许上传的图片类型";
+						}
+					}else{
+						errorMessage = "不允许上传图片";
+					}
+				}
+				
+			}else{
+				errorMessage = "参数错误";
+			}
 		}
+		
+		
 		
 		//上传失败
 		returnJson.put("error", 1);
-		returnJson.put("message", "上传失败");
+		returnJson.put("message", errorMessage);
 		return JsonUtils.toJSONString(returnJson);
 	}
 	

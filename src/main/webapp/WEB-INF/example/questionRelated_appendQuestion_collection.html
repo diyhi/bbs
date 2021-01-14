@@ -24,6 +24,9 @@
 		<tr> 
 			<td>键参数：allowQuestion<br>值内容说明：是否允许提交问题<br>值类型：boolean</td>
 		</tr>
+		<tr> 
+			<td>键参数：fileSystem<br>值内容说明：文件系统 0.本地 10.SeaweedFS 20.MinIO 30.阿里云OSS<br>值类型：int</td>
+		</tr>
 	</tbody> 
 </table>
 
@@ -125,7 +128,8 @@
 			<td>参数</td> 
 			<td colspan="2">
 				file : 上传文件接收字段<br>
-				dir : 文件上传类型 分别为image、file 
+				dir : 文件上传类型 分别为image、file <br>
+				fileName : 文件名称 预签名时必须有值
 			</td>
 		</tr>
 		<tr> 

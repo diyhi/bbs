@@ -164,7 +164,10 @@ public class CommentManageAction {
 		model.addAttribute("availableTag",commentManage.availableTag());
 		Comment comment = commentService.findByCommentId(commentId);
 		if(comment != null){
-			
+			if(comment.getContent() != null && !"".equals(comment.getContent().trim())){
+				//处理富文本路径
+				comment.setContent(fileManage.processRichTextFilePath(comment.getContent(),"comment"));
+			}
 			if(comment.getQuote() != null && !"".equals(comment.getQuote().trim())){
 				//引用
 				List<Quote> customQuoteList = JsonUtils.toGenericObject(comment.getQuote(), new TypeReference< List<Quote> >(){});
@@ -177,6 +180,7 @@ public class CommentManageAction {
 				username =((UserDetails)obj).getUsername();	
 			}
 			model.addAttribute("userName", username);
+			model.addAttribute("fileSystem", fileManage.getFileSystem());
 		}
 		return "jsp/topic/edit_comment";
 	}
@@ -330,52 +334,112 @@ public class CommentManageAction {
 		if(commentId != null && commentId >0L){
 			Comment comment = commentService.findByCommentId(commentId);
 			if(comment != null){
-				
-				int i = commentService.deleteComment(comment.getTopicId(),commentId);
-				if(i >0){
-					//根据评论Id删除用户动态(评论下的回复也同时删除)
-					userService.deleteUserDynamicByCommentId(comment.getTopicId(),commentId);
+				if(comment.getStatus() <100){//标记删除
+					Integer constant = 100000;
+					int i = commentService.markDeleteComment(comment.getId(),constant);
 					
+					if(i >0){
+						User user = userManage.query_cache_findUserByUserName(comment.getUserName());
+						if(user != null){
+							//修改评论状态
+							userService.updateUserDynamicCommentStatus(user.getId(),comment.getUserName(),comment.getTopicId(),comment.getId(),comment.getStatus()+constant);
+						}
+						//删除缓存
+						commentManage.delete_cache_findByCommentId(comment.getId());
+						return "1";	
+					}
 					
-					//删除缓存
-					commentManage.delete_cache_findByCommentId(comment.getId());
-					
-					String fileNumber = topicManage.generateFileNumber(comment.getUserName(), comment.getIsStaff());
-					
-					//删除图片
-					List<String> imageNameList = textFilterManage.readImageName(comment.getContent(),"comment");
-					if(imageNameList != null && imageNameList.size() >0){
-						for(String imagePath : imageNameList){
-							//如果验证不是当前用户上传的文件，则不删除锁
-							 if(!topicManage.getFileNumber(FileUtil.getBaseName(imagePath.trim())).equals(fileNumber)){
-								 continue;
-							 }
-							
-							
-							//替换路径中的..号
-							imagePath = FileUtil.toRelativePath(imagePath);
-							//替换路径分割符
-							imagePath = StringUtils.replace(imagePath, "/", File.separator);
-							
-							Boolean state = fileManage.deleteFile(imagePath);
-							
-							if(state != null && state == false){	
-								//替换指定的字符，只替换第一次出现的
-								imagePath = StringUtils.replaceOnce(imagePath, "file"+File.separator+"comment"+File.separator, "");
-								imagePath = StringUtils.replace(imagePath, File.separator, "_");//替换所有出现过的字符
+				}else{//物理删除
+					int i = commentService.deleteComment(comment.getTopicId(),commentId);
+					if(i >0){
+						//根据评论Id删除用户动态(评论下的回复也同时删除)
+						userService.deleteUserDynamicByCommentId(comment.getTopicId(),commentId);
+						
+						
+						//删除缓存
+						commentManage.delete_cache_findByCommentId(comment.getId());
+						
+						String fileNumber = topicManage.generateFileNumber(comment.getUserName(), comment.getIsStaff());
+						
+						//删除图片
+						List<String> imageNameList = textFilterManage.readImageName(comment.getContent(),"comment");
+						if(imageNameList != null && imageNameList.size() >0){
+							for(String imagePath : imageNameList){
+								//如果验证不是当前用户上传的文件，则不删除锁
+								 if(!topicManage.getFileNumber(FileUtil.getBaseName(imagePath.trim())).equals(fileNumber)){
+									 continue;
+								 }
 								
-								//创建删除失败文件
-								fileManage.failedStateFile("file"+File.separator+"comment"+File.separator+"lock"+File.separator+imagePath);
-							
+								
+								//替换路径中的..号
+								imagePath = FileUtil.toRelativePath(imagePath);
+								//替换路径分割符
+								imagePath = StringUtils.replace(imagePath, "/", File.separator);
+								
+								Boolean state = fileManage.deleteFile(imagePath);
+								
+								if(state != null && state == false){	
+									//替换指定的字符，只替换第一次出现的
+									imagePath = StringUtils.replaceOnce(imagePath, "file"+File.separator+"comment"+File.separator, "");
+									imagePath = StringUtils.replace(imagePath, File.separator, "_");//替换所有出现过的字符
+									
+									//创建删除失败文件
+									fileManage.failedStateFile("file"+File.separator+"comment"+File.separator+"lock"+File.separator+imagePath);
+								
+								}
 							}
 						}
+						return "1";
 					}
-					return "1";
+					
 				}
 			}
 		}
 		return "0";
 	}
+	/**
+	 * 评论  恢复
+	 * @param model
+	 * @param commentId 评论Id
+	 */
+	@RequestMapping(params="method=recoveryComment",method=RequestMethod.POST)
+	@ResponseBody//方式来做ajax,直接返回字符串
+	public String recoveryComment(ModelMap model,Long commentId,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		if(commentId != null && commentId >0L){
+			Comment comment = commentService.findByCommentId(commentId);
+			if(comment != null && comment.getStatus() >100){
+				int originalState = this.parseInitialValue(comment.getStatus());
+				int i = commentService.updateCommentStatus(commentId, originalState);
+				if(i >0){
+					User user = userManage.query_cache_findUserByUserName(comment.getUserName());
+					if(user != null){
+						//修改评论状态
+						userService.updateUserDynamicCommentStatus(user.getId(),comment.getUserName(),comment.getTopicId(),comment.getId(),originalState);
+					}
+				}
+				
+				commentManage.delete_cache_findByCommentId(commentId);
+			}
+	
+			return "1";
+		}
+		return "0";
+	}
+	
+	/**
+	 * 解析初始值
+	 * @param status 状态
+	 * @return
+	 */
+	public int parseInitialValue(Integer status){
+		int tens  = status%100/10;//十位%100/10
+        int units  = status%10;//个位直接%10
+		
+        return Integer.parseInt(tens+""+units);
+	}
+	
+	
 	
 	/**
 	 * 评论  图片上传
@@ -385,69 +449,127 @@ public class CommentManageAction {
 	 * @param topicId 话题Id
 	 * @param userName 用户名称
 	 * @param isStaff 是否是员工   true:员工   false:会员
+	 * @param fileName 文件名称 预签名时有值
 	 */
 	@RequestMapping(params="method=uploadImage",method=RequestMethod.POST)
 	@ResponseBody//方式来做ajax,直接返回字符串
-	public String uploadImage(ModelMap model,Long topicId,String userName, Boolean isStaff,
+	public String uploadImage(ModelMap model,Long topicId,String userName, Boolean isStaff,String fileName,
 			MultipartFile imgFile, HttpServletResponse response) throws Exception {
 		
 		String number = topicManage.generateFileNumber(userName, isStaff);
 		
 		Map<String,Object> returnJson = new HashMap<String,Object>();
+		String errorMessage = "";
 		
-		//文件上传
-		if(imgFile != null && !imgFile.isEmpty() && topicId != null && topicId >0L && number != null && !"".equals(number.trim())){
-			EditorTag editorSiteObject = settingManage.readEditorTag();
-			if(editorSiteObject != null){
-				if(editorSiteObject.isImage()){//允许上传图片
-					//当前图片文件名称
-					String fileName = imgFile.getOriginalFilename();
-					//文件大小
-					Long size = imgFile.getSize();
-					//取得文件后缀
-					String suffix = fileName.substring(fileName.lastIndexOf('.')+1).toLowerCase();
-					
-					
-					//允许上传图片格式
-					List<String> imageFormat = editorSiteObject.getImageFormat();
-					//允许上传图片大小
-					long imageSize = editorSiteObject.getImageSize();
+		
+		int fileSystem = fileManage.getFileSystem();
+		if(fileSystem ==10 || fileSystem == 20 || fileSystem == 30){//10.SeaweedFS 20.MinIO 30.阿里云OSS
+			if(fileName != null && !"".equals(fileName.trim()) && topicId != null && topicId >0L && number != null && !"".equals(number.trim())){
+				//取得文件后缀
+				String suffix = FileUtil.getExtension(fileName.trim()).toLowerCase();
+				EditorTag editorSiteObject = settingManage.readEditorTag();
+				if(editorSiteObject != null){
+					if(editorSiteObject.isImage()){//允许上传图片
+						//允许上传图片格式
+						List<String> imageFormat = editorSiteObject.getImageFormat();
+						//允许上传图片大小
+						long imageSize = editorSiteObject.getImageSize();
 
-					//验证文件类型
-					boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),imageFormat);
-					
-					if(authentication && size/1024 <= imageSize){
+						//验证文件类型
+						boolean authentication = FileUtil.validateFileSuffix(fileName.trim(),imageFormat);
 						
-						//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
-						String pathDir = "file"+File.separator+"comment"+File.separator + topicId + File.separator;
-						//文件锁目录
-						String lockPathDir = "file"+File.separator+"comment"+File.separator+"lock"+File.separator;
-						//构建文件名称
-						String newFileName = UUIDUtil.getUUID32()+ number+"." + suffix;
+						if(authentication){
+							
+							//文件锁目录
+							String lockPathDir = "file"+File.separator+"comment"+File.separator+"lock"+File.separator;
+							//构建文件名称
+							String newFileName = UUIDUtil.getUUID32()+ number+"." + suffix;
+							//生成锁文件
+							fileManage.addLock(lockPathDir,topicId+"_"+newFileName);
+							
+							String presigne = fileManage.createPresigned("file/comment/"+topicId+"/"+newFileName,imageSize);//创建预签名
+							
+							//上传成功
+							returnJson.put("error", 0);//0成功  1错误
+							returnJson.put("url", presigne);
+							
+							return JsonUtils.toJSONString(returnJson);
+							
+						}
 						
-						//生成文件保存目录
-						fileManage.createFolder(pathDir);
-						//生成锁文件保存目录
-						fileManage.createFolder(lockPathDir);
-						//生成锁文件
-						fileManage.addLock(lockPathDir,topicId+"_"+newFileName);
-						//保存文件
-						fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
-		
-						//上传成功
-						returnJson.put("error", 0);//0成功  1错误
-						returnJson.put("url", "file/comment/"+topicId+"/"+newFileName);
 						
-						return JsonUtils.toJSONString(returnJson);
+					}else{
+						errorMessage = "不允许上传图片";
 					}
 				}
+			}else{
+				errorMessage = "参数错误";
 			}
-			
+		}else{//0.本地系统
+			//文件上传
+			if(imgFile != null && !imgFile.isEmpty() && topicId != null && topicId >0L && number != null && !"".equals(number.trim())){
+				EditorTag editorSiteObject = settingManage.readEditorTag();
+				if(editorSiteObject != null){
+					if(editorSiteObject.isImage()){//允许上传图片
+						//当前图片文件名称
+						String sourceFileName = imgFile.getOriginalFilename();
+						//文件大小
+						Long size = imgFile.getSize();
+						//取得文件后缀
+						String suffix = sourceFileName.substring(sourceFileName.lastIndexOf('.')+1).toLowerCase();
+						
+						
+						//允许上传图片格式
+						List<String> imageFormat = editorSiteObject.getImageFormat();
+						//允许上传图片大小
+						long imageSize = editorSiteObject.getImageSize();
+
+						//验证文件类型
+						boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),imageFormat);
+						
+						if(authentication){
+							if(size/1024 <= imageSize){
+								
+								//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
+								String pathDir = "file"+File.separator+"comment"+File.separator + topicId + File.separator;
+								//文件锁目录
+								String lockPathDir = "file"+File.separator+"comment"+File.separator+"lock"+File.separator;
+								//构建文件名称
+								String newFileName = UUIDUtil.getUUID32()+ number+"." + suffix;
+								
+								//生成文件保存目录
+								fileManage.createFolder(pathDir);
+								//生成锁文件保存目录
+								fileManage.createFolder(lockPathDir);
+								//生成锁文件
+								fileManage.addLock(lockPathDir,topicId+"_"+newFileName);
+								//保存文件
+								fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
+				
+								//上传成功
+								returnJson.put("error", 0);//0成功  1错误
+								returnJson.put("url", fileManage.fileServerAddress()+"file/comment/"+topicId+"/"+newFileName);
+								
+								return JsonUtils.toJSONString(returnJson);
+							}else{
+								errorMessage = "图片大小超出"+size/1024+"K";
+							}
+						}else{
+							errorMessage = "不允许上传的图片类型";
+						}
+					}else{
+						errorMessage = "不允许上传图片";
+					}
+				}
+				
+			}else{
+				errorMessage = "参数错误";
+			}
 		}
 		
 		//上传失败
 		returnJson.put("error", 1);
-		returnJson.put("message", "上传失败");
+		returnJson.put("message", errorMessage);
 		return JsonUtils.toJSONString(returnJson);
 	}
 	/**
@@ -461,7 +583,10 @@ public class CommentManageAction {
 		model.addAttribute("availableTag", commentManage.availableTag());
 		Comment comment = commentService.findByCommentId(commentId);
 		if(comment != null){
-			
+			if(comment.getContent() != null && !"".equals(comment.getContent().trim())){
+				//处理富文本路径
+				comment.setContent(fileManage.processRichTextFilePath(comment.getContent(),"comment"));
+			}
 			if(comment.getQuote() != null && !"".equals(comment.getQuote().trim())){
 				//引用
 				List<Quote> customQuoteList = JsonUtils.toGenericObject(comment.getQuote(), new TypeReference< List<Quote> >(){});
@@ -476,6 +601,7 @@ public class CommentManageAction {
 			username =((UserDetails)obj).getUsername();	
 		}
 		model.addAttribute("userName", username);
+		model.addAttribute("fileSystem", fileManage.getFileSystem());
 		return "jsp/topic/add_quote";
 	 }
 	/**
@@ -801,7 +927,6 @@ public class CommentManageAction {
 	}
 	/**
 	 * 回复  删除
-	 * @param pageForm
 	 * @param model
 	 * @param replyId 回复Id
 	 */
@@ -811,23 +936,73 @@ public class CommentManageAction {
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		if(replyId != null && replyId >0){
 			
-			Reply reply = commentManage.query_cache_findReplyByReplyId(replyId);
-			int i = commentService.deleteReply(replyId);
-			if(i >0 && reply != null){
-				User user = userManage.query_cache_findUserByUserName(reply.getUserName());
-				if(user != null){
-					userService.deleteUserDynamicByReplyId(user.getId(),reply.getTopicId(),reply.getCommentId(),replyId);
-				}
-			}
+			Reply reply = commentService.findReplyByReplyId(replyId);
+			if(reply != null){
+				if(reply.getStatus() <100){//标记删除
+					Integer constant = 100000;
+					int i = commentService.markDeleteReply(reply.getId(),constant);
+					
+					
+					if(i >0){
+						User user = userManage.query_cache_findUserByUserName(reply.getUserName());
+						if(user != null){
+							//修改回复状态
+							userService.updateUserDynamicReplyStatus(user.getId(),reply.getUserName(),reply.getTopicId(),reply.getCommentId(),reply.getId(),reply.getStatus()+constant);
+						}
+						//删除缓存
+						commentManage.delete_cache_findReplyByReplyId(reply.getId());
+						return "1";
+					}
+				}else{//物理删除
+					int i = commentService.deleteReply(replyId);
+					if(i >0 && reply != null){
+						User user = userManage.query_cache_findUserByUserName(reply.getUserName());
+						if(user != null){
+							userService.deleteUserDynamicByReplyId(user.getId(),reply.getTopicId(),reply.getCommentId(),replyId);
+						}
+					}
 
-			//删除缓存
-			commentManage.delete_cache_findReplyByReplyId(replyId);
-			if(i >0){
-				return "1";
+					//删除缓存
+					commentManage.delete_cache_findReplyByReplyId(replyId);
+					if(i >0){
+						return "1";
+					}
+				}
 			}
 		}
 		return "0";
 	}
+	
+	/**
+	 * 回复  恢复
+	 * @param model
+	 * @param replyId 回复Id
+	 */
+	@RequestMapping(params="method=recoveryReply",method=RequestMethod.POST)
+	@ResponseBody//方式来做ajax,直接返回字符串
+	public String recoveryReply(ModelMap model,Long replyId,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		if(replyId != null && replyId >0){
+			Reply reply = commentService.findReplyByReplyId(replyId);
+			if(reply != null && reply.getStatus() >100){
+				int originalState = this.parseInitialValue(reply.getStatus());
+				int i = commentService.updateReplyStatus(replyId, originalState);
+				
+				User user = userManage.query_cache_findUserByUserName(reply.getUserName());
+				if(i >0 && user != null){
+					//修改回复状态
+					userService.updateUserDynamicReplyStatus(user.getId(),reply.getUserName(),reply.getTopicId(),reply.getCommentId(),reply.getId(),originalState);
+				}
+			}
+			//删除缓存
+			commentManage.delete_cache_findReplyByReplyId(replyId);
+			
+			return "1";
+		}
+		return "0";
+	}
+	
+	
 	/**
 	 * 审核回复
 	 * @param model
@@ -847,7 +1022,7 @@ public class CommentManageAction {
 			if(reply != null){
 				User user = userManage.query_cache_findUserByUserName(reply.getUserName());
 				if(i >0 && user != null){
-					//修改话题状态
+					//修改回复状态
 					userService.updateUserDynamicReplyStatus(user.getId(),reply.getUserName(),reply.getTopicId(),reply.getCommentId(),reply.getId(),20);
 				}
 			}

@@ -89,6 +89,9 @@
 												<#if systemUser != null && reply.userName ==  systemUser.userName>
 													<a href="javascript:" onclick="editReplyLayer('${reply.id}','${(reply.nickname != null && reply.nickname??) ?string(reply.nickname , reply.userName)}');">编辑</a>&nbsp;
 												</#if>
+												<#if systemUser != null && reply.userName ==  systemUser.userName>
+													<a href="javascript:" onclick="deleteReplyLayer('${reply.id}');">删除</a>&nbsp;
+												</#if>
 												${reply.postTime}
 											</span>
 										</div>
@@ -113,6 +116,9 @@
 						<span class="a-toolbar">
 							<#if systemUser != null && comment.userName ==  systemUser.userName>
 								<a href="javascript:" onclick="editCommentLayer('${comment.id}','${(comment.nickname != null && comment.nickname??) ?string(comment.nickname , comment.userName)}');">编辑</a>&nbsp;|
+							</#if>
+							<#if systemUser != null && comment.userName ==  systemUser.userName>
+								<a href="javascript:" onclick="deleteCommentLayer('${comment.id}');">删除</a>&nbsp;|
 							</#if>
 							<a href="javascript:" onclick="replyLayer('${comment.id}','${(comment.nickname != null && comment.nickname??) ?string(comment.nickname , comment.userName)}');">回复</a>&nbsp;|
 
@@ -229,6 +235,72 @@ function cancelEditReply(replyId){
 	$("#editCommentReply-post_"+replyId).html("");
 }
 
+//删除评论回复弹出层
+function deleteReplyLayer(replyId){
+	layer.confirm('是否删除？', {
+		title:"回复",
+		btn: ['删除','取消'] //按钮
+	}, function(){
+		deleteReply(replyId);
+	}, function(){
+		 
+	});
+
+}
+//删除回复层
+function deleteReply(replyId){
+	var parameter = "";
+	//话题Id
+	parameter += "&replyId="+replyId;
+	//从meta标签获取令牌
+	parameter += "&token="+getCsrf();
+   	//删除第一个&号,防止因为多了&号而出现警告: Parameters: Invalid chunk ignored.信息
+	if(parameter.indexOf("&") == 0){
+		parameter = parameter.substring(1,parameter.length);
+	}
+   	post_request(function(value){
+   		if(value != ""){
+			var data = JSON.parse(value);
+			for(var returnValue in data){
+				
+				if(returnValue == "success"){
+        			if(data[returnValue] == "true"){
+        				layer.msg('删除成功', 
+							{
+							  time: 3000 //3秒关闭（如果不配置，默认是3秒）
+							},function(){
+								//关闭后的操作
+								//刷新页面
+							    document.location.reload();
+							}
+						);
+        			}
+        		}else if(returnValue == "error"){
+        			var errorValue = data[returnValue];
+					var htmlValue = "";
+					var i = 0;
+					for(var error in errorValue){
+						if(error != ""){	
+							i++;
+							htmlValue += "&nbsp;&nbsp;"+i+"、"+errorValue[error]+"<br>";
+						}
+					}
+					
+					layer.open({
+					  type: 1,
+					  title: '错误', 
+					  skin: 'layui-layer-rim', //加上边框
+					  area: ['300px', '150px'], //宽高
+					  content: "<div style='line-height: 36px; font-size: 15px; margin-left: 8px;margin-right: 8px;'>"+htmlValue+"</div>"
+					});
+        		}
+        	}
+       	}
+	},
+		"user/control/comment/deleteReply?timestamp=" + new Date().getTime(), true,parameter);
+	
+}
+
 
 //引用弹出层
 function quoteLayer(commentId,userName){
@@ -302,5 +374,77 @@ function editCommentLayer(commentId,userName){
 function cancelEditComment(commentId){
 	$("#editComment-post_"+commentId).html("");
 }
+
+
+//删除评论弹出层
+function deleteCommentLayer(commentId){
+	layer.confirm('是否删除？', {
+		title:"评论",
+		btn: ['删除','取消'] //按钮
+	}, function(){
+		deleteComment(commentId);
+		//  layer.msg('删除成功');
+	}, function(){
+		 
+	});
+
+}
+
+
+//删除评论
+function deleteComment(commentId){
+
+	var parameter = "";
+	//评论Id
+	parameter += "&commentId="+commentId;
+	//从meta标签获取令牌
+	parameter += "&token="+getCsrf();
+   	//删除第一个&号,防止因为多了&号而出现警告: Parameters: Invalid chunk ignored.信息
+	if(parameter.indexOf("&") == 0){
+		parameter = parameter.substring(1,parameter.length);
+	}
+   	post_request(function(value){
+   		if(value != ""){
+			var data = JSON.parse(value);
+			for(var returnValue in data){
+				
+				if(returnValue == "success"){
+        			if(data[returnValue] == "true"){
+        				layer.msg('删除成功', 
+							{
+							  time: 3000 //3秒关闭（如果不配置，默认是3秒）
+							},function(){
+								//关闭后的操作
+								//刷新页面
+							    document.location.reload();
+							}
+						);
+        			}
+        		}else if(returnValue == "error"){
+        			var errorValue = data[returnValue];
+					var htmlValue = "";
+					var i = 0;
+					for(var error in errorValue){
+						if(error != ""){	
+							i++;
+							htmlValue += "&nbsp;&nbsp;"+i+"、"+errorValue[error]+"<br>";
+						}
+					}
+					
+					layer.open({
+					  type: 1,
+					  title: '错误', 
+					  skin: 'layui-layer-rim', //加上边框
+					  area: ['300px', '150px'], //宽高
+					  content: "<div style='line-height: 36px; font-size: 15px; margin-left: 8px;margin-right: 8px;'>"+htmlValue+"</div>"
+					});
+        		}
+        	}
+       	}
+	},
+		"user/control/comment/delete?timestamp=" + new Date().getTime(), true,parameter);
+}
+
+
 </script> 
 

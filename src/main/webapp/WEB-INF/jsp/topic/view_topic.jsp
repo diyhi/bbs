@@ -100,7 +100,6 @@ function auditReply(replyId){
 
 
 
-
 //显示修改话题页
 function showUpdateTopic(topicId){
 	var url ="${config:url(pageContext.request)}control/topic/manage${config:suffix()}?method=edit&topicId="+topicId+"&timestamp=" + new Date().getTime();
@@ -132,6 +131,12 @@ function deleteTopic(topicId){
 	}else{return false;};
 }
 
+//解决提交按钮的click和富文本的blur事件冲突
+$(document).ready(function(){
+	$("input[type='button']").mousedown(function(e){
+    	e.preventDefault();
+	});
+});
 
 function sureSubmit(){
 	//按钮设置 disabled="disabled"
@@ -216,6 +221,28 @@ function deleteComment(commentId){
 		
 	}else{return false;};
 }
+//恢复评论
+function recoveryComment(commentId){
+	var parameter = "&commentId="+commentId;
+	var csrf =  getCsrf();
+	parameter += "&_csrf_token="+csrf.token;
+	parameter += "&_csrf_header="+csrf.header;
+	//删除第一个&号,防止因为多了&号而出现警告: Parameters: Invalid chunk ignored.信息
+	if(parameter.indexOf("&") == 0){
+		parameter = parameter.substring(1,parameter.length);
+	}
+	
+	post_request(function(value){
+		if(value == "1"){
+			window.location.reload();
+		}else{
+			alert("恢复失败");
+		}
+	},
+		"${config:url(pageContext.request)}control/comment/manage${config:suffix()}?method=recoveryComment&timestamp=" + new Date().getTime(), true,parameter);
+		
+	
+}
 
 //显示引用添加页
 function showQuote(commentId){
@@ -262,6 +289,28 @@ function deleteReply(replyId){
 	}else{return false;};
 	
 }
+//恢复回复
+function recoveryReply(replyId){
+	var parameter = "&replyId="+replyId;
+	var csrf =  getCsrf();
+	parameter += "&_csrf_token="+csrf.token;
+	parameter += "&_csrf_header="+csrf.header;
+	//删除第一个&号,防止因为多了&号而出现警告: Parameters: Invalid chunk ignored.信息
+	if(parameter.indexOf("&") == 0){
+		parameter = parameter.substring(1,parameter.length);
+	}
+	
+	post_request(function(value){
+		if(value == "1"){
+			window.location.reload();
+		}else{
+			alert("恢复失败");
+		}
+	},
+		"${config:url(pageContext.request)}control/comment/manage${config:suffix()}?method=recoveryReply&timestamp=" + new Date().getTime(), true,parameter);
+		
+	
+}
 
 //滚动到描点(当上级跳转来后台'全部待审核评论' '全部待审核回复'时)
 $(function() {
@@ -288,7 +337,7 @@ $(function() {
 <enhance:out escapeXml="false">
 <input type="hidden" id="availableTag" value="<c:out value="${availableTag}"></c:out>">
 </enhance:out>
-
+<input type="hidden" id="fileSystem" value="${fileSystem}">
 
 <DIV class="d-box">
 <div class="d-button">
@@ -495,7 +544,21 @@ $(function() {
 								<span style="color: orange;">${reply.content}</span>
 							</TD>
 							<TD width="20%" style="" align="right">
-								
+								<c:if test="${reply.status == 110}">
+									<i class="markDelete">待审核用户删除</i>
+								</c:if>
+								<c:if test="${reply.status == 120}">
+									<i class="markDelete">已发布用户删除</i>
+								</c:if>
+								<c:if test="${reply.status == 100010}">
+									<i class="markDelete">待审核员工删除</i>
+								</c:if>
+								<c:if test="${reply.status == 100020}">
+									<i class="markDelete">已发布员工删除</i>
+								</c:if>
+								<c:if test="${reply.status >100}">
+									<A onclick="javascript:if(window.confirm('确定恢复吗? ')){recoveryReply('${reply.id}');return false;}else{return false};" hidefocus="true" href="#" ondragstart= "return false">恢复</A>&nbsp;&nbsp;
+								</c:if>
 								<c:if test="${reply.status == 10}">
 									<A onclick="javascript:if(window.confirm('确定发布吗? ')){auditReply('${reply.id}');return false;}else{return false};" hidefocus="true" href="#" ondragstart= "return false">立即审核</A>&nbsp;&nbsp;
 								</c:if>
@@ -514,6 +577,21 @@ $(function() {
 						<A hidefocus="true" onClick="showQuote('${entry.id}'); return false" href="#" ondragstart= "return false">引用</A>
 					</TD>
 					<TD width="50%" style="border-top: #bfe3ff 1px dotted;line-height: 28px;padding-top: 8px; padding-right: 6px;" align="right">
+						<c:if test="${entry.status == 110}">
+							<i class="markDelete">待审核用户删除</i>
+						</c:if>
+						<c:if test="${entry.status == 120}">
+							<i class="markDelete">已发布用户删除</i>
+						</c:if>
+						<c:if test="${entry.status == 100010}">
+							<i class="markDelete">待审核员工删除</i>
+						</c:if>
+						<c:if test="${entry.status == 100020}">
+							<i class="markDelete">已发布员工删除</i>
+						</c:if>
+						<c:if test="${entry.status > 100}">
+							<A onclick="javascript:if(window.confirm('确定恢复吗? ')){recoveryComment('${entry.id}');return false;}else{return false};" hidefocus="true" href="#" ondragstart= "return false">恢复</A>&nbsp;&nbsp;
+						</c:if>
 						<c:if test="${entry.status == 10}">
 							<A onclick="javascript:if(window.confirm('确定发布吗? ')){auditComment('${entry.id}');return false;}else{return false};" hidefocus="true" href="#" ondragstart= "return false">立即审核</A>&nbsp;&nbsp;
 						</c:if>
@@ -574,6 +652,7 @@ $(function() {
 		"font-size: 14px;"+
 	"}";
 	var availableTag = ['source', '|'];
+	
 	var editor;
 	KindEditor.ready(function(K) {
 		var availableTag = document.getElementById("availableTag").value;
@@ -585,8 +664,9 @@ $(function() {
 		
 		
 		var topicId = "${param.topicId}";
+		//文件系统
+		var fileSystem = document.getElementById("fileSystem").value;
 		
-	
 		editor = K.create('textarea[name="content"]', {
 			basePath : '${config:url(pageContext.request)}backstage/kindeditor/',//指定编辑器的根目录路径
 			themeType : 'style :minimalist',//极简主题 加冒号的是主题样式文件名称同时也是主题目录
@@ -595,6 +675,7 @@ $(function() {
 			resizeType : 1,//2或1或0，2时可以拖动改变宽度和高度，1时只能改变高度，0时不能拖动。默认值: 2 
 			allowPreviewEmoticons : true,//true或false，true时鼠标放在表情上可以预览表情
 			allowImageUpload : true,//true时显示图片上传按钮
+			uploadModule : parseInt(fileSystem),//上传模块 0.本地 10.SeaweedFS 20.MinIO 30.阿里云OSS
 			uploadJson :'${config:url(pageContext.request)}control/comment/manage.htm?method=uploadImage&topicId='+topicId+"&userName=${userName}&isStaff=true&${_csrf.parameterName}=${_csrf.token}",//指定浏览远程图片的服务器端程序
 			items : availableTag_obj,
 			

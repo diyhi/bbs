@@ -27,7 +27,9 @@
 		<tr> 
 			<td>键参数：comment<br>值内容说明：评论<br>值类型：List&lt<a style="color: #317ee7" onclick="anchorJump('#anchor_20'); return false;">Comment</a>></td>
 		</tr>
-		
+		<tr> 
+			<td>键参数：fileSystem<br>值内容说明：文件系统 0.本地 10.SeaweedFS 20.MinIO 30.阿里云OSS<br>值类型：int</td>
+		</tr>
 	</tbody> 
 </table>
 
@@ -131,7 +133,10 @@
 		</tr>
 		<tr> 
 			<td>参数</td> 
-			<td colspan="2">file : 上传图片文件接收字段</td>
+			<td colspan="2">
+				file : 上传图片文件接收字段<br>
+				fileName : 文件名称 预签名时必须有值
+			</td>
 		</tr>
 		<tr> 
 			<td width="30%" rowspan="3">提交返回</td> 

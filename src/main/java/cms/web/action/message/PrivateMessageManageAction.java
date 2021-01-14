@@ -19,6 +19,8 @@ import cms.bean.user.User;
 import cms.service.message.PrivateMessageService;
 import cms.service.setting.SettingService;
 import cms.service.user.UserService;
+import cms.web.action.fileSystem.FileManage;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Controller;
@@ -41,8 +43,9 @@ public class PrivateMessageManageAction {
 	
 	@Resource SettingService settingService;
 	@Resource UserService userService;
-	
+	@Resource FileManage fileManage;
 	@Resource PrivateMessageManage privateMessageManage;
+	
 	/**
 	 * 私信列表
 	 * @param model
@@ -97,7 +100,7 @@ public class PrivateMessageManageAction {
 						if(friend_user != null){
 							privateMessage.setFriendUserName(friend_user.getUserName());//私信对方用户名称
 							if(friend_user.getAvatarName() != null && !"".equals(friend_user.getAvatarName().trim())){
-								privateMessage.setFriendAvatarPath(friend_user.getAvatarPath());//私信对方头像路径
+								privateMessage.setFriendAvatarPath(fileManage.fileServerAddress()+friend_user.getAvatarPath());//私信对方头像路径
 								privateMessage.setFriendAvatarName(friend_user.getAvatarName());//私信对方头像名称
 							}
 						}
@@ -105,7 +108,7 @@ public class PrivateMessageManageAction {
 						if(sender_user != null){
 							privateMessage.setSenderUserName(sender_user.getUserName());//私信发送者用户名称
 							if(sender_user.getAvatarName() != null && !"".equals(sender_user.getAvatarName().trim())){
-								privateMessage.setSenderAvatarPath(sender_user.getAvatarPath());//发送者头像路径
+								privateMessage.setSenderAvatarPath(fileManage.fileServerAddress()+sender_user.getAvatarPath());//发送者头像路径
 								privateMessage.setSenderAvatarName(sender_user.getAvatarName());//发送者头像名称
 							}
 						}
@@ -188,7 +191,7 @@ public class PrivateMessageManageAction {
 						if(friend_user != null){
 							privateMessage.setFriendUserName(friend_user.getUserName());//私信对方用户名称
 							if(friend_user.getAvatarName() != null && !"".equals(friend_user.getAvatarName().trim())){
-								privateMessage.setFriendAvatarPath(friend_user.getAvatarPath());//私信对方头像路径
+								privateMessage.setFriendAvatarPath(fileManage.fileServerAddress()+friend_user.getAvatarPath());//私信对方头像路径
 								privateMessage.setFriendAvatarName(friend_user.getAvatarName());//私信对方头像名称
 							}
 						}
@@ -196,7 +199,7 @@ public class PrivateMessageManageAction {
 						if(sender_user != null){
 							privateMessage.setSenderUserName(sender_user.getUserName());//私信发送者用户名称
 							if(sender_user.getAvatarName() != null && !"".equals(sender_user.getAvatarName().trim())){
-								privateMessage.setSenderAvatarPath(sender_user.getAvatarPath());//发送者头像路径
+								privateMessage.setSenderAvatarPath(fileManage.fileServerAddress()+sender_user.getAvatarPath());//发送者头像路径
 								privateMessage.setSenderAvatarName(sender_user.getAvatarName());//发送者头像名称
 							}
 						}

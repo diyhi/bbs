@@ -53,7 +53,7 @@ public class UserAction {
 	
 	@Resource SettingService settingService;
 	@Resource UserManage userManage;
-
+	
 	/**
 	 * 用户列表
 	 * @param formbean
@@ -69,7 +69,8 @@ public class UserAction {
 	public String execute(User formbean,PageForm pageForm,Boolean queryState,ModelMap model,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {	
-	
+		
+		
 		
 		//调用分页算法代码
 		PageView<User> pageView = new PageView<User>(settingService.findSystemSetting_cache().getBackstagePageNumber(),pageForm.getPage(),10);

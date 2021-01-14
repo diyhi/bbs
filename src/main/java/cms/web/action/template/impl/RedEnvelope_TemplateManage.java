@@ -21,6 +21,7 @@ import cms.bean.user.User;
 import cms.service.setting.SettingService;
 import cms.utils.JsonUtils;
 import cms.utils.Verification;
+import cms.web.action.fileSystem.FileManage;
 import cms.web.action.redEnvelope.RedEnvelopeManage;
 import cms.web.action.topic.TopicManage;
 import cms.web.action.user.UserManage;
@@ -38,6 +39,7 @@ public class RedEnvelope_TemplateManage {
 	@Resource UserRoleManage userRoleManage;
 	@Resource UserManage userManage;
 	@Resource SettingService settingService;
+	@Resource FileManage fileManage;
 	
 	/**
 	 * 发红包-- 发红包内容 -- 实体对象
@@ -84,7 +86,7 @@ public class RedEnvelope_TemplateManage {
 				if(user != null){
 					giveRedEnvelope.setUserName(user.getUserName());
 					giveRedEnvelope.setNickname(user.getNickname());
-					giveRedEnvelope.setAvatarPath(user.getAvatarPath());
+					giveRedEnvelope.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 					giveRedEnvelope.setAvatarName(user.getAvatarName());
 				}
 				

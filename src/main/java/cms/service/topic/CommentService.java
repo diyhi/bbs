@@ -106,7 +106,13 @@ public interface CommentService  extends DAO<Comment>{
 	 * @return
 	*/
 	public Integer deleteComment(Long topicId,Long commentId);
-	
+	/**
+	 * 标记删除评论
+	 * @param commentId 评论Id
+	 * @param constant 常数 例如 "110.待审核用户删除" 则加上100
+	 * @return
+	 */
+	public Integer markDeleteComment(Long commentId,Integer constant);
 	/**
 	 * 添加回复
 	 * @param reply
@@ -169,4 +175,11 @@ public interface CommentService  extends DAO<Comment>{
 	 * @return
 	 */
 	public Integer deleteReply(Long replyId);
+	/**
+	 * 标记删除回复
+	 * @param replyId 回复Id
+	 * @param constant 常数 例如 "110.待审核用户删除" 则加上100
+	 * @return
+	 */
+	public Integer markDeleteReply(Long replyId,Integer constant);
 }

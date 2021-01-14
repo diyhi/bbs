@@ -307,6 +307,7 @@ K.options = {
 	pluginsPath : K.basePath + 'plugins/',
 	themeType : 'default',
 	langType : 'zh-CN',
+	uploadModule : 0,//上传模块 0.本地 10.SeaweedFS 20.MinIO 30.阿里云OSS
 	urlType : '',
 	newlineTag : 'p',
 	resizeType : 2,
@@ -1115,6 +1116,119 @@ function _tmpl(str, data) {
 			.split("\r").join("\\'") + "');}return p.join('');");
 	return data ? fn(data) : fn;
 }
+
+
+/**
+ * POST方式提交
+ * @param callback
+ * @param urlAddress 提交URL
+ * @param async true（异步）或 false（同步）
+ * @param formContent 表单内容
+ */
+function _post_ajax(callback, urlAddress, async,formContent){  
+	var xmlhttp;
+	if (window.XMLHttpRequest) {
+		try {
+			xmlhttp = new XMLHttpRequest();
+			xmlhttp.overrideMimeType("text/html;charset=UTF-8");//
+		} catch (e) {}
+	} else if (window.ActiveXObject) {
+		try {
+			xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+		} catch (e) {
+			try {
+				xmlhttp = new ActiveXObject("Msxml2.XMLHttp");
+			} catch (e) {
+				try {
+					xmlhttp = new ActiveXObject("Msxml3.XMLHttp");
+				} catch (e) {}
+			}
+		}
+	}
+	
+	xmlhttp.open('POST', urlAddress, async);
+    //定义传输的文件HTTP头信息    
+//	xmlhttp.setRequestHeader("Content-Type","application/x-www-form-urlencoded"); 
+//	xmlhttp.setRequestHeader("X-Requested-With","XMLHttpRequest");//标记报头为AJAX
+
+	xmlhttp.onreadystatechange = function(){
+        if (xmlhttp.readyState == 4) {//readystate 
+		    try{
+		    	if(xmlhttp.status == 200){
+					
+						
+					callback(xmlhttp);
+						
+					
+				}else{
+					K.popupMessage(KindEditor.lang('uploadError'));
+				}
+	        } catch(e){
+	        	K.popupMessage(KindEditor.lang('sendRequestFailed')+e);
+	        }
+		}
+	};
+   //     alert(div_Form);
+    //发送POST数据    
+	xmlhttp.send(formContent);
+	
+	
+}
+/**
+ * PUT方式提交
+ * @param callback
+ * @param urlAddress 提交URL
+ * @param async true（异步）或 false（同步）
+ * @param formContent 表单内容
+ */
+function _put_ajax(callback, urlAddress, async,formContent){  
+	var xmlhttp;
+	if (window.XMLHttpRequest) {
+		try {
+			xmlhttp = new XMLHttpRequest();
+			xmlhttp.overrideMimeType("text/html;charset=UTF-8");//
+		} catch (e) {}
+	} else if (window.ActiveXObject) {
+		try {
+			xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+		} catch (e) {
+			try {
+				xmlhttp = new ActiveXObject("Msxml2.XMLHttp");
+			} catch (e) {
+				try {
+					xmlhttp = new ActiveXObject("Msxml3.XMLHttp");
+				} catch (e) {}
+			}
+		}
+	}
+	
+	xmlhttp.open('PUT', urlAddress, async);
+
+	xmlhttp.onreadystatechange = function(){
+        if (xmlhttp.readyState == 4) {//readystate 
+		    try{
+		    	if(xmlhttp.status == 200){
+					
+						
+					callback(xmlhttp);
+						
+					
+				}else{
+					K.popupMessage(KindEditor.lang('uploadError'));
+				}
+	        } catch(e){
+	        	K.popupMessage(KindEditor.lang('sendRequestFailed')+e);
+	        }
+		}
+	};
+   //     alert(div_Form);
+    //发送PUT数据    
+	xmlhttp.send(formContent);
+	
+}
+
+
+
 K.formatUrl = _formatUrl;
 K.formatHtml = _formatHtml;
 K.getCssList = _getCssList;
@@ -1127,6 +1241,8 @@ K.embedVideo = _embedVideo;//嵌入视频
 K.embedVideoImg= _embedVideoImg;
 K.clearMsWord = _clearMsWord;
 K.tmpl = _tmpl;
+K.post_ajax = _post_ajax
+K.put_ajax = _put_ajax
 
 
 function _contains(nodeA, nodeB) {
@@ -3732,6 +3848,10 @@ _extend(KCmd, {
 		}
 		return self;
 	}
+	
+	
+	
+	
 });
 _each(('formatblock,selectall,justifyleft,justifycenter,justifyright,justifyfull,insertorderedlist,' +
 	'insertunorderedlist,indent,outdent,subscript,superscript').split(','), function(i, name) {
@@ -4668,7 +4788,7 @@ function _colorpicker(options) {
 K.ColorPickerClass = KColorPicker;
 K.colorpicker = _colorpicker;
 
-
+//文件上传
 function KUploadButton(options) {
 	this.init(options);
 }
@@ -4682,67 +4802,470 @@ _extend(KUploadButton, {
 			extraParams = options.extraParams || {},
 			cls = button[0].className || '',
 			target = options.target || 'kindeditor_upload_iframe_' + new Date().getTime();
-		options.afterError = options.afterError || function(str) {
-			K.popupMessage(str);
-		};
-		var hiddenElements = [];
-		for(var k in extraParams){
-			hiddenElements.push('<input type="hidden" name="' + k + '" value="' + extraParams[k] + '" />');
-		}
-		var html = [
-			'<div class="ke-inline-block ' + cls + '">',
-			(options.target ? '' : '<iframe name="' + target + '" style="display:none;"></iframe>'),
-			(options.form ? '<div class="ke-upload-area">' : '<form class="ke-upload-area ke-form" method="post" enctype="multipart/form-data" target="' + target + '" action="' + url + '">'),
-			'<span class="ke-button-common  ke-button-outer">',
-			hiddenElements.join(''),
-			'<input type="button" class="ke-button-common ke-button" value="' + title + '" />',
-			'</span>',
-			'<input type="file" class="ke-upload-file" name="' + fieldName + '" tabindex="-1" />',
-			(options.form ? '</div>' : '</form>'),
-			'</div>'].join('');
-		var div = K(html, button.doc);
-		button.hide();
-		button.before(div);
-		self.div = div;
-		self.button = button;
-		self.iframe = options.target ? K('iframe[name="' + target + '"]') : K('iframe', div);
-		self.form = options.form ? K(options.form) : K('form', div);
-		self.fileBox = K('.ke-upload-file', div);
-		var width = options.width || K('.ke-button-common', div).width();
 		
-		K('.ke-upload-area', div).width(width);
-		self.options = options;
+
+		//上传模块
+		if(options.uploadModule == 10){// 0.本地 10.SeaweedFS 20.MinIO 30.阿里云OSS
+			options.afterError = options.afterError || function(str) {
+				K.popupMessage(str);
+			};
+			var hiddenElements = [];
+
+			var html = [
+				'<div class="ke-inline-block ' + cls + '">',
+				(options.target ? '' : '<iframe name="' + target + '" style="display:none;"></iframe>'),
+				(options.form ? '<div class="ke-upload-area">' : '<form class="ke-upload-area ke-form" method="post" enctype="multipart/form-data" target="' + target + '" action="' + url + '">'),
+				'<span class="ke-button-common  ke-button-outer">',
+				hiddenElements.join(''),
+				'<input type="button" class="ke-button-common ke-button" value="' + title + '" />',
+				'</span>',
+				'<input type="file" class="ke-upload-file" name="' + fieldName + '" tabindex="-1" />',
+				(options.form ? '</div>' : '</form>'),
+				'</div>'].join('');
+			
+			var div = K(html, button.doc);  
+			
+			button.hide();
+			button.before(div);
+			self.div = div;
+			self.button = button;
+			self.iframe = options.target ? K('iframe[name="' + target + '"]') : K('iframe', div);
+			self.form = options.form ? K(options.form) : K('form', div);
+			self.fileBox = K('.ke-upload-file', div);
+			var width = options.width || K('.ke-button-common', div).width();
+			
+			K('.ke-upload-area', div).width(width);
+			self.options = options;
+	
+		}else if(options.uploadModule == 20){//20.MinIO
+			options.afterError = options.afterError || function(str) {
+				K.popupMessage(str);
+			};
+			
+			
+			var hiddenElements = [];
+			
+			var html = [
+				'<div class="ke-inline-block ' + cls + '">',
+				(options.target ? '' : '<iframe name="' + target + '" style="display:none;"></iframe>'),
+				(options.form ? '<div class="ke-upload-area">' : '<form class="ke-upload-area ke-form" method="post" enctype="multipart/form-data" target="' + target + '" action="' + url + '">'),
+				'<span class="ke-button-common  ke-button-outer">',
+				hiddenElements.join(''),
+				'<input type="button" class="ke-button-common ke-button" value="' + title + '" />',
+				'</span>',
+				'<input type="file" class="ke-upload-file" name="' + fieldName + '" tabindex="-1" />',
+				(options.form ? '</div>' : '</form>'),
+				'</div>'].join('');
+			
+			var div = K(html, button.doc);  
+
+			button.hide();
+			button.before(div);
+			self.div = div;
+			self.button = button;
+			self.iframe = options.target ? K('iframe[name="' + target + '"]') : K('iframe', div);
+			self.form = options.form ? K(options.form) : K('form', div);
+			self.fileBox = K('.ke-upload-file', div);
+			var width = options.width || K('.ke-button-common', div).width();
+			
+			K('.ke-upload-area', div).width(width);
+			self.options = options;
+		}else if(options.uploadModule == 30){//30.阿里云OSS
+			options.afterError = options.afterError || function(str) {
+				K.popupMessage(str);
+			};
+			var hiddenElements = [];
+			
+			var html = [
+				'<div class="ke-inline-block ' + cls + '">',
+				(options.target ? '' : '<iframe name="' + target + '" style="display:none;"></iframe>'),
+				(options.form ? '<div class="ke-upload-area">' : '<form class="ke-upload-area ke-form" method="post" enctype="multipart/form-data" target="' + target + '" action="' + url + '">'),
+				'<span class="ke-button-common  ke-button-outer">',
+				hiddenElements.join(''),
+				'<input type="button" class="ke-button-common ke-button" value="' + title + '" />',
+				'</span>',
+				'<input type="file" class="ke-upload-file" name="' + fieldName + '" tabindex="-1" />',
+				(options.form ? '</div>' : '</form>'),
+				'</div>'].join('');
+			
+			var div = K(html, button.doc);  
+
+			button.hide();
+			button.before(div);
+			self.div = div;
+			self.button = button;
+			self.iframe = options.target ? K('iframe[name="' + target + '"]') : K('iframe', div);
+			self.form = options.form ? K(options.form) : K('form', div);
+			self.fileBox = K('.ke-upload-file', div);
+			var width = options.width || K('.ke-button-common', div).width();
+			
+			K('.ke-upload-area', div).width(width);
+			self.options = options;
+		}else{//0.本地
+			options.afterError = options.afterError || function(str) {
+				K.popupMessage(str);
+			};
+			var hiddenElements = [];
+			for(var k in extraParams){
+				hiddenElements.push('<input type="hidden" name="' + k + '" value="' + extraParams[k] + '" />');
+			}
+			var html = [
+				'<div class="ke-inline-block ' + cls + '">',
+				(options.target ? '' : '<iframe name="' + target + '" style="display:none;"></iframe>'),
+				(options.form ? '<div class="ke-upload-area">' : '<form class="ke-upload-area ke-form" method="post" enctype="multipart/form-data" target="' + target + '" action="' + url + '">'),
+				'<span class="ke-button-common  ke-button-outer">',
+				hiddenElements.join(''),
+				'<input type="button" class="ke-button-common ke-button" value="' + title + '" />',
+				'</span>',
+				'<input type="file" class="ke-upload-file" name="' + fieldName + '" tabindex="-1" />',
+				(options.form ? '</div>' : '</form>'),
+				'</div>'].join('');
+			var div = K(html, button.doc);
+			button.hide();
+			button.before(div);
+			self.div = div;
+			self.button = button;
+			self.iframe = options.target ? K('iframe[name="' + target + '"]') : K('iframe', div);
+			self.form = options.form ? K(options.form) : K('form', div);
+			self.fileBox = K('.ke-upload-file', div);
+			var width = options.width || K('.ke-button-common', div).width();
+			
+			K('.ke-upload-area', div).width(width);
+			self.options = options;
+		}
+		
+		
+		
+		
+		
 	},
 	submit : function() {
 		var self = this,
 			iframe = self.iframe;
-		iframe.bind('load', function() {
-			iframe.unbind();
-			var tempForm = document.createElement('form');
-			self.fileBox.before(tempForm);
-			K(tempForm).append(self.fileBox);
-			tempForm.reset();
-			K(tempForm).remove(true);
-			var doc = K.iframeDoc(iframe),
-				pre = doc.getElementsByTagName('pre')[0],
-				str = '', data;
-			if (pre) {
-				str = pre.innerHTML;
-			} else {
-				str = doc.body.innerHTML;
-			}
-			str = _unescape(str);
-			iframe[0].src = 'javascript:false';
-			try {
-				data = K.json(str);
-			} catch (e) {
-				self.options.afterError.call(self, '<!doctype html><html>' + doc.body.parentNode.innerHTML + '</html>');
-			}
-			if (data) {
-				self.options.afterUpload.call(self, data);
-			}
-		});
-		self.form[0].submit();
+		
+		//上传模块
+		if(self.options.uploadModule == 10){// 0.本地 10.SeaweedFS 20.MinIO 30.阿里云OSS
+			/**
+			var fileName = self.fileBox[0].value.substring(self.fileBox[0].value.lastIndexOf("\\")+1); 
+			var uploadURL = self.options.url || self.options.form[0].action;
+			
+			var parameter = "fileName="+ encodeURIComponent(fileName);
+			
+			
+			K.post_ajax(function(xmlhttp){
+				var result = xmlhttp.responseText;
+				if(result != ""){
+					var fileData = JSON.parse(result);
+					if(fileData.error ==0){
+						var signingUrl = fileData.url;
+						var beforeUrl = signingUrl.substring(0,signingUrl.indexOf("?"));
+						//URL参数部分
+						var urlParam = signingUrl.substring(signingUrl.indexOf("?")+1,signingUrl.length);
+						
+						var newFileName = "";
+						
+						var urlParamArr = urlParam.split("&");
+					    for(var i=0;i<urlParamArr.length;i++){
+					        var paramArr = urlParamArr[i].split("=");
+					        if(paramArr[0] == "key"){
+					        	newFileName = decodeURIComponent(paramArr[1]);
+					        }
+					    }
+					   
+					    K.put_ajax(function(xmlhttp){
+							//xmlhttp.responseText
+					    	if(xmlhttp.getResponseHeader("content-length") != undefined){
+					    		
+					    		K.popupMessage(KindEditor.lang('uploadSuccess'));
+								
+								var tempForm = document.createElement('form');
+								self.fileBox.before(tempForm);
+								K(tempForm).append(self.fileBox);
+								tempForm.reset();
+								K(tempForm).remove(true);
+								var doc = K.iframeDoc(iframe),
+									pre = doc.getElementsByTagName('pre')[0],
+									str = '', data;
+								if (pre) {
+									str = pre.innerHTML;
+								} else {
+									str = doc.body.innerHTML;
+								}
+								str = _unescape(str);
+								
+								
+								
+								var data = {};
+								data.error = 0;
+								data.url = beforeUrl+newFileName;
+								data.title = fileName;
+								
+								iframe[0].src = 'javascript:false';
+								
+								iframe.unbind();
+								self.options.afterUpload.call(self, data);
+					    	}
+						},
+						signingUrl, true,self.fileBox[0].files[0]);
+						
+					}else{
+						K.popupMessage(fileData.message);
+						return;
+					}
+				}
+			},
+			uploadURL+"&"+parameter, true,'');
+			**/
+			var fileName = self.fileBox[0].value.substring(self.fileBox[0].value.lastIndexOf("\\")+1); 
+			var uploadURL = self.options.url || self.options.form[0].action;
+			
+			var parameter = "fileName="+ encodeURIComponent(fileName);
+			K.post_ajax(function(xmlhttp){
+				var result = xmlhttp.responseText;
+
+				if(result != ""){
+					var fileData = JSON.parse(result);
+					if(fileData.error ==0){
+						//签名URL
+						var signingUrl = fileData.url;
+						var beforeUrl = signingUrl.substring(0,signingUrl.indexOf("?"));
+						//URL参数部分
+						var urlParam = signingUrl.substring(signingUrl.indexOf("?")+1,signingUrl.length);
+
+						var newFileName = "";
+						//获取提交的参数
+					    var data = new FormData();
+						var urlParamArr = urlParam.split("&");
+					    for(var i=0;i<urlParamArr.length;i++){
+					        var paramArr = urlParamArr[i].split("=");
+					        data.append(paramArr[0], decodeURIComponent(paramArr[1]));
+					        if(paramArr[0] == "key"){
+					        	newFileName = decodeURIComponent(paramArr[1]);
+					        }
+					    }
+					    data.append("file", self.fileBox[0].files[0]);
+					   
+					   
+						K.post_ajax(function(xmlhttp){
+							if(xmlhttp.status == 200){
+								K.popupMessage(KindEditor.lang('uploadSuccess'));
+								
+								var tempForm = document.createElement('form');
+								self.fileBox.before(tempForm);
+								K(tempForm).append(self.fileBox);
+								tempForm.reset();
+								K(tempForm).remove(true);
+								var doc = K.iframeDoc(iframe),
+									pre = doc.getElementsByTagName('pre')[0],
+									str = '', data;
+								if (pre) {
+									str = pre.innerHTML;
+								} else {
+									str = doc.body.innerHTML;
+								}
+								str = _unescape(str);
+								
+								
+								
+								var data = {};
+								data.error = 0;
+								data.url = beforeUrl+newFileName;
+								data.title = fileName;
+								
+								iframe[0].src = 'javascript:false';
+								
+								iframe.unbind();
+								self.options.afterUpload.call(self, data);
+							}
+							
+						},
+						beforeUrl, true,data);
+					}else{
+						K.popupMessage(fileData.message);
+						return;
+					}
+				}
+			},
+			uploadURL+"&"+parameter, true,'');
+		}else if(self.options.uploadModule == 20){//20.MinIO
+			var fileName = self.fileBox[0].value.substring(self.fileBox[0].value.lastIndexOf("\\")+1); 
+			var uploadURL = self.options.url || self.options.form[0].action;
+			
+			var parameter = "fileName="+ encodeURIComponent(fileName);
+			K.post_ajax(function(xmlhttp){
+				var result = xmlhttp.responseText;
+
+				if(result != ""){
+					var fileData = JSON.parse(result);
+					if(fileData.error ==0){
+						//签名URL
+						var signingUrl = fileData.url;
+						var beforeUrl = signingUrl.substring(0,signingUrl.indexOf("?"));
+						//URL参数部分
+						var urlParam = signingUrl.substring(signingUrl.indexOf("?")+1,signingUrl.length);
+
+						//获取提交的参数
+					    var data = new FormData();
+						var urlParamArr = urlParam.split("&");
+					    for(var i=0;i<urlParamArr.length;i++){
+					        var paramArr = urlParamArr[i].split("=");
+					        data.append(paramArr[0], decodeURIComponent(paramArr[1]));
+	
+					    }
+					    data.append("file", self.fileBox[0].files[0]);
+					   
+					    
+						K.post_ajax(function(xmlhttp){
+							//xmlhttp.responseText
+							var etag = xmlhttp.getResponseHeader("etag");
+							var location = xmlhttp.getResponseHeader("location");
+							
+							if(etag != undefined && location != undefined){
+								K.popupMessage(KindEditor.lang('uploadSuccess'));
+								
+								var tempForm = document.createElement('form');
+								self.fileBox.before(tempForm);
+								K(tempForm).append(self.fileBox);
+								tempForm.reset();
+								K(tempForm).remove(true);
+								var doc = K.iframeDoc(iframe),
+									pre = doc.getElementsByTagName('pre')[0],
+									str = '', data;
+								if (pre) {
+									str = pre.innerHTML;
+								} else {
+									str = doc.body.innerHTML;
+								}
+								str = _unescape(str);
+								
+								
+								
+								var data = {};
+								data.error = 0;
+								data.url = location;
+								data.title = fileName;
+								
+								iframe[0].src = 'javascript:false';
+								
+								iframe.unbind();
+								self.options.afterUpload.call(self, data);
+							}
+						},
+						beforeUrl, true,data);
+					}else{
+						K.popupMessage(fileData.message);
+						return;
+					}
+				}
+			},
+			uploadURL+"&"+parameter, true,'');
+						
+			
+		}else if(self.options.uploadModule == 30){//30.阿里云OSS
+			var fileName = self.fileBox[0].value.substring(self.fileBox[0].value.lastIndexOf("\\")+1); 
+			var uploadURL = self.options.url || self.options.form[0].action;
+			
+			var parameter = "fileName="+ encodeURIComponent(fileName);
+		
+			K.post_ajax(function(xmlhttp){
+				var result = xmlhttp.responseText;
+				
+				if(result != ""){
+					var fileData = JSON.parse(result);
+					if(fileData.error ==0){
+						//签名URL
+						var signingUrl = fileData.url;
+						var beforeUrl = signingUrl.substring(0,signingUrl.indexOf("?"));
+						//URL参数部分
+						var urlParam = signingUrl.substring(signingUrl.indexOf("?")+1,signingUrl.length);
+
+						var newFileName = "";
+						
+						//获取提交的参数
+					    var data = new FormData();
+						var urlParamArr = urlParam.split("&");
+					    for(var i=0;i<urlParamArr.length;i++){
+					        var paramArr = urlParamArr[i].split("=");
+					        data.append(paramArr[0], decodeURIComponent(paramArr[1]));
+					        if(paramArr[0] == "key"){
+					        	newFileName = decodeURIComponent(paramArr[1]);
+					        }
+					    }
+					    
+					    data.append("file", self.fileBox[0].files[0]);
+					   
+					    
+						K.post_ajax(function(xmlhttp){
+							//xmlhttp.responseText
+							if(xmlhttp.getResponseHeader("content-length") != undefined){
+								
+								K.popupMessage(KindEditor.lang('uploadSuccess'));
+								
+								var tempForm = document.createElement('form');
+								self.fileBox.before(tempForm);
+								K(tempForm).append(self.fileBox);
+								tempForm.reset();
+								K(tempForm).remove(true);
+								var doc = K.iframeDoc(iframe),
+									pre = doc.getElementsByTagName('pre')[0],
+									str = '', data;
+								if (pre) {
+									str = pre.innerHTML;
+								} else {
+									str = doc.body.innerHTML;
+								}
+								str = _unescape(str);
+								
+								
+								
+								var data = {};
+								data.error = 0;
+								data.url = beforeUrl+newFileName;
+								data.title = fileName;
+								
+								iframe[0].src = 'javascript:false';
+								
+								iframe.unbind();
+								self.options.afterUpload.call(self, data);
+							}
+						},
+						beforeUrl, true,data);
+					}else{
+						K.popupMessage(fileData.message);
+						return;
+					}
+				}
+			},
+			uploadURL+"&"+parameter, true,'');
+		}else{//0.本地
+			iframe.bind('load', function() {
+				iframe.unbind();
+				var tempForm = document.createElement('form');
+				self.fileBox.before(tempForm);
+				K(tempForm).append(self.fileBox);
+				tempForm.reset();
+				K(tempForm).remove(true);
+				var doc = K.iframeDoc(iframe),
+					pre = doc.getElementsByTagName('pre')[0],
+					str = '', data;
+				if (pre) {
+					str = pre.innerHTML;
+				} else {
+					str = doc.body.innerHTML;
+				}
+				str = _unescape(str);
+				iframe[0].src = 'javascript:false';
+				try {
+					data = K.json(str);
+				} catch (e) {
+					self.options.afterError.call(self, '<!doctype html><html>' + doc.body.parentNode.innerHTML + '</html>');
+				}
+				if (data) {
+					self.options.afterUpload.call(self, data);
+				}
+			});
+			self.form[0].submit();
+		}
 		return self;
 	},
 	remove : function() {
@@ -6284,6 +6807,7 @@ _plugin('core', function(K) {
 			} else {
 				self.cmd.selection();
 			}
+			self.edit.trigger();//触发事件
 		}
 		self.designMode = self.edit.designMode;
 	});
@@ -6944,6 +7468,7 @@ KindEditor.lang({
 	ajaxLoading : '加载中，请稍候 ...',
 	uploadLoading : '上传中，请稍候 ...',
 	uploadError : '上传错误',
+	sendRequestFailed : '发送请求失败，请重试',
 	editHide : '隐藏标签属性',
 	deleteHide : '删除隐藏标签',
 	editCode : '修改语言',
@@ -7942,7 +8467,8 @@ KindEditor.plugin('flash', function(K) {
 		formatUploadUrl = K.undef(self.formatUploadUrl, true),
 		extraParams = K.undef(self.extraFileUploadParams, {}),
 		filePostName = K.undef(self.filePostName, 'imgFile'),
-		uploadJson = K.undef(self.uploadJson, self.basePath + 'php/upload_json.php');
+		uploadJson = K.undef(self.uploadJson, self.basePath + 'php/upload_json.php'),
+		uploadModule = K.undef(self.uploadModule, self.basePath + 'php/upload_json.php');
 	self.plugin.flash = {
 		edit : function() {
 			var html = [
@@ -8014,6 +8540,7 @@ KindEditor.plugin('flash', function(K) {
 					fieldName : filePostName,
 					extraParams : extraParams,
 					url : K.addParam(uploadJson, 'dir=flash'),
+					uploadModule : uploadModule,
 					afterUpload : function(data) {
 						dialog.hideLoading();
 						if (data.error === 0) {
@@ -8096,6 +8623,7 @@ KindEditor.plugin('image', function(K) {
 		formatUploadUrl = K.undef(self.formatUploadUrl, true),
 		allowFileManager = K.undef(self.allowFileManager, false),
 		uploadJson = K.undef(self.uploadJson, self.basePath + 'php/upload_json.php'),
+		uploadModule = K.undef(self.uploadModule, 0),
 		imageTabIndex = K.undef(self.imageTabIndex, 0),
 		imgPath = self.pluginsPath + 'image/images/',
 		extraParams = K.undef(self.extraFileUploadParams, {}),
@@ -8180,8 +8708,10 @@ KindEditor.plugin('image', function(K) {
 						dialog.showLoading(self.lang('uploadLoading'));
 						uploadbutton.submit();
 						localUrlBox.val('');
+						
 						return;
 					}
+					
 					var url = K.trim(urlBox.val()),
 						width = widthBox.val(),
 						height = heightBox.val(),
@@ -8209,6 +8739,7 @@ KindEditor.plugin('image', function(K) {
 						return;
 					}
 					clickFn.call(self, url, title, width, height, 0, align);
+					
 				}
 			},
 			beforeRemove : function() {
@@ -8247,12 +8778,15 @@ KindEditor.plugin('image', function(K) {
 		} else if (showLocal) {
 			K('.tab2', div).show();
 		}
+		
+		
 		var uploadbutton = K.uploadbutton({
 			button : K('.ke-upload-button', div)[0],
 			fieldName : filePostName,
 			form : K('.ke-form', div),
 			target : target,
 			width: 70,
+			uploadModule : uploadModule,
 			afterUpload : function(data) {
 				dialog.hideLoading();
 				if (data.error === 0) {
@@ -8265,11 +8799,40 @@ KindEditor.plugin('image', function(K) {
 					}
 					if (!fillDescAfterUploadImage) {
 						clickFn.call(self, url, data.title, data.width, data.height, data.border, data.align);
+						
 					} else {
 						K(".ke-dialog-row #remoteUrl", div).val(url);
 						K(".ke-tabs-li", div)[0].click();
 						K(".ke-refresh-btn", div).click();
 					}
+					//图片加载完触发才有效
+					/**
+					var iframe = K('.ke-edit-iframe', document).each(function() {
+						var iframeBody = this.contentWindow.document.body;
+						
+						K("img",K(iframeBody)).each(function() {
+							
+							if(this.src == url){
+								var img = new Image();
+					            img.src = this.src; 
+					            img.onload = function(){
+					            	self.edit.trigger();//触发事件
+					            	return;
+				                }
+								
+							}
+						});
+					});**/
+					
+					//可以使用本方法或上面的方法
+					var imgArr = K('<img src="' + url + '" />', document).each(function() {
+						var img = new Image();
+			            img.src = this.src; 
+			            img.onload = function(){
+			            	self.edit.trigger();//触发事件
+		                }
+					});
+					
 				} else {
 					K.popupMessage(data.message);
 				}
@@ -8408,6 +8971,7 @@ KindEditor.plugin('insertfile', function(K) {
 		allowFileManager = K.undef(self.allowFileManager, false),
 		formatUploadUrl = K.undef(self.formatUploadUrl, true),
 		uploadJson = K.undef(self.uploadJson, self.basePath + 'php/upload_json.php'),
+		uploadModule = K.undef(self.uploadModule, 0),
 		extraParams = K.undef(self.extraFileUploadParams, {}),
 		filePostName = K.undef(self.filePostName, 'imgFile'),
 		lang = self.lang(name + '.');
@@ -8465,6 +9029,7 @@ KindEditor.plugin('insertfile', function(K) {
 				fieldName : filePostName,
 				url : K.addParam(uploadJson, 'dir=file'),
 				extraParams : extraParams,
+				uploadModule : uploadModule,
 				afterUpload : function(data) {
 					dialog.hideLoading();
 					if (data.error === 0) {
@@ -8649,6 +9214,7 @@ KindEditor.plugin('media', function(K) {
 		extraParams = K.undef(self.extraFileUploadParams, {}),
 		filePostName = K.undef(self.filePostName, 'imgFile'),
 		uploadJson = K.undef(self.uploadJson, self.basePath + 'php/upload_json.php'),
+		uploadModule = K.undef(self.uploadModule, 0),
 		items = K.undef(self.items, []),
 		tabIndex = K.undef(0, 0);;
 	self.plugin.media = {
@@ -8852,6 +9418,7 @@ KindEditor.plugin('media', function(K) {
 					extraParams : extraParams,
 					width : 60,//上传按钮宽度
 					url : K.addParam(uploadJson, 'dir=media'),
+					uploadModule : uploadModule,
 					afterUpload : function(data) {
 						dialog.hideLoading();
 						if (data.error === 0) {
@@ -8967,78 +9534,536 @@ K.extend(KSWFUpload, {
 			K('.ke-status > div', itemDiv).hide();
 			K('.ke-message', itemDiv).addClass('ke-error').show().html(K.escape(msg));
 		}
-
-		var uploader = WebUploader.create({
-		    //swf文件路径
-		    swf: options.flashUrl,
-		    //文件接收服务端。
-		    server: options.uploadUrl,
-		    //选择文件的按钮。可选。 内部根据当前运行是创建，可能是input元素，也可能是flash.
-		 //   pick: K('.ke-swfupload-button > div', self.div)[0],
-		    pick: K('.ke-swfupload-button > span', self.div)[0],
-		    //配置压缩的图片的选项。如果此选项为false, 则图片在上传前不进行压缩
-		    compress: false,
-		    //选完文件后，是否自动上传
-		    auto: true,
-		    //[可选] [默认值：'file'] 设置文件上传域的name。
-		    fileVal: options.filePostName,
-		    //指定接受哪些类型的文件。 由于目前还有ext转mimeType表，所以这里需要分开指定。
-		    accept: {
-		    	title: self.options.fileTypesDesc,
-		    	extensions: self.options.extensions,
-		    	mimeTypes: 'image/*'
-		    }
 		
+		//上传模块
+		if(options.uploadModule == 10){// 0.本地 10.SeaweedFS 20.MinIO 30.阿里云OSS
+			/**
+			var uploader = WebUploader.create({
+			    //swf文件路径
+			    swf: options.flashUrl,
+			    //文件接收服务端。
+			    server: '',
+			    //server: 'http://127.0.0.1:9000/bbs-bucket/',
+			    method: 'PUT',
+			    sendAsBinary:true,// {Object} [可选] [默认值：false] 是否已二进制的流的方式发送文件 PUT模式必须设置
+			    //选择文件的按钮。可选。 内部根据当前运行是创建，可能是input元素，也可能是flash.
+			 //   pick: K('.ke-swfupload-button > div', self.div)[0],
+			    pick: K('.ke-swfupload-button > span', self.div)[0],
+			    //配置压缩的图片的选项。如果此选项为false, 则图片在上传前不进行压缩
+			    compress: false,
+			    //选完文件后，是否自动上传
+			    auto: true,
+			    //[可选] [默认值：'file'] 设置文件上传域的name。
+			    //fileVal: options.filePostName,
+			    //指定接受哪些类型的文件。 由于目前还有ext转mimeType表，所以这里需要分开指定。
+			    accept: {
+			    	title: self.options.fileTypesDesc,
+			    	extensions: self.options.extensions,
+			    	mimeTypes: 'image/*'
+			    }
+			
+			    
+			});
+			//当某个文件的分块在发送前触发，主要用来询问是否要添加附带参数，大文件在开起分片上传的前提下此事件可能会触发多次。
+			uploader.on('uploadBeforeSend',function (obj,data,headers) {
+				
+				var parameter = "fileName="+ encodeURIComponent(data.name);
+				
+				
+				K.post_ajax(function(xmlhttp){
+					var result = xmlhttp.responseText;
+					if(result != ""){
+						var fileData = JSON.parse(result);
+						if(fileData.error ==0){
+							//签名URL
+							var signingUrl = fileData.url;
+							
+							obj.blob.source.server = signingUrl;
+
+						}else{
+							K.popupMessage(fileData.message);
+							return;
+						}
+					}
+				},
+				options.uploadUrl+"&"+parameter, false,'');//同步
+				
+				// 删除其他数据(webuploader默认的上传字段)
+				delete data.id;
+				delete data.name; 
+				delete data.type; 
+				delete data.lastModifiedDate;
+		        delete data.size;
+    
+			});
+			//当有文件被添加进队列的时候，添加到页面预览
+			uploader.on( 'fileQueued', function(file){
+				file.url = self.options.fileIconUrl;
+				self.appendFile(file);
+				var itemDiv = K('div[data-id="' + file.id + '"]', self.bodyDiv);
+				K('.ke-status > div', itemDiv).hide();
+				K('.ke-progressbar', itemDiv).show();
+				
+			});
+			// 文件上传过程中创建进度条实时显示。
+		    uploader.on( 'uploadProgress', function(file,percentage){
+		    	var percent = Math.round(percentage * 100);
+				var progressbar = self.progressbars[file.id];
+				progressbar.bar.css('width', Math.round(percent * 80 / 100) + 'px');
+				progressbar.percent.html(percent + '%');
+
+		    });
+		    //文件上传成功
+		    uploader.on( 'uploadSuccess', function(file,response){
+		    	var itemDiv = K('div[data-id="' + file.id + '"]', self.bodyDiv).eq(0);
+				
+				if(response._headers != undefined){
+					var server = file.source.source.server;
+					var beforeUrl = server.substring(0,server.indexOf("?"));
+					
+					var data = {};
+					data.error = 0;
+					data.url = beforeUrl;
+					data.title = file.name;
+					
+					
+					file.url = beforeUrl;
+					K('.ke-img', itemDiv).attr('src', beforeUrl).attr('data-status', 'complete').data('data', data);//complete表示上传成功状态
+					K('.ke-status > div', itemDiv).hide();
+				}else{
+					showError(itemDiv, K.DEBUG ? data.message : self.options.errorMessage);
+				}
+				//uploader.removeFile(file, true); // 启用多次上传同一个图片
+		    });
+		    //文件上传失败
+		    uploader.on( 'uploadError', function(file,reason){
+		    	if (file) {
+					var itemDiv = K('div[data-id="' + file.id + '"]', self.bodyDiv).eq(0);
+					showError(itemDiv, self.options.errorMessage);
+				}
+		    });
+		    //完成上传完了，成功或者失败，先删除进度条。
+		    uploader.on( 'uploadComplete', function(file){
+				var itemDiv = K('div[data-id="' + file.id + '"]', self.bodyDiv);
+				K('.ke-progressbar', itemDiv).hide();
+		    });
 		    
-		});
-		//当有文件被添加进队列的时候，添加到页面预览
-		uploader.on( 'fileQueued', function(file){
-			file.url = self.options.fileIconUrl;
-			self.appendFile(file);
+		    self.swfu = uploader;**/
 			
-			var itemDiv = K('div[data-id="' + file.id + '"]', self.bodyDiv);
-			K('.ke-status > div', itemDiv).hide();
-			K('.ke-progressbar', itemDiv).show();
+			var uploader = WebUploader.create({
+			    //swf文件路径
+			    swf: options.flashUrl,
+			    //文件接收服务端。
+			    server: '',
+			    method: 'POST',
+			    //选择文件的按钮。可选。 内部根据当前运行是创建，可能是input元素，也可能是flash.
+			 //   pick: K('.ke-swfupload-button > div', self.div)[0],
+			    pick: K('.ke-swfupload-button > span', self.div)[0],
+			    //配置压缩的图片的选项。如果此选项为false, 则图片在上传前不进行压缩
+			    compress: false,
+			    //选完文件后，是否自动上传
+			    auto: true,
+			    //[可选] [默认值：'file'] 设置文件上传域的name。
+			    //fileVal: options.filePostName,
+			    //指定接受哪些类型的文件。 由于目前还有ext转mimeType表，所以这里需要分开指定。
+			    accept: {
+			    	title: self.options.fileTypesDesc,
+			    	extensions: self.options.extensions,
+			    	mimeTypes: 'image/*'
+			    }
 			
-		});
-		// 文件上传过程中创建进度条实时显示。
-	    uploader.on( 'uploadProgress', function(file,percentage){
-	    	var percent = Math.round(percentage * 100);
-			var progressbar = self.progressbars[file.id];
-			progressbar.bar.css('width', Math.round(percent * 80 / 100) + 'px');
-			progressbar.percent.html(percent + '%');
+			    
+			});
+			//当某个文件的分块在发送前触发，主要用来询问是否要添加附带参数，大文件在开起分片上传的前提下此事件可能会触发多次。
+			uploader.on('uploadBeforeSend',function (obj,data,headers) {
+				
+				var parameter = "fileName="+ encodeURIComponent(data.name);
+				
+				
+				K.post_ajax(function(xmlhttp){
+					var result = xmlhttp.responseText;
+					if(result != ""){
+						var fileData = JSON.parse(result);
+						if(fileData.error ==0){
+							//签名URL
+							var signingUrl = fileData.url;
+							
+							var beforeUrl = signingUrl.substring(0,signingUrl.indexOf("?"));
+							//URL参数部分
+							var urlParam = signingUrl.substring(signingUrl.indexOf("?")+1,signingUrl.length);
+							
+							obj.blob.source.server = beforeUrl;//更改server地址 配合webuploader.js源代码的更改
+							
+							var urlParamArr = urlParam.split("&");
+						    for(var i=0;i<urlParamArr.length;i++){
+						        var paramArr = urlParamArr[i].split("=");
+						        data[paramArr[0]] = decodeURIComponent(paramArr[1]);//格式 data['key'] = "file/links/111.jpg";
+						        if(paramArr[0] == 'key'){//回显文件路径
+						        	obj.blob.source.key = decodeURIComponent(paramArr[1]);
+						        }
+						    }
+						}else{
+							K.popupMessage(fileData.message);
+							return;
+						}
+					}
+				},
+				options.uploadUrl+"&"+parameter, false,'');//同步
+			});
+			//当有文件被添加进队列的时候，添加到页面预览
+			uploader.on( 'fileQueued', function(file){
+				file.url = self.options.fileIconUrl;
+				self.appendFile(file);
+				var itemDiv = K('div[data-id="' + file.id + '"]', self.bodyDiv);
+				K('.ke-status > div', itemDiv).hide();
+				K('.ke-progressbar', itemDiv).show();
+				
+			});
+			// 文件上传过程中创建进度条实时显示。
+		    uploader.on( 'uploadProgress', function(file,percentage){
+		    	var percent = Math.round(percentage * 100);
+				var progressbar = self.progressbars[file.id];
+				progressbar.bar.css('width', Math.round(percent * 80 / 100) + 'px');
+				progressbar.percent.html(percent + '%');
 
-	    });
-	    
-	    //文件上传成功
-	    uploader.on( 'uploadSuccess', function(file,response){
-	    	var itemDiv = K('div[data-id="' + file.id + '"]', self.bodyDiv).eq(0);
-			var data = response;
+		    });
+		    
+		    //文件上传成功
+		    uploader.on( 'uploadSuccess', function(file,response){
+		    	var itemDiv = K('div[data-id="' + file.id + '"]', self.bodyDiv).eq(0);
+		    	if(response._headers != undefined){
+					var server = file.source.source.server;
+					var beforeUrl = server+file.source.source.key;
+					var data = {};
+					data.error = 0;
+					data.url = beforeUrl;
+					data.title = file.name;
+					
+					file.url = beforeUrl;
+					K('.ke-img', itemDiv).attr('src', beforeUrl).attr('data-status', 'complete').data('data', data);//complete表示上传成功状态
+					K('.ke-status > div', itemDiv).hide();
+				}else{
+					showError(itemDiv, K.DEBUG ? response.message : self.options.errorMessage);
+				}
+				//uploader.removeFile(file, true); // 启用多次上传同一个图片
+		    });
+		    //文件上传失败
+		    uploader.on( 'uploadError', function(file,reason){
+		    	if (file) {
+					var itemDiv = K('div[data-id="' + file.id + '"]', self.bodyDiv).eq(0);
+					showError(itemDiv, self.options.errorMessage);
+				}
+		    });
+		    //完成上传完了，成功或者失败，先删除进度条。
+		    uploader.on( 'uploadComplete', function(file){
+				var itemDiv = K('div[data-id="' + file.id + '"]', self.bodyDiv);
+				K('.ke-progressbar', itemDiv).hide();
+		    });
+		    
+		    self.swfu = uploader;
+		}else if(options.uploadModule == 20){//20.MinIO
 
-			if (data.error !== 0) {
-				showError(itemDiv, K.DEBUG ? data.message : self.options.errorMessage);
-				return;
-			}
-			file.url = data.url;
-			K('.ke-img', itemDiv).attr('src', file.url).attr('data-status', 'complete').data('data', data);//complete表示上传成功状态
-			K('.ke-status > div', itemDiv).hide();
+			var uploader = WebUploader.create({
+			    //swf文件路径
+			    swf: options.flashUrl,
+			    //文件接收服务端。
+			    server: '',
+			    method: 'POST',
+			    //选择文件的按钮。可选。 内部根据当前运行是创建，可能是input元素，也可能是flash.
+			 //   pick: K('.ke-swfupload-button > div', self.div)[0],
+			    pick: K('.ke-swfupload-button > span', self.div)[0],
+			    //配置压缩的图片的选项。如果此选项为false, 则图片在上传前不进行压缩
+			    compress: false,
+			    //选完文件后，是否自动上传
+			    auto: true,
+			    //[可选] [默认值：'file'] 设置文件上传域的name。
+			    //fileVal: options.filePostName,
+			    //指定接受哪些类型的文件。 由于目前还有ext转mimeType表，所以这里需要分开指定。
+			    accept: {
+			    	title: self.options.fileTypesDesc,
+			    	extensions: self.options.extensions,
+			    	mimeTypes: 'image/*'
+			    }
 			
-			//uploader.removeFile(file, true); // 启用多次上传同一个图片
-	    });
-	    //文件上传失败
-	    uploader.on( 'uploadError', function(file,reason){
-	    	if (file) {
-				var itemDiv = K('div[data-id="' + file.id + '"]', self.bodyDiv).eq(0);
-				showError(itemDiv, self.options.errorMessage);
-			}
-	    });
-	    //完成上传完了，成功或者失败，先删除进度条。
-	    uploader.on( 'uploadComplete', function(file){
-			var itemDiv = K('div[data-id="' + file.id + '"]', self.bodyDiv);
-			K('.ke-progressbar', itemDiv).hide();
-	    });
-	    
-	    self.swfu = uploader;
+			    
+			});
+			//当某个文件的分块在发送前触发，主要用来询问是否要添加附带参数，大文件在开起分片上传的前提下此事件可能会触发多次。
+			uploader.on('uploadBeforeSend',function (obj,data,headers) {
+				
+				var parameter = "fileName="+ encodeURIComponent(data.name);
+				
+				
+				K.post_ajax(function(xmlhttp){
+					var result = xmlhttp.responseText;
+					if(result != ""){
+						var fileData = JSON.parse(result);
+						if(fileData.error ==0){
+							//签名URL
+							var signingUrl = fileData.url;
+							
+							var beforeUrl = signingUrl.substring(0,signingUrl.indexOf("?"));
+							//URL参数部分
+							var urlParam = signingUrl.substring(signingUrl.indexOf("?")+1,signingUrl.length);
+							
+							obj.blob.source.server = beforeUrl;//更改server地址 配合webuploader.js源代码的更改
+							
+							var urlParamArr = urlParam.split("&");
+						    for(var i=0;i<urlParamArr.length;i++){
+						        var paramArr = urlParamArr[i].split("=");
+						        data[paramArr[0]] = decodeURIComponent(paramArr[1]);//格式 data['key'] = "file/links/111.jpg";
+						    }
+						}else{
+							K.popupMessage(fileData.message);
+							return;
+						}
+					}
+				},
+				options.uploadUrl+"&"+parameter, false,'');//同步
+			});
+			//当有文件被添加进队列的时候，添加到页面预览
+			uploader.on( 'fileQueued', function(file){
+				file.url = self.options.fileIconUrl;
+				self.appendFile(file);
+				var itemDiv = K('div[data-id="' + file.id + '"]', self.bodyDiv);
+				K('.ke-status > div', itemDiv).hide();
+				K('.ke-progressbar', itemDiv).show();
+				
+			});
+			// 文件上传过程中创建进度条实时显示。
+		    uploader.on( 'uploadProgress', function(file,percentage){
+		    	var percent = Math.round(percentage * 100);
+				var progressbar = self.progressbars[file.id];
+				progressbar.bar.css('width', Math.round(percent * 80 / 100) + 'px');
+				progressbar.percent.html(percent + '%');
+
+		    });
+		    
+		    //文件上传成功
+		    uploader.on( 'uploadSuccess', function(file,response){
+		    	var itemDiv = K('div[data-id="' + file.id + '"]', self.bodyDiv).eq(0);
+				
+				if(response._headers.etag != undefined){
+					var data = {};
+					data.error = 0;
+					data.url = response._headers.location;
+					data.title = file.name;
+				
+					file.url = response._headers.location;
+					K('.ke-img', itemDiv).attr('src', response._headers.location).attr('data-status', 'complete').data('data', data);//complete表示上传成功状态
+					K('.ke-status > div', itemDiv).hide();
+				}else{
+					showError(itemDiv, K.DEBUG ? response.message : self.options.errorMessage);
+				}
+				//uploader.removeFile(file, true); // 启用多次上传同一个图片
+		    });
+		    //文件上传失败
+		    uploader.on( 'uploadError', function(file,reason){
+		    	if (file) {
+					var itemDiv = K('div[data-id="' + file.id + '"]', self.bodyDiv).eq(0);
+					showError(itemDiv, self.options.errorMessage);
+				}
+		    });
+		    //完成上传完了，成功或者失败，先删除进度条。
+		    uploader.on( 'uploadComplete', function(file){
+				var itemDiv = K('div[data-id="' + file.id + '"]', self.bodyDiv);
+				K('.ke-progressbar', itemDiv).hide();
+		    });
+		    
+		    self.swfu = uploader;
+	
+		}else if(options.uploadModule == 30){//30.阿里云OSS
+			var uploader = WebUploader.create({
+			    //swf文件路径
+			    swf: options.flashUrl,
+			    //文件接收服务端。
+			    server: '',
+			    method: 'POST',
+			    //选择文件的按钮。可选。 内部根据当前运行是创建，可能是input元素，也可能是flash.
+			 //   pick: K('.ke-swfupload-button > div', self.div)[0],
+			    pick: K('.ke-swfupload-button > span', self.div)[0],
+			    //配置压缩的图片的选项。如果此选项为false, 则图片在上传前不进行压缩
+			    compress: false,
+			    //选完文件后，是否自动上传
+			    auto: true,
+			    //[可选] [默认值：'file'] 设置文件上传域的name。
+			    //fileVal: options.filePostName,
+			    //指定接受哪些类型的文件。 由于目前还有ext转mimeType表，所以这里需要分开指定。
+			    accept: {
+			    	title: self.options.fileTypesDesc,
+			    	extensions: self.options.extensions,
+			    	mimeTypes: 'image/*'
+			    }
+			
+			    
+			});
+			//当某个文件的分块在发送前触发，主要用来询问是否要添加附带参数，大文件在开起分片上传的前提下此事件可能会触发多次。
+			uploader.on('uploadBeforeSend',function (obj,data,headers) {
+				
+				var parameter = "fileName="+ encodeURIComponent(data.name);
+				
+				
+				K.post_ajax(function(xmlhttp){
+					var result = xmlhttp.responseText;
+					if(result != ""){
+						var fileData = JSON.parse(result);
+						if(fileData.error ==0){
+							//签名URL
+							var signingUrl = fileData.url;
+							
+							var beforeUrl = signingUrl.substring(0,signingUrl.indexOf("?"));
+							//URL参数部分
+							var urlParam = signingUrl.substring(signingUrl.indexOf("?")+1,signingUrl.length);
+							
+							obj.blob.source.server = beforeUrl;//更改server地址 配合webuploader.js源代码的更改
+							
+							var urlParamArr = urlParam.split("&");
+						    for(var i=0;i<urlParamArr.length;i++){
+						        var paramArr = urlParamArr[i].split("=");
+						        data[paramArr[0]] = decodeURIComponent(paramArr[1]);//格式 data['key'] = "file/links/111.jpg";
+						        if(paramArr[0] == 'key'){//回显文件路径
+						        	obj.blob.source.key = decodeURIComponent(paramArr[1]);
+						        }
+						    }
+						}else{
+							K.popupMessage(fileData.message);
+							return;
+						}
+					}
+				},
+				options.uploadUrl+"&"+parameter, false,'');//同步
+			});
+			//当有文件被添加进队列的时候，添加到页面预览
+			uploader.on( 'fileQueued', function(file){
+				file.url = self.options.fileIconUrl;
+				self.appendFile(file);
+				var itemDiv = K('div[data-id="' + file.id + '"]', self.bodyDiv);
+				K('.ke-status > div', itemDiv).hide();
+				K('.ke-progressbar', itemDiv).show();
+				
+			});
+			// 文件上传过程中创建进度条实时显示。
+		    uploader.on( 'uploadProgress', function(file,percentage){
+		    	var percent = Math.round(percentage * 100);
+				var progressbar = self.progressbars[file.id];
+				progressbar.bar.css('width', Math.round(percent * 80 / 100) + 'px');
+				progressbar.percent.html(percent + '%');
+
+		    });
+		    
+		    //文件上传成功
+		    uploader.on( 'uploadSuccess', function(file,response){
+		    	var itemDiv = K('div[data-id="' + file.id + '"]', self.bodyDiv).eq(0);
+				if(response._headers != undefined){
+					
+					var server = file.source.source.server;
+					var beforeUrl = server+file.source.source.key;
+					var data = {};
+					data.error = 0;
+					data.url = beforeUrl;
+					data.title = file.name;
+					
+					
+					file.url = beforeUrl;
+					K('.ke-img', itemDiv).attr('src', beforeUrl).attr('data-status', 'complete').data('data', data);//complete表示上传成功状态
+					K('.ke-status > div', itemDiv).hide();
+				}else{
+					showError(itemDiv, K.DEBUG ? response.message : self.options.errorMessage);
+				}
+				//uploader.removeFile(file, true); // 启用多次上传同一个图片
+		    });
+		    //文件上传失败
+		    uploader.on( 'uploadError', function(file,reason){
+		    	if (file) {
+					var itemDiv = K('div[data-id="' + file.id + '"]', self.bodyDiv).eq(0);
+					showError(itemDiv, self.options.errorMessage);
+				}
+		    });
+		    //完成上传完了，成功或者失败，先删除进度条。
+		    uploader.on( 'uploadComplete', function(file){
+				var itemDiv = K('div[data-id="' + file.id + '"]', self.bodyDiv);
+				K('.ke-progressbar', itemDiv).hide();
+		    });
+		    
+		    self.swfu = uploader;
+			
+			
+		}else{//0.本地
+			var uploader = WebUploader.create({
+			    //swf文件路径
+			    swf: options.flashUrl,
+			    //文件接收服务端。
+			    server: options.uploadUrl,
+			    //选择文件的按钮。可选。 内部根据当前运行是创建，可能是input元素，也可能是flash.
+			 //   pick: K('.ke-swfupload-button > div', self.div)[0],
+			    pick: K('.ke-swfupload-button > span', self.div)[0],
+			    //配置压缩的图片的选项。如果此选项为false, 则图片在上传前不进行压缩
+			    compress: false,
+			    //选完文件后，是否自动上传
+			    auto: true,
+			    //[可选] [默认值：'file'] 设置文件上传域的name。
+			    fileVal: options.filePostName,
+			    //指定接受哪些类型的文件。 由于目前还有ext转mimeType表，所以这里需要分开指定。
+			    accept: {
+			    	title: self.options.fileTypesDesc,
+			    	extensions: self.options.extensions,
+			    	mimeTypes: 'image/*'
+			    }
+			
+			    
+			});
+			//当有文件被添加进队列的时候，添加到页面预览
+			uploader.on( 'fileQueued', function(file){
+				file.url = self.options.fileIconUrl;
+				self.appendFile(file);
+				
+				var itemDiv = K('div[data-id="' + file.id + '"]', self.bodyDiv);
+				K('.ke-status > div', itemDiv).hide();
+				K('.ke-progressbar', itemDiv).show();
+				
+			});
+			// 文件上传过程中创建进度条实时显示。
+		    uploader.on( 'uploadProgress', function(file,percentage){
+		    	var percent = Math.round(percentage * 100);
+				var progressbar = self.progressbars[file.id];
+				progressbar.bar.css('width', Math.round(percent * 80 / 100) + 'px');
+				progressbar.percent.html(percent + '%');
+
+		    });
+		    
+		    //文件上传成功
+		    uploader.on( 'uploadSuccess', function(file,response){
+		    	var itemDiv = K('div[data-id="' + file.id + '"]', self.bodyDiv).eq(0);
+				var data = response;
+
+				if (data.error !== 0) {
+					showError(itemDiv, K.DEBUG ? data.message : self.options.errorMessage);
+					return;
+				}
+				file.url = data.url;
+				K('.ke-img', itemDiv).attr('src', file.url).attr('data-status', 'complete').data('data', data);//complete表示上传成功状态
+				K('.ke-status > div', itemDiv).hide();
+				
+				//uploader.removeFile(file, true); // 启用多次上传同一个图片
+		    });
+		    //文件上传失败
+		    uploader.on( 'uploadError', function(file,reason){
+		    	if (file) {
+					var itemDiv = K('div[data-id="' + file.id + '"]', self.bodyDiv).eq(0);
+					showError(itemDiv, self.options.errorMessage);
+				}
+		    });
+		    //完成上传完了，成功或者失败，先删除进度条。
+		    uploader.on( 'uploadComplete', function(file){
+				var itemDiv = K('div[data-id="' + file.id + '"]', self.bodyDiv);
+				K('.ke-progressbar', itemDiv).hide();
+		    });
+		    
+		    self.swfu = uploader;
+		}
+		
+		
+		
+		
 	},
 	getUrlList : function() {
 		var list = [];
@@ -9109,6 +10134,7 @@ KindEditor.plugin('multiimage', function(K) {
 	var self = this, name = 'multiimage',
 		formatUploadUrl = K.undef(self.formatUploadUrl, true),
 		uploadJson = K.undef(self.uploadJson, self.basePath + 'php/upload_json.php'),
+		uploadModule = K.undef(self.uploadModule, 0),
 		imgPath = self.pluginsPath + 'multiimage/images/',
 		extensions = K.undef(self.extensions, 'jpg,jpeg,png,gif,png,bmp'),//允许上传文件后缀
 		imageSizeLimit = K.undef(self.imageSizeLimit, '1MB'),//验证文件总大小是否超出限制, 超出则不允许加入队列
@@ -9162,6 +10188,7 @@ KindEditor.plugin('multiimage', function(K) {
 			buttonWidth : self.langType == 'zh-CN' ? 72 : 88,
 			buttonHeight : 23,
 			fileIconUrl : imgPath + 'image.png',
+			uploadModule : self.uploadModule,
 			uploadDesc : uploadDesc,
 			startButtonValue : lang.startUpload,
 			uploadUrl : K.addParam(uploadJson, 'dir=image'),

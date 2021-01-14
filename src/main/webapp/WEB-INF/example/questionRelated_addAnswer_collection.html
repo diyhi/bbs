@@ -12,16 +12,19 @@
 	</thead> 
 	 <tbody> 
 		<tr> 
-			<td rowspan="3">questionRelated_addAnswer_collection</td> 
-			<td rowspan="3">Map&ltString,Object></td>
+			<td rowspan="4">questionRelated_addAnswer_collection</td> 
+			<td rowspan="4">Map&ltString,Object></td>
 			<td>键参数：availableTag<br>值内容说明：答案编辑器允许使用标签(配合KindEditor编辑器使用)<br>值类型：JSON格式List&ltString></td>
-			<td rowspan="3">答案界面显示返回值</td> 
+			<td rowspan="4">答案界面显示返回值</td> 
 		</tr>
 		<tr> 
 			<td>键参数：captchaKey<br>值内容说明：验证码编号 (根据'全站设置 - 基本设置 - 发表答案每分钟提交超过'参数计算是否含有值)<br>值类型：String </td>
 		</tr>
 		<tr> 
 			<td>键参数：allowAnswer<br>值内容说明：是否允许提交答案<br>值类型：boolean </td>
+		</tr>
+		<tr> 
+			<td>键参数：fileSystem<br>值内容说明：文件系统 0.本地 10.SeaweedFS 20.MinIO 30.阿里云OSS<br>值类型：int</td>
 		</tr>
 	</tbody> 
 </table>
@@ -126,7 +129,10 @@
 		</tr>
 		<tr> 
 			<td>参数</td> 
-			<td colspan="2">file : 上传图片文件接收字段</td>
+			<td colspan="2">
+				file : 上传图片文件接收字段<br>
+				fileName : 文件名称 预签名时必须有值
+			</td>
 		</tr>
 		<tr> 
 			<td width="30%" rowspan="3">提交返回</td> 

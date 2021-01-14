@@ -16,6 +16,7 @@
 	<meta name="_userId" content="${systemUser.userId}"/>
 	<meta name="_userName" content="${systemUser.userName}"/>
 	<meta name="_weixin_oa_appid" content="${weixin_oa_appid}"/>
+	<meta name="_fileStorageSystem" content="${fileStorageSystem}"/>
 	<style>
 		/*兼容template标签*/
 		template { 
@@ -117,8 +118,23 @@
 						<div class="imageInfo" v-if="topic.imageInfoList.length >0 && topic.mediaInfoList.length ==0" v-viewer="pictureOptions">
 							<div class="image-box">
 								<div class="image-box image-column">
-									<!-- 图片最多显示6个 -->
-									<div v-for="(imageInfo,index) in topic.imageInfoList" v-if="index <6" class="image" v-lazy:background-image="imageInfo.path+'240x240/'+imageInfo.name" >
+									<!-- 本地缩略图 图片最多显示6个 -->
+									<div v-for="(imageInfo,index) in topic.imageInfoList" v-if="$store.state.fileStorageSystem ==0 && index <6" class="image" v-lazy:background-image="imageInfo.path+'240x240/'+imageInfo.name" >
+										<img class="zoom" :src="$store.state.commonPath+'images/null.gif'" :key="index":data-src="imageInfo.path+imageInfo.name" >
+										<div class="ratio" ></div>
+									</div>
+									<!-- SeaweedFS缩略图 图片最多显示6个 -->
+									<div v-for="(imageInfo,index) in topic.imageInfoList" v-if="$store.state.fileStorageSystem ==10 && index <6" class="image" v-lazy:background-image="imageInfo.path+imageInfo.name+'?width=240'" >
+										<img class="zoom" :src="$store.state.commonPath+'images/null.gif'" :key="index":data-src="imageInfo.path+imageInfo.name" >
+										<div class="ratio" ></div>
+									</div>
+									<!-- MinIO缩略图 图片最多显示6个 -->
+									<div v-for="(imageInfo,index) in topic.imageInfoList" v-if="$store.state.fileStorageSystem ==20 && index <6" class="image" v-lazy:background-image="imageInfo.path+imageInfo.name+'?width=240'" >
+										<img class="zoom" :src="$store.state.commonPath+'images/null.gif'" :key="index":data-src="imageInfo.path+imageInfo.name" >
+										<div class="ratio" ></div>
+									</div>
+									<!-- 阿里云OSS缩略图 图片最多显示6个 -->
+									<div v-for="(imageInfo,index) in topic.imageInfoList" v-if="$store.state.fileStorageSystem ==30 && index <6" class="image" v-lazy:background-image="imageInfo.path+imageInfo.name+'?x-oss-process=image/resize,w_240'" >
 										<img class="zoom" :src="$store.state.commonPath+'images/null.gif'" :key="index":data-src="imageInfo.path+imageInfo.name" >
 										<div class="ratio" ></div>
 									</div>
@@ -223,7 +239,7 @@
 								    </p>
 								</li>
 								
-								<li v-if="showCaptcha" >
+								<li v-show="showCaptcha" >
 						        	<input type="hidden" v-model="captchaKey">
 						        	<mt-field v-model.trim="captchaValue"  @change.native="validation_captchaValue" label="验证码" placeholder="请输入验证码"  type="text">
 										
@@ -457,6 +473,7 @@
 									        </div>  
 											<span class="time">
 												<span @click="editReplyUI(reply.id)" v-if="reply.userName == $store.state.user.userName"><span class="cms-pencil-alt" style="font-size: 10px;margin-right: 1px;"></span>编辑</span>
+												<span @click="deleteReply(reply.id)" v-if="reply.userName == $store.state.user.userName"><span class="cms-trash" style="font-size: 10px;margin-right: 1px;"></span>删除</span>
 											
 												{{reply.postTime}}
 											</span>
@@ -476,6 +493,7 @@
 						<div class="bottomInfo">
 							<div class="toolbar">
 								<span class="edit-btn"  @click="editCommentUI(comment.id)" v-if="comment.userName == $store.state.user.userName"><span class="cms-pencil-alt" style="font-size: 10px;margin-right: 1px;"></span>编辑</span>
+								<span class="edit-btn"  @click="deleteComment(comment.id)" v-if="comment.userName == $store.state.user.userName"><span class="cms-trash" style="font-size: 10px;margin-right: 1px;"></span>删除</span>
 								<span class="quote-btn"  @click="addQuoteUI(comment.id)"><span class="cms-quote" style="font-size: 10px;margin-right: 1px;"></span>引用</span>
 								<span class="reply-btn"  @click="addReplyUI(comment.id)"><span class="cms-reply" style="font-size: 11px;margin-right: 1px;"></span>回复</span>
 							</div>
@@ -1316,7 +1334,7 @@
 							    </p>
 							</li>
 							
-							<li v-if="showCaptcha" >
+							<li v-show="showCaptcha" >
 					        	<input type="hidden" v-model="captchaKey">
 					        	<mt-field v-model.trim="captchaValue"  v-on:input="validation_captchaValue" label="验证码" placeholder="请输入验证码"  type="text">
 									
@@ -3869,7 +3887,7 @@
 
 <script src="${commonPath}js/vue-cropper.js" type="text/javascript"></script>
  <script src="${commonPath}js/v-readmore.min.js" type="text/javascript"></script>
-<script src="${commonPath}js/wangeditor/wangEditor.min.js?5sdd" type="text/javascript"></script>
+<script src="${commonPath}js/wangeditor/wangEditor.js?5sdd" type="text/javascript"></script>
 <script src="${commonPath}js/vue-lazyload.js" type="text/javascript"></script> 
 <script src="${commonPath}js/v-tooltip/v-tooltip.min.js" type="text/javascript"></script> 
 <link href="${commonPath}js/v-tooltip/v-tooltip.css" type="text/css" rel="stylesheet">
@@ -3878,7 +3896,7 @@
 <script src="${commonPath}js/prism/default-block/prism.js" type="text/javascript"></script> 
 <script src="${commonPath}js/prism/default-block/clipboard.min.js" type="text/javascript"></script> 
 
-<script src="${commonPath}js/main.js?fdddfdfsc" type="text/javascript"></script>
+<script src="${commonPath}js/main.js?a" type="text/javascript"></script>
 
 
 

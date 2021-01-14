@@ -1,0 +1,6 @@
+webuploader.js
+
+修改下面两行代码，让uploader.options.server方法支持动态修改，要预先设置obj.blob.source.server='http://...'才能取到值
+修改6865行  由 opts.server 改为(opts.server != '' ? opts.server : blob.source.server)
+修改7935行  由 opts.server 改为(opts.server != '' ? opts.server : blob.source.server)
+

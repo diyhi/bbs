@@ -279,6 +279,25 @@ public class CommentServiceBean extends DaoSupport<Comment> implements CommentSe
 		topicService.subtractCommentTotal(topicId,1L);
 		return i;
 	} 
+	
+	/**
+	 * 标记删除评论
+	 * @param commentId 评论Id
+	 * @param constant 常数 例如 "110.待审核用户删除" 则加上100
+	 * @return
+	 */
+	public Integer markDeleteComment(Long commentId,Integer constant){
+		int i = 0;
+		Query query = em.createQuery("update Comment o set o.status=o.status+?1 where o.id=?2 and o.status <?3")
+		.setParameter(1, constant)
+		.setParameter(2, commentId)
+		.setParameter(3, constant);
+		i= query.executeUpdate();
+		return i;
+		
+	}
+	
+	
 	/**--------------------------------------回复------------------------------------**/
 	
 	/**
@@ -415,5 +434,21 @@ public class CommentServiceBean extends DaoSupport<Comment> implements CommentSe
 		Query delete = em.createQuery("delete from Reply o where o.id=?1")
 		.setParameter(1, replyId);
 		return delete.executeUpdate();
+	}
+	/**
+	 * 标记删除回复
+	 * @param replyId 回复Id
+	 * @param constant 常数 例如 "110.待审核用户删除" 则加上100
+	 * @return
+	 */
+	public Integer markDeleteReply(Long replyId,Integer constant){
+		int i = 0;
+		Query query = em.createQuery("update Reply o set o.status=o.status+?1 where o.id=?2 and o.status <?3")
+		.setParameter(1, constant)
+		.setParameter(2, replyId)
+		.setParameter(3, constant);
+		i= query.executeUpdate();
+		return i;
+		
 	}
 }

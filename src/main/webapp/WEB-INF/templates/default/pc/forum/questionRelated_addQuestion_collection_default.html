@@ -8,7 +8,9 @@
 	
 		<!-- 问题编辑器允许使用标签 -->
 		<input type="hidden" id="questionAvailableTag"  value="${returnValue['availableTag']}">
-		
+		<!-- 文件系统 -->
+		<input type="hidden" id="fileSystem"  value="${returnValue['fileSystem']}">
+			
 		<div class="question-form">
 			<form id="addQuestionForm" action="user/control/question/add?page=${url_page}" method="post">
 				<#-- 提交问题最多可选择标签数量 -->
@@ -403,7 +405,12 @@
 						var captchaKey = document.getElementById(identificationNumber+"_"+"captchaKey").value;
 						document.getElementById(identificationNumber+"_"+"captcha").src = "captcha/"+captchaKey+".jpg?" + Math.random(); 
 					}
-					
+					//解决提交按钮的click和富文本的blur事件冲突
+					$(document).ready(function(){
+						$("input[type='button']").mousedown(function(e){
+					    	e.preventDefault();
+						});
+					});
 					//表单Form方式提交
 					function sureSubmit(obj){
 						obj.submit();
@@ -458,13 +465,18 @@
 							parameter += "&content="+encodeURIComponent(content);
 						
 							//悬赏金额
-							var amount = document.getElementById("amount").value;
-							parameter += "&amount="+encodeURIComponent(amount);
+							var amount = document.getElementById("amount");
+							if(amount != null){
+								parameter += "&amount="+encodeURIComponent(amount.value);
+							}
+							
+							
 							//悬赏积分
-							var point = document.getElementById("point").value;
-							parameter += "&point="+encodeURIComponent(point);
-						
-						
+							var point = document.getElementById("point");
+							if(point != null){
+								parameter += "&point="+encodeURIComponent(point.value);
+							}
+							
 						
 						   	//删除第一个&号,防止因为多了&号而出现警告: Parameters: Invalid chunk ignored.信息
 							if(parameter.indexOf("&") == 0){
@@ -551,7 +563,7 @@
 					}
 					var editor;
 					KindEditor.ready(function(K) {
-
+						var fileSystem = document.getElementById("fileSystem").value;
 						editor = K.create('textarea[id="questionContent"]', {
 							themeType : 'style :darkGray',//深灰主题 加冒号的是主题样式文件名称同时也是主题目录
 							basePath : '${commonPath}js/kindeditor/',//指定编辑器的根目录路径
@@ -560,6 +572,7 @@
 							autoHeightMode : true,//自适应高度
 							allowPreviewEmoticons : true,//true或false，true时鼠标放在表情上可以预览表情
 							allowImageUpload : true,//true时显示图片上传按钮
+							uploadModule : parseInt(fileSystem),//上传模块 0.本地 10.SeaweedFS 20.MinIO 30.阿里云OSS
 							uploadJson :'user/control/question/upload.htm?method=upload',//指定浏览远程图片的服务器端程序
 							filePostName:'file',//文件上传字段 默认imgFile
 							items : questionAvailableTag_obj,

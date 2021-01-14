@@ -29,6 +29,7 @@ import cms.utils.threadLocal.CSRFTokenThreadLocal;
 import cms.web.action.AccessSourceDeviceManage;
 import cms.web.action.CSRFTokenManage;
 import cms.web.action.common.OAuthManage;
+import cms.web.action.fileSystem.FileManage;
 import cms.web.action.statistic.PageViewManage;
 import cms.web.action.template.TemplateMain;
 import cms.web.action.thirdParty.ThirdPartyManage;
@@ -67,7 +68,7 @@ public class TempletesInterceptor extends HandlerInterceptorAdapter {
 	
 	@Resource UserRoleManage userRoleManage;
 	@Resource ThirdPartyManage thirdPartyManage;
-	
+	@Resource FileManage fileManage;
 	
 	//?  匹配任何单字符
 	//*  匹配0或者任意数量的字符
@@ -102,9 +103,6 @@ public class TempletesInterceptor extends HandlerInterceptorAdapter {
 	        	}
 	        }
 		}
-		
-		
-		
 		
 		//设置自定义标签的URL
 		if(request != null){
@@ -265,6 +263,9 @@ public class TempletesInterceptor extends HandlerInterceptorAdapter {
 	    			request.setAttribute("baseURI",Configuration.baseURI(request.getRequestURI(), request.getContextPath()));//系统资源标识符
 	    			request.setAttribute("token",csrf_token);
 	    			request.setAttribute("identificationNumber",UUIDUtil.getUUID32());//识别号：用来区别每次请求
+	    			request.setAttribute("fileStorageSystem",fileManage.getFileSystem());//文件存储系统 0.本地系统 10.SeaweedFS 20.MinIO 30.阿里云OSS
+	    			
+	    			
 	    			
 	    			
 	    			WeChatConfig weChatConfig = thirdPartyManage.queryWeChatConfig();

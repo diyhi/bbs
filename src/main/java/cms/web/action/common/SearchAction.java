@@ -3,7 +3,6 @@ package cms.web.action.common;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -17,8 +16,6 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.IntPoint;
-import org.apache.lucene.facet.taxonomy.SearcherTaxonomyManager.SearcherAndTaxonomy;
-import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.MultiReader;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
@@ -62,6 +59,7 @@ import cms.utils.JsonUtils;
 import cms.utils.WebUtil;
 import cms.web.action.AccessSourceDeviceManage;
 import cms.web.action.TextFilterManage;
+import cms.web.action.fileSystem.FileManage;
 import cms.web.action.lucene.QuestionLuceneInit;
 import cms.web.action.lucene.TopicLuceneInit;
 import cms.web.action.lucene.TopicLuceneManage;
@@ -84,6 +82,8 @@ public class SearchAction {
 	@Resource UserRoleManage userRoleManage;
 	@Resource TextFilterManage textFilterManage;
 	@Resource QuestionService questionService;
+	@Resource FileManage fileManage;
+	
 	
 	/**
 	 * 搜索
@@ -154,7 +154,7 @@ public class SearchAction {
 									if(t.getIsStaff() == false){//会员
 										User user = userManage.query_cache_findUserByUserName(t.getUserName());
 										t.setNickname(user.getNickname());
-										t.setAvatarPath(user.getAvatarPath());
+										t.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 										t.setAvatarName(user.getAvatarName());
 										
 										
@@ -180,7 +180,7 @@ public class SearchAction {
 									if(t.getIsStaff() == false){//会员
 										User user = userManage.query_cache_findUserByUserName(t.getUserName());
 										t.setNickname(user.getNickname());
-										t.setAvatarPath(user.getAvatarPath());
+										t.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 										t.setAvatarName(user.getAvatarName());
 										
 										

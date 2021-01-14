@@ -55,7 +55,7 @@ public class Comment implements Serializable{
 	/** 话题标题 **/
 	@Transient
 	private String topicTitle;
-	/** 状态 10.待审核 20.已发布 **/
+	/** 状态 10.待审核 20.已发布 110.待审核用户删除 120.已发布用户删除 100010.待审核员工删除 100020.已发布员工删除 **/
 	private Integer status = 10;
 	
 	/** 引用json数据 **/

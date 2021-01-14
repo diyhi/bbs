@@ -83,7 +83,7 @@ public class SystemNotifyManage {
 	 * @param start_sendTime 起始系统通知发送时间
 	 * @return
 	 */
-	@Cacheable(value="systemNotifyManage_cache_findSystemNotifyCountBySendTime",key="#start_sendTime")
+	@Cacheable(value="systemNotifyManage_cache_findSystemNotifyCountBySendTime",key="#start_sendTime.getTime()")
 	public Long query_cache_findSystemNotifyCountBySendTime(Date start_sendTime){
 		return systemNotifyService.findSystemNotifyCountBySendTime(start_sendTime);
 	}

@@ -53,6 +53,7 @@ import cms.utils.WebUtil;
 import cms.utils.threadLocal.AccessUserThreadLocal;
 import cms.web.action.AccessSourceDeviceManage;
 import cms.web.action.CSRFTokenManage;
+import cms.web.action.fileSystem.FileManage;
 import cms.web.action.setting.SettingManage;
 import cms.web.action.thirdParty.ThirdPartyManage;
 import cms.web.action.user.UserLoginLogManage;
@@ -90,7 +91,7 @@ public class UserFormManageAction {
 	@Resource OAuthManage oAuthManage;
 
 	@Resource ThirdPartyManage thirdPartyManage;
-	
+	@Resource FileManage fileManage;
 	
 	//?  匹配任何单字符
 	//*  匹配0或者任意数量的字符
@@ -579,14 +580,14 @@ public class UserFormManageAction {
 					oAuthManage.addOpenId(openId,refreshToken);
 				}
 				
-				oAuthManage.addAccessToken(accessToken, new AccessUser(user.getId(),user.getUserName(),user.getNickname(),user.getAvatarPath(),user.getAvatarName(), user.getSecurityDigest(),false,openId));
-				oAuthManage.addRefreshToken(refreshToken, new RefreshUser(accessToken,user.getId(),user.getUserName(),user.getNickname(),user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),false,openId));
+				oAuthManage.addAccessToken(accessToken, new AccessUser(user.getId(),user.getUserName(),user.getNickname(),fileManage.fileServerAddress()+user.getAvatarPath(),user.getAvatarName(), user.getSecurityDigest(),false,openId));
+				oAuthManage.addRefreshToken(refreshToken, new RefreshUser(accessToken,user.getId(),user.getUserName(),user.getNickname(),fileManage.fileServerAddress()+user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),false,openId));
 	
 				//将访问令牌添加到Cookie
 				WebUtil.addCookie(response, "cms_accessToken", accessToken, 0);
 				//将刷新令牌添加到Cookie
 				WebUtil.addCookie(response, "cms_refreshToken", refreshToken, 0);
-				AccessUserThreadLocal.set(new AccessUser(user.getId(),user.getUserName(),user.getNickname(),user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),false,openId));
+				AccessUserThreadLocal.set(new AccessUser(user.getId(),user.getUserName(),user.getNickname(),fileManage.fileServerAddress()+user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),false,openId));
 				
 				//删除缓存
 				userManage.delete_cache_findUserById(user.getId());
@@ -639,7 +640,7 @@ public class UserFormManageAction {
     			
     			returnValue.put("success", "true");
     			returnValue.put("jumpUrl", _jumpUrl);
-    			returnValue.put("systemUser", new AccessUser(user.getId(),user.getUserName(),user.getNickname(),user.getAvatarPath(),user.getAvatarName(),null,false,""));//登录用户
+    			returnValue.put("systemUser", new AccessUser(user.getId(),user.getUserName(),user.getNickname(),fileManage.fileServerAddress()+user.getAvatarPath(),user.getAvatarName(),null,false,""));//登录用户
     			
     		}
     		
@@ -1026,8 +1027,8 @@ public class UserFormManageAction {
 							oAuthManage.addOpenId(openId,refreshToken);
 						}
 						
-						oAuthManage.addAccessToken(accessToken, new AccessUser(user.getId(),user.getUserName(),user.getNickname(),user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),rememberMe,openId));
-						oAuthManage.addRefreshToken(refreshToken, new RefreshUser(accessToken,user.getId(),user.getUserName(),user.getNickname(),user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),rememberMe,openId));
+						oAuthManage.addAccessToken(accessToken, new AccessUser(user.getId(),user.getUserName(),user.getNickname(),fileManage.fileServerAddress()+user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),rememberMe,openId));
+						oAuthManage.addRefreshToken(refreshToken, new RefreshUser(accessToken,user.getId(),user.getUserName(),user.getNickname(),fileManage.fileServerAddress()+user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),rememberMe,openId));
 						
 						
 						
@@ -1041,7 +1042,7 @@ public class UserFormManageAction {
 						WebUtil.addCookie(response, "cms_accessToken", accessToken, maxAge);
 						//将刷新令牌添加到Cookie
 						WebUtil.addCookie(response, "cms_refreshToken", refreshToken, maxAge);
-						AccessUserThreadLocal.set(new AccessUser(user.getId(),user.getUserName(),user.getNickname(),user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),rememberMe,openId));
+						AccessUserThreadLocal.set(new AccessUser(user.getId(),user.getUserName(),user.getNickname(),fileManage.fileServerAddress()+user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),rememberMe,openId));
 						
 					}else{
 						//密码错误
@@ -1112,7 +1113,7 @@ public class UserFormManageAction {
     		}else{
     			ajax_return.put("success", "true");
     			ajax_return.put("jumpUrl", _jumpUrl);
-    			ajax_return.put("systemUser", new AccessUser(user.getId(),user.getUserName(),user.getNickname(),user.getAvatarPath(),user.getAvatarName(),null,false,""));//登录用户
+    			ajax_return.put("systemUser", new AccessUser(user.getId(),user.getUserName(),user.getNickname(),fileManage.fileServerAddress()+user.getAvatarPath(),user.getAvatarName(),null,false,""));//登录用户
     		}
     		
     		

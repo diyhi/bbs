@@ -77,7 +77,6 @@ import cms.service.user.UserRoleService;
 import cms.service.user.UserService;
 import cms.utils.FileUtil;
 import cms.utils.JsonUtils;
-import cms.utils.PathUtil;
 import cms.utils.RedirectPath;
 import cms.utils.SHA;
 import cms.utils.UUIDUtil;
@@ -153,6 +152,9 @@ public class UserManageAction {
 		user.setPassword(null);//密码不显示
 		user.setAnswer(null);//密码提示答案不显示
 		user.setSalt(null);//盐值不显示
+		user.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+		
+		
 		if(user.getType() >10){
 			user.setPlatformUserId(userManage.platformUserIdToThirdPartyUserId(user.getPlatformUserId()));
 		}
@@ -1833,14 +1835,14 @@ public class UserManageAction {
 								fileManage.writeFile(pathDir_100, newFileName,imgFile.getBytes());
 							}else{
 								//生成100*100缩略图
-								fileManage.createImage(imgFile.getInputStream(),PathUtil.path()+File.separator+pathDir_100+newFileName,suffix,100,100);
+								fileManage.createImage(imgFile.getInputStream(),pathDir_100+newFileName,suffix,100,100);
 							}
 						}else{
 							//生成200*200缩略图
-							fileManage.createImage(imgFile.getInputStream(),PathUtil.path()+File.separator+pathDir+newFileName,suffix,x,y,width,height,200,200);
+							fileManage.createImage(imgFile.getInputStream(),pathDir+newFileName,suffix,x,y,width,height,200,200);
 
 							//生成100*100缩略图
-							fileManage.createImage(imgFile.getInputStream(),PathUtil.path()+File.separator+pathDir_100+newFileName,suffix,x,y,width,height,100,100);
+							fileManage.createImage(imgFile.getInputStream(),pathDir_100+newFileName,suffix,x,y,width,height,100,100);
     
 						}	
 					}else{

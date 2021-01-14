@@ -738,11 +738,12 @@ public class TopicManage {
 	 * 查询缓存 解析上传的文件完整路径名称
 	 * @param html 富文本内容
 	 * @param topicId 话题Id
+	 * @param baseUrlList 基础URL集合
 	 * @return
 	 */
 	@Cacheable(value="topicManage_cache_analysisFullFileName",key="#topicId")
-	public Map<String,String> query_cache_analysisFullFileName(String html,Long topicId){
-		return textFilterManage.analysisFullFileName(html,"topic");
+	public Map<String,String> query_cache_analysisFullFileName(String html,Long topicId,List<String> baseUrlList){
+		return textFilterManage.analysisFullFileName(html,"topic",baseUrlList);
 	}
 	/**
 	 * 删除缓存 解析上传的文件完整路径名称
@@ -759,11 +760,12 @@ public class TopicManage {
 	 * @param item 项目
 	 * @param newFullFileNameMap 新的完整路径名称 key: 完整路径名称 value: 重定向接口
 	 * @param processFullFileNameId 处理'上传的文件完整路径名称'Id
+	 * @param baseUrlList 基础URL集合
 	 * @return
 	 */
 	@Cacheable(value="topicManage_cache_processFullFileName",key="#processFullFileNameId")
-	public String query_cache_processFullFileName(String html,String item,Map<String,String> newFullFileNameMap,String processFullFileNameId){
-		return textFilterManage.processFullFileName(html,item,newFullFileNameMap);
+	public String query_cache_processFullFileName(String html,String item,Map<String,String> newFullFileNameMap,String processFullFileNameId, List<String> baseUrlList){
+		return textFilterManage.processFullFileName(html,item,newFullFileNameMap,baseUrlList);
 	}
 	
 	

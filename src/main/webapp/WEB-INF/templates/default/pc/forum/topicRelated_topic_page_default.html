@@ -70,7 +70,25 @@
 												<#list topic.imageInfoList as imageInfo>
 													<#-- 图片最多显示8张 -->
 													<#if imageInfo_index lt 8>
-														<li data-src="${imageInfo.path}${imageInfo.name}"><div class="img" style="background-image: url(${imageInfo.path}240x240/${imageInfo.name})"></div> <b class="tm-photos-arrow"></b> </li>
+														<li data-src="${imageInfo.path}${imageInfo.name}">
+															<#-- 本地缩略图 -->
+															<#if fileStorageSystem == 0>
+																<div class="img" style="background-image: url(${imageInfo.path}240x240/${imageInfo.name})"></div>
+															</#if>
+															<#-- SeaweedFS缩略图 使用nginx image_filter的缩略图处理功能 -->
+															<#if fileStorageSystem == 10>
+																<div class="img" style="background-image: url(${imageInfo.path}${imageInfo.name}?width=240)"></div>
+															</#if>
+															<#--  MinIO缩略图 使用nginx image_filter的缩略图处理功能 -->
+															<#if fileStorageSystem == 20>
+																<div class="img" style="background-image: url(${imageInfo.path}${imageInfo.name}?width=240)"></div>
+															</#if>
+															<#-- 阿里云OSS缩略图 -->
+															<#if fileStorageSystem == 30>
+																<div class="img" style="background-image: url(${imageInfo.path}${imageInfo.name}?x-oss-process=image/resize,w_240)"></div>
+															</#if>
+															
+														<b class="tm-photos-arrow"></b> </li>
 													</#if>
 												</#list>
 											</ul>

@@ -471,7 +471,6 @@ public class TextFilterManage {
 	    }
 		
 		
-
 		//上传图片文件名称
 		List<String> imageNameList = new ArrayList<String>();
 		//图片
@@ -481,15 +480,15 @@ public class TextFilterManage {
 			//font-size:14px;font-family:NSimSun;
 			 String imageUrl = element.attr("src"); 
 			 if(imageUrl != null && !"".equals(imageUrl.trim())){
-			//	 
+				 
 				 //上传图片
-				 if (imageUrl.trim().startsWith(Configuration.getUrl(request)+"file/") ||
-						 imageUrl.trim().startsWith(Configuration.getUrl(request)+"common/") ||
-						 imageUrl.trim().startsWith(Configuration.getUrl(request)+"backstage/")) {  
+				 if (this.isBindURL(request,imageUrl.trim(),"file/") ||
+						 this.isBindURL(request,imageUrl.trim(),"common/") ||
+						 this.isBindURL(request,imageUrl.trim(),"backstage/")) {  
 					 
 					//内置svg表情图片
-					 if (imageUrl.trim().startsWith(Configuration.getUrl(request)+"common/") ||
-							 imageUrl.trim().startsWith(Configuration.getUrl(request)+"backstage/")) {  
+					 if (this.isBindURL(request,imageUrl.trim(),"common/") ||
+							 this.isBindURL(request,imageUrl.trim(),"backstage/")) {  
 						 String extension = FileUtil.getExtension(imageUrl);
 						 if(extension != null && "svg".equalsIgnoreCase(extension.trim())){
 							 element.attr("width",  "32px");  
@@ -497,12 +496,11 @@ public class TextFilterManage {
 						 }
 		             }
 					 
-					 //从左往右查到相等的字符开始，保留后边的，不包含等于的字符
-					 imageUrl =StringUtils.substringAfter(imageUrl, Configuration.getUrl(request));  
-	                 element.attr("src",  imageUrl);  
-	                 if(StringUtils.startsWithIgnoreCase(imageUrl, "file/"+item+"/")){
+					 String processUrl = this.deleteBindURL(request,imageUrl.trim());
+					 element.attr("src",  processUrl);   
+	                 if(StringUtils.startsWithIgnoreCase(processUrl, "file/"+item+"/")){
 	                	 
-		            	 imageNameList.add(StringUtils.difference("file/"+item+"/", imageUrl));
+		            	 imageNameList.add(StringUtils.difference("file/"+item+"/", processUrl));
 		             }
 	                 
 	                 
@@ -531,24 +529,21 @@ public class TextFilterManage {
 				 String flashUrl = element.attr("src"); 
 				 if(flashUrl != null && !"".equals(flashUrl.trim())){
 					 
-					 if (flashUrl.trim().startsWith(Configuration.getUrl(request)+"file/"+item+"/")) {  
-						 //从左往右查到相等的字符开始，保留后边的，不包含等于的字符
-						 flashUrl =StringUtils.substringAfter(flashUrl, Configuration.getUrl(request));  
-		                 element.attr("src",  flashUrl);
-		                 flashNameList.add(StringUtils.difference("file/"+item+"/", flashUrl));
-		             }
+					 if(this.isBindURL(request,flashUrl.trim(),"file/"+item+"/")){
+						 String processUrl = this.deleteBindURL(request,flashUrl.trim());
+						 element.attr("src",  processUrl);
+						 flashNameList.add(StringUtils.difference("file/"+item+"/", processUrl));//去掉参数2字符串中在参数一中开头部分共有的部分
+					 }
 				 } 
 			 }else if("video/x-ms-asf-plugin".equalsIgnoreCase(type)){//音视频
 				 isMedia = true;
 				 String mediaUrl = element.attr("src"); 
 				 if(mediaUrl != null && !"".equals(mediaUrl.trim())){
-					 
-					 if (mediaUrl.trim().startsWith(Configuration.getUrl(request)+"file/"+item+"/")) {  
-						 //从左往右查到相等的字符开始，保留后边的，不包含等于的字符
-						 mediaUrl =StringUtils.substringAfter(mediaUrl, Configuration.getUrl(request));  
-		                 element.attr("src",  mediaUrl);
-		                 mediaNameList.add(StringUtils.difference("file/"+item+"/", mediaUrl));
-		             }
+					 if(this.isBindURL(request,mediaUrl.trim(),"file/"+item+"/")){
+						 String processUrl = this.deleteBindURL(request,mediaUrl.trim());
+						 element.attr("src",  processUrl);
+						 mediaNameList.add(StringUtils.difference("file/"+item+"/", processUrl));//去掉参数2字符串中在参数一中开头部分共有的部分
+					 }
 				 }
 				 
 			 }
@@ -559,12 +554,11 @@ public class TextFilterManage {
 			String videoUrl = element.attr("src"); 
 			 if(videoUrl != null && !"".equals(videoUrl.trim())){
 				 isMedia = true;
-				 if (videoUrl.trim().startsWith(Configuration.getUrl(request)+"file/"+item+"/")) {  
-					 //从左往右查到相等的字符开始，保留后边的，不包含等于的字符
-					 videoUrl =StringUtils.substringAfter(videoUrl, Configuration.getUrl(request));  
-	                 element.attr("src",  videoUrl);
-	                 mediaNameList.add(StringUtils.difference("file/"+item+"/", videoUrl));
-	             }
+				 if(this.isBindURL(request,videoUrl.trim(),"file/"+item+"/")){
+					 String processUrl = this.deleteBindURL(request,videoUrl.trim());
+					 element.attr("src",  processUrl);
+					 mediaNameList.add(StringUtils.difference("file/"+item+"/", processUrl));//去掉参数2字符串中在参数一中开头部分共有的部分
+				 }
 			 } 
 		}
 		
@@ -615,10 +609,10 @@ public class TextFilterManage {
 			String fileUrl = element.attr("href");
 			if(fileUrl != null && !"".equals(fileUrl.trim())){
 				isFile = true;
-				if (fileUrl.trim().startsWith(Configuration.getUrl(request)+"file/"+item+"/")) { 
-					fileUrl =StringUtils.substringAfter(fileUrl, Configuration.getUrl(request));  
-					element.attr("href",  fileUrl);
-					fileNameList.add(StringUtils.difference("file/"+item+"/", fileUrl));
+				if(this.isBindURL(request,fileUrl.trim(),"file/"+item+"/")){
+					 String processUrl = this.deleteBindURL(request,fileUrl.trim());
+					 element.attr("href",  processUrl);
+					 fileNameList.add(StringUtils.difference("file/"+item+"/", processUrl));//去掉参数2字符串中在参数一中开头部分共有的部分
 				}
 			}
 		}
@@ -666,16 +660,17 @@ public class TextFilterManage {
 			if(htmlData != null && !"".equals(htmlData.trim())){
 				htmlData = HtmlEscape.escapeSymbol(element.html());//仅转义小于号和大于号
 			}
-			
+		
 			//清空元素的内容
 			element.empty();
 			
 			element.prependElement("code").html(htmlData);
 		}
 		
+		
 		//prettyPrint(是否重新格式化)、outline(是否强制所有标签换行)、indentAmount(缩进长度)    doc.outputSettings().indentAmount(0).prettyPrint(false);
 		doc.outputSettings().prettyPrint(false);
-				
+	
 	//	 doc.outputSettings().escapeMode(EscapeMode.xhtml);
 	//     Document clean = new Cleaner(whitelist).clean(doc);
 	//     return clean.body().html();//获取html 
@@ -1439,9 +1434,10 @@ public class TextFilterManage {
 	 * 解析上传的文件完整路径名称
 	 * @param html 富文本内容
 	 * @param item 项目
+	 * @param baseUrlList 基础URL集合
 	 * @return 
 	 */
-	public Map<String,String> analysisFullFileName(String html,String item){
+	public Map<String,String> analysisFullFileName(String html,String item, List<String> baseUrlList){
 		Map<String,String> fullFileNameMap = new HashMap<String,String>();//key:文件完整路径名称 value:文件名称
 		if(!StringUtils.isBlank(html)){
 			Document doc = Jsoup.parseBodyFragment(html);
@@ -1454,6 +1450,15 @@ public class TextFilterManage {
 					if(StringUtils.startsWithIgnoreCase(fileUrl, "file/"+item+"/")){
 						fullFileNameMap.put(fileUrl.trim(),fileName);
 					}
+					if(baseUrlList != null && baseUrlList.size() >0){
+						for(String baseUrl : baseUrlList){
+							if(StringUtils.startsWithIgnoreCase(fileUrl, baseUrl+"file/"+item+"/")){
+								
+								fullFileNameMap.put(fileUrl.trim(),fileName);
+							}
+						}
+					}
+					
 				}
 			}
 		}
@@ -1466,9 +1471,10 @@ public class TextFilterManage {
 	 * @param html 富文本内容
 	 * @param item 项目
 	 * @param newFullFileNameMap 新的完整路径名称 key: 完整路径名称 value: 重定向接口
+	 * @param baseUrlList 基础URL集合
 	 * @return
 	 */
-	public String processFullFileName(String html,String item,Map<String,String> newFullFileNameMap){
+	public String processFullFileName(String html,String item,Map<String,String> newFullFileNameMap, List<String> baseUrlList){
 		
 		if(!StringUtils.isBlank(html)){
 			Document doc = Jsoup.parseBodyFragment(html);
@@ -1481,8 +1487,17 @@ public class TextFilterManage {
 						element.attr("href",newFullFileNameMap.get(fileUrl.trim()));
 						
 					}
+					if(baseUrlList != null && baseUrlList.size() >0){
+						for(String baseUrl : baseUrlList){
+							if(StringUtils.startsWithIgnoreCase(fileUrl, baseUrl+"file/"+item+"/")){
+								
+								element.attr("href",newFullFileNameMap.get(fileUrl.trim()));
+							}
+						}
+					}
 				}
 			}
+			
 			//prettyPrint(是否重新格式化)、outline(是否强制所有标签换行)、indentAmount(缩进长度)    doc.outputSettings().indentAmount(0).prettyPrint(false);
 			doc.outputSettings().prettyPrint(false);
 			html = doc.body().html();
@@ -1631,5 +1646,59 @@ public class TextFilterManage {
 		
 		
 		return html;
+	}	
+		
+	/**
+	 * 判断是否为绑定网址
+	 * @param request
+	 * @param processUrl 待处理URL
+	 * @param append 绑定网址追加URL
+	 * @return
+	 */
+	public boolean isBindURL(HttpServletRequest request,String processUrl,String append){  
+		List<String> validUrlList = this.validBindURL(request);
+		for(String validUrl : validUrlList){
+			if(StringUtils.startsWithIgnoreCase(processUrl.trim(),validUrl+append)) { //判断开始部分是否与二参数相同。不区分大小写 
+				return true;
+            }
+		}
+		
+		return false;
 	}
+	
+	/**
+	 * 删除绑定网址
+	 * @param request
+	 * @param processUrl 待处理URL
+	 * @return
+	 */
+	public String deleteBindURL(HttpServletRequest request,String processUrl){  
+		List<String> validUrlList = this.validBindURL(request);
+		for(String validUrl : validUrlList){
+			if(StringUtils.startsWithIgnoreCase(processUrl.trim(),validUrl)) { //判断开始部分是否与二参数相同。不区分大小写 
+				return StringUtils.removeStartIgnoreCase(processUrl, validUrl);//移除开始部分的相同的字符,不区分大小写
+            }
+		}
+		return processUrl;
+	}
+	/**
+	 * 有效绑定网址
+	 * @param request
+	 * @param processUrl 待处理URL
+	 * @return
+	 */
+	private List<String> validBindURL(HttpServletRequest request){  
+		//生成有效URL
+		List<String> validUrlList = new ArrayList<String>();
+		
+		String url = Configuration.getUrl(request);
+		url = StringUtils.removeStartIgnoreCase(url, "http:");//移除开始部分的相同的字符,不区分大小写
+		url = StringUtils.removeStartIgnoreCase(url, "https:");//移除开始部分的相同的字符,不区分大小写
+		validUrlList.add("http:"+url);
+		validUrlList.add("https:"+url);
+		validUrlList.add(url);
+		
+		return validUrlList;
+	}
+	
 }

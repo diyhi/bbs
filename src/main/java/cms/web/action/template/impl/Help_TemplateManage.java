@@ -21,6 +21,7 @@ import cms.service.help.HelpTypeService;
 import cms.service.setting.SettingService;
 import cms.utils.JsonUtils;
 import cms.utils.Verification;
+import cms.web.action.fileSystem.FileManage;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -35,7 +36,7 @@ public class Help_TemplateManage {
 	
 	@Resource HelpService helpService;
 	@Resource SettingService settingService;
-	
+	@Resource FileManage fileManage;
 	@Resource HelpTypeService helpTypeService;
 	/**
 	 * 在线帮助列表 -- 单层
@@ -205,7 +206,19 @@ public class Help_TemplateManage {
 		//删除第一个and
 		String jpql_str = StringUtils.difference(" and", jpql.toString());
 		QueryResult<Help> qr = helpService.getScrollData(Help.class,firstIndex, maxResult, jpql_str, params.toArray(),orderby);
-
+		
+		if(qr.getResultlist() != null && qr.getResultlist().size() >0){
+			for(Help help: qr.getResultlist()){
+				HelpType helpType = helpTypeService.findById(help.getHelpTypeId());
+				if(helpType != null){
+					help.setHelpTypeName(helpType.getName());
+				}
+				//处理富文本路径
+				help.setContent(fileManage.processRichTextFilePath(help.getContent(),"help"));
+			}
+		}
+		
+		
 		//将查询结果集传给分页List
 		pageView.setQueryResult(qr);
 		return pageView;
@@ -392,6 +405,8 @@ public class Help_TemplateManage {
 				if(helpType != null){
 					help.setHelpTypeName(helpType.getName());
 				}
+				//处理富文本路径
+				help.setContent(fileManage.processRichTextFilePath(help.getContent(),"help"));
 				return help;
 			}
 			

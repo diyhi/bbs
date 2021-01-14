@@ -24,6 +24,7 @@ import cms.bean.redEnvelope.ReceiveRedEnvelope;
 import cms.bean.setting.SystemSetting;
 import cms.bean.topic.Topic;
 import cms.bean.user.AccessUser;
+import cms.bean.user.ResourceEnum;
 import cms.service.redEnvelope.RedEnvelopeService;
 import cms.service.setting.SettingService;
 import cms.service.template.TemplateService;
@@ -110,6 +111,12 @@ public class RedEnvelopeFormAction {
 		  	if(giveRedEnvelopeId != null){
 		  		giveRedEnvelope = redEnvelopeService.findById(giveRedEnvelopeId);
 		  		if(giveRedEnvelope != null){
+		  			
+		  			
+		  		
+		  			
+		  			
+		  			
 		  			if(giveRedEnvelope.getRemainingQuantity() <=0){
 		  				error.put("receiveRedEnvelope", ErrorView._3050.name());//红包已被抢光
 		  				
@@ -124,6 +131,12 @@ public class RedEnvelopeFormAction {
 					if(topic != null){
 						if(!topic.getStatus().equals(20)){//20.已发布
 							error.put("receiveRedEnvelope", ErrorView._3060.name());//话题未发布不允许领取红包
+						}else{
+							//检查权限
+							boolean isPermission = userRoleManage.checkPermission(ResourceEnum._1001000,topic.getTagId());
+				  			if(!isPermission){
+				  				error.put("receiveRedEnvelope", ErrorView._3090.name());//没有领取红包权限
+				  			}
 						}
 						
 					}else{

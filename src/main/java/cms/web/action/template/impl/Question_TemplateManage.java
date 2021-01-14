@@ -39,6 +39,7 @@ import cms.utils.UUIDUtil;
 import cms.utils.Verification;
 import cms.web.action.TextFilterManage;
 import cms.web.action.common.CaptchaManage;
+import cms.web.action.fileSystem.FileManage;
 import cms.web.action.lucene.QuestionLuceneManage;
 import cms.web.action.question.AnswerManage;
 import cms.web.action.question.QuestionManage;
@@ -66,6 +67,8 @@ public class Question_TemplateManage {
 	@Resource AnswerManage answerManage;
 	@Resource CaptchaManage captchaManage;
 	@Resource QuestionLuceneManage questionLuceneManage;
+	@Resource FileManage fileManage;
+	
 	
 	/**
 	 * 问题列表  -- 分页
@@ -235,7 +238,7 @@ public class Question_TemplateManage {
 					User user = userManage.query_cache_findUserByUserName(question.getUserName());
 					if(user != null){
 						question.setNickname(user.getNickname());
-						question.setAvatarPath(user.getAvatarPath());
+						question.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 						question.setAvatarName(user.getAvatarName());
 						
 						List<String> userRoleNameList = userRoleManage.queryUserRoleName(user.getUserName());
@@ -379,6 +382,11 @@ public class Question_TemplateManage {
 				}
 				question.setIpAddress(null);//IP地址不显示
 				
+				if(question.getContent() != null && !"".equals(question.getContent().trim())){
+					//处理富文本路径
+					question.setContent(fileManage.processRichTextFilePath(question.getContent(),"question"));
+				}
+				
 				List<QuestionTag> questionTagList = questionTagService.findAllQuestionTag_cache();
 				
 				if(questionTagList != null && questionTagList.size() >0){
@@ -401,6 +409,17 @@ public class Question_TemplateManage {
 				String _appendContent = StringUtils.substringBeforeLast(question.getAppendContent(), ",");//从右往左截取到相等的字符,保留左边的
 
 				List<AppendQuestionItem> appendQuestionItemList = JsonUtils.toGenericObject(_appendContent+"]", new TypeReference< List<AppendQuestionItem> >(){});
+				if(appendQuestionItemList != null && appendQuestionItemList.size() >0){	
+					for(AppendQuestionItem appendQuestionItem : appendQuestionItemList){
+						if(appendQuestionItem.getContent() != null && !"".equals(appendQuestionItem.getContent().trim())){
+							//处理富文本路径
+							appendQuestionItem.setContent(fileManage.processRichTextFilePath(appendQuestionItem.getContent(),"question"));
+						}
+					}
+				}
+				
+				
+				
 				question.setAppendQuestionItemList(appendQuestionItemList);
 				
 				
@@ -409,7 +428,7 @@ public class Question_TemplateManage {
 					user = userManage.query_cache_findUserByUserName(question.getUserName());
 					if(user != null){
 						question.setNickname(user.getNickname());
-						question.setAvatarPath(user.getAvatarPath());
+						question.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 						question.setAvatarName(user.getAvatarName());
 						
 						List<String> userRoleNameList = userRoleManage.queryUserRoleName(user.getUserName());
@@ -477,6 +496,7 @@ public class Question_TemplateManage {
 		value.put("maxQuestionTagQuantity", systemSetting.getMaxQuestionTagQuantity());//提交问题最多可选择标签数量
 		
 		value.put("availableTag", questionManage.availableTag());//问题编辑器允许使用标签
+		value.put("fileSystem", fileManage.getFileSystem());
 		return value;
 	}
 	
@@ -513,6 +533,7 @@ public class Question_TemplateManage {
 		}
 		
 		value.put("availableTag", questionManage.availableTag());//问题编辑器允许使用标签
+		value.put("fileSystem", fileManage.getFileSystem());
 		return value;
 	}
 	
@@ -680,12 +701,16 @@ public class Question_TemplateManage {
 		Map<String,List<String>> userRoleNameMap = new HashMap<String,List<String>>();//用户角色名称 key:用户名称Id 角色名称集合
 		if(answerList != null && answerList.size() >0){
 			for(Answer answer : answerList){
+				if(answer.getContent() != null && !"".equals(answer.getContent().trim())){
+					//处理富文本路径
+					answer.setContent(fileManage.processRichTextFilePath(answer.getContent(),"answer"));
+				}
 				answer.setIpAddress(null);//IP地址不显示
 				if(answer.getIsStaff() == false){//会员
 					User user = userManage.query_cache_findUserByUserName(answer.getUserName());
 					if(user != null){
 						answer.setNickname(user.getNickname());
-						answer.setAvatarPath(user.getAvatarPath());
+						answer.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 						answer.setAvatarName(user.getAvatarName());
 						userRoleNameMap.put(answer.getUserName(), null);
 					}
@@ -734,7 +759,7 @@ public class Question_TemplateManage {
 								User user = userManage.query_cache_findUserByUserName(answerReply.getUserName());
 								if(user != null){
 									answerReply.setNickname(user.getNickname());
-									answerReply.setAvatarPath(user.getAvatarPath());
+									answerReply.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 									answerReply.setAvatarName(user.getAvatarName());
 									
 									List<String> roleNameList = userRoleManage.queryUserRoleName(answerReply.getUserName());
@@ -790,6 +815,7 @@ public class Question_TemplateManage {
 		}
 		
 		value.put("availableTag", answerManage.availableTag());//答案编辑器允许使用标签
+		value.put("fileSystem", fileManage.getFileSystem());
 		return value;
 	}
 	
@@ -834,7 +860,10 @@ public class Question_TemplateManage {
 			Answer answer = answerManage.query_cache_findByAnswerId(answerId);//查询缓存
 			if(answer != null && answer.getStatus() <100 && answer.getUserName().equals(accessUser.getUserName())){
 				answer.setIpAddress(null);//IP地址不显示
-
+				if(answer.getContent() != null && !"".equals(answer.getContent().trim())){
+					//处理富文本路径
+					answer.setContent(fileManage.processRichTextFilePath(answer.getContent(),"answer"));
+				}
 				value.put("answer",answer);
 				
 				
@@ -851,6 +880,7 @@ public class Question_TemplateManage {
 			value.put("allowAnswer",true);//允许提交答案
 		}
 		value.put("availableTag", answerManage.availableTag());//答案编辑器允许使用标签
+		value.put("fileSystem", fileManage.getFileSystem());
 		return value;
 	}
 	

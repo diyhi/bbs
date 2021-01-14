@@ -17,6 +17,7 @@ import cms.bean.user.User;
 import cms.service.redEnvelope.RedEnvelopeService;
 import cms.utils.JsonUtils;
 import cms.utils.Verification;
+import cms.web.action.fileSystem.FileManage;
 import cms.web.action.payment.PaymentManage;
 import cms.web.action.user.UserManage;
 import net.sf.cglib.beans.BeanCopier;
@@ -43,6 +44,7 @@ public class RedEnvelopeManage {
     @Resource RedEnvelopeManage redEnvelopeManage;
     @Resource PaymentManage paymentManage;
     @Resource UserManage userManage;
+    @Resource FileManage fileManage;
     
 	/**
 	 * 取得收红包Id的用户Id(后N位)
@@ -346,7 +348,7 @@ public class RedEnvelopeManage {
         			receiveRedEnvelope.setReceiveNickname(user.getNickname());
         			receiveRedEnvelope.setReceiveUserName(user.getUserName());
         			if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-        				receiveRedEnvelope.setReceiveAvatarPath(user.getAvatarPath());
+        				receiveRedEnvelope.setReceiveAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
         				receiveRedEnvelope.setReceiveAvatarName(user.getAvatarName());
         			}	
         			ReceiveRedEnvelope valid_receiveRedEnvelope = redEnvelopeService.findByReceiveRedEnvelopeId(this.createReceiveRedEnvelopeId(giveRedEnvelope.getId(),user.getId()));

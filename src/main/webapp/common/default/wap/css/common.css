@@ -811,7 +811,7 @@ html,body{
 }
 .topicContentModule .topicDetail .main p{word-wrap:break-word;}
 .topicContentModule .topicDetail .main img{
-	max-width:100%;height:auto;border:none;background:none;padding:0;
+	max-width:100%;height:auto;border:none;background:none;padding:0;vertical-align: sub;
 }
 .topicContentModule .topicDetail .main iframe{
 	width:100%; height: 300px;padding:10px 0px; 
@@ -1021,7 +1021,7 @@ html,body{
 }
 .topicContentModule .commentList .item .main .commentContent p{font-size:16px;word-wrap:break-word}
 .topicContentModule .commentList .item .main .commentContent img {
-	max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;
+	max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;vertical-align: sub;
 }
 .topicContentModule .commentList .item .main .quote{
 	 padding:5px 8px;border-bottom:none;text-align: left;margin-left: 5px;color: 878787;
@@ -1591,7 +1591,7 @@ html,body{
 }
 .questionContentModule .questionDetail .main p{word-wrap:break-word;}
 .questionContentModule .questionDetail .main img{
-	max-width:100%;height:auto;border:none;background:none;padding:0;
+	max-width:100%;height:auto;border:none;background:none;padding:0;vertical-align: sub;
 }
 .questionContentModule .operating {
 	display:inline-block;text-align: center;width: 100%;
@@ -1645,7 +1645,7 @@ html,body{
 	color: #26a2ff;
 }
 .questionContentModule .questionDetail .appendBox .appendContent p{font-size:16px;word-wrap:break-word}
-.questionContentModule .questionDetail .appendBox .appendContent img{max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;}
+.questionContentModule .questionDetail .appendBox .appendContent img{max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;vertical-align: sub;}
 
 
 
@@ -1832,7 +1832,7 @@ html,body{
 }
 .questionContentModule .answerList .item .main .answerContent p{font-size:16px;word-wrap:break-word}
 .questionContentModule .answerList .item .main .answerContent img {
-	max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;
+	max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;vertical-align: sub;
 }
 .questionContentModule .answerList .replyList {
 	border-top: 1px solid #eee;
@@ -2839,7 +2839,7 @@ html,body{
 	font-style: italic;
 }
 .homeModule .userDynamicList .item .main .topicContent img{
-	max-width:100%;height:auto;border:none;background:none;padding:0;
+	max-width:100%;height:auto;border:none;background:none;padding:0;vertical-align: sub;
 }
 .homeModule .userDynamicList .item .main .topicContent iframe{
 	width:100%; height: 400px;padding:10px 0px; 
@@ -2942,7 +2942,7 @@ html,body{
 	text-align: left;
 }
 .homeModule .userDynamicList .item .main .commentContent img {
-	max-width:100%;height:auto;border:none;background:none;padding:0;
+	max-width:100%;height:auto;border:none;background:none;padding:0;vertical-align: sub;
 	/**
 	display: block;
 	max-width: 100%;
@@ -4466,7 +4466,7 @@ html,body{
 
 .membershipCardModule .detail .content{margin-top:10px;padding:20px 5px;color:#666666;font-size:16px;word-wrap:break-word}
 .membershipCardModule .detail .content p{font-size:16px;word-wrap:break-word}
-.membershipCardModule .detail .content img{max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;}
+.membershipCardModule .detail .content img{max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;vertical-align: sub;}
 
 
 /** 支付 **/

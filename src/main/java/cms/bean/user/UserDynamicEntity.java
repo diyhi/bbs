@@ -118,7 +118,7 @@ public class UserDynamicEntity implements Serializable{
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date postTime = new Date();
 	
-	/** 状态 10.待审核 20.已发布 110.待审核删除 120.已发布删除 **/
+	/** 状态 10.待审核 20.已发布 110.待审核删除 120.已发布删除 100010.待审核员工删除 100020.已发布员工删除 **/
 	protected Integer status = 10;
 
 	public String getId() {

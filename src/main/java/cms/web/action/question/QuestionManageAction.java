@@ -116,11 +116,25 @@ public class QuestionManageAction {
 				if(question.getIp() != null && !"".equals(question.getIp().trim())){
 					question.setIpAddress(IpAddress.queryAddress(question.getIp().trim()));
 				}
+				if(question.getContent() != null && !"".equals(question.getContent().trim())){
+					//处理富文本路径
+					question.setContent(fileManage.processRichTextFilePath(question.getContent(),"question"));
+				}
 
 				//删除最后一个逗号
 				String _appendContent = StringUtils.substringBeforeLast(question.getAppendContent(), ",");//从右往左截取到相等的字符,保留左边的
 
 				List<AppendQuestionItem> appendQuestionItemList = JsonUtils.toGenericObject(_appendContent+"]", new TypeReference< List<AppendQuestionItem> >(){});
+				if(appendQuestionItemList != null && appendQuestionItemList.size() >0){
+					for(AppendQuestionItem appendQuestionItem : appendQuestionItemList){
+						if(appendQuestionItem.getContent() != null && !"".equals(appendQuestionItem.getContent().trim())){
+							//处理富文本路径
+							appendQuestionItem.setContent(fileManage.processRichTextFilePath(appendQuestionItem.getContent(),"question"));
+						}
+					}
+					
+				}
+				
 				question.setAppendQuestionItemList(appendQuestionItemList);
 				
 			
@@ -128,7 +142,7 @@ public class QuestionManageAction {
 					User user = userManage.query_cache_findUserByUserName(question.getUserName());
 					if(user != null){
 						question.setNickname(user.getNickname());
-						question.setAvatarPath(user.getAvatarPath());
+						question.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 						question.setAvatarName(user.getAvatarName());
 						
 						List<String> userRoleNameList = userRoleManage.queryUserRoleName(user.getUserName());
@@ -157,7 +171,7 @@ public class QuestionManageAction {
 				}
 				
 				model.addAttribute("question", question);
-				
+				model.addAttribute("fileSystem", fileManage.getFileSystem());
 				model.addAttribute("availableTag", answerManage.availableTag());
 				
 				PageForm pageForm = new PageForm();
@@ -211,6 +225,11 @@ public class QuestionManageAction {
 				if(answerList != null && answerList.size() >0){
 					for(Answer answer : answerList){
 						answerIdList.add(answer.getId());
+						if(answer.getContent() != null && !"".equals(answer.getContent().trim())){
+							//处理富文本路径
+							answer.setContent(fileManage.processRichTextFilePath(answer.getContent(),"answer"));
+						}
+						
 					}
 				}
 				
@@ -221,7 +240,7 @@ public class QuestionManageAction {
 							User user = userManage.query_cache_findUserByUserName(answer.getUserName());
 							if(user != null){
 								answer.setNickname(user.getNickname());
-								answer.setAvatarPath(user.getAvatarPath());
+								answer.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 								answer.setAvatarName(user.getAvatarName());
 								userRoleNameMap.put(answer.getUserName(), null);
 							}
@@ -300,6 +319,7 @@ public class QuestionManageAction {
 			username =((UserDetails)obj).getUsername();	
 		}
 		model.addAttribute("userName", username);
+		model.addAttribute("fileSystem", fileManage.getFileSystem());
 		return "jsp/question/add_question";
 	}
 	
@@ -557,6 +577,7 @@ public class QuestionManageAction {
 			Question question = questionService.findById(questionId);
 			if(question != null){
 				model.addAttribute("question", question);
+				model.addAttribute("fileSystem", fileManage.getFileSystem());
 			}else{
 				throw new SystemException("问题不存在");
 			}	
@@ -748,6 +769,7 @@ public class QuestionManageAction {
 	 * @param dir 上传类型，分别为image、flash、media、file 
 	 * @param userName 用户名称
 	 * @param isStaff 是否是员工   true:员工   false:会员
+	 * @param fileName 文件名称 预签名时有值
 	 * @param imgFile
 	 * @param response
 	 * @return
@@ -755,7 +777,7 @@ public class QuestionManageAction {
 	 */
 	@RequestMapping(params="method=upload",method=RequestMethod.POST)
 	@ResponseBody//方式来做ajax,直接返回字符串
-	public String upload(ModelMap model,String dir,String userName, Boolean isStaff,
+	public String upload(ModelMap model,String dir,String userName, Boolean isStaff,String fileName,
 			MultipartFile imgFile, HttpServletResponse response) throws Exception {
 		
 		String number = questionManage.generateFileNumber(userName, isStaff);
@@ -769,45 +791,157 @@ public class QuestionManageAction {
 		     
 			String date = dateTime.toString("yyyy-MM-dd");
 			
-			if(imgFile != null && !imgFile.isEmpty()){
-				
-				
-				//当前文件名称
-				String fileName = imgFile.getOriginalFilename();
-				
-				//文件大小
-				Long size = imgFile.getSize();
-				//取得文件后缀
-				String suffix = FileUtil.getExtension(fileName).toLowerCase();
-
-				if(dir.equals("image")){
-					//允许上传图片格式
-					List<String> formatList = new ArrayList<String>();
-					formatList.add("gif");
-					formatList.add("jpg");
-					formatList.add("jpeg");
-					formatList.add("bmp");
-					formatList.add("png");
+			int fileSystem = fileManage.getFileSystem();
+			if(fileSystem ==10 || fileSystem == 20 || fileSystem == 30){//10.SeaweedFS 20.MinIO 30.阿里云OSS
+				if(fileName != null && !"".equals(fileName.trim())){
+					//取得文件后缀
+					String suffix = FileUtil.getExtension(fileName.trim()).toLowerCase();
 					
-					//允许上传图片大小
-					long imageSize = 200000L;
+					if(dir.equals("image")){
+						//允许上传格式
+						List<String> formatList = CommentedProperties.readRichTextAllowImageUploadFormat();
+						//验证文件后缀
+						boolean authentication = FileUtil.validateFileSuffix(fileName.trim(),formatList);
+						if(authentication){
+							//文件锁目录
+							String lockPathDir = "file"+File.separator+"question"+File.separator+"lock"+File.separator;
+							//构建文件名称
+							String newFileName = UUIDUtil.getUUID32()+ number+"." + suffix;
+							
+							
+							//生成锁文件
+							fileManage.addLock(lockPathDir,date +"_image_"+newFileName);
+							String presigne = fileManage.createPresigned("file/question/"+date+"/image/"+newFileName,null);//创建预签名
+							
+							
+							//返回预签名URL
+							returnJson.put("error", 0);//0成功  1错误
+							returnJson.put("url", presigne);
+							returnJson.put("title", fileName);//旧文件名称
+							return JsonUtils.toJSONString(returnJson);
+							
+						}else{
+							errorMessage = "文件格式不允许上传";
+						}
+						
+						
+					}else if(dir.equals("flash")){
+						//允许上传格式
+						List<String> formatList = new ArrayList<String>();
+						formatList.add("swf");
+						//验证文件后缀
+						boolean authentication = FileUtil.validateFileSuffix(fileName.trim(),formatList);
+						if(authentication){
+							//文件锁目录
+							String lockPathDir = "file"+File.separator+"question"+File.separator+"lock"+File.separator;
+							//构建文件名称
+							String newFileName = UUIDUtil.getUUID32()+ number+"." + suffix;
+							
+							
+							//生成锁文件
+							fileManage.addLock(lockPathDir,date +"_flash_"+newFileName);
+							String presigne = fileManage.createPresigned("file/question/"+date+"/flash/"+newFileName,null);//创建预签名
+							
+							
+							//返回预签名URL
+							returnJson.put("error", 0);//0成功  1错误
+							returnJson.put("url", presigne);
+							returnJson.put("title", fileName);//旧文件名称
+							return JsonUtils.toJSONString(returnJson);
+							
+						}else{
+							errorMessage = "文件格式不允许上传";
+						}
+						
+					}else if(dir.equals("media")){
+						//允许上传格式
+						List<String> formatList = CommentedProperties.readRichTextAllowVideoUploadFormat();
+						//验证文件后缀
+						boolean authentication = FileUtil.validateFileSuffix(fileName.trim(),formatList);
+						if(authentication){
+							//文件锁目录
+							String lockPathDir = "file"+File.separator+"question"+File.separator+"lock"+File.separator;
+							//构建文件名称
+							String newFileName = UUIDUtil.getUUID32()+ number+"." + suffix;
+							
+							
+							//生成锁文件
+							fileManage.addLock(lockPathDir,date +"_media_"+newFileName);
+							String presigne = fileManage.createPresigned("file/question/"+date+"/media/"+newFileName,null);//创建预签名
+							
+							
+							//返回预签名URL
+							returnJson.put("error", 0);//0成功  1错误
+							returnJson.put("url", presigne);
+							returnJson.put("title", fileName);//旧文件名称
+							return JsonUtils.toJSONString(returnJson);
+							
+						}else{
+							errorMessage = "文件格式不允许上传";
+						}
+					}else if(dir.equals("file")){
+						//允许上传格式
+						List<String> formatList = CommentedProperties.readRichTextAllowFileUploadFormat();
+						
+						//验证文件后缀
+						boolean authentication = FileUtil.validateFileSuffix(fileName.trim(),formatList);
+						if(authentication){
+							//文件锁目录
+							String lockPathDir = "file"+File.separator+"question"+File.separator+"lock"+File.separator;
+							//构建文件名称
+							String newFileName = UUIDUtil.getUUID32()+ number+"." + suffix;
+							
+							
+							//生成锁文件
+							fileManage.addLock(lockPathDir,date +"_file_"+newFileName);
+							String presigne = fileManage.createPresigned("file/question/"+date+"/file/"+newFileName,null);//创建预签名
+							
+							
+							//返回预签名URL
+							returnJson.put("error", 0);//0成功  1错误
+							returnJson.put("url", presigne);
+							returnJson.put("title", fileName);//旧文件名称
+							return JsonUtils.toJSONString(returnJson);
+							
+						}else{
+							errorMessage = "文件格式不允许上传";
+						}
+					}else{
+						errorMessage = "缺少dir参数";
+					}
+				}else{
+					errorMessage = "文件名称不能为空";
+				}
+				
+			}else{//0.本地系统
+				if(imgFile != null && !imgFile.isEmpty()){
 
-					//验证文件类型
-					boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
+					//当前文件名称
+					String sourceFileName = imgFile.getOriginalFilename();
 					
-					//如果用flash控件上传
-					if(imgFile.getContentType().equalsIgnoreCase("application/octet-stream")){
-						String fileType = FileType.getType(imgFile.getInputStream());
-						for (String format :formatList) {
-							if(format.equalsIgnoreCase(fileType)){
-								authentication = true;
-								break;
+					//取得文件后缀
+					String suffix = FileUtil.getExtension(sourceFileName).toLowerCase();
+
+					if(dir.equals("image")){
+						//允许上传图片格式
+						List<String> formatList = CommentedProperties.readRichTextAllowImageUploadFormat();
+						
+						
+						//验证文件类型
+						boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
+						
+						//如果用flash控件上传
+						if(imgFile.getContentType().equalsIgnoreCase("application/octet-stream")){
+							String fileType = FileType.getType(imgFile.getInputStream());
+							for (String format :formatList) {
+								if(format.equalsIgnoreCase(fileType)){
+									authentication = true;
+									break;
+								}
 							}
 						}
-					}
-					
-					if(authentication){
-						if(size/1024 <= imageSize){
+						
+						if(authentication){
 							//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
 							String pathDir = "file"+File.separator+"question"+File.separator + date +File.separator +"image"+ File.separator;
 							//文件锁目录
@@ -826,130 +960,122 @@ public class QuestionManageAction {
 							
 							//上传成功
 							returnJson.put("error", 0);//0成功  1错误
-							returnJson.put("url", "file/question/"+date+"/image/"+newFileName);
+							returnJson.put("url", fileManage.fileServerAddress()+"file/question/"+date+"/image/"+newFileName);
 							return JsonUtils.toJSONString(returnJson);
 						}else{
-							errorMessage = "文件超出允许上传大小";
+							errorMessage = "当前文件类型不允许上传";
+						}
+					}else if(dir.equals("flash")){
+						//允许上传flash格式
+						List<String> flashFormatList = new ArrayList<String>();
+						flashFormatList.add("swf");
+						
+						//验证文件后缀
+						boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),flashFormatList);
+						
+						if(authentication){
+							
+							//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
+							String pathDir = "file"+File.separator+"question"+File.separator + date+ File.separator +"flash"+ File.separator;
+							//文件锁目录
+							String lockPathDir = "file"+File.separator+"question"+File.separator+"lock"+File.separator;
+							//构建文件名称
+							String newFileName = UUIDUtil.getUUID32()+ number+"." + suffix;
+							
+							//生成文件保存目录
+							fileManage.createFolder(pathDir);
+							//生成锁文件保存目录
+							fileManage.createFolder(lockPathDir);
+							//生成锁文件
+							fileManage.addLock(lockPathDir,date +"_flash_"+newFileName);
+							//保存文件
+							fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
+							
+							
+							//上传成功
+							returnJson.put("error", 0);//0成功  1错误
+							returnJson.put("url", fileManage.fileServerAddress()+"file/question/"+date+"/flash/"+newFileName);
+							return JsonUtils.toJSONString(returnJson);
+						}
+						
+						
+						
+					}else if(dir.equals("media")){
+						//允许上传视音频格式
+						List<String> formatList = CommentedProperties.readRichTextAllowVideoUploadFormat();
+						
+						
+						//验证文件后缀
+						boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
+						
+						if(authentication){
+							
+							//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
+							String pathDir = "file"+File.separator+"question"+File.separator + date+ File.separator +"media"+ File.separator;
+							//文件锁目录
+							String lockPathDir = "file"+File.separator+"question"+File.separator+"lock"+File.separator;
+							//构建文件名称
+							String newFileName = UUIDUtil.getUUID32()+ number+"." + suffix;
+							
+							//生成文件保存目录
+							fileManage.createFolder(pathDir);
+							//生成锁文件保存目录
+							fileManage.createFolder(lockPathDir);
+							//生成锁文件
+							fileManage.addLock(lockPathDir,date +"_media_"+newFileName);
+							//保存文件
+							fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
+
+							//上传成功
+							returnJson.put("error", 0);//0成功  1错误
+							returnJson.put("url", fileManage.fileServerAddress()+"file/question/"+date+"/media/"+newFileName);
+							return JsonUtils.toJSONString(returnJson);
+						}else{
+							errorMessage = "当前文件类型不允许上传";
+						}
+					}else if(dir.equals("file")){
+						//允许上传文件格式
+						List<String> formatList = CommentedProperties.readRichTextAllowFileUploadFormat();
+						
+						//验证文件后缀
+						boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
+						if(authentication){
+							
+							//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
+							String pathDir = "file"+File.separator+"question"+File.separator + date+ File.separator +"file"+ File.separator;
+							//文件锁目录
+							String lockPathDir = "file"+File.separator+"question"+File.separator+"lock"+File.separator;
+							//构建文件名称
+							String newFileName = UUIDUtil.getUUID32()+ number+"." + suffix;
+							
+							//生成文件保存目录
+							fileManage.createFolder(pathDir);
+							//生成锁文件保存目录
+							fileManage.createFolder(lockPathDir);
+							//生成锁文件
+							fileManage.addLock(lockPathDir,date +"_file_"+newFileName);
+							//保存文件
+							fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
+
+							//上传成功
+							returnJson.put("error", 0);//0成功  1错误
+							returnJson.put("url", fileManage.fileServerAddress()+"file/question/"+date+"/file/"+newFileName);
+							returnJson.put("title", imgFile.getOriginalFilename());//旧文件名称
+							return JsonUtils.toJSONString(returnJson);
+						}else{
+							errorMessage = "当前文件类型不允许上传";
 						}
 					}else{
-						errorMessage = "当前文件类型不允许上传";
-					}
-				}else if(dir.equals("flash")){
-					//允许上传flash格式
-					List<String> flashFormatList = new ArrayList<String>();
-					flashFormatList.add("swf");
-					
-					//验证文件后缀
-					boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),flashFormatList);
-					
-					if(authentication){
-						
-						//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
-						String pathDir = "file"+File.separator+"question"+File.separator + date+ File.separator +"flash"+ File.separator;
-						//文件锁目录
-						String lockPathDir = "file"+File.separator+"question"+File.separator+"lock"+File.separator;
-						//构建文件名称
-						String newFileName = UUIDUtil.getUUID32()+ number+"." + suffix;
-						
-						//生成文件保存目录
-						fileManage.createFolder(pathDir);
-						//生成锁文件保存目录
-						fileManage.createFolder(lockPathDir);
-						//生成锁文件
-						fileManage.addLock(lockPathDir,date +"_flash_"+newFileName);
-						//保存文件
-						fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
-						
-						
-						//上传成功
-						returnJson.put("error", 0);//0成功  1错误
-						returnJson.put("url", "file/question/"+date+"/flash/"+newFileName);
-						return JsonUtils.toJSONString(returnJson);
-					}
-					
-					
-					
-				}else if(dir.equals("media")){
-					//允许上传视音频格式
-					List<String> formatList = new ArrayList<String>();
-					formatList.add("flv");
-					formatList.add("mp4");
-					formatList.add("avi");
-					formatList.add("mkv");
-					formatList.add("wmv");
-					formatList.add("wav");
-					formatList.add("rm/rmvb");
-					formatList.add("mp3");
-					formatList.add("flac");
-					formatList.add("ape");
-					
-					
-					//验证文件后缀
-					boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
-					
-					if(authentication){
-						
-						//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
-						String pathDir = "file"+File.separator+"question"+File.separator + date+ File.separator +"media"+ File.separator;
-						//文件锁目录
-						String lockPathDir = "file"+File.separator+"question"+File.separator+"lock"+File.separator;
-						//构建文件名称
-						String newFileName = UUIDUtil.getUUID32()+ number+"." + suffix;
-						
-						//生成文件保存目录
-						fileManage.createFolder(pathDir);
-						//生成锁文件保存目录
-						fileManage.createFolder(lockPathDir);
-						//生成锁文件
-						fileManage.addLock(lockPathDir,date +"_media_"+newFileName);
-						//保存文件
-						fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
-
-						//上传成功
-						returnJson.put("error", 0);//0成功  1错误
-						returnJson.put("url", "file/question/"+date+"/media/"+newFileName);
-						return JsonUtils.toJSONString(returnJson);
-					}else{
-						errorMessage = "当前文件类型不允许上传";
-					}
-				}else if(dir.equals("file")){
-					//允许上传文件格式
-					List<String> formatList = CommentedProperties.readRichTextAllowFileUploadFormat();
-					
-					//验证文件后缀
-					boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
-					if(authentication){
-						
-						//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
-						String pathDir = "file"+File.separator+"question"+File.separator + date+ File.separator +"file"+ File.separator;
-						//文件锁目录
-						String lockPathDir = "file"+File.separator+"question"+File.separator+"lock"+File.separator;
-						//构建文件名称
-						String newFileName = UUIDUtil.getUUID32()+ number+"." + suffix;
-						
-						//生成文件保存目录
-						fileManage.createFolder(pathDir);
-						//生成锁文件保存目录
-						fileManage.createFolder(lockPathDir);
-						//生成锁文件
-						fileManage.addLock(lockPathDir,date +"_file_"+newFileName);
-						//保存文件
-						fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
-
-						//上传成功
-						returnJson.put("error", 0);//0成功  1错误
-						returnJson.put("url", "file/question/"+date+"/file/"+newFileName);
-						returnJson.put("title", imgFile.getOriginalFilename());//旧文件名称
-						return JsonUtils.toJSONString(returnJson);
-					}else{
-						errorMessage = "当前文件类型不允许上传";
+						errorMessage = "缺少dir参数";
 					}
 				}else{
-					errorMessage = "缺少dir参数";
+					errorMessage = "文件不能为空";
 				}
-			}else{
-				errorMessage = "文件不能为空";
+				
 			}
+			
+			
+			
 
 		}else{
 			errorMessage = "参数不能为空";
@@ -957,7 +1083,7 @@ public class QuestionManageAction {
 		
 		//上传失败
 		returnJson.put("error", 1);
-		returnJson.put("message", "上传失败");
+		returnJson.put("message", errorMessage);
 		return JsonUtils.toJSONString(returnJson);
 	}
 	/**
@@ -970,6 +1096,11 @@ public class QuestionManageAction {
 		if(questionId != null && questionId >0L){
 			Question question = questionService.findById(questionId);
 			if(question != null){
+				if(question.getContent() != null && !"".equals(question.getContent().trim())){
+					//处理富文本路径
+					question.setContent(fileManage.processRichTextFilePath(question.getContent(),"question"));
+				}
+				
 				List<QuestionTag> questionTagList = questionTagService.findAllQuestionTag();
 				if(questionTagList != null && questionTagList.size() >0){
 					
@@ -998,6 +1129,7 @@ public class QuestionManageAction {
 				throw new SystemException("问题不存在");
 			}	
 			model.addAttribute("question", question);
+			model.addAttribute("fileSystem", fileManage.getFileSystem());
 		}
 		return "jsp/question/edit_question";
 	}
@@ -1521,6 +1653,12 @@ public class QuestionManageAction {
 				if(appendQuestionItemList != null && appendQuestionItemList.size() >0){
 					for(AppendQuestionItem appendQuestionItem : appendQuestionItemList){
 						if(appendQuestionItem.getId().equals(appendQuestionItemId)){
+							
+							if(appendQuestionItem.getContent() != null && !"".equals(appendQuestionItem.getContent().trim())){
+								//处理富文本路径
+								appendQuestionItem.setContent(fileManage.processRichTextFilePath(appendQuestionItem.getContent(),"question"));
+							}
+							
 							model.addAttribute("appendQuestionItem", appendQuestionItem);
 							break;
 						}
@@ -1528,6 +1666,7 @@ public class QuestionManageAction {
 				}
 
 				model.addAttribute("question", question);
+				model.addAttribute("fileSystem", fileManage.getFileSystem());
 			}else{
 				throw new SystemException("问题不存在");
 			}	

@@ -6862,7 +6862,7 @@
                     opts = this.options,
                     xhr = this._initAjax(),
                     blob = owner._blob,
-                    server = opts.server,
+                    server = (opts.server != '' ? opts.server : blob.source.server),//修改opts.server, 动态修改时要先设置值obj.blob.source.server
                     formData, binary, fr;
     
                 if ( opts.sendAsBinary ) {
@@ -7932,7 +7932,7 @@
                     opts = this.options,
                     xhr = this._initAjax(),
                     blob = owner._blob,
-                    server = opts.server,
+                    server = (opts.server != '' ? opts.server : blob.source.server),//修改opts.server, 动态修改时要先设置值obj.blob.source.server
                     binary;
     
                 xhr.connectRuntime( blob.ruid );

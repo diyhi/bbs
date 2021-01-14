@@ -13,10 +13,10 @@
 	 <tbody> 
 		<tr> 
 		<tr> 
-			<td rowspan="10">questionRelated_addQuestion_collection</td> 
-			<td rowspan="10">Map&ltString,Object></td>
+			<td rowspan="11">questionRelated_addQuestion_collection</td> 
+			<td rowspan="11">Map&ltString,Object></td>
 			<td>键参数：availableTag<br>值内容说明：问题编辑器允许使用标签(配合KindEditor编辑器使用)<br>值类型：JSON格式List&ltString></td>
-			<td rowspan="10">添加问题界面显示返回值</td> 
+			<td rowspan="11">添加问题界面显示返回值</td> 
 		</tr>
 		<tr> 
 			<td>键参数：captchaKey<br>值内容说明：验证码编号 (根据'全站设置 - 基本设置 - 担交问题每分钟提交超过'参数计算是否含有值)<br>值类型：String </td>
@@ -44,6 +44,9 @@
 		</tr>
 		<tr> 
 			<td>键参数：questionRewardAmountMax<br>值内容说明：问题悬赏金额上限；空为无限制 0则不允许悬赏金额<br>值类型：BigDecimal</td>
+		</tr>
+		<tr> 
+			<td>键参数：fileSystem<br>值内容说明：文件系统 0.本地 10.SeaweedFS 20.MinIO 30.阿里云OSS<br>值类型：int</td>
 		</tr>
 	</tbody> 
 </table>
@@ -146,7 +149,8 @@
 			<td>参数</td> 
 			<td colspan="2">
 				file : 上传文件接收字段<br>
-				dir : 文件上传类型 分别为image、file 
+				dir : 文件上传类型 分别为image、file <br>
+				fileName : 文件名称 预签名时必须有值
 			</td>
 		</tr>
 		<tr> 

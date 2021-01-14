@@ -118,21 +118,6 @@
 						url : "queryReceiveRedEnvelopeUser?giveRedEnvelopeId="+giveRedEnvelopeId+"&page="+page,
 						//data: data, 
 						success:function(result) {
-							
-							
-							var base = "";
-							var els = document.getElementsByTagName('base');   
-						    for (var i = 0, len = els.length; i < len; i++) {   
-						        var href = els[i].href;   
-						        if (href) {   
-						            base = href;   
-						        }   
-						    } 
-
-							
-							
-							
-							
 							if(result.records != null && result.records.length >0){
 								var html = "";
 								var html_more = "";
@@ -145,7 +130,7 @@
 									var data = (receiveRedEnvelope.receiveNickname != null && receiveRedEnvelope.receiveNickname !='' ? receiveRedEnvelope.receiveNickname : receiveRedEnvelope.receiveUserName)+" 获得 "+receiveRedEnvelope.amount+" 元";
 									var image = receiveRedEnvelope.receiveAvatarPath+"100x100/"+receiveRedEnvelope.receiveAvatarName;
 									if(receiveRedEnvelope.receiveAvatarName != null){
-										html += "<img class='avatar redEnvelopeData' data='"+data+"' src='"+base+image+"'>";
+										html += "<img class='avatar redEnvelopeData' data='"+data+"' src='"+image+"'>";
 									
 									}else{
 										var avatar = (receiveRedEnvelope.receiveNickname != null && receiveRedEnvelope.receiveNickname !='' ? receiveRedEnvelope.receiveNickname : receiveRedEnvelope.receiveUserName);

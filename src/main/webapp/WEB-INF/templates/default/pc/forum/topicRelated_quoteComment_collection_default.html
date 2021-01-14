@@ -23,6 +23,9 @@
 						<input type="hidden" id="${identificationNumber}_commentId" name="commentId" value="${url_commentId}">
 						<#-- 获取令牌 -->
 						<input type="hidden" id="token" name="token" value="${token!}">
+						<#-- 文件系统 -->
+						<input type="hidden" id="fileSystem"  value="${(returnValue['fileSystem'])!}">
+							
 						<div class="quoteSubmit">
 							<span class="submitButton-box" >
 								<button id="${identificationNumber}_submitForm" type="button" class="submitButton" onClick="javascript:ajax_quote_sureSubmit('${identificationNumber}')">提交</button>
@@ -115,7 +118,12 @@
 							var captchaKey = document.getElementById(identificationNumber+"_"+"captchaKey").value;
 							document.getElementById(identificationNumber+"_"+"captcha").src = "captcha/"+captchaKey+".jpg?" + Math.random(); 
 						}
-					
+						//解决提交按钮的click和富文本的blur事件冲突
+						$(document).ready(function(){
+							$("button[type='button']").mousedown(function(e){
+						    	e.preventDefault();
+							});
+						});
 						//表单Form方式提交
 						function quote_sureSubmit(obj){
 							obj.submit();
@@ -212,6 +220,8 @@
 							}
 							//获取URL中的话题Id
 							var topicId = getUrlParam("topicId");
+							var fileSystem = document.getElementById("fileSystem").value;
+							
 							KindEditor.options.cssData = 'body { font-size: 14px; }';
 							var editor = KindEditor.create('textarea[id="${identificationNumber}_quoteCommentContent"]', {
 								themeType : 'style :minimalist customization',//极简主题 加冒号的是主题样式文件名称同时也是主题目录
@@ -221,6 +231,7 @@
 								autoHeightMode : true,//自适应高度
 								allowPreviewEmoticons : true,//true或false，true时鼠标放在表情上可以预览表情
 								allowImageUpload : true,//true时显示图片上传按钮
+								uploadModule : parseInt(fileSystem),//上传模块 0.本地 10.SeaweedFS 20.MinIO 30.阿里云OSS
 								uploadJson :'user/control/comment/uploadImage.htm?topicId='+topicId,//指定浏览远程图片的服务器端程序
 								filePostName:'file',//文件上传字段 默认imgFile
 								width : '100%',

@@ -472,6 +472,7 @@ public class CommentFormAction {
 	 * 评论  图片上传
 	 * @param model
 	 * @param topicId 话题Id
+	 * @param fileName 文件名称 预签名时有值
 	 * @param imgFile
 	 * @param request
 	 * @param response
@@ -480,7 +481,7 @@ public class CommentFormAction {
 	 */
 	@RequestMapping(value="/uploadImage", method=RequestMethod.POST)
 	@ResponseBody//方式来做ajax,直接返回字符串
-	public String uploadImage(ModelMap model,Long topicId,
+	public String uploadImage(ModelMap model,Long topicId,String fileName,
 			MultipartFile file, HttpServletRequest request,HttpServletResponse response) throws Exception {
 
 		Map<String,Object> returnJson = new HashMap<String,Object>();
@@ -514,27 +515,16 @@ public class CommentFormAction {
 					errorMessage = "权限不足";
 				}else{
 					//文件上传
-					if(flag_permission && file != null && !file.isEmpty()){
-						if(topicId != null && topicId >0L){
-							
-							
-							
+					int fileSystem = fileManage.getFileSystem();
+					if(fileSystem ==10 || fileSystem == 20 || fileSystem == 30){//10.SeaweedFS 20.MinIO 30.阿里云OSS
+						if(fileName != null && !"".equals(fileName.trim()) && topicId != null && topicId >0L){
+							//取得文件后缀
+							String suffix = FileUtil.getExtension(fileName.trim()).toLowerCase();
 							EditorTag editorSiteObject = settingManage.readEditorTag();
 							if(editorSiteObject != null && systemSetting.isAllowComment()){//是否全局允许评论
 								if(editorSiteObject.isImage()){//允许上传图片
-									
 									//上传文件编号
 									String fileNumber = "b"+accessUser.getUserId();
-									
-									
-									//当前图片文件名称
-									String fileName = file.getOriginalFilename();
-									//当前图片类型
-								//	String imgType = file.getContentType();
-									//文件大小
-									Long size = file.getSize();
-									//取得文件后缀
-									String suffix = fileName.substring(fileName.lastIndexOf('.')+1).toLowerCase();
 									
 									
 									//允许上传图片格式
@@ -543,34 +533,25 @@ public class CommentFormAction {
 									long imageSize = editorSiteObject.getImageSize();
 
 									//验证文件类型
-									boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),imageFormat);
+									boolean authentication = FileUtil.validateFileSuffix(fileName.trim(),imageFormat);
 									
-									if(authentication ){
-										if(size/1024 <= imageSize){
-											//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
-											String pathDir = "file"+File.separator+"comment"+File.separator + topicId + File.separator;
-											//文件锁目录
-											String lockPathDir = "file"+File.separator+"comment"+File.separator+"lock"+File.separator;
-											//构建文件名称
-											String newFileName = UUIDUtil.getUUID32()+fileNumber+ "." + suffix;
-											
-											//生成文件保存目录
-											fileManage.createFolder(pathDir);
-											//生成锁文件保存目录
-											fileManage.createFolder(lockPathDir);
-											//生成锁文件
-											fileManage.addLock(lockPathDir,topicId+"_"+newFileName);
-											//保存文件
-											fileManage.writeFile(pathDir, newFileName,file.getBytes());
-											
-											//上传成功
-											returnJson.put("error", 0);//0成功  1错误
-											returnJson.put("url", "file/comment/"+topicId+"/"+newFileName);
-											
-											return JsonUtils.toJSONString(returnJson);
-										}else{
-											errorMessage = "文件超出允许上传大小";
-										}
+									if(authentication){
+										//文件锁目录
+										String lockPathDir = "file"+File.separator+"comment"+File.separator+"lock"+File.separator;
+										//构建文件名称
+										String newFileName = UUIDUtil.getUUID32()+fileNumber+ "." + suffix;
+										
+										
+										//生成锁文件
+										fileManage.addLock(lockPathDir,topicId+"_"+newFileName);
+										String presigne = fileManage.createPresigned("file/comment/"+topicId+"/"+newFileName,imageSize);//创建预签名
+										
+										//上传成功
+										returnJson.put("error", 0);//0成功  1错误
+										returnJson.put("url", presigne);
+										
+										return JsonUtils.toJSONString(returnJson);
+										
 										
 									}else{
 										errorMessage = "当前文件类型不允许上传";
@@ -582,11 +563,87 @@ public class CommentFormAction {
 								errorMessage = "不允许评论";
 							}
 						}else{
-							errorMessage = "话题Id不能为空";
+							errorMessage = "参数错误";
 						}
-					}else{
-						errorMessage = "文件内容不能为空";
+					}else{//0.本地系统
+						if(file != null && !file.isEmpty()){
+							if(topicId != null && topicId >0L){
+								EditorTag editorSiteObject = settingManage.readEditorTag();
+								if(editorSiteObject != null && systemSetting.isAllowComment()){//是否全局允许评论
+									if(editorSiteObject.isImage()){//允许上传图片
+										
+										//上传文件编号
+										String fileNumber = "b"+accessUser.getUserId();
+										
+										
+										//当前图片文件名称
+										String sourceFileName = file.getOriginalFilename();
+										//当前图片类型
+									//	String imgType = file.getContentType();
+										//文件大小
+										Long size = file.getSize();
+										//取得文件后缀
+										String suffix = sourceFileName.substring(sourceFileName.lastIndexOf('.')+1).toLowerCase();
+										
+										
+										//允许上传图片格式
+										List<String> imageFormat = editorSiteObject.getImageFormat();
+										//允许上传图片大小
+										long imageSize = editorSiteObject.getImageSize();
+
+										//验证文件类型
+										boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),imageFormat);
+										
+										if(authentication ){
+											if(size/1024 <= imageSize){
+												//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
+												String pathDir = "file"+File.separator+"comment"+File.separator + topicId + File.separator;
+												//文件锁目录
+												String lockPathDir = "file"+File.separator+"comment"+File.separator+"lock"+File.separator;
+												//构建文件名称
+												String newFileName = UUIDUtil.getUUID32()+fileNumber+ "." + suffix;
+												
+												//生成文件保存目录
+												fileManage.createFolder(pathDir);
+												//生成锁文件保存目录
+												fileManage.createFolder(lockPathDir);
+												//生成锁文件
+												fileManage.addLock(lockPathDir,topicId+"_"+newFileName);
+												//保存文件
+												fileManage.writeFile(pathDir, newFileName,file.getBytes());
+												
+												//上传成功
+												returnJson.put("error", 0);//0成功  1错误
+												returnJson.put("url", fileManage.fileServerAddress()+"file/comment/"+topicId+"/"+newFileName);
+												
+												return JsonUtils.toJSONString(returnJson);
+											}else{
+												errorMessage = "文件超出允许上传大小";
+											}
+											
+										}else{
+											errorMessage = "当前文件类型不允许上传";
+										}
+									}else{
+										errorMessage = "不允许上传图片";
+									}
+								}else{
+									errorMessage = "不允许评论";
+								}
+							}else{
+								errorMessage = "话题Id不能为空";
+							}
+						}else{
+							errorMessage = "文件内容不能为空";
+						}
+						
+						
+						
 					}
+					
+					
+					
+					
 				}
 			}else{
 				errorMessage = "不允许发表评论";
@@ -1383,6 +1440,186 @@ public class CommentFormAction {
 	
 	
 	
+	/**
+	 * 评论  删除
+	 * @param model
+	 * @param commentId 评论Id
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/delete", method=RequestMethod.POST)
+	public String delete(ModelMap model,Long commentId,
+			String token,String jumpUrl,
+			RedirectAttributes redirectAttrs,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+		//获取登录用户
+	  	AccessUser accessUser = AccessUserThreadLocal.get();
+		
+		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+		Map<String,String> error = new HashMap<String,String>();
+		
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.getCloseSite().equals(2)){
+			error.put("comment", ErrorView._21.name());//只读模式不允许提交数据
+		}
+		
+		//判断令牌
+		if(token != null && !"".equals(token.trim())){	
+			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌
+			if(token_sessionid != null && !"".equals(token_sessionid.trim())){
+				if(!token_sessionid.equals(token)){
+					error.put("token", ErrorView._13.name());//令牌错误
+				}
+			}else{
+				error.put("token", ErrorView._12.name());//令牌过期
+			}
+		}else{
+			error.put("token", ErrorView._11.name());//令牌为空
+		}
+
+		
+		Comment comment = null;
+		Topic topic = null;
+		
+
+		if(commentId != null && commentId >0L){
+			comment = commentService.findByCommentId(commentId);
+			if(comment != null){
+				topic = topicService.findById(comment.getTopicId());
+				if(topic != null){
+					if(!comment.getUserName().equals(accessUser.getUserName())){
+						error.put("comment", ErrorView._143.name());//只允许删除自己发布的评论
+					}
+					
+					if(comment.getStatus() > 100){
+						error.put("comment", ErrorView._118.name());//评论已删除
+					}
+					
+					//是否有当前功能操作权限
+					boolean flag_permission = userRoleManage.isPermission(ResourceEnum._1009000,topic.getTagId());
+					if(flag_permission == false){
+						if(isAjax == true){
+							response.setStatus(403);//设置状态码
+				    		
+							WebUtil.writeToWeb("", "json", response);
+							return null;
+						}else{ 
+							String dirName = templateService.findTemplateDir_cache();
+								
+							String accessPath = accessSourceDeviceManage.accessDevices(request);	
+							request.setAttribute("message","权限不足"); 	
+							return "templates/"+dirName+"/"+accessPath+"/message";
+						}
+					}
+
+				}else{
+					error.put("comment", ErrorView._112.name());//话题不存在
+				}
+				
+			}else{
+				error.put("comment", ErrorView._116.name());//评论不存在
+			}
+		
+		}else{
+			error.put("comment", ErrorView._120.name());//评论Id不能为空
+		}
+		
+		
+		
+		if(error.size() == 0){
+			Integer constant = 100;
+			int i = commentService.markDeleteComment(comment.getId(),constant);
+			
+			if(i >0 && comment.getStatus() < 100){
+				User user = userManage.query_cache_findUserByUserName(comment.getUserName());
+				if(user != null){
+					//修改评论状态
+					userService.updateUserDynamicCommentStatus(user.getId(),comment.getUserName(),comment.getTopicId(),comment.getId(),comment.getStatus()+constant);
+				}
+				
+			}
+			 
+			if(i >0){
+				//删除缓存
+				commentManage.delete_cache_findByCommentId(comment.getId());
+				
+				
+			}else{
+				error.put("comment", ErrorView._141.name());//删除评论失败
+			}
+
+		}
+
+		
+		Map<String,String> returnError = new HashMap<String,String>();//错误
+		if(error.size() >0){
+			//将枚举数据转为错误提示字符
+    		for (Map.Entry<String,String> entry : error.entrySet()) {		 
+    			if(ErrorView.get(entry.getValue()) != null){
+    				returnError.put(entry.getKey(),  ErrorView.get(entry.getValue()));
+    			}else{
+    				returnError.put(entry.getKey(),  entry.getValue());
+    			}
+			}
+		}
+		if(isAjax == true){
+			
+    		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
+    		
+    		if(error != null && error.size() >0){
+    			returnValue.put("success", "false");
+    			returnValue.put("error", returnError);
+    			
+    		}else{
+    			returnValue.put("success", "true");
+    		}
+    		WebUtil.writeToWeb(JsonUtils.toJSONString(returnValue), "json", response);
+			return null;
+		}else{
+			
+			
+			if(error != null && error.size() >0){//如果有错误
+				
+				redirectAttrs.addFlashAttribute("error", returnError);//重定向传参
+				redirectAttrs.addFlashAttribute("comment", comment);
+				
+
+				String referer = request.getHeader("referer");	
+				
+				
+				referer = StringUtils.removeStartIgnoreCase(referer,Configuration.getUrl(request));//移除开始部分的相同的字符,不区分大小写
+				referer = StringUtils.substringBefore(referer, ".");//截取到等于第二个参数的字符串为止
+				referer = StringUtils.substringBefore(referer, "?");//截取到等于第二个参数的字符串为止
+				
+				String queryString = request.getQueryString() != null && !"".equals(request.getQueryString().trim()) ? "?"+request.getQueryString() :"";
+
+				return "redirect:/"+referer+queryString;
+	
+			}
+			
+			
+			if(jumpUrl != null && !"".equals(jumpUrl.trim())){
+				String url = Base64.decodeBase64URL(jumpUrl.trim());
+				
+				return "redirect:"+url;
+			}else{//默认跳转
+				model.addAttribute("message", "删除评论成功");
+				String referer = request.getHeader("referer");
+				if(RefererCompare.compare(request, "login")){//如果是登录页面则跳转到首页
+					referer = Configuration.getUrl(request);
+				}
+				model.addAttribute("urlAddress", referer);
+				
+				String dirName = templateService.findTemplateDir_cache();
+				
+				
+				return "templates/"+dirName+"/"+accessSourceDeviceManage.accessDevices(request)+"/jump";	
+			}
+		}
+	}
 	
 	
 	
@@ -2109,5 +2346,183 @@ public class CommentFormAction {
 		}
 	}
 	
+	/**
+	 * 评论回复  删除
+	 * @param model
+	 * @param replyId 回复Id
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/deleteReply", method=RequestMethod.POST)
+	public String deleteReply(ModelMap model,Long replyId,
+			String token,String jumpUrl,
+			RedirectAttributes redirectAttrs,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+		//获取登录用户
+	  	AccessUser accessUser = AccessUserThreadLocal.get();
+		
+		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+		Map<String,String> error = new HashMap<String,String>();
+		
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.getCloseSite().equals(2)){
+			error.put("reply", ErrorView._21.name());//只读模式不允许提交数据
+		}
+		
+		//判断令牌
+		if(token != null && !"".equals(token.trim())){	
+			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌
+			if(token_sessionid != null && !"".equals(token_sessionid.trim())){
+				if(!token_sessionid.equals(token)){
+					error.put("token", ErrorView._13.name());//令牌错误
+				}
+			}else{
+				error.put("token", ErrorView._12.name());//令牌过期
+			}
+		}else{
+			error.put("token", ErrorView._11.name());//令牌为空
+		}
+		
+		
+		Topic topic = null;
+		Reply reply = null;
+		
+		if(replyId != null && replyId >0L){
+			reply = commentService.findReplyByReplyId(replyId);
+			if(reply != null){
+				topic = topicService.findById(reply.getTopicId());
+				if(topic != null){
+					if(!reply.getUserName().equals(accessUser.getUserName())){
+						error.put("reply", ErrorView._144.name());//只允许删除自己发布的回复
+					}
+					
+					if(reply.getStatus() > 100){
+						error.put("reply", ErrorView._116.name());//回复已删除
+					}
+					
+					//是否有当前功能操作权限
+					boolean flag_permission = userRoleManage.isPermission(ResourceEnum._1015000,topic.getTagId());
+					if(flag_permission == false){
+						if(isAjax == true){
+							response.setStatus(403);//设置状态码
+				    		
+							WebUtil.writeToWeb("", "json", response);
+							return null;
+						}else{ 
+							String dirName = templateService.findTemplateDir_cache();
+								
+							String accessPath = accessSourceDeviceManage.accessDevices(request);	
+							request.setAttribute("message","权限不足"); 	
+							return "templates/"+dirName+"/"+accessPath+"/message";
+						}
+					}
+					
+				}else{
+					error.put("reply", ErrorView._107.name());//话题不存在
+				}
+				
+			}else{
+				error.put("reply", ErrorView._125.name());//回复不存在
+			}
+		
+		}else{
+			error.put("reply", ErrorView._126.name());//回复Id不能为空
+		}
+		
+		
+		if(error.size() == 0){
+			Integer constant = 100;
+			int i = commentService.markDeleteReply(reply.getId(),constant);
+			
+			
+			if(i >0){
+				User user = userManage.query_cache_findUserByUserName(reply.getUserName());
+				if(user != null){
+					//修改回复状态
+					userService.updateUserDynamicReplyStatus(user.getId(),reply.getUserName(),reply.getTopicId(),reply.getCommentId(),reply.getId(),reply.getStatus()+constant);
+				}
+				
+			}
+			
+
+			 
+			if(i >0){
+				//删除缓存
+				commentManage.delete_cache_findReplyByReplyId(reply.getId());
+			}else{
+				error.put("reply", ErrorView._142.name());//删除回复失败
+			}
+
+		}
+
+		
+		Map<String,String> returnError = new HashMap<String,String>();//错误
+		if(error.size() >0){
+			//将枚举数据转为错误提示字符
+    		for (Map.Entry<String,String> entry : error.entrySet()) {		 
+    			if(ErrorView.get(entry.getValue()) != null){
+    				returnError.put(entry.getKey(),  ErrorView.get(entry.getValue()));
+    			}else{
+    				returnError.put(entry.getKey(),  entry.getValue());
+    			}
+			}
+		}
+		if(isAjax == true){
+			
+    		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
+    		
+    		if(error != null && error.size() >0){
+    			returnValue.put("success", "false");
+    			returnValue.put("error", returnError);
+    			
+    		}else{
+    			returnValue.put("success", "true");
+    		}
+    		WebUtil.writeToWeb(JsonUtils.toJSONString(returnValue), "json", response);
+			return null;
+		}else{
+			
+			
+			if(error != null && error.size() >0){//如果有错误
+				
+				redirectAttrs.addFlashAttribute("error", returnError);//重定向传参
+				redirectAttrs.addFlashAttribute("reply", reply);
+				
+
+				String referer = request.getHeader("referer");	
+				
+				
+				referer = StringUtils.removeStartIgnoreCase(referer,Configuration.getUrl(request));//移除开始部分的相同的字符,不区分大小写
+				referer = StringUtils.substringBefore(referer, ".");//截取到等于第二个参数的字符串为止
+				referer = StringUtils.substringBefore(referer, "?");//截取到等于第二个参数的字符串为止
+				
+				String queryString = request.getQueryString() != null && !"".equals(request.getQueryString().trim()) ? "?"+request.getQueryString() :"";
+
+				return "redirect:/"+referer+queryString;
 	
+			}
+			
+			
+			if(jumpUrl != null && !"".equals(jumpUrl.trim())){
+				String url = Base64.decodeBase64URL(jumpUrl.trim());
+				
+				return "redirect:"+url;
+			}else{//默认跳转
+				model.addAttribute("message", "删除回复成功");
+				String referer = request.getHeader("referer");
+				if(RefererCompare.compare(request, "login")){//如果是登录页面则跳转到首页
+					referer = Configuration.getUrl(request);
+				}
+				model.addAttribute("urlAddress", referer);
+				
+				String dirName = templateService.findTemplateDir_cache();
+				
+				
+				return "templates/"+dirName+"/"+accessSourceDeviceManage.accessDevices(request)+"/jump";	
+			}
+		}
+	}
 }

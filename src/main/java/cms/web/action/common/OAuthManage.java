@@ -21,6 +21,7 @@ import cms.utils.IpAddress;
 import cms.utils.UUIDUtil;
 import cms.utils.WebUtil;
 import cms.utils.threadLocal.AccessUserThreadLocal;
+import cms.web.action.fileSystem.FileManage;
 import cms.web.action.user.UserLoginLogManage;
 import cms.web.action.user.UserManage;
 
@@ -34,6 +35,7 @@ public class OAuthManage {
 	@Resource UserManage userManage;
 	@Resource UserLoginLogManage userLoginLogManage;
 	@Resource UserService userService;
+	@Resource FileManage fileManage;
 	
 	/**
 	 * 添加刷新令牌
@@ -160,7 +162,7 @@ public class OAuthManage {
 			//呢称
 			String nickname = user.getNickname();
 			//头像路径
-			String avatarPath = user.getAvatarPath();
+			String avatarPath = fileManage.fileServerAddress()+user.getAvatarPath();
 			//头像名称
 			String avatarName = user.getAvatarName();
 			
@@ -210,5 +212,7 @@ public class OAuthManage {
 		
 		return false;
 	}
+    
+    
 
 }

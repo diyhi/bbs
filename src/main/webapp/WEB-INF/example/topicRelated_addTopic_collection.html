@@ -13,10 +13,10 @@
 	 <tbody> 
 		<tr> 
 		<tr> 
-			<td rowspan="7">topicRelated_addTopic_collection</td> 
-			<td rowspan="7">Map&ltString,Object></td>
+			<td rowspan="8">topicRelated_addTopic_collection</td> 
+			<td rowspan="8">Map&ltString,Object></td>
 			<td>键参数：availableTag<br>值内容说明：话题编辑器允许使用标签(配合KindEditor编辑器使用)<br>值类型：JSON格式List&ltString></td>
-			<td rowspan="7">添加话题界面显示返回值</td> 
+			<td rowspan="8">添加话题界面显示返回值</td> 
 		</tr>
 		<tr> 
 			<td>键参数：captchaKey<br>值内容说明：验证码编号 (根据'全站设置 - 基本设置 - 发表话题每分钟提交超过'参数计算是否含有值)<br>值类型：String </td>
@@ -36,7 +36,9 @@
 		<tr> 
 			<td>键参数：userGradeList<br>值内容说明：用户等级集合<br>值类型：JSON格式List&lt<a style="color: #317ee7" onclick="anchorJump('#anchor_230'); return false;">UserGrade</a>></td>
 		</tr>
-		
+		<tr> 
+			<td>键参数：fileSystem<br>值内容说明：文件系统 0.本地 10.SeaweedFS 20.MinIO 30.阿里云OSS<br>值类型：int</td>
+		</tr>
 		
 		
 		
@@ -142,7 +144,8 @@
 			<td>参数</td> 
 			<td colspan="2">
 				file : 上传文件接收字段<br>
-				dir : 文件上传类型 分别为image、file 
+				dir : 文件上传类型 分别为image、file、media<br>
+				fileName : 文件名称 预签名时必须有值
 			</td>
 		</tr>
 		<tr> 

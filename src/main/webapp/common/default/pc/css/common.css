@@ -1167,6 +1167,7 @@ html,body{
 	max-width:100%;height:auto;border:none;background:none;margin:0;padding:0; 
 	cursor: -webkit-zoom-in;
 	cursor: zoom-in;
+	vertical-align: sub;
 }
 .topicContentModule .left .topic-wrap .topicBox .topicContent iframe{
 	width:100%; height: 550px;padding:10px 0px; 
@@ -1416,7 +1417,7 @@ html,body{
 .commentModule .commentList .commentInfo .commentTime a{color:#999;}
 .commentModule .commentList .commentInfo .commentContent{padding:0px;word-wrap:break-word;color:#666;font-size: 15px;margin-top: 20px;line-height: 26px;}
 /* 评论图片尺寸 */
-.commentModule .commentList .commentInfo .commentContent img {max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;}
+.commentModule .commentList .commentInfo .commentContent img {max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;vertical-align: sub;}
 /* 自动换行 */
 .commentModule .commentList .commentInfo .commentContent pre{white-space:pre-wrap;}
 
@@ -3975,7 +3976,7 @@ html,body{
 }
 .userDynamicModule .userDynamicList .userDynamic .topicContent{padding:0px;word-wrap:break-word;color:#666666;font-size:16px;margin-top:12px;}
 .userDynamicModule .userDynamicList .userDynamic .topicContent p{font-size:16px;word-wrap:break-word}
-.userDynamicModule .userDynamicList .userDynamic .topicContent img{max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;}
+.userDynamicModule .userDynamicList .userDynamic .topicContent img{max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;vertical-align: sub;}
 .userDynamicModule .userDynamicList .userDynamic .topicContent iframe{
 	width:100%; height: 550px;padding:10px 0px; 
 }
@@ -4100,7 +4101,7 @@ html,body{
 }
 .userDynamicModule .userDynamicList .userDynamic .commentContent{padding:0px;word-wrap:break-word;color:#666666;font-size:16px;margin-top:12px;}
 .userDynamicModule .userDynamicList .userDynamic .commentContent p{font-size:16px;word-wrap:break-word}
-.userDynamicModule .userDynamicList .userDynamic .commentContent img{max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;}
+.userDynamicModule .userDynamicList .userDynamic .commentContent img{max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;vertical-align: sub;}
 .userDynamicModule .userDynamicList .userDynamic .quoteContent{
 	position: relative;
 	margin: 20px 0px 0px 0px;
@@ -4333,7 +4334,7 @@ html,body{
 
 .membershipCardModule .detail .content{margin-top:10px;padding:20px 5px;color:#666666;font-size:16px;word-wrap:break-word}
 .membershipCardModule .detail .content p{font-size:16px;word-wrap:break-word}
-.membershipCardModule .detail .content img{max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;}
+.membershipCardModule .detail .content img{max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;vertical-align: sub;}
 
 /* 余额 */
 .balanceModule{padding: 30px 0 30px 30px;background: #fff;position: relative;margin-bottom: 10px;
@@ -5110,6 +5111,7 @@ html,body{
 	max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;
 	cursor: -webkit-zoom-in;
 	cursor: zoom-in;
+	vertical-align: sub;
 }
 /* 自动换行 */
 .questionContentModule .left .question-wrap .questionBox .content pre{white-space:pre-wrap;}
@@ -5160,6 +5162,7 @@ html,body{
 	max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;
 	cursor: -webkit-zoom-in;
 	cursor: zoom-in;
+	vertical-align: sub;
 }
 
 .questionContentModule .right{
@@ -5414,7 +5417,7 @@ html,body{
 .answerModule .answerList .answerTime a{color:#999;}
 
 .answerModule .answerList .answer .answerContent{padding:0px;word-wrap:break-word;color:#666;font-size: 15px;margin-top: 20px;line-height: 26px;}
-.answerModule .answerList .answer .answerContent img {max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;}
+.answerModule .answerList .answer .answerContent img {max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;vertical-align: sub;}
 /* 自动换行 */
 .answerModule .answerList .answer .answerContent pre{white-space:pre-wrap;}
 
@@ -6612,6 +6615,8 @@ html,body{
 .footer .copyright a { font-family: Tahoma; margin-left: 16px; color: #999;}
 .footer .copyright a:hover { text-decoration: underline; }
 .footer .copyright span { margin-left: 17px; }
+
+
 
 
 

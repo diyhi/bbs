@@ -17,6 +17,7 @@ import cms.bean.template.Forum;
 import cms.service.membershipCard.MembershipCardService;
 import cms.utils.JsonUtils;
 import cms.utils.Verification;
+import cms.web.action.fileSystem.FileManage;
 import cms.web.action.membershipCard.MembershipCardManage;
 
 /**
@@ -27,6 +28,7 @@ import cms.web.action.membershipCard.MembershipCardManage;
 public class MembershipCard_TemplateManage {
 	@Resource MembershipCardService membershipCardService; 
 	@Resource MembershipCardManage membershipCardManage;
+	@Resource FileManage fileManage;
 	
 	/**
 	 * 会员卡列表  -- 集合
@@ -78,6 +80,11 @@ public class MembershipCard_TemplateManage {
 			MembershipCard membershipCard = membershipCardManage.query_cache_findById(membershipCardId);
 	  		
 	  		if(membershipCard != null){
+	  			if(membershipCard.getIntroduction() != null && !"".equals(membershipCard.getIntroduction().trim())){
+					//处理富文本路径
+	  				membershipCard.setIntroduction(fileManage.processRichTextFilePath(membershipCard.getIntroduction(),"membershipCard"));
+				}
+	  			
 	  			String descriptionTagFormat = membershipCard.getDescriptionTagFormat();
 				if(descriptionTagFormat != null && !"".equals(descriptionTagFormat.trim())){
 					List<String> descriptionTagList = JsonUtils.toGenericObject(descriptionTagFormat.trim(), new TypeReference< List<String> >(){});

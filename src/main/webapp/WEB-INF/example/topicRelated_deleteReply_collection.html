@@ -1,0 +1,175 @@
+<table class="exampleTable" > 
+	<thead>
+		<tr> 
+			<th colspan="4">返回值</th>
+		</tr>
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="12%">类型</th> 
+			<th width="38%">集合内容</th> 
+			<th width="20%">说明</th> 
+		</tr> 
+	</thead> 
+	 <tbody> 
+		<tr> 
+			<td rowspan="3">topicRelated_deleteReply_collection</td> 
+			<td rowspan="3">Map&ltString,Object></td>
+			<td></td>
+			<td rowspan="3">没有返回值</td> 
+		</tr>
+	</tbody> 
+</table>
+
+
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">提交表单 - 默认方式</th>
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td width="30%" >请求路径</td> 
+			<td width="70%" colspan="2">user/control/comment/deleteReply.htm</td>
+		</tr>
+		<tr> 
+			<td>请求方式</td> 
+			<td colspan="2">POST</td>
+		</tr>
+		<tr> 
+			<td>请求参数</td> 
+			<td colspan="2"><a style="color: #317ee7" onclick="anchorJump('#anchor_600'); return false;">参数表</a></td>
+		</tr>
+		<tr> 
+			<td>提交成功返回</td> 
+			<td colspan="2">默认跳转到jump模板页显示提交成功信息；跳转路径参数jumpUrl有值时按参数值路径跳转</td>
+		</tr>
+		<tr> 
+			<td rowspan="2">提交失败返回</td> 
+			<td>错误值</td> 
+			<td width="30%" >
+				变量：error<br>
+				类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_10'); return false;">Map&ltString,String></a>
+			</td>
+		</tr>
+	</tbody> 
+</table>
+
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">提交表单 - AJAX方式</th>
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td>请求路径</td> 
+			<td colspan="2">user/control/comment/deleteReply.htm</td>
+		</tr>
+		<tr> 
+			<td>请求方式</td> 
+			<td colspan="2">POST</td>
+		</tr> 
+		<tr> 
+			<td>自定义请求头</td> 
+			<td colspan="2">协议头：X-Requested-With  值：XMLHttpRequest</td>
+		</tr>
+		<tr> 
+			<td>请求参数</td> 
+			<td colspan="2"><a style="color: #317ee7" onclick="anchorJump('#anchor_600'); return false;">参数表</a></td>
+		</tr>
+		<tr> 
+			<td width="30%" rowspan="3">提交返回</td> 
+			<td width="30%" rowspan="3">JSON格式值 类型:Map&ltString,Object></td>
+			<td width="40%">键参数：success<br>值内容说明：成功返回true 失败返回false<br>值类型：String</td> 
+		</tr>
+		<tr> 
+			<td>键参数：error<br>值内容说明：错误值集合<br>值类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_10'); return false;">Map&ltString,String></a></td> 
+		</tr>
+	</tbody> 
+</table>
+
+
+
+
+<table id="anchor_10"  class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">错误值 error</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td>token</td> 
+			<td>String</td>
+			<td>令牌错误</td>
+		</tr>
+		<tr> 
+			<td>reply</td> 
+			<td>String</td>
+			<td>评论回复错误</td>
+		</tr>
+	</tbody> 
+</table>
+
+<table id="anchor_600" class="exampleTable" > 
+	<thead>
+		<tr> 
+			<th colspan="4">提交参数</th>
+		</tr>
+		<tr> 
+			<th width="30%">参数</th> 
+			<th width="20%">类型</th> 
+			<th width="10%">是否必填</th> 
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	 <tbody> 
+		<tr> 
+			<td>replyId</td> 
+			<td>Long</td>
+			<td>是</td>
+			<td>评论回复Id</td> 
+		</tr>
+		<tr> 
+			<td>token</td> 
+			<td>String</td>
+			<td>是</td>
+			<td>令牌</td> 
+		</tr>
+		<tr> 
+			<td>jumpUrl</td> 
+			<td>String</td>
+			<td>否</td>
+			<td>'提交表单 - 默认方式'提交成功后跳转路径,不填写默认跳转到表单提交页；参数必须经过encodeBase64URL编码后才能提交。例${encodeBase64URL('/index')}</td> 
+		</tr>
+		
+	</tbody> 
+</table>
+
+<h2 style="margin:0;padding:0; margin-top: 10px;">示例</h2>
+<textarea name="exampleCode">
+<script type="text/javascript">
+	//Ajax方式提交
+	function deleteReply(replyId){
+	
+		var parameter = "";
+		//回复Id
+		parameter += "&replyId="+replyId;
+		//从meta标签获取令牌
+		parameter += "&token="+getCsrf();
+
+	   	//删除第一个&号,防止因为多了&号而出现警告: Parameters: Invalid chunk ignored.信息
+		if(parameter.indexOf("&") == 0){
+			parameter = parameter.substring(1,parameter.length);
+		}
+	   	
+	   	//下一步用ajax方式将参数提交到user/control/comment/deleteReply.htm
+	}
+</script>
+</textarea>

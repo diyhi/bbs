@@ -19,6 +19,7 @@ import cms.utils.FileUtil;
 import cms.utils.RedirectPath;
 import cms.utils.UUIDUtil;
 import cms.web.action.SystemException;
+import cms.web.action.TextFilterManage;
 import cms.web.action.fileSystem.FileManage;
 
 import org.springframework.stereotype.Controller;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+
 
 
 
@@ -45,10 +47,8 @@ public class LinksManageAction {
 	private Validator validator; 
 	@Resource LinksService linksService; 
 	@Resource FileManage fileManage;
-	
+	@Resource TextFilterManage textFilterManage;
 	@Resource SettingService settingService;
-	
-	
 	/**
 	 * 友情链接   添加界面显示
 	 */
@@ -78,6 +78,7 @@ public class LinksManageAction {
 		String _fileName = "";
 		if (images == null || images.isEmpty()) { 
 			if(imagePath != null && !"".equals(imagePath.trim())){
+				imagePath = textFilterManage.deleteBindURL(request, imagePath);
 				
 				String fileName = FileUtil.getName(imagePath);
 				
@@ -147,7 +148,7 @@ public class LinksManageAction {
 		//数据校验
 		this.validator.validate(formbean, result); 
 		if (result.hasErrors() || error.size() >0) {  
-			model.addAttribute("imagePath",_imagePath+_fileName);
+			model.addAttribute("imagePath",fileManage.fileServerAddress()+_imagePath+_fileName);
 			model.addAttribute("error",error);
 			return "jsp/links/add_links";
 		} 
@@ -182,7 +183,7 @@ public class LinksManageAction {
 			Links links = linksService.findById(linksId);
 			if(links != null){
 				if(links.getImage() != null && !"".equals(links.getImage())){
-					model.addAttribute("imagePath",links.getImage());
+					model.addAttribute("imagePath",fileManage.fileServerAddress()+links.getImage());
 				}
 				model.addAttribute("links",links);//返回消息
 			}
@@ -216,6 +217,8 @@ public class LinksManageAction {
 		String _fileName = "";
 		if (images == null || images.isEmpty()) { 
 			if(imagePath != null && !"".equals(imagePath.trim())){
+				imagePath = textFilterManage.deleteBindURL(request, imagePath);
+				
 				//取得文件名称
 				String fileName = FileUtil.getName(imagePath);
 
@@ -283,7 +286,7 @@ public class LinksManageAction {
 		//数据校验
 		this.validator.validate(formbean, result); 
 		if (result.hasErrors() || error.size() >0) {  
-			model.addAttribute("imagePath",_imagePath+_fileName);
+			model.addAttribute("imagePath",fileManage.fileServerAddress()+_imagePath+_fileName);
 			model.addAttribute("error",error);
 			return "jsp/links/edit_links";
 		} 

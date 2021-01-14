@@ -6,7 +6,6 @@ import java.util.Map;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import cms.web.taglib.Configuration;
 
 /**
  * 防盗链处理
@@ -65,22 +64,22 @@ public class SecureLink {
 	
 	/**
 	 * 生成安全链接
-	 * @param link 链接
+	 * @param link 链接 例如 http://127.0.0.1/bbs/file/topic/2020-10-11/file/6197f199f6234f2791416282d94a805cb1.rar
 	 * @param fileName 文件名称
 	 * @param secret 密钥
 	 * @param expires 有效时间 单位/秒
 	 * @return
 	 */
 	public static String createSecureLink(String link,String fileName,String secret,Long expires){
+		String uri = UriComponentsBuilder.fromUriString(link).build().getPath();
 		String time = String.valueOf((System.currentTimeMillis() / 1000) + expires);
-		String md5 = org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(DigestUtils.md5(secret +  Configuration.getPath()+"/"+link + time));
+		String md5 = org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(DigestUtils.md5(secret +  uri + time));
 		
 		String newLink = UriComponentsBuilder.fromUriString(link)
-        .replaceQueryParam("md5", md5)
-        .replaceQueryParam("expires", time)
-        .replaceQueryParam("fileName", fileName)
-        .build().toString();
-		
+	    .replaceQueryParam("md5", md5)
+	    .replaceQueryParam("expires", time)
+	    .replaceQueryParam("fileName", fileName)
+	    .build().toString();
 		return newLink;
 	}
 }

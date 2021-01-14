@@ -236,7 +236,15 @@
     color: #2196F3;
     text-decoration: none;
 }
-
+.t-list-tbody TD .markDelete{
+	white-space: nowrap;
+    color: #fe7300;
+    background-color: rgba(254,115,0,0.1);
+    border-radius: 4px;
+    padding: 1px 5px;
+    font-size: 13px;
+    font-style: normal;
+}
 .richTextContent{
 	margin-left:5px;margin-right:5px;margin-top: 5px;margin-bottom: 5px;text-align: left; *width: 600px;/*IE 6和7*/ 
 }
