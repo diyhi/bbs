@@ -224,7 +224,7 @@ function deleteDescriptionTagRow(rowId){
 		    </TD>
 		</TR>
 		<TR>
-		    <TD class="t-label t-label-h" width="12%">用户角色：</TD>
+		    <TD class="t-label t-label-h" width="12%"><span class="span-text">*</span>用户角色：</TD>
 		    <TD class="t-content" width="88%" colSpan="3">
 			    <table cellSpacing="0" cellPadding="0" width="100%" border="0">
 				    <c:forEach items="${userRoleList}" var="entry" > 
