@@ -25,7 +25,7 @@
     <TH>接口产品</TH>
     <TH>发送服务</TH>
     <TH>发送时间</TH>
-    <TH>会员用户名</TH>
+    <TH>平台用户Id</TH>
     <TH>手机</TH>
     <TH>状态码</TH>
     <TH>状态码描述</TH>
@@ -42,7 +42,7 @@
 	    <TD width="15%">
 	    	<fmt:formatDate value="${entry.createDate }"  pattern="yyyy-MM-dd HH:mm:ss"/>
 	    </TD>
-	    <TD width="10%">${entry.userName}</TD>
+	    <TD width="10%">${entry.platformUserId}</TD>
 	    <TD width="10%" >${entry.mobile}</TD>
 	    <TD width="15%">
 	    	${entry.code}

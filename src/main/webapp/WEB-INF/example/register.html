@@ -28,6 +28,13 @@
 				类型：List&lt<a style="color: #317ee7" onclick="anchorJump('#anchor_50'); return false;">UserCustom</a>>
 			</td>
 		</tr>
+		<tr>  
+			<td>允许注册账号类型</td> 
+			<td>
+				变量：allowRegisterAccount<br>
+				类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_90'); return false;">AllowRegisterAccount</a>
+			</td>
+		</tr>
 		<tr> 
 			<td>说明</td> 
 			<td colspan="2">点示超链接访问登录页时如果URL不是注册页面，则URL会自动带有jumpUrl参数，为当前URL的Base64编码,可以设计注册成功后跳转到注册前页面功能</td>
@@ -183,7 +190,35 @@
 	</tbody>
 </table>
 
-
+<table id="anchor_90" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">允许注册账号类型 AllowRegisterAccount</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>local</td> 
+			<td>boolean</td>
+			<td>本地账号密码用户</td>
+		</tr>
+		<tr> 
+			<td>mobile</td> 
+			<td>boolean</td>
+			<td>手机用户</td>
+		</tr>
+		<tr> 
+			<td>weChat</td> 
+			<td>boolean</td>
+			<td>微信用户</td>
+		</tr>
+	</tbody> 
+</table>
 
 <table class="exampleTable" > 
 	<thead> 
@@ -320,12 +355,17 @@
 			<td colspan="2">JSON</td>
 		</tr> 
 		<tr> 
-			<td rowspan="2">选填参数</td> 
+			<td rowspan="3">选填参数</td> 
 			<td>
 				userName：会员用户名<br>
 			</td>
-			<td rowspan="2">
-				当前两组参数每次提交只能填一组
+			<td rowspan="3">
+				当前三组参数每次提交只能填一组
+			</td>
+		</tr>
+		<tr> 
+			<td>
+				mobile：手机号<br>
 			</td>
 		</tr>
 		<tr>
@@ -394,6 +434,16 @@
 			<td>用户名称错误</td>
 		</tr>
 		<tr> 
+			<td>type</td> 
+			<td>Integer</td>
+			<td>用户类型错误</td>
+		</tr>
+		<tr> 
+			<td>mobile</td> 
+			<td>String</td>
+			<td>手机号错误</td>
+		</tr>
+		<tr> 
 			<td>password</td> 
 			<td>String</td>
 			<td>密码错误</td>
@@ -446,8 +496,20 @@
 	 	<tr> 
 			<td>userName</td> 
 			<td>String</td>
-			<td>是</td>
+			<td>按需填写</td>
 			<td>会员用户名</td> 
+		</tr>
+		<tr> 
+			<td>type</td> 
+			<td>Integer</td>
+			<td>是</td>
+			<td>用户类型</td> 
+		</tr>
+		<tr> 
+			<td>mobile</td> 
+			<td>String</td>
+			<td>按需填写</td>
+			<td>手机号</td> 
 		</tr>
 	 	<tr> 
 			<td>password</td> 
@@ -472,6 +534,12 @@
 			<td>String</td>
 			<td>是</td>
 			<td>密码提示答案</td> 
+		</tr>
+		<tr> 
+			<td>smsCode</td> 
+			<td>String</td>
+			<td>按需填写</td>
+			<td>短信验证码</td> 
 		</tr>
 		<tr> 
 			<td>captchaKey</td> 

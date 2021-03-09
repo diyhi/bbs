@@ -178,13 +178,18 @@ public class CaptchaManage {
 
 		//是否需要验证码  true:要  false:不要
 		boolean isCaptcha = false;
-		
-		//用户每分钟提交次数
-		Integer quantity = settingManage.getSubmitQuantity("login", userName); 
-		
-		//如果每用户每分钟提交超过设定次数，则需验证码
-		if(quantity != null && quantity >= settingService.findSystemSetting_cache().getLogin_submitQuantity()){
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.getLogin_submitQuantity() <=0){//为0时每次都出现验证码
 			isCaptcha = true;
+		}else{
+			//用户每分钟提交次数
+			Integer quantity = settingManage.getSubmitQuantity("login", userName); 
+			
+			//如果每用户每分钟提交超过设定次数，则需验证码
+			if(quantity != null && quantity >= settingService.findSystemSetting_cache().getLogin_submitQuantity()){
+				isCaptcha = true;
+			}
+			
 		}
 		
 		return isCaptcha;

@@ -1665,7 +1665,7 @@ public class HomeManageAction {
 			    if(error.size() ==0){
 			    	
 			    	//生成绑定手机验证码标记
-		    		String numeric = smsManage.smsCode_generate(1,new_user.getId(), mobile.trim(),null);
+		    		String numeric = smsManage.smsCode_generate(1,new_user.getPlatformUserId(), mobile.trim(),null);
 		    		if(numeric != null){
 		    			if(!numeric.equals(smsCode)){
 		    				error.put("smsCode", ErrorView._850.name());//手机验证码错误
@@ -1682,7 +1682,7 @@ public class HomeManageAction {
 	    
 	    if(mobile != null && !"".equals(mobile.trim())){
 	    	 //删除绑定手机验证码标记
-		    smsManage.smsCode_delete(1,new_user.getId(), mobile.trim());
+		    smsManage.smsCode_delete(1,new_user.getPlatformUserId(), mobile.trim());
 		   
 	    }
 	    
@@ -1852,14 +1852,14 @@ public class HomeManageAction {
   		}
 	    if(error.size() == 0){
 	    	String randomNumeric = RandomStringUtils.randomNumeric(6);
-	    	String errorInfo = smsManage.sendSms_code(new_user.getId(),new_user.getUserName(),mobile,randomNumeric);//6位随机数
+	    	String errorInfo = smsManage.sendSms_code(new_user.getPlatformUserId(),mobile,randomNumeric);//6位随机数
 	    	if(errorInfo != null){
 	    		error.put("smsCode", errorInfo);
 	    	}else{
 	    		//删除绑定手机验证码标记
-	    	    smsManage.smsCode_delete(module,new_user.getId(), mobile.trim());
+	    	    smsManage.smsCode_delete(module,new_user.getPlatformUserId(), mobile.trim());
 	    		//生成绑定手机验证码标记
-	    		smsManage.smsCode_generate(module,new_user.getId(), mobile.trim(),randomNumeric);
+	    		smsManage.smsCode_generate(module,new_user.getPlatformUserId(), mobile.trim(),randomNumeric);
 	    		
 	    	}
 	    }
@@ -1976,7 +1976,7 @@ public class HomeManageAction {
   				    if(error.size() ==0){
   				    	
   				    	//生成绑定手机验证码标记
-  			    		String numeric = smsManage.smsCode_generate(2,new_user.getId(), new_user.getMobile(),null);
+  			    		String numeric = smsManage.smsCode_generate(2,new_user.getPlatformUserId(), new_user.getMobile(),null);
   			    		if(numeric != null){
   			    			if(!numeric.equals(smsCode)){
   			    				error.put("smsCode", ErrorView._850.name());//手机验证码错误
@@ -1992,7 +1992,7 @@ public class HomeManageAction {
   		    }
   	  			
   			 //删除绑定手机验证码标记
-  		    smsManage.smsCode_delete(2,new_user.getId(), new_user.getMobile());	
+  		    smsManage.smsCode_delete(2,new_user.getPlatformUserId(), new_user.getMobile());	
   		}else{
   			error.put("smsCode", ErrorView._859.name());//用户不存在
   		}
@@ -2137,6 +2137,16 @@ public class HomeManageAction {
 		      			}
 		      		}
 				}
+				
+				if(new_user.getType().equals(20)){//用户类型 20: 手机用户
+		    		String platformUserId = userManage.thirdPartyUserIdToPlatformUserId(mobile.trim(),20);
+		 			User mobile_user = userService.findUserByPlatformUserId(platformUserId);
+		 			
+		 	  		if(mobile_user != null){
+		 	  			error.put("mobile", ErrorView._864.name());//手机号码已注册
+		 	
+		 	  		}
+		    	}
 			}
 	    }else{
 	    	error.put("mobile", ErrorView._851.name());//手机号不能为空
@@ -2150,7 +2160,7 @@ public class HomeManageAction {
 			    if(error.size() ==0){
 			    	
 			    	//生成绑定手机验证码标记
-		    		String numeric = smsManage.smsCode_generate(3,new_user.getId(), mobile.trim(),null);
+		    		String numeric = smsManage.smsCode_generate(3,new_user.getPlatformUserId(), mobile.trim(),null);
 		    		if(numeric != null){
 		    			if(!numeric.equals(smsCode)){
 		    				error.put("smsCode", ErrorView._850.name());//手机验证码错误
@@ -2166,7 +2176,7 @@ public class HomeManageAction {
 	    }
 	    
 	    //删除绑定手机验证码标记
-	    smsManage.smsCode_delete(3,new_user.getId(), mobile.trim());
+	    smsManage.smsCode_delete(3,new_user.getPlatformUserId(), mobile.trim());
 	    
 	    if(error.size() ==0){
 	    	if(new_user != null){
@@ -2178,11 +2188,18 @@ public class HomeManageAction {
 		    	smsManage.replaceCode_delete(new_user.getId(), new_user.getMobile());
 	    	}
 	    	
-	    	
 	    }
 	    
 	    if(error.size() ==0){
-	    	userService.updateUserMobile(new_user.getUserName(),mobile.trim(),true);
+	    	if(new_user.getType().equals(20)){//用户类型 20: 手机用户
+	    		String platformUserId = userManage.thirdPartyUserIdToPlatformUserId(mobile.trim(),20);
+	    		userService.updateUserMobile(new_user.getUserName(),mobile.trim(),true,platformUserId);
+	    		
+	    	}else{
+	    		userService.updateUserMobile(new_user.getUserName(),mobile.trim(),true);
+	    	}
+	    	
+	    	
 	    	//删除缓存
 			userManage.delete_cache_findUserById(new_user.getId());
 			userManage.delete_cache_findUserByUserName(new_user.getUserName());

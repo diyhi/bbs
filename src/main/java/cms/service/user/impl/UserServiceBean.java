@@ -470,7 +470,7 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 		Query query = em.createQuery("update User o set " +
 				" o.nickname=?1, o.allowUserDynamic=?2, o.password=?3,o.email=?4, o.issue=?5," +
 				" o.answer=?6,  o.state=?7, " +
-				" o.remarks=?8,o.mobile=?9,o.realNameAuthentication=?10,o.securityDigest=?11, o.userVersion=o.userVersion+1 where o.id=?12 and o.userVersion=?13")
+				" o.remarks=?8,o.mobile=?9,o.realNameAuthentication=?10,o.securityDigest=?11,o.platformUserId=?12, o.userVersion=o.userVersion+1 where o.id=?13 and o.userVersion=?14")
 		.setParameter(1, user.getNickname())//呢称
 		.setParameter(2, user.getAllowUserDynamic())//允许显示用户动态 
 		.setParameter(3, user.getPassword())//密码
@@ -482,8 +482,9 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 		.setParameter(9, user.getMobile())//手机
 		.setParameter(10, user.isRealNameAuthentication())//实名认证
 		.setParameter(11, user.getSecurityDigest())//安全摘要
-		.setParameter(12, user.getId())//Id
-		.setParameter(13, user.getUserVersion());//版本号
+		.setParameter(12, user.getPlatformUserId())//平台用户Id
+		.setParameter(13, user.getId())//Id
+		.setParameter(14, user.getUserVersion());//版本号
 		
 		
 		
@@ -539,6 +540,22 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 		.setParameter(1, mobile)
 		.setParameter(2, realNameAuthentication)
 		.setParameter(3, userName);
+		return query.executeUpdate();
+	}
+	/**
+	 * 修改用户手机
+	 * @param userName 用户名称
+	 * @param mobile 手机号
+	 * @param realNameAuthentication 是否实名认证
+	 * @param platformUserId 平台用户Id
+	 */
+	public Integer updateUserMobile(String userName,String mobile,Boolean realNameAuthentication,String platformUserId){
+		Query query = em.createQuery("update User o set " +
+				" o.mobile=?1,o.realNameAuthentication=?2,o.platformUserId=?3, o.userVersion=o.userVersion+1 where o.userName=?4")
+		.setParameter(1, mobile)
+		.setParameter(2, realNameAuthentication)
+		.setParameter(3, platformUserId)
+		.setParameter(4, userName);
 		return query.executeUpdate();
 	}
 	/**

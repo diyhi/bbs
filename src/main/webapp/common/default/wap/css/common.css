@@ -4,7 +4,12 @@ body { margin:0 0 0 0;font-size:12px; font-family:Helvetica; background:#fff;}
 
 
 h4 {font-size: 100%;}
-*{ margin:0 ; padding:0}
+*{ margin:0 ; padding:0;
+
+/*解决移动端点击链接元素出现蓝色边框或者出现半透明蓝色背景*/
+	-webkit-tap-highlight-color: transparent;
+    -webkit-appearance: none;
+}
 
 /* 去除黑点 */
 ul,ol {list-style:none;}
@@ -2430,9 +2435,47 @@ html,body{
 .registerModule{
 	padding-top: 40px;padding-bottom: 2px;
 }
+.registerModule .tabs-nav {
+	font-size:17px;
+	position: relative;
+	display: inline-block;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	margin: 8px 8px 8px 8px;
+	padding-left: 0;
+	list-style: none;
+}
+.registerModule .tabs-nav .tabs-tab {
+	position: relative;
+	display: inline-block;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	text-decoration: none;
+	cursor: pointer;
+	padding: 0 0 4px;
+	margin: 0 20px 0 0;
+	height: 41px;
+	line-height: 41px
+}
+.registerModule .tabs-nav .tabs-tab:last-child {
+	margin-right: 0
+}
+.registerModule .tabs-nav .tabs-tab>a:hover {
+	color: #30aff7;
+}
+
+.registerModule .tabs-nav .tabs-tab>a {
+	color: #bbb;
+}
+.registerModule .tabs-nav .tabs-tab .active {
+    color: #30aff7;
+    border-bottom: 2px solid #30aff7;
+    padding: 4px 6px 4px 6px;
+}
 .registerModule .registerInfo{
 	width: 99%; margin-left: auto;margin-right: auto;
 }
+.registerModule .registerInfo .successInfo{color: green; line-height:30px; margin-left: 115px;}
 .registerModule .registerInfo .tips{line-height:30px; margin-left: 115px}
 .registerModule .registerInfo .tips span{color: red;}
 .registerModule .registerInfo .selectName{min-height:22px; margin-top: 20px;margin-left: 8px;color:#888888; line-height: 22px; }
@@ -2445,17 +2488,102 @@ html,body{
 
 /** 找回密码 **/
 .findPassWordModule{padding-top: 40px;padding-bottom: 5px;}
+.findPassWordModule .tabs-nav {
+	font-size:17px;
+	position: relative;
+	display: inline-block;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	margin: 8px 8px 8px 8px;
+	padding-left: 0;
+	list-style: none;
+}
+
+
+.findPassWordModule .tabs-nav .tabs-tab {
+	position: relative;
+	display: inline-block;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	text-decoration: none;
+	cursor: pointer;
+	padding: 0 0 4px;
+	margin: 0 20px 0 0;
+	height: 41px;
+	line-height: 41px
+}
+.findPassWordModule .tabs-nav .tabs-tab:last-child {
+	margin-right: 0
+}
+.findPassWordModule .tabs-nav .tabs-tab>a:hover {
+	color: #30aff7;
+}
+
+.findPassWordModule .tabs-nav .tabs-tab>a {
+	color: #bbb;
+}
+
+.findPassWordModule .tabs-nav .tabs-tab .active {
+    color: #30aff7;
+    border-bottom: 2px solid #30aff7;
+    padding: 4px 6px 4px 6px;
+}
+.findPassWordModule .title{
+	font-size:18px;height: 50px;line-height: 50px;margin-left: 8px;margin-right: 8px;
+}
+.findPassWordModule .title span{
+	color: #30aff7;
+    border-bottom: 2px solid #30aff7;
+    padding: 4px 8px 4px 8px;
+}
 .findPassWordModule .findPassWordTable{
 	
 }
 .findPassWordModule .findPassWordTable .tips{height:30px;line-height:30px; margin-left: 115px}
 .findPassWordModule .findPassWordTable .tips span{color: red;}
-
+.findPassWordModule .findPassWordTable .successInfo{color: green; line-height:30px; margin-left: 115px;}
 
 
 /* 登录 */
 .loginModule{
 	width: 99%;margin-top:40px;  margin-left: auto;margin-right: auto;
+}
+.loginModule .tabs-nav {
+	font-size:17px;
+	position: relative;
+	display: inline-block;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	margin: 8px 8px 8px 8px;
+	padding-left: 0;
+	list-style: none;
+}
+.loginModule .tabs-nav .tabs-tab {
+	position: relative;
+	display: inline-block;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	text-decoration: none;
+	cursor: pointer;
+	padding: 0 0 4px;
+	margin: 0 20px 0 0;
+	height: 41px;
+	line-height: 41px
+}
+.loginModule .tabs-nav .tabs-tab:last-child {
+	margin-right: 0
+}
+.loginModule .tabs-nav .tabs-tab>a:hover {
+	color: #30aff7;
+}
+
+.loginModule .tabs-nav .tabs-tab>a {
+	color: #bbb;
+}
+.loginModule .tabs-nav .tabs-tab .active {
+    color: #30aff7;
+    border-bottom: 2px solid #30aff7;
+    padding: 4px 6px 4px 6px;
 }
 .loginModule .tips{height:30px;line-height:30px; margin-left: 115px}
 .loginModule .tips span{color: red;}

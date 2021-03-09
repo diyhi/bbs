@@ -14,167 +14,365 @@
 		<script language="javascript" src="${commonPath}js/tool.js" type="text/javascript"></script>
 		<script language="javascript" src="${commonPath}js/ajax.js" type="text/javascript"></script>
 		<script language="javascript" src="${commonPath}js/json2.js" type="text/javascript"></script>
-		
+		<script type="text/javascript" src="${commonPath}js/jquery/jquery.min.js" language="javascript"></script>
     </head>
     <body>
     <#-- 引入页头 -->
     <@include action="${newPublic_2}"/>
    	<div class="skeleton backgroundModule">
 		<div class="main wrap backgroundModule" >
-	   		<div style="background: #fff; height: 1px;"></div>
-	        <form id="loginForm" name="login" method="post" autocomplete="off" action="login?jumpUrl=${url_jumpUrl}" onkeydown="keydown(event);">
-				<!-- 令牌标记 -->
-				<input type="hidden" id="token" name="token" value="${token}">
-	           	
-	           	<div class="loginModule clearfix">
-	           		<div class="head">
-						<p class="title">用户登录</p>
-					</div>
-					<div class="box">
-						<!-- 用户名 -->
-						<div class="username">
-			            	<span></span>
-			            	<input id="userName" name="userName" type="text" autocomplete="off" maxLength="40" value="" tabindex="1" onfocus="inputBoxTip_click(this);" onblur="inputBoxTip_leave(this);" onkeyup="showClearUserNameBox(this);"/>
-			            	<a class="clearUserName" id="clearUserName" href="javascript:void(0);" style="display:none;" onClick="javascript:clearUserName();" ></a>
-			            	<label class="promptTag" id="userNameBoxTip" for="userName" style="display:block">用户名</label>
-			            </div>
-						<p class="tips">
-			            	<span id="userName_error">${(error['userName'])!}</span>
-			            </p>
-			            <!-- 密码 -->
-						<div class="password">
-							<span></span>
-							<input id="password" name="password" type="password" maxLength="20" autocomplete="off" tabindex="2" onfocus="inputBoxTip_click(this);" onblur="inputBoxTip_leave(this);"/>
-							<label class="promptTag" id="passwordBoxTip" style="display: block;" for="password">密码</label>
-						</div>
-						<p class="tips">
-							<span id="password_error" >${(error['password'])!}</span>
-						</p>
-						<!-- 验证码 -->
-						<div class="captcha_div" id="captcha_div" <#if formCaptcha.showCaptcha?c == 'false'>style='display: none;'</#if>>
-							<div class="captchaBox">
-								<span></span>
-								<input type="hidden" id="captchaKey" name="captchaKey" value="${formCaptcha.captchaKey}">
-								<input id="captchaValue" name="captchaValue" type="text" maxLength="4" autocomplete="off" tabindex="3" onfocus="inputBoxTip_click(this);" onblur="inputBoxTip_leave(this);"/>
-								<label class="promptTag" id="captchaValueBoxTip" style="display: block;" for="captchaValue">验证码</label>
+			<div style="background: #fff; height: 1px;"></div>
+	        <div class="loginModule" >
+	        	<div class="tabs-nav">
+		        	<div>
+		        		<div id="local_tab" class="tabs-tab">
+		        			<a href="javascript:void(0)" class="active">账号密码登录</a>
+		        		</div>
+	        			<div id="mobile_tab" class="tabs-tab">
+	        				<a href="javascript:void(0)">手机号登录</a>
+	        			</div>
+		        	</div>
+	        	</div>
+	    		<div class="box">
+	        		<div class="form">
+						<!-- 令牌标记 -->
+						<input type="hidden" id="token" name="token" value="${token}">
+			        	<div class="form-field">
+			        		<!-- form-field-container form-field-error -->
+			        		<div id="userName_field_error" class="form-field-container">
+				        		<div class="form-field-text" >
+				        			<div class="form-field-input-container">
+					        			<input id="userName" maxLength="40" class="form-field-text-input" type="text" value="" onfocus="inputBoxClickTip(this);" onblur="inputBoxOutTip(this);">
+					        			<!-- <label class="mi-floating-label form-field-active ">用户名</label>-->
+					        			<label class="form-field-label">用户名</label>
+				        			</div>
+				        		</div>
+				        		
+			        			<div id="userName_prompt_error" class="form-field-prompt-error"></div>
+			        		</div>
+			        	</div>
+			        	<div class="form-field" >
+			        		<div id="mobile_field_error" class="form-field-container">
+				        		<div class="form-field-text">
+				        			<div class="form-field-input-container">
+					        			<input id="mobile" maxLength="11" class="form-field-text-input" type="text" value="" onfocus="inputBoxClickTip(this);" onblur="inputBoxOutTip(this);">
+					        			<label class="form-field-label">手机号</label>
+				        			</div>
+				        		</div>
+			        			<div id="mobile_prompt_error" class="form-field-prompt-error"></div>
+			        		</div>
+			        	</div>
+			        	<div class="form-field" >
+			        		<div id="password_field_error" class="form-field-container">
+				        		<div class="form-field-text">
+				        			<div class="form-field-input-container">
+					        			<input id="password" maxLength="20" class="form-field-text-input" type="password" value="" onfocus="inputBoxClickTip(this);" onblur="inputBoxOutTip(this);">
+					        			<label class="form-field-label">密码</label>
+				        			</div>
+				        		</div>
+			        			<div id="password_prompt_error" class="form-field-prompt-error"></div>
+			        		</div>
+			        	</div>
+			        	<div id="captchaValue_field" class="form-field" <#if formCaptcha.showCaptcha?c == 'false'>style='display: none;'</#if>>
+				        	<div id="captchaValue_field_error" class="form-field-container">
+				        		<div class="form-field-text">
+						        	<div class="form-field-input-container">
+							        	<input type="hidden" id="captchaKey" name="captchaKey" value="${formCaptcha.captchaKey}">
+							        	<input id="captchaValue" class="form-field-text-input" type="text" maxlength="4" value="" onfocus="inputBoxClickTip(this);" onblur="inputBoxOutTip(this);">
+							        	<label class="form-field-label">验证码</label>
+									</div>
+							        <div class="form-field-image-container">
+										<img id="captcha" src="captcha/${formCaptcha.captchaKey}.jpg" onClick="replaceCaptcha();" tabindex="4" />
+										
+							        </div>
+							        <div class="form-field-button-container" style="background: #fff;">
+							        	<button type="button" class="btn btn-link" tabindex="-1" onClick="replaceCaptcha();">换一幅</button>
+							        </div>
+							    </div>
+							    <div id="captchaValue_prompt_error" class="form-field-prompt-error"></div>
 							</div>
-							<a class="captchaImage" href="javascript:void(0);" >
-								<img id="captcha" src="captcha/${formCaptcha.captchaKey}.jpg" onClick="replaceCaptcha();" tabindex="4" />
-							</a>
-							<a  href="javascript:void(0);" onClick="replaceCaptcha();" tabindex="5">换一幅</a>
-						</div>
-						<p class="tips">
-							<span id="captchaValue_error">${(error['captchaValue'])!}</span>
-						</p>
-						
-						<span id="token_error" style="color: red;">${(error['token'])!}</span>
-						<!-- 忘记密码及自动登录  -->
-						<p class="otherInfo">
-							<a href="findPassWord/step1" tabindex="8">找回密码？</a>
+			        	</div>
+		        	</div>
+	        		<div id="token_prompt_error" style="color: red;">${(error['token'])!}</div>
+	        		<div class="otherInfo">
+	        			<a href="findPassWord/step1" tabindex="8">找回密码？</a>
 							
-							<label>
-								<input id="rememberMe" name="rememberMe" type="checkbox" value="true"/>
-								<span>自动登录</span>
-							</label>
-						</p>
-						
-						
-						<!-- 登录  -->
-						<p class="loginButton">
-							<a href="javascript:void(0);" onClick="javascript:ajaxSubmit()" tabindex="6">登&nbsp;录</a>
-						</p>
+						<label>
+							<input id="rememberMe" name="rememberMe" type="checkbox" value="true"/>
+							<span>自动登录</span>
+						</label>
+	        		</div>
+	        		<div class="loginButton">
+						<a href="javascript:void(0);" onClick="javascript:ajaxSubmit()" tabindex="6">登&nbsp;录</a>
 					</div>
-					
 					
 					<#-- 引入第三方登录模块 -->
 					<@include action="${systemRelated_thirdPartyLogin_1}"/>
-					
-				</div>
-				<div class="push"><!-- 将页脚固定在页面底部 --></div>
-				
-	        </form>
-			</div>
+	        	</div>
+	        </div>
+	        <div class="push"><!-- 将页脚固定在页面底部 --></div>
 		</div>
-		<#-- 引入页脚 -->
-		<@include action="${newPublic_3}"/>
-		
-		
-        <script language="javascript" type="text/javascript">
-		//回车键登录
-		function keydown(event){
-			//当按下回车键
-            if(event.keyCode == 13){   
-				ajaxSubmit();
-            } 
-		}
-       
-        
-        
-        
-        //跳出框架
-		if(window != top){
-			top.location = window.location.href;//跳出框架
-		}	
-        
-        
-		//点击输入框提示
-		function inputBoxTip_click(obj){
-			document.getElementById(obj.id+"BoxTip").style.display="none";
+	</div>
+	<#-- 引入页脚 -->
+	<@include action="${newPublic_3}"/>
+	<script language="javascript" type="text/javascript">
+		$(".form-field").find(".form-field-input-container").bind("click",function(e) {
+			$(this).find(".form-field-text-input").focus();
 
+			if($(this).find(".form-field-label").hasClass("form-field-active")){
+				return;
+			
+			}
+			$(this).find(".form-field-label").addClass("form-field-active");
+		});
+		
+		$(document).click(function (e) {
+	        var target = $(e.target);
+	        if (target.closest(".form-field-input-container").length == 0) {
+	            $(".form-field-input-container").each(function(){
+				    if($(this).find(".form-field-label").hasClass("form-field-active")){
+						if($(this).find('input[type="text"]').val() == "" || $(this).find('input[type="password"]').val() == ""){
+							$(this).find(".form-field-label").removeClass("form-field-active");
+						}
+						
+					}
+				});
+	        }
+	    });
+		
+		//监听Tab键
+	    $(document).on('keyup',function (e) {
+		    if(e.keyCode == 9){
+		    	var input = $(this).find('input:focus');
+		    	if (input.length) {
+			    	if(!input.parent().parent().find(".form-field-label").hasClass("form-field-active")){
+						input.parent().parent().find(".form-field-label").addClass("form-field-active");
+					}
+			    }
+			}
+		});
+	    //解决提交按钮的click和blur事件冲突
+		$(document).ready(function(){
+			$("input[type='button']").mousedown(function(e){
+		    	e.preventDefault();
+			});
+			$("a[href='javascript:void(0);']").mousedown(function(e){
+		    	e.preventDefault();
+			});
+			
+		});
+	</script>
+		
+		
+	<script language="javascript" type="text/javascript">	
+		//选择账号类型
+		$(document).ready(function(){
+			//选择
+			$(".tabs-nav").find(".tabs-tab").each(function(){
+				if($(this).find("a").hasClass("active")){
+					selectAccountType($(this).attr("id"));
+				}
+				
+				$(this).bind("click",function(e) {
+					$(".tabs-nav").find(".tabs-tab").each(function(){
+						$(this).find("a").removeClass("active");
+					});
+					$(this).find("a").addClass("active");
+					selectAccountType($(this).attr("id"));
+				});
+			});
+		});
+		
+		function selectAccountType(id){
+			if(id == "local_tab"){//本地账号密码用户
+				$("#userName_field_error").parent().show();
+				$("#mobile_field_error").parent().hide();
+				$("#smsCode_field_error").parent().hide();
+			}
+			if(id == "mobile_tab"){//手机用户
+				$("#userName_field_error").parent().hide();
+				$("#mobile_field_error").parent().show();
+				$("#smsCode_field_error").parent().show();
+			}
+		}
+		
+		
+		//回车键登录
+		$(document).keyup(function(event){
+			if(event.keyCode ==13){
+		    	ajaxSubmit();
+			}
+		});
+		
+		//点击输入框提示
+		function inputBoxClickTip(obj){
+		
+		
 		}
 		//离开输入框提示
-		function inputBoxTip_leave(obj){
-			if(obj.value != ""){
-				document.getElementById(obj.id+"BoxTip").style.display="none";
-			}else{
-				document.getElementById(obj.id+"BoxTip").style.display="";
-			}
+		function inputBoxOutTip(obj){
 			verification(obj.id);
 		}
-		
-		//显示清除用户名称框
-		function showClearUserNameBox(obj){
-			if(obj.value != ""){
-				document.getElementById("clearUserName").style.display="";
-			}else{
-				document.getElementById("clearUserName").style.display="none";
+		//验证参数
+		function verification(field){
+			$("#"+field+"_prompt_error").hide();
+			$("#"+field+"_field_error").removeClass("form-field-error");
+			
+			if(field == "userName"){//用户名
+				var userName = $("#"+field).val().trim();
+				if(userName == ""){
+					$("#"+field+"_prompt_error").html("用户名不能为空");
+					$("#"+field+"_prompt_error").show();
+					$("#"+field+"_field_error").addClass("form-field-error");
+					return false;
+				}
+				if(getStringLeng(userName) < 3){
+					$("#"+field+"_prompt_error").html("用户名长度不能小于3位");
+					$("#"+field+"_prompt_error").show();
+					$("#"+field+"_field_error").addClass("form-field-error");
+					return false;
+				}
+				if(getStringLeng(userName) > 20){
+					$("#"+field+"_prompt_error").html("用户名长度不能大于20位");
+					$("#"+field+"_prompt_error").show();
+					$("#"+field+"_field_error").addClass("form-field-error");
+					return false;
+				}
+				var pattern =  /^\w+$/;
+				if(!pattern.test(userName)){
+					$("#"+field+"_prompt_error").html("用户名只能输入由数字、26个英文字母或者下划线组成");
+					$("#"+field+"_prompt_error").show();
+					$("#"+field+"_field_error").addClass("form-field-error");
+					return false;
+				}
+			}
+			if(field == "mobile"){//手机号
+				var mobile = $("#"+field).val().trim();
+				if(mobile == ""){
+					$("#"+field+"_prompt_error").html("手机号不能为空");
+					$("#"+field+"_prompt_error").show();
+					$("#"+field+"_field_error").addClass("form-field-error");
+					return false;
+				}
+				if(getStringLeng(mobile) < 11){
+					$("#"+field+"_prompt_error").html("手机号不正确");
+					$("#"+field+"_prompt_error").show();
+					$("#"+field+"_field_error").addClass("form-field-error");
+					return false;
+				}
+			
+			}
+			
+			if(field == "password"){//密码
+				var password = $("#"+field).val().trim();
+				if(password == ""){
+					$("#"+field+"_prompt_error").html("密码不能为空");
+					$("#"+field+"_prompt_error").show();
+					$("#"+field+"_field_error").addClass("form-field-error");
+					return false;
+				}
+				if(getStringLeng(password) < 6){
+					$("#"+field+"_prompt_error").html("密码长度不能小于6位");
+					$("#"+field+"_prompt_error").show();
+					$("#"+field+"_field_error").addClass("form-field-error");
+					return false;
+				}
+				if(getStringLeng(password) > 20){
+					$("#"+field+"_prompt_error").html("密码长度不能大于20位");
+					$("#"+field+"_prompt_error").show();
+					$("#"+field+"_field_error").addClass("form-field-error");
+					return false;
+				}
+			}
+	
+			if(field == "captchaValue"){//验证码
+				if(!$("#captchaValue_field").is(":hidden")){//如果验证码框显示
+					var captchaKey = $("#captchaKey").val().trim();
+					var captchaValue = $("#"+field).val().trim();
+					if(captchaValue == ""){
+						$("#"+field+"_prompt_error").html("验证码不能为空");
+						$("#"+field+"_prompt_error").show();
+						$("#"+field+"_field_error").addClass("form-field-error");
+						return false;
+					}
+					
+					get_request(function(value){
+		            	if(value == "false"){
+		            		$("#"+field+"_prompt_error").html("验证码错误");
+							$("#"+field+"_prompt_error").show();
+							$("#"+field+"_field_error").addClass("form-field-error");
+		            	}
+		            },
+				 		"userVerification.htm?captchaKey="+captchaKey+"&captchaValue="+captchaValue+"&timestamp=" + new Date().getTime(), true);
+		            	
+				}
 			}
 		}
 		
-		//清除用户名称
-		function clearUserName(){
-			document.getElementById("clearUserName").style.display="none";
-			document.getElementById("userName").value="";
+		//更换验证码
+		function replaceCaptcha(){
+			var captchaKey = document.getElementById("captchaKey").value;
+			document.getElementById("captcha").src = "captcha/"+captchaKey+".jpg?" + Math.random(); 
 		}
 		
-		
-		
-
-		//确认提交
-		function sureSubmit(){	
-			if(allVerification() == false){
-				alert("请填好资料再提交");
-				return;
+		//组装参数
+		function getParameter(){
+			var parameter = "";
+	
+			//url跳转参数
+			var jumpUrl = getUrlParam("jumpUrl");
+			if(jumpUrl != null){
+				parameter += "&jumpUrl="+encodeURIComponent(jumpUrl);
+			}
+			//令牌标记
+			var token = $("#token").val();
+			parameter += "&token="+token;
+			
+			//验证码Key
+			parameter += "&captchaKey="+encodeURIComponent($("#captchaKey").val());
+			
+			//验证码值
+			parameter += "&captchaValue="+encodeURIComponent($("#captchaValue").val());
+	
+			//用户类型
+			if($("#local_tab").find("a").hasClass("active")){
+				parameter += "&type=10";
+				//用户名
+				parameter += "&userName="+encodeURIComponent($("#userName").val().trim());
+			}
+			if($("#mobile_tab").find("a").hasClass("active")){
+				parameter += "&type=20";
+				//手机号
+				parameter += "&mobile="+encodeURIComponent($("#mobile").val().trim());
 			}
 		
 			//密码需SHA256加密
-			var password = document.getElementById("password").value;
+			var password = $("#password").val().trim();
 			if(password != ""){
-				document.getElementById("password").value = CryptoJS.SHA256(password);
+				parameter += "&password="+ CryptoJS.SHA256(password);
 			}
 			
-			document.getElementById("loginForm").submit();
+			//自动登录
+			var rememberMe = $("input[id='rememberMe']:checked").val();
+			if(rememberMe != null){
+				parameter += "&rememberMe="+rememberMe;
+			}
+		
+			//删除第一个&号,防止因为多了&号而出现警告: Parameters: Invalid chunk ignored.信息
+			if(parameter.indexOf("&") == 0){
+				parameter = parameter.substring(1,parameter.length);
+			}
+			return parameter;
 		}
 		
 		//ajax提交
 		function ajaxSubmit(){
 			if(allVerification() == false){
-				alert("请填好资料再提交");
 				return;
 			}
 		
 			var parameter = getParameter();
-		
+			
 			post_request(function(value){
 				if(value != ""){
 					var returnValue = JSON.parse(value);//JSON转为对象
@@ -211,14 +409,16 @@
 										//刷新当前页面
 										window.location.reload();	
 									}
-									document.getElementById(error+"_error").innerHTML=key_error[error];	
+									$("#"+error+"_prompt_error").html(key_error[error]);
+									$("#"+error+"_prompt_error").show();
+									$("#"+error+"_field_error").addClass("form-field-error");
 								}
 							}
 						}
 						if(key_captchaKey != null){
-							document.getElementById("captcha_div").style.display="";
+							$("#captchaValue_field").show();
 							//设置验证码Key
-							document.getElementById("captchaKey").value = key_captchaKey;
+							$("#captchaKey").val(key_captchaKey);
 							//设置验证码图片
 							replaceCaptcha();
 						}
@@ -226,170 +426,31 @@
 				}	
 			},
 				"login?&timestamp=" + new Date().getTime(), true,parameter);
-	
-		}
-		
-		
-		//组装参数
-		function getParameter(){
-			var parameter = "";
-	
-			//url跳转参数
-			var jumpUrl = getUrlParam("jumpUrl");
-			if(jumpUrl != null){
-				parameter += "&jumpUrl="+encodeURIComponent(jumpUrl);
-			}
-			//令牌标记
-			var token = document.getElementById("token").value;
-			parameter += "&token="+token;
-			
-			//验证码Key
-			var captchaKey = document.getElementById("captchaKey");
-			if(captchaKey != null){
-				parameter += "&captchaKey="+encodeURIComponent(captchaKey.value);
-			}
-			//验证码值
-			var captchaValue = document.getElementById("captchaValue");
-			if(captchaValue != null){
-				parameter += "&captchaValue="+encodeURIComponent(captchaValue.value);
-			}
-	
-			//用户名
-			var userName = document.getElementById("userName").value;
-			parameter += "&userName="+encodeURIComponent(userName);
-			//密码需SHA256加密
-			var password = document.getElementById("password").value;
-			if(password != ""){
-				parameter += "&password="+ CryptoJS.SHA256(password);
-			}
-			//自动登录
-			var rememberMe = document.getElementsByName("rememberMe");
-			for(var i=0;i<rememberMe.length;i++){
-				if(rememberMe[i].checked){
-					parameter += "&rememberMe="+rememberMe[i].value;
-				}
-			} 
-		
-			//删除第一个&号,防止因为多了&号而出现警告: Parameters: Invalid chunk ignored.信息
-			if(parameter.indexOf("&") == 0){
-				parameter = parameter.substring(1,parameter.length);
-			}
-			return parameter;
-		}
-		
-		
-	
-		//更换验证码
-		function replaceCaptcha(){
-			var captchaKey = document.getElementById("captchaKey").value;
-			document.getElementById("captcha").src = "captcha/"+captchaKey+".jpg?" + Math.random(); 
-		}
-		
-		
-		//验证参数
-		function verification(field){
-			if(field == "userName"){//用户名
-				
-				var parameter = document.getElementById(field).value;
-				if(parameter != ""){
-				
-					var parameter_trim = trim(parameter);
-					if(parameter_trim != ""){
-					
-						if(getStringLeng(parameter_trim) < 3){
-							document.getElementById(field+"_error").innerHTML = "用户名长度不能小于3位";
-							return false;
-						}
-						if(getStringLeng(parameter_trim) >= 20){
-							document.getElementById(field+"_error").innerHTML = "用户名长度不能大于20位";
-							return false;
-						}
-						var pattern =  /^\w+$/;
-		            	if(!pattern.test(parameter_trim)) { 
-		                	document.getElementById(field+"_error").innerHTML = "用户名只能输入由数字、26个英文字母或者下划线组成";
-							return false;
-		            	}
-					}else{
-						document.getElementById(field+"_error").innerHTML = "用户名不能为空";
-						return false;
-					}
-				}else{
-				
-					document.getElementById(field+"_error").innerHTML = "用户名不能为空";
-					return false;
-				}
-			}
-			if(field == "password"){//密码
-				var parameter = document.getElementById(field).value;
-				if(parameter != ""){
-					var parameter_trim = trim(parameter);
-					if(parameter_trim != ""){
-						if(getStringLeng(parameter_trim) < 6){
-							document.getElementById(field+"_error").innerHTML = "密码长度不能小于6位";
-							return false;
-						}
-						if(getStringLeng(parameter_trim) > 20){
-							document.getElementById(field+"_error").innerHTML = "密码长度不能大于20位";
-							return false;
-						}
-					}else{
-						document.getElementById(field+"_error").innerHTML = "密码不能为空";
-						return false;
-					}
-				}else{
-					document.getElementById(field+"_error").innerHTML = "密码不能为空";
-					return false;
-				}
-			}
-	
-			if(field == "captchaValue"){//验证码
-				if(document.getElementById("captcha_div").style.display !="none"){
-					if( document.getElementById("captchaKey") != null){
-						var captchaKey = document.getElementById("captchaKey").value;
-						var parameter = document.getElementById(field).value;
-						if(parameter != ""){
-						
-							var parameter_trim = trim(parameter);
-							if(parameter_trim != ""){
-								get_request(function(value){
-					            	if(value == "false"){
-						            	document.getElementById(field+"_error").innerHTML = "验证码错误";
-					            	}
-					            },
-							 		"userVerification.htm?captchaKey="+captchaKey+"&captchaValue="+parameter_trim+"&timestamp=" + new Date().getTime(), true);
-					            	
-							}else{
-								document.getElementById(field+"_error").innerHTML = "验证码不能为空";
-								return false;
-							}
-						}else{
-							document.getElementById(field+"_error").innerHTML = "验证码不能为空";
-							return false;
-						}
-					}
-				}
-			}
-			if(document.getElementById(field+"_error") != null){
-				document.getElementById(field+"_error").innerHTML = "";
-			}
-			
-			return true;
 		}
 		
 		//验证全部参数
 		function allVerification(){
 			var isVerification = true;
-			if(verification("userName") == false){
-				isVerification = false;
+			
+			//用户类型
+			if($("#local_tab").find("a").hasClass("active")){
+				if(verification("userName") == false){
+					isVerification = false;
+				}
 			}
+			if($("#mobile_tab").find("a").hasClass("active")){
+				if(verification("mobile") == false){
+					isVerification = false;
+				}
+			}
+			
+			
+			
 			if(verification("password") == false){
 				isVerification = false;
 			}
 			return isVerification;
 		}
-	
-		//禁止浏览器后退
-		window.history.forward(1);
-		</script>
+	</script>	
     </body>
 </html>

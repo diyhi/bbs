@@ -1162,7 +1162,7 @@ CREATE TABLE `sendsmslog` (
   `message` varchar(200) DEFAULT NULL,
   `mobile` varchar(20) DEFAULT NULL,
   `serviceId` int(11) DEFAULT NULL,
-  `userName` varchar(30) DEFAULT NULL,
+  `platformUserId` varchar(90) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

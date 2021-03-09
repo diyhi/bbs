@@ -82,17 +82,18 @@ public class SmsManage {
 	
 	/**
 	 * 发送短信验证码
+	 * @param platformUserId 平台用户Id
 	 * @param mobile 手机号
 	 * @param code 验证码
 	 * @return
 	 */
-	public String sendSms_code(Long userId,String userName,String mobile,String code){
+	public String sendSms_code(String platformUserId,String mobile,String code){
 
 		String errorInfo = null;
 		
 		SystemSetting systemSetting = settingService.findSystemSetting_cache();
 		if(systemSetting.getUserSentSmsCount() != null && systemSetting.getUserSentSmsCount() >0){
-			int count = smsManage.addSentSmsCount(userName, 0);//先查询发送次数
+			int count = smsManage.addSentSmsCount(platformUserId, 0);//先查询发送次数
 			if(count >= systemSetting.getUserSentSmsCount()){
 				errorInfo = "超出每用户每24小时内发送短信限制次数";
 			}
@@ -178,7 +179,7 @@ public class SmsManage {
 				        //request.setSmsUpExtendCode("90997");
 
 				        //可选:outId为提供给业务方扩展字段,最终在短信回执消息中将此值带回给调用者
-				        request.setOutId(String.valueOf(userId));
+				        request.setOutId(platformUserId);
 
 				        //hint 此处可能会抛出异常，注意catch
 				        try {
@@ -191,7 +192,7 @@ public class SmsManage {
 									SendSmsLog sendSmsLog = new SendSmsLog();
 									sendSmsLog.setInterfaceProduct(smsInterface.getInterfaceProduct());//接口产品
 									sendSmsLog.setServiceId(serviceId);//服务Id
-									sendSmsLog.setUserName(userName);//会员用户名
+									sendSmsLog.setPlatformUserId(platformUserId);;//平台用户Id
 									sendSmsLog.setMobile(mobile);//手机
 									sendSmsLog.setCode(sendSmsResponse.getCode());//状态码-返回OK代表请求成功,其他错误码详见错误码列表
 									sendSmsLog.setMessage(sendSmsResponse.getMessage());//状态码描述
@@ -199,10 +200,10 @@ public class SmsManage {
 								//	sendSmsLog.setAlidayu_bizId(sendSmsResponse.getBizId());//发送回执ID,可根据该ID查询具体的发送状态
 									smsService.saveSendSmsLog(sendSmsLog);
 								}else{
-									int original = smsManage.addSentSmsCount(userName, 0);//原来总次数
-									smsManage.deleteSentSmsCount(userName);
+									int original = smsManage.addSentSmsCount(platformUserId, 0);//原来总次数
+									smsManage.deleteSentSmsCount(platformUserId);
 							    	//增加发送短信次数记录
-									smsManage.addSentSmsCount(userName,original+1);
+									smsManage.addSentSmsCount(platformUserId,original+1);
 								}
 								
 							}	
@@ -237,44 +238,44 @@ public class SmsManage {
 	
 	/**
 	 * 缓存增加用户发短信次数
-	 * @param userName 用户名称
+	 * @param platformUserId 平台用户Id
 	 * @param count 发送总数
 	 */
-	@Cacheable(value="smsManage_cache_sentSmsCount",key="#userName")
-	public Integer addSentSmsCount(String userName,Integer count){
+	@Cacheable(value="smsManage_cache_sentSmsCount",key="#platformUserId")
+	public Integer addSentSmsCount(String platformUserId,Integer count){
 		return count;
 	}
 	/**
 	 * 删除缓存用户发短信次数
-	 * @param userName 用户名称
+	 * @param platformUserId 平台用户Id
 	*/
-	@CacheEvict(value="smsManage_cache_sentSmsCount",key="#userName")
-	public void deleteSentSmsCount(String userName){
+	@CacheEvict(value="smsManage_cache_sentSmsCount",key="#platformUserId")
+	public void deleteSentSmsCount(String platformUserId){
 	} 
 	
 	
 	
 	/**
-	 * 生成绑定手机验证码标记
-	 * @param module 模块 1.绑定手机  2.更换绑定手机第一步  3.更换绑定手机第二步
-	 * @param userId 用户Id
+	 * 生成手机验证码标记
+	 * @param module 模块 1.绑定手机  2.更换绑定手机第一步  3.更换绑定手机第二步   100.注册   200.登录 300.找回密码
+	 * @param platformUserId 平台用户Id
 	 * @param mobile 手机号
 	 * @param mobile 验证码
 	 * @return
 	 */
-	@Cacheable(value="smsManage_cache_smsCode",key="#module+'_'+#userId+'_'+#mobile")
-	public String smsCode_generate(Integer module,Long userId,String mobile,String smsCode){
+	@Cacheable(value="smsManage_cache_smsCode",key="#module+'_'+#platformUserId+'_'+#mobile")
+	public String smsCode_generate(Integer module,String platformUserId,String mobile,String smsCode){
 		return smsCode;
 	}
 	/**
-	 * 删除绑定手机验证码标记
+	 * 删除手机验证码标记
 	 * @param module 模块
-	 * @param userId 用户Id
+	 * @param platformUserId 平台用户Id
 	 * @param mobile 手机号
 	 * @return
 	 */
-	@CacheEvict(value="smsManage_cache_smsCode",key="#module+'_'+#userId+'_'+#mobile")
-	public void smsCode_delete(Integer module,Long userId,String mobile){
+	@CacheEvict(value="smsManage_cache_smsCode",key="#module+'_'+#platformUserId+'_'+#mobile")
+	public void smsCode_delete(Integer module,String platformUserId,String mobile){
 	}
 	
 	/**

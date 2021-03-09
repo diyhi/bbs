@@ -545,8 +545,22 @@ public class UserManageAction {
 		
 		
 		User user = new User();
+		
+		if(formbean.getType().equals(10)){//10:本地账号密码用户
+			user.setUserName(formbean.getUserName().trim());
+			user.setIssue(formbean.getIssue().trim());
+			//密码提示答案由  密码提示答案原文sha256  进行sha256组成
+			user.setAnswer(SHA.sha256Hex(SHA.sha256Hex(formbean.getAnswer().trim())));
+			user.setPlatformUserId(user.getUserName());
+		}else if(formbean.getType().equals(20)){//20: 手机用户
+			user.setUserName(userManage.queryUserIdentifier(20)+"-"+UUIDUtil.getUUID22());//会员用户名
+			user.setPlatformUserId(userManage.thirdPartyUserIdToPlatformUserId(formbean.getMobile().trim(),20));
+		}
+		
+		
+		
 		user.setSalt(UUIDUtil.getUUID32());
-		user.setUserName(formbean.getUserName().trim());
+		
 		if(formbean.getNickname() != null && !"".equals(formbean.getNickname().trim())){
 			user.setNickname(formbean.getNickname().trim());
 		}
@@ -554,9 +568,7 @@ public class UserManageAction {
 		//密码
 		user.setPassword(SHA.sha256Hex(SHA.sha256Hex(formbean.getPassword().trim())+"["+user.getSalt()+"]"));
 		user.setEmail(formbean.getEmail().trim());
-		user.setIssue(formbean.getIssue().trim());
-		//密码提示答案由  密码提示答案原文sha256  进行sha256组成
-		user.setAnswer(SHA.sha256Hex(SHA.sha256Hex(formbean.getAnswer().trim())));
+		
 
 		user.setRegistrationDate(new Date());
 		user.setRemarks(formbean.getRemarks());
@@ -567,8 +579,8 @@ public class UserManageAction {
 		//允许显示用户动态
 		user.setAllowUserDynamic(formbean.getAllowUserDynamic());
 		user.setSecurityDigest(new Date().getTime());
-		user.setType(10);
-		user.setPlatformUserId(user.getUserName());
+		user.setType(formbean.getType());
+		
 		//用户自定义注册功能项用户输入值集合
 		List<UserInputValue> all_userInputValueList = new ArrayList<UserInputValue>();
 	
@@ -896,24 +908,27 @@ public class UserManageAction {
 				new_user.setPassword(user.getPassword());
 				new_user.setSecurityDigest(user.getSecurityDigest());
 			}
-			if(formbean.getIssue() != null && !"".equals(formbean.getIssue().trim())){//密码提示问题
-				if(formbean.getIssue().length()>50){
-					error.put("issue", "密码提示问题不能超过50个字符");
-				}
-				new_user.setIssue(formbean.getIssue().trim());
-			}else{
-				error.put("issue", "密码提示问题不能为空");
-			}
-			if(formbean.getAnswer() != null && !"".equals(formbean.getAnswer().trim())){//密码提示答案
-				if(formbean.getAnswer().length()>50){
-					error.put("answer", "密码提示答案不能超过50个字符");
-				}
-				//密码提示答案由  密码提示答案原文sha256  进行sha256组成
-				new_user.setAnswer(SHA.sha256Hex(SHA.sha256Hex(formbean.getAnswer().trim())));
-			}else{
-				new_user.setAnswer(user.getAnswer());
-			}
 			
+			if(user.getType().equals(10)){
+				if(formbean.getIssue() != null && !"".equals(formbean.getIssue().trim())){//密码提示问题
+					if(formbean.getIssue().length()>50){
+						error.put("issue", "密码提示问题不能超过50个字符");
+					}
+					new_user.setIssue(formbean.getIssue().trim());
+				}else{
+					error.put("issue", "密码提示问题不能为空");
+				}
+				if(formbean.getAnswer() != null && !"".equals(formbean.getAnswer().trim())){//密码提示答案
+					if(formbean.getAnswer().length()>50){
+						error.put("answer", "密码提示答案不能超过50个字符");
+					}
+					//密码提示答案由  密码提示答案原文sha256  进行sha256组成
+					new_user.setAnswer(SHA.sha256Hex(SHA.sha256Hex(formbean.getAnswer().trim())));
+				}else{
+					new_user.setAnswer(user.getAnswer());
+				}
+				
+			}
 		}else{
 			new_user.setPassword(user.getPassword());
 			if(user.getSecurityDigest() != null && !"".equals(user.getSecurityDigest())){
@@ -935,19 +950,56 @@ public class UserManageAction {
 			}
 			new_user.setEmail(formbean.getEmail().trim());
 		}
-		//手机
-		if(formbean.getMobile() != null && !"".equals(formbean.getMobile().trim())){
-	    	if(formbean.getMobile().trim().length() >18){
-				error.put("mobile", "手机号码超长");
-			}else{
-				boolean mobile_verification = Verification.isPositiveInteger(formbean.getMobile().trim());//正整数
-				if(!mobile_verification){
-					error.put("mobile", "手机号码不正确");
+		
+		//平台用户Id
+		new_user.setPlatformUserId(user.getPlatformUserId());
+		if(user.getType().equals(10)){//10:本地账号密码用户
+			//手机
+			if(formbean.getMobile() != null && !"".equals(formbean.getMobile().trim())){
+		    	if(formbean.getMobile().trim().length() >18){
+					error.put("mobile", "手机号码超长");
 				}else{
-					new_user.setMobile(formbean.getMobile().trim());
+					boolean mobile_verification = Verification.isPositiveInteger(formbean.getMobile().trim());//正整数
+					if(!mobile_verification){
+						error.put("mobile", "手机号码不正确");
+					}else{
+						new_user.setMobile(formbean.getMobile().trim());
+					}
 				}
-			}
-	    }
+		    }
+			
+		}else if(user.getType().equals(20)){//20: 手机用户
+			//手机
+			if(formbean.getMobile() != null && !"".equals(formbean.getMobile().trim())){
+		    	if(formbean.getMobile().trim().length() >18){
+					error.put("mobile", "手机号码超长");
+				}else{
+					boolean mobile_verification = Verification.isPositiveInteger(formbean.getMobile().trim());//正整数
+					if(!mobile_verification){
+						error.put("mobile", "手机号码不正确");
+					}else{
+						
+						if(!user.getMobile().equals(formbean.getMobile().trim())){
+							String platformUserId = userManage.thirdPartyUserIdToPlatformUserId(formbean.getMobile().trim(),20);
+							User mobile_user = userService.findUserByPlatformUserId(platformUserId);
+							
+				      		if(mobile_user != null){
+				      			error.put("mobile", "手机号码已注册");
+
+				      		}
+						}
+						
+						new_user.setPlatformUserId(userManage.thirdPartyUserIdToPlatformUserId(formbean.getMobile().trim(),20));
+						new_user.setMobile(formbean.getMobile().trim());
+					}
+				}
+		    }else{
+		    	error.put("mobile", "手机号码不能为空");
+		    }
+		}
+		
+		
+		
 		//实名认证
 		new_user.setRealNameAuthentication(formbean.isRealNameAuthentication());
 		//允许显示用户动态
@@ -1018,8 +1070,10 @@ public class UserManageAction {
 		new_user.setUserVersion(formbean.getUserVersion());
 		if(error.size() >0){
 			model.addAttribute("error",error);
+			formbean.setType(user.getType());
 			formbean.setUserName(user.getUserName());
 			formbean.setUserVersion(user.getUserVersion());
+			
 			model.addAttribute("user",formbean);
 			
 			

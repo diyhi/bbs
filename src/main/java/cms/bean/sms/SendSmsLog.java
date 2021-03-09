@@ -27,9 +27,14 @@ public class SendSmsLog implements Serializable{
 	private Integer interfaceProduct;
 	/** 服务Id 1.绑定手机  10.营销广告  **/
 	private Integer serviceId;
-	/** 会员用户名 **/
+	/** 会员用户名
 	@Column(length=30)
-	private String userName;
+	private String userName; **/
+	
+	/** 平台用户Id   本地账号密码用户类型为'会员用户名';  手机用户类型为'手机号-mobile';  邮箱用户类型为'邮箱-email';  第三方用户类型的为'第三方用户Id-第三方平台标记',例如微信为'unionid-weixin' **/
+	@Column(length=90)
+	private String platformUserId;
+	
 	/** 手机 **/
 	@Column(length=20)
 	private String mobile;
@@ -68,11 +73,11 @@ public class SendSmsLog implements Serializable{
 	public void setServiceId(Integer serviceId) {
 		this.serviceId = serviceId;
 	}
-	public String getUserName() {
-		return userName;
+	public String getPlatformUserId() {
+		return platformUserId;
 	}
-	public void setUserName(String userName) {
-		this.userName = userName;
+	public void setPlatformUserId(String platformUserId) {
+		this.platformUserId = platformUserId;
 	}
 	public String getMobile() {
 		return mobile;

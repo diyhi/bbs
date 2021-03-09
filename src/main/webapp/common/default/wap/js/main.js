@@ -39,7 +39,7 @@ $.ajaxSettings = $.extend($.ajaxSettings, {
 		}
 		//XMLHttpRequest.getAllResponseHeaders().indexOf("jumppath") >= 0解决跨域上传文件时出现错误 Refused to get unsafe header "jumpPath" 注意参数小写
 		//请求完成后回调函数 (请求成功或失败时均调用)
-		if (XMLHttpRequest.getAllResponseHeaders().indexOf("jumppath") >= 0 && XMLHttpRequest.getResponseHeader("jumpPath") != null && XMLHttpRequest.getResponseHeader("jumpPath") != "") {
+		if (XMLHttpRequest.getAllResponseHeaders().toLowerCase().indexOf("jumppath") >= 0 && XMLHttpRequest.getResponseHeader("jumpPath") != null && XMLHttpRequest.getResponseHeader("jumpPath") != "") {
 			//session登陆超时登陆页面响应http头
 			//收到未登录标记，执行登录页面跳转
 			router.push({
@@ -6380,6 +6380,17 @@ var register_component = Vue.extend({
 
 	data : function() {
 		return {
+			registerType_tab_10 : 'active',//注册类型选中样式
+			registerType_tab_20 : '',//注册类型选中样式
+			
+			userName_field : true,//表单用户名字段
+			mobile_field : false,//表单手机号字段
+			issue_field : true,//表单密码提示问题字段
+			answer_field : true,//表单密码提示答案字段
+			email_field : true,//表单邮箱字段
+			smsCode_field : false,//表单手机号验证码字段
+			
+			type : 10,//用户类型
 			userCustomList : [], //用户自定义注册功能项
 			captchaKey : '', //验证码编号
 			captchaValue : '',
@@ -6391,8 +6402,15 @@ var register_component = Vue.extend({
 			issue : '', //密码提示问题
 			answer : '', //密码提示答案
 			email : '', //邮箱
-
+			smsCode: '', //手机验证码
 			userBoundField : [], //用户自定义注册功能项绑定
+			mobile : '', //手机号
+			successInfo:'', //验证码发送成功信息
+			time: 0,//倒计时间
+			button: {//获取短信校验码按钮
+				disabled : false,
+				text : '获取短信校验码',
+			},
 			error : {
 				userName : '', //用户名
 				password : '', //密码
@@ -6401,11 +6419,14 @@ var register_component = Vue.extend({
 				answer : '', //密码提示答案
 				email : '', //邮箱
 				captchaValue : '', //验证码值
-				register: '', //注册错误
+				register: '', //注册错误	
+				mobile : '',//手机号
+				smsCode : ''//手机验证码
 			},
 			customError : [], //用户自定义注册功能项错误提示	
 
 			agreement : true, //是否同意服务协议
+			allowSubmit:false,//提交按钮disabled状态
 		};
 	},
 	created : function() {
@@ -6425,6 +6446,148 @@ var register_component = Vue.extend({
 		this.initialization();
 	},
 	methods : {
+		
+		//选择注册用户类型
+		selectRegisterAccountType : function(type) {
+			if(type == 10){
+				this.type =10;//用户类型
+				this.registerType_tab_10 = "active";
+				this.registerType_tab_20 = "";
+				
+				this.userName_field = true;
+				this.mobile_field = false;
+				this.issue_field = true;
+				this.answer_field = true;
+				this.email_field = true;
+				this.smsCode_field = false;
+			}else if(type == 20){
+				this.type =20;//用户类型
+				this.registerType_tab_10 = "";
+				this.registerType_tab_20 = "active";
+				
+				this.userName_field = false;
+				this.mobile_field = true;
+				this.issue_field = false;
+				this.answer_field = false;
+				this.email_field = false;
+				this.smsCode_field = true;
+			}
+			
+		},
+		//获取短信验证码
+		getSmsCode : function () {
+			var _self = this;
+			//清除所有错误
+			_self.clearError();
+			_self.successInfo = '';
+			//设置按钮禁用状态
+			_self.button.disabled = true;
+			
+			
+			var parameter = "";
+			if(_self.mobile != null && _self.mobile !=''){
+				parameter += "&mobile=" + encodeURIComponent(_self.mobile);
+			}
+			parameter += "&module=100";
+			
+			//验证码Key
+			parameter += "&captchaKey=" + encodeURIComponent(_self.captchaKey);
+
+			//验证码值
+			parameter += "&captchaValue=" + encodeURIComponent(_self.captchaValue.trim());
+
+			//令牌
+			parameter += "&token=" + _self.$store.state.token;
+			$.ajax({
+				type : "POST",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "smsCode",
+				data: parameter,
+				success : function success(result) {
+					if (result != "") {
+						var returnValue = $.parseJSON(result);
+						var value_success = "";
+						var value_error = null;
+						var value_captchaKey = null;
+						for (var key in returnValue) {
+							if (key == "success") {
+								value_success = returnValue[key];
+							} else if (key == "error") {
+								value_error = returnValue[key];
+							} else if (key == "captchaKey") {
+								value_captchaKey = returnValue[key];
+							}
+						}
+						if(value_success == "true"){
+							//倒计时
+							_self.countdown();
+							_self.successInfo = "短信验证码已发送";	
+						}else{
+							//设置按钮启用状态
+							_self.button.disabled = false;
+							
+							if (value_error != null) {
+								var htmlContent = "";
+								var count = 0;
+								for (var errorKey in value_error) {
+									var errorValue = value_error[errorKey];
+									if (errorKey == "mobile") {
+										_self.error.mobile = errorValue;
+									}else if (errorKey == "smsCode") {
+										_self.error.smsCode = errorValue;
+									} else if (errorKey == "captchaValue") {
+										_self.error.captchaValue = errorValue;
+									} else if (errorKey == "token") {
+										//如果令牌错误
+										_self.$toast({
+											message : "页面已过期，3秒后自动刷新",
+											duration : 3000,
+											className : "mint-ui-toast",
+										});
+										setTimeout(function() {
+											//刷新当前页面
+											window.location.reload();
+										}, 3000);
+									}else{
+										count++;
+										htmlContent += count + ". " + errorValue + "<br>";
+									}
+									
+								}
+								if (htmlContent != "") {
+									_self.$messagebox('提示', htmlContent);
+								}
+							}
+							if (value_captchaKey != null) {
+								_self.showCaptcha = true;
+								_self.captchaKey = value_captchaKey;
+								_self.imgUrl = "captcha/" + value_captchaKey + ".jpg";
+								//设置验证码图片
+								_self.replaceCaptcha();
+							}	
+						}
+					}
+				}
+			});
+		},
+		//倒计时
+		countdown : function () {
+			var _self = this;
+			_self.time = 60;
+			var interval = window.setInterval(function() {
+				_self.time--;
+				_self.button.disabled = true;
+				_self.button.text="重新发送("+_self.time+")";
+				
+				if(_self.time <= 0) {
+					window.clearInterval(interval);
+					_self.button.disabled = false;
+					_self.button.text="获取短信校验码";
+				}
+			}, 1000);
+
+		},		
 		//查询注册页
 		queryRegister : function() {
 			var _self = this;
@@ -6556,6 +6719,7 @@ var register_component = Vue.extend({
 		//提交用户
 		addUser : function() {
 			var _self = this;
+			_self.allowSubmit = true;//提交按钮disabled状态
 			
 			//清除错误
 			_self.error.userName = '';//用户名
@@ -6567,7 +6731,8 @@ var register_component = Vue.extend({
 			_self.error.captchaValue  = '';//验证码值
 			_self.error.register = '';//注册错误
 			_self.customError =[];//用户自定义注册功能项错误提示
-			
+			_self.error.smsCode = ''; //手机验证码
+			_self.error.mobile = '' //手机号
 
 			if (_self.agreement == false) { //如果不同意服务协议
 				_self.$messagebox('提示', '必须同意本站服务协议才能注册用户');
@@ -6582,13 +6747,32 @@ var register_component = Vue.extend({
 			}
 
 			var parameter = "";
-			//用户名
-			var userName = _self.userName;
-			if (userName != "") {
-				parameter += "&userName=" + encodeURIComponent(userName);
+			
+			if(_self.type == 10){//10:本地账号密码用户
+				parameter += "&type=10";
+				
+				//用户名
+				var userName = _self.userName;
+				if (userName != "") {
+					parameter += "&userName=" + encodeURIComponent(userName);
+				}
+				
+			}else if(_self.type == 20){//20: 手机用户
+				parameter += "&type=20";
+				
+				//手机号
+				var mobile = _self.mobile;
+				if (mobile != "") {
+					parameter += "&mobile=" + encodeURIComponent(mobile);
+				}
+				//手机验证码
+				var smsCode = _self.smsCode;
+				if (smsCode != "") {
+					parameter += "&smsCode=" + encodeURIComponent(smsCode);
+				}
+				
 			}
-
-
+			
 			//密码需SHA256加密
 			var password = _self.password.trim();
 			if (password != "") { //密码
@@ -6711,8 +6895,12 @@ var register_component = Vue.extend({
 									_self.error.email = errorValue;
 								} else if (error == "register") { //注册错误
 									_self.error.register = errorValue;
-								}  else if (error == "captchaValue") { //验证码错误
+								} else if (error == "captchaValue") { //验证码错误
 									_self.error.captchaValue = errorValue;
+								} else if (error == "smsCode") { //手机验证码
+									_self.error.smsCode = errorValue;
+								} else if (error == "mobile") { //手机
+									_self.error.mobile = errorValue;
 								}else {
 									var number = error.split("_")[1];
 									for (var i = 0; i < _self.userCustomList.length; i++) {
@@ -6724,7 +6912,8 @@ var register_component = Vue.extend({
 									}
 								}
 							}
-
+							
+							_self.allowSubmit = false;//提交按钮disabled状态
 							if (value_captchaKey != null) {
 								_self.showCaptcha = true;
 								_self.captchaKey = value_captchaKey;
@@ -6894,20 +7083,51 @@ var findPassWord_step1_component = Vue.extend({
 	template : '#findPassWord_step1-template',
 	data : function data() {
 		return {
+			type_tab_10 : 'active',//用户类型选中样式
+			type_tab_20 : '',//用户类型选中样式
+			
+			userName_field : true,//表单用户名字段
+			mobile_field : false,//表单手机号字段
+			
+			type : 10,//用户类型
+			mobile : '',//手机号
 			userName : '',
 			imgUrl : '',
 			captchaKey : '',
 			captchaValue : '',
 			error : {
+				mobile : '',//手机号
 				userName : '',
 				captchaValue : ''
-			}
+			},
+			
+			allowSubmit:false,//提交按钮disabled状态
 		};
 	},
 	created : function created() {
 		this.queryFindPassWord_step1();
 	},
 	methods : {
+		//选择用户类型
+		selectAccountType : function(type) {
+			if(type == 10){
+				this.type =10;//用户类型
+				this.type_tab_10 = "active";
+				this.type_tab_20 = "";
+				
+				this.userName_field = true;
+				this.mobile_field = false;
+			}else if(type == 20){
+				this.type =20;//用户类型
+				this.type_tab_10 = "";
+				this.type_tab_20 = "active";
+				
+				this.userName_field = false;
+				this.mobile_field = true;
+			}
+			
+		},
+		
 		//查询找回密码第一步
 		queryFindPassWord_step1 : function() {
 			var _self = this;
@@ -6934,14 +7154,31 @@ var findPassWord_step1_component = Vue.extend({
 		//提交数据
 		submitData : function() {
 			var _self = this;
+			
+			_self.allowSubmit = true;//提交按钮disabled状态
 			//清除所有错误
 			_self.clearError();
 
 			var parameter = "";
 
-			var userName = _self.userName;
-			if (userName != null && userName != '') {
-				parameter += "&userName=" + encodeURIComponent(userName);
+			if(_self.type == 10){//10:本地账号密码用户
+				parameter += "&type=10";
+				
+				//用户名
+				var userName = _self.userName;
+				if (userName != "") {
+					parameter += "&userName=" + encodeURIComponent(userName);
+				}
+				
+			}else if(_self.type == 20){//20: 手机用户
+				parameter += "&type=20";
+				
+				//手机号
+				var mobile = _self.mobile;
+				if (mobile != "") {
+					parameter += "&mobile=" + encodeURIComponent(mobile);
+				}
+				
 			}
 
 			//验证码Key
@@ -7017,7 +7254,7 @@ var findPassWord_step1_component = Vue.extend({
 									}
 								}
 							}
-
+							_self.allowSubmit = false;//提交按钮disabled状态
 							if (value_captchaKey != null) {
 								_self.captchaKey = value_captchaKey;
 								_self.imgUrl = "captcha/" + value_captchaKey + ".jpg";
@@ -7091,7 +7328,15 @@ var findPassWord_step2_component = Vue.extend({
 	template : '#findPassWord_step2-template',
 	data : function data() {
 		return {
+			userName_field : true,//表单用户名字段
+			mobile_field : false,//表单手机号字段
+			issue_field : true,//表单密码提示问题字段
+			answer_field : true,//表单密码提示答案字段
+			smsCode_field : false,//表单手机号验证码字段
+
+			type : 10,
 			userName : '',
+			mobile: '',
 			issue : '',
 			answer : '',
 			password : '', //新密码
@@ -7100,12 +7345,23 @@ var findPassWord_step2_component = Vue.extend({
 			captchaKey : '',
 			captchaValue : '',
 			error : {
+				mobile : '',//手机号
+				smsCode : '',//手机验证码
 				userName : '',
 				password : '',
 				confirmPassword : '',
 				answer : '',
 				captchaValue : ''
-			}
+			},
+			smsCode:'',//手机号
+			successInfo:'', //验证码发送成功信息
+			time: 0,//倒计时间
+			button: {//获取短信校验码按钮
+				disabled : false,
+				text : '获取短信校验码',
+			},
+			allowSubmit:false,//提交按钮disabled状态
+			allowSmsCodeSubmit:false,//提交按钮disabled状态
 		};
 	},
 	created : function created() {
@@ -7113,6 +7369,12 @@ var findPassWord_step2_component = Vue.extend({
 		var userName = getUrlParam("userName");
 		if (userName != null && userName != "") {
 			this.userName = userName;
+		}
+		
+		//获取手机号
+		var mobile = getUrlParam("mobile");
+		if (mobile != null && mobile != "") {
+			this.mobile = mobile;
 		}
 		this.queryFindPassWord_step2();
 	},
@@ -7151,6 +7413,23 @@ var findPassWord_step2_component = Vue.extend({
 						//成功
 						if (value_success == "true") {
 							_self.issue = value_user.issue;
+							_self.type = value_user.type;
+							
+							
+							if(_self.type == 10){
+								_self.userName_field = true;
+								_self.mobile_field = false;
+								_self.issue_field = true;
+								_self.answer_field = true;
+								_self.smsCode_field = false;
+							}else if(_self.type == 20){
+								_self.userName_field = false;
+								_self.mobile_field = true;
+								_self.issue_field = false;
+								_self.answer_field = false;
+								_self.smsCode_field = true;
+							}
+							
 						} else {
 							//显示错误
 							if (value_error != null) {
@@ -7180,6 +7459,9 @@ var findPassWord_step2_component = Vue.extend({
 		//提交数据
 		submitData : function() {
 			var _self = this;
+			
+			_self.allowSubmit = true;//提交按钮disabled状态
+			
 			//清除所有错误
 			_self.clearError();
 			//验证密码
@@ -7188,6 +7470,19 @@ var findPassWord_step2_component = Vue.extend({
 				return;
 			}
 			var parameter = "";
+			
+			if(_self.type == 10){//10:本地账号密码用户
+				parameter += "&type=10";		
+			}else if(_self.type == 20){//20: 手机用户
+				parameter += "&type=20";
+				//手机验证码
+				var smsCode = _self.smsCode;
+				if (smsCode != "") {
+					parameter += "&smsCode=" + encodeURIComponent(smsCode);
+				}
+				
+			}
+			
 			//用户名
 			var userName = _self.userName;
 			if (userName != "") {
@@ -7224,7 +7519,7 @@ var findPassWord_step2_component = Vue.extend({
 				url : "findPassWord/step2",
 				data : parameter,
 				success : function success(result) {
-					if (result != "") {
+					if (result != "") {console.log(result);
 						var returnValue = $.parseJSON(result);
 
 						var value_success = "";
@@ -7270,7 +7565,9 @@ var findPassWord_step2_component = Vue.extend({
 											_self.error.answer = value_error[error];
 										} else if (error == "captchaValue") {
 											_self.error.captchaValue = value_error[error];
-										} else if (error == "token") {
+										} else if (error == "smsCode") {
+											_self.error.smsCode = value_error[error];
+										}else if (error == "token") {
 											//如果令牌错误
 											_self.$toast({
 												message : "页面已过期，3秒后自动刷新",
@@ -7284,7 +7581,7 @@ var findPassWord_step2_component = Vue.extend({
 									}
 								}
 							}
-
+							_self.allowSubmit = false;//提交按钮disabled状态
 							if (value_captchaKey != null) {
 								_self.captchaKey = value_captchaKey;
 								_self.imgUrl = "captcha/" + value_captchaKey + ".jpg";
@@ -7341,6 +7638,7 @@ var findPassWord_step2_component = Vue.extend({
 		//验证验证码
 		validation_captchaValue : function validation_captchaValue(event) {
 			var _self = this;
+			
 			var cv = this.captchaValue.trim();
 			if (cv.length < 4) {
 				_self.error.captchaValue = "请填写完整验证码";
@@ -7357,7 +7655,7 @@ var findPassWord_step2_component = Vue.extend({
 					url : "userVerification",
 					data : parameter,
 					success : function success(result) {
-						if (result == "false") {
+						if (result == "false" && _self.allowSmsCodeSubmit == false) {
 							_self.error.captchaValue = "验证码错误";
 						}
 					},
@@ -7373,10 +7671,129 @@ var findPassWord_step2_component = Vue.extend({
 					complete : function complete(XMLHttpRequest, textStatus) {
 						//请求完成后回调函数 (请求成功或失败时均调用)
 						_self.$indicator.close(); //关闭旋转进度条
+						
 					}
 				});
 			}
 		},
+
+		//获取短信验证码
+		getSmsCode : function () {
+			var _self = this;
+			
+			_self.allowSmsCodeSubmit = true;//提交按钮disabled状态
+			//清除所有错误
+			_self.clearError();
+			_self.successInfo = '';
+			//设置按钮禁用状态
+			_self.button.disabled = true;
+			
+			
+			var parameter = "";
+			if(_self.mobile != null && _self.mobile !=''){
+				parameter += "&mobile=" + encodeURIComponent(_self.mobile);
+			}
+			parameter += "&module=300";
+			
+			//验证码Key
+			parameter += "&captchaKey=" + encodeURIComponent(_self.captchaKey);
+
+			//验证码值
+			parameter += "&captchaValue=" + encodeURIComponent(_self.captchaValue.trim());
+
+			//令牌
+			parameter += "&token=" + _self.$store.state.token;
+			$.ajax({
+				type : "POST",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "smsCode",
+				data: parameter,
+				success : function success(result) {
+					if (result != "") {
+						var returnValue = $.parseJSON(result);
+						var value_success = "";
+						var value_error = null;
+						var value_captchaKey = null;
+						for (var key in returnValue) {
+							if (key == "success") {
+								value_success = returnValue[key];
+							} else if (key == "error") {
+								value_error = returnValue[key];
+							} else if (key == "captchaKey") {
+								value_captchaKey = returnValue[key];
+							}
+						}
+						if(value_success == "true"){
+							//倒计时
+							_self.countdown();
+							_self.successInfo = "短信验证码已发送";	
+						}else{
+							//设置按钮启用状态
+							_self.button.disabled = false;
+							
+							if (value_error != null) {
+								var htmlContent = "";
+								var count = 0;
+								for (var errorKey in value_error) {
+									var errorValue = value_error[errorKey];
+									if (errorKey == "mobile") {
+										_self.error.mobile = errorValue;
+									}else if (errorKey == "smsCode") {
+										_self.error.smsCode = errorValue;
+									} else if (errorKey == "captchaValue") {
+										_self.error.captchaValue = errorValue;
+									} else if (errorKey == "token") {
+										//如果令牌错误
+										_self.$toast({
+											message : "页面已过期，3秒后自动刷新",
+											duration : 3000,
+											className : "mint-ui-toast",
+										});
+										setTimeout(function() {
+											//刷新当前页面
+											window.location.reload();
+										}, 3000);
+									}else{
+										count++;
+										htmlContent += count + ". " + errorValue + "<br>";
+									}
+									
+								}
+								if (htmlContent != "") {
+									_self.$messagebox('提示', htmlContent);
+								}
+							}
+							if (value_captchaKey != null) {
+								_self.showCaptcha = true;
+								_self.captchaKey = value_captchaKey;
+								_self.imgUrl = "captcha/" + value_captchaKey + ".jpg";
+								//设置验证码图片
+								_self.replaceCaptcha();
+							}	
+						}
+						_self.allowSmsCodeSubmit = false;//提交按钮disabled状态
+					}
+				}
+			});
+		},
+		//倒计时
+		countdown : function () {
+			var _self = this;
+			_self.time = 60;
+			var interval = window.setInterval(function() {
+				_self.time--;
+				_self.button.disabled = true;
+				_self.button.text="重新发送("+_self.time+")";
+				
+				if(_self.time <= 0) {
+					window.clearInterval(interval);
+					_self.button.disabled = false;
+					_self.button.text="获取短信校验码";
+				}
+			}, 1000);
+
+		},	
 
 		//清除所有错误
 		clearError : function clearError(event) {
@@ -7392,6 +7809,14 @@ var login_component = Vue.extend({
 	template : '#login-template',
 	data : function data() {
 		return {
+			type_tab_10 : 'active',//用户类型选中样式
+			type_tab_20 : '',//用户类型选中样式
+			
+			userName_field : true,//表单用户名字段
+			mobile_field : false,//表单手机号字段
+			
+			type : 10,//用户类型
+			mobile : '',//手机号
 			userName : '',
 			password : '',
 			rememberMe:false,
@@ -7401,12 +7826,15 @@ var login_component = Vue.extend({
 			captchaKey : '',
 			captchaValue : '',
 			error : {
+				mobile : '',
 				userName : '',
 				password : '',
 				captchaValue : ''
 			},
 			supportLoginInterfaceList: '',//支持登录接口集合
-			jumpUrl : ''
+			jumpUrl : '',
+			
+			allowSubmit:false,//提交按钮disabled状态
 		};
 	},
 	
@@ -7477,6 +7905,27 @@ var login_component = Vue.extend({
 		    	this.$router.back();
 		    }
 		},
+		
+		//选择用户类型
+		selectAccountType : function(type) {
+			if(type == 10){
+				this.type =10;//用户类型
+				this.type_tab_10 = "active";
+				this.type_tab_20 = "";
+				
+				this.userName_field = true;
+				this.mobile_field = false;
+			}else if(type == 20){
+				this.type =20;//用户类型
+				this.type_tab_10 = "";
+				this.type_tab_20 = "active";
+				
+				this.userName_field = false;
+				this.mobile_field = true;
+			}
+			
+		},
+		
 		//加载登录页
 		loadLogin : function loadLogin(event) {
 			var _self = this;
@@ -7533,12 +7982,37 @@ var login_component = Vue.extend({
 		submitData : function submitData(event) {
 			var _self = this;
 
+			_self.allowSubmit = true;//提交按钮disabled状态
+			//清除错误
+			_self.error.userName = "";
+			_self.error.password = "";
+			_self.error.mobile = "";
+			_self.error.captchaValue = "";
+			
+			
+			
 			var parameter = "";
 
-			//用户名
-			var userName = _self.userName;
 
-			parameter += "&userName=" + encodeURIComponent(userName);
+			if(_self.type == 10){//10:本地账号密码用户
+				parameter += "&type=10";
+				
+				//用户名
+				var userName = _self.userName;
+				if (userName != "") {
+					parameter += "&userName=" + encodeURIComponent(userName);
+				}
+				
+			}else if(_self.type == 20){//20: 手机用户
+				parameter += "&type=20";
+				
+				//手机号
+				var mobile = _self.mobile;
+				if (mobile != "") {
+					parameter += "&mobile=" + encodeURIComponent(mobile);
+				}
+				
+			}
 			//密码需SHA256加密
 			var password = _self.password;
 			if (password != "") {
@@ -7626,6 +8100,8 @@ var login_component = Vue.extend({
 											_self.error.userName = key_error[error];
 										} else if (error == "password") {
 											_self.error.password = key_error[error];
+										} else if (error == "mobile") {
+											_self.error.mobile = key_error[error];
 										} else if (error == "captchaValue") {
 											_self.error.captchaValue = key_error[error];
 										} else if (error == "token") {
@@ -7642,7 +8118,7 @@ var login_component = Vue.extend({
 									}
 								}
 							}
-
+							_self.allowSubmit = false;//提交按钮disabled状态
 							if (key_captchaKey != null) {
 								_self.showCaptcha = true;
 								_self.captchaKey = key_captchaKey;

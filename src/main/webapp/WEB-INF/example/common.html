@@ -476,6 +476,128 @@
 <table class="exampleTable" > 
 	<thead> 
 		<tr> 
+			<th colspan="3">获取短信验证码 - AJAX方式</th>
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td>请求路径</td> 
+			<td colspan="2">smsCode.htm</td>
+		</tr>
+		<tr> 
+			<td>请求方式</td> 
+			<td colspan="2">POST</td>
+		</tr> 
+		<tr> 
+			<td>自定义请求头</td> 
+			<td colspan="2">协议头：X-Requested-With  值：XMLHttpRequest</td>
+		</tr>
+		<tr> 
+			<td>请求参数</td> 
+			<td colspan="2"><a style="color: #317ee7" onclick="anchorJump('#anchor_500'); return false;">参数表</a></td>
+		</tr>
+		<tr> 
+			<td width="30%" rowspan="3">提交返回</td> 
+			<td width="30%" rowspan="3">JSON格式值 类型:Map&ltString,Object></td>
+			<td width="40%">键参数：success<br>值内容说明：成功返回true 失败返回false<br>值类型：String</td> 
+		</tr>
+		<tr> 
+			<td>键参数：error<br>值内容说明：错误值集合<br>值类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_80'); return false;">Map&ltString,String></a></td> 
+		</tr>
+		<tr> 
+			<td>键参数：captchaKey<br>值内容说明：验证码编号 success为false时有值</td> 
+		</tr>
+	</tbody> 
+</table>
+<table id="anchor_500" class="exampleTable" > 
+	<thead>
+		<tr> 
+			<th colspan="4">提交'获取短信验证码'参数</th>
+		</tr>
+		<tr> 
+			<th width="30%">参数</th> 
+			<th width="20%">类型</th> 
+			<th width="10%">是否必填</th> 
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	 <tbody>
+	 	<tr> 
+			<td>mobile</td> 
+			<td>String</td>
+			<td>是</td>
+			<td>手机号</td>
+		</tr>
+		<tr> 
+			<td>module</td> 
+			<td>String</td>
+			<td>是</td>
+			<td>模块 100.注册  200.登录 300.找回密码</td>
+		</tr>
+		<tr> 
+			<td>captchaKey</td> 
+			<td>String</td>
+			<td>是</td>
+			<td>验证码编号</td> 
+		</tr>
+		<tr>
+			<td>captchaValue</td> 
+			<td>String</td>
+			<td>是</td>
+			<td>验证码值 同一编号验证码每分钟提交次数不能超过60次,超出时验证码图片返回空字符</td> 
+		</tr>
+		<tr> 
+			<td>token</td> 
+			<td>String</td>
+			<td>是</td>
+			<td>令牌</td> 
+		</tr>
+	</tbody> 
+</table>
+<table id="anchor_80"  class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">获取短信验证码 错误值 error</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td>token</td> 
+			<td>String</td>
+			<td>令牌错误</td>
+		</tr>
+		<tr> 
+			<td>captchaValue</td> 
+			<td>String</td>
+			<td>验证码错误</td>
+		</tr>
+		<tr> 
+			<td>mobile</td> 
+			<td>String</td>
+			<td>手机号</td>
+		</tr>
+		<tr> 
+			<td>smsCode</td> 
+			<td>String</td>
+			<td>手机验证码</td>
+		</tr>
+		<tr> 
+			<td>message</td> 
+			<td>String</td>
+			<td>获取短信验证码</td>
+		</tr>
+	</tbody> 
+</table>
+
+
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
 			<th colspan="3">注意事项</th>
 		</tr> 
 	</thead> 

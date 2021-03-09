@@ -16,6 +16,20 @@ function sureSubmit(objForm){
 	document.getElementById("submitForm").disabled=true;
 	objForm.submit();
 } 
+
+//选择用户类型
+function selectType(obj){
+	if(obj.value == 10){//10:本地账号密码用户
+		document.getElementById("userName-field").style.display = "";
+		document.getElementById("issue-field").style.display = "";
+		document.getElementById("answer-field").style.display = "";
+	}else if(obj.value == 20){//20: 手机用户
+		document.getElementById("userName-field").style.display = "none";
+		document.getElementById("issue-field").style.display = "none";
+		document.getElementById("answer-field").style.display = "none";
+	}
+}
+
 </script>
   
 </HEAD>
@@ -29,13 +43,28 @@ function sureSubmit(objForm){
 </div>
 <TABLE class="t-table" cellSpacing="1" cellPadding="2" width="100%" border="0">
 	<TBODY>
+	
 	<TR>
+	    <TD class="t-label t-label-h" width="12%">用户类型：</TD>
+	    <TD class="t-content" width="88%" colSpan="3">
+			<label><INPUT type="radio" value="10" name="type" <c:if test="${ user.type == 10}">checked="checked"</c:if> onclick="selectType(this)">本地账号密码用户</label>
+			<label><INPUT type="radio" value="20" name="type" <c:if test="${ user.type == 20}">checked="checked"</c:if> onclick="selectType(this)">手机用户</label>
+	    </TD>
+	</TR>
+	<TR id="userName-field" <c:if test="${ user.type != 10}"> style='display: none;'</c:if>>
 	    <TD class="t-label t-label-h" width="12%"><SPAN class="span-text">*</SPAN>会员用户名：</TD>
 	    <TD class="t-content" width="88%" colSpan="3">
 	    	<input class="form-text" name="userName" size="30" maxlength="30" value="${user.userName }"/>&nbsp;&nbsp;
 	    	<form:errors path="userName" class="span-text"/>
 	   		<SPAN class="span-help">会员用户名只能输入由数字、26个英文字母或者下划线组成</SPAN>
 	   	</TD>
+	</TR>
+	<TR>
+	    <TD class="t-label t-label-h" width="12%">手机：</TD>
+	    <TD class="t-content" width="88%" colSpan="3">
+	    	<input class="form-text" name="mobile" size="50" maxlength="60" value="${user.mobile}"/>
+	    	&nbsp;&nbsp;<form:errors path="mobile" class="span-text"/>
+    	</TD>
 	</TR>
 	<TR>
 	    <TD class="t-label t-label-h" width="12%">呢称：</TD>
@@ -59,14 +88,14 @@ function sureSubmit(objForm){
 	    	&nbsp;&nbsp;<form:errors path="email" class="span-text"/>
 	    </TD>
 	</TR>
-	<TR>
+	<TR id="issue-field" <c:if test="${ user.type != 10}"> style='display: none;'</c:if>>
 	    <TD class="t-label t-label-h" width="12%"><SPAN class="span-text">*</SPAN>密码提示问题：</TD>
 	    <TD class="t-content" width="88%" colSpan="3">
 	    	<input class="form-text" name="issue" size="50" maxlength="40" value="${user.issue}"/>
 	    	&nbsp;&nbsp;<SPAN style="color: red"><form:errors path="issue"  class="span-text"/></SPAN>
 	    </TD>
 	</TR>
-	<TR>
+	<TR id="answer-field" <c:if test="${ user.type != 10}"> style='display: none;'</c:if>>
 	    <TD class="t-label t-label-h" width="12%"><SPAN class="span-text">*</SPAN>密码提示答案：</TD>
 	    <TD class="t-content" width="88%" colSpan="3">
 	    	<input class="form-text" name="answer" size="50" maxlength="40" value="${user.answer}"/>
@@ -74,13 +103,7 @@ function sureSubmit(objForm){
 	    </TD>
 	</TR>
 
-	<TR>
-	    <TD class="t-label t-label-h" width="12%">手机：</TD>
-	    <TD class="t-content" width="88%" colSpan="3">
-	    	<input class="form-text" name="mobile" size="50" maxlength="60" value="${user.mobile}"/>
-	    	&nbsp;&nbsp;<form:errors path="mobile" class="span-text"/></span>
-    	</TD>
-	</TR>
+	
 	<TR>
 	    <TD class="t-label t-label-h" width="12%">实名认证：</TD>
 	    <TD class="t-content" width="88%" colSpan="3">

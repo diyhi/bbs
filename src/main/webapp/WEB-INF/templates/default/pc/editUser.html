@@ -27,275 +27,6 @@
 	<script type="text/javascript" src="${commonPath}js/layer/layer.js" language="javascript"></script>
 </head>
 
-<script type="text/javascript" language="javascript"> 
- 
-
-	//确认提交
-	function sureSubmit(objForm){
-		if(allVerification() == false){
-			//需引入layer
-     		layer.msg('请填好资料再提交', {
-				time: 3000 //3秒关闭（如果不配置，默认是3秒）
-				},function(){//关闭后的操作
-						
-				}
-			);
-			return;
-		}
-		
-		
-		
-		//密码需SHA256加密
-		var password = document.getElementById("password").value;
-		if(password != ""){
-			document.getElementById("password").value = CryptoJS.SHA256(password);
-			
-			//旧密码
-			var oldPassword = document.getElementById("oldPassword").value;
-			if(oldPassword != ""){
-				document.getElementById("oldPassword").value = CryptoJS.SHA256(oldPassword);
-			}
-		}
-		document.getElementById("editUserForm").submit();
-	}
-	
-	//ajax提交
-	function ajaxSubmit(){
-	
-		if(allVerification() == false){
-			//需引入layer
-     		layer.msg('请填好资料再提交', {
-				time: 3000 //3秒关闭（如果不配置，默认是3秒）
-				},function(){//关闭后的操作
-						
-				}
-			);
-			return;
-		}
-	
-		var parameter = getParameter();
-		if(parameter.indexOf("&") == 0){
-			parameter = parameter.substring(1,parameter.length);
-		}
-		post_request(function(value){
-			if(value != ""){
-				var returnValue = JSON.parse(value);//JSON转为对象
-				for(var key in returnValue){
-					if(key == "success"){	
-						var success = returnValue[key];	
-						if(success == "true"){
-							alert("修改成功");
-							//刷新当前在页面
-							window.location.reload();
-						}
-					}else if(key == "error"){
-						var errorValue = returnValue[key];
-						for(var error in errorValue){
-							if(error != ""){
-								document.getElementById(error+"_error").innerHTML=errorValue[error];	
-							}
-						}
-					}
-				}
-			}	
-		},
-			"user/control/editUser?&timestamp=" + new Date().getTime(), true,parameter);
-
-	}
-
-	
-	//组装参数
-	function getParameter(){
-		var parameter = "";
-		//令牌标记
-		var token = document.getElementById("token").value;
-		parameter += "&token="+token;
-		
-		var nickname = document.getElementById("nickname");
-		if(nickname != null){
-			parameter += "&nickname="+nickname.value;
-		}
-		var allowUserDynamic_radio = document.getElementsByName("allowUserDynamic");
-		for(var i=0; i<allowUserDynamic_radio.length; i++) {
-			if (allowUserDynamic_radio[i].checked) {
-				parameter += "&allowUserDynamic="+allowUserDynamic_radio[i].value;
-			}
-		}
-
-		//密码需SHA256加密
-		var password = document.getElementById("password").value;
-		if(password !=""){
-			parameter += "&password="+ CryptoJS.SHA256(password);
-			//旧密码
-			var oldPassword = document.getElementById("oldPassword").value;
-			if(oldPassword != ""){
-				parameter += "&oldPassword="+ CryptoJS.SHA256(oldPassword);
-			}
-		}
-		
-		
-		
-		//自定义表单name集合
-		var array = new Array();
-		
-		//读取表单所有的input标签
-		var all_input = document.getElementsByTagName("input");
-		for(var i=0;i<all_input.length; i++){
-			var obj = all_input[i];
-			if(obj.name.substring(0,11) =="userCustom_"){
-				var isExist = false;//是否已存在数组中
-				//如果存在，则不添加
-				for(var j=0;j<array.length; j++){
-					if(array[j] == all_input[i].name){
-						isExist = true;
-						break;
-					}
-				}
-				if(isExist == false){
-					array.push (all_input[i].name); 
-				}		
-			}
-		}
-		//读取表单所有的select标签
-		var all_select = document.getElementsByTagName("select");
-		for(var i=0;i<all_select.length; i++){
-			var obj = all_select[i];
-			if(obj.name.substring(0,11) =="userCustom_"){
-				var isExist = false;//是否已存在数组中
-				//如果存在，则不添加
-				for(var j=0;j<array.length; j++){
-					if(array[j] == all_select[i].name){
-						isExist = true;
-						break;
-					}
-				}
-				if(isExist == false){
-					array.push (all_select[i].name); 
-				}		
-			}
-		}
-		//读取表单所有的textarea标签
-		var all_textarea = document.getElementsByTagName("textarea");
-		for(var i=0;i<all_textarea.length; i++){
-			var obj = all_textarea[i];
-			if(obj.name.substring(0,11) =="userCustom_"){
-				var isExist = false;//是否已存在数组中
-				//如果存在，则不添加
-				for(var j=0;j<array.length; j++){
-					if(array[j] == all_textarea[i].name){
-						isExist = true;
-						break;
-					}
-				}
-				if(isExist == false){
-					array.push (all_textarea[i].name); 
-				}		
-			}
-		}
-
-		for(var i=0;i<array.length; i++){
-			//读取表单参数
-			var obj = document.getElementsByName(array[i]);
-			if(obj[0].type == "text"){//输入框
-			
-				parameter += "&"+obj[0].name+"="+encodeURIComponent(obj[0].value);
-			}
-			if(obj[0].type == "radio"){//单选
-				for(var j=0;j<obj.length;j++){ 
-					if(obj[j].checked){
-						parameter += "&"+obj[0].name+"="+obj[j].value;
-						break; 
-					}
-				}
-			}
-			if(obj[0].type == "checkbox"){//多选
-				for(var j=0;j<obj.length;j++){ 
-					if(obj[j].checked){
-						parameter += "&"+obj[0].name+"="+obj[j].value;
-					}
-				}
-			}
-			if(obj[0].type.substring(0,6) == "select"){//下拉列表
-				for(var j=0;j<obj[0].length;j++){ 
-					if(obj[0][j].selected){
-						parameter += "&"+obj[0].name+"="+obj[0][j].value;
-					}
-				}
-			}
-			if(obj[0].type == "textarea"){//表单域
-				parameter += "&"+obj[0].name+"="+encodeURIComponent(obj[0].value);
-			
-			}
-		}
-		
-
-	
-		//删除第一个&号,防止因为多了&号而出现警告: Parameters: Invalid chunk ignored.信息
-		if(parameter.indexOf("&") == 0){
-			parameter = parameter.substring(1,parameter.length);
-		}
-		return parameter;
-	}
-	
-	
-	
-	
-	//验证参数
-	function verification(field){
-		if(field == "password"){//密码
-			var parameter = document.getElementById(field).value;
-			if(parameter != ""){
-				var parameter_trim = trim(parameter);
-				if(parameter_trim != ""){
-					if(getStringLeng(parameter_trim) < 6){
-						document.getElementById(field+"_error").innerHTML = "密码长度不能小于6位";
-						return false;
-					}
-					if(getStringLeng(parameter_trim) > 20){
-						document.getElementById(field+"_error").innerHTML = "密码长度不能大于20位";
-						return false;
-					}
-				}else{
-					document.getElementById(field+"_error").innerHTML = "密码不能为空";
-					return false;
-				}
-				//旧密码
-				var oldPassword = document.getElementById("oldPassword").value;
-				if(oldPassword == ""){
-					document.getElementById("oldPassword_error").innerHTML = "旧密码不能为空";
-				}
-			}
-		}
-		if(field == "confirmPassword"){//确认密码
-			var password = document.getElementById("password").value;
-			
-			var parameter = document.getElementById(field).value;
-			if(password != parameter){
-				document.getElementById(field+"_error").innerHTML = "两次密码不相等";
-				return false;
-			}
-		}
-	
-		document.getElementById(field+"_error").innerHTML = "";
-		return true;
-	}
-	
-	//验证全部参数
-	function allVerification(){
-		var isVerification = true;
-		if(verification("password") == false){
-			isVerification = false;
-		}
-		if(verification("confirmPassword") == false){
-			isVerification = false;
-		}
-		return isVerification;
-	}
-
-	//禁止浏览器后退
-//	window.history.forward(1);
-</script> 
-
 
 <script type="text/javascript" language="javascript"> 
 	var commonPath = "";
@@ -861,177 +592,266 @@
 						<!--[if !(IE)]><!--><img avatar="${(user.nickname != null && user.nickname??) ?string(user.nickname , user.userName)}" ><!--<![endif]-->
 					</#if> 
 		        </div>
-				<table class="blankTable" border="0" cellSpacing="2" cellPadding="0" width="100%">
-					<tbody>
-						<tr>
-				    		<td width="160px" align="right">用户名： </td>
-				    		<td align="left">${user.userName}</td>
-						</tr>
-						<tr>
-							<td align="right">呢称： </td>
-							<td align="left">
-								<#if user.nickname != null && user.nickname??>
-									${user.nickname}
-								
+				
+				<div class="box">
+        			<div class="form">
+						<div class="form-field" >
+			        		<div id="userName_field_error" class="form-field-container">
+				        		<div class="form-field-radio">
+				        			<div class="form-field-radio-container">
+					        			<div class="form-field-radio-input">
+					        				<div>${user.userName}</div>
+					        				<label class="form-field-label form-field-active">用户名</label>
+					        			</div>
+				        			</div>
+				        		</div>
+			        		</div>
+			        	</div>
+			        	<div class="form-field" >
+			        		<div id="nickname_field_error" class="form-field-container">
+				        		<#if user.nickname != null && user.nickname??>
+									<div class="form-field-radio">
+					        			<div class="form-field-radio-container">
+											<div class="form-field-radio-input">
+						        				<div>${user.nickname}</div>
+						        				<label class="form-field-label form-field-active">呢称</label>
+						        			</div>
+						        		</div>
+				        			</div>	
 								<#else>
-									<input type="text" id="nickname" name="nickname" class="formText" autocomplete="off" size="25" maxlength="20" />
-									<span id="nickname_error" class="error">${(error['nickname'])!}</span>
-									<span class="help">不设置请留空</span> 
+									<div class="form-field-text">
+										<div class="form-field-input-container">
+						        			<input id="nickname" maxLength="20" class="form-field-text-input" type="text" value="" onfocus="inputBoxClickTip(this);" onblur="inputBoxOutTip(this);">
+						        			<label class="form-field-label">呢称</label>
+					        			</div>
+				        			</div>
 								</#if>
-								
-							</td>
-						</tr>
-						<#if userRoleList?? && userRoleList?size gt 0>
-							<tr>
-					    		<td align="right">角色：</td>
-					    		<td align="left">
-					    			<table cellSpacing="0" cellPadding="0" width="100%" border="0">
-									    <#list userRoleList as userRole>
-										    <tr>
-										  		<td style="text-align:left;width: 200px;">
-										  			${userRole.name}
-										    	</td>
-										    	<td style="text-align:left;">
-										    		${userRole.validPeriodEnd} 到期
-										    	</td>
-										    </tr>
-										</#list>
-								    </table>
-					    		</td>
-							</tr>
-						</#if>
-						<tr>
-				    		<td align="right">允许显示用户动态：</td>
-				    		<td align="left">
-				    			<label>
-									<input type="radio" class="formRadio" name="allowUserDynamic" value="true" <#if user.allowUserDynamic ==true> checked='checked'</#if>>
-					                <span class="formRadio-core"></span>
-									<span class="formRadio-text">显示</span> 
-								</label>
-								<label>
-									<input type="radio" class="formRadio" name="allowUserDynamic" value="true" <#if user.allowUserDynamic ==false> checked='checked'</#if>>
-					                <span class="formRadio-core"></span>
-									<span class="formRadio-text">关闭</span> 
-								</label>
-				    			<span id="allowUserDynamic_error" class="error">${(error['allowUserDynamic'])!}</span>
-				    		</td>
-						</tr>
-						
-						<tr>
-							<td align="right">旧密码： </td>
-							<td align="left">
-								<input type="password" id="oldPassword" name="oldPassword" class="formText" autocomplete="off" size="25" maxlength="20" onBlur="verification(this.id)" <#if user.type gte 40 > disabled='disabled'</#if>/>
-								<span id="oldPassword_error" class="error">${(error['oldPassword'])!}</span>
-								<span class="help">不修改密码请留空</span> 
-							</td>
-						</tr>
-						<tr>
-							<td align="right">密码： </td>
-							<td>
-								<input type="password" id="password" name="password" class="formText" autocomplete="off" size="25" maxlength="20" onBlur="verification(this.id)" <#if user.type gte 40 > disabled='disabled'</#if> />
-								<span id="password_error" class="error">${(error['password'])!}</span>
-								<span class="help">不修改请留空</span> 
-							</td>
-							
-						</tr>
-						<tr>
-							<td align="right">确认密码：</td>
-							<td align="left">
-								<input type="password" id="confirmPassword" class="formText" autocomplete="off" size="25" maxlength="20" onBlur="verification(this.id)" <#if user.type gte 40 > disabled='disabled'</#if> />
-								<span id="confirmPassword_error" class="error"></span>
-								<span class="help">不修改请留空</span>
-							</td>
-						<tr>
-						
-						<!-- 用户自定义注册功能项 -->
-						<#list userCustomList as userCustom>
-						<tr>
-							<td align="right"><#if userCustom.required == true><span class="required">*</span></#if>${userCustom.name}：</td>
-							<td align="left">
-								<#if userCustom.chooseType ==1>
-									<input type="text" class="inputBox formText" name="userCustom_${userCustom.id}" value="<#list userCustom.userInputValueList as userInputValue>${userInputValue.content}</#list>" size="${userCustom.size}" maxlength="${userCustom.maxlength}">
-								</#if>
-								<#if userCustom.chooseType ==2>
-									<#if userCustom.itemValue?has_content>
-										<#list userCustom.itemValue?keys as itemValue>
-											<#-- 选中项 -->
-											<#assign _checked = "">
-											<#list userCustom.userInputValueList as userInputValue>
-												<#if userInputValue.options == itemValue>
-													<#assign _checked=" checked='checked'">
-												</#if>
-											</#list>
-											
-											<#-- 默认选第一项 -->
-											<#if itemValue_index == 0  && userCustom.userInputValueList?exists && userCustom.userInputValueList?size == 0> 
-											<#assign _checked = " checked='checked'">
-											</#if>
-
-											<label>
-												<input type="radio" class="formRadio" name="userCustom_${userCustom.id}" value="${itemValue}" ${_checked}>
+				        		<div id="nickname_prompt_error" class="form-field-prompt-error"></div>
+				        		<div class="form-field-help">不设置请留空</div>
+			        		</div>
+			        	</div>
+			        	<#if userRoleList?? && userRoleList?size gt 0>
+			        	<div class="form-field" >
+			        		<div id="role_field_error" class="form-field-container">
+				        		<div class="form-field-radio">
+				        			<div class="form-field-radio-container">
+					        			<div class="form-field-radio-input">
+					        				<div>
+					        					<table cellSpacing="0" cellPadding="0" width="100%" border="0">
+												    <#list userRoleList as userRole>
+													    <tr>
+													  		<td style="text-align:left;width: 200px;line-height: 28px;">
+													  			${userRole.name}
+													    	</td>
+													    	<td style="text-align:left;">
+													    		${userRole.validPeriodEnd} 到期
+													    	</td>
+													    </tr>
+													</#list>
+											    </table>
+					        				</div>
+					        				<label class="form-field-label form-field-active">角色</label>
+					        			</div>
+				        			</div>
+				        		</div>
+			        		</div>
+			        	</div>
+			        	</#if>
+			        	<div class="form-field" >
+			        		<div id="allowUserDynamic_field_error" class="form-field-container">
+				        		<div class="form-field-radio">
+				        			<div class="form-field-radio-container">
+				        				<div class="form-field-radio-input">
+					        				<label>
+												<input type="radio" class="formRadio" name="allowUserDynamic" value="true" <#if user.allowUserDynamic ==true> checked='checked'</#if>>
 								                <span class="formRadio-core"></span>
-												<span class="formRadio-text">${userCustom.itemValue[itemValue]}</span> 
+												<span class="formRadio-text">显示</span> 
 											</label>
-										
-										</#list>
-									</#if>
-								</#if>
-								<#if userCustom.chooseType ==3>
-									<#if userCustom.itemValue?has_content>
-										<#list userCustom.itemValue?keys as itemValue>
-											<#-- 选中项 -->
-											<#assign _checked = "">
-											<#list userCustom.userInputValueList as userInputValue>
-												<#if userInputValue.options == itemValue>
-													<#assign _checked=" checked='checked'">
-												</#if>
-											</#list>
 											<label>
-												<input type="checkbox" class="formCheckbox" name="userCustom_${userCustom.id}" value="${itemValue}" ${_checked}>
-												<span class="formCheckbox-core"></span>
-												<span class="formCheckbox-text">${userCustom.itemValue[itemValue]}</span>
+												<input type="radio" class="formRadio" name="allowUserDynamic" value="false" <#if user.allowUserDynamic ==false> checked='checked'</#if>>
+								                <span class="formRadio-core"></span>
+												<span class="formRadio-text">关闭</span> 
 											</label>
-										</#list>
-									</#if>
+					        			</div>
+					        			<label class="form-field-label form-field-active">允许显示用户动态</label>
+				        			</div>
+				        		</div>
+			        			<div id="allowUserDynamic_prompt_error" class="form-field-prompt-error"></div>
+			        		</div>
+			        	</div>
+			        	
+			        	<div class="form-field" >
+			        		<div id="oldPassword_field_error" class="form-field-container">
+				        		<div class="form-field-text">
+				        			<div class="form-field-input-container">
+					        			<input id="oldPassword" maxLength="20" class="form-field-text-input" type="password" value="" onfocus="inputBoxClickTip(this);" onblur="inputBoxOutTip(this);">
+					        			<label class="form-field-label">旧密码</label>
+				        			</div>
+				        		</div>
+			        			<div id="oldPassword_prompt_error" class="form-field-prompt-error"></div>
+			        		</div>
+			        	</div>
+			        	<div class="form-field" >
+			        		<div id="password_field_error" class="form-field-container">
+				        		<div class="form-field-text">
+				        			<div class="form-field-input-container">
+					        			<input id="password" maxLength="20" class="form-field-text-input" type="password" value="" onfocus="inputBoxClickTip(this);" onblur="inputBoxOutTip(this);">
+					        			<label class="form-field-label">密码</label>
+				        			</div>
+				        		</div>
+			        			<div id="password_prompt_error" class="form-field-prompt-error"></div>
+			        		</div>
+			        	</div>
+			        	<div class="form-field" >
+			        		<div id="confirmPassword_field_error" class="form-field-container">
+				        		<div class="form-field-text">
+				        			<div class="form-field-input-container">
+					        			<input id="confirmPassword" maxLength="20" class="form-field-text-input" type="password" value="" onfocus="inputBoxClickTip(this);" onblur="inputBoxOutTip(this);">
+					        			<label class="form-field-label">确认密码</label>
+				        			</div>
+				        		</div>
+			        			<div id="confirmPassword_prompt_error" class="form-field-prompt-error"></div>
+			        		</div>
+			        	</div>
+			        	<!-- 用户自定义注册功能项 -->
+						<#list userCustomList as userCustom>
+			        		<#if userCustom.chooseType ==1>
+								<div class="form-field" >
+					        		<div id="userCustom_${userCustom.id}_field_error" class="form-field-container">
+						        		<div class="form-field-text">
+						        			<div class="form-field-input-container">
+							        			<input name="userCustom_${userCustom.id}" size="${userCustom.size}" maxlength="${userCustom.maxlength}" class="form-field-text-input" type="text" value="<#list userCustom.userInputValueList as userInputValue>${userInputValue.content}</#list>" onfocus="inputBoxClickTip(this);" onblur="inputBoxOutTip(this);">
+							        			<label class="form-field-label"><#if userCustom.required == true><span class="required">*</span></#if>${userCustom.name}</label>
+						        			</div>
+						        		</div>
+					        			<div id="userCustom_${userCustom.id}_prompt_error" class="form-field-prompt-error"></div>
+					        			<div class="form-field-help">${userCustom.tip}</div>
+					        		</div>
+					        	</div>
+							</#if>
+			        		<#if userCustom.chooseType ==2>
+			        			<#if userCustom.itemValue?has_content>
+								<div class="form-field" >
+					        		<div id="userCustom_${userCustom.id}_field_error" class="form-field-container">
+						        		<div class="form-field-radio">
+						        			<div class="form-field-radio-container">
+						        				<div class="form-field-radio-input">
+							        			<#list userCustom.itemValue?keys as itemValue>
+													<#-- 选中项 -->
+													<#assign _checked = "">
+													<#list userCustom.userInputValueList as userInputValue>
+														<#if userInputValue.options == itemValue>
+															<#assign _checked=" checked='checked'">
+														</#if>
+													</#list>
+													
+													<#-- 默认选第一项 -->
+													<#if itemValue_index == 0  && userCustom.userInputValueList?exists && userCustom.userInputValueList?size == 0> 
+													<#assign _checked = " checked='checked'">
+													</#if>
+		
+													<label>
+														<input type="radio" class="formRadio" name="userCustom_${userCustom.id}" value="${itemValue}" ${_checked}>
+										                <span class="formRadio-core"></span>
+														<span class="formRadio-text">${userCustom.itemValue[itemValue]}</span> 
+													</label>
+												
+												</#list>
+							        			</div>
+							        			<label class="form-field-label form-field-active"><#if userCustom.required == true><span class="required">*</span></#if>${userCustom.name}</label>
+						        			</div>
+						        		</div>
+					        			<div id="userCustom_${userCustom.id}_prompt_error" class="form-field-prompt-error"></div>
+					        			<div class="form-field-help">${userCustom.tip}</div>
+					        		</div>
+					        	</div>
+					        	</#if>
+					        	
+							</#if>
+							<#if userCustom.chooseType ==3>
+								<#if userCustom.itemValue?has_content>
+									<div class="form-field" >
+						        		<div id="userCustom_${userCustom.id}_field_error" class="form-field-container">
+							        		<div class="form-field-radio">
+							        			<div class="form-field-radio-container">
+							        				<div class="form-field-radio-input">
+								        			<#list userCustom.itemValue?keys as itemValue>
+														<#-- 选中项 -->
+														<#assign _checked = "">
+														<#list userCustom.userInputValueList as userInputValue>
+															<#if userInputValue.options == itemValue>
+																<#assign _checked=" checked='checked'">
+															</#if>
+														</#list>
+														<label>
+															<input type="checkbox" class="formCheckbox" name="userCustom_${userCustom.id}" value="${itemValue}" ${_checked}>
+															<span class="formCheckbox-core"></span>
+															<span class="formCheckbox-text">${userCustom.itemValue[itemValue]}</span>
+														</label>
+													</#list>
+								        			</div>
+								        			<label class="form-field-label form-field-active"><#if userCustom.required == true><span class="required">*</span></#if>${userCustom.name}</label>
+							        			</div>
+							        		</div>
+						        			<div id="userCustom_${userCustom.id}_prompt_error" class="form-field-prompt-error"></div>
+						        			<div class="form-field-help">${userCustom.tip}</div>
+						        		</div>
+						        	</div>
 								</#if>
-								<#if userCustom.chooseType ==4>
-									<select class="formSelect" name="userCustom_${userCustom.id}" <#if userCustom.multiple == true> multiple='multiple'</#if> <#if userCustom.selete_size != null> size='${userCustom.selete_size}'</#if>>
-										<#if userCustom.itemValue?has_content>
-										<#list userCustom.itemValue?keys as itemValue>
-											<#assign _selected = "">
-											<#list userCustom.userInputValueList as userInputValue>
-												<#if userInputValue.options == itemValue>
-													<#assign _selected=" selected='selected'">
-												</#if>
-											</#list>			
-											<option value="${itemValue}" ${_selected}>${userCustom.itemValue[itemValue]}</option>		
-										</#list>
-										</#if>	
-									</select>
-								</#if>
-								<#if userCustom.chooseType ==5>
-									<textarea class="formTextarea" name="userCustom_${userCustom.id}" rows="${userCustom.rows}" cols="${userCustom.cols}"><#list userCustom.userInputValueList as userInputValue>${userInputValue.content}</#list></textarea>
-								</#if>
-								<span class="help">${userCustom.tip}</span>
-								<#assign userCustom_id = "userCustom_"+userCustom.id>
-								<span id="userCustom_${userCustom.id}_error" class="error">${error[userCustom_id]}</span>
-							</td>
-						</tr>
-						</#list>
-						<tr>
-							<td></td>
-							<td>
-								<span id="user_error" class="error">${error['user']}</span>  
-								<span class="submitButton"><INPUT type="button" value="提交" onClick="javascript:sureSubmit();"></span>
-								
-								<!-- 
-								<span class="submitButton"><INPUT type="button" value="ajax提交" onClick="javascript:ajaxSubmit();"></span>
-								  -->
-								<span id="token_error" class="error">${error['token']}</span> 
-							</td>
-						</tr>
-					</tbody>
-				</table>
+							</#if>
+							<#if userCustom.chooseType ==4>
+								<div class="form-field" >
+					        		<div id="userCustom_${userCustom.id}_field_error" class="form-field-container">
+						        		<div class="form-field-radio">
+						        			<div class="form-field-radio-container">
+						        				<div class="form-field-radio-input">
+							        			<select class="formSelect" name="userCustom_${userCustom.id}" <#if userCustom.multiple == true> multiple='multiple'</#if> <#if userCustom.selete_size != null> size='${userCustom.selete_size}'</#if>>
+													<#if userCustom.itemValue?has_content>
+													<#list userCustom.itemValue?keys as itemValue>
+														<#assign _selected = "">
+														<#list userCustom.userInputValueList as userInputValue>
+															<#if userInputValue.options == itemValue>
+																<#assign _selected=" selected='selected'">
+															</#if>
+														</#list>			
+														<option value="${itemValue}" ${_selected}>${userCustom.itemValue[itemValue]}</option>		
+													</#list>
+													</#if>	
+												</select>
+							        			</div>
+							        			<label class="form-field-label form-field-active"><#if userCustom.required == true><span class="required">*</span></#if>${userCustom.name}</label>
+						        			</div>
+						        		</div>
+					        			<div id="userCustom_${userCustom.id}_prompt_error" class="form-field-prompt-error"></div>
+					        			<div class="form-field-help">${userCustom.tip}</div>
+					        		</div>
+					        	</div>
+							</#if>
+							<#if userCustom.chooseType ==5>
+								<div class="form-field" >
+					        		<div id="userCustom_${userCustom.id}_field_error" class="form-field-container">
+						        		<div class="form-field-radio">
+						        			<div class="form-field-radio-container">
+						        				<div class="form-field-radio-input">
+							        				<textarea class="formTextarea" name="userCustom_${userCustom.id}" rows="${userCustom.rows}" cols="${userCustom.cols}"><#list userCustom.userInputValueList as userInputValue>${userInputValue.content}</#list></textarea>
+							        			</div>
+							        			<label class="form-field-label form-field-active"><#if userCustom.required == true><span class="required">*</span></#if>${userCustom.name}</label>
+						        			</div>
+						        		</div>
+					        			<div id="userCustom_${userCustom.id}_prompt_error" class="form-field-prompt-error"></div>
+					        			<div class="form-field-help">${userCustom.tip}</div>
+					        		</div>
+					        	</div>
+							</#if>
+			        	</#list>
+			        	
+					</div>
+				</div>
+				<div id="token_prompt_error" style="color: red;">${(error['token'])!}</div>
+        		<div id="user_prompt_error" style="color: red;">${(error['user'])!}</div>
+				<div class="submitButton-box">
+					<a href="javascript:void(0);" onClick="javascript:ajaxSubmit()" tabindex="6">提&nbsp;交</a>
+				</div>
 			</div>
 		</div>
 		</form>
@@ -1040,6 +860,313 @@
 </div>
 <#--引入页脚-->
 <@include action="${newPublic_3}"/>
+
+
+<script language="javascript" type="text/javascript">
+	$(".form-field").find(".form-field-input-container").bind("click",function(e) {
+		$(this).find(".form-field-text-input").focus();
+		
+		if($(this).find(".form-field-label").hasClass("form-field-active")){
+			return;
+		
+		}
+		$(this).find(".form-field-label").addClass("form-field-active");
+	});
+	
+	$(document).click(function (e) {
+        var target = $(e.target);
+        if (target.closest(".form-field-input-container").length == 0) {
+            $(".form-field-input-container").each(function(){
+			    if($(this).find(".form-field-label").hasClass("form-field-active")){
+					if($(this).find('input[type="text"]').val() == "" || $(this).find('input[type="password"]').val() == ""){
+						$(this).find(".form-field-label").removeClass("form-field-active");
+					}
+					
+				}
+			});
+        }
+    });
+    //文本框含有默认值时字段名称缩小
+	$(document).ready(function(){
+		$(".form-field-input-container").each(function(){
+		    if(!$(this).find(".form-field-label").hasClass("form-field-active")){
+				if(($(this).find('input[type="text"]').val() != undefined && $(this).find('input[type="text"]').val() != '') 
+					|| $(this).find('input[type="password"]').val() != undefined && $(this).find('input[type="password"]').val() != ''){
+					$(this).find(".form-field-label").addClass("form-field-active");
+				}
+				
+			}
+		});
+	});
+	
+	
+	//监听Tab键
+    $(document).on('keyup',function (e) {
+	    if(e.keyCode == 9){
+	    	var input = $(this).find('input:focus');
+	    	if (input.length) {
+		    	if(!input.parent().parent().find(".form-field-label").hasClass("form-field-active")){
+					input.parent().parent().find(".form-field-label").addClass("form-field-active");
+				}
+		    }
+		}
+	});
+    //解决提交按钮的click和blur事件冲突
+	$(document).ready(function(){
+		$("input[type='button']").mousedown(function(e){
+	    	e.preventDefault();
+		});
+		$("a[href='javascript:void(0);']").mousedown(function(e){
+	    	e.preventDefault();
+		});
+		
+	});
+</script>
+<script language="javascript" type="text/javascript">	
+	//点击输入框提示
+	function inputBoxClickTip(obj){
+	
+	
+	}
+	//离开输入框提示
+	function inputBoxOutTip(obj){
+		verification(obj.id);
+	}
+	//验证参数
+	function verification(field){
+		$("#"+field+"_prompt_error").hide();
+		$("#"+field+"_field_error").removeClass("form-field-error");
+		
+		if(field == "password"){//密码
+			var password = $("#"+field).val().trim();
+				if(password != ""){
+					if(getStringLeng(password) < 7){
+					$("#"+field+"_prompt_error").html("密码长度不能小于7位");
+					$("#"+field+"_prompt_error").show();
+					$("#"+field+"_field_error").addClass("form-field-error");
+					return false;
+				}
+				if(getStringLeng(password) > 20){
+					$("#"+field+"_prompt_error").html("密码长度不能大于20位");
+					$("#"+field+"_prompt_error").show();
+					$("#"+field+"_field_error").addClass("form-field-error");
+					return false;
+				}
+			}
+			
+		}
+		if(field == "confirmPassword"){//确认密码
+			var confirmPassword = $("#"+field).val().trim();
+			var password = $("#password").val().trim();
+			if(confirmPassword != password){
+				$("#"+field+"_prompt_error").html("两次密码不相等");
+				$("#"+field+"_prompt_error").show();
+				$("#"+field+"_field_error").addClass("form-field-error");
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	
+	//组装参数
+	function getParameter(){
+		var parameter = "";
+
+		//令牌标记
+		var token = $("#token").val();
+		parameter += "&token="+token;
+		
+		
+		//呢称
+		var nickname = $("#nickname").val();
+		if(nickname != null){
+			parameter += "&nickname="+encodeURIComponent(nickname.trim());
+		}
+		
+		var allowUserDynamic_radio = document.getElementsByName("allowUserDynamic");
+		for(var i=0; i<allowUserDynamic_radio.length; i++) {
+			if (allowUserDynamic_radio[i].checked) {
+				parameter += "&allowUserDynamic="+allowUserDynamic_radio[i].value;
+			}
+		}
+	
+		//密码需SHA256加密
+		var password = $("#password").val().trim();
+		if(password != ""){
+			parameter += "&password="+ CryptoJS.SHA256(password);
+			
+			var oldPassword = $("#oldPassword").val().trim();
+			if(oldPassword != ""){
+				parameter += "&oldPassword="+ CryptoJS.SHA256(oldPassword);
+			}
+		}
+		
+		//自定义表单name集合
+		var array = new Array();
+		
+		//读取表单所有的input标签
+		var all_input = document.getElementsByTagName("input");
+		for(var i=0;i<all_input.length; i++){
+			var obj = all_input[i];
+			if(obj.name.substring(0,11) =="userCustom_"){
+				var isExist = false;//是否已存在数组中
+				//如果存在，则不添加
+				for(var j=0;j<array.length; j++){
+					if(array[j] == all_input[i].name){
+						isExist = true;
+						break;
+					}
+				}
+				if(isExist == false){
+					array.push (all_input[i].name); 
+				}		
+			}
+		}
+		//读取表单所有的select标签
+		var all_select = document.getElementsByTagName("select");
+		for(var i=0;i<all_select.length; i++){
+			var obj = all_select[i];
+			if(obj.name.substring(0,11) =="userCustom_"){
+				var isExist = false;//是否已存在数组中
+				//如果存在，则不添加
+				for(var j=0;j<array.length; j++){
+					if(array[j] == all_select[i].name){
+						isExist = true;
+						break;
+					}
+				}
+				if(isExist == false){
+					array.push (all_select[i].name); 
+				}		
+			}
+		}
+		//读取表单所有的textarea标签
+		var all_textarea = document.getElementsByTagName("textarea");
+		for(var i=0;i<all_textarea.length; i++){
+			var obj = all_textarea[i];
+			if(obj.name.substring(0,11) =="userCustom_"){
+				var isExist = false;//是否已存在数组中
+				//如果存在，则不添加
+				for(var j=0;j<array.length; j++){
+					if(array[j] == all_textarea[i].name){
+						isExist = true;
+						break;
+					}
+				}
+				if(isExist == false){
+					array.push (all_textarea[i].name); 
+				}		
+			}
+		}
+
+		for(var i=0;i<array.length; i++){
+			//读取表单参数
+			var obj = document.getElementsByName(array[i]);
+			if(obj[0].type == "text"){//输入框
+			
+				parameter += "&"+obj[0].name+"="+encodeURIComponent(obj[0].value);
+			}
+			if(obj[0].type == "radio"){//单选
+				for(var j=0;j<obj.length;j++){ 
+					if(obj[j].checked){
+						parameter += "&"+obj[0].name+"="+obj[j].value;
+						break; 
+					}
+				}
+			}
+			if(obj[0].type == "checkbox"){//多选
+				for(var j=0;j<obj.length;j++){ 
+					if(obj[j].checked){
+						parameter += "&"+obj[0].name+"="+obj[j].value;
+					}
+				}
+			}
+			if(obj[0].type.substring(0,6) == "select"){//下拉列表
+				for(var j=0;j<obj[0].length;j++){ 
+					if(obj[0][j].selected){
+						parameter += "&"+obj[0].name+"="+obj[0][j].value;
+					}
+				}
+			}
+			if(obj[0].type == "textarea"){//表单域
+				parameter += "&"+obj[0].name+"="+encodeURIComponent(obj[0].value);
+			
+			}
+		}
+		
+
+	
+		//删除第一个&号,防止因为多了&号而出现警告: Parameters: Invalid chunk ignored.信息
+		if(parameter.indexOf("&") == 0){
+			parameter = parameter.substring(1,parameter.length);
+		}
+		return parameter;
+	}
+	
+	//验证全部参数
+	function allVerification(){
+		var isVerification = true;
+		if(verification("password") == false){
+			isVerification = false;
+		}
+		if(verification("confirmPassword") == false){
+			isVerification = false;
+		}
+		return isVerification;
+	}
+	
+	//ajax提交
+	function ajaxSubmit(){
+	
+		if(allVerification() == false){
+			//需引入layer
+     		layer.msg('请填好资料再提交', {
+				time: 3000 //3秒关闭（如果不配置，默认是3秒）
+				},function(){//关闭后的操作
+						
+				}
+			);
+			return;
+		}
+	
+		var parameter = getParameter();
+		if(parameter.indexOf("&") == 0){
+			parameter = parameter.substring(1,parameter.length);
+		}
+		post_request(function(value){
+			if(value != ""){
+				var returnValue = JSON.parse(value);//JSON转为对象
+				for(var key in returnValue){
+					if(key == "success"){	
+						var success = returnValue[key];	
+						if(success == "true"){
+							//需引入layer
+				     		layer.msg('修改成功，3秒后自动刷新当前页面', {
+								time: 3000 //3秒关闭（如果不配置，默认是3秒）
+								},function(){//关闭后的操作
+									//刷新当前在页面
+									window.location.reload();	
+								}
+							);
+						}
+					}else if(key == "error"){
+						var errorValue = returnValue[key];
+						for(var error in errorValue){
+							if(error != ""){
+								$("#"+error+"_prompt_error").html(errorValue[error]);
+								$("#"+error+"_prompt_error").show();
+								$("#"+error+"_field_error").addClass("form-field-error");
+							}
+						}
+					}
+				}
+			}	
+		},
+			"user/control/editUser?&timestamp=" + new Date().getTime(), true,parameter);
+
+	}
+</script>
 </BODY>
 
 </HTML>

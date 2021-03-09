@@ -36,7 +36,24 @@ function sureSubmit(objForm){
 <TABLE class="t-table" cellSpacing="1" cellPadding="2" width="100%" border="0">
 	<TBODY>
 	<TR>
-	    <TD class="t-label t-label-h" width="12%"><SPAN class="span-text">*</SPAN>会员用户名：</TD>
+	    <TD class="t-label t-label-h" width="12%">用户类型：</TD>
+	    <TD class="t-content" width="88%" colSpan="3">
+	    	<c:if test="${user.type == 10}">
+	    		本地账号密码用户
+	    	</c:if>
+	    	<c:if test="${user.type == 20}">
+	    		手机用户
+	    	</c:if>
+	    	<c:if test="${user.type == 30}">
+	    		邮箱用户
+	    	</c:if>
+	    	<c:if test="${user.type == 40}">
+	    		微信用户
+	    	</c:if>
+	    </TD>
+    </TR>
+	<TR>
+	    <TD class="t-label t-label-h" width="12%">会员用户名：</TD>
 	    <TD class="t-content" width="88%" colSpan="3">
 	    	${user.userName }
 	    </TD>
@@ -64,14 +81,14 @@ function sureSubmit(objForm){
 	    	&nbsp;&nbsp;<span class="span-text">${error['email']}</span>
 	    </TD>
 	</TR>
-	<TR>
+	<TR <c:if test="${ user.type != 10}"> style='display: none;'</c:if>>
 	    <TD class="t-label t-label-h" width="12%"><SPAN class="span-text">*</SPAN>密码提示问题：</TD>
 	    <TD class="t-content" width="88%" colSpan="3">
 	    	<input class="form-text" name="issue" size="50" maxlength="40" value="${user.issue}" <c:if test="${user.type >=40}">disabled="disabled"</c:if>/>
 	    	&nbsp;&nbsp;<span class="span-text">${error['issue']}</span>
 	    </TD>
 	</TR>
-	<TR>
+	<TR <c:if test="${ user.type != 10}"> style='display: none;'</c:if>>
 	    <TD class="t-label t-label-h" width="12%"><SPAN class="span-text">*</SPAN>密码提示答案：</TD>
 	    <TD class="t-content" width="88%" colSpan="3">
 	    	<input class="form-text" name="answer" size="50" maxlength="40" value="${user.answer}" <c:if test="${user.type >=40}">disabled="disabled"</c:if>/>

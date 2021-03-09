@@ -248,6 +248,7 @@ function setAllowFilterWord(obj){
 			    <TD class="t-label t-label-h" width="20%">允许注册账号类型：</TD>
 			    <TD class="t-content" width="80%" colSpan="3">
 			    	<label><form:checkbox path="allowRegisterAccountObject.local" />本地账号密码用户</label>
+			    	<label><form:checkbox path="allowRegisterAccountObject.mobile" />手机用户</label>
 			    	<label><form:checkbox path="allowRegisterAccountObject.weChat" />微信用户</label>
 
 			    	<web:errors path="allowRegisterAccount" cssStyle="color: red;"/>

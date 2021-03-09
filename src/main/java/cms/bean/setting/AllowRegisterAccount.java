@@ -11,8 +11,8 @@ public class AllowRegisterAccount  implements Serializable{
 	
 	/** 本地账号密码用户 **/
 	private boolean local = false;
-	/** 手机用户 
-	private boolean mobile = false;**/
+	/** 手机用户 **/
+	private boolean mobile = false;
 	/** 邮箱用户
 	private boolean email = false; **/
 	/** 微信用户 **/
@@ -31,4 +31,11 @@ public class AllowRegisterAccount  implements Serializable{
 	public void setWeChat(boolean weChat) {
 		this.weChat = weChat;
 	}
+	public boolean isMobile() {
+		return mobile;
+	}
+	public void setMobile(boolean mobile) {
+		this.mobile = mobile;
+	}
+	
 }

@@ -195,225 +195,42 @@
 				
 				<textarea id="privateMessageContent" maxlength="500" placeholder="我想说的话..."></textarea>
 				
-				<span id="messageContent_error" name="error" class="error" >${(error['messageContent'])!}</span> 
-				<span id="privateMessage_error" name="error" class="error">${error['privateMessage']}</span>
+				<div id="messageContent_prompt_error" name="error" class="error" >${(error['messageContent'])!}</div> 
+				<div id="privateMessage_prompt_error" name="error" class="error">${error['privateMessage']}</div>
 				<#-- 令牌错误 -->
-				<span id="token_error" name="error" class="error">${(error['token'])!}</span>
+				<div id="token_prompt_error" name="error" class="error">${(error['token'])!}</div>
+
 				<div class="form-action">
-					<div class="chatSubmit">
-			        	<span class="submitButton"><INPUT id="submitForm" type="button" value="提交" onClick="javascript:ajax_submit()"></span>
-			        </div>
-					
-					
-					<#-- identificationNumber:识别号：用来区别每次请求 -->
-					<#-- 验证码 -->
-					<div id="captchaModule" class="captchaModule" style="display: none;">
-						<div class="captcha_div">
-							<div class="captchaBox">
-								<input type="hidden" id="identificationNumber" value="${identificationNumber}">
-								<input type="hidden" id="${identificationNumber}_captchaKey" name="captchaKey" value="${(returnValue['captchaKey'])!}">
-								<input id="${identificationNumber}_captchaValue" name="captchaValue" type="text" maxLength="5" autocomplete="off" tabindex="3" onfocus="inputBoxTip_click(this);" onblur="inputBoxTip_leave('${identificationNumber}',this);"/>
-								<label class="promptTag" id="${identificationNumber}_captchaValueBoxTip"  for="captchaValue">验证码</label>
+					<div class="form" >
+						<#-- identificationNumber:识别号：用来区别每次请求 -->
+		        		<div id="captchaValue_field" class="form-field" style="display: none; margin-top: 10px;">
+				        	<div id="captchaValue_field_error" class="form-field-container">
+				        		<div class="form-field-text">
+						        	<div class="form-field-input-container">
+							        	<input type="hidden" id="captchaKey" name="captchaKey" value="${(returnValue['captchaKey'])!}">
+							        	<input id="captchaValue" class="form-field-text-input" type="text" maxlength="4" value="" onfocus="inputBoxClickTip(this);" onblur="inputBoxOutTip(this);">
+							        	<label class="form-field-label">验证码</label>
+									</div>
+							        <div class="form-field-image-container">
+										<img id="captcha" src="captcha/${(returnValue['captchaKey'])!}.jpg" onClick="replaceCaptcha();" tabindex="4" />
+										
+							        </div>
+							        <div class="form-field-button-container" style="background: #fff;">
+							        	<button type="button" class="btn btn-link" tabindex="-1" onClick="replaceCaptcha();">换一幅</button>
+							        </div>
+							    </div>
+							    <div id="captchaValue_prompt_error" name="error" class="form-field-prompt-error"></div>
 							</div>
-							<a class="captchaImage" href="javascript:void(0);" >
-								<img id="${identificationNumber}_captcha" src="captcha/${(returnValue['captchaKey'])!}.jpg" onClick="replaceCaptcha('${identificationNumber}');" tabindex="4" />
-							</a>
-							<a  href="javascript:void(0);" onClick="replaceCaptcha('${identificationNumber}');" tabindex="5">换一幅</a>
-						</div>
-						<p class="tips">
-							
-							<#-- 验证码错误 -->
-							<span id="${identificationNumber}_captchaValue_error">${(error['captchaValue'])!}</span>
-							
-						</p>
+			        	</div>
+					
+					</div>
+					<div class="submitButton-box">
+						<a href="javascript:void(0);" onClick="javascript:ajax_submit()" tabindex="6">提&nbsp;交</a>
 					</div>
 				</div>
+
 			</div>
 		</div>
-		
-		<script language="javascript" type="text/javascript">
-			//添加私信页
-			function addPrivateMessageUI(){
-				//从URL获取对方用户名称
-				var friendUserName = getUrlParam("friendUserName");
-				get_request(function(value){
-	           		if(value != ""){
-	            		var data = JSON.parse(value);
-	            		for(var returnValue in data){
-						
-							if(returnValue == "formCaptcha"){
-								var formCaptcha = data[returnValue];
-			        			if(formCaptcha.showCaptcha == true){//如果显示验证码
-			        				document.getElementById("captchaModule").style.display = "";//显示
-			        				var identificationNumber = document.getElementById("identificationNumber").value;
-			        				document.getElementById(identificationNumber+"_captchaKey").value = formCaptcha.captchaKey;
-			        				replaceCaptcha(identificationNumber);	
-			        			}
-			        		}else if(returnValue == "allowSendPrivateMessage"){
-			        			if(data[returnValue] == true){//如果允许发私信
-			        				document.getElementById("privateMessageChatForm").style.display = "";//显示
-			        			}
-			        		}	
-		        		}
-	           		}
-	           	},
-		 			"user/control/addPrivateMessage?friendUserName="+friendUserName+"&timestamp=" + new Date().getTime(), true);
-			}
-			//打开页面时执行
-			addPrivateMessageUI();
-			
-			//点击输入框提示 
-			function inputBoxTip_click(obj){
-				document.getElementById(obj.id+"BoxTip").style.display="none";
-			
-			}
-			//离开输入框提示
-			function inputBoxTip_leave(identificationNumber,obj){
-				if(obj.value != ""){
-					document.getElementById(obj.id+"BoxTip").style.display="none";
-				}else{
-					document.getElementById(obj.id+"BoxTip").style.display="";
-				}
-				verificationCode(identificationNumber);
-			}
-			//校对验证码 identificationNumber:识别号：用来区别每次请求
-			function verificationCode(identificationNumber){
-				var flag = true;
-				if( document.getElementById(identificationNumber+"_"+"captchaKey") != null){
-					
-					var captchaKey = document.getElementById(identificationNumber+"_"+"captchaKey").value;
-					var parameter = document.getElementById(identificationNumber+"_"+"captchaValue").value;
-					if(parameter != ""){
-					
-						var parameter_trim = trim(parameter);
-						if(parameter_trim != ""){
-							//ajax使用同步提交
-							get_request(function(value){
-				            	if(value == "false"){
-				            	
-					            	document.getElementById(identificationNumber+"_"+"captchaValue_error").innerHTML = "验证码错误";
-					            	flag = false;
-				            	}
-				            },
-						 		"checkCaptcha.htm?captchaKey="+captchaKey+"&captchaValue="+parameter_trim+"&timestamp=" + new Date().getTime(), false);
-				            	
-						}else{
-							document.getElementById(identificationNumber+"_"+"captchaValue_error").innerHTML = "验证码不能为空";
-							flag = false;
-						}
-					}else{
-						document.getElementById(identificationNumber+"_"+"captchaValue_error").innerHTML = "验证码不能为空";
-						flag = false;
-					}
-					if(flag == true){
-						document.getElementById(identificationNumber+"_"+"captchaValue_error").innerHTML = "";
-					}
-				}
-			
-				return flag;
-			}
-			//更换验证码
-			function replaceCaptcha(identificationNumber){
-				var captchaKey = document.getElementById(identificationNumber+"_"+"captchaKey").value;
-				document.getElementById(identificationNumber+"_"+"captcha").src = "captcha/"+captchaKey+".jpg?" + Math.random(); 
-			}
-			
-			//ajax提交方式
-			function ajax_submit(){
-				//按钮设置 disabled="disabled"
-				document.getElementById("submitForm").disabled=true;
-				//清空错误提示
-				var error_tag = getElementsByName_pseudo("span", "error");
-				for(var i = 0;i < error_tag.length; i++) {
-					error_tag[i].innerHTML="";
-				
-				}
-			
-			
-				var parameter = "";
-				//从URL获取对方用户名称
-				parameter += "&friendUserName="+getUrlParam("friendUserName");
-				//从meta标签获取令牌
-				parameter += "&token="+getCsrf();
-				
-				var identificationNumber = document.getElementById("identificationNumber").value;
-				var captchaKey = document.getElementById(identificationNumber+"_"+"captchaKey").value;
-				parameter += "&captchaKey="+encodeURIComponent(captchaKey);
-				
-				var captchaValue = document.getElementById(identificationNumber+"_"+"captchaValue").value;
-				parameter += "&captchaValue="+encodeURIComponent(captchaValue);
-				
-				
-				//私信内容
-				var privateMessageContent = document.getElementById("privateMessageContent").value;
-				if(trim(privateMessageContent) != ""){
-					parameter += "&messageContent="+encodeURIComponent(privateMessageContent);
-				}else{
-					document.getElementById("messageContent_error").innerHTML = "私信内容不能为空";
-					//按钮设置 disabled="disabled"
-					document.getElementById("submitForm").disabled=false;
-					return;
-				}
-				
-	
-			   	//删除第一个&号,防止因为多了&号而出现警告: Parameters: Invalid chunk ignored.信息
-				if(parameter.indexOf("&") == 0){
-					parameter = parameter.substring(1,parameter.length);
-				}
-			   	post_request(function(value){
-					var data = JSON.parse(value);
-					for(var returnValue in data){
-						
-						if(returnValue == "success"){
-		        			if(data[returnValue] == "true"){
-		        				layer.msg('发送私信成功,3秒后刷新页面', 
-									{
-									  time: 3000 //3秒关闭（如果不配置，默认是3秒）
-									},function(){//关闭后的操作		
-										var url = window.location.href;
-										//删除URL中的page参数
-										 window.location.href= deleteUrlParam(url,"page");
-									}
-								);
-		        				
-		        			}
-		        		}else if(returnValue == "error"){
-		        			
-		        			var error = data[returnValue];
-		        			for(var key in error){
-		        				var error_html = document.getElementById(key+"_error");
-		        				if(error_html != null){
-		        					error_html.innerHTML = error[key];
-		        				}
-		        				
-		        			}
-		        			//如果需要验证码
-		        			if(document.getElementById("captchaModule").style.display == ""){
-		        				replaceCaptcha(identificationNumber);	
-		        			}
-		        			
-		        			//按钮设置 disabled="disabled"
-							document.getElementById("submitForm").disabled=false;
-		        		}else if(returnValue == "captchaKey"){//如果需要验证码
-		        			document.getElementById("captchaModule").style.display = "";//显示
-	        				var identificationNumber = document.getElementById("identificationNumber").value;
-	        				document.getElementById(identificationNumber+"_captchaKey").value = data[returnValue];
-	        				replaceCaptcha(identificationNumber);	
-		        		
-		        		}
-		        		
-		        		
-		        		
-		        	}
-				},
-					"user/control/addPrivateMessage?timestamp=" + new Date().getTime(), true,parameter);
-			
-			}
-		
-		</script>
-	
-	
-	
 	
 	</div>
 
@@ -421,6 +238,240 @@
 </div>
 <#--引入页脚-->
 <@include action="${newPublic_3}"/>
+
+
+<script language="javascript" type="text/javascript">
+	$(".form-field").find(".form-field-input-container").bind("click",function(e) {
+		$(this).find(".form-field-text-input").focus();
+		
+		if($(this).find(".form-field-label").hasClass("form-field-active")){
+			return;
+		
+		}
+		$(this).find(".form-field-label").addClass("form-field-active");
+	});
+	
+	$(document).click(function (e) {
+        var target = $(e.target);
+        if (target.closest(".form-field-input-container").length == 0) {
+            $(".form-field-input-container").each(function(){
+			    if($(this).find(".form-field-label").hasClass("form-field-active")){
+					if($(this).find('input[type="text"]').val() == "" || $(this).find('input[type="password"]').val() == ""){
+						$(this).find(".form-field-label").removeClass("form-field-active");
+					}
+					
+				}
+			});
+        }
+    });
+    //文本框含有默认值时字段名称缩小
+	$(document).ready(function(){
+		$(".form-field-input-container").each(function(){
+		    if(!$(this).find(".form-field-label").hasClass("form-field-active")){
+				if(($(this).find('input[type="text"]').val() != undefined && $(this).find('input[type="text"]').val() != '') 
+					|| $(this).find('input[type="password"]').val() != undefined && $(this).find('input[type="password"]').val() != ''){
+					$(this).find(".form-field-label").addClass("form-field-active");
+				}
+				
+			}
+		});
+	});
+	
+	
+	//监听Tab键
+    $(document).on('keyup',function (e) {
+	    if(e.keyCode == 9){
+	    	var input = $(this).find('input:focus');
+	    	if (input.length) {
+		    	if(!input.parent().parent().find(".form-field-label").hasClass("form-field-active")){
+					input.parent().parent().find(".form-field-label").addClass("form-field-active");
+				}
+		    }
+		}
+	});
+    //解决提交按钮的click和blur事件冲突
+	$(document).ready(function(){
+		$("input[type='button']").mousedown(function(e){
+	    	e.preventDefault();
+		});
+		$("a[href='javascript:void(0);']").mousedown(function(e){
+	    	e.preventDefault();
+		});
+		
+	});
+
+</script>
+
+
+<script language="javascript" type="text/javascript">
+	//点击输入框提示
+	function inputBoxClickTip(obj){
+	
+	
+	}
+	//离开输入框提示
+	function inputBoxOutTip(obj){
+		verification(obj.id);
+	}
+	
+	//添加私信页
+	function addPrivateMessageUI(){
+		//从URL获取对方用户名称
+		var friendUserName = getUrlParam("friendUserName");
+		get_request(function(value){
+          		if(value != ""){
+           		var data = JSON.parse(value);
+           		for(var returnValue in data){
+				
+					if(returnValue == "formCaptcha"){
+						var formCaptcha = data[returnValue];
+	        			if(formCaptcha.showCaptcha == true){//如果显示验证码
+	        			
+	        			
+	        				$("#captchaValue_field").show();
+	        				$("#captchaKey").val(formCaptcha.captchaKey);
+	        				replaceCaptcha();	
+	        			}
+	        		}else if(returnValue == "allowSendPrivateMessage"){
+	        			if(data[returnValue] == true){//如果允许发私信
+	        				$("#privateMessageChatForm").show();
+	        			}
+	        		}	
+        		}
+          		}
+          	},
+ 			"user/control/addPrivateMessage?friendUserName="+friendUserName+"&timestamp=" + new Date().getTime(), true);
+	}
+	$(document).ready(function(){
+		//打开页面时执行
+		addPrivateMessageUI();
+	});
+	
+	
+	//更换验证码
+	function replaceCaptcha(){
+		var captchaKey = document.getElementById("captchaKey").value;
+		document.getElementById("captcha").src = "captcha/"+captchaKey+".jpg?" + Math.random(); 
+	}
+	//验证参数
+	function verification(field){
+		$("#"+field+"_prompt_error").hide();
+		$("#"+field+"_field_error").removeClass("form-field-error");
+
+		if(field == "captchaValue"){//验证码
+			if(!$("#captchaValue_field").is(":hidden")){//如果验证码框显示
+				var captchaKey = $("#captchaKey").val().trim();
+				var captchaValue = $("#"+field).val().trim();
+				if(captchaValue == ""){
+					$("#"+field+"_prompt_error").html("验证码不能为空");
+					$("#"+field+"_prompt_error").show();
+					$("#"+field+"_field_error").addClass("form-field-error");
+					return false;
+				}
+				var submitButton_disabled = $(".submitButton-box").find("a").attr("disabled");
+				get_request(function(value){
+	            	if(value == "false" && submitButton_disabled != "disabled"){
+	            		$("#"+field+"_prompt_error").html("验证码错误");
+						$("#"+field+"_prompt_error").show();
+						$("#"+field+"_field_error").addClass("form-field-error");
+	            	}
+	            },
+			 		"userVerification.htm?captchaKey="+captchaKey+"&captchaValue="+captchaValue+"&timestamp=" + new Date().getTime(), true);
+	            	
+			}
+		}
+	}
+	//ajax提交方式
+	function ajax_submit(){
+		var submitButton_disabled = $(".submitButton-box").find("a").attr("disabled");
+		if(submitButton_disabled){
+			return;
+		}
+	
+		$(".submitButton-box").find("a").attr("disabled","disabled");
+		
+		//清空错误提示
+		$("*[name='error']").each(function(){
+			$(this).html("");
+		});
+		
+		var parameter = "";
+		//从URL获取对方用户名称
+		parameter += "&friendUserName="+getUrlParam("friendUserName");
+		//从meta标签获取令牌
+		parameter += "&token="+getCsrf();
+		
+		//验证码Key
+		parameter += "&captchaKey="+encodeURIComponent($("#captchaKey").val());
+		
+		//验证码值
+		parameter += "&captchaValue="+encodeURIComponent($("#captchaValue").val());
+		
+		//私信内容
+		var privateMessageContent = $("#privateMessageContent").val().trim();
+		if(privateMessageContent != ""){
+			parameter += "&messageContent="+encodeURIComponent(privateMessageContent);
+		}else{
+			$("#messageContent_prompt_error").html("私信内容不能为空");
+			$("#messageContent_prompt_error").show();
+			
+			//按钮设置 disabled="disabled"
+			$(".submitButton-box").find("a").removeAttr("disabled");
+			return;
+		}
+		
+
+
+	   	//删除第一个&号,防止因为多了&号而出现警告: Parameters: Invalid chunk ignored.信息
+		if(parameter.indexOf("&") == 0){
+			parameter = parameter.substring(1,parameter.length);
+		}
+		post_request(function(value){
+			var data = JSON.parse(value);
+			
+			for(var returnValue in data){
+				
+				if(returnValue == "success"){
+        			if(data[returnValue] == "true"){
+        				layer.msg('发送私信成功,3秒后刷新页面', 
+							{
+							  time: 3000 //3秒关闭（如果不配置，默认是3秒）
+							},function(){//关闭后的操作		
+								var url = window.location.href;
+								//删除URL中的page参数
+								 window.location.href= deleteUrlParam(url,"page");
+							}
+						);
+        				
+        			}
+        		}else if(returnValue == "error"){
+        			
+        			var error = data[returnValue];
+        			for(var key in error){
+        				$("#"+key+"_prompt_error").html(error[key]);
+						$("#"+key+"_prompt_error").show();
+						$("#"+key+"_field_error").addClass("form-field-error");	
+    
+        			}
+        			if(!$("#captchaValue_field").is(":hidden")){
+						replaceCaptcha();
+					}
+        		}else if(returnValue == "captchaKey"){//如果需要验证码
+        			$("#captchaValue_field").show();
+       				$("#captchaKey").val(data[returnValue]);
+       				replaceCaptcha();		
+        		
+        		}
+        		
+        		
+        		
+        	}
+        	//按钮设置 disabled="disabled"
+			$(".submitButton-box").find("a").removeAttr("disabled");
+		},
+			"user/control/addPrivateMessage?timestamp=" + new Date().getTime(), true,parameter);
+	}
+</script>
 </body>
 
 </html>

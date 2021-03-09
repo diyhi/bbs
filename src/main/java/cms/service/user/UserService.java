@@ -115,6 +115,13 @@ public interface UserService extends DAO<User> {
 	 * @param realNameAuthentication 是否实名认证
 	 */
 	public Integer updateUserMobile(String userName,String mobile,Boolean realNameAuthentication);
+	/** 修改用户手机
+	 * @param userName 用户名称
+	 * @param mobile 手机号
+	 * @param realNameAuthentication 是否实名认证
+	 * @param platformUserId 平台用户Id
+	 */
+	public Integer updateUserMobile(String userName,String mobile,Boolean realNameAuthentication,String platformUserId);
 	/**
 	 * 修改安全摘要
 	 * @param userName 用户名称
