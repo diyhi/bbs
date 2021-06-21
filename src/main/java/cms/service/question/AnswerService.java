@@ -26,7 +26,7 @@ public interface AnswerService  extends DAO<Answer>{
 	 * @param answerIdList 答案Id集合
 	 * @return
 	 */
-	public List<Answer> findByCommentIdList(List<Long> answerIdList);
+	public List<Answer> findByAnswerIdList(List<Long> answerIdList);
 	/**
 	 * 根据用户名称查询回答数量
 	 * @param userName 用户名称
@@ -139,7 +139,11 @@ public interface AnswerService  extends DAO<Answer>{
 	 * @return
 	 */
 	public Integer deleteAnswer(List<String> userNameList);
-	
+	/**
+	 * 查询待审核答案数量
+	 * @return
+	 */
+	public Long auditAnswerCount();
 	/**
 	 * 添加回复
 	 * @param answerReply
@@ -171,7 +175,12 @@ public interface AnswerService  extends DAO<Answer>{
 	 * @return
 	 */
 	public AnswerReply findReplyByReplyId(Long answerReplyId);
-	
+	/**
+	 * 根据答案回复Id集合查询答案回复
+	 * @param answerReplyIdList 答案Id集合
+	 * @return
+	 */
+	public List<AnswerReply> findByAnswerReplyIdList(List<Long> answerReplyIdList);
 	/**
 	 * 修改回复
 	 * @param answerReplyId 回复Id
@@ -210,4 +219,9 @@ public interface AnswerService  extends DAO<Answer>{
 	 * @return
 	 */
 	public Integer deleteAnswerReply(List<String> userNameList);
+	/**
+	 * 查询待审核回复数量
+	 * @return
+	 */
+	public Long auditReplyCount();
 }

@@ -41,8 +41,8 @@
 					<div class="quote">
 						<#assign quoteContent = ""> 
 						<#list comment.quoteList as quote>
-							<#assign avatarHtml = "<a class='avatarBox' href='user/control/home?userName="+quote.userName+"'>"+(quote.avatarName != null && quote.avatarName??) ?string("<img src='"+quote.avatarPath+"100x100/"+quote.avatarName+"'>" , "<img avatar='"+(quote.nickname != null && quote.nickname??) ?string(quote.nickname , quote.userName)+"'>")+"</a>"> 
-							<#assign quoteContent = "<div class='quoteComment'>"+quoteContent+"<span class='userName'>"+avatarHtml+"<a href='user/control/home?userName="+quote.userName+"'>"+(quote.nickname != null && quote.nickname??) ?string(quote.nickname , quote.userName)+"</a>"+"&nbsp;的评论：</span><br/>"+quote.content+"</div>"> 
+							<#assign avatarHtml = "<a class='avatarBox' href='user/control/home?userName="+quote.userName?html+"'>"+(quote.avatarName != null && quote.avatarName??) ?string("<img src='"+quote.avatarPath?html+"100x100/"+quote.avatarName?html+"'>" , "<img avatar='"+(quote.nickname != null && quote.nickname??) ?string(quote.nickname?html , quote.userName?html)+"'>")+"</a>"> 
+							<#assign quoteContent = "<div class='quoteComment'>"+quoteContent+"<span class='userName'>"+avatarHtml+"<a href='user/control/home?userName="+quote.userName?html+"'>"+(quote.nickname != null && quote.nickname??) ?string(quote.nickname?html , quote.userName?html)+"</a>"+"&nbsp;的评论：</span><br/>"+quote.content+"</div>"> 
 						</#list>
 						<#noescape>${quoteContent}</#noescape>
 					</div>
@@ -250,7 +250,7 @@ function deleteReplyLayer(replyId){
 //删除回复层
 function deleteReply(replyId){
 	var parameter = "";
-	//话题Id
+	//回复Id
 	parameter += "&replyId="+replyId;
 	//从meta标签获取令牌
 	parameter += "&token="+getCsrf();

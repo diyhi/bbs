@@ -19,12 +19,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import cms.bean.PageForm;
 import cms.bean.PageView;
 import cms.bean.QueryResult;
+import cms.bean.RequestResult;
+import cms.bean.ResultCode;
 import cms.bean.user.User;
 import cms.bean.user.UserCustom;
 import cms.bean.user.UserGrade;
@@ -54,22 +57,23 @@ public class UserAction {
 	@Resource SettingService settingService;
 	@Resource UserManage userManage;
 	
+	
 	/**
 	 * 用户列表
 	 * @param formbean
 	 * @param pageForm
-	 * @param queryState  null或true:正常页面  false:回收站
+	 * @param visible  null或true:正常页面  false:回收站
 	 * @param model
 	 * @param request
 	 * @param response
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping("/control/user/list") 
-	public String execute(User formbean,PageForm pageForm,Boolean queryState,ModelMap model,
+	public String execute(User formbean,PageForm pageForm,Boolean visible,ModelMap model,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {	
-		
 		
 		
 		//调用分页算法代码
@@ -81,7 +85,7 @@ public class UserAction {
 		List<Object> paramValue = new ArrayList<Object>();//sql参数值
 		
 		
-		if(queryState != null && queryState == false){//回收站
+		if(visible != null && visible == false){//回收站
 			param = " o.state>? ";
 			paramValue.add(2);
 		}else{//正常页面
@@ -113,10 +117,39 @@ public class UserAction {
 				}
 				
 			}
+			//仅显示指定字段
+			List<User> userViewList = new ArrayList<User>();
+			for(User user : pageView.getRecords()){//取得所有用户
+				User userView = new User();
+
+				userView.setId(user.getId());
+				userView.setUserName(user.getUserName());
+				userView.setNickname(user.getNickname());
+				userView.setAllowUserDynamic(user.getAllowUserDynamic());
+				userView.setEmail(user.getEmail());
+				userView.setIssue(user.getIssue());
+				userView.setMobile(user.getMobile());
+				userView.setId(user.getId());
+				userView.setRealNameAuthentication(user.isRealNameAuthentication());
+				userView.setRegistrationDate(user.getRegistrationDate());
+				userView.setRemarks(user.getRemarks());
+				userView.setPoint(user.getPoint());
+				userView.setDeposit(user.getDeposit());
+				userView.setType(user.getType());
+				userView.setPlatformUserId(user.getPlatformUserId());
+				userView.setState(user.getState());
+				userView.setUserVersion(user.getUserVersion());
+				userView.setUserRoleNameList(user.getUserRoleNameList());
+				userView.setGradeId(user.getGradeId());
+				userView.setGradeName(user.getGradeName());
+				userView.setAvatarPath(user.getAvatarPath());
+				userView.setAvatarName(user.getAvatarName());
+				userViewList.add(userView);
+			}
+			pageView.setRecords(userViewList);
 		}
 		
-		request.setAttribute("pageView", pageView);
-		return "jsp/user/userList";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,pageView));
 	}
 	
 	
@@ -139,6 +172,7 @@ public class UserAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping("/control/user/search") 
 	public String search(ModelMap model,PageForm pageForm,
 			Integer searchType,String userName,
@@ -529,26 +563,28 @@ public class UserAction {
 			}
 		}
 		if(pageView.getRecords() != null && pageView.getRecords().size() >0){
+			List<UserGrade> userGradeList = userGradeService.findAllGrade();
 			for(User user : pageView.getRecords()){//取得所有用户
 				if(user.getType() >10){
 					user.setPlatformUserId(userManage.platformUserIdToThirdPartyUserId(user.getPlatformUserId()));
 				}
 				
+				if(userGradeList != null && userGradeList.size() >0){
+					for(UserGrade userGrade : userGradeList){//取得所有等级 
+						if(user.getPoint() >= userGrade.getNeedPoint()){
+							user.setGradeName(userGrade.getName());//将等级值设进等级参数里
+							break;
+						}
+					} 
+				}
 			}
 		}
 		
 		
-		model.addAttribute("searchType", searchType);
-		
-		model.addAttribute("userCustomList", userCustomList);
-		model.addAttribute("pageView", pageView);
-		model.addAttribute("error", error);
-		
-		model.addAttribute("userName", userName);
-		model.addAttribute("start_point", start_point);
-		model.addAttribute("end_point", end_point);
-		model.addAttribute("start_registrationDate", start_registrationDate);
-		model.addAttribute("end_registrationDate", end_registrationDate);
-		return "jsp/user/userSearchList";
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,pageView));
+		}
 	}
 }

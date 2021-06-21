@@ -64,7 +64,7 @@ public class InstallManageAction extends HttpServlet{
 		
 		Install install = new Install();
 		request.setAttribute("install", install);
-		request.getRequestDispatcher("/WEB-INF/jsp/install/install.jsp").forward(request, response);
+		request.getRequestDispatcher("/WEB-INF/data/install/install.jsp").forward(request, response);
 	}
 
 	@Override
@@ -387,7 +387,8 @@ public class InstallManageAction extends HttpServlet{
 				String path = PathUtil.path()+File.separator+"WEB-INF"+File.separator+"data"+File.separator+"install"+File.separator;
 				//导入SQL结构文件
 				SqlFile.importSQL(conn,path+"structure_tables_mysql.sql","utf-8");
-					
+				
+				
 				//导入SQL数据文件
 				SqlFile.importSQL(conn,path+"data_tables_mysql.sql","utf-8");
 				
@@ -464,7 +465,7 @@ public class InstallManageAction extends HttpServlet{
 		if(error != null && error.size() >0){
 			request.setAttribute("error", error);
 			request.setAttribute("install", install);
-			request.getRequestDispatcher("/WEB-INF/jsp/install/install.jsp").forward(request, response);
+			request.getRequestDispatcher("/WEB-INF/data/install/install.jsp").forward(request, response);
 		}else{
 			WebUtil.writeToWeb("安装轻论坛系统成功，请重启服务器自动初始化数据", "html", response);
 		}

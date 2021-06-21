@@ -26,6 +26,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import cms.bean.PageForm;
 import cms.bean.QueryResult;
+import cms.bean.RequestResult;
+import cms.bean.ResultCode;
 import cms.bean.payment.PaymentLog;
 import cms.bean.platformShare.QuestionRewardPlatformShare;
 import cms.bean.question.Answer;
@@ -82,8 +84,8 @@ public class AnswerManageAction {
 	/**
 	 * 答案  添加
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=add",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String add(ModelMap model,Long questionId,String content,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
@@ -148,52 +150,59 @@ public class AnswerManageAction {
 			error.put("content", "回答内容不能为空");
 		}
 		
-		
-	
-		
-		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
-		
-		if(error != null && error.size() >0){
-			returnValue.put("success", "false");
-			returnValue.put("error", error);
-		}else{
-			returnValue.put("success", "true");
+		if(error.size()==0){
 			
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 		}
-		return JsonUtils.toJSONString(returnValue);
-		
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	
 	/**
 	 * 答案  修改页面显示
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=edit",method=RequestMethod.GET)
 	public String editUI(ModelMap model,Long answerId,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
-		model.addAttribute("availableTag",answerManage.availableTag());
-		Answer answer = answerService.findByAnswerId(answerId);
-		if(answer != null){
-			if(answer.getContent() != null && !"".equals(answer.getContent().trim())){
-				//处理富文本路径
-				answer.setContent(fileManage.processRichTextFilePath(answer.getContent(),"answer"));
+		
+		Map<String,String> error = new HashMap<String,String>();
+		Map<String,Object> returnValue = new HashMap<String,Object>();
+		
+		returnValue.put("availableTag",answerManage.availableTag());
+		
+		if(answerId != null && answerId >0L){
+			Answer answer = answerService.findByAnswerId(answerId);
+			if(answer != null){
+				if(answer.getContent() != null && !"".equals(answer.getContent().trim())){
+					//处理富文本路径
+					answer.setContent(fileManage.processRichTextFilePath(answer.getContent(),"answer"));
+				}
+				returnValue.put("answer", answer);
+				String username = "";
+				Object obj  =  SecurityContextHolder.getContext().getAuthentication().getPrincipal(); 
+				if(obj instanceof UserDetails){
+					username =((UserDetails)obj).getUsername();	
+				}
+				returnValue.put("userName", username);
+			}else{
+				error.put("answerId", "答案Id不能为空");
 			}
-			model.addAttribute("answer", answer);
-			String username = "";
-			Object obj  =  SecurityContextHolder.getContext().getAuthentication().getPrincipal(); 
-			if(obj instanceof UserDetails){
-				username =((UserDetails)obj).getUsername();	
-			}
-			model.addAttribute("userName", username);
-			model.addAttribute("fileSystem", fileManage.getFileSystem());
+			
+		}else{
+			error.put("answerId", "答案不存在");
 		}
-		return "jsp/question/edit_answer";
+		
+		if(error.size()==0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
+		}
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	/**
 	 * 答案  修改
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=edit",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String edit(PageForm pageForm,ModelMap model,Long answerId,String content,Integer status,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
@@ -312,26 +321,20 @@ public class AnswerManageAction {
 			error.put("content", "答案内容不能为空");
 		}
 
-		
-		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
-		
-		if(error != null && error.size() >0){
-			returnValue.put("success", "false");
-			returnValue.put("error", error);
-		}else{
-			returnValue.put("success", "true");
+		if(error.size()==0){
 			
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 		}
-		return JsonUtils.toJSONString(returnValue);
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	/**
 	 * 答案  删除
 	 * @param model
 	 * @param answerId 答案Id
 	*/
+	@ResponseBody
 	@RequestMapping(params="method=delete",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
-	public String delete(ModelMap model,Long answerId,
+	public String delete(ModelMap model,Long[] answerId,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		String username = "";//用户名称
@@ -344,148 +347,148 @@ public class AnswerManageAction {
 		Map<String,String> error = new HashMap<String,String>();//错误
 		
 		
-		if(answerId != null && answerId >0L){
-			Answer answer = answerService.findByAnswerId(answerId);
-			if(answer != null){
-				Question question = questionManage.query_cache_findById(answer.getQuestionId());
-				if(question != null){
-					Date time = new Date();
-					
-					User user = userManage.query_cache_findUserByUserName(answer.getUserName());
-				
-					//取消采纳用户名称
-					String cancelAdoptionUserName = null;
-					//取消采纳用户退还悬赏积分日志
-					Object cancelAdoptionPointLogObject = null;
-					//取消采纳用户退还分成金额
-					BigDecimal cancelAdoptionUserNameShareAmount = new BigDecimal("0");
-					//取消采纳用户退还悬赏金额日志
-					Object cancelAdoptionPaymentLogObject = null;
-					
-					if(question.getAdoptionAnswerId() >0L){//已悬赏
-						cancelAdoptionUserName = answer.getUserName();
-	
-						if(user != null && answer.getIsStaff() ==false){
-							if(question.getPoint() != null && question.getPoint() >0L){
-								PointLog reward_pointLog = new PointLog();
-								reward_pointLog.setId(pointManage.createPointLogId(user.getId()));
-								reward_pointLog.setModule(1100);//1100.采纳答案
-								reward_pointLog.setParameterId(answer.getId());//参数Id 
-								reward_pointLog.setOperationUserType(1);//操作用户类型  0:系统  1: 员工  2:会员
-								reward_pointLog.setOperationUserName(username);//操作用户名称
-								reward_pointLog.setPointState(2);//积分状态  1:账户存入  2:账户支出
-								reward_pointLog.setPoint(question.getPoint());//积分
-								reward_pointLog.setUserName(answer.getUserName());//用户名称
-								reward_pointLog.setRemark("");
-								reward_pointLog.setTimes(time);
-								cancelAdoptionPointLogObject = pointManage.createPointLogObject(reward_pointLog);
-							}
-							if(question.getAmount() != null && question.getAmount().compareTo(new BigDecimal("0")) >0){
-								QuestionRewardPlatformShare questionRewardPlatformShare = platformShareService.findQuestionRewardPlatformShareByQuestionIdAndAnswerUserName(question.getId(),answer.getUserName());
-								if(questionRewardPlatformShare != null){
-									//用户分成金额
-									BigDecimal userNameShareAmount = questionRewardPlatformShare.getTotalAmount().subtract(questionRewardPlatformShare.getShareAmount());
-									cancelAdoptionUserNameShareAmount = userNameShareAmount;
-									
-									PaymentLog reward_paymentLog = new PaymentLog();
-									String paymentRunningNumber = paymentManage.createRunningNumber(user.getId());
-									reward_paymentLog.setPaymentRunningNumber(paymentRunningNumber);//支付流水号
-									reward_paymentLog.setPaymentModule(100);//支付模块 100.采纳答案
-									reward_paymentLog.setSourceParameterId(String.valueOf(answer.getId()));//参数Id 
-									reward_paymentLog.setOperationUserType(1);//操作用户类型  0:系统  1: 员工  2:会员
-									reward_paymentLog.setOperationUserName(username);//操作用户名称  0:系统  1: 员工  2:会员
-									reward_paymentLog.setAmountState(2);//金额状态  1:账户存入  2:账户支出 
-									reward_paymentLog.setAmount(userNameShareAmount);//金额
-									reward_paymentLog.setInterfaceProduct(0);//接口产品
-									reward_paymentLog.setUserName(answer.getUserName());//用户名称
-									reward_paymentLog.setTimes(time);
-									cancelAdoptionPaymentLogObject = paymentManage.createPaymentLogObject(reward_paymentLog);
-									
-								}
-							}
-						}
-						//员工回答
-						if(answer.getIsStaff() && question.getAmount() != null && question.getAmount().compareTo(new BigDecimal("0")) >0){
-							cancelAdoptionUserNameShareAmount = question.getAmount();
+		if(answerId != null && answerId.length >0){
+			List<Long> answerIdList = new ArrayList<Long>();
+			for(Long l :answerId){
+				if(l != null && l >0L){
+					answerIdList .add(l);
+				}
+			}
+			if(answerIdList != null && answerIdList.size() >0){
+				List<Answer> answerList = answerService.findByAnswerIdList(answerIdList);
+				if(answerList != null && answerList.size() >0){
+					for(Answer answer : answerList){
+						Question question = questionManage.query_cache_findById(answer.getQuestionId());
+						if(question != null){
+							Date time = new Date();
 							
-						}
+							User user = userManage.query_cache_findUserByUserName(answer.getUserName());
 						
-					}
-					
-					try {
-						int i = answerService.deleteAnswer(answer.getQuestionId(),answerId,cancelAdoptionUserName,cancelAdoptionPointLogObject,cancelAdoptionUserNameShareAmount,cancelAdoptionPaymentLogObject,question.getPoint());
-						if(i >0){
-							//根据答案Id删除用户动态(答案下的回复也同时删除)
-							userService.deleteUserDynamicByAnswerId(answer.getQuestionId(),answerId);
+							//取消采纳用户名称
+							String cancelAdoptionUserName = null;
+							//取消采纳用户退还悬赏积分日志
+							Object cancelAdoptionPointLogObject = null;
+							//取消采纳用户退还分成金额
+							BigDecimal cancelAdoptionUserNameShareAmount = new BigDecimal("0");
+							//取消采纳用户退还悬赏金额日志
+							Object cancelAdoptionPaymentLogObject = null;
 							
-							//删除缓存
-							answerManage.delete_cache_findByAnswerId(answer.getId());
-							answerManage.delete_cache_answerCount(answer.getUserName());
-							if(user != null){
-								userManage.delete_cache_findUserById(user.getId());
-								userManage.delete_cache_findUserByUserName(user.getUserName());
-							}
-							
-							String fileNumber = questionManage.generateFileNumber(answer.getUserName(), answer.getIsStaff());
-							
-							
-							
-							//删除图片
-							List<String> imageNameList = textFilterManage.readImageName(answer.getContent(),"answer");
-							if(imageNameList != null && imageNameList.size() >0){
-								for(String imagePath : imageNameList){
-									//如果验证不是当前用户上传的文件，则不删除锁
-									 if(!questionManage.getFileNumber(FileUtil.getBaseName(imagePath.trim())).equals(fileNumber)){
-										 continue;
-									 }
-									
-									
-									//替换路径中的..号
-									imagePath = FileUtil.toRelativePath(imagePath);
-									//替换路径分割符
-									imagePath = StringUtils.replace(imagePath, "/", File.separator);
-									
-									Boolean state = fileManage.deleteFile(imagePath);
-									
-									if(state != null && state == false){	
-										//替换指定的字符，只替换第一次出现的
-										imagePath = StringUtils.replaceOnce(imagePath, "file"+File.separator+"answer"+File.separator, "");
-										imagePath = StringUtils.replace(imagePath, File.separator, "_");//替换所有出现过的字符
-										
-										//创建删除失败文件
-										fileManage.failedStateFile("file"+File.separator+"answer"+File.separator+"lock"+File.separator+imagePath);
-									
+							if(question.getAdoptionAnswerId() >0L){//已悬赏
+								cancelAdoptionUserName = answer.getUserName();
+			
+								if(user != null && answer.getIsStaff() ==false){
+									if(question.getPoint() != null && question.getPoint() >0L){
+										PointLog reward_pointLog = new PointLog();
+										reward_pointLog.setId(pointManage.createPointLogId(user.getId()));
+										reward_pointLog.setModule(1100);//1100.采纳答案
+										reward_pointLog.setParameterId(answer.getId());//参数Id 
+										reward_pointLog.setOperationUserType(1);//操作用户类型  0:系统  1: 员工  2:会员
+										reward_pointLog.setOperationUserName(username);//操作用户名称
+										reward_pointLog.setPointState(2);//积分状态  1:账户存入  2:账户支出
+										reward_pointLog.setPoint(question.getPoint());//积分
+										reward_pointLog.setUserName(answer.getUserName());//用户名称
+										reward_pointLog.setRemark("");
+										reward_pointLog.setTimes(time);
+										cancelAdoptionPointLogObject = pointManage.createPointLogObject(reward_pointLog);
+									}
+									if(question.getAmount() != null && question.getAmount().compareTo(new BigDecimal("0")) >0){
+										QuestionRewardPlatformShare questionRewardPlatformShare = platformShareService.findQuestionRewardPlatformShareByQuestionIdAndAnswerUserName(question.getId(),answer.getUserName());
+										if(questionRewardPlatformShare != null){
+											//用户分成金额
+											BigDecimal userNameShareAmount = questionRewardPlatformShare.getTotalAmount().subtract(questionRewardPlatformShare.getShareAmount());
+											cancelAdoptionUserNameShareAmount = userNameShareAmount;
+											
+											PaymentLog reward_paymentLog = new PaymentLog();
+											String paymentRunningNumber = paymentManage.createRunningNumber(user.getId());
+											reward_paymentLog.setPaymentRunningNumber(paymentRunningNumber);//支付流水号
+											reward_paymentLog.setPaymentModule(100);//支付模块 100.采纳答案
+											reward_paymentLog.setSourceParameterId(String.valueOf(answer.getId()));//参数Id 
+											reward_paymentLog.setOperationUserType(1);//操作用户类型  0:系统  1: 员工  2:会员
+											reward_paymentLog.setOperationUserName(username);//操作用户名称  0:系统  1: 员工  2:会员
+											reward_paymentLog.setAmountState(2);//金额状态  1:账户存入  2:账户支出 
+											reward_paymentLog.setAmount(userNameShareAmount);//金额
+											reward_paymentLog.setInterfaceProduct(0);//接口产品
+											reward_paymentLog.setUserName(answer.getUserName());//用户名称
+											reward_paymentLog.setTimes(time);
+											cancelAdoptionPaymentLogObject = paymentManage.createPaymentLogObject(reward_paymentLog);
+											
+										}
 									}
 								}
+								//员工回答
+								if(answer.getIsStaff() && question.getAmount() != null && question.getAmount().compareTo(new BigDecimal("0")) >0){
+									cancelAdoptionUserNameShareAmount = question.getAmount();
+									
+								}
+								
 							}
 							
+							try {
+								int i = answerService.deleteAnswer(answer.getQuestionId(),answer.getId(),cancelAdoptionUserName,cancelAdoptionPointLogObject,cancelAdoptionUserNameShareAmount,cancelAdoptionPaymentLogObject,question.getPoint());
+								if(i >0){
+									//根据答案Id删除用户动态(答案下的回复也同时删除)
+									userService.deleteUserDynamicByAnswerId(answer.getQuestionId(),answer.getId());
+									
+									//删除缓存
+									answerManage.delete_cache_findByAnswerId(answer.getId());
+									answerManage.delete_cache_answerCount(answer.getUserName());
+									if(user != null){
+										userManage.delete_cache_findUserById(user.getId());
+										userManage.delete_cache_findUserByUserName(user.getUserName());
+									}
+									
+									String fileNumber = questionManage.generateFileNumber(answer.getUserName(), answer.getIsStaff());
+									
+									
+									
+									//删除图片
+									List<String> imageNameList = textFilterManage.readImageName(answer.getContent(),"answer");
+									if(imageNameList != null && imageNameList.size() >0){
+										for(String imagePath : imageNameList){
+											//如果验证不是当前用户上传的文件，则不删除锁
+											 if(!questionManage.getFileNumber(FileUtil.getBaseName(imagePath.trim())).equals(fileNumber)){
+												 continue;
+											 }
+											
+											
+											//替换路径中的..号
+											imagePath = FileUtil.toRelativePath(imagePath);
+											//替换路径分割符
+											imagePath = StringUtils.replace(imagePath, "/", File.separator);
+											
+											Boolean state = fileManage.deleteFile(imagePath);
+											
+											if(state != null && state == false){	
+												//替换指定的字符，只替换第一次出现的
+												imagePath = StringUtils.replaceOnce(imagePath, "file"+File.separator+"answer"+File.separator, "");
+												imagePath = StringUtils.replace(imagePath, File.separator, "_");//替换所有出现过的字符
+												
+												//创建删除失败文件
+												fileManage.failedStateFile("file"+File.separator+"answer"+File.separator+"lock"+File.separator+imagePath);
+											
+											}
+										}
+									}
+									
+								}
+							} catch (SystemException e) {
+								error.put("answer", e.getMessage());
+							}
+							
+						}else{
+							error.put("question", "问题不存在");
 						}
-					} catch (SystemException e) {
-						error.put("answer", e.getMessage());
 					}
-					
-				}else{
-					error.put("question", "问题不存在");
 				}
-			}else{
-				error.put("answer", "答案不存在");
 			}
-			
 		}else{
 			error.put("answerId", "答案Id不能为空");
 		}
-		
-		
-		
-		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
-		
-		if(error != null && error.size() >0){
-			returnValue.put("success", "false");
-			returnValue.put("error", error);	
-		}else{
-			returnValue.put("success", "true");
+		if(error.size()==0){
+			
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 		}
-		return JsonUtils.toJSONString(returnValue);
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	/**
@@ -498,10 +501,10 @@ public class AnswerManageAction {
 	 * @param isStaff 是否是员工   true:员工   false:会员
 	 * @param fileName 文件名称 预签名时有值
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=uploadImage",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String uploadImage(ModelMap model,Long questionId,String userName, Boolean isStaff,String fileName,
-			MultipartFile imgFile, HttpServletResponse response) throws Exception {
+			MultipartFile file, HttpServletResponse response) throws Exception {
 		
 		String number = questionManage.generateFileNumber(userName, isStaff);
 		
@@ -556,14 +559,14 @@ public class AnswerManageAction {
 		
 		}else{//0.本地系统
 			//文件上传
-			if(imgFile != null && !imgFile.isEmpty() && questionId != null && questionId >0L && number != null && !"".equals(number.trim())){
+			if(file != null && !file.isEmpty() && questionId != null && questionId >0L && number != null && !"".equals(number.trim())){
 				EditorTag editorSiteObject = settingManage.readAnswerEditorTag();
 				if(editorSiteObject != null){
 					if(editorSiteObject.isImage()){//允许上传图片
 						//当前图片文件名称
-						String sourceFileName = imgFile.getOriginalFilename();
+						String sourceFileName = file.getOriginalFilename();
 						//文件大小
-						Long size = imgFile.getSize();
+						Long size = file.getSize();
 						//取得文件后缀
 						String suffix = sourceFileName.substring(sourceFileName.lastIndexOf('.')+1).toLowerCase();
 						
@@ -574,7 +577,7 @@ public class AnswerManageAction {
 						long imageSize = editorSiteObject.getImageSize();
 
 						//验证文件类型
-						boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),imageFormat);
+						boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),imageFormat);
 						
 						if(authentication){
 							if(size/1024 <= imageSize){
@@ -592,7 +595,7 @@ public class AnswerManageAction {
 								//生成锁文件
 								fileManage.addLock(lockPathDir,questionId+"_"+newFileName);
 								//保存文件
-								fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
+								fileManage.writeFile(pathDir, newFileName,file.getBytes());
 				
 								//上传成功
 								returnJson.put("error", 0);//0成功  1错误
@@ -631,10 +634,12 @@ public class AnswerManageAction {
 	 * @return
 	 * @throws Exception
 	*/
+	@ResponseBody
 	@RequestMapping(params="method=auditAnswer",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String auditAnswer(ModelMap model,Long answerId,
 			HttpServletResponse response) throws Exception {
+		Map<String,String> error = new HashMap<String,String>();
+		
 		if(answerId != null && answerId>0L){
 			int i = answerService.updateAnswerStatus(answerId, 20);
 			
@@ -648,12 +653,14 @@ public class AnswerManageAction {
 				//删除缓存
 				answerManage.delete_cache_findByAnswerId(answerId);
 				answerManage.delete_cache_answerCount(answer.getUserName());
+				return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+			}else{
+				error.put("answerId", "答案不存在或修改答案状态失败");
 			}
-			
-			
-			return "1";
+		}else{
+			error.put("answerId", "答案Id不能为空");
 		}
-		return "0";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	
@@ -664,19 +671,20 @@ public class AnswerManageAction {
 	 * @param model
 	 * @param answerId 答案Id
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=addAnswerReply",method=RequestMethod.GET)
 	public String addAnswerReplyUI(ModelMap model,Long answerId,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-		return "jsp/question/add_answerReply";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 	}
 	/**
 	 * 答案回复  添加
 	 * @param model
 	 * @param answerId 答案Id
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=addAnswerReply",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String addAnswerReply(ModelMap model,Long answerId,String content,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Answer answer = null;
@@ -730,16 +738,11 @@ public class AnswerManageAction {
 			error.put("content", "回复内容不能为空");
 		}
 		
-		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
-		
-		if(error != null && error.size() >0){
-			returnValue.put("success", "false");
-			returnValue.put("error", error);
-		}else{
-			returnValue.put("success", "true");
+		if(error.size()==0){
 			
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 		}
-		return JsonUtils.toJSONString(returnValue);
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	/**
 	 * 答案回复  修改页面显示
@@ -747,9 +750,13 @@ public class AnswerManageAction {
 	 * @param model
 	 * @param answerReplyId 答案回复Id
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=editAnswerReply",method=RequestMethod.GET)
 	public String editAnswerReplyUI(ModelMap model,Long answerReplyId,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		Map<String,String> error = new HashMap<String,String>();
+		Map<String,Object> returnValue = new HashMap<String,Object>();
+		
 		if(answerReplyId != null && answerReplyId >0){
 			AnswerReply answerReply = answerService.findReplyByReplyId(answerReplyId);
 			if(answerReply != null){
@@ -757,10 +764,13 @@ public class AnswerManageAction {
 					
 					answerReply.setIpAddress(IpAddress.queryAddress(answerReply.getIp()));
 				}
-				model.addAttribute("answerReply", answerReply);
+				returnValue.put("answerReply", answerReply);
+				return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
 			}
+		}else{
+			error.put("answerReplyId", "回复Id不能为空");
 		}
-		return "jsp/question/edit_answerReply";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	/**
 	 * 答案回复  修改页面
@@ -768,8 +778,8 @@ public class AnswerManageAction {
 	 * @param model
 	 * @param answerReplyId 答案回复Id
 	*/
+	@ResponseBody
 	@RequestMapping(params="method=editAnswerReply",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String editAnswerReply(ModelMap model,Long answerReplyId,String content,Integer status,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		AnswerReply answerReply = null;
@@ -820,16 +830,11 @@ public class AnswerManageAction {
 			error.put("content", "回复内容不能为空");
 		}
 		
-		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
-		
-		if(error != null && error.size() >0){
-			returnValue.put("success", "false");
-			returnValue.put("error", error);
-		}else{
-			returnValue.put("success", "true");
+		if(error.size()==0){
 			
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 		}
-		return JsonUtils.toJSONString(returnValue);
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	/**
 	 * 回复  删除
@@ -837,28 +842,45 @@ public class AnswerManageAction {
 	 * @param model
 	 * @param answerReplyId 回复Id
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=deleteAnswerReply",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
-	public String deleteAnswerReply(ModelMap model,Long answerReplyId,
+	public String deleteAnswerReply(ModelMap model,Long[] answerReplyId,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
-		if(answerReplyId != null && answerReplyId >0){
-			
-			AnswerReply answerReply = answerManage.query_cache_findReplyByReplyId(answerReplyId);
-			int i = answerService.deleteReply(answerReplyId);
-			if(i >0 && answerReply != null){
-				User user = userManage.query_cache_findUserByUserName(answerReply.getUserName());
-				if(user != null){
-					userService.deleteUserDynamicByAnswerReplyId(user.getId(),answerReply.getQuestionId(),answerReply.getAnswerId(),answerReplyId);
+		Map<String,String> error = new HashMap<String,String>();
+		
+		if(answerReplyId != null && answerReplyId.length >0){
+			List<Long> answerReplyIdList = new ArrayList<Long>();
+			for(Long l :answerReplyId){
+				if(l != null && l >0L){
+					answerReplyIdList .add(l);
 				}
 			}
+			if(answerReplyIdList != null && answerReplyIdList.size() >0){
+				List<AnswerReply> answerReplyList = answerService.findByAnswerReplyIdList(answerReplyIdList);
+				if(answerReplyList != null && answerReplyList.size() >0){
+					for(AnswerReply answerReply : answerReplyList){
+						int i = answerService.deleteReply(answerReply .getId());
+						if(i >0 && answerReply != null){
+							User user = userManage.query_cache_findUserByUserName(answerReply.getUserName());
+							if(user != null){
+								userService.deleteUserDynamicByAnswerReplyId(user.getId(),answerReply.getQuestionId(),answerReply.getAnswerId(),answerReply .getId());
+							}
+						}
 
-			//删除缓存
-			answerManage.delete_cache_findReplyByReplyId(answerReplyId);
-			if(i >0){
-				return "1";
+						//删除缓存
+						answerManage.delete_cache_findReplyByReplyId(answerReply .getId());
+					}
+				}
 			}
+		}else{
+			error.put("answerReplyId", "回复Id不能为空");
 		}
-		return "0";
+		
+		if(error.size()==0){
+			
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+		}
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	/**
 	 * 审核回复
@@ -867,11 +889,11 @@ public class AnswerManageAction {
 	 * @return
 	 * @throws Exception
 	*/
+	@ResponseBody
 	@RequestMapping(params="method=auditAnswerReply",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String auditAnswerReply(ModelMap model,Long answerReplyId,
 			HttpServletResponse response) throws Exception {
-		
+		Map<String,String> error = new HashMap<String,String>();
 		if(answerReplyId != null && answerReplyId>0L){
 			int i = answerService.updateReplyStatus(answerReplyId, 20);
 			
@@ -886,9 +908,11 @@ public class AnswerManageAction {
 			
 			//删除缓存
 			answerManage.delete_cache_findReplyByReplyId(answerReplyId);
-			return "1";
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+		}else{
+			error.put("answerReplyId", "回复Id不能为空");
 		}
-		return "0";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	
@@ -899,8 +923,8 @@ public class AnswerManageAction {
 	 * @return
 	 * @throws Exception
 	*/
+	@ResponseBody
 	@RequestMapping(params="method=adoptionAnswer",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String adoptionAnswer(ModelMap model,Long answerId,
 			HttpServletResponse response) throws Exception {
 		String username = "";//用户名称
@@ -1148,15 +1172,11 @@ public class AnswerManageAction {
 		
 		
 		
-		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
-		
-		if(error != null && error.size() >0){
-			returnValue.put("success", "false");
-			returnValue.put("error", error);	
-		}else{
-			returnValue.put("success", "true");
+		if(error.size()==0){
+			
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 		}
-		return JsonUtils.toJSONString(returnValue);
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 		
 	}
 	/**
@@ -1166,8 +1186,8 @@ public class AnswerManageAction {
 	 * @return
 	 * @throws Exception
 	*/
+	@ResponseBody
 	@RequestMapping(params="method=cancelAdoptionAnswer",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String cancelAdoptionAnswer(ModelMap model,Long answerId,
 			HttpServletResponse response) throws Exception {
 		
@@ -1278,16 +1298,11 @@ public class AnswerManageAction {
 		}
 		
 		
-		
-		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
-		
-		if(error != null && error.size() >0){
-			returnValue.put("success", "false");
-			returnValue.put("error", error);	
-		}else{
-			returnValue.put("success", "true");
+		if(error.size()==0){
+			
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 		}
-		return JsonUtils.toJSONString(returnValue);
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	

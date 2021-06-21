@@ -11,6 +11,7 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -53,6 +54,9 @@ public class CommentedProperties{
 	private static List<String> videoUploadFormatList = null;
 	//富文本嵌入视频地址白名单
 	private static List<String> embedVideoWhiteList = null;
+	
+	//OAuth2配置参数
+	private static Map<String,Object> oauth2Map = null;
 	
 	/**
 	 * 内部属性表
@@ -882,7 +886,65 @@ public class CommentedProperties{
 	}
 	
 	
+	/**
+	 * 读取oauth2.properties参数
+	 * @return
+	 */
+	public static Map<String,Object> readOAuth2(){	
+		if(oauth2Map != null && oauth2Map.size() >0){
+			return oauth2Map;
+		}
+		//OAuth2配置参数
+		Map<String,Object> _oauth2Map = new HashMap<String,Object>();
+		
+		
+		org.springframework.core.io.Resource resource = new ClassPathResource("/oauth2.properties");//读取配置文件
+		CommentedProperties props = new CommentedProperties();
+
+		try {
+			props.load(resource.getInputStream(),"utf-8");
+			
+			Set<String> propertyNameList = props.propertyNames();
+			if(propertyNameList != null && propertyNameList.size() >0){
+				for(String propertyName : propertyNameList){
+					if(propertyName.trim().equals("oauth2.secret")){
+						String value = props.getProperty(propertyName.trim());
+						if(value != null && !"".equals(value.trim())){
+							_oauth2Map.put("secret", value.trim());
+						}else{//如果为空，则密钥为随机数
+							_oauth2Map.put("secret", UUIDUtil.getUUID32());
+						}
+					}else if(propertyName.trim().equals("oauth2.accessTokenValiditySeconds")){
+						String value = props.getProperty(propertyName.trim());
+						if(value != null && !"".equals(value.trim())){
+							_oauth2Map.put("accessTokenValiditySeconds", Integer.parseInt(value.trim()));
+						}
+					}else if(propertyName.trim().equals("oauth2.refreshTokenValiditySeconds")){
+						String value = props.getProperty(propertyName.trim());
+						if(value != null && !"".equals(value.trim())){
+							_oauth2Map.put("refreshTokenValiditySeconds", Integer.parseInt(value.trim()));
+						}
+					}else if(propertyName.trim().equals("oauth2.loginFailureNumber")){
+						String value = props.getProperty(propertyName.trim());
+						if(value != null && !"".equals(value.trim())){
+							_oauth2Map.put("loginFailureNumber", Integer.parseInt(value.trim()));
+						}
+					}
+					
+					
+				}
+				
+				oauth2Map = _oauth2Map;
+			}
 	
+		} catch (IOException e) {
+			if (logger.isErrorEnabled()) {
+	            logger.error("读取配置文件oauth2.properties错误",e);
+	        }
+		}
+		return _oauth2Map;	
+
+	}
 	
 	
 	

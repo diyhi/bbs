@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -15,6 +16,8 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import cms.bean.RequestResult;
+import cms.bean.ResultCode;
 import cms.service.template.TemplateService;
 import cms.utils.Coding;
 import cms.utils.FileUtil;
@@ -54,19 +57,29 @@ public class ResourceManageAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=showFileUI", method=RequestMethod.GET)
 	public String showFileUI(String resourceId,String dirName,
 			ModelMap model,HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
+		Map<String,Object> returnValue = new LinkedHashMap<String,Object>();
+		if(dirName == null || "".equals(dirName.trim())){
+			error.put("dirName", "目录名称不能为空");
+		}
+		if(resourceId == null || "".equals(resourceId.trim())){
+			error.put("resourceId", "资源Id不能为空");
+		}
 		
-		if(resourceId != null && !"".equals(resourceId.trim()) && dirName != null && !"".equals(dirName.trim())){
+		if(error.size() ==0){
 
 			String path = PathUtil.path()+File.separator+"common"+File.separator+FileUtil.toRelativePath(dirName)+File.separator+FileUtil.toRelativePath(FileUtil.toSystemPath(resourceId));
 			
 			
 			String suffix = FileUtil.getExtension(path);
 			if(suffix != null && !"".equals(suffix.trim())){//如果是js,css后缀文件
-				if("js".equalsIgnoreCase(suffix) || "css".equalsIgnoreCase(suffix)){
+				if("js".equalsIgnoreCase(suffix) || "css".equalsIgnoreCase(suffix) || "map".equalsIgnoreCase(suffix) || "txt".equalsIgnoreCase(suffix)){
 					
 					StringBuffer sb = new StringBuffer();
 					File file = new File(path); 
@@ -81,17 +94,21 @@ public class ResourceManageAction {
 							sb.append(row).append("\n");
 						}
 					}else{
-						throw new SystemException("系统找不到指定的文件");
+						error.put("fileContent", "找不到指定的文件");
 					}	
-					model.addAttribute("fileContent",sb.toString());
-					model.addAttribute("fileType",suffix.toLowerCase());
+					returnValue.put("fileType",suffix.toLowerCase());
+					returnValue.put("fileContent",sb.toString());
+					
 					
 				}
 			}	
 		}
 		
-		
-		return "jsp/template/resource_showFile";
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
+		}
 	}
 	
 	/**
@@ -105,12 +122,12 @@ public class ResourceManageAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=editFile", method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String editFile(String resourceId,String dirName,String content,
 			ModelMap model,HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		Map<String,Object> returnJson = new HashMap<String,Object>();
+		
 		Map<String,String> error = new HashMap<String,String>();
 		if(resourceId != null && !"".equals(resourceId.trim()) && dirName != null && !"".equals(dirName.trim())){
 
@@ -141,15 +158,12 @@ public class ResourceManageAction {
 		
 		
 		if(error.size() >0){
-			//上传失败
-			returnJson.put("error", error);
-			returnJson.put("success", false);
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 		}else{
-			returnJson.put("success", true);
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 		}
-		
-		return JsonUtils.toJSONString(returnJson);
 	}
+	
 	/**
 	 * 资源管理 下载
 	 * @param model
@@ -160,6 +174,7 @@ public class ResourceManageAction {
 	 * @return
 	 * @throws Exception
 	*/
+	@ResponseBody
 	@RequestMapping(params="method=download", method=RequestMethod.GET)
 	public ResponseEntity<byte[]> download(ModelMap model,String resourceId,String dirName,
 			HttpServletRequest request, HttpServletResponse response)
@@ -192,12 +207,12 @@ public class ResourceManageAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=newFolder", method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String newFolder(ModelMap model,String resourceId,String dirName,String folderName,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		Map<String,Object> returnJson = new HashMap<String,Object>();
+		
 		Map<String,String> error = new HashMap<String,String>();
 
 		if(dirName != null && !"".equals(dirName.trim())){
@@ -206,7 +221,6 @@ public class ResourceManageAction {
 			boolean validateFolderName = FileUtil.validateFileName(folderName);
 			if(validateFolderName == false){
 				error.put("folderName", "名称不能含有特殊字符");
-				
 			}
 			
 			File file = new File(path);
@@ -228,14 +242,10 @@ public class ResourceManageAction {
 		}
 		
 		if(error.size() >0){
-			//上传失败
-			returnJson.put("error", error);
-			returnJson.put("success", false);
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 		}else{
-			returnJson.put("success", true);
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 		}
-		
-		return JsonUtils.toJSONString(returnJson);
 	}
 	
 	/**
@@ -243,13 +253,12 @@ public class ResourceManageAction {
 	 * @param resourceId 资源Id
 	 * @param dirName 模板目录
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=upload",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String upload(ModelMap model,String resourceId,String dirName,
 			MultipartFile uploadFile,
 			HttpServletRequest request,HttpServletResponse response) throws Exception {
 		
-		Map<String,Object> returnJson = new HashMap<String,Object>();
 		Map<String,String> error = new HashMap<String,String>();
 		if(dirName != null && !"".equals(dirName.trim())){
 			String path = PathUtil.path()+File.separator+"common"+File.separator+FileUtil.toRelativePath(dirName)+(resourceId == null || "".equals(resourceId.trim()) ? "" :File.separator+FileUtil.toRelativePath(FileUtil.toSystemPath(resourceId)));
@@ -269,12 +278,16 @@ public class ResourceManageAction {
 				List<String> formatList = new ArrayList<String>();
 				formatList.add("gif");
 				formatList.add("jpg");
+				formatList.add("jpeg");
 				formatList.add("bmp");
 				formatList.add("png");
+				formatList.add("svg");
+				formatList.add("map");
+				formatList.add("txt");
 				formatList.add("css");
 				formatList.add("js");
 				//允许上传大小
-				long uploadSize = 2048000L;//单位为字节  例1024000为1M
+				long uploadSize = 1024 * 1024 * 200;//单位为字节  
 				
 				//验证文件后缀
 				boolean authentication = FileUtil.validateFileSuffix(uploadFile.getOriginalFilename(),formatList);
@@ -282,7 +295,7 @@ public class ResourceManageAction {
 					error.put("uploadFile", "当前文件格式不允许上传");
 				}
 				if(size > uploadSize){
-					error.put("uploadFile", "文件大小超出2M");
+					error.put("uploadFile", "文件大小超出200M");
 				}
 				
 				
@@ -312,13 +325,10 @@ public class ResourceManageAction {
 		}
 
 		if(error.size() >0){
-			//上传失败
-			returnJson.put("error", error);
-			returnJson.put("success", false);
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 		}else{
-			returnJson.put("success", true);
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 		}
-		return JsonUtils.toJSONString(returnJson);
 	}
 	/**
 	 * 资源管理  重命名
@@ -326,12 +336,12 @@ public class ResourceManageAction {
 	 * @param rename 重命名
 	 * @param dirName 模板目录
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=rename",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String rename(ModelMap model,String resourceId,String rename,String dirName,
 			HttpServletRequest request,HttpServletResponse response) throws Exception {
 		
-		Map<String,Object> returnJson = new HashMap<String,Object>();
+		Map<String,Object> returnValue = new HashMap<String,Object>();
 		Map<String,String> error = new HashMap<String,String>();
 		if(resourceId != null && !"".equals(resourceId.trim()) && dirName != null && !"".equals(dirName.trim())){
 			if(rename != null && !"".equals(rename.trim())){
@@ -369,7 +379,7 @@ public class ResourceManageAction {
 								resource.setLeaf(true);//是叶子节点
 							}
 							resource.setName(newFile.getName());
-							returnJson.put("resource", resource);
+							returnValue.put("resource", resource);
 							
 						}
 					}
@@ -401,7 +411,7 @@ public class ResourceManageAction {
 								resource.setLeaf(true);//是叶子节点
 							}
 							resource.setName(newFile.getName());
-							returnJson.put("resource", resource);
+							returnValue.put("resource", resource);
 						}
 					}
 								
@@ -416,40 +426,45 @@ public class ResourceManageAction {
 			error.put("rename", "参数错误");
 		}
 		if(error.size() >0){
-			//上传失败
-			returnJson.put("error", error);
-			returnJson.put("success", false);
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 		}else{
-			returnJson.put("success", true);
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
 		}
-		return JsonUtils.toJSONString(returnJson);
 	}
 	/**
 	 * 资源管理  删除
 	 * @param resourceId 资源Id
 	 * @param dirName 模板目录
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=delete",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String delete(ModelMap model,String resourceId,String dirName,
 			HttpServletRequest request,HttpServletResponse response) throws Exception {
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
+		if(dirName == null || "".equals(dirName.trim())){
+			error.put("dirName", "目录名称不能为空");
+		}
+		if(resourceId == null || "".equals(resourceId.trim())){
+			error.put("resourceId", "资源Id不能为空");
+		}
 		
-		if(resourceId != null && !"".equals(resourceId.trim()) && dirName != null && !"".equals(dirName.trim())){
-			
+		if(error.size() ==0){
 			String path = "common"+File.separator+FileUtil.toRelativePath(dirName)+File.separator+FileUtil.toRelativePath(FileUtil.toSystemPath(resourceId));
 			
 			File file = new File(PathUtil.path()+File.separator+path);
 			if(file.isFile()){//文件
 				
 				localFileManage.deleteFile(path);
-				return "1";
 			}else if(file .isDirectory()){//目录
 				localFileManage.removeDirectory(path);
-				return "1";
 			}
 			
-		
 		}
-		return "0";
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+		}
 	}
 }

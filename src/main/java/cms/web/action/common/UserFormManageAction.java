@@ -1012,7 +1012,7 @@ public class UserFormManageAction {
 	 * @throws Exception
 	 */
 	@RequestMapping(value="/login",method=RequestMethod.POST) 
-	public String login2(ModelMap model,String userName, String password,Integer type,String mobile,Boolean rememberMe,String jumpUrl,
+	public String login(ModelMap model,String userName, String password,Integer type,String mobile,Boolean rememberMe,String jumpUrl,
 			RedirectAttributes redirectAttrs,
 			String token,String captchaKey,String captchaValue,
 			String thirdPartyOpenId,
@@ -1251,6 +1251,21 @@ public class UserFormManageAction {
     			ajax_return.put("success", "false");
     			ajax_return.put("error", returnError);
     			
+    			
+    			
+    			//重新判断是否需要验证码
+    			if(type != null && numbers.contains(type)){
+    				if(type.equals(10)){//10:本地账号密码用户
+    					if(userName != null && !"".equals(userName.trim())){
+    						isCaptcha = captchaManage.login_isCaptcha(userName);
+    					}
+    				}else if(type.equals(20)){//20: 手机用户
+    					if(mobile != null && !"".equals(mobile.trim())){
+    						String platformUserId = userManage.thirdPartyUserIdToPlatformUserId(mobile.trim(),20);
+    						isCaptcha = captchaManage.login_isCaptcha(platformUserId);
+    					}
+    				}
+    			}
     			
     			if(isCaptcha){
     				ajax_return.put("captchaKey", UUIDUtil.getUUID32());

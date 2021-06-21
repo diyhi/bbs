@@ -17,6 +17,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import cms.bean.PageForm;
+import cms.bean.RequestResult;
+import cms.bean.ResultCode;
 import cms.bean.template.Column;
 import cms.bean.template.Forum;
 import cms.bean.template.Layout;
@@ -27,10 +29,8 @@ import cms.utils.DisablePath;
 import cms.utils.FileUtil;
 import cms.utils.JsonUtils;
 import cms.utils.PathUtil;
-import cms.utils.RedirectPath;
 import cms.utils.UUIDUtil;
 import cms.utils.Verification;
-import cms.web.action.SystemException;
 import cms.web.action.fileSystem.localImpl.LocalFileManage;
 
 import org.apache.commons.lang3.StringUtils;
@@ -68,19 +68,22 @@ public class LayoutManageAction {
 	/**
 	 * 模板管理 添加布局界面显示
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=add",method=RequestMethod.GET)
 	public String addUI(ModelMap model,Layout layout,String dirName)throws Exception {
-		
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
+		Map<String,Object> returnValue = new HashMap<String,Object>();
 		//根据模板目录名称查询模板
 		if(dirName != null && !"".equals(dirName.trim())){
 			Templates templates = templateService.findTemplatebyDirName(dirName);
-			model.addAttribute("templates", templates);
+			returnValue.put("templates", templates);
 			
-			List<Layout> default_layoutList = templateManage.newLayout(dirName);
+			List<Layout> defaultLayoutList = templateManage.newLayout(dirName);
 			
 			List<Layout> layoutList = templateService.findLayout(dirName, 1);
 			if(layoutList != null && layoutList.size() >0){
-				Iterator<Layout> default_layoutIter = default_layoutList.iterator();  
+				Iterator<Layout> default_layoutIter = defaultLayoutList.iterator();  
 			    while (default_layoutIter.hasNext()) { 
 			    	Layout default_layout = default_layoutIter.next();  
 
@@ -92,15 +95,18 @@ public class LayoutManageAction {
 					}
 				}
 			}
-			
-			
-			model.addAttribute("default_layoutList", default_layoutList);
+			returnValue.put("defaultLayoutList", defaultLayoutList);
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
+
+		}else{
+			error.put("dirName", "目录名称不能为空");
 		}
-		return "jsp/template/add_layout";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	/**
 	 * 模板管理 添加布局
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=add", method=RequestMethod.POST)
 	public String add(ModelMap model,Layout formbean,BindingResult result,
 			HttpServletRequest request, HttpServletResponse response)
@@ -372,20 +378,12 @@ public class LayoutManageAction {
 				FileUtil.writeStringToFile(wap_path+ layout.getLayoutFile(),"<#-- "+layout.getName()+" 公共页(生成新引用页) -->","utf-8",false);
 		  		
 			}	
-		}else{
-			model.addAttribute("error",error);
-			model.addAttribute("layout",layout);
-			if(layout.getType().equals(1)){//1.默认页
-				model.addAttribute("default_layoutList",default_layoutList);
-			}
-			return "jsp/template/add_layout";
 		}
-		
-		
-		model.addAttribute("message","添加布局成功");//返回消息
-		model.addAttribute("urladdress",RedirectPath.readUrl("control.layout.list")+"?dirName="+formbean.getDirName());//返回消息//返回转向地址
-		return "jsp/common/message";
-		
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+		}
 	}
 	
 	/**
@@ -400,30 +398,38 @@ public class LayoutManageAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=editLayout", method=RequestMethod.GET)
 	public String editLayoutUI(ModelMap model,String layoutId,String dirName,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
+		Map<String,String> error = new HashMap<String,String>();
+		Map<String,Object> returnValue = new HashMap<String,Object>();
 		
 		//根据模板目录名称查询模板
 		if(dirName != null && !"".equals(dirName.trim())){
 			Templates templates = templateService.findTemplatebyDirName(dirName);
-			model.addAttribute("templates", templates);
+			returnValue.put("templates", templates);
 		}
 		
 		if(layoutId != null && !"".equals(layoutId.trim())){
 			Layout layout = templateService.findLayoutByLayoutId(layoutId);
 			if(layout != null){
 				
-				model.addAttribute("layout",layout);
+				returnValue.put("layout",layout);
 				
 			}else{
-				throw new SystemException("布局不存在！");
+				error.put("layoutId", "布局不存在");
 			}
 		}else{
-			throw new SystemException("参数不能为空！");
+			error.put("layoutId", "布局Id不能为空");
 		}
-		return "jsp/template/edit_layout";
+		
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
+		}
 	}
 	
 	/**
@@ -438,26 +444,19 @@ public class LayoutManageAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=editLayout", method=RequestMethod.POST)
 	public String editLayout(ModelMap model,String layoutId,Layout formbean,BindingResult result,
 			PageForm pageForm,String templeteName,String dirName,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
+		
+		Map<String,String> error = new HashMap<String,String>();
 		if(layoutId != null && !"".equals(layoutId.trim())){
 			Layout layout = templateService.findLayoutByLayoutId(layoutId);
 			if(layout != null){
-				
-				//根据模板目录名称查询模板
-				if(layout.getDirName() != null && !"".equals(layout.getDirName().trim())){
-					Templates templates = templateService.findTemplatebyDirName(layout.getDirName().trim());
-					model.addAttribute("templates", templates);
-				}
-				
-				
-				Map<String,String> error = new HashMap<String,String>();
-	
 				if(formbean.getName() == null || "".equals(formbean.getName().trim())){
-					error.put("name", "布局名称不能为空！");
+					error.put("name", "布局名称不能为空");
 				}
 				layout.setName(formbean.getName().trim());
 				
@@ -467,16 +466,16 @@ public class LayoutManageAction {
 					//取得模板文件名
 					if(formbean.getReferenceCode() != null && !"".equals(formbean.getReferenceCode().trim())){
 						if(formbean.getReferenceCode().trim().matches("/.+?")){
-							error.put("referenceCode", "不能以/开头！");
+							error.put("referenceCode", "不能以/开头");
 						}
 						if(formbean.getReferenceCode().trim().matches(".+?/")){
-							error.put("referenceCode", "不能以/结尾！");
+							error.put("referenceCode", "不能以/结尾");
 						}
 						if(formbean.getReferenceCode().trim().matches(".*/{2,}.*")){
-							error.put("referenceCode", "左斜杆不能连续出现！");
+							error.put("referenceCode", "左斜杆不能连续出现");
 						}
 						if(!formbean.getReferenceCode().trim().matches("[\\d\\w_/]+")){
-							error.put("referenceCode", "只能由数字、26个英文字母、下划线和或者左斜杆组成！");
+							error.put("referenceCode", "只能由数字、26个英文字母、下划线和或者左斜杆组成");
 						}
 						//?  匹配任何单字符
 						//*  匹配0或者任意数量的字符
@@ -497,7 +496,7 @@ public class LayoutManageAction {
 							List<Layout> _default_layoutList = templateManage.newLayout(formbean.getDirName());
 							for(Layout l : _default_layoutList){
 								if(l.getReferenceCode().equalsIgnoreCase(formbean.getReferenceCode().trim())){
-									error.put("referenceCode", "URL为默认页，不能使用！");
+									error.put("referenceCode", "URL为默认页，不能使用");
 									break;
 								}
 							}
@@ -513,11 +512,11 @@ public class LayoutManageAction {
 							}
 			
 							if(referenceCodeList.contains(formbean.getReferenceCode().trim().toLowerCase())){
-								error.put("referenceCode", "URL名称不能重复！");		
+								error.put("referenceCode", "URL名称不能重复");		
 							}
 						}				
 					}else{
-						error.put("referenceCode", "URL不能为空！");
+						error.put("referenceCode", "URL不能为空");
 					}
 					
 				}
@@ -533,21 +532,19 @@ public class LayoutManageAction {
 						column.setName(layout.getName());
 						List<Column> newColumnList = columnManage.updateColumn(column, layout.getDirName());
 					}
-				}else{
-					model.addAttribute("error",error);
-					model.addAttribute("layout",layout);
-					return "jsp/template/edit_layout";
 				}
 			}else{
-				throw new SystemException("布局不存在！");
+				error.put("layoutId", "布局不存在");
 			}
 		}else{
-			throw new SystemException("参数不能为空！");
+			error.put("layoutId", "布局Id不能为空");
 		}
 		
-		model.addAttribute("message","布局修改成功");//返回消息
-		model.addAttribute("urladdress",RedirectPath.readUrl("control.layout.list")+"?dirName="+dirName+"&page="+pageForm.getPage());//返回消息//返回转向地址
-		return "jsp/common/message";
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+		}
 	}
 	
 	
@@ -564,11 +561,13 @@ public class LayoutManageAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=deleteLayout", method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String deleteLayout(ModelMap model,String layoutId, String dirName,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
+		Map<String,String> error = new HashMap<String,String>();
+		
 		if(layoutId != null && !"".equals(layoutId.trim())){
 			Layout layout = templateService.findLayoutByLayoutId(layoutId);
 			if(layout != null){
@@ -625,10 +624,14 @@ public class LayoutManageAction {
 					List<Column> newColumnList = columnManage.deleteColumn(Integer.parseInt(columnId_str), dirName);
 				}
 				
-				return "1";
+				return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+			}else{
+				error.put("layoutId", "布局不存在");
 			}
+		}else{
+			error.put("layoutId", "布局Id不能为空");
 		}
-		return "0";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	
@@ -636,10 +639,10 @@ public class LayoutManageAction {
 	
 	
 	/**
-	 * Ajax校验URL名称
+	 * 校验URL名称
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=checkUrlName", method=RequestMethod.GET)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String checkUrlName(Layout formbean,String layoutId,
 				HttpServletRequest request, HttpServletResponse response)
 				throws Exception {
@@ -701,32 +704,36 @@ public class LayoutManageAction {
 		}
 		
 		if(error.size() >0){
-			for(Map.Entry<String, String> entry : error.entrySet()){ 
-				return entry.getValue();
-			} 
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 		}
-		return "";
 	}
 	/**
 	 * * AJAX读取'更多'
 	 * 返回JSON Map格式
 	 * @param dirName 目录名称
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=ajax_more", method=RequestMethod.GET)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String more(String dirName,String forumChildType,
 				HttpServletRequest request, HttpServletResponse response)
 				throws Exception {
-		
-		if(forumChildType != null && !"".equals(forumChildType) ){
-			String forumChildType_decode= java.net.URLDecoder.decode(forumChildType, "UTF-8"); 
-			//key:布局文件名称  value: 布局文件名称+布局名称
-			Map<String,String> more = layoutManage.queryMore(dirName, forumChildType_decode);
+		Map<String,String> error = new HashMap<String,String>();
+		if(dirName != null && !"".equals(dirName.trim())){
+			if(forumChildType != null && !"".equals(forumChildType) ){
+				String forumChildType_decode= java.net.URLDecoder.decode(forumChildType, "UTF-8"); 
+				//key:布局文件名称  value: 布局文件名称+布局名称
+				Map<String,String> more = layoutManage.queryMore(dirName, forumChildType_decode);
+				return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,more));
+			}
 			
-			return JsonUtils.toJSONString(more);
+		}else{
+			error.put("dirName", "目录名称不能为空");
 		}
+		
 
-		return "";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	/**
@@ -793,104 +800,118 @@ public class LayoutManageAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=editLayoutCode", method=RequestMethod.GET)
-	public String editLayoutCodeUI(String layoutId,String dirName,PageForm pageForm,
+	public String editLayoutCodeUI(String layoutId,String dirName,
 			ModelMap model,HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		
-		if(layoutId != null && !"".equals(layoutId.trim())){
-			Layout layout = templateService.findLayoutByLayoutId(layoutId);
-			if(layout != null){
-				String pc_path = "";
-				String wap_path = "";
-				if(layout.getType().equals(1)){//如果是默认页
-					pc_path = PathUtil.path()+File.separator+"WEB-INF"+File.separator+"templates"+File.separator+dirName+File.separator+"pc"+File.separator+layout.getLayoutFile();
-					wap_path = PathUtil.path()+File.separator+"WEB-INF"+File.separator+"templates"+File.separator+dirName+File.separator+"wap"+File.separator+layout.getLayoutFile();
+		Map<String,String> error = new HashMap<String,String>();
+		Map<String,Object> returnValue = new HashMap<String,Object>();
+		if(dirName != null && !"".equals(dirName.trim())){
+			Templates templates = templateService.findTemplatebyDirName(dirName);
+			returnValue.put("templates", templates);
+			
+			if(layoutId != null && !"".equals(layoutId.trim())){
+				Layout layout = templateService.findLayoutByLayoutId(layoutId);
+				if(layout != null){
+					String pc_path = "";
+					String wap_path = "";
+					if(layout.getType().equals(1)){//如果是默认页
+						pc_path = PathUtil.path()+File.separator+"WEB-INF"+File.separator+"templates"+File.separator+dirName+File.separator+"pc"+File.separator+layout.getLayoutFile();
+						wap_path = PathUtil.path()+File.separator+"WEB-INF"+File.separator+"templates"+File.separator+dirName+File.separator+"wap"+File.separator+layout.getLayoutFile();
+						
+					}else{
+						pc_path = PathUtil.path()+File.separator+"WEB-INF"+File.separator+"templates"+File.separator+dirName+File.separator+"pc"+File.separator+"public"+File.separator+layout.getLayoutFile();
+						wap_path = PathUtil.path()+File.separator+"WEB-INF"+File.separator+"templates"+File.separator+dirName+File.separator+"wap"+File.separator+"public"+File.separator+layout.getLayoutFile();
+						
+					}
+					StringBuffer pc_html = new StringBuffer();
+					StringBuffer wap_html = new StringBuffer();
+					File pc_f = new File(pc_path); 
+					if(pc_f.exists()){
+						//调用文件编码判断类
+						String coding = Coding.detection(pc_f);
+						InputStreamReader read = new InputStreamReader (new FileInputStream(pc_f),coding); 
+						BufferedReader br = new BufferedReader(read);
+						String row;
+						while((row = br.readLine())!=null){	
+							pc_html.append(row).append("\n");
+						}
+						returnValue.put("isPCHtmlExist", true);
+					}else{
+						returnValue.put("isPCHtmlExist", false);
+						
+					}	
 					
-				}else{
-					pc_path = PathUtil.path()+File.separator+"WEB-INF"+File.separator+"templates"+File.separator+dirName+File.separator+"pc"+File.separator+"public"+File.separator+layout.getLayoutFile();
-					wap_path = PathUtil.path()+File.separator+"WEB-INF"+File.separator+"templates"+File.separator+dirName+File.separator+"wap"+File.separator+"public"+File.separator+layout.getLayoutFile();
-					
-				}
-				StringBuffer pc_html = new StringBuffer();
-				StringBuffer wap_html = new StringBuffer();
-				File pc_f = new File(pc_path); 
-				if(pc_f.exists()){
-					//调用文件编码判断类
-					String coding = Coding.detection(pc_f);
-					InputStreamReader read = new InputStreamReader (new FileInputStream(pc_f),coding); 
-					BufferedReader br = new BufferedReader(read);
-					String row;
-					while((row = br.readLine())!=null){	
-						pc_html.append(row).append("\n");
+					File wap_f = new File(wap_path); 
+					if(wap_f.exists()){
+						//调用文件编码判断类
+						String coding = Coding.detection(wap_f);
+						InputStreamReader read = new InputStreamReader (new FileInputStream(wap_f),coding); 
+						BufferedReader br = new BufferedReader(read);
+						String row;
+						while((row = br.readLine())!=null){		
+							wap_html.append(row).append("\n");
+						}
+						returnValue.put("isWapHtmlExist", true);
+					}else{
+						returnValue.put("isWapHtmlExist", false);
 					}
 					
-				}else{
-					model.addAttribute("layout_error", "电脑版找不到指定的文件");
-				}	
-				
-				File wap_f = new File(wap_path); 
-				if(wap_f.exists()){
-					//调用文件编码判断类
-					String coding = Coding.detection(wap_f);
-					InputStreamReader read = new InputStreamReader (new FileInputStream(wap_f),coding); 
-					BufferedReader br = new BufferedReader(read);
-					String row;
-					while((row = br.readLine())!=null){		
-						wap_html.append(row).append("\n");
+					//最后一个左斜杆后的值 例:user/orderList 保留orderList   index返回空值
+					String lastValue = StringUtils.substringAfterLast(layout.getReferenceCode(), "/");//从右往左截取到相等的字符
+					if(lastValue == null || "".equals(lastValue.trim())){
+						lastValue = layout.getReferenceCode();
+					}
+					//默认页
+					if(layout.getType().equals(1)){
+						lastValue = StringUtils.substringBeforeLast(layout.getLayoutFile(), ".html");
 					}
 					
-				}else{
-					model.addAttribute("layout_error", "移动版找不到指定的文件");
-				}
-				
-				//最后一个左斜杆后的值 例:user/orderList 保留orderList   index返回空值
-				String lastValue = StringUtils.substringAfterLast(layout.getReferenceCode(), "/");//从右往左截取到相等的字符
-				if(lastValue == null || "".equals(lastValue.trim())){
-					lastValue = layout.getReferenceCode();
-				}
-				//默认页
-				if(layout.getType().equals(1)){
-					lastValue = StringUtils.substringBeforeLast(layout.getLayoutFile(), ".html");
-				}
-				
-				//默认更多  因为下一处理步骤会删除最后一个下划线之后的字符,所以本参数值加上一个下划线。如more_product改成more_product_
-				if("more".equals(layout.getReferenceCode())){
-					//从右往左截取到相等的字符
-					lastValue = StringUtils.substringBeforeLast(layout.getLayoutFile(), ".html");
+					//默认更多  因为下一处理步骤会删除最后一个下划线之后的字符,所以本参数值加上一个下划线。如more_product改成more_product_
+					if("more".equals(layout.getReferenceCode())){
+						//从右往左截取到相等的字符
+						lastValue = StringUtils.substringBeforeLast(layout.getLayoutFile(), ".html");
+						
+						lastValue +="_";
+					}
+					//布局更多
+					if(layout.getType().equals(3)){
+						//从右往左截取到相等的字符
+						lastValue = StringUtils.substringBeforeLast(layout.getLayoutFile(), ".html");
+					}
 					
-					lastValue +="_";
+					
+					
+					//显示示例程序
+					String example = templateManage.readExample(lastValue);
+					
+					//显示公共API
+					String common = templateManage.readExample("common");
+					
+					
+					returnValue.put("example", example);
+					returnValue.put("common", common);
+					returnValue.put("layout", layout);
+					returnValue.put("pc_html", pc_html.toString());
+					returnValue.put("wap_html", wap_html.toString());
+					
+				}else{
+					error.put("layoutId", "布局不存在");
 				}
-				//布局更多
-				if(layout.getType().equals(3)){
-					//从右往左截取到相等的字符
-					lastValue = StringUtils.substringBeforeLast(layout.getLayoutFile(), ".html");
-				}
-				
-				
-				
-				//显示示例程序
-				String example = templateManage.readExample(lastValue);
-				
-				//显示公共API
-				String common = templateManage.readExample("common");
-				
-				//根据模板目录名称查询模板
-				if(dirName != null && !"".equals(dirName.trim())){
-					Templates templates = templateService.findTemplatebyDirName(dirName);
-					model.addAttribute("templates", templates);
-				}
-				model.addAttribute("example", example);
-				model.addAttribute("common", common);
-				model.addAttribute("layout", layout);
-				model.addAttribute("pc_html", pc_html.toString());
-				model.addAttribute("wap_html", wap_html.toString());
-				
+			}else{
+				error.put("layoutId", "布局Id不能为空");
 			}
+		}else{
+			error.put("dirName", "目录名称不能为空");
 		}
 		
-
-		return "jsp/template/edit_layoutCode";
+		
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
+		}
 	}
 	
 	/**
@@ -906,10 +927,13 @@ public class LayoutManageAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=editLayoutCode", method=RequestMethod.POST)
-	public String editLayoutCode(ModelMap model,String pc_code,String wap_code,String layoutId, PageForm pageForm,String dirName,
+	public String editLayoutCode(ModelMap model,String pc_code,String wap_code,String layoutId, String dirName,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
+		Map<String,String> error = new HashMap<String,String>();
+		
 		if(layoutId != null && !"".equals(layoutId.trim())){
 			Layout layout = templateService.findLayoutByLayoutId(layoutId);
 			if(layout != null){
@@ -928,10 +952,10 @@ public class LayoutManageAction {
 				
 				FileUtil.writeStringToFile(wap_path,wap_code,"utf-8", false);
 			}else{
-				throw new SystemException("布局不存在！");
+				error.put("layoutId", "布局Id不能为空");
 			}
 		}else{
-			throw new SystemException("参数不能为空！");
+			error.put("dirName", "目录名称不能为空");
 		}
 		
 		//在Chrome浏览器下和home.html页的下面两行js代码有冲突，会报错误manage.htm?method=editLayoutCode&layoutId=440b1b2f202d4de38f450226083ca174&dirName=default&page=:31 The XSS Auditor refused to execute a script in 'http://bbs.diyhi.com/control/layout/manage.htm?method=editLayoutCode&layoutId=440b1b2f202d4de38f450226083ca174&dirName=default&page=' because its source code was found within the request. The auditor was enabled as the server did not send an 'X-XSS-Protection' header.
@@ -940,9 +964,10 @@ public class LayoutManageAction {
 		//解决办法是设置Header头文件为X-XSS-Protection:0
 		//	response.addHeader("X-XSS-Protection", "0");
 		
-		
-		model.addAttribute("message","布局代码编辑成功");//返回消息
-		model.addAttribute("urladdress",RedirectPath.readUrl("control.layout.list")+"?&dirName="+dirName+"&page="+pageForm.getPage());//返回消息//返回转向地址
-		return "jsp/common/message";
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+		}
 	}
 }

@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import cms.bean.RequestResult;
+import cms.bean.ResultCode;
 import cms.bean.FilterWord.FilterWord;
 import cms.utils.FileSize;
 import cms.utils.FileUtil;
@@ -40,6 +42,7 @@ public class FilterWordManageAction {
 	/**
 	 * 过滤词展示
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=view",method=RequestMethod.GET)
 	public String view(ModelMap model,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -47,11 +50,11 @@ public class FilterWordManageAction {
 		String path = PathUtil.path()+File.separator+"WEB-INF"+File.separator+"data"+File.separator+"filterWord"+File.separator;
 		File file = new File(path+"word.txt");
 		
-		FilterWord filterWord = new FilterWord();
+		FilterWord filterWord = null;
 		
 		
 		if(file.exists()){
-			
+			filterWord = new FilterWord();
 			List<String> wordList = FileUtil.readLines(file,"utf-8");
 			if(wordList != null){
 				filterWord.setWordNumber(wordList.size());
@@ -65,28 +68,26 @@ public class FilterWordManageAction {
 			
 			filterWord.setSize(FileSize.conversion(file.length()));
 			filterWord.setLastModified(new Date(file.lastModified()));
-			model.addAttribute("filterWord", filterWord);
 		}
 		
 		
 		
-		return "jsp/setting/view_filterWord";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,filterWord));
 	}
 	
 	
 	/**
 	 * 上传词库
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=uploadFilterWord",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String uploadFilterWord(ModelMap model,
 			MultipartHttpServletRequest request) throws Exception {
-		Map<String,Object> returnJson = new HashMap<String,Object>();
 		Map<String,String> error = new HashMap<String,String>();
 
 		FileOutputStream fileoutstream = null;
 		try {
-			//获得文件： 
+			//获得文件
 			MultipartFile file = request.getFile("file");
 			if(file != null && !file.isEmpty()){
 				//验证文件后缀
@@ -121,31 +122,29 @@ public class FilterWordManageAction {
 		}
 		
 		if(error.size() >0){
-			//上传失败
-			returnJson.put("error", error);
-			returnJson.put("success", false);
-		}else{
-			returnJson.put("success", true);
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 		}
 		
-		return JsonUtils.toJSONString(returnJson);
-		
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 	
 	}
 	
 	/**
 	 * 删除词库
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=deleteFilterWord",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String deleteFilterWord(ModelMap model,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		Map<String,String> error = new HashMap<String,String>();
 		Boolean state = localFileManage.deleteFile("WEB-INF"+File.separator+"data"+File.separator+"filterWord"+File.separator+"word.txt");
 		if(state != null && state == true){
-			return "1";
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+		}else{
+			error.put("filterWord", "删除失败");
 		}
 		
-		return "0";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	

@@ -9,13 +9,17 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import cms.bean.PageForm;
 import cms.bean.PageView;
 import cms.bean.QueryResult;
+import cms.bean.RequestResult;
+import cms.bean.ResultCode;
 import cms.bean.thirdParty.ThirdPartyLoginInterface;
 import cms.service.setting.SettingService;
 import cms.service.thirdParty.ThirdPartyLoginService;
+import cms.utils.JsonUtils;
 
 /**
  * 第三方登录接口管理显示
@@ -26,6 +30,7 @@ public class ThirdPartyLoginInterfaceAction {
 	@Resource SettingService settingService;
 	@Resource ThirdPartyLoginService thirdPartyLoginService;
 
+	@ResponseBody
 	@RequestMapping("/control/thirdPartyLoginInterface/list")  
 	public String execute(ModelMap model, PageForm pageForm,
 			HttpServletRequest request, HttpServletResponse response)
@@ -41,8 +46,6 @@ public class ThirdPartyLoginInterfaceAction {
 		QueryResult<ThirdPartyLoginInterface> qr = thirdPartyLoginService.getScrollData(ThirdPartyLoginInterface.class,firstindex, pageView.getMaxresult(),orderby);
 		//将查询结果集传给分页List
 		pageView.setQueryResult(qr);
-		request.setAttribute("pageView", pageView);
-
-		return "jsp/thirdParty/thirdPartyLoginInterfaceList";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,pageView));
 	}
 }

@@ -35,6 +35,8 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
+import cms.bean.RequestResult;
+import cms.bean.ResultCode;
 import cms.bean.upgrade.UpgradeLog;
 import cms.bean.upgrade.UpgradePackage;
 import cms.bean.upgrade.UpgradeSystem;
@@ -73,12 +75,13 @@ public class UpgradeManageAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=upgradeSystemList",method=RequestMethod.GET)
 	public String upgradeSystemList(ModelMap model,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
-
+		Map<String,Object> returnValue = new HashMap<String,Object>();
 		
-		//读取当前商城版本
+		//读取当前系统版本
 		String currentVersion = FileUtil.readFileToString("WEB-INF"+File.separator+"data"+File.separator+"systemVersion.txt","utf-8");
 
 		List<UpgradeSystem> upgradeSystemList = upgradeService.findAllUpgradeSystem();
@@ -186,35 +189,41 @@ public class UpgradeManageAction {
 		        }
 			}
 		}
-
-		model.addAttribute("currentVersion", currentVersion);
-		model.addAttribute("notCompletedUpgrade", notCompletedUpgrade);
-		model.addAttribute("upgradeSystemList", upgradeSystemList);
-		return "jsp/upgrade/upgradeSystemList";
+		
+		returnValue.put("currentVersion", currentVersion);
+		returnValue.put("notCompletedUpgrade", notCompletedUpgrade);
+		returnValue.put("upgradeSystemList", upgradeSystemList);
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
 	}
 	
 	/**
 	 * 根据Id查询升级
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=queryUpgrade",method=RequestMethod.GET)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String queryUpgrade(ModelMap model,String upgradeSystemId,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
-	
-		UpgradeSystem upgradeSystem = upgradeService.findUpgradeSystemById(upgradeSystemId);
-		if(upgradeSystem != null){
-			//删除最后一个逗号
-			String _upgradeLog = StringUtils.substringBeforeLast(upgradeSystem.getUpgradeLog(), ",");//从右往左截取到相等的字符,保留左边的
-
-			List<UpgradeLog> upgradeLogList = JsonUtils.toGenericObject(_upgradeLog+"]", new TypeReference< List<UpgradeLog> >(){});
-			upgradeSystem.setUpgradeLogList(upgradeLogList);
-		
+		//错误
+		Map<String,Object> error = new HashMap<String,Object>();
+		if(upgradeSystemId != null && !"".equals(upgradeSystemId.trim())){
+			UpgradeSystem upgradeSystem = upgradeService.findUpgradeSystemById(upgradeSystemId);
 			if(upgradeSystem != null){
-				return JsonUtils.toJSONString(upgradeSystem);
+				//删除最后一个逗号
+				String _upgradeLog = StringUtils.substringBeforeLast(upgradeSystem.getUpgradeLog(), ",");//从右往左截取到相等的字符,保留左边的
+
+				List<UpgradeLog> upgradeLogList = JsonUtils.toGenericObject(_upgradeLog+"]", new TypeReference< List<UpgradeLog> >(){});
+				upgradeSystem.setUpgradeLogList(upgradeLogList);
+			
+				return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,upgradeSystem));
+			}else{
+				error.put("upgradeSystemId", "系统升级不存在");
 			}
+		}else{
+			error.put("upgradeSystemId", "系统升级Id不能为空");
 		}
 		
-		return "";
+		
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 		
 	}
 	
@@ -227,12 +236,11 @@ public class UpgradeManageAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=upgradeNow",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String upgradeNow(ModelMap model,String updatePackageName,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-		Map<String,Object> returnValue = new HashMap<String,Object>();
 		Map<String,String> error = new HashMap<String,String>();
 		
 		Long count = upgradeManage.taskRunMark_add(-1L);
@@ -383,7 +391,6 @@ public class UpgradeManageAction {
 							if(error.size()==0){
 								try {
 									upgradeService.save(upgradeSystem);
-									returnValue.put("upgradeId", newSystemVersion);
 								} catch (Exception e) {
 									error.put("upgradeNow", "升级错误");
 									//e.printStackTrace();
@@ -411,18 +418,14 @@ public class UpgradeManageAction {
 			}
 			
 		}
-
-		if(error.size() >0){
-			//失败
-			returnValue.put("error", error);
-			returnValue.put("success", false);
-		}else{
-			returnValue.put("success", true);
-		}
-		
 		upgradeManage.taskRunMark_delete();
 		
-		return JsonUtils.toJSONString(returnValue);
+		
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+		}
 	}
 	
 	/**
@@ -434,11 +437,10 @@ public class UpgradeManageAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=continueUpgrade",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String continueUpgrade(ModelMap model,String upgradeId,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
-		Map<String,Object> returnValue = new HashMap<String,Object>();
 		Map<String,String> error = new HashMap<String,String>();
 		
 		
@@ -596,13 +598,10 @@ public class UpgradeManageAction {
 		}
 
 		if(error.size() >0){
-			//失败
-			returnValue.put("error", error);
-			returnValue.put("success", false);
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 		}else{
-			returnValue.put("success", true);
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 		}
-		return JsonUtils.toJSONString(returnValue);
 	}
 	
 	
@@ -610,8 +609,8 @@ public class UpgradeManageAction {
 	/**
 	 * 查询升级包列表
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=queryUpgradePackageList",method=RequestMethod.GET)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String queryUpgradePackageList(ModelMap model,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
@@ -642,17 +641,16 @@ public class UpgradeManageAction {
 	        }
 		}
 		
-		return JsonUtils.toJSONString(upgradePackageList);
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,upgradePackageList));
 	}
 	
 	/**
-	 * 上传升级包列表
+	 * 上传升级包
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=uploadUpgradePackage",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String uploadUpgradePackage(ModelMap model,
 			MultipartHttpServletRequest request) throws Exception {
-		Map<String,Object> returnJson = new HashMap<String,Object>();
 		Map<String,String> error = new HashMap<String,String>();
 
 		FileOutputStream fileoutstream = null;
@@ -696,32 +694,32 @@ public class UpgradeManageAction {
 		}
 		
 		if(error.size() >0){
-			//上传失败
-			returnJson.put("error", error);
-			returnJson.put("success", false);
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 		}else{
-			returnJson.put("success", true);
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 		}
-		
-		return JsonUtils.toJSONString(returnJson);
-		
-	
 	}
 	
 	/**
-	 * 删除升级包列表
+	 * 删除升级包
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=deleteUpgradePackage",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String deleteUpgradePackage(ModelMap model,String fileName,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		//错误
+		Map<String,Object> error = new HashMap<String,Object>();
 		if(fileName != null && !"".equals(fileName.trim())){
 			
 			Boolean state = localFileManage.deleteFile("WEB-INF"+File.separator+"data"+File.separator+"upgrade"+File.separator+FileUtil.toRelativePath(fileName.trim()));
 			if(state != null && state == true){
-				return "1";
+				return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+			}else{
+				error.put("fileName", "删除升级包失败");
 			}
+		}else{
+			error.put("fileName", "文件名称不能为空");
 		}
-		return "0";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 }

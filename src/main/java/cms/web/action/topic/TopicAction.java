@@ -18,25 +18,30 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
-
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import cms.bean.PageForm;
 import cms.bean.PageView;
 import cms.bean.QueryResult;
-import cms.bean.favorite.Favorites;
+import cms.bean.RequestResult;
+import cms.bean.ResultCode;
 import cms.bean.topic.Comment;
 import cms.bean.topic.Reply;
 import cms.bean.topic.Tag;
 import cms.bean.topic.Topic;
 import cms.bean.topic.TopicUnhide;
+import cms.bean.user.User;
 import cms.service.setting.SettingService;
 import cms.service.topic.CommentService;
 import cms.service.topic.TagService;
 import cms.service.topic.TopicService;
 import cms.utils.HtmlEscape;
+import cms.utils.JsonUtils;
 import cms.utils.Verification;
 import cms.web.action.TextFilterManage;
+import cms.web.action.fileSystem.FileManage;
 import cms.web.action.lucene.TopicLuceneManage;
+import cms.web.action.user.UserManage;
 
 /**
  * 话题
@@ -50,7 +55,11 @@ public class TopicAction {
 	@Resource TagService tagService;
 	@Resource TopicLuceneManage topicLuceneManage;
 	@Resource TextFilterManage textFilterManage;
+	@Resource FileManage fileManage;
+	@Resource UserManage userManage;
+	@Resource TopicManage topicManage;
 	
+	@ResponseBody
 	@RequestMapping("/control/topic/list") 
 	public String execute(PageForm pageForm,ModelMap model,Boolean visible,
 			HttpServletRequest request, HttpServletResponse response)
@@ -94,14 +103,26 @@ public class TopicAction {
 				}
 			}
 			
+			
+			for(Topic topic : qr.getResultlist()){
+			//	User user = userService.findUserByUserName(topic.getUserName());
+				User user = userManage.query_cache_findUserByUserName(topic.getUserName());
+				if(user != null){
+					topic.setNickname(user.getNickname());
+					if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
+						topic.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+						topic.setAvatarName(user.getAvatarName());
+					}		
+				}
+			}
+			
+			
 		}
 
 		pageView.setQueryResult(qr);
 		
 		
-		model.addAttribute("pageView", pageView);
-
-		return "jsp/topic/topicList";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,pageView));
 	}
 	
 	/**
@@ -120,6 +141,7 @@ public class TopicAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping("/control/topic/search") 
 	public String search(ModelMap model,PageForm pageForm,
 			Integer dataSource,String keyword,String tagId,String tagName,String userName,
@@ -196,6 +218,7 @@ public class TopicAction {
 		
 		//调用分页算法代码
 		PageView<Topic> pageView = new PageView<Topic>(settingService.findSystemSetting_cache().getBackstagePageNumber(),pageForm.getPage(),10);
+		
 		//当前页
 		int firstindex = (pageForm.getPage()-1)*pageView.getMaxresult();
 	
@@ -217,6 +240,15 @@ public class TopicAction {
 								if(pi.getId().equals(old_t.getId())){
 									pi.setTitle(old_t.getTitle());
 									pi.setContent(old_t.getContent());
+									
+									User user = userManage.query_cache_findUserByUserName(pi.getUserName());
+									if(user != null){
+										pi.setNickname(user.getNickname());
+										if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
+											pi.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+											pi.setAvatarName(user.getAvatarName());
+										}		
+									}
 									new_topicList.add(pi);
 									break;
 								}
@@ -236,11 +268,11 @@ public class TopicAction {
 			List<Object> paramValue = new ArrayList<Object>();//sql参数值
 			
 			if(_keyword != null){//标题
-				param += " and o.title like ?"+(paramValue.size()+1)+" escape '/' ";
+				param += " and (o.title like ?"+(paramValue.size()+1)+" escape '/' ";
 				paramValue.add("%/"+ _keyword+"%");	
 				
 				//内容
-				param += " or o.content like ?"+(paramValue.size()+1)+" escape '/' ";
+				param += " or o.content like ?"+(paramValue.size()+1)+" escape '/' )";
 				paramValue.add("%/"+ _keyword+"%");	
 			}
 			if(_tagId != null && _tagId >0){//标签
@@ -262,6 +294,8 @@ public class TopicAction {
 			}
 			//删除第一个and
 			param = StringUtils.difference(" and", param);
+			
+			
 			//排序
 			LinkedHashMap<String,String> orderby = new LinkedHashMap<String,String>();
 			orderby.put("id", "desc");//排序
@@ -280,12 +314,22 @@ public class TopicAction {
 							t.setContent(t.getContent().substring(0, 190));
 						}
 					}
+					
+					User user = userManage.query_cache_findUserByUserName(t.getUserName());
+					if(user != null){
+						t.setNickname(user.getNickname());
+						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
+							t.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+							t.setAvatarName(user.getAvatarName());
+						}		
+					}
 				}
 			}
 			
 			//将查询结果集传给分页List
 			pageView.setQueryResult(qr);
 		}
+
 		
 		
 		if(pageView.getRecords() != null && pageView.getRecords().size() >0){
@@ -302,23 +346,14 @@ public class TopicAction {
 					
 				}
 			}
+			
 		}
 		
-		
-		
-		model.addAttribute("dataSource", dataSource);
-		
-		model.addAttribute("pageView", pageView);
-		model.addAttribute("error", error);
-	
-		model.addAttribute("keyword", keyword);
-		model.addAttribute("tagId", tagId);
-		model.addAttribute("tagName", tagName);
-		model.addAttribute("userName", userName);//用户名称
-		
-		model.addAttribute("start_postTime", start_postTime);
-		model.addAttribute("end_postTime", end_postTime);
-		return "jsp/topic/topicSearchList";
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,pageView));
+		}
 	}
 	
 	/**
@@ -330,6 +365,7 @@ public class TopicAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping("/control/topic/allAuditTopic") 
 	public String allAuditTopic(PageForm pageForm,ModelMap model,
 			HttpServletRequest request, HttpServletResponse response)
@@ -368,15 +404,23 @@ public class TopicAction {
 					
 				}
 			}
-			
+			for(Topic topic : qr.getResultlist()){
+				User user = userManage.query_cache_findUserByUserName(topic.getUserName());
+				if(user != null){
+					topic.setNickname(user.getNickname());
+					if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
+						topic.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+						topic.setAvatarName(user.getAvatarName());
+					}		
+				}
+			}
 		}
 
 		pageView.setQueryResult(qr);
 		
 		
-		model.addAttribute("pageView", pageView);
-
-		return "jsp/topic/allAuditTopicList";
+		
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,pageView));
 	}
 	
 	/**
@@ -388,6 +432,7 @@ public class TopicAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping("/control/topic/allAuditComment") 
 	public String allAuditComment(PageForm pageForm,ModelMap model,
 			HttpServletRequest request, HttpServletResponse response)
@@ -424,6 +469,15 @@ public class TopicAction {
 			List<Topic> topicList = topicService.findTitleByIdList(topicIdList);
 			if(topicList != null && topicList.size() >0){
 				for(Comment o :qr.getResultlist()){
+					User user = userManage.query_cache_findUserByUserName(o.getUserName());
+					if(user != null){
+						o.setNickname(user.getNickname());
+						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
+							o.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+							o.setAvatarName(user.getAvatarName());
+						}		
+					}
+					
 					for(Topic topic : topicList){
 						if(topic.getId().equals(o.getTopicId())){
 							o.setTopicTitle(topic.getTitle());
@@ -439,9 +493,7 @@ public class TopicAction {
 		pageView.setQueryResult(qr);
 		
 		
-		model.addAttribute("pageView", pageView);
-
-		return "jsp/topic/allAuditCommentList";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,pageView));
 	}
 	
 	/**
@@ -453,6 +505,7 @@ public class TopicAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping("/control/topic/allAuditReply") 
 	public String allAuditReply(PageForm pageForm,ModelMap model,
 			HttpServletRequest request, HttpServletResponse response)
@@ -486,6 +539,19 @@ public class TopicAction {
     			if(!topicIdList.contains(o.getTopicId())){
     				topicIdList.add(o.getTopicId());
     			}
+    			
+    			
+    			
+				User user = userManage.query_cache_findUserByUserName(o.getUserName());
+				if(user != null){
+					o.setNickname(user.getNickname());
+					if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
+						o.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+						o.setAvatarName(user.getAvatarName());
+					}		
+				}
+    			
+    			
     		}
 			List<Topic> topicList = topicService.findTitleByIdList(topicIdList);
 			if(topicList != null && topicList.size() >0){
@@ -505,9 +571,7 @@ public class TopicAction {
 		pageView.setQueryResult(qr);
 		
 		
-		model.addAttribute("pageView", pageView);
-
-		return "jsp/topic/allAuditReplyList";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,pageView));
 	}
 	
 	
@@ -521,24 +585,56 @@ public class TopicAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping("/control/topic/topicUnhideList") 
 	public String dynamicImageFavoriteList(ModelMap model,PageForm pageForm,Long topicId,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
+		Map<String,Object> returnValue = new HashMap<String,Object>();
+		
+		
 		if(topicId != null && topicId >0L){
 			
 			//调用分页算法代码
-			PageView<Favorites> pageView = new PageView<Favorites>(settingService.findSystemSetting_cache().getBackstagePageNumber(),pageForm.getPage(),10,request.getRequestURI(),request.getQueryString());
+			PageView<TopicUnhide> pageView = new PageView<TopicUnhide>(settingService.findSystemSetting_cache().getBackstagePageNumber(),pageForm.getPage(),10,request.getRequestURI(),request.getQueryString());
 			//当前页
 			int firstIndex = (pageForm.getPage()-1)*pageView.getMaxresult();
 			
 			QueryResult<TopicUnhide> qr = topicService.findTopicUnhidePageByTopicId(firstIndex,pageView.getMaxresult(),topicId);
+			if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
+				for(TopicUnhide o :qr.getResultlist()){
 
+					User user = userManage.query_cache_findUserByUserName(o.getUserName());
+					if(user != null){
+						o.setNickname(user.getNickname());
+						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
+							o.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+							o.setAvatarName(user.getAvatarName());
+						}		
+					}
+	    			
+	    			
+	    		}
+				
+			}
 			//将查询结果集传给分页List
 			pageView.setQueryResult(qr);
-			model.addAttribute("pageView", pageView);
+			if(topicId != null){
+				Topic topic = topicManage.queryTopicCache(topicId);
+				if(topic != null){
+					returnValue.put("currentTopic", topic);
+				}
+			}
+			returnValue.put("pageView", pageView);
+		}else{
+			error.put("topicId", " 话题Id不能为空");
 		}
-		return "jsp/topic/topicUnhideList";
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
+		}
 	}
 }

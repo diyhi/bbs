@@ -351,9 +351,11 @@ public class SystemNotifyServiceBean extends DaoSupport<SystemNotify> implements
 		Query query  = null;
 		
 		if(tableNumber == 0){//默认对象
-			query = em.createQuery("select o.systemNotifyId from SubscriptionSystemNotify o where o.userId=?1 and o.status =?2 ORDER BY o.systemNotifyId desc");
+			query = em.createQuery("select o.systemNotifyId from SubscriptionSystemNotify o where o.userId=?1 and o.status >=?2 and o.status <=?3 and o.status !=?4 ORDER BY o.systemNotifyId desc");
 			query.setParameter(1, userId);
 			query.setParameter(2, 20);
+			query.setParameter(3, 120);
+			query.setParameter(4, 110);
 			//索引开始,即从哪条记录开始
 			query.setFirstResult(0);
 			//获取多少条数据
@@ -370,9 +372,11 @@ public class SystemNotifyServiceBean extends DaoSupport<SystemNotify> implements
 			}
 			
 		}else{//带下划线对象
-			query = em.createQuery("select o.systemNotifyId from SubscriptionSystemNotify_"+tableNumber+" o where o.userId=?1 and o.status =?2 ORDER BY o.systemNotifyId desc");
+			query = em.createQuery("select o.systemNotifyId from SubscriptionSystemNotify_"+tableNumber+" o where o.userId=?1 and o.status >=?2 and o.status <=?3 and o.status !=?4 ORDER BY o.systemNotifyId desc");
 			query.setParameter(1, userId);
 			query.setParameter(2, 20);
+			query.setParameter(3, 120);
+			query.setParameter(4, 110);
 			//索引开始,即从哪条记录开始
 			query.setFirstResult(0);
 			//获取多少条数据

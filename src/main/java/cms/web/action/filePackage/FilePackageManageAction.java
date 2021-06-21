@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListSet;
@@ -23,7 +22,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-
+import cms.bean.RequestResult;
+import cms.bean.ResultCode;
 import cms.bean.filePackage.FileResource;
 import cms.utils.FileUtil;
 import cms.utils.JsonUtils;
@@ -51,6 +51,7 @@ public class FilePackageManageAction {
 	 * @return
 	 * @throws Exception
 	*/
+	@ResponseBody
 	@RequestMapping(params="method=download", method=RequestMethod.GET)
 	public ResponseEntity<byte[]> download(ModelMap model,String fileName,
 			HttpServletRequest request, HttpServletResponse response)
@@ -81,30 +82,34 @@ public class FilePackageManageAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=delete", method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String deleteExport(ModelMap model,String fileName,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
+		Map<String,Object> error = new HashMap<String,Object>();
 		if(fileName != null && !"".equals(fileName.trim())){
 			//替换路径中的..号
 			fileName = FileUtil.toRelativePath(fileName);
 			//模板文件路径
 			String filePath = "WEB-INF"+File.separator+"data"+ File.separator+"filePackage"+ File.separator+fileName;
 			localFileManage.deleteFile(filePath);
-			return "1";
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+		}else{
+			error.put("fileName", "文件名称不能为空");
 		}
-		return "0";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	/**
 	 * 打包界面
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=package",method=RequestMethod.GET)
 	public String packageUI(ModelMap model,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		return "jsp/filePackage/package";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 	}
 	
 	/**
@@ -116,12 +121,11 @@ public class FilePackageManageAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=package",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String packages(ModelMap model,String[] idGroup,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
 		Map<String,String> error = new HashMap<String,String>();//错误
 		
 		//要压缩的目录或文件
@@ -161,17 +165,17 @@ public class FilePackageManageAction {
 		}else{
 			error.put("package", "未选择目录或文件");
 		}
-		
-		//打包
-		filePackageManage.filePack(compressList);
-
-		if(error != null && error.size() >0){
-			returnValue.put("success", "false");
-			returnValue.put("error", error);
-		}else{
-			returnValue.put("success", "true");
+		if(error.size() ==0){
+			//打包
+			filePackageManage.filePack(compressList);
 		}
-		return JsonUtils.toJSONString(returnValue);
+		
+
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+		}
 	}
 	
 	
@@ -202,8 +206,8 @@ public class FilePackageManageAction {
 	 * @param model
 	 * @return
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=querySubdirectory",method=RequestMethod.GET)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String querySubdirectory(String parentId,ModelMap model,
 			HttpServletRequest request){
 		List<FileResource> fileResourceList = new ArrayList<FileResource>();
@@ -269,10 +273,12 @@ public class FilePackageManageAction {
 			
 		}
 		
+		/**
+		List<Map<String,Object>> parameterList = new ArrayList<Map<String,Object>>();
 		//组装参数
 		if(fileResourceList != null && fileResourceList.size() >0){
 			
-			List<Map<String,Object>> parameterList = new ArrayList<Map<String,Object>>();
+			
 			for(FileResource fileResource : fileResourceList){
 				Map<String,Object> parameter = new LinkedHashMap<String,Object>();
 				
@@ -282,9 +288,8 @@ public class FilePackageManageAction {
 				parameter.put("isParent", fileResource.isLeaf() == true ? false : true);//是否为父节点
 				parameterList.add(parameter);
 			}
-			return JsonUtils.toJSONString(parameterList);
 		}
-		
-		return "[]";	
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,parameterList));	**/
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,fileResourceList));
 	}
 }

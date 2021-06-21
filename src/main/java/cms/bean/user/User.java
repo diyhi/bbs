@@ -92,7 +92,7 @@ public class User implements Serializable{
 	@Column(length=90)
 	private String platformUserId;
 	
-	/** 用户状态    1:正常用户   2:禁止用户   11: 正常用户删除   12: 禁止用户删除 **/
+	/** 用户状态    1:启用   2:停用   11: 启用时删除   12: 停用时删除 **/
 	private Integer state = 1;
 	/** 用户版本号 **/
 	private Integer userVersion = 0;

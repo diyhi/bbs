@@ -79,11 +79,12 @@ public class UserRoleServiceBean extends DaoSupport<UserRole> implements
 	 */
 	@CacheEvict(value="userRoleServiceBean_cache",allEntries=true)
 	public Integer updateUserRole(UserRole userRole){
-		Query query = em.createQuery("update UserRole o set o.name=?1, o.remark=?2,o.userResourceFormat=?3 where o.id=?4")
+		Query query = em.createQuery("update UserRole o set o.name=?1,o.sort=?2, o.remark=?3,o.userResourceFormat=?4 where o.id=?5")
 			.setParameter(1, userRole.getName())
-			.setParameter(2, userRole.getRemark())
-			.setParameter(3, userRole.getUserResourceFormat())
-			.setParameter(4, userRole.getId());
+			.setParameter(2, userRole.getSort())
+			.setParameter(3, userRole.getRemark())
+			.setParameter(4, userRole.getUserResourceFormat())
+			.setParameter(5, userRole.getId());
 		int i = query.executeUpdate();
 		return i;
 				
@@ -103,20 +104,25 @@ public class UserRoleServiceBean extends DaoSupport<UserRole> implements
 	/**
 	 * 设置为默认角色
 	 * @param userRoleId 用户角色Id
+	 * @param defaultRole 是否设置为默认角色
 	 */
 	@CacheEvict(value="userRoleServiceBean_cache",allEntries=true)
-	public Integer setAsDefaultRole(String userRoleId){
+	public Integer setAsDefaultRole(String userRoleId,Boolean defaultRole){
+		int i = 0;
 		Query query = em.createQuery("update UserRole o set o.defaultRole=?1 ");
 		//给SQL语句设置参数
 		query.setParameter(1, false);
-		query.executeUpdate();
+		i = query.executeUpdate();
 		
-		
-		query = em.createQuery("update UserRole o set o.defaultRole=?1 where o.id=?2");
-		//给SQL语句设置参数
-		query.setParameter(1, true);
-		query.setParameter(2, userRoleId);
-		return query.executeUpdate();
+		if(defaultRole != null && defaultRole){//设置默认角色
+			query = em.createQuery("update UserRole o set o.defaultRole=?1 where o.id=?2");
+			//给SQL语句设置参数
+			query.setParameter(1, true);
+			query.setParameter(2, userRoleId);
+			i += query.executeUpdate();
+			
+		}
+		return i;
 	}
 	
 	/**---------------------------------------------------- 角色组 -----------------------------------------------------**/

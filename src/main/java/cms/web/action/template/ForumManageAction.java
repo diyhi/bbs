@@ -13,9 +13,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.validation.Validator;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -26,7 +28,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
-import cms.bean.PageForm;
+import cms.bean.RequestResult;
+import cms.bean.ResultCode;
 import cms.bean.forumCode.ForumCodeNode;
 import cms.bean.help.Help;
 import cms.bean.help.HelpType;
@@ -56,10 +59,8 @@ import cms.utils.CommentedProperties;
 import cms.utils.FileType;
 import cms.utils.FileUtil;
 import cms.utils.JsonUtils;
-import cms.utils.RedirectPath;
 import cms.utils.UUIDUtil;
 import cms.utils.Verification;
-import cms.web.action.SystemException;
 import cms.web.action.TextFilterManage;
 import cms.web.action.fileSystem.localImpl.LocalFileManage;
 import cms.web.action.forumCode.ForumCodeManage;
@@ -86,7 +87,7 @@ public class ForumManageAction{
 	@Resource TextFilterManage textFilterManage;
 	@Resource(name = "forumValidator") 
 	private Validator validator; 
-	
+	@Resource MessageSource messageSource;
 
 	
 	/**
@@ -94,39 +95,64 @@ public class ForumManageAction{
 	 * @param dirName 目录名称
 	 * @param childNodeName 版块类型子节点名称
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=forumTemplateFileNameUI", method=RequestMethod.GET)
 	public String forumTemplateFileNameUI(String dirName, String childNodeName,ModelMap model,
 			HttpServletRequest request) throws Exception {
-		List<ForumCodeNode> forumCodeNodeList = forumCodeManage.getForumCodeNode(dirName,childNodeName);
 		
-		model.addAttribute("forumCodeNodeList",forumCodeNodeList);
-
-		return "jsp/template/forumTemplateFileName";
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
 		
+		//根据模板目录名称查询模板
+		if(dirName != null && !"".equals(dirName.trim())){
+			if(childNodeName != null && !"".equals(childNodeName.trim())){
+				List<ForumCodeNode> forumCodeNodeList = forumCodeManage.getForumCodeNode(dirName,childNodeName);
+				return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,forumCodeNodeList));
+			}else{
+				error.put("childNodeName", "版块类型子节点名称不能为空");
+			}
+		}else{
+			error.put("dirName", "目录名称不能为空");
+		}
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	
 	/**
 	 * 模板管理 添加界面显示
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=add",method=RequestMethod.GET)
 	public String addUI(Forum forum,String layoutId,String dirName,
 			ModelMap model,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 	
-		if(layoutId!=null && !"".equals(layoutId)){
-			if(layoutId != null && !"".equals(layoutId.trim())){
-				Layout layout = templateService.findLayoutByLayoutId(layoutId);
-				model.addAttribute("layout", layout);
-			}
-		
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
+		Map<String,Object> returnValue = new LinkedHashMap<String,Object>();
+		if(layoutId != null && !"".equals(layoutId)){
+			Layout layout = templateService.findLayoutByLayoutId(layoutId);
+			returnValue.put("layout", layout);
+		}else {
+			error.put("layoutId", "布局Id不能为空");
 		}
+		
 		//根据模板目录名称查询模板
 		if(dirName != null && !"".equals(dirName.trim())){
 			Templates templates = templateService.findTemplatebyDirName(dirName);
-			model.addAttribute("templates", templates);
+			returnValue.put("templates", templates);
+			
+			List<ForumCodeNode> forumCodeNodeList = forumCodeManage.forumCodeNodeList(dirName);
+			returnValue.put("forumCodeNodeList", forumCodeNodeList);
+			
+		}else {
+			error.put("dirName", "目录名称不能为空");
 		}	
-		return "jsp/template/add_forum";
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
+		}
 		
 	}
 	/**
@@ -139,75 +165,72 @@ public class ForumManageAction{
 	 * @param layoutName 布局名称
 	 * @param returnData 空白页返回数据
 	 */
-
+	@ResponseBody
 	@RequestMapping(params="method=add",method=RequestMethod.POST)
 	public String add(Forum formbean,BindingResult result,String layoutId,String dirName,
 			Integer[] advertisingRelated_Image_Count,
 			MultipartHttpServletRequest request,HttpServletResponse response,
 			ModelMap model,RedirectAttributes redirectAttrs) throws Exception {
-		
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
 		Layout layout = null;
-		if(layoutId!=null && !"".equals(layoutId)){
-			if(layoutId != null && !"".equals(layoutId.trim())){
-				layout = templateService.findLayoutByLayoutId(layoutId);
-				
-				model.addAttribute("layout", layout);
+		if(layoutId != null && !"".equals(layoutId)){
+			layout = templateService.findLayoutByLayoutId(layoutId);
+			if(layout == null){
+				error.put("layoutId", "布局不存在");
 			}
+		}else {
+			error.put("layoutId", "布局Id不能为空");
+		}
 		
+		//根据模板目录名称查询模板
+		if(dirName == null || "".equals(dirName.trim())){
+			error.put("dirName", "目录名称不能为空");
 		}
-		if(layout == null){
-			throw new SystemException("布局不存在");
-		}
+
 		
 		//公共页(引用版块值)只允许添加一个版块
 		boolean b = templateService.getForumThere(formbean.getDirName(),layoutId,6);//6:公共页(引用版块值)
 		if(b == true){
-			throw new SystemException("公共页(引用版块值)只允许添加一个版块");
+			error.put("forum", "公共页(引用版块值)只允许添加一个版块");
 		}
 		
 		Forum forum = new Forum();
-		
-		forum.setLayoutId(layoutId);
-		forum.setName(formbean.getName());
-		forum.setModule(formbean.getModule());
-		forum.setForumType(formbean.getForumType());
-		forum.setForumChildType(formbean.getForumChildType());
-		forum.setDirName(formbean.getDirName());
-		forum.setLayoutType(layout.getType());
-		forum.setLayoutFile(layout.getLayoutFile());
-		forum.setInvokeMethod(formbean.getInvokeMethod());
-		
-		if((layout.getType().equals(4) && layout.getReturnData().equals(1)) || layout.getType().equals(6)){//空白页json方式返回数据或公共页(引用版块值) 这两种布局方式不能选择'调用对象' 
-			if(formbean.getInvokeMethod().equals(2)){//2.调用对象
-				throw new SystemException("不能选择调用对象");
-			}
-		}
-		
-		
-		//根据模板目录名称查询模板
-		if(dirName != null && !"".equals(dirName.trim())){
-			Templates templates = templateService.findTemplatebyDirName(dirName);
-			model.addAttribute("templates", templates);
-		}
-
-		//空白页(json)只允许添加一个版块
-		List<Forum> forumList_Blank = templateService.findForumByLayoutId(dirName, layoutId);
-		if(forumList_Blank != null && forumList_Blank.size() >0){
-			for(Forum forum_Blank : forumList_Blank){
-				if(forum_Blank.getLayoutType().equals(4) && layout.getReturnData().equals(1)){
-					throw new SystemException("空白页(json)只允许添加一个版块");
+		String module = formbean.getModule();
+		if(error.size() ==0){
+			
+			
+			forum.setLayoutId(layoutId);
+			forum.setName(formbean.getName());
+			forum.setModule(formbean.getModule());
+			forum.setForumType(formbean.getForumType());
+			forum.setForumChildType(formbean.getForumChildType());
+			forum.setDirName(formbean.getDirName());
+			forum.setLayoutType(layout.getType());
+			forum.setLayoutFile(layout.getLayoutFile());
+			forum.setInvokeMethod(formbean.getInvokeMethod());
+			
+			if((layout.getType().equals(4) && layout.getReturnData().equals(1)) || layout.getType().equals(6)){//空白页json方式返回数据或公共页(引用版块值) 这两种布局方式不能选择'调用对象' 
+				if(formbean.getInvokeMethod().equals(2)){//2.调用对象
+					error.put("forum", "不允许选择调用对象");
 				}
 			}
-		}
+			
 		
-		Map<String,String> forumError = new HashMap<String,String>();//表单错误
-		
-		
-		String module = formbean.getModule();
+			//空白页(json)只允许添加一个版块
+			List<Forum> forumList_Blank = templateService.findForumByLayoutId(dirName, layoutId);
+			if(forumList_Blank != null && forumList_Blank.size() >0){
+				for(Forum forum_Blank : forumList_Blank){
+					if(forum_Blank.getLayoutType().equals(4) && layout.getReturnData().equals(1)){
+						error.put("forum", "空白页(json)只允许添加一个版块");
+					}
+				}
+			}
+			
+			
 
-		String displayType = "monolayer";//模板显示类型
-		if(module != null){
-			if(!module.equals("请选择")){
+			String displayType = "monolayer";//模板显示类型
+			if(module != null && !"".equals(module.trim())){
 				String[] moduleArray = module.split("_");
 				if(moduleArray[2].equals("monolayer")){//单层
 					displayType = "monolayer";
@@ -220,272 +243,194 @@ public class ForumManageAction{
 				}else if(moduleArray[2].equals("collection")){
 					displayType = "collection";//集合
 				}
-			}
-			forum.setDisplayType(displayType);
-		}else{
-			throw new SystemException("请选择模板");
-		}
-		
-		
-		//版块扩展
-		this.forumExtend(forum,formbean,displayType, advertisingRelated_Image_Count,dirName,forumError,request);
-		
-		
-		//数据校验
-		this.validator.validate(formbean, result); 
-		if (result.hasErrors() || forumError.size() >0) {  
-			model.addAttribute("forum",formbean);
-
-			//查询‘更多’
-			Map<String,String> more = layoutManage.queryMore(formbean.getDirName(),forum.getForumChildType());
-			model.addAttribute("more",JsonUtils.toJSONString(more));
-			
-			if(forum.getFormValue() != null && !"".equals(forum.getFormValue().trim())){
-				if(forum.getForumChildType().equals("图片广告")){
-					
-					if("collection".equals(forum.getDisplayType())){//集合
-						model.addAttribute("collection_Forum_AdvertisingRelated_imageList",forum.getFormValue());	
-					}
-				}
-
-				if(forum.getForumChildType().equals("话题列表")){
-					if("page".equals(forum.getDisplayType())){//分页
-						model.addAttribute("page_Forum_TopicRelated_Topic",forum.getFormValue());	
-					}
-				}
-				
-				if(forum.getForumChildType().equals("相似话题")){
-					if("collection".equals(forum.getDisplayType())){//集合
-						model.addAttribute("collection_Forum_TopicRelated_LikeTopic",forum.getFormValue());	
-					}
-				}
-				
-				
-				
-				if(forum.getForumChildType().equals("评论列表")){
-					if("page".equals(forum.getDisplayType())){//分页
-						model.addAttribute("page_Forum_CommentRelated_Comment",forum.getFormValue());	
-					}
-				}
-				
-				if(forum.getForumChildType().equals("问题列表")){
-					if("page".equals(forum.getDisplayType())){//分页
-						model.addAttribute("page_Forum_QuestionRelated_Question",forum.getFormValue());	
-					}
-				}
-
-				if(forum.getForumChildType().equals("答案列表")){
-					if("page".equals(forum.getDisplayType())){//分页
-						model.addAttribute("page_Forum_AnswerRelated_Answer",forum.getFormValue());	
-					}
-				}
-				if(forum.getForumChildType().equals("相似问题")){
-					if("collection".equals(forum.getDisplayType())){//集合
-						model.addAttribute("collection_Forum_QuestionRelated_LikeQuestion",forum.getFormValue());	
-					}
-				}
-				
-				if(forum.getForumChildType().equals("领取红包用户列表")){
-					if("page".equals(forum.getDisplayType())){//分页
-						model.addAttribute("page_Forum_RedEnvelopeRelated_ReceiveRedEnvelopeUser",forum.getFormValue());	
-					}
-				}
-				
-				if(forum.getForumChildType().equals("在线帮助列表")){
-					if("monolayer".equals(forum.getDisplayType())){//单层
-						model.addAttribute("monolayer_Forum_HelpRelated_Help",forum.getFormValue());	
-					}
-					if("page".equals(forum.getDisplayType())){//分页
-						model.addAttribute("page_Forum_HelpRelated_Help",forum.getFormValue());	
-					}
-				}
-				
-				if(forum.getForumChildType().equals("推荐在线帮助")){
-					if("collection".equals(forum.getDisplayType())){//集合
-						model.addAttribute("collection_Forum_HelpRelated_RecommendHelp",forum.getFormValue());	
-					}
-				}
-				
-				
-				
-				//用户自定义HTML
-				if(forum.getForumChildType().equals("用户自定义HTML")){
-					if("entityBean".equals(forum.getDisplayType())){//集合
-						model.addAttribute("entityBean_Forum_CustomForumRelated_CustomHTML",forum.getFormValue());	
-					}
-				}
-				//热门搜索词
-				if(forum.getForumChildType().equals("热门搜索词")){
-					if("collection".equals(forum.getDisplayType())){//集合
-						model.addAttribute("collection_Forum_SystemRelated_SearchWord",forum.getFormValue());	
-					}
-				}
-			}
-			model.addAttribute("forumError",JsonUtils.toJSONString(forumError));
-
-			model.addAttribute("errorStatus","Error");
-			
-			
-			return "jsp/template/add_forum";
-		} 
-		//生成模块引用代码
-		if(layout.getType().equals(6)){//6.公共页(引用版块值)
-			forum.setReferenceCode(layout.getReferenceCode());
-		}else{
-			if(module == null || "".equals(module)){
-				throw new SystemException("【请选择版块类型】！");
-			}
-			
-			String[] moduleArray = module.split("_");
-			String newModule = moduleArray[0]+"_"+moduleArray[1]+"_"; //组成查询字符Product_Show_
-			
-			List<Forum> forumList = templateService.findForumByReferenceCodePrefix(dirName,newModule);
-			
-			
-			List<Integer> number = new ArrayList<Integer>();
-			if(forumList != null && forumList.size()>0){
-				
-				for(Forum f : forumList){
-					
-					String rc = f.getReferenceCode();
-					if(rc != null && !"".equals(rc)){
-						String[] rcArray = rc.split("_");
-						int newNumber = Integer.parseInt(rcArray[2]); //组成查询字符Product_Show_
-						number.add(newNumber);
-					}
-				}
-				//初始化数组   ,冒泡排序法从低到高选择排序 
-				Integer[] lastArray = (Integer []) number.toArray(new Integer[0]);//li.toArray返回的是Object类型数组,这句是将Object数组转为Integer数组
-				//外层循环lastArray.length-1次循环   
-		        for(int i=lastArray.length-1; i>0; i--) {   
-		            //外层循环i次循环   
-		            for(int j=0; j<i; j++) {   
-		                //当前面的数据大于后面的数据，把两个数据进行交换   
-		                if(lastArray[j] > lastArray[j+1]) {   
-		                    int tempInt = lastArray[j];   
-		                    lastArray[j] = lastArray[j+1];   
-		                    lastArray[j+1] = tempInt;   
-		                }   
-		            }   
-		        }   
-		        
-		        Integer max = Integer.parseInt(lastArray[lastArray.length-1].toString())+1;//最大数字
-		        forum.setReferenceCode(newModule + max.toString());
+				forum.setDisplayType(displayType);
 			}else{
-				forum.setReferenceCode(newModule + "1");
+				error.put("module", "请选择版块模板");
 			}
+			
+			//版块扩展
+			this.forumExtend(forum,formbean,displayType, advertisingRelated_Image_Count,dirName,error,request);
+			
+			//数据校验
+			this.validator.validate(formbean, result); 
+			if (result.hasErrors()) {  
+				List<FieldError> fieldErrorList = result.getFieldErrors();
+				if(fieldErrorList != null && fieldErrorList.size() >0){
+					for(FieldError fieldError : fieldErrorList){
+						error.put(fieldError.getField(), messageSource.getMessage(fieldError, null));
+					}
+				}
+			}
+			
+			
 		}
-		templateService.saveForum(forum);
-		
-		
-		//广告 - 图片广告   删除图片锁
-		if(forum.getForumChildType().equals("图片广告")){
-			if("collection".equals(forum.getDisplayType())){//集合
-				if(forum.getFormValue() != null && !"".equals(forum.getFormValue().trim())){
-					List<Forum_AdvertisingRelated_Image> collection_Forum_AdvertisingRelated_imageList = JsonUtils.toGenericObject(forum.getFormValue(), new TypeReference< List<Forum_AdvertisingRelated_Image> >(){});
-					if(collection_Forum_AdvertisingRelated_imageList != null && collection_Forum_AdvertisingRelated_imageList.size() >0){
-						for(Forum_AdvertisingRelated_Image forum_AdvertisingRelated_Image :collection_Forum_AdvertisingRelated_imageList){
-							if(forum_AdvertisingRelated_Image.getImage_fileName() != null && !"".equals(forum_AdvertisingRelated_Image.getImage_fileName().trim())){	
-								localFileManage.deleteLock("file"+File.separator+"template"+File.separator+"lock"+File.separator,dirName +"_"+FileUtil.toRelativePath(forum_AdvertisingRelated_Image.getImage_fileName()));
-							}
+		if(error.size() ==0){
+			//生成模块引用代码
+			if(layout.getType().equals(6)){//6.公共页(引用版块值)
+				forum.setReferenceCode(layout.getReferenceCode());
+			}else{
+				String[] moduleArray = module.split("_");
+				String newModule = moduleArray[0]+"_"+moduleArray[1]+"_"; //组成查询字符Product_Show_
+				
+				List<Forum> forumList = templateService.findForumByReferenceCodePrefix(dirName,newModule);
+				
+				
+				List<Integer> number = new ArrayList<Integer>();
+				if(forumList != null && forumList.size()>0){
+					
+					for(Forum f : forumList){
+						
+						String rc = f.getReferenceCode();
+						if(rc != null && !"".equals(rc)){
+							String[] rcArray = rc.split("_");
+							int newNumber = Integer.parseInt(rcArray[2]); //组成查询字符Product_Show_
+							number.add(newNumber);
 						}
 					}
-				
+					//初始化数组   ,冒泡排序法从低到高选择排序 
+					Integer[] lastArray = (Integer []) number.toArray(new Integer[0]);//li.toArray返回的是Object类型数组,这句是将Object数组转为Integer数组
+					//外层循环lastArray.length-1次循环   
+			        for(int i=lastArray.length-1; i>0; i--) {   
+			            //外层循环i次循环   
+			            for(int j=0; j<i; j++) {   
+			                //当前面的数据大于后面的数据，把两个数据进行交换   
+			                if(lastArray[j] > lastArray[j+1]) {   
+			                    int tempInt = lastArray[j];   
+			                    lastArray[j] = lastArray[j+1];   
+			                    lastArray[j+1] = tempInt;   
+			                }   
+			            }   
+			        }   
+			        
+			        Integer max = Integer.parseInt(lastArray[lastArray.length-1].toString())+1;//最大数字
+			        forum.setReferenceCode(newModule + max.toString());
+				}else{
+					forum.setReferenceCode(newModule + "1");
 				}
 				
 			}
-		}
-
-		//自定义版块 用户自定义HTML 文件锁
-		if(forum.getForumChildType().equals("用户自定义HTML")){
-			if("entityBean".equals(forum.getDisplayType())){//集合
-				if(forum.getFormValue() != null && !"".equals(forum.getFormValue().trim())){
-					Forum_CustomForumRelated_CustomHTML entityBean_Forum_CustomForumRelated_CustomHTML = JsonUtils.toObject(forum.getFormValue(), Forum_CustomForumRelated_CustomHTML.class);
-					
-					if(entityBean_Forum_CustomForumRelated_CustomHTML != null){
-						if(entityBean_Forum_CustomForumRelated_CustomHTML.getHtml_content() != null && !"".equals(entityBean_Forum_CustomForumRelated_CustomHTML.getHtml_content())){
-							Object[] htmlContent_obj = textFilterManage.readPathName(entityBean_Forum_CustomForumRelated_CustomHTML.getHtml_content(), "template");
-							List<String> pathFileList = new ArrayList<String>();//路径文件
-							if(htmlContent_obj != null && htmlContent_obj.length >0){
-								//图片
-								List<String> imageNameList = (List<String>)htmlContent_obj[0];		
-								if(imageNameList != null && imageNameList.size() >0){
-									
-									for(String imageName : imageNameList){
-										//路径文件
-										pathFileList.add(imageName);
-								
-									}	
+			
+			templateService.saveForum(forum);
+			
+			
+			//广告 - 图片广告   删除图片锁
+			if(forum.getForumChildType().equals("图片广告")){
+				if("collection".equals(forum.getDisplayType())){//集合
+					if(forum.getFormValue() != null && !"".equals(forum.getFormValue().trim())){
+						List<Forum_AdvertisingRelated_Image> collection_Forum_AdvertisingRelated_imageList = JsonUtils.toGenericObject(forum.getFormValue(), new TypeReference< List<Forum_AdvertisingRelated_Image> >(){});
+						if(collection_Forum_AdvertisingRelated_imageList != null && collection_Forum_AdvertisingRelated_imageList.size() >0){
+							for(Forum_AdvertisingRelated_Image forum_AdvertisingRelated_Image :collection_Forum_AdvertisingRelated_imageList){
+								if(forum_AdvertisingRelated_Image.getImage_fileName() != null && !"".equals(forum_AdvertisingRelated_Image.getImage_fileName().trim())){	
+									localFileManage.deleteLock("file"+File.separator+"template"+File.separator+"lock"+File.separator,dirName +"_"+FileUtil.toRelativePath(forum_AdvertisingRelated_Image.getImage_fileName()));
 								}
-								
-								//Flash
-								List<String> flashNameList = (List<String>)htmlContent_obj[1];		
-								if(flashNameList != null && flashNameList.size() >0){
-									for(String flashName : flashNameList){
-										//路径文件
-										pathFileList.add(flashName);
+							}
+						}
+					
+					}
+					
+				}
+			}
+
+			//自定义版块 用户自定义HTML 文件锁
+			if(forum.getForumChildType().equals("用户自定义HTML")){
+				if("entityBean".equals(forum.getDisplayType())){//集合
+					if(forum.getFormValue() != null && !"".equals(forum.getFormValue().trim())){
+						Forum_CustomForumRelated_CustomHTML entityBean_Forum_CustomForumRelated_CustomHTML = JsonUtils.toObject(forum.getFormValue(), Forum_CustomForumRelated_CustomHTML.class);
+						
+						if(entityBean_Forum_CustomForumRelated_CustomHTML != null){
+							if(entityBean_Forum_CustomForumRelated_CustomHTML.getHtml_content() != null && !"".equals(entityBean_Forum_CustomForumRelated_CustomHTML.getHtml_content())){
+								Object[] htmlContent_obj = textFilterManage.readPathName(entityBean_Forum_CustomForumRelated_CustomHTML.getHtml_content(), "template");
+								List<String> pathFileList = new ArrayList<String>();//路径文件
+								if(htmlContent_obj != null && htmlContent_obj.length >0){
+									//图片
+									List<String> imageNameList = (List<String>)htmlContent_obj[0];		
+									if(imageNameList != null && imageNameList.size() >0){
+										
+										for(String imageName : imageNameList){
+											//路径文件
+											pathFileList.add(imageName);
+									
+										}	
+									}
+									
+									//Flash
+									List<String> flashNameList = (List<String>)htmlContent_obj[1];		
+									if(flashNameList != null && flashNameList.size() >0){
+										for(String flashName : flashNameList){
+											//路径文件
+											pathFileList.add(flashName);
+											
+										}
 										
 									}
-									
-								}
-								//影音
-								List<String> mediaNameList = (List<String>)htmlContent_obj[2];	
-								if(mediaNameList != null && mediaNameList.size() >0){
-									for(String mediaName : mediaNameList){
-										//路径文件
-										pathFileList.add(mediaName);
-									
+									//影音
+									List<String> mediaNameList = (List<String>)htmlContent_obj[2];	
+									if(mediaNameList != null && mediaNameList.size() >0){
+										for(String mediaName : mediaNameList){
+											//路径文件
+											pathFileList.add(mediaName);
+										
+										}
+										
+									}	
+									//文件
+									List<String> fileNameList = (List<String>)htmlContent_obj[3];		
+									if(fileNameList != null && fileNameList.size() >0){
+										for(String fileName : fileNameList){
+											//路径文件
+											pathFileList.add(fileName);
+										
+										}
 									}
-									
-								}	
-								//文件
-								List<String> fileNameList = (List<String>)htmlContent_obj[3];		
-								if(fileNameList != null && fileNameList.size() >0){
-									for(String fileName : fileNameList){
-										//路径文件
-										pathFileList.add(fileName);
-									
-									}
 								}
-							}
-							//删除路径文件
-							if(pathFileList != null && pathFileList.size() >0){
-								for(String oldPathFile :pathFileList){
-									 //替换指定的字符，只替换第一次出现的
-									oldPathFile = StringUtils.replaceOnce(oldPathFile, "file/template/", "");
-									
-									if(oldPathFile != null && !"".equals(oldPathFile.trim())){
-										localFileManage.deleteLock("file"+File.separator+"template"+File.separator+"lock"+File.separator,oldPathFile.replaceAll("/","_"));
-									 }
+								//删除路径文件
+								if(pathFileList != null && pathFileList.size() >0){
+									for(String oldPathFile :pathFileList){
+										 //替换指定的字符，只替换第一次出现的
+										oldPathFile = StringUtils.replaceOnce(oldPathFile, "file/template/", "");
+										
+										if(oldPathFile != null && !"".equals(oldPathFile.trim())){
+											localFileManage.deleteLock("file"+File.separator+"template"+File.separator+"lock"+File.separator,oldPathFile.replaceAll("/","_"));
+										 }
+									}
 								}
 							}
 						}
+						
 					}
-					
 				}
 			}
 		}
-		redirectAttrs.addAttribute("forumId", forum.getId());
 		
-		return "redirect:"+RedirectPath.readUrl("control.template.referenceCode")+"?forumId={forumId}";
+
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+		}
 	}
 	
 	
 	/**
 	 * 模板管理 修改界面显示
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=edit",method=RequestMethod.GET)
 	public String editUI(Integer forumId,String layoutId,String dirName,
 			ModelMap model,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
-	
-		if(layoutId!=null && !"".equals(layoutId)){
-			if(layoutId != null && !"".equals(layoutId.trim())){
-				Layout layout = templateService.findLayoutByLayoutId(layoutId);
-				model.addAttribute("layout", layout);
-			}
 		
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
+		Map<String,Object> returnValue = new LinkedHashMap<String,Object>();
+		if(layoutId != null && !"".equals(layoutId)){
+			Layout layout = templateService.findLayoutByLayoutId(layoutId);
+			returnValue.put("layout", layout);
+		}else {
+			error.put("layoutId", "布局Id不能为空");
 		}
+		
+
 		
 		if(forumId != null && forumId >0){
 			Forum forum = templateService.findForumById(forumId);
@@ -495,101 +440,108 @@ public class ForumManageAction{
 				if(forumCodeNodeList != null && forumCodeNodeList.size() >0){
 					for(ForumCodeNode forumCodeNode : forumCodeNodeList){
 						if(forumCodeNode.getNodeName().equals(forum.getModule())){
-							model.addAttribute("forumCodeNode_remark", forumCodeNode.getRemark());
+							returnValue.put("forumCodeNode_remark", forumCodeNode.getRemark());
 						}
 					}
 				}
-				model.addAttribute("forum", forum);
+				returnValue.put("forum", forum);
 				
 				//查询‘更多’
 				Map<String,String> more = layoutManage.queryMore(forum.getDirName(),forum.getForumChildType());
-				model.addAttribute("more",JsonUtils.toJSONString(more));
+				returnValue.put("more",JsonUtils.toJSONString(more));
 
 				
 				if(forum.getFormValue() != null && !"".equals(forum.getFormValue().trim())){
-					
+					 
 					if(forum.getForumChildType().equals("图片广告")){
 						if("collection".equals(forum.getDisplayType())){//集合
-							model.addAttribute("collection_Forum_AdvertisingRelated_imageList",forum.getFormValue());	
+							returnValue.put("collection_Forum_AdvertisingRelated_imageList",JsonUtils.toGenericObject(forum.getFormValue(), new TypeReference<List<Forum_AdvertisingRelated_Image>>(){}));	
 						}
 					}
 
 					if(forum.getForumChildType().equals("话题列表")){
 						if("page".equals(forum.getDisplayType())){//分页
-							model.addAttribute("page_Forum_TopicRelated_Topic",forum.getFormValue());	
+							returnValue.put("page_Forum_TopicRelated_Topic",JsonUtils.toGenericObject(forum.getFormValue(), new TypeReference<Forum_TopicRelated_Topic>(){}));	
 						}
 					}
 					if(forum.getForumChildType().equals("相似话题")){
 						if("collection".equals(forum.getDisplayType())){//集合
-							model.addAttribute("collection_Forum_TopicRelated_LikeTopic",forum.getFormValue());	
+							returnValue.put("collection_Forum_TopicRelated_LikeTopic",JsonUtils.toGenericObject(forum.getFormValue(), new TypeReference<Forum_TopicRelated_LikeTopic>(){}));	
 						}
 					}
 					if(forum.getForumChildType().equals("评论列表")){
 						if("page".equals(forum.getDisplayType())){//分页
-							model.addAttribute("page_Forum_CommentRelated_Comment",forum.getFormValue());	
+							returnValue.put("page_Forum_CommentRelated_Comment",JsonUtils.toGenericObject(forum.getFormValue(), new TypeReference<Forum_CommentRelated_Comment>(){}));	
 						}
 					}
 					
 					if(forum.getForumChildType().equals("问题列表")){
 						if("page".equals(forum.getDisplayType())){//分页
-							model.addAttribute("page_Forum_QuestionRelated_Question",forum.getFormValue());	
+							returnValue.put("page_Forum_QuestionRelated_Question",JsonUtils.toGenericObject(forum.getFormValue(), new TypeReference<Forum_QuestionRelated_Question>(){}));	
 						}
 					}
 					if(forum.getForumChildType().equals("答案列表")){
 						if("page".equals(forum.getDisplayType())){//分页
-							model.addAttribute("page_Forum_AnswerRelated_Answer",forum.getFormValue());	
+							returnValue.put("page_Forum_AnswerRelated_Answer",JsonUtils.toGenericObject(forum.getFormValue(), new TypeReference<Forum_AnswerRelated_Answer>(){}));	
 						}
 					}
 					if(forum.getForumChildType().equals("相似问题")){
 						if("collection".equals(forum.getDisplayType())){//集合
-							model.addAttribute("collection_Forum_QuestionRelated_LikeQuestion",forum.getFormValue());	
+							returnValue.put("collection_Forum_QuestionRelated_LikeQuestion",JsonUtils.toGenericObject(forum.getFormValue(), new TypeReference<Forum_QuestionRelated_LikeQuestion>(){}));	
 						}
 					}
 					if(forum.getForumChildType().equals("领取红包用户列表")){
 						if("page".equals(forum.getDisplayType())){//分页
-							model.addAttribute("page_Forum_RedEnvelopeRelated_ReceiveRedEnvelopeUser",forum.getFormValue());	
+							returnValue.put("page_Forum_RedEnvelopeRelated_ReceiveRedEnvelopeUser",JsonUtils.toGenericObject(forum.getFormValue(), new TypeReference<Forum_RedEnvelopeRelated_ReceiveRedEnvelopeUser>(){}));	
 						}
 					}
 					if(forum.getForumChildType().equals("在线帮助列表")){
 						if("monolayer".equals(forum.getDisplayType())){//单层
-							model.addAttribute("monolayer_Forum_HelpRelated_Help",forum.getFormValue());	
+							returnValue.put("monolayer_Forum_HelpRelated_Help",JsonUtils.toGenericObject(forum.getFormValue(), new TypeReference<Forum_HelpRelated_Help>(){}));	
 						}
 						if("page".equals(forum.getDisplayType())){//分页
-							model.addAttribute("page_Forum_HelpRelated_Help",forum.getFormValue());	
+							returnValue.put("page_Forum_HelpRelated_Help",JsonUtils.toGenericObject(forum.getFormValue(), new TypeReference<Forum_HelpRelated_Help>(){}));	
 						}
 					}
 					
 					if(forum.getForumChildType().equals("推荐在线帮助")){
 						if("collection".equals(forum.getDisplayType())){//集合
-							model.addAttribute("collection_Forum_HelpRelated_RecommendHelp",forum.getFormValue());	
+							returnValue.put("collection_Forum_HelpRelated_RecommendHelp",JsonUtils.toGenericObject(forum.getFormValue(), new TypeReference<Forum_HelpRelated_Help>(){}));	
 						}
 					}
 					
 					//用户自定义HTML
 					if(forum.getForumChildType().equals("用户自定义HTML")){
 						if("entityBean".equals(forum.getDisplayType())){//集合
-							model.addAttribute("entityBean_Forum_CustomForumRelated_CustomHTML",forum.getFormValue());	
+							returnValue.put("entityBean_Forum_CustomForumRelated_CustomHTML",JsonUtils.toGenericObject(forum.getFormValue(), new TypeReference<Forum_CustomForumRelated_CustomHTML>(){}));	
 						}
 					}
 					//热门搜索词
 					if(forum.getForumChildType().equals("热门搜索词")){
 						if("collection".equals(forum.getDisplayType())){//集合
-							model.addAttribute("collection_Forum_SystemRelated_SearchWord",forum.getFormValue());	
+							returnValue.put("collection_Forum_SystemRelated_SearchWord",JsonUtils.toGenericObject(forum.getFormValue(), new TypeReference< Forum_SystemRelated_SearchWord>(){}));	
 						}
 					}
 				}
 			}
+		}else{
+			error.put("forumId", "版块Id不能为空");
 		}
 		
 		
 		//根据模板目录名称查询模板
 		if(dirName != null && !"".equals(dirName.trim())){
 			Templates templates = templateService.findTemplatebyDirName(dirName);
-			model.addAttribute("templates", templates);
-		}	
-		
-		return "jsp/template/edit_forum";
-		
+			returnValue.put("templates", templates);
+		}else {
+			error.put("dirName", "目录名称不能为空");
+		}
+	
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
+		}
 	}
 	
 	
@@ -604,396 +556,115 @@ public class ForumManageAction{
 	 * @param layoutName 布局名称
 	 * @param returnData 空白页返回数据
 	 */
-
+	@ResponseBody
 	@RequestMapping(params="method=edit",method=RequestMethod.POST)
 	public String edit(Forum formbean,BindingResult result,Integer forumId, String layoutId,String dirName,
-			Integer[] advertisingRelated_Image_Count,PageForm pageForm,
+			Integer[] advertisingRelated_Image_Count,
 			MultipartHttpServletRequest request,HttpServletResponse response,
 			ModelMap model,RedirectAttributes redirectAttrs) throws Exception {
 		
-		Layout layout = null;
-		if(layoutId!=null && !"".equals(layoutId)){
-			if(layoutId != null && !"".equals(layoutId.trim())){
-				layout = templateService.findLayoutByLayoutId(layoutId);
-				
-				model.addAttribute("layout", layout);
-			}
 		
-		}
-		if(layout == null){
-			throw new SystemException("布局不存在");
+		
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
+		Layout layout = null;
+		if(layoutId != null && !"".equals(layoutId)){
+			layout = templateService.findLayoutByLayoutId(layoutId);
+			if(layout == null){
+				error.put("layoutId", "布局不存在");
+			}
+		}else {
+			error.put("layoutId", "布局Id不能为空");
 		}
 		Forum forum = null;
 		if(forumId != null && forumId >0){
 			forum = templateService.findForumById(forumId);
-		}
-		if(forum == null){
-			throw new SystemException("版块不存在");
-		}
-		
-		
-		
-		
-		Forum new_forum = new Forum();
-		new_forum.setId(forumId);
-		new_forum.setLayoutId(layoutId);
-		new_forum.setName(formbean.getName());
-		new_forum.setModule(forum.getModule());
-		new_forum.setDisplayType(forum.getDisplayType());
-		new_forum.setForumType(forum.getForumType());
-		new_forum.setForumChildType(forum.getForumChildType());
-		new_forum.setDirName(forum.getDirName());
-		new_forum.setLayoutType(layout.getType());
-		new_forum.setLayoutFile(layout.getLayoutFile());
-		new_forum.setInvokeMethod(formbean.getInvokeMethod());
-		
-		if((layout.getType().equals(4) && layout.getReturnData().equals(1)) || layout.getType().equals(6)){//空白页json方式返回数据或公共页(引用版块值) 这两种布局方式不能选择'调用对象' 
-			if(formbean.getInvokeMethod().equals(2)){//2.调用对象
-				throw new SystemException("不能选择调用对象");
+			if(forum == null){
+				error.put("forumId", "版块不存在");
 			}
+		}else {
+			error.put("forumId", "版块Id不能为空");
 		}
 		
 		
 		//根据模板目录名称查询模板
-		if(dirName != null && !"".equals(dirName.trim())){
-			Templates templates = templateService.findTemplatebyDirName(dirName);
-			model.addAttribute("templates", templates);
-		}
-		Map<String,String> forumError = new HashMap<String,String>();//表单错误
-		
-		//版块扩展
-		this.forumExtend(new_forum,formbean,new_forum.getDisplayType(), advertisingRelated_Image_Count,dirName,forumError,request);
-			
-		//回显和校验需要
-		formbean.setLayoutId(forum.getLayoutId());//布局Id
-		formbean.setModule(forum.getModule());//选择版块模板
-		formbean.setDisplayType(forum.getDisplayType());//模板显示类型
-		formbean.setForumType(forum.getForumType());//版块类型
-		formbean.setForumChildType(forum.getForumChildType());//版块子类型
-		formbean.setReferenceCode(forum.getReferenceCode());//生成版块引用代码
-		formbean.setDirName(forum.getDirName());//模板目录名称
-		formbean.setLayoutType(forum.getLayoutType());//布局类型
-		formbean.setLayoutFile(forum.getLayoutFile());//布局文件
-	
-		
-		//数据校验
-		this.validator.validate(formbean, result); 
-		if (result.hasErrors() || forumError.size() >0) {
-			
-			model.addAttribute("forum",formbean);
-
-			List<ForumCodeNode> forumCodeNodeList = forumCodeManage.getForumCodeNode(dirName,forum.getForumChildType());
-			if(forumCodeNodeList != null && forumCodeNodeList.size() >0){
-				for(ForumCodeNode forumCodeNode : forumCodeNodeList){
-					if(forumCodeNode.getNodeName().equals(forum.getModule())){
-						model.addAttribute("forumCodeNode_remark", forumCodeNode.getRemark());
-					}
-				}
-			}
-			
-			//查询‘更多’
-			Map<String,String> more = layoutManage.queryMore(forum.getDirName(),forum.getForumChildType());
-			model.addAttribute("more",JsonUtils.toJSONString(more));
-			
-			if(forum.getFormValue() != null && !"".equals(forum.getFormValue().trim())){
-				
-				if(forum.getForumChildType().equals("图片广告")){
-					if("collection".equals(forum.getDisplayType())){//集合
-						model.addAttribute("collection_Forum_AdvertisingRelated_imageList",new_forum.getFormValue());	
-					}
-				}
-				if(forum.getForumChildType().equals("话题列表")){
-					
-					if("page".equals(forum.getDisplayType())){//分页
-						
-						model.addAttribute("page_Forum_TopicRelated_Topic",new_forum.getFormValue());	
-					}
-				}
-				if(forum.getForumChildType().equals("相似话题")){
-					if("collection".equals(forum.getDisplayType())){//集合
-						model.addAttribute("collection_Forum_TopicRelated_LikeTopic",new_forum.getFormValue());	
-					}
-				}
-				if(forum.getForumChildType().equals("评论列表")){
-					if("page".equals(forum.getDisplayType())){//分页
-						model.addAttribute("page_Forum_CommentRelated_Comment",new_forum.getFormValue());	
-					}
-				}
-				if(forum.getForumChildType().equals("问题列表")){
-					if("page".equals(forum.getDisplayType())){//分页
-						model.addAttribute("page_Forum_QuestionRelated_Question",new_forum.getFormValue());	
-					}
-				}
-				if(forum.getForumChildType().equals("答案列表")){
-					if("page".equals(forum.getDisplayType())){//分页
-						model.addAttribute("page_Forum_AnswerRelated_Answer",new_forum.getFormValue());	
-					}
-				}
-				if(forum.getForumChildType().equals("相似问题")){
-					if("collection".equals(forum.getDisplayType())){//集合
-						model.addAttribute("collection_Forum_QuestionRelated_LikeQuestion",new_forum.getFormValue());	
-					}
-				}
-				if(forum.getForumChildType().equals("领取红包用户列表")){
-					if("page".equals(forum.getDisplayType())){//分页
-						model.addAttribute("page_Forum_RedEnvelopeRelated_ReceiveRedEnvelopeUser",new_forum.getFormValue());	
-					}
-				}
-				
-				
-				if(forum.getForumChildType().equals("在线帮助列表")){
-					if("monolayer".equals(forum.getDisplayType())){//单层
-						model.addAttribute("monolayer_Forum_HelpRelated_Help",new_forum.getFormValue());	
-					}
-					if("page".equals(forum.getDisplayType())){//分页
-						model.addAttribute("page_Forum_HelpRelated_Help",new_forum.getFormValue());	
-					}
-				}
-				
-				if(forum.getForumChildType().equals("推荐在线帮助")){
-					if("collection".equals(forum.getDisplayType())){//集合
-						model.addAttribute("collection_Forum_HelpRelated_RecommendHelp",new_forum.getFormValue());	
-					}
-				}
-				
-				//用户自定义HTML
-				if(forum.getForumChildType().equals("用户自定义HTML")){
-					if("entityBean".equals(forum.getDisplayType())){//集合
-						model.addAttribute("entityBean_Forum_CustomForumRelated_CustomHTML",new_forum.getFormValue());	
-					}
-				}
-				//热门搜索词
-				if(forum.getForumChildType().equals("热门搜索词")){
-					if("collection".equals(forum.getDisplayType())){//集合
-						model.addAttribute("collection_Forum_SystemRelated_SearchWord",new_forum.getFormValue());	
-					}
-				}
-			}
-
-			
-			model.addAttribute("forumError",JsonUtils.toJSONString(forumError));
-
-			model.addAttribute("errorStatus","Error");
-			
-			return "jsp/template/edit_forum";
-		} 
-		templateService.updateForum(new_forum);
-		
-		
-		//广告 - 图片广告   删除图片锁
-		if(forum.getForumChildType().equals("图片广告")){
-			if("collection".equals(forum.getDisplayType())){//集合
-				if(new_forum.getFormValue() != null && !"".equals(new_forum.getFormValue().trim())){
-					List<Forum_AdvertisingRelated_Image> collection_Forum_AdvertisingRelated_imageList = JsonUtils.toGenericObject(new_forum.getFormValue(), new TypeReference< List<Forum_AdvertisingRelated_Image> >(){});
-					if(collection_Forum_AdvertisingRelated_imageList != null && collection_Forum_AdvertisingRelated_imageList.size() >0){
-						
-						for(Forum_AdvertisingRelated_Image forum_AdvertisingRelated_Image :collection_Forum_AdvertisingRelated_imageList){
-							if(forum_AdvertisingRelated_Image.getImage_fileName() != null && !"".equals(forum_AdvertisingRelated_Image.getImage_fileName().trim())){
-								
-								
-								localFileManage.deleteLock("file"+File.separator+"template"+File.separator+"lock"+File.separator,dirName +"_"+FileUtil.toRelativePath(forum_AdvertisingRelated_Image.getImage_fileName()));
-							}
-						}
-					}
-				
-				}
-				
-			}
-		}
-
-		//自定义版块 用户自定义HTML 文件锁
-		if(forum.getForumChildType().equals("用户自定义HTML")){
-			if("entityBean".equals(forum.getDisplayType())){//集合
-				if(new_forum.getFormValue() != null && !"".equals(new_forum.getFormValue().trim())){
-					Forum_CustomForumRelated_CustomHTML entityBean_Forum_CustomForumRelated_CustomHTML = JsonUtils.toObject(new_forum.getFormValue(), Forum_CustomForumRelated_CustomHTML.class);
-					
-					if(entityBean_Forum_CustomForumRelated_CustomHTML != null){
-						if(entityBean_Forum_CustomForumRelated_CustomHTML.getHtml_content() != null && !"".equals(entityBean_Forum_CustomForumRelated_CustomHTML.getHtml_content())){
-							Object[] htmlContent_obj = textFilterManage.readPathName(entityBean_Forum_CustomForumRelated_CustomHTML.getHtml_content(), "template");
-							List<String> pathFileList = new ArrayList<String>();//路径文件
-							if(htmlContent_obj != null && htmlContent_obj.length >0){
-								//图片
-								List<String> imageNameList = (List<String>)htmlContent_obj[0];		
-								if(imageNameList != null && imageNameList.size() >0){
-									
-									for(String imageName : imageNameList){
-										//路径文件
-										pathFileList.add(imageName);
-								
-									}	
-								}
-								
-								//Flash
-								List<String> flashNameList = (List<String>)htmlContent_obj[1];		
-								if(flashNameList != null && flashNameList.size() >0){
-									for(String flashName : flashNameList){
-										//路径文件
-										pathFileList.add(flashName);
-										
-									}
-									
-								}
-								//影音
-								List<String> mediaNameList = (List<String>)htmlContent_obj[2];	
-								if(mediaNameList != null && mediaNameList.size() >0){
-									for(String mediaName : mediaNameList){
-										//路径文件
-										pathFileList.add(mediaName);
-									
-									}
-									
-								}	
-								//文件
-								List<String> fileNameList = (List<String>)htmlContent_obj[3];		
-								if(fileNameList != null && fileNameList.size() >0){
-									for(String fileName : fileNameList){
-										//路径文件
-										pathFileList.add(fileName);
-									
-									}
-								}
-							}
-							
-							//删除路径文件
-							if(pathFileList != null && pathFileList.size() >0){
-								for(String oldPathFile :pathFileList){
-									 //替换指定的字符，只替换第一次出现的
-									oldPathFile = StringUtils.replaceOnce(oldPathFile, "file/template/", "");
-									if(oldPathFile != null && !"".equals(oldPathFile.trim())){
-										localFileManage.deleteLock("file"+File.separator+"template"+File.separator+"lock"+File.separator,oldPathFile.replaceAll("/","_"));
-									 }
-								}
-							}
-						}
-					}
-					
-				}
-			}
+		if(dirName == null || "".equals(dirName.trim())){
+			error.put("dirName", "目录名称不能为空");
 		}
 		
+		
+		Forum new_forum = new Forum();
+		if(error.size() ==0){
+			new_forum.setId(forumId);
+			new_forum.setLayoutId(layoutId);
+			new_forum.setName(formbean.getName());
+			new_forum.setModule(forum.getModule());
+			new_forum.setDisplayType(forum.getDisplayType());
+			new_forum.setForumType(forum.getForumType());
+			new_forum.setForumChildType(forum.getForumChildType());
+			new_forum.setDirName(forum.getDirName());
+			new_forum.setLayoutType(layout.getType());
+			new_forum.setLayoutFile(layout.getLayoutFile());
+			new_forum.setInvokeMethod(formbean.getInvokeMethod());
+			
+			if((layout.getType().equals(4) && layout.getReturnData().equals(1)) || layout.getType().equals(6)){//空白页json方式返回数据或公共页(引用版块值) 这两种布局方式不能选择'调用对象' 
+				if(formbean.getInvokeMethod().equals(2)){//2.调用对象
+					error.put("invokeMethod", "不能选择调用对象");
+				}
+			}
+			
 
-		//广告 - 图片广告   删除旧图片
-		if(forum.getForumChildType().equals("图片广告")){
-			if("collection".equals(forum.getDisplayType())){//集合
+			//版块扩展
+			this.forumExtend(new_forum,formbean,new_forum.getDisplayType(), advertisingRelated_Image_Count,dirName,error,request);
 				
-				//旧图片
-				List<String> old_imageList = new ArrayList<String>();
-				//新图片
-				List<String> new_imageList = new ArrayList<String>();
-				if(forum.getFormValue() != null && !"".equals(forum.getFormValue().trim())){
-					List<Forum_AdvertisingRelated_Image> collection_Forum_AdvertisingRelated_imageList = JsonUtils.toGenericObject(forum.getFormValue(), new TypeReference< List<Forum_AdvertisingRelated_Image> >(){});
-					if(collection_Forum_AdvertisingRelated_imageList != null && collection_Forum_AdvertisingRelated_imageList.size() >0){
-						for(Forum_AdvertisingRelated_Image forum_AdvertisingRelated_Image :collection_Forum_AdvertisingRelated_imageList){
-							if(forum_AdvertisingRelated_Image.getImage_fileName() != null && !"".equals(forum_AdvertisingRelated_Image.getImage_fileName().trim())){
-								
-								old_imageList.add(forum_AdvertisingRelated_Image.getImage_filePath()+dirName+"/"+forum_AdvertisingRelated_Image.getImage_fileName());	
-							}
-						}	
+			//数据校验
+			this.validator.validate(formbean, result); 
+			if (result.hasErrors()) {  
+				List<FieldError> fieldErrorList = result.getFieldErrors();
+				if(fieldErrorList != null && fieldErrorList.size() >0){
+					for(FieldError fieldError : fieldErrorList){
+						error.put(fieldError.getField(), messageSource.getMessage(fieldError, null));
 					}
+				}
+			}
+			
+		}
+		
+		if(error.size() ==0){
+			templateService.updateForum(new_forum);
+			
+			
+			//广告 - 图片广告   删除图片锁
+			if(forum.getForumChildType().equals("图片广告")){
+				if("collection".equals(forum.getDisplayType())){//集合
 					if(new_forum.getFormValue() != null && !"".equals(new_forum.getFormValue().trim())){
-						List<Forum_AdvertisingRelated_Image> new_collection_Forum_AdvertisingRelated_imageList = JsonUtils.toGenericObject(new_forum.getFormValue(), new TypeReference< List<Forum_AdvertisingRelated_Image> >(){});;
-						if(new_collection_Forum_AdvertisingRelated_imageList != null && new_collection_Forum_AdvertisingRelated_imageList.size() >0){
-							for(Forum_AdvertisingRelated_Image new_forum_AdvertisingRelated_Image :new_collection_Forum_AdvertisingRelated_imageList){
-								
-								new_imageList.add(new_forum_AdvertisingRelated_Image.getImage_filePath()+dirName+"/"+new_forum_AdvertisingRelated_Image.getImage_fileName());
-							}	
-						}
-					}
-					
-					Iterator<String> iter = old_imageList.iterator();
-			        while (iter.hasNext()) {
-			        	String old_image_path = iter.next();
-						for(String new_image_path : new_imageList){
-							if(old_image_path.equals(new_image_path)){
-								iter.remove();
-								break;
+						List<Forum_AdvertisingRelated_Image> collection_Forum_AdvertisingRelated_imageList = JsonUtils.toGenericObject(new_forum.getFormValue(), new TypeReference< List<Forum_AdvertisingRelated_Image> >(){});
+						if(collection_Forum_AdvertisingRelated_imageList != null && collection_Forum_AdvertisingRelated_imageList.size() >0){
+							
+							for(Forum_AdvertisingRelated_Image forum_AdvertisingRelated_Image :collection_Forum_AdvertisingRelated_imageList){
+								if(forum_AdvertisingRelated_Image.getImage_fileName() != null && !"".equals(forum_AdvertisingRelated_Image.getImage_fileName().trim())){
+									
+									
+									localFileManage.deleteLock("file"+File.separator+"template"+File.separator+"lock"+File.separator,dirName +"_"+FileUtil.toRelativePath(forum_AdvertisingRelated_Image.getImage_fileName()));
+								}
 							}
 						}
+					
 					}
-				
-			        //删除旧图片
-			        for(String old_image :old_imageList){
-						//替换路径中的..号
-			        	old_image = FileUtil.toRelativePath(old_image);
-						Boolean state = localFileManage.deleteFile(old_image);
-						if(state != null && state == false){
-							//替换指定的字符，只替换第一次出现的
-							old_image = StringUtils.replaceOnce(old_image, "file/template/", "");
-							old_image = StringUtils.replace(old_image, "/", "_");//替换所有出现过的字符
-							//创建删除失败文件
-							localFileManage.failedStateFile("file"+File.separator+"template"+File.separator+"lock"+File.separator+old_image);
-						}
-					}
+					
 				}
-				
 			}
-		}
-		
-		//自定义版块 用户自定义HTML 删除上传文件
-		if(forum.getForumChildType().equals("用户自定义HTML")){
-			if("entityBean".equals(forum.getDisplayType())){//集合
-				List<String> old_pathFileList = new ArrayList<String>();//旧路径文件
-				
-				List<String> new_pathFileList = new ArrayList<String>();// 新路径文件
-				
-				if(forum.getFormValue() != null && !"".equals(forum.getFormValue().trim())){
-					Forum_CustomForumRelated_CustomHTML old_entityBean_Forum_CustomForumRelated_CustomHTML = JsonUtils.toObject(forum.getFormValue(), Forum_CustomForumRelated_CustomHTML.class);
-					
-					if(old_entityBean_Forum_CustomForumRelated_CustomHTML != null){
-						if(old_entityBean_Forum_CustomForumRelated_CustomHTML.getHtml_content() != null && !"".equals(old_entityBean_Forum_CustomForumRelated_CustomHTML.getHtml_content())){
-							Object[] htmlContent_obj = textFilterManage.readPathName(old_entityBean_Forum_CustomForumRelated_CustomHTML.getHtml_content(), "template");
-							
-							if(htmlContent_obj != null && htmlContent_obj.length >0){
-								//图片
-								List<String> imageNameList = (List<String>)htmlContent_obj[0];		
-								if(imageNameList != null && imageNameList.size() >0){
-									
-									for(String imageName : imageNameList){
-										//路径文件
-										old_pathFileList.add(imageName);
-								
-									}	
-								}
-								
-								//Flash
-								List<String> flashNameList = (List<String>)htmlContent_obj[1];		
-								if(flashNameList != null && flashNameList.size() >0){
-									for(String flashName : flashNameList){
-										//路径文件
-										old_pathFileList.add(flashName);
-										
-									}
-									
-								}
-								//影音
-								List<String> mediaNameList = (List<String>)htmlContent_obj[2];	
-								if(mediaNameList != null && mediaNameList.size() >0){
-									for(String mediaName : mediaNameList){
-										//路径文件
-										old_pathFileList.add(mediaName);
-									
-									}
-									
-								}	
-								//文件
-								List<String> fileNameList = (List<String>)htmlContent_obj[3];		
-								if(fileNameList != null && fileNameList.size() >0){
-									for(String fileName : fileNameList){
-										//路径文件
-										old_pathFileList.add(fileName);
-									
-									}
-								}
-							}
-							
-						}
-					}
-					
+			
+			//自定义版块 用户自定义HTML 文件锁
+			if(forum.getForumChildType().equals("用户自定义HTML")){
+				if("entityBean".equals(forum.getDisplayType())){//集合
 					if(new_forum.getFormValue() != null && !"".equals(new_forum.getFormValue().trim())){
-						Forum_CustomForumRelated_CustomHTML new_entityBean_Forum_CustomForumRelated_CustomHTML = JsonUtils.toObject(new_forum.getFormValue(), Forum_CustomForumRelated_CustomHTML.class);
-						if(new_entityBean_Forum_CustomForumRelated_CustomHTML != null){
-							if(new_entityBean_Forum_CustomForumRelated_CustomHTML.getHtml_content() != null && !"".equals(new_entityBean_Forum_CustomForumRelated_CustomHTML.getHtml_content())){
-								Object[] htmlContent_obj = textFilterManage.readPathName(new_entityBean_Forum_CustomForumRelated_CustomHTML.getHtml_content(), "template");
+						Forum_CustomForumRelated_CustomHTML entityBean_Forum_CustomForumRelated_CustomHTML = JsonUtils.toObject(new_forum.getFormValue(), Forum_CustomForumRelated_CustomHTML.class);
+						
+						if(entityBean_Forum_CustomForumRelated_CustomHTML != null){
+							if(entityBean_Forum_CustomForumRelated_CustomHTML.getHtml_content() != null && !"".equals(entityBean_Forum_CustomForumRelated_CustomHTML.getHtml_content())){
+								Object[] htmlContent_obj = textFilterManage.readPathName(entityBean_Forum_CustomForumRelated_CustomHTML.getHtml_content(), "template");
+								List<String> pathFileList = new ArrayList<String>();//路径文件
 								if(htmlContent_obj != null && htmlContent_obj.length >0){
 									//图片
 									List<String> imageNameList = (List<String>)htmlContent_obj[0];		
@@ -1001,7 +672,7 @@ public class ForumManageAction{
 										
 										for(String imageName : imageNameList){
 											//路径文件
-											new_pathFileList.add(imageName);
+											pathFileList.add(imageName);
 									
 										}	
 									}
@@ -1011,7 +682,7 @@ public class ForumManageAction{
 									if(flashNameList != null && flashNameList.size() >0){
 										for(String flashName : flashNameList){
 											//路径文件
-											new_pathFileList.add(flashName);
+											pathFileList.add(flashName);
 											
 										}
 										
@@ -1021,7 +692,7 @@ public class ForumManageAction{
 									if(mediaNameList != null && mediaNameList.size() >0){
 										for(String mediaName : mediaNameList){
 											//路径文件
-											new_pathFileList.add(mediaName);
+											pathFileList.add(mediaName);
 										
 										}
 										
@@ -1031,55 +702,241 @@ public class ForumManageAction{
 									if(fileNameList != null && fileNameList.size() >0){
 										for(String fileName : fileNameList){
 											//路径文件
-											new_pathFileList.add(fileName);
+											pathFileList.add(fileName);
 										
 										}
 									}
 								}
+								
+								//删除路径文件
+								if(pathFileList != null && pathFileList.size() >0){
+									for(String oldPathFile :pathFileList){
+										 //替换指定的字符，只替换第一次出现的
+										oldPathFile = StringUtils.replaceOnce(oldPathFile, "file/template/", "");
+										if(oldPathFile != null && !"".equals(oldPathFile.trim())){
+											localFileManage.deleteLock("file"+File.separator+"template"+File.separator+"lock"+File.separator,oldPathFile.replaceAll("/","_"));
+										 }
+									}
+								}
 							}
 						}
-						Iterator<String> iter = old_pathFileList.iterator();
+						
+					}
+				}
+			}
+			
+
+			//广告 - 图片广告   删除旧图片
+			if(forum.getForumChildType().equals("图片广告")){
+				if("collection".equals(forum.getDisplayType())){//集合
+					
+					//旧图片
+					List<String> old_imageList = new ArrayList<String>();
+					//新图片
+					List<String> new_imageList = new ArrayList<String>();
+					if(forum.getFormValue() != null && !"".equals(forum.getFormValue().trim())){
+						List<Forum_AdvertisingRelated_Image> collection_Forum_AdvertisingRelated_imageList = JsonUtils.toGenericObject(forum.getFormValue(), new TypeReference< List<Forum_AdvertisingRelated_Image> >(){});
+						if(collection_Forum_AdvertisingRelated_imageList != null && collection_Forum_AdvertisingRelated_imageList.size() >0){
+							for(Forum_AdvertisingRelated_Image forum_AdvertisingRelated_Image :collection_Forum_AdvertisingRelated_imageList){
+								if(forum_AdvertisingRelated_Image.getImage_fileName() != null && !"".equals(forum_AdvertisingRelated_Image.getImage_fileName().trim())){
+									
+									old_imageList.add(forum_AdvertisingRelated_Image.getImage_filePath()+dirName+"/"+forum_AdvertisingRelated_Image.getImage_fileName());	
+								}
+							}	
+						}
+						if(new_forum.getFormValue() != null && !"".equals(new_forum.getFormValue().trim())){
+							List<Forum_AdvertisingRelated_Image> new_collection_Forum_AdvertisingRelated_imageList = JsonUtils.toGenericObject(new_forum.getFormValue(), new TypeReference< List<Forum_AdvertisingRelated_Image> >(){});;
+							if(new_collection_Forum_AdvertisingRelated_imageList != null && new_collection_Forum_AdvertisingRelated_imageList.size() >0){
+								for(Forum_AdvertisingRelated_Image new_forum_AdvertisingRelated_Image :new_collection_Forum_AdvertisingRelated_imageList){
+									
+									new_imageList.add(new_forum_AdvertisingRelated_Image.getImage_filePath()+dirName+"/"+new_forum_AdvertisingRelated_Image.getImage_fileName());
+								}	
+							}
+						}
+						
+						Iterator<String> iter = old_imageList.iterator();
 				        while (iter.hasNext()) {
-				        	String old_pathFile = iter.next();
-							for(String new_pathFile : new_pathFileList){
-								
-								if(old_pathFile.equals(new_pathFile)){
+				        	String old_image_path = iter.next();
+							for(String new_image_path : new_imageList){
+								if(old_image_path.equals(new_image_path)){
 									iter.remove();
 									break;
 								}
 							}
 						}
-						if(old_pathFileList != null && old_pathFileList.size() >0){
-							
-							for(String old_pathFile : old_pathFileList){
-								//替换路径中的..号
-								old_pathFile = FileUtil.toRelativePath(old_pathFile);
-								old_pathFile = FileUtil.toSystemPath(old_pathFile);
-								Boolean state = localFileManage.deleteFile(old_pathFile);
-								
-								if(state != null && state == false){
-									//替换指定的字符，只替换第一次出现的
-									old_pathFile = StringUtils.replaceOnce(old_pathFile, "file"+File.separator+"template"+File.separator, "");
-									old_pathFile = FileUtil.toUnderline(old_pathFile);//替换所有出现过的字符
-									//创建删除失败文件
-									localFileManage.failedStateFile("file"+File.separator+"template"+File.separator+"lock"+File.separator+old_pathFile);
-								}
+					
+				        //删除旧图片
+				        for(String old_image :old_imageList){
+							//替换路径中的..号
+				        	old_image = FileUtil.toRelativePath(old_image);
+							Boolean state = localFileManage.deleteFile(old_image);
+							if(state != null && state == false){
+								//替换指定的字符，只替换第一次出现的
+								old_image = StringUtils.replaceOnce(old_image, "file/template/", "");
+								old_image = StringUtils.replace(old_image, "/", "_");//替换所有出现过的字符
+								//创建删除失败文件
+								localFileManage.failedStateFile("file"+File.separator+"template"+File.separator+"lock"+File.separator+old_image);
 							}
-							
+						}
+					}
+					
+				}
+			}
+			
+			//自定义版块 用户自定义HTML 删除上传文件
+			if(forum.getForumChildType().equals("用户自定义HTML")){
+				if("entityBean".equals(forum.getDisplayType())){//集合
+					List<String> old_pathFileList = new ArrayList<String>();//旧路径文件
+					
+					List<String> new_pathFileList = new ArrayList<String>();// 新路径文件
+					
+					if(forum.getFormValue() != null && !"".equals(forum.getFormValue().trim())){
+						Forum_CustomForumRelated_CustomHTML old_entityBean_Forum_CustomForumRelated_CustomHTML = JsonUtils.toObject(forum.getFormValue(), Forum_CustomForumRelated_CustomHTML.class);
+						
+						if(old_entityBean_Forum_CustomForumRelated_CustomHTML != null){
+							if(old_entityBean_Forum_CustomForumRelated_CustomHTML.getHtml_content() != null && !"".equals(old_entityBean_Forum_CustomForumRelated_CustomHTML.getHtml_content())){
+								Object[] htmlContent_obj = textFilterManage.readPathName(old_entityBean_Forum_CustomForumRelated_CustomHTML.getHtml_content(), "template");
+								
+								if(htmlContent_obj != null && htmlContent_obj.length >0){
+									//图片
+									List<String> imageNameList = (List<String>)htmlContent_obj[0];		
+									if(imageNameList != null && imageNameList.size() >0){
+										
+										for(String imageName : imageNameList){
+											//路径文件
+											old_pathFileList.add(imageName);
+									
+										}	
+									}
+									
+									//Flash
+									List<String> flashNameList = (List<String>)htmlContent_obj[1];		
+									if(flashNameList != null && flashNameList.size() >0){
+										for(String flashName : flashNameList){
+											//路径文件
+											old_pathFileList.add(flashName);
+											
+										}
+										
+									}
+									//影音
+									List<String> mediaNameList = (List<String>)htmlContent_obj[2];	
+									if(mediaNameList != null && mediaNameList.size() >0){
+										for(String mediaName : mediaNameList){
+											//路径文件
+											old_pathFileList.add(mediaName);
+										
+										}
+										
+									}	
+									//文件
+									List<String> fileNameList = (List<String>)htmlContent_obj[3];		
+									if(fileNameList != null && fileNameList.size() >0){
+										for(String fileName : fileNameList){
+											//路径文件
+											old_pathFileList.add(fileName);
+										
+										}
+									}
+								}
+								
+							}
 						}
 						
-						
+						if(new_forum.getFormValue() != null && !"".equals(new_forum.getFormValue().trim())){
+							Forum_CustomForumRelated_CustomHTML new_entityBean_Forum_CustomForumRelated_CustomHTML = JsonUtils.toObject(new_forum.getFormValue(), Forum_CustomForumRelated_CustomHTML.class);
+							if(new_entityBean_Forum_CustomForumRelated_CustomHTML != null){
+								if(new_entityBean_Forum_CustomForumRelated_CustomHTML.getHtml_content() != null && !"".equals(new_entityBean_Forum_CustomForumRelated_CustomHTML.getHtml_content())){
+									Object[] htmlContent_obj = textFilterManage.readPathName(new_entityBean_Forum_CustomForumRelated_CustomHTML.getHtml_content(), "template");
+									if(htmlContent_obj != null && htmlContent_obj.length >0){
+										//图片
+										List<String> imageNameList = (List<String>)htmlContent_obj[0];		
+										if(imageNameList != null && imageNameList.size() >0){
+											
+											for(String imageName : imageNameList){
+												//路径文件
+												new_pathFileList.add(imageName);
+										
+											}	
+										}
+										
+										//Flash
+										List<String> flashNameList = (List<String>)htmlContent_obj[1];		
+										if(flashNameList != null && flashNameList.size() >0){
+											for(String flashName : flashNameList){
+												//路径文件
+												new_pathFileList.add(flashName);
+												
+											}
+											
+										}
+										//影音
+										List<String> mediaNameList = (List<String>)htmlContent_obj[2];	
+										if(mediaNameList != null && mediaNameList.size() >0){
+											for(String mediaName : mediaNameList){
+												//路径文件
+												new_pathFileList.add(mediaName);
+											
+											}
+											
+										}	
+										//文件
+										List<String> fileNameList = (List<String>)htmlContent_obj[3];		
+										if(fileNameList != null && fileNameList.size() >0){
+											for(String fileName : fileNameList){
+												//路径文件
+												new_pathFileList.add(fileName);
+											
+											}
+										}
+									}
+								}
+							}
+							Iterator<String> iter = old_pathFileList.iterator();
+					        while (iter.hasNext()) {
+					        	String old_pathFile = iter.next();
+								for(String new_pathFile : new_pathFileList){
+									
+									if(old_pathFile.equals(new_pathFile)){
+										iter.remove();
+										break;
+									}
+								}
+							}
+							if(old_pathFileList != null && old_pathFileList.size() >0){
+								
+								for(String old_pathFile : old_pathFileList){
+									//替换路径中的..号
+									old_pathFile = FileUtil.toRelativePath(old_pathFile);
+									old_pathFile = FileUtil.toSystemPath(old_pathFile);
+									Boolean state = localFileManage.deleteFile(old_pathFile);
+									
+									if(state != null && state == false){
+										//替换指定的字符，只替换第一次出现的
+										old_pathFile = StringUtils.replaceOnce(old_pathFile, "file"+File.separator+"template"+File.separator, "");
+										old_pathFile = FileUtil.toUnderline(old_pathFile);//替换所有出现过的字符
+										//创建删除失败文件
+										localFileManage.failedStateFile("file"+File.separator+"template"+File.separator+"lock"+File.separator+old_pathFile);
+									}
+								}
+								
+							}
+							
+							
+						}
 					}
+					
+					
 				}
-				
-				
 			}
 		}
 		
-			
-		model.addAttribute("message","修改版块成功");//返回消息&page=${param.page}
-		model.addAttribute("urladdress", RedirectPath.readUrl("control.forum.list")+"?layoutId="+layoutId+"&dirName="+dirName+"&page="+pageForm.getPage());//返回消息//返回转向地址
-		return "jsp/common/message";
+
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+		}
 	}
 	
 	/**
@@ -1118,7 +975,7 @@ public class ForumManageAction{
 						if(collection_image_imageLink[i] != null && !"".equals(collection_image_imageLink[i].trim())){
 							image_link = collection_image_imageLink[i];
 						}
-					
+						
 						MultipartFile file = collection_image_imageFile.get(i);
 						
 						if(file != null && !file.isEmpty()){
@@ -1156,7 +1013,7 @@ public class ForumManageAction{
 							
 						}else{//如果图片已上传
 							
-							if(collection_image_imagePath[i] != null && !"".equals(collection_image_imagePath[i].trim())){
+							if(collection_image_imagePath[i] != null && collection_image_imagePath[i].trim().length() >14){
 								//取得文件名称
 								String fileName = FileUtil.getName(collection_image_imagePath[i].trim());
 								//旧路径必须为file/template/开头
@@ -1247,10 +1104,10 @@ public class ForumManageAction{
 			}
 		}
 		
-		Forum_CommentRelated_Comment collection_Forum_CommentRelated_Comment = new Forum_CommentRelated_Comment();
+		Forum_CommentRelated_Comment page_Forum_CommentRelated_Comment = new Forum_CommentRelated_Comment();
 		//评论列表
 		if(formbean.getForumChildType().equals("评论列表")){
-			if("page".equals(displayType)){//集合
+			if("page".equals(displayType)){//分页
 				String page_comment_sort = request.getParameter("page_comment_sort");//排序
 				String page_comment_maxResult = request.getParameter("page_comment_maxResult");//每页显示记录数
 				String page_comment_pageCount = request.getParameter("page_comment_pageCount");//页码显示总数
@@ -1277,11 +1134,11 @@ public class ForumManageAction{
 					}
 				}
 				
-				collection_Forum_CommentRelated_Comment.setComment_id(UUIDUtil.getUUID32());
-				collection_Forum_CommentRelated_Comment.setComment_sort(Integer.parseInt(page_comment_sort));
-				collection_Forum_CommentRelated_Comment.setComment_maxResult(comment_maxResult);//每页显示记录数
-				collection_Forum_CommentRelated_Comment.setComment_pageCount(comment_pageCount);//页码显示总数
-				forum.setFormValue(JsonUtils.toJSONString(collection_Forum_CommentRelated_Comment));//加入表单值
+				page_Forum_CommentRelated_Comment.setComment_id(UUIDUtil.getUUID32());
+				page_Forum_CommentRelated_Comment.setComment_sort(Integer.parseInt(page_comment_sort));
+				page_Forum_CommentRelated_Comment.setComment_maxResult(comment_maxResult);//每页显示记录数
+				page_Forum_CommentRelated_Comment.setComment_pageCount(comment_pageCount);//页码显示总数
+				forum.setFormValue(JsonUtils.toJSONString(page_Forum_CommentRelated_Comment));//加入表单值
 				
 				
 				
@@ -1636,7 +1493,7 @@ public class ForumManageAction{
 			String[] collection_recommendHelp_helpId = request.getParameterValues("collection_recommendHelp_helpId");//在线帮助Id
 
 			//在线帮助Id
-			Map<Long,String> helpList = new LinkedHashMap<Long,String>();//key:在线帮助Id value:在线帮助名称
+			List<Help> help_recommendHelpList = new ArrayList<Help>();//id:在线帮助Id name:在线帮助名称
 			if(collection_recommendHelp_helpId != null && collection_recommendHelp_helpId.length >0){
 				List<Long> helpIdList = new ArrayList<Long>();
 				for(int i = 0; i<collection_recommendHelp_helpId.length; i++){
@@ -1652,7 +1509,7 @@ public class ForumManageAction{
 						for(Long id :helpIdList){//按添加的顺序
 							for(Help help : _helpList){
 								if(id.equals(help.getId())){
-									helpList.put(help.getId(), help.getName());
+									help_recommendHelpList.add(new Help(help.getId(), help.getName()));
 									break;
 								}
 							}						
@@ -1664,7 +1521,7 @@ public class ForumManageAction{
 			
 			collection_Forum_HelpRelated_RecommendHelp.setHelp_id(UUIDUtil.getUUID32());
 
-			collection_Forum_HelpRelated_RecommendHelp.setHelp_recommendHelpList(helpList);
+			collection_Forum_HelpRelated_RecommendHelp.setHelp_recommendHelpList(help_recommendHelpList);
 			forum.setFormValue(JsonUtils.toJSONString(collection_Forum_HelpRelated_RecommendHelp));//加入表单值
 			
 		}
@@ -1733,10 +1590,10 @@ public class ForumManageAction{
 	 * @param layoutId 布局Id
 	 * @param dir: 上传类型，分别为image、flash、media、file 
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=upload",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String upload(ModelMap model,String layoutId,String dir,
-			MultipartFile imgFile, HttpServletResponse response) throws Exception {
+			MultipartFile file, HttpServletResponse response) throws Exception {
 		//当前图片类型
 		Map<String,Object> returnJson = new HashMap<String,Object>();
 		
@@ -1749,11 +1606,11 @@ public class ForumManageAction{
 
 		if(dir != null && layout != null){
 				
-			if(imgFile != null && !imgFile.isEmpty()){
+			if(file != null && !file.isEmpty()){
 				//当前文件名称
-				String fileName = imgFile.getOriginalFilename();
+				String fileName = file.getOriginalFilename();
 				//文件大小
-				Long size = imgFile.getSize();
+				Long size = file.getSize();
 				//取得文件后缀
 				String suffix = FileUtil.getExtension(fileName).toLowerCase();
 				
@@ -1769,12 +1626,12 @@ public class ForumManageAction{
 					//允许上传图片大小
 					long imageSize = 200000L;
 	
-					boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
+					boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),formatList);
 					
 					
 					//如果用flash控件上传
-					if(imgFile.getContentType().equalsIgnoreCase("application/octet-stream")){
-						String fileType = FileType.getType(imgFile.getInputStream());
+					if(file.getContentType().equalsIgnoreCase("application/octet-stream")){
+						String fileType = FileType.getType(file.getInputStream());
 						for (String format :formatList) {
 							if(format.equalsIgnoreCase(fileType)){
 								authentication = true;
@@ -1800,7 +1657,7 @@ public class ForumManageAction{
 						//生成锁文件
 						localFileManage.addLock(lockPathDir,layout.getDirName()+"_image_"+newFileName);
 						//保存文件
-						localFileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
+						localFileManage.writeFile(pathDir, newFileName,file.getBytes());
 						
 						//上传成功
 						returnJson.put("error", 0);//0成功  1错误
@@ -1814,7 +1671,7 @@ public class ForumManageAction{
 					flashFormatList.add("swf");
 					
 					//验证文件后缀
-					boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),flashFormatList);
+					boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),flashFormatList);
 					
 					if(authentication){
 						
@@ -1832,7 +1689,7 @@ public class ForumManageAction{
 						//生成锁文件
 						localFileManage.addLock(lockPathDir,layout.getDirName() +"_flash_"+newFileName);
 						//保存文件
-						localFileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
+						localFileManage.writeFile(pathDir, newFileName,file.getBytes());
 						
 						//上传成功
 						returnJson.put("error", 0);//0成功  1错误
@@ -1858,7 +1715,7 @@ public class ForumManageAction{
 					
 					
 					//验证文件后缀
-					boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
+					boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),formatList);
 					
 					if(authentication){
 						//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
@@ -1875,7 +1732,7 @@ public class ForumManageAction{
 						//生成锁文件
 						localFileManage.addLock(lockPathDir,layout.getDirName()+"_media_"+newFileName);
 						//保存文件
-						localFileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
+						localFileManage.writeFile(pathDir, newFileName,file.getBytes());
 						
 						//上传成功
 						returnJson.put("error", 0);//0成功  1错误
@@ -1887,7 +1744,7 @@ public class ForumManageAction{
 					List<String> formatList = CommentedProperties.readRichTextAllowFileUploadFormat();
 					
 					//验证文件后缀
-					boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
+					boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),formatList);
 					if(authentication){
 						//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
 						String pathDir = "file"+File.separator+"template"+File.separator + layout.getDirName()+ File.separator +"file"+ File.separator;
@@ -1903,12 +1760,12 @@ public class ForumManageAction{
 						//生成锁文件
 						localFileManage.addLock(lockPathDir,layout.getDirName()+"_file_"+newFileName);
 						//保存文件
-						localFileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
+						localFileManage.writeFile(pathDir, newFileName,file.getBytes());
 						
 						//上传成功
 						returnJson.put("error", 0);//0成功  1错误
 						returnJson.put("url", "file/template/"+layout.getDirName()+"/file/"+newFileName);
-						returnJson.put("title", imgFile.getOriginalFilename());//旧文件名称
+						returnJson.put("title", file.getOriginalFilename());//旧文件名称
 						return JsonUtils.toJSONString(returnJson);
 					}
 				}
@@ -1927,12 +1784,12 @@ public class ForumManageAction{
 	/**
 	 * 版块管理 删除
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=delete",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
-	public String delete(ModelMap model,String code,
-			Integer forumId,
+	public String delete(ModelMap model,Integer forumId,
 			HttpServletRequest request, HttpServletResponse response)
 		throws Exception {
+		Map<String,String> error = new HashMap<String,String>();
 		if(forumId != null && forumId >0){
 			Forum forum = templateService.findForumById(forumId);
 			if(forum != null){
@@ -1943,9 +1800,11 @@ public class ForumManageAction{
 				
 				
 				templateService.deleteForumByForumId(forumId);
-				return "1";
+				return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 			}
+		}else{
+			error.put("forumId", "版块Id不能为空");
 		}
-		return "0";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 }

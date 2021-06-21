@@ -70,5 +70,13 @@ public class FeedbackServiceBean extends DaoSupport<Feedback> implements Feedbac
 		i = delete.executeUpdate();
 		return i;
 	}
-	
+	/**
+	 * 查询留言数量
+	 * @return
+	 */
+	@Transactional(readOnly=true,propagation=Propagation.NOT_SUPPORTED)
+	public Long feedbackCount(){
+		Query query = em.createQuery("select count(o) from Feedback o");
+		return (Long)query.getSingleResult();
+	}
 }

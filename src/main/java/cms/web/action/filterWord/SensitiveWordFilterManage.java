@@ -3,6 +3,7 @@ package cms.web.action.filterWord;
 import java.io.File;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -25,54 +26,74 @@ public class SensitiveWordFilterManage {
 	
 	private static Words words = new Words(); 
 	
-	/**
-	 * 初始化敏感词
-	
-	public void init(){
-		words.addWord("敏感词1");  
 
-		words.addWord("敏感词2");  
-
-		words.addWord("敏感词3");  
-
-		words.addWord("敏感词4");  
-
-		words.addWord("敏感词5");  
-		words.addWord("av"); 
-
-		//words.addWord("标题敏感词", 2); 
-	} */
-	/**
-	 * 清空词库
-	 */
-	private void clearWord() {
-		words = new Words();
-	}
 	
 	/**
 	 * 返回过滤后的字符
 	 * @param content 输入内容
-	 * @param replace 敏感词替换字符
+	 * @param replaceChar 敏感词替换字符
 	 * @return
 	 */
-	public String filterSensitiveWord(String content,String replace){
-		List<String> findedWords = words.getFindedAllOriginalWords(content);
+	public String filterSensitiveWord(String content,String replaceChar){
+		List<String> findedWords = this.getFindedAllSensitive(content.toLowerCase());
 		if(findedWords != null && findedWords.size() >0){
 			for(String str :findedWords){
-				content = replace(content, str, replace);
+			//	content = replace(content, str, replaceChar);
+				content = StringUtils.replaceIgnoreCase(content, str, replaceChar);//忽略大小写替换； String.replaceAll不能直接替换特殊字符，例如：$/
 			}
 		}
 		return content;
 	}
 	
 	/**
-	 * 判断是否有敏感词
-	 * @param content 输入内容
-	 * @return
+	 * 清空词库
 	 */
-	public boolean isSensitiveWord(String content){
-		return words.contains(content);
+	private void clearWord() {
+		words.clear();
+	} 
+	
+
+	/**
+	 * 是否包含敏感词
+	 * @param text 文本
+	 * @return 是否包含
+	 */
+	public boolean containsSensitive(String text){
+		return words.isMatch(text);
 	}
+	
+	
+	/**
+	 * 查找敏感词，返回找到的第一个敏感词
+	 * @param text 文本
+	 * @return 敏感词
+	 */
+	public String getFindedFirstSensitive(String text){
+		return words.match(text);
+	}
+	/**
+	 * 查找敏感词，返回找到的所有敏感词
+	 * @param text 文本
+	 * @return 敏感词
+	 */
+	public List<String> getFindedAllSensitive(String text){
+		return words.matchAll(text);
+	}
+	
+	/**
+	 * 查找敏感词，返回找到的所有敏感词<br>
+	 * 密集匹配原则：假如关键词有 ab,b，文本是abab，将匹配 [ab,b,ab]<br>
+	 * 贪婪匹配（最长匹配）原则：假如关键字a,ab，最长匹配将匹配[a, ab]
+	 * 
+	 * @param text 文本
+	 * @param isDensityMatch 是否使用密集匹配原则
+	 * @param isGreedMatch 是否使用贪婪匹配（最长匹配）原则
+	 * @return 敏感词
+	 */
+	public List<String> getFindedAllSensitive(String text, boolean isDensityMatch, boolean isGreedMatch){
+		return words.matchAll(text, -1, isDensityMatch, isGreedMatch);
+	}
+	
 	
 	/**
 	 * @describe:可以替换特殊字符的替换方法,replaceAll只能替换普通字符串,含有特殊字符的不能替换
@@ -145,7 +166,7 @@ public class SensitiveWordFilterManage {
 					if(wordList != null && wordList.size() >0){
 						for(String word : wordList){
 							if(word != null && !"".equals(word.trim())){
-								words.addWord(word.trim());  
+								words.addWord(word.toLowerCase().trim());  
 							}
 						}
 					}

@@ -21,6 +21,7 @@
 <script type="text/javascript" src="${commonPath}js/tool.js" language="javascript"></script>
 <script type="text/javascript" src="${commonPath}js/ajax.js" language="javascript" ></script>
 <script type="text/javascript" src="${commonPath}js/json2.js" language="javascript" ></script>
+<script type="text/javascript" src="${commonPath}js/lodash.min.js" language="javascript" ></script>
 <script type="text/javascript" src="${commonPath}js/jquery/jquery.min.js" language="javascript"></script>
 <script type="text/javascript" src="${commonPath}js/DPlayer/hls.min.js" language="javascript"></script>
 <script type="text/javascript" src="${commonPath}js/DPlayer/DPlayer.min.js" language="javascript"></script>
@@ -266,8 +267,6 @@
 				
 				<#-- 引入红包 -->
 				<@include action="${redEnvelopeRelated_giveRedEnvelopeContent_1}" giveRedEnvelopeId="${topic.giveRedEnvelopeId}"/>
-				
-				<@include action="${redEnvelopeRelated_receiveRedEnvelopeUser_1}" giveRedEnvelopeId="${topic.giveRedEnvelopeId}"/>
 				
 				
 				<#-- 引入相似问题 -->

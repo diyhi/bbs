@@ -119,7 +119,6 @@ public class ForumCodeManage {
 		childNode30.add(new ForumCodeNode(300003,"抢红包","redEnvelopeRelated_addReceiveRedEnvelope_",Arrays.asList(new String[]{"集合"})));
 		forumCodeNodeList.add(new ForumCodeNode(3000,"红包",childNode30));//添加一级节点
 		
-		
 		//在线留言
 		List<ForumCodeNode> childNode3 =  new ArrayList<ForumCodeNode>();//添加二级节点	
 		childNode3.add(new ForumCodeNode(3001,"添加在线留言","feedbackRelated_addFeedback_",Arrays.asList(new String[]{"集合"})));

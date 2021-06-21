@@ -6897,6 +6897,7 @@ html,body{
 
 
 
+
 /* 页脚 border-top: 1px solid #e1e1e1; */
 .footer { min-width: 990px; 
 	background: #f8f8f9;
@@ -6910,7 +6911,11 @@ html,body{
 
 .footer .copyright { width: 990px; margin: 0 auto;  color: #999; text-align: center; margin-top: 18px; }
 .footer .copyright em { font-family: Tahoma; margin-left: 3px; }
-.footer .copyright .link{ font-family: Tahoma; margin-left: 2px; color: #999; font-weight: bold;}
-.footer .copyright a { font-family: Tahoma; margin-left: 16px; color: #999;}
+.footer .copyright a { font-family: Tahoma; margin-left: 19px; color: #999; }
 .footer .copyright a:hover { text-decoration: underline; }
 .footer .copyright span { margin-left: 17px; }
+
+
+
+
+

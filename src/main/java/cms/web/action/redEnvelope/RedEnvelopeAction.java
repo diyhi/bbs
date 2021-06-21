@@ -3,8 +3,10 @@ package cms.web.action.redEnvelope;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -13,7 +15,8 @@ import javax.servlet.http.HttpServletResponse;
 import cms.bean.PageForm;
 import cms.bean.PageView;
 import cms.bean.QueryResult;
-import cms.bean.payment.PaymentVerificationLog;
+import cms.bean.RequestResult;
+import cms.bean.ResultCode;
 import cms.bean.redEnvelope.GiveRedEnvelope;
 import cms.bean.redEnvelope.ReceiveRedEnvelope;
 import cms.bean.topic.Topic;
@@ -21,13 +24,15 @@ import cms.bean.user.User;
 import cms.service.redEnvelope.RedEnvelopeService;
 import cms.service.setting.SettingService;
 import cms.service.user.UserService;
+import cms.utils.JsonUtils;
+import cms.web.action.fileSystem.FileManage;
 import cms.web.action.topic.TopicManage;
 import cms.web.action.user.UserManage;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * 红包管理
@@ -43,6 +48,7 @@ public class RedEnvelopeAction{
 	@Resource TopicManage topicManage;
 	@Resource RedEnvelopeManage redEnvelopeManage;
 	@Resource UserManage userManage;
+	@Resource FileManage fileManage;
 	
 	/**
 	 * 发红包
@@ -54,10 +60,15 @@ public class RedEnvelopeAction{
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping("/control/redEnvelope/giveRedEnvelope/list")  
 	public String giveRedEnvelopePage(ModelMap model, PageForm pageForm,Long id,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {	
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
+		Map<String,Object> returnValue = new HashMap<String,Object>();
+		
 		//调用分页算法代码
 		PageView<GiveRedEnvelope> pageView = new PageView<GiveRedEnvelope>(settingService.findSystemSetting_cache().getBackstagePageNumber(),pageForm.getPage(),10);
 		//当前页
@@ -83,7 +94,7 @@ public class RedEnvelopeAction{
 			QueryResult<GiveRedEnvelope> qr = redEnvelopeService.getScrollData(GiveRedEnvelope.class,firstIndex, pageView.getMaxresult(),_jpql, params.toArray(),orderby);
 			//将查询结果集传给分页List
 			pageView.setQueryResult(qr);
-			request.setAttribute("pageView", pageView);
+			
 
 			if(qr.getResultlist() != null && qr.getResultlist().size() >0){
 				for(GiveRedEnvelope giveRedEnvelope : qr.getResultlist()){
@@ -92,18 +103,24 @@ public class RedEnvelopeAction{
 						if(topic != null){
 							giveRedEnvelope.setBindTopicTitle(topic.getTitle());
 						}
-						
 					}
-					
 				}
-				
 			}
 			
+			User user = userService.findUserById(id);
+			if(user != null){
+				returnValue.put("currentUser", user);
+			}
+			returnValue.put("pageView", pageView);
+		}else{
+			error.put("userId", "用户Id不能为空");
 		}
 		
-		
-
-		return "jsp/redEnvelope/giveRedEnvelopeList";
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
+		}
 	}
 	
 	
@@ -112,16 +129,20 @@ public class RedEnvelopeAction{
 	 * @param model
 	 * @param pageForm
 	 * @param giveRedEnvelopeId 发红包Id
+	 * @param id 用户Id
 	 * @param request
 	 * @param response
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping("/control/redEnvelope/redEnvelopeAmountDistribution/list")  
-	public String redEnvelopeAmountDistributionPage(ModelMap model, PageForm pageForm,String giveRedEnvelopeId,
+	public String redEnvelopeAmountDistributionPage(ModelMap model, PageForm pageForm,String giveRedEnvelopeId,Long id,Long topicId,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {	
-
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
+		Map<String,Object> returnValue = new HashMap<String,Object>();
 		//调用分页算法代码
 		PageView<ReceiveRedEnvelope> pageView = new PageView<ReceiveRedEnvelope>(settingService.findSystemSetting_cache().getBackstagePageNumber(),pageForm.getPage(),10);
 		
@@ -139,13 +160,34 @@ public class RedEnvelopeAction{
 		
 				//将查询结果集传给分页List
 				pageView.setQueryResult(qr);
-				model.addAttribute("pageView", pageView);
 				
-				model.addAttribute("giveRedEnvelope", giveRedEnvelope);
+				if(id != null){
+					User user = userService.findUserById(id);
+					if(user != null){
+						returnValue.put("currentUser", user);
+					}
+				}
+				if(topicId != null){
+					Topic topic = topicManage.queryTopicCache(topicId);
+					if(topic != null){
+						returnValue.put("currentTopic", topic);
+					}
+				}
+				returnValue.put("pageView", pageView);
+				
+				returnValue.put("giveRedEnvelope", giveRedEnvelope);
+			}else{
+				error.put("giveRedEnvelopeId", "发红包不存在");
 			}
+		}else{
+			error.put("giveRedEnvelopeId", "发红包Id不能为空");
 		}
 		
-		return "jsp/redEnvelope/redEnvelopeAmountDistributionList";
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
+		}
 	}
 	
 	
@@ -161,10 +203,15 @@ public class RedEnvelopeAction{
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping("/control/redEnvelope/receiveRedEnvelope/list")  
 	public String receiveRedEnvelopePage(ModelMap model, PageForm pageForm,Long id,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {	
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
+		Map<String,Object> returnValue = new HashMap<String,Object>();
+		
 		//调用分页算法代码
 		PageView<ReceiveRedEnvelope> pageView = new PageView<ReceiveRedEnvelope>(settingService.findSystemSetting_cache().getBackstagePageNumber(),pageForm.getPage(),10);
 		//当前页
@@ -174,7 +221,12 @@ public class RedEnvelopeAction{
 			QueryResult<ReceiveRedEnvelope> qr = redEnvelopeService.findReceiveRedEnvelopeByUserId(id, firstIndex, pageView.getMaxresult());
 			//将查询结果集传给分页List
 			pageView.setQueryResult(qr);
-			request.setAttribute("pageView", pageView);
+			User _user = userService.findUserById(id);
+			if(_user != null){
+				returnValue.put("currentUser", _user);
+			}
+			
+			returnValue.put("pageView", pageView);
 			
 			if(qr.getResultlist() != null && qr.getResultlist().size() >0){
 				for(ReceiveRedEnvelope receiveRedEnvelope : qr.getResultlist()){
@@ -183,7 +235,7 @@ public class RedEnvelopeAction{
 	        			receiveRedEnvelope.setGiveNickname(user.getNickname());
 	        			receiveRedEnvelope.setGiveUserName(user.getUserName());
 	        			if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-	        				receiveRedEnvelope.setGiveAvatarPath(user.getAvatarPath());
+	        				receiveRedEnvelope.setGiveAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 	        				receiveRedEnvelope.setGiveAvatarName(user.getAvatarName());
 	        			}		
 	        		}
@@ -203,8 +255,14 @@ public class RedEnvelopeAction{
 	        		
 				}
 			}
+		}else{
+			error.put("userId", "用户Id不能为空");
 		}
-		return "jsp/redEnvelope/receiveRedEnvelopeList";
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
+		}
 	}
 	
 }

@@ -14,11 +14,14 @@ import javax.servlet.http.HttpServletResponse;
 import cms.bean.PageForm;
 import cms.bean.PageView;
 import cms.bean.QueryResult;
+import cms.bean.RequestResult;
+import cms.bean.ResultCode;
 import cms.bean.message.PrivateMessage;
 import cms.bean.user.User;
 import cms.service.message.PrivateMessageService;
 import cms.service.setting.SettingService;
 import cms.service.user.UserService;
+import cms.utils.JsonUtils;
 import cms.web.action.fileSystem.FileManage;
 
 import org.apache.logging.log4j.LogManager;
@@ -55,10 +58,13 @@ public class PrivateMessageManageAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=privateMessageList",method=RequestMethod.GET)
 	public String privateMessageList(PageForm pageForm,ModelMap model,Long id,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
-		
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
+		Map<String,Object> returnValue = new HashMap<String,Object>();
 		if(id != null && id >0L){
 			//调用分页算法代码
 			PageView<PrivateMessage> pageView = new PageView<PrivateMessage>(settingService.findSystemSetting_cache().getBackstagePageNumber(),pageForm.getPage(),10);
@@ -99,6 +105,7 @@ public class PrivateMessageManageAction {
 						User friend_user = userMap.get(privateMessage.getFriendUserId());
 						if(friend_user != null){
 							privateMessage.setFriendUserName(friend_user.getUserName());//私信对方用户名称
+							privateMessage.setFriendNickname(friend_user.getNickname());
 							if(friend_user.getAvatarName() != null && !"".equals(friend_user.getAvatarName().trim())){
 								privateMessage.setFriendAvatarPath(fileManage.fileServerAddress()+friend_user.getAvatarPath());//私信对方头像路径
 								privateMessage.setFriendAvatarName(friend_user.getAvatarName());//私信对方头像名称
@@ -107,6 +114,7 @@ public class PrivateMessageManageAction {
 						User sender_user = userMap.get(privateMessage.getSenderUserId());
 						if(sender_user != null){
 							privateMessage.setSenderUserName(sender_user.getUserName());//私信发送者用户名称
+							privateMessage.setSenderNickname(sender_user.getNickname());
 							if(sender_user.getAvatarName() != null && !"".equals(sender_user.getAvatarName().trim())){
 								privateMessage.setSenderAvatarPath(fileManage.fileServerAddress()+sender_user.getAvatarPath());//发送者头像路径
 								privateMessage.setSenderAvatarName(sender_user.getAvatarName());//发送者头像名称
@@ -121,13 +129,22 @@ public class PrivateMessageManageAction {
 			}
 			//将查询结果集传给分页List
 			pageView.setQueryResult(qr);
+			User user = userService.findUserById(id);
+			if(user != null){
+				returnValue.put("currentUser", user);
+			}
 			
-			model.addAttribute("pageView", pageView);
+			returnValue.put("pageView", pageView);
+		}else{
+			error.put("id", "用户Id不能为空");
+			
 		}
 		
-		
-		
-		return "jsp/message/privateMessageList";
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
+		}
 	}
 	
 	/**
@@ -140,30 +157,56 @@ public class PrivateMessageManageAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=privateMessageChatList",method=RequestMethod.GET)
-	public String privateMessageChatList(PageForm pageForm,ModelMap model,Long id,Long friendUserId,
+	public String privateMessageChatList(Integer page,ModelMap model,Long id,Long friendUserId,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
+		Map<String,Object> returnValue = new HashMap<String,Object>();
 		
-		//调用分页算法代码
-		PageView<PrivateMessage> pageView = new PageView<PrivateMessage>(settingService.findSystemSetting_cache().getBackstagePageNumber(),pageForm.getPage(),10);
-		//当前页
-		int firstIndex = (pageForm.getPage()-1)*pageView.getMaxresult();
-			
-				
-		//用户Id集合
-		Set<Long> userIdList = new HashSet<Long>();
-		//用户集合
-		Map<Long,User> userMap = new HashMap<Long,User>();
+
 		
 		if(id != null && id >0L && friendUserId !=null && friendUserId >0L){
-			//对话用户
-			User chatUser = userService.findUserById(friendUserId);
-			if(chatUser != null){
-				model.addAttribute("chatUser", chatUser);
+			
+			
+			PageForm pageForm = new PageForm();
+			pageForm.setPage(page);
+			
+			if(page == null){
+				Long count = privateMessageService.findPrivateMessageChatCountByUserId(id,friendUserId,null);
+				if(count != null && count >0L){
+					Integer _page = Integer.parseInt(String.valueOf(count))/settingService.findSystemSetting_cache().getBackstagePageNumber();
+					if(Integer.parseInt(String.valueOf(count))%settingService.findSystemSetting_cache().getBackstagePageNumber() >0){//余数大于0要加1
+						_page = _page+1;
+					}
+					pageForm.setPage(_page);
+				}
 			}
 			
 			
-			QueryResult<PrivateMessage> qr = privateMessageService.findPrivateMessageChatByUserId(id,friendUserId,null,firstIndex,pageView.getMaxresult(),2);
+			
+			
+			//调用分页算法代码
+			PageView<PrivateMessage> pageView = new PageView<PrivateMessage>(settingService.findSystemSetting_cache().getBackstagePageNumber(),pageForm.getPage(),10);
+			//当前页
+			int firstIndex = (pageForm.getPage()-1)*pageView.getMaxresult();
+				
+					
+			//用户Id集合
+			Set<Long> userIdList = new HashSet<Long>();
+			//用户集合
+			Map<Long,User> userMap = new HashMap<Long,User>();
+			
+			
+			//对话用户
+			User chatUser = userService.findUserById(friendUserId);
+			if(chatUser != null){
+				returnValue.put("chatUser", chatUser);
+			}
+			
+			
+			QueryResult<PrivateMessage> qr = privateMessageService.findPrivateMessageChatByUserId(id,friendUserId,null,firstIndex,pageView.getMaxresult(),1);
 			if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
 				for(PrivateMessage privateMessage : qr.getResultlist()){
 					userIdList.add(privateMessage.getSenderUserId());//发送者用户Id 
@@ -190,6 +233,7 @@ public class PrivateMessageManageAction {
 						
 						if(friend_user != null){
 							privateMessage.setFriendUserName(friend_user.getUserName());//私信对方用户名称
+							privateMessage.setFriendNickname(friend_user.getNickname());
 							if(friend_user.getAvatarName() != null && !"".equals(friend_user.getAvatarName().trim())){
 								privateMessage.setFriendAvatarPath(fileManage.fileServerAddress()+friend_user.getAvatarPath());//私信对方头像路径
 								privateMessage.setFriendAvatarName(friend_user.getAvatarName());//私信对方头像名称
@@ -198,6 +242,7 @@ public class PrivateMessageManageAction {
 						User sender_user = userMap.get(privateMessage.getSenderUserId());
 						if(sender_user != null){
 							privateMessage.setSenderUserName(sender_user.getUserName());//私信发送者用户名称
+							privateMessage.setSenderNickname(sender_user.getNickname());
 							if(sender_user.getAvatarName() != null && !"".equals(sender_user.getAvatarName().trim())){
 								privateMessage.setSenderAvatarPath(fileManage.fileServerAddress()+sender_user.getAvatarPath());//发送者头像路径
 								privateMessage.setSenderAvatarName(sender_user.getAvatarName());//发送者头像名称
@@ -212,10 +257,15 @@ public class PrivateMessageManageAction {
 			}
 			//将查询结果集传给分页List
 			pageView.setQueryResult(qr);
-			model.addAttribute("pageView", pageView);
+			returnValue.put("pageView", pageView);
+		}else{
+			error.put("id", "用户Id或对方用户Id不能为空");
+			
 		}
-		
-		return "jsp/message/privateMessageChatList";
+		if(error.size()==0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
+		}
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	
@@ -229,19 +279,24 @@ public class PrivateMessageManageAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=deletePrivateMessageChat", method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String delete(ModelMap model,Long userId,Long friendUserId,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
 		if(userId != null && userId >0L && friendUserId != null && friendUserId >0L){
 			int i = privateMessageService.deletePrivateMessage(userId, friendUserId);
 			
 			//删除私信缓存
 			privateMessageManage.delete_cache_findUnreadPrivateMessageByUserId(userId);
 			privateMessageManage.delete_cache_findUnreadPrivateMessageByUserId(friendUserId);
-			return "1";
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+		}else{
+			error.put("id", "用户Id或对方用户Id不能为空");
+			
 		}
-		return "0";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	/**
@@ -253,10 +308,12 @@ public class PrivateMessageManageAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=reductionPrivateMessage", method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String reductionPrivateMessage(ModelMap model,Long userId,String privateMessageId,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
 		if(privateMessageId != null && !"".equals(privateMessageId.trim())){
 			int i = privateMessageService.reductionPrivateMessage(privateMessageId);
 			if(userId != null){
@@ -264,9 +321,12 @@ public class PrivateMessageManageAction {
 				privateMessageManage.delete_cache_findUnreadPrivateMessageByUserId(userId);
 			}
 			
-			return "1";
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+		}else{
+			error.put("privateMessageId", "私信Id不能为空");
+			
 		}
-		return "0";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	

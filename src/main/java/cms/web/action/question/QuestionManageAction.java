@@ -33,6 +33,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import cms.bean.PageForm;
 import cms.bean.PageView;
 import cms.bean.QueryResult;
+import cms.bean.RequestResult;
+import cms.bean.ResultCode;
 import cms.bean.payment.PaymentLog;
 import cms.bean.question.Answer;
 import cms.bean.question.AnswerReply;
@@ -55,7 +57,6 @@ import cms.utils.FileType;
 import cms.utils.FileUtil;
 import cms.utils.IpAddress;
 import cms.utils.JsonUtils;
-import cms.utils.RedirectPath;
 import cms.utils.UUIDUtil;
 import cms.utils.Verification;
 import cms.web.action.SystemException;
@@ -94,25 +95,26 @@ public class QuestionManageAction {
 	
 	/**
 	 * 问题   查看
+	 * @param model
 	 * @param questionId
 	 * @param answerId
-	 * @param model
-	 * @param pageForm
-	 * @param origin 来源 1.问题列表  2.全部待审核问题 3.全部待审核答案 4.全部待审核回复
+	 * @param page
 	 * @param request
 	 * @param response
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=view",method=RequestMethod.GET)
-	public String view(Long questionId,Long answerId,ModelMap model,Integer page,Integer origin,
+	public String view(ModelMap model,Long questionId,Long answerId,Integer page,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
+		Map<String,String> error = new HashMap<String,String>();
+		Map<String,Object> returnValue = new LinkedHashMap<String,Object>();
 		
 		if(questionId != null && questionId >0L){
 			Question question = questionService.findById(questionId);
-			if(question == null){
-				throw new SystemException("问题不存在");
-			}else{
+			if(question != null){
 				if(question.getIp() != null && !"".equals(question.getIp().trim())){
 					question.setIpAddress(IpAddress.queryAddress(question.getIp().trim()));
 				}
@@ -170,9 +172,8 @@ public class QuestionManageAction {
 					question.setQuestionTagAssociationList(questionTagAssociationList);
 				}
 				
-				model.addAttribute("question", question);
-				model.addAttribute("fileSystem", fileManage.getFileSystem());
-				model.addAttribute("availableTag", answerManage.availableTag());
+				returnValue.put("question", question);
+				returnValue.put("availableTag", answerManage.availableTag());
 				
 				PageForm pageForm = new PageForm();
 				pageForm.setPage(page);
@@ -252,7 +253,29 @@ public class QuestionManageAction {
 					}
 					
 				}
-				
+				if(answerIdList != null && answerIdList.size() >0){
+					List<AnswerReply> answerReplyList = answerService.findReplyByAnswerId(answerIdList);
+					if(answerReplyList != null && answerReplyList.size() >0){
+						for(Answer answer : answerList){
+							for(AnswerReply answerReply : answerReplyList){
+								if(answerReply.getIsStaff() == false){//会员
+									User user = userManage.query_cache_findUserByUserName(answerReply.getUserName());
+									if(user != null){
+										answerReply.setNickname(user.getNickname());
+										answerReply.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+										answerReply.setAvatarName(user.getAvatarName());
+										userRoleNameMap.put(answerReply.getUserName(), null);
+									}
+									
+								}
+								if(answer.getId().equals(answerReply.getAnswerId())){
+									answer.addAnswerReply(answerReply);
+								}
+							}
+							
+						}
+					}
+				}
 				if(userRoleNameMap != null && userRoleNameMap.size() >0){
 					for (Map.Entry<String, List<String>> entry : userRoleNameMap.entrySet()) {
 						List<String> roleNameList = userRoleManage.queryUserRoleName(entry.getKey());
@@ -260,8 +283,7 @@ public class QuestionManageAction {
 					}
 				}
 				if(answerList != null && answerList.size() >0){
-					for(Answer answer : answerList){
-						answerIdList.add(answer.getId());	
+					for(Answer answer : answerList){	
 						//用户角色名称集合
 						for (Map.Entry<String, List<String>> entry : userRoleNameMap.entrySet()) {
 							if(entry.getKey().equals(answer.getUserName())){
@@ -272,27 +294,29 @@ public class QuestionManageAction {
 								break;
 							}
 						}
-					}
-				}
-				
-				if(answerIdList != null && answerIdList.size() >0){
-					List<AnswerReply> answerReplyList = answerService.findReplyByAnswerId(answerIdList);
-					if(answerReplyList != null && answerReplyList.size() >0){
-						for(Answer answer : answerList){
-							for(AnswerReply answerReply : answerReplyList){
-								if(answer.getId().equals(answerReply.getAnswerId())){
-									answer.addAnswerReply(answerReply);
+						
+						if(answer.getAnswerReplyList() != null && answer.getAnswerReplyList().size() >0){
+							for(AnswerReply reply : answer.getAnswerReplyList()){
+								for (Map.Entry<String, List<String>> entry : userRoleNameMap.entrySet()) {
+									if(entry.getKey().equals(reply.getUserName())){
+										List<String> roleNameList = entry.getValue();
+										if(roleNameList != null && roleNameList.size() >0){
+											reply.setUserRoleNameList(roleNameList);
+										}
+										break;
+									}
 								}
 							}
-							
 						}
 					}
 				}
 				
 				
+				
+				
 				//将查询结果集传给分页List
 				pageView.setQueryResult(qr);
-				model.addAttribute("pageView", pageView);
+				returnValue.put("pageView", pageView);
 				
 				String username = "";//用户名称
 				
@@ -300,36 +324,44 @@ public class QuestionManageAction {
 				if(obj instanceof UserDetails){
 					username =((UserDetails)obj).getUsername();	
 				}
-				model.addAttribute("userName", username);
+				returnValue.put("userName", username);
+				
+				return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
+			}else{
+				error.put("questionId", "问题不存在");
 			}
+		}else{
+			error.put("questionId", "问题Id参数不能为空");
 		}
-		return "jsp/question/view_question";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	/**
 	 * 问题   添加界面显示
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=add",method=RequestMethod.GET)
 	public String addUI(Question question,ModelMap model,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		Map<String,Object> returnValue = new HashMap<String,Object>();
+		
 		String username = "";//用户名称
 		
 		Object obj  =  SecurityContextHolder.getContext().getAuthentication().getPrincipal(); 
 		if(obj instanceof UserDetails){
 			username =((UserDetails)obj).getUsername();	
 		}
-		model.addAttribute("userName", username);
-		model.addAttribute("fileSystem", fileManage.getFileSystem());
-		return "jsp/question/add_question";
+		returnValue.put("userName", username);
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
 	}
 	
 	/**
 	 * 问题  添加
-	 * isQuestionList 上一链接是否来自问题列表
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=add", method=RequestMethod.POST)
 	public String add(ModelMap model,Long[] tagId,String tagName, String title,Boolean allow,Integer status,String point,
-			String content,String sort,Boolean isQuestionList,
+			String content,String sort,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Question question = new Question();
 		List<String> imageNameList = null;
@@ -471,15 +503,7 @@ public class QuestionManageAction {
 			error.put("sort", "排序不能为空");
 		}
 		
-		if(error != null && error.size() >0){
-			model.addAttribute("error", error);
-			model.addAttribute("questionTagAssociationList", questionTagAssociationList);
-			
-			
-			
-			
-			
-		}else{
+		if(error.size() ==0){
 			questionService.saveQuestion(question,new ArrayList<QuestionTagAssociation>(questionTagAssociationList),null,null,null,null);
 			
 			//更新索引
@@ -549,41 +573,38 @@ public class QuestionManageAction {
 			}
 			
 			
-			model.addAttribute("message","添加问题成功");//返回消息
-			if(isQuestionList != null && isQuestionList == true){
-				model.addAttribute("urladdress", RedirectPath.readUrl("control.question.list")+"?visible=true");
-			}else{
-				model.addAttribute("urladdress", RedirectPath.readUrl("control.question.manage")+"?method=list&visible=true&tagId="+tagId);
-			}
-			
-			return "jsp/common/message";
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 			
 		}
-		question.setTitle(title);
-		question.setContent(content);
-		model.addAttribute("question",question);
-		model.addAttribute("userName", username);
-		return "jsp/question/add_question";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	
 	/**
 	 * 问题   追加界面显示
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=appendQuestion",method=RequestMethod.GET)
 	public String appendQuestionUI(Long questionId,ModelMap model,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
+		Map<String,String> error = new HashMap<String,String>();
+		Map<String,Object> returnValue = new LinkedHashMap<String,Object>();
 		if(questionId != null && questionId >0L){
 			Question question = questionService.findById(questionId);
 			if(question != null){
-				model.addAttribute("question", question);
-				model.addAttribute("fileSystem", fileManage.getFileSystem());
+				returnValue.put("question", question);
 			}else{
-				throw new SystemException("问题不存在");
-			}	
-			
+				error.put("questionId", "问题不存在");
+			}
+		}else{
+			error.put("questionId", "问题Id参数不能为空");
 		}
-		return "jsp/question/add_appendQuestion";
+		if(error.size()==0){
+			
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
+		}
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	
@@ -598,7 +619,7 @@ public class QuestionManageAction {
 	 * @return
 	 * @throws Exception
 	 */
-	@ResponseBody//方式来做ajax,直接返回字符串
+	@ResponseBody
 	@RequestMapping(params="method=appendQuestion", method=RequestMethod.POST)
 	public String appendQuestion(ModelMap model,Long questionId,String content,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -746,16 +767,11 @@ public class QuestionManageAction {
 			}
 			
 		}
-		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
-		
-		if(error != null && error.size() >0){
-			returnValue.put("success", "false");
-			returnValue.put("error", error);
-		}else{
-			returnValue.put("success", "true");
+		if(error.size()==0){
 			
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 		}
-		return JsonUtils.toJSONString(returnValue);
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	
@@ -775,10 +791,10 @@ public class QuestionManageAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=upload",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String upload(ModelMap model,String dir,String userName, Boolean isStaff,String fileName,
-			MultipartFile imgFile, HttpServletResponse response) throws Exception {
+			MultipartFile file, HttpServletResponse response) throws Exception {
 		
 		String number = questionManage.generateFileNumber(userName, isStaff);
 		
@@ -914,10 +930,10 @@ public class QuestionManageAction {
 				}
 				
 			}else{//0.本地系统
-				if(imgFile != null && !imgFile.isEmpty()){
+				if(file != null && !file.isEmpty()){
 
 					//当前文件名称
-					String sourceFileName = imgFile.getOriginalFilename();
+					String sourceFileName = file.getOriginalFilename();
 					
 					//取得文件后缀
 					String suffix = FileUtil.getExtension(sourceFileName).toLowerCase();
@@ -928,11 +944,11 @@ public class QuestionManageAction {
 						
 						
 						//验证文件类型
-						boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
+						boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),formatList);
 						
 						//如果用flash控件上传
-						if(imgFile.getContentType().equalsIgnoreCase("application/octet-stream")){
-							String fileType = FileType.getType(imgFile.getInputStream());
+						if(file.getContentType().equalsIgnoreCase("application/octet-stream")){
+							String fileType = FileType.getType(file.getInputStream());
 							for (String format :formatList) {
 								if(format.equalsIgnoreCase(fileType)){
 									authentication = true;
@@ -956,7 +972,7 @@ public class QuestionManageAction {
 							//生成锁文件
 							fileManage.addLock(lockPathDir,date +"_image_"+newFileName);
 							//保存文件
-							fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
+							fileManage.writeFile(pathDir, newFileName,file.getBytes());
 							
 							//上传成功
 							returnJson.put("error", 0);//0成功  1错误
@@ -971,7 +987,7 @@ public class QuestionManageAction {
 						flashFormatList.add("swf");
 						
 						//验证文件后缀
-						boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),flashFormatList);
+						boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),flashFormatList);
 						
 						if(authentication){
 							
@@ -989,7 +1005,7 @@ public class QuestionManageAction {
 							//生成锁文件
 							fileManage.addLock(lockPathDir,date +"_flash_"+newFileName);
 							//保存文件
-							fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
+							fileManage.writeFile(pathDir, newFileName,file.getBytes());
 							
 							
 							//上传成功
@@ -1006,7 +1022,7 @@ public class QuestionManageAction {
 						
 						
 						//验证文件后缀
-						boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
+						boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),formatList);
 						
 						if(authentication){
 							
@@ -1024,7 +1040,7 @@ public class QuestionManageAction {
 							//生成锁文件
 							fileManage.addLock(lockPathDir,date +"_media_"+newFileName);
 							//保存文件
-							fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
+							fileManage.writeFile(pathDir, newFileName,file.getBytes());
 
 							//上传成功
 							returnJson.put("error", 0);//0成功  1错误
@@ -1038,7 +1054,7 @@ public class QuestionManageAction {
 						List<String> formatList = CommentedProperties.readRichTextAllowFileUploadFormat();
 						
 						//验证文件后缀
-						boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
+						boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),formatList);
 						if(authentication){
 							
 							//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
@@ -1055,12 +1071,12 @@ public class QuestionManageAction {
 							//生成锁文件
 							fileManage.addLock(lockPathDir,date +"_file_"+newFileName);
 							//保存文件
-							fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
+							fileManage.writeFile(pathDir, newFileName,file.getBytes());
 
 							//上传成功
 							returnJson.put("error", 0);//0成功  1错误
 							returnJson.put("url", fileManage.fileServerAddress()+"file/question/"+date+"/file/"+newFileName);
-							returnJson.put("title", imgFile.getOriginalFilename());//旧文件名称
+							returnJson.put("title", file.getOriginalFilename());//旧文件名称
 							return JsonUtils.toJSONString(returnJson);
 						}else{
 							errorMessage = "当前文件类型不允许上传";
@@ -1090,9 +1106,14 @@ public class QuestionManageAction {
 	 * 问题   修改界面显示
 	 * 
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=editQuestion", method=RequestMethod.GET)
-	public String editQuestionUI(ModelMap model,Long questionId,Boolean visible,
+	public String editQuestionUI(ModelMap model,Long questionId,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
+		Map<String,String> error = new HashMap<String,String>();
+		Map<String,Object> returnValue = new HashMap<String,Object>();
+		
 		if(questionId != null && questionId >0L){
 			Question question = questionService.findById(questionId);
 			if(question != null){
@@ -1121,17 +1142,18 @@ public class QuestionManageAction {
 				
 				User user = userManage.query_cache_findUserByUserName(question.getUserName());
 				if(user != null){
-					model.addAttribute("maxDeposit",user.getDeposit());//允许使用的预存款
-					model.addAttribute("maxPoint",user.getPoint());//允许使用的积分
+					returnValue.put("maxDeposit",user.getDeposit());//允许使用的预存款
+					returnValue.put("maxPoint",user.getPoint());//允许使用的积分
 				}
-				
+				returnValue.put("question", question);
+				return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
 			}else{
-				throw new SystemException("问题不存在");
-			}	
-			model.addAttribute("question", question);
-			model.addAttribute("fileSystem", fileManage.getFileSystem());
+				error.put("questionId", "问题不存在");
+			}
+		}else{
+			error.put("questionId", "问题Id不能为空");
 		}
-		return "jsp/question/edit_question";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	/**
 	 * 问题   修改
@@ -1142,13 +1164,12 @@ public class QuestionManageAction {
 	 * @param content
 	 * @param sort 
 	 * @param visible
-	 * @param isQuestionList 上一链接是否来自问题列表
 	 */
-	@ResponseBody//方式来做ajax,直接返回字符串
+	@ResponseBody
 	@RequestMapping(params="method=editQuestion", method=RequestMethod.POST)
 	public String editQuestion(ModelMap model,Long questionId,Long[] tagId,
 			String title,Boolean allow,Integer status,String point,String amount,
-			String content,String sort,Boolean visible,Boolean isQuestionList,
+			String content,String sort,Boolean visible,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		String username = "";//用户名称
@@ -1182,9 +1203,8 @@ public class QuestionManageAction {
 			if(question != null){
 				old_status = question.getStatus();
 				question.setAllow(allow);
-				if(question.getStatus() < 100){
-					question.setStatus(status);
-				}
+				question.setStatus(status);
+				
 
 				old_content = question.getContent();
 				if(title != null && !"".equals(title.trim())){
@@ -1417,7 +1437,7 @@ public class QuestionManageAction {
 						//更新索引
 						questionIndexService.addQuestionIndex(new QuestionIndex(String.valueOf(question.getId()),2));
 						
-						if(i >0 && question.getStatus() < 100 && !old_status.equals(status)){
+						if(i >0 && !old_status.equals(status)){
 							if(user != null){
 								//修改用户动态问题状态
 								userService.updateUserDynamicQuestionStatus(user.getId(),question.getUserName(),question.getId(),question.getStatus());
@@ -1624,25 +1644,24 @@ public class QuestionManageAction {
 			error.put("question", "Id不存在");
 		}
 		
-		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
-		
-		if(error != null && error.size() >0){
-			returnValue.put("success", "false");
-			returnValue.put("error", error);
-		}else{
-			returnValue.put("success", "true");
+		if(error.size()==0){
 			
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 		}
-		return JsonUtils.toJSONString(returnValue);
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	
 	/**
 	 * 问题   修改追加界面显示
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=editAppendQuestion",method=RequestMethod.GET)
 	public String editAppendQuestionUI(Long questionId,String appendQuestionItemId,ModelMap model,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		Map<String,String> error = new HashMap<String,String>();
+		Map<String,Object> returnValue = new LinkedHashMap<String,Object>();
+		
 		if(questionId != null && questionId >0L){
 			Question question = questionService.findById(questionId);
 			if(question != null){
@@ -1659,20 +1678,25 @@ public class QuestionManageAction {
 								appendQuestionItem.setContent(fileManage.processRichTextFilePath(appendQuestionItem.getContent(),"question"));
 							}
 							
-							model.addAttribute("appendQuestionItem", appendQuestionItem);
+							returnValue.put("appendQuestionItem", appendQuestionItem);
 							break;
 						}
 					}
 				}
-
-				model.addAttribute("question", question);
-				model.addAttribute("fileSystem", fileManage.getFileSystem());
+				
+				returnValue.put("question", question);
 			}else{
-				throw new SystemException("问题不存在");
-			}	
-			
+				error.put("questionId", "问题不存在");
+			}
+		}else{
+			error.put("questionId", "问题Id参数不能为空");
 		}
-		return "jsp/question/edit_appendQuestion";
+		if(error.size()==0){
+			
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
+		}
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		
 	}
 	
 	
@@ -1687,7 +1711,7 @@ public class QuestionManageAction {
 	 * @return
 	 * @throws Exception
 	 */
-	@ResponseBody//方式来做ajax,直接返回字符串
+	@ResponseBody
 	@RequestMapping(params="method=editAppendQuestion", method=RequestMethod.POST)
 	public String editAppendQuestion(ModelMap model,Long questionId,String appendQuestionItemId, String content,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -1978,16 +2002,11 @@ public class QuestionManageAction {
 			error.put("question", "Id不存在");
 		}
 		
-		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
-		
-		if(error != null && error.size() >0){
-			returnValue.put("success", "false");
-			returnValue.put("error", error);
-		}else{
-			returnValue.put("success", "true");
+		if(error.size()==0){
 			
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 		}
-		return JsonUtils.toJSONString(returnValue);
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	
@@ -1996,10 +2015,9 @@ public class QuestionManageAction {
 	 * @param model
 	 * @param questionId
 	*/
+	@ResponseBody
 	@RequestMapping(params="method=deleteQuestion", method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String deleteQuestion(ModelMap model,Long[] questionId,
-			Boolean isQuestionList,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		String username = "";//用户名称
@@ -2203,15 +2221,11 @@ public class QuestionManageAction {
 		}
 		
 		
-		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
-		
-		if(error != null && error.size() >0){
-			returnValue.put("success", "false");
-			returnValue.put("error", error);	
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 		}else{
-			returnValue.put("success", "true");
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 		}
-		return JsonUtils.toJSONString(returnValue);
 	}
 	
 	
@@ -2225,14 +2239,14 @@ public class QuestionManageAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=deleteAppendQuestion", method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String deleteAppendQuestion(ModelMap model,Long questionId,String appendQuestionItemId,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
 		if(questionId != null && questionId >0 && appendQuestionItemId != null && !"".equals(appendQuestionItemId.trim())){
-			
-		
 			Question question = questionService.findById(questionId);
 			if(question != null){
 				boolean flag = false;
@@ -2333,11 +2347,19 @@ public class QuestionManageAction {
 						}
 						
 					}
-					return"1";	
 				}
+			}else{
+				error.put("questionId", "问题不存在");
 			}
+		}else{
+			error.put("questionId", "问题Id或追加问题项Id不能为空");
 		}
-		return"0";
+		
+		if(error.size()==0){
+			
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+		}
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	/**
@@ -2347,10 +2369,13 @@ public class QuestionManageAction {
 	 * @return
 	 * @throws Exception
 	*/
+	@ResponseBody
 	@RequestMapping(params="method=reduction",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String reduction(ModelMap model,Long[] questionId,
 			HttpServletResponse response) throws Exception {
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
+		
 		if(questionId != null && questionId.length>0){
 			
 			List<Question> questionList = questionService.findByIdList(Arrays.asList(questionId));
@@ -2370,10 +2395,14 @@ public class QuestionManageAction {
 					questionManage.delete_cache_findById(question.getId());//删除缓存
 				}
 		
-				return "1";
-			}	
+				return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+			}else{
+				error.put("question", "问题不能为空");
+			}
+		}else{
+			error.put("question", "问题Id不能为空");
 		}
-		return "0";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	/**
@@ -2383,10 +2412,12 @@ public class QuestionManageAction {
 	 * @return
 	 * @throws Exception
 	*/
+	@ResponseBody
 	@RequestMapping(params="method=auditQuestion",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String auditQuestion(ModelMap model,Long questionId,
 			HttpServletResponse response) throws Exception {
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
 		if(questionId != null && questionId>0L){
 			int i = questionService.updateQuestionStatus(questionId, 20);
 
@@ -2402,9 +2433,11 @@ public class QuestionManageAction {
 			//更新索引
 			questionIndexService.addQuestionIndex(new QuestionIndex(String.valueOf(questionId),2));
 			questionManage.delete_cache_findById(questionId);//删除缓存
-			return "1";
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+		}else{
+			error.put("questionId", "问题Id不能为空");
 		}
-		return "0";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	

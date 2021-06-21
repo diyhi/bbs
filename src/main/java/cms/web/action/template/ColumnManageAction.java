@@ -12,7 +12,8 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import cms.bean.PageForm;
+import cms.bean.RequestResult;
+import cms.bean.ResultCode;
 import cms.bean.template.Column;
 import cms.bean.template.Forum;
 import cms.bean.template.Layout;
@@ -21,7 +22,6 @@ import cms.service.template.TemplateService;
 import cms.utils.FileUtil;
 import cms.utils.JsonUtils;
 import cms.utils.UUIDUtil;
-import cms.web.action.SystemException;
 import cms.web.action.fileSystem.localImpl.LocalFileManage;
 
 import org.apache.commons.lang3.StringUtils;
@@ -50,18 +50,18 @@ public class ColumnManageAction {
 	 * 栏目列表
 	 * @param dirName 模板目录名称
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=list",method=RequestMethod.GET)
-	public String execute(@RequestParam("dirName") String dirName,PageForm pageForm,ModelMap model){
-		
-		if(dirName == null || "".equals(dirName.trim())){
-			throw new SystemException("目录名称不能为空");
-		}
-		//根据模板目录名称查询模板
+	public String execute(@RequestParam("dirName") String dirName,ModelMap model){
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
 		if(dirName != null && !"".equals(dirName.trim())){
 			Templates templates = templateService.findTemplatebyDirName(dirName);
-			model.addAttribute("templates", templates);
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,templates));
+		}else{
+			error.put("dirName", "目录名称不能为空");
 		}
-		return "jsp/template/columnList";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	
@@ -69,14 +69,19 @@ public class ColumnManageAction {
 	 * 查询栏目
 	 * @param dirName 模板目录名称
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=queryColumn",method=RequestMethod.GET)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String queryColumn(ModelMap model,String dirName,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
-
-		List<Column> columnList = columnManage.columnList(dirName);
-
-		return JsonUtils.toJSONString(columnList);
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
+		if(dirName != null && !"".equals(dirName.trim())){
+			List<Column> columnList = columnManage.columnList(dirName);
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,columnList));
+		}else{
+			error.put("dirName", "目录名称不能为空");
+		}
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	
@@ -84,16 +89,13 @@ public class ColumnManageAction {
 	 * 栏目管理 添加
 	 * @param dirName 模板目录名称
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=add",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String add(Integer parentId,String dirName,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 			
 		//错误
 		Map<String,String> error = new HashMap<String,String>();
-		//返回值
-		Map<String,Object> returnJson = new HashMap<String,Object>();
-		
 		
 		Column column = new Column();
 		if(parentId != null && parentId >0){
@@ -152,15 +154,9 @@ public class ColumnManageAction {
 			column.setUrl("");
 		}
 
-		if(error.size() >0){//有错误
-			returnJson.put("error", error);
-			returnJson.put("success", false);
-		}else{
-			
+		if(error.size() ==0){
 			Integer maxId = columnManage.addColumn(column, dirName);
 			if(column.getLinkMode().equals(4)){//空白页
-				
-				
 				//添加布局文件
 				Layout layout = new Layout();
 				layout.setId(UUIDUtil.getUUID32());
@@ -176,19 +172,19 @@ public class ColumnManageAction {
 				//生成文件
 				String pc_path = "WEB-INF"+File.separator+"templates"+File.separator+dirName+File.separator+"pc"+File.separator+"public"+File.separator;
 				//创建文件并将注释写入模板文件
-				FileUtil.writeStringToFile(pc_path+layout.getLayoutFile(),"<#-- "+column.getName()+" -->","utf-8",false);
+				FileUtil.writeStringToFile(FileUtil.toRelativePath(pc_path+layout.getLayoutFile()),"<#-- "+column.getName()+" -->","utf-8",false);
 				//生成文件
 				String wap_path = "WEB-INF"+File.separator+"templates"+File.separator+dirName+File.separator+"wap"+File.separator+"public"+File.separator;
 				//创建文件并将注释写入模板文件
-				FileUtil.writeStringToFile(wap_path+layout.getLayoutFile(),"<#-- "+column.getName()+" -->","utf-8",false);
-				
+				FileUtil.writeStringToFile(FileUtil.toRelativePath(wap_path+layout.getLayoutFile()),"<#-- "+column.getName()+" -->","utf-8",false);
 			}
-
-			returnJson.put("success", true);
 		}
 		
-		return JsonUtils.toJSONString(returnJson);
-		
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+		}
 	}
 	
 	
@@ -196,15 +192,13 @@ public class ColumnManageAction {
 	 * 栏目管理 修改
 	 * @param dirName 模板目录名称
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=edit",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String edit(String dirName,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		//错误
 		Map<String,String> error = new HashMap<String,String>();
-		//返回值
-		Map<String,Object> returnJson = new HashMap<String,Object>();
 		
 		
 		String id = request.getParameter("columnId");
@@ -269,25 +263,18 @@ public class ColumnManageAction {
 		}
 		
 		
-		if(error.size() >0){
-			returnJson.put("error", error);
-			returnJson.put("success", false);
-		}else{
-			
-			
+		if(error.size() ==0){
 			List<Column> newColumnList = columnManage.updateColumn(column, dirName);
 			if(newColumnList != null){
-				
-				
 				if(column.getLinkMode().equals(1) || column.getLinkMode().equals(2) ||column.getLinkMode().equals(3)){//无   外部URL  内部URL 
 					//路径
 					String pc_path = "WEB-INF"+File.separator+"templates"+File.separator+dirName+File.separator+"pc"+File.separator+"public"+File.separator;
 					//删除空白页文件
-					localFileManage.deleteFile(pc_path+"column_"+column.getId()+".html");
+					localFileManage.deleteFile(FileUtil.toRelativePath(pc_path)+"column_"+column.getId()+".html");
 					//路径
 					String wap_path = "WEB-INF"+File.separator+"templates"+File.separator+dirName+File.separator+"wap"+File.separator+"public"+File.separator;
 					//删除空白页文件
-					localFileManage.deleteFile(wap_path+"column_"+column.getId()+".html");
+					localFileManage.deleteFile(FileUtil.toRelativePath(wap_path)+"column_"+column.getId()+".html");
 					
 					//删除布局
 					Layout layout = templateService.findLayoutByReferenceCode(dirName,7,"column_"+column.getId());
@@ -317,67 +304,85 @@ public class ColumnManageAction {
 					//路径
 					String pc_path = "WEB-INF"+File.separator+"templates"+File.separator+dirName+File.separator+"pc"+File.separator+"public"+File.separator;
 					//创建文件并将注释写入模板文件
-					FileUtil.writeStringToFile(pc_path+layout.getLayoutFile(),"<#-- "+column.getName()+" -->","utf-8",false);
+					FileUtil.writeStringToFile(FileUtil.toRelativePath(pc_path+layout.getLayoutFile()),"<#-- "+column.getName()+" -->","utf-8",false);
 					//路径
 					String wap_path = "WEB-INF"+File.separator+"templates"+File.separator+dirName+File.separator+"wap"+File.separator+"public"+File.separator;
 					//创建文件并将注释写入模板文件
-					FileUtil.writeStringToFile(wap_path+layout.getLayoutFile(),"<#-- "+column.getName()+" -->","utf-8",false);
+					FileUtil.writeStringToFile(FileUtil.toRelativePath(wap_path+layout.getLayoutFile()),"<#-- "+column.getName()+" -->","utf-8",false);
 					
 				}
 				
-				returnJson.put("success", true);
+				
 			}
 			
 		}
 
-		return JsonUtils.toJSONString(returnJson);
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+		}
 	}
 	/**
 	 * 栏目管理  删除
 	 * @param dirName 模板目录名称
 	 * @param columnId 栏目Id
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=delete",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String delete(ModelMap model,String dirName,Integer columnId,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
-		//返回值
-		Map<String,Object> returnJson = new HashMap<String,Object>();
-		
-		Column column = columnManage.queryColumnById(columnId,dirName);
-		if(column != null){
-			List<Column> columnList = new ArrayList<Column>();
-			columnList.add(column);
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
 			
-			TreeSet<Integer> columnIdList = columnManage.columnIdList(columnList,new TreeSet<Integer>());
-			columnIdList.add(columnId);
-			for(Integer id : columnIdList){
-				//路径
-				String pc_path = "WEB-INF"+File.separator+"templates"+File.separator+dirName+File.separator+"pc"+File.separator+"public"+File.separator;
-				//删除空白页文件
-				localFileManage.deleteFile(pc_path+"column_"+id+".html");
-				//路径
-				String wap_path = "WEB-INF"+File.separator+"templates"+File.separator+dirName+File.separator+"wap"+File.separator+"public"+File.separator;
-				//删除空白页文件
-				localFileManage.deleteFile(wap_path+"column_"+id+".html");
-				//删除布局
-				Layout layout = templateService.findLayoutByReferenceCode(dirName,7,"column_"+id);
-				if(layout != null){
-					//版块
-					List<Forum> forumList = templateService.findForumByLayoutId(dirName,layout.getId());
-					//删除布局版块上传文件
-					layoutManage.deleteUploadFile(forumList);
-					
-		
-					templateService.deleteLayoutByLayoutId(dirName, layout.getId());
-				}
-				
-			}
-			List<Column> newColumnList = columnManage.deleteColumn(columnId, dirName);
-			returnJson.put("success", true);
+		if(dirName == null || "".equals(dirName.trim())){
+			error.put("dirName", "目录名称不能为空");
 		}
+		if(columnId == null){
+			error.put("columnId", "栏目Id不能为空");
+		}
+		if(error.size() ==0){
+			Column column = columnManage.queryColumnById(columnId,dirName);
+			if(column != null){
+				List<Column> columnList = new ArrayList<Column>();
+				columnList.add(column);
+				
+				TreeSet<Integer> columnIdList = columnManage.columnIdList(columnList,new TreeSet<Integer>());
+				columnIdList.add(columnId);
+				for(Integer id : columnIdList){
+					//路径
+					String pc_path = "WEB-INF"+File.separator+"templates"+File.separator+dirName+File.separator+"pc"+File.separator+"public"+File.separator;
+					//删除空白页文件
+					localFileManage.deleteFile(FileUtil.toRelativePath(pc_path)+"column_"+id+".html");
+					//路径
+					String wap_path = "WEB-INF"+File.separator+"templates"+File.separator+dirName+File.separator+"wap"+File.separator+"public"+File.separator;
+					//删除空白页文件
+					localFileManage.deleteFile(FileUtil.toRelativePath(wap_path)+"column_"+id+".html");
+					//删除布局
+					Layout layout = templateService.findLayoutByReferenceCode(dirName,7,"column_"+id);
+					if(layout != null){
+						//版块
+						List<Forum> forumList = templateService.findForumByLayoutId(dirName,layout.getId());
+						//删除布局版块上传文件
+						layoutManage.deleteUploadFile(forumList);
+						
+			
+						templateService.deleteLayoutByLayoutId(dirName, layout.getId());
+					}
+					
+				}
+				List<Column> newColumnList = columnManage.deleteColumn(columnId, dirName);
+			
+			}else{
+				error.put("column", "栏目不存在");
+			}
 
-		return JsonUtils.toJSONString(returnJson);
+		}
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+		}
 	}
 	
 	

@@ -9,13 +9,17 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import cms.bean.PageForm;
 import cms.bean.PageView;
 import cms.bean.QueryResult;
+import cms.bean.RequestResult;
+import cms.bean.ResultCode;
 import cms.bean.sms.SmsInterface;
 import cms.service.setting.SettingService;
 import cms.service.sms.SmsService;
+import cms.utils.JsonUtils;
 
 @Controller
 public class SmsAction {
@@ -32,6 +36,7 @@ public class SmsAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping("/control/smsInterface/list")  
 	public String execute(ModelMap model, PageForm pageForm,
 			HttpServletRequest request, HttpServletResponse response)
@@ -48,8 +53,6 @@ public class SmsAction {
 		QueryResult<SmsInterface> qr = smsService.getScrollData(SmsInterface.class,firstindex, pageView.getMaxresult(),orderby);
 		//将查询结果集传给分页List
 		pageView.setQueryResult(qr);
-		request.setAttribute("pageView", pageView);
-		
-		return "jsp/sms/smsInterfaceList";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,pageView));
 	}
 }

@@ -50,6 +50,18 @@ public class Upgrade4_3to4_4 {
     				upgradeService.addLog(upgradeId, JsonUtils.toJSONString(new UpgradeLog(new Date(),"表layout插入SQL成功",1))+",");
     			}
     			
+    			insertSQL_mediaprocesssetting(upgradeService);
+    			upgradeService.addLog(upgradeId, JsonUtils.toJSONString(new UpgradeLog(new Date(),"表mediaprocesssetting插入SQL成功",1))+",");
+    			
+    			insertSQL_syspermission(upgradeService);
+    			upgradeService.addLog(upgradeId, JsonUtils.toJSONString(new UpgradeLog(new Date(),"表syspermission插入SQL成功",1))+",");
+    			
+    			insertSQL_syspermissionresources(upgradeService);
+    			upgradeService.addLog(upgradeId, JsonUtils.toJSONString(new UpgradeLog(new Date(),"表syspermissionresources插入SQL成功",1))+",");
+    				
+    			insertSQL_sysresources(upgradeService);
+    			upgradeService.addLog(upgradeId, JsonUtils.toJSONString(new UpgradeLog(new Date(),"表sysresources插入SQL成功",1))+",");
+    			
     			
     			//更改运行状态
 				upgradeService.updateRunningStatus(upgradeId ,200,JsonUtils.toJSONString(new UpgradeLog(new Date(),"升级流程结束",1))+",");
@@ -99,6 +111,46 @@ public class Upgrade4_3to4_4 {
         
     }
     
-   
+    /**
+  	 * 插入升级SQL
+  	 * @param upgradeService
+  	 */
+	private static void insertSQL_mediaprocesssetting(UpgradeService upgradeService){
+		String sql = "INSERT INTO `mediaprocesssetting` (`id`,`segmentLocation`,`segmentTime`,`version`,`watermark`,`watermarkDistance_x`,`watermarkDistance_y`,`watermarkFullPathName`,`watermarkPosition`,`videoFrameRate`,`remoteSegmentSecret`) VALUES (1,10,10,1585561032448,b'0',10,10,NULL,40,NULL,'');";
+        upgradeService.insertNativeSQL(sql);
+		
+	}
+    
+    
+    /**
+  	 * 插入升级SQL
+  	 * @param upgradeService
+  	 */
+	private static void insertSQL_syspermission(UpgradeService upgradeService){
+		String sql = "INSERT INTO `syspermission` (`id`,`methods`,`name`,`priority`,`remarks`) VALUES ('10787b012ca64a6a981bb216995f46f2','GET','AUTH_45ec750354a341d2b1ec04c04b029d65_GET_READ',1,'媒体待处理列表'),('1fe612e9c51d4d01ba303fbd475532da','POST','AUTH_2dd1f8a6a2d94d71ab1d9bc3b3b27abe_POST_DELETE',1,'删除待处理媒体'),('3055c537668a4c53947eaac0d11e65bd','GET','AUTH_9f0143083d8f46e3ab6b0769cd0e2ceb_GET_READ',1,'媒体处理设置页'),('bdbab685233f41a4a0bcdfa10f61721f','POST','AUTH_325e9574f702487b8dd60cf6427eb496_POST_ADD',1,'添加媒体处理任务'),('f2c3780c74344e07b6d3befe660d7544','POST','AUTH_9f0143083d8f46e3ab6b0769cd0e2ceb_POST_UPDATE',2,'媒体处理设置');";
+		upgradeService.insertNativeSQL(sql);
+	}
+	      
+	/**
+	 * 插入升级SQL
+	 * @param upgradeService
+	 */
+	private static void insertSQL_syspermissionresources(UpgradeService upgradeService){
+		
+		String sql = "INSERT INTO `syspermissionresources` (`id`,`permissionId`,`resourceId`) VALUES (NULL,'bdbab685233f41a4a0bcdfa10f61721f','325e9574f702487b8dd60cf6427eb496'),(NULL,'10787b012ca64a6a981bb216995f46f2','45ec750354a341d2b1ec04c04b029d65'),(NULL,'1fe612e9c51d4d01ba303fbd475532da','2dd1f8a6a2d94d71ab1d9bc3b3b27abe'),(NULL,'3055c537668a4c53947eaac0d11e65bd','9f0143083d8f46e3ab6b0769cd0e2ceb'),(NULL,'f2c3780c74344e07b6d3befe660d7544','9f0143083d8f46e3ab6b0769cd0e2ceb');";
+	      	
+	    upgradeService.insertNativeSQL(sql);
+	}
+	
+	/**
+		 * 插入升级SQL
+		 * @param upgradeService
+		 */
+	private static void insertSQL_sysresources(UpgradeService upgradeService){
+		  	
+		String sql = "INSERT INTO `sysresources` (`id`,`module`,`name`,`priority`,`remarks`,`url`,`urlParentId`,`urlType`) VALUES ('2dd1f8a6a2d94d71ab1d9bc3b3b27abe','媒体处理管理','删除待处理媒体',46475,'','/control/mediaProcessQueue/manage.htm?method=deleteMediaProcessQueue&*',NULL,NULL),('325e9574f702487b8dd60cf6427eb496','话题管理','添加媒体处理任务',12615,'','/control/mediaProcessQueue/manage.htm?method=addMediaProcessQueue*',NULL,NULL),('45ec750354a341d2b1ec04c04b029d65','媒体处理管理','媒体待处理列表',46470,'','/control/mediaProcessQueue/list.htm*',NULL,NULL),('9f0143083d8f46e3ab6b0769cd0e2ceb','媒体处理管理','媒体处理设置',46480,'','/control/mediaProcessSetting/manage/edit.htm*',NULL,NULL);";
+	   	
+		upgradeService.insertNativeSQL(sql);
+	}
 
 }

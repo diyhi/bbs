@@ -6,12 +6,16 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import cms.bean.RequestResult;
+import cms.bean.ResultCode;
 import cms.bean.thumbnail.Thumbnail;
 import cms.service.thumbnail.ThumbnailService;
+import cms.utils.JsonUtils;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * 缩略图列表
@@ -33,6 +37,7 @@ public class ThumbnailAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping("/control/thumbnail/list")  
 	public String execute(ModelMap model,
 			HttpServletRequest request, HttpServletResponse response)
@@ -40,9 +45,6 @@ public class ThumbnailAction {
 		
 		
 		List<Thumbnail> thumbnailList = thumbnailService.findAllThumbnail();
-		
-		request.setAttribute("thumbnailList", thumbnailList);
-
-		return "jsp/thumbnail/thumbnailList";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,thumbnailList));
 	}
 }

@@ -5,12 +5,16 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
+import cms.bean.RequestResult;
+import cms.bean.ResultCode;
 import cms.bean.template.Templates;
 import cms.service.template.TemplateService;
+import cms.utils.JsonUtils;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 
 /**
@@ -24,14 +28,13 @@ public class TemplateAction {
 	private TemplateService templateService;//通过接口引用代理返回的对象
 	
 	
-	
+	@ResponseBody
 	@RequestMapping("/control/template/list") 
 	public String execute(ModelMap model,HttpServletRequest request)
 			throws Exception {
 
-		List<Templates> templatesDir =  templateService.findAllTemplates();
+		List<Templates> templatesList =  templateService.findAllTemplates();
 
-		model.addAttribute("templatesDir", templatesDir);
-		return "jsp/template/templateList";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,templatesList));
 	}
 }

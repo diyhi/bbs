@@ -15,11 +15,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import cms.bean.RequestResult;
+import cms.bean.ResultCode;
 import cms.bean.user.DisableUserName;
 import cms.service.user.UserService;
-import cms.utils.RedirectPath;
+import cms.utils.JsonUtils;
 import cms.utils.Verification;
-import cms.web.action.SystemException;
 
 /**
  * 禁止的用户名称管理
@@ -34,16 +35,18 @@ public class DisableUserNameManageAction {
 	/**
 	 * 禁止的用户名称 添加界面显示
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=add",method=RequestMethod.GET)
 	public String addUI(ModelMap model,DisableUserName disableUserName,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
-		return "jsp/user/add_disableUserName";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 	}
 	
 	/**
 	 * 禁止的用户名称 添加
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=add",method=RequestMethod.POST)
 	public String add(ModelMap model,DisableUserName formbean,BindingResult result,	
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -79,50 +82,58 @@ public class DisableUserNameManageAction {
 		}
 		
 	
-		if (error.size() >0) {  
-			model.addAttribute("error", error);
-			return "jsp/user/add_disableUserName";
-		} 
-	
-		
-		userService.saveDisableUserName(disableUserName);
-		model.addAttribute("message", "添加禁止的用户名称成功");
-		model.addAttribute("urladdress", RedirectPath.readUrl("control.disableUserName.list"));
-		return "jsp/common/message";
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			userService.saveDisableUserName(disableUserName);
+			
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+		}
 		
 	}
 	
 	/**
 	 * 禁止的用户名称 显示修改
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=edit",method=RequestMethod.GET)
 	public String editUI(ModelMap model,Integer disableUserNameId,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {	
 	
+		Map<String,String> error = new HashMap<String,String>();
+		Map<String,Object> returnValue = new HashMap<String,Object>();
+		
 		if(disableUserNameId != null && disableUserNameId >0){
 			//根据ID查询要修改的数据
 			DisableUserName disableUserName = userService.findDisableUserNameById(disableUserNameId);
 			
 			if(disableUserName != null){
-				model.addAttribute("disableUserName", disableUserName);
+				returnValue.put("disableUserName", disableUserName);
 			}
 		}else{
-			throw new SystemException("参数不能为空");
+			error.put("disableUserNameId", "禁止的用户名称Id不能为空");
 		}
 
-		return "jsp/user/edit_disableUserName";
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
+		}
 	}
 	/**
 	 * 禁止的用户名称 修改
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=edit",method=RequestMethod.POST)
 	public String edit(ModelMap model,DisableUserName formbean,BindingResult result,Integer disableUserNameId,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 	
-		if(disableUserNameId == null || disableUserNameId <=0){
-			throw new SystemException("参数不能为空");
-		}
 		Map<String,String> error = new HashMap<String,String>();
+		
+		if(disableUserNameId == null || disableUserNameId <=0){
+			error.put("disableUserNameId", "禁止的用户名称Id不能为空");
+		}
+		
 		DisableUserName disableUserName = new DisableUserName();
 		disableUserName.setId(disableUserNameId);
 		
@@ -154,30 +165,30 @@ public class DisableUserNameManageAction {
 		}
 		
 	
-		if (error.size() >0) {  
-			model.addAttribute("error", error);
-			return "jsp/user/edit_disableUserName";
-		} 
-	
-		
-		userService.updateDisableUserName(disableUserName);
-		model.addAttribute("message", "修改禁止的用户名称成功");
-		model.addAttribute("urladdress", RedirectPath.readUrl("control.disableUserName.list"));
-		return "jsp/common/message";
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			userService.updateDisableUserName(disableUserName);
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+		}
 	}
 	
 	/**
 	 * 禁止的用户名称 删除
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=delete",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String delete(ModelMap model,Integer disableUserNameId,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		Map<String,String> error = new HashMap<String,String>();
+		
 		if(disableUserNameId != null && disableUserNameId >0){
 			userService.deleteDisableUserName(disableUserNameId);
-			return "1";
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+		}else{
+			error.put("disableUserNameId", "禁止的用户名称Id不能为空");
 		}
-		return "0";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	

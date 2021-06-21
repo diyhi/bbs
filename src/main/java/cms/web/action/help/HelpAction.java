@@ -11,15 +11,19 @@ import javax.servlet.http.HttpServletResponse;
 import cms.bean.PageForm;
 import cms.bean.PageView;
 import cms.bean.QueryResult;
+import cms.bean.RequestResult;
+import cms.bean.ResultCode;
 import cms.bean.help.Help;
 import cms.bean.help.HelpType;
 import cms.service.help.HelpService;
 import cms.service.help.HelpTypeService;
 import cms.service.setting.SettingService;
+import cms.utils.JsonUtils;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * 帮助管理
@@ -31,10 +35,12 @@ public class HelpAction {
 	@Resource HelpTypeService helpTypeService;
 	@Resource SettingService settingService;
 	
+	@ResponseBody
 	@RequestMapping("/control/help/list") 
 	public String execute(PageForm pageForm,ModelMap model,Boolean visible,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
+				
 		StringBuffer jpql = new StringBuffer("");
 		//存放参数值
 		List<Object> params = new ArrayList<Object>();
@@ -86,10 +92,7 @@ public class HelpAction {
 		}
 		
 		
-		
-		model.addAttribute("pageView", pageView);
-
-		return "jsp/help/helpList";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,pageView));
 	}
 	
 	

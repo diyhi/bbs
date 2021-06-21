@@ -267,10 +267,10 @@ public class Help_TemplateManage {
 		if(formValueJSON != null && !"".equals(formValueJSON)){
 			Forum_HelpRelated_Help forum_HelpRelated_Help = JsonUtils.toObject(formValueJSON,Forum_HelpRelated_Help.class);
 			if(forum_HelpRelated_Help != null){
-				Map<Long, String> recommendHelp = forum_HelpRelated_Help.getHelp_recommendHelpList();
-				if(recommendHelp != null && recommendHelp.size() >0){
-					for(Map.Entry<Long, String> entry : recommendHelp.entrySet()){
-						Help help = helpService.findById(entry.getKey());
+				List<Help> recommendHelpList = forum_HelpRelated_Help.getHelp_recommendHelpList();
+				if(recommendHelpList != null && recommendHelpList.size() >0){
+					for(int i = 0; i< recommendHelpList.size(); i++){
+						Help help = helpService.findById(recommendHelpList.get(i).getId());
 						if(help != null){
 							helpList.add(help);
 						}

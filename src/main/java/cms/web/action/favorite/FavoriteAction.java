@@ -2,7 +2,10 @@ package cms.web.action.favorite;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -10,17 +13,25 @@ import javax.servlet.http.HttpServletResponse;
 import cms.bean.PageForm;
 import cms.bean.PageView;
 import cms.bean.QueryResult;
+import cms.bean.RequestResult;
+import cms.bean.ResultCode;
 import cms.bean.favorite.Favorites;
 import cms.bean.question.Question;
 import cms.bean.topic.Topic;
+import cms.bean.user.User;
 import cms.service.favorite.FavoriteService;
 import cms.service.question.QuestionService;
 import cms.service.setting.SettingService;
 import cms.service.topic.TopicService;
+import cms.service.user.UserService;
+import cms.utils.JsonUtils;
+import cms.web.action.fileSystem.FileManage;
+import cms.web.action.user.UserManage;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * 收藏夹
@@ -32,6 +43,11 @@ public class FavoriteAction {
 	@Resource SettingService settingService;
 	@Resource TopicService topicService;
 	@Resource QuestionService questionService;
+	@Resource UserService userService;
+	@Resource UserManage userManage;
+	@Resource FileManage fileManage;
+	
+	
 	/**
 	 * 收藏夹列表
 	 * @param model
@@ -43,12 +59,15 @@ public class FavoriteAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping("/control/favorite/list") 
 	public String favoriteList(ModelMap model,PageForm pageForm,Long id,String userName,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-
-		if(userName != null && !"".equals(userName.trim())){
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
+		Map<String,Object> returnValue = new HashMap<String,Object>();
+		if(id != null && id >0L && userName != null && !"".equals(userName.trim())){
 			
 			//调用分页算法代码
 			PageView<Favorites> pageView = new PageView<Favorites>(settingService.findSystemSetting_cache().getBackstagePageNumber(),pageForm.getPage(),10,request.getRequestURI(),request.getQueryString());
@@ -97,9 +116,20 @@ public class FavoriteAction {
 			}
 			//将查询结果集传给分页List
 			pageView.setQueryResult(qr);
-			model.addAttribute("pageView", pageView);
+			User user = userService.findUserById(id);
+			if(user != null){
+				returnValue.put("currentUser", user);
+			}
+			
+			returnValue.put("pageView", pageView);
+		}else{
+			error.put("userId", "用户Id或用户名称不能为空");
 		}
-		return "jsp/favorite/favoriteList";
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
+		}
 	}
 	
 	
@@ -113,12 +143,19 @@ public class FavoriteAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping("/control/topicFavorite/list") 
 	public String topicFavoriteList(ModelMap model,PageForm pageForm,Long topicId,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
+		Map<String,Object> returnValue = new HashMap<String,Object>();
 		if(topicId != null && topicId >0L){
+			Topic topic = topicService.findById(topicId);
+			if(topic != null){
+				returnValue.put("currentTopic", topic);
+			}
 			
 			//调用分页算法代码
 			PageView<Favorites> pageView = new PageView<Favorites>(settingService.findSystemSetting_cache().getBackstagePageNumber(),pageForm.getPage(),10,request.getRequestURI(),request.getQueryString());
@@ -127,27 +164,28 @@ public class FavoriteAction {
 			
 			QueryResult<Favorites> qr = favoriteService.findFavoritePageByTopicId(firstIndex,pageView.getMaxresult(),topicId);
 			if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
-				List<Long> topicIdList = new ArrayList<Long>();
 				for(Favorites favorites : qr.getResultlist()){
-					topicIdList.add(favorites.getTopicId());
-				}
-				List<Topic> topicList = topicService.findByIdList(topicIdList);
-				if(topicList != null && topicList.size() >0){
-					for(Favorites favorites : qr.getResultlist()){
-						for(Topic topic : topicList){
-							if(favorites.getTopicId().equals(topic.getId())){
-								favorites.setTopicTitle(topic.getTitle());
-								break;
-							}
-						}
+					User user = userManage.query_cache_findUserByUserName(favorites.getUserName());
+					if(user != null){
+						favorites.setNickname(user.getNickname());
+						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
+							favorites.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+							favorites.setAvatarName(user.getAvatarName());
+						}		
 					}
 				}
 			}
 			//将查询结果集传给分页List
 			pageView.setQueryResult(qr);
-			model.addAttribute("pageView", pageView);
+			returnValue.put("pageView", pageView);
+		}else{
+			error.put("topicId", "话题Id不能为空");
 		}
-		return "jsp/favorite/topicFavoriteList";
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
+		}
 	}
 	
 	/**
@@ -160,12 +198,20 @@ public class FavoriteAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping("/control/questionFavorite/list") 
 	public String questionFavoriteList(ModelMap model,PageForm pageForm,Long questionId,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
+		Map<String,Object> returnValue = new HashMap<String,Object>();
 		if(questionId != null && questionId >0L){
+			Question question = questionService.findById(questionId);
+			if(question != null){
+				returnValue.put("currentQuestion", question);
+			}
+			
 			
 			//调用分页算法代码
 			PageView<Favorites> pageView = new PageView<Favorites>(settingService.findSystemSetting_cache().getBackstagePageNumber(),pageForm.getPage(),10,request.getRequestURI(),request.getQueryString());
@@ -174,26 +220,27 @@ public class FavoriteAction {
 			
 			QueryResult<Favorites> qr = favoriteService.findFavoritePageByQuestionId(firstIndex,pageView.getMaxresult(),questionId);
 			if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
-				List<Long> questionIdList = new ArrayList<Long>();
 				for(Favorites favorites : qr.getResultlist()){
-					questionIdList.add(favorites.getQuestionId());
-				}
-				List<Question> questionList = questionService.findByIdList(questionIdList);
-				if(questionList != null && questionList.size() >0){
-					for(Favorites favorites : qr.getResultlist()){
-						for(Question question : questionList){
-							if(favorites.getQuestionId().equals(question.getId())){
-								favorites.setQuestionTitle(question.getTitle());
-								break;
-							}
-						}
+					User user = userManage.query_cache_findUserByUserName(favorites.getUserName());
+					if(user != null){
+						favorites.setNickname(user.getNickname());
+						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
+							favorites.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+							favorites.setAvatarName(user.getAvatarName());
+						}		
 					}
 				}
 			}
 			//将查询结果集传给分页List
 			pageView.setQueryResult(qr);
-			model.addAttribute("pageView", pageView);
+			returnValue.put("pageView", pageView);
+		}else{
+			error.put("questionId", "问题Id不能为空");
 		}
-		return "jsp/favorite/questionFavoriteList";
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
+		}
 	}
 }

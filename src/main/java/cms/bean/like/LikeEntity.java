@@ -27,7 +27,15 @@ public class LikeEntity implements Serializable{
 	/** 点赞的用户名称 **/
 	@Column(length=30)
 	protected String userName;
-	
+	/** 呢称 **/
+	@Transient
+	protected String nickname;
+	/** 头像路径 **/
+	@Transient
+	protected String avatarPath;
+	/** 头像名称 **/
+	@Transient
+	protected String avatarName;
 	
 	/** 发布话题的用户名称 **/
 	@Column(length=30)
@@ -89,6 +97,30 @@ public class LikeEntity implements Serializable{
 
 	public void setPostUserName(String postUserName) {
 		this.postUserName = postUserName;
+	}
+
+	public String getNickname() {
+		return nickname;
+	}
+
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
+	}
+
+	public String getAvatarPath() {
+		return avatarPath;
+	}
+
+	public void setAvatarPath(String avatarPath) {
+		this.avatarPath = avatarPath;
+	}
+
+	public String getAvatarName() {
+		return avatarName;
+	}
+
+	public void setAvatarName(String avatarName) {
+		this.avatarName = avatarName;
 	}
 	
 	

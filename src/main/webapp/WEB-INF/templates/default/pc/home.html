@@ -15,6 +15,7 @@
 	<script language="javascript" src="${commonPath}js/tool.js" type="text/javascript"></script>
 	<script language="javascript" src="${commonPath}js/ajax.js" type="text/javascript"></script>
 	<script language="javascript" src="${commonPath}js/json2.js" type="text/javascript"></script>
+	<script type="text/javascript" src="${commonPath}js/lodash.min.js" language="javascript" ></script>
 	<script type="text/javascript" src="${commonPath}js/jquery/jquery.min.js" language="javascript"></script>
 	<script type="text/javascript" src="${commonPath}js/jquery/jquery.letterAvatar.js" language="javascript"></script>
 	<script type="text/javascript" src="${commonPath}js/jquery/readmore.min.js" language="javascript"></script>
@@ -330,7 +331,7 @@
 						
 						html += "<div class='userDynamic'>";
 						html += 	"<div class='userDynamic-author'>";
-						html += 		"<a href='user/control/home?userName="+userDynamic.userName+"'>";
+						html += 		"<a href='user/control/home?userName="+_.escape(userDynamic.userName)+"'>";
 						if(userDynamic.avatarName != null && userDynamic.avatarName != ''){
 							html += "<img src='"+userDynamic.avatarPath+"100x100/"+userDynamic.avatarName+"' >";
 						}else{
@@ -338,7 +339,7 @@
 							html += "<!--[if (IE)]><img src='"+commonPath+"images/min_avata.png'><![endif]-->";
 						
 							if(userDynamic.nickname != null && userDynamic.nickname != ''){
-								html += "<!--[if !(IE)]><!--><img avatar='"+userDynamic.nickname+"' ><!--<![endif]-->";
+								html += "<!--[if !(IE)]><!--><img avatar='"+_.escape(userDynamic.nickname)+"' ><!--<![endif]-->";
 							}else{
 								html += "<!--[if !(IE)]><!--><img avatar='"+userDynamic.userName+"' ><!--<![endif]-->";
 							}
@@ -349,7 +350,7 @@
 						html += 		"<cite>";
 						html += 			"<a class='userName' href='user/control/home?userName="+userDynamic.userName+"'>";
 						if(userDynamic.nickname != null && userDynamic.nickname != ''){
-							html += userDynamic.nickname;
+							html += _.escape(userDynamic.nickname);
 						}else{
 							html += userDynamic.userName;
 						}
@@ -360,31 +361,31 @@
 						html += 	"<div class='topicTitle'>";
 						if(userDynamic.module == 100){
 							html += "<span class='info'>发表了话题</span>";	
-							html += 		"<a href='thread?topicId="+userDynamic.topicId+"'> "+userDynamic.topicTitle+"</a>";
+							html += 		"<a href='thread?topicId="+userDynamic.topicId+"'> "+_.escape(userDynamic.topicTitle)+"</a>";
 						}else if(userDynamic.module == 200){
 							html += "<span class='info'>评论了话题</span>";	
-							html += 		"<a href='thread?topicId="+userDynamic.topicId+"'> "+userDynamic.topicTitle+"</a>";
+							html += 		"<a href='thread?topicId="+userDynamic.topicId+"'> "+_.escape(userDynamic.topicTitle)+"</a>";
 						}else if(userDynamic.module == 300){
 							html += "<span class='info'>引用了话题</span>";
-							html += 		"<a href='thread?topicId="+userDynamic.topicId+"'> "+userDynamic.topicTitle+"</a>";	
+							html += 		"<a href='thread?topicId="+userDynamic.topicId+"'> "+_.escape(userDynamic.topicTitle)+"</a>";	
 						}else if(userDynamic.module == 400){
 							html += "<span class='info'>回复了话题</span>";
-							html += 		"<a href='thread?topicId="+userDynamic.topicId+"'> "+userDynamic.topicTitle+"</a>";	
+							html += 		"<a href='thread?topicId="+userDynamic.topicId+"'> "+_.escape(userDynamic.topicTitle)+"</a>";	
 						}else if(userDynamic.module == 500){
 							html += "<span class='info'>提交了问题</span>";
-							html += 		"<a href='question?questionId="+userDynamic.questionId+"'> "+userDynamic.questionTitle+"</a>";	
+							html += 		"<a href='question?questionId="+userDynamic.questionId+"'> "+_.escape(userDynamic.questionTitle)+"</a>";	
 						}else if(userDynamic.module == 600){
 							html += "<span class='info'>回答了问题</span>";	
-							html += 		"<a href='question?questionId="+userDynamic.questionId+"'> "+userDynamic.questionTitle+"</a>";	
+							html += 		"<a href='question?questionId="+userDynamic.questionId+"'> "+_.escape(userDynamic.questionTitle)+"</a>";	
 						}else if(userDynamic.module == 700){
 							html += "<span class='info'>回复了问题</span>";	
-							html += 		"<a href='question?questionId="+userDynamic.questionId+"'> "+userDynamic.questionTitle+"</a>";	
+							html += 		"<a href='question?questionId="+userDynamic.questionId+"'> "+_.escape(userDynamic.questionTitle)+"</a>";	
 						}
 						
 						
 						for(var j = 0; j<userDynamic.allowRoleViewList.length; j++){
 							var roleName = userDynamic.allowRoleViewList[j];
-							html += 	"<i class='topicRoleName'>"+roleName+"</i>";
+							html += 	"<i class='topicRoleName'>"+_.escape(roleName)+"</i>";
 						
 						}
 						
@@ -574,7 +575,7 @@
 						var html = "";
 						html += '<div class="hide-box">';
 						html += 	'<div class="background-image"></div>';
-						html += 	'<div class="background-prompt">此处内容已被隐藏，等级达到‘'+gradeName+'’可见</div>';
+						html += 	'<div class="background-prompt">此处内容已被隐藏，等级达到‘'+_.escape(gradeName)+'’可见</div>';
 						html += '</div>';
 	 					$(this).html(html);
 					}else if(hideType == '40'){
@@ -950,9 +951,11 @@
 				    }
 				    
 				    var code = $(this).find('code')[0];
-				    
-				 	//渲染
-				    Prism.highlightElement(code, false, function(){});
+				    if(code !=undefined){
+				    	//渲染
+				    	Prism.highlightElement(code, false, function(){});
+				    }
+				 	
 			    });
 			}
 		</script>

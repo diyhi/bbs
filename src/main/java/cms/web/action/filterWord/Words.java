@@ -1,256 +1,219 @@
 package cms.web.action.filterWord;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
 
 /**
- * 单词树
+ * DFA单词树
  *
  */
-public class Words extends HashMap<Character, Words>{
-	private static final long serialVersionUID = -3360553487822917751L;
-
-	/** 默认的类型 */
-	public final static int DEFAULT_TYPE = 0;
+public class Words extends HashMap<Character, Words> {
+	private static final long serialVersionUID = 4120320421949440930L;
 	
-	/** 关键字类型，是否最后一个字符 */
-	public Map<Integer, Boolean> types = new HashMap<Integer, Boolean>();
+	/**
+	 * 敏感词字符末尾标识，用于标识单词末尾字符
+	 */
+	private Set<Character> endCharacterSet = new HashSet<>();
 	
-	//------------------------------------------------------------------------------- 构造 start
 	/**
 	 * 默认构造
 	 */
 	public Words() {
 	}
-	
+	//------------------------------------------------------------------------------- add word
+
 	/**
-	 * 构造方法
-	 * @param type 类型
+	 * 增加一组单词
+	 *
+	 * @param words 单词集合
 	 */
-	public Words(int type) {
-		types.put(type, false);
+	public void addWords(Collection<String> words) {
+		if (false == (words instanceof Set)) {
+			words = new HashSet<>(words);
+		}
+		for (String word : words) {
+			addWord(word);
+		}
 	}
-	//------------------------------------------------------------------------------- 构造 end
-	
+
 	/**
 	 * 添加单词，使用默认类型
+	 *
 	 * @param word 单词
 	 */
 	public void addWord(String word) {
-		this.addWord(word, DEFAULT_TYPE);
-	}
-	
-	/**
-	 * 增加单词
-	 * @param word 单词
-	 * @param type 类型
-	 */
-	public void addWord(String word, int type){
-		//已经是单词的末尾
-		if(StringUtils.isBlank(word)){
-			this.types.put(type, true);
-			this.clear();
-			return;
+		Words parent = null;
+		Words current = this;
+		Words child;
+		char currentChar = 0;
+		int length = word.length();
+		for (int i = 0; i < length; i++) {
+			currentChar = word.charAt(i);
+			if (StopChar.isNotStopChar(currentChar)) {//只处理合法字符
+				child = current.get(currentChar);
+				if (child == null) {
+					//无子类，新建一个子节点后存放下一个字符
+					child = new Words();
+					current.put(currentChar, child);
+				}
+				parent = current;
+				current = child;
+			}
 		}
-		//已经是关键字的末尾，则结束（即只保留最短字符串）
-		Boolean isEnd = this.types.get(type);
-		if(isEnd != null && isEnd) return;
-		this.types.put(type, false);
-		
-		word = word.trim();
-		char currentChar = word.charAt(0);
-		//跳过特殊字符（跳过本字符，从下一个字符开始）
-		if(StopChar.isStopChar(currentChar)){
-			this.addWord(word.substring(1), type);
-			return;
-		}
-		
-		Words child = this.get(currentChar);
-		if(child != null){
-			//已经存在子节点，在子节点中存放下一个字符
-			child.addWord(word.substring(1), type);
-		}else{
-			//无子类，新建一个子节点后存放下一个字符
-			child = new Words(type);
-			this.put(currentChar, child);
-			child.addWord(word.substring(1), type);
+		if (null != parent) {
+			parent.setEnd(currentChar);
 		}
 	}
-	
-	/**
-	 * 指定文本是否包含树中的词，默认类型
-	 * @param text 被检查的文本
-	 * @return 是否包含
-	 */
-	public boolean contains(String text) {
-		return contains(text, DEFAULT_TYPE);
-	}
-	
+
+	//------------------------------------------------------------------------------- match
+
 	/**
 	 * 指定文本是否包含树中的词
+	 *
 	 * @param text 被检查的文本
-	 * @param type 类型
 	 * @return 是否包含
 	 */
-	public boolean contains(String text, int type){
-		while(! StringUtils.isBlank(text)){
-			Words words = this;
-			char[] array = text.toCharArray();
-			for (char c : array) {
-				//跳过特殊字符
-				if(StopChar.isStopChar(c)) continue;
-				
-				//子节点中子节点、类型为空表示词不存在
-				words = words.get(c);
-				if(words == null) break;
-				Boolean isEnd = words.types.get(type);
-				if(isEnd == null) break; 
-				
-				if(isEnd) return true;
-			}
-			text = text.substring(1);
+	public boolean isMatch(String text) {
+		if (null == text) {
+			return false;
 		}
-		return false;
+		return null != match(text);
 	}
-	
-	/**
-	 * 获得第一个匹配的关键字，默认类型
-	 * @param text 被检查的文本
-	 * @return 匹配到的关键字
-	 */
-	public String getFindedFirstWord(String text) {
-		return getFindedFirstWord(text, DEFAULT_TYPE);
-	}
-	
+
 	/**
 	 * 获得第一个匹配的关键字
+	 *
 	 * @param text 被检查的文本
-	 * @param type 类型
 	 * @return 匹配到的关键字
 	 */
-	public String getFindedFirstWord(String text, int type){
-		while(! StringUtils.isBlank(text)){
-			StringBuilder sb = new StringBuilder();
-			Words words = this;
-			char[] array = text.toCharArray();
-			for (char c : array) {
-				//跳过特殊字符
-				if(StopChar.isStopChar(c)) continue;
-				
-				//子节点中子节点、类型为空表示词不存在
-				words = words.get(c);
-				if(words == null) break;
-				sb.append(c);
-				Boolean isEnd = words.types.get(type);
-				if(isEnd == null) break; 
-				
-				if(isEnd) return sb.toString();
-			}
-			//从下一个字符开始查找
-			text = text.substring(1);
+	public String match(String text) {
+		if (null == text) {
+			return null;
+		}
+		List<String> matchAll = matchAll(text, 1);
+		if (matchAll != null && matchAll.size() >0) {
+			return matchAll.get(0);
 		}
 		return null;
 	}
-	
-	/**
-	 * 找出所有匹配的关键字，默认类型
-	 * @param text 被检查的文本
-	 * @return 匹配的词列表
-	 */
-	public List<String> getFindedAllWords(String text) {
-		return getFindedAllWords(text, DEFAULT_TYPE);
-	}
-	
+
+	//------------------------------------------------------------------------------- match all
+
 	/**
 	 * 找出所有匹配的关键字
+	 *
 	 * @param text 被检查的文本
-	 * @param type 文本的类型
 	 * @return 匹配的词列表
 	 */
-	public List<String> getFindedAllWords(String text, int type) {
-		List<String> findedWords = new ArrayList<String>();
-		while(!StringUtils.isBlank(text)){
-			StringBuilder sb = new StringBuilder();
-			Words words = this;
-			char[] array = text.toCharArray();
-			for (char c : array) {
-				//跳过特殊字符
-				if(StopChar.isStopChar(c)) continue;
-				
-				//子节点中子节点、类型为空表示词不存在
-				words = words.get(c);
-				if(words == null) break;
-				sb.append(c);
-				Boolean isEnd = words.types.get(type);
-				if(isEnd == null) break; 
-				
-				//到达单词末尾，关键词成立，从此词的下一个位置开始查找
-				if(isEnd) {
-					findedWords.add(sb.toString());
-					int len = sb.length();
-					sb.delete(0, len);
-					text = text.substring(len);
+	public List<String> matchAll(String text) {
+		return matchAll(text, -1);
+	}
+
+	/**
+	 * 找出所有匹配的关键字
+	 *
+	 * @param text  被检查的文本
+	 * @param limit 限制匹配个数
+	 * @return 匹配的词列表
+	 */
+	public List<String> matchAll(String text, int limit) {
+		return matchAll(text, limit, false, false);
+	}
+
+	/**
+	 * 找出所有匹配的关键字<br>
+	 * 密集匹配原则：假如关键词有 ab,b，文本是abab，将匹配 [ab,b,ab]<br>
+	 * 贪婪匹配（最长匹配）原则：假如关键字a,ab，最长匹配将匹配[a, ab]
+	 *
+	 * @param text           被检查的文本
+	 * @param limit          限制匹配个数
+	 * @param isDensityMatch 是否使用密集匹配原则
+	 * @param isGreedMatch   是否使用贪婪匹配（最长匹配）原则
+	 * @return 匹配的词列表
+	 */
+	public List<String> matchAll(String text, int limit, boolean isDensityMatch, boolean isGreedMatch) {
+		if (null == text) {
+			return null;
+		}
+
+		List<String> foundWords = new ArrayList<>();
+		Words current = this;
+		int length = text.length();
+		
+		char currentChar;
+		for (int i = 0; i < length; i++) {
+			StringBuffer wordBuffer = new StringBuffer("");
+			for (int j = i; j < length; j++) {
+				currentChar = text.charAt(j);
+
+				if (false == StopChar.isNotStopChar(currentChar)) {
+					if (wordBuffer.length() > 0) {
+						//做为关键词中间的停顿词被当作关键词的一部分被返回
+						wordBuffer.append(currentChar);
+					} else {
+						//停顿词做为关键词的第一个字符时需要跳过
+						i++;
+					}
+					continue;
+				} else if (false == current.containsKey(currentChar)) {
+					//非关键字符被整体略过，重新以下个字符开始检查
+					break;
+				}
+				wordBuffer.append(currentChar);
+				if (current.isEnd(currentChar)) {
+					//到达单词末尾，关键词成立，从此词的下一个位置开始查找
+					foundWords.add(wordBuffer.toString());
+					if (limit > 0 && foundWords.size() >= limit) {
+						//超过匹配限制个数，直接返回
+						return foundWords;
+					}
+					if (false == isDensityMatch) {
+						//如果非密度匹配，跳过匹配到的词
+						i = j;
+					}
+					if (false == isGreedMatch) {
+						//如果懒惰匹配（非贪婪匹配）。当遇到第一个结尾标记就结束本轮匹配
+						break;
+					}
+				}
+				current = current.get(currentChar);
+				if (null == current) {
 					break;
 				}
 			}
-			//从下一个字符开始
-			if(text.length() > 0) {
-				text = text.substring(1);
-			}
+			current = this;
 		}
-		return findedWords;
+		return foundWords;
 	}
+
+
+	//--------------------------------------------------------------------------------------- Private method start
+
 	/**
-	 * 找出所有匹配的原始关键字
-	 * @param text 被检查的文本
-	 * @param type 文本的类型
-	 * @return 匹配的词列表
+	 * 是否末尾
+	 *
+	 * @param c 检查的字符
+	 * @return 是否末尾
 	 */
-	public List<String> getFindedAllOriginalWords(String text) {
-		return this.getFindedAllOriginalWords(text, DEFAULT_TYPE);
+	private boolean isEnd(Character c) {
+		return this.endCharacterSet.contains(c);
 	}
-	
+
 	/**
-	 * 找出所有匹配的原始关键字
-	 * @param text 被检查的文本
-	 * @param type 文本的类型
-	 * @return 匹配的词列表
+	 * 设置是否到达末尾
+	 *
+	 * @param c 设置结尾的字符
 	 */
-	public List<String> getFindedAllOriginalWords(String text, int type) {
-		List<String> findedWords = new ArrayList<String>();
-		while(!StringUtils.isBlank(text)){
-			StringBuilder sb = new StringBuilder();
-			Words words = this;
-			char[] array = text.toCharArray();
-			for (char c : array) {
-				sb.append(c);
-				//跳过特殊字符
-				if(StopChar.isStopChar(c)) continue;
-				
-				//子节点中子节点、类型为空表示词不存在
-				words = words.get(c);
-				if(words == null) break;
-				Boolean isEnd = words.types.get(type);
-				if(isEnd == null) break; 
-				
-				//到达单词末尾，关键词成立，从此词的下一个位置开始查找
-				if(isEnd) {
-					findedWords.add(sb.toString());
-					int len = sb.length();
-					sb.delete(0, len);
-					text = text.substring(len);
-					break;
-				}
-			}
-			//从下一个字符开始
-			if(text.length() > 0) {
-				text = text.substring(1);
-			}
+	private void setEnd(Character c) {
+		if (null != c) {
+			this.endCharacterSet.add(c);
 		}
-		return findedWords;
 	}
+	//--------------------------------------------------------------------------------------- Private method end
 }
+

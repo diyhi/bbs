@@ -18,24 +18,30 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
-
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import cms.bean.PageForm;
 import cms.bean.PageView;
 import cms.bean.QueryResult;
+import cms.bean.RequestResult;
+import cms.bean.ResultCode;
 import cms.bean.question.Answer;
 import cms.bean.question.AnswerReply;
 import cms.bean.question.Question;
 import cms.bean.question.QuestionTag;
 import cms.bean.question.QuestionTagAssociation;
+import cms.bean.user.User;
 import cms.service.question.AnswerService;
 import cms.service.question.QuestionService;
 import cms.service.question.QuestionTagService;
 import cms.service.setting.SettingService;
 import cms.utils.HtmlEscape;
+import cms.utils.JsonUtils;
 import cms.utils.Verification;
 import cms.web.action.TextFilterManage;
+import cms.web.action.fileSystem.FileManage;
 import cms.web.action.lucene.QuestionLuceneManage;
+import cms.web.action.user.UserManage;
 
 /**
  * 问题
@@ -50,8 +56,12 @@ public class QuestionAction {
 	@Resource TextFilterManage textFilterManage;
 	
 	@Resource QuestionLuceneManage questionLuceneManage;
-
+	@Resource FileManage fileManage;
+	@Resource UserManage userManage;
 	
+	
+	
+	@ResponseBody
 	@RequestMapping("/control/question/list") 
 	public String execute(PageForm pageForm,ModelMap model,Boolean visible,
 			HttpServletRequest request, HttpServletResponse response)
@@ -102,14 +112,21 @@ public class QuestionAction {
 				}
 			}
 			
+			for(Question question : qr.getResultlist()){
+				User user = userManage.query_cache_findUserByUserName(question.getUserName());
+				if(user != null){
+					question.setNickname(user.getNickname());
+					if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
+						question.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+						question.setAvatarName(user.getAvatarName());
+					}		
+				}
+			}
 		}
 
 		pageView.setQueryResult(qr);
 		
-		
-		model.addAttribute("pageView", pageView);
-
-		return "jsp/question/questionList";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,pageView));
 	}
 	
 	/**
@@ -128,6 +145,7 @@ public class QuestionAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping("/control/question/search") 
 	public String search(ModelMap model,PageForm pageForm,
 			Integer dataSource,String keyword,String tagId,String tagName,String userName,
@@ -226,6 +244,18 @@ public class QuestionAction {
 								if(pi.getId().equals(old_t.getId())){
 									pi.setTitle(old_t.getTitle());
 									pi.setContent(old_t.getContent());
+									
+									
+									User user = userManage.query_cache_findUserByUserName(pi.getUserName());
+									if(user != null){
+										pi.setNickname(user.getNickname());
+										if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
+											pi.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+											pi.setAvatarName(user.getAvatarName());
+										}		
+									}
+									
+									
 									new_questionList.add(pi);
 									break;
 								}
@@ -245,11 +275,11 @@ public class QuestionAction {
 			List<Object> paramValue = new ArrayList<Object>();//sql参数值
 			
 			if(_keyword != null){//标题
-				param += " and o.title like ?"+(paramValue.size()+1)+" escape '/' ";
+				param += " and (o.title like ?"+(paramValue.size()+1)+" escape '/' ";
 				paramValue.add("%/"+ _keyword+"%");	
 				
 				//内容
-				param += " or o.content like ?"+(paramValue.size()+1)+" escape '/' ";
+				param += " or o.content like ?"+(paramValue.size()+1)+" escape '/' )";
 				paramValue.add("%/"+ _keyword+"%");	
 			}
 			if(_tagId != null && _tagId >0){//标签
@@ -289,6 +319,15 @@ public class QuestionAction {
 							t.setContent(t.getContent().substring(0, 190));
 						}
 					}
+					
+					User user = userManage.query_cache_findUserByUserName(t.getUserName());
+					if(user != null){
+						t.setNickname(user.getNickname());
+						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
+							t.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+							t.setAvatarName(user.getAvatarName());
+						}		
+					}
 				}
 			}
 			
@@ -322,19 +361,11 @@ public class QuestionAction {
 		
 		
 		
-		model.addAttribute("dataSource", dataSource);
-		
-		model.addAttribute("pageView", pageView);
-		model.addAttribute("error", error);
-	
-		model.addAttribute("keyword", keyword);
-		model.addAttribute("tagId", tagId);
-		model.addAttribute("tagName", tagName);
-		model.addAttribute("userName", userName);//用户名称
-		
-		model.addAttribute("start_postTime", start_postTime);
-		model.addAttribute("end_postTime", end_postTime);
-		return "jsp/question/questionSearchList";
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,pageView));
+		}
 	}
 	
 	/**
@@ -346,6 +377,7 @@ public class QuestionAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping("/control/question/allAuditQuestion") 
 	public String allAuditQuestion(PageForm pageForm,ModelMap model,
 			HttpServletRequest request, HttpServletResponse response)
@@ -390,15 +422,22 @@ public class QuestionAction {
 					}
 				}
 			}
-			
+			for(Question question : qr.getResultlist()){
+				User user = userManage.query_cache_findUserByUserName(question.getUserName());
+				if(user != null){
+					question.setNickname(user.getNickname());
+					if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
+						question.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+						question.setAvatarName(user.getAvatarName());
+					}		
+				}
+			}
 		}
 
 		pageView.setQueryResult(qr);
 		
 		
-		model.addAttribute("pageView", pageView);
-
-		return "jsp/question/allAuditQuestionList";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,pageView));
 	}
 	
 	/**
@@ -410,6 +449,7 @@ public class QuestionAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping("/control/question/allAuditAnswer") 
 	public String allAuditAnswer(PageForm pageForm,ModelMap model,
 			HttpServletRequest request, HttpServletResponse response)
@@ -442,6 +482,19 @@ public class QuestionAction {
     			if(!questionIdList.contains(o.getQuestionId())){
     				questionIdList.add(o.getQuestionId());
     			}
+    			
+    			
+    		
+				User user = userManage.query_cache_findUserByUserName(o.getUserName());
+				if(user != null){
+					o.setNickname(user.getNickname());
+					if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
+						o.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+						o.setAvatarName(user.getAvatarName());
+					}		
+				}
+    			
+    			
     		}
 			List<Question> questionList = questionService.findTitleByIdList(questionIdList);
 			if(questionList != null && questionList.size() >0){
@@ -461,9 +514,7 @@ public class QuestionAction {
 		pageView.setQueryResult(qr);
 		
 		
-		model.addAttribute("pageView", pageView);
-
-		return "jsp/question/allAuditAnswerList";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,pageView));
 	}
 	
 	/**
@@ -475,6 +526,7 @@ public class QuestionAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping("/control/question/allAuditAnswerReply") 
 	public String allAuditAnswerReply(PageForm pageForm,ModelMap model,
 			HttpServletRequest request, HttpServletResponse response)
@@ -508,6 +560,15 @@ public class QuestionAction {
     			if(!questionIdList.contains(o.getQuestionId())){
     				questionIdList.add(o.getQuestionId());
     			}
+    			
+    			User user = userManage.query_cache_findUserByUserName(o.getUserName());
+				if(user != null){
+					o.setNickname(user.getNickname());
+					if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
+						o.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+						o.setAvatarName(user.getAvatarName());
+					}		
+				}
     		}
 			List<Question> questionList = questionService.findTitleByIdList(questionIdList);
 			if(questionList != null && questionList.size() >0){
@@ -527,9 +588,7 @@ public class QuestionAction {
 		pageView.setQueryResult(qr);
 		
 		
-		model.addAttribute("pageView", pageView);
-
-		return "jsp/question/allAuditAnswerReplyList";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,pageView));
 	}
 	
 }

@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+
 import cms.bean.QueryResult;
 import cms.bean.payment.PaymentLog;
 import cms.bean.platformShare.TopicUnhidePlatformShare;
@@ -117,6 +118,11 @@ public interface TopicService extends DAO<Topic>{
 	 * @return
 	 */
 	public Integer deleteTopic(Long topicId,GiveRedEnvelope giveRedEnvelope,String userName,BigDecimal amount,Object paymentLogObject);
+	/**
+	 * 查询待审核话题数量
+	 * @return
+	 */
+	public Long auditTopicCount();
 	/**
 	 * 增加展示次数
 	 * @param countMap key: 话题Id value:展示次数

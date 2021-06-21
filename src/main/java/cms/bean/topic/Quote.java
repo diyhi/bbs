@@ -1,6 +1,9 @@
 package cms.bean.topic;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
 
 
 
@@ -30,6 +33,10 @@ public class Quote implements Serializable{
 	private String avatarName;
 	/** 评论内容 **/
 	private String content;
+	
+	/** 用户角色名称集合 **/
+	private List<String> userRoleNameList = new ArrayList<String>();
+	
 	public Long getCommentId() {
 		return commentId;
 	}
@@ -83,6 +90,12 @@ public class Quote implements Serializable{
 	}
 	public void setAvatarName(String avatarName) {
 		this.avatarName = avatarName;
+	}
+	public List<String> getUserRoleNameList() {
+		return userRoleNameList;
+	}
+	public void setUserRoleNameList(List<String> userRoleNameList) {
+		this.userRoleNameList = userRoleNameList;
 	}
 	
 	

@@ -3,7 +3,6 @@ package cms.web.action.setting;
 import java.math.BigDecimal;
 import java.util.List;
 
-import javax.persistence.Column;
 
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -100,7 +99,7 @@ public class SystemSettingValidator implements Validator{
 		
 		//发表话题奖励积分
 		if(systemSetting.getTopic_rewardPoint() != null){
-			if(systemSetting.getTopic_rewardPoint() <0){
+			if(systemSetting.getTopic_rewardPoint() <0L){
 				errors.rejectValue("topic_rewardPoint","errors.required", new String[]{"必须大于或等于0"},"");
 			}
 		}else{
@@ -108,7 +107,7 @@ public class SystemSettingValidator implements Validator{
 		}
 		//发表评论奖励积分
 		if(systemSetting.getComment_rewardPoint() != null){
-			if(systemSetting.getComment_rewardPoint() <0){
+			if(systemSetting.getComment_rewardPoint() <0L){
 				errors.rejectValue("comment_rewardPoint","errors.required", new String[]{"必须大于或等于0"},"");
 			}
 		}else{
@@ -116,7 +115,7 @@ public class SystemSettingValidator implements Validator{
 		}
 		//发表回复奖励积分
 		if(systemSetting.getReply_rewardPoint() != null){
-			if(systemSetting.getReply_rewardPoint() <0){
+			if(systemSetting.getReply_rewardPoint() <0L){
 				errors.rejectValue("reply_rewardPoint","errors.required", new String[]{"必须大于或等于0"},"");
 			}
 		}else{
@@ -125,7 +124,7 @@ public class SystemSettingValidator implements Validator{
 		
 		//提交问题奖励积分
 		if(systemSetting.getQuestion_rewardPoint() != null){
-			if(systemSetting.getQuestion_rewardPoint() <0){
+			if(systemSetting.getQuestion_rewardPoint() <0L){
 				errors.rejectValue("question_rewardPoint","errors.required", new String[]{"必须大于或等于0"},"");
 			}
 		}else{
@@ -133,7 +132,7 @@ public class SystemSettingValidator implements Validator{
 		}
 		//提交答案奖励积分
 		if(systemSetting.getAnswer_rewardPoint() != null){
-			if(systemSetting.getAnswer_rewardPoint() <0){
+			if(systemSetting.getAnswer_rewardPoint() <0L){
 				errors.rejectValue("answer_rewardPoint","errors.required", new String[]{"必须大于或等于0"},"");
 			}
 		}else{
@@ -141,7 +140,7 @@ public class SystemSettingValidator implements Validator{
 		}
 		//提交答案回复奖励积分
 		if(systemSetting.getAnswerReply_rewardPoint() != null){
-			if(systemSetting.getAnswerReply_rewardPoint() <0){
+			if(systemSetting.getAnswerReply_rewardPoint() <0L){
 				errors.rejectValue("answerReply_rewardPoint","errors.required", new String[]{"必须大于或等于0"},"");
 			}
 		}else{

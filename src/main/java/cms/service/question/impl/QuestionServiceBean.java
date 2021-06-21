@@ -585,5 +585,14 @@ public class QuestionServiceBean extends DaoSupport<Question> implements Questio
 		return query.executeUpdate();
 	}
 	
-	
+	/**
+	 * 查询待审核问题数量
+	 * @return
+	 */
+	@Transactional(readOnly=true,propagation=Propagation.NOT_SUPPORTED)
+	public Long auditQuestionCount(){
+		Query query = em.createQuery("select count(o) from Question o where o.status=?1");
+		query.setParameter(1, 10);
+		return (Long)query.getSingleResult();
+	}
 }

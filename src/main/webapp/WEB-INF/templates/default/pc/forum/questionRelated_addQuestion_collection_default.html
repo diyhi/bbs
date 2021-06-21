@@ -120,13 +120,13 @@
 									var questionTag = returnValue[i];
 					
 									nav_html += "<li class='nav-item'>";
-									nav_html += 	"<a class='nav-link' id='tag-"+i+"' childTagQuantity='"+questionTag.childTag.length+"' tagId='"+questionTag.id+"' tagName = '"+questionTag.name+"' href='javascript:;'>"+questionTag.name+"</a>";
+									nav_html += 	"<a class='nav-link' id='tag-"+i+"' childTagQuantity='"+questionTag.childTag.length+"' tagId='"+questionTag.id+"' tagName = '"+_.escape(questionTag.name)+"' href='javascript:;'>"+_.escape(questionTag.name)+"</a>";
 									nav_html += "</li>";
 									
 									childTag_html += "<div class='tab-pane' id='tag-"+i+"-panel' >";
 									for(var j =0; j<questionTag.childTag.length; j++){
 										var childQuestionTag = questionTag.childTag[j];
-										childTag_html += "<a class='child-tag' href='javascript:;' tagId='"+childQuestionTag.id+"' tagName = '"+childQuestionTag.name+"'>"+childQuestionTag.name+"</a>";
+										childTag_html += "<a class='child-tag' href='javascript:;' tagId='"+childQuestionTag.id+"' tagName = '"+_.escape(childQuestionTag.name)+"'>"+_.escape(childQuestionTag.name)+"</a>";
 									}
 									childTag_html += "</div>";
 								}
@@ -235,7 +235,7 @@
 								
 								var html = "";
 									html += "<a class='btn mr' data-tagId='"+tagId+"' href='javascript:;'>";
-									html += 	tagName;
+									html += 	_.escape(tagName);
 									html += 	"<span class='ml'>×</span>";
 									html += 	"<input type='hidden' name='tagId' value='"+tagId+"'>";
 									html += "</a>";
@@ -294,7 +294,7 @@
 							
 							var html = "";
 								html += "<a class='btn mr' data-tagId='"+tagId+"' href='javascript:;'>";
-								html += 	tagName;
+								html += 	_.escape(tagName);
 								html += 	"<span class='ml'>×</span>";
 								html += 	"<input type='hidden' name='tagId' value='"+tagId+"'>";
 								html += "</a>";

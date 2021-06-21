@@ -27,33 +27,8 @@ http://www.springframework.org/schema/context/spring-context-4.3.xsd">
     <mvc:resources location="/common/" mapping="/common/**"/> 
     <mvc:resources location="/file/" mapping="/file/**"/>
       
-	<!-- 处理器适配器 -->
-	<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">  
-		<!-- 解决json乱码 -->
-		<property name="messageConverters">     
-			<list>
-				<!-- HTTP消息转换器 -->
-				<bean class="org.springframework.http.converter.StringHttpMessageConverter">
-					<property name = "supportedMediaTypes">     
-					    <list>
-					 		<value>text/html;charset=UTF-8</value>      
-					    </list>
-					</property>
-				</bean>
-				<!-- 文件下载配置 -->
-				<bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter"/>   
+     
 
-                <!-- Json转换器 -->
-                <bean id="mappingJacksonHttpMessageConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">          
-                    <property name="supportedMediaTypes">      
-                        <list>
-                            <value>text/plain;charset=UTF-8</value> 
-                       </list>      
-                    </property>    
-                </bean>
-			 </list>
-		</property>
-	</bean>
 
 	<!-- 处理器映射 -->
 	<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping">  
@@ -69,7 +44,7 @@ http://www.springframework.org/schema/context/spring-context-4.3.xsd">
     
 	<!-- FreeMarker页面解析器--> 
 	<bean id="freemarkerViewResolver" class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
-		<property name="order" value="1" />  
+		<property name="order" value="1" />
 		<property name="suffix" value=".html"/><!-- 后缀 -->
 		<property name="contentType" value="text/html;charset=UTF-8"/><!-- 页面编码 -->
 		<property name="viewClass">
@@ -85,16 +60,7 @@ http://www.springframework.org/schema/context/spring-context-4.3.xsd">
 		</property>
 		
 	</bean>
-	
-	<!-- 对模型视图名称的解析，即在模型视图名称添加前后缀 -->
-	<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-		<property name="order" value="2" /><!-- 视图解析顺序 -->
-		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView"></property>   
-		<property name="prefix" value="/WEB-INF/"></property> <!--前缀 -->
-		<property name="suffix" value=".jsp"></property> <!-- 后缀 -->
-	</bean>
-	
-	
+
 	
 	<!-- 文件上传 
     <bean id="multipartResolver"  

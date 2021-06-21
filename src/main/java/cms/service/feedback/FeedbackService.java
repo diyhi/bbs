@@ -33,4 +33,9 @@ public interface FeedbackService extends DAO<Feedback>{
 	 * @param feedbackId 留言Id
 	 */
 	public Integer deleteFeedback(Long feedbackId);
+	/**
+	 * 查询留言数量
+	 * @return
+	 */
+	public Long feedbackCount();
 }

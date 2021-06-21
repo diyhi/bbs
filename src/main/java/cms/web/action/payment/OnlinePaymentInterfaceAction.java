@@ -10,12 +10,16 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import cms.bean.PageForm;
 import cms.bean.PageView;
 import cms.bean.QueryResult;
+import cms.bean.RequestResult;
+import cms.bean.ResultCode;
 import cms.service.payment.PaymentService;
 import cms.service.setting.SettingService;
+import cms.utils.JsonUtils;
 import cms.bean.payment.OnlinePaymentInterface;
 /**
  * 在线支付接口管理显示
@@ -28,6 +32,7 @@ public class OnlinePaymentInterfaceAction{
 	
 	@Resource SettingService settingService;
 
+	@ResponseBody
 	@RequestMapping("/control/onlinePaymentInterface/list")  
 	public String execute(ModelMap model, PageForm pageForm,
 			HttpServletRequest request, HttpServletResponse response)
@@ -43,9 +48,7 @@ public class OnlinePaymentInterfaceAction{
 		QueryResult<OnlinePaymentInterface> qr = paymentService.getScrollData(OnlinePaymentInterface.class,firstindex, pageView.getMaxresult(),orderby);
 		//将查询结果集传给分页List
 		pageView.setQueryResult(qr);
-		request.setAttribute("pageView", pageView);
-
-		return "jsp/payment/onlinePaymentInterfaceList";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,pageView));
 	}
 
 }

@@ -13,14 +13,10 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import cms.bean.PageForm;
-import cms.bean.PageView;
 import cms.bean.PermissionObject;
-import cms.bean.QueryResult;
-import cms.bean.SaveResourcesObject;
+import cms.bean.RequestResult;
+import cms.bean.ResultCode;
 import cms.bean.staff.SysPermission;
-import cms.bean.staff.SysPermissionResources;
-import cms.bean.staff.SysResources;
 import cms.bean.staff.SysRoles;
 import cms.bean.staff.SysRolesPermission;
 import cms.bean.staff.SysUsers;
@@ -28,11 +24,8 @@ import cms.service.setting.SettingService;
 import cms.service.staff.ACLService;
 import cms.service.staff.StaffService;
 import cms.utils.JsonUtils;
-import cms.utils.RedirectPath;
 import cms.utils.UUIDUtil;
-import cms.web.action.SystemException;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -53,29 +46,7 @@ public class ACLManageAction {
 	@Resource ACLService aclService;//通过接口引用代理返回的对象
 	@Resource SettingService settingService;
 	
-	/**
-	 * Ajax查询模块名称分页显示
-	 */
-	@RequestMapping(params="method=queryModuleName",method=RequestMethod.GET)
-	public String queryModuleName(PageForm pageForm,ModelMap model
-			) throws Exception {
-		//调用分页算法代码
-		PageView<SysResources> pageView = new PageView<SysResources>(settingService.findSystemSetting_cache().getBackstagePageNumber(),pageForm.getPage(),8);
-		//当前页
-		int firstindex = (pageForm.getPage()-1)*pageView.getMaxresult();
-		//排序
-		LinkedHashMap<String,String> orderby = new LinkedHashMap<String,String>();
-		
-		orderby.put("priority", "desc");//根据priority字段降序排序
-		QueryResult<String> qr = aclService.modulePage(firstindex, pageView.getMaxresult(),orderby);
-		
-		//将查询结果集传给分页List
-		pageView.setQueryResult(qr);
-		model.addAttribute("pageView", pageView);
-		return"jsp/staff/queryModuleName";
-	}
-	
-	
+
 	
 	/**-------------------------------------- 角色 ----------------------------------------**/
 	
@@ -83,9 +54,11 @@ public class ACLManageAction {
 	/**
 	 * 角色管理 添加界面显示
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=addRoles",method=RequestMethod.GET)
 	public String addRolesUI(ModelMap model,SysRoles sysRoles,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
 		Collection<GrantedAuthority> auths = new ArrayList<GrantedAuthority>();//用户权限
 
 		Object obj  =  SecurityContextHolder.getContext().getAuthentication().getPrincipal(); 
@@ -134,14 +107,15 @@ public class ACLManageAction {
 				permissionObjectList.add(permissionObject);
 				permissionObjectMap.put(permissionObject.getModule(), permissionObjectList);		
 			}
-			model.addAttribute("permissionObjectMap",permissionObjectMap);//返回消息
+			
 		}
 		
-		return"jsp/staff/add_roles";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,permissionObjectMap));
 	}
 	/**
 	 * 角色管理 添加
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=addRoles",method=RequestMethod.POST)
 	public String addRoles(ModelMap model,SysRoles formbean,
 			String[] sysPermissionId
@@ -164,7 +138,7 @@ public class ACLManageAction {
 		//系统模块权限Id
 		String systemPermissionId = "";
 		
-		List<String> permissionIdList = new ArrayList<String>();//可用的权限ID
+		Set<String> permissionIdList = new HashSet<String>();//可用的权限ID
 		List<SysRolesPermission> sysRolesPermissionList = new ArrayList<SysRolesPermission>();
 		List<PermissionObject> modulePermissionList = null;
 		if(username != null && !"".equals(username)){
@@ -254,22 +228,59 @@ public class ACLManageAction {
 		
 		if(error.size() == 0){
 			aclService.saveRoles(sysRoles, sysRolesPermissionList);
+		}
+
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 		}else{
-			
-			Collection<GrantedAuthority> auths = new ArrayList<GrantedAuthority>();//用户权限
-	
-			Set<String> userAuthority = new HashSet<String>();//用户权限
-			if(auths != null && auths.size() >0){
-				for(GrantedAuthority ga: auths){
-					userAuthority.add(ga.getAuthority());
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+		}
+	}
+	/**
+	 * 角色管理 修改页面显示
+	 */
+	@ResponseBody
+	@RequestMapping(params="method=editRoles",method=RequestMethod.GET)
+	public String editRolesUI(ModelMap model,String rolesId
+			) throws Exception {
+		Map<String,String> error = new HashMap<String,String>();
+		Map<String,Object> returnValue = new LinkedHashMap<String,Object>();
+		
+		if(rolesId != null && !"".equals(rolesId.trim())){
+			Set<String> rolesPermissionName = new HashSet<String>();//要修改的角色权限name
+			SysRoles roles = (SysRoles)aclService.find(SysRoles.class, rolesId);
+			if(roles != null){
+				List<SysPermission> sysPermissionList = aclService.findPermissionByRolesId(rolesId);
+				if(sysPermissionList != null && sysPermissionList.size() >0){
+					for(SysPermission sysPermission : sysPermissionList){
+						rolesPermissionName.add(sysPermission.getName());
+					}
 				}
-			}
-			
-			if(modulePermissionList == null){
-				modulePermissionList = aclService.findModulePermission();
-			}
-			LinkedHashMap<String, List<PermissionObject>> permissionObjectMap = new LinkedHashMap<String, List<PermissionObject>>();
-			if(modulePermissionList != null && modulePermissionList.size() >0){
+				
+				Collection<GrantedAuthority> auths = new ArrayList<GrantedAuthority>();//用户权限
+				Object obj  =  SecurityContextHolder.getContext().getAuthentication().getPrincipal(); 
+				boolean issys = false;//是否是超级用户
+				boolean isPermissions = true;//当前登录用户是否包含本角色权限
+				if(obj instanceof SysUsers){
+					auths =((SysUsers)obj).getAuthorities();
+					issys = ((SysUsers)obj).isIssys();
+				}
+				Set<String> userAuthority = new HashSet<String>();//用户权限
+				if(auths != null && auths.size() >0){
+					for(GrantedAuthority ga: auths){
+						userAuthority.add(ga.getAuthority());
+					}
+				}
+				if(!issys && userAuthority.containsAll(rolesPermissionName)){//如果用户权限包含角色权限
+					if(userAuthority.size() == rolesPermissionName.size()){//当前登录用户不能修改和自己相同权限的角色
+						isPermissions = false;	
+					}else{
+						isPermissions = true;
+					}
+				}
+				
+				List<PermissionObject> modulePermissionList = aclService.findModulePermission();
+				LinkedHashMap<String, List<PermissionObject>> permissionObjectMap = new LinkedHashMap<String, List<PermissionObject>>();
 				for (PermissionObject permissionObject : modulePermissionList) {
 					//如果为系统最大权限则不可选
 					if("99999999999999999999999999999999".equals(permissionObject.getPermissionId())){
@@ -280,134 +291,59 @@ public class ACLManageAction {
 					if(permissionObject.isAppendUrl() == true){
 						continue;
 					}
-						
-						
+					
 					List<PermissionObject> permissionObjectList = new ArrayList<PermissionObject>();
 					if(permissionObjectMap.containsKey(permissionObject.getModule())){
 						permissionObjectList.addAll(permissionObjectMap.get(permissionObject.getModule()));
 					}
-					if(auths != null && auths.size() >0){	
+
+					if(auths != null && auths.size() >0){
 						for (GrantedAuthority ga:auths) {
-							if(ga.getAuthority().equals(permissionObject.getPermissionName())){
-								permissionObject.setLogonUserPermission(true);//当前用户可选择本权限
-								break;
-							}	
-						}
+							if(ga.getAuthority().equals(permissionObject.getPermissionName())&& isPermissions){
+								permissionObject.setLogonUserPermission(true);//当前登录用户权限拥有本权限
+								break;	
+							}
+						}						
 					}
 					if(issys){//如果是超级管理员
 						permissionObject.setLogonUserPermission(true);//当前用户可选择本权限
 					}
-				
-					if(permissionIdList.contains(permissionObject.getPermissionId())){
+					if(rolesPermissionName.contains(permissionObject.getPermissionName())){
 						permissionObject.setSelected(true);
 					}
 					
 					permissionObjectList.add(permissionObject);
 					permissionObjectMap.put(permissionObject.getModule(), permissionObjectList);		
 				}
-				
-				model.addAttribute("permissionObjectMap",permissionObjectMap);//返回消息
-			}
-			model.addAttribute("sysRoles",formbean);//返回消息
-			model.addAttribute("error",error);//返回消息
-			return"jsp/staff/add_roles";
-		}
-
-		model.addAttribute("message","添加角色成功");//返回消息
-		model.addAttribute("urladdress", RedirectPath.readUrl("control.roles.list"));//返回消息//返回转向地址
-		return "jsp/common/message";
-	}
-	/**
-	 * 角色管理 修改页面显示
-	 */
-	@RequestMapping(params="method=editRoles",method=RequestMethod.GET)
-	public String editRolesUI(ModelMap model,SysRoles sysRoles,
-			String rolesId
-			) throws Exception {
-
-		Set<String> rolesPermissionName = new HashSet<String>();//要修改的角色权限name
-		SysRoles roles = (SysRoles)aclService.find(SysRoles.class, rolesId);
-
-		List<SysPermission> sysPermissionList = aclService.findPermissionByRolesId(rolesId);
-		if(sysPermissionList != null && sysPermissionList.size() >0){
-			for(SysPermission sysPermission : sysPermissionList){
-				rolesPermissionName.add(sysPermission.getName());
-			}
-		}
-		
-		Collection<GrantedAuthority> auths = new ArrayList<GrantedAuthority>();//用户权限
-		Object obj  =  SecurityContextHolder.getContext().getAuthentication().getPrincipal(); 
-		boolean issys = false;//是否是超级用户
-		boolean isPermissions = true;//当前登录用户是否包含本角色权限
-		if(obj instanceof SysUsers){
-			auths =((SysUsers)obj).getAuthorities();
-			issys = ((SysUsers)obj).isIssys();
-		}
-		Set<String> userAuthority = new HashSet<String>();//用户权限
-		if(auths != null && auths.size() >0){
-			for(GrantedAuthority ga: auths){
-				userAuthority.add(ga.getAuthority());
-			}
-		}
-		if(!issys && userAuthority.containsAll(rolesPermissionName)){//如果用户权限包含角色权限
-			if(userAuthority.size() == rolesPermissionName.size()){//当前登录用户不能修改和自己相同权限的角色
-				isPermissions = false;	
+				roles.setLogonUserPermission(isPermissions);
+				returnValue.put("roles",roles);
+				returnValue.put("permissionObjectMap",permissionObjectMap);//返回消息
 			}else{
-				isPermissions = true;
+				error.put("rolesId", "角色不存在");
 			}
+		}else{
+			error.put("rolesId", "角色Id不能为空");
 		}
 		
-		List<PermissionObject> modulePermissionList = aclService.findModulePermission();
-		LinkedHashMap<String, List<PermissionObject>> permissionObjectMap = new LinkedHashMap<String, List<PermissionObject>>();
-		for (PermissionObject permissionObject : modulePermissionList) {
-			//如果为系统最大权限则不可选
-			if("99999999999999999999999999999999".equals(permissionObject.getPermissionId())){
-				continue;
-			}
-			
-			//如果为附加URL则不可选
-			if(permissionObject.isAppendUrl() == true){
-				continue;
-			}
-			
-			List<PermissionObject> permissionObjectList = new ArrayList<PermissionObject>();
-			if(permissionObjectMap.containsKey(permissionObject.getModule())){
-				permissionObjectList.addAll(permissionObjectMap.get(permissionObject.getModule()));
-			}
-
-			if(auths != null && auths.size() >0){
-				for (GrantedAuthority ga:auths) {
-					if(ga.getAuthority().equals(permissionObject.getPermissionName())&& isPermissions){
-						permissionObject.setLogonUserPermission(true);//当前登录用户权限拥有本权限
-						break;	
-					}
-				}						
-			}
-			if(issys){//如果是超级管理员
-				permissionObject.setLogonUserPermission(true);//当前用户可选择本权限
-			}
-			if(rolesPermissionName.contains(permissionObject.getPermissionName())){
-				permissionObject.setSelected(true);
-			}
-			
-			permissionObjectList.add(permissionObject);
-			permissionObjectMap.put(permissionObject.getModule(), permissionObjectList);		
+		
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
 		}
-		roles.setLogonUserPermission(isPermissions);
-		model.addAttribute("roles",roles);
-		model.addAttribute("permissionObjectMap",permissionObjectMap);//返回消息
-		return "jsp/staff/edit_roles";
 	}
 	/**
 	 * 角色管理 修改
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=editRoles",method=RequestMethod.POST)
 	public String editRoles(ModelMap model,SysRoles formbean,
-			String[] sysPermissionId,String rolesId,PageForm pageForm
+			String[] sysPermissionId,String rolesId
 			) throws Exception {
+		Map<String,String> error = new HashMap<String,String>();
 		
 		SysRoles sysRoles = new SysRoles ();
-		Map<String,String> error = new HashMap<String,String>();
+		
 		List<SysRolesPermission> sysRolesPermissionList = new ArrayList<SysRolesPermission>();
 		
 		if(rolesId == null || "".equals(rolesId.trim())){
@@ -417,199 +353,153 @@ public class ACLManageAction {
 			error.put("name", "请填写角色名");
 		}
 		
-		sysRoles.setId(rolesId);
-		sysRoles.setName(formbean.getName());
-		sysRoles.setRemarks(formbean.getRemarks());
-		
-		Collection<GrantedAuthority> auths = new ArrayList<GrantedAuthority>();//用户权限
-		String username = "";//用户名称
-		boolean issys = false;//是否是超级用户
-		boolean isPermissions = true;//当前登录用户是否包含本角色权限
-		Object obj  =  SecurityContextHolder.getContext().getAuthentication().getPrincipal(); 
+		if(error.size() ==0){
+			sysRoles.setId(rolesId);
+			sysRoles.setName(formbean.getName());
+			sysRoles.setRemarks(formbean.getRemarks());
+			
+			Collection<GrantedAuthority> auths = new ArrayList<GrantedAuthority>();//用户权限
+			String username = "";//用户名称
+			boolean issys = false;//是否是超级用户
+			boolean isPermissions = true;//当前登录用户是否包含本角色权限
+			Object obj  =  SecurityContextHolder.getContext().getAuthentication().getPrincipal(); 
 
-		if(obj instanceof SysUsers){
-			auths =((SysUsers)obj).getAuthorities();
-			issys = ((SysUsers)obj).isIssys();
-			username =((SysUsers)obj).getUsername();
-		}
-		
-		if(!issys){//如果登录用户不是超级管理员
-			Set<String> userAuthority = new HashSet<String>();//用户权限
-			for(GrantedAuthority ga: auths){
-				userAuthority.add(ga.getAuthority());
-			}
-			Set<String> rolesPermissionName = new HashSet<String>();//当前角色权限name
-			List<SysPermission> sysPermissionList = aclService.findPermissionByRolesId(rolesId);
-			if(sysPermissionList != null && sysPermissionList.size() >0){
-				for(SysPermission sysPermission : sysPermissionList){
-					rolesPermissionName.add(sysPermission.getName());
-				}
+			if(obj instanceof SysUsers){
+				auths =((SysUsers)obj).getAuthorities();
+				issys = ((SysUsers)obj).isIssys();
+				username =((SysUsers)obj).getUsername();
 			}
 			
-			if(!issys && userAuthority.containsAll(rolesPermissionName)){//如果用户权限包含角色权限
-				if(userAuthority.size() == rolesPermissionName.size()){//当前登录用户不能修改和自己相同权限的角色
-					isPermissions = false;	
-				}else{
-					isPermissions = true;
+			if(!issys){//如果登录用户不是超级管理员
+				Set<String> userAuthority = new HashSet<String>();//用户权限
+				for(GrantedAuthority ga: auths){
+					userAuthority.add(ga.getAuthority());
 				}
-			}
-			
-			//检查是否越权修改  只能修改权限比自己角色小的角色
-			if(userAuthority.containsAll(rolesPermissionName)){//如果用户权限不包含角色权限
-				if(userAuthority.size() == rolesPermissionName.size()){
-					error.put("permission", "不能修改和自己相同权限的角色");
+				Set<String> rolesPermissionName = new HashSet<String>();//当前角色权限name
+				List<SysPermission> sysPermissionList = aclService.findPermissionByRolesId(rolesId);
+				if(sysPermissionList != null && sysPermissionList.size() >0){
+					for(SysPermission sysPermission : sysPermissionList){
+						rolesPermissionName.add(sysPermission.getName());
+					}
 				}
-			}else{
-				error.put("permission", "账号权限不足");
-			}
-		}
-		sysRoles.setLogonUserPermission(isPermissions);
-		//系统模块权限Id
-		String systemPermissionId = "";
 				
-		List<String> permissionIdList = new ArrayList<String>();//可用的权限ID
-		List<PermissionObject> modulePermissionList = null;
-		if(username != null && !"".equals(username)){
-			
-			if(issys){
-				modulePermissionList = aclService.findModulePermission();
-				List<String> allSysPermissionId = new ArrayList<String>();//系统所有权限ID
-				if(modulePermissionList != null && modulePermissionList.size() >0){
-					for (PermissionObject permissionObject : modulePermissionList) {
-						//如果为系统最大权限则不可选
-						if("99999999999999999999999999999999".equals(permissionObject.getPermissionId())){
-							continue;
-						}
-						allSysPermissionId.add(permissionObject.getPermissionId());
+				if(!issys && userAuthority.containsAll(rolesPermissionName)){//如果用户权限包含角色权限
+					if(userAuthority.size() == rolesPermissionName.size()){//当前登录用户不能修改和自己相同权限的角色
+						isPermissions = false;	
+					}else{
+						isPermissions = true;
 					}
-					if(sysPermissionId != null && sysPermissionId.length >0){
-						for(String spi :sysPermissionId){
-							if(allSysPermissionId.contains(spi)){
-								permissionIdList.add(spi);
+				}
+				
+				//检查是否越权修改  只能修改权限比自己角色小的角色
+				if(userAuthority.containsAll(rolesPermissionName)){//如果用户权限不包含角色权限
+					if(userAuthority.size() == rolesPermissionName.size()){
+						error.put("permission", "不能修改和自己相同权限的角色");
+					}
+				}else{
+					error.put("permission", "账号权限不足");
+				}
+			}
+			sysRoles.setLogonUserPermission(isPermissions);
+			//系统模块权限Id
+			String systemPermissionId = "";
+					
+			Set<String> permissionIdList = new HashSet<String>();//可用的权限ID
+			List<PermissionObject> modulePermissionList = null;
+			if(username != null && !"".equals(username)){
+				
+				if(issys){
+					modulePermissionList = aclService.findModulePermission();
+					List<String> allSysPermissionId = new ArrayList<String>();//系统所有权限ID
+					if(modulePermissionList != null && modulePermissionList.size() >0){
+						for (PermissionObject permissionObject : modulePermissionList) {
+							//如果为系统最大权限则不可选
+							if("99999999999999999999999999999999".equals(permissionObject.getPermissionId())){
+								continue;
+							}
+							allSysPermissionId.add(permissionObject.getPermissionId());
+						}
+						if(sysPermissionId != null && sysPermissionId.length >0){
+							for(String spi :sysPermissionId){
+								if(allSysPermissionId.contains(spi)){
+									permissionIdList.add(spi);
+								}
 							}
 						}
 					}
-				}
+				}else{
+					List<String> userPermissionId = staffService.findPermissionIdByUserAccount(username);
+					for(String s : userPermissionId){
+						if(sysPermissionId != null && sysPermissionId.length >0){
+							//如果为系统最大权限则不可选
+							if("99999999999999999999999999999999".equals(s)){
+								continue;
+							}
+							for(String spi :sysPermissionId){
+								if(s.equals(spi)){
+									permissionIdList.add(s);
+								}
+							}
+						}
+					}
+				}		
 			}else{
-				List<String> userPermissionId = staffService.findPermissionIdByUserAccount(username);
-				for(String s : userPermissionId){
-					if(sysPermissionId != null && sysPermissionId.length >0){
-						//如果为系统最大权限则不可选
-						if("99999999999999999999999999999999".equals(s)){
-							continue;
-						}
-						for(String spi :sysPermissionId){
-							if(s.equals(spi)){
-								permissionIdList.add(s);
-							}
-						}
-					}
-				}
-			}		
-		}else{
-			error.put("permission", "没有权限");		
-		}
-		
-		if(modulePermissionList == null){
-			modulePermissionList = aclService.findModulePermission();
-		}
-		
-		if(modulePermissionList != null && modulePermissionList.size() >0){
-			for (PermissionObject permissionObject : modulePermissionList) {
-				//如果为系统最大权限则不可选
-				if("99999999999999999999999999999999".equals(permissionObject.getPermissionId())){
-					continue;
-				}
-
-				//自动勾选"系统-->后台框架"
-				if("系统".equals(permissionObject.getModule())){
-					systemPermissionId = permissionObject.getPermissionId();
-				}
+				error.put("permission", "没有权限");		
 			}
-		}
-		//如果没选中"系统-->后台框架"，则自动选择
-		if(!permissionIdList.contains(systemPermissionId)){
-			error.put("permission", "必须选择【 系统-->后台框架】");
 			
-		}
-		
-		
-		
-		if(permissionIdList != null && permissionIdList.size() >0){
-			for (String permissionId : permissionIdList) {
-				SysRolesPermission sysRolesPermission = new SysRolesPermission();
-				sysRolesPermission.setPermissionId(permissionId);
-				sysRolesPermission.setRoleId(sysRoles.getId());
-				sysRolesPermissionList.add(sysRolesPermission);
-			}
-		}
-		
-		
-		if(error.size() == 0){
-			aclService.updateRoles(sysRoles, sysRolesPermissionList);
-		}else{
 			if(modulePermissionList == null){
 				modulePermissionList = aclService.findModulePermission();
 			}
-			LinkedHashMap<String, List<PermissionObject>> permissionObjectMap = new LinkedHashMap<String, List<PermissionObject>>();
+			
 			if(modulePermissionList != null && modulePermissionList.size() >0){
 				for (PermissionObject permissionObject : modulePermissionList) {
 					//如果为系统最大权限则不可选
 					if("99999999999999999999999999999999".equals(permissionObject.getPermissionId())){
 						continue;
 					}
-					
-					//如果为附加URL则不可选
-					if(permissionObject.isAppendUrl() == true){
-						continue;
+
+					//自动勾选"系统-->后台框架"
+					if("系统".equals(permissionObject.getModule())){
+						systemPermissionId = permissionObject.getPermissionId();
 					}
-					
-					List<PermissionObject> permissionObjectList = new ArrayList<PermissionObject>();
-					if(permissionObjectMap.containsKey(permissionObject.getModule())){
-						permissionObjectList.addAll(permissionObjectMap.get(permissionObject.getModule()));
-					}
-					if(auths != null && auths.size() >0){	
-						for (GrantedAuthority ga:auths) {
-							if(ga.getAuthority().equals(permissionObject.getPermissionName())){
-								permissionObject.setLogonUserPermission(true);//当前用户可选择本权限
-								break;
-							}	
-						}
-					}
-					if(issys){//如果是超级管理员
-						permissionObject.setLogonUserPermission(true);//当前用户可选择本权限
-					}
-				
-					if(permissionIdList.contains(permissionObject.getPermissionId())){
-						permissionObject.setSelected(true);
-					}
-					
-					permissionObjectList.add(permissionObject);
-					permissionObjectMap.put(permissionObject.getModule(), permissionObjectList);		
 				}
-				model.addAttribute("permissionObjectMap",permissionObjectMap);//返回消息
+			}
+			//如果没选中"系统-->后台框架"，则自动选择
+			if(!permissionIdList.contains(systemPermissionId)){
+				error.put("permission", "必须选择【 系统-->后台框架】");
+				
+			}
+			
+			if(permissionIdList != null && permissionIdList.size() >0){
+				for (String permissionId : permissionIdList) {
+					SysRolesPermission sysRolesPermission = new SysRolesPermission();
+					sysRolesPermission.setPermissionId(permissionId);
+					sysRolesPermission.setRoleId(sysRoles.getId());
+					sysRolesPermissionList.add(sysRolesPermission);
+				}
 			}
 			
 			
-			model.addAttribute("error",error);
-			model.addAttribute("roles",sysRoles);
-			return "jsp/staff/edit_roles";
+			if(error.size() == 0){
+				aclService.updateRoles(sysRoles, sysRolesPermissionList);
+			}
 		}
 		
 		
-		model.addAttribute("message","修改角色成功");//返回消息
-		model.addAttribute("urladdress", RedirectPath.readUrl("control.roles.list")+"?page="+pageForm.getPage());//返回消息//返回转向地址
-		return "jsp/common/message";
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+		}
 	}
 	/**
 	 * 角色管理 删除
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=deleteRoles",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String deleteRoles(ModelMap model ,String rolesId
 			) throws Exception {
 		Map<String,String> error = new HashMap<String,String>();
-		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
 		
 		//角色只有上级或超级管理员才能删除
 		if(rolesId != null && !"".equals(rolesId.trim())){
@@ -658,14 +548,9 @@ public class ACLManageAction {
 			error.put("role", "角色不存在");
 		}
 		
-		if(error != null && error.size() >0){
-			returnValue.put("success", "false");
-			returnValue.put("error", error);
-		}else{
-			
-			returnValue.put("success", "true");
-			
+		if(error.size()==0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 		}
-		return JsonUtils.toJSONString(returnValue);
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 }

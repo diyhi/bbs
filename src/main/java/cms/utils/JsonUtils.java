@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -45,6 +46,7 @@ public class JsonUtils {
         SimpleModule simpleModule = new SimpleModule();
         simpleModule.addSerializer(Long.class, ToStringSerializer.instance);
         simpleModule.addSerializer(Long.TYPE, ToStringSerializer.instance);
+    //    simpleModule.addSerializer(String.class,new JsonHtmlXssSerializer());
         objectMapper.registerModule(simpleModule);
 
     //    jackson2HttpMessageConverter.setObjectMapper(objectMapper);
@@ -136,5 +138,20 @@ public class JsonUtils {
         return (T) "";
     }
  
+	/**
+     * 对出参的json进行转义
+   
+	private static class JsonHtmlXssSerializer extends JsonSerializer<Object> {   
+        public void serialize(Object value, JsonGenerator jgen,   
+                SerializerProvider provider) throws IOException,   
+                JsonProcessingException {   
+        	if (value != null) {
+                String encodedValue = HtmlUtils.htmlEscape(value.toString());
+                jgen.writeString(encodedValue);
+            }
+        }   
+    }   */
 	
+	
+
 }

@@ -19,14 +19,18 @@ import org.queryString.util.UrlEncoded;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import cms.bean.PageForm;
 import cms.bean.PageView;
 import cms.bean.QueryResult;
+import cms.bean.RequestResult;
+import cms.bean.ResultCode;
 import cms.bean.statistic.PV;
 import cms.service.setting.SettingService;
 import cms.service.statistic.PageViewService;
 import cms.utils.IpAddress;
+import cms.utils.JsonUtils;
 import cms.utils.Verification;
 
 /**
@@ -49,6 +53,7 @@ public class PageViewAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping("/control/pageView/list")  
 	public String execute(ModelMap model, PageForm pageForm,String start_times,String end_times,
 			HttpServletRequest request, HttpServletResponse response)
@@ -93,9 +98,7 @@ public class PageViewAction {
         		error.put("start_times", "起始时间不能比结束时间大");
         	}
 		}
-		model.addAttribute("error", error);
-		model.addAttribute("start_times", start_times);
-		model.addAttribute("end_times", end_times);
+		
 
 		
 		if(_start_times != null){//起始时间
@@ -137,9 +140,10 @@ public class PageViewAction {
 			}
 		}
 		
+		if(error.size() ==0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,pageView));
+		}
 		
-		request.setAttribute("pageView", pageView);
-		
-		return "jsp/statistic/pageViewList";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 }

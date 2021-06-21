@@ -39,9 +39,32 @@ public class QuestionRewardPlatformShare implements Serializable{
 	/** 提问题的用户名称 **/
 	@Column(length=80)
 	private String postUserName;
+	/** 提问题的用户呢称 **/
+	@Transient
+	private String postNickname;
+	/** 提问题的用户头像路径 **/
+	@Transient
+	private String postAvatarPath;
+	/** 提问题的用户头像名称 **/
+	@Transient
+	private String postAvatarName;
+	
+	
+	
+	
 	/** 回答问题的用户名称 **/ 
 	@Column(length=30)
 	private String answerUserName;
+	/** 回答问题的用户呢称 **/
+	@Transient
+	private String answerNickname;
+	/** 回答问题的用户头像路径 **/
+	@Transient
+	private String answerAvatarPath;
+	/** 回答问题的用户头像名称 **/
+	@Transient
+	private String answerAvatarName;
+	
 	/** 平台分成比例 **/
 	private Integer platformShareProportion;
 	
@@ -170,6 +193,66 @@ public class QuestionRewardPlatformShare implements Serializable{
 
 	public void setAdoptionTime(Date adoptionTime) {
 		this.adoptionTime = adoptionTime;
+	}
+
+
+	public String getPostNickname() {
+		return postNickname;
+	}
+
+
+	public void setPostNickname(String postNickname) {
+		this.postNickname = postNickname;
+	}
+
+
+	public String getPostAvatarPath() {
+		return postAvatarPath;
+	}
+
+
+	public void setPostAvatarPath(String postAvatarPath) {
+		this.postAvatarPath = postAvatarPath;
+	}
+
+
+	public String getPostAvatarName() {
+		return postAvatarName;
+	}
+
+
+	public void setPostAvatarName(String postAvatarName) {
+		this.postAvatarName = postAvatarName;
+	}
+
+
+	public String getAnswerNickname() {
+		return answerNickname;
+	}
+
+
+	public void setAnswerNickname(String answerNickname) {
+		this.answerNickname = answerNickname;
+	}
+
+
+	public String getAnswerAvatarPath() {
+		return answerAvatarPath;
+	}
+
+
+	public void setAnswerAvatarPath(String answerAvatarPath) {
+		this.answerAvatarPath = answerAvatarPath;
+	}
+
+
+	public String getAnswerAvatarName() {
+		return answerAvatarName;
+	}
+
+
+	public void setAnswerAvatarName(String answerAvatarName) {
+		this.answerAvatarName = answerAvatarName;
 	}
 
 

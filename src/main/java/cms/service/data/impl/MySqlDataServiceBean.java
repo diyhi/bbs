@@ -149,9 +149,12 @@ public class MySqlDataServiceBean extends DaoSupport implements DataService {
 		//	String sql="SELECT sum(DATA_LENGTH)+sum(INDEX_LENGTH)FROM information_schema.TABLES where TABLE_SCHEMA='itcast'";
 		//	String sql="SELECT concat(round(sum(DATA_LENGTH/1024/1024),2),'MB') as data FROM information_schema.TABLES WHERE table_schema='"+databaseName+"' AND table_name='"+tablName+"'";
 			//SHOW TABLE STATUS FROM `itcast` like 'orders'
-			String sql="SELECT DATA_LENGTH FROM information_schema.TABLES WHERE TABLE_SCHEMA='"+databaseName+"' AND TABLE_NAME='"+tableName+"'";
+			String sql="SELECT DATA_LENGTH FROM information_schema.TABLES WHERE TABLE_SCHEMA=? AND TABLE_NAME=?";
+			
 			pstmt = conn.prepareStatement(sql);
-	//		pstmt.setString(1, "");
+			
+			pstmt.setString(1, databaseName);
+			pstmt.setString(2, tableName);
 			rs = pstmt.executeQuery();
 			while(rs.next()) {
 				size = rs.getString(1);
@@ -209,9 +212,10 @@ public class MySqlDataServiceBean extends DaoSupport implements DataService {
 		//	String sql="SELECT sum(DATA_LENGTH)+sum(INDEX_LENGTH)FROM information_schema.TABLES where TABLE_SCHEMA='itcast'";
 		//	String sql="SELECT concat(round(sum(DATA_LENGTH/1024/1024),2),'MB') as data FROM information_schema.TABLES WHERE table_schema='"+databaseName+"' AND table_name='"+tablName+"'";
 			//SHOW TABLE STATUS FROM `itcast` like 'orders'
-			String sql="SELECT INDEX_LENGTH FROM information_schema.TABLES WHERE TABLE_SCHEMA='"+databaseName+"' AND TABLE_NAME='"+tableName+"'";
+			String sql="SELECT INDEX_LENGTH FROM information_schema.TABLES WHERE TABLE_SCHEMA=? AND TABLE_NAME=?";
 			pstmt = conn.prepareStatement(sql);
-	//		pstmt.setString(1, "");
+			pstmt.setString(1, databaseName);
+			pstmt.setString(2, tableName);
 			rs = pstmt.executeQuery();
 			while(rs.next()) {
 				size = rs.getString(1);

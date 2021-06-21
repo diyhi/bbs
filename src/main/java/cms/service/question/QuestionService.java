@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+
 import cms.bean.payment.PaymentLog;
 import cms.bean.question.Question;
 import cms.bean.question.QuestionTagAssociation;
@@ -190,4 +191,9 @@ public interface QuestionService extends DAO<Question>{
 	 * @return
 	 */
 	public int subtractAnswerTotal(Long questionId,Long quantity);
+	/**
+	 * 查询待审核问题数量
+	 * @return
+	 */
+	public Long auditQuestionCount();
 }

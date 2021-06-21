@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import cms.bean.PageForm;
 import cms.bean.PageView;
 import cms.bean.QueryResult;
+import cms.bean.RequestResult;
+import cms.bean.ResultCode;
 import cms.bean.message.Remind;
 import cms.bean.question.Question;
 import cms.bean.topic.Topic;
@@ -27,6 +29,8 @@ import cms.bean.user.User;
 import cms.service.message.RemindService;
 import cms.service.setting.SettingService;
 import cms.service.user.UserService;
+import cms.utils.JsonUtils;
+import cms.web.action.fileSystem.FileManage;
 import cms.web.action.question.QuestionManage;
 import cms.web.action.topic.TopicManage;
 
@@ -45,6 +49,9 @@ public class RemindManageAction {
 	@Resource TopicManage topicManage;
 	
 	@Resource RemindManage remindManage;
+	@Resource FileManage fileManage;
+	
+	
 	/**
 	 * 提醒列表
 	 * @param model
@@ -54,10 +61,13 @@ public class RemindManageAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=remindList",method=RequestMethod.GET)
 	public String remindList(PageForm pageForm,ModelMap model,Long id,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
-		
+		//错误
+		Map<String,Object> error = new HashMap<String,Object>();
+		Map<String,Object> returnValue = new HashMap<String,Object>();
 		if(id != null && id >0L){
 			//调用分页算法代码
 			PageView<Remind> pageView = new PageView<Remind>(settingService.findSystemSetting_cache().getBackstagePageNumber(),pageForm.getPage(),10);
@@ -113,6 +123,11 @@ public class RemindManageAction {
 						User sender_user = userMap.get(remind.getSenderUserId());
 						if(sender_user != null){
 							remind.setSenderUserName(sender_user.getUserName());
+							remind.setSenderNickname(sender_user.getNickname());
+							if(sender_user.getAvatarName() != null && !"".equals(sender_user.getAvatarName().trim())){
+								remind.setSenderAvatarPath(fileManage.fileServerAddress()+sender_user.getAvatarPath());//发送者头像路径
+								remind.setSenderAvatarName(sender_user.getAvatarName());//发送者头像名称
+							}
 						}
 						
 					}
@@ -123,13 +138,22 @@ public class RemindManageAction {
 			}
 			//将查询结果集传给分页List
 			pageView.setQueryResult(qr);
+			User user = userService.findUserById(id);
+			if(user != null){
+				returnValue.put("currentUser", user);
+			}
 			
-			model.addAttribute("pageView", pageView);
+			returnValue.put("pageView", pageView);
+		}else{
+			error.put("userId", "用户Id不能为空");
+			
 		}
 		
-		
-		
-		return "jsp/message/remindList";
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
+		}
 	}
 
 	
@@ -147,14 +171,16 @@ public class RemindManageAction {
 	@ResponseBody//方式来做ajax,直接返回字符串
 	public String delete(ModelMap model,Long userId,Long friendUserId,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
 		if(userId != null && userId >0L && friendUserId != null && friendUserId >0L){
 			int i = remindService.deleteUserRemind(new ArrayList()<Long>);
 			
 			//删除提醒缓存
 			remindManage.delete_cache_findUnreadRemindByUserId(userId);
-			return "1";
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 		}
-		return "0";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}*/
 	
 	
@@ -167,10 +193,12 @@ public class RemindManageAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=reductionRemind", method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String reductionRemind(ModelMap model,Long userId,String remindId,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
 		if(remindId != null && !"".equals(remindId.trim())){
 			int i = remindService.reductionRemind(remindId);
 			if(userId != null){
@@ -178,9 +206,12 @@ public class RemindManageAction {
 				remindManage.delete_cache_findUnreadRemindByUserId(userId);
 			}
 			
-			return "1";
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+		}else{
+			error.put("remindId", "提醒Id不能为空");
+			
 		}
-		return "0";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 }

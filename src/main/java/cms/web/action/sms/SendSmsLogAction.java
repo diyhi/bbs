@@ -9,13 +9,17 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import cms.bean.PageForm;
 import cms.bean.PageView;
 import cms.bean.QueryResult;
+import cms.bean.RequestResult;
+import cms.bean.ResultCode;
 import cms.bean.sms.SendSmsLog;
 import cms.service.setting.SettingService;
 import cms.service.sms.SmsService;
+import cms.utils.JsonUtils;
 
 /**
  * 短信发送错误日志
@@ -36,6 +40,7 @@ public class SendSmsLogAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping("/control/sendSmsLog/list")  
 	public String execute(ModelMap model, PageForm pageForm,
 			HttpServletRequest request, HttpServletResponse response)
@@ -52,8 +57,6 @@ public class SendSmsLogAction {
 		QueryResult<SendSmsLog> qr = smsService.getScrollData(SendSmsLog.class,firstindex, pageView.getMaxresult(),orderby);
 		//将查询结果集传给分页List
 		pageView.setQueryResult(qr);
-		request.setAttribute("pageView", pageView);
-		
-		return "jsp/sms/sendSmsLogList";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,pageView));
 	}
 }

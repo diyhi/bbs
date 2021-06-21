@@ -1,6 +1,9 @@
 package cms.web.action.feedback;
 
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -11,11 +14,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-
+import cms.bean.RequestResult;
+import cms.bean.ResultCode;
 import cms.bean.feedback.Feedback;
 import cms.service.feedback.FeedbackService;
 import cms.utils.IpAddress;
-import cms.web.action.SystemException;
+import cms.utils.JsonUtils;
 
 /**
  * 在线留言管理
@@ -30,23 +34,27 @@ public class FeedbackManageAction {
 	/**
 	 * 在线留言管理  查看
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=view",method=RequestMethod.GET)
 	public String view(ModelMap model,Long feedbackId,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
+		
 		if(feedbackId != null && feedbackId >0L){
 			Feedback feedback = feedbackService.findById(feedbackId);
 			if(feedback == null){
-				throw new SystemException("在线留言不存在");
+				error.put("feedbackId", "在线留言不存在");
 			}else{
 				if(feedback.getIp() != null && !"".equals(feedback.getIp().trim())){
 					feedback.setIpAddress(IpAddress.queryAddress(feedback.getIp()));
 				}
-				model.addAttribute("feedback", feedback);
+				return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,feedback));
 			}
 		}else{
-			throw new SystemException("缺少参数");
+			error.put("feedbackId", "在线留言Id不能为空");
 		}
-		return "jsp/feedback/view_feedback";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	
@@ -61,14 +69,18 @@ public class FeedbackManageAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=delete", method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String delete(ModelMap model,Long feedbackId,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
 		if(feedbackId != null && feedbackId >0L){
 			int i = feedbackService.deleteFeedback(feedbackId);	
-			return "1";
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+		}else{
+			error.put("feedbackId", "在线留言Id不能为空");
 		}
-		return "0";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 }

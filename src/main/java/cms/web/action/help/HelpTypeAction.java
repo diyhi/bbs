@@ -2,6 +2,7 @@ package cms.web.action.help;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,17 +14,21 @@ import javax.servlet.http.HttpServletResponse;
 import cms.bean.PageForm;
 import cms.bean.PageView;
 import cms.bean.QueryResult;
+import cms.bean.RequestResult;
+import cms.bean.ResultCode;
 import cms.bean.help.HelpType;
 import cms.service.help.HelpTypeService;
 import cms.service.setting.SettingService;
+import cms.utils.JsonUtils;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
- * 资讯分类
+ * 帮助分类
  *
  */
 @Controller
@@ -31,10 +36,15 @@ public class HelpTypeAction {
 	@Resource HelpTypeService helpTypeService;
 	@Resource SettingService settingService;
 	
+	@ResponseBody
 	@RequestMapping("/control/helpType/list") 
 	public String execute(PageForm pageForm,ModelMap model,Long parentId,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
+		Map<String,Object> returnValue = new HashMap<String,Object>();
+		
 		StringBuffer jpql = new StringBuffer("");
 		//存放参数值
 		List<Object> params = new ArrayList<Object>();
@@ -66,7 +76,7 @@ public class HelpTypeAction {
 		QueryResult<HelpType> qr = helpTypeService.getScrollData(HelpType.class, firstindex, pageView.getMaxresult(), jpql_str, params.toArray(),orderby);		
 		
 		pageView.setQueryResult(qr);
-		model.addAttribute("pageView", pageView);
+		returnValue.put("pageView", pageView);
 		
 		
 		//分类导航
@@ -79,11 +89,15 @@ public class HelpTypeAction {
 					navigation.put(p.getId(), p.getName());
 				}
 				navigation.put(helpType.getId(), helpType.getName());
-				model.addAttribute("navigation", navigation);//分类导航
+				returnValue.put("navigation", navigation);//分类导航
 			}
 			
 		}
 		
-		return "jsp/help/helpTypeList";
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
+		}
 	}
 }

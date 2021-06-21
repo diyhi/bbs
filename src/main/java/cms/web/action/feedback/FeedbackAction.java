@@ -18,15 +18,19 @@ import javax.servlet.http.HttpServletResponse;
 import cms.bean.PageForm;
 import cms.bean.PageView;
 import cms.bean.QueryResult;
+import cms.bean.RequestResult;
+import cms.bean.ResultCode;
 import cms.bean.feedback.Feedback;
 import cms.service.feedback.FeedbackService;
 import cms.service.setting.SettingService;
+import cms.utils.JsonUtils;
 import cms.utils.Verification;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 
 /**
@@ -38,6 +42,7 @@ public class FeedbackAction {
 	@Resource FeedbackService feedbackService;
 	@Resource SettingService settingService;
 	
+	@ResponseBody
 	@RequestMapping("/control/feedback/list") 
 	public String execute(PageForm pageForm,ModelMap model,String start_createDate,String end_createDate,
 			HttpServletRequest request, HttpServletResponse response)
@@ -83,9 +88,7 @@ public class FeedbackAction {
         		error.put("start_createDate", "起始时间不能比结束时间大");
         	}
 		}
-		model.addAttribute("error", error);
-		model.addAttribute("start_createDate", start_createDate);
-		model.addAttribute("end_createDate", end_createDate);
+		
 
 		
 		if(_start_createDate != null){//起始时间
@@ -114,8 +117,10 @@ public class FeedbackAction {
 		QueryResult<Feedback> qr = feedbackService.getScrollData(Feedback.class, firstindex, pageView.getMaxresult(), jpql_str, params.toArray(),orderby);		
 		
 		pageView.setQueryResult(qr);
-		model.addAttribute("pageView", pageView);
-		
-		return "jsp/feedback/feedbackList";
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,pageView));
+		}
 	}
 }

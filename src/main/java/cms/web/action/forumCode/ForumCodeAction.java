@@ -1,17 +1,19 @@
 package cms.web.action.forumCode;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import cms.bean.PageForm;
+import cms.bean.RequestResult;
+import cms.bean.ResultCode;
 import cms.bean.forumCode.ForumCodeNode;
 import cms.bean.template.Templates;
 import cms.service.template.TemplateService;
 import cms.utils.JsonUtils;
-import cms.web.action.SystemException;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -31,20 +33,26 @@ public class ForumCodeAction {
 	@Resource(name="templateServiceBean")
 	private TemplateService templateService;//通过接口引用代理返回的对象
 	
+	@ResponseBody
 	@RequestMapping("/control/forumCode/list") 
-	public String execute(ModelMap model,@RequestParam("dirName") String dirName,PageForm pageForm,
+	public String execute(ModelMap model,@RequestParam("dirName") String dirName,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		
-		if(dirName == null || "".equals(dirName.trim())){
-			throw new SystemException("目录名称不能为空");
-		}
-		//根据模板目录名称查询模板
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
+				
 		if(dirName != null && !"".equals(dirName.trim())){
+			//根据模板目录名称查询模板
 			Templates templates = templateService.findTemplatebyDirName(dirName);
-			model.addAttribute("templates", templates);
+			if(templates != null){
+				return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,templates));
+			}else{
+				error.put("templates", "模板不存在");
+			}
+		}else{
+			error.put("dirName", "目录名称不能为空");
 		}
-		return "jsp/forumCode/forumCodeList";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	/**
@@ -56,15 +64,21 @@ public class ForumCodeAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(value="/control/forumCode/query",params="method=directory",method=RequestMethod.GET)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String queryForumDirectory(ModelMap model,@RequestParam("dirName") String dirName,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		
-		List<ForumCodeNode> forumCodeNodeList = forumCodeManage.forumCodeNodeList(dirName);
-		
-		return JsonUtils.toJSONString(forumCodeNodeList);
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
+				
+		if(dirName != null && !"".equals(dirName.trim())){
+			List<ForumCodeNode> forumCodeNodeList = forumCodeManage.forumCodeNodeList(dirName);
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,forumCodeNodeList));
+		}else{
+			error.put("dirName", "目录名称不能为空");
+		}
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	/**
@@ -76,15 +90,22 @@ public class ForumCodeAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(value="/control/forumCode/query",params="method=forumCode",method=RequestMethod.GET)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String queryForumCode(ModelMap model,@RequestParam("dirName") String dirName,
 			String childNodeName,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-
-		List<ForumCodeNode> forumCodeNodeList = forumCodeManage.getForumCodeNode(dirName,childNodeName);
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
+				
+		if(dirName != null && !"".equals(dirName.trim())){
+			List<ForumCodeNode> forumCodeNodeList = forumCodeManage.getForumCodeNode(dirName,childNodeName);
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,forumCodeNodeList));
+		}else{
+			error.put("dirName", "目录名称不能为空");
+		}
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 		
-		return JsonUtils.toJSONString(forumCodeNodeList);
 	}
 }

@@ -58,7 +58,7 @@
 					var html = "";
 					html += '<div class="hide-box">';
 					html += 	'<div class="background-image"></div>';
-					html += 	'<div class="background-prompt">此处内容已被隐藏，等级达到‘'+gradeName+'’可见</div>';
+					html += 	'<div class="background-prompt">此处内容已被隐藏，等级达到‘'+_.escape(gradeName)+'’可见</div>';
 					html += '</div>';
  					$(this).html(html);
 				}else if(hideType == '40'){

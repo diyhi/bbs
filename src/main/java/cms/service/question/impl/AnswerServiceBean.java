@@ -64,7 +64,7 @@ public class AnswerServiceBean extends DaoSupport<Answer> implements AnswerServi
 	 * @return
 	 */
 	@Transactional(readOnly=true,propagation=Propagation.NOT_SUPPORTED)
-	public List<Answer> findByCommentIdList(List<Long> answerIdList){
+	public List<Answer> findByAnswerIdList(List<Long> answerIdList){
 		Query query = em.createQuery("select o from Answer o where o.id in(:answerIdList)");
 		//给SQL语句设置参数
 		query.setParameter("answerIdList", answerIdList);
@@ -412,7 +412,16 @@ public class AnswerServiceBean extends DaoSupport<Answer> implements AnswerServi
 		
 	}
 	
-			
+	/**
+	 * 查询待审核答案数量
+	 * @return
+	 */
+	@Transactional(readOnly=true,propagation=Propagation.NOT_SUPPORTED)
+	public Long auditAnswerCount(){
+		Query query = em.createQuery("select count(o) from Answer o where o.status=?1");
+		query.setParameter(1, 10);
+		return (Long)query.getSingleResult();
+	}
 			
 		
 	
@@ -490,7 +499,19 @@ public class AnswerServiceBean extends DaoSupport<Answer> implements AnswerServi
 		}
 		return null;
 	}
-	
+	/**
+	 * 根据答案回复Id集合查询答案回复
+	 * @param answerReplyIdList 答案Id集合
+	 * @return
+	 */
+	@Transactional(readOnly=true,propagation=Propagation.NOT_SUPPORTED)
+	public List<AnswerReply> findByAnswerReplyIdList(List<Long> answerReplyIdList){
+		Query query = em.createQuery("select o from AnswerReply o where o.id in(:answerReplyIdList)");
+		//给SQL语句设置参数
+		query.setParameter("answerReplyIdList", answerReplyIdList);
+		
+		return query.getResultList();
+	}
 	/**
 	 * 分页查询回复
 	 * @param userName 用户名称
@@ -584,5 +605,15 @@ public class AnswerServiceBean extends DaoSupport<Answer> implements AnswerServi
 				.setParameter("isStaff", false);
 		return delete.executeUpdate();
 		
+	}
+	/**
+	 * 查询待审核回复数量
+	 * @return
+	 */
+	@Transactional(readOnly=true,propagation=Propagation.NOT_SUPPORTED)
+	public Long auditReplyCount(){
+		Query query = em.createQuery("select count(o) from Reply o where o.status=?1");
+		query.setParameter(1, 10);
+		return (Long)query.getSingleResult();
 	}
 }

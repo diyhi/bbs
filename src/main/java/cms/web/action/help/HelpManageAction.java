@@ -18,6 +18,8 @@ import javax.servlet.http.HttpServletResponse;
 import cms.bean.PageForm;
 import cms.bean.PageView;
 import cms.bean.QueryResult;
+import cms.bean.RequestResult;
+import cms.bean.ResultCode;
 import cms.bean.help.Help;
 import cms.bean.help.HelpType;
 import cms.service.help.HelpService;
@@ -27,9 +29,7 @@ import cms.utils.CommentedProperties;
 import cms.utils.FileType;
 import cms.utils.FileUtil;
 import cms.utils.JsonUtils;
-import cms.utils.RedirectPath;
 import cms.utils.UUIDUtil;
-import cms.web.action.SystemException;
 import cms.web.action.TextFilterManage;
 import cms.web.action.fileSystem.FileManage;
 
@@ -65,45 +65,61 @@ public class HelpManageAction {
 	/**
 	 * 帮助   查看
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=view",method=RequestMethod.GET)
 	public String view(Long helpId,ModelMap model,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
-		
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
+				
 		if(helpId != null && helpId >0L){
 			Help help = helpService.findById(helpId);
-			if(help == null){
-				throw new SystemException("帮助不存在");
+			if(help != null){
+				//处理富文本路径
+				help.setContent(fileManage.processRichTextFilePath(help.getContent(),"help"));
+				return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,help));	
+			}else{
+				error.put("helpId", "帮助不存在");
 			}
 			
-			//处理富文本路径
-			help.setContent(fileManage.processRichTextFilePath(help.getContent(),"help"));
-			model.addAttribute("help", help);
-			model.addAttribute("fileSystem", fileManage.getFileSystem());
+			
+		}else{
+			error.put("helpId", "帮助Id不存在");
 		}
 		
-		
-		
-		return "jsp/help/view_help";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	/**
 	 * 帮助   添加界面显示
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=add",method=RequestMethod.GET)
 	public String addUI(Help help,Long helpTypeId,ModelMap model,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
-		model.addAttribute("fileSystem", fileManage.getFileSystem());
-		return "jsp/help/add_help";
+		
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 	}
 	
 	/**
 	 * 帮助  添加
-	 * isHelpList 上一链接是否来自帮助列表
+	 * @param model
+	 * @param helpTypeId
+	 * @param helpTypeName
+	 * @param name
+	 * @param content
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=add", method=RequestMethod.POST)
-	public String add(ModelMap model,Long helpTypeId,String helpTypeName, String name,
-			String content,Boolean isHelpList,
+	public String add(ModelMap model,Long helpTypeId,String helpTypeName, String name,String content,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
+		
 		Help help = new Help();
 		List<String> imageNameList = null;
 		boolean isImage = false;//是否含有图片
@@ -114,7 +130,6 @@ public class HelpManageAction {
 		List<String> fileNameList = null;
 		boolean isFile = false;//是否含有文件
 		boolean isMap = false;//是否含有地图
-		Map<String,String> error = new HashMap<String,String>();
 		
 		//复制文件锁
 		List<String> fileLock_list = new ArrayList<String>();
@@ -208,10 +223,7 @@ public class HelpManageAction {
 			}
 		}
 		
-		if(error != null && error.size() >0){
-			model.addAttribute("error", error);
-		}else{
-			
+		if(error.size() ==0){
 			int i = helpService.saveHelp(help);
 			
 			if(i == 0){
@@ -282,32 +294,28 @@ public class HelpManageAction {
 						}
 					}
 				}
-				model.addAttribute("message","添加帮助成功");//返回消息
-				if(isHelpList != null && isHelpList == true){
-					model.addAttribute("urladdress", RedirectPath.readUrl("control.help.list")+"?visible=true");
-				}else{
-					model.addAttribute("urladdress", RedirectPath.readUrl("control.help.manage")+"?method=list&visible=true&helpTypeId="+helpTypeId);
-				}
 				
-				return "jsp/common/message";
 			}
+		};
+		
+		
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 		}
-		help.setName(name);
-		help.setContent(content);
-		model.addAttribute("help",help);
-		return "jsp/help/add_help";
 	}
 	
 	/**
-	 * 图片上传
+	 * 文件上传
 	 * @param dir: 上传类型，分别为image、flash、media、file 
 	 * @param fileName 文件名称 预签名时有值
 	 * 
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=upload",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String upload(ModelMap model,Long helpTypeId,String dir,String fileName,
-			MultipartFile imgFile, HttpServletResponse response) throws Exception {
+			MultipartFile file, HttpServletResponse response) throws Exception {
 
 		Map<String,Object> returnJson = new HashMap<String,Object>();
 		String errorMessage  = "";
@@ -449,9 +457,9 @@ public class HelpManageAction {
 				
 			
 			}else{//0.本地系统
-				if(imgFile != null && !imgFile.isEmpty()){
+				if(file != null && !file.isEmpty()){
 					//当前文件名称
-					String sourceFileName = imgFile.getOriginalFilename();
+					String sourceFileName = file.getOriginalFilename();
 					
 					String suffix = FileUtil.getExtension(sourceFileName).toLowerCase();
 
@@ -460,11 +468,11 @@ public class HelpManageAction {
 						List<String> formatList = CommentedProperties.readRichTextAllowImageUploadFormat();
 					
 						//验证文件类型
-						boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
+						boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),formatList);
 						
 						//如果用flash控件上传
-						if(imgFile.getContentType().equalsIgnoreCase("application/octet-stream")){
-							String fileType = FileType.getType(imgFile.getInputStream());
+						if(file.getContentType().equalsIgnoreCase("application/octet-stream")){
+							String fileType = FileType.getType(file.getInputStream());
 							for (String format :formatList) {
 								if(format.equalsIgnoreCase(fileType)){
 									authentication = true;
@@ -489,7 +497,7 @@ public class HelpManageAction {
 							//生成锁文件
 							fileManage.addLock(lockPathDir,helpTypeId+"_"+date +"_image_"+newFileName);
 							//保存文件
-							fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
+							fileManage.writeFile(pathDir, newFileName,file.getBytes());
 							
 				
 							//上传成功
@@ -506,7 +514,7 @@ public class HelpManageAction {
 						flashFormatList.add("swf");
 						
 						//验证文件后缀
-						boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),flashFormatList);
+						boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),flashFormatList);
 
 						if(authentication){
 							
@@ -523,7 +531,7 @@ public class HelpManageAction {
 							//生成锁文件
 							fileManage.addLock(lockPathDir,helpTypeId+"_"+date +"_flash_"+newFileName);
 							//保存文件
-							fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
+							fileManage.writeFile(pathDir, newFileName,file.getBytes());
 							
 							
 							//上传成功
@@ -542,7 +550,7 @@ public class HelpManageAction {
 						
 						
 						//验证文件后缀
-						boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
+						boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),formatList);
 						
 						if(authentication){	
 							//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
@@ -558,7 +566,7 @@ public class HelpManageAction {
 							//生成锁文件
 							fileManage.addLock(lockPathDir,helpTypeId+"_"+date +"_media_"+newFileName);
 							//保存文件
-							fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
+							fileManage.writeFile(pathDir, newFileName,file.getBytes());
 
 							//上传成功
 							returnJson.put("error", 0);//0成功  1错误
@@ -571,7 +579,7 @@ public class HelpManageAction {
 						//允许上传文件格式
 						List<String> formatList = CommentedProperties.readRichTextAllowFileUploadFormat();
 						//验证文件后缀
-						boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
+						boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),formatList);
 						if(authentication){
 							//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
 							String pathDir = "file"+File.separator+"help"+File.separator + helpTypeId + File.separator + date+ File.separator +"file"+ File.separator;
@@ -587,12 +595,12 @@ public class HelpManageAction {
 							//生成锁文件
 							fileManage.addLock(lockPathDir,helpTypeId+"_"+date +"_file_"+newFileName);
 							//保存文件
-							fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
+							fileManage.writeFile(pathDir, newFileName,file.getBytes());
 							
 							//上传成功
 							returnJson.put("error", 0);//0成功  1错误
 							returnJson.put("url", fileManage.fileServerAddress()+"file/help/"+helpTypeId+"/"+date+"/file/"+newFileName);
-							returnJson.put("title", imgFile.getOriginalFilename());//旧文件名称
+							returnJson.put("title", file.getOriginalFilename());//旧文件名称
 							return JsonUtils.toJSONString(returnJson);
 						}else{
 							errorMessage = "当前文件类型不允许上传";
@@ -620,11 +628,13 @@ public class HelpManageAction {
 	 * 帮助   修改界面显示
 	 * 
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=edit", method=RequestMethod.GET)
-	public String editUI(ModelMap model,PageForm pageForm,Long helpId,Long helpTypeId,Boolean visible,
-			
+	public String editUI(ModelMap model,Long helpId,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
-		
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
+				
 		if(helpId != null && helpId >0L){
 			Help help = helpService.findById(helpId);
 			if(help != null){
@@ -634,33 +644,36 @@ public class HelpManageAction {
 				}
 				//处理富文本路径
 				help.setContent(fileManage.processRichTextFilePath(help.getContent(),"help"));
-				
+				return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,help));
 			}else{
-				throw new SystemException("帮助不存在");
+				error.put("helpId", "帮助不存在");
 			}
-			
-			
-			model.addAttribute("help", help);
-			model.addAttribute("fileSystem", fileManage.getFileSystem());
+		}else{
+			error.put("helpId", "帮助Id不能为空");
 		}
 
-		return "jsp/help/edit_help";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	/**
 	 * 帮助   修改
 	 * @param model
-	 * @param pageForm
 	 * @param helpId
+	 * @param helpTypeId
 	 * @param name
 	 * @param content
-	 * @param visible
-	 * @param isHelpList 上一链接是否来自帮助列表
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=edit", method=RequestMethod.POST)
-	public String edit(ModelMap model,PageForm pageForm,Long helpId,Long helpTypeId,
-			String helpTypeName,String name,
-			String content,Boolean visible,Boolean isHelpList,
+	public String edit(ModelMap model,Long helpId,Long helpTypeId,String name,String content,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
+		
 		Help help = null;
 		List<String> imageNameList = null;
 		boolean isImage = false;//是否含有图片
@@ -671,7 +684,6 @@ public class HelpManageAction {
 		List<String> fileNameList = null;
 		boolean isFile = false;//是否含有文件
 		boolean isMap = false;//是否含有地图
-		Map<String,String> error = new HashMap<String,String>();
 		
 		
 		//复制文件锁
@@ -682,9 +694,21 @@ public class HelpManageAction {
 		String old_content = "";
 		if(helpId != null && helpId >0L){
 			help = helpService.findById(helpId);
-			help.setHelpTypeId(helpTypeId);
-			help.setHelpTypeName(helpTypeName);
 			if(help != null){
+				if(helpTypeId != null && helpTypeId >0L){
+					HelpType helpType = helpTypeService.findById(helpTypeId);
+					if(helpType != null){
+						help.setHelpTypeId(helpType.getId());
+						help.setHelpTypeName(helpType.getName());
+						
+					}else{
+						error.put("helpTypeId", "帮助不存在");
+					}
+				}else{
+					error.put("helpTypeId", "帮助Id不能为空");
+				}
+				
+				
 				old_content = help.getContent();
 				if(name != null && !"".equals(name.trim())){
 					help.setName(name);
@@ -764,205 +788,193 @@ public class HelpManageAction {
 				}else{
 					error.put("content", "帮助内容不能为空");
 				}
+			}else{
+				error.put("helpId", "帮助不存在");
 			}
+		}else{
+			error.put("helpId", "帮助Id不能为空");
 		}
 
 		
-		if(error != null && error.size() >0){
-			model.addAttribute("error", error);
-		}else{
-			if(help != null){
-				helpService.updateHelp(help);
-				//分隔符
-				String separator = "";
-				if("\\".equals(File.separator)){
-					separator = "\\\\";
-				}else{
-					separator = "/";
-				}
-				
-				Object[] obj = textFilterManage.readPathName(old_content,"help");
-				if(obj != null && obj.length >0){
-					//旧图片
-					List<String> old_imageNameList = (List<String>)obj[0];
-					if(old_imageNameList != null && old_imageNameList.size() >0){
-						
-				        Iterator<String> iter = old_imageNameList.iterator();
-				        while (iter.hasNext()) {
-				        	String imageName = iter.next();  
-							for(String new_imageName : imageNameList){
-								if(imageName.equals("file/help/"+new_imageName)){
-									iter.remove();
-									break;
-								}
-							}
-						}
-						if(old_imageNameList != null && old_imageNameList.size() >0){
-							for(String imageName : old_imageNameList){
-								oldPathFileList.add(FileUtil.toSystemPath(imageName));
-							}
-							
-						}
-					}
-					
-					//旧Flash
-					List<String> old_flashNameList = (List<String>)obj[1];		
-					if(old_flashNameList != null && old_flashNameList.size() >0){		
-				        Iterator<String> iter = old_flashNameList.iterator();
-				        while (iter.hasNext()) {
-				        	String flashName = iter.next();  
-							for(String new_flashName : flashNameList){
-								if(flashName.equals("file/help/"+new_flashName)){
-									iter.remove();
-									break;
-								}
-							}
-						}
-						if(old_flashNameList != null && old_flashNameList.size() >0){
-							for(String flashName : old_flashNameList){
-								oldPathFileList.add(FileUtil.toSystemPath(flashName));
-							}
-							
-						}
-					}
-	
-					//旧影音
-					List<String> old_mediaNameList = (List<String>)obj[2];	
-					if(old_mediaNameList != null && old_mediaNameList.size() >0){		
-				        Iterator<String> iter = old_mediaNameList.iterator();
-				        while (iter.hasNext()) {
-				        	String mediaName = iter.next();  
-							for(String new_mediaName : mediaNameList){
-								if(mediaName.equals("file/help/"+new_mediaName)){
-									iter.remove();
-									break;
-								}
-							}
-						}
-						if(old_mediaNameList != null && old_mediaNameList.size() >0){
-							for(String mediaName : old_mediaNameList){
-								oldPathFileList.add(FileUtil.toSystemPath(mediaName));
-							}
-							
-						}
-					}
-					
-					//旧文件
-					List<String> old_fileNameList = (List<String>)obj[3];		
-					if(old_fileNameList != null && old_fileNameList.size() >0){		
-				        Iterator<String> iter = old_fileNameList.iterator();
-				        while (iter.hasNext()) {
-				        	String fileName = iter.next();  
-							for(String new_fileName : fileNameList){
-								if(fileName.equals("file/help/"+new_fileName)){
-									iter.remove();
-									break;
-								}
-							}
-						}
-						if(old_fileNameList != null && old_fileNameList.size() >0){
-							for(String fileName : old_fileNameList){
-								oldPathFileList.add(FileUtil.toSystemPath(fileName));
-							}
-							
-						}
-					}
-				}
-				
-				
-				//删除图片锁
-				if(imageNameList != null && imageNameList.size() >0){
-					for(String imageName :imageNameList){
-						 if(imageName != null && !"".equals(imageName.trim())){
-							 fileManage.deleteLock("file"+File.separator+"help"+File.separator+"lock"+File.separator,imageName.replaceAll("/","_"));
-						 }
-					}
-				}
-				//删除Falsh锁
-				if(flashNameList != null && flashNameList.size() >0){
-					for(String flashName :flashNameList){
-						 if(flashName != null && !"".equals(flashName.trim())){
-							 fileManage.deleteLock("file"+File.separator+"help"+File.separator+"lock"+File.separator,flashName.replaceAll("/","_"));
-						 }
-					}
-				}
-				//删除音视频锁
-				if(mediaNameList != null && mediaNameList.size() >0){
-					for(String mediaName :mediaNameList){
-						if(mediaName != null && !"".equals(mediaName.trim())){
-							fileManage.deleteLock("file"+File.separator+"help"+File.separator+"lock"+File.separator,mediaName.replaceAll("/","_"));
-							
-						}
-					}
-				}
-				//删除文件锁
-				if(fileNameList != null && fileNameList.size() >0){
-					for(String fileName :fileNameList){
-						if(fileName != null && !"".equals(fileName.trim())){
-							fileManage.deleteLock("file"+File.separator+"help"+File.separator+"lock"+File.separator,fileName.replaceAll("/","_"));
-							
-						}
-					}
-				}
-				//删除复制文件锁
-				if(fileLock_list != null && fileLock_list.size() >0){
-					for(String fileName :fileLock_list){
-						if(fileName != null && !"".equals(fileName.trim())){
-							fileManage.deleteLock("file"+File.separator+"help"+File.separator+"lock"+File.separator,fileName.replaceAll("/","_"));
-							
-						}
-					}
-				}
-				
-				//删除旧路径文件
-				if(oldPathFileList != null && oldPathFileList.size() >0){
-					for(String oldPathFile :oldPathFileList){
-						//替换路径中的..号
-						oldPathFile = FileUtil.toRelativePath(oldPathFile);
-						
-						//删除旧路径文件
-						Boolean state = fileManage.deleteFile(oldPathFile);
-						if(state != null && state == false){
-							//替换指定的字符，只替换第一次出现的
-							oldPathFile = StringUtils.replaceOnce(oldPathFile, "file"+File.separator+"help"+File.separator, "");
-							
-							//创建删除失败文件
-							fileManage.failedStateFile("file"+File.separator+"help"+File.separator+"lock"+File.separator+FileUtil.toUnderline(oldPathFile));
-
-						}
-					}
-				}
-				
-				if(isHelpList != null && isHelpList == true){//跳转到分类下帮助列表
-					model.addAttribute("message","修改帮助成功");//返回消息
-					model.addAttribute("urladdress", RedirectPath.readUrl("control.help.list")+"?visible="+(visible == null ? "" : visible)+"&page="+pageForm.getPage());
-					return "jsp/common/message";
-					
-				}else{//路转到帮助列表
-					model.addAttribute("message","修改帮助成功");//返回消息
-					model.addAttribute("urladdress", RedirectPath.readUrl("control.help.manage")+"?method=list&visible="+(visible == null ? "" : visible)+"&helpTypeId="+helpTypeId+"&page="+pageForm.getPage());
-					return "jsp/common/message";
-				}
-				
-				
+		if(error.size() ==0){
+			helpService.updateHelp(help);
+			//分隔符
+			String separator = "";
+			if("\\".equals(File.separator)){
+				separator = "\\\\";
+			}else{
+				separator = "/";
 			}
+			
+			Object[] obj = textFilterManage.readPathName(old_content,"help");
+			if(obj != null && obj.length >0){
+				//旧图片
+				List<String> old_imageNameList = (List<String>)obj[0];
+				if(old_imageNameList != null && old_imageNameList.size() >0){
+					
+			        Iterator<String> iter = old_imageNameList.iterator();
+			        while (iter.hasNext()) {
+			        	String imageName = iter.next();  
+						for(String new_imageName : imageNameList){
+							if(imageName.equals("file/help/"+new_imageName)){
+								iter.remove();
+								break;
+							}
+						}
+					}
+					if(old_imageNameList != null && old_imageNameList.size() >0){
+						for(String imageName : old_imageNameList){
+							oldPathFileList.add(FileUtil.toSystemPath(imageName));
+						}
+						
+					}
+				}
+				
+				//旧Flash
+				List<String> old_flashNameList = (List<String>)obj[1];		
+				if(old_flashNameList != null && old_flashNameList.size() >0){		
+			        Iterator<String> iter = old_flashNameList.iterator();
+			        while (iter.hasNext()) {
+			        	String flashName = iter.next();  
+						for(String new_flashName : flashNameList){
+							if(flashName.equals("file/help/"+new_flashName)){
+								iter.remove();
+								break;
+							}
+						}
+					}
+					if(old_flashNameList != null && old_flashNameList.size() >0){
+						for(String flashName : old_flashNameList){
+							oldPathFileList.add(FileUtil.toSystemPath(flashName));
+						}
+						
+					}
+				}
+
+				//旧影音
+				List<String> old_mediaNameList = (List<String>)obj[2];	
+				if(old_mediaNameList != null && old_mediaNameList.size() >0){		
+			        Iterator<String> iter = old_mediaNameList.iterator();
+			        while (iter.hasNext()) {
+			        	String mediaName = iter.next();  
+						for(String new_mediaName : mediaNameList){
+							if(mediaName.equals("file/help/"+new_mediaName)){
+								iter.remove();
+								break;
+							}
+						}
+					}
+					if(old_mediaNameList != null && old_mediaNameList.size() >0){
+						for(String mediaName : old_mediaNameList){
+							oldPathFileList.add(FileUtil.toSystemPath(mediaName));
+						}
+						
+					}
+				}
+				
+				//旧文件
+				List<String> old_fileNameList = (List<String>)obj[3];		
+				if(old_fileNameList != null && old_fileNameList.size() >0){		
+			        Iterator<String> iter = old_fileNameList.iterator();
+			        while (iter.hasNext()) {
+			        	String fileName = iter.next();  
+						for(String new_fileName : fileNameList){
+							if(fileName.equals("file/help/"+new_fileName)){
+								iter.remove();
+								break;
+							}
+						}
+					}
+					if(old_fileNameList != null && old_fileNameList.size() >0){
+						for(String fileName : old_fileNameList){
+							oldPathFileList.add(FileUtil.toSystemPath(fileName));
+						}
+						
+					}
+				}
+			}
+			
+			
+			//删除图片锁
+			if(imageNameList != null && imageNameList.size() >0){
+				for(String imageName :imageNameList){
+					 if(imageName != null && !"".equals(imageName.trim())){
+						 fileManage.deleteLock("file"+File.separator+"help"+File.separator+"lock"+File.separator,imageName.replaceAll("/","_"));
+					 }
+				}
+			}
+			//删除Falsh锁
+			if(flashNameList != null && flashNameList.size() >0){
+				for(String flashName :flashNameList){
+					 if(flashName != null && !"".equals(flashName.trim())){
+						 fileManage.deleteLock("file"+File.separator+"help"+File.separator+"lock"+File.separator,flashName.replaceAll("/","_"));
+					 }
+				}
+			}
+			//删除音视频锁
+			if(mediaNameList != null && mediaNameList.size() >0){
+				for(String mediaName :mediaNameList){
+					if(mediaName != null && !"".equals(mediaName.trim())){
+						fileManage.deleteLock("file"+File.separator+"help"+File.separator+"lock"+File.separator,mediaName.replaceAll("/","_"));
+						
+					}
+				}
+			}
+			//删除文件锁
+			if(fileNameList != null && fileNameList.size() >0){
+				for(String fileName :fileNameList){
+					if(fileName != null && !"".equals(fileName.trim())){
+						fileManage.deleteLock("file"+File.separator+"help"+File.separator+"lock"+File.separator,fileName.replaceAll("/","_"));
+						
+					}
+				}
+			}
+			//删除复制文件锁
+			if(fileLock_list != null && fileLock_list.size() >0){
+				for(String fileName :fileLock_list){
+					if(fileName != null && !"".equals(fileName.trim())){
+						fileManage.deleteLock("file"+File.separator+"help"+File.separator+"lock"+File.separator,fileName.replaceAll("/","_"));
+						
+					}
+				}
+			}
+			
+			//删除旧路径文件
+			if(oldPathFileList != null && oldPathFileList.size() >0){
+				for(String oldPathFile :oldPathFileList){
+					//替换路径中的..号
+					oldPathFile = FileUtil.toRelativePath(oldPathFile);
+					
+					//删除旧路径文件
+					Boolean state = fileManage.deleteFile(oldPathFile);
+					if(state != null && state == false){
+						//替换指定的字符，只替换第一次出现的
+						oldPathFile = StringUtils.replaceOnce(oldPathFile, "file"+File.separator+"help"+File.separator, "");
+						
+						//创建删除失败文件
+						fileManage.failedStateFile("file"+File.separator+"help"+File.separator+"lock"+File.separator+FileUtil.toUnderline(oldPathFile));
+
+					}
+				}
+			}
+			
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+			
+			
 		}
-		help.setName(name);
-		help.setContent(content);
-		model.addAttribute("help",help);
-		return "jsp/help/edit_help";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	/**
 	 * 帮助   删除
 	 * @param model
 	 * @param helpId
-	 * @param visible
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=delete", method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String delete(ModelMap model,Long[] helpId,
-			Long helpTypeId,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
 		
 		if(helpId != null && helpId.length >0){
 			List<Long> helpIdList = new ArrayList<Long>();
@@ -1025,11 +1037,15 @@ public class HelpManageAction {
 							}
 						}
 					}
-					return "1";	
+					return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+				}else{
+					error.put("helpId", "帮助不存在");
 				}
 			}
+		}else{
+			error.put("helpId", "帮助Id不能为空");
 		}
-		return "0";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	/**
@@ -1039,18 +1055,24 @@ public class HelpManageAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=reduction",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
-	public String reduction(ModelMap model,Long[] helpId,Integer helpTypeId,
+	public String reduction(ModelMap model,Long[] helpId,
 			HttpServletResponse response) throws Exception {
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
 		if(helpId != null && helpId.length>0){
 			List<Help> helpList = helpService.findByIdList(Arrays.asList(helpId));
 			if(helpList != null && helpList.size() >0){
 				helpService.reductionHelp(helpList);
-				return "1";
-			}	
+				return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+			}else{
+				error.put("helpId", "帮助不存在");
+			}
+		}else{
+			error.put("helpId", "帮助Id不能为空");
 		}
-		return "0";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	/**
@@ -1060,10 +1082,14 @@ public class HelpManageAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=move",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String move(ModelMap model,Long[] helpId,Long helpTypeId,
 			HttpServletResponse response) throws Exception {
+		
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
+		
 		if(helpId != null && helpId.length>0){
 			
 			List<Help> helpList = helpService.findByIdList(Arrays.asList(helpId));
@@ -1113,63 +1139,72 @@ public class HelpManageAction {
 					}
 					
 				}
+			}else{
+				error.put("helpId", "帮助不存在");
 			}
-			helpService.updateHelp(helpList,helpTypeId);
 			
-			
-			//删除复制文件锁
-			if(fileLock_list != null && fileLock_list.size() >0){
-				for(String fileName :fileLock_list){
-					if(fileName != null && !"".equals(fileName.trim())){
-						fileManage.deleteLock("file"+File.separator+"help"+File.separator+"lock"+File.separator,fileName.replaceAll("/","_"));
-						
+			if(error.size() ==0){
+				helpService.updateHelp(helpList,helpTypeId);
+				
+				
+				//删除复制文件锁
+				if(fileLock_list != null && fileLock_list.size() >0){
+					for(String fileName :fileLock_list){
+						if(fileName != null && !"".equals(fileName.trim())){
+							fileManage.deleteLock("file"+File.separator+"help"+File.separator+"lock"+File.separator,fileName.replaceAll("/","_"));
+							
+						}
 					}
 				}
-			}
-			//删除旧路径文件
-			if(pathFileList != null && pathFileList.size() >0){
-				for(String pathFile :pathFileList){
-					//替换路径中的..号
-					pathFile = FileUtil.toRelativePath(pathFile);
-					
-					//删除旧路径文件
-					Boolean state = fileManage.deleteFile(pathFile);
-					if(state != null && state == false){
-						//替换指定的字符，只替换第一次出现的
-						pathFile = StringUtils.replaceOnce(pathFile, "file"+File.separator+"help"+File.separator, "");
+				//删除旧路径文件
+				if(pathFileList != null && pathFileList.size() >0){
+					for(String pathFile :pathFileList){
+						//替换路径中的..号
+						pathFile = FileUtil.toRelativePath(pathFile);
 						
-						//创建删除失败文件
-						fileManage.failedStateFile("file"+File.separator+"help"+File.separator+"lock"+File.separator+FileUtil.toUnderline(pathFile));
-					
-					
+						//删除旧路径文件
+						Boolean state = fileManage.deleteFile(pathFile);
+						if(state != null && state == false){
+							//替换指定的字符，只替换第一次出现的
+							pathFile = StringUtils.replaceOnce(pathFile, "file"+File.separator+"help"+File.separator, "");
+							
+							//创建删除失败文件
+							fileManage.failedStateFile("file"+File.separator+"help"+File.separator+"lock"+File.separator+FileUtil.toUnderline(pathFile));
+						
+						
+						}
 					}
 				}
+				
 			}
+			
 
-			return "1";
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+		}else{
+			error.put("helpId", "帮助Id不能为空");
 		}
-		return "0";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	/**
 	 * 搜索帮助分页
-	 * @param searchName 搜索名称
-	 * @param tableName div表名
+	 * @param keyword 关键词
 	 * @return
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=ajax_searchHelpPage", method=RequestMethod.GET)
 	public String searchHelpPage(ModelMap model,PageForm pageForm,
-			String searchName,String tableName) {
-			
+			String keyword) {
+		
 		StringBuffer jpql = new StringBuffer("");
 		String sql = "";
 		List<Object> params = new ArrayList<Object>();
 		//调用分页算法代码
 		PageView<Help> pageView = new PageView<Help>(settingService.findSystemSetting_cache().getBackstagePageNumber(),pageForm.getPage(),10);
-		if(searchName != null && !"".equals(searchName.trim())){
+		if(keyword != null && !"".equals(keyword.trim())){
 			String searchName_utf8 = "";
 			try {
-				searchName_utf8 = URLDecoder.decode(searchName.trim(),"utf-8");
+				searchName_utf8 = URLDecoder.decode(keyword.trim(),"utf-8");
 			} catch (UnsupportedEncodingException e) {
 				// TODO Auto-generated catch block
 			//	e.printStackTrace();
@@ -1180,10 +1215,6 @@ public class HelpManageAction {
 			jpql.append(" and o.name like ?").append((params.size()+1)).append(" escape '/' ");
 			params.add("%/"+ searchName_utf8.trim()+"%" );//加上查询参数
 			
-			
-			
-			
-			model.addAttribute("searchName", searchName_utf8);
 		}
 		jpql.append(" and o.visible=?").append((params.size()+1));//and o.code=?1
 		params.add(true);//设置o.visible=?1是否可见
@@ -1201,13 +1232,7 @@ public class HelpManageAction {
 		
 		//将查询结果集传给分页List
 		pageView.setQueryResult(qr);
-		model.addAttribute("pageView", pageView);
 		
-		
-		model.addAttribute("tableName", tableName);
-		
-		return "jsp/help/ajax_searchHelpPage";
-		
-		
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,pageView));
 	}
 }

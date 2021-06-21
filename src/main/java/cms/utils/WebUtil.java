@@ -62,8 +62,8 @@ public class WebUtil {
     	}
     	
         Cookie cookie = new Cookie(name, value);
+        cookie.setHttpOnly(true);
         cookie.setPath("/");//根目录下的所有程序都可以访问cookie
-     //   cookie.setHttpOnly(true);
         if (maxAge>0) cookie.setMaxAge(maxAge);
         response.addCookie(cookie); ; 
     }

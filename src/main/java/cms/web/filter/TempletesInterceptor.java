@@ -70,6 +70,7 @@ public class TempletesInterceptor extends HandlerInterceptorAdapter {
 	@Resource ThirdPartyManage thirdPartyManage;
 	@Resource FileManage fileManage;
 	
+	
 	//?  匹配任何单字符
 	//*  匹配0或者任意数量的字符
 	//** 匹配0或者更多的目录
@@ -89,7 +90,7 @@ public class TempletesInterceptor extends HandlerInterceptorAdapter {
 	  
 	public boolean preHandle(HttpServletRequest request,HttpServletResponse response, 
 			Object handler) throws Exception { 
-	//System.out.println(request.getRequestURI()+" -- "+request.getQueryString()+" -- "+request.getMethod());
+		//System.out.println(request.getRequestURI()+" -- "+request.getQueryString()+" -- "+request.getMethod());
 		
 		//拦截用户角色处理 注解参考： @RoleAnnotation(resourceCode=ResourceEnum._2001000)
 		if(handler instanceof HandlerMethod){
@@ -192,15 +193,28 @@ public class TempletesInterceptor extends HandlerInterceptorAdapter {
 				}
 			}
 		}
+		/**
+		if(WebUtil.submitDataMode(request)){//如果以Ajax方式提交数据
+			// 设置响应头
+	        response.setHeader("Pragma", "No-cache");
+			response.setHeader("Cache-Control", "no-cache");
+			response.setDateHeader("Expires", 0); 
+		}**/
+		
 		
 		String mav = "";
 		if(modelAndView != null){ 
 			mav = modelAndView.getViewName();
 		}
 		
+		
+		request.setAttribute("baseURL", Configuration.getUrl(request));//系统路径
+		
+		
 	    //如果视图方法返回值为templates开头,就将模板显示功能加入页面中	
 		if(mav != null && !"".equals(mav)){
 		//	if(mav.matches("^templates/.*$")){
+
 			if(mav != null && !"".equals(mav) && mav.length() >10){
 				String begin = mav.substring(0, 9);//取得templates
 				if("templates".equals(begin)){//如果以templates开头
@@ -251,7 +265,6 @@ public class TempletesInterceptor extends HandlerInterceptorAdapter {
     		    	}
     		    	
     		    	//执行自定义标签		
-					request.setAttribute("baseURL", Configuration.getUrl(request));//系统路径
 					request.setAttribute("commonPath", "common/"+dirName+"/"+accessSourceDeviceManage.accessDevices(request)+"/");//资源路径
 	    			request.setAttribute("contextPath",request.getContextPath());//系统虚拟目录
 	    			request.setAttribute("suffix",Configuration.getSuffix());//取得系统后缀名

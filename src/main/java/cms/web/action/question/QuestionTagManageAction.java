@@ -15,6 +15,8 @@ import javax.servlet.http.HttpServletResponse;
 import cms.bean.PageForm;
 import cms.bean.PageView;
 import cms.bean.QueryResult;
+import cms.bean.RequestResult;
+import cms.bean.ResultCode;
 import cms.bean.question.QuestionTag;
 import cms.bean.topic.Tag;
 import cms.service.question.QuestionTagService;
@@ -47,14 +49,17 @@ public class QuestionTagManageAction {
 	/**
 	 * 问题标签   添加界面显示
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=add",method=RequestMethod.GET)
 	public String addUI(ModelMap model,Tag tag,Long parentId,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
-
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
+		Map<String,Object> returnValue = new HashMap<String,Object>();
 		if(parentId != null){//判断父类ID是否存在;
 			QuestionTag _tag = questionTagService.findById(parentId);
 			if(_tag != null){
-				model.addAttribute("parentName",_tag.getName());//返回消息
+				returnValue.put("parentTag", _tag);//返回消息
 				
 				
 				Map<Long,String> navigation = new LinkedHashMap<Long,String>();
@@ -64,21 +69,26 @@ public class QuestionTagManageAction {
 					navigation.put(p.getId(), p.getName());
 				}
 				navigation.put(_tag.getId(),_tag.getName());
-				model.addAttribute("navigation", navigation);//标签导航
+				returnValue.put("navigation", navigation);//标签导航
+			}else{
+				error.put("parentId", "父类不存在");
 			}
 
 			
 		}
 		
-		
-		return "jsp/question/add_questionTag";
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
+		}
 	}
 	
 	/**
 	 * 问题标签  添加
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=add", method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String add(ModelMap model,String name,String sort,String parentId,
 		HttpServletRequest request, HttpServletResponse response) throws Exception {
 
@@ -139,33 +149,29 @@ public class QuestionTagManageAction {
 			tag.setParentIdGroup(parentIdGroup);
 			tag.setSort(Integer.parseInt(sort));
 			questionTagService.saveQuestionTag(tag);
+			
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 		}
 		
-		
-		
-		
-		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
-
-		if(error != null && error.size() >0){
-			returnValue.put("success", "false");
-			returnValue.put("error", error);
-		}else{
-			returnValue.put("success", "true");
-		}
-		return JsonUtils.toJSONString(returnValue);
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	
 	/**
 	 * 标签   修改界面显示
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=edit", method=RequestMethod.GET)
 	public String editUI(ModelMap model,Long questionTagId,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
+		Map<String,Object> returnValue = new HashMap<String,Object>();
+		
 		if(questionTagId != null){//判断ID是否存在;
 			QuestionTag tag = questionTagService.findById(questionTagId);
 			if(tag != null){
-				model.addAttribute("tag",tag);//返回消息
+				returnValue.put("tag",tag);//返回消息
 
 				int i=0;
 				Map<Long,String> navigation = new LinkedHashMap<Long,String>();
@@ -174,21 +180,27 @@ public class QuestionTagManageAction {
 					navigation.put(p.getId(), p.getName());
 					i++;
 					if(i ==1){
-						model.addAttribute("parentName", p.getName());
+						returnValue.put("parentTag", p);
 						
 					}
 					
 				}
-				model.addAttribute("navigation", navigation);//分类导航
+				returnValue.put("navigation", navigation);//分类导航
 			}
+		}else{
+			error.put("questionTagId", "标签Id不能为空");
 		}
-		return "jsp/question/edit_questionTag";
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
+		}
 	}
 	/**
 	 * 标签   修改
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=edit", method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String edit(ModelMap model,Long questionTagId,String name,String sort,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
@@ -237,27 +249,21 @@ public class QuestionTagManageAction {
 			
 			
 			questionTagService.updateQuestionTag(new_tag);
-			
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 		}
 		
-		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
-
-		if(error != null && error.size() >0){
-			returnValue.put("success", "false");
-			returnValue.put("error", error);
-		}else{
-			returnValue.put("success", "true");
-		}
-		return JsonUtils.toJSONString(returnValue);
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
+	
 	/**
 	 * 标签 删除
 	*/
+	@ResponseBody
 	@RequestMapping(params="method=delete", method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String delete(ModelMap model,Long questionTagId,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
-	
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
 		if(questionTagId != null && questionTagId >0L){
 			QuestionTag tag = questionTagService.findById(questionTagId);
 			
@@ -274,22 +280,23 @@ public class QuestionTagManageAction {
 			
 			int i = questionTagService.deleteQuestionTag(tag);
 			if(i >0){
-				return"1";
+				return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 			}
 			
+		}else{
+			error.put("questionTagId", "标签Id不能为空");
 		}
-		return"0";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	/**
 	 * 问题标签 查询所有标签
 	*/
+	@ResponseBody
 	@RequestMapping(params="method=allTag", method=RequestMethod.GET)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String queryAllTag(ModelMap model,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
-	
-		
+
 		List<QuestionTag> questionTagList =  questionTagService.findAllQuestionTag();
 		List<QuestionTag> new_questionTagList = new ArrayList<QuestionTag>();//排序后标签
 		
@@ -313,22 +320,23 @@ public class QuestionTagManageAction {
 			}
 			//排序
 			questionTagManage.questionTagSort(new_questionTagList);
-
-			return JsonUtils.toJSONString(new_questionTagList);
 		}
-		
-		return "";
-		
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,new_questionTagList));
 	}
 	
 	
 	/**
 	 * 标签 查询标签分页
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=questionTagPage", method=RequestMethod.GET)
-	public String queryQuestionTagPage(ModelMap model,String module,String tableName,PageForm pageForm,Long parentId,
+	public String queryQuestionTagPage(ModelMap model,PageForm pageForm,Long parentId,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
-		
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
+		Map<String,Object> returnValue = new HashMap<String,Object>();
+				
+				
 		StringBuffer jpql = new StringBuffer("");
 		//存放参数值
 		List<Object> params = new ArrayList<Object>();
@@ -357,9 +365,7 @@ public class QuestionTagManageAction {
 		QueryResult<QuestionTag> qr = questionTagService.getScrollData(QuestionTag.class, firstindex, pageView.getMaxresult(), _jpql, params.toArray(),orderby);
 
 		pageView.setQueryResult(qr);
-		model.addAttribute("pageView", pageView);
-		model.addAttribute("tableName", tableName);
-		
+		returnValue.put("pageView", pageView);
 		
 		//分类导航
 		if(parentId != null && parentId >0L){
@@ -372,17 +378,14 @@ public class QuestionTagManageAction {
 				}
 				navigation.put(questionTag.getId(), questionTag.getName());
 			}
-			model.addAttribute("navigation", navigation);
+			returnValue.put("navigation", navigation);
 		}
 		
-		if(module != null && "forum".equals(module)){
-			model.addAttribute("tableName", tableName);
-			return "jsp/question/ajax_forum_questionTagPage";
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 		}else{
-			return "jsp/question/ajax_questionTagPage";
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
 		}
-		
-
 	}
 
 }

@@ -11,6 +11,7 @@ import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 /**
  * 会员卡订单
@@ -28,6 +29,15 @@ public class MembershipCardOrder implements Serializable{
 	/** 用户名称 **/
 	@Column(length=30)
 	private String userName;
+	/** 呢称 **/
+	@Transient
+	private String nickname;
+	/** 头像路径 **/
+	@Transient
+	private String avatarPath;
+	/** 头像名称 **/
+	@Transient
+	private String avatarName;
 	
 	/** 订单创建时间 **/
 	@Temporal(TemporalType.TIMESTAMP)
@@ -229,6 +239,36 @@ public class MembershipCardOrder implements Serializable{
 
 	public void setVersion(Integer version) {
 		this.version = version;
+	}
+
+
+	public String getNickname() {
+		return nickname;
+	}
+
+
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
+	}
+
+
+	public String getAvatarPath() {
+		return avatarPath;
+	}
+
+
+	public void setAvatarPath(String avatarPath) {
+		this.avatarPath = avatarPath;
+	}
+
+
+	public String getAvatarName() {
+		return avatarName;
+	}
+
+
+	public void setAvatarName(String avatarName) {
+		this.avatarName = avatarName;
 	}
 	
 	

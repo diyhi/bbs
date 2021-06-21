@@ -123,8 +123,8 @@ public class UpgradeManage {
 		
 		
 		//排除路径
-        String excludeDirectoryPath  = new File(directoryPath+"signature.pem").getAbsolutePath();
-        
+       String excludeDirectoryPath  = new File(directoryPath+"signature.pem").getAbsolutePath();
+       
 		
 		
 		Collection<File> files = FileUtils.listFiles(new File(directoryPath), extensions, recursive);

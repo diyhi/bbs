@@ -50,6 +50,14 @@ public class Help implements Serializable{
 	/** 是否可见 **/
 	private boolean visible = true;
 
+	
+	
+	public Help() {}
+	public Help(Long id, String name) {
+		this.id = id;
+		this.name = name;
+	}
+
 	public Long getId() {
 		return id;
 	}

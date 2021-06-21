@@ -10,13 +10,17 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import cms.bean.RequestResult;
+import cms.bean.ResultCode;
 import cms.bean.setting.AllowRegisterAccount;
 import cms.bean.setting.EditorTag;
 import cms.bean.setting.SystemNode;
@@ -25,11 +29,11 @@ import cms.service.setting.SettingService;
 import cms.utils.CommentedProperties;
 import cms.utils.DruidTool;
 import cms.utils.JsonUtils;
-import cms.utils.RedirectPath;
 import cms.utils.Verification;
 import cms.web.action.cache.CacheManage;
 import cms.web.action.cache.CacheStatus;
 import cms.web.action.cache.SelectCache;
+import cms.web.action.fileSystem.FileManage;
 import cms.web.action.lucene.QuestionIndexManage;
 import cms.web.action.lucene.QuestionLuceneInit;
 import cms.web.action.lucene.TopicIndexManage;
@@ -37,10 +41,14 @@ import cms.web.action.lucene.TopicLuceneInit;
 import net.rubyeye.xmemcached.MemcachedClient;
 import net.sf.ehcache.CacheManager;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.context.MessageSource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.validation.Validator;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -55,6 +63,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 @RequestMapping("/control/systemSetting/manage") 
 public class SystemSettingManageAction {
+	private static final Logger logger = LogManager.getLogger(SystemSettingManageAction.class);
+	
 	@Resource SettingService settingService;
 	@Resource SettingManage settingManage;
 	
@@ -73,16 +83,35 @@ public class SystemSettingManageAction {
 	
 	@Resource TopicIndexManage topicIndexManage;
 	@Resource QuestionIndexManage questionIndexManage;
+	@Resource FileManage fileManage;
+	
+	@Resource MessageSource messageSource;
 	
 	
+	public static Long randInt(int min, int max) {
+
+	    // NOTE: Usually this should be a field rather than a method
+	    // variable so that it is not re-seeded every call.
+	    Random rand = new Random();
+
+	    // nextInt is normally exclusive of the top value,
+	    // so add 1 to make it inclusive
+	    int randomNum = rand.nextInt((max - min) + 1) + min;
+
+	    return (long)randomNum;
+	}
 	
 	
 	/**
 	 * 系统设置 修改界面显示
 	 */
+	@ResponseBody
 	@RequestMapping(value="edit",method=RequestMethod.GET)
 	public String editSystemSettingUI(ModelMap model,SystemSetting formbean,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+		Map<String,Object> returnValue = new HashMap<String,Object>();
+		
 		SystemSetting systemSite = settingService.findSystemSetting();
 	
 		if(systemSite.getAllowRegisterAccount() != null && !"".equals(systemSite.getAllowRegisterAccount().trim())){
@@ -119,54 +148,56 @@ public class SystemSettingManageAction {
 		}
 		//允许上传图片格式
 		List<String> imageUploadFormatList = CommentedProperties.readRichTextAllowImageUploadFormat();
-		model.addAttribute("imageUploadFormatList",imageUploadFormatList);
+		returnValue.put("imageUploadFormatList",imageUploadFormatList);
 		
 		//允许上传文件格式
 		List<String> fileUploadFormatList = CommentedProperties.readRichTextAllowFileUploadFormat();
-		model.addAttribute("fileUploadFormatList",fileUploadFormatList);
+		returnValue.put("fileUploadFormatList",fileUploadFormatList);
 		
 		//允许上传视频格式
 		List<String> videoUploadFormatList = CommentedProperties.readRichTextAllowVideoUploadFormat();
-		model.addAttribute("videoUploadFormatList",videoUploadFormatList);
+		returnValue.put("videoUploadFormatList",videoUploadFormatList);
 		
-		model.addAttribute("systemSetting",systemSite);
-		return "jsp/setting/edit_systemSetting";
+		returnValue.put("systemSetting",systemSite);
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
 	}
 	/**
 	 * 系统设置 修改
 	 */
+	@ResponseBody
 	@RequestMapping(value="edit",method=RequestMethod.POST)
 	public String editSystemSetting(ModelMap model,SystemSetting formbean,BindingResult result,String[] supportBank,String[] couponMore_couponType,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		//错误
+		Map<String,Object> error = new HashMap<String,Object>();
+		
 		//数据校验
 		this.validator.validate(formbean, result); 
 		if (result.hasErrors()) {  
-			//允许上传图片格式
-			List<String> imageUploadFormatList = CommentedProperties.readRichTextAllowImageUploadFormat();
-			model.addAttribute("imageUploadFormatList",imageUploadFormatList);
-			
-			//允许上传文件格式
-			List<String> fileUploadFormatList = CommentedProperties.readRichTextAllowFileUploadFormat();
-			model.addAttribute("fileUploadFormatList",fileUploadFormatList);
-			
-			//允许上传视频格式
-			List<String> videoUploadFormatList = CommentedProperties.readRichTextAllowVideoUploadFormat();
-			model.addAttribute("videoUploadFormatList",videoUploadFormatList);
-			return "jsp/setting/edit_systemSetting";
+			List<FieldError> fieldErrorList = result.getFieldErrors();
+			if(fieldErrorList != null && fieldErrorList.size() >0){
+				for(FieldError fieldError : fieldErrorList){
+					error.put(fieldError.getField(), messageSource.getMessage(fieldError, null));//messageSource.getMessage(fieldError.getCode(), fieldError.getArguments(), myQuestionnaire.getLocale())
+				}
+			}
 		}
-		formbean.setAllowRegisterAccount(JsonUtils.toJSONString(formbean.getAllowRegisterAccountObject()));
-		formbean.setTopicEditorTag(JsonUtils.toJSONString(formbean.getTopicEditorTagObject()));
-		formbean.setEditorTag(JsonUtils.toJSONString(formbean.getEditorTagObject()));
-		formbean.setQuestionEditorTag(JsonUtils.toJSONString(formbean.getQuestionEditorTagObject()));
-		formbean.setAnswerEditorTag(JsonUtils.toJSONString(formbean.getAnswerEditorTagObject()));
+		if(error.size() ==0){
+			formbean.setAllowRegisterAccount(JsonUtils.toJSONString(formbean.getAllowRegisterAccountObject()));
+			formbean.setTopicEditorTag(JsonUtils.toJSONString(formbean.getTopicEditorTagObject()));
+			formbean.setEditorTag(JsonUtils.toJSONString(formbean.getEditorTagObject()));
+			formbean.setQuestionEditorTag(JsonUtils.toJSONString(formbean.getQuestionEditorTagObject()));
+			formbean.setAnswerEditorTag(JsonUtils.toJSONString(formbean.getAnswerEditorTagObject()));
+			
+			formbean.setId(1);
+			formbean.setVersion(new Date().getTime());
+			settingService.updateSystemSetting(formbean);
+		}
 		
-		formbean.setId(1);
-		formbean.setVersion(new Date().getTime());
-		settingService.updateSystemSetting(formbean);
-		
-		request.setAttribute("message", "修改设置成功");
-		request.setAttribute("urladdress", RedirectPath.readUrl("control.systemSetting.manage.edit"));
-		return "jsp/common/message";
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+		}
 	}
 	
 	/**
@@ -175,11 +206,12 @@ public class SystemSettingManageAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=maintainData",method=RequestMethod.GET)
 	public String rebuildIndexUI(ModelMap model
 			) throws Exception {
 		
-		return "jsp/setting/maintainData";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 	}
 	
 	
@@ -192,30 +224,41 @@ public class SystemSettingManageAction {
 	 * @return  1.修改成功  2.修改失败 3.读取数库配置文件错误 4.读取旧密码为空  5.旧密码错误 6.加密数据库密码错误 7.写入配置文件错误
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=updateDatabasePassword",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String updateDatabasePassword(ModelMap model,String oldPassword, String newPassword
 			) throws Exception {
+		Map<String,String> error = new HashMap<String,String>();
 		
-		if(oldPassword != null && !"".equals(oldPassword.trim()) && newPassword != null && !"".equals(newPassword.trim())){
-			//旧数据库密码密文
-			String jdbc_password_ciphertext = null;
-			//旧数据库密码原文
-			String jdbc_password_original = null;
-			//公钥参数组
-			String jdbc_publickey = null;
+		if(oldPassword == null || "".equals(oldPassword.trim())){
+			error.put("oldPassword", "旧密码不能为空");
+		}
+		if(newPassword == null || "".equals(newPassword.trim())){
+			error.put("newPassword", "新密码不能为空");
+		}
+		//旧数据库密码密文
+		String jdbc_password_ciphertext = null;
+		//旧数据库密码原文
+		String jdbc_password_original = null;
+		//公钥参数组
+		String jdbc_publickey = null;
+		org.springframework.core.io.Resource database_resource = null;
+		CommentedProperties database_props = new CommentedProperties();
+		if(error.size() ==0){
 			
-			org.springframework.core.io.Resource database_resource = new ClassPathResource("/druid.properties");//读取配置文件
-			CommentedProperties database_props = new CommentedProperties();
 			
-			
+			database_resource = new ClassPathResource("/druid.properties");//读取配置文件
+
     		try {
     			database_props.load(database_resource.getInputStream(),"utf-8");
     			jdbc_password_ciphertext = database_props.getProperty("jdbc_password");
     			jdbc_publickey = database_props.getProperty("jdbc_publickey");
     			
 			} catch (IOException e) {
-				return "3";
+				if (logger.isErrorEnabled()) {
+		            logger.error("修改数据库密码 -- 读取配置文件异常",e);
+		        }
+				error.put("config", "读取数库配置文件错误");
 			}
 			
 		  
@@ -238,13 +281,18 @@ public class SystemSettingManageAction {
 					jdbc_password_original = jdbc_password_ciphertext;
 				}
 			}else{
-				return "4";
+				error.put("config_oldPassword", "读取旧密码为空");
 			}
 			
 			if(!oldPassword.trim().equals(jdbc_password_original)){
-				return "5";
+				error.put("oldPassword", "旧密码错误");
 			}
 			
+			
+		}
+		
+		
+		if(error.size() ==0){
 			//修改配置文件		
     		BufferedWriter bw = null;
     		try {
@@ -270,7 +318,10 @@ public class SystemSettingManageAction {
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 				//	e.printStackTrace();
-					return "6";
+					if (logger.isErrorEnabled()) {
+			            logger.error("修改数据库密码 -- 加密数据库密码异常",e);
+			        }
+					error.put("password", "加密数据库密码错误");
 				}
 
     			database_props.load(database_resource.getInputStream(),"utf-8");
@@ -282,17 +333,22 @@ public class SystemSettingManageAction {
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 			//	e.printStackTrace();
-				return "7";
+				if (logger.isErrorEnabled()) {
+		            logger.error("修改数据库密码 -- 写入配置文件异常",e);
+		        }
+				error.put("config", "写入配置文件错误");
 			}finally {
 				if(bw != null){
 					bw.close();
 				}
 				
 			}
-			
-			return "1";
 		}
-		return "2";
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+		}
 	}
 	
 	
@@ -302,14 +358,14 @@ public class SystemSettingManageAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=clearAllCache",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String clearAllCache(ModelMap model
 			) throws Exception {
 		
 		cacheManage.clearAllCache();
 		
-		return "1";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 	}
 	
 	/**
@@ -318,26 +374,26 @@ public class SystemSettingManageAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=rebuildTopicIndex",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String rebuildTopicIndex(ModelMap model
 			) throws Exception {
+		Map<String,String> error = new HashMap<String,String>();
+		
 		Long count = topicIndexManage.taskRunMark_add(-1L);
 		
 		if(count >=0L){
-			return "2";
+			error.put("rebuildTopicIndex", "任务正在运行");
 		}else{
 			boolean allow = TopicLuceneInit.INSTANCE.allowCreateIndexWriter();//是否允许创建IndexWriter
 			if(allow){
 				settingManage.addAllTopicIndex();
-				return "1";
+				return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 			}else{
-				return "3";
+				error.put("rebuildTopicIndex", "索引运行过程中，不能执行重建");
 			}
-			
-			
 		}
-		// 1.任务开始运行;   2.任务正在运行  3.索引运行过程中，不能执行创建
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	/**
@@ -346,27 +402,30 @@ public class SystemSettingManageAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=rebuildQuestionIndex",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String rebuildQuestionIndex(ModelMap model
 			) throws Exception {
+		Map<String,String> error = new HashMap<String,String>();
+		
 		Long count = questionIndexManage.taskRunMark_add(-1L);
 		
 		if(count >=0L){
-			return "2";
+			error.put("rebuildQuestionIndex", "任务正在运行");
 		}else{
 			boolean allow = QuestionLuceneInit.INSTANCE.allowCreateIndexWriter();//是否允许创建IndexWriter
 			if(allow){
 				settingManage.addAllQuestionIndex();
-				return "1";
+				return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 			}else{
-				return "3";
+				error.put("rebuildQuestionIndex", "索引运行过程中，不能执行重建");
 			}
 			
 			
 		}
-		// 1.任务开始运行;   2.任务正在运行  3.索引运行过程中，不能执行创建
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
+	
 	
 	/**
 	 * 删除浏览量数据
@@ -375,24 +434,26 @@ public class SystemSettingManageAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=deletePageViewData",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String deletePageViewData(ModelMap model,String deletePageViewData_beforeTime
 			) throws Exception {	
+		Map<String,String> error = new HashMap<String,String>();
 		
 		if(deletePageViewData_beforeTime != null && !"".equals(deletePageViewData_beforeTime.trim())){
 			boolean beforeTimeVerification = Verification.isTime_minute(deletePageViewData_beforeTime.trim());
 			if(beforeTimeVerification){
 				DateFormat dd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");		
 				settingManage.executeDeletePageViewData(dd.parse(deletePageViewData_beforeTime.trim()+":00"));	
-				return "1";
+				
+				return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 			}else{
-				return "4";
+				error.put("deletePageViewData_beforeTime", "时间格式错误");
 			}
 		}else{
-			return "3";
+			error.put("deletePageViewData_beforeTime", "时间不能为空");
 		}
-		// 1.任务开始运行;  3.时间不能为空; 4.时间格式错误
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	/**
@@ -402,24 +463,25 @@ public class SystemSettingManageAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=deleteUserLoginLogData",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String deleteUserLoginLogData(ModelMap model,String deleteUserLoginLogData_beforeTime
 			) throws Exception {	
+		Map<String,String> error = new HashMap<String,String>();
 		
 		if(deleteUserLoginLogData_beforeTime != null && !"".equals(deleteUserLoginLogData_beforeTime.trim())){
 			boolean deleteUserLoginLogData_beforeTimeVerification = Verification.isTime_minute(deleteUserLoginLogData_beforeTime.trim());
 			if(deleteUserLoginLogData_beforeTimeVerification){
 				DateFormat dd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");		
 				settingManage.executeDeleteUserLoginLogData(dd.parse(deleteUserLoginLogData_beforeTime.trim()+":00"));	
-				return "1";
+				return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 			}else{
-				return "4";
+				error.put("deleteUserLoginLogData_beforeTime", "时间格式错误");
 			}
 		}else{
-			return "3";
+			error.put("deleteUserLoginLogData_beforeTime", "时间不能为空");
 		}
-		// 1.任务开始运行;  3.时间不能为空; 4.时间格式错误
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	
@@ -430,18 +492,19 @@ public class SystemSettingManageAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=nodeParameter",method=RequestMethod.GET)
 	public String nodeParameterUI(ModelMap model
 			) throws Exception {
+		Map<String,Object> returnValue = new HashMap<String,Object>();
+		
 		SystemNode systemNode = new SystemNode();
 		systemNode.setMaxMemory(settingManage.maxMemory());//分配最大内存
 		systemNode.setTotalMemory(settingManage.totalMemory());//已分配内存
 		systemNode.setFreeMemory(settingManage.freeMemory());//已分配内存中的剩余空间
 		systemNode.setUsableMemory(settingManage.maxMemory() - settingManage.totalMemory() + settingManage.freeMemory());//空闲内存
 		
-		model.addAttribute("systemNode",systemNode);
-		
-		
+		returnValue.put("systemNode",systemNode);
 		
 		
 		List<CacheStatus> cacheStatusList = new ArrayList<CacheStatus>();
@@ -485,7 +548,7 @@ public class SystemSettingManageAction {
 				}
 
 			}
-			model.addAttribute("memcached_cacheStatusList", cacheStatusList);
+			returnValue.put("memcached_cacheStatusList", cacheStatusList);
 		}else{//ehCache服务器
 			List<CacheManager> cacheManagerList = ehCacheManager.ALL_CACHE_MANAGERS;
 			if(cacheManagerList != null && cacheManagerList.size() >0){
@@ -495,13 +558,13 @@ public class SystemSettingManageAction {
 			}
 			
 			
-			model.addAttribute("ehCache_cacheStatusList", cacheStatusList);
+			returnValue.put("ehCache_cacheStatusList", cacheStatusList);
 		}
 		
-		model.addAttribute("cacheName", selectCache.getCacheName());
+		returnValue.put("cacheName", selectCache.getCacheName());
 		
 		
-		return "jsp/setting/nodeParameter";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
 	}
 	
 	

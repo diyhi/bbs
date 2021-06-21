@@ -36,6 +36,36 @@ http://www.springframework.org/schema/task http://www.springframework.org/schema
 	<!-- 启动Spring 自带定时器功能 -->      
 	<task:annotation-driven/> 
 	
+	<!-- 处理器适配器 -->
+	<bean id="handlerAdapter" class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">  
+		
+		<!-- 解决json乱码 -->
+		<property name="messageConverters">     
+			<list>
+				<!-- HTTP消息转换器 -->
+				<bean class="org.springframework.http.converter.StringHttpMessageConverter">
+					<property name = "supportedMediaTypes">     
+					    <list>
+					 		<value>text/html;charset=UTF-8</value>      
+					    </list>
+					</property>
+				</bean>
+				<!-- 文件下载配置 -->
+				<bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter"/>   
+
+                <!-- Json转换器 -->
+                <bean id="mappingJacksonHttpMessageConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">          
+                    <property name="supportedMediaTypes">      
+                        <list>
+                            <value>application/json;charset=UTF-8</value> 
+                       </list>      
+                    </property>    
+                </bean>
+			 </list>
+		</property>
+	</bean>
+	
+	
 	<!-- 配置应用参数 -->
 	<bean id="propertyPlaceholderConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">   
 	    <property name="locations">   
@@ -295,13 +325,6 @@ http://www.springframework.org/schema/task http://www.springframework.org/schema
     <!-- 使用工厂bean来构建memcached的客户端 --> 
     <bean name="memcachedClient" factory-bean="memcachedClientBuilder" factory-method="build" destroy-method="shutdown"/>
 
-   
-	 <!-- 设置权限的前缀为AUTH_  -->
-	<bean id="roleVoter" class="org.springframework.security.access.vote.RoleVoter">
-    	<property name="rolePrefix" value="AUTH_"/>
-    </bean> 
-    <!-- 引入spring security -->
-    <import resource="beans-security.xml"/>
     
     <!-- 线池程 -->
     <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor" >  

@@ -1718,7 +1718,7 @@ var thread_component = Vue.extend({
 	            			var nodeHtml = "";
 	            			nodeHtml += '<div class="hide-box">';
 	            			nodeHtml += 	'<div class="background-image cms-lock"></div>';
-	            			nodeHtml += 	'<div class="background-prompt">此处内容已被隐藏，等级达到‘'+childNode.getAttribute("description")+'’可见</div>';
+	            			nodeHtml += 	'<div class="background-prompt">此处内容已被隐藏，等级达到‘'+escapeHtml(childNode.getAttribute("description"))+'’可见</div>';
 	            			nodeHtml += '</div>';
 	            			childNode.innerHTML = nodeHtml;
 	    				}else if(childNode.getAttribute("hide-type") == "40"){
@@ -2182,7 +2182,7 @@ var thread_component = Vue.extend({
 										}
 											
 										avatarHtml += "</router-link>";
-										quoteContent = "<div class=\"quoteComment\">"+quoteContent+"<span class=\"userName\">"+avatarHtml+"<router-link tag=\"span\" :to=\"{path: '/user/control/home', query: {userName: '"+quote.userName+"'}}\">"+(quote.nickname != null && quote.nickname != '' ? quote.nickname : quote.userName)+"</router-link>&nbsp;的评论：</span><br/>"+quote.content+"</div>";
+										quoteContent = "<div class=\"quoteComment\">"+quoteContent+"<span class=\"userName\">"+avatarHtml+"<router-link tag=\"span\" :to=\"{path: '/user/control/home', query: {userName: '"+quote.userName+"'}}\">"+(quote.nickname != null && quote.nickname != '' ? escapeHtml(quote.nickname) : quote.userName)+"</router-link>&nbsp;的评论：</span><br/>"+quote.content+"</div>";
 	
 									}
 									_self.$set(_self.quoteData, comment.id, quoteContent);
@@ -8978,7 +8978,7 @@ var home_component = Vue.extend({
 	            			var nodeHtml = "";
 	            			nodeHtml += '<div class="hide-box">';
 	            			nodeHtml += 	'<div class="background-image cms-lock"></div>';
-	            			nodeHtml += 	'<div class="background-prompt">此处内容已被隐藏，等级达到‘'+childNode.getAttribute("description")+'’可见</div>';
+	            			nodeHtml += 	'<div class="background-prompt">此处内容已被隐藏，等级达到‘'+_.escape(childNode.getAttribute("description"))+'’可见</div>';
 	            			nodeHtml += '</div>';
 	            			childNode.innerHTML = nodeHtml;
 	    				}else if(childNode.getAttribute("hide-type") == "40"){
@@ -15470,4 +15470,10 @@ function createEditor(editorToolbar,editorText,commonPath,menus,userGradeList,im
 	return editor;
 }
 
-
+/**
+ * 转义html
+ */
+function escapeHtml(html) {
+	return _.escape(html);//引入lodash.js
+	
+}

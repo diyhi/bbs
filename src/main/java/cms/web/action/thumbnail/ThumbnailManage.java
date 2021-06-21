@@ -1,5 +1,6 @@
 package cms.web.action.thumbnail;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -274,7 +275,7 @@ public class ThumbnailManage {
 			// TODO Auto-generated catch block
 		//	e.printStackTrace();
 			if (logger.isErrorEnabled()) {
-				logger.error("生成缩略图异常"+sourcePath.getAbsolutePath(),e);
+	            logger.error("生成缩略图异常"+sourcePath.getAbsolutePath(),e);
 	        }
 		}finally {	
 			if(inStream != null){
@@ -400,6 +401,167 @@ public class ThumbnailManage {
 		}
 		
 	}
+	
+	/**
+	 * 生成缩略图
+	 * @param sourcePath 源图片路径
+	 * @param outputPath 输出图片路径
+	 * @param extension 后缀名
+	 * @param scaleWidth 缩放宽
+	 * @param scaleHeight 缩放高
+	**/
+	public byte[] createImage(InputStream sourceInputStream,String extension,int scaleWidth,int scaleHeight) {
+		//创建储存图片二进制流的输出流
+		ByteArrayOutputStream outputStream = null;
+		byte[] picture = null;
+		try {
+			outputStream = new ByteArrayOutputStream();
+			
+			if(extension != null && "gif".equalsIgnoreCase(extension)){
+				Thumbnails.of(sourceInputStream)
+				.size(scaleWidth,scaleHeight)
+				.outputQuality(1)
+				.outputFormat(extension.toLowerCase())
+				.toOutputStream(outputStream);
+			}else{//阿里巴巴工具读取某些gif图片会出错
+				ImageWrapper imageWrapper = ImageReadHelper.read(sourceInputStream);
+				//outputQuality：输出的图片质量，范围：0.0~1.0，1为最高质量。注意使用该方法时输出的图片格式必须为jpg（即outputFormat("jpg")）。否则若是输出png格式图片，则该方法作用无效
+				//watermark指定了水印，通过Positions指定水印位置，BufferedImage指定水印图片，第三个参数指定了水印的不透明性，范围为(0~1.0f),1.0f为不透明。
+			//	.watermark(Positions.BOTTOM_RIGHT, ImageIO.read(new File("watermark.png")), 0.5f)    
+				Thumbnails.of(imageWrapper.getAsBufferedImage())        
+				.size(scaleWidth,scaleHeight)
+				.outputQuality(1)
+				.outputFormat(extension.toLowerCase())
+				.toOutputStream(outputStream);
+			}
+			picture = outputStream.toByteArray();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			if (logger.isErrorEnabled()) {
+	            logger.error("生成缩略图IO错误",e);
+	        }
+		} catch (SimpleImageException e) {
+			// TODO Auto-generated catch block
+		//	e.printStackTrace();
+			if (logger.isErrorEnabled()) {
+	            logger.error("生成缩略图",e);
+	        }
+		}finally {	
+			if(sourceInputStream != null){
+				try {
+					sourceInputStream.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+			//		e.printStackTrace();
+					if (logger.isErrorEnabled()) {
+			            logger.error("生成缩略图关闭输入流错误",e);
+			        }
+				}
+			}
+			if(outputStream != null){
+				try {
+					outputStream.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					//e.printStackTrace();
+					if (logger.isErrorEnabled()) {
+			            logger.error("生成缩略图关闭输出流错误",e);
+			        }
+				}
+			}
+		}
+		
+		return picture;
+	}
+	
+	
+	/**
+	 * 生成缩略图
+	 * @param sourcePath 源图片路径
+	 * @param outputPath 输出图片路径
+	 * @param extension 后缀名
+	 * @param x 坐标X轴
+	 * @param y 坐标Y轴
+	 * @param width 剪裁区域宽
+	 * @param high 剪裁区域高
+	 * @param scaleWidth 缩放宽
+	 * @param scaleHeight 缩放高
+	**/
+	public byte[] createImage(InputStream sourceInputStream,String extension,int x,int y,int width,int height,int scaleWidth,int scaleHeight) {
+		//创建储存图片二进制流的输出流
+		ByteArrayOutputStream outputStream = null;
+		byte[] picture = null;
+		
+		
+		try {
+			outputStream = new ByteArrayOutputStream();
+			
+			if(extension != null && "gif".equalsIgnoreCase(extension)){
+				Thumbnails.of(sourceInputStream)
+				.sourceRegion(x, y, width, height)//指定坐标(0, 0)和(400, 400)区域
+				.size(scaleWidth,scaleHeight)
+				.outputQuality(1)
+				.outputFormat(extension.toLowerCase())
+				.toOutputStream(outputStream);
+			}else{//阿里巴巴工具读取某些gif图片会出错
+				ImageWrapper imageWrapper = ImageReadHelper.read(sourceInputStream);
+				//outputQuality：输出的图片质量，范围：0.0~1.0，1为最高质量。注意使用该方法时输出的图片格式必须为jpg（即outputFormat("jpg")）。否则若是输出png格式图片，则该方法作用无效
+				//watermark指定了水印，通过Positions指定水印位置，BufferedImage指定水印图片，第三个参数指定了水印的不透明性，范围为(0~1.0f),1.0f为不透明。
+			//	.watermark(Positions.BOTTOM_RIGHT, ImageIO.read(new File("watermark.png")), 0.5f)    
+				Thumbnails.of(imageWrapper.getAsBufferedImage())   
+				.sourceRegion(x, y, width, height)//指定坐标(0, 0)和(400, 400)区域
+				.size(scaleWidth,scaleHeight)
+				.outputQuality(1)
+				.outputFormat(extension.toLowerCase())
+				.toOutputStream(outputStream);
+			}	
+			picture = outputStream.toByteArray();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			if (logger.isErrorEnabled()) {
+	            logger.error("生成缩略图IO错误",e);
+	        }
+		} catch (SimpleImageException e) {
+			// TODO Auto-generated catch block
+		//	e.printStackTrace();
+			if (logger.isErrorEnabled()) {
+	            logger.error("生成缩略图",e);
+	        }
+		}finally {	
+			if(sourceInputStream != null){
+				try {
+					sourceInputStream.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+			//		e.printStackTrace();
+					if (logger.isErrorEnabled()) {
+			            logger.error("生成缩略图关闭输入流错误",e);
+			        }
+				}
+			}
+			if(outputStream != null){
+				try {
+					outputStream.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					//e.printStackTrace();
+					if (logger.isErrorEnabled()) {
+			            logger.error("生成缩略图关闭输出流错误",e);
+			        }
+				}
+			}
+		}
+		return picture;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 	/**
 	 * 异步增加缩略图

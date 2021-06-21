@@ -3,6 +3,7 @@ package cms.service.user;
 import java.util.Date;
 import java.util.List;
 
+
 import cms.bean.user.UserRole;
 import cms.bean.user.UserRoleGroup;
 import cms.service.besa.DAO;
@@ -47,8 +48,9 @@ public interface UserRoleService extends DAO<UserRole> {
 	/**
 	 * 设置为默认角色
 	 * @param userRoleId 用户角色Id
+	 * @param defaultRole 是否设置为默认角色
 	 */
-	public Integer setAsDefaultRole(String userRoleId);
+	public Integer setAsDefaultRole(String userRoleId,Boolean defaultRole);
 	/**
 	 * 根据角色Id查询角色组
 	 * @param userRoleId 角色Id

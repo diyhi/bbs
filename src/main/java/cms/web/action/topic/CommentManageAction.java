@@ -25,6 +25,8 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import cms.bean.PageForm;
+import cms.bean.RequestResult;
+import cms.bean.ResultCode;
 import cms.bean.setting.EditorTag;
 import cms.bean.staff.SysUsers;
 import cms.bean.topic.Comment;
@@ -72,8 +74,8 @@ public class CommentManageAction {
 	/**
 	 * 评论  添加
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=add",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String add(ModelMap model,Long topicId,String content,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
@@ -138,57 +140,66 @@ public class CommentManageAction {
 			error.put("content", "评论内容不能为空");
 		}
 		
-		
-	
-		
-		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
-		
-		if(error != null && error.size() >0){
-			returnValue.put("success", "false");
-			returnValue.put("error", error);
-		}else{
-			returnValue.put("success", "true");
+		if(error.size()==0){
 			
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 		}
-		return JsonUtils.toJSONString(returnValue);
-		
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	
 	/**
 	 * 评论  修改页面显示
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=edit",method=RequestMethod.GET)
 	public String editUI(ModelMap model,Long commentId,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
-		model.addAttribute("availableTag",commentManage.availableTag());
-		Comment comment = commentService.findByCommentId(commentId);
-		if(comment != null){
-			if(comment.getContent() != null && !"".equals(comment.getContent().trim())){
-				//处理富文本路径
-				comment.setContent(fileManage.processRichTextFilePath(comment.getContent(),"comment"));
+		Map<String,String> error = new HashMap<String,String>();
+		Map<String,Object> returnValue = new HashMap<String,Object>();
+		
+		
+		returnValue.put("availableTag",commentManage.availableTag());
+		
+		if(commentId != null && commentId >0L){
+			Comment comment = commentService.findByCommentId(commentId);
+			if(comment != null){
+				if(comment.getContent() != null && !"".equals(comment.getContent().trim())){
+					//处理富文本路径
+					comment.setContent(fileManage.processRichTextFilePath(comment.getContent(),"comment"));
+				}
+				if(comment.getQuote() != null && !"".equals(comment.getQuote().trim())){
+					//引用
+					List<Quote> customQuoteList = JsonUtils.toGenericObject(comment.getQuote(), new TypeReference< List<Quote> >(){});
+					comment.setQuoteList(customQuoteList);
+				}
+				returnValue.put("comment", comment);
+				String username = "";
+				Object obj  =  SecurityContextHolder.getContext().getAuthentication().getPrincipal(); 
+				if(obj instanceof UserDetails){
+					username =((UserDetails)obj).getUsername();	
+				}
+				returnValue.put("userName", username);
+			}else{
+				error.put("commentId", "评论不存在");
 			}
-			if(comment.getQuote() != null && !"".equals(comment.getQuote().trim())){
-				//引用
-				List<Quote> customQuoteList = JsonUtils.toGenericObject(comment.getQuote(), new TypeReference< List<Quote> >(){});
-				comment.setQuoteList(customQuoteList);
-			}
-			model.addAttribute("comment", comment);
-			String username = "";
-			Object obj  =  SecurityContextHolder.getContext().getAuthentication().getPrincipal(); 
-			if(obj instanceof UserDetails){
-				username =((UserDetails)obj).getUsername();	
-			}
-			model.addAttribute("userName", username);
-			model.addAttribute("fileSystem", fileManage.getFileSystem());
+			
+		}else{
+			error.put("commentId", "评论Id不能为空");
 		}
-		return "jsp/topic/edit_comment";
+		
+		
+		if(error.size()==0){
+			
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
+		}
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	/**
 	 * 评论  修改
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=edit",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String edit(PageForm pageForm,ModelMap model,Long commentId,String content,Integer status,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
@@ -200,7 +211,17 @@ public class CommentManageAction {
 		}else{
 			comment = commentService.findByCommentId(commentId);
 		}
-		if(content != null && !"".equals(content.trim())){
+		
+		if(status == null){
+			error.put("status", "状态参数不能为空");
+		}
+	//	List<Integer> numbers = Arrays.asList(10,20); 
+	//	if(!numbers.contains(status)){
+	//		error.put("status", "状态参数错误");
+	//	}
+		
+		
+		if(error.size()==0 && content != null && !"".equals(content.trim())){
 			if(comment != null){
 				old_status = comment.getStatus();
 				comment.setStatus(status);
@@ -311,101 +332,117 @@ public class CommentManageAction {
 		}
 
 		
-		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
-		
-		if(error != null && error.size() >0){
-			returnValue.put("success", "false");
-			returnValue.put("error", error);
-		}else{
-			returnValue.put("success", "true");
+		if(error.size()==0){
 			
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 		}
-		return JsonUtils.toJSONString(returnValue);
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	/**
 	 * 评论  删除
 	 * @param model
 	 * @param commentId 评论Id
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=delete",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
-	public String delete(ModelMap model,Long commentId,
+	public String delete(ModelMap model,Long[] commentId,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
-		if(commentId != null && commentId >0L){
-			Comment comment = commentService.findByCommentId(commentId);
-			if(comment != null){
-				if(comment.getStatus() <100){//标记删除
-					Integer constant = 100000;
-					int i = commentService.markDeleteComment(comment.getId(),constant);
-					
-					if(i >0){
-						User user = userManage.query_cache_findUserByUserName(comment.getUserName());
-						if(user != null){
-							//修改评论状态
-							userService.updateUserDynamicCommentStatus(user.getId(),comment.getUserName(),comment.getTopicId(),comment.getId(),comment.getStatus()+constant);
-						}
-						//删除缓存
-						commentManage.delete_cache_findByCommentId(comment.getId());
-						return "1";	
-					}
-					
-				}else{//物理删除
-					int i = commentService.deleteComment(comment.getTopicId(),commentId);
-					if(i >0){
-						//根据评论Id删除用户动态(评论下的回复也同时删除)
-						userService.deleteUserDynamicByCommentId(comment.getTopicId(),commentId);
-						
-						
-						//删除缓存
-						commentManage.delete_cache_findByCommentId(comment.getId());
-						
-						String fileNumber = topicManage.generateFileNumber(comment.getUserName(), comment.getIsStaff());
-						
-						//删除图片
-						List<String> imageNameList = textFilterManage.readImageName(comment.getContent(),"comment");
-						if(imageNameList != null && imageNameList.size() >0){
-							for(String imagePath : imageNameList){
-								//如果验证不是当前用户上传的文件，则不删除锁
-								 if(!topicManage.getFileNumber(FileUtil.getBaseName(imagePath.trim())).equals(fileNumber)){
-									 continue;
-								 }
-								
-								
-								//替换路径中的..号
-								imagePath = FileUtil.toRelativePath(imagePath);
-								//替换路径分割符
-								imagePath = StringUtils.replace(imagePath, "/", File.separator);
-								
-								Boolean state = fileManage.deleteFile(imagePath);
-								
-								if(state != null && state == false){	
-									//替换指定的字符，只替换第一次出现的
-									imagePath = StringUtils.replaceOnce(imagePath, "file"+File.separator+"comment"+File.separator, "");
-									imagePath = StringUtils.replace(imagePath, File.separator, "_");//替换所有出现过的字符
-									
-									//创建删除失败文件
-									fileManage.failedStateFile("file"+File.separator+"comment"+File.separator+"lock"+File.separator+imagePath);
-								
-								}
-							}
-						}
-						return "1";
-					}
-					
+		
+		Map<String,String> error = new HashMap<String,String>();
+		
+		
+		if(commentId != null && commentId.length >0){
+			List<Long> commentIdList = new ArrayList<Long>();
+			for(Long l :commentId){
+				if(l != null && l >0L){
+					commentIdList .add(l);
 				}
 			}
+			if(commentIdList != null && commentIdList.size() >0){
+				List<Comment> commentList = commentService.findByCommentIdList(commentIdList);
+				if(commentList != null && commentList.size() >0){
+					for(Comment comment : commentList){
+						if(comment.getStatus() <100){//标记删除
+							Integer constant = 100000;
+							int i = commentService.markDeleteComment(comment.getId(),constant);
+							
+							if(i >0){
+								User user = userManage.query_cache_findUserByUserName(comment.getUserName());
+								if(user != null){
+									//修改评论状态
+									userService.updateUserDynamicCommentStatus(user.getId(),comment.getUserName(),comment.getTopicId(),comment.getId(),comment.getStatus()+constant);
+								}
+								//删除缓存
+								commentManage.delete_cache_findByCommentId(comment.getId());
+							}
+							
+						}else{//物理删除
+							int i = commentService.deleteComment(comment.getTopicId(),comment.getId());
+							if(i >0){
+								//根据评论Id删除用户动态(评论下的回复也同时删除)
+								userService.deleteUserDynamicByCommentId(comment.getTopicId(),comment.getId());
+								
+								
+								//删除缓存
+								commentManage.delete_cache_findByCommentId(comment.getId());
+								
+								String fileNumber = topicManage.generateFileNumber(comment.getUserName(), comment.getIsStaff());
+								
+								//删除图片
+								List<String> imageNameList = textFilterManage.readImageName(comment.getContent(),"comment");
+								if(imageNameList != null && imageNameList.size() >0){
+									for(String imagePath : imageNameList){
+										//如果验证不是当前用户上传的文件，则不删除锁
+										 if(!topicManage.getFileNumber(FileUtil.getBaseName(imagePath.trim())).equals(fileNumber)){
+											 continue;
+										 }
+										
+										
+										//替换路径中的..号
+										imagePath = FileUtil.toRelativePath(imagePath);
+										//替换路径分割符
+										imagePath = StringUtils.replace(imagePath, "/", File.separator);
+										
+										Boolean state = fileManage.deleteFile(imagePath);
+										
+										if(state != null && state == false){	
+											//替换指定的字符，只替换第一次出现的
+											imagePath = StringUtils.replaceOnce(imagePath, "file"+File.separator+"comment"+File.separator, "");
+											imagePath = StringUtils.replace(imagePath, File.separator, "_");//替换所有出现过的字符
+											
+											//创建删除失败文件
+											fileManage.failedStateFile("file"+File.separator+"comment"+File.separator+"lock"+File.separator+imagePath);
+										
+										}
+									}
+								}
+							}
+							
+						}
+					}
+				}
+			}
+		}else{
+			error.put("commentId", "评论Id不能为空");
 		}
-		return "0";
+
+		if(error.size()==0){
+			
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+		}
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	/**
 	 * 评论  恢复
 	 * @param model
 	 * @param commentId 评论Id
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=recoveryComment",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String recoveryComment(ModelMap model,Long commentId,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
+		Map<String,String> error = new HashMap<String,String>();
 		if(commentId != null && commentId >0L){
 			Comment comment = commentService.findByCommentId(commentId);
 			if(comment != null && comment.getStatus() >100){
@@ -420,11 +457,14 @@ public class CommentManageAction {
 				}
 				
 				commentManage.delete_cache_findByCommentId(commentId);
+				return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+			}else{
+				error.put("commentId", "评论不存在或未标记删除");
 			}
-	
-			return "1";
+		}else{
+			error.put("commentId", "评论Id不能为空");
 		}
-		return "0";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	/**
@@ -432,7 +472,7 @@ public class CommentManageAction {
 	 * @param status 状态
 	 * @return
 	 */
-	public int parseInitialValue(Integer status){
+	private int parseInitialValue(Integer status){
 		int tens  = status%100/10;//十位%100/10
         int units  = status%10;//个位直接%10
 		
@@ -454,7 +494,7 @@ public class CommentManageAction {
 	@RequestMapping(params="method=uploadImage",method=RequestMethod.POST)
 	@ResponseBody//方式来做ajax,直接返回字符串
 	public String uploadImage(ModelMap model,Long topicId,String userName, Boolean isStaff,String fileName,
-			MultipartFile imgFile, HttpServletResponse response) throws Exception {
+			MultipartFile file, HttpServletResponse response) throws Exception {
 		
 		String number = topicManage.generateFileNumber(userName, isStaff);
 		
@@ -507,14 +547,14 @@ public class CommentManageAction {
 			}
 		}else{//0.本地系统
 			//文件上传
-			if(imgFile != null && !imgFile.isEmpty() && topicId != null && topicId >0L && number != null && !"".equals(number.trim())){
+			if(file != null && !file.isEmpty() && topicId != null && topicId >0L && number != null && !"".equals(number.trim())){
 				EditorTag editorSiteObject = settingManage.readEditorTag();
 				if(editorSiteObject != null){
 					if(editorSiteObject.isImage()){//允许上传图片
 						//当前图片文件名称
-						String sourceFileName = imgFile.getOriginalFilename();
+						String sourceFileName = file.getOriginalFilename();
 						//文件大小
-						Long size = imgFile.getSize();
+						Long size = file.getSize();
 						//取得文件后缀
 						String suffix = sourceFileName.substring(sourceFileName.lastIndexOf('.')+1).toLowerCase();
 						
@@ -525,7 +565,7 @@ public class CommentManageAction {
 						long imageSize = editorSiteObject.getImageSize();
 
 						//验证文件类型
-						boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),imageFormat);
+						boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),imageFormat);
 						
 						if(authentication){
 							if(size/1024 <= imageSize){
@@ -544,7 +584,7 @@ public class CommentManageAction {
 								//生成锁文件
 								fileManage.addLock(lockPathDir,topicId+"_"+newFileName);
 								//保存文件
-								fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
+								fileManage.writeFile(pathDir, newFileName,file.getBytes());
 				
 								//上传成功
 								returnJson.put("error", 0);//0成功  1错误
@@ -577,10 +617,15 @@ public class CommentManageAction {
 	 * @param model
 	 * @param commentId 评论Id
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=addQuote",method=RequestMethod.GET)
 	public String addQuoteUI(ModelMap model,Long commentId,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
-		model.addAttribute("availableTag", commentManage.availableTag());
+		Map<String,String> error = new HashMap<String,String>();
+		Map<String,Object> returnValue = new HashMap<String,Object>();
+		
+	
+		returnValue.put("availableTag", commentManage.availableTag());
 		Comment comment = commentService.findByCommentId(commentId);
 		if(comment != null){
 			if(comment.getContent() != null && !"".equals(comment.getContent().trim())){
@@ -592,7 +637,9 @@ public class CommentManageAction {
 				List<Quote> customQuoteList = JsonUtils.toGenericObject(comment.getQuote(), new TypeReference< List<Quote> >(){});
 				comment.setQuoteList(customQuoteList);
 			}
-			model.addAttribute("comment", comment);
+			returnValue.put("comment", comment);
+		}else{
+			error.put("commentId", "评论Id不能为空");
 		}
 		String username = "";//用户名称
 		
@@ -600,19 +647,25 @@ public class CommentManageAction {
 		if(obj instanceof UserDetails){
 			username =((UserDetails)obj).getUsername();	
 		}
-		model.addAttribute("userName", username);
-		model.addAttribute("fileSystem", fileManage.getFileSystem());
-		return "jsp/topic/add_quote";
+		returnValue.put("userName", username);
+		
+		if(error.size()==0){
+			
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
+		}
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	 }
 	/**
 	 * 引用  添加
 	 * @param model
 	 * @param commentId 评论Id
 	 */
-	@RequestMapping(params="method=addQuote",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
+	@ResponseBody
+	@RequestMapping(params="method=addQuote",method=RequestMethod.POST)	
 	public String addQuote(ModelMap model,Long commentId,String content,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
+		
 		Comment comment = null;
 		Map<String,String> error = new HashMap<String,String>();
 		if(commentId == null || commentId <=0){
@@ -706,17 +759,12 @@ public class CommentManageAction {
 			error.put("content", "评论内容不能为空");
 		}
 		
-		
-		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
-		
-		if(error != null && error.size() >0){
-			returnValue.put("success", "false");
-			returnValue.put("error", error);
-		}else{
-			returnValue.put("success", "true");
+		if(error.size()==0){
 			
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 		}
-		return JsonUtils.toJSONString(returnValue);
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+	
 	 }
 	
 	
@@ -727,10 +775,11 @@ public class CommentManageAction {
 	 * @return
 	 * @throws Exception
 	*/
+	@ResponseBody
 	@RequestMapping(params="method=auditComment",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String auditComment(ModelMap model,Long commentId,
 			HttpServletResponse response) throws Exception {
+		Map<String,String> error = new HashMap<String,String>();
 		if(commentId != null && commentId>0L){
 			int i = commentService.updateCommentStatus(commentId, 20);
 			
@@ -745,9 +794,11 @@ public class CommentManageAction {
 			
 			//删除缓存
 			commentManage.delete_cache_findByCommentId(commentId);
-			return "1";
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+		}else{
+			error.put("commentId", "评论Id不能为空");
 		}
-		return "0";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	
@@ -758,19 +809,20 @@ public class CommentManageAction {
 	 * @param model
 	 * @param commentId 自定义评论Id
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=addReply",method=RequestMethod.GET)
 	public String addReplyUI(ModelMap model,Long commentId,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-		return "jsp/topic/add_reply";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 	}
 	/**
 	 * 回复  添加
 	 * @param model
 	 * @param commentId 评论Id
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=addReply",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String addReply(ModelMap model,Long commentId,String content,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Comment comment = null;
@@ -824,16 +876,11 @@ public class CommentManageAction {
 			error.put("content", "回复内容不能为空");
 		}
 		
-		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
-		
-		if(error != null && error.size() >0){
-			returnValue.put("success", "false");
-			returnValue.put("error", error);
-		}else{
-			returnValue.put("success", "true");
+		if(error.size()==0){
 			
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 		}
-		return JsonUtils.toJSONString(returnValue);
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	/**
 	 * 回复  修改页面显示
@@ -841,9 +888,12 @@ public class CommentManageAction {
 	 * @param model
 	 * @param replyId 回复Id
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=editReply",method=RequestMethod.GET)
 	public String editReplyUI(ModelMap model,Long replyId,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		Map<String,String> error = new HashMap<String,String>();
+		Map<String,Object> returnValue = new HashMap<String,Object>();
 		if(replyId != null && replyId >0){
 			Reply reply = commentService.findReplyByReplyId(replyId);
 			if(reply != null){
@@ -851,21 +901,31 @@ public class CommentManageAction {
 					
 					reply.setIpAddress(IpAddress.queryAddress(reply.getIp()));
 				}
-				model.addAttribute("reply", reply);
+				returnValue.put("reply", reply);
+				return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
 			}
+		}else{
+			error.put("replyId", "回复Id不能为空");
 		}
-		return "jsp/topic/edit_reply";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	/**
-	 * 回复  修改页面
-	 * @param pageForm
+	 * 回复  修改
 	 * @param model
 	 * @param replyId 回复Id
+	 * @param content 内容
+	 * @param status 状态
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=editReply",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String editReply(ModelMap model,Long replyId,String content,Integer status,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
+		
 		Reply reply = null;
 		Integer old_status = -1;
 		Map<String,String> error = new HashMap<String,String>();
@@ -875,7 +935,11 @@ public class CommentManageAction {
 			error.put("replyId", "回复Id不能为空");
 			
 		}
-
+		
+		if(status == null){
+			error.put("status", "回复状态不能为空");
+		}
+		
 		if(content != null && !"".equals(content.trim())){
 			if(reply != null){
 				old_status = reply.getStatus();
@@ -914,63 +978,76 @@ public class CommentManageAction {
 			error.put("content", "回复内容不能为空");
 		}
 		
-		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
-		
-		if(error != null && error.size() >0){
-			returnValue.put("success", "false");
-			returnValue.put("error", error);
-		}else{
-			returnValue.put("success", "true");
+		if(error.size()==0){
 			
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 		}
-		return JsonUtils.toJSONString(returnValue);
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	/**
 	 * 回复  删除
 	 * @param model
 	 * @param replyId 回复Id
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=deleteReply",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
-	public String deleteReply(ModelMap model,Long replyId,
+	public String deleteReply(ModelMap model,Long[] replyId,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
-		if(replyId != null && replyId >0){
-			
-			Reply reply = commentService.findReplyByReplyId(replyId);
-			if(reply != null){
-				if(reply.getStatus() <100){//标记删除
-					Integer constant = 100000;
-					int i = commentService.markDeleteReply(reply.getId(),constant);
-					
-					
-					if(i >0){
-						User user = userManage.query_cache_findUserByUserName(reply.getUserName());
-						if(user != null){
-							//修改回复状态
-							userService.updateUserDynamicReplyStatus(user.getId(),reply.getUserName(),reply.getTopicId(),reply.getCommentId(),reply.getId(),reply.getStatus()+constant);
-						}
-						//删除缓存
-						commentManage.delete_cache_findReplyByReplyId(reply.getId());
-						return "1";
-					}
-				}else{//物理删除
-					int i = commentService.deleteReply(replyId);
-					if(i >0 && reply != null){
-						User user = userManage.query_cache_findUserByUserName(reply.getUserName());
-						if(user != null){
-							userService.deleteUserDynamicByReplyId(user.getId(),reply.getTopicId(),reply.getCommentId(),replyId);
-						}
-					}
-
-					//删除缓存
-					commentManage.delete_cache_findReplyByReplyId(replyId);
-					if(i >0){
-						return "1";
-					}
+		
+		Map<String,String> error = new HashMap<String,String>();
+		
+		if(replyId != null && replyId.length >0){
+			List<Long> replyIdList = new ArrayList<Long>();
+			for(Long l :replyId){
+				if(l != null && l >0L){
+					replyIdList .add(l);
 				}
 			}
+			if(replyIdList != null && replyIdList.size() >0){
+				List<Reply> replyList = commentService.findByReplyIdList(replyIdList);
+				if(replyList != null && replyList.size() >0){
+					for(Reply reply : replyList){
+						if(reply.getStatus() <100){//标记删除
+							Integer constant = 100000;
+							int i = commentService.markDeleteReply(reply.getId(),constant);
+							
+							
+							if(i >0){
+								User user = userManage.query_cache_findUserByUserName(reply.getUserName());
+								if(user != null){
+									//修改回复状态
+									userService.updateUserDynamicReplyStatus(user.getId(),reply.getUserName(),reply.getTopicId(),reply.getCommentId(),reply.getId(),reply.getStatus()+constant);
+								}
+								//删除缓存
+								commentManage.delete_cache_findReplyByReplyId(reply.getId());
+							}
+						}else{//物理删除
+							int i = commentService.deleteReply(reply.getId());
+							if(i >0 && reply != null){
+								User user = userManage.query_cache_findUserByUserName(reply.getUserName());
+								if(user != null){
+									userService.deleteUserDynamicByReplyId(user.getId(),reply.getTopicId(),reply.getCommentId(),reply.getId());
+								}
+							}
+
+							//删除缓存
+							commentManage.delete_cache_findReplyByReplyId(reply.getId());
+						}
+						
+					}
+					
+				}
+				
+			}
 		}
-		return "0";
+		
+		
+		
+		if(error.size()==0){
+			
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+		}
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	/**
@@ -978,10 +1055,12 @@ public class CommentManageAction {
 	 * @param model
 	 * @param replyId 回复Id
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=recoveryReply",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String recoveryReply(ModelMap model,Long replyId,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
+		Map<String,String> error = new HashMap<String,String>();
 		if(replyId != null && replyId >0){
 			Reply reply = commentService.findReplyByReplyId(replyId);
 			if(reply != null && reply.getStatus() >100){
@@ -993,13 +1072,18 @@ public class CommentManageAction {
 					//修改回复状态
 					userService.updateUserDynamicReplyStatus(user.getId(),reply.getUserName(),reply.getTopicId(),reply.getCommentId(),reply.getId(),originalState);
 				}
+				//删除缓存
+				commentManage.delete_cache_findReplyByReplyId(replyId);
+				
+				return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+			}else{
+				error.put("replyId", "回复不存在或未标记删除");
 			}
-			//删除缓存
-			commentManage.delete_cache_findReplyByReplyId(replyId);
 			
-			return "1";
+		}else{
+			error.put("replyId", "回复Id不能为空");
 		}
-		return "0";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	
@@ -1010,11 +1094,11 @@ public class CommentManageAction {
 	 * @return
 	 * @throws Exception
 	*/
-	@RequestMapping(params="method=auditReply",method=RequestMethod.POST)
 	@ResponseBody//方式来做ajax,直接返回字符串
+	@RequestMapping(params="method=auditReply",method=RequestMethod.POST)
 	public String auditReply(ModelMap model,Long replyId,
 			HttpServletResponse response) throws Exception {
-		
+		Map<String,String> error = new HashMap<String,String>();
 		if(replyId != null && replyId>0L){
 			int i = commentService.updateReplyStatus(replyId, 20);
 			
@@ -1029,9 +1113,11 @@ public class CommentManageAction {
 			
 			//删除缓存
 			commentManage.delete_cache_findReplyByReplyId(replyId);
-			return "1";
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+		}else{
+			error.put("replyId", "回复Id不能为空");
 		}
-		return "0";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	

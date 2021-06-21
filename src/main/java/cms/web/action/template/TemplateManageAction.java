@@ -25,10 +25,12 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.context.MessageSource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.validation.Validator;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -38,6 +40,8 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
+import cms.bean.RequestResult;
+import cms.bean.ResultCode;
 import cms.bean.template.Forum;
 import cms.bean.template.Forum_CustomForumRelated_CustomHTML;
 import cms.bean.template.Layout;
@@ -47,7 +51,6 @@ import cms.service.template.TemplateService;
 import cms.utils.FileUtil;
 import cms.utils.JsonUtils;
 import cms.utils.PathUtil;
-import cms.utils.RedirectPath;
 import cms.utils.UUIDUtil;
 import cms.utils.WebUtil;
 import cms.utils.ZipUtil;
@@ -72,33 +75,45 @@ public class TemplateManageAction {
 	@Resource TemplateManage templateManage;
 	@Resource LocalFileManage localFileManage;
 	@Resource TextFilterManage textFilterManage;
+	@Resource MessageSource messageSource;
 	
 	/**
 	 * 模板管理 添加模板显示
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=add",method=RequestMethod.GET)
 	public String addUI(Templates templates)throws Exception {
 		
-		return "jsp/template/add_templates";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 	}
 	
 	/**
 	 * 模板管理 添加
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=add", method=RequestMethod.POST)
 	public String add(ModelMap model,Templates formbean,BindingResult result, 
 			MultipartHttpServletRequest request, HttpServletResponse response)throws Exception {
 		
+		//错误
+		Map<String,Object> error = new HashMap<String,Object>();
+		
 		//数据校验
 		this.validator.validate(formbean, result); 
-		
-		Templates templates = new Templates();
-		templates.setName(formbean.getName().trim());
-		templates.setDirName(formbean.getDirName().trim());
-		templates.setIntroduction(formbean.getIntroduction());
-		
-		
-		if (!result.hasErrors()) {  
+		if (result.hasErrors()) { 
+			List<FieldError> fieldErrorList = result.getFieldErrors();
+			if(fieldErrorList != null && fieldErrorList.size() >0){
+				for(FieldError fieldError : fieldErrorList){
+					error.put(fieldError.getField(), messageSource.getMessage(fieldError, null));
+				}
+			}
+		}
+		if(error.size() == 0){
+			Templates templates = new Templates();
+			templates.setName(formbean.getName().trim());
+			templates.setDirName(formbean.getDirName().trim());
+			templates.setIntroduction(formbean.getIntroduction());
+			
 			//图片上传
 			List<MultipartFile> files = request.getFiles("uploadImage"); 
 			for(MultipartFile file : files) {
@@ -131,67 +146,99 @@ public class TemplateManageAction {
 				
 				break;//只有一个文件上传框
 			}
+			
+			List<Layout> layoutList = templateManage.newTemplate(templates.getDirName());
+			templateService.saveTemplate(templates,layoutList);
+			
 		}
-
-		if (result.hasErrors()) {  
-			return "jsp/template/add_templates";
-		} 
 		
 		
 		
-		List<Layout> layoutList = templateManage.newTemplate(templates.getDirName());
-		templateService.saveTemplate(templates,layoutList);
 		
-		model.addAttribute("message","添加模板成功");//返回消息
-		model.addAttribute("urladdress", RedirectPath.readUrl("control.template.list"));//返回消息//返回转向地址
-		return "jsp/common/message";
+		
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+		}
 	}
 	
 	/**
 	 * 模板管理 修改模板显示
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=edit",method=RequestMethod.GET)
 	public String editUI(ModelMap model,String dirName)throws Exception {
-		Templates templates = templateService.findTemplatebyDirName(dirName);
-		if(templates.getThumbnailSuffix() != null && !"".equals(templates.getThumbnailSuffix().trim())){
-			String imagePath = "common/"+ templates.getDirName() +"/templates."+templates.getThumbnailSuffix();
-			model.addAttribute("imagePath",imagePath);
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
+		if(dirName != null && !"".equals(dirName.trim())){
+			Templates templates = templateService.findTemplatebyDirName(dirName);
+			if(templates != null){
+				return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,templates));
+			}else{
+				error.put("templates", "模板不存在");
+			}
+		}else{
+			error.put("dirName", "目录名称不能为空");
 		}
 		
-		model.addAttribute("templates",templates);//返回消息
-		
-		return "jsp/template/edit_templates";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	/**
 	 * 模板管理 修改
+	 * @param model
+	 * @param formbean
+	 * @param result
+	 * @param imagePath 图片路径
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=edit", method=RequestMethod.POST)
-	public String edit(ModelMap model,Templates formbean,BindingResult result,
+	public String edit(ModelMap model,Templates formbean,BindingResult result,String imagePath,
 			MultipartHttpServletRequest request, HttpServletResponse response)throws Exception {
 		
-		Templates old_templates = templateService.findTemplatebyDirName(formbean.getDirName().trim());
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
 		
+		Templates old_templates = templateService.findTemplatebyDirName(formbean.getDirName().trim());
+		if(formbean.getDirName() == null || "".equals(formbean.getDirName().trim())){
+			error.put("dirName", "目录名称不能为空");
+		}else{
+			old_templates = templateService.findTemplatebyDirName(formbean.getDirName().trim());
+			if(old_templates == null){
+				error.put("templates", "模板不存在");
+			}
+		}
 		if(formbean.getName() == null || "".equals(formbean.getName().trim())){
-			result.rejectValue("name","errors.required", new String[]{"模板名称不能为空"},"");
+			error.put("name", "模板名称不能为空");
 		}
 		
 		Templates templates = new Templates();
-		templates.setName(formbean.getName().trim());
-		templates.setDirName(formbean.getDirName().trim());
-		templates.setIntroduction(formbean.getIntroduction());
-		
 		//标记是否删除旧图片文件
 		boolean flag = false;
-		
-		if (!result.hasErrors()) {  
+		if(error.size()==0){
+			
+			templates.setName(formbean.getName().trim());
+			templates.setDirName(formbean.getDirName().trim());
+			templates.setIntroduction(formbean.getIntroduction());
+
+			if(imagePath != null && !"".equals(imagePath.trim())){
+				templates.setThumbnailSuffix(old_templates.getThumbnailSuffix());
+			}else{
+				templates.setThumbnailSuffix(null);
+			}
+			
+			
 			//图片上传
 			List<MultipartFile> files = request.getFiles("uploadImage"); 
 			for(MultipartFile file : files) {
 				if(file.isEmpty()){//如果图片已上传
-					String imagePathName = request.getParameter("imagePath_1");//图片路径
-					if(imagePathName != null && !"".equals(imagePathName)){
+					if(imagePath != null && !"".equals(imagePath.trim())){
 						//取得文件后缀
-						String ext = FileUtil.getExtension(imagePathName);
+						String ext = FileUtil.getExtension(imagePath.trim());
 						templates.setThumbnailSuffix(ext);
 						
 					}else{
@@ -228,47 +275,41 @@ public class TemplateManageAction {
 						
 						
 				   }else{
-					   result.rejectValue("thumbnailSuffix","errors.required", new String[]{"图片格式错误"},"");
+					   error.put("thumbnailSuffix", "图片格式错误");
 				   }
 				}
 				
 				break;//只有一个文件上传框
 			}
+			
+			
 		}
 		
-		
-		
-		
-
-		if (result.hasErrors()) {  
-			if(old_templates.getThumbnailSuffix() != null && !"".equals(old_templates.getThumbnailSuffix().trim())){
-				String imagePath = "common/"+ old_templates.getDirName() +"/templates."+old_templates.getThumbnailSuffix();
-				model.addAttribute("imagePath",imagePath);
+		if(error.size()==0){
+			templateService.updateTemplate(templates);
+			if(flag){//删除旧文件
+				String pathDir = "common"+File.separator+old_templates.getDirName()+File.separator+"templates."+old_templates.getThumbnailSuffix();
+					
+				//删除旧路径文件
+				localFileManage.deleteFile(pathDir);
 			}
-			return "jsp/template/edit_templates";
-		} 
-		
-		templateService.updateTemplate(templates);
-		
-		
-		if(flag){//删除旧文件
-			 String pathDir = "common"+File.separator+old_templates.getDirName()+File.separator+"templates."+old_templates.getThumbnailSuffix();
-				
-			//删除旧路径文件
-			 localFileManage.deleteFile(pathDir);
 		}
 		
-		model.addAttribute("message","修改模板成功");//返回消息
-		model.addAttribute("urladdress", RedirectPath.readUrl("control.template.list"));//返回消息//返回转向地址
-		return "jsp/common/message";
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+		}
 	}
 	
 	/**
 	 * 模板管理 删除模板
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=delete",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String delete(ModelMap model,String dirName)throws Exception {
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
 		
 		if(dirName != null && !"".equals(dirName.trim())){
 			Templates templates = templateService.findTemplatebyDirName(dirName.trim());
@@ -282,11 +323,15 @@ public class TemplateManageAction {
 				localFileManage.removeDirectory("file"+File.separator+"template"+File.separator+dirName.trim()+File.separator);
 				//删除模板文件
 				localFileManage.removeDirectory("WEB-INF"+File.separator+"templates"+File.separator + dirName.trim() + File.separator);
-				return "1";
+				return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+			}else{
+				error.put("templates", "模板不存在");
 			}
+		}else{
+			error.put("dirName", "目录名称不能为空");
 		}
 		
-		return "0";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	/**
@@ -298,93 +343,102 @@ public class TemplateManageAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=export", method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String export(ModelMap model,String dirName,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		if(dirName == null || "".equals(dirName.trim())){
-			return "0";
-		}
-		//替换路径中的..号
-		dirName = FileUtil.toRelativePath(dirName);
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
 		
-		//构建文件名称
-		String tempDirName = UUIDUtil.getUUID32();
-		
-		//创建临时目录
-		String pathDir = "WEB-INF"+File.separator+"data"+File.separator + "temp" + File.separator+ tempDirName +File.separator+dirName+ File.separator;
-				
-		//取得文件保存目录的真实路径
-		String realpathDir = PathUtil.path()+File.separator+pathDir;
-		File saveDir = new File(realpathDir);//生成目录
-		if (!saveDir.exists()) {//如果目录不存在
-			 saveDir.mkdirs();//生成目录
-		}
-		
-		TemplateData templateData = new TemplateData();
-		//读取模板数据
-		Templates templates = templateService.findTemplatebyDirName(dirName);
-		//读取布局数据
-		List<Layout> layoutList = templateService.findLayout(dirName);
-		//读取版块数据
-		List<Forum> forumList = templateService.findForumByDirName(dirName);
-		templateData.setTemplates(templates);
-		templateData.setLayoutList(layoutList);
-		templateData.setForumList(forumList);
-		//备份到临时目录
-		FileUtil.writeStringToFile(pathDir+"templateData.data",JsonUtils.toJSONString(templateData),"UTF-8", false);
-		
-		//创建模板目录
-		String template_dir_path = realpathDir+"templates"+File.separator;
-		File template_dir = new File(template_dir_path);//生成目录
-		if (!template_dir.exists()) {//如果目录不存在
-			template_dir.mkdirs();//生成目录
-		}
-		//创建资源文件目录
-		String file_dir_path = realpathDir+"common"+File.separator;
-		File file_dir = new File(file_dir_path);//生成目录
-		if (!file_dir.exists()) {//如果目录不存在
-			file_dir.mkdirs();//生成目录
-		}
-		//创建模板上传文件目录
-		String upload_dir_path = realpathDir+"uploadFile"+File.separator;
-		File upload_dir = new File(upload_dir_path);//生成目录
-		if (!upload_dir.exists()) {//如果目录不存在
-			upload_dir.mkdirs();//生成目录
-		}
-		
-		//模板源目录
-		String template_source = "WEB-INF"+File.separator+"templates"+File.separator+dirName+File.separator;	
-		//复制模板文件到临时目录
-		FileUtil.copyDirectory(template_source, pathDir+"templates"+File.separator);
+		if(dirName != null && !"".equals(dirName.trim())){
+			//替换路径中的..号
+			dirName = FileUtil.toRelativePath(dirName);
 			
-		//资源文件源目录
-		String file_source = "common"+File.separator+dirName+File.separator;
-		//复制模板文件到临时目录
-		FileUtil.copyDirectory(file_source, pathDir+"common"+File.separator);
+			//构建文件名称
+			String tempDirName = UUIDUtil.getUUID32();
+			
+			//创建临时目录
+			String pathDir = "WEB-INF"+File.separator+"data"+File.separator + "temp" + File.separator+ tempDirName +File.separator+dirName+ File.separator;
+					
+			//取得文件保存目录的真实路径
+			String realpathDir = PathUtil.path()+File.separator+pathDir;
+			File saveDir = new File(realpathDir);//生成目录
+			if (!saveDir.exists()) {//如果目录不存在
+				 saveDir.mkdirs();//生成目录
+			}
+			
+			TemplateData templateData = new TemplateData();
+			//读取模板数据
+			Templates templates = templateService.findTemplatebyDirName(dirName);
+			//读取布局数据
+			List<Layout> layoutList = templateService.findLayout(dirName);
+			//读取版块数据
+			List<Forum> forumList = templateService.findForumByDirName(dirName);
+			templateData.setTemplates(templates);
+			templateData.setLayoutList(layoutList);
+			templateData.setForumList(forumList);
+			//备份到临时目录
+			FileUtil.writeStringToFile(pathDir+"templateData.data",JsonUtils.toJSONString(templateData),"UTF-8", false);
+			
+			//创建模板目录
+			String template_dir_path = realpathDir+"templates"+File.separator;
+			File template_dir = new File(template_dir_path);//生成目录
+			if (!template_dir.exists()) {//如果目录不存在
+				template_dir.mkdirs();//生成目录
+			}
+			//创建资源文件目录
+			String file_dir_path = realpathDir+"common"+File.separator;
+			File file_dir = new File(file_dir_path);//生成目录
+			if (!file_dir.exists()) {//如果目录不存在
+				file_dir.mkdirs();//生成目录
+			}
+			//创建模板上传文件目录
+			String upload_dir_path = realpathDir+"uploadFile"+File.separator;
+			File upload_dir = new File(upload_dir_path);//生成目录
+			if (!upload_dir.exists()) {//如果目录不存在
+				upload_dir.mkdirs();//生成目录
+			}
+			
+			//模板源目录
+			String template_source = "WEB-INF"+File.separator+"templates"+File.separator+dirName+File.separator;	
+			//复制模板文件到临时目录
+			FileUtil.copyDirectory(template_source, pathDir+"templates"+File.separator);
+				
+			//资源文件源目录
+			String file_source = "common"+File.separator+dirName+File.separator;
+			//复制模板文件到临时目录
+			FileUtil.copyDirectory(file_source, pathDir+"common"+File.separator);
+			
+			//模板上传文件源目录
+			String upload_source = "file"+File.separator+"template"+File.separator+dirName+File.separator;
+			//复制模板文件到临时目录
+			FileUtil.copyDirectory(upload_source, pathDir+"uploadFile"+File.separator);
+			
+			
+			SimpleDateFormat dateformat=new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
+			
+			//压缩文件名称
+			String zipName = dirName+"_"+dateformat.format(new Date())+".zip";
+			
+			//压缩文件
+			
 		
-		//模板上传文件源目录
-		String upload_source = "file"+File.separator+"template"+File.separator+dirName+File.separator;
-		//复制模板文件到临时目录
-		FileUtil.copyDirectory(upload_source, pathDir+"uploadFile"+File.separator);
+			ZipUtil.pack(PathUtil.path()+File.separator+"WEB-INF"+File.separator+"data"+File.separator + "temp" + File.separator+ tempDirName +File.separator, 
+					PathUtil.path()+File.separator+"WEB-INF"+File.separator+"data"+ File.separator+"templateBackup"+ File.separator+zipName);//第一个参数：待压缩目录  第二个参数：输出文件
+		
+			//删除临时文件
+			localFileManage.removeDirectory("WEB-INF"+File.separator+"data"+File.separator + "temp" + File.separator+ tempDirName +File.separator);
+		}else{
+			error.put("dirName", "目录名称不能为空");
+		}
 		
 		
-		SimpleDateFormat dateformat=new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
-		
-		//压缩文件名称
-		String zipName = dirName+"_"+dateformat.format(new Date())+".zip";
-		
-		//压缩文件
-		
-	
-		ZipUtil.pack(PathUtil.path()+File.separator+"WEB-INF"+File.separator+"data"+File.separator + "temp" + File.separator+ tempDirName +File.separator, 
-				PathUtil.path()+File.separator+"WEB-INF"+File.separator+"data"+ File.separator+"templateBackup"+ File.separator+zipName);//第一个参数：待压缩目录  第二个参数：输出文件
-	
-		//删除临时文件
-		localFileManage.removeDirectory("WEB-INF"+File.separator+"data"+File.separator + "temp" + File.separator+ tempDirName +File.separator);
-		
-		return "1";
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+		}
 	}
 	
 
@@ -397,20 +451,24 @@ public class TemplateManageAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=deleteExport", method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String deleteExport(ModelMap model,String fileName,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
 		if(fileName != null && !"".equals(fileName.trim())){
 			//替换路径中的..号
 			fileName = FileUtil.toRelativePath(fileName);
 			//模板文件路径
 			String templateFile_path = "WEB-INF"+File.separator+"data"+ File.separator+"templateBackup"+ File.separator+fileName;
 			localFileManage.deleteFile(templateFile_path);
-			return "1";
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+		}else{
+			error.put("fileName", "文件名称不能为空");
 		}
-		return "0";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	/**
@@ -422,13 +480,14 @@ public class TemplateManageAction {
 	 * @return
 	 * @throws Exception
 	*/
+	@ResponseBody
 	@RequestMapping(params="method=templateDownload", method=RequestMethod.GET)
 	public ResponseEntity<byte[]> templateDownload(ModelMap model,String fileName,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-
+		
 		if(fileName == null || "".equals(fileName.trim())){
-			throw new SystemException("文件不名称不能为空！");
+			throw new SystemException("文件名称不能为空");
 		}
 		//替换路径中的..号
 		fileName = FileUtil.toRelativePath(fileName); 
@@ -437,8 +496,6 @@ public class TemplateManageAction {
 
 	    File file = new File(PathUtil.path()+File.separator+templateFile_path);
 	    
-	    
-	  
         return WebUtil.downloadResponse(FileUtils.readFileToByteArray(file), fileName,request);
 	}
 	
@@ -447,214 +504,226 @@ public class TemplateManageAction {
 	/**
 	 * 模板管理  导入模板
 	 * @param model
-	 * @param templateFileName 模板文件名称
+	 * @param fileName 模板文件名称
 	 * @param request
 	 * @param response
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=import", method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
-	public String importTemplate(ModelMap model,String templateFileName,
+	public String importTemplate(ModelMap model,String fileName,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		if(templateFileName == null || "".equals(templateFileName.trim())){
-			return "-1";
-		}
-		//替换路径中的..号
-		templateFileName = FileUtil.toRelativePath(templateFileName);
-		
-		//模板文件路径
-		String templateFile_path = "WEB-INF"+File.separator+"data"+ File.separator+"templateBackup"+ File.separator+templateFileName;
-		//临时目录名称
-		String tempDirName = UUIDUtil.getUUID32();
-		//临时目录路径
-		String temp_dir_path = "WEB-INF"+File.separator+"data"+File.separator + "temp" + File.separator+ tempDirName + File.separator;
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
 		
 		
-		
-		//读取模板文件
-		File templateFile = new File(PathUtil.path()+File.separator+templateFile_path);
-		
-		if (templateFile.isFile()) {//如果文件存在
+		if(fileName != null && !"".equals(fileName.trim())){
+			//替换路径中的..号
+			fileName = FileUtil.toRelativePath(fileName);
 			
-			//解压到临时目录
-			ZipUtil.unZip(PathUtil.path()+File.separator+templateFile_path, PathUtil.path()+File.separator+temp_dir_path);
-			//模板目录名称
-			String templateDirName = "";
+			//模板文件路径
+			String templateFile_path = "WEB-INF"+File.separator+"data"+ File.separator+"templateBackup"+ File.separator+fileName;
+			//临时目录名称
+			String tempDirName = UUIDUtil.getUUID32();
+			//临时目录路径
+			String temp_dir_path = "WEB-INF"+File.separator+"data"+File.separator + "temp" + File.separator+ tempDirName + File.separator;
 			
-			File temp_dir_path_file = new File(PathUtil.path()+File.separator+temp_dir_path);
-			File[] dirs = temp_dir_path_file.listFiles(); 
-			for (File f : dirs) {
-				if (f.isDirectory()) {
-					templateDirName = f.getName();
-					break;
-				} 
-			}
 			
-			if(templateDirName != null && !"".equals(templateDirName.trim())){
-				//替换路径中的..号
-				templateDirName = FileUtil.toRelativePath(templateDirName);
-				//验证目录是否重复
-				Templates t = templateService.findTemplatebyDirName(templateDirName.trim());
-				if(t != null){
-					//删除临时文件
-					localFileManage.removeDirectory("WEB-INF"+File.separator+"data"+File.separator + "temp" + File.separator+ tempDirName +File.separator);
-					
-					return "-3";
+			
+			//读取模板文件
+			File templateFile = new File(PathUtil.path()+File.separator+templateFile_path);
+			
+			if (templateFile.isFile()) {//如果文件存在
+				
+				//解压到临时目录
+				ZipUtil.unZip(PathUtil.path()+File.separator+templateFile_path, PathUtil.path()+File.separator+temp_dir_path);
+				//模板目录名称
+				String templateDirName = "";
+				
+				File temp_dir_path_file = new File(PathUtil.path()+File.separator+temp_dir_path);
+				File[] dirs = temp_dir_path_file.listFiles(); 
+				for (File f : dirs) {
+					if (f.isDirectory()) {
+						templateDirName = f.getName();
+						break;
+					} 
 				}
 				
-				//读取模板数据
-				String templateData_str = FileUtil.readFileToString(temp_dir_path+templateDirName+File.separator+"templateData.data","UTF-8");
-				
-				if(templateData_str != null && !"".equals(templateData_str.trim())){
-					TemplateData templateData = JsonUtils.toGenericObject(templateData_str, new TypeReference<TemplateData>(){});		
-					Map<String,String> newPrimaryKey = new HashMap<String,String>();//布局数据新主键
-					Templates templates = templateData.getTemplates();
-					//旧模板目录名称
-					String oldDirName = "";
-					
-					if(templates != null){
-						//重设主键
-						templates.setId(null);
-						oldDirName = templates.getDirName();
-						//重设模板目录名称
-						templates.setDirName(templateDirName);
-						//设置模板没选中
-						templates.setUses(false);
-					}
-					List<Layout> layoutList = templateData.getLayoutList();
-					if(layoutList != null && layoutList.size() >0){
-						for(Layout layout : layoutList){
-							String layoutId = UUIDUtil.getUUID32();
-							newPrimaryKey.put(layout.getId(), layoutId);
-							//重设布局主键
-							layout.setId(layoutId);
-							//重设模板目录名称
-							layout.setDirName(templateDirName);
+				if(templateDirName != null && !"".equals(templateDirName.trim())){
+					//替换路径中的..号
+					templateDirName = FileUtil.toRelativePath(templateDirName);
+					//验证目录是否重复
+					Templates t = templateService.findTemplatebyDirName(templateDirName.trim());
+					if(t == null){
+						//读取模板数据
+						String templateData_str = FileUtil.readFileToString(temp_dir_path+templateDirName+File.separator+"templateData.data","UTF-8");
+						
+						if(templateData_str != null && !"".equals(templateData_str.trim())){
+							TemplateData templateData = JsonUtils.toGenericObject(templateData_str, new TypeReference<TemplateData>(){});		
+							Map<String,String> newPrimaryKey = new HashMap<String,String>();//布局数据新主键
+							Templates templates = templateData.getTemplates();
+							//旧模板目录名称
+							String oldDirName = "";
 							
-							     
-						}
-					}
-					List<Forum> forumList = templateData.getForumList();
-					if(forumList != null && forumList.size() >0){
-						for(Forum forum : forumList){
-							//重设版块主键
-							forum.setId(null);
-							//重设模板目录名称
-							forum.setDirName(templateDirName);
-							//重设布局Id
-							forum.setLayoutId(newPrimaryKey.get(forum.getLayoutId()));
-							
-							//更改用户自定义HTML上传文件的模板目录
-							if("自定义版块".equals(forum.getForumType()) && "用户自定义HTML".equals(forum.getForumChildType())){
-								
-								String formValueJSON = forum.getFormValue();//表单值
-								if(formValueJSON != null && !"".equals(formValueJSON)){
+							if(templates != null){
+								//重设主键
+								templates.setId(null);
+								oldDirName = templates.getDirName();
+								//重设模板目录名称
+								templates.setDirName(templateDirName);
+								//设置模板没选中
+								templates.setUses(false);
+							}
+							List<Layout> layoutList = templateData.getLayoutList();
+							if(layoutList != null && layoutList.size() >0){
+								for(Layout layout : layoutList){
+									String layoutId = UUIDUtil.getUUID32();
+									newPrimaryKey.put(layout.getId(), layoutId);
+									//重设布局主键
+									layout.setId(layoutId);
+									//重设模板目录名称
+									layout.setDirName(templateDirName);
 									
-									Forum_CustomForumRelated_CustomHTML forum_CustomForumRelated_CustomHTML = JsonUtils.toObject(formValueJSON, Forum_CustomForumRelated_CustomHTML.class);
-									
-									
-									if(forum_CustomForumRelated_CustomHTML != null){
-										if(forum_CustomForumRelated_CustomHTML.getHtml_content() != null && !"".equals(forum_CustomForumRelated_CustomHTML.getHtml_content().trim())){
-											
-										}
-										String content = textFilterManage.updatePathName(forum_CustomForumRelated_CustomHTML.getHtml_content(),oldDirName,templateDirName);
-										
-										forum_CustomForumRelated_CustomHTML.setHtml_content(content);
-										
-										forum.setFormValue(JsonUtils.toJSONString(forum_CustomForumRelated_CustomHTML));//加入表单值
-										
-									}
+									     
 								}
 							}
+							List<Forum> forumList = templateData.getForumList();
+							if(forumList != null && forumList.size() >0){
+								for(Forum forum : forumList){
+									//重设版块主键
+									forum.setId(null);
+									//重设模板目录名称
+									forum.setDirName(templateDirName);
+									//重设布局Id
+									forum.setLayoutId(newPrimaryKey.get(forum.getLayoutId()));
+									
+									//更改用户自定义HTML上传文件的模板目录
+									if("自定义版块".equals(forum.getForumType()) && "用户自定义HTML".equals(forum.getForumChildType())){
+										
+										String formValueJSON = forum.getFormValue();//表单值
+										if(formValueJSON != null && !"".equals(formValueJSON)){
+											
+											Forum_CustomForumRelated_CustomHTML forum_CustomForumRelated_CustomHTML = JsonUtils.toObject(formValueJSON, Forum_CustomForumRelated_CustomHTML.class);
+											
+											
+											if(forum_CustomForumRelated_CustomHTML != null){
+												if(forum_CustomForumRelated_CustomHTML.getHtml_content() != null && !"".equals(forum_CustomForumRelated_CustomHTML.getHtml_content().trim())){
+													
+												}
+												String content = textFilterManage.updatePathName(forum_CustomForumRelated_CustomHTML.getHtml_content(),oldDirName,templateDirName);
+												
+												forum_CustomForumRelated_CustomHTML.setHtml_content(content);
+												
+												forum.setFormValue(JsonUtils.toJSONString(forum_CustomForumRelated_CustomHTML));//加入表单值
+												
+											}
+										}
+									}
+									
+									
+								}
+							}
+							templateService.saveTemplateData(templateData);
+						}
+						
+						
+						//templates目录的下一级目录名称
+						String next_templates_dirName = "";
+						File next_templates_temp_dir_path_file = new File(PathUtil.path()+File.separator+temp_dir_path+templateDirName+File.separator+"templates"+File.separator);
+						File[] next_templates_dirs = next_templates_temp_dir_path_file.listFiles(); 
+						for (File f : next_templates_dirs) {
+							if (f.isDirectory()) {
+								next_templates_dirName = f.getName();
+								break;
+							} 
+						}
+						
+						//common目录的下一级目录名称
+						String next_common_dirName = "";
+						File next_common_temp_dir_path_file = new File(PathUtil.path()+File.separator+temp_dir_path+templateDirName+File.separator+"common"+File.separator);
+						File[] next_common_dirs = next_common_temp_dir_path_file.listFiles(); 
+						for (File f : next_common_dirs) {
+							if (f.isDirectory()) {
+								next_common_dirName = f.getName();
+								break;
+							} 
+						}
+						//uploadFile目录的下一级目录名称
+						String next_uploadFile_dirName = "";
+						File next_uploadFile_temp_dir_path_file = new File(PathUtil.path()+File.separator+temp_dir_path+templateDirName+File.separator+"uploadFile"+File.separator);
+						File[] next_uploadFile_dirs = next_uploadFile_temp_dir_path_file.listFiles(); 
+						for (File f : next_uploadFile_dirs) {
+							if (f.isDirectory()) {
+								next_uploadFile_dirName = f.getName();
+								break;
+							} 
+						}
+						
+						if(next_templates_dirName != null && !"".equals(next_templates_dirName.trim())){
+							//模板源目录
+							String template_source = temp_dir_path+templateDirName+File.separator+"templates"+File.separator+next_templates_dirName+File.separator;	
 							
+							//重命名文件夹名称,和模板名称一致
+							FileUtil.renameFile(template_source, templateDirName);
+							
+							//复制模板文件到模板目录
+							FileUtil.copyDirectory(temp_dir_path+templateDirName+File.separator+"templates"+File.separator+templateDirName+File.separator, "WEB-INF"+File.separator+"templates");
+						}
+						if(next_common_dirName != null && !"".equals(next_common_dirName.trim())){
+							String file_source = temp_dir_path+templateDirName+File.separator+"common"+File.separator+next_common_dirName+File.separator;
+							//重命名文件夹名称,和模板名称一致
+							FileUtil.renameFile(file_source, templateDirName);
+							//复制模板资源文件到文件目录
+							FileUtil.copyDirectory(temp_dir_path+templateDirName+File.separator+"common"+File.separator+templateDirName+File.separator, "common");
 							
 						}
+						if(next_uploadFile_dirName != null && !"".equals(next_uploadFile_dirName.trim())){
+							String upload_source = temp_dir_path+templateDirName+File.separator+"uploadFile"+File.separator+next_common_dirName+File.separator;
+							//重命名文件夹名称,和模板名称一致
+							FileUtil.renameFile(upload_source, templateDirName);
+							//复制模板上传文件到文件目录
+							FileUtil.copyDirectory(temp_dir_path+templateDirName+File.separator+"uploadFile"+File.separator+templateDirName+File.separator, "file"+File.separator+"template");
+							
+						}
+						
+						
+						
+						//删除临时文件
+						localFileManage.removeDirectory("WEB-INF"+File.separator+"data"+File.separator + "temp" + File.separator+ tempDirName +File.separator);
+						
+					}else{
+						//删除临时文件
+						localFileManage.removeDirectory("WEB-INF"+File.separator+"data"+File.separator + "temp" + File.separator+ tempDirName +File.separator);
+						error.put("fileName", "模板目录已存在");
+						
 					}
-					templateService.saveTemplateData(templateData);
 				}
-				
-				
-				//templates目录的下一级目录名称
-				String next_templates_dirName = "";
-				File next_templates_temp_dir_path_file = new File(PathUtil.path()+File.separator+temp_dir_path+templateDirName+File.separator+"templates"+File.separator);
-				File[] next_templates_dirs = next_templates_temp_dir_path_file.listFiles(); 
-				for (File f : next_templates_dirs) {
-					if (f.isDirectory()) {
-						next_templates_dirName = f.getName();
-						break;
-					} 
-				}
-				
-				//common目录的下一级目录名称
-				String next_common_dirName = "";
-				File next_common_temp_dir_path_file = new File(PathUtil.path()+File.separator+temp_dir_path+templateDirName+File.separator+"common"+File.separator);
-				File[] next_common_dirs = next_common_temp_dir_path_file.listFiles(); 
-				for (File f : next_common_dirs) {
-					if (f.isDirectory()) {
-						next_common_dirName = f.getName();
-						break;
-					} 
-				}
-				//uploadFile目录的下一级目录名称
-				String next_uploadFile_dirName = "";
-				File next_uploadFile_temp_dir_path_file = new File(PathUtil.path()+File.separator+temp_dir_path+templateDirName+File.separator+"uploadFile"+File.separator);
-				File[] next_uploadFile_dirs = next_uploadFile_temp_dir_path_file.listFiles(); 
-				for (File f : next_uploadFile_dirs) {
-					if (f.isDirectory()) {
-						next_uploadFile_dirName = f.getName();
-						break;
-					} 
-				}
-				
-				if(next_templates_dirName != null && !"".equals(next_templates_dirName.trim())){
-					//模板源目录
-					String template_source = temp_dir_path+templateDirName+File.separator+"templates"+File.separator+next_templates_dirName+File.separator;	
-					
-					//重命名文件夹名称,和模板名称一致
-					FileUtil.renameFile(template_source, templateDirName);
-					
-					//复制模板文件到模板目录
-					FileUtil.copyDirectory(temp_dir_path+templateDirName+File.separator+"templates"+File.separator+templateDirName+File.separator, "WEB-INF"+File.separator+"templates");
-				}
-				if(next_common_dirName != null && !"".equals(next_common_dirName.trim())){
-					String file_source = temp_dir_path+templateDirName+File.separator+"common"+File.separator+next_common_dirName+File.separator;
-					//重命名文件夹名称,和模板名称一致
-					FileUtil.renameFile(file_source, templateDirName);
-					//复制模板资源文件到文件目录
-					FileUtil.copyDirectory(temp_dir_path+templateDirName+File.separator+"common"+File.separator+templateDirName+File.separator, "common");
-					
-				}
-				if(next_uploadFile_dirName != null && !"".equals(next_uploadFile_dirName.trim())){
-					String upload_source = temp_dir_path+templateDirName+File.separator+"uploadFile"+File.separator+next_common_dirName+File.separator;
-					//重命名文件夹名称,和模板名称一致
-					FileUtil.renameFile(upload_source, templateDirName);
-					//复制模板上传文件到文件目录
-					FileUtil.copyDirectory(temp_dir_path+templateDirName+File.separator+"uploadFile"+File.separator+templateDirName+File.separator, "file"+File.separator+"template");
-					
-				}
-				
-				
-				
-				//删除临时文件
-				localFileManage.removeDirectory("WEB-INF"+File.separator+"data"+File.separator + "temp" + File.separator+ tempDirName +File.separator);
-				
-				
+			}else{	
+				error.put("fileName", "文件不存在");
 			}
-		}else{	
-			return "-2";
+		}else{
+			error.put("fileName", "文件名称不能为空");
+			
 		}
 		
-		
-		return "1";
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+		}
 	}
 	/**
 	 * 模板管理 导入模板列表
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=importTemplateList",method=RequestMethod.GET)
 	public String importTemplateList(ModelMap model
 			)throws Exception {
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
+		
 		List<Templates> templatesList = new ArrayList<Templates>();
 		
 		//模板目录
@@ -721,6 +790,7 @@ public class TemplateManageAction {
 					}
 					templatesList.add(templates);
 				} catch (Exception e) {
+					error.put("templates", "导入模板列表查询错误");
 					// TODO Auto-generated catch block
 				//	e.printStackTrace();
 					if (logger.isErrorEnabled()) {
@@ -734,9 +804,12 @@ public class TemplateManageAction {
 				}
 			}
 		}
-
-		model.addAttribute("templatesList",templatesList);
-		return "jsp/template/importTemplateList";
+		
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,templatesList));
+		}
 	}
 	
 	/**
@@ -749,13 +822,12 @@ public class TemplateManageAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=directoryRename",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String directoryRename(ModelMap model,String fileName,String directoryName,
 			HttpServletRequest request, HttpServletResponse response)throws Exception {
 		
 		Map<String,String> error = new HashMap<String,String>();//错误
-		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
 		
 		if(directoryName != null && !"".equals(directoryName.trim())){
 			if(directoryName.length() >40){
@@ -775,10 +847,9 @@ public class TemplateManageAction {
 		}else{
 			error.put("directoryName", "新目录名称不能为空");
 		}
-		
 		if(fileName != null && !"".equals(fileName.trim())){
 			if(error.size() == 0){
-
+				
 				//替换路径中的..号
 				fileName = FileUtil.toRelativePath(fileName.trim());
 				
@@ -820,23 +891,20 @@ public class TemplateManageAction {
 		
 					//删除临时文件
 					localFileManage.removeDirectory("WEB-INF"+File.separator+"data"+File.separator + "temp" + File.separator+ tempDirName +File.separator);
+				}else{
+					error.put("fileName", "文件不存在");
 				}
 				
 			}
 		}else{
-			error.put("directoryRename", "文件不存在");
+			error.put("directoryRename", "文件名称不能为空");
 		}
 		
-		if(error != null && error.size() >0){
-			returnValue.put("success", "false");
-			returnValue.put("error", error);
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 		}else{
-			returnValue.put("success", "true");
-			
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 		}
-
-		WebUtil.writeToWeb(JsonUtils.toJSONString(returnValue), "json", response);
-		return null;
 	}
 	
 	/**
@@ -844,13 +912,12 @@ public class TemplateManageAction {
 	 * @param resourceId 资源Id
 	 * @param dirName 模板目录
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=upload",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String upload(ModelMap model,
 			MultipartFile uploadFile,
 			HttpServletRequest request,HttpServletResponse response) throws Exception {
 		
-		Map<String,Object> returnJson = new HashMap<String,Object>();
 		Map<String,String> error = new HashMap<String,String>();
 		
 		String path = PathUtil.path()+File.separator+"WEB-INF"+File.separator+"data"+ File.separator+"templateBackup";
@@ -869,8 +936,8 @@ public class TemplateManageAction {
 			List<String> formatList = new ArrayList<String>();
 			formatList.add("zip");
 			//允许上传大小
-			long uploadSize = 204800000L;//单位为字节  例1024000为1M
-			
+			long uploadSize = 1024 * 1024 * 200;//单位为字节  
+			//204800000L
 			//验证文件后缀
 			boolean authentication = FileUtil.validateFileSuffix(uploadFile.getOriginalFilename(),formatList);
 			if(authentication == false){
@@ -932,13 +999,10 @@ public class TemplateManageAction {
 		
 
 		if(error.size() >0){
-			//上传失败
-			returnJson.put("error", error);
-			returnJson.put("success", false);
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 		}else{
-			returnJson.put("success", true);
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 		}
-		return JsonUtils.toJSONString(returnJson);
 	}
 	
 	
@@ -951,15 +1015,17 @@ public class TemplateManageAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=setTemplate",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String setTemplate(ModelMap model,String dirName,
 			HttpServletRequest request, HttpServletResponse response)throws Exception {
-		
+
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
 		if(dirName != null && !"".equals(dirName.trim())){
 			templateService.useTemplate(dirName.trim());
-			return "1";
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 		}
-		return "0";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 }

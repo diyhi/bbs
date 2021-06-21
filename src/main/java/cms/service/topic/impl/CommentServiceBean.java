@@ -296,6 +296,16 @@ public class CommentServiceBean extends DaoSupport<Comment> implements CommentSe
 		return i;
 		
 	}
+	/**
+	 * 查询待审核评论数量
+	 * @return
+	 */
+	@Transactional(readOnly=true,propagation=Propagation.NOT_SUPPORTED)
+	public Long auditCommentCount(){
+		Query query = em.createQuery("select count(o) from Comment o where o.status=?1");
+		query.setParameter(1, 10);
+		return (Long)query.getSingleResult();
+	}
 	
 	
 	/**--------------------------------------回复------------------------------------**/
@@ -370,7 +380,19 @@ public class CommentServiceBean extends DaoSupport<Comment> implements CommentSe
 		}
 		return null;
 	}
-	
+	/**
+	 * 根据回复Id集合查询回复
+	 * @param replyIdList 回复Id集合
+	 * @return
+	 */
+	@Transactional(readOnly=true,propagation=Propagation.NOT_SUPPORTED)
+	public List<Reply> findByReplyIdList(List<Long> replyIdList){
+		Query query = em.createQuery("select o from Reply o where o.id in(:replyIdList)");
+		//给SQL语句设置参数
+		query.setParameter("replyIdList", replyIdList);
+		
+		return query.getResultList();
+	}
 	/**
 	 * 分页查询回复
 	 * @param userName 用户名称
@@ -404,12 +426,11 @@ public class CommentServiceBean extends DaoSupport<Comment> implements CommentSe
 	 * @return
 	*/
 	public Integer updateReply(Long replyId,String content,String userName,Integer status,Date lastUpdateTime){
-		Query query = em.createQuery("update Reply o set o.content=?1,o.userName=?2,o.status=?3,o.status=?4 where o.id=?5")
+		Query query = em.createQuery("update Reply o set o.content=?1,o.userName=?2,o.status=?3 where o.id=?4")
 		.setParameter(1, content)
 		.setParameter(2, userName)
 		.setParameter(3, status)
-		.setParameter(4, status)
-		.setParameter(5, replyId);
+		.setParameter(4, replyId);
 		int i = query.executeUpdate();
 		return i;
 	} 
@@ -450,5 +471,15 @@ public class CommentServiceBean extends DaoSupport<Comment> implements CommentSe
 		i= query.executeUpdate();
 		return i;
 		
+	}
+	/**
+	 * 查询待审核回复数量
+	 * @return
+	 */
+	@Transactional(readOnly=true,propagation=Propagation.NOT_SUPPORTED)
+	public Long auditReplyCount(){
+		Query query = em.createQuery("select count(o) from Reply o where o.status=?1");
+		query.setParameter(1, 10);
+		return (Long)query.getSingleResult();
 	}
 }

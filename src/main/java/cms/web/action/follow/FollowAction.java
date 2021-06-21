@@ -1,6 +1,9 @@
 package cms.web.action.follow;
 
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -8,17 +11,21 @@ import javax.servlet.http.HttpServletResponse;
 import cms.bean.PageForm;
 import cms.bean.PageView;
 import cms.bean.QueryResult;
+import cms.bean.RequestResult;
+import cms.bean.ResultCode;
 import cms.bean.follow.Follow;
 import cms.bean.follow.Follower;
 import cms.bean.user.User;
 import cms.service.follow.FollowService;
 import cms.service.setting.SettingService;
 import cms.service.user.UserService;
+import cms.utils.JsonUtils;
 import cms.web.action.fileSystem.FileManage;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * 关注
@@ -42,12 +49,16 @@ public class FollowAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping("/control/follow/list") 
 	public String followList(ModelMap model,PageForm pageForm,Long id,String userName,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 
-		if(userName != null && !"".equals(userName.trim())){
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
+		Map<String,Object> returnValue = new HashMap<String,Object>();
+		if(id != null && id >0L && userName != null && !"".equals(userName.trim())){
 			
 			//调用分页算法代码
 			PageView<Follow> pageView = new PageView<Follow>(settingService.findSystemSetting_cache().getBackstagePageNumber(),pageForm.getPage(),10,request.getRequestURI(),request.getQueryString());
@@ -69,9 +80,20 @@ public class FollowAction {
 			}
 			//将查询结果集传给分页List
 			pageView.setQueryResult(qr);
-			model.addAttribute("pageView", pageView);
+			User user = userService.findUserById(id);
+			if(user != null){
+				returnValue.put("currentUser", user);
+			}
+			
+			returnValue.put("pageView", pageView);
+		}else{
+			error.put("userId", "用户Id或用户名称不能为空");
 		}
-		return "jsp/follow/followList";
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
+		}
 	}
 	
 	
@@ -86,12 +108,16 @@ public class FollowAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping("/control/follower/list") 
 	public String followerList(ModelMap model,PageForm pageForm,Long id,String userName,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 
-		if(userName != null && !"".equals(userName.trim())){
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
+		Map<String,Object> returnValue = new HashMap<String,Object>();
+		if(id != null && id >0L && userName != null && !"".equals(userName.trim())){
 			
 			//调用分页算法代码
 			PageView<Follower> pageView = new PageView<Follower>(settingService.findSystemSetting_cache().getBackstagePageNumber(),pageForm.getPage(),10,request.getRequestURI(),request.getQueryString());
@@ -113,8 +139,18 @@ public class FollowAction {
 			}
 			//将查询结果集传给分页List
 			pageView.setQueryResult(qr);
-			model.addAttribute("pageView", pageView);
+			User user = userService.findUserById(id);
+			if(user != null){
+				returnValue.put("currentUser", user);
+			}
+			returnValue.put("pageView", pageView);
+		}else{
+			error.put("userId", "用户Id或用户名称不能为空");
 		}
-		return "jsp/follow/followerList";
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
+		}
 	}
 }

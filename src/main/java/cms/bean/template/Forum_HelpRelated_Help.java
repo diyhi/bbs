@@ -1,8 +1,10 @@
 package cms.bean.template;
 
 import java.io.Serializable;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
+
+import cms.bean.help.Help;
 
 /**
  * 版块---在线帮助相关--在线帮助
@@ -35,8 +37,8 @@ public class Forum_HelpRelated_Help implements Serializable{
 	/** 是否传递分类参数 **/
 	private boolean help_helpType_transferPrameter = false;
 	
-	/** 选择推荐在线帮助 key:在线帮助Id value:在线帮助名称**/
-	private Map<Long,String> help_recommendHelpList = new LinkedHashMap<Long,String>();
+	/** 选择推荐在线帮助 只存储Id,Name **/
+	private List<Help> help_recommendHelpList = new ArrayList<Help>();
 
 	public String getHelp_id() {
 		return help_id;
@@ -119,14 +121,14 @@ public class Forum_HelpRelated_Help implements Serializable{
 		this.help_helpType_transferPrameter = help_helpType_transferPrameter;
 	}
 
-	public Map<Long, String> getHelp_recommendHelpList() {
+	public List<Help> getHelp_recommendHelpList() {
 		return help_recommendHelpList;
 	}
 
-	public void setHelp_recommendHelpList(Map<Long, String> help_recommendHelpList) {
+	public void setHelp_recommendHelpList(List<Help> help_recommendHelpList) {
 		this.help_recommendHelpList = help_recommendHelpList;
 	}
-	
+
 	
 	
 }

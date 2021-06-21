@@ -31,6 +31,15 @@ public class FavoritesEntity implements Serializable{
 	/** 收藏夹的用户名称 **/
 	@Column(length=30)
 	protected String userName;
+	/** 呢称 **/
+	@Transient
+	protected String nickname;
+	/** 头像路径 **/
+	@Transient
+	protected String avatarPath;
+	/** 头像名称 **/
+	@Transient
+	protected String avatarName;
 	
 	
 	/** 发布 话题/问题 的用户名称 **/
@@ -124,6 +133,30 @@ public class FavoritesEntity implements Serializable{
 
 	public void setQuestionTitle(String questionTitle) {
 		this.questionTitle = questionTitle;
+	}
+
+	public String getNickname() {
+		return nickname;
+	}
+
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
+	}
+
+	public String getAvatarPath() {
+		return avatarPath;
+	}
+
+	public void setAvatarPath(String avatarPath) {
+		this.avatarPath = avatarPath;
+	}
+
+	public String getAvatarName() {
+		return avatarName;
+	}
+
+	public void setAvatarName(String avatarName) {
+		this.avatarName = avatarName;
 	}
 	
 	

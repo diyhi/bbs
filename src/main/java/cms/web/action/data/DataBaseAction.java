@@ -9,13 +9,17 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import cms.bean.RequestResult;
+import cms.bean.ResultCode;
 import cms.bean.data.DataBaseFile;
 import cms.utils.FileUtil;
+import cms.utils.JsonUtils;
 import cms.utils.PathUtil;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * 数据库备份/还原管理
@@ -33,6 +37,7 @@ public class DataBaseAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping("/control/dataBase/list") 
 	public String execute(ModelMap model,
 			HttpServletRequest request, HttpServletResponse response)
@@ -56,8 +61,7 @@ public class DataBaseAction {
 		   
 		}  
 		
-		model.addAttribute("dataBaseFileList",dataBaseFileList );
-		return "jsp/data/dataBaseList";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,dataBaseFileList));
 	}	
 
 }

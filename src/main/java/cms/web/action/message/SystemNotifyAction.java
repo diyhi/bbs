@@ -11,13 +11,17 @@ import javax.servlet.http.HttpServletResponse;
 import cms.bean.PageForm;
 import cms.bean.PageView;
 import cms.bean.QueryResult;
+import cms.bean.RequestResult;
+import cms.bean.ResultCode;
 import cms.bean.message.SystemNotify;
 import cms.service.message.SystemNotifyService;
 import cms.service.setting.SettingService;
+import cms.utils.JsonUtils;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * 系统通知
@@ -28,6 +32,7 @@ public class SystemNotifyAction {
 	@Resource SettingService settingService;
 	@Resource SystemNotifyService systemNotifyService;
 	
+	@ResponseBody
 	@RequestMapping("/control/systemNotify/list") 
 	public String execute(PageForm pageForm,ModelMap model,
 			HttpServletRequest request, HttpServletResponse response)
@@ -46,8 +51,6 @@ public class SystemNotifyAction {
 		QueryResult<SystemNotify> qr = systemNotifyService.getScrollData(SystemNotify.class, firstindex, pageView.getMaxresult(), orderby);		
 		
 		pageView.setQueryResult(qr);
-		model.addAttribute("pageView", pageView);
-		
-		return "jsp/message/systemNotifyList";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,pageView));
 	}
 }

@@ -12,15 +12,22 @@ import javax.servlet.http.HttpServletResponse;
 import cms.bean.PageForm;
 import cms.bean.PageView;
 import cms.bean.QueryResult;
+import cms.bean.RequestResult;
+import cms.bean.ResultCode;
 import cms.bean.membershipCard.MembershipCard;
 import cms.bean.membershipCard.MembershipCardOrder;
+import cms.bean.user.User;
 import cms.service.membershipCard.MembershipCardService;
 import cms.service.setting.SettingService;
+import cms.utils.JsonUtils;
+import cms.web.action.fileSystem.FileManage;
+import cms.web.action.user.UserManage;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 
 /**
@@ -31,6 +38,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class MembershipCardAction {
 	@Resource MembershipCardService membershipCardService;
 	@Resource SettingService settingService;
+	@Resource UserManage userManage;
+	@Resource FileManage fileManage;
 	
 	/**
 	 * 会员卡列表
@@ -41,6 +50,7 @@ public class MembershipCardAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping("/control/membershipCard/list") 
 	public String execute(PageForm pageForm,ModelMap model,
 			HttpServletRequest request, HttpServletResponse response)
@@ -66,9 +76,7 @@ public class MembershipCardAction {
 		QueryResult<MembershipCard> qr = membershipCardService.getScrollData(MembershipCard.class, firstindex, pageView.getMaxresult(), jpql_str, params.toArray(),orderby);		
 		
 		pageView.setQueryResult(qr);
-		model.addAttribute("pageView", pageView);
-		
-		return "jsp/membershipCard/membershipCardList";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,pageView));
 	}
 	
 	/**
@@ -80,6 +88,7 @@ public class MembershipCardAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping("/control/membershipCardOrder/list") 
 	public String queryMembershipCardOrderList(PageForm pageForm,ModelMap model,
 			HttpServletRequest request, HttpServletResponse response)
@@ -103,10 +112,23 @@ public class MembershipCardAction {
 		//调用分页算法类
 		QueryResult<MembershipCardOrder> qr = membershipCardService.getScrollData(MembershipCardOrder.class, firstindex, pageView.getMaxresult(), jpql_str, params.toArray(),orderby);		
 		
-		pageView.setQueryResult(qr);
-		model.addAttribute("pageView", pageView);
+		if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
+			for(MembershipCardOrder t :qr.getResultlist()){
+
+				User user = userManage.query_cache_findUserByUserName(t.getUserName());
+				if(user != null){
+					t.setNickname(user.getNickname());
+					if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
+						t.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+						t.setAvatarName(user.getAvatarName());
+					}		
+				}
+			}
+		}
 		
-		return "jsp/membershipCard/membershipCardOrderList";
+		
+		pageView.setQueryResult(qr);
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,pageView));
 	}
 	
 	

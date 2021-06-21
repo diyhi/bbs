@@ -18,17 +18,24 @@ import javax.servlet.http.HttpServletResponse;
 import cms.bean.PageForm;
 import cms.bean.PageView;
 import cms.bean.QueryResult;
+import cms.bean.RequestResult;
+import cms.bean.ResultCode;
 import cms.bean.platformShare.QuestionRewardPlatformShare;
 import cms.bean.question.Question;
+import cms.bean.user.User;
 import cms.service.platformShare.PlatformShareService;
 import cms.service.setting.SettingService;
+import cms.service.user.UserService;
+import cms.utils.JsonUtils;
 import cms.utils.Verification;
+import cms.web.action.fileSystem.FileManage;
 import cms.web.action.question.QuestionManage;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * 问答悬赏平台分成
@@ -39,8 +46,11 @@ public class QuestionRewardPlatformShareAction {
 	@Resource PlatformShareService platformShareService;
 	@Resource SettingService settingService;
 	@Resource QuestionManage questionManage;
+	@Resource UserService userService;
+	@Resource FileManage fileManage;
 	
 	
+	@ResponseBody
 	@RequestMapping("/control/questionRewardPlatformShare/list") 
 	public String execute(ModelMap model,PageForm pageForm,String start_times,String end_times,
 			HttpServletRequest request, HttpServletResponse response)
@@ -86,10 +96,7 @@ public class QuestionRewardPlatformShareAction {
         		error.put("start_times", "起始时间不能比结束时间大");
         	}
 		}
-		model.addAttribute("error", error);
-		model.addAttribute("start_times", start_times);
-		model.addAttribute("end_times", end_times);
-
+		
 		
 		if(_start_times != null){//起始时间
 			jpql.append(" and o.adoptionTime >= ?"+ (params.size()+1));
@@ -128,13 +135,32 @@ public class QuestionRewardPlatformShareAction {
 					}
 					
 				}
+				
+				User post_user = userService.findUserByUserName(questionRewardPlatformShare.getPostUserName());
+				if(post_user != null){
+					questionRewardPlatformShare.setPostNickname(post_user.getNickname());
+					if(post_user.getAvatarName() != null && !"".equals(post_user.getAvatarName().trim())){
+						questionRewardPlatformShare.setPostAvatarPath(fileManage.fileServerAddress()+post_user.getAvatarPath());
+						questionRewardPlatformShare.setPostAvatarName(post_user.getAvatarName());
+					}		
+				}
+				User answer_user = userService.findUserByUserName(questionRewardPlatformShare.getAnswerUserName());
+				if(answer_user != null){
+					questionRewardPlatformShare.setAnswerNickname(answer_user.getNickname());
+					if(answer_user.getAvatarName() != null && !"".equals(answer_user.getAvatarName().trim())){
+						questionRewardPlatformShare.setAnswerAvatarPath(fileManage.fileServerAddress()+answer_user.getAvatarPath());
+						questionRewardPlatformShare.setAnswerAvatarName(answer_user.getAvatarName());
+					}		
+				}
 			}
 		}
 
 		//将查询结果集传给分页List
 		pageView.setQueryResult(qr);
-		request.setAttribute("pageView", pageView);
+		if(error.size() ==0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,pageView));
+		}
 		
-		return "jsp/platformShare/questionRewardPlatformShareList";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 }

@@ -1,13 +1,11 @@
 package cms.web.action.template.impl;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -15,7 +13,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
-import cms.bean.payment.OnlinePaymentInterface;
 import cms.bean.template.Forum;
 import cms.bean.template.Forum_SystemRelated_SearchWord;
 import cms.bean.thirdParty.SupportLoginInterface;

@@ -1124,8 +1124,9 @@ function _tmpl(str, data) {
  * @param urlAddress 提交URL
  * @param async true（异步）或 false（同步）
  * @param formContent 表单内容
+ * @param isAuthorization 是否带有权限信息
  */
-function _post_ajax(callback, urlAddress, async,formContent){  
+function _post_ajax(callback, urlAddress, async,formContent,isAuthorization){  
 	var xmlhttp;
 	if (window.XMLHttpRequest) {
 		try {
@@ -1150,7 +1151,20 @@ function _post_ajax(callback, urlAddress, async,formContent){
     //定义传输的文件HTTP头信息    
 //	xmlhttp.setRequestHeader("Content-Type","application/x-www-form-urlencoded"); 
 //	xmlhttp.setRequestHeader("X-Requested-With","XMLHttpRequest");//标记报头为AJAX
-
+	
+	if(isAuthorization){
+		//从sessionStorage中获取登录令牌
+		var oauth2Token = window.sessionStorage.getItem('oauth2Token');
+		if(oauth2Token != null){
+			var oauth2Object = JSON.parse(oauth2Token);
+			xmlhttp.setRequestHeader("Authorization",'Bearer '+oauth2Object.access_token);
+		}
+		
+		var csrfToken = K.getCookie('XSRF-TOKEN');
+		xmlhttp.setRequestHeader("X-XSRF-TOKEN",csrfToken);
+	}
+	
+	
 	xmlhttp.onreadystatechange = function(){
         if (xmlhttp.readyState == 4) {//readystate 
 		    try{
@@ -1180,8 +1194,9 @@ function _post_ajax(callback, urlAddress, async,formContent){
  * @param urlAddress 提交URL
  * @param async true（异步）或 false（同步）
  * @param formContent 表单内容
+ * @param isAuthorization 是否带有权限信息
  */
-function _put_ajax(callback, urlAddress, async,formContent){  
+function _put_ajax(callback, urlAddress, async,formContent,isAuthorization){  
 	var xmlhttp;
 	if (window.XMLHttpRequest) {
 		try {
@@ -1203,6 +1218,18 @@ function _put_ajax(callback, urlAddress, async,formContent){
 	}
 	
 	xmlhttp.open('PUT', urlAddress, async);
+	
+	if(isAuthorization){
+		//从sessionStorage中获取登录令牌
+		var oauth2Token = window.sessionStorage.getItem('oauth2Token');
+		if(oauth2Token != null){
+			var oauth2Object = JSON.parse(oauth2Token);
+			xmlhttp.setRequestHeader("Authorization",'Bearer '+oauth2Object.access_token);
+		}
+		
+		var csrfToken = K.getCookie('XSRF-TOKEN');
+		xmlhttp.setRequestHeader("X-XSRF-TOKEN",csrfToken);
+	}
 
 	xmlhttp.onreadystatechange = function(){
         if (xmlhttp.readyState == 4) {//readystate 
@@ -1227,7 +1254,26 @@ function _put_ajax(callback, urlAddress, async,formContent){
 	
 }
 
+/**
+ * 读取Cookie
+ * @param name 名称
+ * @return 值
+ */
+function _getCookie(name) {
+	if (!document.cookie) {
+	    return null;
+	}
+	var xsrfCookies = document.cookie.split(';').map(function (c) {
+	    return c.trim();
+	}).filter(function (c) {
+	    return c.startsWith(name + '=');
+	});
 
+	if (xsrfCookies.length === 0) {
+	    return null;
+	}
+	return decodeURIComponent(xsrfCookies[0].split('=')[1]);
+}
 
 K.formatUrl = _formatUrl;
 K.formatHtml = _formatHtml;
@@ -1243,6 +1289,7 @@ K.clearMsWord = _clearMsWord;
 K.tmpl = _tmpl;
 K.post_ajax = _post_ajax
 K.put_ajax = _put_ajax
+K.getCookie=_getCookie
 
 
 function _contains(nodeA, nodeB) {
@@ -5086,7 +5133,7 @@ _extend(KUploadButton, {
 					}
 				}
 			},
-			uploadURL+"&"+parameter, true,'');
+			uploadURL+"&"+parameter, true,'',true);
 		}else if(self.options.uploadModule == 20){//20.MinIO
 			var fileName = self.fileBox[0].value.substring(self.fileBox[0].value.lastIndexOf("\\")+1); 
 			var uploadURL = self.options.url || self.options.form[0].action;
@@ -5158,7 +5205,7 @@ _extend(KUploadButton, {
 					}
 				}
 			},
-			uploadURL+"&"+parameter, true,'');
+			uploadURL+"&"+parameter, true,'',true);
 						
 			
 		}else if(self.options.uploadModule == 30){//30.阿里云OSS
@@ -5236,8 +5283,69 @@ _extend(KUploadButton, {
 					}
 				}
 			},
-			uploadURL+"&"+parameter, true,'');
+			uploadURL+"&"+parameter, true,'',true);
 		}else{//0.本地
+			
+			var fileName = self.fileBox[0].value.substring(self.fileBox[0].value.lastIndexOf("\\")+1); 
+			var uploadURL = self.options.url || self.options.form[0].action;
+			
+			var parameter = "fileName="+ encodeURIComponent(fileName);
+			
+
+			var newFileName = "";
+			
+			//获取提交的参数
+		    var data = new FormData();
+		   
+		    data.append(self.options.fieldName, self.fileBox[0].files[0]);
+
+			K.post_ajax(function(xmlhttp){
+				var result = xmlhttp.responseText;
+				if(result != ""){
+					var fileData = JSON.parse(result);
+					if(fileData.error ==0){
+				
+						
+						K.popupMessage(KindEditor.lang('uploadSuccess'));
+						
+						var tempForm = document.createElement('form');
+						self.fileBox.before(tempForm);
+						K(tempForm).append(self.fileBox);
+						tempForm.reset();
+						K(tempForm).remove(true);
+						var doc = K.iframeDoc(iframe),
+							pre = doc.getElementsByTagName('pre')[0],
+							str = '', data;
+						if (pre) {
+							str = pre.innerHTML;
+						} else {
+							str = doc.body.innerHTML;
+						}
+						str = _unescape(str);
+						
+						
+						
+						var data = {};
+						data.error = 0;
+						data.url = fileData.url;
+						data.title = fileData.title;
+						
+						iframe[0].src = 'javascript:false';
+						
+						iframe.unbind();
+						self.options.afterUpload.call(self, data);
+						
+					}else{
+						K.popupMessage(fileData.message);
+						return;
+					}
+				}
+			},
+			uploadURL+"&"+parameter, true,data,true);
+			
+			
+			
+			/**
 			iframe.bind('load', function() {
 				iframe.unbind();
 				var tempForm = document.createElement('form');
@@ -5264,7 +5372,7 @@ _extend(KUploadButton, {
 					self.options.afterUpload.call(self, data);
 				}
 			});
-			self.form[0].submit();
+			self.form[0].submit();**/
 		}
 		return self;
 	},
@@ -9708,7 +9816,7 @@ K.extend(KSWFUpload, {
 						}
 					}
 				},
-				options.uploadUrl+"&"+parameter, false,'');//同步
+				options.uploadUrl+"&"+parameter, false,'',true);//同步
 			});
 			//当有文件被添加进队列的时候，添加到页面预览
 			uploader.on( 'fileQueued', function(file){
@@ -9818,7 +9926,7 @@ K.extend(KSWFUpload, {
 						}
 					}
 				},
-				options.uploadUrl+"&"+parameter, false,'');//同步
+				options.uploadUrl+"&"+parameter, false,'',true);//同步
 			});
 			//当有文件被添加进队列的时候，添加到页面预览
 			uploader.on( 'fileQueued', function(file){
@@ -9930,7 +10038,7 @@ K.extend(KSWFUpload, {
 						}
 					}
 				},
-				options.uploadUrl+"&"+parameter, false,'');//同步
+				options.uploadUrl+"&"+parameter, false,'',true);//同步
 			});
 			//当有文件被添加进队列的时候，添加到页面预览
 			uploader.on( 'fileQueued', function(file){
@@ -10010,6 +10118,23 @@ K.extend(KSWFUpload, {
 			    }
 			
 			    
+			});
+			//当某个文件的分块在发送前触发，主要用来询问是否要添加附带参数，大文件在开起分片上传的前提下此事件可能会触发多次。
+			uploader.on('uploadBeforeSend',function (obj,data,headers) {
+				//从sessionStorage中获取登录令牌
+				var oauth2Token = window.sessionStorage.getItem('oauth2Token');
+				if(oauth2Token != null){
+					var oauth2Object = JSON.parse(oauth2Token);
+					$.extend(headers, {
+				 		"Authorization": "Bearer " +oauth2Object.access_token
+					});
+				}
+				
+				var csrfToken = K.getCookie('XSRF-TOKEN');
+				$.extend(headers, {
+			 		"X-XSRF-TOKEN": csrfToken
+				});
+				
 			});
 			//当有文件被添加进队列的时候，添加到页面预览
 			uploader.on( 'fileQueued', function(file){

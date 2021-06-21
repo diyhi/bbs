@@ -127,18 +127,17 @@
 								
 								for(var i = 0; i<result.records.length; i++){
 									var receiveRedEnvelope = result.records[i];
-									var data = (receiveRedEnvelope.receiveNickname != null && receiveRedEnvelope.receiveNickname !='' ? receiveRedEnvelope.receiveNickname : receiveRedEnvelope.receiveUserName)+" 获得 "+receiveRedEnvelope.amount+" 元";
+									var data = (receiveRedEnvelope.receiveNickname != null && receiveRedEnvelope.receiveNickname !='' ? _.escape(receiveRedEnvelope.receiveNickname) : receiveRedEnvelope.receiveUserName)+" 获得 "+receiveRedEnvelope.amount+" 元";
 									var image = receiveRedEnvelope.receiveAvatarPath+"100x100/"+receiveRedEnvelope.receiveAvatarName;
 									if(receiveRedEnvelope.receiveAvatarName != null){
-										html += "<img class='avatar redEnvelopeData' data='"+data+"' src='"+image+"'>";
+										html += "<img class='avatar redEnvelopeData' data='"+_.escape(data)+"' src='"+_.escape(image)+"'>";
 									
 									}else{
-										var avatar = (receiveRedEnvelope.receiveNickname != null && receiveRedEnvelope.receiveNickname !='' ? receiveRedEnvelope.receiveNickname : receiveRedEnvelope.receiveUserName);
+										var avatar = (receiveRedEnvelope.receiveNickname != null && receiveRedEnvelope.receiveNickname !='' ? _.escape(receiveRedEnvelope.receiveNickname) : receiveRedEnvelope.receiveUserName);
 										
 										
-										html += "<img class='avatar redEnvelopeData' data='"+data+"' avatar='"+avatar+"'>";
+										html += "<img class='avatar redEnvelopeData' data='"+_.escape(data)+"' avatar='"+_.escape(avatar)+"'>";
 									}
-									
 									
 								}
 								html_more += "<i class='icon cms-angle-down' page='"+page+"'></i>";

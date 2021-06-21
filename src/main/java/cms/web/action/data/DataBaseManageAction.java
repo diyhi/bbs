@@ -2,15 +2,20 @@ package cms.web.action.data;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import cms.bean.RequestResult;
+import cms.bean.ResultCode;
 import cms.bean.data.TableInfoObject;
 import cms.utils.FileSize;
 import cms.utils.FileUtil;
+import cms.utils.JsonUtils;
 import cms.utils.PathUtil;
 
 import org.springframework.stereotype.Controller;
@@ -35,9 +40,12 @@ public class DataBaseManageAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=backup",method=RequestMethod.GET)
 	public String backupUI(ModelMap model)
 			throws Exception {
+		Map<String,Object> returnValue = new HashMap<String,Object>();
+		
 		long countIndexSize = 0L;
 		long countDataSize = 0L;
 		long countRow = 0L;
@@ -50,11 +58,11 @@ public class DataBaseManageAction {
 			countRow += tableInfoObject.getRows();
 		}
 		
-		model.addAttribute("showTable", tableInfoObjectList);
-		model.addAttribute("countIndexSize", FileSize.conversion(countIndexSize));
-		model.addAttribute("countDataSize",  FileSize.conversion(countDataSize));
-		model.addAttribute("countRow",  countRow);
-		return "jsp/data/dataBackupList";
+		returnValue.put("showTable", tableInfoObjectList);
+		returnValue.put("countIndexSize", FileSize.conversion(countIndexSize));
+		returnValue.put("countDataSize",  FileSize.conversion(countDataSize));
+		returnValue.put("countRow",  countRow);
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
 	}	
 	
 
@@ -64,20 +72,23 @@ public class DataBaseManageAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=backup",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String backup(ModelMap model)
 			throws Exception {
+		//错误
+		Map<String,Object> error = new HashMap<String,Object>();
+		
 		Long count = dataRunMarkManage.taskRunMark_add(-1L);
 		
 		if(count >=0L){
-			return "2";//任务正在运行
+			error.put("backup", "任务正在运行");
 		}else{
 			SimpleDateFormat dateFm = new SimpleDateFormat("yyyy-MM-dd-HHmmss"); //格式化当前系统日期
 			String dateTime = dateFm.format(new java.util.Date());
 			String path = "WEB-INF"+File.separator+"data" +File.separator+"backup" + File.separator+dateTime;
 			
-			//读取当前商城版本
+			//读取当前系统版本
 			String currentVersion = FileUtil.readFileToString("WEB-INF"+File.separator+"data"+File.separator+"systemVersion.txt","utf-8");
 			
 			//写入备份数据库版本
@@ -85,7 +96,11 @@ public class DataBaseManageAction {
 			mySqlDataManage.backup(path);
 		
 		}
-		return "1";
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+		}
 	}
 	
 	
@@ -95,13 +110,13 @@ public class DataBaseManageAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=queryBackupProgress",method=RequestMethod.GET)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String queryBackupProgress(ModelMap model)
 			throws Exception {
 		
 		String backupProgress = mySqlDataManage.getBackupProgress();
-		return backupProgress;
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,backupProgress));
 	}
 	/**
 	 * 查询还原进度
@@ -109,36 +124,39 @@ public class DataBaseManageAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=queryResetProgress",method=RequestMethod.GET)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String queryResetProgress(ModelMap model)
 			throws Exception {
 		String resetProgress = mySqlDataManage.getResetProgress();
-		
-		return resetProgress;
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,resetProgress));
 	}
 	
 	/**
 	 * 还原数据表
 	 * @param dateName 还原数据名称
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=reset",method=RequestMethod.GET)
 	public String resetUI(ModelMap model,String dateName,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
+		Map<String,Object> returnValue = new HashMap<String,Object>();
 		//显示还原数据目录
 		String path = PathUtil.path()+File.separator+"WEB-INF"+File.separator+"data"+File.separator + "backup" + File.separator+FileUtil.toRelativePath(dateName)+ File.separator;
-		model.addAttribute("file", mySqlDataManage.getFile(path));
-		return "jsp/data/dataReset";
+		returnValue.put("fileMap", mySqlDataManage.getFile(path));
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
 	}
 	/**
 	 * 数据还原
 	 * @param dateName 还原数据名称   "2012-07-30-142738"
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=reset",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String reset(ModelMap model,String dateName,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		//错误
+		Map<String,Object> error = new HashMap<String,Object>();
 		
 		//显示还原数据目录
 		String path = "WEB-INF"+File.separator+"data"+File.separator + "backup" + File.separator+FileUtil.toRelativePath(dateName);
@@ -147,19 +165,23 @@ public class DataBaseManageAction {
 		String version = FileUtil.readFileToString(path+File.separator+"version.txt","utf-8");
 		//读取当前BBS版本
 		String currentVersion = FileUtil.readFileToString("WEB-INF"+File.separator+"data"+File.separator+"systemVersion.txt","utf-8");
+		
 		if(!currentVersion.equals(version)){
-			return "3";//备份文件版本和当前BBS系统版本不匹配
-			
-		}
-		
-		
-		Long count = dataRunMarkManage.taskRunMark_add(-1L);
-		
-		if(count >=0L){
-			return "2";//任务正在运行
+			error.put("reset", "备份文件版本和当前BBS系统版本不匹配");
 		}else{
-			mySqlDataManage.reduction(PathUtil.path()+File.separator+path);
+			Long count = dataRunMarkManage.taskRunMark_add(-1L);
+			
+			if(count >=0L){
+				error.put("reset", "任务正在运行");
+			}else{
+				mySqlDataManage.reduction(PathUtil.path()+File.separator+path);
+			}
 		}
-		return "1";
+		
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+		}
 	}
 }

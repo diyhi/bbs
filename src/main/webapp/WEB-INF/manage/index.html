@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<base href="${baseURL}">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>后台管理</title>
+	<meta name="_baseURL" content="${baseURL}"/>
+	<link rel="shortcut icon" type="image/x-icon" href="backstage/images/favicon.ico" media="screen" />
+	<!-- 引入element-plus样式 -->
+	<link href="backstage/element-plus/index.css" rel="stylesheet" >
+	<link href="backstage/css/themify-icons/style.css" type="text/css" rel="stylesheet">
+	<link href="backstage/kindeditor/themes/default/icon.css" rel="stylesheet"/>
+	<style>
+		/*兼容template标签*/
+		template { 
+			display: none !important; 
+	    }
+	</style>
+	
+	<style>
+	
+   [v-cloak]{
+	  display: none;
+	}
+
+
+    </style>
+    
+    
+    
+</head>
+<body>
+
+	<div id="app" >
+		<router-view></router-view>
+	</div>
+
+	<!-- 后台管理框架页 -->
+    <template id="index-template">
+    	<div class="manageModule"><!-- 迷你模式收缩时全部缩进 -->
+			<el-container style="height: 100%;" :class="mini ? 'mini' :''">
+				<!-- 左侧菜单栏 -->
+			    <el-aside :class="isLeftNavigationMenuCollapse ? 'aside-shrink' :'aside-expand'" >
+			   		<!-- 迷你模式不显示 -->
+			    	<div v-show="!mini" v-if="!isLeftNavigationMenuCollapse" class="logo-wrap"><div class=logo></div></div>
+			    	<div v-show="!mini" v-if="isLeftNavigationMenuCollapse" class="logo-icon"><div class=logo></div></div>
+			    	<el-scrollbar>
+						<el-menu v-if="topNavigationActiveIndex ==1 || mini" :default-active="leftNavigationMenuActive" :collapse="isLeftNavigationMenuCollapse" text-color="#606266" class="navigation-menu-left" @open="leftNavigationMenuOpen" @close="leftNavigationMenuClose"  @select="leftNavigationMenuSelect" :default-openeds="leftNavigationMenuOpeneds">
+							<el-submenu index="1-100100" >
+						        <template #title >
+						        	<i class="el-icon-chat-line-square icon"></i>
+						        	<span>话题管理</span>
+						        </template>
+						        <el-menu-item index="1-100100-1" >话题列表</el-menu-item>
+						        <el-menu-item index="1-100100-2">标签列表</el-menu-item>
+								<el-menu-item index="1-100100-3">全部待审核话题</el-menu-item>
+								<el-menu-item index="1-100100-4">全部待审核评论</el-menu-item>
+								<el-menu-item index="1-100100-5">全部待审核回复</el-menu-item>
+								<el-menu-item index="1-100100-6">话题搜索</el-menu-item>
+						    </el-submenu>
+						    <el-submenu index="1-100200">
+						        <template #title>
+						        	<i class="el-icon-question icon"></i>
+						        	<span>问答管理</span>
+						        </template>
+						        <el-menu-item index="1-100200-1">问题列表</el-menu-item>
+						        <el-menu-item index="1-100200-2">标签列表</el-menu-item>
+								<el-menu-item index="1-100200-3">全部待审核问题</el-menu-item>
+								<el-menu-item index="1-100200-4">全部待审核答案</el-menu-item>
+								<el-menu-item index="1-100200-5">全部待审核回复</el-menu-item>
+								<el-menu-item index="1-100200-6">问题搜索</el-menu-item>
+						    </el-submenu>
+						    <el-submenu index="1-100300">
+						        <template #title>
+						        	<i class="el-icon-chat-dot-square icon"></i>
+						        	<span>留言管理</span>
+						        </template>
+						        <el-menu-item index="1-100300-1">留言列表</el-menu-item>
+						    </el-submenu>
+						     <el-submenu index="1-100400">
+						        <template #title>
+						        	<i class="el-icon-link icon"></i>
+						        	<span>友情链接管理</span>
+						        </template>
+						        <el-menu-item index="1-100400-1">友情链接列表</el-menu-item>
+						    </el-submenu>
+						</el-menu>
+						
+						
+						<el-menu v-if="topNavigationActiveIndex ==2 || mini" :default-active="leftNavigationMenuActive" :collapse="isLeftNavigationMenuCollapse" text-color="#606266" class="navigation-menu-left" @open="leftNavigationMenuOpen" @close="leftNavigationMenuClose"  @select="leftNavigationMenuSelect" :default-openeds="leftNavigationMenuOpeneds">
+							<el-submenu index="2-200100" >
+						        <template #title >
+						        	<i class="el-icon-user icon"></i>
+						        	<span>会员管理</span>
+						        </template>
+						        <el-menu-item index="2-200100-1" >会员搜索</el-menu-item>
+						        <el-menu-item index="2-200100-2">会员列表</el-menu-item>
+								<el-menu-item index="2-200100-3">会员角色</el-menu-item>
+								<el-menu-item index="2-200100-4">会员等级</el-menu-item>
+								<el-menu-item index="2-200100-5">会员注册项</el-menu-item>
+								<el-menu-item index="2-200100-6">会员注册禁止用户名称</el-menu-item>
+						    </el-submenu>
+						    <el-submenu index="2-200200">
+						        <template #title>
+						        	<i class="el-icon-tickets icon"></i>
+						        	<span>会员卡管理</span>
+						        </template>
+						        <el-menu-item index="2-200200-1">会员卡列表</el-menu-item>
+						        <el-menu-item index="2-200200-2">会员卡订单列表</el-menu-item>
+						    </el-submenu>
+						    <el-submenu index="2-200300">
+						        <template #title>
+						        	<i class="el-icon-s-custom icon"></i>
+						        	<span>员工管理</span>
+						        </template>
+						        <el-menu-item index="2-200300-1">员工列表</el-menu-item>
+						        <el-menu-item index="2-200300-2">角色列表</el-menu-item>
+						    </el-submenu>
+						</el-menu>
+						
+						<el-menu v-if="topNavigationActiveIndex ==3 || mini" :default-active="leftNavigationMenuActive" :collapse="isLeftNavigationMenuCollapse" text-color="#606266" class="navigation-menu-left" @open="leftNavigationMenuOpen" @close="leftNavigationMenuClose"  @select="leftNavigationMenuSelect" :default-openeds="leftNavigationMenuOpeneds">
+							<el-submenu index="3-300100" >
+						        <template #title >
+						        	<i class="el-icon-help icon"></i>
+						        	<span>帮助管理</span>
+						        </template>
+						        <el-menu-item index="3-300100-1" >帮助分类</el-menu-item>
+						        <el-menu-item index="3-300100-2">帮助列表</el-menu-item>
+						    </el-submenu>
+						    <el-submenu index="3-300200">
+						        <template #title>
+						        	<i class="el-icon-document icon"></i>
+						        	<span>模板管理</span>
+						        </template>
+						        <el-menu-item index="3-300200-1">模板列表</el-menu-item>
+						    </el-submenu>
+						</el-menu>
+						
+						<el-menu v-if="topNavigationActiveIndex ==4 || mini" :default-active="leftNavigationMenuActive" :collapse="isLeftNavigationMenuCollapse" text-color="#606266" class="navigation-menu-left" @open="leftNavigationMenuOpen" @close="leftNavigationMenuClose"  @select="leftNavigationMenuSelect" :default-openeds="leftNavigationMenuOpeneds">
+							<el-submenu index="4-400100" >
+						        <template #title >
+						        	<i class="el-icon-view icon"></i>
+						        	<span>浏览量管理</span>
+						        </template>
+						        <el-menu-item index="4-400100-1" >浏览量列表</el-menu-item>
+						    </el-submenu>
+						    <el-submenu index="4-400200">
+						        <template #title>
+						        	<i class="el-icon-files icon"></i>
+						        	<span>文件打包管理</span>
+						        </template>
+						        <el-menu-item index="4-400200-1">压缩文件列表</el-menu-item>
+						    </el-submenu>
+						    <el-submenu index="4-400300">
+						        <template #title>
+						        	<i class="el-icon-bell icon"></i>
+						        	<span>系统通知管理</span>
+						        </template>
+						        <el-menu-item index="4-400300-1">系统通知列表</el-menu-item>
+						    </el-submenu>
+						    <el-submenu index="4-400400">
+						        <template #title>
+						        	<i class="el-icon-coin icon"></i>
+						        	<span>平台收益管理</span>
+						        </template>
+						        <el-menu-item index="4-400400-1">解锁话题隐藏内容分成</el-menu-item>
+						        <el-menu-item index="4-400400-2">问答悬赏平台分成</el-menu-item>
+						    </el-submenu>
+						    
+						</el-menu>
+						
+						<el-menu v-if="topNavigationActiveIndex ==5 || mini" :default-active="leftNavigationMenuActive" :collapse="isLeftNavigationMenuCollapse" text-color="#606266" class="navigation-menu-left" @open="leftNavigationMenuOpen" @close="leftNavigationMenuClose"  @select="leftNavigationMenuSelect" :default-openeds="leftNavigationMenuOpeneds">
+							<el-submenu index="5-500100" >
+						        <template #title >
+						        	<i class="el-icon-setting icon"></i>
+						        	<span>全站设置</span>
+						        </template>
+						        <el-menu-item index="5-500100-1" >基本设置</el-menu-item>
+						        <el-menu-item index="5-500100-2" >维护数据</el-menu-item>
+						        <el-menu-item index="5-500100-3" >敏感词</el-menu-item>
+						        <el-menu-item index="5-500100-4" >数据库备份/还原</el-menu-item>
+						        <el-menu-item index="5-500100-5" >服务器节点参数</el-menu-item>
+						        <el-menu-item index="5-500100-6" >升级</el-menu-item>
+						    </el-submenu>
+						    <el-submenu index="5-500200">
+						        <template #title>
+						        	<i class="el-icon-wallet icon"></i>
+						        	<span>支付管理</span>
+						        </template>
+						        <el-menu-item index="5-500200-1">在线支付接口</el-menu-item>
+						    </el-submenu>
+						    <el-submenu index="5-500300">
+						        <template #title>
+						        	<i class="el-icon-message icon"></i>
+						        	<span>短信管理</span>
+						        </template>
+						        <el-menu-item index="5-500300-1">短信接口列表</el-menu-item>
+						        <el-menu-item index="5-500300-2">短信发送错误日志</el-menu-item>
+						    </el-submenu>
+						   
+						    <el-submenu index="5-500500">
+						        <template #title>
+						        	<i class="el-icon-s-platform icon"></i>
+						        	<span>第三方服务管理</span>
+						        </template>
+						        <el-menu-item index="5-500500-1">第三方登录接口列表</el-menu-item>
+						    </el-submenu>
+						    
+						    <el-submenu index="5-500700">
+						        <template #title>
+						        	<i class="el-icon-picture-outline icon"></i>
+						        	<span>缩略图管理</span>
+						        </template>
+						        <el-menu-item index="5-500700-1">缩略图列表</el-menu-item>
+						    </el-submenu>
+						</el-menu>
+					<el-scrollbar>
+			    	
+			    </el-aside>
+			    <div class="leftNavigationArrow">
+				    <div class="toggleArrow" :title="isLeftNavigationMenuCollapse ? '展开' :'收缩'" @click="leftNavigationMenuCollapse">
+			    		<i :class="isLeftNavigationMenuCollapse ? 'icon el-icon-arrow-right': 'icon el-icon-arrow-left' " ></i>
+			    		<svg width="10" height="50" xmlns="http://www.w3.org/2000/svg">
+							<path stroke="null" fill-rule="evenodd" fill="#fff" d="m6.606031,3.611539l-6.606031,-3.611539l0,49.75l6.606031,-3.611539c1.926827,-1.053403 3.143969,-3.206725 3.143969,-5.562219l0,-31.402485c0,-2.355494 -1.217141,-4.508816 -3.143969,-5.562219z"/>
+						</svg>
+					</div>
+				</div>
+			    <el-container>
+			    	<!-- 顶部菜单栏 -->
+			    	<el-header>
+			    		<div class="header-box">
+			    		<!-- 迷你模式不显示 -->
+			      		<el-row :gutter="5"  v-show="!mini">
+							<el-col :span="16">
+								<div style="display: flex;">
+									<el-menu :default-active="topNavigationActiveIndex" class="navigation-menu-header" mode="horizontal" @select="topNavigationSelect" text-color="#606266" active-text-color="#409eff">
+										<el-menu-item index="1">内容管理</el-menu-item>
+										<el-menu-item index="2">会员管理</el-menu-item>
+										<el-menu-item index="3">页面管理</el-menu-item>
+										<el-menu-item index="4">运营管理</el-menu-item>
+										<el-menu-item index="5">系统设置</el-menu-item>
+									</el-menu>
+								
+									<div class="browseButtonMenu">
+										<div class="nav-list-item ">
+					                		<div class="browserButton" @click ="retreat()" title="后退">
+					                      		<div class="circle"><i class="el-icon-back" ></i></div>
+					                      	</div>
+							            </div>
+							            <div class="nav-list-item ">
+					                		<div class="browserButton" @click ="advance()" title="前进">
+					                      		<div class="circle"><i class="el-icon-right" ></i></div>
+					                      	</div>
+							            </div>
+							            <div class="nav-list-item ">
+					                		<div class="browserButton" @click="refresh()" title="刷新">
+					                      		<div class="circle"><i class="el-icon-refresh-right" ></i></div>
+					                      	</div>
+							            </div>
+									</div>
+								</div>
+							</el-col>
+							
+							<el-col :span="8">
+								<div class="homeMenu">  
+									<el-tooltip content="网站首页" placement="bottom" effect="light">
+				                		<div class="nav-list-icon" >
+				                			<a class="link-icon" hidefocus="true"  href="" target="_blank"><i class="el-icon-s-home" style="color:#ff9e00;"></i></a>
+				                    	</div>
+			                    	</el-tooltip>
+									<el-tooltip content="后台首页" placement="bottom" effect="light">
+				                		<div class="nav-list-icon" >
+				                			<div class="link-icon" @click="topNavigationHomeLink" >
+											    <i class="el-icon-s-home"></i>
+											</div>
+				                    	</div>
+			                    	</el-tooltip>
+									<el-tooltip content="联系我们" placement="bottom" effect="light">
+				                		<div class="nav-list-icon">	
+				                			<a class="link-icon" hidefocus="true" href="http://www.diyhi.com" target=_blank><i class="el-icon-phone" ></i></a> 
+				                    	</div>
+			                    	</el-tooltip>
+			                		<div class="nav-list-user">
+			                			<el-dropdown>
+			                      			<div>
+												<div class="avatarImg">
+						                      		<el-avatar icon="el-icon-user-solid"></el-avatar>
+						                     	</div>
+						                     	<div class="user-info">
+													<span class="name">{{sysUsers.fullName}}</span>
+													<span class="role">{{sysUsers.userDuty}}</span>
+												</div>
+												<div class="more"><i class="el-icon-arrow-down"></i></div>
+											</div>
+											<template #dropdown>
+											    <el-dropdown-menu>
+											    	<el-dropdown-item icon="el-icon-s-tools" @click="$router.push({path: '/admin/control/staff/manage/editStaff',query:{ userId: sysUsers.userId}})">个人设置</el-dropdown-item>
+											    	<el-dropdown-item icon="el-icon-switch-button" @click="logout()">退出登录</el-dropdown-item>
+											    </el-dropdown-menu>
+											</template>
+										</el-dropdown>
+			                		</div>
+								</div>
+							</el-col>
+						</el-row>
+						<el-row :gutter="20">
+							<el-col :span="24">
+								<div class="tagMenu clearfix">  
+									<span :class="tag.active ? 'item active': 'item'" :key="tag" v-for="(tag,index) in linkTag">  
+										<el-tag closable effect="plain" @click="selectWindow(tag)" @close="closeWindow(tag)">{{tag.name}}</el-tag>
+									</span>
+								</div>
+							</el-col>
+						</el-row>
+			      	</div>
+			      	
+			    	</el-header>
+			    	
+			    	<!-- 内容区 -->
+			    	<el-main>
+					    <router-view v-slot="{ Component }" >
+					        <keep-alive :include="cacheComponents" :max="200"><!-- :max 缓存组件最大数量 -->
+					        	<component :is="Component" :key="$store.getters.cacheKey" v-if="isRouterAlive"/>
+					        	
+					        </keep-alive>
+					    </router-view>
+			    	</el-main>
+			    </el-container>
+			</el-container>
+		</div>
+	</template>  
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+    <!-- 后台首页 -->
+	<template id="home-template">
+		<div>
+			<div class="homeModule">
+				<div class="item">
+					<div class="box">
+						<div class="icon-container"><div class="round round_bg_1"><i class="cms-topic icon color_1"></i></div></div>
+						<div class="info-container">
+							<div class="digital">{{auditTopicCount}}</div>
+							<div class="text">待审核话题总数</div>
+						</div>
+					</div>
+				</div>
+				<div class="item">
+					<div class="box">
+						<div class="icon-container"><div class="round round_bg_2"><i class="cms-comment icon color_2"></i></div></div>
+						<div class="info-container">
+							<div class="digital">{{auditCommentCount}}</div>
+							<div class="text">待审核评论总数</div>
+						</div>
+					</div>
+				</div>
+				<div class="item">
+					<div class="box">
+						<div class="icon-container"><div class="round round_bg_3"><i class="cms-reply icon color_3"></i></div></div>
+						<div class="info-container">
+							<div class="digital">{{auditCommentReplyCount}}</div>
+							<div class="text">待审核评论回复总数</div>
+						</div>
+					</div>
+				</div>
+				<div class="item">
+					<div class="box">
+						<div class="icon-container"><div class="round round_bg_4"><i class="cms-help-alt icon color_4"></i></div></div>
+						<div class="info-container">
+							<div class="digital">{{auditQuestionCount}}</div>
+							<div class="text">待审核问题总数</div>
+						</div>
+					</div>
+				</div>
+				<div class="item">
+					<div class="box">
+						<div class="icon-container"><div class="round round_bg_5"><i class="cms-info-alt icon color_5"></i></div></div>
+						<div class="info-container">
+							<div class="digital">{{auditAnswerCount}}</div>
+							<div class="text">待审核答案总数</div>
+						</div>
+					</div>
+				</div>
+				<div class="item">
+					<div class="box">
+						<div class="icon-container"><div class="round round_bg_6"><i class="el-icon-chat-dot-round icon color_6"></i></div></div>
+						<div class="info-container">
+							<div class="digital">{{auditAnswerReplyCount}}</div>
+							<div class="text">待审核答案回复总数</div>
+						</div>
+					</div>
+				</div>
+				<div class="item">
+					<div class="box">
+						<div class="icon-container"><div class="round round_bg_7"><i class="el-icon-chat-round icon color_7"></i></div></div>
+						<div class="info-container">
+							<div class="digital">{{feedbackCount}}</div>
+							<div class="text">留言总数</div>
+						</div>
+					</div>
+				</div>
+				<div class="item">
+					<div class="box">
+						<div class="icon-container"></div>
+						<div class="info-container">
+							
+						</div>
+					</div>
+				</div>
+			</div> 
+			<div class="main">
+				<div class="data-table" >
+					<el-table ref="multipleTable" :data="tableData" tooltip-effect="dark" style="width: 100%" stripe empty-text="没有内容">
+						<el-table-column prop="ip" label="我的登录IP" align="center" min-width="200"></el-table-column>
+						<el-table-column prop="ipAddress" label="IP归属地" align="center" ></el-table-column>
+						<el-table-column prop="logonTime" label="登录时间" align="center" ></el-table-column>
+					</el-table>
+				</div>
+			</div>  
+		</div>
+	</template>  
+    
+    <!-- 登录 -->
+	<template id="login-template">
+		<div class="loginModule">
+			<div class="login-container">
+				<div class="title">
+		        	<h2>后台登录</h2>
+		        </div>
+		    	<div class="box">
+					<div class="form">
+		                <div class="form-field" >
+			        		<div class="form-field-container" @click="selectedField('username')">
+				        		<div class="form-field-text">
+				        			<div class="form-field-input-container">
+					        			<input v-model.trim="username" @keyup.enter="submitData" v-custom-focus="username_focus" tabindex="1" @keyup.tab="selectedField('username')" @blur="fieldBlur('username')" maxLength="20" class="form-field-text-input" type="text" value="" >
+					        			<label :class="username_field_label_class" >用户名</label>
+				        			</div>
+				        		</div>
+			        			
+			        		</div>
+			        		
+			        	</div>
+			        	<div v-text="error.username" v-show="error.username != ''" class="form-field-prompt-error"></div>
+			        	
+			        	<div class="form-field" >
+			        		<div class="form-field-container" @click="selectedField('password')">
+				        		<div class="form-field-text">
+				        			<div class="form-field-input-container">
+					        			<input v-model.trim="password" @keyup.enter="submitData" v-custom-focus="password_focus" tabindex="2" @keyup.tab="selectedField('password')" @blur="fieldBlur('password')" maxLength="20" class="form-field-text-input" type="password" value="" >
+					        			<label :class="password_field_label_class" >密码</label>
+				        			</div>
+				        		</div>
+			        		</div>
+			        	</div>
+			        	<div v-text="error.password" v-show="error.password != ''" class="form-field-prompt-error"></div>
+			        	<div id="captchaValue_field" class="form-field" v-show="showCaptcha" >
+				        	<div class="form-field-container" @click="selectedField('captchaValue')">
+				        		<div class="form-field-text">
+						        	<div class="form-field-input-container">
+							        	<input v-model.trim="captchaValue" @keyup.enter="submitData" v-custom-focus="captchaValue_focus" tabindex="3" @keyup.tab="selectedField('captchaValue')" @blur="fieldBlur('captchaValue')" @change.native="validation_captchaValue"  class="form-field-text-input" type="text" maxlength="4" value="" >
+							        	<label :class="captchaValue_field_label_class" >验证码</label>
+									</div>
+							        <div class="form-field-image-container">
+										<img :src="imgUrl" @click="replaceCaptcha" tabindex="-1" />
+										
+							        </div>
+							        <div class="form-field-button-container" style="background: #fff;">
+							        	<button type="button" class="btn btn-link" tabindex="-1" @click="replaceCaptcha">换一幅</button>
+							        </div>
+							    </div>
+							    
+							</div>
+			        	</div>
+			        	<div v-text="error.captchaValue" v-show="error.captchaValue != ''"  class="form-field-prompt-error"></div>
+	                </div>
+	            	<div class="loginButton">
+						<span @click="submitData" @keyup.enter="submitData" tabindex="4">登&nbsp;录</span>
+						<div v-text="error.userInfo" v-if="error.userInfo != ''" class="form-error"></div>
+						<div v-text="error.login" v-if="error.login != ''" class="form-error"></div>
+					</div>  
+				</div>
+		
+			</div>
+
+		</div>
+	</template>  
+
+	
+
+	
+</body>
+<script src="backstage/js/lodash.min.js" type="text/javascript"></script>
+<script src="backstage/cryptoJS/core-min.js" type="text/javascript"></script>
+<script src="backstage/cryptoJS/sha256-min.js" type="text/javascript"></script>
+	
+<!-- 引入vue3.0.11 -->
+<script src="backstage/js/vue.global.prod.js" type="text/javascript"></script>
+<script src="backstage/js/vue-router.global.js" type="text/javascript"></script>
+
+
+<!-- vuex需要Promise -->
+<script src="backstage/vuex/es6-promise.auto.min.js" type="text/javascript"></script>
+<script src="backstage/vuex/vuex.global.prod.js" type="text/javascript"></script>
+
+<!-- 引入element-plus组件库 -->
+<script src="backstage/element-plus/index.full.js" type="text/javascript"></script>
+<script src="backstage/element-plus/locale/zh-cn.js" type="text/javascript"></script>
+
+
+<script src="backstage/axios/axios.min.js" type="text/javascript"></script>
+
+
+<!-- WebUploader上传组件和kindeditor.js 和jquery.jclock.js(服务器时钟) 需要jquery -->
+<script src="backstage/jquery/jquery.min.js" type="text/javascript"></script>
+<script src="backstage/kindeditor/kindeditor-min.js" type="text/javascript"></script>
+<!-- 服务器时钟 -->
+<script src="backstage/jquery/jquery.jclock.js" type="text/javascript"></script>
+
+
+
+<!-- 视频播放器 -->
+<script src="backstage/DPlayer/hls.min.js" type="text/javascript" ></script>
+<script src="backstage/DPlayer/DPlayer.min.js" type="text/javascript" ></script>
+
+<!-- 代码高亮 -->
+<link href="backstage/prism/default-block/prism.css" type="text/css" rel="stylesheet">
+<script src="backstage/prism/default-block/prism.js" type="text/javascript"></script>
+<script src="backstage/prism/default-block/clipboard.min.js" type="text/javascript"></script>
+
+<!-- 组件加载 -->
+<script src="backstage/vue3-sfc-loader/vue3-sfc-loader.js" type="text/javascript"></script>
+
+<!-- 代码编辑器 -->
+<link href="backstage/codeMirror/lib/codemirror.css" type="text/css" rel="stylesheet">
+<script src="backstage/codeMirror/lib/codemirror.js"></script>
+<script src="backstage/codeMirror/mode/xml/xml.js"></script>
+<script src="backstage/codeMirror/mode/javascript/javascript.js"></script>
+<script src="backstage/codeMirror/mode/css/css.js"></script>
+<script src="backstage/codeMirror/mode/htmlmixed/htmlmixed.js"></script>
+<script src="backstage/codeMirror/mode/vue/vue.js"></script>
+
+<!-- 头像剪裁 -->
+<link href="backstage/cropperjs/cropper.min.css" type="text/css" rel="stylesheet">
+<script src="backstage/cropperjs/cropper.min.js" type="text/javascript"></script>
+
+<script src="backstage/js/main.js" type="text/javascript"></script>
+<link href="backstage/css/common.css?fdxcdcxcbdd3" type="text/css" rel="stylesheet">
+
+
+<script type="text/javascript">
+//判断浏览器兼容
+(function (w) {  
+    var flag = true;
+
+    var arrowFunction ="var t = () => {};" ;
+ 
+	try{
+		f = new Function(arrowFunction);//支持ES6
+	}catch (e){
+  		flag = false; //不支持ES6
+	}
+
+	//if (!!window.ActiveXObject || "ActiveXObject" in window){//IE6～IE11
+	//	flag = false;
+	//} 
+	
+	if(!flag){
+		var d = document.createElement("div");   
+		d.innerHTML = '<div style="width: 100%;height: 100px;line-height:100px;background: #fcf3e6;color: #e2b46d;font-size: 24px;text-align: center;">您正在使用的浏览器版本过低，将不能正常浏览和使用本网页，建议升级您的浏览器</div>';  
+		var f = function () {  
+			var s = document.getElementsByTagName("body")[0];  
+			if ("undefined" == typeof(s)) {  
+				setTimeout(f, 10) 
+			} else {  
+				s.insertBefore(d, s.firstChild);
+		    }  
+		};  
+		f();
+	}
+	
+	
+	 
+}(window));
+
+</script>
+
+
+</html>

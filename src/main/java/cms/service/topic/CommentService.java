@@ -114,6 +114,11 @@ public interface CommentService  extends DAO<Comment>{
 	 */
 	public Integer markDeleteComment(Long commentId,Integer constant);
 	/**
+	 * 查询待审核评论数量
+	 * @return
+	 */
+	public Long auditCommentCount();
+	/**
 	 * 添加回复
 	 * @param reply
 	*/
@@ -153,6 +158,12 @@ public interface CommentService  extends DAO<Comment>{
 	 */
 	public Reply findReplyByReplyId(Long replyId);
 	/**
+	 * 根据回复Id集合查询回复
+	 * @param replyIdList 回复Id集合
+	 * @return
+	 */
+	public List<Reply> findByReplyIdList(List<Long> replyIdList);
+	/**
 	 * 修改回复
 	 * @param replyId 回复Id
 	 * @param content 回复内容
@@ -182,4 +193,9 @@ public interface CommentService  extends DAO<Comment>{
 	 * @return
 	 */
 	public Integer markDeleteReply(Long replyId,Integer constant);
+	/**
+	 * 查询待审核回复数量
+	 * @return
+	 */
+	public Long auditReplyCount();
 }

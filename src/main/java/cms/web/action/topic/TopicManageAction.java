@@ -31,6 +31,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import cms.bean.PageForm;
 import cms.bean.PageView;
 import cms.bean.QueryResult;
+import cms.bean.RequestResult;
+import cms.bean.ResultCode;
 import cms.bean.mediaProcess.MediaProcessQueue;
 import cms.bean.payment.PaymentLog;
 import cms.bean.redEnvelope.GiveRedEnvelope;
@@ -62,11 +64,9 @@ import cms.utils.FileType;
 import cms.utils.FileUtil;
 import cms.utils.IpAddress;
 import cms.utils.JsonUtils;
-import cms.utils.RedirectPath;
 import cms.utils.SecureLink;
 import cms.utils.UUIDUtil;
 import cms.utils.Verification;
-import cms.web.action.SystemException;
 import cms.web.action.TextFilterManage;
 import cms.web.action.fileSystem.FileManage;
 import cms.web.action.mediaProcess.MediaProcessQueueManage;
@@ -112,21 +112,24 @@ public class TopicManageAction {
 	 * @param topicId
 	 * @param model
 	 * @param pageForm
-	 * @param origin 来源 1.话题列表  2.全部待审核话题 3.全部待审核评论 4.全部待审核回复
 	 * @param request
 	 * @param response
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=view",method=RequestMethod.GET)
-	public String view(Long topicId,Long commentId,ModelMap model,Integer page,Integer origin,
+	public String view(Long topicId,Long commentId,ModelMap model,Integer page,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
+		Map<String,String> error = new HashMap<String,String>();
+		Map<String,Object> returnValue = new LinkedHashMap<String,Object>();
+		
+		
 		
 		if(topicId != null && topicId >0L){
 			Topic topic = topicService.findById(topicId);
-			if(topic == null){
-				throw new SystemException("话题不存在");
-			}else{
+			if(topic != null){
 				if(topic.getIp() != null && !"".equals(topic.getIp().trim())){
 					topic.setIpAddress(IpAddress.queryAddress(topic.getIp().trim()));
 				}
@@ -191,14 +194,14 @@ public class TopicManageAction {
 				
 				if(topic.getGiveRedEnvelopeId() != null && !"".equals(topic.getGiveRedEnvelopeId())){//红包
 					GiveRedEnvelope giveRedEnvelope = redEnvelopeService.findById(topic.getGiveRedEnvelopeId());
-					model.addAttribute("giveRedEnvelope", giveRedEnvelope);
+					returnValue.put("giveRedEnvelope", giveRedEnvelope);
+					
 				}
 				
 				
-				model.addAttribute("topic", topic);
+				returnValue.put("topic", topic);
 				
-				model.addAttribute("availableTag", commentManage.availableTag());
-				model.addAttribute("fileSystem", fileManage.getFileSystem());
+				returnValue.put("availableTag", commentManage.availableTag());
 				
 				PageForm pageForm = new PageForm();
 				pageForm.setPage(page);
@@ -209,11 +212,9 @@ public class TopicManageAction {
 							
 						Integer _page = Integer.parseInt(String.valueOf(row))/settingService.findSystemSetting_cache().getBackstagePageNumber();
 						if(Integer.parseInt(String.valueOf(row))%settingService.findSystemSetting_cache().getBackstagePageNumber() >0){//余数大于0要加1
-							
 							_page = _page+1;
 						}
 						pageForm.setPage(_page);
-						
 					}
 				}
 				
@@ -317,8 +318,6 @@ public class TopicManageAction {
 							}
 							
 						}
-						
-						
 						commentIdList.add(comment.getId());
 						if(comment.getQuote() != null && !"".equals(comment.getQuote().trim())){
 							//旧引用
@@ -328,9 +327,52 @@ public class TopicManageAction {
 									if(new_quoteList.containsKey(quote.getCommentId())){
 										quote.setContent(new_quoteList.get(quote.getCommentId()));
 									}
+									
+									if(quote.getIsStaff() == false){//会员
+										User user = userManage.query_cache_findUserByUserName(quote.getUserName());
+										if(user != null){
+											quote.setNickname(user.getNickname());
+											quote.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+											quote.setAvatarName(user.getAvatarName());
+											userRoleNameMap.put(quote.getUserName(), null);
+										}
+										
+									}
+									
+									
 								}
 							}
 							comment.setQuoteList(quoteList);
+						}
+						
+						
+					}
+				}
+				
+				
+				
+				
+				if(commentIdList != null && commentIdList.size() >0){
+					List<Reply> replyList = commentService.findReplyByCommentId(commentIdList);
+					if(replyList != null && replyList.size() >0){
+						for(Comment comment : commentList){
+							for(Reply reply : replyList){
+								if(reply.getIsStaff() == false){//会员
+									User user = userManage.query_cache_findUserByUserName(reply.getUserName());
+									if(user != null){
+										reply.setNickname(user.getNickname());
+										reply.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+										reply.setAvatarName(user.getAvatarName());
+										userRoleNameMap.put(reply.getUserName(), null);
+									}
+									
+								}
+								
+								if(comment.getId().equals(reply.getCommentId())){
+									comment.addReply(reply);
+								}
+							}
+							
 						}
 					}
 				}
@@ -342,20 +384,6 @@ public class TopicManageAction {
 					}
 				}
 				
-				
-				if(commentIdList != null && commentIdList.size() >0){
-					List<Reply> replyList = commentService.findReplyByCommentId(commentIdList);
-					if(replyList != null && replyList.size() >0){
-						for(Comment comment : commentList){
-							for(Reply reply : replyList){
-								if(comment.getId().equals(reply.getCommentId())){
-									comment.addReply(reply);
-								}
-							}
-							
-						}
-					}
-				}
 				if(commentList != null && commentList.size() >0){
 					for(Comment comment : commentList){
 						//用户角色名称集合
@@ -368,12 +396,43 @@ public class TopicManageAction {
 								break;
 							}
 						}
+						if(comment.getReplyList() != null && comment.getReplyList().size() >0){
+							for(Reply reply : comment.getReplyList()){
+								for (Map.Entry<String, List<String>> entry : userRoleNameMap.entrySet()) {
+									if(entry.getKey().equals(reply.getUserName())){
+										List<String> roleNameList = entry.getValue();
+										if(roleNameList != null && roleNameList.size() >0){
+											reply.setUserRoleNameList(roleNameList);
+										}
+										break;
+									}
+								}
+							}
+						}
+						if(comment.getQuoteList() != null && comment.getQuoteList().size() >0){
+							for(Quote quote : comment.getQuoteList()){
+								//用户角色名称集合
+								for (Map.Entry<String, List<String>> entry : userRoleNameMap.entrySet()) {
+									if(entry.getKey().equals(quote.getUserName())){
+										List<String> roleNameList = entry.getValue();
+										if(roleNameList != null && roleNameList.size() >0){
+											quote.setUserRoleNameList(roleNameList);
+										}
+										break;
+									}
+								}
+								
+								
+							}
+							
+						}
 					}
 				}
 				
 				//将查询结果集传给分页List
 				pageView.setQueryResult(qr);
-				model.addAttribute("pageView", pageView);
+				returnValue.put("pageView", pageView);
+				
 				
 				String username = "";//用户名称
 				
@@ -381,40 +440,53 @@ public class TopicManageAction {
 				if(obj instanceof UserDetails){
 					username =((UserDetails)obj).getUsername();	
 				}
-				model.addAttribute("userName", username);
+				returnValue.put("userName", username);
+				
+				
+				
+				return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
+			}else{
+				error.put("topicId", "话题不存在");
 			}
+		}else{
+			error.put("topicId", "话题Id参数不能为空");
 		}
-		return "jsp/topic/view_topic";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	/**
 	 * 话题   添加界面显示
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=add",method=RequestMethod.GET)
 	public String addUI(Topic topic,ModelMap model,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
+		Map<String,Object> returnValue = new HashMap<String,Object>();
+		
 		String username = "";//用户名称
 		
 		Object obj  =  SecurityContextHolder.getContext().getAuthentication().getPrincipal(); 
 		if(obj instanceof UserDetails){
 			username =((UserDetails)obj).getUsername();	
 		}
-		model.addAttribute("userName", username);
+		returnValue.put("userName", username);
 		List<UserGrade> userGradeList = userGradeService.findAllGrade();
-		model.addAttribute("userGradeList", JsonUtils.toJSONString(userGradeList));
-		
-		model.addAttribute("fileSystem", fileManage.getFileSystem());
-		return "jsp/topic/add_topic";
+		returnValue.put("userGradeList", userGradeList);
+
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
 	}
 	
 	/**
 	 * 话题  添加
-	 * isTopicList 上一链接是否来自话题列表
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=add", method=RequestMethod.POST)
 	public String add(ModelMap model,Long tagId,String tagName, String title,Boolean allow,Integer status,
-			String content,String sort,Boolean isTopicList,
+			String content,String sort,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
+		
 		Topic topic = new Topic();
 		List<String> imageNameList = null;
 		boolean isImage = false;//是否含有图片
@@ -558,9 +630,7 @@ public class TopicManageAction {
 			error.put("sort", "排序不能为空");
 		}
 		
-		if(error != null && error.size() >0){
-			model.addAttribute("error", error);
-		}else{
+		if(error.size() ==0){
 			topicService.saveTopic(topic,null,null,null,null);
 			topicManage.delete_cache_markUpdateTopicStatus(topic.getId());//删除 标记修改话题状态
 			//更新索引
@@ -656,24 +726,10 @@ public class TopicManageAction {
 				}
 			}
 			
-			
-			
-			model.addAttribute("message","添加话题成功");//返回消息
-			if(isTopicList != null && isTopicList == true){
-				model.addAttribute("urladdress", RedirectPath.readUrl("control.topic.list")+"?visible=true");
-			}else{
-				model.addAttribute("urladdress", RedirectPath.readUrl("control.topic.manage")+"?method=list&visible=true&tagId="+tagId);
-			}
-			
-			return "jsp/common/message";
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 			
 		}
-		topic.setTitle(title);
-		topic.setContent(content);
-		model.addAttribute("topic",topic);
-		model.addAttribute("userName", username);
-		model.addAttribute("userGradeList", JsonUtils.toJSONString(userGradeList));
-		return "jsp/topic/add_topic";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	
@@ -692,10 +748,10 @@ public class TopicManageAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=upload",method=RequestMethod.POST)
-	@ResponseBody//方式来做ajax,直接返回字符串
 	public String upload(ModelMap model,String dir,String userName, Boolean isStaff,String fileName,
-			MultipartFile imgFile, HttpServletResponse response) throws Exception {
+			MultipartFile file, HttpServletResponse response) throws Exception {
 		
 		String number = topicManage.generateFileNumber(userName, isStaff);
 		
@@ -834,9 +890,9 @@ public class TopicManageAction {
 			
 			}else{//0.本地系统
 				
-				if(imgFile != null && !imgFile.isEmpty()){
+				if(file != null && !file.isEmpty()){
 					//当前文件名称
-					String sourceFileName = imgFile.getOriginalFilename();
+					String sourceFileName = file.getOriginalFilename();
 				
 					//取得文件后缀
 					String suffix = FileUtil.getExtension(sourceFileName).toLowerCase();
@@ -846,11 +902,11 @@ public class TopicManageAction {
 						List<String> formatList = CommentedProperties.readRichTextAllowImageUploadFormat();
 
 						//验证文件类型
-						boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
+						boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),formatList);
 						
 						//如果用flash控件上传
-						if(imgFile.getContentType().equalsIgnoreCase("application/octet-stream")){
-							String fileType = FileType.getType(imgFile.getInputStream());
+						if(file.getContentType().equalsIgnoreCase("application/octet-stream")){
+							String fileType = FileType.getType(file.getInputStream());
 							for (String format :formatList) {
 								if(format.equalsIgnoreCase(fileType)){
 									authentication = true;
@@ -874,12 +930,12 @@ public class TopicManageAction {
 							//生成锁文件
 							fileManage.addLock(lockPathDir,date +"_image_"+newFileName);
 							//保存文件
-							fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
+							fileManage.writeFile(pathDir, newFileName,file.getBytes());
 							
 							//上传成功
 							returnJson.put("error", 0);//0成功  1错误
 							returnJson.put("url", fileManage.fileServerAddress()+"file/topic/"+date+"/image/"+newFileName);
-							returnJson.put("title", imgFile.getOriginalFilename());//旧文件名称
+							returnJson.put("title", file.getOriginalFilename());//旧文件名称
 							return JsonUtils.toJSONString(returnJson);
 						}else{
 							errorMessage = "当前文件类型不允许上传";
@@ -890,7 +946,7 @@ public class TopicManageAction {
 						flashFormatList.add("swf");
 						
 						//验证文件后缀
-						boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),flashFormatList);
+						boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),flashFormatList);
 						
 						if(authentication){
 							
@@ -908,13 +964,13 @@ public class TopicManageAction {
 							//生成锁文件
 							fileManage.addLock(lockPathDir,date +"_flash_"+newFileName);
 							//保存文件
-							fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
+							fileManage.writeFile(pathDir, newFileName,file.getBytes());
 							
 							
 							//上传成功
 							returnJson.put("error", 0);//0成功  1错误
 							returnJson.put("url", fileManage.fileServerAddress()+"file/topic/"+date+"/flash/"+newFileName);
-							returnJson.put("title", imgFile.getOriginalFilename());//旧文件名称
+							returnJson.put("title", file.getOriginalFilename());//旧文件名称
 							return JsonUtils.toJSONString(returnJson);
 						}else{
 							errorMessage = "当前文件类型不允许上传";
@@ -924,7 +980,7 @@ public class TopicManageAction {
 						List<String> formatList = CommentedProperties.readRichTextAllowVideoUploadFormat();
 						
 						//验证文件后缀
-						boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
+						boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),formatList);
 						
 						if(authentication){
 							
@@ -942,12 +998,12 @@ public class TopicManageAction {
 							//生成锁文件
 							fileManage.addLock(lockPathDir,date +"_media_"+newFileName);
 							//保存文件
-							fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
+							fileManage.writeFile(pathDir, newFileName,file.getBytes());
 
 							//上传成功
 							returnJson.put("error", 0);//0成功  1错误
 							returnJson.put("url", fileManage.fileServerAddress()+"file/topic/"+date+"/media/"+newFileName);
-							returnJson.put("title", imgFile.getOriginalFilename());//旧文件名称
+							returnJson.put("title", file.getOriginalFilename());//旧文件名称
 							return JsonUtils.toJSONString(returnJson);
 						}else{
 							errorMessage = "当前文件类型不允许上传";
@@ -957,7 +1013,7 @@ public class TopicManageAction {
 						List<String> formatList = CommentedProperties.readRichTextAllowFileUploadFormat();
 						
 						//验证文件后缀
-						boolean authentication = FileUtil.validateFileSuffix(imgFile.getOriginalFilename(),formatList);
+						boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),formatList);
 						if(authentication){
 							
 							//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
@@ -974,12 +1030,12 @@ public class TopicManageAction {
 							//生成锁文件
 							fileManage.addLock(lockPathDir,date +"_file_"+newFileName);
 							//保存文件
-							fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
+							fileManage.writeFile(pathDir, newFileName,file.getBytes());
 
 							//上传成功
 							returnJson.put("error", 0);//0成功  1错误
 							returnJson.put("url", fileManage.fileServerAddress()+"file/topic/"+date+"/file/"+newFileName);
-							returnJson.put("title", imgFile.getOriginalFilename());//旧文件名称
+							returnJson.put("title", file.getOriginalFilename());//旧文件名称
 							return JsonUtils.toJSONString(returnJson);
 						}else{
 							errorMessage = "当前文件类型不允许上传";
@@ -1006,9 +1062,13 @@ public class TopicManageAction {
 	 * 话题   修改界面显示
 	 * 
 	 */
+	@ResponseBody
 	@RequestMapping(params="method=edit", method=RequestMethod.GET)
-	public String editUI(ModelMap model,Long topicId,Boolean visible,
+	public String editUI(ModelMap model,Long topicId,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		Map<String,String> error = new HashMap<String,String>();
+		Map<String,Object> returnValue = new HashMap<String,Object>();
+
 		if(topicId != null && topicId >0L){
 			Topic topic = topicService.findById(topicId);
 			if(topic != null){
@@ -1025,17 +1085,22 @@ public class TopicManageAction {
 						}
 					}
 				}	
+				
+				returnValue.put("topic", topic);
+				
+				List<UserGrade> userGradeList = userGradeService.findAllGrade();
+				returnValue.put("userGradeList", userGradeList);
+				
+				return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
 			}else{
-				throw new SystemException("话题不存在");
+				error.put("topicId", "话题不存在");
 			}	
-			model.addAttribute("topic", topic);
 			
-			List<UserGrade> userGradeList = userGradeService.findAllGrade();
-			model.addAttribute("userGradeList", JsonUtils.toJSONString(userGradeList));
 			
-			model.addAttribute("fileSystem", fileManage.getFileSystem());
+		}else{
+			error.put("topicId", "话题Id不能为空");
 		}
-		return "jsp/topic/edit_topic";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	/**
 	 * 话题   修改
@@ -1045,14 +1110,12 @@ public class TopicManageAction {
 	 * @param title
 	 * @param content
 	 * @param sort 
-	 * @param visible
-	 * @param isTopicList 上一链接是否来自话题列表
 	 */
-	@ResponseBody//方式来做ajax,直接返回字符串
+	@ResponseBody
 	@RequestMapping(params="method=edit", method=RequestMethod.POST)
 	public String edit(ModelMap model,Long topicId,Long tagId,
 			String tagName,String title,Boolean allow,Integer status,
-			String content,String sort,Boolean visible,Boolean isTopicList,
+			String content,String sort,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Topic topic = null;
 		List<String> imageNameList = null;
@@ -1075,17 +1138,21 @@ public class TopicManageAction {
 		//旧状态
 		Integer old_status = -1;
 		
+		
+		if(status == null){
+			error.put("status", "话题状态不能为空");
+		}
+		
+		
 		String old_content = "";
 		if(topicId != null && topicId >0L){
 			topic = topicService.findById(topicId);
-			if(topic != null){
+			if(topic != null && error.size() ==0){
 				old_status = topic.getStatus();
 				topic.setTagId(tagId);
 				topic.setTagName(tagName);
 				topic.setAllow(allow);
-				if(topic.getStatus() < 100){
-					topic.setStatus(status);
-				}
+				topic.setStatus(status);
 				
 				if(topic.getImage() != null && !"".equals(topic.getImage().trim())){
 					oldBeforeImageList = JsonUtils.toGenericObject(topic.getImage().trim(),new TypeReference< List<ImageInfo> >(){});
@@ -1211,7 +1278,7 @@ public class TopicManageAction {
 					//更新索引
 					topicIndexService.addTopicIndex(new TopicIndex(String.valueOf(topic.getId()),2));
 					
-					if(i >0 && topic.getStatus() < 100 && !old_status.equals(status)){
+					if(i >0 && !old_status.equals(status)){
 						User user = userManage.query_cache_findUserByUserName(topic.getUserName());
 						if(user != null){
 							//修改用户动态话题状态
@@ -1505,29 +1572,27 @@ public class TopicManageAction {
 			error.put("topic", "Id不存在");
 		}
 		
-		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
-		
-		if(error != null && error.size() >0){
-			returnValue.put("success", "false");
-			returnValue.put("error", error);
-		}else{
-			returnValue.put("success", "true");
+		if(error.size()==0){
 			
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 		}
-		return JsonUtils.toJSONString(returnValue);
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	/**
 	 * 话题   删除
 	 * @param model
-	 * @param informationId
-	 * @param visible
-	*/
+	 * @param topicId 话题Id集合
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	@RequestMapping(params="method=delete", method=RequestMethod.POST)
 	@ResponseBody//方式来做ajax,直接返回字符串
 	public String delete(ModelMap model,Long[] topicId,
-			Boolean isTopicList,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
-		
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
 		
 		String username = "";//用户名称
 		String userId = "";//用户Id
@@ -1717,11 +1782,15 @@ public class TopicManageAction {
 						
 						
 					}	
-					return"1";	
+					return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 				}
+			}else{
+				error.put("topicId", "话题Id不能为空");
 			}
+		}else{
+			error.put("topicId", "话题Id不存在");
 		}
-		return"0";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	/**
@@ -1735,6 +1804,9 @@ public class TopicManageAction {
 	@ResponseBody//方式来做ajax,直接返回字符串
 	public String reduction(ModelMap model,Long[] topicId,
 			HttpServletResponse response) throws Exception {
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
+		
 		if(topicId != null && topicId.length>0){
 			
 			List<Topic> topicList = topicService.findByIdList(Arrays.asList(topicId));
@@ -1754,10 +1826,14 @@ public class TopicManageAction {
 					topicManage.deleteTopicCache(topic.getId());//删除缓存
 				}
 		
-				return "1";
-			}	
+				return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+			}else{
+				error.put("topic", "话题不能为空");
+			}
+		}else{
+			error.put("topic", "话题Id不能为空");
 		}
-		return "0";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	/**
@@ -1771,6 +1847,8 @@ public class TopicManageAction {
 	@ResponseBody//方式来做ajax,直接返回字符串
 	public String auditTopic(ModelMap model,Long topicId,
 			HttpServletResponse response) throws Exception {
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
 		if(topicId != null && topicId>0L){
 			int i = topicService.updateTopicStatus(topicId, 20);
 
@@ -1786,9 +1864,11 @@ public class TopicManageAction {
 			//更新索引
 			topicIndexService.addTopicIndex(new TopicIndex(String.valueOf(topicId),2));
 			topicManage.deleteTopicCache(topicId);//删除缓存
-			return "1";
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+		}else{
+			error.put("topicId", "话题Id不能为空");
 		}
-		return "0";
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	
 	

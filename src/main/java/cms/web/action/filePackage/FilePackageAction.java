@@ -13,9 +13,13 @@ import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import cms.bean.RequestResult;
+import cms.bean.ResultCode;
 import cms.bean.filePackage.FilePackage;
 import cms.utils.FileSize;
+import cms.utils.JsonUtils;
 import cms.utils.PathUtil;
 
 
@@ -29,6 +33,7 @@ public class FilePackageAction {
 	/**
 	 * 文件打包管理列表
 	 */
+	@ResponseBody
 	@RequestMapping("/control/filePackage/list")  
 	public String execute(ModelMap model)
 			throws Exception {	
@@ -60,9 +65,7 @@ public class FilePackageAction {
 		
 		//排序
         Collections.sort(filePackageList, new ComparatorDate());  
-        
-		model.addAttribute("filePackageList",filePackageList);
-		return "jsp/filePackage/filePackageList";
+        return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,filePackageList));
 	}
 	
 	/**

@@ -2,6 +2,7 @@ package cms.web.action.question;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,13 +14,17 @@ import javax.servlet.http.HttpServletResponse;
 import cms.bean.PageForm;
 import cms.bean.PageView;
 import cms.bean.QueryResult;
+import cms.bean.RequestResult;
+import cms.bean.ResultCode;
 import cms.bean.question.QuestionTag;
 import cms.service.question.QuestionTagService;
 import cms.service.setting.SettingService;
+import cms.utils.JsonUtils;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * 问题标签
@@ -34,9 +39,14 @@ public class QuestionTagAction {
 	 * parentId 父ID 
 	 * name 标签名称
 	 */
+	@ResponseBody
 	@RequestMapping("/control/questionTag/list") 
 	public String execute(ModelMap model,PageForm pageForm,Long parentId,String name,
 			HttpServletRequest request, HttpServletResponse response)throws Exception {	
+		//错误
+		Map<String,String> error = new HashMap<String,String>();
+		Map<String,Object> returnValue = new HashMap<String,Object>();
+		
 		StringBuffer jpql = new StringBuffer("");
 		//存放参数值
 		List<Object> params = new ArrayList<Object>();
@@ -69,7 +79,7 @@ public class QuestionTagAction {
 		
 
 		pageView.setQueryResult(qr);
-		model.addAttribute("pageView", pageView);
+		returnValue.put("pageView", pageView);
 		
 		//标签路径
 		if(parentId != null && parentId >0){
@@ -83,10 +93,14 @@ public class QuestionTagAction {
 				navigation.put(t.getId(), t.getName());
 			}
 			
-			model.addAttribute("navigation", navigation);//标签导航
+			returnValue.put("navigation", navigation);//标签导航
 		}
 		
-		return "jsp/question/questionTagList";
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
+		}
 	}
 	
 	

@@ -39,9 +39,31 @@ public class TopicUnhidePlatformShare implements Serializable{
 	/** 发布话题的用户名称 **/
 	@Column(length=80)
 	private String postUserName;
+	/** 发布话题的用户呢称 **/
+	@Transient
+	private String postNickname;
+	/** 发布话题的用户头像路径 **/
+	@Transient
+	private String postAvatarPath;
+	/** 发布话题的用户头像名称 **/
+	@Transient
+	private String postAvatarName;
+	
+	
+	
 	/** 解锁话题的用户名称 **/ 
 	@Column(length=30)
 	private String unlockUserName;
+	/** 解锁话题的用户呢称 **/
+	@Transient
+	private String unlockNickname;
+	/** 解锁话题的用户头像路径 **/
+	@Transient
+	private String unlockAvatarPath;
+	/** 解锁话题的用户头像名称 **/
+	@Transient
+	private String unlockAvatarName;
+	
 	/** 平台分成比例 **/
 	private Integer platformShareProportion;
 	
@@ -170,6 +192,66 @@ public class TopicUnhidePlatformShare implements Serializable{
 
 	public void setTopicTitle(String topicTitle) {
 		this.topicTitle = topicTitle;
+	}
+
+
+	public String getPostNickname() {
+		return postNickname;
+	}
+
+
+	public void setPostNickname(String postNickname) {
+		this.postNickname = postNickname;
+	}
+
+
+	public String getPostAvatarPath() {
+		return postAvatarPath;
+	}
+
+
+	public void setPostAvatarPath(String postAvatarPath) {
+		this.postAvatarPath = postAvatarPath;
+	}
+
+
+	public String getPostAvatarName() {
+		return postAvatarName;
+	}
+
+
+	public void setPostAvatarName(String postAvatarName) {
+		this.postAvatarName = postAvatarName;
+	}
+
+
+	public String getUnlockNickname() {
+		return unlockNickname;
+	}
+
+
+	public void setUnlockNickname(String unlockNickname) {
+		this.unlockNickname = unlockNickname;
+	}
+
+
+	public String getUnlockAvatarPath() {
+		return unlockAvatarPath;
+	}
+
+
+	public void setUnlockAvatarPath(String unlockAvatarPath) {
+		this.unlockAvatarPath = unlockAvatarPath;
+	}
+
+
+	public String getUnlockAvatarName() {
+		return unlockAvatarName;
+	}
+
+
+	public void setUnlockAvatarName(String unlockAvatarName) {
+		this.unlockAvatarName = unlockAvatarName;
 	}
 	
 	

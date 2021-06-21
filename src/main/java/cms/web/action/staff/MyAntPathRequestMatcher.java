@@ -41,6 +41,9 @@ import org.springframework.util.StringUtils;
  * for this class for comprehensive information on the syntax used.
  * </p>
  *	URL匹配(修改matches方法，以支持带参数的URL匹配)
+ * @author Luke Taylor
+ * @author Rob Winch
+ * @since 3.1
  *
  * @see org.springframework.util.AntPathMatcher
  */
