@@ -125,6 +125,8 @@ public class LayoutManageAction {
 		layout.setType(formbean.getType());
 		layout.setDirName(formbean.getDirName());
 		
+
+		
 		//根据模板目录名称查询模板
 		if(formbean.getDirName() != null && !"".equals(formbean.getDirName().trim())){
 			Templates templates = templateService.findTemplatebyDirName(formbean.getDirName().trim());
@@ -324,6 +326,17 @@ public class LayoutManageAction {
 				layout.setReferenceCode("quote_1");
 			}
 		}
+		
+		
+		if(error.size() == 0){
+			if((layout.getType().equals(1) || layout.getType().equals(4)) && layout.getReferenceCode() != null && !"".equals(layout.getReferenceCode().trim())){
+				if(!StringUtils.startsWithIgnoreCase(layout.getReferenceCode(), "user/")){//判断开始部分是否与二参数相同。不区分大小写
+					layout.setAccessRequireLogin(formbean.isAccessRequireLogin());
+				}
+			}
+		}
+		
+		
 
 		if(error.size() == 0){
 			if(layout.getSort() != null && layout.getSort() <= 1){
@@ -520,7 +533,14 @@ public class LayoutManageAction {
 					}
 					
 				}
-				
+				if(error.size() == 0){
+					layout.setAccessRequireLogin(false);
+					if((layout.getType().equals(1) || layout.getType().equals(4)) && layout.getReferenceCode() != null && !"".equals(layout.getReferenceCode().trim())){
+						if(!StringUtils.startsWithIgnoreCase(layout.getReferenceCode(), "user/")){//判断开始部分是否与二参数相同。不区分大小写
+							layout.setAccessRequireLogin(formbean.isAccessRequireLogin());
+						}
+					}
+				}
 				
 				if(error.size() == 0){
 					templateService.updateLayoutById(layout);
@@ -831,11 +851,11 @@ public class LayoutManageAction {
 					if(pc_f.exists()){
 						//调用文件编码判断类
 						String coding = Coding.detection(pc_f);
-						InputStreamReader read = new InputStreamReader (new FileInputStream(pc_f),coding); 
-						BufferedReader br = new BufferedReader(read);
-						String row;
-						while((row = br.readLine())!=null){	
-							pc_html.append(row).append("\n");
+						try (InputStreamReader read = new InputStreamReader (new FileInputStream(pc_f),coding); BufferedReader br = new BufferedReader(read);){
+							String row;
+							while((row = br.readLine())!=null){	
+								pc_html.append(row).append("\n");
+							}
 						}
 						returnValue.put("isPCHtmlExist", true);
 					}else{
@@ -847,11 +867,11 @@ public class LayoutManageAction {
 					if(wap_f.exists()){
 						//调用文件编码判断类
 						String coding = Coding.detection(wap_f);
-						InputStreamReader read = new InputStreamReader (new FileInputStream(wap_f),coding); 
-						BufferedReader br = new BufferedReader(read);
-						String row;
-						while((row = br.readLine())!=null){		
-							wap_html.append(row).append("\n");
+						try (InputStreamReader read = new InputStreamReader (new FileInputStream(wap_f),coding); BufferedReader br = new BufferedReader(read);){
+							String row;
+							while((row = br.readLine())!=null){		
+								wap_html.append(row).append("\n");
+							}
 						}
 						returnValue.put("isWapHtmlExist", true);
 					}else{

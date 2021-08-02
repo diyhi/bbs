@@ -4498,7 +4498,6 @@ _extend(KEdit, KWidget, {
 		}
 		K(body).bind('paste', timeoutHandler);
 		K(body).bind('cut', timeoutHandler);
-		
 		$(doc).on('customChange',function() {//监听自定义change事件，
 	    	fn();
 	    });
@@ -6904,6 +6903,8 @@ _plugin('core', function(K) {
 			self.toolbar.disableAll(true);
 			self.edit.design(false);
 			self.toolbar.select('source');
+			var autoheight = self.edit.doc.body.scrollHeight;
+			self.edit.setHeight(autoheight);
 		} else {
 			self.toolbar.disableAll(false);
 			self.edit.design(true);
@@ -7765,6 +7766,7 @@ KindEditor.plugin('autoheight', function(K) {
 	if (!self.autoHeightMode) {
 		return;
 	}
+	
 	var minHeight = K.removeUnit(self.height);
 	function hideScroll() {
 		var edit = self.edit;
@@ -8144,7 +8146,7 @@ KindEditor.plugin('code', function(K) {
 						self.cmd.range.insertNode(codeNode[0]).selectNodeContents(codeNode[0]).collapse(false);
 						self.cmd.select();
 						
-						
+						self.edit.trigger();//触发事件
 						//setTimeout(function() {
 							//选中焦点
 						//	var ancestor2 = K(self.cmd.range.commonAncestor());

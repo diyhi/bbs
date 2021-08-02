@@ -180,7 +180,10 @@ public class ForumCodeManage {
 							count++;
 							//版块代码文件
 							ForumCodeNode forumCodeNode = new ForumCodeNode();
-							forumCodeNode.setNodeId(Integer.parseInt("99000"+count));
+							String first_afterNumber = String.format("%02d", i%100);//两位数字
+							String second_afterNumber = String.format("%02d", j%100);//两位数字
+
+							forumCodeNode.setNodeId(Integer.parseInt("9"+first_afterNumber+second_afterNumber+count));
 							forumCodeNode.setNodeName(forumCodeFile.getFileName());
 							forumCodeNode.setRemark(forumCodeFile.getRemark());
 							forumCodeNode.setPc_lastTime(forumCodeFile.getPc_lastTime());

@@ -104,7 +104,7 @@ public class RedEnvelopeFormAction {
 		//拆红包获得金额
 		BigDecimal receiveRedEnvelopeAmount = null;
 		
-		if(RateLimiterUtil.apply("giveRedEnvelope-"+giveRedEnvelopeId, 50)){//限流
+		if(RateLimiterUtil.apply_minutes("giveRedEnvelope-"+giveRedEnvelopeId, 50)){//限流
 			//获取登录用户
 		  	AccessUser accessUser = AccessUserThreadLocal.get();
 		  	GiveRedEnvelope giveRedEnvelope = null;

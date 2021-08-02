@@ -5,7 +5,7 @@
 			<div class="navbar">
 				<el-button type="primary" plain size="small" @click="$router.push({path: '/admin/control/disableUserName/list',query:{ page : ($route.query.superiorPage != undefined ? $route.query.superiorPage :'')}})">返回</el-button>
 			</div>
-			<div class="data-form" >
+			<div class="data-form label-width-blank" >
 				<el-form label-width="auto"  @submit.native.prevent>
 					<el-form-item label="名称" :required="true" :error="error.name">
 						<el-input v-model.trim="name" maxlength="100"></el-input>

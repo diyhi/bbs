@@ -2,14 +2,16 @@ package cms.web.action.template;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.annotation.Resource;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-
 import cms.bean.template.Forum;
 import cms.bean.template.Forum_AdvertisingRelated_Image;
 import cms.bean.template.Forum_CustomForumRelated_CustomHTML;
@@ -20,7 +22,12 @@ import cms.utils.JsonUtils;
 import cms.web.action.TextFilterManage;
 import cms.web.action.fileSystem.localImpl.LocalFileManage;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Component;
 
 /**
@@ -28,10 +35,21 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component("layoutManage")
-public class LayoutManage {
+public class LayoutManage{
+	private static final Logger logger = LogManager.getLogger(LayoutManage.class);
+	
 	@Resource TemplateService templateService;//通过接口引用代理返回的对象
 	@Resource TextFilterManage textFilterManage;
 	@Resource LocalFileManage localFileManage;
+	@Resource LayoutManage layoutManage;
+	
+	
+	private AtomicLong number = new AtomicLong(new Random().nextLong());
+	
+	private List<AntPathRequestMatcher> antPathRequestMatcherList = new ArrayList<AntPathRequestMatcher>(Arrays.asList(new AntPathRequestMatcher("/user/**")));
+	private String layoutUrlVersion = "";
+	private String antPathRequestMatcherVersion = "";
+	
 	
 	/**
 	 * 查询‘更多’
@@ -192,6 +210,86 @@ public class LayoutManage {
 	
 	
 	
+	/**
+	 * 查询布局路径集合
+	 * @return
+	 */
+	@Cacheable(value="templateServiceBean_cache",key="'queryLoginValidationPath'")
+	public List<String> queryLayoutUrlList(){ 
+		//查询需要登录权限的布局URL
+		List<String> layoutUrlList = new ArrayList<String>();
+		layoutUrlList.add("/user/**");
+		
+		String dirName = templateService.findTemplateDir();
+		
+		List<Layout> layoutList = templateService.findLayout(dirName);
+		if(layoutList != null && layoutList.size() >0){
+			for(Layout layout : layoutList){
+				if((layout.getType().equals(1) || layout.getType().equals(4)) && layout.getReferenceCode() != null && !"".equals(layout.getReferenceCode().trim())){
+					if(!StringUtils.startsWithIgnoreCase(layout.getReferenceCode(), "user/") && layout.isAccessRequireLogin()){//判断开始部分是否与二参数相同。不区分大小写
+						layoutUrlList.add("/"+layout.getReferenceCode());
+						
+					}
+				}
+			}
+		}
+		
+		layoutUrlVersion = RandomStringUtils.random(16);
+		
+		return 	layoutUrlList;
+	}
+	
+	
+	/**
+	 * 查询需要登录验证的路径
+	 * @return
+	 */
+	public AntPathRequestMatcher[] queryLoginValidationPath(){
+   
+		number.incrementAndGet();
+
+		return antPathRequestMatcherList.toArray(new AntPathRequestMatcher[antPathRequestMatcherList.size()]);
+	}
+	
+	
+	/**
+	 * 定时处理布局路径
+	 * 由Spring定时器调用 每3秒钟运行一次
+	 */
+	public void timerProcessLayoutUrl(){
+		if(number.get() !=0L){
+			this.processLayoutUrl();
+			number.set(0L);
+		}
+	}
+	
+	
+	/**
+	 * 处理布局路径
+	 * 由Spring定时器调用 每3秒钟运行一次
+	 */
+	private void processLayoutUrl(){
+		try {
+			List<String> layoutUrlList = layoutManage.queryLayoutUrlList();
+			if(!layoutUrlVersion.equals(antPathRequestMatcherVersion)){
+				
+				//指定的URL下工作
+				List<AntPathRequestMatcher> filterMatchers = new ArrayList<AntPathRequestMatcher>();
+				for(int i=0; i<layoutUrlList.size(); i++){
+					filterMatchers.add(new AntPathRequestMatcher(layoutUrlList.get(i))); 
+				}
+				antPathRequestMatcherList = filterMatchers;
+				antPathRequestMatcherVersion = layoutUrlVersion;
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+			if (logger.isErrorEnabled()) {
+	            logger.error("处理布局路径异常",e);
+	        }
+		}
+		
+	}
 	
 	
 }

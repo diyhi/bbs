@@ -30,7 +30,7 @@ public class AccessSourceDeviceManage {
 	 */
 	public String accessDevices(HttpServletRequest request) {
 		SystemSetting systemSetting = settingService.findSystemSetting_cache();
-		if(systemSetting.getSupportAccessDevice() != null){
+		if(systemSetting != null && systemSetting.getSupportAccessDevice() != null){
 			if(systemSetting.getSupportAccessDevice().equals(2)){
 				return "pc";//电脑端
 			}else if(systemSetting.getSupportAccessDevice().equals(3)){

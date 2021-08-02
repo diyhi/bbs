@@ -38,10 +38,16 @@
 						</el-radio-group>
 					</el-form-item>
 	
-					<el-form-item label="URL名称" v-if="type != 1 && type != 3" :required="true" :error="error.referenceCode">
+					<el-form-item label="URL名称" v-if="type == 4" :required="true" :error="error.referenceCode">
 						<el-input v-model.trim="referenceCode" maxlength="40" clearable="true" show-word-limit @blur="checkUrlName"></el-input>
 						<div class="form-help" >URL名称只能输入由数字、26个英文字母、下划线和或者左斜杆组成，左斜杆不能在最前面或最后面或连续出现。例一：aaa/ggg &nbsp;&nbsp; 例二：aaa </div>
 					</el-form-item>
+					<el-form-item label="访问需要登录" v-if="type != 5 && type != 6">
+						<el-switch v-model="accessRequireLogin" :disabled="disabled_accessRequireLogin"></el-switch>
+						<div class="form-help" >访问URI为user/开头的地址则默认需要登录后才能访问，本设置无效</div>
+						<div v-if="disabled_accessRequireLogin" style="color: #ffa940;">URL名称为user/开头的地址不需要设置本参数</div>
+					</el-form-item>
+					
 					<el-form-item>
 					    <el-button type="primary" class="submitButton" @click="submitForm" :disabled="submitForm_disabled">提交</el-button>
 					</el-form-item>
@@ -67,6 +73,10 @@ export default({
 			layoutFile: '',
 			forumData: 3,
 			returnData: 0,
+			accessRequireLogin :false,//访问需要登录
+			
+			disabled_accessRequireLogin:false,
+			
 			
 			options: [{//类型
 				value: 1,
@@ -108,6 +118,18 @@ export default({
 		}
 		
 		this.queryLayoutList();
+	},
+	watch: {
+		//监听版块子类型值变化
+		referenceCode: {
+	　　　　handler(newValue, oldValue) {
+				if(newValue.toLowerCase().startsWith("user/")){
+					this.disabled_accessRequireLogin = true;
+				}else{
+					this.disabled_accessRequireLogin = false;
+				}
+	　　　　}
+	　　},
 	},
 	methods : {
 		//查询布局
@@ -178,7 +200,7 @@ export default({
 			let _self = this;
 
 			_self.error.referenceCode = "";
-			
+	
 			
 			_self.$ajax.get('control/layout/manage', {
 			    params: {
@@ -247,6 +269,11 @@ export default({
 			if(_self.referenceCode != null){
 				formData.append('referenceCode', _self.referenceCode);
 			}
+			if(_self.accessRequireLogin != null){
+				formData.append('accessRequireLogin', _self.accessRequireLogin);
+			}
+			
+			
 			if(_self.layoutFile != null){
 				formData.append('layoutFile', _self.layoutFile);
 			}

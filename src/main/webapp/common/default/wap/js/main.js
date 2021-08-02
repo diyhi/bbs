@@ -1141,7 +1141,7 @@ var thread_component = Vue.extend({
 		    receiveRedEnvelopeList:[],//领取红包用户集合
 		    selectedReceiveRedEnvelopeId:'',//选中领取红包用户
 		    receiveRedEnvelopeCurrentPage:0,//领取红包用户当前页
-		    receiveRedEnvelope_more:false//是否显示更多领取红包用户
+		    receiveRedEnvelope_more:false,//是否显示更多领取红包用户
 		    
 		    
 		};
@@ -1192,7 +1192,12 @@ var thread_component = Vue.extend({
 		quoteDataComponent: function quoteDataComponent() {
 			return function (html) {
 				return {
-					template: html , // use content as template for this component 不能有换行符，否则换行符后面的数据不显示
+					template: "<div>"+ html +"</div>", // use content as template for this component 必须用<div>标签包裹，否则会有部分内容不显示
+					data : function data() {
+						return {
+							escapeChar:'{{'//富文本转义字符
+						};
+					},
 					props: this.$options.props, // re-use current props definitions
 					
 				};
@@ -1203,6 +1208,11 @@ var thread_component = Vue.extend({
 			return function (html) {
 				return {
 					template: "<div>"+ html +"</div>", // use content as template for this component 必须用<div>标签包裹，否则会有部分内容不显示
+					data : function data() {
+						return {
+							escapeChar:'{{'//富文本转义字符
+						};
+					},
 					props: this.$options.props, // re-use current props definitions
 					
 				};
@@ -1217,7 +1227,7 @@ var thread_component = Vue.extend({
 					data : function data() {
 						return {
 							hide_passwordList :[],//话题隐藏密码
-							
+							escapeChar:'{{'//富文本转义字符
 						};
 					},
 					mounted :function () {
@@ -1383,9 +1393,9 @@ var thread_component = Vue.extend({
 							
 							_self.hidePasswordIndex = 0;
 							_self.bindNode(contentNode);
-							topic.content = contentNode.innerHTML;
+							topic.content = escapeVueHtml(contentNode.innerHTML);
 							
-							
+						
 							_self.topic = topic;
 							
 							
@@ -1571,9 +1581,9 @@ var thread_component = Vue.extend({
 							});
 
 							setTimeout(function() {
-							//	_self.receiveRedEnvelopeList.length = 0;//清空数组
+								_self.receiveRedEnvelopeList.length = 0;//清空数组
 								//查询领取红包用户列表
-							//	_self.queryReceiveRedEnvelopeUserList(1);
+								_self.queryReceiveRedEnvelopeUserList(1);
 							}, 1000);
 							
 						} else {
@@ -2185,14 +2195,14 @@ var thread_component = Vue.extend({
 										quoteContent = "<div class=\"quoteComment\">"+quoteContent+"<span class=\"userName\">"+avatarHtml+"<router-link tag=\"span\" :to=\"{path: '/user/control/home', query: {userName: '"+quote.userName+"'}}\">"+(quote.nickname != null && quote.nickname != '' ? escapeHtml(quote.nickname) : quote.userName)+"</router-link>&nbsp;的评论：</span><br/>"+quote.content+"</div>";
 	
 									}
-									_self.$set(_self.quoteData, comment.id, quoteContent);
+									_self.$set(_self.quoteData, comment.id, escapeVueHtml(quoteContent));
 								}
 								
 								//处理图片放大标签
 								var contentNode = document.createElement("div");
 								contentNode.innerHTML = comment.content;
 								_self.bindNode(contentNode);
-								comment.content = contentNode.innerHTML;
+								comment.content = escapeVueHtml(contentNode.innerHTML);
 								
 							}
 
@@ -3922,6 +3932,11 @@ var question_component = Vue.extend({
 			return function (html) {
 				return {
 					template: "<div>"+ html +"</div>", // use content as template for this component 必须用<div>标签包裹，否则会有部分内容不显示
+					data : function data() {
+						return {
+							escapeChar:'{{'//富文本转义字符
+						};
+					},
 					mounted :function () {
 					
 					},
@@ -3972,7 +3987,7 @@ var question_component = Vue.extend({
 							contentNode.innerHTML = question.content;
 							
 							_self.bindNode(contentNode);
-							question.content = contentNode.innerHTML;
+							question.content = escapeVueHtml(contentNode.innerHTML);
 					
 							if(question.appendQuestionItemList != null && question.appendQuestionItemList.length >0){
 								for(var i=0; i<question.appendQuestionItemList.length; i++){
@@ -3982,7 +3997,7 @@ var question_component = Vue.extend({
 									var contentNode2 = document.createElement("div");
 									contentNode2.innerHTML = appendQuestionItem.content;
 									_self.bindNode(contentNode2);
-									appendQuestionItem.content = contentNode2.innerHTML;
+									appendQuestionItem.content = escapeVueHtml(contentNode2.innerHTML);
 									
 									
 								}
@@ -4343,7 +4358,7 @@ var question_component = Vue.extend({
 								var contentNode = document.createElement("div");
 								contentNode.innerHTML = answer.content;
 								_self.bindNode(contentNode);
-								answer.content = contentNode.innerHTML;
+								answer.content = escapeVueHtml(contentNode.innerHTML);
 							}
 							_self.answerList = new_answerList;
 							
@@ -8301,6 +8316,11 @@ var home_component = Vue.extend({
 			return function (html) {
 				return {
 					template: "<div>"+ html +"</div>", // use content as template for this component 必须用<div>标签包裹，否则会有部分内容不显示
+					data : function data() {
+						return {
+							escapeChar:'{{'//富文本转义字符
+						};
+					},
 					props: this.$options.props, // re-use current props definitions
 					
 				};
@@ -8312,6 +8332,11 @@ var home_component = Vue.extend({
 			return function (html) {
 				return {
 					template: "<div>"+ html +"</div>", // use content as template for this component 必须用<div>标签包裹，否则会有部分内容不显示
+					data : function data() {
+						return {
+							escapeChar:'{{'//富文本转义字符
+						};
+					},
 					props: this.$options.props, // re-use current props definitions
 					
 				};
@@ -8326,7 +8351,8 @@ var home_component = Vue.extend({
 					
 					data : function data() {
 						return {
-							hide_passwordList :[]//话题隐藏密码
+							hide_passwordList :[],//话题隐藏密码
+							escapeChar:'{{'//富文本转义字符
 						};
 					},
 					props: this.$options.props, // re-use current props definitions
@@ -8835,7 +8861,7 @@ var home_component = Vue.extend({
 										contentNode.innerHTML = userDynamic.topicContent;
 										_self.hidePasswordIndex = 0;
 										_self.bindNode(contentNode,userDynamic.topicId);
-										userDynamic.topicContent = contentNode.innerHTML;
+										userDynamic.topicContent = escapeVueHtml(contentNode.innerHTML);
 										
 										var favoriteObject = new Object(); 
 										favoriteObject.topicId = userDynamic.topicId; 
@@ -8874,7 +8900,7 @@ var home_component = Vue.extend({
 										var contentNode = document.createElement("div");
 										contentNode.innerHTML = userDynamic.commentContent;
 										_self.bindNode(contentNode,null);
-										userDynamic.commentContent = contentNode.innerHTML;
+										userDynamic.commentContent = escapeVueHtml(contentNode.innerHTML);
 									}else if(userDynamic.module == 500){
 										var favoriteObject = new Object(); 
 										favoriteObject.question = userDynamic.questionId; 
@@ -8894,13 +8920,13 @@ var home_component = Vue.extend({
 										var contentNode = document.createElement("div");
 										contentNode.innerHTML = userDynamic.questionContent;
 										_self.bindNode(contentNode,null);
-										userDynamic.questionContent = contentNode.innerHTML;
+										userDynamic.questionContent = escapeVueHtml(contentNode.innerHTML);
 									}else if(userDynamic.module == 600){
 										//处理图片标签
 										var contentNode = document.createElement("div");
 										contentNode.innerHTML = userDynamic.answerContent;
 										_self.bindNode(contentNode,null);
-										userDynamic.answerContent = contentNode.innerHTML;
+										userDynamic.answerContent = escapeVueHtml(contentNode.innerHTML);
 									}
 									
 									
@@ -15476,4 +15502,10 @@ function createEditor(editorToolbar,editorText,commonPath,menus,userGradeList,im
 function escapeHtml(html) {
 	return _.escape(html);//引入lodash.js
 	
+}
+/**
+ * vue文本转义
+ */
+function escapeVueHtml(html) {
+	return html.replace(/{{/g, "<span v-html='escapeChar'></span>");//{{大括号转义
 }

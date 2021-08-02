@@ -189,7 +189,7 @@ public class FileUtil {
 			// TODO Auto-generated catch block
 		//	e.printStackTrace();
 			if (logger.isErrorEnabled()) {
-	            logger.error("写文件(如果目标文件不存在，FileUtils会自动创建)",e);
+				logger.error("写文件(如果目标文件不存在，FileUtils会自动创建)"+ path,e);
 	        }
 		}  
     } 

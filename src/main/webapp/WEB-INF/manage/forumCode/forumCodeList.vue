@@ -10,7 +10,7 @@
 				</el-breadcrumb>
 			</div>
 			<div class="data-table forumCodeListModule" >
-				<el-table ref="multipleTable" :data="tableData" tooltip-effect="dark" row-key="nodeId" :expand-row-keys="defaultExpandRow" @cell-click="cellExpandRow" :tree-props="{children: 'childNode', hasChildren: 'hasChildren'}" style="width: 100%" stripe empty-text="没有内容">
+				<el-table ref="multipleTable" :data="tableData" :indent="34" tooltip-effect="dark" row-key="nodeId" :expand-row-keys="defaultExpandRow" @cell-click="cellExpandRow" :tree-props="{children: 'childNode', hasChildren: 'hasChildren'}" style="width: 100%" stripe empty-text="没有内容">
 					<el-table-column prop="nodeName" label="版块" ></el-table-column>
 					<el-table-column label="最后修改时间" align="center" width="200">
 						<template #default="scope">	

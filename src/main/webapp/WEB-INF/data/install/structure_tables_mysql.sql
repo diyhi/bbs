@@ -373,6 +373,7 @@ CREATE TABLE `layout` (
   `returnData` int(11) DEFAULT NULL,
   `sort` int(11) DEFAULT NULL,
   `type` int(11) DEFAULT NULL,
+  `accessRequireLogin` bit(1) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

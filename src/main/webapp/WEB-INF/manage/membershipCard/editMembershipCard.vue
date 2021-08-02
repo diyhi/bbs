@@ -39,33 +39,37 @@
 									
 									<el-form-item label="库存" :required="true" :error="error.stock.get(scope.$index)">
 										
-										<el-row :gutter="10" v-if="specification.stockStatus[scope.$index] == 0">
-											<el-col :span="8">
-												<el-input v-model.trim="specification.stock[scope.$index]" maxlength="10" clearable="true" show-word-limit></el-input>
-											</el-col>
-											<el-col :span="12">
-												<span v-if="specification.stockOccupy[scope.$index] != ''">
+										<el-row v-if="specification.stockStatus[scope.$index] == 0">
+											<div class="singleRowTable">
+												<div class="leftCell">
+													<el-input v-model.trim="specification.stock[scope.$index]" maxlength="10" clearable="true" show-word-limit></el-input>
+												</div>
+												<div class="rightCell">
+													<span v-if="specification.stockOccupy[scope.$index] != ''">
 													已出售数量:{{specification.stockOccupy[scope.$index]}}
 												</span>
-											</el-col>
+												</div>
+											</div>
 										</el-row>
-										<el-row :gutter="10" v-if="specification.stockStatus[scope.$index] > 0">
-											<el-col :span="4">
-												{{specification.stock[scope.$index]}}
-											</el-col>
-											<el-col :span="4">
-												<el-select v-model="specification.symbol[scope.$index]"  no-match-text="还没有符号" placeholder="选择符号">
-													<el-option v-for="item in specification.stockStatusOptions[scope.$index]" :key="item.value" :label="item.label" :value="item.value"></el-option>
-												</el-select>
-											</el-col>
-											<el-col :span="6">
-												<el-input v-model.trim="specification.changeStock[scope.$index]" maxlength="10" clearable="true" show-word-limit></el-input>
-											</el-col>
-											<el-col :span="10">
-												<span v-if="specification.stockOccupy[scope.$index] != ''">
-													已出售数量:{{specification.stockOccupy[scope.$index]}}
-												</span>
-											</el-col>
+										<el-row v-if="specification.stockStatus[scope.$index] > 0">
+											<div class="singleRowTable">
+												<div class="leftCell">
+													{{specification.stock[scope.$index]}}
+												</div>
+												<div class="leftCell" style="margin-left: 20px;width: 100px;">
+													<el-select v-model="specification.symbol[scope.$index]"  no-match-text="还没有符号" placeholder="选择符号">
+														<el-option v-for="item in specification.stockStatusOptions[scope.$index]" :key="item.value" :label="item.label" :value="item.value"></el-option>
+													</el-select>
+												</div>
+												<div class="leftCell">
+													<el-input v-model.trim="specification.changeStock[scope.$index]" maxlength="10" clearable="true" show-word-limit></el-input>
+												</div>
+												<div class="rightCell">
+													<span v-if="specification.stockOccupy[scope.$index] != ''">
+														已出售数量:{{specification.stockOccupy[scope.$index]}}
+													</span>
+												</div>
+											</div>
 										</el-row>
 									</el-form-item>
 									<el-row :gutter="30">
@@ -112,8 +116,8 @@
 							
 						</el-table>
 						<el-form-item>
-							<div class="item-button"><el-button icon="el-icon-plus" @click="specification_addItem">添加规格项</el-button></div>
-							</el-form-item>
+							<div class="item-button" style="margin-left: 10px;"><el-button icon="el-icon-plus" @click="specification_addItem">添加规格项</el-button></div>
+						</el-form-item>
 						
 					</div>
 					

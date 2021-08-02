@@ -14,6 +14,7 @@
 					</div>
 					<div class="operat">
 						<el-link class="item" href="javascript:void(0);" v-if="topic.status == 10" @click="auditTopic(topic.id);">审核</el-link>
+						
 						<el-link class="item" href="javascript:void(0);" @click="$router.push({path: '/admin/control/topicLike/list', query:{ visible:($route.query.visible != undefined ? $route.query.visible:''),topicView_beforeUrl:($route.query.topicView_beforeUrl != undefined ? $route.query.topicView_beforeUrl:''),topicId :topic.id, commentId:($route.query.commentId != undefined ? $route.query.commentId:''),page:($route.query.page != undefined ? $route.query.page:''), topicPage:($route.query.page != undefined ? $route.query.page:'')}})">点赞用户</el-link>
 						<el-link class="item" href="javascript:void(0);" v-if="topic.giveRedEnvelopeId != null && topic.giveRedEnvelopeId != ''" @click="$router.push({path: '/admin/control/redEnvelope/redEnvelopeAmountDistribution/list', query:{giveRedEnvelopeId:topic.giveRedEnvelopeId, visible:($route.query.visible != undefined ? $route.query.visible:''),topicView_beforeUrl:($route.query.topicView_beforeUrl != undefined ? $route.query.topicView_beforeUrl:''),topicId :topic.id, commentId:($route.query.commentId != undefined ? $route.query.commentId:''),page:($route.query.page != undefined ? $route.query.page:''), topicPage:($route.query.page != undefined ? $route.query.page:'')}})">红包</el-link>
 						<el-link class="item" href="javascript:void(0);" @click="$router.push({path: '/admin/control/topicFavorite/list', query:{ visible:($route.query.visible != undefined ? $route.query.visible:''),topicView_beforeUrl:($route.query.topicView_beforeUrl != undefined ? $route.query.topicView_beforeUrl:''),topicId :topic.id, commentId:($route.query.commentId != undefined ? $route.query.commentId:''),page:($route.query.page != undefined ? $route.query.page:''), topicPage:($route.query.page != undefined ? $route.query.page:'')}})">收藏用户</el-link>
@@ -741,7 +742,7 @@ export default({
 								contentNode.innerHTML = topic.content;
 								
 								_self.bindNode(contentNode);
-								topic.content = contentNode.innerHTML;
+								topic.content = escapeVueHtml(contentNode.innerHTML);
 								
 								
 								_self.topic = topic;
@@ -871,7 +872,7 @@ export default({
 			
 											}
 											
-											_self.quoteData.set(comment.id, quoteContent);
+											_self.quoteData.set(comment.id, escapeVueHtml(quoteContent));
 										}
 										
 										//定义回复数组
@@ -907,7 +908,7 @@ export default({
 										let contentNode = document.createElement("div");
 										contentNode.innerHTML = comment.content;
 										_self.bindNode(contentNode);
-										comment.content = contentNode.innerHTML;
+										comment.content = escapeVueHtml(contentNode.innerHTML);
 				    					
 				    					_self.quoteFormView.set(comment.id,false);
 				    					
@@ -2313,6 +2314,8 @@ export default({
 				    	let returnValue = JSON.parse(result);
 				    	if(returnValue.code === 200){//成功
 				    		_self.$message.success("操作成功");
+				    		//删除缓存
+			    			_self.$store.commit('setCacheNumber');
 				    		_self.queryTopic();
 				    	}else if(returnValue.code === 500){//错误
 				    		
@@ -2504,6 +2507,7 @@ export default({
 	        });
 		
 		},
+
 	}
 });
 

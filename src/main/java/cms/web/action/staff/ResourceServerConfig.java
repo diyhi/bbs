@@ -68,7 +68,9 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter{
         http
 	        // 关闭httpBasic
 	        .httpBasic().disable();
-       
+        http
+ 		.logout().logoutUrl("/admin/logout").disable();//关闭默认退出入口(不能删除，删除会和前台/logout冲突)
+	
       
         http
         	.headers().frameOptions().sameOrigin();//允许加载本站点内的页面

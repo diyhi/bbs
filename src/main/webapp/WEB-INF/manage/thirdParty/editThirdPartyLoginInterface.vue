@@ -29,6 +29,12 @@
 						<el-input type="textarea" v-model="weixin_oa_appSecret" :autosize="{minRows: 5}" ></el-input>	
 						<div class="form-help" >应用密钥</div>
 					</el-form-item>
+					<el-form-item label="注意" v-if="interfaceProduct ==10">
+						<div class="form-help" >
+							1、需要在微信公众平台的“开发 - 接口权限 - 网页服务 - 网页帐号 - 网页授权获取用户基本信息”的配置选项中，修改授权回调域名 (域名格式不需要加http://协议头)<br>
+			    			2、需要在微信开放平台绑定公众号
+						</div>
+					</el-form-item>
 					
 					<el-form-item label="排序" :required="true" :error="error.sort">
 						<el-row><el-col :span="6"><el-input v-model.trim="sort" maxlength="8" clearable="true" show-word-limit></el-input></el-col></el-row>

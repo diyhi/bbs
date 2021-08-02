@@ -9,10 +9,10 @@
 				<div class="headInfo">
 					<div class="title">选择要打包的目录或文件</div>
 				</div>
-				<el-tree ref="tree" :props="props" :load="loadNode" lazy show-checkbox>
+				<el-tree ref="tree" :props="props" :indent="23" :load="loadNode" lazy show-checkbox>
 					<template #default="scope">
-			        	<i class="icon icon-folder el-icon-folder" v-if="scope.node.isLeaf == false"></i>
-						<i class="icon icon-file el-icon-document" v-if="scope.node.isLeaf == true"></i>
+			        	<i class="icon icon-folder el-icon-folder" v-if="scope.node.data.leaf == false"></i>
+						<i class="icon icon-file el-icon-document" v-if="scope.node.data.leaf == true"></i>
 			        	<span>{{scope.node.label}}</span>
 				    </template>
 				</el-tree>
@@ -42,7 +42,8 @@ export default({
 			props: {
 				label: 'name',
 		        children: 'zones',
-		        isLeaf: 'leaf'
+		        isLeaf: 'leaf',
+		        parentId2: 'parentId'
 			},
 			
 			

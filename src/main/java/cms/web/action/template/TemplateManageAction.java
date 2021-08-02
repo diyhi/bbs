@@ -3,6 +3,7 @@ package cms.web.action.template;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -21,6 +22,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOCase;
+import org.apache.commons.io.filefilter.DirectoryFileFilter;
+import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -42,12 +47,14 @@ import com.fasterxml.jackson.core.type.TypeReference;
 
 import cms.bean.RequestResult;
 import cms.bean.ResultCode;
+import cms.bean.filePackage.FilePackage;
 import cms.bean.template.Forum;
 import cms.bean.template.Forum_CustomForumRelated_CustomHTML;
 import cms.bean.template.Layout;
 import cms.bean.template.TemplateData;
 import cms.bean.template.Templates;
 import cms.service.template.TemplateService;
+import cms.utils.FileSize;
 import cms.utils.FileUtil;
 import cms.utils.JsonUtils;
 import cms.utils.PathUtil;
@@ -231,16 +238,28 @@ public class TemplateManageAction {
 				templates.setThumbnailSuffix(null);
 			}
 			
+			//验证文件类型
+			List<String> formatList = new ArrayList<String>();
+			formatList.add("gif");
+			formatList.add("jpg");
+			formatList.add("jpeg");
+			formatList.add("bmp");
+			formatList.add("png");
+			
 			
 			//图片上传
 			List<MultipartFile> files = request.getFiles("uploadImage"); 
 			for(MultipartFile file : files) {
 				if(file.isEmpty()){//如果图片已上传
 					if(imagePath != null && !"".equals(imagePath.trim())){
-						//取得文件后缀
-						String ext = FileUtil.getExtension(imagePath.trim());
-						templates.setThumbnailSuffix(ext);
-						
+						boolean authentication = FileUtil.validateFileSuffix(imagePath.trim(),formatList);
+						if(authentication){
+							//取得文件后缀
+							String ext = FileUtil.getExtension(imagePath.trim());
+							templates.setThumbnailSuffix(ext);
+						}else{
+							error.put("thumbnailSuffix", "图片格式错误");
+						}
 					}else{
 						flag = true;
 						templates.setThumbnailSuffix(null);
@@ -249,13 +268,7 @@ public class TemplateManageAction {
 				
 				if(!file.isEmpty()){	
 					
-					//验证文件类型
-					List<String> formatList = new ArrayList<String>();
-					formatList.add("gif");
-					formatList.add("jpg");
-					formatList.add("jpeg");
-					formatList.add("bmp");
-					formatList.add("png");
+					
 					boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),formatList);
 					if(authentication){
 						//取得文件后缀		
@@ -550,6 +563,10 @@ public class TemplateManageAction {
 						break;
 					} 
 				}
+				
+				//删除不安全的jsp和jspx文件
+				this.deleteJSP(temp_dir_path);
+				
 				
 				if(templateDirName != null && !"".equals(templateDirName.trim())){
 					//替换路径中的..号
@@ -1028,4 +1045,40 @@ public class TemplateManageAction {
 		}
 		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
+	
+	
+	/**
+	 * 删除不安全的jsp和jspx文件
+	 * @param path 路径
+	 */
+	private void deleteJSP(String path){
+		String[] extensions = {"jsp", "jspx"};//后缀名{"doc", "pdf"}
+		
+		IOFileFilter filter = new SuffixFileFilter(extensions, IOCase.INSENSITIVE);//不区分大小写
+		Iterator<File> files = FileUtils.iterateFiles(new File(PathUtil.path()+File.separator+path), filter, DirectoryFileFilter.DIRECTORY);
+		
+		// 迭代输出
+		for (Iterator<File> iterator = files; iterator.hasNext();) {
+			File file = iterator.next();
+			
+			if(file.exists() && file.isFile()){
+				boolean state = file.delete();
+				
+				if(state == false){
+					try {
+						//清空内容
+						org.apache.commons.io.FileUtils.writeStringToFile(file, "", "UTF-8");
+						state = file.delete();
+					} catch (IOException e) {
+					//	e.printStackTrace();
+						if (logger.isErrorEnabled()) {
+				            logger.error("删除文件 "+file.getAbsolutePath(),e);
+				        }
+					}
+
+				}
+			}
+		}
+	}
+	
 }

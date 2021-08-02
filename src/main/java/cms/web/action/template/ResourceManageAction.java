@@ -87,11 +87,11 @@ public class ResourceManageAction {
 						
 						//调用文件编码判断类
 						String coding = Coding.detection(file);
-						InputStreamReader read = new InputStreamReader (new FileInputStream(file),coding); 
-						BufferedReader br = new BufferedReader(read);
-						String row;
-						while((row = br.readLine())!=null){
-							sb.append(row).append("\n");
+						try (InputStreamReader read = new InputStreamReader (new FileInputStream(file),coding); BufferedReader br = new BufferedReader(read);){
+							String row;
+							while((row = br.readLine())!=null){
+								sb.append(row).append("\n");
+							}
 						}
 					}else{
 						error.put("fileContent", "找不到指定的文件");

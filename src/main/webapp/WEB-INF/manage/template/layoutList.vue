@@ -37,6 +37,15 @@
 							<el-tag effect="dark" v-if="scope.row.type==4 && scope.row.returnData == 1" class="tag-wrapper tag-color-purple" style="margin-left: 4px;">json</el-tag>
 				    	</template>
 					</el-table-column>
+					<el-table-column label="访问需要登录" align="center" width="110">
+						<template #default="scope">
+							<el-tag effect="dark" type="success" v-if="type != 5 && type != 6 && scope.row.accessRequireLogin==true" class="tag-wrapper" >需要</el-tag>
+					        <el-tag effect="dark" type="success" v-if="type != 5 && type != 6 && accessRequireLoginLayoutList.get(scope.row.id)" class="tag-wrapper" >默认需要</el-tag>
+					        
+					        
+					        
+				    	</template>
+					</el-table-column>
 					<el-table-column label="引用代码/URL" align="center" width="120">
 						<template #default="scope">
 							<el-popover effect="light" trigger="hover" placement="top">
@@ -55,7 +64,7 @@
 					        </el-popover>
 				    	</template>
 					</el-table-column>
-					<el-table-column label="操作" align="center" width="350">
+					<el-table-column label="操作" align="center" width="330">
 						<template #default="scope">
 							<el-button-group>
 								<el-button type="primary" size="mini" @click="$router.push({path: '/admin/control/forum/list', query:{ layoutId : scope.row.id,dirName : $route.query.dirName,sourcePage:($route.query.page != undefined ? $route.query.page:'')}})">版块</el-button>
@@ -95,6 +104,8 @@ export default({
 
 			
 			referenceCodeList:new Map(),//引用代码集合
+			
+			accessRequireLoginLayoutList:new Map(),//默认访问需要登录布局集合
 			
 		    totalrecord : 0, //总记录数
 		    currentpage : 1, //当前页码
@@ -159,6 +170,10 @@ export default({
 					    					let referenceCode = layout.referenceCode;
 					    					
 					    					_self.referenceCodeList.set(layout.id,_self.$store.state.baseURL+referenceCode);
+					    					
+					    					if(referenceCode.toLowerCase().startsWith("user/")){
+												_self.accessRequireLoginLayoutList.set(layout.id,true);
+											}
 					    				}
 										if(layout.type == 5 || layout.type ==6){
 										//	let referenceCode = "&lt;@include action=&quot;&#36;&#123;"+layout.referenceCode+"&#125;&quot;/&gt;";
@@ -166,6 +181,10 @@ export default({
 					    		
 											_self.referenceCodeList.set(layout.id,referenceCode);
 					    				}
+					    				
+					    				
+					    				
+					    				
 					    			}
 					    			
 					    			

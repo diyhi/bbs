@@ -28,7 +28,7 @@ import cms.web.action.upgrade.UpgradeManage;
 public class UpdatePackageSignature {
 	
 	//升级包源文件完整路径
-	private static String sourceFileFullPath = "D:\\测试\\bbs-5.0to5.1.zip";//升级包签名后文件路径和源文件路径同目录
+	private static String sourceFileFullPath = "D:\\测试\\bbs-5.1to5.2.zip";//升级包签名后文件路径和源文件路径同目录
 	//私钥文件完整路径
 	private static String privateKeyFullPath = "D:\\测试\\upgradePrivateKey.pem";//RSA PKCS#8 2048
 			

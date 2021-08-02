@@ -420,11 +420,12 @@ public class TemplateServiceBean extends DaoSupport<Layout> implements TemplateS
 	@CacheEvict(value="templateServiceBean_cache",allEntries=true)
 	public Integer updateLayoutById(Layout layout){
 	
-		Query query = em.createQuery("update Layout o set o.name=?1,o.referenceCode=?2 where o.id=?3");
+		Query query = em.createQuery("update Layout o set o.name=?1,o.referenceCode=?2, o.accessRequireLogin=?3 where o.id=?4");
 		//给SQL语句设置参数
 		query.setParameter(1, layout.getName());
 		query.setParameter(2, layout.getReferenceCode());
-		query.setParameter(3, layout.getId());
+		query.setParameter(3, layout.isAccessRequireLogin());
+		query.setParameter(4, layout.getId());
 		return query.executeUpdate();
 	}
 	/**

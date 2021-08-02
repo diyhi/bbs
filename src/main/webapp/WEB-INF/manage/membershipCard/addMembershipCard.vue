@@ -91,7 +91,7 @@
 							
 						</el-table>
 						<el-form-item>
-							<div class="item-button"><el-button icon="el-icon-plus" @click="specification_addItem">添加规格项</el-button></div>
+							<div class="item-button" style="margin-left: 10px;"><el-button icon="el-icon-plus" @click="specification_addItem">添加规格项</el-button></div>
 							</el-form-item>
 						
 					</div>

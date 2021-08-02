@@ -821,7 +821,7 @@ export default({
 								contentNode.innerHTML = question.content;
 								
 								_self.bindNode(contentNode);
-								question.content = contentNode.innerHTML;
+								question.content = escapeVueHtml(contentNode.innerHTML);
 								
 								
 								if(question.appendQuestionItemList != null && question.appendQuestionItemList.length >0){
@@ -832,7 +832,7 @@ export default({
 										var contentNode2 = document.createElement("div");
 										contentNode2.innerHTML = appendQuestionItem.content;
 										_self.bindNode(contentNode2);
-										appendQuestionItem.content = contentNode2.innerHTML;
+										appendQuestionItem.content = escapeVueHtml(contentNode2.innerHTML);
 										
 										
 									}
@@ -900,7 +900,7 @@ export default({
 										let contentNode = document.createElement("div");
 										contentNode.innerHTML = answer.content;
 										_self.bindNode(contentNode);
-										answer.content = contentNode.innerHTML;
+										answer.content = escapeVueHtml(contentNode.innerHTML);
 				    				
 				    					_self.answerStatusField.push(answer.status);
 				    					

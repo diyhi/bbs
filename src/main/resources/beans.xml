@@ -224,7 +224,11 @@ http://www.springframework.org/schema/task http://www.springframework.org/schema
 		<task:scheduled ref="task" method="deleteInvalidFile" cron="0 50 0/2 * * ?"/>
 	</task:scheduled-tasks>
 
-
+	<!-- 定时任务 - 处理布局路径 每隔3秒执行一次-->
+	<task:scheduler id="scheduler_timerProcessLayoutUrl" pool-size="1"/>
+	<task:scheduled-tasks scheduler="scheduler_timerProcessLayoutUrl">
+		<task:scheduled ref="layoutManage" method="timerProcessLayoutUrl" cron="0/3 * * * * ?"/>
+	</task:scheduled-tasks>
    
    <!-- Kaptcha验证码 -->
    <bean id="captchaProducer" class="com.google.code.kaptcha.impl.DefaultKaptcha"> 

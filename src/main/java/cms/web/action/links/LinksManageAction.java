@@ -100,7 +100,7 @@ public class LinksManageAction {
 					if(!newPathName.equals(pathName)){
 						
 						//复制文件到新路径
-						fileManage.copyFile(imagePath, newPathName);
+						fileManage.copyFile(FileUtil.toRelativePath(imagePath), newPathName);
 						//新建文件锁到新路径
 						//生成锁文件名称
 						String lockFileName =fileName;
@@ -252,7 +252,7 @@ public class LinksManageAction {
 							if(!newPathName.equals(pathName)){
 								
 								//复制文件到新路径
-								fileManage.copyFile(imagePath, newPathName);
+								fileManage.copyFile(FileUtil.toRelativePath(imagePath), newPathName);
 								//新建文件锁到新路径
 								//生成锁文件名称
 								String lockFileName = fileName;

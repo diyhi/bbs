@@ -465,7 +465,7 @@ public class TemplateManage {
 		layout_membershipCardOrder.setLayoutFile("membershipCardOrderList.html");
 		layout_membershipCardOrder.setType(1);//默认页
 		layout_membershipCardOrder.setSort(1700);//排序
-		layout_membershipCardOrder.setReferenceCode("membershipCardOrderList");
+		layout_membershipCardOrder.setReferenceCode("user/control/membershipCardOrderList");
 		layoutList.add(layout_membershipCardOrder);
 		
 		

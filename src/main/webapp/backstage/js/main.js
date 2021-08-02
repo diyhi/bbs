@@ -2283,6 +2283,23 @@ var routes = [
 ];
 
 
+//监听.el-main窗口
+let resizeObserver = null;
+let validFullPath_scrollTop = 0;
+if(window.ResizeObserver){
+	resizeObserver = new ResizeObserver(entries => {
+		for (let entry of entries) {
+		    const cr = entry.contentRect;
+		    if(cr.height >250){
+		    	resizeObserver.unobserve(document.querySelector(".main"));//停止对指定目标的监听
+		    	
+		    	document.querySelector(".el-main").scrollTop = validFullPath_scrollTop;
+		    	
+		   }
+		}
+	});
+}
+
 var scrollBehavior = function (to, from, savedPosition) {
 	if (savedPosition) {
 		// savedPosition仅适用于popstate导航。
@@ -2290,8 +2307,8 @@ var scrollBehavior = function (to, from, savedPosition) {
 	} else {
 		if(document.querySelector(".el-main")){//默认滚动到顶部
 			document.querySelector(".el-main").scrollTop = 0;
+			validFullPath_scrollTop = 0;
 		}
-		
 		
 		let validFullPath = null;//有效的
 		A:for (let [key,value] of store.state.historyPath){
@@ -2344,9 +2361,10 @@ var scrollBehavior = function (to, from, savedPosition) {
 				if(document.querySelector(".el-main")){
 					const { nextTick } = Vue;
 					nextTick(function(){
-						setTimeout(() => {
-							document.querySelector(".el-main").scrollTop = validFullPath.scrollTop;
-					    }, 300)
+						validFullPath_scrollTop = validFullPath.scrollTop;
+						if(resizeObserver != null && document.querySelector(".main")){
+							resizeObserver.observe(document.querySelector(".main"));
+						}
 					});
 				}
 			}
@@ -2356,13 +2374,14 @@ var scrollBehavior = function (to, from, savedPosition) {
 };
 
 //创建路由对象
-const router = VueRouter.createRouter({
+const createRouter = () => VueRouter.createRouter({
 	// html5模式 去掉锚点
 	history: VueRouter.createWebHistory(),
 	scrollBehavior : scrollBehavior, //记住页面的滚动位置 html5模式适用
 	//base : getMetaTag().contextPath, //虚拟目录
 	routes
 });
+const router = createRouter();
 
 //在跳转之前监听路由
 router.beforeEach((to,from,next)=>{
@@ -3200,6 +3219,12 @@ function getElementTop(element){
 function escapeHtml(html) {
 	return _.escape(html);//引入lodash.js
 	
+}
+/**
+ * vue文本转义
+ */
+function escapeVueHtml(html) {
+	return html.replace(/{{/g, "&#123;&#123;").replace(/}}/g, "&#125;&#125;");//{{}}大括号转义
 }
 /**
  * 判断对象类型 getType(new Map()) // "map"

@@ -13,7 +13,7 @@
 				<el-button type="primary" plain size="small" @click="addColumnUI(null)">添加栏目</el-button>
 			</div>
 			<div class="data-table columnListModule" >
-				<el-table ref="multipleTable" :data="tableData" tooltip-effect="dark" row-key="id" default-expand-all @cell-click="cellExpandRow"  :tree-props="{children: 'childColumn', hasChildren: 'hasChildren'}" style="width: 100%" stripe empty-text="没有内容">
+				<el-table ref="multipleTable" :data="tableData" :indent="34" tooltip-effect="dark" row-key="id" default-expand-all @cell-click="cellExpandRow"  :tree-props="{children: 'childColumn', hasChildren: 'hasChildren'}" style="width: 100%" stripe empty-text="没有内容">
 					<el-table-column label="栏目名称" >
 						<template #default="scope">	
 							<i class="icon icon-folder el-icon-folder" v-if="scope.row.childColumn.length >0"></i>

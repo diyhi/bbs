@@ -503,10 +503,11 @@
 	                return xhr;
 	            }
 	        },
-	        success: function(data) {//提交成功后调用      	
-	        	for(var returnValue in data){
-	        		if(returnValue == "success"){
-	        			if(data[returnValue] == "true"){
+	        success: function(data) {//提交成功后调用  
+	        	var returnValue = JSON.parse(data);//JSON转为对象   	
+	        	for(var key in returnValue){
+	        		if(key == "success"){
+	        			if(returnValue[key] == "true"){
 	        				layer.msg('更新头像成功,3秒后刷新页面', 
 								{
 								  time: 3000 //3秒关闭（如果不配置，默认是3秒）
@@ -516,8 +517,8 @@
 								}
 							);
 	        			}
-	        		}else if(returnValue == "error"){
-	        			var errorValue = data[returnValue];
+	        		}else if(key == "error"){
+	        			var errorValue = returnValue[key];
 						var htmlValue = "";
 						var i = 0;
 						for(var error in errorValue){

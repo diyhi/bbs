@@ -14,7 +14,7 @@
 				<el-button type="primary" plain size="small" @click="newFolderUI(null)">新建文件夹</el-button>
 			</div>
 			<div class="data-table resourceListModule" >
-				<el-table ref="multipleTable" :data="tableData" tooltip-effect="dark" row-key="id"  @cell-click="cellExpandRow" lazy :load="loadNode" :tree-props="{children: 'childNode', hasChildren: 'hasChildren'}" style="width: 100%" stripe empty-text="没有内容">
+				<el-table ref="multipleTable" :data="tableData" :indent="34" tooltip-effect="dark" row-key="id"  @cell-click="cellExpandRow" lazy :load="loadNode" :tree-props="{children: 'childNode', hasChildren: 'hasChildren'}" style="width: 100%" stripe empty-text="没有内容">
 					<el-table-column label="文件" >
 						<template #default="scope">	
 							<i class="icon icon-folder el-icon-folder" v-if="!scope.row.leaf"></i>

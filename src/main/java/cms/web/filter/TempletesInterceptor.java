@@ -147,7 +147,7 @@ public class TempletesInterceptor extends HandlerInterceptorAdapter {
 
 		SystemSetting systemSetting = settingService.findSystemSetting_cache();
 		
-		if(systemSetting.getCloseSite().equals(3)){//3.全站关闭
+		if(systemSetting != null && systemSetting.getCloseSite().equals(3)){//3.全站关闭
 			boolean backstage_flag = false;
 			//后台URL
 			for (AntPathRequestMatcher rm : backstage_filterMatchers) {

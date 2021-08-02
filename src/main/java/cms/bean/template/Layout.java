@@ -32,6 +32,9 @@ public class Layout implements Serializable{
 	/** 生成模板引用代码 **/
 	@Column(length=100)
 	private String referenceCode;
+	/** 访问需要登录 **/
+	private boolean accessRequireLogin = false;
+	
 	
 	/** 空白页返回数据     0:html   1: json**/
 	private Integer returnData = 0;
@@ -93,6 +96,12 @@ public class Layout implements Serializable{
 	}
 	public void setSort(Integer sort) {
 		this.sort = sort;
+	}
+	public boolean isAccessRequireLogin() {
+		return accessRequireLogin;
+	}
+	public void setAccessRequireLogin(boolean accessRequireLogin) {
+		this.accessRequireLogin = accessRequireLogin;
 	}
 
 	
