@@ -35,7 +35,7 @@
 		<!-- 红包  -->
 		<div class="redEnvelopeHeadModule">
 			<span class="text">
-				类型：
+				<span class="name">类型：</span>
 				<#if giveRedEnvelope.type == 10>
 					个人定向红包
 				<#elseif giveRedEnvelope.type == 20>
@@ -45,19 +45,19 @@
 				</#if>	
 			</span>
 			<span class="text">
-				总金额：￥${giveRedEnvelope.totalAmount}
+				<span class="name">总金额：</span>￥${giveRedEnvelope.totalAmount}
 				<#if giveRedEnvelope.refundAmount gt 0 > 
 					<span style="color: red;">中止领取红包后返还金额￥${giveRedEnvelope.refundAmount}</span>
 				</#if>
 			</span>
-			<span class="text">发放数量：${giveRedEnvelope.giveQuantity}</span>
-			<span class="text">已领取数量：${giveRedEnvelope.giveQuantity - giveRedEnvelope.remainingQuantity}</span>
-		 	<span class="text">时间：${giveRedEnvelope.giveTime}</span>
+			<span class="text"><span class="name">发放数量：</span>${giveRedEnvelope.giveQuantity}</span>
+			<span class="text"><span class="name">已领取数量：</span>${giveRedEnvelope.giveQuantity - giveRedEnvelope.remainingQuantity}</span>
+		 	<span class="text"><span class="name">时间：</span>${giveRedEnvelope.giveTime}</span>
 			<span class="topic">
 				<a href="thread?topicId=${giveRedEnvelope.bindTopicId}" target="_blank" class="link">${giveRedEnvelope.bindTopicTitle}</a>
 			</span>
 		</div>
-		<div class="clearfix"></div>
+		<div class="clearfix" style="height: 10px;background: #f8f8f9;"></div>
 		<div class="dataTable">
 			<TABLE class="dataList" width="100%">
 				<THEAD>

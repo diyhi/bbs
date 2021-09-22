@@ -212,25 +212,24 @@ public class MembershipCardManageAction {
 				Specification specification = new Specification();
 				
 				//规格名称
-				String _specificationName = specificationName[i];
-				if(_specificationName != null && _specificationName.trim().length() >0){
-					if(_specificationName.trim().length() >50){
+				if(specificationName != null && specificationName.length>0 && specificationName[i] != null && specificationName[i].trim().length() >0){
+					if(specificationName[i].trim().length() >50){
 						error.put("specificationName_"+i, "规格名称超过50个字符");
 					}else{
-						specification.setSpecificationName(_specificationName.trim());
+						specification.setSpecificationName(specificationName[i].trim());
 					}
 				}else{
 					error.put("specificationName_"+i, "请填写规格名称");
 				}
 				//是否启用
-				if(enable[i] != null){
+				if(enable != null && enable.length>0 && enable[i] != null){
 					specification.setEnable(enable[i]);
 				}else{
 					error.put("enable_"+i, "请填写库存");
 				}
 				
 				
-				if(stock[i] != null && !"".equals(stock[i].trim())){
+				if(stock != null && stock.length>0 && stock[i] != null && !"".equals(stock[i].trim())){
 					if(!Verification.isPositiveIntegerZero(stock[i].trim())){
 						error.put("stock_"+i, "库存必须为数字");
 					}else{
@@ -246,7 +245,7 @@ public class MembershipCardManageAction {
 					error.put("stock_"+i, "请填写库存");
 				}
 				
-				if(point[i] != null && !"".equals(point[i].trim())){
+				if(point != null && point.length>0 && point[i] != null && !"".equals(point[i].trim())){
 					if(!Verification.isPositiveIntegerZero(point[i].trim())){
 						error.put("point_"+i, "积分必须为整数");
 					}else{
@@ -263,7 +262,7 @@ public class MembershipCardManageAction {
 				
 				
 				//市场价
-				if(marketPrice[i] != null && !"".equals(marketPrice[i].trim())){
+				if(marketPrice != null && marketPrice.length>0 && marketPrice[i] != null && !"".equals(marketPrice[i].trim())){
 					if(!Verification.isAmount(marketPrice[i].trim())){
 						error.put("marketPrice_"+i, "市场价必须为金额类型");
 					}else{
@@ -276,7 +275,7 @@ public class MembershipCardManageAction {
 					}
 				}
 				//销售价
-				if(sellingPrice[i] != null && !"".equals(sellingPrice[i].trim())){
+				if(sellingPrice != null && sellingPrice.length>0 && sellingPrice[i] != null && !"".equals(sellingPrice[i].trim())){
 					if(!Verification.isAmount(sellingPrice[i].trim())){
 						error.put("sellingPrice_"+i, "销售价必须为金额类型");
 					}else{
@@ -294,7 +293,7 @@ public class MembershipCardManageAction {
 					
 				}
 				
-				if(duration[i] != null && !"".equals(duration[i].trim())){
+				if(duration != null && duration.length >0 && duration[i] != null && !"".equals(duration[i].trim())){
 					if(!Verification.isPositiveIntegerZero(duration[i].trim())){
 						error.put("duration_"+i, "时长必须为整数");
 					}else{
@@ -311,7 +310,7 @@ public class MembershipCardManageAction {
 				}
 				
 				//时长单位
-				if(unit[i] != null){
+				if(unit != null && unit.length >0 && unit[i] != null){
 					specification.setUnit(unit[i]);
 				}else{
 					error.put("unit_"+i, "时长单位不能为空");
@@ -608,38 +607,37 @@ public class MembershipCardManageAction {
 						Specification specification = new Specification();
 						
 						specification.setMembershipCardId(membershipCardId);
-						if(specificationId[i] != null && specificationId[i] >0){
+						if(specificationId != null && specificationId.length >0 && specificationId[i] != null && specificationId[i] >0){
 							specification.setId(specificationId[i]);
 						}
 						
 						
 						
 						//规格名称
-						String _specificationName = specificationName[i];
-						if(_specificationName != null && _specificationName.trim().length() >0){
-							if(_specificationName.trim().length() >50){
+						if(specificationName != null && specificationName.length >0 && specificationName[i] != null && specificationName[i].trim().length() >0){
+							if(specificationName[i].trim().length() >50){
 								error.put("specificationName_"+i, "规格名称超过50个字符");
 							}else{
-								specification.setSpecificationName(_specificationName.trim());
+								specification.setSpecificationName(specificationName[i].trim());
 							}
 						}else{
 							error.put("specificationName_"+i, "请填写规格名称");
 						}
 						
 						//是否启用
-						if(enable[i] != null){
+						if(enable != null && enable.length >0 && enable[i] != null){
 							specification.setEnable(enable[i]);
 						}else{
 							error.put("enable_"+i, "请填写库存");
 						}
 						
 						//更改库存状态
-						if(stockStatus[i] != null){
+						if(stockStatus != null && stockStatus.length >0 && stockStatus[i] != null){
 							specification.setStockStatus(stockStatus[i]);
 						}
 						
 						if(specification.getStockStatus().equals(0)){// 0:不变  1:增加   2:减少
-							if(stock[i] != null && !"".equals(stock[i].trim())){
+							if(stock != null && stock.length >0 && stock[i] != null && !"".equals(stock[i].trim())){
 								if(!Verification.isPositiveIntegerZero(stock[i].trim())){
 									error.put("stock_"+i, "库存必须为数字");
 								}else{
@@ -666,7 +664,7 @@ public class MembershipCardManageAction {
 							}
 							
 							//更改库存
-							if(changeStock[i] != null && !"".equals(changeStock[i].trim())){
+							if(changeStock != null && changeStock.length >0 && changeStock[i] != null && !"".equals(changeStock[i].trim())){
 								if(!Verification.isPositiveIntegerZero(changeStock[i].trim())){
 									error.put("stock_"+i, "库存必须为数字");
 								}else{
@@ -691,7 +689,7 @@ public class MembershipCardManageAction {
 						
 						
 						
-						if(point[i] != null && !"".equals(point[i].trim())){
+						if(point != null && point.length >0 && point[i] != null && !"".equals(point[i].trim())){
 							if(!Verification.isPositiveIntegerZero(point[i].trim())){
 								error.put("point_"+i, "积分必须为整数");
 							}else{
@@ -708,7 +706,7 @@ public class MembershipCardManageAction {
 						
 						
 						//市场价
-						if(marketPrice[i] != null && !"".equals(marketPrice[i].trim())){
+						if(marketPrice != null && marketPrice.length >0 && marketPrice[i] != null && !"".equals(marketPrice[i].trim())){
 							if(!Verification.isAmount(marketPrice[i].trim())){
 								error.put("marketPrice_"+i, "市场价必须为金额类型");
 							}else{
@@ -721,7 +719,7 @@ public class MembershipCardManageAction {
 							}
 						}
 						//销售价
-						if(sellingPrice[i] != null && !"".equals(sellingPrice[i].trim())){
+						if(sellingPrice != null && sellingPrice.length >0 && sellingPrice[i] != null && !"".equals(sellingPrice[i].trim())){
 							if(!Verification.isAmount(sellingPrice[i].trim())){
 								error.put("sellingPrice_"+i, "销售价必须为金额类型");
 							}else{
@@ -739,7 +737,7 @@ public class MembershipCardManageAction {
 							
 						}
 						
-						if(duration[i] != null && !"".equals(duration[i].trim())){
+						if(duration != null && duration.length >0 && duration[i] != null && !"".equals(duration[i].trim())){
 							if(!Verification.isPositiveIntegerZero(duration[i].trim())){
 								error.put("duration_"+i, "时长必须为整数");
 							}else{
@@ -756,7 +754,7 @@ public class MembershipCardManageAction {
 						}
 						
 						//时长单位
-						if(unit[i] != null){
+						if(unit != null && unit.length >0 && unit[i] != null){
 							specification.setUnit(unit[i]);
 						}else{
 							error.put("unit_"+i, "时长单位不能为空");

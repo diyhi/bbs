@@ -3672,10 +3672,10 @@ var askList_component = Vue.extend({
 			var _self = this;
 			var data = "";
 			if(_self.questionTagId != null && _self.questionTagId != ""){
-				data += "questionTagId=" + _self.questionTagId;
+				data += "&questionTagId=" + _self.questionTagId;
 			}
 			if(_self.filterCondition != null){
-				data += "filterCondition=" + _self.filterCondition;
+				data += "&filterCondition=" + _self.filterCondition;
 			}
 			
 			
@@ -4902,7 +4902,76 @@ var question_component = Vue.extend({
 				}
 			});
 		},
-		
+		//删除答案
+		deleteAnswer : function(answerId) {
+			var _self = this;
+			_self.$messagebox.confirm('确定删除答案?').then(function (action) {
+				var parameter = "&answerId=" + answerId;
+
+				//	alert(parameter);
+				//令牌
+				parameter += "&token=" + _self.$store.state.token;
+				$.ajax({
+					type : "POST",
+					cache : false,
+					async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+					url : "user/control/answer/delete",
+					data : parameter,
+					success : function success(result) {
+						if (result != "") {
+
+							var returnValue = $.parseJSON(result);
+
+							var value_success = "";
+							var value_error = null;
+
+							for (var key in returnValue) {
+								if (key == "success") {
+									value_success = returnValue[key];
+								} else if (key == "error") {
+									value_error = returnValue[key];
+								}
+							}
+
+							//加入成功
+							if (value_success == "true") {
+								_self.$toast({
+									message : "删除答案成功，3秒后自动刷新当前页面",
+									duration : 3000,
+									className : "mint-ui-toast",
+								});
+
+								setTimeout(function() {
+									//清空分页数据
+									_self.answerList = []; //答案列表
+									//查询答案列表
+									_self.queryAnswerList();
+								}, 3000);
+								
+							} else {
+								//显示错误
+								if (value_error != null) {
+
+
+									var htmlContent = "";
+									var count = 0;
+									for (var errorKey in value_error) {
+										var errorValue = value_error[errorKey];
+										count++;
+										htmlContent += count + ". " + errorValue + "<br>";
+									}
+									_self.$messagebox('提示', htmlContent);
+
+								}
+							}
+						}
+					}
+				});
+			}).catch(function (err){//不捕获 Promise 的异常,若用户点击了取消按钮,会出现警告
+			    console.log(err);
+			});
+		},
+				
 		
 		//回复界面
 		addReplyUI : function(answerId) {
@@ -5272,7 +5341,75 @@ var question_component = Vue.extend({
 			});
 		},
 		
-		
+		//删除回复
+		deleteReply : function(replyId) {
+			var _self = this;
+			_self.$messagebox.confirm('确定删除回复?').then(function (action) {
+				var parameter = "&replyId=" + replyId;
+
+				//	alert(parameter);
+				//令牌
+				parameter += "&token=" + _self.$store.state.token;
+				$.ajax({
+					type : "POST",
+					cache : false,
+					async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+					url : "user/control/answer/deleteReply",
+					data : parameter,
+					success : function success(result) {
+						if (result != "") {
+
+							var returnValue = $.parseJSON(result);
+
+							var value_success = "";
+							var value_error = null;
+
+							for (var key in returnValue) {
+								if (key == "success") {
+									value_success = returnValue[key];
+								} else if (key == "error") {
+									value_error = returnValue[key];
+								}
+							}
+
+							//加入成功
+							if (value_success == "true") {
+								_self.$toast({
+									message : "删除回复成功，3秒后自动刷新当前页面",
+									duration : 3000,
+									className : "mint-ui-toast",
+								});
+
+								setTimeout(function() {
+									//清空分页数据
+									_self.answerList = []; //答案列表
+									//查询答案列表
+									_self.queryAnswerList();
+								}, 3000);
+								
+							} else {
+								//显示错误
+								if (value_error != null) {
+
+
+									var htmlContent = "";
+									var count = 0;
+									for (var errorKey in value_error) {
+										var errorValue = value_error[errorKey];
+										count++;
+										htmlContent += count + ". " + errorValue + "<br>";
+									}
+									_self.$messagebox('提示', htmlContent);
+
+								}
+							}
+						}
+					}
+				});
+			}).catch(function (err){//不捕获 Promise 的异常,若用户点击了取消按钮,会出现警告
+			    console.log(err);
+			});
+		},
 		
 		//采纳答案
 		adoptionAnswer : function(id) {
@@ -5314,8 +5451,11 @@ var question_component = Vue.extend({
 								});
 
 								setTimeout(function() {
+									_self.question.adoptionAnswerId = 1;
+									
 									//清空分页数据
 									_self.answerList = []; //答案列表
+									
 									//查询答案列表
 									_self.queryAnswerList();
 								}, 3000);
@@ -9778,6 +9918,7 @@ var answerList_component = Vue.extend({
 		//查询答案列表
 		queryAnswerList : function() {
 			var _self = this;
+			
 			var data = "";
 			data += "&page=" + _self.currentpage; //提交参数
 			$.ajax({

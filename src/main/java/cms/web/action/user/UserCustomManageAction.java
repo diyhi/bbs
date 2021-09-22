@@ -299,14 +299,17 @@ public class UserCustomManageAction {
 					for(int i = 0; i< _itemValue.length; i++){
 						String item = _itemValue[i];
 						if(item != null && !"".equals(item.trim())){
-							String oldItemKey = itemKey[i];//旧key
-							if(oldItemKey != null && !"".equals(oldItemKey.trim())){
-								LinkedHashMap<String,String> oldItemValue_map = old_userCustom.getItemValue();			
-								if(oldItemValue_map.get(oldItemKey) != null){//已存在key
-									itemValue_map.put(oldItemKey, item);
-									continue;
-								}	
+							if(itemKey != null && itemKey.length >0){
+								String oldItemKey = itemKey[i];//旧key
+								if(oldItemKey != null && !"".equals(oldItemKey.trim())){
+									LinkedHashMap<String,String> oldItemValue_map = old_userCustom.getItemValue();			
+									if(oldItemValue_map.get(oldItemKey) != null){//已存在key
+										itemValue_map.put(oldItemKey, item);
+										continue;
+									}	
+								}
 							}
+							
 							itemValue_map.put(UUIDUtil.getUUID32(), item);
 						}
 					}

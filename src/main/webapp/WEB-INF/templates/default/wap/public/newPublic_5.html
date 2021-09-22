@@ -505,7 +505,7 @@
 				    	<router-link :to="{path: '/thread', query: {topicId: topicId,page: next}}" :class="next != ''? 'selected' : 'no'">下一页</router-link>
 				    </div>
 				    
-				    <div style="margin-left: 10px;margin-right: 10px; margin-top: 10px; margin-bottom: 10px;">
+				    <div style="margin-left: 10px;margin-right: 10px; margin-top: 10px; padding-bottom:10px;">
 						<mt-button  type="primary" size="large"  @click.native="addCommentUI">发表评论</mt-button>
 					</div>
 				</div>
@@ -1035,6 +1035,7 @@
 									        </div>  
 											<span class="time">
 												<span @click="editReplyUI(reply.id)" v-if="reply.userName == $store.state.user.userName"><span class="cms-pencil-alt" style="font-size: 10px;margin-right: 1px;"></span>编辑</span>
+												<span @click="deleteReply(reply.id)" v-if="reply.userName == $store.state.user.userName"><span class="cms-trash" style="font-size: 10px;margin-right: 1px;"></span>删除</span>
 											
 												{{reply.postTime}}
 											</span>
@@ -1054,6 +1055,7 @@
 						<div class="bottomInfo">
 							<div class="toolbar">
 								<span class="edit-btn"  @click="editAnswerUI(answer.id)" v-if="answer.userName == $store.state.user.userName"><span class="cms-pencil-alt" style="font-size: 10px;margin-right: 1px;"></span>编辑</span>
+								<span class="edit-btn"  @click="deleteAnswer(answer.id)" v-if="answer.userName == $store.state.user.userName"><span class="cms-trash" style="font-size: 10px;margin-right: 1px;"></span>删除</span>
 								
 								<span class="quote-btn"  @click="adoptionAnswer(answer.id)" v-if="question.userName == $store.state.user.userName && question.adoptionAnswerId == 0"><span class="cms-check-circle-solid" style="font-size: 10px;margin-right: 1px;"></span>采纳</span>
 								<span class="reply-btn"  @click="addReplyUI(answer.id)"><span class="cms-reply" style="font-size: 11px;margin-right: 1px;"></span>回复</span>
@@ -1066,7 +1068,7 @@
 				    	<router-link :to="{path: '/question', query: {questionId: questionId,page: next}}" :class="next != ''? 'selected' : 'no'">下一页</router-link>
 				    </div>
 				    
-				    <div style="margin-left: 10px;margin-right: 10px; margin-top: 10px;margin-bottom: 10px; ">
+				    <div style="margin-left: 10px;margin-right: 10px; margin-top: 10px;padding-bottom:10px; ">
 						<mt-button  type="primary" size="large"  @click.native="addAnswerUI">回答问题</mt-button>
 					</div>
 				</div>

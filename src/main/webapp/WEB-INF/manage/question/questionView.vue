@@ -336,6 +336,10 @@
 					                        <div class="operatInfo">
 					                        	<span class="orange-tag" v-if="reply.status ==10" title="回复状态">待审核</span>
 												<span class="green-tag" v-if="reply.status ==20" title="回复状态">已发布</span>
+												<span class="red-tag" v-if="reply.status ==110" title="回复状态">待审核用户删除</span>
+												<span class="red-tag" v-if="reply.status ==120" title="回复状态">已发布用户删除</span>
+												<span class="red-tag" v-if="reply.status ==100010" title="回复状态">待审核员工删除</span>
+												<span class="red-tag" v-if="reply.status ==100020" title="回复状态">已发布员工删除</span>
 					                        	<el-link class="operat-btn" href="javascript:void(0);" v-if="reply.status ==10"  @click="auditReply(reply.id)">审核</el-link>
 					                        	<el-link class="operat-btn" href="javascript:void(0);" @click="editReplyUI(reply)">修改</el-link>
 					                        	<el-link class="operat-btn" href="javascript:void(0);" v-if="reply.status >100"  @click="recoveryReply(reply.id)">恢复</el-link>
@@ -861,7 +865,7 @@ export default({
 			    				_self.answerStatusField.length = 0;
 			    				_self.editReplyStatusField.length = 0;
 			    				_self.editReplyContentField.length = 0;
-			    				
+			    				_self.answerList = '';
 			    				
 			    				
 			    				if(answerList != null && answerList.length > 0){
@@ -2668,9 +2672,7 @@ export default({
 				    	if(returnValue.code === 200){//成功
 				    		_self.$message.success("操作成功");
 				    		
-				    		if(_self.question.status < 100){
-				    			_self.queryQuestion();
-				    		}
+				    		_self.queryQuestion();
 				    		
 				    		_self.$router.push({
 				    			path: _self.sourceUrlObject.path, 
@@ -2872,7 +2874,59 @@ export default({
 		},
 		
 	
+		//恢复回复
+		recoveryReply : function(replyId) {
+			let _self = this;
+			this.$confirm('此操作将恢复该回复, 是否继续?', '提示', {
+	            confirmButtonText: '确定',
+	            cancelButtonText: '取消',
+	            type: 'warning'
+	        }).then(() => {
+	        	let formData = new FormData();
+		    	
+		    	formData.append('replyId', replyId);
+		    	
+				this.$ajax({
+			        method: 'post',
+			        url: 'control/answer/manage?method=recoveryReply',
+			        data: formData
+				})
+				.then(function (response) {
+					if(response == null){
+						return;
+					}
+				    let result = response.data;
+				    if(result){
+				    	
+				    	let returnValue = JSON.parse(result);
+				    	if(returnValue.code === 200){//成功
+				    		_self.$message.success("操作成功");
+				    		_self.queryQuestion();
+				    	}else if(returnValue.code === 500){//错误
+				    		
+				    		let errorMap = returnValue.data;
+				    		for (let key in errorMap) {
+				    			
+			    				_self.$message({
+						            showClose: true,
+						            message: errorMap[key],
+						            type: 'error'
+						        });
+				    			
+				    	    }
+				    		
+				    		
+				    	}
+				    }
+				})
+				.catch(function (error) {
+					console.log(error);
+				});
+	        }).catch((error) => {
+	        	console.log(error);
+	        });
 		
+		},
 		
 	}
 });

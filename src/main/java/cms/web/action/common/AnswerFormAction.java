@@ -829,6 +829,187 @@ public class AnswerFormAction {
 	}
 
 	/**
+	 * 答案  删除
+	 * @param model
+	 * @param answerId 答案Id
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/delete", method=RequestMethod.POST)
+	public String delete(ModelMap model,Long answerId,
+			String token,String jumpUrl,
+			RedirectAttributes redirectAttrs,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+		//获取登录用户
+	  	AccessUser accessUser = AccessUserThreadLocal.get();
+		
+		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+		Map<String,String> error = new HashMap<String,String>();
+		
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.getCloseSite().equals(2)){
+			error.put("answer", ErrorView._21.name());//只读模式不允许提交数据
+		}
+		
+		//判断令牌
+		if(token != null && !"".equals(token.trim())){	
+			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌
+			if(token_sessionid != null && !"".equals(token_sessionid.trim())){
+				if(!token_sessionid.equals(token)){
+					error.put("token", ErrorView._13.name());//令牌错误
+				}
+			}else{
+				error.put("token", ErrorView._12.name());//令牌过期
+			}
+		}else{
+			error.put("token", ErrorView._11.name());//令牌为空
+		}
+
+		
+		Answer answer = null;
+		Question question = null;
+		
+
+		if(answerId != null && answerId >0L){
+			answer = answerService.findByAnswerId(answerId);
+			if(answer != null){
+				question = questionService.findById(answer.getQuestionId());
+				if(question != null){
+					if(!answer.getUserName().equals(accessUser.getUserName())){
+						error.put("answer", ErrorView._240.name());//只允许删除自己发布的答案
+					}
+					
+					if(answer.getStatus() > 100){
+						error.put("answer", ErrorView._241.name());//答案已删除
+					}
+					
+					//是否有当前功能操作权限
+					boolean flag_permission = userRoleManage.isPermission(ResourceEnum._10009000,null);
+					if(flag_permission == false){
+						if(isAjax == true){
+							response.setStatus(403);//设置状态码
+				    		
+							WebUtil.writeToWeb("", "json", response);
+							return null;
+						}else{ 
+							String dirName = templateService.findTemplateDir_cache();
+								
+							String accessPath = accessSourceDeviceManage.accessDevices(request);	
+							request.setAttribute("message","权限不足"); 	
+							return "templates/"+dirName+"/"+accessPath+"/message";
+						}
+					}
+
+				}else{
+					error.put("answer", ErrorView._212.name());//问题不存在
+				}
+				
+			}else{
+				error.put("answer", ErrorView._205.name());//答案不存在
+			}
+		
+		}else{
+			error.put("answer", ErrorView._215.name());//答案Id不能为空
+		}
+		
+		
+		
+		if(error.size() == 0){
+			Integer constant = 100;
+			int i = answerService.markDeleteAnswer(answer.getId(),constant);
+			
+			if(i >0 && answer.getStatus() < 100){
+				User user = userManage.query_cache_findUserByUserName(answer.getUserName());
+				if(user != null){
+					//修改答案状态
+					userService.updateUserDynamicAnswerStatus(user.getId(),answer.getUserName(),answer.getQuestionId(),answer.getId(),answer.getStatus()+constant);
+				}
+				
+			}
+			 
+			if(i >0){
+				//删除缓存
+				answerManage.delete_cache_findByAnswerId(answer.getId());
+				
+				
+			}else{
+				error.put("answer", ErrorView._245.name());//删除答案失败
+			}
+
+		}
+
+		
+		Map<String,String> returnError = new HashMap<String,String>();//错误
+		if(error.size() >0){
+			//将枚举数据转为错误提示字符
+    		for (Map.Entry<String,String> entry : error.entrySet()) {		 
+    			if(ErrorView.get(entry.getValue()) != null){
+    				returnError.put(entry.getKey(),  ErrorView.get(entry.getValue()));
+    			}else{
+    				returnError.put(entry.getKey(),  entry.getValue());
+    			}
+			}
+		}
+		if(isAjax == true){
+			
+    		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
+    		
+    		if(error != null && error.size() >0){
+    			returnValue.put("success", "false");
+    			returnValue.put("error", returnError);
+    			
+    		}else{
+    			returnValue.put("success", "true");
+    		}
+    		WebUtil.writeToWeb(JsonUtils.toJSONString(returnValue), "json", response);
+			return null;
+		}else{
+			
+			
+			if(error != null && error.size() >0){//如果有错误
+				
+				redirectAttrs.addFlashAttribute("error", returnError);//重定向传参
+				redirectAttrs.addFlashAttribute("answer", answer);
+				
+
+				String referer = request.getHeader("referer");	
+				
+				
+				referer = StringUtils.removeStartIgnoreCase(referer,Configuration.getUrl(request));//移除开始部分的相同的字符,不区分大小写
+				referer = StringUtils.substringBefore(referer, ".");//截取到等于第二个参数的字符串为止
+				referer = StringUtils.substringBefore(referer, "?");//截取到等于第二个参数的字符串为止
+				
+				String queryString = request.getQueryString() != null && !"".equals(request.getQueryString().trim()) ? "?"+request.getQueryString() :"";
+
+				return "redirect:/"+referer+queryString;
+	
+			}
+			
+			
+			if(jumpUrl != null && !"".equals(jumpUrl.trim())){
+				String url = Base64.decodeBase64URL(jumpUrl.trim());
+				
+				return "redirect:"+url;
+			}else{//默认跳转
+				model.addAttribute("message", "删除答案成功");
+				String referer = request.getHeader("referer");
+				if(RefererCompare.compare(request, "login")){//如果是登录页面则跳转到首页
+					referer = Configuration.getUrl(request);
+				}
+				model.addAttribute("urlAddress", referer);
+				
+				String dirName = templateService.findTemplateDir_cache();
+				
+				
+				return "templates/"+dirName+"/"+accessSourceDeviceManage.accessDevices(request)+"/jump";	
+			}
+		}
+	}
+	
+	/**
 	 * 答案  图片上传
 	 * @param model
 	 * @param questionId 问题Id
@@ -1725,5 +1906,182 @@ public class AnswerFormAction {
 			}
 		}
 	}
+	/**
+	 * 答案回复  删除
+	 * @param model
+	 * @param replyId 回复Id
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/deleteReply", method=RequestMethod.POST)
+	public String deleteReply(ModelMap model,Long replyId,
+			String token,String jumpUrl,
+			RedirectAttributes redirectAttrs,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+		//获取登录用户
+	  	AccessUser accessUser = AccessUserThreadLocal.get();
+		
+		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+		Map<String,String> error = new HashMap<String,String>();
+		
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.getCloseSite().equals(2)){
+			error.put("reply", ErrorView._21.name());//只读模式不允许提交数据
+		}
+		
+		//判断令牌
+		if(token != null && !"".equals(token.trim())){	
+			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌
+			if(token_sessionid != null && !"".equals(token_sessionid.trim())){
+				if(!token_sessionid.equals(token)){
+					error.put("token", ErrorView._13.name());//令牌错误
+				}
+			}else{
+				error.put("token", ErrorView._12.name());//令牌过期
+			}
+		}else{
+			error.put("token", ErrorView._11.name());//令牌为空
+		}
+		
+		
+		Question question = null;
+		AnswerReply reply = null;
+		
+		if(replyId != null && replyId >0L){
+			reply = answerService.findReplyByReplyId(replyId);
+			if(reply != null){
+				question = questionService.findById(reply.getQuestionId());
+				if(question != null){
+					if(!reply.getUserName().equals(accessUser.getUserName())){
+						error.put("reply", ErrorView._144.name());//只允许删除自己发布的回复
+					}
+					
+					if(reply.getStatus() > 100){
+						error.put("reply", ErrorView._116.name());//回复已删除
+					}
+					
+					//是否有当前功能操作权限
+					boolean flag_permission = userRoleManage.isPermission(ResourceEnum._10015000,null);
+					if(flag_permission == false){
+						if(isAjax == true){
+							response.setStatus(403);//设置状态码
+				    		
+							WebUtil.writeToWeb("", "json", response);
+							return null;
+						}else{ 
+							String dirName = templateService.findTemplateDir_cache();
+								
+							String accessPath = accessSourceDeviceManage.accessDevices(request);	
+							request.setAttribute("message","权限不足"); 	
+							return "templates/"+dirName+"/"+accessPath+"/message";
+						}
+					}
+					
+				}else{
+					error.put("reply", ErrorView._107.name());//话题不存在
+				}
+				
+			}else{
+				error.put("reply", ErrorView._125.name());//回复不存在
+			}
+		
+		}else{
+			error.put("reply", ErrorView._126.name());//回复Id不能为空
+		}
+		
+		
+		if(error.size() == 0){
+			Integer constant = 100;
+			int i = answerService.markDeleteReply(reply.getId(),constant);
+			
+			if(i >0){
+				User user = userManage.query_cache_findUserByUserName(reply.getUserName());
+				if(user != null){
+					//修改回复状态
+					userService.updateUserDynamicAnswerReplyStatus(user.getId(),reply.getUserName(),reply.getQuestionId(),reply.getAnswerId(),reply.getId(),reply.getStatus()+constant);
+				}
+				
+			}
+			
+
+			 
+			if(i >0){
+				//删除缓存
+				answerManage.delete_cache_findReplyByReplyId(reply.getId());
+			}else{
+				error.put("reply", ErrorView._142.name());//删除回复失败
+			}
+
+		}
+
+		
+		Map<String,String> returnError = new HashMap<String,String>();//错误
+		if(error.size() >0){
+			//将枚举数据转为错误提示字符
+    		for (Map.Entry<String,String> entry : error.entrySet()) {		 
+    			if(ErrorView.get(entry.getValue()) != null){
+    				returnError.put(entry.getKey(),  ErrorView.get(entry.getValue()));
+    			}else{
+    				returnError.put(entry.getKey(),  entry.getValue());
+    			}
+			}
+		}
+		if(isAjax == true){
+			
+    		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
+    		
+    		if(error != null && error.size() >0){
+    			returnValue.put("success", "false");
+    			returnValue.put("error", returnError);
+    			
+    		}else{
+    			returnValue.put("success", "true");
+    		}
+    		WebUtil.writeToWeb(JsonUtils.toJSONString(returnValue), "json", response);
+			return null;
+		}else{
+			
+			
+			if(error != null && error.size() >0){//如果有错误
+				
+				redirectAttrs.addFlashAttribute("error", returnError);//重定向传参
+				redirectAttrs.addFlashAttribute("reply", reply);
+				
+
+				String referer = request.getHeader("referer");	
+				
+				
+				referer = StringUtils.removeStartIgnoreCase(referer,Configuration.getUrl(request));//移除开始部分的相同的字符,不区分大小写
+				referer = StringUtils.substringBefore(referer, ".");//截取到等于第二个参数的字符串为止
+				referer = StringUtils.substringBefore(referer, "?");//截取到等于第二个参数的字符串为止
+				
+				String queryString = request.getQueryString() != null && !"".equals(request.getQueryString().trim()) ? "?"+request.getQueryString() :"";
+
+				return "redirect:/"+referer+queryString;
 	
+			}
+			
+			
+			if(jumpUrl != null && !"".equals(jumpUrl.trim())){
+				String url = Base64.decodeBase64URL(jumpUrl.trim());
+				
+				return "redirect:"+url;
+			}else{//默认跳转
+				model.addAttribute("message", "删除回复成功");
+				String referer = request.getHeader("referer");
+				if(RefererCompare.compare(request, "login")){//如果是登录页面则跳转到首页
+					referer = Configuration.getUrl(request);
+				}
+				model.addAttribute("urlAddress", referer);
+				
+				String dirName = templateService.findTemplateDir_cache();
+				
+				
+				return "templates/"+dirName+"/"+accessSourceDeviceManage.accessDevices(request)+"/jump";	
+			}
+		}
+	}
 }

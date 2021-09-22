@@ -1529,7 +1529,7 @@ html,body{
 	font-weight: 300;
 	font-size: 20px;
 }
-.questionContentModule .questionDetail .head .info{ padding:15px 0px 1px 0px;}
+.questionContentModule .questionDetail .head .info{ padding:15px 0px 5px 0px;}
 .questionContentModule .questionDetail .head .info .left{float:left!important;}
 .questionContentModule .questionDetail .head .info .left .tagName{
 	margin-right:3px;
@@ -1959,9 +1959,9 @@ html,body{
 .questionContentModule .answerList .item .bottomInfo .toolbar .quote-btn{
 	color: #999;
 	font-size: 14px;
+	margin-right: 30px;
 }
 .questionContentModule .answerList .item .bottomInfo .toolbar .reply-btn{
-	margin-left:30px;
 	color: #999;
 	font-size: 14px;
 }

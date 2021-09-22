@@ -1,0 +1,67 @@
+<#--  删除答案回复 需要引入layer -->
+<@function>
+	<#--  只允许删除自己的答案回复 -->
+	<a href="javascript:" onclick="deleteAnswerReply('${reply.id}');">删除</a>
+	
+	
+	
+	<script language="javascript" type="text/javascript">
+		//删除回复
+		function deleteAnswerReply(replyId){
+			var parameter = "";
+			//回复Id
+			parameter += "&replyId="+replyId;
+			//从meta标签获取令牌
+			parameter += "&token="+getCsrf();
+		   	//删除第一个&号,防止因为多了&号而出现警告: Parameters: Invalid chunk ignored.信息
+			if(parameter.indexOf("&") == 0){
+				parameter = parameter.substring(1,parameter.length);
+			}
+		   	post_request(function(value){
+		   		if(value != ""){
+					var data = JSON.parse(value);
+					for(var returnValue in data){
+						
+						if(returnValue == "success"){
+		        			if(data[returnValue] == "true"){
+		        				layer.msg('删除成功', 
+									{
+									  time: 3000 //3秒关闭（如果不配置，默认是3秒）
+									},function(){
+										//关闭后的操作
+										//刷新页面
+									    document.location.reload();
+									}
+								);
+		        			}
+		        		}else if(returnValue == "error"){
+		        			var errorValue = data[returnValue];
+							var htmlValue = "";
+							var i = 0;
+							for(var error in errorValue){
+								if(error != ""){	
+									i++;
+									htmlValue += "&nbsp;&nbsp;"+i+"、"+errorValue[error]+"<br>";
+								}
+							}
+							
+							layer.open({
+							  type: 1,
+							  title: '错误', 
+							  skin: 'layui-layer-rim', //加上边框
+							  area: ['300px', '150px'], //宽高
+							  content: "<div style='line-height: 36px; font-size: 15px; margin-left: 8px;margin-right: 8px;'>"+htmlValue+"</div>"
+							});
+		        		}
+		        	}
+		       	}
+			},
+				"user/control/answer/deleteReply?timestamp=" + new Date().getTime(), true,parameter);
+			
+		}
+	</script>
+	
+		
+		
+	
+</@function>

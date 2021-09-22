@@ -140,6 +140,13 @@ public interface AnswerService  extends DAO<Answer>{
 	 */
 	public Integer deleteAnswer(List<String> userNameList);
 	/**
+	 * 标记删除答案
+	 * @param answerIdId 答案Id
+	 * @param constant 常数 例如 "110.待审核用户删除" 则加上100
+	 * @return
+	 */
+	public Integer markDeleteAnswer(Long answerId,Integer constant);
+	/**
 	 * 查询待审核答案数量
 	 * @return
 	 */
@@ -207,6 +214,13 @@ public interface AnswerService  extends DAO<Answer>{
 	 * @return
 	 */
 	public int updateReplyStatus(Long answerReplyId,Integer status);
+	/**
+	 * 标记删除回复
+	 * @param replyId 回复Id
+	 * @param constant 常数 例如 "110.待审核用户删除" 则加上100
+	 * @return
+	 */
+	public Integer markDeleteReply(Long replyId,Integer constant);
 	/**
 	 * 删除回复
 	 * @param answerReplyId 回复Id

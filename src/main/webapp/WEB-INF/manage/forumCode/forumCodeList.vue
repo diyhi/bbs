@@ -20,7 +20,7 @@
 					</el-table-column>
 					<el-table-column label="添加版块代码" align="center" width="130">
 						<template #default="scope">	
-							<el-link type="primary" href="javascript:void(0);" @click="addForumCodeUI($event,scope.row)" v-if="scope.row.prefix != null && scope.row.prefix != '' && scope.row.childNode.length >0">添加版块代码</el-link>
+							<el-link type="primary" href="javascript:void(0);" @click="addForumCodeUI($event,scope.row)" v-if="scope.row.prefix != null && scope.row.prefix != ''">添加版块代码</el-link>
 				    	</template>
 					</el-table-column>
 					<el-table-column label="操作" align="center" width="220">

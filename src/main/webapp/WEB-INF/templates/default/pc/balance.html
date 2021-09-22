@@ -33,16 +33,13 @@
 	
 		<!-- 余额  -->
 		<div class="balanceModule">
-			<span class="deposit">余额：￥${deposit}</span>
-		 
-			<span class="button">
+			<span class="deposit"><span class="name">余额：</span>￥${deposit}</span>
 
-				<span class="blue_btn_box">
-                    <input type="button" class="blue_btn" value="充值" style="text-align:center;width:45px;" onclick="javascript:window.location.href='user/control/payment?paymentModule=5'" />
-                </span>
+			<span class="buttonBox">
+				<button type="button" class="payButton" onclick="javascript:window.location.href='user/control/payment?paymentModule=5'">充值</button>
 			</span>
 		</div>
-		<div class="clearfix"></div>
+		<div class="clearfix" style="height: 10px;background: #f8f8f9;"></div>
 		<div class="dataTable paymentLogListModule">
 			<TABLE class="dataList" width="100%">
 				<THEAD>
@@ -97,7 +94,7 @@
 			    	</#if> 
 				    <#if !pageView.records?exists || pageView.totalrecord == 0 > 
 				    	<TR>
-							<TD colSpan="4" class="empty">还没有日志</TD>
+							<TD colSpan="5" class="empty">还没有日志</TD>
 				    	</TR>
 					</#if>
 		    	</TBODY>

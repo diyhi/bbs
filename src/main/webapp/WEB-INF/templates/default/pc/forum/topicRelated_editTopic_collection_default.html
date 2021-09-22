@@ -22,7 +22,7 @@
 					<#-- 提交后跳转参数  参数必须经过encodeBase64URL编码后才能提交 不填写时默认跳转回当前页 -->
 					<input type="hidden" id="jumpUrl" name="jumpUrl" value="">
 					
-					<div style="height: 40px;">
+					<div style="height: 50px;">
 						<div style="float:left;">
 							
 							<input type="text" id="title" name="title" class="formText" size="90" value="${topicValue.title}" alt="标题" title="标题"/>
@@ -341,7 +341,7 @@
 							var fileSystem = document.getElementById("fileSystem").value;
 
 							editor = K.create('textarea[id="topicContent"]', {
-								themeType : 'style :darkGray',//深灰主题 加冒号的是主题样式文件名称同时也是主题目录
+								themeType : 'style :minimalist customization',//极简主题 加冒号的是主题样式文件名称同时也是主题目录
 								basePath : '${commonPath}js/kindeditor/',//指定编辑器的根目录路径
 								formatUploadUrl :false,//false时不会自动格式化上传后的URL
 								resizeType : 1,//2或1或0，2时可以拖动改变宽度和高度，1时只能改变高度，0时不能拖动。默认值: 2 

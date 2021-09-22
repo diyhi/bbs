@@ -14,7 +14,6 @@
 					</div>
 					<div class="operat">
 						<el-link class="item" href="javascript:void(0);" v-if="topic.status == 10" @click="auditTopic(topic.id);">审核</el-link>
-						
 						<el-link class="item" href="javascript:void(0);" @click="$router.push({path: '/admin/control/topicLike/list', query:{ visible:($route.query.visible != undefined ? $route.query.visible:''),topicView_beforeUrl:($route.query.topicView_beforeUrl != undefined ? $route.query.topicView_beforeUrl:''),topicId :topic.id, commentId:($route.query.commentId != undefined ? $route.query.commentId:''),page:($route.query.page != undefined ? $route.query.page:''), topicPage:($route.query.page != undefined ? $route.query.page:'')}})">点赞用户</el-link>
 						<el-link class="item" href="javascript:void(0);" v-if="topic.giveRedEnvelopeId != null && topic.giveRedEnvelopeId != ''" @click="$router.push({path: '/admin/control/redEnvelope/redEnvelopeAmountDistribution/list', query:{giveRedEnvelopeId:topic.giveRedEnvelopeId, visible:($route.query.visible != undefined ? $route.query.visible:''),topicView_beforeUrl:($route.query.topicView_beforeUrl != undefined ? $route.query.topicView_beforeUrl:''),topicId :topic.id, commentId:($route.query.commentId != undefined ? $route.query.commentId:''),page:($route.query.page != undefined ? $route.query.page:''), topicPage:($route.query.page != undefined ? $route.query.page:'')}})">红包</el-link>
 						<el-link class="item" href="javascript:void(0);" @click="$router.push({path: '/admin/control/topicFavorite/list', query:{ visible:($route.query.visible != undefined ? $route.query.visible:''),topicView_beforeUrl:($route.query.topicView_beforeUrl != undefined ? $route.query.topicView_beforeUrl:''),topicId :topic.id, commentId:($route.query.commentId != undefined ? $route.query.commentId:''),page:($route.query.page != undefined ? $route.query.page:''), topicPage:($route.query.page != undefined ? $route.query.page:'')}})">收藏用户</el-link>
@@ -779,7 +778,7 @@ export default({
 			    				_self.commentStatusField.length = 0;
 			    				_self.editReplyStatusField.length = 0;
 			    				_self.editReplyContentField.length = 0;
-			    				
+			    				_self.commentList = '';
 			    				
 			    				
 			    				if(commentList != null && commentList.length > 0){
@@ -2314,8 +2313,6 @@ export default({
 				    	let returnValue = JSON.parse(result);
 				    	if(returnValue.code === 200){//成功
 				    		_self.$message.success("操作成功");
-				    		//删除缓存
-			    			_self.$store.commit('setCacheNumber');
 				    		_self.queryTopic();
 				    	}else if(returnValue.code === 500){//错误
 				    		
@@ -2507,7 +2504,7 @@ export default({
 	        });
 		
 		},
-
+		
 	}
 });
 

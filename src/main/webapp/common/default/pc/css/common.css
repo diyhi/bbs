@@ -7,7 +7,7 @@
 body {
 	color: #939499;
 	line-height: 22px;
-	background: #fcfcfc;
+	background: #f8f8f9;
 	min-width: 960px;
 }
 
@@ -157,17 +157,19 @@ html,body{
 	-moz-box-pack: center;
 	-o-box-pack: center;
 	box-pack: center;
-	-ms-flex-pack: center
+	-ms-flex-pack: center;
 }
 /* 正文 */
 .main{
 	margin:0 auto;
-	margin-top:51px;
-	margin-bottom: 90px;
+	margin-top:61px;
+	margin-bottom: 100px;
 }
 /* 背景 */
 .backgroundModule{
+	margin-top:71px;
 	background: #fff; 
+	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
 }
 .wrap{width:1210px;}
 
@@ -260,15 +262,27 @@ html,body{
 }
 
 /* 表单 text */
-.formText{height:24px; line-height:24px; padding:2px 4px;border:1px solid;border-color:#e0e0e0 #e0e0e0 #e0e0e0 #e0e0e0;background:#fff;border-radius:3px;outline: none;}
+.formText{height:34px; line-height: normal;line-height: 34px\9; padding:0px 10px 0px 10px;background:#f9f9f9;border: 1px solid transparent; border-radius:3px;outline: none;}
 .formText:disabled{  
-    border: 1px solid #e6e6e6;  
+    border: 1px solid transparent;
     background-color: #fbfbfb;  
     color:#c9c9c9;
-    border-radius:2px;
+    border-radius:3px;
 } 
+.formText::-webkit-input-placeholder {
+	color: #999;
+}
+.formText:-ms-input-placeholder {
+	color: #999;
+}
+.formText:-moz-placeholder {
+	color: #999;
+}
+.formText::-moz-placeholder {
+	color: #999;
+}
 /* 表单 select */
-.formSelect{height:30px; line-height:30px; padding:2px 4px;border:1px solid;border-color:#e0e0e0 #e0e0e0 #e0e0e0 #e0e0e0;background:#fff;border-radius:3px;margin-right: 1px;outline: none;}
+.formSelect{height:36px; line-height:36px; padding:0px 10px 0px 10px;border: 1px solid transparent;background:#f9f9f9;border-radius:3px;margin-right: 1px;outline: none;}
 
 /* 表单 radio */
 .formRadio {
@@ -635,14 +649,14 @@ html,body{
 	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
 	
 	position: absolute;
-	height: 50px;
+	height: 60px;
 	left: 0; top: 0; right: 0; 
 }
 
 .headerModule .box {
 	*zoom: 1;
-	height: 50px;
-	line-height: 50px;
+	height: 60px;
+	line-height: 60px;
 	width: 1210px;
 	margin: 0 auto
 }
@@ -655,7 +669,7 @@ html,body{
 }
 
 .headerModule .box .logo {
-	float: left;margin-top: 5px;*margin-top:2px; 
+	float: left;margin-top: 10px;*margin-top:7px; 
 }
 
 
@@ -709,11 +723,11 @@ html,body{
 
 .headerModule .box .menu ul li .author{position:relative;color:#999}
 .headerModule .box .menu ul li .author img{
-	width:32px;
-	height:32px;
+	width:36px;
+	height:36px;
 	position:absolute;
-	left:-18px;
-	top:9px;
+	left:-22px;
+	top:12px;
 	-webkit-border-radius:50%;
 	-moz-border-radius:50%;
 	border-radius:50%;
@@ -733,16 +747,16 @@ html,body{
 
 .headerModule .box .head-search form {
 	width: 220px;
-	height: 30px;
+	height: 34px;
 	background: #f5f5f7;
 	border-radius: 3px;
 	float: left;
-	margin-top: 10px;
+	margin-top: 13px;
 	position: relative
 }
 .headerModule .box .head-search form input {
-	width: 180px;
-	height: 20px;
+	width: 176px;
+	height: 24px;
 	*height: 50px;
 	line-height: 20px;
 	background: none;
@@ -764,8 +778,8 @@ html,body{
 	width: 30px;
 	height: 30px;
 	position: absolute;
-	top: 0px;
-	right: 0px;
+	top: 2px;
+	right: 2px;
 	text-indent: -999px;
 	cursor: pointer;
 	margin: 0px;
@@ -1227,7 +1241,7 @@ html,body{
 	position: relative;top: 1px;
 }
 .topic-formModule .addTopic-wrap .redEnvelope{
-	position: absolute;right: 15px;top: 20px; cursor: pointer;
+	position: absolute;right: 15px;top: 20px; cursor: pointer;color: #909399;
 }
 .topic-formModule .addTopic-wrap .redEnvelope:hover{color: #2196F3;}
 .topic-formModule .addTopic-wrap .redEnvelope .txt{
@@ -1237,10 +1251,10 @@ html,body{
 	
 }
 .topic-formModule .addTopic-wrap .error {
-	color: red;position: relative;top: 1px;
+	color: #F56C6C;position: relative;top: 1px;
 }
 .topic-formModule .addTopic-wrap .help {
-	color: #747474;position: relative;top: 1px;margin-left: 3px;
+	color: #747474;position: relative;top: 1px;margin-left: 4px;
 }
 .topic-formModule .addTopic-wrap .topicSubmit {
 	width: 70px;
@@ -1332,7 +1346,6 @@ html,body{
 	float: left;
 	width: 900px;
 	height: auto;
-	padding-bottom: 10px;
 }
 .topicContentModule .left .topic-wrap{
 	background: #fff;
@@ -1871,7 +1884,7 @@ html,body{
 	 padding-left: 0px; padding-right: 0px; padding-top: 8px;margin-bottom: 12px;
 }
 .commentReply-formModule .addReply-wrap .error {
-	color: red;
+	color: #F56C6C;
 }
 .commentReply-formModule .addReply-wrap .replySubmit {
 	height: 38px;
@@ -2034,7 +2047,7 @@ html,body{
 	 padding-left: 0px; padding-right: 0px; padding-top: 8px;margin-bottom: 12px;
 }
 .editCommentReply-formModule .editReply-wrap .error {
-	color: red;
+	color: #F56C6C
 }
 .editCommentReply-formModule .editReply-wrap .replySubmit {
 	height: 38px;
@@ -2197,7 +2210,7 @@ html,body{
 	 padding-left: 0px; padding-right: 0px; padding-top: 8px;margin-bottom: 12px;
 }
 .quote-formModule .addQuote-wrap .error {
-	color: red;
+	color: #F56C6C;
 }
 .quote-formModule .addQuote-wrap .quoteSubmit {
 	height: 38px;
@@ -2345,7 +2358,7 @@ html,body{
 	 padding-left: 0px; padding-right: 0px; padding-top: 8px;margin-bottom: 12px;
 }
 .comment-formModule .addComment-wrap .error {
-	color: red;
+	color: #F56C6C;
 }
 .comment-formModule .addComment-wrap .commentSubmit {
 	width: 70px;
@@ -2436,7 +2449,7 @@ html,body{
 	 padding-left: 0px; padding-right: 0px; padding-top: 8px;margin-bottom: 12px;
 }
 .editComment-formModule .editComment-wrap .error {
-	color: red;
+	color: #F56C6C;
 }
 .editComment-formModule .editComment-wrap .editCommentSubmit {
 	height: 38px;
@@ -3067,6 +3080,11 @@ html,body{
 	width: 30px;
 	height: 30px;
 }
+.loginModule .otherLogin .link .icon-50{
+	background-image:url('../images/other-login.svg');
+	width: 30px;
+	height: 30px;
+}
 
 
 /* 找回密码 */
@@ -3149,13 +3167,13 @@ html,body{
 /* 用户中心 */
 .user-home-header{
 	background: red;
-	margin-top: 60px;
+	margin-top: 50px;
 	position: relative;
 	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
 }
 .user-home-header .avatarRing {
-	width: 150px;
-	height: 100px;
+	width: 160px;
+	height: 110px;
 	background: #fff;
 	border-radius: 4px;
 	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
@@ -3176,8 +3194,8 @@ html,body{
 	background: #fff;
 	border-radius: 4px;
 	position: absolute;
-	left: 20px;
-	top: -35px;
+	left: 25px;
+	top: -30px;
 	width: 140px
 }
 .user-home-header .avatar .img-box {
@@ -3321,9 +3339,9 @@ html,body{
 
 
 /* 服务 */
-.selfService { margin-left: -5px;margin-top: 10px;}
-.selfService .box{overflow:hidden;zoom:1; margin:0 0px;}
-.selfService .box .ul{padding-bottom:10px;overflow:hidden;zoom:1;background-position:0 0px;}
+.selfService { margin-left: -5px;margin-top: 5px;}
+.selfService .box{overflow:hidden;zoom:1; margin:0 0px;margin-bottom:-5px;}
+.selfService .box .ul{overflow:hidden;zoom:1;background-position:0 0px;}
 .selfService .box .ul .item{
 	width:19%; position:relative;float:left; height:130px;border:1px solid #fff;
 	padding:10px 0 0;margin:5px 5px 5px 5px;
@@ -3353,8 +3371,9 @@ html,body{
 
 /** 服务导航 **/
 .serviceNav {
+	margin-top:-10px;
 	height: 46px;
-	background-color: #fcfcfc;
+	background-color: #f8f8f9;
 	font-size: 15px;
 	color: #333;
 }
@@ -3792,7 +3811,6 @@ html,body{
 }
 .privateMessageChatForm{
 	margin-top: 10px;
-	margin-bottom:10px;
 	background: #fff;
 	padding-bottom: 1px;
 	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
@@ -3834,7 +3852,7 @@ html,body{
 	margin-left:20px;
 	font-size: 14px;
 	line-height: 20px;
-	color: #f04645;
+	color: #F56C6C;
 	display: none;
 }
 .privateMessageChatForm .form-action .submitButton-box{
@@ -4454,11 +4472,10 @@ html,body{
 	color: #aaa;margin-right: 10px;
 }
 .userDynamicPage {
-	margin-top: 8px;margin-right:8px;height: 40px;
+	margin-top: 20px;margin-right:10px;height: 40px;margin-bottom: 20px;
 }
 
 .membershipCardListModule{
-	margin-bottom: 20px;
 	display: -webkit-box;
     display: -webkit-flex;
     display: -ms-flexbox;
@@ -4472,13 +4489,13 @@ html,body{
     -ms-flex-pack: center;
     justify-content: center;
 }
-.membershipCardListModule ul{ margin-left: -16px;}
+.membershipCardListModule ul{ margin-left: -10px;}
 .membershipCardListModule li{
   
 	-moz-box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
 	-webkit-box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
 	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
-	float: left; width: 250px; background-color: #fff; padding: 25px 20px; color: #666; font-size: 12px; margin-left: 16px;margin-top:18px; position: relative;}
+	float: left; width: 255px; background-color: #fff; padding: 25px 20px; color: #666; font-size: 12px; margin-left: 10px;margin-top:10px; position: relative;}
 .membershipCardListModule h5{ text-align: center; color: #333; font-size: 24px; line-height: 24px; font-weight: normal;}
 /**
 .membershipCardListModule .introduction-box{ padding-top: 25px; margin-top: 25px; border-top: 1px solid #f2f2f2;min-height: 120px;}
@@ -4520,7 +4537,7 @@ html,body{
 
 /* 模块头 */
 .module-head{
-	margin-top:20px;
+	margin-top:10px;
 	background: #fff;
 	padding: 2px 20px 2px 20px;
 	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
@@ -4635,12 +4652,31 @@ html,body{
 .membershipCardModule .detail .content img{max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;vertical-align: sub;}
 
 /* 余额 */
-.balanceModule{padding: 30px 0 30px 30px;background: #fff;position: relative;margin-bottom: 10px;
+.balanceModule{padding: 30px 0 30px 30px;background: #fff;position: relative;
 	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
 }
 .balanceModule .deposit{font-size: 16px; }
-.balanceModule .button{margin-left: 200px; display: block;margin-top: -26px;}
-
+.balanceModule .deposit .name{color: #99a9bf;}
+.balanceModule .buttonBox{margin-left: 100px; margin-top: -26px;}
+.balanceModule .buttonBox .payButton{
+	color: #30aff7;
+    border-color: #30aff7;
+    outline: none;
+    display: inline-block;
+    padding: 0 16px;
+    font-size: 14px;
+    line-height: 32px;
+    text-align: center;
+    cursor: pointer;
+    background: none;
+    border: 1px solid;
+    border-radius: 3px;
+    margin: 0;
+	
+}
+.balanceModule .buttonBox .payButton:hover {  
+    background: #e2f2ff;  
+} 
 
 
 /* 付款页面 */
@@ -4711,11 +4747,11 @@ html,body{
 	line-height: 34px;
 	font-weight: 700;
 	color: #4d4d4d;
-	float: left
+	float: left;
 }
 .paymentModule .bankSelect dl {
-	width: 142px;
-	height: 32px;
+	width: 162px;
+	height: 42px;
 	border: 1px solid #ebebeb;
 	margin-right: 30px;
 	margin-bottom: 10px;
@@ -4723,8 +4759,8 @@ html,body{
 	display: block
 }
 .paymentModule .bankSelect dl input {
-	margin: 10px 0 0 8px;
-	width: 13px;
+	margin: 14px 0 0 8px;
+	width: 16px;
 	height: 13px
 }
 .paymentModule .bankSelect dt {
@@ -4735,7 +4771,9 @@ html,body{
 .paymentModule .bankSelect dd {
 	width: 120px;
 	height: 32px;
-	float: left
+	float: left;
+	margin-left: 10px;
+	margin-top: 5px;
 }
 .paymentModule .bankSelect dd img {
 	width: 120px;
@@ -4779,11 +4817,12 @@ html,body{
 }
 
 /* 红包 */
-.redEnvelopeHeadModule{padding: 30px 0 30px 30px;background: #fff;position: relative;margin-bottom: 10px;
+.redEnvelopeHeadModule{padding: 30px 0 30px 30px;background: #fff;position: relative;
 	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
 }
-.redEnvelopeHeadModule .text{font-size: 16px; margin-right: 40px;}
-.redEnvelopeHeadModule .topic{display: block;font-size: 16px;margin-top: 10px;}
+.redEnvelopeHeadModule .text{font-size: 15px; margin-right: 40px;}
+.redEnvelopeHeadModule .text .name{color: #99a9bf;}
+.redEnvelopeHeadModule .topic{display: block;font-size: 15px;margin-top: 10px;}
 
 
 /*修改话题*/
@@ -4805,7 +4844,7 @@ html,body{
 	 padding-left: 0px; padding-right: 0px; padding-top: 8px;margin-bottom: 12px;
 }
 .editTopicModule .topic-box .topic-form .error {
-	color: red;
+	color: #F56C6C;
 }
 
 .editTopicModule .topic-box .topic-form .topicSubmit {
@@ -4946,7 +4985,7 @@ html,body{
 }
 .askListModule .nav>li>a:focus,.askListModule .nav>li>a:hover {
 	text-decoration: none;
-	background-color: #f2f2f2;
+	background-color: #f2f2f4;
 }
 .askListModule .nav>li>a>img {
 	max-width: none
@@ -5001,7 +5040,7 @@ html,body{
 	
 }
 .askListModule .question-box .questionList {
-	margin-bottom: 10px;
+	
 }
 .askListModule .question-box .questionList .questionItem {
 	margin: 0;
@@ -5299,7 +5338,6 @@ html,body{
 	float: left;
 	width: 900px;
 	height: auto;
-	padding-bottom: 10px;
 }
 .questionContentModule .left .question-wrap{
 	background: #fff;
@@ -5867,7 +5905,7 @@ html,body{
 	 padding-left: 0px; padding-right: 0px; padding-top: 8px;margin-bottom: 12px;
 }
 .answerReply-formModule .addReply-wrap .error {
-	color: red;
+	color: #F56C6C;
 }
 .answerReply-formModule .addReply-wrap .answerSubmit {
 	height: 38px;
@@ -6032,7 +6070,7 @@ html,body{
 	 padding-left: 0px; padding-right: 0px; padding-top: 8px;margin-bottom: 12px;
 }
 .editAnswerReply-formModule .editReply-wrap .error {
-	color: red;
+	color: #F56C6C;
 }
 .editAnswerReply-formModule .editReply-wrap .replySubmit {
 	height: 38px;
@@ -6178,7 +6216,7 @@ html,body{
 }
 .addQuestionModule .question-wrap{
 	background: #fff;
-	padding:15px 15px 30px 15px;
+	padding:15px 15px 50px 15px;
 	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
 }
 .addQuestionModule .question-form {
@@ -6202,12 +6240,12 @@ html,body{
 	
 	border: 1px solid transparent;
 	color: #83878f;
-	background-color: #e7eaee;
-	border-color: #e7eaee;
+	background-color: #f9f9f9;
+	border-color: #f9f9f9;
 
 	padding: 3px 8px;
 	font-size: 14px;
-	line-height: 22px;
+	line-height: 30px;
 	border-radius: 3px;
 	transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 	outline:none;
@@ -6216,8 +6254,8 @@ html,body{
 }
 .addQuestionModule .question-form .questionTag .btn:hover {
 	color: #5c5f65;
-	background-color: #e2e6ea;
-	border-color: #dae0e5
+	background-color: #f0f0f0;
+	border-color: #f0f0f0;
 }
 .addQuestionModule .question-form .questionTag .mr{
 	margin-right: 5px!important;
@@ -6327,7 +6365,7 @@ html,body{
 	background-color: #a2d7fe;
 }
 .addQuestionModule .question-form .item{
-	height: 40px;
+	height: 46px;
 }
 .addQuestionModule .question-form .item .unit{
 	margin-left: 5px;font-size: 15px;position: relative;top: 2px;
@@ -6339,10 +6377,10 @@ html,body{
 	 padding-left: 0px; padding-right: 0px; padding-top: 8px;margin-bottom: 12px;
 }
 .addQuestionModule .question-form .error {
-	color: red;position: relative;top: 2px;
+	color: #F56C6C;position: relative;top: 2px;
 }
 .addQuestionModule .question-form .help {
-	color: #747474;position: relative;top: 2px;
+	color: #747474;position: relative;top: 2px;margin-left: 4px;
 }
 .addQuestionModule .question-form .questionSubmit {
 	width: 70px;
@@ -6486,7 +6524,7 @@ html,body{
 	color: #ccc;
 }
 .appendQuestion-form  .error {
-	color: red;
+	color: #F56C6C;
 }
 .appendQuestion-form  .captchaModule{
 	float: left;
@@ -6576,7 +6614,7 @@ html,body{
 	 padding-left: 0px; padding-right: 0px; padding-top: 8px;margin-bottom: 12px;
 }
 .answer-formModule .addAnswer-wrap .error {
-	color: red;
+	color: #F56C6C;
 }
 .answer-formModule .addAnswer-wrap .answerSubmit {
 	width: 70px;
@@ -6679,7 +6717,7 @@ html,body{
 	 padding-left: 0px; padding-right: 0px; padding-top: 8px;margin-bottom: 12px;
 }
 .editAnswer-formModule .editAnswer-wrap .error {
-	color: red;
+	color: #F56C6C;
 }
 .editAnswer-formModule .editAnswer-wrap .editAnswerSubmit {
 	height: 38px;
@@ -6842,11 +6880,14 @@ html,body{
   width: 100%; border-collapse: collapse;
 }
 .dataTable .dataList .dataThead TH{
- text-align:center;	padding-right: 3px; padding-left: 3px; font-weight: normal; padding-bottom: 0px; margin: 0px; vertical-align: middle; color: #666; padding-top: 0px; white-space: nowrap; height: 34px;background: #f5f5f7;border-left: #f1f1f2 1px solid; border-right: #f1f1f2 1px solid; border-top: #f1f1f2 1px solid; border-bottom: #f1f1f2 1px solid;
+ text-align:center;	padding-right: 3px; padding-left: 3px; font-weight: normal; padding-bottom: 0px; margin: 0px; vertical-align: middle; color: #909399; padding-top: 0px; white-space: nowrap; height: 40px;background: #fff;
 }
 .dataTable .dataList .dataTD {
-	padding-right: 5px; padding-left: 5px; padding-bottom: 0px; margin: 0px; vertical-align: middle;border-left: #f1f1f2 1px solid; border-right: #f1f1f2 1px solid; border-top: #f1f1f2 1px solid; border-bottom: #f1f1f2 1px solid; word-break: break-all; padding-top: 0px; height: 34px;line-height:28px; text-align: center! important;
+	padding-right: 5px; padding-left: 5px; padding-bottom: 0px; margin: 0px; vertical-align: middle; word-break: break-all; padding-top: 0px; height: 38px;line-height:32px; text-align: center! important;
 }
+.dataTable .dataList tr:nth-of-type(odd){ background:#fafafa;}/*奇数行*/ 
+.dataTable .dataList tr:nth-of-type(even){ background:#f5f5f5;}/*偶数行 */ 
+.dataTable .dataList tr:hover {background: #f0f0f0;}
 /**
 .dataTable .dataList .dataTD:first-child{
 	border-left: 1px solid #fff
@@ -6855,10 +6896,10 @@ html,body{
 	border-right: 1px solid #fff
 }**/
 .dataTable .dataList .error{
-	color: red;
+	color: #F56C6C;
 }
 .dataTable .dataList .empty{
-	text-align:center;height: 36px; line-height: 36px;color: #747474;
+	text-align:center;height: 55px; line-height: 55px;color: #909399;background:#fff;
 }
 .dataTable .pageList {
 	margin-top: 10px; float: right; color: #999; line-height: 22px;
@@ -6872,7 +6913,7 @@ html,body{
 	padding-bottom:5px; padding-left:0px; padding-right:5px; color:#666;padding-top: 5px;height: 30px;font-size: 14px;
 }
 .blankTableModule .blankTable .required{color: red; }
-.blankTableModule .blankTable .error {color: red;margin-left: 2px;}
+.blankTableModule .blankTable .error {color: #F56C6C;margin-left: 2px;}
 .blankTableModule .blankTable .help {color: #9e9e9e; margin-left: 2px;vertical-align: middle;}
 
 
@@ -6898,9 +6939,10 @@ html,body{
 
 
 
+
 /* 页脚 border-top: 1px solid #e1e1e1; */
 .footer { min-width: 990px; 
-	background: #f8f8f9;
+	background: #f2f2f4;
 	height: 90px;
 	margin-top: -90px }
 
@@ -6911,11 +6953,7 @@ html,body{
 
 .footer .copyright { width: 990px; margin: 0 auto;  color: #999; text-align: center; margin-top: 18px; }
 .footer .copyright em { font-family: Tahoma; margin-left: 3px; }
-.footer .copyright a { font-family: Tahoma; margin-left: 19px; color: #999; }
+.footer .copyright .link{ font-family: Tahoma; margin-left: 2px; color: #999; font-weight: bold;}
+.footer .copyright a { font-family: Tahoma; margin-left: 16px; color: #999;}
 .footer .copyright a:hover { text-decoration: underline; }
 .footer .copyright span { margin-left: 17px; }
-
-
-
-
-

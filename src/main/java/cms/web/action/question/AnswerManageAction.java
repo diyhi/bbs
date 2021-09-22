@@ -358,125 +358,142 @@ public class AnswerManageAction {
 				List<Answer> answerList = answerService.findByAnswerIdList(answerIdList);
 				if(answerList != null && answerList.size() >0){
 					for(Answer answer : answerList){
-						Question question = questionManage.query_cache_findById(answer.getQuestionId());
-						if(question != null){
-							Date time = new Date();
+						if(answer.getStatus() <100){//标记删除
+							Integer constant = 100000;
+							int i = answerService.markDeleteAnswer(answer.getId(),constant);
 							
-							User user = userManage.query_cache_findUserByUserName(answer.getUserName());
-						
-							//取消采纳用户名称
-							String cancelAdoptionUserName = null;
-							//取消采纳用户退还悬赏积分日志
-							Object cancelAdoptionPointLogObject = null;
-							//取消采纳用户退还分成金额
-							BigDecimal cancelAdoptionUserNameShareAmount = new BigDecimal("0");
-							//取消采纳用户退还悬赏金额日志
-							Object cancelAdoptionPaymentLogObject = null;
-							
-							if(question.getAdoptionAnswerId() >0L){//已悬赏
-								cancelAdoptionUserName = answer.getUserName();
-			
-								if(user != null && answer.getIsStaff() ==false){
-									if(question.getPoint() != null && question.getPoint() >0L){
-										PointLog reward_pointLog = new PointLog();
-										reward_pointLog.setId(pointManage.createPointLogId(user.getId()));
-										reward_pointLog.setModule(1100);//1100.采纳答案
-										reward_pointLog.setParameterId(answer.getId());//参数Id 
-										reward_pointLog.setOperationUserType(1);//操作用户类型  0:系统  1: 员工  2:会员
-										reward_pointLog.setOperationUserName(username);//操作用户名称
-										reward_pointLog.setPointState(2);//积分状态  1:账户存入  2:账户支出
-										reward_pointLog.setPoint(question.getPoint());//积分
-										reward_pointLog.setUserName(answer.getUserName());//用户名称
-										reward_pointLog.setRemark("");
-										reward_pointLog.setTimes(time);
-										cancelAdoptionPointLogObject = pointManage.createPointLogObject(reward_pointLog);
-									}
-									if(question.getAmount() != null && question.getAmount().compareTo(new BigDecimal("0")) >0){
-										QuestionRewardPlatformShare questionRewardPlatformShare = platformShareService.findQuestionRewardPlatformShareByQuestionIdAndAnswerUserName(question.getId(),answer.getUserName());
-										if(questionRewardPlatformShare != null){
-											//用户分成金额
-											BigDecimal userNameShareAmount = questionRewardPlatformShare.getTotalAmount().subtract(questionRewardPlatformShare.getShareAmount());
-											cancelAdoptionUserNameShareAmount = userNameShareAmount;
-											
-											PaymentLog reward_paymentLog = new PaymentLog();
-											String paymentRunningNumber = paymentManage.createRunningNumber(user.getId());
-											reward_paymentLog.setPaymentRunningNumber(paymentRunningNumber);//支付流水号
-											reward_paymentLog.setPaymentModule(100);//支付模块 100.采纳答案
-											reward_paymentLog.setSourceParameterId(String.valueOf(answer.getId()));//参数Id 
-											reward_paymentLog.setOperationUserType(1);//操作用户类型  0:系统  1: 员工  2:会员
-											reward_paymentLog.setOperationUserName(username);//操作用户名称  0:系统  1: 员工  2:会员
-											reward_paymentLog.setAmountState(2);//金额状态  1:账户存入  2:账户支出 
-											reward_paymentLog.setAmount(userNameShareAmount);//金额
-											reward_paymentLog.setInterfaceProduct(0);//接口产品
-											reward_paymentLog.setUserName(answer.getUserName());//用户名称
-											reward_paymentLog.setTimes(time);
-											cancelAdoptionPaymentLogObject = paymentManage.createPaymentLogObject(reward_paymentLog);
-											
-										}
-									}
+							if(i >0){
+								User user = userManage.query_cache_findUserByUserName(answer.getUserName());
+								if(user != null){
+									//修改答案状态
+									userService.updateUserDynamicAnswerStatus(user.getId(),answer.getUserName(),answer.getQuestionId(),answer.getId(),answer.getStatus()+constant);
 								}
-								//员工回答
-								if(answer.getIsStaff() && question.getAmount() != null && question.getAmount().compareTo(new BigDecimal("0")) >0){
-									cancelAdoptionUserNameShareAmount = question.getAmount();
-									
-								}
-								
+								//删除缓存
+								answerManage.delete_cache_findByAnswerId(answer.getId());
 							}
 							
-							try {
-								int i = answerService.deleteAnswer(answer.getQuestionId(),answer.getId(),cancelAdoptionUserName,cancelAdoptionPointLogObject,cancelAdoptionUserNameShareAmount,cancelAdoptionPaymentLogObject,question.getPoint());
-								if(i >0){
-									//根据答案Id删除用户动态(答案下的回复也同时删除)
-									userService.deleteUserDynamicByAnswerId(answer.getQuestionId(),answer.getId());
-									
-									//删除缓存
-									answerManage.delete_cache_findByAnswerId(answer.getId());
-									answerManage.delete_cache_answerCount(answer.getUserName());
-									if(user != null){
-										userManage.delete_cache_findUserById(user.getId());
-										userManage.delete_cache_findUserByUserName(user.getUserName());
-									}
-									
-									String fileNumber = questionManage.generateFileNumber(answer.getUserName(), answer.getIsStaff());
-									
-									
-									
-									//删除图片
-									List<String> imageNameList = textFilterManage.readImageName(answer.getContent(),"answer");
-									if(imageNameList != null && imageNameList.size() >0){
-										for(String imagePath : imageNameList){
-											//如果验证不是当前用户上传的文件，则不删除锁
-											 if(!questionManage.getFileNumber(FileUtil.getBaseName(imagePath.trim())).equals(fileNumber)){
-												 continue;
-											 }
-											
-											
-											//替换路径中的..号
-											imagePath = FileUtil.toRelativePath(imagePath);
-											//替换路径分割符
-											imagePath = StringUtils.replace(imagePath, "/", File.separator);
-											
-											Boolean state = fileManage.deleteFile(imagePath);
-											
-											if(state != null && state == false){	
-												//替换指定的字符，只替换第一次出现的
-												imagePath = StringUtils.replaceOnce(imagePath, "file"+File.separator+"answer"+File.separator, "");
-												imagePath = StringUtils.replace(imagePath, File.separator, "_");//替换所有出现过的字符
+						}else{//物理删除
+							Question question = questionManage.query_cache_findById(answer.getQuestionId());
+							if(question != null){
+								Date time = new Date();
+								
+								User user = userManage.query_cache_findUserByUserName(answer.getUserName());
+							
+								//取消采纳用户名称
+								String cancelAdoptionUserName = null;
+								//取消采纳用户退还悬赏积分日志
+								Object cancelAdoptionPointLogObject = null;
+								//取消采纳用户退还分成金额
+								BigDecimal cancelAdoptionUserNameShareAmount = new BigDecimal("0");
+								//取消采纳用户退还悬赏金额日志
+								Object cancelAdoptionPaymentLogObject = null;
+								
+								if(question.getAdoptionAnswerId() >0L){//已悬赏
+									cancelAdoptionUserName = answer.getUserName();
+				
+									if(user != null && answer.getIsStaff() ==false){
+										if(question.getPoint() != null && question.getPoint() >0L){
+											PointLog reward_pointLog = new PointLog();
+											reward_pointLog.setId(pointManage.createPointLogId(user.getId()));
+											reward_pointLog.setModule(1100);//1100.采纳答案
+											reward_pointLog.setParameterId(answer.getId());//参数Id 
+											reward_pointLog.setOperationUserType(1);//操作用户类型  0:系统  1: 员工  2:会员
+											reward_pointLog.setOperationUserName(username);//操作用户名称
+											reward_pointLog.setPointState(2);//积分状态  1:账户存入  2:账户支出
+											reward_pointLog.setPoint(question.getPoint());//积分
+											reward_pointLog.setUserName(answer.getUserName());//用户名称
+											reward_pointLog.setRemark("");
+											reward_pointLog.setTimes(time);
+											cancelAdoptionPointLogObject = pointManage.createPointLogObject(reward_pointLog);
+										}
+										if(question.getAmount() != null && question.getAmount().compareTo(new BigDecimal("0")) >0){
+											QuestionRewardPlatformShare questionRewardPlatformShare = platformShareService.findQuestionRewardPlatformShareByQuestionIdAndAnswerUserName(question.getId(),answer.getUserName());
+											if(questionRewardPlatformShare != null){
+												//用户分成金额
+												BigDecimal userNameShareAmount = questionRewardPlatformShare.getTotalAmount().subtract(questionRewardPlatformShare.getShareAmount());
+												cancelAdoptionUserNameShareAmount = userNameShareAmount;
 												
-												//创建删除失败文件
-												fileManage.failedStateFile("file"+File.separator+"answer"+File.separator+"lock"+File.separator+imagePath);
-											
+												PaymentLog reward_paymentLog = new PaymentLog();
+												String paymentRunningNumber = paymentManage.createRunningNumber(user.getId());
+												reward_paymentLog.setPaymentRunningNumber(paymentRunningNumber);//支付流水号
+												reward_paymentLog.setPaymentModule(100);//支付模块 100.采纳答案
+												reward_paymentLog.setSourceParameterId(String.valueOf(answer.getId()));//参数Id 
+												reward_paymentLog.setOperationUserType(1);//操作用户类型  0:系统  1: 员工  2:会员
+												reward_paymentLog.setOperationUserName(username);//操作用户名称  0:系统  1: 员工  2:会员
+												reward_paymentLog.setAmountState(2);//金额状态  1:账户存入  2:账户支出 
+												reward_paymentLog.setAmount(userNameShareAmount);//金额
+												reward_paymentLog.setInterfaceProduct(0);//接口产品
+												reward_paymentLog.setUserName(answer.getUserName());//用户名称
+												reward_paymentLog.setTimes(time);
+												cancelAdoptionPaymentLogObject = paymentManage.createPaymentLogObject(reward_paymentLog);
+												
 											}
 										}
 									}
+									//员工回答
+									if(answer.getIsStaff() && question.getAmount() != null && question.getAmount().compareTo(new BigDecimal("0")) >0){
+										cancelAdoptionUserNameShareAmount = question.getAmount();
+										
+									}
 									
 								}
-							} catch (SystemException e) {
-								error.put("answer", e.getMessage());
+								
+								try {
+									int i = answerService.deleteAnswer(answer.getQuestionId(),answer.getId(),cancelAdoptionUserName,cancelAdoptionPointLogObject,cancelAdoptionUserNameShareAmount,cancelAdoptionPaymentLogObject,question.getPoint());
+									if(i >0){
+										//根据答案Id删除用户动态(答案下的回复也同时删除)
+										userService.deleteUserDynamicByAnswerId(answer.getQuestionId(),answer.getId());
+										
+										//删除缓存
+										answerManage.delete_cache_findByAnswerId(answer.getId());
+										answerManage.delete_cache_answerCount(answer.getUserName());
+										if(user != null){
+											userManage.delete_cache_findUserById(user.getId());
+											userManage.delete_cache_findUserByUserName(user.getUserName());
+										}
+										
+										String fileNumber = questionManage.generateFileNumber(answer.getUserName(), answer.getIsStaff());
+										
+										
+										
+										//删除图片
+										List<String> imageNameList = textFilterManage.readImageName(answer.getContent(),"answer");
+										if(imageNameList != null && imageNameList.size() >0){
+											for(String imagePath : imageNameList){
+												//如果验证不是当前用户上传的文件，则不删除锁
+												 if(!questionManage.getFileNumber(FileUtil.getBaseName(imagePath.trim())).equals(fileNumber)){
+													 continue;
+												 }
+												
+												
+												//替换路径中的..号
+												imagePath = FileUtil.toRelativePath(imagePath);
+												//替换路径分割符
+												imagePath = StringUtils.replace(imagePath, "/", File.separator);
+												
+												Boolean state = fileManage.deleteFile(imagePath);
+												
+												if(state != null && state == false){	
+													//替换指定的字符，只替换第一次出现的
+													imagePath = StringUtils.replaceOnce(imagePath, "file"+File.separator+"answer"+File.separator, "");
+													imagePath = StringUtils.replace(imagePath, File.separator, "_");//替换所有出现过的字符
+													
+													//创建删除失败文件
+													fileManage.failedStateFile("file"+File.separator+"answer"+File.separator+"lock"+File.separator+imagePath);
+												
+												}
+											}
+										}
+										
+									}
+								} catch (SystemException e) {
+									error.put("answer", e.getMessage());
+								}
+								
+							}else{
+								error.put("question", "问题不存在");
 							}
 							
-						}else{
-							error.put("question", "问题不存在");
 						}
 					}
 				}
@@ -859,16 +876,33 @@ public class AnswerManageAction {
 				List<AnswerReply> answerReplyList = answerService.findByAnswerReplyIdList(answerReplyIdList);
 				if(answerReplyList != null && answerReplyList.size() >0){
 					for(AnswerReply answerReply : answerReplyList){
-						int i = answerService.deleteReply(answerReply .getId());
-						if(i >0 && answerReply != null){
-							User user = userManage.query_cache_findUserByUserName(answerReply.getUserName());
-							if(user != null){
-								userService.deleteUserDynamicByAnswerReplyId(user.getId(),answerReply.getQuestionId(),answerReply.getAnswerId(),answerReply .getId());
+						if(answerReply.getStatus() <100){//标记删除
+							Integer constant = 100000;
+							int i = answerService.markDeleteReply(answerReply.getId(),constant);
+							
+							
+							if(i >0){
+								User user = userManage.query_cache_findUserByUserName(answerReply.getUserName());
+								if(user != null){
+									//修改回复状态
+									userService.updateUserDynamicAnswerReplyStatus(user.getId(),answerReply.getUserName(),answerReply.getQuestionId(),answerReply.getAnswerId(),answerReply.getId(),answerReply.getStatus()+constant);
+								}
+								//删除缓存
+								answerManage.delete_cache_findReplyByReplyId(answerReply.getId());
 							}
-						}
+						}else{//物理删除
+							int i = answerService.deleteReply(answerReply .getId());
+							if(i >0 && answerReply != null){
+								User user = userManage.query_cache_findUserByUserName(answerReply.getUserName());
+								if(user != null){
+									userService.deleteUserDynamicByAnswerReplyId(user.getId(),answerReply.getQuestionId(),answerReply.getAnswerId(),answerReply .getId());
+								}
+							}
 
-						//删除缓存
-						answerManage.delete_cache_findReplyByReplyId(answerReply .getId());
+							//删除缓存
+							answerManage.delete_cache_findReplyByReplyId(answerReply .getId());
+						}
+						
 					}
 				}
 			}
@@ -914,7 +948,41 @@ public class AnswerManageAction {
 		}
 		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
-	
+	/**
+	 * 回复  恢复
+	 * @param model
+	 * @param replyId 回复Id
+	 */
+	@ResponseBody
+	@RequestMapping(params="method=recoveryReply",method=RequestMethod.POST)
+	public String recoveryReply(ModelMap model,Long replyId,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
+		Map<String,String> error = new HashMap<String,String>();
+		if(replyId != null && replyId >0){
+			AnswerReply answerReply = answerService.findReplyByReplyId(replyId);
+			if(answerReply != null && answerReply.getStatus() >100){
+				int originalState = this.parseInitialValue(answerReply.getStatus());
+				int i = answerService.updateReplyStatus(replyId, originalState);
+				
+				User user = userManage.query_cache_findUserByUserName(answerReply.getUserName());
+				if(i >0 && user != null){
+					//修改回复状态
+					userService.updateUserDynamicAnswerReplyStatus(user.getId(),answerReply.getUserName(),answerReply.getQuestionId(),answerReply.getAnswerId(),answerReply.getId(),originalState);
+				}
+				//删除缓存
+				answerManage.delete_cache_findReplyByReplyId(replyId);
+				
+				return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+			}else{
+				error.put("replyId", "回复不存在或未标记删除");
+			}
+			
+		}else{
+			error.put("replyId", "回复Id不能为空");
+		}
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+	}
 	
 	/**
 	 * 采纳答案
@@ -1306,5 +1374,15 @@ public class AnswerManageAction {
 	}
 	
 	
-	
+	/**
+	 * 解析初始值
+	 * @param status 状态
+	 * @return
+	 */
+	private int parseInitialValue(Integer status){
+		int tens  = status%100/10;//十位%100/10
+        int units  = status%10;//个位直接%10
+		
+        return Integer.parseInt(tens+""+units);
+	}
 }
