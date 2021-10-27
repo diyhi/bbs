@@ -356,12 +356,14 @@ public class ZipUtil {
             ins = new ZipArchiveInputStream(new BufferedInputStream(new FileInputStream(zipPath)), "UTF-8");
             ZipArchiveEntry entry = null;
             while ((entry = ins.getNextZipEntry()) != null) {
+            	//执行目录检查，过滤文件路径名称包含"../"这种特殊字符
+            	String name = FileUtil.toRelativePath(entry.getName());
                 if (entry.isDirectory()) {
-                    File directory = new File(destDir, entry.getName());
+                    File directory = new File(destDir, name);
                     directory.mkdirs();
                     directory.setLastModified(entry.getTime());
                 } else {
-                    String absPath=formatPath(destDir+entry.getName());
+                    String absPath=formatPath(destDir+name);
                     mkdirsForFile(absPath);
                     File tmpFile=new File(absPath);
                     os=new BufferedOutputStream(new FileOutputStream(tmpFile));

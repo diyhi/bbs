@@ -12,7 +12,6 @@
 </@object> 
 
 <title><#if topic != null && topic?? >${topic.title}</#if> - ${title}</title>
-<link rel="shortcut icon" type="image/x-icon" href="${baseURL}${commonPath}images/favicon.ico" media="screen" />
 <link href="${commonPath}css/common.css?12dd" rel="stylesheet" type="text/css" />
 <link href="${commonPath}css/themify-icons/style.css" type="text/css" rel="stylesheet">
 <!--[if (IE 6)|(IE 7)|(IE 8)]>
@@ -73,7 +72,15 @@
 						</div>
 					</#if>
 		        	<div class="topicBox">
-		                <div class="title">${topic.title}</div>
+		                <div class="title">
+		                ${topic.title}
+			                <#if topic.essence == true>
+				            	<span class="essence">精华</span>
+				            </#if>
+				             <#if topic.sort gt 0>
+				            	<span class="top">置顶</span>
+				            </#if>
+		                </div>
 		                <div class="topicInfo clearfix" >
 		                	<div class="postTime">${topic.postTime}</div>
 		                	<div class="viewTotal-icon"><i class="cms-view"></i></div>

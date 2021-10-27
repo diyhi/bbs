@@ -202,6 +202,7 @@ public class UserFormManageAction {
 			AllowRegisterAccount allowRegisterAccount = JsonUtils.toObject(systemSetting.getAllowRegisterAccount(), AllowRegisterAccount.class);
 			if(allowRegisterAccount != null){
 				model.addAttribute("allowRegisterAccount",allowRegisterAccount);
+				returnValue.put("allowRegisterAccount",allowRegisterAccount);
 			}
 		}
 		

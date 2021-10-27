@@ -354,6 +354,8 @@ CREATE TABLE `helptype` (
   `parentIdGroup` varchar(200) DEFAULT NULL,
   `sort` int(11) DEFAULT NULL,
   `totalHelp` bigint(20) DEFAULT NULL,
+  `description` longtext,
+  `image` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `helpType_1_idx` (`parentId`),
   KEY `helpType_2_idx` (`parentIdGroup`(191))
@@ -1595,6 +1597,7 @@ CREATE TABLE `topic` (
   `sort` int(11) DEFAULT NULL,
   `lastUpdateTime` datetime DEFAULT NULL,
   `giveRedEnvelopeId` varchar(32) DEFAULT NULL,
+  `essence` bit(1) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `topic_idx` (`tagId`,`status`),
   KEY `topic_3_idx` (`userName`,`postTime`),

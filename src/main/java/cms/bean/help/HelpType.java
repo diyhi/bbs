@@ -8,6 +8,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Index;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -48,7 +49,12 @@ public class HelpType implements Serializable{
 	@Column(length=1000)
 	private String mergerTypeId = ",";
 	
-	
+	/** 图片 **/
+	@Column(length=100)
+	private String image;
+	/** 描述 **/
+	@Lob
+	private String description;
 	
 	/** 子节点帮助分类 **/
 	@Transient
@@ -118,6 +124,18 @@ public class HelpType implements Serializable{
 	}
 	public void setChildHelpType(List<HelpType> childHelpType) {
 		this.childHelpType = childHelpType;
+	}
+	public String getImage() {
+		return image;
+	}
+	public void setImage(String image) {
+		this.image = image;
+	}
+	public String getDescription() {
+		return description;
+	}
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	

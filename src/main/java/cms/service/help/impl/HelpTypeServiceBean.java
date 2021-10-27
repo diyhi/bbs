@@ -181,10 +181,12 @@ public class HelpTypeServiceBean extends DaoSupport<HelpType> implements HelpTyp
 	 * @param helpType 帮助分类
 	 */
 	public Integer updateHelpType(HelpType helpType){
-		Query query = em.createQuery("update HelpType o set o.name=?1, o.sort=?2 where o.id=?3")
+		Query query = em.createQuery("update HelpType o set o.name=?1, o.sort=?2,o.image=?3,o.description=?4 where o.id=?5")
 		.setParameter(1, helpType.getName())
 		.setParameter(2, helpType.getSort())
-		.setParameter(3, helpType.getId());
+		.setParameter(3, helpType.getImage())
+		.setParameter(4, helpType.getDescription())
+		.setParameter(5, helpType.getId());
 		int i = query.executeUpdate();
 		return i;
 	}

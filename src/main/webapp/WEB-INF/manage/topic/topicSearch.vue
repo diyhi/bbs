@@ -56,6 +56,8 @@
 					<el-table-column prop="title" label="话题标题" min-width="200">
 						<template #default="scope">
 				            <span v-html="scope.row.title"></span>
+				            <span class="essence" v-if="scope.row.essence == true">精华</span>
+		                	<span class="top" v-if="scope.row.sort >0">置顶</span>
 				            <span v-if="scope.row.giveRedEnvelopeId != null && scope.row.giveRedEnvelopeId != ''" class="redEnvelope">红包</span></c:if>
 				        </template>
 					</el-table-column>

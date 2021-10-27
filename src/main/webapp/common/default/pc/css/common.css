@@ -943,26 +943,28 @@ html,body{
 	margin-top:2px;
 	margin-bottom: 8px;
 	color: #c4c4c4;
-	font-size: 14px;
 	padding-left: 0;
 	list-style: none;
+	font-size:0;/*父级元素设置font-size:0; 解决 display：inline-block两个元素之间的默认空格 */
 }
 .topicModule .topic-box .topicList .topicItem .content .info>li{
 	display: inline-block;
 }
 .topicModule .topic-box .topicList .topicItem .content .info .tag{
 	display: inline-block;
-	min-width: 10px;
-	padding: 4px 7px;
-	font-size: 12px;
-	color: #666666;
-	line-height: 1;
-	vertical-align: baseline;
-	white-space: nowrap;
-	text-align: center;
+	white-space:nowrap;
+    vertical-align: middle;
+    padding: 3px 5px;
+    margin-left:5px;
+    font-size: 12px;
+    line-height: 14px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color: #666666;
 	background-color: #f5f5f5;
-	border-radius: 2px;
-	
+	position: relative;
+	top: -5px;
 }
 .topicModule .topic-box .topicList .topicItem .content .info .module{
 	display: inline-block;
@@ -980,65 +982,120 @@ html,body{
 }
 .topicModule .topic-box .topicList .topicItem .content .info .userName{
 	color: #999;
+	font-size: 14px;
+	margin-left: 10px;
 }
 .topicModule .topic-box .topicList .topicItem .content .info .userRoleName{
+	display: inline-block;
 	white-space:nowrap;
-	color:#e2b46e;
+    vertical-align: middle;
+    padding: 2px 4px;
+    margin-left:5px;
+    font-size: 12px;
+    line-height: 14px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color:#e2b46e;
 	background-color:#f8e7c4;
-	border-radius:4px;
-	padding:0 5px;
-	font-size: 12px;
+	position: relative;
+	top: -5px;
 }
 .topicModule .topic-box .topicList .topicItem .content .info .staff{
+	display: inline-block;
 	white-space:nowrap;
-	color:#15d327;
+    vertical-align: middle;
+    padding: 2px 4px;
+    margin-left:5px;
+    font-size: 12px;
+    line-height: 14px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color:#15d327;
 	background-color:#cafcc7;
-	border-radius:4px;
-	padding:0 5px;
-	font-size: 12px;
+	position: relative;
+	top: -5px;
 }
 .topicModule .topic-box .topicList .topicItem .content .info .postTime{
 	margin-left: 10px;
+	font-size: 14px;
 }
 .topicModule .topic-box .topicList .topicItem .content .info .lastReplyTime{
 	margin-left: 10px;
+	font-size: 14px;
+}
+.topicModule .topic-box .topicList .topicItem .content .essence{
+	display: inline-block;
+    vertical-align: middle;
+    padding: 2px 4px;
+    margin-left:5px;
+    font-size: 13px;
+    line-height: 14px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color: #fff;
+    background-color: #ff7875;
+    position: relative;
+    top: -6px;
+}
+.topicModule .topic-box .topicList .topicItem .content .top{
+	display: inline-block;
+    vertical-align: middle;
+    padding: 2px 4px;
+    margin-left:5px;
+    font-size: 13px;
+    line-height: 14px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color: #fff;
+    background-color: #69c0ff;
+    position: relative;
+    top: -6px;
 }
 .topicModule .topic-box .topicList .topicItem .content .title {
 	margin: 0 5px 0 0;
-	font-size: 18px;
-	line-height: 32px;
-	
+	font-size:0;/*父级元素设置font-size:0; 解决 display：inline-block两个元素之间的默认空格 */
 }
 .topicModule .topic-box .topicList .topicItem .content .title a{
 	color: #393939;
+	font-size: 18px;
+	line-height: 32px;
 }
 .topicModule .topic-box .topicList .topicItem .content .title a:hover {
 	text-decoration: none;
 	color: #2196F3;
 }
 .topicModule .topic-box .topicList .topicItem .content .title .topicRoleName{
+	display: inline-block;
 	white-space:nowrap;
-	color:#fff;
-	background-color:#ffcc00;
-	border-radius:4px;
-	padding:0 5px;
-	font-size: 13px;
-	position:relative;
-    top:-1px;
+    vertical-align: middle;
+    padding: 2px 4px;
+    margin-left:5px;
+    font-size: 13px;
+    line-height: 14px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color: #fff;
+    background-color:#ffcc00;
+    position: relative;
+    top: -6px;
 }
 .topicModule .topic-box .topicList .topicItem .content .title .redEnvelope{
 	font-size: 22px;
 	position:relative;
-    top:2px;
+    top:4px;
     color: #ff483a;
+    margin-left: 3px;
 }
 .topicModule .topic-box .topicList .topicItem .content .title .hideTagType{
 	font-size:0;/*父级元素设置font-size:0; 解决 display：inline-block两个元素之间的默认空格 */
-	position: relative;
-	top: -1px;
 }
 .topicModule .topic-box .topicList .topicItem .content .title .hideTagType .circle{
-	border-radius:12px;display: inline-block;margin-right:5px;
+	border-radius:12px;display: inline-block;margin-left:5px;
 	width: 24px;height: 24px;
 	position:relative;
 }
@@ -1398,6 +1455,36 @@ html,body{
 	border:none;
 	line-height:34px; 
 	margin:9px 0 18px 0;
+}
+.topicContentModule .left .topic-wrap .topicBox .title .essence{
+	display: inline-block;
+    vertical-align: middle;
+    padding: 3px 4px;
+    margin-right:1px;
+    font-size: 15px;
+    line-height: 15px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color: #fff;
+    background-color: #ff7875;
+    position: relative;
+    top: -1px;
+}
+.topicContentModule .left .topic-wrap .topicBox .title .top{
+	display: inline-block;
+    vertical-align: middle;
+    padding: 3px 4px;
+    margin-right:1px;
+    font-size: 15px;
+    line-height: 15px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color: #fff;
+    background-color: #69c0ff;
+    position: relative;
+    top: -1px;
 }
 .topicContentModule .left .topic-wrap .topicBox .topicInfo{
 	color: #ccc;font-size: 14px;
@@ -4197,7 +4284,8 @@ html,body{
 .userDynamicModule .userDynamicList .userDynamicTime{margin-bottom:5px;color:#999;font-size: 13px;}
 .userDynamicModule .userDynamicList .userDynamicTime a{color:#999;}
 .userDynamicModule .userDynamicList .userDynamic .topicTitle{
-	padding:0px;word-wrap:break-word;color:#666;font-size: 15px;margin-top: 5px;
+	padding:0px;word-wrap:break-word;color:#666;margin-top: 5px;
+	font-size:0;/*父级元素设置font-size:0; 解决 display：inline-block两个元素之间的默认空格 */
 }
 .userDynamicModule .userDynamicList .userDynamic .topicTitle .info{
 	background-color: #f0f0f0;
@@ -4205,27 +4293,34 @@ html,body{
 	color: #999;
 	font-size: 13px;
 	padding: 3px 8px 3px 8px;
-	vertical-align: middle;
 	line-height: 32px;
-	position: relative;
-	top: -1px;
 }
 .userDynamicModule .userDynamicList .userDynamic .topicTitle a{
 	color: #2196F3;
+	font-size: 15px;
+	line-height: 32px;
+	margin-left: 5px;
 }
 .userDynamicModule .userDynamicList .userDynamic .topicRoleName{
+	display: inline-block;
 	white-space:nowrap;
-	color:#fff;
-	background-color:#ffb800;
-	border-radius:4px;
-	padding:0 5px;
-	font-size: 14px;
-	margin-left: 5px;
+    vertical-align: middle;
+    padding: 2px 4px;
+    margin-left: 5px;
+    font-size: 13px;
+    line-height: 14px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color: #fff;
+    background-color:#ffcc00;
+    position: relative;
+    top: -5px;
 }
 .userDynamicModule .userDynamicList .userDynamic .topicTitle .hideTagType{
 	font-size:0;/*父级元素设置font-size:0; 解决 display：inline-block两个元素之间的默认空格 */
 	position: relative;
-	top: -1px;
+	top: 0px;
 	
 }
 .userDynamicModule .userDynamicList .userDynamic .topicTitle .hideTagType .circle{
@@ -5033,6 +5128,11 @@ html,body{
 	background-color: #11a8ff;
 	border-color: #11a8ff;
 }
+.askListModule .nav .btn i{
+	position: relative;
+	top: 2px;
+	font-size: 15px;
+}
 
 .askListModule .question-box{
 	background:#fff;padding:0px 15px 0px 15px;
@@ -5087,10 +5187,10 @@ html,body{
 .askListModule .question-box .questionList .questionItem .content .info {
 	margin-bottom: 8px;
 	color: #c4c4c4;
-	font-size: 14px;
 	padding-left: 0;
 	list-style: none;
 	margin-left: -5px;
+	font-size:0;/*父级元素设置font-size:0; 解决 display：inline-block两个元素之间的默认空格 */
 }
 .askListModule .question-box .questionList .questionItem .content .info>li{
 	display: inline-block;
@@ -5099,39 +5199,63 @@ html,body{
 }
 .askListModule .question-box .questionList .questionItem .content .info .userName{
 	color: #999;
+	font-size: 14px;
 }
 .askListModule .question-box .questionList .questionItem .content .info .userRoleName{
+	display: inline-block;
 	white-space:nowrap;
-	color:#feb21a;
+    vertical-align: middle;
+    padding: 2px 4px;
+    margin-left:5px;
+    font-size: 12px;
+    line-height: 14px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color:#feb21a;
 	background-color:#ffedba;
-	border-radius:4px;
-	padding:0 5px;
-	font-size: 12px;
+	position: relative;
+	top: -5px;
 }
 .askListModule .question-box .questionList .questionItem .content .info .staff{
+	display: inline-block;
 	white-space:nowrap;
-	color:#15d327;
+    vertical-align: middle;
+    padding: 2px 4px;
+    margin-left:5px;
+    font-size: 12px;
+    line-height: 14px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color:#15d327;
 	background-color:#cafcc7;
-	border-radius:4px;
-	padding:0 5px;
-	font-size: 12px;
+	position: relative;
+	top: -5px;
 }
 .askListModule .question-box .questionList .questionItem .content .info .postTime{
 	margin-left: 10px;position: relative;top: 1px;
+	font-size: 14px;
 }
 .askListModule .question-box .questionList .questionItem .content .info .lastAnswerTime{
 	margin-left: 10px;position: relative;top: 1px;
+	font-size: 14px;
 }
 .askListModule .question-box .questionList .questionItem .content .info .reward{
+	display: inline-block;
+	vertical-align: middle;
 	background: #fcf3e6;
 	border-radius:3px;
-	padding: 1px 0px;
+	padding: 5px 6px;
+	margin-left: 6px;
+	position: relative;
+	top: -5px;
 }
 .askListModule .question-box .questionList .questionItem .content .info .reward .rewardInfo{
-	padding: 1px 5px;color: #e2b46d;font-size: 14px;
+	color: #e2b46d;font-size: 14px;line-height: 14px;
 }
 .askListModule .question-box .questionList .questionItem .content .info .reward .rewardInfo .symbol{
-	font-family:Arial;font-weight:normal; vertical-align: middle; display:inline-block;margin-left: 5px;color: #cca558;
+	font-family:Arial;font-weight:normal; margin-left: 5px;color: #cca558;
 }
 .askListModule .question-box .questionList .questionItem .content .info .reward .rewardInfo .amount{
 	margin-left: 1px;color: #cca558; margin-right: 5px;font-weight: 700;position: relative;top: 1px;
@@ -6872,6 +6996,249 @@ html,body{
 }
 
 
+/* 帮助分类 */
+.helpTypeModule{
+	background: #fff;
+	padding:0px 40px 40px 40px;color:#6e6e6e;margin:0px auto;
+	
+}
+.helpTypeModule .nav-row {
+
+}
+/* 图文竖排 */
+.helpTypeModule .nav-row .vertical-row-title {
+    font-size: 16px;
+    color: #373d40;
+    line-height: 20px;
+    padding-left: 12px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+.helpTypeModule .nav-row .vertical-row-title .row-title-line {
+    width: 2px;
+    height: 16px;
+    margin-right: 6px;
+    background: #2196F3;
+}
+.helpTypeModule .nav-row .vertical-container{
+    overflow: hidden;
+    position: relative;
+}
+.helpTypeModule .nav-row .vertical-container .item{
+    padding: 15px;
+    box-sizing: border-box;
+    float: left;
+    width: 33.3%;
+    position: relative;
+}
+.helpTypeModule .nav-row .vertical-container .item:hover {
+	background: #f5f6f7;
+}
+.helpTypeModule .nav-row .vertical-container .item .link {
+    margin: 5px 5px;
+    height: 100%;
+}
+
+.helpTypeModule .nav-row .vertical-container .item .link .block{
+    display: block;
+}
+.helpTypeModule .nav-row .vertical-container .item .link .block .icon{
+    display: inline-block;
+    width: 70px;
+    height: 70px;
+    border-radius: 4px;
+    background-size: cover;
+    background-repeat: no-repeat;
+    float: left;
+}
+.helpTypeModule .nav-row .vertical-container .item .link .block .title {
+    position: relative;
+    left: 20px;
+    margin-right:20px;
+    display: block;
+    margin-bottom: 4px;
+    color: #383838;
+    font-size: 14px;
+    line-height: 24px;
+    font-weight: 500;
+    text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden
+}
+.helpTypeModule .nav-row .vertical-container .item .link .block .description{
+    position: relative;
+    left: 20px;
+    margin-right:20px;
+    color: #9b9ba3;
+    max-height:44px;
+    line-height:21px;
+    display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+	overflow: hidden;
+}
+/* 图文横排 */
+.helpTypeModule .nav-row .horizontal-row-title {
+    font-size: 23px;
+    color: rgba(0,0,0,.65);
+    padding-left: 12px;
+    margin-top: 50px;
+    margin-bottom: 40px;
+    text-align: center;
+    position: relative;
+}
+.helpTypeModule .nav-row .horizontal-container{
+    overflow: hidden;
+    position: relative;
+}
+.helpTypeModule .nav-row .horizontal-container .item{
+    padding: 15px;
+    box-sizing: border-box;
+    float: left;
+    width: 25%;
+    position: relative;
+}
+.helpTypeModule .nav-row .horizontal-container .item:hover {
+	background: #f5f6f7;
+}
+.helpTypeModule .nav-row .horizontal-container .item .link {
+    margin: 5px 5px;
+    height: 100%;
+}
+.helpTypeModule .nav-row .horizontal-container .item .link .block{
+  text-align: center;
+}
+.helpTypeModule .nav-row .horizontal-container .item .link .block .img {
+	display: inline-block;
+	margin-top:5px;
+    width: 110px;
+    height: 110px;
+    border-radius: 4px;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+.helpTypeModule .nav-row .horizontal-container .item .link .block .icon{
+	display: inline-block;
+	margin-top:5px;
+	font-size: 80px;
+	width: 110px;
+    height: 110px;
+    line-height: 110px;
+    color:#d9d9d9;
+	text-align: center;
+	vertical-align: middle;
+	background: #f5f5f5;
+	border-radius: 4px;
+}
+.helpTypeModule .nav-row .horizontal-container .item .link .block .title {
+  font-size: 16px;
+  font-weight: bold;
+  margin-top:15px;
+  color:  rgba(0, 0, 0, 0.65);
+}
+.helpTypeModule .nav-row .horizontal-container .item .link .block .description {
+	margin-top:3px;
+	font-size: 14px;
+	line-height:22px;
+	color: rgba(0, 0, 0, 0.45);
+}
+
+
+
+.helpDetailModule{
+	margin:10px auto auto auto;height: 100%;
+}
+.helpDetailModule .left{
+	float: left;
+	width: 300px;
+	height: auto;
+}
+.helpDetailModule .left .nav-wrap{
+	background: #fff;
+	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
+	padding-bottom: 20px;
+}
+.helpDetailModule .left .nav-wrap{
+
+}
+.helpDetailModule .left .nav-wrap .helpTypeName{ 
+	line-height:44px; 
+	font-size:18px;
+    color:#434343; 
+    padding-left:15px;
+}
+.helpDetailModule .left .nav-wrap .helpName{
+	margin-left:15px; 
+	margin-right: 15px;
+	margin-top:5px; 
+	padding-bottom:8px; 
+	
+}
+.helpDetailModule .left .nav-wrap .helpName a span{
+	display:block;
+	color:#595959; 
+	font-size: 15px;
+	margin-top:8px; 
+	line-height:26px; 
+	cursor:pointer;
+}
+.helpDetailModule .left .nav-wrap .helpName a:hover span{ 
+	color:#2196F3;
+}
+
+.helpDetailModule .right {
+	float: right;
+	width: 900px;
+	height: 100%;
+	padding-bottom: 10px;
+	
+}
+.helpDetailModule .right .help-wrap{
+	background: #fff;
+	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
+	position: relative;
+	height: -moz-calc(100% - 10px);
+	height: -webkit-calc(100% - 10px);
+	height: calc(100% - 10px);
+}
+.helpDetailModule .right .help-wrap .helpBox{
+	height: auto;
+	padding:15px 15px 15px 15px;
+}
+.helpDetailModule .right .help-wrap .helpBox .title{
+	color:#333;
+	font-weight:600;
+	font-size:22px;
+	border:none;
+	line-height:34px; 
+	margin:9px 0 18px 0;
+}
+.helpDetailModule .right .help-wrap .helpBox .helpInfo{
+	color: #ccc;font-size: 14px;border-bottom:1px solid #f1f1f1;padding-bottom: 5px;
+}
+.helpDetailModule .right .help-wrap .helpBox .helpInfo .postTime{
+	float: left;
+}
+.helpDetailModule .right .help-wrap .helpBox .content{margin-top:5px;padding:20px 0px;color:#333;font-size:16px;line-height:28px; word-wrap:break-word;min-height: 100px;}
+.helpDetailModule .right .help-wrap .helpBox .content a{
+	color: #26a2ff;
+}
+.helpDetailModule .right .help-wrap .helpBox .content p{font-size:16px;word-wrap:break-word}
+.helpDetailModule .right .help-wrap .helpBox .content img{
+	max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;
+	cursor: -webkit-zoom-in;
+	cursor: zoom-in;
+	vertical-align: sub;
+}
+/* 自动换行 */
+.helpDetailModule .right .help-wrap .helpBox .content pre{white-space:pre-wrap;}
+
+
+
+
+
 /* 数据表格 */
 .dataTable {
 	margin-bottom:50px; background: #fff;padding-right:8px;padding-left:8px;padding-top:8px;padding-bottom: 70px;font-size: 14px;
@@ -6935,6 +7302,7 @@ html,body{
 	min-width: 0;
 	*height: 2px;
 }
+
 
 
 

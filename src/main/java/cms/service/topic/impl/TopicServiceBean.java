@@ -308,7 +308,7 @@ public class TopicServiceBean extends DaoSupport<Topic> implements TopicService{
 	 * @return
 	 */
 	public Integer updateTopic(Topic topic){
-		Query query = em.createQuery("update Topic o set o.title=?1, o.content=?2,o.summary=?3,o.tagId=?4,o.allow=?5,o.image=?6,o.status=?7,o.sort=?8 where o.id=?9")
+		Query query = em.createQuery("update Topic o set o.title=?1, o.content=?2,o.summary=?3,o.tagId=?4,o.allow=?5,o.image=?6,o.status=?7,o.sort=?8,o.essence=?9 where o.id=?10")
 		.setParameter(1, topic.getTitle())
 		.setParameter(2, topic.getContent())
 		.setParameter(3, topic.getSummary())
@@ -317,7 +317,8 @@ public class TopicServiceBean extends DaoSupport<Topic> implements TopicService{
 		.setParameter(6, topic.getImage())
 		.setParameter(7, topic.getStatus())
 		.setParameter(8, topic.getSort())
-		.setParameter(9, topic.getId());
+		.setParameter(9, topic.getEssence())
+		.setParameter(10, topic.getId());
 		int i = query.executeUpdate();
 		return i;
 	}

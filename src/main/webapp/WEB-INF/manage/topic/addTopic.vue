@@ -22,6 +22,9 @@
 					<el-form-item label="允许评论" :required="true" :error="error.allow">
 						<el-switch v-model="allow" ></el-switch>
 					</el-form-item>
+					<el-form-item label="精华" :error="error.essence">
+						<el-switch v-model="essence" ></el-switch>
+					</el-form-item>
 					<el-form-item label="状态" :required="true" :error="error.status">
 						<el-radio-group v-model="status">
 						    <el-radio :label="10">待审核</el-radio>
@@ -54,6 +57,7 @@ export default({
 			tagId :'',//标签Id
 			sort : 0,
 			allow : true,
+			essence: false,
 			status :20,
 			content :'',
 			
@@ -66,6 +70,7 @@ export default({
 				title :'',
 				tagId :'',
 				sort :'',
+				essence :'',
 				content :'',
 			},
 			
@@ -239,8 +244,7 @@ export default({
 			}
 			formData.append('allow', _self.allow);
 			formData.append('status', _self.status);
-			
-			
+			formData.append('essence', _self.essence);
 			if(_self.$refs.content.value != null && _self.$refs.content.value !=''){
 				formData.append('content', _self.$refs.content.value);
 			}

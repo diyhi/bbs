@@ -482,7 +482,7 @@ public class TopicManageAction {
 	 */
 	@ResponseBody
 	@RequestMapping(params="method=add", method=RequestMethod.POST)
-	public String add(ModelMap model,Long tagId,String tagName, String title,Boolean allow,Integer status,
+	public String add(ModelMap model,Long tagId,String tagName, String title,Boolean allow,Integer status,Boolean essence,
 			String content,String sort,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
@@ -516,6 +516,7 @@ public class TopicManageAction {
 		topic.setTagName(tagName);
 		topic.setAllow(allow);
 		topic.setStatus(status);
+		topic.setEssence(essence);
 		Date d = new Date();
 		topic.setPostTime(d);
 		topic.setLastReplyTime(d);
@@ -904,16 +905,7 @@ public class TopicManageAction {
 						//验证文件类型
 						boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),formatList);
 						
-						//如果用flash控件上传
-						if(file.getContentType().equalsIgnoreCase("application/octet-stream")){
-							String fileType = FileType.getType(file.getInputStream());
-							for (String format :formatList) {
-								if(format.equalsIgnoreCase(fileType)){
-									authentication = true;
-									break;
-								}
-							}
-						}
+				
 						
 						if(authentication ){
 							//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
@@ -1114,7 +1106,7 @@ public class TopicManageAction {
 	@ResponseBody
 	@RequestMapping(params="method=edit", method=RequestMethod.POST)
 	public String edit(ModelMap model,Long topicId,Long tagId,
-			String tagName,String title,Boolean allow,Integer status,
+			String tagName,String title,Boolean allow,Integer status,Boolean essence,
 			String content,String sort,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Topic topic = null;
@@ -1153,6 +1145,7 @@ public class TopicManageAction {
 				topic.setTagName(tagName);
 				topic.setAllow(allow);
 				topic.setStatus(status);
+				topic.setEssence(essence);
 				
 				if(topic.getImage() != null && !"".equals(topic.getImage().trim())){
 					oldBeforeImageList = JsonUtils.toGenericObject(topic.getImage().trim(),new TypeReference< List<ImageInfo> >(){});

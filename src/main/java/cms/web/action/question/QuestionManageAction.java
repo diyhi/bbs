@@ -945,17 +945,7 @@ public class QuestionManageAction {
 						
 						//验证文件类型
 						boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),formatList);
-						
-						//如果用flash控件上传
-						if(file.getContentType().equalsIgnoreCase("application/octet-stream")){
-							String fileType = FileType.getType(file.getInputStream());
-							for (String format :formatList) {
-								if(format.equalsIgnoreCase(fileType)){
-									authentication = true;
-									break;
-								}
-							}
-						}
+					
 						
 						if(authentication){
 							//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度

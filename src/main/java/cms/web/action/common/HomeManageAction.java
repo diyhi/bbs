@@ -428,6 +428,9 @@ public class HomeManageAction {
 		jpql.append(" and o.isStaff=?"+ (params.size()+1));
 		params.add(false);
 		
+		jpql.append(" and o.status<?"+ (params.size()+1));
+		params.add(100);
+		
 		//删除第一个and
 		String _jpql = org.apache.commons.lang3.StringUtils.difference(" and", jpql.toString());
 		
@@ -506,6 +509,9 @@ public class HomeManageAction {
 		
 		jpql.append(" and o.isStaff=?"+ (params.size()+1));
 		params.add(false);
+		
+		jpql.append(" and o.status<?"+ (params.size()+1));
+		params.add(100);
 		
 		//删除第一个and
 		String _jpql = org.apache.commons.lang3.StringUtils.difference(" and", jpql.toString());
@@ -4903,6 +4909,9 @@ public class HomeManageAction {
 		jpql.append(" and o.isStaff=?"+ (params.size()+1));
 		params.add(false);
 		
+		jpql.append(" and o.status<?"+ (params.size()+1));
+		params.add(100);
+		
 		//删除第一个and
 		String _jpql = org.apache.commons.lang3.StringUtils.difference(" and", jpql.toString());
 		
@@ -4981,6 +4990,9 @@ public class HomeManageAction {
 		
 		jpql.append(" and o.isStaff=?"+ (params.size()+1));
 		params.add(false);
+		
+		jpql.append(" and o.status<?"+ (params.size()+1));
+		params.add(100);
 		
 		//删除第一个and
 		String _jpql = org.apache.commons.lang3.StringUtils.difference(" and", jpql.toString());

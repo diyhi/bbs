@@ -424,6 +424,31 @@ ul {
     color:#F56C6C;
 	background-color:#fde2e2;
 }
+.main .data-table .essence{
+	display: inline-block;
+    padding: 4px 4px 2px;
+    margin-left:5px;
+    font-size: 12px;
+    line-height: 12px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color: #fff;
+    background-color: #ff7875;
+}
+.main .data-table .top{
+	display: inline-block;
+    padding: 4px 4px 2px;
+    margin-left:5px;
+    font-size: 12px;
+    line-height: 12px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color: #fff;
+    background-color: #69c0ff;
+}
+
 /* 数据展示 */
 .main .data-view{
 	padding: 10px 10px 10px 10px;
@@ -1452,7 +1477,35 @@ background-position: 0px 2px, 4px 35px, 29px 31px, 34px 6px;
 	font-size:24px;
 	border:none;
 	line-height:34px; 
-	margin:9px 0 18px 0;
+	margin:9px 0 18px 0;redEnvelope
+}
+.topicViewModule .topic-wrap .head .title .essence{
+	display: inline-block;
+    padding: 4px 5px 4px;
+    margin-right:5px;
+    font-size: 14px;
+    line-height: 14px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color: #fff;
+    background-color: #ff7875;
+    position: relative;
+    top: -3px;
+}
+.topicViewModule .topic-wrap .head .title .top{
+	display: inline-block;
+    padding: 4px 5px 4px;
+    margin-right:5px;
+    font-size: 14px;
+    line-height: 14px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color: #fff;
+    background-color: #69c0ff;
+    position: relative;
+    top: -3px;
 }
 .topicViewModule .topic-wrap .head .topicInfo{
 	color: #909399;font-size: 14px;
@@ -4118,6 +4171,7 @@ background-position: 0px 2px, 4px 35px, 29px 31px, 34px 6px;
     color: #606266;
     line-height: 1.3;
 }
+
 
 
 

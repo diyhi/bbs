@@ -264,6 +264,7 @@ public class FileManage {
     			localFileManage.lockRemoveFile("answer",maxDeleteTime);//答案文件
     			
     			localFileManage.lockRemoveFile("help",maxDeleteTime);//删除帮助文件
+    			localFileManage.lockRemoveFile("helpType",maxDeleteTime);//删除帮助分类文件
     			localFileManage.lockRemoveFile("links",maxDeleteTime);//删除友情链接文件
     			localFileManage.lockRemoveFile("membershipCard",maxDeleteTime);//会员卡
     			

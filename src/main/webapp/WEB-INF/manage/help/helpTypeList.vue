@@ -19,6 +19,11 @@
 							<i class="icon icon-file el-icon-document" v-if="scope.row.childNodeNumber ==0"></i>{{scope.row.name}}
 				    	</template>
 					</el-table-column>
+					<el-table-column label="图片" align="center" width="200">
+						<template #default="scope">
+			          		<el-image v-if="scope.row.image != null && scope.row.image != ''" style="width: 120px; height: 120px" fit="contain" :src="scope.row.image+'?time='+new Date().getTime()" :preview-src-list="[scope.row.image+'?time='+new Date().getTime()]" hide-on-click-modal ></el-image>
+				    	</template>
+					</el-table-column>
 					<el-table-column label="分类帮助数量" align="center" width="120">
 						<template #default="scope">
 							<span v-if="scope.row.childNodeNumber ==0">{{scope.row.totalHelp}}</span>

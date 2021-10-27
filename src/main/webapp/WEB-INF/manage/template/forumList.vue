@@ -216,8 +216,9 @@ export default({
 											_self.referenceCodeList.set(forum.id,referenceCode);
 					    				}
 										if(forum.invokeMethod == 2){
-					    					let referenceCode = '<@object action="${'+forum.referenceCode+'}"><#assign value = '+forum.module+'></@object>';
-					    					
+					    					let pos=forum.module.lastIndexOf("_");
+	   										let moduleCode = forum.module.substr(0,pos);
+					    					let referenceCode = '<@object action="${'+forum.referenceCode+'}"><#assign value = '+moduleCode+'></@object>';
 					    					_self.referenceCodeList.set(forum.id,referenceCode);
 					    				}
 					    			}

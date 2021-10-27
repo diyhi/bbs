@@ -6527,6 +6527,332 @@ var search_component = Vue.extend({
 });
 
 
+//帮助中心
+var help_component = Vue.extend({
+	template : '#help-template',
+	data : function data() {
+		return {
+			helpTypeList: '',//帮助分类
+		};
+	},
+	created : function created() {
+		this.queryHelpTypeList();
+	},
+	methods : {
+		//查询帮助分类
+		queryHelpTypeList : function() {
+			var _self = this;
+			$.ajax({
+				type : "GET",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "queryHelpTypeList",
+				success : function success(result) {
+					if (result != "") {
+						var returnValue = $.parseJSON(result);
+						if (returnValue != null && returnValue.length > 0) {
+							_self.helpTypeList = returnValue;
+						}
+					}
+				}
+			});
+		},
+	},
+});
+
+//帮助内容
+var helpDetail_component = Vue.extend({
+	template : '#helpDetail-template',
+	data : function data() {
+		return {
+			helpTypeId : '',//帮助分类Id
+			helpId : '',//帮助Id
+			help : '', //帮助
+			helpList : '', //帮助列表
+			helpNavigationName : '', //帮助导航名称(导航最后一个节点名称)
+			show_helpDetail:true,//帮助内容显示/隐藏
+			show_helpList:false,//帮助列表显示/隐藏
+			
+			pictureOptions: {//放大图片配置
+		        url: 'src',//定义从何处获取原始图像URL进行查看
+		        navbar : true, //导航栏
+		        title : false, //标题
+		        toolbar : false, //工具栏
+		        loop:false, //是否启用循环查看
+		        filter : function(image) {
+		        	return image.dataset.enable != 'false';//将不允许放大的表情图片过滤
+		        },
+		        viewed : function(e) {
+		        //	this.viewer.zoomTo(1);
+		        }
+		    },
+		};
+	},
+	created : function created() {
+		//初始化
+		this.initialization();
+	},
+	mounted : function mounted(){
+		//挂载完成后，判断浏览器是否支持popstate
+		if (window.history && window.history.pushState) {//监听浏览器前进后退按钮
+			
+			window.addEventListener('popstate', this.goBack, false);
+		}
+	},
+	destroyed : function destroyed() {//离开当前页面
+		this.showHelp(false);
+		//页面销毁时，取消监听
+		window.removeEventListener('popstate', this.goBack, false);
+	},
+	deactivated: function() {//keep-alive组件停用时调用 (keepAlive缓存机制才会触发的钩子函数)
+		this.showHelp(false);
+	},
+	//在当前路由改变，但是该组件被复用时调用
+	beforeRouteUpdate : function beforeRouteUpdate(to, from, next) {
+		next(true);
+		//重置data
+		Object.assign(this.$data, this.$options.data());
+		//初始化
+		this.initialization();
+	},
+	computed: {
+		//动态解析模板数据
+		analyzeDataComponent: function analyzeDataComponent() {
+			return function (html) {
+				return {
+					template: "<div>"+ html +"</div>", // use content as template for this component 必须用<div>标签包裹，否则会有部分内容不显示
+					data : function data() {
+						return {
+							escapeChar:'{{'//富文本转义字符
+						};
+					},
+					mounted :function () {
+					
+					},
+					props: this.$options.props, // re-use current props definitions
+					methods: {
+						
+				    }
+				};
+			};	
+		},
+	},
+	methods : {
+		//显示帮助内容界面
+		showHelp : function(back){
+		    this.show_helpDetail = true;//显示问题页
+		    this.show_helpList = false;//隐藏帮助列表
+		    
+		    //判断浏览器是否支持popstate
+			if (window.history && window.history.pushState && back) {
+				//后退
+				history.go(-1);
+			}
+		},
+		//显示帮助列表界面
+		showHelpList : function(){
+		    this.show_helpDetail = false;//隐藏问题页
+		    this.show_helpList = true;//显示帮助列表
+		},
+		
+		
+		//查询帮助
+		queryHelp : function() {
+			var _self = this;
+
+			var data = "helpId=" + _self.helpId; //提交参数
+			$.ajax({
+				type : "GET",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "queryHelpContent",
+				data : data,
+				success : function success(result) {
+					if (result != "") {
+						var help = $.parseJSON(result);
+						if (help != null) {
+							
+							//处理隐藏标签
+							var contentNode = document.createElement("div");
+							contentNode.innerHTML = help.content;
+							
+							_self.bindNode(contentNode);
+							help.content = escapeVueHtml(contentNode.innerHTML);
+					
+							
+							_self.help = help;
+		
+						}
+					}
+				}
+			});
+			
+		},
+
+		
+		//递归绑定节点参数
+		bindNode : function(node) {
+			//先找到子节点
+	        var nodeList = node.childNodes;
+	        for(var i = 0;i < nodeList.length;i++){
+	            //childNode获取到到的节点包含了各种类型的节点
+	            //但是我们只需要元素节点  通过nodeType去判断当前的这个节点是不是元素节点
+	        	var childNode = nodeList[i];
+	            var random = Math.random().toString().slice(2);
+	            //判断是否是元素节点。如果节点是元素(Element)节点，则 nodeType 属性将返回 1。如果节点是属性(Attr)节点，则 nodeType 属性将返回 2。
+	            if(childNode.nodeType == 1){
+	            	if(childNode.nodeName.toLowerCase() == "img" ){
+	            		var src = childNode.getAttribute("src");
+	            		
+	            		if(childNode.getAttribute("width") == null){//不是表情图片
+	            			childNode.setAttribute("key",random+"_"+i);
+	            		}else{
+	            			childNode.setAttribute("data-enable","false");//标记不显示放大图
+	            		}
+	            		
+	            		//延迟加载 表情图片也使用<img>标签，也执行延迟加载
+	        			childNode.setAttribute("src",this.$store.state.commonPath+'images/null.gif');
+	        			childNode.setAttribute("data-src",src);
+	            	}
+	            	
+	            	//处理代码标签
+	            	if(childNode.nodeName.toLowerCase() == "pre" ){
+	            		var pre_html = childNode.innerHTML;
+	            		var class_val = childNode.className;
+	            		var lan_class = "";
+	            		
+	        	        var class_arr = new Array();
+	        	        class_arr = class_val.split(' ');
+	        	        
+	        	        for(var k=0; k<class_arr.length; k++){
+	        	        	var className = class_arr[k].trim();
+	        	        	
+	        	        	if(className != null && className != ""){
+	        	        		if (className.lastIndexOf('lang-', 0) === 0) {
+	        	        			lan_class = className;
+	        			            break;
+	        			        }
+	        	        	}
+	        	        }
+	        	       
+	        	        childNode.className = "line-numbers "+getLanguageClassName(lan_class);
+	            		
+	            		
+	        	        var nodeHtml = "";
+
+	        			//删除code节点
+	        			var preChildNodeList = childNode.childNodes;
+	        			for(var p = 0;p < preChildNodeList.length;p++){
+	        				var preChildNode = preChildNodeList[p];
+	        				if(preChildNode.nodeName.toLowerCase() == "code" ){
+	        					nodeHtml += preChildNode.innerHTML;
+	        					preChildNode.parentNode.removeChild(preChildNode);
+	            			}
+	        				
+	        			}
+	        			
+	        			var dom = document.createElement('code');
+	        			dom.className = "line-numbers "+getLanguageClassName(lan_class);
+	    				dom.innerHTML=nodeHtml;
+	    				
+	    				childNode.appendChild(dom);
+	    				//渲染代码
+	    				Prism.highlightElement(dom);
+	            		
+	            	}
+	            	this.bindNode(childNode);
+	            }
+	        }
+		},
+		
+		//查询帮助列表
+		queryHelpList : function(callback) {
+			var _self = this;
+			var data = "helpTypeId=" + _self.helpTypeId; //提交参数
+			
+			$.ajax({
+				type : "GET",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "queryHelpList",
+				data : data,
+				success : function success(result) {
+					if (result != "") {
+						var returnValue = $.parseJSON(result);
+						if (returnValue != null && returnValue.length > 0) {
+							_self.helpList = returnValue;
+						}
+						callback();
+					}
+				}
+			});
+		},
+		
+		//查询帮助导航
+		queryHelpNavigation : function() {
+			var _self = this;
+			var data = "helpTypeId=" + _self.helpTypeId; //提交参数
+			
+			$.ajax({
+				type : "GET",
+				cache : false,
+				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+				url : "queryHelpNavigation",
+				data : data,
+				success : function success(result) {
+					if (result != "") {
+						var returnValue = $.parseJSON(result);
+						
+						for(var key in returnValue){
+							_self.helpNavigationName = returnValue[key];
+						}
+					}
+				}
+			});
+		},
+		
+		
+		
+		
+		
+		//初始化
+		initialization : function() {
+			var _self = this;
+			var helpTypeId = getUrlParam("helpTypeId");//帮助分类Id
+			if(helpTypeId != null){
+				_self.helpTypeId = helpTypeId;
+			}
+			var helpId = getUrlParam("helpId");//帮助Id
+			if(helpId != null){
+				_self.helpId = helpId;
+			}
+			//查询帮助列表
+			_self.queryHelpList(function (){
+				if(helpId == null || helpId == ''){
+					//查询第一个帮助
+					if(_self.helpList != null && _self.helpList.length >0){
+						for(var i=0; i<_self.helpList.length; i++){
+							var help = _self.helpList[i];
+							
+							_self.helpId = help.id;
+							break;
+						}
+					}
+				}
+				//查询帮助
+				_self.queryHelp();
+				
+			});
+			//查询帮助导航
+			_self.queryHelpNavigation();
+		},
+		
+	}
+	
+	
+});
+
+
 
 //注册组件
 var register_component = Vue.extend({
@@ -6547,6 +6873,7 @@ var register_component = Vue.extend({
 			
 			type : 10,//用户类型
 			userCustomList : [], //用户自定义注册功能项
+			allowRegisterAccount : '',//允许注册账号类型
 			captchaKey : '', //验证码编号
 			captchaValue : '',
 			showCaptcha : false,
@@ -6765,7 +7092,20 @@ var register_component = Vue.extend({
 								}
 
 							}
-						} else if (key == "captchaKey") {
+						} else if (key == "allowRegisterAccount") {
+							_self.allowRegisterAccount = returnValue[key];
+							
+							if(_self.allowRegisterAccount.local){
+								_self.selectRegisterAccountType(10);
+								
+							}else{
+								if(_self.allowRegisterAccount.mobile){
+									_self.selectRegisterAccountType(20);
+								}
+							}
+							
+						
+						}else if (key == "captchaKey") {
 							var captchaKey = returnValue[key];
 							_self.captchaKey = captchaKey;
 
@@ -14224,6 +14564,7 @@ var bottomTab_component = Vue.extend({
 	data : function data() {
 		return {
 			bottomTab : 'index',
+			popup_find : false,//发现弹出层
 		};
 	},
 	created : function created() {
@@ -14254,11 +14595,8 @@ var bottomTab_component = Vue.extend({
 					this.selectedTagId = tagId;
 				}**/
 				
-			} else if ('search' == this.bottomTab) {
-				//搜索
-				this.$router.push({
-					path : '/search'
-				});
+			} else if ('find' == this.bottomTab) {
+				this.popup_find = true;
 
 			} else if ('mine' == this.bottomTab) {
 				//我的
@@ -14280,13 +14618,17 @@ var bottomTab_component = Vue.extend({
 				this.bottomTab = "index";
 			} else if (pathName.indexOf(this.$store.state.contextPath + "/askList/") >= 0) {
 				this.bottomTab = "askList";
-			} else if (pathName.indexOf(this.$store.state.contextPath + "/search/") >= 0) {
-				this.bottomTab = "search";
+		//	} else if (pathName.indexOf(this.$store.state.contextPath + "/find/") >= 0) {
+		//		this.bottomTab = "find";
 			} else if (pathName.indexOf(this.$store.state.contextPath + "/user/control/") >= 0) {
 				this.bottomTab = "mine";
 			}
 		},
-		
+		//关闭弹出层遮罩
+		closePopup : function() {
+			this.popup_find = false;
+			
+		}
 	},
 	
 	
@@ -14306,6 +14648,8 @@ var routes = [
 	{path : '/user/addQuestion',component : addQuestion_component}, //提问题
 	{path : '/user/appendQuestion',component : appendQuestion_component}, //追加问题
 	{path : '/search',component : search_component}, //搜索列表
+	{path : '/help',component : help_component}, //帮助中心
+	{path : '/helpDetail',component : helpDetail_component}, //帮助内容
 	{path : '/register',component : register_component}, //注册组件
 	{path : '/agreement',component : agreement_component}, //服务协议
 	{path : '/findPassWord/step1',component : findPassWord_step1_component}, //找回密码第一步组件

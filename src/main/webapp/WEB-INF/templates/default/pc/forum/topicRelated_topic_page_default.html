@@ -39,9 +39,7 @@
 					        	</li>
 					        </ul>
 							<h2 class="title clearfix">
-								<a href="thread?topicId=${topic.id}" target="_blank">
-					            	${topic.title}
-					            </a>
+								<a href="thread?topicId=${topic.id}" target="_blank">${topic.title}</a>
 					            <#list topic.allowRoleViewList as roleName>
 									<span class="topicRoleName">${roleName}</span>
 								</#list>
@@ -52,9 +50,15 @@
 		                      			<#else>
 		                      				<span class="circle"><i class="cms-lock-solid" ></i></span>
 		                      			</#if>
-			                      	</span> 
+			                      	</span>
 								</#list>
-								
+					            <#if topic.essence == true>
+				            		<span class="essence">精华</span>
+					            </#if>
+					             <#if topic.sort gt 0>
+					            	<span class="top">置顶</span>
+					            </#if>
+						            
 								<#if topic.giveRedEnvelopeId != null && topic.giveRedEnvelopeId??>
 		                      		<span class="redEnvelope" alt="红包" title="红包" ><i class="cms-redEnvelope-1" ></i></span>
 		                      	</#if>

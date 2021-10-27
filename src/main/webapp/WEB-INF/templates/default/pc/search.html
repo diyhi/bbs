@@ -64,12 +64,16 @@
 								        	</li>
 								        </ul>
 										<h2 class="title highlight clearfix">
-											<a href="thread?topicId=${topic.id}">
-								            	<#noescape>${topic.title}</#noescape>
-								            </a>
+											<a href="thread?topicId=${topic.id}"><#noescape>${topic.title}</#noescape></a>
 								            <#list topic.allowRoleViewList as roleName>
 												<span class="topicRoleName">${roleName}</span>
 											</#list>
+											<#if topic.essence == true>
+								            	<span class="essence">精华</span>
+								            </#if>
+								             <#if topic.sort gt 0>
+								            	<span class="top">置顶</span>
+								            </#if>
 										</h2>
 										<div class="clearfix"></div>
 										<div class="detail">

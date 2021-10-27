@@ -40,6 +40,9 @@
 								<el-form-item label="允许评论" :required="true" :error="error.allow">
 									<el-switch v-model="allow" ></el-switch>
 								</el-form-item>
+								<el-form-item label="精华" :error="error.essence">
+									<el-switch v-model="essence" ></el-switch>
+								</el-form-item>
 								<el-form-item label="状态" :required="true" :error="error.status">
 									<el-radio-group v-model="status">
 									    <el-radio :label="10">待审核</el-radio>
@@ -58,7 +61,11 @@
 					</div>
 					
 					<div class="head">
-		                <div class="title">{{topic.title}}</div>
+		                <div class="title">
+		                	{{topic.title}}
+		                	<span class="essence" v-if="topic.essence == true">精华</span>
+		                	<span class="top" v-if="topic.sort >0">置顶</span>
+		                </div>
 		                <div class="topicInfo clearfix" >
 		                	<div class="avatar">
 		                		<el-popover effect="light" trigger="hover" placement="top">
@@ -435,6 +442,7 @@ export default({
 			sort : 0,
 			allow : true,
 			status :0,
+			essence:false,
 			isAllowLoadTagGroup:true,//是否允许加载标签组
 			tagIdGroup : [], //标签Id组
 			loading :false,//是否正在从远程获取数据
@@ -449,6 +457,7 @@ export default({
 				tagId :'',
 				sort :'',
 				content :'',
+				essence :'',
 			},
 			
 		    
@@ -1818,6 +1827,7 @@ export default({
 							_self.sort = _self.topic.sort;
 							_self.allow = _self.topic.allow;
 							_self.status = _self.topic.status;
+							_self.essence = _self.topic.essence;
 		    				_self.$refs.topicContent.value = topic.content;
 		    				
 		    				
@@ -1882,6 +1892,7 @@ export default({
 			_self.sort= 0;
 			_self.allow = true;
 			_self.status =0;
+			_self.essence = false;
 			_self.isAllowLoadTagGroup=true;//是否允许加载标签组
 			_self.tagIdGroup =[];//标签Id组
 			_self.loading =false;//是否正在从远程获取数据
@@ -1915,7 +1926,7 @@ export default({
 			}
 			formData.append('allow', _self.allow);
 			formData.append('status', _self.status);
-			
+			formData.append('essence', _self.essence);
 			
 			if(_self.$refs.topicContent.value != null && _self.$refs.topicContent.value !=''){
 				formData.append('content', _self.$refs.topicContent.value);
@@ -2504,7 +2515,6 @@ export default({
 	        });
 		
 		},
-		
 	}
 });
 

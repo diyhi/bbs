@@ -19,7 +19,10 @@ import cms.bean.ResultCode;
 import cms.bean.help.HelpType;
 import cms.service.help.HelpTypeService;
 import cms.service.setting.SettingService;
+import cms.utils.FileUtil;
 import cms.utils.JsonUtils;
+import cms.utils.UUIDUtil;
+import cms.web.action.TextFilterManage;
 import cms.web.action.fileSystem.FileManage;
 
 import org.apache.commons.lang3.StringUtils;
@@ -32,6 +35,7 @@ import org.springframework.validation.Validator;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 帮助分类
@@ -49,6 +53,7 @@ public class HelpTypeManageAction {
 	
 	@Resource SettingService settingService;
 	@Resource MessageSource messageSource;
+	@Resource TextFilterManage textFilterManage;
 	
 	/**
 	 * 帮助分类   添加界面显示
@@ -92,8 +97,8 @@ public class HelpTypeManageAction {
 	 */
 	@ResponseBody
 	@RequestMapping(params="method=add", method=RequestMethod.POST)
-	public String add(ModelMap model,HelpType formbean,BindingResult result,Long parentId
-			) throws Exception {
+	public String add(ModelMap model,HelpType formbean,BindingResult result,Long parentId,String imagePath,MultipartFile images,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		//错误
 		Map<String,String> error = new HashMap<String,String>();
 		
@@ -105,11 +110,82 @@ public class HelpTypeManageAction {
 				error.put("parentId", "父类不存在");
 			}
 		}
+		HelpType type = new HelpType(); 
 		
-		
+		String _imagePath = "";
+		String _fileName = "";
+		if (images == null || images.isEmpty()) { 
+			if(imagePath != null && !"".equals(imagePath.trim())){
+				imagePath = textFilterManage.deleteBindURL(request, imagePath);
+				
+				String fileName = FileUtil.getName(imagePath);
+				
+				//取得路径名称
+				String pathName = FileUtil.getFullPath(imagePath);
+				
+				//旧路径必须为file/helpType/开头
+				if(imagePath.substring(0, 14).equals("file/helpType/")){
+					//新路径名称
+					String newPathName = "file/helpType/";
+					
+					//如果新旧路径不一致
+					if(!newPathName.equals(pathName)){
+						
+						//复制文件到新路径
+						fileManage.copyFile(FileUtil.toRelativePath(imagePath), newPathName);
+						//新建文件锁到新路径
+						//生成锁文件名称
+						String lockFileName =fileName;
+						//添加文件锁
+						fileManage.addLock("file"+File.separator+"helpType"+File.separator+"lock"+File.separator,lockFileName);
+						
+						
+					}
+				
+					_imagePath = "file/helpType/";
+					_fileName = fileName;
+				}
+				
+					  
+			}
+        }else{
+        	//验证文件类型
+			List<String> formatList = new ArrayList<String>();
+			formatList.add("gif");
+			formatList.add("jpg");
+			formatList.add("jpeg");
+			formatList.add("bmp");
+			formatList.add("png");
+			boolean authentication = FileUtil.validateFileSuffix(images.getOriginalFilename(),formatList);
+			if(authentication){
+				//取得文件后缀		
+				String ext = FileUtil.getExtension(images.getOriginalFilename());
+				//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
+				String pathDir = "file"+File.separator+"helpType"+File.separator;
+				//构建文件名称
+				String fileName = UUIDUtil.getUUID32()+ "." + ext;
+				_imagePath = "file/helpType/";
+				_fileName = fileName; 
+				  
+				//生成文件保存目录
+				FileUtil.createFolder(pathDir);
+				 
+				//生成锁文件名称
+				String lockFileName = fileName;
+				//添加文件锁
+				fileManage.addLock("file"+File.separator+"helpType"+File.separator+"lock"+File.separator,lockFileName);
+				
+				//保存文件
+				fileManage.writeFile(pathDir, fileName,images.getBytes());
+				
+			}else{
+				error.put("images", "图片格式错误");
+			}
+        }
+		type.setImage(_imagePath+_fileName);
 		//数据校验
 		this.validator.validate(formbean, result); 
-		if (result.hasErrors()) { 
+		if (result.hasErrors()) {  
 			List<FieldError> fieldErrorList = result.getFieldErrors();
 			if(fieldErrorList != null && fieldErrorList.size() >0){
 				for(FieldError fieldError : fieldErrorList){
@@ -117,11 +193,15 @@ public class HelpTypeManageAction {
 				}
 			}
 		} 
-		HelpType type = new HelpType(); 
+		
+		
+		
+		
 		if(error.size() ==0){
 			
 			type.setId(helpTypeManage.nextNumber());
 			type.setName(formbean.getName());
+			type.setDescription(formbean.getDescription());
 			
 			type.setSort(formbean.getSort());
 			if(parentHelpType != null){
@@ -138,6 +218,10 @@ public class HelpTypeManageAction {
 		}
 		if(error.size() ==0){
 			helpTypeService.saveType(type);
+			//删除图片锁
+			if(_imagePath != null && !"".equals(_imagePath.trim())){	
+				fileManage.deleteLock("file"+File.separator+"helpType"+File.separator+"lock"+File.separator,_fileName);		
+			}
 			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 		}
 		
@@ -158,6 +242,9 @@ public class HelpTypeManageAction {
 		if(typeId != null){//判断父类ID是否存在;
 			HelpType helpType = helpTypeService.findById(typeId);
 			if(helpType != null){
+				if(helpType.getImage() != null && !"".equals(helpType.getImage())){
+					returnValue.put("imagePath",fileManage.fileServerAddress()+helpType.getImage());
+				}
 				returnValue.put("helpType",helpType);//返回消息
 			}
 			Map<Long,String> navigation = new LinkedHashMap<Long,String>();
@@ -180,16 +267,92 @@ public class HelpTypeManageAction {
 	 */
 	@ResponseBody
 	@RequestMapping(params="method=edit", method=RequestMethod.POST)
-	public String edit(ModelMap model,HelpType formbean,BindingResult result,Long typeId,
+	public String edit(ModelMap model,HelpType formbean,BindingResult result,Long typeId,String imagePath,
+			MultipartFile images,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		//错误
 		Map<String,String> error = new HashMap<String,String>();
 				
 		HelpType helpType = null;
+		String _imagePath = "";
+		String _fileName = "";
+		
 		if(typeId != null && typeId >0L){
 			//取得对象
 			helpType = helpTypeService.findById(typeId);
-			if(helpType == null){
+			if(helpType != null){
+				
+				if(images ==null || images.isEmpty()){//如果图片已上传
+					if(imagePath != null && !"".equals(imagePath.trim())){
+						imagePath = textFilterManage.deleteBindURL(request, imagePath);
+						
+						//取得文件名称
+						String fileName = FileUtil.getName(imagePath);
+
+						//取得路径名称
+						String pathName = FileUtil.getFullPath(imagePath);
+						
+						//旧路径必须为file/helpType/开头
+						if(imagePath.substring(0, 14).equals("file/helpType/")){
+							//新路径名称
+							String newPathName = "file/helpType/";
+							
+							//如果新旧路径不一致
+							if(!newPathName.equals(pathName)){
+								
+								//复制文件到新路径
+								fileManage.copyFile(FileUtil.toRelativePath(imagePath), newPathName);
+								//新建文件锁到新路径
+								//生成锁文件名称
+								String lockFileName = fileName;
+								//添加文件锁
+								fileManage.addLock("file"+File.separator+"helpType"+File.separator+"lock"+File.separator,lockFileName);
+			
+								
+							}
+							_imagePath = "file/helpType/";
+							_fileName = fileName;
+						}
+					}
+				}
+				
+				if(images !=null && !images.isEmpty()){	
+					//验证文件类型
+					List<String> formatList = new ArrayList<String>();
+					formatList.add("gif");
+					formatList.add("jpg");
+					formatList.add("jpeg");
+					formatList.add("bmp");
+					formatList.add("png");
+					boolean authentication = FileUtil.validateFileSuffix(images.getOriginalFilename(),formatList);
+					if(authentication){
+						//取得文件后缀		
+						String ext = FileUtil.getExtension(images.getOriginalFilename());
+						//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
+						String pathDir = "file"+File.separator+"helpType"+File.separator;
+						//构建文件名称
+						String fileName = UUIDUtil.getUUID32()+ "." + ext;
+						_imagePath = "file/helpType/";
+						_fileName = fileName;
+						   
+						//生成文件保存目录
+						FileUtil.createFolder(pathDir);
+						//生成锁文件名称
+						String lockFileName = fileName;
+						//添加文件锁
+						fileManage.addLock("file"+File.separator+"helpType"+File.separator+"lock"+File.separator,lockFileName);
+						  
+						//保存文件
+						fileManage.writeFile(pathDir, fileName,images.getBytes());
+				   }else{
+						error.put("images", "图片格式错误");
+				   }
+				}
+			
+				
+				
+
+			}else{
 				error.put("typeId", "分类不存在");
 			}
 		}else{
@@ -213,8 +376,24 @@ public class HelpTypeManageAction {
 			type.setId(typeId);
 			type.setName(formbean.getName());
 			type.setSort(formbean.getSort());
-			
+			type.setImage(_imagePath+_fileName);
+			type.setDescription(formbean.getDescription());
 			helpTypeService.updateHelpType(type);
+			
+			if(helpType.getImage() != null && !"".equals(helpType.getImage().trim())){
+				if(!(_imagePath+_fileName).equals(helpType.getImage())){//如果图片有变化
+					//删除旧图片
+					//替换路径中的..号
+					String oldPathFile = FileUtil.toRelativePath(helpType.getImage());
+					//删除旧文件
+					fileManage.deleteFile(FileUtil.toSystemPath(oldPathFile));
+				}
+			}
+			
+			//删除图片锁
+			if(_imagePath != null && !"".equals(_imagePath.trim())){	
+				fileManage.deleteLock("file"+File.separator+"helpType"+File.separator+"lock"+File.separator,_fileName);		
+			}
 			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 		}
 	
@@ -247,8 +426,26 @@ public class HelpTypeManageAction {
 					
 					delete_dirGroup.append(","+it.getId()).append(it.getMergerTypeId());
 					
+					if(it.getImage() != null && !"".equals(it.getImage().trim())){
+						
+						//删除旧图片
+						//替换路径中的..号
+						String oldPathFile = FileUtil.toRelativePath(it.getImage());
+						//删除旧文件
+						fileManage.deleteFile(FileUtil.toSystemPath(oldPathFile));
+						
+					}
+					
 				}
-				
+				if(helpType.getImage() != null && !"".equals(helpType.getImage().trim())){
+					
+					//删除旧图片
+					//替换路径中的..号
+					String oldPathFile = FileUtil.toRelativePath(helpType.getImage());
+					//删除旧文件
+					fileManage.deleteFile(FileUtil.toSystemPath(oldPathFile));
+					
+				}
 				
 				String[] old_typeId_array = delete_dirGroup.toString().split(",");
 				if(old_typeId_array != null && old_typeId_array.length >0){
@@ -261,6 +458,8 @@ public class HelpTypeManageAction {
 								//创建删除失败目录文件
 								fileManage.failedStateFile("file"+File.separator+"help"+File.separator+"lock"+File.separator+"#"+old_typeId);
 							}
+							
+							
 						}
 					}
 				}

@@ -89,17 +89,20 @@
 				        </div>
 				        <div class="clearfix"></div>
 				      
-				      	<div class="title">
-				      		<router-link tag="span" :to="{path: '/thread', query: {topicId: topic.id}}" >{{topic.title}}</router-link>
-				      		<i class="topicRoleName" v-for="(roleName,index) in topic.allowRoleViewList" >{{roleName}}</i>
+				      	<div class="titleBox">
+				      		<router-link tag="span" class="title" :to="{path: '/thread', query: {topicId: topic.id}}" >{{topic.title}}</router-link>
+				      		<i class="topicRoleName" v-for="(roleName,index) in topic.allowRoleViewList" ><span>{{roleName}}</span></i>
 				      		
-				      		<span :class="'hideTagType hide_'+key"  v-for="(value, key) in topic.hideTagTypeMap">
+			      			<span :class="'hideTagType hide_'+key"  v-for="(value, key) in topic.hideTagTypeMap">
                       			<span class="circle point" v-if="value==true"><i class="cms-unlock-solid" ></i></span>
                       			<span class="circle" v-if="value==false"><i class="cms-lock-solid" ></i></span>
 	                      	</span>
-	                      	
+	                      	<span class="essence" v-if="topic.essence == true"><span>精华</span></span>
+                    		<span class="top" v-if="topic.sort >0"><span>置顶</span></span>
+			      		
+				      		
 	                      	<span class="redEnvelope" alt="红包" title="红包" v-if="topic.giveRedEnvelopeId != null && topic.giveRedEnvelopeId != ''"><i class="cms-redEnvelope-1" ></i></span>
-	                      
+	                     
 				      	</div>
 				      	
 				        <div class="summary" v-if="topic.imageInfoList.length ==0 && topic.mediaInfoList.length ==0">
@@ -303,7 +306,7 @@
 			<mt-header fixed title="话题内容" style="background: #fafafa; color: #000000;font-size: 14px">
 		    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
 		    	<router-link to="/index" slot="right">
-				    <span class="cms-home" style="font-size: 18px;"></span>
+				    <span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 				</router-link>
 			</mt-header>
 			<div class="topicContentModule">
@@ -377,9 +380,12 @@
 					
 				<div class="topicDetail">
 					<div class="head">
-				    	<h1>
-				    		{{topic.title}}
-				    	</h1>
+				    	<div class="titleBox">
+				    		<span class="title">{{topic.title}}</span>
+				    		<span class="essence" v-if="topic.essence == true"><span>精华</span></span>
+	                    	<span class="top" v-if="topic.sort >0"><span>置顶</span></span>
+				    	</div>
+				    	
 				    	<div class="info clearfix">                                 
 				            <span class="left">
 				            	 <div class="tagName">{{topic.tagName}}</div>
@@ -492,10 +498,10 @@
 						</div>
 						<div class="bottomInfo">
 							<div class="toolbar">
-								<span class="edit-btn"  @click="editCommentUI(comment.id)" v-if="comment.userName == $store.state.user.userName"><span class="cms-pencil-alt" style="font-size: 10px;margin-right: 1px;"></span>编辑</span>
-								<span class="edit-btn"  @click="deleteComment(comment.id)" v-if="comment.userName == $store.state.user.userName"><span class="cms-trash" style="font-size: 10px;margin-right: 1px;"></span>删除</span>
-								<span class="quote-btn"  @click="addQuoteUI(comment.id)"><span class="cms-quote" style="font-size: 10px;margin-right: 1px;"></span>引用</span>
-								<span class="reply-btn"  @click="addReplyUI(comment.id)"><span class="cms-reply" style="font-size: 11px;margin-right: 1px;"></span>回复</span>
+								<span class="edit-btn"  @click="editCommentUI(comment.id)" v-if="comment.userName == $store.state.user.userName"><span class="cms-pencil-alt" style="font-size: 12px;margin-right: 1px;"></span>编辑</span>
+								<span class="edit-btn"  @click="deleteComment(comment.id)" v-if="comment.userName == $store.state.user.userName"><span class="cms-trash" style="font-size: 12px;margin-right: 1px;"></span>删除</span>
+								<span class="quote-btn"  @click="addQuoteUI(comment.id)"><span class="cms-quote" style="font-size: 12px;margin-right: 1px;"></span>引用</span>
+								<span class="reply-btn"  @click="addReplyUI(comment.id)"><span class="cms-reply" style="font-size: 12px;margin-right: 1px;"></span>回复</span>
 							</div>
 						</div>
 					</div>
@@ -517,7 +523,7 @@
 					<mt-header fixed title="发表回复" style="background: #fafafa; color: #000000;font-size: 14px">
 				    	<mt-button icon="back" @click.native="popup_reply = false;" slot="left" >返回</mt-button>
 				    	<router-link to="/index" slot="right" @click.native="popup_reply = false" >
-				    		<span class="cms-home" style="font-size: 18px;"></span>
+				    		<span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 						</router-link>
 					</mt-header> 
 					<div ref="addReplyFormScroll" class="addReplyScroll">
@@ -563,7 +569,7 @@
 					<mt-header fixed title="修改回复" style="background: #fafafa; color: #000000;font-size: 14px">
 				    	<mt-button icon="back" @click.native="popup_editReply = false" slot="left" >返回</mt-button>
 				    	<router-link to="/index" slot="right" @click.native="popup_editReply = false" >
-				    		<span class="cms-home" style="font-size: 18px;"></span>
+				    		<span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 						</router-link>
 					</mt-header> 
 					<div ref="editReplyFormScroll" class="editReplyScroll">
@@ -609,7 +615,7 @@
 			<mt-header fixed title="发表评论" style="background: #fafafa; color: #000000;font-size: 14px">
 		    	<mt-button icon="back" @click.native="showTopic(true)" slot="left" >返回</mt-button>
 		    	<router-link to="/index" slot="right">
-		    		<span class="cms-home" style="font-size: 18px;"></span>
+		    		<span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 				</router-link>
 			</mt-header> 
 			<div class="topicContentModule" style="margin-top: -40px;">
@@ -654,7 +660,7 @@
 			<mt-header fixed title="引用评论" style="background: #fafafa; color: #000000;font-size: 14px">
 			    <mt-button icon="back" @click.native="showTopic(true)" slot="left" >返回</mt-button>
 			    <router-link to="/index" slot="right">
-			    	<span class="cms-home" style="font-size: 18px;"></span>
+			    	<span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 				</router-link>
 			</mt-header> 
 			<div class="topicContentModule"  style="margin-top: -40px;">
@@ -707,7 +713,7 @@
 			<mt-header fixed title="修改评论" style="background: #fafafa; color: #000000;font-size: 14px">
 			    <mt-button icon="back" @click.native="showTopic(true)" slot="left" >返回</mt-button>
 			    <router-link to="/index" slot="right">
-			    	<span class="cms-home" style="font-size: 18px;"></span>
+			    	<span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 				</router-link>
 			</mt-header> 
 			<div class="topicContentModule"  style="margin-top: -40px;">
@@ -882,7 +888,7 @@
 			<mt-header fixed title="问题内容" style="background: #fafafa; color: #000000;font-size: 14px">
 		    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
 		    	<router-link to="/index" slot="right">
-				    <span class="cms-home" style="font-size: 18px;"></span>
+				    <span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 				</router-link>
 			</mt-header>
 			
@@ -1054,11 +1060,11 @@
 						</div>
 						<div class="bottomInfo">
 							<div class="toolbar">
-								<span class="edit-btn"  @click="editAnswerUI(answer.id)" v-if="answer.userName == $store.state.user.userName"><span class="cms-pencil-alt" style="font-size: 10px;margin-right: 1px;"></span>编辑</span>
-								<span class="edit-btn"  @click="deleteAnswer(answer.id)" v-if="answer.userName == $store.state.user.userName"><span class="cms-trash" style="font-size: 10px;margin-right: 1px;"></span>删除</span>
+								<span class="edit-btn"  @click="editAnswerUI(answer.id)" v-if="answer.userName == $store.state.user.userName"><span class="cms-pencil-alt" style="font-size: 12px;margin-right: 1px;"></span>编辑</span>
+								<span class="edit-btn"  @click="deleteAnswer(answer.id)" v-if="answer.userName == $store.state.user.userName"><span class="cms-trash" style="font-size: 12px;margin-right: 1px;"></span>删除</span>
 								
-								<span class="quote-btn"  @click="adoptionAnswer(answer.id)" v-if="question.userName == $store.state.user.userName && question.adoptionAnswerId == 0"><span class="cms-check-circle-solid" style="font-size: 10px;margin-right: 1px;"></span>采纳</span>
-								<span class="reply-btn"  @click="addReplyUI(answer.id)"><span class="cms-reply" style="font-size: 11px;margin-right: 1px;"></span>回复</span>
+								<span class="quote-btn"  @click="adoptionAnswer(answer.id)" v-if="question.userName == $store.state.user.userName && question.adoptionAnswerId == 0"><span class="cms-check-circle-solid" style="font-size: 12px;margin-right: 1px;"></span>采纳</span>
+								<span class="reply-btn"  @click="addReplyUI(answer.id)"><span class="cms-reply" style="font-size: 12px;margin-right: 1px;"></span>回复</span>
 							</div>
 						</div>
 					</div>
@@ -1080,7 +1086,7 @@
 					<mt-header fixed title="发表回复" style="background: #fafafa; color: #000000;font-size: 14px">
 				    	<mt-button icon="back" @click.native="popup_reply = false" slot="left" >返回</mt-button>
 				    	<router-link to="/index" slot="right" @click.native="popup_reply = false" >
-				    		<span class="cms-home" style="font-size: 18px;"></span>
+				    		<span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 						</router-link>
 					</mt-header> 
 					<div ref="addReplyFormScroll" class="addReplyScroll">
@@ -1125,7 +1131,7 @@
 					<mt-header fixed title="修改回复" style="background: #fafafa; color: #000000;font-size: 14px">
 				    	<mt-button icon="back" @click.native="popup_editReply = false" slot="left" >返回</mt-button>
 				    	<router-link to="/index" slot="right" @click.native="popup_editReply = false" >
-				    		<span class="cms-home" style="font-size: 18px;"></span>
+				    		<span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 						</router-link>
 					</mt-header> 
 					<div ref="editReplyFormScroll" class="editReplyScroll">
@@ -1171,7 +1177,7 @@
 			<mt-header fixed title="发表答案" style="background: #fafafa; color: #000000;font-size: 14px">
 		    	<mt-button icon="back" @click.native="showQuestion(true)" slot="left" >返回</mt-button>
 		    	<router-link to="/index" slot="right">
-		    		<span class="cms-home" style="font-size: 18px;"></span>
+		    		<span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 				</router-link>
 			</mt-header> 
 			<div class="questionContentModule" style="margin-top: -40px;">
@@ -1216,7 +1222,7 @@
 			<mt-header fixed title="修改答案" style="background: #fafafa; color: #000000;font-size: 14px">
 			    <mt-button icon="back" @click.native="showQuestion(true)" slot="left" >返回</mt-button>
 			    <router-link to="/index" slot="right">
-			    	<span class="cms-home" style="font-size: 18px;"></span>
+			    	<span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 				</router-link>
 			</mt-header> 
 			<div class="questionContentModule"  style="margin-top: -40px;">
@@ -1269,7 +1275,7 @@
 		<mt-header fixed title="提问题" style="background: #fafafa; color: #000000;font-size: 14px">
 	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
 	    	<router-link to="/index" slot="right">
-			    <span class="cms-home" style="font-size: 18px;"></span>
+			    <span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 			</router-link>
 		</mt-header>
 		<div class="addQuestionModule">
@@ -1393,7 +1399,7 @@
 		<mt-header fixed title="追加问题" style="background: #fafafa; color: #000000;font-size: 14px">
 	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
 	    	<router-link to="/index" slot="right">
-			    <span class="cms-home" style="font-size: 18px;"></span>
+			    <span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 			</router-link>
 		</mt-header>
 		<div class="appendQuestionModule">
@@ -1452,7 +1458,7 @@
 		<mt-header fixed style="background: #fafafa; color: #000000;font-size: 14px; ">
 	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
 	    	<router-link to="/index" slot="right">
-	    		<span class="cms-home" style="font-size: 18px;"></span>
+	    		<span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 			</router-link>
 		</mt-header>
 		<div style=" position:relative; margin-left: 60px; margin-right: 60px;">
@@ -1485,8 +1491,12 @@
 				        <div class="clearfix"></div>
 				      
 				      	<div class="title">
-				      		<router-link  tag="span" :to="{path: '/thread', query: {topicId: searchResult.topic.id}}" v-html="searchResult.topic.title"></router-link>
-				        	<i class="topicRoleName" v-for="(roleName,index) in searchResult.topic.allowRoleViewList" >{{roleName}}</i>
+				      		<router-link tag="span" :to="{path: '/thread', query: {topicId: searchResult.topic.id}}" v-html="searchResult.topic.title"></router-link>
+				      		<span class="box">
+					      		<i class="topicRoleName" v-for="(roleName,index) in searchResult.topic.allowRoleViewList" ><span>{{roleName}}</span></i>
+				        		<span class="essence" v-if="searchResult.topic.essence == true"><span>精华</span></span>
+		                    	<span class="top" v-if="searchResult.topic.sort >0"><span>置顶</span></span>
+				        	</span>
 				      	</div>
 				        <div class="content">
 				            <span v-html="searchResult.topic.content"></span>
@@ -1550,6 +1560,94 @@
 	</div>
 </template>
 
+<!-- 帮助中心 -->
+<template id="help-template">
+	<div>
+		<mt-header fixed style="background: #fafafa; color: #000000;font-size: 14px; ">
+	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
+	    	<router-link to="/index" slot="right">
+	    		<span class="cms-home" style="font-size: 18px;color: #595959;"></span>
+			</router-link>
+		</mt-header>
+		<div class="helpModule">
+	        <div class="container" v-for="helpType in helpTypeList">
+	        	<div class="line"><span class="title">{{helpType.name}}</span></div>
+				<ul class="nav-row" >
+					<li class="item" v-for="childHelpType in helpType.childHelpType">
+						<router-link  tag="div" :to="{path: '/helpDetail', query: {helpTypeId: childHelpType.id}}" class="info">
+				    		<div class="img" v-if="childHelpType.image != null && childHelpType.image != ''" :style="{backgroundImage: 'url('+ childHelpType.image +')'}"></div>
+				    		<div v-if="childHelpType.image == null || childHelpType.image == ''" class="icon cms-help-alt" ></div>
+							<h5>{{childHelpType.name}}</h5>
+							<div class="description-box">
+		                        <p class="description">{{childHelpType.description}}</p>
+		                    </div>
+						</router-link>
+					</li>	
+				</ul> 
+			</div> 
+		</div>
+	</div>
+</template>
+
+<!-- 帮助内容 -->
+<template id="helpDetail-template">
+	<div>
+		<div v-show="show_helpDetail">
+			<mt-header fixed title="帮助内容" style="background: #fafafa; color: #000000;font-size: 14px">
+		    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
+		    	<router-link to="/index" slot="right">
+				    <span class="cms-home" style="font-size: 18px;color: #595959;"></span>
+				</router-link>
+			</mt-header>
+			
+			<div class="helpContentModule">
+				<div class="head-box">
+					<div class="helpTypeInfo clearfix" >                                   
+						<div class="icon" @click="showHelpList();"><i class="cms-menu-unfold-fill"></i></div>
+						<div class="typeName" @click="showHelpList();">{{helpNavigationName}}</div>
+			        </div>
+				</div>
+				<div class="helpDetail">
+					<div class="head">
+					
+				    	<h1>
+				    		{{help.name}}
+				    	</h1>
+				    	<div class="info clearfix">                                 
+				            <span class="time" >{{help.times}}</span>
+				        </div>
+					</div>
+					<div class="main">
+						<div v-viewer="pictureOptions"> 
+							<!-- 内容 -->
+							<component v-lazy-container="{ selector: 'img'}" v-bind:is ="analyzeDataComponent(help.content)" v-bind="$props" />
+						</div>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+		
+		<!-- 帮助列表 -->
+		<div v-show="show_helpList">
+			<mt-header fixed title="帮助列表" style="background: #fafafa; color: #000000;font-size: 14px">
+		    	<mt-button icon="back" @click.native="showHelp(false)" slot="left" style='font-size:12px'>返回</mt-button>
+		    	<router-link to="/index" slot="right">
+		    		<span class="cms-home" style="font-size: 18px;color: #595959;"></span>
+				</router-link>
+			</mt-header> 
+			<div class="helpContentModule">
+				<div class="helpList">
+					<div v-for="help in helpList" class="item">
+						<mt-cell :title="help.name"  value="" :to="{path: '/helpDetail', query: {helpTypeId: helpTypeId, helpId:help.id}}"  is-link  v-on:click.native="showHelp(false)">
+							 <span slot="icon" class="icon cms-search" ></span> 
+						</mt-cell>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>
 
 <!-- 注册页 -->
 <template id="register-template">
@@ -1557,18 +1655,18 @@
 	<mt-header fixed title="注册" style="background: #fafafa; color: #000000;font-size: 14px">
     	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
     	<router-link to="/index" slot="right">
-	    	<span class="cms-home" style="font-size: 18px;"></span>
+	    	<span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 		</router-link>
 	</mt-header>
 	<div class="registerModule">
 		
        	<div class="tabs-nav">
         	<div>
-        		<div class="tabs-tab" >
+        		<div class="tabs-tab" v-if="allowRegisterAccount.local == true">
         			<span :class="registerType_tab_10" @click="selectRegisterAccountType(10);">账号密码注册</span>
         		</div>
-       			<div class="tabs-tab" @click="selectRegisterAccountType(20);">
-       				<span :class="registerType_tab_20" >手机号注册</span>
+       			<div class="tabs-tab" v-if="allowRegisterAccount.mobile == true">
+       				<span :class="registerType_tab_20"  @click="selectRegisterAccountType(20);">手机号注册</span>
        			</div>
         	</div>
        	</div>
@@ -1695,7 +1793,7 @@
 		<mt-header fixed title="服务协议" style="background: #fafafa; color: #000000;font-size: 14px">
 	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
 	    	<router-link to="/index" slot="right">
-		    	<span class="cms-home" style="font-size: 18px;"></span>
+		    	<span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 			</router-link>
 		</mt-header>
 	
@@ -1713,7 +1811,7 @@
 		<mt-header fixed title="找回密码一" style="background: #fafafa; color: #000000;font-size: 14px">
 	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
 	    	<router-link to="/index" slot="right">
-		    	<span class="cms-home" style="font-size: 18px;"></span>
+		    	<span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 			</router-link>
 		</mt-header>
 		<div class="findPassWordModule">
@@ -1770,7 +1868,7 @@
 		<mt-header fixed title="找回密码二" style="background: #fafafa; color: #000000;font-size: 14px">
 	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
 	    	<router-link to="/index" slot="right">
-		    	<span class="cms-home" style="font-size: 18px;"></span>
+		    	<span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 			</router-link>
 		</mt-header>
 		<div class="findPassWordModule">
@@ -1853,7 +1951,7 @@
 	<mt-header fixed title="用户登录" style="background: #fafafa; color: #000000;font-size: 14px">
     	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
     	<router-link to="/index" slot="right">
-	    	<span class="cms-home" style="font-size: 18px;"></span>
+	    	<span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 		</router-link>
 	</mt-header>
 	<div class="loginModule" v-show="show_loginModule">   
@@ -1980,7 +2078,7 @@
 		    		<span class="name">我的回复</span>
 		    	</router-link>
 		    	<router-link to="/user/control/questionList" class="item" tag="div">
-		    		<div class="icon cms-help-alt" ></div> 
+		    		<div class="icon cms-question-answer-line" ></div> 
 		    		<span class="name">我的问题</span>
 		    	</router-link>
 		    	<router-link  to="/user/control/answerList" class="item" tag="div">
@@ -2057,13 +2155,6 @@
 		    	</div>
 	    	</div>
 	    </div>
-	
-		
-		<div class="membershipCard" v-if="user.userName == $store.state.user.userName">
-			<router-link to="/membershipCardList" class="link">
-				<div class="title">会员卡</div>
-			</router-link>
-		</div>
 		
 		<!-- 动态内容 -->
 		<div class="userDynamicList" v-infinite-scroll="scrollQueryUserDynamicList" infinite-scroll-disabled="loading" infinite-scroll-distance="10" >
@@ -2173,7 +2264,7 @@
 			<mt-header fixed title="用户设置" style="background: #fafafa; color: #000000;font-size: 14px">
 		    	<mt-button icon="back" @click.native="popup_userSetting = false" slot="left" >返回</mt-button>
 		    	<router-link to="/index" slot="right">
-		    		<span class="cms-home" style="font-size: 18px;"></span>
+		    		<span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 				</router-link>
 			</mt-header>
 			<div class="userSettingScroll">
@@ -2198,7 +2289,7 @@
 			<mt-header fixed title="更换头像" style="background: #fafafa; color: #000000;font-size: 14px">
 		    	<mt-button icon="back" @click.native="popup_updateAvatar = false" slot="left" >返回</mt-button>
 		    	<router-link to="/index" slot="right">
-		    		<span class="cms-home" style="font-size: 18px;"></span>
+		    		<span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 				</router-link>
 			</mt-header>
 			<div class="updateAvatarInfo" v-if="popup_updateAvatar">
@@ -2250,7 +2341,7 @@
 		<mt-header fixed title="我的话题" style="background: #fafafa; color: #000000;font-size: 14px">
 		    <mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
 		    <router-link to="/index" slot="right">
-		    	<span class="cms-home" style="font-size: 18px;"></span>
+		    	<span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 			</router-link>
 		</mt-header>
 		<div class="topicListModule">
@@ -2297,14 +2388,14 @@
 		<mt-header fixed title="我的评论" style="background: #fafafa; color: #000000;font-size: 14px">
 		    <mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
 		    <router-link to="/index" slot="right">
-		    	<span class="cms-home" style="font-size: 18px; "></span>
+		    	<span class="cms-home" style="font-size: 18px;color: #595959; "></span>
 			</router-link>
 		</mt-header>
 		<div class="commentListModule">
 			<div class="commentList">
 			    <div class="item" v-for="comment in commentList" >
 			        <div class="title">
-			            <i class="cms-topic" style="font-size: 12px; margin-right: 3px; color: #aaa;"></i><span>{{comment.topicTitle}}</span>
+			            <i class="cms-topic" style="font-size: 13px; margin-right: 3px; color: #aaa;"></i><span>{{comment.topicTitle}}</span>
 			        </div>
 			        <!-- router-link渲染成<div>标签-->
 			        <router-link class="content"  tag="div" :to="{path: '/thread', query: {topicId: comment.topicId,commentId: comment.id}}"  v-if="comment.status == 20">
@@ -2334,14 +2425,14 @@
 		<mt-header fixed title="我的回复" style="background: #fafafa; color: #000000;font-size: 14px">
 		    <mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
 		    <router-link to="/index" slot="right">
-		    	<span class="cms-home" style="font-size: 18px; "></span>
+		    	<span class="cms-home" style="font-size: 18px;color: #595959; "></span>
 			</router-link>
 		</mt-header>
 		<div class="replyListModule">
 			<div class="replyList">
 			    <div class="item" v-for="reply in replyList" >
 			        <div class="title">
-			            <i class="cms-topic" style="font-size: 12px; margin-right: 3px; color: #aaa;"></i><span>{{reply.topicTitle}}</span>
+			            <i class="cms-topic" style="font-size: 13px; margin-right: 3px; color: #aaa;"></i><span>{{reply.topicTitle}}</span>
 			        </div>
 			        <!-- router-link渲染成<div>标签-->
 			        <router-link class="content"  tag="div" :to="{path: '/thread', query: {topicId: reply.topicId,commentId: reply.commentId}}" v-if="reply.status == 20">
@@ -2372,7 +2463,7 @@
 		<mt-header fixed title="我的问题" style="background: #fafafa; color: #000000;font-size: 14px">
 		    <mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
 		    <router-link to="/index" slot="right">
-		    	<span class="cms-home" style="font-size: 18px;"></span>
+		    	<span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 			</router-link>
 		</mt-header>
 		<div class="questionListModule">
@@ -2409,14 +2500,14 @@
 		<mt-header fixed title="我的答案" style="background: #fafafa; color: #000000;font-size: 14px">
 		    <mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
 		    <router-link to="/index" slot="right">
-		    	<span class="cms-home" style="font-size: 18px; "></span>
+		    	<span class="cms-home" style="font-size: 18px;color: #595959; "></span>
 			</router-link>
 		</mt-header>
 		<div class="answerListModule">
 			<div class="answerList">
 			    <div class="item" v-for="answer in answerList" >
 			        <div class="title">
-			            <i class="cms-help-alt" style="font-size: 12px; margin-right: 3px; color: #aaa;"></i><span>{{answer.questionTitle}}</span>
+			            <i class="cms-question-answer-line" style="font-size: 13px; margin-right: 3px; color: #aaa;"></i><span>{{answer.questionTitle}}</span>
 			        </div>
 			        <!-- router-link渲染成<div>标签-->
 			        <router-link class="content"  tag="div" :to="{path: '/question', query: {questionId: answer.questionId,answerId: answer.id}}"  v-if="answer.status == 20">
@@ -2446,14 +2537,14 @@
 		<mt-header fixed title="我的答案回复" style="background: #fafafa; color: #000000;font-size: 14px">
 		    <mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
 		    <router-link to="/index" slot="right">
-		    	<span class="cms-home" style="font-size: 18px; "></span>
+		    	<span class="cms-home" style="font-size: 18px;color: #595959; "></span>
 			</router-link>
 		</mt-header>
 		<div class="answerReplyListModule">
 			<div class="answerReplyList">
 			    <div class="item" v-for="answerReply in answerReplyList" >
 			        <div class="title">
-			            <i class="cms-help-alt" style="font-size: 12px; margin-right: 3px; color: #aaa;"></i><span>{{answerReply.questionTitle}}</span>
+			            <i class="cms-question-answer-line" style="font-size: 13px; margin-right: 3px; color: #aaa;"></i><span>{{answerReply.questionTitle}}</span>
 			        </div>
 			        <!-- router-link渲染成<div>标签-->
 			        <router-link class="content"  tag="div" :to="{path: '/question', query: {questionId: answerReply.questionId,answerId: answerReply.answerId}}" v-if="answerReply.status == 20">
@@ -2484,7 +2575,7 @@
 		<mt-header fixed title="积分记录" style="background: #fafafa; color: #000000;font-size: 14px">
 	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
 	    	<router-link to="/index" slot="right">
-			    <span class="cms-home" style="font-size: 18px;"></span>
+			    <span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 			</router-link>
 		</mt-header>
 		<div class="pointModule">
@@ -2521,7 +2612,7 @@
 	<mt-header fixed title="修改个人信息" style="background: #fafafa; color: #000000;font-size: 14px">
 	    <mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
 	    <router-link to="/index" slot="right">
-	    	<span class="cms-home" style="font-size: 18px;"></span>
+	    	<span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 		</router-link>
 	</mt-header>
 
@@ -2603,7 +2694,7 @@
 		<mt-header fixed title="绑定手机" style="background: #fafafa; color: #000000;font-size: 14px">
 	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
 	    	<router-link to="/index" slot="right">
-			    <span class="cms-home" style="font-size: 18px;"></span>
+			    <span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 			</router-link>
 		</mt-header>
 		<div class="realNameAuthenticationModule">
@@ -2620,7 +2711,7 @@
 		<mt-header fixed title="绑定手机" style="background: #fafafa; color: #000000;font-size: 14px">
 		    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
 	    	<router-link to="/index" slot="right">
-			    <span class="cms-home" style="font-size: 18px;"></span>
+			    <span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 			</router-link>
 		</mt-header>
 		<div class="phoneBindingModule">
@@ -2675,7 +2766,7 @@
 		<mt-header fixed title="更换手机绑定" style="background: #fafafa; color: #000000;font-size: 14px">
 		    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
 	    	<router-link to="/index" slot="right">
-			    <span class="cms-home" style="font-size: 18px;"></span>
+			    <span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 			</router-link>
 		</mt-header>
 		<div class="updatePhoneBinding_step1Module">
@@ -2728,7 +2819,7 @@
 		<mt-header fixed title="绑定新手机" style="background: #fafafa; color: #000000;font-size: 14px">
 		    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
 	    	<router-link to="/index" slot="right">
-			    <span class="cms-home" style="font-size: 18px;"></span>
+			    <span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 			</router-link>
 		</mt-header>
 		<div class="updatePhoneBinding_step2Module">
@@ -2783,7 +2874,7 @@
 		<mt-header fixed title="登录日志" style="background: #fafafa; color: #000000;font-size: 14px">
 	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
 	    	<router-link to="/index" slot="right">
-			    <span class="cms-home" style="font-size: 18px;"></span>
+			    <span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 			</router-link>
 		</mt-header>
 		<div class="userLoginLogModule">
@@ -2806,7 +2897,7 @@
 		<mt-header fixed title="私信" style="background: #fafafa; color: #000000;font-size: 14px">
 	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
 	    	<router-link to="/index" slot="right">
-			    <span class="cms-home" style="font-size: 18px;"></span>
+			    <span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 			</router-link>
 		</mt-header>
 		<div class="privateMessageModule" >
@@ -2847,7 +2938,7 @@
 		<mt-header fixed title="私信对话" style="background: #fafafa; color: #000000;font-size: 14px">
 	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
 	    	<router-link to="/index" slot="right">
-			    <span class="cms-home" style="font-size: 18px;"></span>
+			    <span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 			</router-link>
 		</mt-header>
 		
@@ -2949,7 +3040,7 @@
 				<mt-header fixed title="发私信" style="background: #fafafa; color: #000000;font-size: 14px">
 			    	<mt-button icon="back" @click.native="popup_privateMessage = false" slot="left" >返回</mt-button>
 			    	<router-link to="/index" slot="right" @click.native="popup_privateMessage = false" >
-			    		<span class="cms-home" style="font-size: 18px;"></span>
+			    		<span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 					</router-link>
 				</mt-header> 
 				
@@ -3004,7 +3095,7 @@
 		<mt-header fixed title="系统通知" style="background: #fafafa; color: #000000;font-size: 14px">
 	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
 	    	<router-link to="/index" slot="right">
-			    <span class="cms-home" style="font-size: 18px;"></span>
+			    <span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 			</router-link>
 		</mt-header>
 		
@@ -3035,7 +3126,7 @@
 		<mt-header fixed title="提醒" style="background: #fafafa; color: #000000;font-size: 14px">
 	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
 	    	<router-link to="/index" slot="right">
-			    <span class="cms-home" style="font-size: 18px;"></span>
+			    <span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 			</router-link>
 		</mt-header>
 		<div class="remindModule" >
@@ -3224,7 +3315,7 @@
 		<mt-header fixed title="收藏夹" style="background: #fafafa; color: #000000;font-size: 14px">
 	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
 	    	<router-link to="/index" slot="right">
-			    <span class="cms-home" style="font-size: 18px;"></span>
+			    <span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 			</router-link>
 		</mt-header>
 		<div class="favoriteModule" >
@@ -3265,7 +3356,7 @@
 		<mt-header fixed title="话题收藏" style="background: #fafafa; color: #000000;font-size: 14px">
 	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
 	    	<router-link to="/index" slot="right">
-			    <span class="cms-home" style="font-size: 18px;"></span>
+			    <span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 			</router-link>
 		</mt-header>
 		<div class="userLoginLogModule">
@@ -3287,7 +3378,7 @@
 		<mt-header fixed title="点赞" style="background: #fafafa; color: #000000;font-size: 14px">
 	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
 	    	<router-link to="/index" slot="right">
-			    <span class="cms-home" style="font-size: 18px;"></span>
+			    <span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 			</router-link>
 		</mt-header>
 		<div class="likeModule" >
@@ -3319,7 +3410,7 @@
 		<mt-header fixed title="话题点赞" style="background: #fafafa; color: #000000;font-size: 14px">
 	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
 	    	<router-link to="/index" slot="right">
-			    <span class="cms-home" style="font-size: 18px;"></span>
+			    <span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 			</router-link>
 		</mt-header>
 		<div class="userLoginLogModule">
@@ -3341,7 +3432,7 @@
 		<mt-header fixed title="话题取消隐藏用户" style="background: #fafafa; color: #000000;font-size: 14px">
 	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
 	    	<router-link to="/index" slot="right">
-			    <span class="cms-home" style="font-size: 18px;"></span>
+			    <span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 			</router-link>
 		</mt-header>
 		<div class="topicUnhideListModule">
@@ -3364,7 +3455,7 @@
 		<mt-header fixed title="关注" style="background: #fafafa; color: #000000;font-size: 14px">
 	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
 	    	<router-link to="/index" slot="right">
-			    <span class="cms-home" style="font-size: 18px;"></span>
+			    <span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 			</router-link>
 		</mt-header>
 		<div class="followModule" >
@@ -3403,7 +3494,7 @@
 		<mt-header fixed title="粉丝" style="background: #fafafa; color: #000000;font-size: 14px">
 	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
 	    	<router-link to="/index" slot="right">
-			    <span class="cms-home" style="font-size: 18px;"></span>
+			    <span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 			</router-link>
 		</mt-header>
 		<div class="followerModule" >
@@ -3442,7 +3533,7 @@
 		<mt-header fixed title="会员卡订单" style="background: #fafafa; color: #000000;font-size: 14px">
 	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
 	    	<router-link to="/index" slot="right">
-			    <span class="cms-home" style="font-size: 18px;"></span>
+			    <span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 			</router-link>
 		</mt-header>
 		<div class="membershipCardOrderListModule" >
@@ -3472,8 +3563,8 @@
 						</div>
 						<div class="bottomInfo">
 						 	<span class="funds" >
-			                    <i class="cms-deposit"></i><span class="paymentAmount" >{{membershipCardOrder.paymentAmount}}元</span>
-			                    <i class="cms-point icon"></i><span class="paymentPoint" >{{membershipCardOrder.paymentPoint}}积分</span>
+			                    <i class="cms-deposit paymentAmount-icon"></i><span class="paymentAmount" >{{membershipCardOrder.paymentAmount}}元</span>
+			                    <i class="cms-point paymentPoint-icon"></i><span class="paymentPoint" >{{membershipCardOrder.paymentPoint}}积分</span>
 			                </span>
 			                <span class="time" >
 			                	{{membershipCardOrder.createDate}}
@@ -3492,7 +3583,7 @@
 		<mt-header fixed title="余额" style="background: #fafafa; color: #000000;font-size: 14px">
 	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
 	    	<router-link to="/index" slot="right">
-			    <span class="cms-home" style="font-size: 18px;"></span>
+			    <span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 			</router-link>
 		</mt-header>
 		
@@ -3519,7 +3610,7 @@
 						<div class="bottomInfo">
 						 	<span class="module" >
 			                    <span class="payment" v-if="paymentLog.paymentModule == 1">会员卡订单支付</span>
-			                    <span class="payment" v-if="paymentLog.paymentModule == 5">冲值</span>
+			                    <span class="payment" v-if="paymentLog.paymentModule == 5">充值</span>
 			                    <span class="payment" v-if="paymentLog.paymentModule == 70">余额购买话题隐藏内容</span>
 			                    <span class="payment" v-if="paymentLog.paymentModule == 80">解锁话题隐藏内容分成</span>
 			                    <span class="payment" v-if="paymentLog.paymentModule == 90">悬赏金额</span>
@@ -3546,7 +3637,7 @@
 		<mt-header fixed title="支付" style="background: #fafafa; color: #000000;font-size: 14px">
 	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
 	    	<router-link to="/index" slot="right">
-		    	<span class="ti-home" style="font-size: 18px;"></span>
+		    	<span class="ti-home" style="font-size: 18px;color: #595959;"></span>
 			</router-link>
 		</mt-header>
 		<div class="paymentModule">
@@ -3606,7 +3697,7 @@
 		<mt-header fixed title="支付完成" style="background: #fafafa; color: #000000;font-size: 14px">
 	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
 	    	<router-link to="/index" slot="right">
-		    	<span class="ti-home" style="font-size: 18px;"></span>
+		    	<span class="ti-home" style="font-size: 18px;color: #595959;"></span>
 			</router-link>
 		</mt-header>
 	    <div class="paymentCompletedModule">
@@ -3629,7 +3720,7 @@
 		<mt-header fixed title="会员卡列表" style="background: #fafafa; color: #000000;font-size: 14px">
 	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
 	    	<router-link to="/index" slot="right">
-			    <span class="cms-home" style="font-size: 18px;"></span>
+			    <span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 			</router-link>
 		</mt-header>
 	    <div class="membershipCardListModule">
@@ -3668,7 +3759,7 @@
 		<mt-header fixed title="会员卡" style="background: #fafafa; color: #000000;font-size: 14px">
 	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
 	    	<router-link to="/index" slot="right">
-			    <span class="cms-home" style="font-size: 18px;"></span>
+			    <span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 			</router-link>
 		</mt-header>
 	    <div class="membershipCardModule" v-if="membershipCard != null && membershipCard != ''">
@@ -3709,7 +3800,7 @@
 		<mt-header fixed title="修改话题" style="background: #fafafa; color: #000000;font-size: 14px">
 	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
 	    	<router-link to="/index" slot="right">
-			    <span class="cms-home" style="font-size: 18px;"></span>
+			    <span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 			</router-link>
 		</mt-header>
 		<div class="editTopicModule">
@@ -3769,7 +3860,7 @@
 		<mt-header fixed title="发红包" style="background: #fafafa; color: #000000;font-size: 14px">
 		    <mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
 		    <router-link to="/index" slot="right">
-		    	<span class="cms-home" style="font-size: 18px;"></span>
+		    	<span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 			</router-link>
 		</mt-header>
 		<div class="giveRedEnvelopeListModule">
@@ -3817,7 +3908,7 @@
 		<mt-header fixed title="红包金额分配" style="background: #fafafa; color: #000000;font-size: 14px">
 	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
 	    	<router-link to="/index" slot="right">
-			    <span class="cms-home" style="font-size: 18px;"></span>
+			    <span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 			</router-link>
 		</mt-header>
 		<div class="redEnvelopeAmountDistributionListModule" >
@@ -3885,7 +3976,7 @@
 		<mt-header fixed title="收红包" style="background: #fafafa; color: #000000;font-size: 14px">
 	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
 	    	<router-link to="/index" slot="right">
-			    <span class="cms-home" style="font-size: 18px;"></span>
+			    <span class="cms-home" style="font-size: 18px;color: #595959;"></span>
 			</router-link>
 		</mt-header>
 		<div class="receiveRedEnvelopeListModule" >
@@ -3922,6 +4013,8 @@
 </template>
 
 
+
+
 <!-- 公共模块 -->
 <template id="bottomTab-template">
 	<div>
@@ -3932,18 +4025,35 @@
 		    	<div style="margin-top: 3px;">首页</div>
 			</mt-tab-item>
 			<mt-tab-item id="askList">
-			    <span class="cms-help-alt" style="font-size: 20px;"></span>
+			    <span class="cms-question-answer-line" style="font-size: 20px;"></span>
 			    <div style="margin-top: 3px;">问答</div>
 			</mt-tab-item>
-			<mt-tab-item id="search">
-			    <span class="cms-search" style="font-size: 20px;"></span> 
-			    <div style="margin-top: 3px;">搜索</div>
+			<mt-tab-item id="find">
+			    <span class="cms-compass-line" style="font-size: 20px;"></span> 
+			    <div style="margin-top: 3px;">发现</div>
 			</mt-tab-item>
 			<mt-tab-item id="mine">
 			    <span class="cms-user" style="font-size: 20px;"></span><span class="badge" style="position: absolute;" v-show="$store.state.allMessage_badge"></span>
 			    <div style="margin-top: 3px;">我的</div>
 			</mt-tab-item>
 		</mt-tabbar>
+		
+		
+		<!-- 发现 -->
+		<mt-popup v-model="popup_find" position="bottom" style="width: 100%; height: 70%;" @touchmove.native.stop.prevent>
+			<div class="findModule">
+				<mt-cell title="搜索"  value="" to="/search" is-link v-on:click.native="closePopup">
+					 <span slot="icon" class="icon cms-search" ></span> 
+				</mt-cell>
+				<mt-cell title="会员卡"  value="" to="/membershipCardList" is-link v-on:click.native="closePopup">
+					 <span slot="icon" class="icon cms-membershipCard" ></span> 
+				</mt-cell>
+				<mt-cell title="帮助中心"  value="" to="/help" is-link v-on:click.native="closePopup">
+					 <span slot="icon" class="icon cms-help-alt" ></span> 
+				</mt-cell>
+			</div>
+		</mt-popup>
+		
 	</div>
 </template>
 
@@ -3966,7 +4076,7 @@
 <script src="${commonPath}js/v-viewer/viewer.min.js?1" type="text/javascript"></script> 
 <script src="${commonPath}js/v-viewer/v-viewer.min.js" type="text/javascript"></script> 
 
-<link href="${baseURL}${commonPath}css/common.css?fdxcdcxcbdd3" type="text/css" rel="stylesheet">
+<link href="${baseURL}${commonPath}css/common.css?fdaxsdd3" type="text/css" rel="stylesheet">
 <script src="${commonPath}js/better-scroll.min.js?2d" type="text/javascript"></script> 
 <script src="${commonPath}js/DPlayer/hls.min.js" type="text/javascript"></script>
 <script src="${commonPath}js/DPlayer/DPlayer.min.js" type="text/javascript"></script>
@@ -3982,7 +4092,7 @@
 <script src="${commonPath}js/prism/default-block/prism.js" type="text/javascript"></script> 
 <script src="${commonPath}js/prism/default-block/clipboard.min.js" type="text/javascript"></script> 
 
-<script src="${commonPath}js/main.js?a" type="text/javascript"></script>
+<script src="${commonPath}js/main.js?asdw" type="text/javascript"></script>
 
 
 

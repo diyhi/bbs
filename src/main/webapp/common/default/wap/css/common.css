@@ -13,8 +13,8 @@ h4 {font-size: 100%;}
 
 /* 去除黑点 */
 ul,ol {list-style:none;}
-a{text-decoration:none; color:#333; font-size:12px;}
-a:link {color: #333; text-decoration:none;}
+a{text-decoration:none; color:#595959; font-size:12px;}
+a:link {color: #595959; text-decoration:none;}
 a:hover{text-decoration:none; color:#317ee7; font-size:12px;}
 a:focus { outline: none; } /*去掉链接A标签周围的虚线框*/
 em{ font-style:normal;}
@@ -228,7 +228,9 @@ html,body{
 	float: right;
 }
 .indexModule .topicList {margin-top: 1px;}
-.indexModule .topicList .item {position: relative;margin-top: 2px;}
+.indexModule .topicList .item {
+	position: relative;margin-top: 2px;
+}
 .indexModule .topicList .item .avatarBox{
 	position:absolute;display:inline-block;border-radius:100%;
 	left: 10px;top:8px;
@@ -262,110 +264,156 @@ html,body{
 
 .indexModule .topicList .item .topInfo .bottom-box{font-size:14px;color:#aaa;}
 .indexModule .topicList .item .topInfo .bottom-box .time{font-style:normal;}
-.indexModule .topicList .item .title{
+
+.indexModule .topicList .item .titleBox{
 	position:relative;
 	color:#222;
 	padding:10px 10px 0px 56px;
     max-height:48px;
-	font-size:16px;
+	font-size:0;/*父级元素设置font-size:0; 解决 display：inline-block两个元素之间的默认空格 */
     line-height:24px;
     display: -webkit-box;
 	-webkit-box-orient: vertical;
 	-webkit-line-clamp: 2;
 	overflow: hidden;
 }
-.indexModule .topicList .item .title .topicRoleName{
-	font-style:normal;
-	margin-left:5px;
-	white-space:nowrap; 
-	color:#fff;
+.indexModule .topicList .item .titleBox .title{
+	font-size:16px;
+}
+.indexModule .topicList .item .titleBox .essence{
+	display: inline-block;
+    padding: 2px 3px;
+    margin-left:5px;
+    font-size: initial;/*解决安卓浏览器文本无法垂直居中*/
+    line-height: 10px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color: #fff;
+    background-color: #ff7875;
+    position: relative;
+	top: -1px;
+}
+.indexModule .topicList .item .titleBox .essence span{
+    font-size: 12px;
+}
+.indexModule .topicList .item .titleBox .top{
+	display: inline-block;
+    padding: 2px 3px;
+    margin-left:5px;
+    font-size: initial;/*解决安卓浏览器文本无法垂直居中*/
+    line-height: 10px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color: #fff;
+    background-color: #69c0ff;
+    position: relative;
+	top: -1px;
+}
+.indexModule .topicList .item .titleBox .top span{
+    font-size: 12px;
+}
+
+.indexModule .topicList .item .titleBox .topicRoleName{
+	display: inline-block;
+    padding: 2px 3px;
+    margin-left:5px;
+    font-size: initial;/*解决安卓浏览器文本无法垂直居中*/
+    line-height: 10px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color:#fff;
 	background-color:#ffcc00;
-	border-radius:4px;
-	padding:2px 4px 0px;
-	font-size: 12px;
+	font-style: normal;
 	position: relative;
 	top: -1px;
-	
 }
-.indexModule .topicList .item .title .redEnvelope{
+.indexModule .topicList .item .titleBox .topicRoleName span{
+    font-size: 12px;
+}
+.indexModule .topicList .item .titleBox .redEnvelope{
 	font-size: 20px;
 	position:relative;
-    top:4px;
+    top:3px;
     color: #ff483a;
+    margin-left: 2px;
+    
 }
-.indexModule .topicList .item .title .hideTagType{
+.indexModule .topicList .item .titleBox .hideTagType{
 	font-size:0;/*父级元素设置font-size:0; 解决 display:inline-block两个元素之间的默认空格 */
 	line-height:0;
 	position: relative;
 	top: -1px;
 	
 }
-.indexModule .topicList .item .title .hideTagType .circle{
-	border-radius:10px;display: inline-block;margin-right:5px;
+.indexModule .topicList .item .titleBox .hideTagType .circle{
+	border-radius:10px;display: inline-block;margin-left:5px;
 	width: 20px;height: 20px;
 	position:relative;
 }
-.indexModule .topicList .item .title .hideTagType .circle i{
-	font-size: 12px;line-height: 20px; margin-left: 5px;
+.indexModule .topicList .item .titleBox .hideTagType .circle i{
+	font-size: 12px;line-height: 20px; margin-left: 4px;
 }
 
-.indexModule .topicList .item .title .hideTagType .point:before{
+.indexModule .topicList .item .titleBox .hideTagType .point:before{
 	content: ' ';
     position: absolute;
     width: 4px;
     height: 4px;
     border-radius: 2px;
-    top: 13px;
+    top: 11px;
     left: 8px;
 }
 
-.indexModule .topicList .item .title .hide_10 .circle{
+.indexModule .topicList .item .titleBox .hide_10 .circle{
 	background: #ebebeb;
 }
-.indexModule .topicList .item .title .hide_10 .point:before{
+.indexModule .topicList .item .titleBox .hide_10 .point:before{
 	background-color: #ebebeb;
 }
-.indexModule .topicList .item .title .hide_10 .circle i{
+.indexModule .topicList .item .titleBox .hide_10 .circle i{
 	color: #b2b2b2;
 }
 
-.indexModule .topicList .item .title .hide_20 .circle{
+.indexModule .topicList .item .titleBox .hide_20 .circle{
 	background: #bbf9d5;
 }
-.indexModule .topicList .item .title .hide_20 .point:before{
+.indexModule .topicList .item .titleBox .hide_20 .point:before{
 	background-color: #bbf9d5;
 }
-.indexModule .topicList .item .title .hide_20 .circle i{
+.indexModule .topicList .item .titleBox .hide_20 .circle i{
 	color: #21de70;
 }
 
-.indexModule .topicList .item .title .hide_30 .circle{
+.indexModule .topicList .item .titleBox .hide_30 .circle{
 	background: #bfebfb;
 }
-.indexModule .topicList .item .title .hide_30 .point:before{
+.indexModule .topicList .item .titleBox .hide_30 .point:before{
 	background-color: #bfebfb;
 }
-.indexModule .topicList .item .title .hide_30 .circle i{
+.indexModule .topicList .item .titleBox .hide_30 .circle i{
 	color: #27c3fc;
 }
 
-.indexModule .topicList .item .title .hide_40 .circle{
+.indexModule .topicList .item .titleBox .hide_40 .circle{
 	background: #e2cffe;
 }
-.indexModule .topicList .item .title .hide_40 .point:before{
+.indexModule .topicList .item .titleBox .hide_40 .point:before{
 	background-color: #e2cffe;
 }
-.indexModule .topicList .item .title .hide_40 .circle i{
+.indexModule .topicList .item .titleBox .hide_40 .circle i{
 	color: #af82f2;
 }
 
-.indexModule .topicList .item .title .hide_50 .circle{
+.indexModule .topicList .item .titleBox .hide_50 .circle{
 	background: #fedbb2;
 }
-.indexModule .topicList .item .title .hide_50 .point:before{
+.indexModule .topicList .item .titleBox .hide_50 .point:before{
 	background-color: #fedbb2;
 }
-.indexModule .topicList .item .title .hide_50 .circle i{
+.indexModule .topicList .item .titleBox .hide_50 .circle i{
 	color: #fe9d2d;
 }
 .indexModule .topicList .item .summary{
@@ -769,10 +817,51 @@ html,body{
 	background: #fff;
 	box-shadow: 0 -4px 4px -4px rgba(0,0,0,.02);
 }
-.topicContentModule .topicDetail .head h1 {
+.topicContentModule .topicDetail .head .titleBox{
+	font-size:0;/*父级元素设置font-size:0; 解决 display:inline-block两个元素之间的默认空格 */
+	line-height:0;
+}
+.topicContentModule .topicDetail .head .titleBox .title {
 	color: #222;
 	font-weight: 300;
 	font-size: 20px;
+	line-height: 30px;
+}
+.topicContentModule .topicDetail .head .titleBox .essence{
+	display: inline-block;
+    padding: 2px 3px;
+    margin-left:5px;
+    font-size: initial;/*解决安卓浏览器文本无法垂直居中*/
+    line-height: 14px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color: #fff;
+    background-color: #ff7875;
+    position: relative;
+    top: -2px;
+   
+}
+.topicContentModule .topicDetail .head .titleBox .essence span{
+    font-size: 14px;
+}
+.topicContentModule .topicDetail .head .titleBox .top{
+	display: inline-block;
+    padding: 2px 3px;
+    margin-left:5px;
+    font-size: initial;/*解决安卓浏览器文本无法垂直居中*/
+    line-height: 14px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color: #fff;
+    background-color: #69c0ff;
+    position: relative;
+    top: -2px;
+}
+.topicContentModule .topicDetail .head .titleBox .top span{
+    font-size: 14px;
+   
 }
 .topicContentModule .topicDetail .head .info{ padding:15px 0px 4px 0px;}
 .topicContentModule .topicDetail .head .info .left{float:left!important;}
@@ -791,9 +880,9 @@ html,body{
 }
 .topicContentModule .topicDetail .head .info .right{float:right!important;font-size:13px;color:#aaa;position: relative;top: 5px;}
 .topicContentModule .topicDetail .head .info .right .editTopic{font-size: 12px;color: #aaa;margin-right: 10px;}
-.topicContentModule .topicDetail .head .info .right .editTopic-icon{font-size: 12px;color: #aaa; margin-right: 2px;}
-.topicContentModule .topicDetail .head .info .right .count-icon{font-size: 12px;color: #aaa;margin-right: 2px;}
-.topicContentModule .topicDetail .head .info .right .view-icon{font-size: 12px;margin-right: 2px;color: #aaa;margin-left: 10px;}
+.topicContentModule .topicDetail .head .info .right .editTopic-icon{font-size: 12px;color: #aaa; margin-right: 2px;position: relative;top: 1px;}
+.topicContentModule .topicDetail .head .info .right .count-icon{font-size: 12px;color: #aaa;margin-right: 2px;position: relative;top: 1px;}
+.topicContentModule .topicDetail .head .info .right .view-icon{font-size: 12px;margin-right: 2px;color: #aaa;margin-left: 10px;position: relative;top: 1px;}
 
 
 .topicContentModule .topicDetail .main {
@@ -1546,10 +1635,10 @@ html,body{
     color: #999;
 }
 .questionContentModule .questionDetail .head .info .right{float:right!important;font-size:13px;color:#aaa;position: relative;top: 4px;}
-.questionContentModule .questionDetail .head .info .right .appendQuestion{font-size: 12px;color: #aaa;margin-right: 10px;}
-.questionContentModule .questionDetail .head .info .right .appendQuestion-icon{font-size: 12px;color: #aaa; margin-right: 2px;}
-.questionContentModule .questionDetail .head .info .right .count-icon{font-size: 12px;color: #aaa;margin-right: 2px;}
-.questionContentModule .questionDetail .head .info .right .view-icon{font-size: 12px;margin-right: 2px;color: #aaa;margin-left: 10px;}
+.questionContentModule .questionDetail .head .info .right .appendQuestion{font-size: 12px;color: #aaa;margin-right: 10px;position: relative;top: 1px;}
+.questionContentModule .questionDetail .head .info .right .appendQuestion-icon{font-size: 12px;color: #aaa; margin-right: 2px;position: relative;top: 1px;}
+.questionContentModule .questionDetail .head .info .right .count-icon{font-size: 12px;color: #aaa;margin-right: 2px;position: relative;top: 1px;}
+.questionContentModule .questionDetail .head .info .right .view-icon{font-size: 12px;margin-right: 2px;color: #aaa;margin-left: 10px;position: relative;top: 1px;}
 
 .questionContentModule .questionDetail .main {
 	margin: 10px 8px 10px 8px;
@@ -2324,20 +2413,58 @@ html,body{
 	-webkit-line-clamp: 2;
 	overflow: hidden;
 }
-.searchModule .topicList .item .title .topicRoleName{
-	font-style:normal;
-	margin-left:5px;
-	white-space:nowrap; 
-	color:#fff;
-	background-color:#ffcc00;
-	border-radius:4px;
-	padding:2px 4px 0px;
-	font-size: 12px;
+.searchModule .topicList .item .title .box{
+	font-size:0;/*父级元素设置font-size:0; 解决 display:inline-block两个元素之间的默认空格 */
+	line-height:0;
 	position: relative;
-	top: -1px;
-	
+	top: -2px;
 }
-
+.searchModule .topicList .item .title .box .essence{
+	display: inline-block;
+    padding: 2px 3px;
+    margin-right:5px;
+    font-size: initial;/*解决安卓浏览器文本无法垂直居中*/
+    line-height: 10px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color: #fff;
+    background-color: #ff7875;
+}
+.searchModule .topicList .item .title .box .essence span{
+    font-size: 12px;
+}
+.searchModule .topicList .item .title .box .top{
+	display: inline-block;
+    padding: 2px 3px;
+    margin-right:5px;
+    font-size: initial;/*解决安卓浏览器文本无法垂直居中*/
+    line-height: 10px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color: #fff;
+    background-color: #69c0ff;
+}
+.searchModule .topicList .item .title .box .top span{
+    font-size: 12px;
+}
+.searchModule .topicList .item .title .box .topicRoleName{
+	display: inline-block;
+	font-style: normal; 
+    padding: 2px 3px;
+    margin-right:5px;
+    font-size: initial;/*解决安卓浏览器文本无法垂直居中*/
+    line-height: 10px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color:#fff;
+	background-color:#ffcc00;
+}
+.searchModule .topicList .item .title .box .topicRoleName span{
+    font-size: 12px;
+}
 
 
 
@@ -2429,7 +2556,202 @@ html,body{
 }
 
 
+/* 帮助中心 */
+.helpModule{
+	padding-top: 40px;padding-bottom: 2px;
+}
+.helpModule .container{
+	font-size: 0;
+	width: 100%;
+	background-color: #f5f5f5;
+	overflow: hidden;
+}
+.helpModule .container .line {
+	position: relative;
+	display: -webkit-box;
+	margin: 15px 20px;
+	color: #878787;
+	font-size: 16px;
+	-webkit-box-pack: center;
+}
+.helpModule .container .line:after {
+	content: "";
+	height: 1px;
+	width: 100%;
+	position: absolute;
+	top: 50%;
+	left: 0;
+	background-color: #cbcbcb;
+	-webkit-transform: scaleY(0.5)
+}
+.helpModule .container .title {
+	display: block;
+	padding: 0 10px;
+	background-color: #f5f5f5;
+	z-index: 1;
+	position: relative;
+	
+}
+.helpModule .container .nav-row:after {
+	content: "";
+	display: block;
+	height: 0;
+	clear: both;
+	visibility: hidden;
+}
+.helpModule .container .nav-row .item {
+	float: left;
+	width: 50%;
+	box-sizing: border-box;
+	padding-bottom: 4px;
+	position: relative
+}
+.helpModule .container .nav-row .item:nth-child(2n+1) {
+	padding-right: 2px
+}
+.helpModule .container .nav-row .item:nth-child(2n) {
+	padding-left: 2px
+}
+.helpModule .container .nav-row .item .info {
+	background-color: white;
+	padding-top:20px;
+	padding-bottom: 10px;
+	font-size: 0;
+	 text-align: center;
+}
 
+.helpModule .container .nav-row .item .img{ 
+	display: inline-block;
+    width: 110px;
+    height: 110px;
+    border-radius: 4px;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+.helpModule .container .nav-row .item .icon{
+	display: inline-block;
+	font-size: 80px;
+	width: 110px;
+    height: 110px;
+    line-height: 110px;
+    color:#d9d9d9;
+	text-align: center;
+	vertical-align: middle;
+	background: #f5f5f5;
+	border-radius: 4px;
+}
+.helpModule .container .nav-row .item h5{margin-top:15px; text-align: center; color: #333; font-size: 18px; line-height: 24px; font-weight: normal;}
+.helpModule .container .nav-row .item .description-box {
+    margin: 0 auto;
+	padding-top: 5px; margin-top: 5px; 
+    width: 90%;
+    overflow: hidden;
+}
+.helpModule .container .nav-row .item .description-box .description {
+    line-height: 24px;
+    font-size: 15px;
+    color: #666;
+    text-align: center;
+}
+
+/** 帮助内容 **/
+.helpContentModule{
+	padding-top: 40px;background: #fcfcfc;
+}
+.helpContentModule .head-box{
+	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
+	background: #fff;
+}
+.helpContentModule .head-box .helpTypeInfo{position:relative;padding:5px 10px 7px 10px;}
+.helpContentModule .head-box .helpTypeInfo .icon{
+	margin-left:10px;
+	float: left;
+	font-size: 20px; 
+	color:#2192f8;
+	padding:4px 0;
+	margin-top: 2px;
+}
+.helpContentModule .head-box .helpTypeInfo .typeName{
+	margin-left:12px;
+	float: left;
+	font-size: 16px; 
+	color:#2192f8;
+	border-bottom:2px solid #2192f8;
+	padding:4px 0;
+}
+
+.helpContentModule .helpDetail {
+	margin-top:10px;
+	padding-bottom:2px;
+	background: #fff;
+	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
+}
+.helpContentModule .helpDetail .head {
+	position: relative;
+	margin-left:8px;
+	margin-right:8px;
+	padding-top:15px;
+	padding-bottom: 2px;
+	border-bottom: 1px solid #eee;
+	background: #fff;
+	box-shadow: 0 -4px 4px -4px rgba(0,0,0,.02);
+}
+.helpContentModule .helpDetail .head h1 {
+	color: #222;
+	font-weight: 300;
+	font-size: 20px;
+}
+.helpContentModule .helpDetail .head .info{ padding:15px 0px 5px 0px;}
+.helpContentModule .helpDetail .head .info .time{font-style:normal;font-size:14px;color:#8c8c8c;}
+
+.helpContentModule .helpDetail .main {
+	margin: 10px 8px 10px 8px;
+	min-height: 80px;
+	font-size: 15px;
+	line-height: 1.8;
+	color: #222;
+}
+
+.helpContentModule .helpDetail .main a{
+	font-size: 15px;
+	line-height: 1.8;
+	color: #26a2ff;
+}
+.helpContentModule .helpDetail .main i {
+	font-style: italic;
+}
+.helpContentModule .helpDetail .main p{word-wrap:break-word;}
+.helpContentModule .helpDetail .main img{
+	max-width:100%;height:auto;border:none;background:none;padding:0;vertical-align: sub;
+}
+.helpContentModule .helpList{
+	
+}
+.helpContentModule .helpList .item {counter-increment: index;}
+.helpContentModule .helpList .item .icon::before {
+	content: counter(index);
+    display: inline-block;
+    vertical-align: middle;
+    padding: 2px 5px 3px 5px;
+    margin-right: 6px;
+    font-size: 12px;
+    line-height: 12px;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    color: #939499;
+    background-color: #f6f6f7;
+    position: relative;
+    top: 3px;
+}
+.helpContentModule .helpList .item .mint-cell-title{
+	padding-top: 4px;
+	padding-bottom: 4px;
+	margin-top: 4px;
+}
+.helpContentModule .helpList .item .mint-cell-text{
+	line-height: 24px;
+}
 
 /** 注册 **/
 .registerModule{
@@ -2662,8 +2984,8 @@ html,body{
 	font-style:normal;
 	margin-left:5px;
 	white-space:nowrap; 
-	color:#fff;
-	background-color:#FBBC05;
+	color: #e2b46e;
+    background-color: #f8e7c4;
 	border-radius:4px;
 	padding:2px 5px 0px;
 	font-size: 14px;
@@ -3184,7 +3506,8 @@ html,body{
 .topicListModule .topicList .item .topInfo .bRight .time{font-style:normal;}
 .topicListModule .topicList .item .title{
 	position:relative;
-	color:#222;padding:10px 10px 10px 10px;font-size:16px;
+	color:#595959;
+	padding:10px 10px 10px 10px;font-size:16px;
     line-height:24px;
     max-height:42px;
     display: -webkit-box;
@@ -3216,7 +3539,7 @@ html,body{
 }
 .commentListModule .commentList .item .content{
 	position:relative;
-	color:#222;padding:0px 10px 5px 10px;font-size:16px;
+	color:#595959;padding:0px 10px 5px 10px;font-size:16px;
     line-height:24px;
     max-height:46px;
     display: -webkit-box;
@@ -3251,7 +3574,7 @@ html,body{
 }
 .replyListModule .replyList .item .content{
 	position:relative;
-	color:#222;padding:0px 10px 5px 10px;font-size:16px;
+	color:#595959;padding:0px 10px 5px 10px;font-size:16px;
     line-height:24px;
     max-height:46px;
     display: -webkit-box;
@@ -3307,7 +3630,7 @@ html,body{
 .questionListModule .questionList .item .topInfo .bRight .time{font-style:normal;}
 .questionListModule .questionList .item .title{
 	position:relative;
-	color:#222;padding:10px 10px 10px 10px;font-size:16px;
+	color:#595959;padding:10px 10px 10px 10px;font-size:16px;
     line-height:24px;
     max-height:42px;
     display: -webkit-box;
@@ -3339,7 +3662,7 @@ html,body{
 }
 .answerListModule .answerList .item .content{
 	position:relative;
-	color:#222;padding:0px 10px 5px 10px;font-size:16px;
+	color:#595959;padding:0px 10px 5px 10px;font-size:16px;
     line-height:24px;
     max-height:46px;
     display: -webkit-box;
@@ -3376,7 +3699,7 @@ html,body{
 }
 .answerReplyListModule .answerReplyList .item .content{
 	position:relative;
-	color:#222;padding:0px 10px 5px 10px;font-size:16px;
+	color:#595959;padding:0px 10px 5px 10px;font-size:16px;
     line-height:24px;
     max-height:46px;
     display: -webkit-box;
@@ -3396,11 +3719,11 @@ html,body{
 .pointModule{
 	padding-top: 40px;
 	padding-bottom: 40px;/*没此属性UC浏览器无法下拉加载*/
+	color: #595959;
 }
 .pointModule .pointList .remark{
 	margin-left: 10px;line-height: 18px;margin-bottom: 2px;color:#878787;font-size: 12px;margin-right: 10px;
 }
-
 
 
 
@@ -3473,6 +3796,7 @@ html,body{
 .userLoginLogModule{
 	padding-top: 40px;
 	padding-bottom: 40px;/*没此属性UC浏览器无法下拉加载*/
+	color: #595959;
 	
 }
 
@@ -3937,7 +4261,7 @@ html,body{
 }
 .systemNotifyModule .systemNotifyList .item .main .content {
 	margin-bottom: 10px;
-	color:#222;
+	color:#595959;
 }
 
 
@@ -4016,7 +4340,7 @@ html,body{
 }
 .remindModule .remindList .item .main .content {
 	margin-bottom: 2px;
-	color:#222;
+	color:#595959;
 }
 .remindModule .remindList .item .main .link {
 	font-size: 15px;
@@ -4086,7 +4410,7 @@ html,body{
 }
 .favoriteModule .favoriteList .item .main .content {
 	margin-bottom: 10px;
-	color:#222;
+	color:#595959;
 }
 
 
@@ -4135,7 +4459,7 @@ html,body{
 }
 .likeModule .likeList .item .main .content {
 	margin-bottom: 10px;
-	color:#222;
+	color:#595959;
 }
 
 /** 关注 **/
@@ -4190,7 +4514,7 @@ html,body{
 }
 .followModule .followList .item .main .userName {
 	display:block;
-	color:#222;font-size: 16px;position: relative;top: 3px;padding-left: 50px;
+	color:#595959;font-size: 16px;position: relative;top: 3px;padding-left: 50px;
 }
 
 /** 粉丝 **/
@@ -4298,7 +4622,7 @@ html,body{
 }
 .membershipCardOrderListModule .membershipCardOrderList .item .main .content {
 	margin-bottom: 10px;
-	color:#222;
+	color:#595959;
 }
 .membershipCardOrderListModule .membershipCardOrderList .item .bottomInfo {
 	min-height: 24px;
@@ -4315,8 +4639,11 @@ html,body{
 	margin-left: 5px;
 	color:#999;
 }
-.membershipCardOrderListModule .membershipCardOrderList .item .bottomInfo .funds .icon{
-	margin-left: 5px;
+.membershipCardOrderListModule .membershipCardOrderList .item .bottomInfo .funds .paymentAmount-icon{
+	position: relative;top: 1px;
+}
+.membershipCardOrderListModule .membershipCardOrderList .item .bottomInfo .funds .paymentPoint-icon{
+	margin-left: 5px;position: relative;top: 1px;
 }
 .membershipCardOrderListModule .membershipCardOrderList .item .bottomInfo .funds .paymentPoint{
 	margin-left: 5px;
@@ -4401,7 +4728,7 @@ html,body{
 }
 .balanceModule .paymentLogList .item .main .content {
 	margin-bottom: 10px;
-	color:#222;
+	color:#595959;
 }
 .balanceModule .paymentLogList .item .bottomInfo {
 	min-height: 24px;
@@ -4947,8 +5274,16 @@ html,body{
 }
 
 
-
-
+/* 发现 */
+.findModule{
+}
+.findModule .icon{
+	font-size: 20px;
+	margin-right: 10px;
+	width: 24px; height: 24px;
+	vertical-align: middle;
+	color: #595959;
+}
 
 
 

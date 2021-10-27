@@ -162,6 +162,7 @@ http://www.springframework.org/schema/task http://www.springframework.org/schema
 		        <prop key="whitespace_stripping">true</prop><!-- 剥去空白域 -->
 		        <prop key="tag_syntax">auto_detect</prop><!-- tag_syntax = square_bracket||auto_detect 设置标签类型 两种：[] 和 <> 。[] 这种标记解析要快些-->
 		        <prop key="url_escaping_charset">UTF-8</prop><!-- URL编码的字符集 -->
+		        <prop key="new_builtin_class_resolver">allows_nothing</prop><!-- 禁止解析任何类 -->
 		    </props>
 		</property>
 		<property name="freemarkerVariables">  

@@ -1628,18 +1628,7 @@ public class ForumManageAction{
 	
 					boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),formatList);
 					
-					
-					//如果用flash控件上传
-					if(file.getContentType().equalsIgnoreCase("application/octet-stream")){
-						String fileType = FileType.getType(file.getInputStream());
-						for (String format :formatList) {
-							if(format.equalsIgnoreCase(fileType)){
-								authentication = true;
-								break;
-							}
-						}
-					}
-					
+				
 					if(authentication && size/1024 <= imageSize){
 						
 						

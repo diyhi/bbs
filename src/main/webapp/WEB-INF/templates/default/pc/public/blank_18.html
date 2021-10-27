@@ -1,0 +1,190 @@
+<#-- 帮助内容 空白页 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<base href="${baseURL}">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<@object action="${helpRelated_helpContent_1}" helpId="${url_helpId}">
+		<#assign help = helpRelated_helpContent_entityBean>
+	</@object>
+	<title><#if help != null && help?? >${help.name}</#if> - ${title}</title>
+	<#-- 获取令牌 -->
+	<meta name="csrfToken" content="${token}"/>
+	<meta name="keywords" content="帮助中心"/>
+	<meta name="description" content="帮助中心"/>
+	<link rel="shortcut icon" type="image/x-icon" href="${baseURL}${commonPath}images/favicon.ico" media="screen" />
+	<link href="${commonPath}css/common.css" type="text/css" rel="stylesheet">	
+	<link href="${commonPath}css/themify-icons/style.css" type="text/css" rel="stylesheet">
+	<script language="javascript" src="${commonPath}js/tool.js" type="text/javascript"></script>
+	<script type="text/javascript" src="${commonPath}js/jquery/jquery.min.js" language="javascript"></script>
+	<link href="${commonPath}js/simplebox/css/simplebox.css"  type="text/css" rel="stylesheet"/>
+	<script type="text/javascript" src="${commonPath}js/simplebox/js/simplebox.js" language="javascript"></script>
+	
+	<link href="${commonPath}js/prism/default-block/prism.css"  type="text/css" rel="stylesheet"/>
+	<script type="text/javascript" src="${commonPath}js/prism/default-block/prism.js" language="javascript"></script>
+	<script type="text/javascript" src="${commonPath}js/prism/default-block/clipboard.min.js" language="javascript"></script>
+</head>
+
+<body >
+<#-- 引入页头 -->
+<@include action="${newPublic_2}"/>
+<div class="skeleton">
+	<div class="main wrap">
+		
+		<div class="helpDetailModule">
+			<div class="left">
+	        	<div class="nav-wrap">
+	        		<!-- 导航 -->
+	        		<@object action="${helpRelated_helpNavigation_1}" helpTypeId="${url_helpTypeId}">
+	        			<#assign value = helpRelated_helpNavigation_collection>
+	        			<#if helpRelated_helpNavigation_collection?exists && helpRelated_helpNavigation_collection?size gt 0>
+	        				<#-- 获取最后一项 -->
+	        				<#list helpRelated_helpNavigation_collection as key, value>
+	        					<#if !key_has_next><div class="helpTypeName">${value}</div></#if>
+	        				</#list>
+	        			</#if>
+	        		</@object>
+	        	
+	        	
+					
+					<!-- 帮助列表 -->
+					<@object action="${helpRelated_help_1}" helpTypeId="${url_helpTypeId}">
+						<#if helpRelated_help_collection?exists && helpRelated_help_collection?size gt 0>
+
+						<div class="helpName">
+							<#list helpRelated_help_collection as entry>
+								<a href="helpDetail?helpTypeId=${url_helpTypeId}&helpId=${entry.id}"><span>${entry.name}</span></a>
+							</#list>
+						</div>
+						</#if>
+					</@object>
+					
+	        	</div>
+	        </div>
+	        <div class="right">
+	        	<!-- 帮助内容 -->
+	        	<div class="help-wrap">
+	        	<#if help != null && help?? >
+	        		<div class="helpBox">
+		                <div class="title">${help.name}</div>
+		                
+		                <div class="helpInfo clearfix" >
+		                	<div class="postTime">${help.times}</div>
+		                </div>
+		                
+						<div class="content" >
+		                	<#noescape>${help.content}</#noescape>          
+						</div>
+					</div>
+	        	
+	        	
+	        	
+	        	</#if>
+	        	</div>
+	        	
+	        </div>
+		</div>
+		
+	</div>
+</div>
+<#-- 引入页脚 -->
+<@include action="${newPublic_3}"/>
+</body>
+
+<!-- 当帮助Id为空时默认跳转第一个在线帮助 -->
+<script type="text/javascript">
+$(document).ready(function(){
+	var helpId = getUrlParam("helpId");
+	if(helpId == null ||  helpId == ""){
+		var helpLink = $(".helpName").find("a").first();
+		if(helpLink.attr("href") != null){
+			console.log(helpLink.attr("href"));
+			window.location.replace(helpLink.attr("href"));//无历史记录跳转
+		}
+	}
+});
+</script>
+
+<!-- 代码高亮显示 -->
+<script type="text/javascript">
+	//代码语言类
+	function languageClassName(originalClass, newClass) {
+		var o = new Object()
+		o.originalClass = originalClass;//原始样式标签名称
+		o.newClass = newClass;//新样式标签名称
+		return o;
+	}
+
+	$(document).ready(function(){
+	    //代码语言映射集合
+	    var languageMapping_arr = new Array();
+		var languageClassName_xml = languageClassName("lang-xml","language-xml");
+	    languageMapping_arr.push(languageClassName_xml);
+	    var languageClassName_css = languageClassName("lang-css","language-css");
+	    languageMapping_arr.push(languageClassName_css);
+	    var languageClassName_html = languageClassName("lang-html","language-html");
+	    languageMapping_arr.push(languageClassName_html);
+	    var languageClassName_js = languageClassName("lang-js","language-JavaScript");
+	    languageMapping_arr.push(languageClassName_js);
+	    var languageClassName_java = languageClassName("lang-java","language-java");
+	    languageMapping_arr.push(languageClassName_java);
+	    var languageClassName_pl = languageClassName("lang-pl","language-perl");
+	    languageMapping_arr.push(languageClassName_pl);
+	    var languageClassName_py = languageClassName("lang-py","language-python");
+	    languageMapping_arr.push(languageClassName_py);
+	    var languageClassName_rb = languageClassName("lang-rb","language-ruby");
+	    languageMapping_arr.push(languageClassName_rb);
+	    var languageClassName_go = languageClassName("lang-go","language-Go");
+	    languageMapping_arr.push(languageClassName_go);  
+	    var languageClassName_cpp = languageClassName("lang-cpp","language-C++");
+	    languageMapping_arr.push(languageClassName_cpp);  
+	    var languageClassName_cs = languageClassName("lang-cs","language-C#");
+	    languageMapping_arr.push(languageClassName_cs);  
+	    var languageClassName_bsh = languageClassName("lang-bsh","language-Bash + Shell");
+	    languageMapping_arr.push(languageClassName_bsh);  
+	      
+	  
+	    var doc_pre = $(".content").find('pre[class^="prettyprint"]');
+	    doc_pre.each(function(){
+	        var class_val = $(this).attr('class');
+	      	var lan_class = "";
+	        var class_arr = new Array();
+	        class_arr = class_val.split(' ');
+	        for(var i=0; i<class_arr.length; i++){
+	        	var className = $.trim(class_arr[i]);
+	        	
+	        	if(className != null && className != ""){
+	        		if (className.lastIndexOf('lang-', 0) === 0) {
+	        			lan_class = className;
+			            break;
+			        }
+	        	}	
+	        }
+	        
+	        for(var i=0; i<languageMapping_arr.length; i++){
+		    	var languageMapping = languageMapping_arr[i];
+		    	if(languageMapping.originalClass == lan_class){
+			    //	var pre_content = '<code>'+$(this).html()+'</code>';
+			        $(this).html($(this).html());
+			        $(this).attr("class",'line-numbers '+languageMapping.newClass);
+		    	}
+		    }
+		    if(lan_class == ""){
+		    //	var pre_content = '<code>'+$(this).html()+'</code>';
+			    $(this).html($(this).html());
+			    $(this).attr("class",'line-numbers language-markup');
+		    }
+	    });
+	});
+</script>
+
+<!-- 图片点击放大 -->
+<script type="text/javascript">
+	$(function () {
+    	//图片不含宽度的元素,因为svg表情不放大，svg表情后端默认设置了宽度
+    	$(".content img:not([width])").simplebox();
+	
+    	//$(".content img,.appendContent img,.answerContent img").simplebox();
+	});
+</script>
+</html>
