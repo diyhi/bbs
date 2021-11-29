@@ -158,7 +158,7 @@ public class InstallManageAction extends HttpServlet{
 				ResultSet rs = null;
 				ResultSet rs2 = null;
 				try {
-					databaseLink = "jdbc:mysql://"+install.getDatabaseIP().trim()+":"+install.getDatabasePort().trim()+"/"+install.getDatabaseName().trim()+"?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&zeroDateTimeBehavior=CONVERT_TO_NULL&useSSL=false&rewriteBatchedStatements=true";
+					databaseLink = "jdbc:mysql://"+install.getDatabaseIP().trim()+":"+install.getDatabasePort().trim()+"/"+install.getDatabaseName().trim()+"?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&zeroDateTimeBehavior=CONVERT_TO_NULL&allowPublicKeyRetrieval=true&useSSL=false&rewriteBatchedStatements=true";
 					//linux下5.7必须加这句,不然会报错java.sql.SQLException: No suitable driver found for
 					DriverManager.registerDriver(new com.mysql.cj.jdbc.Driver());//注册驱动
 				
@@ -375,7 +375,7 @@ public class InstallManageAction extends HttpServlet{
 			Connection conn = null;
     		Statement stmt = null;
 			try {
-				databaseLink = "jdbc:mysql://"+install.getDatabaseIP().trim()+":"+install.getDatabasePort().trim()+"/"+install.getDatabaseName().trim()+"?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&zeroDateTimeBehavior=CONVERT_TO_NULL&useSSL=false&rewriteBatchedStatements=true";
+				databaseLink = "jdbc:mysql://"+install.getDatabaseIP().trim()+":"+install.getDatabasePort().trim()+"/"+install.getDatabaseName().trim()+"?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&zeroDateTimeBehavior=CONVERT_TO_NULL&allowPublicKeyRetrieval=true&useSSL=false&rewriteBatchedStatements=true";
 				//linux下5.7必须加这句,不然会报错java.sql.SQLException: No suitable driver found for
 				DriverManager.registerDriver(new com.mysql.cj.jdbc.Driver());//注册驱动
 				
@@ -449,7 +449,7 @@ public class InstallManageAction extends HttpServlet{
 		if(error.size() ==0){
     		//复制文件
 			Map<String,String> copyFileMap = new HashMap<String,String>();//key:旧文件路径  value:新文件路径
-			copyFileMap.put("WEB-INF"+File.separator+"data"+File.separator+"install"+File.separator+"web.xml", "WEB-INF");
+			copyFileMap.put("WEB-INF"+File.separator+"data"+File.separator+"install"+File.separator+"web.xml", "WEB-INF"+File.separator);
 			for (Map.Entry<String,String> entry : copyFileMap.entrySet()) {  
 				localFileManage.copyFile(entry.getKey(), entry.getValue());
 			}

@@ -38,7 +38,7 @@
 				if(hideType == '10'){
 					var html = "";
 					html += '<div class="hide-box">';
-					html += 	'<div class="background-image"></div>';
+					html += 	'<div class="background-image cms-lock-solid-2"></div>';
 					html += 	'<div class="background-prompt">此处内容已被隐藏，输入密码可见</div>';
 					html += 	'<div class="input-box">';
 					html += 		'<input type="password" id="hide_password_'+random+'" class="text" maxlength="30"  placeholder="密码" value="">';
@@ -50,21 +50,21 @@
 				}else if(hideType == '20'){
 					var html = "";
 					html += '<div class="hide-box">';
-					html += 	'<div class="background-image"></div>';
+					html += 	'<div class="background-image cms-lock-solid-2"></div>';
 					html += 	'<div class="background-prompt">此处内容已被隐藏，评论话题可见</div>';
 					html += '</div>';
  					$(this).html(html);
 				}else if(hideType == '30'){
 					var html = "";
 					html += '<div class="hide-box">';
-					html += 	'<div class="background-image"></div>';
+					html += 	'<div class="background-image cms-lock-solid-2"></div>';
 					html += 	'<div class="background-prompt">此处内容已被隐藏，等级达到‘'+_.escape(gradeName)+'’可见</div>';
 					html += '</div>';
  					$(this).html(html);
 				}else if(hideType == '40'){
 					var html = "";
 					html += '<div class="hide-box">';
-					html += 	'<div class="background-image"></div>';
+					html += 	'<div class="background-image cms-lock-solid-2"></div>';
 					html += 	'<div class="background-prompt">此处内容已被隐藏，支付 '+inputValue+' 积分可见</div>';
 					html += 	'<div class="submit-box">';
 					html += 		'<input type="button" value="立即购买" class="button" onclick="topicUnhide(40,'+random+','+topicId+');">';
@@ -74,7 +74,7 @@
 				}else if(hideType == '50'){
 					var html = "";
 					html += '<div class="hide-box">';
-					html += 	'<div class="background-image"></div>';
+					html += 	'<div class="background-image cms-lock-solid-2"></div>';
 					html += 	'<div class="background-prompt">此处内容已被隐藏，支付￥<span class="highlight">'+inputValue+' </span>元可见</div>';
 					html += 	'<div class="submit-box">';
 					html += 		'<input type="button" value="立即购买" class="button" onclick="topicUnhide(50,'+random+','+topicId+');">';

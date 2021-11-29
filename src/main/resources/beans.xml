@@ -334,9 +334,9 @@ http://www.springframework.org/schema/task http://www.springframework.org/schema
     <!-- 线池程 -->
     <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor" >  
 		<!-- 默认开启线程数   -->
-		<property name="corePoolSize" value="2" />  
+		<property name="corePoolSize" value="20" />  
 		<!-- 最大线程  -->
-		<property name="maxPoolSize" value="8" />  
+		<property name="maxPoolSize" value="500" />  
 		<!-- 缓冲任务队列的长度    去掉queueCapacity属性则延后执行，放在无界队列当中，任务过多仍然可能内存溢出
 		<property name="queueCapacity" value="100" /> -->   
 		<!-- 线程池对拒绝任务(无线程可用)的处理策略 -->   
@@ -484,6 +484,11 @@ http://www.springframework.org/schema/task http://www.springframework.org/schema
     <!-- 创建收红包配置 -->
     <bean id="receiveRedEnvelopeConfig" class="cms.web.action.redEnvelope.ReceiveRedEnvelopeConfig" >
         <!-- 收红包分表数量 -->
+        <property name="tableQuantity" value="4" />    
+    </bean>
+    <!-- 会员卡赠送项配置 -->
+    <bean id="membershipCardGiftItemConfig" class="cms.web.action.membershipCard.MembershipCardGiftItemConfig" >
+        <!-- 会员卡赠送项分表数量 -->
         <property name="tableQuantity" value="4" />    
     </bean>
     

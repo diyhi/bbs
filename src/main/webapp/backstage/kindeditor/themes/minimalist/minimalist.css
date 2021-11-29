@@ -373,17 +373,18 @@
 /* container */
 .ke-container {
 	display: block;
-	overflow: hidden;
+	/**overflow: hidden; 使用固定元素插件不能用本属性**/
 	margin: 0;
 	padding: 0;
 }
 /* toolbar 工具栏 */
 .ke-toolbar {
-	padding: 4px 5px;
+	padding: 6px 5px;
 	text-align: left;
 	overflow: hidden;
 	zoom: 1;
 	color: #666;
+	background: #fff;
 }
 .ke-toolbar-icon {
     text-align: center;

@@ -85,6 +85,7 @@ import cms.utils.Verification;
 import cms.web.action.TextFilterManage;
 import cms.web.action.fileSystem.FileManage;
 import cms.web.action.lucene.TopicLuceneManage;
+import cms.web.action.membershipCard.MembershipCardGiftTaskManage;
 import cms.web.action.payment.PaymentManage;
 import cms.web.action.question.QuestionManage;
 import cms.web.action.topic.TopicManage;
@@ -135,7 +136,7 @@ public class UserManageAction {
 	@Resource QuestionIndexService questionIndexService;
 	@Resource FileManage fileManage;
 	@Resource MessageSource messageSource;
-	
+	@Resource MembershipCardGiftTaskManage membershipCardGiftTaskManage;
 	/**
 	 * 用户管理 查看
 	 */
@@ -2363,7 +2364,9 @@ public class UserManageAction {
 									
 									userService.onlineRecharge(paymentRunningNumber,paymentVerificationLog.getUserName(),paymentRunningNumber_amount,new_paymentLog);
 									
-									
+									//删除缓存
+									userManage.delete_cache_findUserById(user.getId());
+									userManage.delete_cache_findUserByUserName(user.getUserName());
 									
 									return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 								}else{
@@ -2431,7 +2434,9 @@ public class UserManageAction {
 							userService.subtractUserDeposit(user.getUserName(),deposit,new_paymentLog);
 						}
 						
-						
+						//删除缓存
+						userManage.delete_cache_findUserById(user.getId());
+						userManage.delete_cache_findUserByUserName(user.getUserName());
 						return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 					}
 					
@@ -2486,6 +2491,12 @@ public class UserManageAction {
 							Object new_pointLog = pointManage.createPointLogObject(pointLog);
 							userService.subtractUserPoint(user.getUserName(),point,new_pointLog);
 						}
+						//删除缓存
+						userManage.delete_cache_findUserById(user.getId());
+						userManage.delete_cache_findUserByUserName(user.getUserName());
+						
+						//异步执行会员卡赠送任务(长期任务类型)
+						membershipCardGiftTaskManage.async_triggerMembershipCardGiftTask(user.getUserName());
 						
 						return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 					}

@@ -35,7 +35,6 @@
 							<div class="button-group-wrapper">
 								<el-button-group>
 									<el-button type="primary" size="mini" @click="$store.commit('setCacheNumber');$router.push({path: '/admin/control/help/manage/view', query:{helpId : scope.row.id, visible : ($route.query.visible != undefined ? $route.query.visible:''),page : ($route.query.page != undefined ? $route.query.page:'')}})">查看</el-button>
-									<el-button type="primary" size="mini" @click="$store.commit('setCacheNumber');$router.push({path: '/admin/control/help/manage/edit', query:{helpId : scope.row.id, visible : ($route.query.visible != undefined ? $route.query.visible:''),page : ($route.query.page != undefined ? $route.query.page:'')}})">修改</el-button>
 									<el-button type="primary" size="mini" @click="deleteHelp($event,scope.row)">删除</el-button>
 								</el-button-group>
 							</div>

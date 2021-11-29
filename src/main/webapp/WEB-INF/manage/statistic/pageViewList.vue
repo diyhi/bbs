@@ -178,7 +178,8 @@ export default({
   				query:{ 
   					start_times :encodeURIComponent(_self.start_times),
   					end_times :encodeURIComponent(_self.end_times),
-  					page : 1
+  					page : 1,
+  					time: new Date().getTime()
   				}
   			});
   	    },
@@ -200,7 +201,8 @@ export default({
   				query:{ 
   					start_times :encodeURIComponent(_self.start_times),
   					end_times :encodeURIComponent(_self.end_times),
-  					page : 1
+  					page : 1,
+  					time: new Date().getTime()
   				}
   			});
   		},
@@ -222,7 +224,8 @@ export default({
   				query:{ 
   					start_times :encodeURIComponent(_self.start_times),
   					end_times :encodeURIComponent(_self.end_times),
-  					page : 1
+  					page : 1,
+  					time: new Date().getTime()
   				}
   			});
   		},

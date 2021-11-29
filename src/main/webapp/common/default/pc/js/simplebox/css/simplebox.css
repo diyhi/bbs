@@ -1,23 +1,35 @@
+.cross-box{
+	position:sticky;
+	top: 0px;
+	z-index: 99999;
+	height: 40px;
+	overflow: hidden;
+}
 .cross {
-  position: fixed;
-  right: 0;
-  top: 0;
-  margin: 10px 10px 0 0;
-  cursor: pointer;
-  transition: 300ms all ease-in-out;
-  z-index: 99;
-  opacity: 1;
-  will-change: transform; 
-  
-	width: 40px;height: 40px;
-  }
-
+	background-color: rgba(0,0,0,.5);
+	border-radius: 50%;
+	cursor: pointer;
+	width: 80px;
+	height: 80px;
+	overflow: hidden;
+	position: absolute;
+	
+	right: -40px;
+	top: -40px;
+	-webkit-transition: background-color .15s;
+	transition: background-color .15s;
+	
+	z-index: 999999;
+}
+.cross:hover {
+	background-color: rgba(0,0,0,.8);
+}
 .cross::after,
 .cross::before {
   position: absolute;
   content: '';
-  width: 30px;
-  height: 2px; top: 20px;left: 5px;}
+  width: 14px;
+  height: 2px; top: 56px;left: 18px;}
 
 .cross::after {
   -webkit-transform: rotate(45deg);
@@ -29,11 +41,14 @@
 
 .cross--light::after,
 .cross--light::before {
-  background-color: #807f7f; }
+	background-color: #fff;
+}
 
 .cross--dark::after,
 .cross--dark::before {
-  background-color: white; }
+	background-color: white;
+}
+
 
 .slb {
   box-shadow: 2px 2px 12px 1px rgba(0, 0, 0, 0.2);
@@ -57,52 +72,56 @@
   -ms-animation: pop-out 250ms; }
 
 #overlay {
+	/**
 	position: fixed;
+	left: 0;
+	right: 0;
 	top: 0;
 	bottom: 0;
 	overflow:auto;
+	display: none;
+	pointer-events: none;
+	cursor: pointer;
+	will-change: transform;
+	z-index: 999;**/
+	position: fixed;
+	left: 0;
+	top: 0;
+	width:100%;
+	height:100%;
+	overflow:auto;
+	display: none;
+	pointer-events: none;
+	cursor: pointer;
+	will-change: transform;
+	z-index: 999;
 	
-  display: none;
- /** width: 100vw;
-  height: 100vh;
-  position: fixed;
-  top: 0;
-  bottom: 0;**/
-  left: 0;
-  
-  right: 0;
-  pointer-events: none;
-  cursor: pointer;
-  will-change: transform;
-  z-index: 999; }
-
+	/**
+	position: absolute;
+	width:100%;
+	height:100%;
+	
+	top: 0;
+	left: 0;
+	overflow:auto;
+	display: none;
+	pointer-events: none;
+	cursor: pointer;
+	will-change: transform;
+	z-index: 999;**/
+}
 
 .image-box {
 	position: absolute; 
     top: 0; right: 0; left: 0;
     margin: auto;
     text-align:center;
-	margin-top:50px;
-	margin-bottom:50px;
 	
 }
-
 .center {
- /** max-height: 90%;
-  max-width: 90%;
-  position: absolute;
-  top: 20px;
-  bottom: 20px;
-  left: 0;
-  right: 0;
-  margin: auto;**/
-  /**
-  position: absolute; 
-    top: 0; right: 0; left: 0;
-    margin: auto;**/
-
-   }
-
+    margin-top:50px;
+	margin-bottom: 50px;
+}
 
 @-webkit-keyframes pop-in {
   0% {

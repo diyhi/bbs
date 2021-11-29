@@ -222,37 +222,35 @@
 						}
 					} 
 					
-	
-					// 指定编辑器iframe document的CSS数据，用于设置可视化区域的样式。 单冒号(:)用于CSS3伪类，双冒号(::)用于CSS3伪元素。伪元素由双冒号和伪元素名称组成。双冒号是在当前规范中引入的，用于区分伪类和伪元素。但是伪类兼容现存样式，浏览器需要同时支持旧的伪类，比如:first-line、:first-letter、:before、:after等
-				    KindEditor.options.cssData = ".ke-content .prettyprint {"+
-						"background:#f8f8f8;"+
-						"border:1px solid #ddd;"+
-						"padding:5px;"+
-					"}"+//默认字体大小
-					"body {"+
-						"font-size: 14px;"+
-					"}";
-				
-				   
-					var questionAvailableTag = document.getElementById("questionAvailableTag").value;
-					var questionAvailableTag_obj = null;//['source', '|','fontname','fontsize','emoticons'];
-					if(questionAvailableTag != ""){
-						questionAvailableTag_obj = JSON.parse(questionAvailableTag);//JSON转为对象
-						if(questionAvailableTag_obj != null && questionAvailableTag_obj.length >0){
-							for(var i=0; i< questionAvailableTag_obj.length; i++){
-								var availableTag = questionAvailableTag_obj[i];
-								if(availableTag == "image"){//增加批量插入图片按钮
-									questionAvailableTag_obj.splice(i+1, 0, 'multiimage');//在指定索引处插入元素
-									break;
+					$(function () {
+						// 指定编辑器iframe document的CSS数据，用于设置可视化区域的样式。 单冒号(:)用于CSS3伪类，双冒号(::)用于CSS3伪元素。伪元素由双冒号和伪元素名称组成。双冒号是在当前规范中引入的，用于区分伪类和伪元素。但是伪类兼容现存样式，浏览器需要同时支持旧的伪类，比如:first-line、:first-letter、:before、:after等
+					    KindEditor.options.cssData = ".ke-content .prettyprint {"+
+							"background:#f8f8f8;"+
+							"border:1px solid #ddd;"+
+							"padding:5px;"+
+						"}"+//默认字体大小
+						"body {"+
+							"font-size: 14px;"+
+						"}";
+					
+					   
+						var questionAvailableTag = document.getElementById("questionAvailableTag").value;
+						var questionAvailableTag_obj = null;//['source', '|','fontname','fontsize','emoticons'];
+						if(questionAvailableTag != ""){
+							questionAvailableTag_obj = JSON.parse(questionAvailableTag);//JSON转为对象
+							if(questionAvailableTag_obj != null && questionAvailableTag_obj.length >0){
+								for(var i=0; i< questionAvailableTag_obj.length; i++){
+									var availableTag = questionAvailableTag_obj[i];
+									if(availableTag == "image"){//增加批量插入图片按钮
+										questionAvailableTag_obj.splice(i+1, 0, 'multiimage');//在指定索引处插入元素
+										break;
+									}
 								}
 							}
 						}
-					}
-					var editor;
-					KindEditor.ready(function(K) {
+					
 						var fileSystem = document.getElementById("fileSystem").value;
-						
-						editor = K.create('textarea[id="appendQuestionContent"]', {
+						var editor = KindEditor.create('textarea[id="appendQuestionContent"]', {
 							themeType : 'style :minimalist',//极简主题 加冒号的是主题样式文件名称同时也是主题目录
 							basePath : '${commonPath}js/kindeditor/',//指定编辑器的根目录路径
 							formatUploadUrl :false,//false时不会自动格式化上传后的URL
@@ -263,6 +261,7 @@
 							uploadModule : parseInt(fileSystem),//上传模块 0.本地 10.SeaweedFS 20.MinIO 30.阿里云OSS
 							uploadJson :'user/control/question/upload.htm?method=upload',//指定浏览远程图片的服务器端程序
 							filePostName:'file',//文件上传字段 默认imgFile
+							fixToolBar : true,//浮动工具栏
 							items : questionAvailableTag_obj,
 							
 							/**['source', 'fontsize', 'forecolor', 'hilitecolor', 'bold',
@@ -274,7 +273,10 @@
 							}
 					
 						});
+						
+					
 					});
+					
 					</script>
 				
 			</form>

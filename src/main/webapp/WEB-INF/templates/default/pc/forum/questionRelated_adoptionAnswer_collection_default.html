@@ -7,8 +7,27 @@
 		<#assign returnValue = questionRelated_adoptionAnswer_collection>
 		
 		<script language="javascript" type="text/javascript">
+			//采纳答案弹出层
+			function adoptionAnswerLayer(answerId){
+				layer.confirm('是否采纳？', {
+					title:"采纳答案",
+					btn: ['确定采纳','取消'] //按钮
+				}, function(){
+					adoptionAnswer(answerId);
+					//  layer.msg('删除成功');
+				}, function(){
+					 
+				});
+			}
+			
+		
 			//Ajax方式提交
 			function adoptionAnswer(answerId){
+				
+			
+			
+			
+			
 				var parameter = "";
 				//答案Id
 				parameter += "&answerId="+answerId;

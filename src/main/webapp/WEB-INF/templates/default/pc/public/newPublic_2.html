@@ -10,15 +10,16 @@
 		<div class="head-search">
 			<form action="search" method="get">
 				<input name="keyword" value="${keyword}" autocomplete="off" placeholder="搜索">
-				<input type="submit" class="sub-button">
+				<input type="submit" class="sub-button" value="">
+				<i class="icon cms-search"></i>
 			</form>
 		</div>
 		<div class="menu" >
 			<ul class="clearfix">
 				<#-- 未登录 -->
 				<#if systemUser == null>
-					<li><a href="register">注册</a></li>
-					<li><a href="login">登录</a></li>
+					<li><a href="register" class="a-button">注册</a></li>
+					<li><a href="login" class="a-button">登录</a></li>
 				<#else>
 					<#-- 已登录 -->
 					<li>
@@ -27,11 +28,13 @@
 								<#if systemUser.avatarName != null>
 									<img src="${systemUser.avatarPath}100x100/${systemUser.avatarName}" >
 								<#else>
-									<img src="${commonPath}images/min_avata.png" >
+									<span class="avatarImg" >
+		                      			<span class="circle"><i class="cms-user2"></i></span>
+			                      	</span>
 								</#if> 
 							</a>
 						</div>
-						<a href="user/control/home">${(systemUser.nickname != null && systemUser.nickname??) ?string(systemUser.nickname , systemUser.userName)}</a>
+						<a class="userName" href="user/control/home">${(systemUser.nickname != null && systemUser.nickname??) ?string(systemUser.nickname , systemUser.userName)}</a>
 					</li>
 					<li><a href="user/control/home">用户中心<span id="allMessage-badge" class="badge" style="position: absolute; margin-top: 14px; display: none;"></span></a></li>
 					<li><a href="" onClick="javascript:document.getElementById('logout').submit();return false;">退出</a></li>

@@ -39,7 +39,7 @@ public class SendSmsLog implements Serializable{
 	@Column(length=20)
 	private String mobile;
 	/** 状态码 **/
-	@Column(length=60)
+	@Column(name="\"code\"",length=60)
 	private String code;
 	/** 状态码描述 **/
 	@Column(length=200)

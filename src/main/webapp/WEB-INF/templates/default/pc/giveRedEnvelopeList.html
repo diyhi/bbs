@@ -56,7 +56,7 @@
 						<TD class="dataTD">
 							${giveRedEnvelope.totalAmount}
 							<#if giveRedEnvelope.refundAmount gt 0 > 
-								<span style="color: red;">中止领取红包后返还金额￥${giveRedEnvelope.refundAmount}</span>
+								<span style="color: #F56C6C;">中止领取红包后返还金额￥${giveRedEnvelope.refundAmount}</span>
 							</#if>
 						</TD>
 						<TD class="dataTD">${giveRedEnvelope.giveQuantity}</TD>
@@ -66,7 +66,9 @@
 						</TD>
 						<TD class="dataTD">${giveRedEnvelope.giveTime}</TD>
 						<TD class="dataTD">
-							<a href="user/control/redEnvelopeAmountDistributionList?giveRedEnvelopeId=${giveRedEnvelope.id}" class="link">查看金额分配</a>
+							<a class="operation-button" href="user/control/redEnvelopeAmountDistributionList?giveRedEnvelopeId=${giveRedEnvelope.id}" >
+								<span>查看金额分配</span>
+							</a>
 						</TD>
 		    		</TR>
 		    		</#list>

@@ -22,6 +22,7 @@ import cms.utils.UUIDUtil;
 import cms.utils.WebUtil;
 import cms.utils.threadLocal.AccessUserThreadLocal;
 import cms.web.action.fileSystem.FileManage;
+import cms.web.action.membershipCard.MembershipCardGiftTaskManage;
 import cms.web.action.user.UserLoginLogManage;
 import cms.web.action.user.UserManage;
 
@@ -36,6 +37,7 @@ public class OAuthManage {
 	@Resource UserLoginLogManage userLoginLogManage;
 	@Resource UserService userService;
 	@Resource FileManage fileManage;
+	@Resource MembershipCardGiftTaskManage membershipCardGiftTaskManage;
 	
 	/**
 	 * 添加刷新令牌
@@ -204,6 +206,10 @@ public class OAuthManage {
 			userLoginLog.setLogonTime(new Date());
 			Object new_userLoginLog = userLoginLogManage.createUserLoginLogObject(userLoginLog);
 			userService.saveUserLoginLog(new_userLoginLog);
+			
+			//异步执行会员卡赠送任务(长期任务类型)
+			membershipCardGiftTaskManage.async_triggerMembershipCardGiftTask(user.getUserName());
+			
 			return true;
 		}
 		

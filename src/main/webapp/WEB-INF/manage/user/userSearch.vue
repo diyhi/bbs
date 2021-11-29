@@ -319,7 +319,8 @@ export default({
 					end_point :encodeURIComponent(_self.end_point),
 					start_registrationDate :encodeURIComponent(_self.start_registrationDate),
 					end_registrationDate :encodeURIComponent(_self.end_registrationDate),
-					page : 1
+					page : 1,
+					time: new Date().getTime()
 				}
 			});
 	    },

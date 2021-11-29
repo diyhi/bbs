@@ -156,9 +156,17 @@ export default({
 		        url: 'control/filterWord/manage?method=uploadFilterWord',
 		        data: formData,
 		        onUploadProgress: progressEvent => {
-		            // progressEvent.loaded:已上传文件大小
-		            // progressEvent.total:被上传文件的总大小
-		            _self.progressPercent = (progressEvent.loaded / progressEvent.total * 100)
+		        	if (progressEvent.lengthComputable) {
+                    	let rate = progressEvent.loaded / progressEvent.total;  //已上传的比例
+                        if (rate < 1) {
+                        	//这里的进度只能表明文件已经上传到后台，但是后台有没有处理完还不知道
+                            //因此不能直接显示为100%，不然用户会误以为已经上传完毕，关掉浏览器的话就可能导致上传失败
+                            //等响应回来时，再将进度设为100%
+                            // progressEvent.loaded:已上传文件大小
+		            		// progressEvent.total:被上传文件的总大小
+                            _self.progressPercent = (progressEvent.loaded / progressEvent.total * 100).toFixed(2);
+                        }
+                    }
 		        }
 			})
 			.then(function (response) {
@@ -170,6 +178,7 @@ export default({
 			    if(result){
 			    	let returnValue = JSON.parse(result);
 			    	if(returnValue.code === 200){//成功
+			    		_self.progressPercent = 100;
 			    		_self.$message.success("上传成功");
 			    		
 			    		//删除缓存

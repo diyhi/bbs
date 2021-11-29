@@ -87,9 +87,9 @@ function deleteLike(likeId){
 			<TABLE class="dataList" width="100%">
 				<THEAD>
 					<TR class="dataThead">
-						<TH width="50%">标题</TH>	
+						<TH width="56%">标题</TH>	
 						<TH width="30%">点赞时间</TH>	
-						<TH width="20%">操作</TH>
+						<TH width="14%">操作</TH>
 					</TR>
 				</THEAD>
 				<TBODY>
@@ -103,7 +103,9 @@ function deleteLike(likeId){
 							${like.addtime}	
 						</TD>
 						<TD class="dataTD">
-							<a href="javascript:" onclick="deleteLike('${like.id}')">删除</a>
+							<a class="operation-button" href="javascript:" onclick="deleteLike('${like.id}')">
+								<span>删除</span>
+							</a>
 						</TD>
 		    		</TR>
 		    		</#list>

@@ -265,18 +265,29 @@ public class ACLServiceBean extends DaoSupport implements ACLService {
 	 * 模块分页显示
 	 */
 	@Transactional(readOnly=true,propagation=Propagation.NOT_SUPPORTED)
-	public QueryResult<String> modulePage(int firstindex, int maxresult,LinkedHashMap<String , String >orderby){
+	public QueryResult<String> modulePage(int firstindex, int maxresult){
 		QueryResult<String> qr = new QueryResult<String>();
 
-		Query query = em.createQuery("select distinct o.module from SysResources o "+ buildOrderby(orderby));
+		//JPA不支持from (select ……)方式的子查询   支持改为类似方式select * from test t where t.age = (select max(age) from test where t.class = class) order by class;  
+		//select t1.module from (select * from sysresources o order by o.priority desc) t1 GROUP BY t1.module order by t1.priority asc
+		
+		Query query = em.createQuery("select o.module,MAX(o.priority) as priority from SysResources o GROUP BY o.module order by priority asc");
+		
+		
+		
 		if(firstindex != -1 && maxresult != -1){
 			//索引开始,即从哪条记录开始
 			query.setFirstResult(firstindex);
 			//获取多少条数据
 			query.setMaxResults(maxresult);
 		}
+		List<String> resultList = new ArrayList<String>();
+		List<Object[]> objList = query.getResultList();
+		for(Object[] obj: objList){//只取第一项结果
+			resultList.add((String)obj[0]);
+		}
 		//把查询结果设进去
-		qr.setResultlist(query.getResultList());
+		qr.setResultlist(resultList);
 		
 		//获取总记录数
 		query = em.createQuery("select count(distinct o.module) from SysResources o");

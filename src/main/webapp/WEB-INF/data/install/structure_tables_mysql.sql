@@ -494,6 +494,97 @@ CREATE TABLE `membershipcard` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 #
+# Structure for table "membershipcardgiftitem_0"
+#
+
+CREATE TABLE `membershipcardgiftitem_0` (
+  `id` varchar(65) NOT NULL,
+  `duration` int(11) DEFAULT NULL,
+  `membershipCardGiftTaskId` bigint(20) DEFAULT NULL,
+  `postTime` datetime DEFAULT NULL,
+  `type` int(11) DEFAULT NULL,
+  `unit` int(11) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  `restriction` longtext,
+  PRIMARY KEY (`id`),
+  KEY `membershipCardGiftItem_idx` (`membershipCardGiftTaskId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "membershipcardgiftitem_1"
+#
+
+CREATE TABLE `membershipcardgiftitem_1` (
+  `id` varchar(65) NOT NULL,
+  `duration` int(11) DEFAULT NULL,
+  `membershipCardGiftTaskId` bigint(20) DEFAULT NULL,
+  `postTime` datetime DEFAULT NULL,
+  `type` int(11) DEFAULT NULL,
+  `unit` int(11) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  `restriction` longtext,
+  PRIMARY KEY (`id`),
+  KEY `membershipCardGiftItem_idx` (`membershipCardGiftTaskId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "membershipcardgiftitem_2"
+#
+
+CREATE TABLE `membershipcardgiftitem_2` (
+  `id` varchar(65) NOT NULL,
+  `duration` int(11) DEFAULT NULL,
+  `membershipCardGiftTaskId` bigint(20) DEFAULT NULL,
+  `postTime` datetime DEFAULT NULL,
+  `type` int(11) DEFAULT NULL,
+  `unit` int(11) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  `restriction` longtext,
+  PRIMARY KEY (`id`),
+  KEY `membershipCardGiftItem_idx` (`membershipCardGiftTaskId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "membershipcardgiftitem_3"
+#
+
+CREATE TABLE `membershipcardgiftitem_3` (
+  `id` varchar(65) NOT NULL,
+  `duration` int(11) DEFAULT NULL,
+  `membershipCardGiftTaskId` bigint(20) DEFAULT NULL,
+  `postTime` datetime DEFAULT NULL,
+  `type` int(11) DEFAULT NULL,
+  `unit` int(11) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  `restriction` longtext,
+  PRIMARY KEY (`id`),
+  KEY `membershipCardGiftItem_idx` (`membershipCardGiftTaskId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "membershipcardgifttask"
+#
+
+CREATE TABLE `membershipcardgifttask` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `createDate` datetime DEFAULT NULL,
+  `duration` int(11) DEFAULT NULL,
+  `enable` bit(1) NOT NULL,
+  `name` varchar(190) DEFAULT NULL,
+  `type` int(11) DEFAULT NULL,
+  `unit` int(11) DEFAULT NULL,
+  `expirationDate_end` datetime DEFAULT NULL,
+  `expirationDate_start` datetime DEFAULT NULL,
+  `restriction` longtext,
+  `version` int(11) DEFAULT NULL,
+  `userRoleId` varchar(32) DEFAULT NULL,
+  `userRoleName` varchar(192) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `membershipCardGiftTask_1_idx` (`expirationDate_start`,`expirationDate_end`,`type`,`enable`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+#
 # Structure for table "membershipcardorder"
 #
 

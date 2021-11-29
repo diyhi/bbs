@@ -40,6 +40,7 @@ import cms.web.action.payment.OnlinePaymentInterfaceManage;
 import cms.web.action.payment.PaymentManage;
 import cms.web.action.payment.impl.mobile.AlipayConfig_Mobile;
 import cms.web.action.payment.impl.pc.AlipayConfig_PC;
+import cms.web.action.user.UserManage;
 import cms.web.taglib.Configuration;
 
 import org.springframework.stereotype.Controller;
@@ -74,6 +75,7 @@ public class PaymentFormAction {
 	@Resource PaymentManage paymentManage;
 	
 	@Resource CSRFTokenManage csrfTokenManage;
+	@Resource UserManage userManage;
 	
 	@Resource AlipayConfig_Mobile alipayConfig_Mobile;
 	@Resource AlipayConfig_PC alipayConfig_PC;
@@ -756,6 +758,13 @@ public class PaymentFormAction {
 				Object new_paymentLog = paymentManage.createPaymentLogObject(paymentLog);
 				
 				userService.onlineRecharge(paymentRunningNumber,paymentVerificationLog.getUserName(),paymentAmount,new_paymentLog);
+				
+				User user = userManage.query_cache_findUserByUserName(paymentVerificationLog.getUserName());
+				if(user != null){
+					//删除缓存
+					userManage.delete_cache_findUserById(user.getId());
+					userManage.delete_cache_findUserByUserName(user.getUserName());
+				}
 			}
 			
 		}

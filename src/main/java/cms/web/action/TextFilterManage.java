@@ -710,6 +710,30 @@ public class TextFilterManage {
 	    return "";
 	}
 	
+
+	/**
+	 * 判断路径类型
+	 * @param path 路径 
+	 * @param item 项目
+	 * @return 10:图片  20:Flash  30:影音  40:文件
+	 */
+	public int isPathType(String path,String item) {
+		if(StringUtils.startsWithIgnoreCase(path, "file/"+item+"/")){
+			if(StringUtils.contains(path, "/image/")){
+				return 10;
+			}
+			if(StringUtils.contains(path, "/flash/")){
+				return 20;
+			}
+			if(StringUtils.contains(path, "/media/")){
+				return 30;
+			}
+			if(StringUtils.countMatches(path, "file/")==2){
+				return 40;
+			}
+        }
+		return 0;
+	}
 	
 	/**
 	 * 修改分类路径
@@ -746,7 +770,7 @@ public class TextFilterManage {
 						 //替换指定的字符，只替换第一次出现的
 						 String url = StringUtils.replaceOnce(imageUrl, "/"+old_typeId+"/", "/"+new_typeId_str+"/");
 						 element.attr("src",  url);
-						 path.put(imageUrl, StringUtils.substringBeforeLast(url, "/"));
+						 path.put(imageUrl, StringUtils.substringBeforeLast(url, "/")+"/");
 					 }
 	             }
 			}
@@ -777,7 +801,7 @@ public class TextFilterManage {
 								 //替换指定的字符，只替换第一次出现的
 								 String url = StringUtils.replaceOnce(flashUrl, "/"+old_typeId+"/", "/"+new_typeId_str+"/");
 								 element.attr("src",  url);
-								 path.put(flashUrl, StringUtils.substringBeforeLast(url, "/"));//返回最后一个指定字符串之前的所有字符
+								 path.put(flashUrl, StringUtils.substringBeforeLast(url, "/")+"/");//返回最后一个指定字符串之前的所有字符
 							 }
 						 }
 					 } 
@@ -803,7 +827,7 @@ public class TextFilterManage {
 								 //替换指定的字符，只替换第一次出现的
 								 String url = StringUtils.replaceOnce(mediaUrl, "/"+old_typeId+"/", "/"+new_typeId_str+"/");
 								 element.attr("src",  url);
-								 path.put(mediaUrl, StringUtils.substringBeforeLast(url, "/"));//返回最后一个指定字符串之前的所有字符
+								 path.put(mediaUrl, StringUtils.substringBeforeLast(url, "/")+"/");//返回最后一个指定字符串之前的所有字符
 							 }
 						 }
 					 }
@@ -833,7 +857,7 @@ public class TextFilterManage {
 							 //替换指定的字符，只替换第一次出现的
 							 String url = StringUtils.replaceOnce(mediaUrl, "/"+old_typeId+"/", "/"+new_typeId_str+"/");
 							 element.attr("src",  url);
-							 path.put(mediaUrl, StringUtils.substringBeforeLast(url, "/"));//返回最后一个指定字符串之前的所有字符
+							 path.put(mediaUrl, StringUtils.substringBeforeLast(url, "/")+"/");//返回最后一个指定字符串之前的所有字符
 						 }
 					 }
 				 }
@@ -862,7 +886,7 @@ public class TextFilterManage {
 							 //替换指定的字符，只替换第一次出现的
 							 String url = StringUtils.replaceOnce(fileUrl, "/"+old_typeId+"/", "/"+new_typeId_str+"/");
 							 element.attr("href",  url);
-							 path.put(fileUrl, StringUtils.substringBeforeLast(url, "/"));//返回最后一个指定字符串之前的所有字符
+							 path.put(fileUrl, StringUtils.substringBeforeLast(url, "/")+"/");//返回最后一个指定字符串之前的所有字符
 						 }
 					}
 				}

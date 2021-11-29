@@ -31,10 +31,10 @@
 			<TABLE class="dataList" width="100%">
 				<THEAD>
 					<TR class="dataThead">
-						<TH width="38%">标题</TH>	
+						<TH width="25%">标题</TH>	
 						<TH width="20%">标签</TH>	
 						<TH width="18%">发表时间</TH>
-						<TH width="24%">操作</TH>
+						<TH width="37%">操作</TH>
 					</TR>
 				</THEAD>
 				<TBODY>
@@ -51,10 +51,20 @@
 							${topic.postTime}
 						</TD>
 						<TD class="dataTD">
-							<a href="user/control/topicUnhideList?topicId=${topic.id}" class="link">解锁隐藏标签用户</a>
-							<a href="user/control/topicFavoriteList?topicId=${topic.id}" class="link">收藏用户</a>
-							<a href="user/control/topicLikeList?topicId=${topic.id}" class="link">点赞用户</a>
-							<a href="user/editTopic?topicId=${topic.id}" target="_blank" >编辑</a>
+							<div class="operation-button-group">
+								<a class="operation-button" href="user/control/topicUnhideList?topicId=${topic.id}" >
+									<span>解锁隐藏标签用户</span>
+								</a>
+								<a class="operation-button" href="user/control/topicFavoriteList?topicId=${topic.id}">
+									<span>收藏用户</span>
+								</a>
+								<a class="operation-button" href="user/control/topicLikeList?topicId=${topic.id}">
+									<span>点赞用户</span>
+								</a>
+								<a class="operation-button" href="user/editTopic?topicId=${topic.id}" target="_blank" >
+									<span>编辑</span>
+								</a>
+							</div>
 						</TD>
 		    		</TR>
 		    		</#list>

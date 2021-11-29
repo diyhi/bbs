@@ -514,7 +514,7 @@ public class MySqlDataServiceBean extends DaoSupport implements DataService {
         
         for(FieldProperties fieldProperties : fieldPropertiesList){
 			fieldName.add(fieldProperties.getFieldName());
-			sb_fieldName.append(fieldProperties.getFieldName()+",");
+			sb_fieldName.append("`"+fieldProperties.getFieldName()+"`,");
         	placeholder.append("?,");
 		}
         sql.append("INSERT INTO ")

@@ -187,7 +187,8 @@ export default({
   				query:{ 
   					start_createDate :encodeURIComponent(_self.start_createDate),
   					end_createDate :encodeURIComponent(_self.end_createDate),
-  					page : 1
+  					page : 1,
+  					time: new Date().getTime()
   				}
   			});
   	    },

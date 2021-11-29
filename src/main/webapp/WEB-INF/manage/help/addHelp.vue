@@ -146,7 +146,7 @@ export default({
 			    	if(returnValue.code === 200){//成功
 			    		let returnValueMap = returnValue.data;
 
-		    			let availableTag = ['source', '|', 'preview', 'template',  
+		    			let availableTag = ['source', '|', 'preview', 'template', 'code', 
 		    				        '|', 'justifyleft', 'justifycenter', 'justifyright',
 		    				        'justifyfull', 'insertorderedlist', 'insertunorderedlist', 'indent', 'outdent', 'subscript',
 		    				        'superscript', 'clearhtml', 'quickformat', 'selectall', '|', 

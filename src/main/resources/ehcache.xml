@@ -430,7 +430,18 @@
 	<cache name="membershipCardManage_cache_findSpecificationByMembershipCardId" maxElementsInMemory="900000" 
 		overflowToDisk="true"
 		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
-		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>		
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>
+	<!-- 查询启用的长期会员卡赠送任务 (更新一个全部刷新)-->	
+	<cache name="membershipCardGiftTaskBean_cache" maxElementsInMemory="1" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="60" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
+	<!-- 查询查询会员卡赠送项 -->	
+	<cache name="membershipCardGiftTaskManage_cache_findMembershipCardGiftItemById" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
+					
 	<!-- 支付接口 (更新一个全部刷新)-->	
 	<cache name="paymentServiceBean_cache" maxElementsInMemory="100000" 
 		overflowToDisk="true"

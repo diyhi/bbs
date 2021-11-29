@@ -10,15 +10,21 @@
 	<title><#if help != null && help?? >${help.name}</#if> - ${title}</title>
 	<#-- 获取令牌 -->
 	<meta name="csrfToken" content="${token}"/>
-	<meta name="keywords" content="帮助中心"/>
-	<meta name="description" content="帮助中心"/>
+	<meta name="keywords" content="帮助中心 - ${keywords}"/>
+	<meta name="description" content="帮助中心 - ${description}"/>
 	<link rel="shortcut icon" type="image/x-icon" href="${baseURL}${commonPath}images/favicon.ico" media="screen" />
 	<link href="${commonPath}css/common.css" type="text/css" rel="stylesheet">	
 	<link href="${commonPath}css/themify-icons/style.css" type="text/css" rel="stylesheet">
 	<script language="javascript" src="${commonPath}js/tool.js" type="text/javascript"></script>
+	<script language="javascript" src="${commonPath}js/ajax.js" type="text/javascript"></script>
+	<script language="javascript" src="${commonPath}js/json2.js" type="text/javascript"></script>
 	<script type="text/javascript" src="${commonPath}js/jquery/jquery.min.js" language="javascript"></script>
 	<link href="${commonPath}js/simplebox/css/simplebox.css"  type="text/css" rel="stylesheet"/>
 	<script type="text/javascript" src="${commonPath}js/simplebox/js/simplebox.js" language="javascript"></script>
+	
+	<script type="text/javascript" src="${commonPath}js/DPlayer/hls.min.js" language="javascript"></script>
+	<script type="text/javascript" src="${commonPath}js/DPlayer/DPlayer.min.js" language="javascript"></script>
+	
 	
 	<link href="${commonPath}js/prism/default-block/prism.css"  type="text/css" rel="stylesheet"/>
 	<script type="text/javascript" src="${commonPath}js/prism/default-block/prism.js" language="javascript"></script>
@@ -40,7 +46,7 @@
 	        			<#if helpRelated_helpNavigation_collection?exists && helpRelated_helpNavigation_collection?size gt 0>
 	        				<#-- 获取最后一项 -->
 	        				<#list helpRelated_helpNavigation_collection as key, value>
-	        					<#if !key_has_next><div class="helpTypeName">${value}</div></#if>
+	        					<#if !key_has_next><div class="helpTypeName"><div class="name">${value}</div></div></#if>
 	        				</#list>
 	        			</#if>
 	        		</@object>
@@ -104,6 +110,85 @@ $(document).ready(function(){
 	}
 });
 </script>
+
+
+
+
+
+<script type="text/javascript">
+// 获取随机数
+function getRandom(m) {
+	//生成的随机数截取m位，生成的随机数最大不超过13位，能保证首位不为0
+    m = m > 13 ? 13 : m;
+   	var num = Math.random().toString();
+   	if(num.substr(num.length - m, 1) === '0') {           
+   		return getRandom(m);
+   	}
+	return num.substring(num.length - m);
+}
+//设置播放器标签
+function setPlayerTag(){
+	//获取<player>标签属性
+	$(".content").find("player").each(function(){
+		var random = getRandom(13);
+
+		var id = "player_"+random;
+		var url = $(this).attr("url");
+		var cover = $(this).attr("cover");//封面
+		var thumbnail = $(this).attr("thumbnail");//缩略图
+		//设置Id
+		$(this).attr("id",id);
+		
+		if(url == ""){//如果视频处理中
+			var dp = new DPlayer({
+         		container: document.getElementById(id),//播放器容器元素
+         		screenshot: false,//开启截图，如果开启，视频和视频封面需要开启跨域
+         		video: {
+         			    
+         		}
+         	});
+			insertProcess(id);
+		}else{
+			if(cover != undefined && cover != "" && thumbnail != undefined && thumbnail != ""){//切片视频
+				var dp = new DPlayer({
+					container: document.getElementById(id),//播放器容器元素
+					screenshot: false,//开启截图，如果开启，视频和视频封面需要开启跨域
+					hotkey: true,
+					video: {
+					    url: url,
+					    type: 'hls',
+					    pic: cover,//视频封面
+					    thumbnails: thumbnail//视频预览图
+					}
+				});
+			}else{
+				var dp = new DPlayer({
+           			container: document.getElementById(id),//播放器容器元素
+           			screenshot: false,//开启截图，如果开启，视频和视频封面需要开启跨域
+           			
+           			video: {
+           			    url: url
+           			}
+           		});
+			
+			}
+			
+			
+		}
+		
+	})
+
+}
+//插入处理提示层
+function insertProcess(id){
+	$("#"+id).prepend("<div class='dplayer-process'><div class='box'><div class='prompt'>视频处理中，请稍后再刷新</div></div></div>");
+}
+$(document).ready(function(){
+	setPlayerTag();
+});
+</script>
+
+
 
 <!-- 代码高亮显示 -->
 <script type="text/javascript">

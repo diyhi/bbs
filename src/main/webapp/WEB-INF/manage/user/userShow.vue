@@ -284,7 +284,7 @@
 				<el-row :gutter="10" type="flex">
 					<el-col :span="4"><div class="name">角色：</div></el-col>
 					<el-col :span="20">
-						<el-table ref="table" :data="userRoleList" tooltip-effect="dark" :show-header="false" stripe style="width: 100%" empty-text="没有角色">
+						<el-table ref="table" :data="userRoleList" tooltip-effect="dark" :row-class-name="tableRowClassName" :show-header="false" stripe style="width: 100%" empty-text="没有角色">
 							<el-table-column label="角色名称" >
 								<template #default="scope">	
 									{{scope.row.name}}
@@ -472,6 +472,14 @@ export default({
 		this.queryUser();
 	},
 	methods : {
+		//隐藏行
+		tableRowClassName: function({ row, rowIndex }) {
+			if(!row.selected){
+				return 'hidden-row';
+			}
+      		return '';
+    	},
+	
 		//查询用户
 	    queryUser: function(){
 	        let _self = this;
@@ -904,9 +912,17 @@ export default({
    		        url: 'control/user/manage?method=updateAvatar',
    		        data: formData,
    		     	onUploadProgress: progressEvent => {
-		            // progressEvent.loaded:已上传文件大小
-		            // progressEvent.total:被上传文件的总大小
-		            _self.progressPercent = (progressEvent.loaded / progressEvent.total * 100)
+		             if (progressEvent.lengthComputable) {
+                    	let rate = progressEvent.loaded / progressEvent.total;  //已上传的比例
+                        if (rate < 1) {
+                        	//这里的进度只能表明文件已经上传到后台，但是后台有没有处理完还不知道
+                            //因此不能直接显示为100%，不然用户会误以为已经上传完毕，关掉浏览器的话就可能导致上传失败
+                            //等响应回来时，再将进度设为100%
+                            // progressEvent.loaded:已上传文件大小
+		            		// progressEvent.total:被上传文件的总大小
+                            _self.progressPercent = (progressEvent.loaded / progressEvent.total * 100).toFixed(2);
+                        }
+                    }
 		        }
    			})
    			.then(function (response) {
@@ -918,6 +934,7 @@ export default({
    			    if(result){
    			    	let returnValue = JSON.parse(result);
    			    	if(returnValue.code === 200){//成功
+   			    		_self.progressPercent = 100;
    			    		_self.$message.success("提交成功");
    			    		
    			    		//删除缓存
@@ -970,9 +987,17 @@ export default({
        		        url: 'control/user/manage?method=updateAvatar',
        		        data: formData,
 	       		    onUploadProgress: progressEvent => {
-	 		            // progressEvent.loaded:已上传文件大小
-	 		            // progressEvent.total:被上传文件的总大小
-	 		            _self.progressPercent = (progressEvent.loaded / progressEvent.total * 100)
+	 		            if (progressEvent.lengthComputable) {
+                    		let rate = progressEvent.loaded / progressEvent.total;  //已上传的比例
+                        	if (rate < 1) {
+                        		//这里的进度只能表明文件已经上传到后台，但是后台有没有处理完还不知道
+                            	//因此不能直接显示为100%，不然用户会误以为已经上传完毕，关掉浏览器的话就可能导致上传失败
+                            	//等响应回来时，再将进度设为100%
+                            	// progressEvent.loaded:已上传文件大小
+		            			// progressEvent.total:被上传文件的总大小
+                            	_self.progressPercent = (progressEvent.loaded / progressEvent.total * 100).toFixed(2);
+                        	}
+                    	}
 	 		        }
        			})
        			.then(function (response) {
@@ -984,6 +1009,7 @@ export default({
        			    if(result){
        			    	let returnValue = JSON.parse(result);
        			    	if(returnValue.code === 200){//成功
+       			    		_self.progressPercent = 100;
        			    		_self.$message.success("提交成功");
        			    		
        			    		//删除缓存

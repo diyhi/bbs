@@ -1841,6 +1841,26 @@ var routes = [
 	              	{path : '/admin/control/follow/list',component : () => loadModule('./admin/component/follow/followList.vue',options), name:'followList',meta: {parent:'2-200100-2',title:'关注列表'}},//关注列表
 	              	{path : '/admin/control/follower/list',component : () => loadModule('./admin/component/follow/followerList.vue',options), name:'followerList',meta: {parent:'2-200100-2',title:'粉丝列表'}},//粉丝列表
 	              	{path : '/admin/control/membershipCard/manage/membershipCardOrderList',component : () => loadModule('./admin/component/membershipCard/userMembershipCardOrderList.vue', options), name:'userMembershipCardOrderList',meta: {parent:'2-200100-2',title:'用户会员卡订单列表'}},//用户会员卡订单列表
+	              	{path : '/admin/control/membershipCardGiftTask/list',component : () => loadModule('./admin/component/membershipCard/membershipCardGiftTaskList.vue', options), name:'membershipCardGiftTaskList',meta: {index:'2-200200-3',title:'会员卡赠送任务列表',cacheNumber:'0'}},//会员卡赠送任务列表
+	              	{path : '/admin/control/membershipCardGiftTask/manage/view',component : () => loadModule('./admin/component/membershipCard/membershipCardGiftTaskView.vue', options), name:'membershipCardGiftTaskView',meta: {parent:'2-200200-3',title:'会员卡赠送任务'}},//会员卡赠送任务
+	              	{path : '/admin/control/membershipCardGiftTask/manage/add',component : () => loadModule('./admin/component/membershipCard/addMembershipCardGiftTask.vue', options),name:'addMembershipCardGiftTask',meta: {parent:'2-200200-3',title:'添加会员卡赠送任务'},
+	              		beforeEnter: (to, from, next) => {
+	              			if(from.name == 'membershipCardGiftTaskList'){//如果来自会员卡赠送任务列表,则删除缓存
+	              				store.commit('setCacheNumber');
+	              			}
+	              			next();
+	              		}
+	              	},//添加会员卡赠送任务
+	              	{path : '/admin/control/membershipCardGiftTask/manage/edit',component : () => loadModule('./admin/component/membershipCard/editMembershipCardGiftTask.vue', options),name:'editMembershipCardGiftTask',meta: {parent:'2-200200-3',title:'修改会员卡赠送任务'},
+	              		beforeEnter: (to, from, next) => {
+	              			if(from.name == 'membershipCardGiftTaskList'){//如果来自会员卡赠送任务列表,则删除缓存
+	              				store.commit('setCacheNumber');
+	              			}
+	              			next();
+	              		}
+	              	},//修改会员卡赠送任务
+	              	{path : '/admin/control/membershipCardGiftTask/manage/membershipCardGiftItemList',component : () => loadModule('./admin/component/membershipCard/membershipCardGiftItemList.vue', options), name:'membershipCardGiftItemList',meta: {index:'2-200200-3',title:'获赠用户列表',cacheNumber:'0'}},//查询会员卡赠送项(获赠用户)
+	              	
 	              	{path : '/admin/control/redEnvelope/giveRedEnvelope/list',component : () => loadModule('./admin/component/redEnvelope/giveRedEnvelopeList.vue',options), name:'giveRedEnvelopeList',meta: {parent:'2-200100-2',title:'发红包列表'}},//发红包列表
 	              	{path : '/admin/control/redEnvelope/redEnvelopeAmountDistribution/list',component : () => loadModule('./admin/component/redEnvelope/redEnvelopeAmountDistributionList.vue',options), name:'redEnvelopeAmountDistributionList',meta: {parent:'2-200100-2',title:'发红包金额分配'}},//发红包金额分配
 	              	{path : '/admin/control/redEnvelope/receiveRedEnvelope/list',component : () => loadModule('./admin/component/redEnvelope/receiveRedEnvelopeList.vue',options), name:'receiveRedEnvelopeList',meta: {parent:'2-200100-2',title:'收红包列表'}},//收红包列表
@@ -3055,6 +3075,7 @@ function createEditor(ref,availableTag,uploadPath,userGradeList ) {
 		filePostName:'file',//文件上传字段 默认imgFile  第三方文件服务器不受本参数影响
 		items : availableTag,
      	userGradeList:userGradeList,
+     	fixToolBar : true,//浮动工具栏
 		afterChange : function() {
 			this.sync();
 		},
@@ -3063,6 +3084,8 @@ function createEditor(ref,availableTag,uploadPath,userGradeList ) {
 		}
 
 	});
+    //自动展开内容
+    editor.autoExpandContent();
     return editor;
 }
 /**

@@ -21,7 +21,10 @@ em{ font-style:normal;}
 img{ border:0;}
 form,dt,dd,dl{ margin:0px; padding:0px;}
 input {vertical-align: middle}
-
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
 .clearfix:after { content:"."; display:block; visibility:hidden; clear:both; height:0; font-size:0; }
 .clearfix { *zoom:1;}
 
@@ -482,11 +485,44 @@ html,body{
 	height: 22px;
     top: 0;  
     bottom: 0;  
-    left: 0;  
+    left: -5px;  
     right: 0;  
     margin: auto;
     color: #fff;
 }
+.indexModule .topicList .item .dplayer-process {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 99;
+}
+.indexModule .topicList .item .dplayer-process .box{
+	position: relative;
+	width: 100%;
+	height: 100%;
+}
+.indexModule .topicList .item .dplayer-process .box .prompt{
+   	width: 200px;
+    height: 80px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+   	padding :0px 30px;
+   	border-radius :3px;
+   	color: #fff;
+   	line-height: 80px;
+   	font-size: 16px;
+   	background-color:rgb(0,0,0);
+	opacity:0.7;
+	filter:alpha(opacity=70);
+	text-align: center;
+}
+
 
 .indexModule .topicList .item .imageInfo{
     position:relative;
@@ -907,6 +943,32 @@ html,body{
 .topicContentModule .topicDetail .main img{
 	max-width:100%;height:auto;border:none;background:none;padding:0;vertical-align: sub;
 }
+.topicContentModule .topicDetail .main table {
+    width: 100%;
+}
+.topicContentModule .topicDetail .main table th {
+	font-weight: 600
+}
+.topicContentModule .topicDetail .main table td,
+.topicContentModule .topicDetail .main table th {
+	border: 1px solid #E5E6EB;
+	padding: 6px 13px
+}
+.topicContentModule .topicDetail .main table tr {
+	background-color: #fff;
+	border-top: 1px solid #E5E6EB;
+}
+.topicContentModule .topicDetail .main table tr:nth-child(2n) {
+	background-color: #F7F8FA;
+}
+.topicContentModule .topicDetail .main ol li{ 
+	list-style-type:decimal;
+	list-style-position:inside;
+}
+.topicContentModule .topicDetail .main ul li{ 
+	margin-left:20px;
+	list-style-type:disc;
+}
 .topicContentModule .topicDetail .main iframe{
 	width:100%; height: 300px;padding:10px 0px; 
 }
@@ -952,7 +1014,7 @@ html,body{
 	margin-top: 8px;
 	height: 576px;
 }
-.dplayer-process {
+.topicContentModule .topicDetail .main .dplayer-process {
     position: absolute;
     top: 0;
     bottom: 0;
@@ -960,12 +1022,12 @@ html,body{
     right: 0;
     z-index: 99;
 }
-.dplayer-process .box{
+.topicContentModule .topicDetail .main .dplayer-process .box{
 	position: relative;
 	width: 100%;
 	height: 100%;
 }
-.dplayer-process .box .prompt{
+.topicContentModule .topicDetail .main .dplayer-process .box .prompt{
    	width: 250px;
     height: 80px;
     position: absolute;
@@ -1686,6 +1748,35 @@ html,body{
 .questionContentModule .questionDetail .main p{word-wrap:break-word;}
 .questionContentModule .questionDetail .main img{
 	max-width:100%;height:auto;border:none;background:none;padding:0;vertical-align: sub;
+}
+.questionContentModule .questionDetail .main table {
+    width: 100%;
+}
+.questionContentModule .questionDetail .main table th {
+	font-weight: 600
+}
+.questionContentModule .questionDetail .main table td,
+.questionContentModule .questionDetail .main table th {
+	border: 1px solid #E5E6EB;
+	padding: 6px 13px
+}
+.questionContentModule .questionDetail .main table tr {
+	background-color: #fff;
+	border-top: 1px solid #E5E6EB;
+}
+.questionContentModule .questionDetail .main table tr:nth-child(2n) {
+	background-color: #F7F8FA;
+}
+.questionContentModule .questionDetail .main ol li{ 
+	list-style-type:decimal;
+	list-style-position:inside;
+}
+.questionContentModule .questionDetail .main ul li{ 
+	margin-left:20px;
+	list-style-type:disc;
+}
+.questionContentModule .questionDetail .main iframe{
+	width:100%; height: 300px;padding:10px 0px; 
 }
 .questionContentModule .operating {
 	display:inline-block;text-align: center;width: 100%;
@@ -2724,6 +2815,74 @@ html,body{
 .helpContentModule .helpDetail .main img{
 	max-width:100%;height:auto;border:none;background:none;padding:0;vertical-align: sub;
 }
+.helpContentModule .helpDetail .main table {
+    width: 100%;
+}
+.helpContentModule .helpDetail .main table th {
+	font-weight: 600
+}
+.helpContentModule .helpDetail .main table td,
+.helpContentModule .helpDetail .main table th {
+	border: 1px solid #E5E6EB;
+	padding: 6px 13px
+}
+.helpContentModule .helpDetail .main table tr {
+	background-color: #fff;
+	border-top: 1px solid #E5E6EB;
+}
+.helpContentModule .helpDetail .main table tr:nth-child(2n) {
+	background-color: #F7F8FA;
+}
+.helpContentModule .helpDetail .main ol li{ 
+	list-style-type:decimal;
+	list-style-position:inside;
+}
+.helpContentModule .helpDetail .main ul li{ 
+	margin-left:20px;
+	list-style-type:disc;
+}
+.helpContentModule .helpDetail .main iframe{
+	width:100%; height: 300px;padding:10px 0px; 
+}
+.helpContentModule .helpDetail .main player{
+	display: block;
+	margin-top: 8px;
+	height: 576px;
+}
+.helpContentModule .helpDetail .main .dplayer-process {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 99;
+}
+.helpContentModule .helpDetail .main .dplayer-process .box{
+	position: relative;
+	width: 100%;
+	height: 100%;
+}
+.helpContentModule .helpDetail .main .dplayer-process .box .prompt{
+   	width: 250px;
+    height: 80px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+   	padding :0px 30px;
+   	border-radius :3px;
+   	color: #fff;
+   	line-height: 80px;
+   	font-size: 20px;
+   	background-color:rgb(0,0,0);
+	opacity:0.7;
+	filter:alpha(opacity=70);
+	text-align: center;
+}
+
+
 .helpContentModule .helpList{
 	
 }
@@ -3291,6 +3450,32 @@ html,body{
 .homeModule .userDynamicList .item .main .topicContent img{
 	max-width:100%;height:auto;border:none;background:none;padding:0;vertical-align: sub;
 }
+.homeModule .userDynamicList .item .main .topicContent table {
+    width: 100%;
+}
+.homeModule .userDynamicList .item .main .topicContent table th {
+	font-weight: 600
+}
+.homeModule .userDynamicList .item .main .topicContent table td,
+.homeModule .userDynamicList .item .main .topicContent table th {
+	border: 1px solid #E5E6EB;
+	padding: 6px 13px
+}
+.homeModule .userDynamicList .item .main .topicContent table tr {
+	background-color: #fff;
+	border-top: 1px solid #E5E6EB;
+}
+.homeModule .userDynamicList .item .main .topicContent table tr:nth-child(2n) {
+	background-color: #F7F8FA;
+}
+.homeModule .userDynamicList .item .main .topicContent ol li{ 
+	list-style-type:decimal;
+	list-style-position:inside;
+}
+.homeModule .userDynamicList .item .main .topicContent ul li{ 
+	margin-left:20px;
+	list-style-type:disc;
+}
 .homeModule .userDynamicList .item .main .topicContent iframe{
 	width:100%; height: 400px;padding:10px 0px; 
 }
@@ -3341,7 +3526,7 @@ html,body{
 	height: 22px;
     top: 0;  
     bottom: 0;  
-    left: 0;  
+    left: -5px;  
     right: 0;  
     margin: auto;
     color: #fff;

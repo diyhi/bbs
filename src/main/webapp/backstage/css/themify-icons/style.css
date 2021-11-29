@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'themify';
-  src:  url('fonts/themify.eot?6rywee');
-  src:  url('fonts/themify.eot?6rywee#iefix') format('embedded-opentype'),
-    url('fonts/themify.ttf?6rywee') format('truetype'),
-    url('fonts/themify.woff?6rywee') format('woff'),
-    url('fonts/themify.svg?6rywee#themify') format('svg');
+  src:  url('fonts/themify.eot?r6qzhc');
+  src:  url('fonts/themify.eot?r6qzhc#iefix') format('embedded-opentype'),
+    url('fonts/themify.ttf?r6qzhc') format('truetype'),
+    url('fonts/themify.woff?r6qzhc') format('woff'),
+    url('fonts/themify.svg?r6qzhc#themify') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -25,6 +25,9 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.cms-chat-line:before {
+  content: "\e93e";
+}
 .cms-menu-fold-fill:before {
   content: "\e93c";
 }

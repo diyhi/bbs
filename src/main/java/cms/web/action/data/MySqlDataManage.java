@@ -175,7 +175,7 @@ public class MySqlDataManage {
     			}
     			StringBuffer param = new StringBuffer();//按顺序组装返回值参数
     			for(String s : fieldName){
-    				param.append(s).append(",");
+    				param.append("`").append(s).append("`,");//加上`防止字段名和关键字冲突
     			}
     			param.deleteCharAt(param.length()-1);   
     			

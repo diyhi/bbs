@@ -85,7 +85,7 @@ public interface ACLService extends DAO{
 	/**
 	 * 模块分页显示
 	 */
-	public QueryResult<String> modulePage(int firstindex, int maxresult,LinkedHashMap<String , String >orderby);
+	public QueryResult<String> modulePage(int firstindex, int maxresult);
 	/**
 	 * 根据附加URL所属父ID查询资源
 	 */

@@ -47,12 +47,14 @@
 					            	
 					            	<#if question.amount gt 0 || question.point gt 0 >
 						                <span class="reward" >
+						                	<span class="gradientMask"></span>
 						                	<span class="rewardInfo" >
 						                		悬赏<#if question.amount gt 0>金额<span class="symbol">¥</span><span class="amount">${question.amount}</span>元 </#if>
 						                		<#if question.point gt 0>
 						                			<span class="point">${question.point}</span>积分
 						                		</#if>
 						                	</span>
+						                	
 						                </span>
 						            </#if>
 					            	

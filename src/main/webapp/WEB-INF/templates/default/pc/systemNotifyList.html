@@ -44,9 +44,8 @@
 								<div class="tipBottom">
 									<span class="a-toolbar">
 										<#if subscriptionSystemNotify.status == 10><span>未读</span></#if>
-										<#if subscriptionSystemNotify.status == 20><span style="color: green;">已读</span></#if>
-										&nbsp;|&nbsp;
-										<a href="javascript:" onclick="deleteSystemNotify('${subscriptionSystemNotify.id}')">删除</a>
+										<#if subscriptionSystemNotify.status == 20><span style="color: #009A29;">已读</span></#if>
+										<a href="javascript:" onclick="deleteSystemNotify('${subscriptionSystemNotify.id}')"><i class="cms-trash" ></i>删除</a>
 										
 									</span>
 								</div>

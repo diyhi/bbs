@@ -20,6 +20,7 @@ import cms.bean.help.HelpType;
 import cms.service.help.HelpTypeService;
 import cms.service.setting.SettingService;
 import cms.utils.JsonUtils;
+import cms.web.action.fileSystem.FileManage;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
@@ -35,6 +36,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class HelpTypeAction {
 	@Resource HelpTypeService helpTypeService;
 	@Resource SettingService settingService;
+	@Resource FileManage fileManage;
+	
 	
 	@ResponseBody
 	@RequestMapping("/control/helpType/list") 
@@ -78,6 +81,11 @@ public class HelpTypeAction {
 		pageView.setQueryResult(qr);
 		returnValue.put("pageView", pageView);
 		
+		if(qr.getResultlist() != null && qr.getResultlist().size() >0){
+			for(HelpType helpType :pageView.getRecords()){
+				helpType.setImage(fileManage.fileServerAddress()+helpType.getImage());
+			}
+		}
 		
 		//分类导航
 		if(parentId != null && parentId >0L){

@@ -9,7 +9,7 @@
 				</el-breadcrumb>
 			</div>
 			<div class="navbar">
-				<el-button type="primary" plain size="small" @click="$router.push({path: '/admin/control/helpType/manage/add',query:{sourceParentId:($route.query.parentId != undefined ? $route.query.parentId:''), page:($route.query.page != undefined ? $route.query.page:'')}});">添加分类</el-button>
+				<el-button type="primary" plain size="small" @click="$router.push({path: '/admin/control/helpType/manage/add',query:{sourceParentId:($route.query.parentId != undefined ? $route.query.parentId:''),parentId : parentId, page:($route.query.page != undefined ? $route.query.page:'')}});">添加分类</el-button>
 			</div>
 			<div class="data-table" >
 				<el-table :data="tableData" tooltip-effect="dark" style="width: 100%" @cell-click="cellExpandRow"  stripe empty-text="没有内容">

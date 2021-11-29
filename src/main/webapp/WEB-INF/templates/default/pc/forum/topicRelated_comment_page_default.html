@@ -19,8 +19,8 @@
 							<!--[if (IE)]><img src="${commonPath}images/min_avata.png"><![endif]-->
 							<!--[if !(IE)]><!--><img avatar="${(comment.nickname != null && comment.nickname??) ?string(comment.nickname , comment.userName)}" ><!--<![endif]-->
 						</#if> 
-						<cite>
-							<a href="user/control/home?userName=${comment.userName}">
+						<div class="info-container">
+							<a class="userName" href="user/control/home?userName=${comment.userName}">
 								${(comment.nickname != null && comment.nickname??) ?string(comment.nickname , comment.userName)}
 							</a>
 							<#list comment.userRoleNameList as roleName>
@@ -34,7 +34,7 @@
 								<span class="master">作者</span>
 							</#if>
 							
-						</cite> 
+						</div> 
 					</div>
 					<div class="commentTime">${comment.postTime}</div>
 					<#if comment.quoteList?? && comment.quoteList?size gt 0> 
@@ -69,28 +69,22 @@
 											</a>
 											
 											<#if reply.userRoleNameList?size gt 0>
-												<div class="userTag">
-													<#list reply.userRoleNameList as roleName>
-														<span class="userRoleName">${roleName}</span>
-													</#list>
-												</div>
+												<#list reply.userRoleNameList as roleName>
+													<span class="userRoleName">${roleName}</span>
+												</#list>
 											</#if> 
 											<#if reply.isStaff>
-												<div class="userTag">
-										        	<span class="staff">官方人员</span>
-									        	</div>
+										        <span class="staff">官方人员</span>
 											</#if>
 											<#if reply.userName == topic.userName && reply.isStaff == topic.isStaff>
-												<div class="userTag">
-													<span class="master">作者</span>
-												</div>
+												<span class="master">作者</span>
 											</#if>
 											<span class="time">
 												<#if systemUser != null && reply.userName ==  systemUser.userName>
-													<a href="javascript:" onclick="editReplyLayer('${reply.id}','${(reply.nickname != null && reply.nickname??) ?string(reply.nickname , reply.userName)}');">编辑</a>&nbsp;
+													<a href="javascript:" onclick="editReplyLayer('${reply.id}','${(reply.nickname != null && reply.nickname??) ?string(reply.nickname , reply.userName)}');"><i class="cms-pencil-alt" ></i>编辑</a>&nbsp;
 												</#if>
 												<#if systemUser != null && reply.userName ==  systemUser.userName>
-													<a href="javascript:" onclick="deleteReplyLayer('${reply.id}');">删除</a>&nbsp;
+													<a href="javascript:" onclick="deleteReplyLayer('${reply.id}');"><i class="cms-trash" ></i>删除</a>&nbsp;
 												</#if>
 												${reply.postTime}
 											</span>
@@ -114,15 +108,15 @@
 					</div>
 					<div class="tipBottom">
 						<span class="a-toolbar">
-							<#if systemUser != null && comment.userName ==  systemUser.userName>
-								<a href="javascript:" onclick="editCommentLayer('${comment.id}','${(comment.nickname != null && comment.nickname??) ?string(comment.nickname , comment.userName)}');">编辑</a>&nbsp;|
-							</#if>
-							<#if systemUser != null && comment.userName ==  systemUser.userName>
-								<a href="javascript:" onclick="deleteCommentLayer('${comment.id}');">删除</a>&nbsp;|
-							</#if>
-							<a href="javascript:" onclick="replyLayer('${comment.id}','${(comment.nickname != null && comment.nickname??) ?string(comment.nickname , comment.userName)}');">回复</a>&nbsp;|
+							<a href="javascript:" onclick="replyLayer('${comment.id}','${(comment.nickname != null && comment.nickname??) ?string(comment.nickname , comment.userName)}');"><i class="cms-reply" ></i>回复</a>
 
-							<a href="javascript:" onclick="quoteLayer('${comment.id}','${(comment.nickname != null && comment.nickname??) ?string(comment.nickname , comment.userName)}')">引用</a>
+							<a href="javascript:" onclick="quoteLayer('${comment.id}','${(comment.nickname != null && comment.nickname??) ?string(comment.nickname , comment.userName)}')"><i class="cms-quote" ></i>引用</a>
+							<#if systemUser != null && comment.userName ==  systemUser.userName>
+								<a href="javascript:" onclick="editCommentLayer('${comment.id}','${(comment.nickname != null && comment.nickname??) ?string(comment.nickname , comment.userName)}');"><i class="cms-pencil-alt" ></i>编辑</a>
+							</#if>
+							<#if systemUser != null && comment.userName ==  systemUser.userName>
+								<a href="javascript:" onclick="deleteCommentLayer('${comment.id}');"><i class="cms-trash" ></i>删除</a>
+							</#if>
 							<!-- 是否登录 -->
 							<input type="hidden" id="isLogin" value="<#if systemUser != null>true<#else>false</#if>">
 							

@@ -88,9 +88,9 @@ function deleteFollow(followId){
 			<TABLE class="dataList" width="100%">
 				<THEAD>
 					<TR class="dataThead">
-						<TH width="60%">用户</TH>	
+						<TH width="66%">用户</TH>	
 						<TH width="20%">关注时间</TH>	
-						<TH width="20%">操作</TH>
+						<TH width="14%">操作</TH>
 					</TR>
 				</THEAD>
 				<TBODY>
@@ -121,7 +121,9 @@ function deleteFollow(followId){
 							${follow.addtime}	
 						</TD>
 						<TD class="dataTD">
-							<a href="javascript:" onclick="deleteFollow('${follow.id}')">删除</a>
+							<a class="operation-button" href="javascript:" onclick="deleteFollow('${follow.id}')">
+								<span>删除</span>
+							</a>
 						</TD>
 		    		</TR>
 		    		</#list>

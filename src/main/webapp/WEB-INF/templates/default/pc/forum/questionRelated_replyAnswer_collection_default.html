@@ -125,6 +125,10 @@
 						//按钮设置 disabled="disabled"
 						document.getElementById(identificationNumber+"_submitForm").disabled=true;
 						if(verificationCode() == true){
+							//清除错误信息
+							document.getElementById(identificationNumber+"_content_error").innerHTML = "";
+						    document.getElementById(identificationNumber+"_answerReply_error").innerHTML = "";
+						
 							var parameter = "";
 							//答案Id
 							parameter += "&answerId="+document.getElementById(identificationNumber+"_answerId").value;

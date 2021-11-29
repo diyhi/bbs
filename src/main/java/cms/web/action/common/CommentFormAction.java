@@ -61,6 +61,7 @@ import cms.web.action.TextFilterManage;
 import cms.web.action.fileSystem.FileManage;
 import cms.web.action.filterWord.SensitiveWordFilterManage;
 import cms.web.action.follow.FollowManage;
+import cms.web.action.membershipCard.MembershipCardGiftTaskManage;
 import cms.web.action.message.RemindManage;
 import cms.web.action.setting.SettingManage;
 import cms.web.action.topic.CommentManage;
@@ -104,7 +105,7 @@ public class CommentFormAction {
 	@Resource FileManage fileManage;
 	@Resource UserRoleManage userRoleManage;
 	@Resource CommentManage commentManage;
-	
+	@Resource MembershipCardGiftTaskManage membershipCardGiftTaskManage;
 	
 	/**
 	 * 评论   添加
@@ -370,6 +371,8 @@ public class CommentFormAction {
 			
 			
 			
+			//异步执行会员卡赠送任务(长期任务类型)
+			membershipCardGiftTaskManage.async_triggerMembershipCardGiftTask(accessUser.getUserName());
 			
 			
 			
@@ -979,6 +982,8 @@ public class CommentFormAction {
 			}
 			
 			
+			//异步执行会员卡赠送任务(长期任务类型)
+			membershipCardGiftTaskManage.async_triggerMembershipCardGiftTask(_user.getUserName());
 			
 			
 			
@@ -1971,6 +1976,8 @@ public class CommentFormAction {
 				}
 			}
 			
+			//异步执行会员卡赠送任务(长期任务类型)
+			membershipCardGiftTaskManage.async_triggerMembershipCardGiftTask(_user.getUserName());
 			
 			
 			

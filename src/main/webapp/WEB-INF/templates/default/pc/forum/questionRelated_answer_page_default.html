@@ -20,18 +20,10 @@
 							</#if>   
 						</a>
 						
-						<#if question.userName == systemUser.userName && question.adoptionAnswerId == 0>
-							<div class="adoption-post-box">
-								<#-- 执行的相关JS需调用本页的方法引入采纳答案页 -->
-								<div class="adoption-post" onClick="javascript:adoptionAnswer('${answer.id}');"> 
-					                <i class="cms-check-circle-solid" ></i><br>
-					                <span>采纳</span>
-					            </div>
-							</div>
-						</#if>
 						
-						<cite>
-							<a href="user/control/home?userName=${answer.userName}">
+						
+						<div class="info-container">
+							<a class="userName" href="user/control/home?userName=${answer.userName}">
 								${(answer.nickname != null && answer.nickname??) ?string(answer.nickname , answer.userName)}
 							</a>
 							<#list answer.userRoleNameList as roleName>
@@ -44,7 +36,7 @@
 							<#if answer.userName == question.userName && answer.isStaff == question.isStaff>
 								<span class="master">作者</span>
 							</#if>
-						</cite> 
+						</div> 
 					</div>
 					<div class="answerTime">${answer.postTime}</div>
 	
@@ -76,25 +68,23 @@
 									    	<a class="userName" href="user/control/home?userName=${reply.userName}">
 												${(reply.nickname != null && reply.nickname??) ?string(reply.nickname , reply.userName)}
 											</a>
-											<div class="userTag">
-												<#if reply.userRoleNameList?size gt 0>
-													<#list reply.userRoleNameList as roleName>
-														<span class="userRoleName">${roleName}</span>
-													</#list>
-												</#if>
-												<#if reply.isStaff>
-											        <span class="staff">官方人员</span>
-												</#if>
-												<#if reply.userName == question.userName && reply.isStaff == question.isStaff>
-													<span class="master">作者</span>
-												</#if>
-											</div>
+											<#if reply.userRoleNameList?size gt 0>
+												<#list reply.userRoleNameList as roleName>
+													<span class="userRoleName">${roleName}</span>
+												</#list>
+											</#if>
+											<#if reply.isStaff>
+										        <span class="staff">官方人员</span>
+											</#if>
+											<#if reply.userName == question.userName && reply.isStaff == question.isStaff>
+												<span class="master">作者</span>
+											</#if>
 											<span class="time">
 												<#if systemUser != null && reply.userName ==  systemUser.userName>
-													<a href="javascript:" onclick="editReplyLayer('${reply.id}','${(reply.nickname != null && reply.nickname??) ?string(reply.nickname , reply.userName)}');">编辑</a>&nbsp;
+													<a href="javascript:" onclick="editReplyLayer('${reply.id}','${(reply.nickname != null && reply.nickname??) ?string(reply.nickname , reply.userName)}');"><i class="cms-pencil-alt" ></i>编辑</a>&nbsp;
 												</#if>
 												<#if systemUser != null && reply.userName ==  systemUser.userName>
-													<a href="javascript:" onclick="deleteReplyLayer('${reply.id}');">删除</a>&nbsp;
+													<a href="javascript:" onclick="deleteReplyLayer('${reply.id}');"><i class="cms-trash" ></i>删除</a>&nbsp;
 												</#if>
 												${reply.postTime}
 											</span>
@@ -116,13 +106,19 @@
 					
 					<div class="tipBottom">
 						<span class="a-toolbar">
-							<#if systemUser != null && answer.userName ==  systemUser.userName>
-								<a href="javascript:" onclick="editAnswerLayer('${answer.id}','${(answer.nickname != null && answer.nickname??) ?string(answer.nickname , answer.userName)}');">编辑</a>&nbsp;|
+							
+							<#if question.userName == systemUser.userName && question.adoptionAnswerId == 0>
+								<#-- 执行的相关JS需调用本页的方法引入采纳答案页 -->
+								<a href="javascript:" onclick="adoptionAnswerLayer('${answer.id}');"><i class="cms-check-circle-solid" ></i>采纳</a>
+							</#if>
+							<a href="javascript:" onclick="replyLayer('${answer.id}','${(answer.nickname != null && answer.nickname??) ?string(answer.nickname , answer.userName)}');"><i class="cms-reply" ></i>回复</a>
+							
+							<#if systemUser != null && answer.userName ==  systemUser.userName  && answer.adoption == false>
+								<a href="javascript:" onclick="editAnswerLayer('${answer.id}','${(answer.nickname != null && answer.nickname??) ?string(answer.nickname , answer.userName)}');"><i class="cms-pencil-alt" ></i>编辑</a>
 							</#if>
 							<#if systemUser != null && answer.userName ==  systemUser.userName>
-								<a href="javascript:" onclick="deleteAnswerLayer('${answer.id}');">删除</a>&nbsp;|
+								<a href="javascript:" onclick="deleteAnswerLayer('${answer.id}');"><i class="cms-trash" ></i>删除</a>
 							</#if>
-							<a href="javascript:" onclick="replyLayer('${answer.id}','${(answer.nickname != null && answer.nickname??) ?string(answer.nickname , answer.userName)}');">回复</a>
 							<!-- 是否登录 -->
 							<input type="hidden" id="isLogin" value="<#if systemUser != null>true<#else>false</#if>">
 							

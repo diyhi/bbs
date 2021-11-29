@@ -40,6 +40,7 @@ import cms.utils.threadLocal.AccessUserThreadLocal;
 import cms.web.action.AccessSourceDeviceManage;
 import cms.web.action.CSRFTokenManage;
 import cms.web.action.fileSystem.FileManage;
+import cms.web.action.membershipCard.MembershipCardGiftTaskManage;
 import cms.web.action.setting.SettingManage;
 import cms.web.action.template.TemplateMain;
 import cms.web.action.thirdParty.ThirdPartyManage;
@@ -67,6 +68,7 @@ public class ThirdPartyFormAction {
 	@Resource OAuthManage oAuthManage;
 	@Resource SettingManage settingManage;
 	@Resource FileManage fileManage;
+	@Resource MembershipCardGiftTaskManage membershipCardGiftTaskManage;
 	
 	/**
 	 * 查询微信openid
@@ -386,6 +388,9 @@ public class ThirdPartyFormAction {
 				//删除缓存
 				userManage.delete_cache_findUserById(user.getId());
 				userManage.delete_cache_findUserByUserName(user.getUserName());
+				
+				//异步执行会员卡赠送任务(长期任务类型)
+				membershipCardGiftTaskManage.async_triggerMembershipCardGiftTask(user.getUserName());
 				
 			}else{
 				error.put("register", ErrorView._824.name());//禁止用户

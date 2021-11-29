@@ -319,7 +319,8 @@ export default({
 					userName :encodeURIComponent(_self.userName),
 					start_postTime :encodeURIComponent(_self.start_postTime),
 					end_postTime :encodeURIComponent(_self.end_postTime),
-					page : 1
+					page : 1,
+					time: new Date().getTime()
 				}
 			});
 	    },

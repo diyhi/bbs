@@ -6586,6 +6586,10 @@ var helpDetail_component = Vue.extend({
 		        //	this.viewer.zoomTo(1);
 		        }
 		    },
+		    
+		    playerIdList: [],//视频播放Id列表
+		    playerObjectList: [],//视频播放对象集合
+		    playerNodeList: [],//视频节点对象集合
 		};
 	},
 	created : function created() {
@@ -6615,6 +6619,13 @@ var helpDetail_component = Vue.extend({
 		//初始化
 		this.initialization();
 	},
+	beforeDestroy : function() {
+		for(var i =0; i<this.playerObjectList.length; i++){
+			var playerObject = this.playerObjectList[i];
+			playerObject.destroy();//销毁播放器
+			
+		}
+	},
 	computed: {
 		//动态解析模板数据
 		analyzeDataComponent: function analyzeDataComponent() {
@@ -6627,15 +6638,31 @@ var helpDetail_component = Vue.extend({
 						};
 					},
 					mounted :function () {
-					
+						this.resumePlayerNodeData();
 					},
 					props: this.$options.props, // re-use current props definitions
 					methods: {
-						
+						//恢复播放器节点数据(vue组件切换时会自动刷新数据，视频播放器框在组件生成数据内容之后插入，组件刷新数据时播放器框会消失，组件刷新后需要用之前的节点数据恢复)
+				        resumePlayerNodeData : function(){
+				        	var _self = this;
+				        	_self.$nextTick(function() {
+					        	if(_self.$parent.playerObjectList.length >0){
+					        		for(var i=0; i< _self.$parent.playerNodeList.length; i++){
+					        			var playerNode = _self.$parent.playerNodeList[i];
+					        			var playerId = playerNode.getAttribute("id");
+					        			var node = document.getElementById(playerId);
+					        			if(node != null){
+					        				node.parentNode.replaceChild(playerNode,node);
+					        			}
+					        			
+					        		}
+					        	}
+				        	});
+				        }
 				    }
 				};
 			};	
-		},
+		},	
 	},
 	methods : {
 		//显示帮助内容界面
@@ -6671,6 +6698,8 @@ var helpDetail_component = Vue.extend({
 					if (result != "") {
 						var help = $.parseJSON(result);
 						if (help != null) {
+							//清空播放器
+							_self.clearVideoPlayer();
 							
 							//处理隐藏标签
 							var contentNode = document.createElement("div");
@@ -6682,6 +6711,16 @@ var helpDetail_component = Vue.extend({
 							
 							_self.help = help;
 		
+							
+							
+							_self.$nextTick(function() {
+								setTimeout(function() {
+									_self.renderVideoPlayer();//渲染视频播放器
+								}, 30);
+								
+								
+							});
+							
 						}
 					}
 				}
@@ -6689,7 +6728,86 @@ var helpDetail_component = Vue.extend({
 			
 		},
 
-		
+		//清空播放器
+		clearVideoPlayer : function() {
+			var _self = this;
+			
+			for(var i=0; i< _self.playerObjectList.length; i++){
+				var playerObject = _self.playerObjectList[i];
+				
+				playerObject.destroy();//销毁播放器
+			}
+			_self.playerObjectList.length = 0;//清空数组
+			_self.playerIdList.length = 0;//清空数组
+			_self.playerNodeList.length = 0;//清空数组
+		},
+		//渲染视频播放器
+		renderVideoPlayer : function() {
+			var _self = this;
+			
+			
+			
+			
+			for(var i=0; i< _self.playerIdList.length; i++){
+				var playerId = _self.playerIdList[i];
+				var url = document.getElementById(playerId).getAttribute("url");
+        		var cover = document.getElementById(playerId).getAttribute("cover");//封面
+        		var thumbnail = document.getElementById(playerId).getAttribute("thumbnail");//缩略图
+				
+        		if(url == ""){//如果视频处理中
+        			var dp = new DPlayer({
+            			container: document.getElementById(playerId),//播放器容器元素
+            			screenshot: false,//开启截图，如果开启，视频和视频封面需要开启跨域
+            			
+            			video: {
+            			    
+            			}
+            		});
+					var dom = document.createElement('div');
+					dom.innerHTML="<div class='dplayer-process'><div class='box'><div class='prompt'>视频处理中，请稍后再刷新</div></div></div>";
+					document.getElementById(playerId).appendChild(dom);
+				}else{
+					if(cover != undefined && cover != "" && thumbnail != undefined && thumbnail != ""){//切片视频
+	        			var dp = new DPlayer({
+	            			container: document.getElementById(playerId),//播放器容器元素
+	            			screenshot: false,//开启截图，如果开启，视频和视频封面需要开启跨域
+	            			
+	            			video: {
+	            			    url: url,
+	            			    type: 'hls',
+	            			    pic: cover,//视频封面
+	            			    thumbnails: thumbnail//视频预览图
+	            			}
+	            		});
+	    				
+	        		}else{
+	        			var dp = new DPlayer({
+	            			container: document.getElementById(playerId),//播放器容器元素
+	            			screenshot: false,//开启截图，如果开启，视频和视频封面需要开启跨域
+	            			
+	            			video: {
+	            			    url: url
+	            			}
+	            		});
+	        		}
+					
+				}
+				_self.playerObjectList.push(dp);
+			}
+			
+			
+			//添加播放器节点数据
+			if(_self.playerObjectList.length >0){
+				
+				for(var i=0; i< _self.playerIdList.length; i++){
+			    	var playerId = _self.playerIdList[i];
+			    	var node = document.getElementById(playerId);//节点对象
+			    	_self.playerNodeList.push(node);
+			    }
+			}
+			
+		},
+				
 		//递归绑定节点参数
 		bindNode : function(node) {
 			//先找到子节点
@@ -6713,6 +6831,13 @@ var helpDetail_component = Vue.extend({
 	            		//延迟加载 表情图片也使用<img>标签，也执行延迟加载
 	        			childNode.setAttribute("src",this.$store.state.commonPath+'images/null.gif');
 	        			childNode.setAttribute("data-src",src);
+	            	}
+	            	//处理视频标签
+	            	if(childNode.nodeName.toLowerCase() == "player" ){
+	            		
+	            		var id = "player_"+random+"_"+i;
+	            		childNode.setAttribute("id",id);//设置Id
+	            		this.playerIdList.push(id);	
 	            	}
 	            	
 	            	//处理代码标签
@@ -6764,7 +6889,7 @@ var helpDetail_component = Vue.extend({
 	            }
 	        }
 		},
-		
+
 		//查询帮助列表
 		queryHelpList : function(callback) {
 			var _self = this;

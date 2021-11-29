@@ -14,6 +14,7 @@ import cms.bean.PageView;
 import cms.bean.QueryResult;
 import cms.bean.help.Help;
 import cms.bean.help.HelpType;
+import cms.bean.setting.SystemSetting;
 import cms.bean.template.Forum;
 import cms.bean.template.Forum_HelpRelated_Help;
 import cms.service.help.HelpService;
@@ -21,6 +22,7 @@ import cms.service.help.HelpTypeService;
 import cms.service.setting.SettingService;
 import cms.utils.JsonUtils;
 import cms.utils.Verification;
+import cms.web.action.TextFilterManage;
 import cms.web.action.fileSystem.FileManage;
 
 import org.apache.commons.lang3.StringUtils;
@@ -38,6 +40,9 @@ public class Help_TemplateManage {
 	@Resource SettingService settingService;
 	@Resource FileManage fileManage;
 	@Resource HelpTypeService helpTypeService;
+	@Resource TextFilterManage textFilterManage;
+	
+	
 	/**
 	 * 在线帮助列表 -- 单层
 	 * @param forum
@@ -245,6 +250,8 @@ public class Help_TemplateManage {
 				}
 			}
 		}
+		
+		
 		if(helpTypeId != null && helpTypeId >0L){
 			List<Help> _helpList = helpService.findByTypeId(helpTypeId);
 			if(_helpList != null && _helpList.size() >0){
@@ -363,6 +370,7 @@ public class Help_TemplateManage {
 				}
 			}
 		}
+		
 		if(helpTypeId != null && helpTypeId > 0){
 			HelpType helpType = helpTypeService.findById(helpTypeId);
 			if(helpType != null){
@@ -400,13 +408,22 @@ public class Help_TemplateManage {
 		
 		if(helpId != null && helpId > 0){
 			Help help = helpService.findById(helpId);
-			if(help != null){
+			if(help != null && help.isVisible()){
 				HelpType helpType = helpTypeService.findById(help.getHelpTypeId());
 				if(helpType != null){
 					help.setHelpTypeName(helpType.getName());
 				}
 				//处理富文本路径
 				help.setContent(fileManage.processRichTextFilePath(help.getContent(),"help"));
+				
+				SystemSetting systemSetting = settingService.findSystemSetting_cache();
+				if(help.getContent() != null && !"".equals(help.getContent().trim())){
+					//处理视频播放器标签
+					String content = textFilterManage.processVideoPlayer(help.getContent(),-1L,systemSetting.getFileSecureLinkSecret());
+					help.setContent(content);
+				}
+				
+				
 				return help;
 			}
 			

@@ -55,6 +55,7 @@ import cms.utils.threadLocal.AccessUserThreadLocal;
 import cms.web.action.AccessSourceDeviceManage;
 import cms.web.action.CSRFTokenManage;
 import cms.web.action.fileSystem.FileManage;
+import cms.web.action.membershipCard.MembershipCardGiftTaskManage;
 import cms.web.action.setting.SettingManage;
 import cms.web.action.sms.SmsManage;
 import cms.web.action.thirdParty.ThirdPartyManage;
@@ -95,7 +96,7 @@ public class UserFormManageAction {
 	@Resource ThirdPartyManage thirdPartyManage;
 	@Resource FileManage fileManage;
 	@Resource SmsManage smsManage;
-	
+	@Resource MembershipCardGiftTaskManage membershipCardGiftTaskManage;
 	
 	//?  匹配任何单字符
 	//*  匹配0或者任意数量的字符
@@ -689,6 +690,10 @@ public class UserFormManageAction {
 				//删除缓存
 				userManage.delete_cache_findUserById(user.getId());
 				userManage.delete_cache_findUserByUserName(user.getUserName());
+				
+				//异步执行会员卡赠送任务(长期任务类型)
+				membershipCardGiftTaskManage.async_triggerMembershipCardGiftTask(user.getUserName());
+				
 			}
 			
 		}
@@ -1187,6 +1192,10 @@ public class UserFormManageAction {
 					//将刷新令牌添加到Cookie
 					WebUtil.addCookie(response, "cms_refreshToken", refreshToken, maxAge);
 					AccessUserThreadLocal.set(new AccessUser(user.getId(),user.getUserName(),user.getNickname(),fileManage.fileServerAddress()+user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),rememberMe,openId));
+					
+					//异步执行会员卡赠送任务(长期任务类型)
+					membershipCardGiftTaskManage.async_triggerMembershipCardGiftTask(user.getUserName());
+					
 					
 				}else{
 					//密码错误

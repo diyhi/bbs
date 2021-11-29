@@ -218,6 +218,15 @@
 						    <el-radio :label="false">否</el-radio>
 						</el-radio-group>
 					</el-form-item>
+					<el-form-item label="解锁话题隐藏内容平台分成比例" :error="error.topicUnhidePlatformShareProportion" v-show="activeTag == 10">
+						<el-row :gutter="12">
+							<el-col :span="6"><el-input v-model.trim="topicUnhidePlatformShareProportion" maxlength="3" clearable="true" show-word-limit></el-input></el-col>
+							<el-col :span="6">%</el-col>
+						</el-row>
+						<div class="form-help" >0至100之间的整数</div>
+					</el-form-item> 
+					
+					
 					<el-form-item label="问题悬赏积分下限" :error="error.questionRewardPointMin" v-show="activeTag == 10">
 						<el-row >
 							<el-col :span="6"><el-input v-model.trim="questionRewardPointMin" :required="true" maxlength="15" clearable="true" show-word-limit></el-input></el-col>
@@ -1045,6 +1054,7 @@ export default({
 			questionRewardPointMax:'',
 			questionRewardAmountMin:'',
 			questionRewardAmountMax:'',
+			topicUnhidePlatformShareProportion:'',
 			questionRewardPlatformShareProportion:'',
 			giveRedEnvelopeAmountMin:'',
 			giveRedEnvelopeAmountMax:'',
@@ -1103,6 +1113,7 @@ export default({
 				questionRewardPointMax:'',
 				questionRewardAmountMin:'',
 				questionRewardAmountMax:'',
+				topicUnhidePlatformShareProportion:'',
 				questionRewardPlatformShareProportion:'',
 				giveRedEnvelopeAmountMin:'',
 				giveRedEnvelopeAmountMax:'',
@@ -1280,6 +1291,9 @@ export default({
 			    				}
 			    				if(systemSetting.questionRewardAmountMax != null){
 			    					_self.questionRewardAmountMax = systemSetting.questionRewardAmountMax;
+			    				}
+			    				if(systemSetting.topicUnhidePlatformShareProportion != null){
+			    					_self.topicUnhidePlatformShareProportion = systemSetting.topicUnhidePlatformShareProportion;
 			    				}
 			    				if(systemSetting.questionRewardPlatformShareProportion != null){
 			    					_self.questionRewardPlatformShareProportion = systemSetting.questionRewardPlatformShareProportion;
@@ -1506,6 +1520,7 @@ export default({
 				formData.append('allowRegisterAccountObject.local', _self.allowRegisterAccountObject.local);
 				formData.append('allowRegisterAccountObject.mobile', _self.allowRegisterAccountObject.mobile);
 				formData.append('allowRegisterAccountObject.weChat', _self.allowRegisterAccountObject.weChat);
+				formData.append('allowRegisterAccountObject.other', _self.allowRegisterAccountObject.other);
 			}
 			
 			if(_self.registerCaptcha != null){
@@ -1606,6 +1621,10 @@ export default({
 			}
 			if(_self.questionRewardAmountMax != null){
 				formData.append('questionRewardAmountMax', _self.questionRewardAmountMax);
+			}
+			
+			if(_self.topicUnhidePlatformShareProportion != null){
+				formData.append('topicUnhidePlatformShareProportion', _self.topicUnhidePlatformShareProportion);
 			}
 			if(_self.questionRewardPlatformShareProportion != null){
 				formData.append('questionRewardPlatformShareProportion', _self.questionRewardPlatformShareProportion);

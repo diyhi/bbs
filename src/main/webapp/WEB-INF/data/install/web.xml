@@ -18,7 +18,10 @@
 	<listener>
 	  <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
 	</listener> 
-	
+	<!-- 监听器清空ThreadLocal -->
+	<listener>
+	    <listener-class>cms.web.filter.ThreadLocalListener</listener-class>
+	</listener>
 
 	
 	<!-- 读取Spring配置文件  /WEB-INF/beans.xml -->

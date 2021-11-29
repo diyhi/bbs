@@ -20,13 +20,14 @@ import cms.service.besa.DAO;
 public interface UserService extends DAO<User> {
 
 	/**
-	 * 根据条件分页查询用户名称
+	 * 根据条件分页查询用户名称和Id
 	 * @param jpql SQL
 	 * @param params 参数值
 	 * @param firstIndex 开始索引
 	 * @param maxResult 需要获取的记录数
+	 * @return 返回值只包含id和userName字段值
 	 */
-	public List<String> findUserNameByConditionPage(String jpql,List<Object> params,int firstIndex, int maxResult);
+	public List<User> findUserInfoByConditionPage(String jpql,List<Object> params,int firstIndex, int maxResult);
 	/**
 	 * 根据条件查询所有用户
 	 * @param param 参数

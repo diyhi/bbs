@@ -22,16 +22,19 @@ import cms.bean.RequestResult;
 import cms.bean.ResultCode;
 import cms.bean.help.Help;
 import cms.bean.help.HelpType;
+import cms.bean.mediaProcess.MediaProcessQueue;
+import cms.bean.setting.SystemSetting;
 import cms.service.help.HelpService;
 import cms.service.help.HelpTypeService;
+import cms.service.mediaProcess.MediaProcessService;
 import cms.service.setting.SettingService;
 import cms.utils.CommentedProperties;
-import cms.utils.FileType;
 import cms.utils.FileUtil;
 import cms.utils.JsonUtils;
 import cms.utils.UUIDUtil;
 import cms.web.action.TextFilterManage;
 import cms.web.action.fileSystem.FileManage;
+import cms.web.action.mediaProcess.MediaProcessQueueManage;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -61,6 +64,8 @@ public class HelpManageAction {
 	@Resource TextFilterManage textFilterManage;
 	@Resource SettingService settingService;
 	@Resource FileManage fileManage;
+	@Resource MediaProcessService mediaProcessService;
+	@Resource MediaProcessQueueManage mediaProcessQueueManage;
 	
 	/**
 	 * 帮助   查看
@@ -75,8 +80,23 @@ public class HelpManageAction {
 		if(helpId != null && helpId >0L){
 			Help help = helpService.findById(helpId);
 			if(help != null){
+				
+				HelpType helpType = helpTypeService.findById(help.getHelpTypeId());
+				if(helpType != null){
+					help.setHelpTypeName(helpType.getName());
+				}
+				SystemSetting systemSetting = settingService.findSystemSetting_cache();
+				
 				//处理富文本路径
 				help.setContent(fileManage.processRichTextFilePath(help.getContent(),"help"));
+				
+				
+				if(help.getContent() != null && !"".equals(help.getContent().trim())){
+					//处理视频播放器标签
+					String content = textFilterManage.processVideoPlayer(help.getContent(),-1L,systemSetting.getFileSecureLinkSecret());
+					help.setContent(content);
+				}
+				
 				return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,help));	
 			}else{
 				error.put("helpId", "帮助不存在");
@@ -190,7 +210,7 @@ public class HelpManageAction {
 						
 						//新建文件锁到新路径
 						 //生成锁文件名称
-						String lockFileName = StringUtils.replaceOnce(entry.getValue(), "file/help/", "")+"/"+fileName;
+						String lockFileName = StringUtils.replaceOnce(entry.getValue(), "file/help/", "")+fileName;
 						lockFileName = lockFileName.replaceAll("/", "_");
 						
 						fileLock_list.add(lockFileName);
@@ -225,11 +245,39 @@ public class HelpManageAction {
 		
 		if(error.size() ==0){
 			int i = helpService.saveHelp(help);
-			
+
 			if(i == 0){
 				error.put("content", "帮助添加失败");
 				model.addAttribute("error", error);
 			}else{
+				
+				if(isMedia){
+					
+					Object[] object = textFilterManage.readPathName(help.getContent(),"help");
+					
+					List<String> newMediaNameList = (List<String>)object[2];
+					
+					
+					List<MediaProcessQueue> mediaProcessQueueList = new ArrayList<MediaProcessQueue>();
+					for(String fullPathName :newMediaNameList){
+						//取得路径名称
+						String pathName = FileUtil.getFullPath(fullPathName);
+						//文件名称
+						String fileName = FileUtil.getName(fullPathName);
+						
+						MediaProcessQueue mediaProcessQueue = new MediaProcessQueue();
+						mediaProcessQueue.setModule(60);//60:在线帮助
+						mediaProcessQueue.setType(10);//10:视频
+						mediaProcessQueue.setParameter(String.valueOf(help.getId()));
+						mediaProcessQueue.setPostTime(help.getTimes());
+						mediaProcessQueue.setFilePath(pathName);
+						mediaProcessQueue.setFileName(fileName);
+						mediaProcessQueueList.add(mediaProcessQueue);
+					}
+					mediaProcessService.saveMediaProcessQueueList(mediaProcessQueueList);
+				}
+				
+				
 				//删除图片锁
 				if(imageNameList != null && imageNameList.size() >0){
 					for(String imageName :imageNameList){
@@ -469,7 +517,7 @@ public class HelpManageAction {
 					
 						//验证文件类型
 						boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),formatList);
-
+						
 						
 						if(authentication){
 							//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
@@ -680,6 +728,10 @@ public class HelpManageAction {
 		List<String> fileLock_list = new ArrayList<String>();
 		List<String> oldPathFileList = new ArrayList<String>();//旧路径文件
 
+		//删除旧媒体处理任务
+		List<String> delete_mediaProcessFileNameList = new ArrayList<String>();//文件名称
+		//删除旧媒体切片文件夹
+		List<String> delete_mediaProcessDirectoryList = new ArrayList<String>();//文件夹
 		
 		String old_content = "";
 		if(helpId != null && helpId >0L){
@@ -748,7 +800,7 @@ public class HelpManageAction {
 							
 							//新建文件锁到新路径
 							 //生成锁文件名称
-							String lockFileName = StringUtils.replaceOnce(entry.getValue(), "file/help/", "")+"/"+fileName;
+							String lockFileName = StringUtils.replaceOnce(entry.getValue(), "file/help/", "")+fileName;
 							lockFileName = lockFileName.replaceAll("/", "_");
 							
 							fileLock_list.add(lockFileName);
@@ -756,6 +808,20 @@ public class HelpManageAction {
 							fileManage.addLock("file"+File.separator+"help"+File.separator+"lock"+File.separator,lockFileName);
 							//旧路径文件
 							oldPathFileList.add(old_path_Delimiter);
+							
+							//判断路径类型
+							int type = textFilterManage.isPathType(entry.getKey(),"help");
+							if(type == 30 && !StringUtils.startsWithIgnoreCase(entry.getKey(), "file/help/null/")){//如果不是新影音
+					
+								String newDirectory = FileUtil.getFullPath(old_path_Delimiter)+FileUtil.getBaseName(entry.getKey())+"/";
+								fileManage.copyDirectory(newDirectory,new_path_Delimiter);
+								
+								delete_mediaProcessFileNameList.add(FileUtil.getName(entry.getKey()));
+
+								delete_mediaProcessDirectoryList.add(FileUtil.toSystemPath(FileUtil.getFullPath(entry.getKey()))+FileUtil.getBaseName(entry.getKey())+File.separator);
+						
+								
+							}
 						}
 					}
 					//不含标签内容
@@ -798,6 +864,46 @@ public class HelpManageAction {
 			
 			Object[] obj = textFilterManage.readPathName(old_content,"help");
 			if(obj != null && obj.length >0){
+				
+				
+				//新增媒体处理任务
+				if(isMedia){
+					List<MediaProcessQueue> mediaProcessQueueList = new ArrayList<MediaProcessQueue>();
+					//旧影音
+					List<String> old_mediaNameList = (List<String>)obj[2];	
+					A:for(String fullPathName :mediaNameList){
+						if(StringUtils.startsWithIgnoreCase(fullPathName, "null/")){//新上传影音路径
+							 //替换指定的字符，只替换第一次出现的
+							fullPathName= StringUtils.replaceOnce("/"+fullPathName, "/null/", help.getHelpTypeId()+"/");
+							
+						}
+						
+						for(String old_fullPathName : old_mediaNameList){
+							if(old_fullPathName.equals("file/help/"+fullPathName)){
+								continue A;
+							}
+							
+						}
+						//取得路径名称
+						String pathName = FileUtil.getFullPath(fullPathName);
+						//文件名称
+						String fileName = FileUtil.getName(fullPathName);
+						
+						MediaProcessQueue mediaProcessQueue = new MediaProcessQueue();
+						mediaProcessQueue.setModule(60);//60:在线帮助
+						mediaProcessQueue.setType(10);//10:视频
+						mediaProcessQueue.setParameter(String.valueOf(help.getId()));
+						mediaProcessQueue.setPostTime(help.getTimes());
+						mediaProcessQueue.setFilePath("file/help/"+pathName);
+						mediaProcessQueue.setFileName(fileName);
+						mediaProcessQueueList.add(mediaProcessQueue);
+					}
+					mediaProcessService.saveMediaProcessQueueList(mediaProcessQueueList);
+
+				}
+				
+				
+				
 				//旧图片
 				List<String> old_imageNameList = (List<String>)obj[0];
 				if(old_imageNameList != null && old_imageNameList.size() >0){
@@ -857,6 +963,12 @@ public class HelpManageAction {
 					if(old_mediaNameList != null && old_mediaNameList.size() >0){
 						for(String mediaName : old_mediaNameList){
 							oldPathFileList.add(FileUtil.toSystemPath(mediaName));
+							delete_mediaProcessFileNameList.add(FileUtil.getName(mediaName));
+
+							delete_mediaProcessDirectoryList.add(FileUtil.toSystemPath(FileUtil.getFullPath(mediaName))+FileUtil.getBaseName(mediaName)+File.separator);
+					
+							
+							
 						}
 						
 					}
@@ -880,6 +992,23 @@ public class HelpManageAction {
 							oldPathFileList.add(FileUtil.toSystemPath(fileName));
 						}
 						
+					}
+				}
+				
+				//删除旧媒体处理任务
+				if(delete_mediaProcessFileNameList != null && delete_mediaProcessFileNameList.size() >0){
+					mediaProcessService.deleteMediaProcessQueue(delete_mediaProcessFileNameList);
+					//删除缓存
+					for(String delete_mediaProcessFileName : delete_mediaProcessFileNameList){
+						mediaProcessQueueManage.delete_cache_findMediaProcessQueueByFileName(delete_mediaProcessFileName);
+					}
+				}
+				//删除旧媒体切片文件夹
+				if(delete_mediaProcessDirectoryList != null && delete_mediaProcessDirectoryList.size() >0){
+					for(String mediaProcessDirectory :delete_mediaProcessDirectoryList){
+						if(mediaProcessDirectory != null && !"".equals(mediaProcessDirectory.trim())){
+							fileManage.removeDirectory(mediaProcessDirectory);
+						}
 					}
 				}
 			}
@@ -987,6 +1116,11 @@ public class HelpManageAction {
 							if(obj != null && obj.length >0){
 								List<String> filePathList = new ArrayList<String>();
 								
+								//删除旧媒体处理任务
+								List<String> delete_mediaProcessFileNameList = new ArrayList<String>();//文件名称
+								//删除旧媒体切片文件夹
+								List<String> delete_mediaProcessDirectoryList = new ArrayList<String>();//文件夹
+								
 								//删除图片
 								List<String> imageNameList = (List<String>)obj[0];		
 								for(String imageName :imageNameList){
@@ -1002,6 +1136,10 @@ public class HelpManageAction {
 								List<String> mediaNameList = (List<String>)obj[2];		
 								for(String mediaName :mediaNameList){
 									filePathList.add(mediaName);
+									delete_mediaProcessFileNameList.add(FileUtil.getName(mediaName));
+									
+									delete_mediaProcessDirectoryList.add(FileUtil.toSystemPath(FileUtil.getFullPath(mediaName))+FileUtil.getBaseName(mediaName)+File.separator);
+							
 								}
 								//删除文件
 								List<String> fileNameList = (List<String>)obj[3];		
@@ -1024,6 +1162,24 @@ public class HelpManageAction {
 									}
 								}
 								
+								//删除旧媒体处理任务
+								if(delete_mediaProcessFileNameList != null && delete_mediaProcessFileNameList.size() >0){
+									mediaProcessService.deleteMediaProcessQueue(delete_mediaProcessFileNameList);
+									
+									//删除缓存
+									for(String delete_mediaProcessFileName : delete_mediaProcessFileNameList){
+										mediaProcessQueueManage.delete_cache_findMediaProcessQueueByFileName(delete_mediaProcessFileName);
+									}
+									
+								}
+								//删除旧媒体切片文件夹
+								if(delete_mediaProcessDirectoryList != null && delete_mediaProcessDirectoryList.size() >0){
+									for(String mediaProcessDirectory :delete_mediaProcessDirectoryList){
+										if(mediaProcessDirectory != null && !"".equals(mediaProcessDirectory.trim())){
+											fileManage.removeDirectory(mediaProcessDirectory);
+										}
+									}
+								}
 							}
 						}
 					}
@@ -1088,6 +1244,11 @@ public class HelpManageAction {
 			List<String> fileLock_list = new ArrayList<String>();
 			List<String> pathFileList = new ArrayList<String>();//旧路径文件
 			
+			//删除旧媒体处理任务
+			List<String> delete_mediaProcessFileNameList = new ArrayList<String>();//文件名称
+			//删除旧媒体切片文件夹
+			List<String> delete_mediaProcessDirectoryList = new ArrayList<String>();//文件夹
+			
 			if(helpList != null && helpList.size() >0){
 				for(Help help : helpList){
 					//修改文件路径
@@ -1117,7 +1278,7 @@ public class HelpManageAction {
 							
 							//新建文件锁到新路径
 							 //生成锁文件名称
-							String lockFileName = StringUtils.replaceOnce(entry.getValue(), "file/help/", "")+"/"+fileName;
+							String lockFileName = StringUtils.replaceOnce(entry.getValue(), "file/help/", "")+fileName;
 							lockFileName = lockFileName.replaceAll("/", "_");
 							
 							fileLock_list.add(lockFileName);
@@ -1125,9 +1286,22 @@ public class HelpManageAction {
 							fileManage.addLock("file"+File.separator+"help"+File.separator+"lock"+File.separator,lockFileName);
 							//旧路径文件
 							pathFileList.add(old_path_Delimiter);
+							
+							
+							//判断路径类型
+							int type = textFilterManage.isPathType(entry.getKey(),"help");
+							if(type == 30){//影音
+								String newDirectory = FileUtil.getFullPath(old_path_Delimiter)+FileUtil.getBaseName(entry.getKey())+"/";
+								fileManage.copyDirectory(newDirectory,new_path_Delimiter);
+								
+								delete_mediaProcessFileNameList.add(FileUtil.getName(entry.getKey()));
+
+								delete_mediaProcessDirectoryList.add(FileUtil.toSystemPath(FileUtil.getFullPath(entry.getKey()))+FileUtil.getBaseName(entry.getKey())+File.separator);
+						
+								
+							}
 						}
 					}
-					
 				}
 			}else{
 				error.put("helpId", "帮助不存在");
@@ -1162,6 +1336,23 @@ public class HelpManageAction {
 							fileManage.failedStateFile("file"+File.separator+"help"+File.separator+"lock"+File.separator+FileUtil.toUnderline(pathFile));
 						
 						
+						}
+					}
+				}
+				
+				//删除旧媒体处理任务
+				if(delete_mediaProcessFileNameList != null && delete_mediaProcessFileNameList.size() >0){
+					mediaProcessService.deleteMediaProcessQueue(delete_mediaProcessFileNameList);
+					//删除缓存
+					for(String delete_mediaProcessFileName : delete_mediaProcessFileNameList){
+						mediaProcessQueueManage.delete_cache_findMediaProcessQueueByFileName(delete_mediaProcessFileName);
+					}
+				}
+				//删除旧媒体切片文件夹
+				if(delete_mediaProcessDirectoryList != null && delete_mediaProcessDirectoryList.size() >0){
+					for(String mediaProcessDirectory :delete_mediaProcessDirectoryList){
+						if(mediaProcessDirectory != null && !"".equals(mediaProcessDirectory.trim())){
+							fileManage.removeDirectory(mediaProcessDirectory);
 						}
 					}
 				}

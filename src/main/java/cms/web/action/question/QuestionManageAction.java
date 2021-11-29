@@ -62,6 +62,7 @@ import cms.utils.Verification;
 import cms.web.action.SystemException;
 import cms.web.action.TextFilterManage;
 import cms.web.action.fileSystem.FileManage;
+import cms.web.action.membershipCard.MembershipCardGiftTaskManage;
 import cms.web.action.payment.PaymentManage;
 import cms.web.action.user.PointManage;
 import cms.web.action.user.UserManage;
@@ -91,7 +92,7 @@ public class QuestionManageAction {
 	@Resource PointManage pointManage;
 	@Resource PaymentManage paymentManage;
 	@Resource UserRoleManage userRoleManage;
-	
+	@Resource MembershipCardGiftTaskManage membershipCardGiftTaskManage;
 	
 	/**
 	 * 问题   查看
@@ -1442,6 +1443,9 @@ public class QuestionManageAction {
 						if(user != null){
 							userManage.delete_cache_findUserById(user.getId());
 							userManage.delete_cache_findUserByUserName(user.getUserName());
+							//异步执行会员卡赠送任务(长期任务类型)
+							membershipCardGiftTaskManage.async_triggerMembershipCardGiftTask(user.getUserName());
+							
 						}
 						
 						Object[] obj = textFilterManage.readPathName(old_content,"question");
@@ -2113,6 +2117,9 @@ public class QuestionManageAction {
 								if(user != null){
 									userManage.delete_cache_findUserById(user.getId());
 									userManage.delete_cache_findUserByUserName(user.getUserName());
+									//异步执行会员卡赠送任务(长期任务类型)
+									membershipCardGiftTaskManage.async_triggerMembershipCardGiftTask(user.getUserName());
+									
 								}
 								
 								//更新索引

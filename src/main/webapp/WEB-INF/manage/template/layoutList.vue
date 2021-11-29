@@ -46,24 +46,46 @@
 					        
 				    	</template>
 					</el-table-column>
-					<el-table-column label="引用代码/URL" align="center" width="120">
+					<el-table-column label="引用代码/URL" align="center" width="130">
+						<template #header>
+        					<el-popover effect="light" trigger="hover" placement="top" width="330">
+					        	<template #default>
+					        		<el-switch v-model="button" inactive-text="按钮" active-text="本列单元格显示复制按钮"></el-switch><div><br></div>
+					        		<el-switch v-model="text" inactive-text="文本" active-text="本列单元格显示'引用代码'或'URL'的文本内容"></el-switch>
+					        	</template>
+					        	<template #reference>
+      								<div class="header-arrow">引用代码/URL<span class="el-icon-arrow-down header-arrow-icon"></span></div>
+								</template>
+					        </el-popover>
+        					
+						</template>
 						<template #default="scope">
-							<el-popover effect="light" trigger="hover" placement="top">
+							<el-popover effect="light" trigger="hover" placement="top" :disabled="text== true">
 					        	<template #default>
 					        		<span v-if="referenceCodeList.get(scope.row.id)">{{referenceCodeList.get(scope.row.id)}}</span>
 					        	</template>
 					        	<template #reference>
-					          		<div>
-										<!-- 1.默认页 4.空白页 -->
-										<span class="button-blue" v-if="scope.row.type == 1 || scope.row.type == 4" @click="copyText($event,scope.row)">URL</span>
-										<!-- 5.公共页(生成新引用页)  6.公共页(引用版块值)  -->
-										<span class="button-blue" v-if="scope.row.type == 5 || scope.row.type == 6" @click="copyText($event,scope.row)">代码</span>
+					        		<div>
+					          			<div v-if="button == true">
+											<!-- 1.默认页 4.空白页 -->
+											<span class="button-blue" v-if="scope.row.type == 1 || scope.row.type == 4" @click="copyText($event,scope.row)">复制URL</span>
+											<!-- 5.公共页(生成新引用页)  6.公共页(引用版块值)  -->
+											<span class="button-blue" v-if="scope.row.type == 5 || scope.row.type == 6" @click="copyText($event,scope.row)">复制代码</span>
 										
-									</div>
+										</div>
+										<div v-if="text == true">
+											{{referenceCodeList.get(scope.row.id)}}
+										</div>
+									<div>
 					        	</template>
 					        </el-popover>
 				    	</template>
 					</el-table-column>
+					
+					
+					
+					
+					
 					<el-table-column label="操作" align="center" width="330">
 						<template #default="scope">
 							<el-button-group>
@@ -102,6 +124,8 @@ export default({
 			wap_lastModified :new Map(),//移动版式最后修改时间
 			templates :'',
 
+			text :false,//文本
+			button :true,//按钮
 			
 			referenceCodeList:new Map(),//引用代码集合
 			
@@ -134,6 +158,8 @@ export default({
 		this.queryLayoutList();
 	},
 	methods : {
+	
+	
 		//查询布局列表
 		queryLayoutList : function() {
 			let _self = this;
@@ -257,6 +283,7 @@ export default({
 		        tempInput.select();
 		        document.execCommand("copy");
 		        document.body.removeChild(tempInput);
+		        this.$message.success("复制 "+value+" 到剪贴板成功");
 	    	}
 	    },
 	    

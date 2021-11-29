@@ -49,9 +49,66 @@ public class LoginFilter implements Filter {
 		HttpServletRequest request = (HttpServletRequest)req;
 		HttpServletResponse response = (HttpServletResponse)res;
 
-
-		
 		boolean isJump = false;
+		
+		OAuthManage oAuthManage = (OAuthManage)SpringConfigTool.getContext().getBean("oAuthManage");
+		UserManage userManage = (UserManage)SpringConfigTool.getContext().getBean("userManage");
+		
+		
+		
+		AccessUser accessUser = oAuthManage.getUserName(request);
+		if(accessUser != null){
+			
+			UserState userState = userManage.query_userState(accessUser.getUserName().trim());//用户状态
+			if(userState != null){
+				if(!userState.getSecurityDigest().equals(accessUser.getSecurityDigest())){//如果安全摘要有改变
+					isJump = true;
+				}
+				
+				if(userState.getState() !=1){// 如果不是正常用户   1:正常用户
+					isJump = true;
+				}
+			}else{
+				isJump = true;
+			}
+			
+			if(isJump == false){
+				AccessUserThreadLocal.set(accessUser);
+			}
+		}else{
+			String accessToken = WebUtil.getCookieByName(request, "cms_accessToken");
+			String refreshToken = WebUtil.getCookieByName(request, "cms_refreshToken");
+			if(accessToken != null && !"".equals(accessToken.trim()) && refreshToken != null && !"".equals(refreshToken.trim())){
+
+				RefreshUser refreshUser = oAuthManage.getRefreshUserByRefreshToken(refreshToken.trim());
+
+				if(refreshUser != null){
+					if("0".equals(refreshUser.getAccessToken())){//如果刷新令牌重复执行，则修改用户的安全摘要，让当前用户重新登录
+						UserService userService = (UserService)SpringConfigTool.getContext().getBean("userServiceBean");
+						
+						userService.updateUserSecurityDigest(refreshUser.getUserName(),new Date().getTime());
+						userManage.delete_userState(refreshUser.getUserName());
+						isJump = true;
+					}else if(accessToken.equals(refreshUser.getAccessToken())){
+						//令牌续期
+						boolean flag = oAuthManage.tokenRenewal(refreshToken,refreshUser,request,response);
+						
+						if(!flag){//如果续期不成功
+							isJump = true;
+						}
+					}else{
+						isJump = true;
+					}
+					
+				}else{
+					isJump = true;
+				}
+			
+			}else{
+				isJump = true;
+			}
+		}
+		
 		LayoutManage layoutManage = (LayoutManage)SpringConfigTool.getContext().getBean("layoutManage");//查询需要登录验证的路径
 		
 		//查询需要登录验证的路径
@@ -73,65 +130,8 @@ public class LoginFilter implements Filter {
 				break;
 			}
 		}
+	
 		if(isFilter){
-			OAuthManage oAuthManage = (OAuthManage)SpringConfigTool.getContext().getBean("oAuthManage");
-			UserManage userManage = (UserManage)SpringConfigTool.getContext().getBean("userManage");
-			
-			
-			
-			AccessUser accessUser = oAuthManage.getUserName(request);
-			if(accessUser != null){
-				
-				UserState userState = userManage.query_userState(accessUser.getUserName().trim());//用户状态
-				if(userState != null){
-					if(!userState.getSecurityDigest().equals(accessUser.getSecurityDigest())){//如果安全摘要有改变
-						isJump = true;
-					}
-					
-					if(userState.getState() !=1){// 如果不是正常用户   1:正常用户
-						isJump = true;
-					}
-				}else{
-					isJump = true;
-				}
-				
-				if(isJump == false){
-					AccessUserThreadLocal.set(accessUser);
-				}
-			}else{
-				String accessToken = WebUtil.getCookieByName(request, "cms_accessToken");
-				String refreshToken = WebUtil.getCookieByName(request, "cms_refreshToken");
-				if(accessToken != null && !"".equals(accessToken.trim()) && refreshToken != null && !"".equals(refreshToken.trim())){
-				
-					RefreshUser refreshUser = oAuthManage.getRefreshUserByRefreshToken(refreshToken.trim());
-					if(refreshUser != null){
-						if("0".equals(refreshUser.getAccessToken())){//如果刷新令牌重复执行，则修改用户的安全摘要，让当前用户重新登录
-							UserService userService = (UserService)SpringConfigTool.getContext().getBean("userServiceBean");
-							
-							userService.updateUserSecurityDigest(refreshUser.getUserName(),new Date().getTime());
-							userManage.delete_userState(refreshUser.getUserName());
-							isJump = true;
-						}else if(accessToken.equals(refreshUser.getAccessToken())){
-							//令牌续期
-							boolean flag = oAuthManage.tokenRenewal(refreshToken,refreshUser,request,response);
-							
-							if(!flag){//如果续期不成功
-								isJump = true;
-							}
-						}else{
-							isJump = true;
-						}
-						
-					}else{
-						isJump = true;
-					}
-				
-				}else{
-					isJump = true;
-				}
-			}
-			
-			
 			
 			boolean isAjax = WebUtil.submitDataMode(request);
 			if(isJump == true){

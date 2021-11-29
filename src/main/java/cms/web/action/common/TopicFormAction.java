@@ -77,6 +77,7 @@ import cms.web.action.fileSystem.FileManage;
 import cms.web.action.filterWord.SensitiveWordFilterManage;
 import cms.web.action.follow.FollowManage;
 import cms.web.action.mediaProcess.MediaProcessQueueManage;
+import cms.web.action.membershipCard.MembershipCardGiftTaskManage;
 import cms.web.action.message.RemindManage;
 import cms.web.action.payment.PaymentManage;
 import cms.web.action.redEnvelope.RedEnvelopeManage;
@@ -129,6 +130,8 @@ public class TopicFormAction {
 	@Resource MediaProcessService mediaProcessService;
 	@Resource RedEnvelopeManage redEnvelopeManage;
 	@Resource MediaProcessQueueManage mediaProcessQueueManage;
+	@Resource MembershipCardGiftTaskManage membershipCardGiftTaskManage;
+	
 	/**
 	 * 话题  添加
 	 * @param model
@@ -761,6 +764,8 @@ public class TopicFormAction {
 			
 			
 			
+			//异步执行会员卡赠送任务(长期任务类型)
+			membershipCardGiftTaskManage.async_triggerMembershipCardGiftTask(user.getUserName());
 			
 			
 			
@@ -2366,6 +2371,8 @@ public class TopicFormAction {
 				}
 				
 				
+				//异步执行会员卡赠送任务(长期任务类型)
+				membershipCardGiftTaskManage.async_triggerMembershipCardGiftTask(_user.getUserName());
 				
 				
 				

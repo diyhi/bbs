@@ -58,6 +58,7 @@ import cms.web.action.TextFilterManage;
 import cms.web.action.fileSystem.FileManage;
 import cms.web.action.filterWord.SensitiveWordFilterManage;
 import cms.web.action.follow.FollowManage;
+import cms.web.action.membershipCard.MembershipCardGiftTaskManage;
 import cms.web.action.message.RemindManage;
 import cms.web.action.question.AnswerManage;
 import cms.web.action.question.QuestionManage;
@@ -103,6 +104,8 @@ public class AnswerFormAction {
 	@Resource RemindManage remindManage;
 	@Resource RemindService remindService;
 	@Resource AnswerManage answerManage;
+	@Resource MembershipCardGiftTaskManage membershipCardGiftTaskManage;
+	
 	/**
 	 * 答案   添加
 	 * @param model
@@ -369,6 +372,8 @@ public class AnswerFormAction {
 			
 			
 			
+			//异步执行会员卡赠送任务(长期任务类型)
+			membershipCardGiftTaskManage.async_triggerMembershipCardGiftTask(accessUser.getUserName());
 			
 			
 			
@@ -1533,6 +1538,8 @@ public class AnswerFormAction {
 			}
 			
 			
+			//异步执行会员卡赠送任务(长期任务类型)
+			membershipCardGiftTaskManage.async_triggerMembershipCardGiftTask(_user.getUserName());
 			
 			
 			//统计每分钟原来提交次数

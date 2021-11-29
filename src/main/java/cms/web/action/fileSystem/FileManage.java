@@ -120,7 +120,17 @@ public class FileManage {
     	//本地文件系统
 		localFileManage.copyFile(resFilePath,distFolder);
     }  
-    
+    /**  
+     * 复制目录
+     * @param resDirectory 源目录路径  
+     * @param distFolder  目标文件夹  
+     * @IOException 当操作发生异常时抛出  
+     */   
+    public void copyDirectory(String resDirectory, String distFolder) throws IOException {  
+    	//本地文件存储系统
+    	localFileManage.copyDirectory(resDirectory, distFolder);
+    	
+    }  
     /**
 	 * 删除失败状态文件
 	 * @param path 路径

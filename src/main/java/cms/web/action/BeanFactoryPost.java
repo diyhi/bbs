@@ -296,5 +296,20 @@ public class BeanFactoryPost implements BeanFactoryPostProcessor{
 				}	
 			}
 		}
+		BeanDefinition membershipCardGiftItem_bd = beanFactory.getBeanDefinition("membershipCardGiftItemConfig");
+		if(membershipCardGiftItem_bd != null){
+			MutablePropertyValues mutablePropertyValues = membershipCardGiftItem_bd.getPropertyValues();
+			TypedStringValue typedStringValue = (TypedStringValue)mutablePropertyValues.getPropertyValue("tableQuantity").getValue();
+
+			//会员卡赠送项分表数量
+			Integer tableQuantity = Integer.parseInt(typedStringValue.getValue());
+			if(tableQuantity >1){
+				for(int i =1; i<tableQuantity; i++){
+					
+					//初始化会员卡赠送项bean
+					CreateBean.createMembershipCardGiftItem(i);
+				}	
+			}
+		}
 	}
 }

@@ -63,6 +63,7 @@ import cms.web.action.SystemException;
 import cms.web.action.TextFilterManage;
 import cms.web.action.fileSystem.FileManage;
 import cms.web.action.filterWord.SensitiveWordFilterManage;
+import cms.web.action.membershipCard.MembershipCardGiftTaskManage;
 import cms.web.action.payment.PaymentManage;
 import cms.web.action.question.AnswerManage;
 import cms.web.action.question.QuestionManage;
@@ -101,6 +102,7 @@ public class QuestionFormAction {
 	@Resource AnswerManage answerManage;
 	@Resource AnswerService answerService;
 	@Resource PaymentManage paymentManage;
+	@Resource MembershipCardGiftTaskManage membershipCardGiftTaskManage;
 	
 	/**
 	 * 问题  添加
@@ -560,6 +562,10 @@ public class QuestionFormAction {
 				//删除缓存
 				userManage.delete_cache_findUserById(accessUser.getUserId());
 				userManage.delete_cache_findUserByUserName(accessUser.getUserName());
+				
+				//异步执行会员卡赠送任务(长期任务类型)
+				membershipCardGiftTaskManage.async_triggerMembershipCardGiftTask(accessUser.getUserName());
+				
 				
 				String fileNumber = "b"+ accessUser.getUserId();
 				
@@ -1461,6 +1467,10 @@ public class QuestionFormAction {
 			if(user != null){
 				userManage.delete_cache_findUserById(user.getId());
 				userManage.delete_cache_findUserByUserName(user.getUserName());
+				
+				//异步执行会员卡赠送任务(长期任务类型)
+				membershipCardGiftTaskManage.async_triggerMembershipCardGiftTask(user.getUserName());
+				
 			}
 			
 			

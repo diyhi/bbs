@@ -78,19 +78,20 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 	
 	
 	/**
-	 * 根据条件分页查询用户名称
+	 * 根据条件分页查询用户信息
 	 * @param jpql SQL
 	 * @param params 参数值
 	 * @param firstIndex 开始索引
 	 * @param maxResult 需要获取的记录数
+	 * @return 返回值只包含id、userName、point、deposit、registrationDate 等字段值
 	 */
 	@Transactional(readOnly=true,propagation=Propagation.NOT_SUPPORTED)
-	public List<String> findUserNameByConditionPage(String jpql,List<Object> params,int firstIndex, int maxResult){
+	public List<User> findUserInfoByConditionPage(String jpql,List<Object> params,int firstIndex, int maxResult){
 		
-		
+		List<User> userList = new ArrayList<User>();
 		
 		int placeholder = 1;//占位符参数
-		Query query =  em.createQuery("select o.userName from User o"+(jpql == null || "".equals(jpql.trim())? "" : " where "+jpql));
+		Query query =  em.createQuery("select o.id, o.userName, o.point, o.deposit, o.registrationDate from User o"+(jpql == null || "".equals(jpql.trim())? "" : " where "+jpql));
 		if(params != null && params.size() >0){
 			for(Object obj : params){
 				query.setParameter(placeholder,obj);
@@ -102,7 +103,24 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 		//获取多少条数据
 		query.setMaxResults(maxResult);
 		
-		return query.getResultList();
+		
+		List<Object[]> objectList = query.getResultList();
+		
+		if(objectList != null && objectList.size() >0){
+			for(int o = 0; o<objectList.size(); o++){
+				Object[] object = objectList.get(o);
+				
+				User user = new User();
+				user.setId(ObjectConversion.conversion(object[0], ObjectConversion.LONG));
+				user.setUserName(ObjectConversion.conversion(object[1], ObjectConversion.STRING));
+				user.setPoint(ObjectConversion.conversion(object[2], ObjectConversion.LONG));
+				user.setDeposit(ObjectConversion.conversion(object[3], ObjectConversion.BIGDECIMAL));
+				user.setRegistrationDate(ObjectConversion.conversion(object[4], ObjectConversion.TIMESTAMP));
+				
+				userList.add(user);
+			}
+		}
+		return userList;
 	}
 	
 	

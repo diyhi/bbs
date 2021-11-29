@@ -3,7 +3,7 @@
 	<div>
 		<div class="main">
 			<div class="navbar">
-				<el-button type="primary" plain size="small" @click="$router.push({path: '/admin/control/help/list', query:{ visible : ($route.query.visible != undefined ? $route.query.visible:''),page:($route.query.page != undefined ? $route.query.page:'')}})">返回</el-button>
+				<el-button type="primary" plain size="small" @click="$router.push({path: '/admin/control/help/manage/view', query:{ visible:($route.query.visible != undefined ? $route.query.visible:''),helpView_beforeUrl:($route.query.helpView_beforeUrl != undefined ? $route.query.helpView_beforeUrl:''),helpId :$route.query.helpId, page:($route.query.helpPage != undefined ? $route.query.helpPage:'')}})">返回</el-button>
 			</div>
 			<div class="data-form" >
 				<el-form label-width="auto"  @submit.native.prevent>
@@ -160,7 +160,7 @@ export default({
 		    			obj.label = help.helpTypeName;
 		    			_self.options.push(obj);
 			    		
-		    			let availableTag = ['source', '|', 'preview', 'template',  
+		    			let availableTag = ['source', '|', 'preview', 'template', 'code', 
 		    				        '|', 'justifyleft', 'justifycenter', 'justifyright',
 		    				        'justifyfull', 'insertorderedlist', 'insertunorderedlist', 'indent', 'outdent', 'subscript',
 		    				        'superscript', 'clearhtml', 'quickformat', 'selectall', '|', 
@@ -369,12 +369,27 @@ export default({
 			    		//删除缓存
 			    		_self.$store.commit('setCacheNumber');
 			    		_self.$router.push({
-							path : '/admin/control/help/list',
+							path : '/admin/control/help/manage/view',
 							query:{
 								visible : (_self.$route.query.visible != undefined ? _self.$route.query.visible:''),
 								page:(_self.$route.query.page != undefined ? _self.$route.query.page:'')
 							}
 						});
+						
+						_self.$router.push({
+							path : '/admin/control/help/manage/view',
+							query:{ 
+								visible:(_self.$route.query.visible != undefined ? _self.$route.query.visible:''),
+								helpView_beforeUrl:(_self.$route.query.helpView_beforeUrl != undefined ? _self.$route.query.helpView_beforeUrl:''),
+								helpId :_self.$route.query.helpId, 
+								page:(_self.$route.query.helpPage != undefined ? _self.$route.query.helpPage:'')
+							}
+						});
+						
+						
+						
+						
+						
 			    		
 			    	}else if(returnValue.code === 500){//错误
 			    		let errorMap = returnValue.data;

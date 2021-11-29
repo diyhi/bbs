@@ -1124,8 +1124,9 @@ function _tmpl(str, data) {
  * @param urlAddress 提交URL
  * @param async true（异步）或 false（同步）
  * @param formContent 表单内容
+ * @param isAuthorization 是否带有权限信息
  */
-function _post_ajax(callback, urlAddress, async,formContent){  
+function _post_ajax(callback, urlAddress, async,formContent,isAuthorization){  
 	var xmlhttp;
 	if (window.XMLHttpRequest) {
 		try {
@@ -1150,7 +1151,20 @@ function _post_ajax(callback, urlAddress, async,formContent){
     //定义传输的文件HTTP头信息    
 //	xmlhttp.setRequestHeader("Content-Type","application/x-www-form-urlencoded"); 
 //	xmlhttp.setRequestHeader("X-Requested-With","XMLHttpRequest");//标记报头为AJAX
-
+	
+	if(isAuthorization){
+		//从sessionStorage中获取登录令牌
+		var oauth2Token = window.sessionStorage.getItem('oauth2Token');
+		if(oauth2Token != null){
+			var oauth2Object = JSON.parse(oauth2Token);
+			xmlhttp.setRequestHeader("Authorization",'Bearer '+oauth2Object.access_token);
+		}
+		
+		var csrfToken = K.getCookie('XSRF-TOKEN');
+		xmlhttp.setRequestHeader("X-XSRF-TOKEN",csrfToken);
+	}
+	
+	
 	xmlhttp.onreadystatechange = function(){
         if (xmlhttp.readyState == 4) {//readystate 
 		    try{
@@ -1180,8 +1194,9 @@ function _post_ajax(callback, urlAddress, async,formContent){
  * @param urlAddress 提交URL
  * @param async true（异步）或 false（同步）
  * @param formContent 表单内容
+ * @param isAuthorization 是否带有权限信息
  */
-function _put_ajax(callback, urlAddress, async,formContent){  
+function _put_ajax(callback, urlAddress, async,formContent,isAuthorization){  
 	var xmlhttp;
 	if (window.XMLHttpRequest) {
 		try {
@@ -1203,6 +1218,18 @@ function _put_ajax(callback, urlAddress, async,formContent){
 	}
 	
 	xmlhttp.open('PUT', urlAddress, async);
+	
+	if(isAuthorization){
+		//从sessionStorage中获取登录令牌
+		var oauth2Token = window.sessionStorage.getItem('oauth2Token');
+		if(oauth2Token != null){
+			var oauth2Object = JSON.parse(oauth2Token);
+			xmlhttp.setRequestHeader("Authorization",'Bearer '+oauth2Object.access_token);
+		}
+		
+		var csrfToken = K.getCookie('XSRF-TOKEN');
+		xmlhttp.setRequestHeader("X-XSRF-TOKEN",csrfToken);
+	}
 
 	xmlhttp.onreadystatechange = function(){
         if (xmlhttp.readyState == 4) {//readystate 
@@ -1227,7 +1254,26 @@ function _put_ajax(callback, urlAddress, async,formContent){
 	
 }
 
+/**
+ * 读取Cookie
+ * @param name 名称
+ * @return 值
+ */
+function _getCookie(name) {
+	if (!document.cookie) {
+	    return null;
+	}
+	var xsrfCookies = document.cookie.split(';').map(function (c) {
+	    return c.trim();
+	}).filter(function (c) {
+	    return c.startsWith(name + '=');
+	});
 
+	if (xsrfCookies.length === 0) {
+	    return null;
+	}
+	return decodeURIComponent(xsrfCookies[0].split('=')[1]);
+}
 
 K.formatUrl = _formatUrl;
 K.formatHtml = _formatHtml;
@@ -1243,6 +1289,7 @@ K.clearMsWord = _clearMsWord;
 K.tmpl = _tmpl;
 K.post_ajax = _post_ajax
 K.put_ajax = _put_ajax
+K.getCookie=_getCookie
 
 
 function _contains(nodeA, nodeB) {
@@ -4195,7 +4242,10 @@ function _getInitHtml(themesPath, bodyClass, cssPath, cssData) {
 	if (cssData) {
 		arr.push('<style>' + cssData + '</style>');
 	}
+	//iframeResizer.contentWindow.min.js如果在<head></head>标记之间的script中会出现document.body为空或不是对象
+	//arr.push('</head><body ' + (bodyClass ? 'class="' + bodyClass + '"' : '') + '></body><script type="text/javascript" src="backstage/kindeditor/iframe-resizer/iframeResizer.contentWindow.min.js"></script></html>');
 	arr.push('</head><body ' + (bodyClass ? 'class="' + bodyClass + '"' : '') + '></body></html>');
+	
 	return arr.join('\n');
 }
 function _elementVal(knode, val) {
@@ -4451,8 +4501,7 @@ _extend(KEdit, KWidget, {
 		}
 		K(body).bind('paste', timeoutHandler);
 		K(body).bind('cut', timeoutHandler);
-		
-		$(doc).on('customChange',function() {//监听自定义change事件，
+		$(doc).on('customChange',function() {//监听自定义change事件
 	    	fn();
 	    });
 		return self;
@@ -5086,7 +5135,7 @@ _extend(KUploadButton, {
 					}
 				}
 			},
-			uploadURL+"&"+parameter, true,'');
+			uploadURL+"&"+parameter, true,'',true);
 		}else if(self.options.uploadModule == 20){//20.MinIO
 			var fileName = self.fileBox[0].value.substring(self.fileBox[0].value.lastIndexOf("\\")+1); 
 			var uploadURL = self.options.url || self.options.form[0].action;
@@ -5158,7 +5207,7 @@ _extend(KUploadButton, {
 					}
 				}
 			},
-			uploadURL+"&"+parameter, true,'');
+			uploadURL+"&"+parameter, true,'',true);
 						
 			
 		}else if(self.options.uploadModule == 30){//30.阿里云OSS
@@ -5197,8 +5246,8 @@ _extend(KUploadButton, {
 					    
 						K.post_ajax(function(xmlhttp){
 							//xmlhttp.responseText
-							if(xmlhttp.getResponseHeader("content-length") != undefined){
-								
+							//if(xmlhttp.getResponseHeader("content-length") != undefined){
+							if(xmlhttp.status == 200){	
 								K.popupMessage(KindEditor.lang('uploadSuccess'));
 								
 								var tempForm = document.createElement('form');
@@ -5236,8 +5285,69 @@ _extend(KUploadButton, {
 					}
 				}
 			},
-			uploadURL+"&"+parameter, true,'');
+			uploadURL+"&"+parameter, true,'',true);
 		}else{//0.本地
+			
+			var fileName = self.fileBox[0].value.substring(self.fileBox[0].value.lastIndexOf("\\")+1); 
+			var uploadURL = self.options.url || self.options.form[0].action;
+			
+			var parameter = "fileName="+ encodeURIComponent(fileName);
+			
+
+			var newFileName = "";
+			
+			//获取提交的参数
+		    var data = new FormData();
+		   
+		    data.append(self.options.fieldName, self.fileBox[0].files[0]);
+
+			K.post_ajax(function(xmlhttp){
+				var result = xmlhttp.responseText;
+				if(result != ""){
+					var fileData = JSON.parse(result);
+					if(fileData.error ==0){
+				
+						
+						K.popupMessage(KindEditor.lang('uploadSuccess'));
+						
+						var tempForm = document.createElement('form');
+						self.fileBox.before(tempForm);
+						K(tempForm).append(self.fileBox);
+						tempForm.reset();
+						K(tempForm).remove(true);
+						var doc = K.iframeDoc(iframe),
+							pre = doc.getElementsByTagName('pre')[0],
+							str = '', data;
+						if (pre) {
+							str = pre.innerHTML;
+						} else {
+							str = doc.body.innerHTML;
+						}
+						str = _unescape(str);
+						
+						
+						
+						var data = {};
+						data.error = 0;
+						data.url = fileData.url;
+						data.title = fileData.title;
+						
+						iframe[0].src = 'javascript:false';
+						
+						iframe.unbind();
+						self.options.afterUpload.call(self, data);
+						
+					}else{
+						K.popupMessage(fileData.message);
+						return;
+					}
+				}
+			},
+			uploadURL+"&"+parameter, true,data,true);
+			
+			
+			
+			/**
 			iframe.bind('load', function() {
 				iframe.unbind();
 				var tempForm = document.createElement('form');
@@ -5264,7 +5374,7 @@ _extend(KUploadButton, {
 					self.options.afterUpload.call(self, data);
 				}
 			});
-			self.form[0].submit();
+			self.form[0].submit();**/
 		}
 		return self;
 	},
@@ -6141,6 +6251,12 @@ KEditor.prototype = {
 			});
 			K(document.body.parentNode).css('overflow', 'hidden');
 			self._fullscreenExecuted = true;
+			
+			
+			//全屏时清除固定元素插件
+			if (self.fixToolBar) {
+				stickybits('.ke-toolbar').cleanup();
+			}
 		} else {
 			container.css({
 				'background-color' : ''//取消全屏时改变背景颜色
@@ -6155,6 +6271,25 @@ KEditor.prototype = {
 			if (self._scrollPos) {
 				window.scrollTo(self._scrollPos.x, self._scrollPos.y);
 			}
+			
+			
+			//浮动工具栏
+			//取消全屏时加载固定元素插件
+		    K.loadScript(K.options.basePath+"stickybits.min.js",function() {
+				setTimeout(function() {
+					if (self.fixToolBar) {
+						if(document.querySelector(".el-main")){//使用element-plus是获取窗口高度
+				    		stickybits('.ke-toolbar', {scrollEl: '.el-main',stickyBitStickyOffset: -20});
+						}else{
+							stickybits('.ke-toolbar',{stickyBitStickyOffset: -1});//有浮动情况或没设置行高时可能距顶部会有1px的间距
+						}
+				    }
+				}, 0);
+			});
+			
+			
+			
+			
 		}
 		var htmlList = [];
 		K.each(self.items, function(i, name) {
@@ -6368,6 +6503,7 @@ KEditor.prototype = {
 		if (height) {
 			height = _removeUnit(height);
 			var editHeight = _removeUnit(height) - self.toolbar.div.height() - self.statusbar.height();
+	
 			editHeight = editHeight < self.minHeight ? self.minHeight : editHeight;
 			self.edit.setHeight(editHeight);
 			if (updateProp) {
@@ -6467,6 +6603,21 @@ KEditor.prototype = {
 	},
 	sync : function() {
 		_elementVal(this.srcElement, this.html());
+		return this;
+	},
+	autoExpandContent : function() {//自动展开内容(因为图片需要onload后才能触发事件，所以用本方法触发所有的图片加载事件)
+		var self = this;
+		
+		setTimeout(function() {
+			self.edit.trigger();//触发事件
+		}, 100);
+		K("img",self.cmd.doc.body).each(function() {
+			var img = new Image();
+            img.src = this.src; 
+            img.onload = function(){
+            	self.edit.trigger();//触发事件
+            }
+		});
 		return this;
 	},
 	focus : function() {
@@ -7167,6 +7318,344 @@ _plugin('core', function(K) {
 			
 			self.insertHtml(html, true);
 		}
+		
+		/**
+		 * 页面垂直平滑滚动到指定滚动高度
+		 * scrollTop 当前滚动条位置 document.documentElement.scrollTop || document.body.scrollTop;
+		 * position 滚动到目标高度
+		 */
+		function scrollAnimation(scrollTop,position) {
+		    if (!window.requestAnimationFrame) {
+		        window.requestAnimationFrame = function(callback, element) {
+		            return setTimeout(callback, 50);
+		        };
+		    }
+		    
+		    // 滚动step方法
+		    var step = function () {
+		        // 距离目标滚动距离
+		        var distance = position - scrollTop;
+		        // 目标滚动位置
+		        scrollTop = scrollTop + distance / 5;
+		        if (Math.abs(distance) < 1) {
+		        	if(document.querySelector(".el-main")){//使用element-plus是获取窗口高度
+						document.querySelector(".el-main").scrollTo(0, position);
+					}else{
+						window.scrollTo(0, position);
+					}
+		        } else {
+		        	if(document.querySelector(".el-main")){//使用element-plus是获取窗口高度
+						document.querySelector(".el-main").scrollTo(0, scrollTop);
+					}else{
+						window.scrollTo(0, scrollTop);
+					}
+		            window.scrollTo(0, scrollTop);
+		            requestAnimationFrame(step);
+		        }
+		    };
+		    step();
+		}
+		
+		//文件上传
+		function fileUpload(file,appendParam) {
+			var uploadJson = K.undef(self.uploadJson, self.basePath + 'php/upload_json');
+			var filePostName = K.undef(self.filePostName, 'imgFile');
+			
+			//上传模块
+			if(self.options.uploadModule == 10){// 0.本地 10.SeaweedFS 20.MinIO 30.阿里云OSS
+				var fileName = file.name; 
+				var uploadURL = K.addParam(uploadJson, appendParam);
+				var parameter = "fileName="+ encodeURIComponent(fileName);
+				
+				K.post_ajax(function(xmlhttp){
+					var result = xmlhttp.responseText;
+
+					if(result != ""){
+						var fileData = JSON.parse(result);
+						if(fileData.error ==0){
+							//签名URL
+							var signingUrl = fileData.url;
+							var beforeUrl = signingUrl.substring(0,signingUrl.indexOf("?"));
+							//URL参数部分
+							var urlParam = signingUrl.substring(signingUrl.indexOf("?")+1,signingUrl.length);
+
+							document.getElementById("kindeditor_pasteImageUpload_imageName").innerText = fileName;
+							
+							var newFileName = "";
+							//获取提交的参数
+						    var data = new FormData();
+							var urlParamArr = urlParam.split("&");
+						    for(var i=0;i<urlParamArr.length;i++){
+						        var paramArr = urlParamArr[i].split("=");
+						        data.append(paramArr[0], decodeURIComponent(paramArr[1]));
+						        if(paramArr[0] == "key"){
+						        	newFileName = decodeURIComponent(paramArr[1]);
+						        }
+						    }
+						    data.append(filePostName, file);
+						   
+						   
+							K.post_ajax(function(xmlhttp){
+								if(xmlhttp.status == 200){
+									
+									K.popupMessage(KindEditor.lang('uploadSuccess'));
+									
+									
+									self.exec('insertimage', beforeUrl+newFileName, fileName, undefined, undefined, undefined, undefined);
+			 						
+			 						
+ 								//图片加载完触发才有效
+ 								var imgArr = K('<img src="' + beforeUrl+newFileName + '" />', document).each(function() {
+ 									
+ 									var img = new Image();
+ 						            img.src = beforeUrl+newFileName; 
+ 						            img.onload = function(){
+ 										self.edit.trigger();//触发事件
+ 					                }
+ 								});
+									
+								}
+								
+							},
+							beforeUrl, true,data);
+						}else{
+							K.popupMessage(fileData.message);
+							return;
+						}
+					}
+				},
+				uploadURL+"&"+parameter, true,'',true);
+			}else if(self.options.uploadModule == 20){//20.MinIO
+				var fileName = file.name; 
+				var uploadURL = K.addParam(uploadJson, appendParam);
+				var parameter = "fileName="+ encodeURIComponent(fileName);
+				K.post_ajax(function(xmlhttp){
+					var result = xmlhttp.responseText;
+
+					if(result != ""){
+						var fileData = JSON.parse(result);
+						if(fileData.error ==0){
+							//签名URL
+							var signingUrl = fileData.url;
+							var beforeUrl = signingUrl.substring(0,signingUrl.indexOf("?"));
+							//URL参数部分
+							var urlParam = signingUrl.substring(signingUrl.indexOf("?")+1,signingUrl.length);
+
+							document.getElementById("kindeditor_pasteImageUpload_imageName").innerText = fileName;
+							
+							//获取提交的参数
+						    var data = new FormData();
+							var urlParamArr = urlParam.split("&");
+						    for(var i=0;i<urlParamArr.length;i++){
+						        var paramArr = urlParamArr[i].split("=");
+						        data.append(paramArr[0], decodeURIComponent(paramArr[1]));
+		
+						    }
+						   data.append(filePostName, file);
+						   
+						    
+							K.post_ajax(function(xmlhttp){
+								//xmlhttp.responseText
+								var etag = xmlhttp.getResponseHeader("etag");
+								var location = xmlhttp.getResponseHeader("location");
+								
+								if(etag != undefined && location != undefined){
+									
+									
+									K.popupMessage(KindEditor.lang('uploadSuccess'));
+									
+									
+									self.exec('insertimage', location, fileName, undefined, undefined, undefined, undefined);
+			 						
+			 						
+ 								//图片加载完触发才有效
+ 								var imgArr = K('<img src="' + location + '" />', document).each(function() {
+ 									
+ 									var img = new Image();
+ 						            img.src = location; 
+ 						            img.onload = function(){
+ 										self.edit.trigger();//触发事件
+ 					                }
+ 								});
+									
+								}
+							},
+							beforeUrl, true,data);
+						}else{
+							K.popupMessage(fileData.message);
+							return;
+						}
+					}
+				},
+				uploadURL+"&"+parameter, true,'',true);
+				
+			}else if(self.options.uploadModule == 30){//30.阿里云OSS
+				var fileName = file.name; 
+				var uploadURL = K.addParam(uploadJson, appendParam);
+				var parameter = "fileName="+ encodeURIComponent(fileName);
+				K.post_ajax(function(xmlhttp){
+					var result = xmlhttp.responseText;
+					
+					if(result != ""){
+						var fileData = JSON.parse(result);
+						if(fileData.error ==0){
+							//签名URL
+							var signingUrl = fileData.url;
+							var beforeUrl = signingUrl.substring(0,signingUrl.indexOf("?"));
+							//URL参数部分
+							var urlParam = signingUrl.substring(signingUrl.indexOf("?")+1,signingUrl.length);
+
+							var newFileName = "";
+							
+							document.getElementById("kindeditor_pasteImageUpload_imageName").innerText = fileName;
+							
+							//获取提交的参数
+						    var data = new FormData();
+							var urlParamArr = urlParam.split("&");
+						    for(var i=0;i<urlParamArr.length;i++){
+						        var paramArr = urlParamArr[i].split("=");
+						        data.append(paramArr[0], decodeURIComponent(paramArr[1]));
+						        if(paramArr[0] == "key"){
+						        	newFileName = decodeURIComponent(paramArr[1]);
+						        }
+						    }
+						    
+						    data.append(filePostName, file);
+						   
+						    
+							K.post_ajax(function(xmlhttp){
+								//xmlhttp.responseText
+								//if(xmlhttp.getResponseHeader("content-length") != undefined){
+								if(xmlhttp.status == 200){	
+									K.popupMessage(KindEditor.lang('uploadSuccess'));
+									
+									
+									self.exec('insertimage', beforeUrl+newFileName, fileName, undefined, undefined, undefined, undefined);
+			 						
+			 						
+ 								//图片加载完触发才有效
+ 								var imgArr = K('<img src="' + beforeUrl+newFileName + '" />', document).each(function() {
+ 									
+ 									var img = new Image();
+ 						            img.src = beforeUrl+newFileName; 
+ 						            img.onload = function(){
+ 										self.edit.trigger();//触发事件
+ 					                }
+ 								});
+									
+								}
+							},
+							beforeUrl, true,data);
+						}else{
+							K.popupMessage(fileData.message);
+							return;
+						}
+					}
+				},
+				uploadURL+"&"+parameter, true,'',true);
+				
+				
+			}else{//0.本地
+				
+				var fileName = file.name; 
+				var uploadURL = K.addParam(uploadJson,appendParam);
+				var parameter = "fileName="+ encodeURIComponent(fileName);
+				
+				document.getElementById("kindeditor_pasteImageUpload_imageName").innerText = fileName;
+
+				var newFileName = "";
+				
+				//获取提交的参数
+			    var data = new FormData();
+			   
+			    data.append(filePostName, file);
+			    
+			    
+				K.post_ajax(function(xmlhttp){
+					var result = xmlhttp.responseText;
+					if(result != ""){
+						var fileData = JSON.parse(result);
+						if(fileData.error ==0){
+							
+							self.exec('insertimage', fileData.url, fileData.title, undefined, undefined, undefined, undefined);
+					
+							//图片加载完触发才有效
+							var imgArr = K('<img src="' + fileData.url + '" />', document).each(function() {
+								
+								var img = new Image();
+					            img.src = fileData.url; 
+					            img.onload = function(){
+									self.edit.trigger();//触发事件
+				                }
+							});
+							
+						}else{
+							K.popupMessage(fileData.message);
+						}
+					}
+				},
+				uploadURL+"&"+parameter, true,data,true);
+				
+				
+			}
+			
+		}
+		
+		
+		
+		//粘贴图片上传
+		function pasteImageUpload(event,callback) {
+			var name = 'pasteImageUpload', lang = self.lang(name + '.');
+	
+		 	var items = event.event.clipboardData.items;
+		 	if (items){//chrome 
+		 		//上传图片数量
+		 		var count = 0;
+		 		
+		 		for (var i = 0; i < items.length; i++) {
+		 			if (items[i].kind === "file" && items[i].type.indexOf('image/') !== -1) {  
+		 				if(count ==0){//遍历第一项时创建本弹窗
+				 			var html = ['<div style="padding:20px;">',
+			 							'<div class="ke-dialog-row">',
+			 							'图片 <span id="kindeditor_pasteImageUpload_imageName"></span> 上传中..',
+			 							'</div>',
+			 							//提示
+			 							'<div style="color: #747474;position: absolute;left: 21px;bottom: 18px;">',
+			 							'提示：上传完成会自动关闭本窗口',
+			 							'</div>',
+			 							'</div>'].join('');
+			 				var dialog = self.createDialog({
+			 					name : name,
+			 					width : 450,
+			 					height : 200,
+			 					title : self.lang(name),
+			 					body : html
+			 				});
+				 		}
+		 				
+		 				
+		 				count++;
+		 				
+		 				
+		 				var file = items[i].getAsFile();//得到二进制数据
+		 				
+		 				fileUpload(file,'dir=image');
+		 				
+		            }  
+		 		}
+		 		if(count >0){
+		 			setTimeout(function() {
+						self.hideDialog().focus();
+					}, 3000);
+		 			return callback(true);
+		 		}
+		 		
+			}
+		 	return callback(false);
+		}
+		
+		
+		
 		//粘贴事件
 		K(doc.body).bind('paste', function(e){
 			if (self.pasteType === 0) {//禁止粘贴
@@ -7176,46 +7665,125 @@ _plugin('core', function(K) {
 			if (pasting) {
 				return;
 			}
-			//获取滚动条位置
-			var sTop= document.body.scrollTop + document.documentElement.scrollTop;
+			//原始滚动条位置
+			var originalTop= 0;
+			//目标滚动条位置
+			var targetTop= 0;
+			
+			
 			
 			pasting = true;
-			K('div.' + cls, doc).remove();
-			cmd = self.cmd.selection();
-			bookmark = cmd.range.createBookmark();
 			
-			div = K('<div class="' + cls + '"></div>', doc).css({
-				position : 'absolute',
-				width : '1px',
-				height : '1px',
-				overflow : 'hidden',
-				left : '-1981px',
-				top : K(bookmark.start).pos().y + 'px',
-				'white-space' : 'nowrap'
+			pasteImageUpload(e,function (isUpload){
+				
+				if(isUpload){//粘贴上传图片(Chrome 91 开始支持粘贴操作系统剪贴板中的文件，其他版本仅支持粘贴剪切板中的Base64图片)
+					//阻止默认行为即不让剪贴板内容在div中显示出来
+		            e.preventDefault();
+					//e.stop();//处理粘贴结束 
+					setTimeout(function() {
+						pasting = false;
+						
+					}, 0);
+					
+					setTimeout(function() {
+						self.edit.trigger();//触发事件
+					}, 0);
+					
+					
+				}else{//粘贴文本
+					if(document.querySelector(".el-main")){//使用element-plus是获取窗口高度
+						originalTop = document.querySelector(".el-main").scrollTop;
+						$(".el-main").on('scroll.unable',function (e) {//禁止滚动条滚动
+					        $(document.querySelector(".el-main")).scrollTop(originalTop);
+					    });
+					}else{
+						originalTop = document.body.scrollTop + document.documentElement.scrollTop;
+						$(document).on('scroll.unable',function (e) {//禁止滚动条滚动
+					        $(document).scrollTop(originalTop);
+					    })
+					}
+					
+					//先滚动到粘贴之前位置，然后让粘贴的内容平滑滚动到末尾
+					if(document.querySelector(".el-main")){//使用element-plus是获取窗口高度
+						document.querySelector(".el-main").scrollTo(0,originalTop);
+					}else{
+						window.scrollTo(0,originalTop);
+					}
+					
+					
+					K('div.' + cls, doc).remove();
+					cmd = self.cmd.selection();
+					bookmark = cmd.range.createBookmark();
+					
+					div = K('<div class="' + cls + '"></div>', doc).css({
+						position : 'absolute',
+						width : '1px',
+						height : '1px',
+						overflow : 'hidden',
+						left : '-1981px',
+						top : K(bookmark.start).pos().y + 'px',
+						'white-space' : 'nowrap'
+					});
+					
+					
+					K(doc.body).append(div);
+					if (_IE) {
+						var rng = cmd.range.get(true);
+						rng.moveToElementText(div[0]);
+						rng.select();
+						rng.execCommand('paste');
+						e.preventDefault();
+					} else {
+						cmd.range.selectNodeContents(div[0]);
+						cmd.select();
+						div[0].tabIndex = -1;
+						div[0].focus();
+					}
+					
+					setTimeout(function() {
+						movePastedData();
+						pasting = false;
+						
+					}, 0);
+					
+					setTimeout(function() {
+						self.edit.trigger();//触发事件
+					}, 0);
+					
+					
+					
+					setTimeout(function() {
+						targetTop = originalTop + K(bookmark.start).pos().y;
+					}, 0);
+					
+					
+					//粘贴时设置滚动条位置
+					setTimeout(function() {
+						
+						//平滑滚动到末尾
+						if(document.querySelector(".el-main")){//使用element-plus是获取窗口高度
+							//scrollAnimation(originalTop,targetTop);
+							//$('.el-main').animate({
+							//    scrollTop: targetTop
+							//});
+							document.querySelector(".el-main").scrollTo(0, targetTop);
+							$(document.querySelector(".el-main")).unbind("scroll.unable");//移除'禁止滚动条滚动'
+						}else{
+							window.scrollTo(0,targetTop);
+							$(document).unbind("scroll.unable");//移除'禁止滚动条滚动'
+						}
+					}, 200);
+					
+					
+				}
+				
+				
 			});
-			K(doc.body).append(div);
 			
-			if (_IE) {
-				var rng = cmd.range.get(true);
-				rng.moveToElementText(div[0]);
-				rng.select();
-				rng.execCommand('paste');
-				e.preventDefault();
-			} else {
-				cmd.range.selectNodeContents(div[0]);
-				cmd.select();
-				div[0].tabIndex = -1;
-				div[0].focus();
-			}
-			setTimeout(function() {
-				movePastedData();
-				pasting = false;
-			}, 0);
 			
-			//设置滚动条位置
-			setTimeout(function() {
-				window.scrollTo(0,sTop);
-			}, 0);
+			
+			
+			
 			
 		});
 	});
@@ -7399,6 +7967,7 @@ KindEditor.lang({
 	removeformat : '删除格式',
 	image : '图片',
 	multiimage : '批量图片上传',
+	pasteImageUpload : '粘贴图片上传',
 	flash : 'Flash',
 	media : '视音频',
 	table : '表格',
@@ -7659,40 +8228,33 @@ KindEditor.plugin('autoheight', function(K) {
 	if (!self.autoHeightMode) {
 		return;
 	}
+	
 	var minHeight = K.removeUnit(self.height);
 	function hideScroll() {
 		var edit = self.edit;
 		var body = edit.doc.body;
 		edit.iframe[0].scroll = 'no';
 		body.style.overflowY = 'hidden';
+		
+		
 	}
-	function resetHeight_change() {//点击文本框时增加时高度
+	function resetHeight() {//点击文本框时增加时高度
 		if(self.fullscreenMode){
 			return;
 		}
+		
 		var edit = self.edit;
 		var body = edit.doc.body;
 
-		edit.iframe.height(minHeight);
-		self.resize(null, Math.max((K.IE ? body.scrollHeight : body.offsetHeight) + 76, minHeight));
-	}
-	function resetHeight() {
-		if(self.fullscreenMode){
-			return;
-		}
-		var edit = self.edit;
-		var body = edit.doc.body;
-		edit.iframe.height(minHeight);
-		self.resize(null, Math.max((K.IE ? body.scrollHeight : body.offsetHeight), minHeight));
+		var newMinHeight = minHeight - self.toolbar.div.height() - self.statusbar.height()-30;
+		
+		edit.iframe.height(newMinHeight);
+		//工具栏高度 + 底部拖动栏 + 最后一行距底部距离   数值30必须大于字符行高，低于行高时最后一行换行会发生闪烁
+		self.resize(null, Math.max((K.IE ? body.scrollHeight : body.offsetHeight)+ self.toolbar.div.height() +self.statusbar.height()+30 , newMinHeight));	
 	}
 	function init() {
-		if(minHeight != K.removeUnit(self.height)){//高度有变化
-			minHeight = K.removeUnit(self.height);
-			
-		}else{
-			minHeight = K.removeUnit(self.height)-76;
-		}
-		self.edit.afterChange(resetHeight_change);
+		minHeight = K.removeUnit(self.height);
+		self.edit.afterChange(resetHeight);
 		if(!self.fullscreenMode){
 			hideScroll();
 		}
@@ -7950,7 +8512,7 @@ KindEditor.plugin('clearhtml', function(K) {
 		html = K.formatHtml(html, {
 			a : ['href', 'target'],
 			video : ['src', 'width', 'height', 'loop', 'autoplay', 'muted', '.width', '.height', 'align', 'poster','preload','controls'],//视频
-			iframe : ['src', 'frameborder', 'width', 'height', '.width', '.height','scrolling','border','allow','frameborder','framespacing','allowfullscreen'],//嵌入袖频
+			iframe : ['src', 'frameborder', 'width', 'height', '.width', '.height','scrolling','border','allow','frameborder','framespacing','allowfullscreen'],//嵌入视频
 			
 			img : ['src', 'width', 'height', 'border', 'alt', 'title', '.width', '.height'],
 			table : ['border'],
@@ -9710,7 +10272,7 @@ K.extend(KSWFUpload, {
 						}
 					}
 				},
-				options.uploadUrl+"&"+parameter, false,'');//同步
+				options.uploadUrl+"&"+parameter, false,'',true);//同步
 			});
 			//当有文件被添加进队列的时候，添加到页面预览
 			uploader.on( 'fileQueued', function(file){
@@ -9820,7 +10382,7 @@ K.extend(KSWFUpload, {
 						}
 					}
 				},
-				options.uploadUrl+"&"+parameter, false,'');//同步
+				options.uploadUrl+"&"+parameter, false,'',true);//同步
 			});
 			//当有文件被添加进队列的时候，添加到页面预览
 			uploader.on( 'fileQueued', function(file){
@@ -9932,7 +10494,7 @@ K.extend(KSWFUpload, {
 						}
 					}
 				},
-				options.uploadUrl+"&"+parameter, false,'');//同步
+				options.uploadUrl+"&"+parameter, false,'',true);//同步
 			});
 			//当有文件被添加进队列的时候，添加到页面预览
 			uploader.on( 'fileQueued', function(file){
@@ -10012,6 +10574,23 @@ K.extend(KSWFUpload, {
 			    }
 			
 			    
+			});
+			//当某个文件的分块在发送前触发，主要用来询问是否要添加附带参数，大文件在开起分片上传的前提下此事件可能会触发多次。
+			uploader.on('uploadBeforeSend',function (obj,data,headers) {
+				//从sessionStorage中获取登录令牌
+				var oauth2Token = window.sessionStorage.getItem('oauth2Token');
+				if(oauth2Token != null){
+					var oauth2Object = JSON.parse(oauth2Token);
+					$.extend(headers, {
+				 		"Authorization": "Bearer " +oauth2Object.access_token
+					});
+				}
+				
+				var csrfToken = K.getCookie('XSRF-TOKEN');
+				$.extend(headers, {
+			 		"X-XSRF-TOKEN": csrfToken
+				});
+				
 			});
 			//当有文件被添加进队列的时候，添加到页面预览
 			uploader.on( 'fileQueued', function(file){
@@ -10146,7 +10725,7 @@ KindEditor.plugin('multiimage', function(K) {
 	
 		K.loadScript(K.options.pluginsPath+name+"/webuploader.min.js");
 		K.loadStyle(K.options.pluginsPath+name+"/webuploader.css");
-	
+		
 	
 	self.plugin.multiImageDialog = function(options) {
 		var clickFn = options.clickFn,
@@ -10167,7 +10746,21 @@ KindEditor.plugin('multiimage', function(K) {
 				name : lang.insertAll,
 				click : function(e) {
 					clickFn.call(self, swfupload.getUrlList());
-					self.edit.trigger();//触发事件
+					
+					
+					for(var i=0; i<swfupload.getUrlList().length; i++){
+						var fileData = swfupload.getUrlList()[i];
+						//图片加载完触发才有效
+						var imgArr = K('<img src="' + fileData.url + '" />', document).each(function() {
+							
+							var img = new Image();
+				            img.src = fileData.url; 
+				            img.onload = function(){
+								self.edit.trigger();//触发事件
+			                }
+						});
+					}
+	
 				}
 			},
 			yesBtn : {
@@ -11179,32 +11772,33 @@ KindEditor.plugin('wordpaste', function(K) {
 	});
 });
 
-
+/**
+//浮动工具栏
+由6206行的create : function() 方法处理
 KindEditor.plugin('fixtoolbar', function (K) {
     var self = this;
+    
     if (!self.fixToolBar) {
         return;
     }
+   
     function init() {
-        var toolbar = K('.ke-toolbar');
-        var originY = toolbar.pos().y;
-        K(window).bind('scroll', function () {
-            if (toolbar.css('position') == 'fixed') {
-                if(document.body.scrollTop - originY < 0){
-                    toolbar.css('position', 'static');
-                    toolbar.css('top', 'auto');
-                }
-            } else {
-                if (toolbar.pos().y - document.body.scrollTop < 0) {
-                    toolbar.css('position', 'fixed');
-                    toolbar.css('top', 0);
-                }
-            }
-        });
+    	if(document.querySelector(".el-main")){//使用element-plus是获取窗口高度
+    		stickybits('.ke-toolbar', {scrollEl: '.el-main',stickyBitStickyOffset: -20});
+		}else{
+			stickybits('.ke-toolbar');
+		}
     }
-    if (self.isCreated) {
-        init();
-    } else {
-        self.afterCreate(init);
-    }
+    
+    //加载固定元素插件
+    K.loadScript(K.options.basePath+"stickybits.min.js",function() {
+		setTimeout(function() {
+			if (self.isCreated) {
+		        init();
+		    } else {
+		        self.afterCreate(init);
+		    }
+		}, 0);
+	});
 });
+**/

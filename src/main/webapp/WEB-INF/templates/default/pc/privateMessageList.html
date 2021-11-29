@@ -59,10 +59,9 @@
 								<div class="tipBottom">
 									<span class="a-toolbar">
 										<#if privateMessage.status == 10><span>未读</span></#if>
-										<#if privateMessage.status == 20><span style="color: green;">已读</span></#if>
-										&nbsp;|&nbsp;
-										<a href="user/control/privateMessageChatList?friendUserName=${privateMessage.friendUserName}">对话</a>&nbsp;|&nbsp;
-										<a href="javascript:" onclick="deletePrivateMessage('${privateMessage.friendUserName}')">删除</a>
+										<#if privateMessage.status == 20><span style="color: #009A29;">已读</span></#if>
+										<a href="user/control/privateMessageChatList?friendUserName=${privateMessage.friendUserName}"><i class="cms-chat-line" ></i>对话</a>
+										<a href="javascript:" onclick="deletePrivateMessage('${privateMessage.friendUserName}')"><i class="cms-trash" ></i>删除</a>
 										
 									</span>
 								</div>

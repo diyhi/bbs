@@ -125,21 +125,11 @@ public class TempletesInterceptor extends HandlerInterceptorAdapter {
 	    	//IP
 	    	TemplateThreadLocal.addRuntimeParameter("ip", IpAddress.getClientIpAddress(request));
 	    	
-	    	//获取登录用户(user/开头的URL才有值)
+	    	//获取登录用户
 		  	AccessUser accessUser = AccessUserThreadLocal.get();
 	    	if(accessUser != null){
 	    		
 	    		TemplateThreadLocal.addRuntimeParameter("accessUser", accessUser);
-	    	}else{
-	    		//获取登录用户
-	    		AccessUser _accessUser = oAuthManage.getUserName(request);
-	    		if(_accessUser != null){
-	    			UserState userState = userManage.query_userState(_accessUser.getUserName().trim());//用户状态
-	    			if(userState != null && userState.getSecurityDigest().equals(_accessUser.getSecurityDigest())){//验证安全摘要
-	    				TemplateThreadLocal.addRuntimeParameter("accessUser", _accessUser );
-		    			AccessUserThreadLocal.set(_accessUser);
-	    			}
-    			}	
 	    	}
 		}
 		//设置令牌
@@ -173,26 +163,7 @@ public class TempletesInterceptor extends HandlerInterceptorAdapter {
 	public void postHandle(HttpServletRequest request, HttpServletResponse response, 
 			 Object handler, ModelAndView modelAndView)throws Exception {  
 
-		//获取登录用户
-	  	AccessUser accessUser = AccessUserThreadLocal.get();
-		if(accessUser == null){
-			//为非user开头URI的登录用户令牌续期,因为user开头的URI由LoginFilter拦截
-			String baseURI = Configuration.baseURI(request.getRequestURI(), request.getContextPath());
-			if(!StringUtils.startsWithIgnoreCase(baseURI, "user/")){//如果不是user/开头
-				String accessToken = WebUtil.getCookieByName(request, "cms_accessToken");
-				String refreshToken = WebUtil.getCookieByName(request, "cms_refreshToken");
-				if(accessToken != null && !"".equals(accessToken.trim()) && refreshToken != null && !"".equals(refreshToken.trim())){
-					RefreshUser refreshUser = oAuthManage.getRefreshUserByRefreshToken(refreshToken.trim());
-					if(refreshUser != null && accessToken.equals(refreshUser.getAccessToken())){
-						
-						//令牌续期
-						oAuthManage.tokenRenewal(refreshToken,refreshUser,request,response);
-						accessUser = AccessUserThreadLocal.get();
-						
-					}
-				}
-			}
-		}
+		
 		/**
 		if(WebUtil.submitDataMode(request)){//如果以Ajax方式提交数据
 			// 设置响应头
@@ -253,7 +224,8 @@ public class TempletesInterceptor extends HandlerInterceptorAdapter {
     		    	//添加到模板参数线程变量
     		    	TemplateThreadLocal.setLayoutFile(requestName+".html");
     		    	
-    		    	
+    		    	//获取登录用户
+    			  	AccessUser accessUser = AccessUserThreadLocal.get();
     		    	
     		    	
     		    	String dirName = templateService.findTemplateDir_cache();	
@@ -332,11 +304,9 @@ public class TempletesInterceptor extends HandlerInterceptorAdapter {
 	/**
 	 *  afterCompletion()方法在DispatcherServlet完全处理完请求后被调用
 	 */
+	@Override
 	public void afterCompletion(HttpServletRequest request, HttpServletResponse 
 			 response, Object handler, Exception ex)throws Exception {  	
-    	//删除当前线程副本
-    	TemplateThreadLocal.removeThreadLocal();
-    	AccessUserThreadLocal.removeThreadLocal();
-    	CSRFTokenThreadLocal.removeThreadLocal();
+    	
 	}   
 }
