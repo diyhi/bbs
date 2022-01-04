@@ -147,7 +147,7 @@ JDK 1.8及以上 + Tomcat 8.0及以上 + MySQL 5.5.3及以上
 <br><br>
 #### 安装界面
 
-![输入图片说明](https://raw.githubusercontent.com/diyhi/bbs/master/image/600.png "600.png")
+![输入图片说明](https://raw.githubusercontent.com/diyhi/bbs/master/image/600.jpg "600.jpg")
 
 
 
