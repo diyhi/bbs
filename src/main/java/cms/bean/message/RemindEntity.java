@@ -34,6 +34,9 @@ public class RemindEntity implements Serializable{
 	/** 提醒发送用户名称 **/
 	@Transient
 	protected String senderUserName;
+	/** 提醒发送账号 **/
+	@Transient
+	protected String senderAccount;
 	/** 提醒发送用户呢称 **/
 	@Transient
 	protected String senderNickname;
@@ -254,6 +257,12 @@ public class RemindEntity implements Serializable{
 	}
 	public void setFriendQuestionReplyId(Long friendQuestionReplyId) {
 		this.friendQuestionReplyId = friendQuestionReplyId;
+	}
+	public String getSenderAccount() {
+		return senderAccount;
+	}
+	public void setSenderAccount(String senderAccount) {
+		this.senderAccount = senderAccount;
 	}
 
 	

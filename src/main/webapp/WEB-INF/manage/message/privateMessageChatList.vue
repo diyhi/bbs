@@ -9,7 +9,7 @@
 			
 			<div class="privateMessageChatModule">
 				<div class="headInfo">
-					<div class="title">与 {{chatUser.userName}} ({{chatUser.nickname}}) 的对话</div>
+					<div class="title">与 {{chatUser.account}} <span v-if="chatUser.nickname != null && chatUser.nickname != ''">({{chatUser.nickname}})</span> 的对话</div>
 				</div>
 			
 				<div v-for="privateMessage in privateMessageChatList" >
@@ -17,7 +17,7 @@
 						<el-popover effect="light" trigger="hover" placement="top">
 				        	<template #default>
 					            <p v-if="privateMessage.senderNickname != null && privateMessage.senderNickname != ''">呢称: {{privateMessage.senderNickname}}</p>
-					            <p>用户名称: {{privateMessage.senderUserName}}</p>
+					            <p>账号: {{privateMessage.senderAccount}}</p>
 				        	</template>
 				        	<template #reference>
 				          		<div class="avatar-wrapper" >
@@ -51,7 +51,7 @@
 						<el-popover effect="light" trigger="hover" placement="top">
 				        	<template #default>
 					            <p v-if="privateMessage.senderNickname != null && privateMessage.senderNickname != ''">呢称: {{privateMessage.senderNickname}}</p>
-					            <p>用户名称: {{privateMessage.senderUserName}}</p>
+					            <p>账号: {{privateMessage.senderAccount}}</p>
 				        	</template>
 				        	<template #reference>
 				          		<div class="avatar-wrapper" >

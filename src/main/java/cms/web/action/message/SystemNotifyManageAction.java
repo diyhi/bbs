@@ -39,6 +39,7 @@ import cms.utils.HtmlEscape;
 import cms.utils.JsonUtils;
 import cms.utils.WebUtil;
 import cms.web.action.TextFilterManage;
+import cms.web.action.fileSystem.FileManage;
 
 /**
  * 系统通知管理
@@ -57,6 +58,7 @@ public class SystemNotifyManageAction {
 	@Resource SystemNotifyManage systemNotifyManage;
 	@Resource UserService userService;
 	@Resource MessageSource messageSource;
+	@Resource FileManage fileManage;
 	
 	/**
 	 * 系统通知   添加界面显示
@@ -305,7 +307,15 @@ public class SystemNotifyManageAction {
 			
 			User user = userService.findUserById(id);
 			if(user != null){
-				returnValue.put("currentUser", user);
+				User currentUser = new User();
+				currentUser.setId(user.getId());
+				currentUser.setAccount(user.getAccount());
+				currentUser.setNickname(user.getNickname());
+				if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
+					currentUser.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+					currentUser.setAvatarName(user.getAvatarName());
+				}
+				returnValue.put("currentUser", currentUser);
 			}
 			
 			returnValue.put("pageView", pageView);

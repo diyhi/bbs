@@ -18,9 +18,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import cms.bean.RequestResult;
 import cms.bean.ResultCode;
@@ -53,9 +55,8 @@ public class FilePackageManageAction {
 	*/
 	@ResponseBody
 	@RequestMapping(params="method=download", method=RequestMethod.GET)
-	public ResponseEntity<byte[]> download(ModelMap model,String fileName,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ResponseEntity<StreamingResponseBody> download(ModelMap model,String fileName,@RequestHeader(required = false) String range,
+			HttpServletRequest request, HttpServletResponse response)throws Exception {
 
 		if(fileName == null || "".equals(fileName.trim())){
 			throw new SystemException("文件不名称不能为空！");
@@ -64,12 +65,12 @@ public class FilePackageManageAction {
 		fileName = FileUtil.toRelativePath(fileName); 
 		
 		String templateFile_path = "WEB-INF"+File.separator+"data"+ File.separator+"filePackage"+ File.separator+fileName;
-
-	    File file = new File(PathUtil.path()+File.separator+templateFile_path);
-	    
-	    
-	  
-        return WebUtil.downloadResponse(FileUtils.readFileToByteArray(file), fileName,request);
+		String filePackagePath = PathUtil.path()+File.separator+templateFile_path;
+		
+		return WebUtil.rangeDownloadResponse(filePackagePath, fileName,range,request,response);
+		
+		
+		//return WebUtil.rangeDownloadResponse(filePackagePath, fileName,range,request);
 	}
 	
 

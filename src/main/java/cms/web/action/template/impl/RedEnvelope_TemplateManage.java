@@ -85,6 +85,7 @@ public class RedEnvelope_TemplateManage {
 				User user = userManage.query_cache_findUserById(giveRedEnvelope.getUserId());
 				if(user != null){
 					giveRedEnvelope.setUserName(user.getUserName());
+					giveRedEnvelope.setAccount(user.getAccount());
 					giveRedEnvelope.setNickname(user.getNickname());
 					giveRedEnvelope.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 					giveRedEnvelope.setAvatarName(user.getAvatarName());

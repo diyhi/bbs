@@ -161,6 +161,8 @@ public class OAuthManage {
 		
 		User user = userManage.query_cache_findUserById(refreshUser.getUserId());
 		if(user != null){
+			//账号
+			String account = user.getAccount();
 			//呢称
 			String nickname = user.getNickname();
 			//头像路径
@@ -168,7 +170,7 @@ public class OAuthManage {
 			//头像名称
 			String avatarName = user.getAvatarName();
 			
-			oAuthManage.addAccessToken(new_accessToken, new AccessUser(refreshUser.getUserId(),refreshUser.getUserName(),nickname,avatarPath,avatarName, refreshUser.getSecurityDigest(),refreshUser.isRememberMe(),refreshUser.getOpenId()));
+			oAuthManage.addAccessToken(new_accessToken, new AccessUser(refreshUser.getUserId(),refreshUser.getUserName(),account,nickname,avatarPath,avatarName, refreshUser.getSecurityDigest(),refreshUser.isRememberMe(),refreshUser.getOpenId()));
 			refreshUser.setAccessToken(new_accessToken);
 			oAuthManage.addRefreshToken(new_refreshToken, refreshUser);
 			
@@ -179,8 +181,8 @@ public class OAuthManage {
 			
 			
 			//将旧的刷新令牌的accessToken设为0
-			oAuthManage.addRefreshToken(oldRefreshToken, new RefreshUser("0",refreshUser.getUserId(),refreshUser.getUserName(),nickname,avatarPath,avatarName,refreshUser.getSecurityDigest(),refreshUser.isRememberMe(),refreshUser.getOpenId()));
-			AccessUserThreadLocal.set(new AccessUser(refreshUser.getUserId(),refreshUser.getUserName(),nickname,avatarPath,avatarName,refreshUser.getSecurityDigest(),refreshUser.isRememberMe(),refreshUser.getOpenId()));
+			oAuthManage.addRefreshToken(oldRefreshToken, new RefreshUser("0",refreshUser.getUserId(),refreshUser.getUserName(),account,nickname,avatarPath,avatarName,refreshUser.getSecurityDigest(),refreshUser.isRememberMe(),refreshUser.getOpenId()));
+			AccessUserThreadLocal.set(new AccessUser(refreshUser.getUserId(),refreshUser.getUserName(),account,nickname,avatarPath,avatarName,refreshUser.getSecurityDigest(),refreshUser.isRememberMe(),refreshUser.getOpenId()));
 			
 			
 			

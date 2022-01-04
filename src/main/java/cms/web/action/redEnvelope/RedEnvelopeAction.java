@@ -109,7 +109,15 @@ public class RedEnvelopeAction{
 			
 			User user = userService.findUserById(id);
 			if(user != null){
-				returnValue.put("currentUser", user);
+				User currentUser = new User();
+				currentUser.setId(user.getId());
+				currentUser.setAccount(user.getAccount());
+				currentUser.setNickname(user.getNickname());
+				if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
+					currentUser.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+					currentUser.setAvatarName(user.getAvatarName());
+				}
+				returnValue.put("currentUser", currentUser);
 			}
 			returnValue.put("pageView", pageView);
 		}else{
@@ -164,7 +172,15 @@ public class RedEnvelopeAction{
 				if(id != null){
 					User user = userService.findUserById(id);
 					if(user != null){
-						returnValue.put("currentUser", user);
+						User currentUser = new User();
+						currentUser.setId(user.getId());
+						currentUser.setAccount(user.getAccount());
+						currentUser.setNickname(user.getNickname());
+						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
+							currentUser.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+							currentUser.setAvatarName(user.getAvatarName());
+						}
+						returnValue.put("currentUser", currentUser);
 					}
 				}
 				if(topicId != null){
@@ -223,7 +239,15 @@ public class RedEnvelopeAction{
 			pageView.setQueryResult(qr);
 			User _user = userService.findUserById(id);
 			if(_user != null){
-				returnValue.put("currentUser", _user);
+				User currentUser = new User();
+				currentUser.setId(_user.getId());
+				currentUser.setAccount(_user.getAccount());
+				currentUser.setNickname(_user.getNickname());
+				if(_user.getAvatarName() != null && !"".equals(_user.getAvatarName().trim())){
+					currentUser.setAvatarPath(fileManage.fileServerAddress()+_user.getAvatarPath());
+					currentUser.setAvatarName(_user.getAvatarName());
+				}
+				returnValue.put("currentUser", currentUser);
 			}
 			
 			returnValue.put("pageView", pageView);
@@ -232,6 +256,7 @@ public class RedEnvelopeAction{
 				for(ReceiveRedEnvelope receiveRedEnvelope : qr.getResultlist()){
 					User user = userManage.query_cache_findUserById(receiveRedEnvelope.getGiveUserId());
 	        		if(user != null){
+	        			receiveRedEnvelope.setGiveAccount(user.getAccount());
 	        			receiveRedEnvelope.setGiveNickname(user.getNickname());
 	        			receiveRedEnvelope.setGiveUserName(user.getUserName());
 	        			if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){

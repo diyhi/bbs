@@ -243,6 +243,10 @@ export default({
 			    				}
 			    				
 			    			}
+			    		}else{
+				    		//清空已加载的数据
+				    		_self.$refs.multipleTable.store.states.lazyTreeNodeMap.value[tree.id] = []; 
+			    		
 			    		}
 			    		resolve(resourceList);
 			    		_self.maps.set(tree.id, {tree, treeNode, resolve});

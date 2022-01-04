@@ -34,7 +34,7 @@
 							<el-popover effect="light" trigger="hover" placement="top">
 					        	<template #default>
 					        		<p v-if="scope.row.staff == false">呢称: {{scope.row.postNickname}}</p>
-						            <p>用户名称: {{scope.row.postUserName}}</p>
+						            <p>账号: {{scope.row.postAccount}}</p>
 					        	</template>
 					        	<template #reference v-if="scope.row.staff == false">
 					          		<div class="avatar-wrapper" >
@@ -45,7 +45,7 @@
 											<el-avatar :size="48" :src="scope.row.postAvatarPath+'100x100/'+scope.row.postAvatarName"></el-avatar>
 										</div>
 										
-										<div class="avatar-text">{{scope.row.postUserName}}</div>
+										<div class="avatar-text">{{scope.row.postAccount}}</div>
 									</div>
 					        	</template>
 					        	
@@ -54,7 +54,7 @@
 										<el-badge value="员工" type="warning" class="avatar-badge">
 											<el-avatar :size="48" icon="el-icon-user-solid"></el-avatar>
 										</el-badge>
-										<div class="avatar-text">{{scope.row.postUserName}}</div>
+										<div class="avatar-text">{{scope.row.postAccount}}</div>
 									</div>
 					        	</template>
 					        </el-popover>
@@ -65,7 +65,7 @@
 							<el-popover effect="light" trigger="hover" placement="top">
 					        	<template #default>
 					        		<p v-if="scope.row.staff == false">呢称: {{scope.row.answerNickname}}</p>
-						            <p>用户名称: {{scope.row.answerUserName}}</p>
+						            <p>账号: {{scope.row.answerAccount}}</p>
 					        	</template>
 					        	<template #reference v-if="scope.row.staff == false">
 					          		<div class="avatar-wrapper" >
@@ -76,7 +76,7 @@
 											<el-avatar :size="48" :src="scope.row.answerAvatarPath+'100x100/'+scope.row.answerAvatarName"></el-avatar>
 										</div>
 										
-										<div class="avatar-text">{{scope.row.answerUserName}}</div>
+										<div class="avatar-text">{{scope.row.answerAccount}}</div>
 									</div>
 					        	</template>
 					        	
@@ -85,7 +85,7 @@
 										<el-badge value="员工" type="warning" class="avatar-badge">
 											<el-avatar :size="48" icon="el-icon-user-solid"></el-avatar>
 										</el-badge>
-										<div class="avatar-text">{{scope.row.answerUserName}}</div>
+										<div class="avatar-text">{{scope.row.answerAccount}}</div>
 									</div>
 					        	</template>
 					        </el-popover>

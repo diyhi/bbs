@@ -31,6 +31,9 @@ public class UserDynamicEntity implements Serializable{
 	/** 用户名称 **/
 	@Column(length=30)
 	protected String userName;
+	/** 账号 **/
+	@Transient
+	protected String account;
 	/** 呢称 **/
 	@Transient
 	protected String nickname;
@@ -367,6 +370,14 @@ public class UserDynamicEntity implements Serializable{
 
 	public void setHideTagTypeMap(LinkedHashMap<Integer, Boolean> hideTagTypeMap) {
 		this.hideTagTypeMap = hideTagTypeMap;
+	}
+
+	public String getAccount() {
+		return account;
+	}
+
+	public void setAccount(String account) {
+		this.account = account;
 	}
 	
 }

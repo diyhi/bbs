@@ -338,12 +338,14 @@ public class ForumCodeManageAction {
 					
 					//调用文件编码判断类
 					String coding = Coding.detection(pc_f);
-					InputStreamReader read = new InputStreamReader (new FileInputStream(pc_f),coding); 
-					BufferedReader br = new BufferedReader(read);
-					String row;
-					while((row = br.readLine())!=null){
-						pc_sb.append(row).append("\n");
+					try (InputStreamReader read = new InputStreamReader (new FileInputStream(pc_f),coding); 
+							BufferedReader br = new BufferedReader(read);) {
+						String row;
+						while((row = br.readLine())!=null){
+							pc_sb.append(row).append("\n");
+						}
 					}
+					
 					returnValue.put("isPCHtmlExist", true);
 				}else{
 					returnValue.put("isPCHtmlExist", false);
@@ -354,12 +356,14 @@ public class ForumCodeManageAction {
 				if(wap_f.exists()){
 					//调用文件编码判断类
 					String coding = Coding.detection(wap_f);
-					InputStreamReader read = new InputStreamReader (new FileInputStream(wap_f),coding); 
-					BufferedReader br = new BufferedReader(read);
-					String row;
-					while((row = br.readLine())!=null){
-						wap_sb.append(row).append("\n");
+					try (InputStreamReader read = new InputStreamReader (new FileInputStream(wap_f),coding); 
+					BufferedReader br = new BufferedReader(read);) {
+						String row;
+						while((row = br.readLine())!=null){
+							wap_sb.append(row).append("\n");
+						}
 					}
+					
 					returnValue.put("isWapHtmlExist", true);
 				}else{
 					returnValue.put("isWapHtmlExist", false);
@@ -467,12 +471,14 @@ public class ForumCodeManageAction {
 					
 					//调用文件编码判断类
 					String coding = Coding.detection(pc_f);
-					InputStreamReader read = new InputStreamReader (new FileInputStream(pc_f),coding); 
-					BufferedReader br = new BufferedReader(read);
-					String row;
-					while((row = br.readLine())!=null){
-						pc_sb.append(row).append("\n");
+					try (InputStreamReader read = new InputStreamReader (new FileInputStream(pc_f),coding); 
+					BufferedReader br = new BufferedReader(read);){
+						String row;
+						while((row = br.readLine())!=null){
+							pc_sb.append(row).append("\n");
+						}
 					}
+					
 					returnValue.put("isPCHtmlExist", true);//是否存在电脑版html文件
 				}else{
 					returnValue.put("isPCHtmlExist", false);
@@ -482,12 +488,14 @@ public class ForumCodeManageAction {
 				if(wap_f.exists()){
 					//调用文件编码判断类
 					String coding = Coding.detection(wap_f);
-					InputStreamReader read = new InputStreamReader (new FileInputStream(wap_f),coding); 
-					BufferedReader br = new BufferedReader(read);
-					String row;
-					while((row = br.readLine())!=null){
-						wap_sb.append(row).append("\n");
+					try (InputStreamReader read = new InputStreamReader (new FileInputStream(wap_f),coding); 
+					BufferedReader br = new BufferedReader(read);){
+						String row;
+						while((row = br.readLine())!=null){
+							wap_sb.append(row).append("\n");
+						}
 					}
+					
 					returnValue.put("isWapHtmlExist", true);//是否存在手机版html文件
 				}else{
 					returnValue.put("isWapHtmlExist", false);

@@ -38,7 +38,7 @@
 												<img src="${topic.avatarPath}100x100/${topic.avatarName}">
 											<#else>
 												<!--[if (IE)]><img src="${commonPath}images/min_avata.png"><![endif]-->
-												<!--[if !(IE)]><!--><img avatar="${(topic.nickname != null && topic.nickname??) ?string(topic.nickname , topic.userName)}" ><!--<![endif]-->
+												<!--[if !(IE)]><!--><img avatar="${(topic.nickname != null && topic.nickname??) ?string(topic.nickname , topic.account)}" ><!--<![endif]-->
 											</#if>                                                         
 							            </a>   
 							        </div>
@@ -49,7 +49,7 @@
 								        		<span class="module">话题</span>
 								            	<span class="tag">${topic.tagName}</span>
 								            	<a class="userName" href="user/control/home?userName=${topic.userName}">
-								            		${(topic.nickname != null && topic.nickname??) ?string(topic.nickname , topic.userName)}
+								            		${(topic.nickname != null && topic.nickname??) ?string(topic.nickname , topic.account)}
 								            	</a>
 								            	<#list topic.userRoleNameList as roleName>
 													<span class="userRoleName">${roleName}</span>
@@ -107,7 +107,7 @@
 												<img src="${question.avatarPath}100x100/${question.avatarName}">
 											<#else>
 												<!--[if (IE)]><img src="${commonPath}images/min_avata.png"><![endif]-->
-												<!--[if !(IE)]><!--><img avatar="${(question.nickname != null && question.nickname??) ?string(question.nickname , question.userName)}" ><!--<![endif]-->
+												<!--[if !(IE)]><!--><img avatar="${(question.nickname != null && question.nickname??) ?string(question.nickname , question.account)}" ><!--<![endif]-->
 											</#if>                                                           
 							            </a>   
 							        </div>
@@ -117,7 +117,7 @@
 								        	<li>
 								        		<span class="module">问题</span>
 								            	<a class="userName" href="user/control/home?userName=${question.userName}">
-								            		${(question.nickname != null && question.nickname??) ?string(question.nickname , question.userName)}
+								            		${(question.nickname != null && question.nickname??) ?string(question.nickname , question.account)}
 								            	</a>
 								            	<#list question.userRoleNameList as roleName>
 													<span class="userRoleName">${roleName}</span>

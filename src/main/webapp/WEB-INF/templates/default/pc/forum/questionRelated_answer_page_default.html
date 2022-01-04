@@ -16,7 +16,7 @@
 								<img src="${answer.avatarPath}100x100/${answer.avatarName}" >
 							<#else>
 								<!--[if (IE)]><img src="${commonPath}images/min_avata.png"><![endif]-->
-								<!--[if !(IE)]><!--><img avatar="${(answer.nickname != null && answer.nickname??) ?string(answer.nickname , answer.userName)}" ><!--<![endif]-->
+								<!--[if !(IE)]><!--><img avatar="${(answer.nickname != null && answer.nickname??) ?string(answer.nickname , answer.account)}" ><!--<![endif]-->
 							</#if>   
 						</a>
 						
@@ -24,7 +24,7 @@
 						
 						<div class="info-container">
 							<a class="userName" href="user/control/home?userName=${answer.userName}">
-								${(answer.nickname != null && answer.nickname??) ?string(answer.nickname , answer.userName)}
+								${(answer.nickname != null && answer.nickname??) ?string(answer.nickname , answer.account)}
 							</a>
 							<#list answer.userRoleNameList as roleName>
 								<span class="userRoleName">${roleName}</span>
@@ -62,11 +62,11 @@
 													<img src="${reply.avatarPath}100x100/${reply.avatarName}" >
 												<#else>
 													<!--[if (IE)]><img src="${commonPath}images/min_avata.png"><![endif]-->
-													<!--[if !(IE)]><!--><img class="round" avatar="${(reply.nickname != null && reply.nickname??) ?string(reply.nickname , reply.userName)}" ><!--<![endif]-->
+													<!--[if !(IE)]><!--><img class="round" avatar="${(reply.nickname != null && reply.nickname??) ?string(reply.nickname , reply.account)}" ><!--<![endif]-->
 												</#if>
 											</a>
 									    	<a class="userName" href="user/control/home?userName=${reply.userName}">
-												${(reply.nickname != null && reply.nickname??) ?string(reply.nickname , reply.userName)}
+												${(reply.nickname != null && reply.nickname??) ?string(reply.nickname , reply.account)}
 											</a>
 											<#if reply.userRoleNameList?size gt 0>
 												<#list reply.userRoleNameList as roleName>

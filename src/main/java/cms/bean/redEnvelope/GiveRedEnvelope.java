@@ -31,6 +31,9 @@ public class GiveRedEnvelope implements Serializable{
 	/** 发红包的用户名称 **/
 	@Transient
 	private String userName;
+	/** 发红包的账号 **/
+	@Transient
+	private String account;
 	/** 发红包的用户呢称 **/
 	@Transient
 	private String nickname;
@@ -208,6 +211,12 @@ public class GiveRedEnvelope implements Serializable{
 	}
 	public void setRefundAmount(BigDecimal refundAmount) {
 		this.refundAmount = refundAmount;
+	}
+	public String getAccount() {
+		return account;
+	}
+	public void setAccount(String account) {
+		this.account = account;
 	}
 
 }

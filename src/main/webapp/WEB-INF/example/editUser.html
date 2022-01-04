@@ -97,6 +97,11 @@
 			<td colspan="2">会员用户名</td>
 		</tr>
 		<tr> 
+			<td>account</td> 
+			<td>String</td>
+			<td colspan="2">账号</td>
+		</tr>
+		<tr> 
 			<td>nickname</td> 
 			<td>String</td>
 			<td colspan="2">呢称</td>
@@ -618,8 +623,8 @@
 <form method="post" autocomplete="off" action="user/control/editUser">
 	<!-- 令牌标记 -->
 	<input type="hidden" id="token" name="token" value="${token}">
-	<#-- 用户名 -->
-	${user.userName}
+	<#-- 账号 -->
+	${user.account}
 	
 	<#-- 允许显示用户动态 -->
 	<input type="radio" name="allowUserDynamic" value="true" <#if user.allowUserDynamic ==true> checked='checked'</#if>>显示

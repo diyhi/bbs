@@ -126,9 +126,19 @@
 			<td colspan="2">用户名称</td>
 		</tr>
 		<tr> 
+			<td>account</td> 
+			<td>String</td>
+			<td colspan="2">账号</td>
+		</tr>
+		<tr> 
 			<td>nickname</td> 
 			<td>String</td>
 			<td colspan="2">呢称</td>
+		</tr>
+		<tr> 
+			<td>userInfoStatus</td> 
+			<td>Integer</td>
+			<td colspan="2">用户信息状态 -30.账号已注销(不显示数据) -20.账号已逻辑删除(不显示数据) -10.账号已禁用(不显示数据)  0.正常 10.账号已禁用(显示数据) 20.账号已逻辑删除(显示数据)</td>
 		</tr>
 		<tr> 
 			<td>userRoleNameList</td> 
@@ -201,6 +211,11 @@
 			<td>userName</td> 
 			<td>String</td>
 			<td colspan="2">用户名称</td>
+		</tr>
+		<tr> 
+			<td>account</td> 
+			<td>String</td>
+			<td colspan="2">账号</td>
 		</tr>
 		<tr> 
 			<td>nickname</td> 
@@ -283,8 +298,8 @@
 	<#if pageView.records?exists>
 		<#list pageView.records as answer>
 
-			<#-- 用户名称 -->
-			${answer.userName}
+			<#-- 账号 -->
+			${answer.account}
 			<#-- 回答时间 -->
 			${answer.postTime}
 	
@@ -293,8 +308,8 @@
 			
 			共有 ${answer.totalReply} 条回复
 			<#list answer.answerReplyList as reply>
-				<#-- 用户名称 -->
-				${reply.userName}
+				<#-- 账号 -->
+				${reply.account}
 				<#-- 回复内容 -->
 				${reply.content}
 				<#-- 回复时间 -->

@@ -334,11 +334,18 @@ public class Topic_TemplateManage {
 				if(topic.getIsStaff() == false){//会员
 					User user = userManage.query_cache_findUserByUserName(topic.getUserName());
 					if(user != null){
+						topic.setAccount(user.getAccount());
 						topic.setNickname(user.getNickname());
 						topic.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 						topic.setAvatarName(user.getAvatarName());
+						
+						if(user.getCancelAccountTime() != -1L){//账号已注销
+							topic.setUserInfoStatus(-30);
+						}
 					}
 					
+				}else{
+					topic.setAccount(topic.getUserName());//员工用户名和账号是同一个
 				}
 				//话题允许查看的角色名称集合
 				for (Map.Entry<Long, List<String>> entry : tagRoleNameMap.entrySet()) {
@@ -380,7 +387,20 @@ public class Topic_TemplateManage {
 			}
 			
 			
-			
+			//非正常状态用户清除显示数据
+			for(Topic topic : qr.getResultlist()){
+				if(topic.getUserInfoStatus() <0){
+					topic.setUserName(null);
+					topic.setAccount(null);
+					topic.setNickname(null);
+					topic.setAvatarPath(null);
+					topic.setAvatarName(null);
+					topic.setUserRoleNameList(new ArrayList<String>());
+					topic.setTitle("");
+					topic.setContent("");
+					topic.setSummary("");
+				}
+			}
 			
 		}
 		
@@ -513,6 +533,7 @@ public class Topic_TemplateManage {
 				if(topic.getIsStaff() == false){//会员
 					user = userManage.query_cache_findUserByUserName(topic.getUserName());
 					if(user != null){
+						topic.setAccount(user.getAccount());
 						topic.setNickname(user.getNickname());
 						topic.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 						topic.setAvatarName(user.getAvatarName());
@@ -521,8 +542,13 @@ public class Topic_TemplateManage {
 						if(userRoleNameList != null && userRoleNameList.size() >0){
 							topic.setUserRoleNameList(userRoleNameList);//用户角色名称集合
 						}
+						if(user.getCancelAccountTime() != -1L){//账号已注销
+							topic.setUserInfoStatus(-30);
+						}
 					}
 					
+				}else{
+					topic.setAccount(topic.getUserName());//员工用户名和账号是同一个
 				}
 				
 				List<String> topicRoleNameList = userRoleManage.queryAllowViewTopicRoleName(topic.getTagId());
@@ -602,7 +628,18 @@ public class Topic_TemplateManage {
 					
 				}
 				
-				
+				//非正常状态用户清除显示数据
+				if(topic.getUserInfoStatus() <0){
+					topic.setUserName(null);
+					topic.setAccount(null);
+					topic.setNickname(null);
+					topic.setAvatarPath(null);
+					topic.setAvatarName(null);
+					topic.setUserRoleNameList(new ArrayList<String>());
+					topic.setTitle(null);
+					topic.setContent(null);
+					topic.setSummary(null);
+				}
 				
 				return topic;
 			}
@@ -1020,12 +1057,19 @@ public class Topic_TemplateManage {
 				if(comment.getIsStaff() == false){//会员
 					User user = userManage.query_cache_findUserByUserName(comment.getUserName());
 					if(user != null){
+						comment.setAccount(user.getAccount());
 						comment.setNickname(user.getNickname());
 						comment.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 						comment.setAvatarName(user.getAvatarName());
 						userRoleNameMap.put(comment.getUserName(), null);
+						
+						if(user.getCancelAccountTime() != -1L){//账号已注销
+							comment.setUserInfoStatus(-30);
+						}
 					}
 					
+				}else{
+					comment.setAccount(comment.getUserName());//员工用户名和账号是同一个
 				}
 				
 				if(comment.getQuoteUpdateId() != null && comment.getQuoteUpdateId().length() >1){
@@ -1087,10 +1131,27 @@ public class Topic_TemplateManage {
 							}
 							if(quote.getIsStaff() == false){//会员
 								User user = userManage.query_cache_findUserByUserName(quote.getUserName());
+								quote.setAccount(user.getAccount());
 								quote.setNickname(user.getNickname());
 								quote.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 								quote.setAvatarName(user.getAvatarName());
 
+								if(user.getCancelAccountTime() != -1L){//账号已注销
+									quote.setUserInfoStatus(-30);
+								}
+							}else{
+								quote.setAccount(quote.getUserName());//员工用户名和账号是同一个
+							}
+							
+							//非正常状态用户清除显示数据
+							if(quote.getUserInfoStatus() <0){
+								quote.setUserName(null);
+								quote.setAccount(null);
+								quote.setNickname(null);
+								quote.setAvatarPath(null);
+								quote.setAvatarName(null);
+								quote.setUserRoleNameList(new ArrayList<String>());
+								quote.setContent("");
 							}
 						}
 					}
@@ -1107,6 +1168,17 @@ public class Topic_TemplateManage {
 						break;
 					}
 				}
+				
+				//非正常状态用户清除显示数据
+				if(comment.getUserInfoStatus() <0){
+					comment.setUserName(null);
+					comment.setAccount(null);
+					comment.setNickname(null);
+					comment.setAvatarPath(null);
+					comment.setAvatarName(null);
+					comment.setUserRoleNameList(new ArrayList<String>());
+					comment.setContent("");
+				}
 			}
 		}
 		
@@ -1120,14 +1192,32 @@ public class Topic_TemplateManage {
 							if(reply.getIsStaff() == false){//会员
 								User user = userManage.query_cache_findUserByUserName(reply.getUserName());
 								if(user != null){
+									reply.setAccount(user.getAccount());
 									reply.setNickname(user.getNickname());
 									reply.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 									reply.setAvatarName(user.getAvatarName());
 									
 									List<String> roleNameList = userRoleManage.queryUserRoleName(reply.getUserName());
 									reply.setUserRoleNameList(roleNameList);
+									
+									if(user.getCancelAccountTime() != -1L){//账号已注销
+										reply.setUserInfoStatus(-30);
+									}
 								}
 								
+							}else{
+								reply.setAccount(reply.getUserName());//员工用户名和账号是同一个
+							}
+							
+							//非正常状态用户清除显示数据
+							if(reply.getUserInfoStatus() <0){
+								reply.setUserName(null);
+								reply.setAccount(null);
+								reply.setNickname(null);
+								reply.setAvatarPath(null);
+								reply.setAvatarName(null);
+								reply.setUserRoleNameList(new ArrayList<String>());
+								reply.setContent(null);
 							}
 							
 							comment.addReply(reply);

@@ -14,7 +14,7 @@
 									<img src="${topic.avatarPath}100x100/${topic.avatarName}">
 								<#else>
 									<!--[if (IE)]><img src="${commonPath}images/min_avata.png"><![endif]-->
-									<!--[if !(IE)]><!--><img avatar="${(topic.nickname != null && topic.nickname??) ?string(topic.nickname , topic.userName)}" ><!--<![endif]-->
+									<!--[if !(IE)]><!--><img avatar="${(topic.nickname != null && topic.nickname??) ?string(topic.nickname , topic.account)}" ><!--<![endif]-->
 								</#if>                                                           
 				            </a>   
 				        </div>
@@ -24,7 +24,7 @@
 					        	<li>
 					            	<span class="tag-container"><span class="tag">${topic.tagName}</span></span>
 					            	<a class="userName" href="user/control/home?userName=${topic.userName}">
-					            		${(topic.nickname != null && topic.nickname??) ?string(topic.nickname , topic.userName)}
+					            		${(topic.nickname != null && topic.nickname??) ?string(topic.nickname , topic.account)}
 					            	</a>
 					            	<#list topic.userRoleNameList as roleName>
 										<span class="userRoleName">${roleName}</span>

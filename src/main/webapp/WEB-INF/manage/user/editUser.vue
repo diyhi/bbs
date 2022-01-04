@@ -10,9 +10,12 @@
 					<el-form-item label="用户类型" >
 						<span v-if="type == 10">本地账号密码用户</span>
 						<span v-if="type == 20">手机用户</span>
+						<span v-if="type == 30">邮箱用户</span>
+						<span v-if="type == 40">微信用户</span>
+						<span v-if="type == 80">其他用户</span>
 					</el-form-item>
-					<el-form-item label="会员用户名" >
-						{{userName}}
+					<el-form-item label="账号" >
+						{{account}}
 					</el-form-item>
 					<el-form-item label="手机" :required="type == 10? false :true" :error="error.mobile" >
 						<el-row><el-col :span="12"><el-input v-model.trim="mobile" maxlength="15" clearable="true" show-word-limit></el-input></el-col></el-row>
@@ -133,6 +136,7 @@ export default({
 			id:'',
 			type : 10,
 			userName :'',
+			account :'',
 			mobile :'',
 			nickname :'',
 			password :'',
@@ -274,6 +278,7 @@ export default({
 			    				let user = mapData[key];
 			    				_self.type = user.type;
 		    					_self.userName = user.userName;
+		    					_self.account = user.account;
 		    					_self.mobile = user.mobile;
 		    					_self.nickname = user.nickname;
 		    					_self.email = user.email;

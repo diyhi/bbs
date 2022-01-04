@@ -4,6 +4,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.Transient;
+
+
 
 
 
@@ -25,12 +28,16 @@ public class Quote implements Serializable{
 	private String ipAddress;
 	/** 用户名称 **/
 	private String userName;
+	/** 账号 **/
+	private String account;
 	/** 呢称 **/
 	private String nickname;
 	/** 头像路径 **/
 	private String avatarPath;
 	/** 头像名称 **/
 	private String avatarName;
+	/** 用户信息状态 -30.账号已注销(不显示数据) -20.账号已逻辑删除(不显示数据) -10.账号已禁用(不显示数据)  0.正常 10.账号已禁用(显示数据) 20.账号已逻辑删除(显示数据) **/
+	private Integer userInfoStatus = 0;
 	/** 评论内容 **/
 	private String content;
 	
@@ -96,6 +103,18 @@ public class Quote implements Serializable{
 	}
 	public void setUserRoleNameList(List<String> userRoleNameList) {
 		this.userRoleNameList = userRoleNameList;
+	}
+	public String getAccount() {
+		return account;
+	}
+	public void setAccount(String account) {
+		this.account = account;
+	}
+	public Integer getUserInfoStatus() {
+		return userInfoStatus;
+	}
+	public void setUserInfoStatus(Integer userInfoStatus) {
+		this.userInfoStatus = userInfoStatus;
 	}
 	
 	

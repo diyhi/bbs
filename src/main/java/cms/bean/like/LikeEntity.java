@@ -27,6 +27,9 @@ public class LikeEntity implements Serializable{
 	/** 点赞的用户名称 **/
 	@Column(length=30)
 	protected String userName;
+	/** 账号 **/
+	@Transient
+	protected String account;
 	/** 呢称 **/
 	@Transient
 	protected String nickname;
@@ -121,6 +124,14 @@ public class LikeEntity implements Serializable{
 
 	public void setAvatarName(String avatarName) {
 		this.avatarName = avatarName;
+	}
+
+	public String getAccount() {
+		return account;
+	}
+
+	public void setAccount(String account) {
+		this.account = account;
 	}
 	
 	

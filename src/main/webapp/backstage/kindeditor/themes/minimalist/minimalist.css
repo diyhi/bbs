@@ -26,7 +26,7 @@
 	-moz-box-shadow: 0 2px 10px 0 rgba(0,0,0,.16);
 	-webkit-box-shadow: 0 2px 10px 0 rgba(0,0,0,.16);
 	filter: progid:DXImageTransform.Microsoft.Shadow(color='#b8b8b8', Direction=135, Strength=2);
-	background-color: #f7f7f6;
+	background-color: #f5f7fa;
 }
 .ke-menu a,
 .ke-menu a:hover,
@@ -37,12 +37,12 @@
 }
 /* icons */
 .ke-icon-source {
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-preview {
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-print {
 	background-position: 0px -32px;
@@ -75,48 +75,48 @@
 	height: 16px;
 }
 .ke-icon-selectall {
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-justifyleft {
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-justifycenter {
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-justifyright {
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-justifyfull {
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-insertorderedlist {
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-insertunorderedlist {
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-indent {
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-outdent {
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-subscript {
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-superscript {
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-date {
 	background-position: 0px -304px;
@@ -129,53 +129,50 @@
 	height: 16px;
 }
 .ke-icon-formatblock {
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-fontname {
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-fontsize {
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-forecolor {/*文字颜色*/
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 	
 }
 .ke-icon-hilitecolor {/*文字背景*/
-	width: 22px;
-	height: 22px;
-	font-size: 15px;
-	position: relative;
-	top: -1px;
+	width: 24px;
+	height: 24px;
+	font-size: 22px;
 }
 .ke-icon-bold {
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-italic {
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-underline {
-	width: 22px;
-	height: 22px;
-	font-size: 13px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-strikethrough {
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-removeformat {
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-image {
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-flash {
 	background-position: 0px -512px;
@@ -183,8 +180,8 @@
 	height: 16px;
 }
 .ke-icon-media {
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-div {
 	background-position: 0px -544px;
@@ -197,24 +194,24 @@
 	height: 16px;
 }
 .ke-icon-hr {
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-emoticons {
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-link {
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-unlink {
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-fullscreen {
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-about {
 	background-position: 0px -672px;
@@ -232,8 +229,8 @@
 	height: 16px;
 }
 .ke-icon-table {
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-tablemenu {
 	background-position: 0px -768px;
@@ -241,52 +238,52 @@
 	height: 16px;
 }
 .ke-icon-tableinsert {/*插入表格*/
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-tabledelete {/*删除表格*/
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-tablecolinsertleft {/*左侧插入列*/
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-tablecolinsertright {/*右侧插入列*/
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-tablerowinsertabove {/*上方插入行*/
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-tablerowinsertbelow {/*下方插入行*/
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-tablecoldelete {/*删除列*/
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-tablerowdelete {/*删除行*/
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-tablecellprop {
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-tableprop {
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-checked {
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-code {
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-map {
 	background-position: 0px -976px;
@@ -294,32 +291,32 @@
 	height: 16px;
 }
 .ke-icon-baidumap {
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-lineheight {
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-clearhtml {
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-pagebreak {
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-insertfile {
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-quickformat {
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-template {
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-tablecellsplit {
 	background-position: 0px -1088px;
@@ -327,20 +324,20 @@
 	height: 16px;
 }
 .ke-icon-tablerowmerge {/**向下合并单元格**/
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-tablerowsplit {/*拆分行*/
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-tablecolmerge {/**向右合并单元格**/
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-tablecolsplit {/*拆分列*/
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-anchor {
 	background-position: 0px -1168px;
@@ -363,12 +360,12 @@
 	height: 16px;
 }
 .ke-icon-multiimage {
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 .ke-icon-hide {
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 }
 /* container */
 .ke-container {
@@ -383,7 +380,7 @@
 	text-align: left;
 	overflow: hidden;
 	zoom: 1;
-	color: #666;
+	color: #606266;
 	background: #fff;
 }
 .ke-toolbar-icon {
@@ -405,7 +402,7 @@
 	float: left;
 }
 .ke-toolbar .ke-on {
-	color: #333;
+	color: #303133;
 	
 }
 .ke-toolbar .ke-selected {
@@ -417,7 +414,7 @@
 .ke-toolbar .ke-separator {
 	height: 18px;
 	margin: 4px 3px 2px 3px;
-	border-left: 1px solid #dddddd;
+	border-left: 1px solid #dcdfe6;
 	border-right: 1px solid #FFFFFF;
 	border-top:0;
 	border-bottom:0;
@@ -436,7 +433,7 @@
 /* edit */
 .ke-edit {
 	padding: 0;
-	border: 1px solid #e0e0e0;
+	border: 1px solid #dcdfe6;
 	border-radius: 1px;
 	background-color: #FFF;
 }
@@ -449,7 +446,7 @@
 }
 .ke-edit-textarea {
 	font: 14px/1.5 "Consolas", "Monaco", "Bitstream Vera Sans Mono", "Courier New", Courier, monospace;
-	color: #000;
+	color: #303133;
 	overflow: auto;
 	resize: none;
 }
@@ -481,9 +478,9 @@
 }
 /* menu */
 .ke-menu {
-	border: 1px solid #dddddd;
+	border: 1px solid #dcdfe6;
 	background-color: #fcfcfc;
-	color: #222222;
+	color: #303133;
 	font-family: "sans serif",tahoma,verdana,helvetica;
 	font-size: 14px;
 	text-align: left;
@@ -492,14 +489,13 @@
 .ke-menu-item {
 	border: 1px solid #fcfcfc;
 	background-color: #fcfcfc;
-	color: #222222;
+	color: #303133;
 	height: 30px;
-	line-height: 30px;
 	overflow: hidden;
 	cursor: pointer;
 }
 .ke-menu-item-on {
-	background-color: #eeeeee;
+	background-color: #f4f4f5;
 }
 .ke-menu-item-left {
 	width: 27px;
@@ -531,16 +527,16 @@
 	margin: 2px 0;
 	height: 0;
 	overflow: hidden;
-	border-top: 1px solid #e0e0e0;
+	border-top: 1px solid #dcdfe6;
 	border-bottom: 1px solid #FFFFFF;
 	border-left: 0;
 	border-right: 0;
 }
 /* 字体颜色选择弹出框 */
 .ke-colorpicker {
-	border: 1px solid #ddd;
+	border: 1px solid #dcdfe6;
 	background-color: #fcfcfc;
-	color: #222222;
+	color: #303133;
 	padding: 2px;
 }
 .ke-colorpicker-table {
@@ -552,16 +548,16 @@
 .ke-colorpicker-cell {
 	font-size: 0;
 	line-height: 0;
-	border: 1px solid #f7f7f6;
+	border: 1px solid #f5f7fa;
 	cursor: pointer;
 	margin:3px;
 	padding:0;
 }
 .ke-colorpicker-cell-top {
 	font-family: "sans serif",tahoma,verdana,helvetica;
-	font-size: 12px;
-	line-height: 24px;
-	border: 1px solid #f7f7f6;
+	font-size: 14px;
+	line-height: 28px;
+	border: 1px solid #f5f7fa;
 	cursor: pointer;
 	margin:0;
 	padding:0;
@@ -574,8 +570,8 @@
 	border: 1px solid #1792f3;
 }
 .ke-colorpicker-cell-color {
-	width: 14px;
-	height: 14px;
+	width: 18px;
+	height: 18px;
 	margin: 3px;
 	padding: 0;
 	border: 0;
@@ -603,13 +599,16 @@
 	display: inline;
 	vertical-align: top;
 }
+.ke-dialog .ke-header input[type=checkbox] {
+	position: relative;
+	top: 1px;
+}
 .ke-dialog-content {
 	background-color: #FFF;
 	width: 100%;
 	height: 100%;
-	color: #333;
-	border: 1px solid #dddddd;
-	border-radius: 2px;
+	color: #303133;
+	border-radius :2px;  /* .ke-dialog-content和 .ke-dialog-header 和 .ke-dialog-footer的圆角一起起作用*/
 }
 .ke-dialog-shadow {
 	position: absolute;
@@ -618,30 +617,25 @@
 	left: 0;
 	width: 100%;
 	height: 100%;
-	box-shadow: 3px 3px 7px #dddddd;
-	-moz-box-shadow: 3px 3px 7px #dddddd;
-	-webkit-box-shadow: 3px 3px 7px #dddddd;
-	filter: progid:DXImageTransform.Microsoft.Blur(PixelRadius='3', MakeShadow='true', ShadowOpacity='0.4');
-	background-color: #f7f7f6;
 }
 .ke-dialog-header {
 	border:0;
 	margin:0;
-	padding: 4px 10px;
-	background: #f7f7f6;
-	border-bottom: 1px solid #dddddd;
+	padding: 8px 10px;
+	background: #f5f7fa;
 	height: 24px;
 	font: 14px/24px "sans serif",tahoma,verdana,helvetica;
 	text-align: left;
-	color: #222;
+	color: #303133;
 	cursor: move;
+	border-radius :2px;
 }
 .ke-dialog-icon-close {
 	display: block;
 	width: 16px;
 	height: 16px;
 	position: absolute;
-	right: 3px;
+	right: 10px;
 	top: 10px;
 	cursor: pointer;
 }
@@ -693,9 +687,11 @@
 	font-family: "sans serif",tahoma,verdana,helvetica;
 	font-size: 14px;
 	line-height:22px;
-	border-color: #e0e0e0 #e0e0e0 #e0e0e0 #e0e0e0;
+	border-color: #dcdfe6 #dcdfe6 #dcdfe6 #dcdfe6;
 	border-style: solid;
 	border-width: 1px;
+	border-radius:2px;
+	padding: 5px;
 }
 .ke-dialog-body .ke-form {
 	margin: 0;
@@ -710,7 +706,7 @@
 }
 .ke-dialog-loading-content {
 	background: url("../common/loading.gif") no-repeat;
-    color: #666;
+    color: #606266;
     font-size: 14px;
     font-weight: bold;
     height: 31px;
@@ -719,6 +715,7 @@
 }
 .ke-dialog-row {
 	margin-bottom: 10px;
+	line-height: 30px;
 }
 .ke-dialog-footer {/*弹出框底部*/
 	font: 12px/1 "sans serif",tahoma,verdana,helvetica;
@@ -726,6 +723,7 @@
 	padding:0 0 15px 0;
 	margin-right:15px;
 	background-color: #FFF;
+	border-radius :2px;
 }
 .ke-dialog-preview,
 .ke-dialog-yes {
@@ -734,15 +732,16 @@
 .ke-dialog-no {
 	margin: 5px 10px 5px 5px;
 }
+/* 遮罩层 */
 .ke-dialog-mask {
-	background-color:#FFF;
+	background-color:#000;
 	filter:alpha(opacity=50);
 	opacity:0.5;
 }
 /* 按钮 */
 .ke-button-common {
     cursor: pointer;
-    height: 30px;
+    height: 32px;
     overflow: visible;
     display: inline-block;
     vertical-align: top;
@@ -768,13 +767,14 @@
 }
 
 .ke-button {
-    background: #30aff7;
+    background: #409eff;
     color: #fff;
-    border-color: #30aff7;
+    border-color: #409eff;
 }
 
 .ke-button:hover {
-    background: #45b6f7;
+    background: #66b1ff;
+    border-color: #66b1ff;
 }
 
 .ke-button[value="确定"],
@@ -783,17 +783,19 @@
 .ke-button[value="全部清空"],
 .ke-button[value="全部插入"]{
     margin: 0px 5px;
-    padding: 0px 20px;
+    padding: 0px 20px 1px 20px;
 }
 
 .ke-button[value="取消"] {
-    background: #ebebeb;
-    color: #555;
-    border: 1px solid #ebebeb;
+    background: #909399;
+    color: #fff;
+    border: 1px solid #909399;
 }
 
 .ke-button[value="取消"]:hover {
-    background: #f5f5f5;
+    color: #fff;
+    background: #a6a9ad;
+    border: 1px solid #a6a9ad;
 }
 
 .ke-button[value="文件空间"] {
@@ -809,12 +811,13 @@
 .ke-button[value="上传"],
 .ke-button[value="搜索"],
 .ke-button[value="浏览\.\.\."]{/*小数点要转义*/
-    background: #f4f4f4;
-    color: #555;
-    border: 1px solid #ddd;
+    background: #f5f7fa;
+    color: #606266;
+    border: 1px solid #dcdfe6;
     width: 60px;
-    height: 26px;
-    margin-top: 2px;
+    height: 30px;
+    margin-top: 1px;
+    padding: 0px 0px 1px 0px;
 }
 
 .ke-button[value="上传"]:hover {
@@ -822,23 +825,24 @@
 }
 
 .ke-button[value="添加图片"]{/*小数点要转义*/
-    background: #f4f4f4;
-    color: #555;
-    border: 1px solid #ddd;
+    background: #f5f7fa;
+    color: #606266;
+    border: 1px solid #dcdfe6;
     width: 80px;
-    height: 26px;
-    margin-top: 2px;
+    height: 30px;
+    margin-top: 0px;
+    padding: 0px 0px 1px 0px;
 }
 
 
 /* 下拉列表 */
 .ke-dialog .ke-header .ke-left select,
 .ke-dialog-row select{
-	height:26px; 
+	height:30px; 
 	line-height:26px; 
 	padding:2px 4px;
 	border:1px solid;
-	border-color:#e0e0e0 #e0e0e0 #e0e0e0 #e0e0e0;
+	border-color:#dcdfe6 #dcdfe6 #dcdfe6 #dcdfe6;
 	background:#fff;
 	border-radius:2px;
 	margin-right: 1px;
@@ -849,11 +853,11 @@
 	background-color:#FFFFFF;
 	font-family: "sans serif",tahoma,verdana,helvetica;
 	font-size: 14px;
-	line-height: 20px;
-	height: 20px;
+	line-height: 24px;
+	height: 24px;
 	padding: 2px 4px;
 	border-radius:2px;
-	border-color: #e0e0e0 #e0e0e0 #e0e0e0 #e0e0e0;
+	border-color: #dcdfe6 #dcdfe6 #dcdfe6 #dcdfe6;
 	border-style: solid;
 	border-width: 1px;
 	display: -moz-inline-stack;
@@ -866,12 +870,12 @@
 	width: 50px;
 }
 .ke-input-color {
-	border: 1px solid #dddddd;
+	border: 1px solid #dcdfe6;
 	background-color: #FFFFFF;
 	font-size: 14px;
 	width: 64px;
-	height: 24px;
-	line-height: 24px;
+	height: 28px;
+	line-height: 28px;
 	border-radius:2px;
 	padding-left: 5px;
 	overflow: hidden;
@@ -907,7 +911,7 @@
 /* tabs */
 .ke-tabs {
 	font: 12px/1 "sans serif",tahoma,verdana,helvetica;
-	border-bottom:1px solid #dddddd;
+	border-bottom:1px solid #dcdfe6;
 	padding-left:5px;
 	margin-bottom:20px;
 }
@@ -920,25 +924,27 @@
 }
 .ke-tabs-li {
 	position: relative;
-	border: 1px solid #dddddd;
-	background-color: #f7f7f6;
+	border: 1px solid #dcdfe6;
+	background-color: #f5f7fa;
 	margin: 0 2px -1px 0;
-	padding: 0 20px;
+	padding: 4px 20px;
 	float: left;
 	line-height: 25px;
+	font-size:14px;
 	text-align: center;
-	color: #555555;
+	color: #606266;
 	cursor: pointer;
+	border-radius:2px;
 }
 .ke-tabs-li-selected {
 	background-color: #FFF;
 	border-bottom: 1px solid #FFF;
-	color: #000;
+	color: #303133;
 	cursor: default;
 }
 .ke-tabs-li-on {
 	background-color: #FFF;
-	color: #000;
+	color: #303133;
 }
 /* progressbar */
 .ke-progressbar {
@@ -970,7 +976,7 @@
 /* swfupload */
 .ke-swfupload-top {
 	position: relative;
-	margin-bottom: 10px;
+	margin-bottom: 18px;
 	_width: 608px;
 }
 .ke-swfupload-button {
@@ -992,11 +998,11 @@
 .ke-swfupload-body {
 	overflow:auto;
 	background-color:#FFFFFF;
-	border-color: #e0e0e0 #e0e0e0 #e0e0e0 #e0e0e0;
+	border-color: #dcdfe6 #dcdfe6 #dcdfe6 #dcdfe6;
 	border-style: solid;
 	border-width: 1px;
 	width: auto;
-	height: 370px;
+	height: 360px;
 	padding: 5px;
 }
 .ke-swfupload-body .ke-item {
@@ -1005,7 +1011,7 @@
 }
 .ke-swfupload-body .ke-photo {
 	position: relative;
-	border: 1px solid #DDDDDD;
+	border: 1px solid #dcdfe6;
 	background-color:#FFFFFF;
 	padding: 10px;
 }
@@ -1055,7 +1061,7 @@
 	margin: 2px;
 	padding: 10px;
 	top: 0;
-	border: 1px solid #dddddd;
+	border: 1px solid #dcdfe6;
 	background-color: #FFFFFF;
 	display: none;
 }
@@ -1073,7 +1079,7 @@
 .ke-plugin-emoticons .ke-cell {
 	margin:0;
 	padding:1px;
-	border:1px solid #f7f7f6;
+	border:1px solid #f5f7fa;
 	cursor:pointer;
 }
 .ke-plugin-emoticons .ke-on {
@@ -1097,7 +1103,7 @@
 	padding: 8px 0px 8px 0px;
 	border: 0;
 	font: 14px/1 "sans serif",tahoma,verdana,helvetica;
-	color: #666;
+	color: #606266;
 	text-decoration: none;
 }
 .ke-plugin-emoticons .ke-page a{
@@ -1117,7 +1123,7 @@
 	height: 260px;
 	font-family: "sans serif",tahoma,verdana,helvetica;
 	font-size: 12px;
-	border-color: #848484 #E0E0E0 #E0E0E0 #848484;
+	border-color: #848484 #dcdfe6 #dcdfe6 #848484;
 	border-style: solid;
 	border-width: 1px;
 }
@@ -1135,7 +1141,7 @@
 .ke-plugin-filemanager-body {
 	overflow: scroll;
 	background-color:#FFFFFF;
-	border-color: #e0e0e0 #e0e0e0 #e0e0e0 #e0e0e0;
+	border-color: #dcdfe6 #dcdfe6 #dcdfe6 #dcdfe6;
 	border-style: solid;
 	border-width: 1px;
 	width: auto;
@@ -1147,7 +1153,7 @@
 	margin: 5px;
 }
 .ke-plugin-filemanager-body .ke-photo {
-	border: 1px solid #DDDDDD;
+	border: 1px solid #dcdfe6;
 	background-color:#FFFFFF;
 	padding: 10px;
 }
@@ -1196,5 +1202,5 @@
 .ke-kindEditor_msg p{
 	position: relative;
     left: -50%; min-width:150px;
-	background:#000;opacity:0.7;color:#fff;text-align:center;padding:10px 10px;margin:0 auto;font-size:14px;border-radius:4px;
+	background:#303133;opacity:0.7;color:#fff;text-align:center;padding:10px 10px;margin:0 auto;font-size:14px;border-radius:4px;
 }

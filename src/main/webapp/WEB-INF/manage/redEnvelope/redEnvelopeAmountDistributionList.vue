@@ -11,7 +11,7 @@
                		<el-popover effect="light" trigger="hover" placement="bottom">
 			        	<template #default>
 			        		<p >呢称: {{currentUser.nickname}}</p>
-				            <p>用户名称: {{currentUser.userName}}</p>
+				            <p>账号: {{currentUser.account}}</p>
 			        	</template>
 			        	<template #reference>
 			          		<div class="avatar-wrapper" >
@@ -25,8 +25,8 @@
 			        	</template>
 			        </el-popover>
                	</div>
-               	<div class="userName" title="用户名称">
-               		{{currentUser.userName}}
+               	<div class="userName" title="账号">
+               		{{currentUser.account}}
                		<div class="nickname" title="呢称">
                			{{currentUser.nickname}}
                			 <i class="tag">发红包分配金额</i>
@@ -84,7 +84,7 @@
 							<el-popover effect="light" trigger="hover" placement="top">
 					        	<template #default>
 						            <p v-if="scope.row.receiveNickname != null && scope.row.receiveNickname != ''">呢称: {{scope.row.receiveNickname}}</p>
-						            <p v-if="scope.row.receiveUserName != null && scope.row.receiveUserName != ''">用户名称: {{scope.row.receiveUserName}}</p>
+						            <p v-if="scope.row.receiveUserName != null && scope.row.receiveUserName != ''">账号: {{scope.row.receiveAccount}}</p>
 					        	</template>
 					        	<template #reference>
 					          		<div class="avatar-wrapper" >
@@ -95,7 +95,7 @@
 											<el-avatar :size="48" :src="scope.row.receiveAvatarPath+'100x100/'+scope.row.receiveAvatarName"></el-avatar>
 										</div>
 										
-										<div class="avatar-text">{{scope.row.receiveUserName}}</div>
+										<div class="avatar-text">{{scope.row.receiveAccount}}</div>
 									</div>
 					        	</template>
 					        </el-popover>

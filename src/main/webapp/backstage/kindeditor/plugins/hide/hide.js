@@ -100,14 +100,14 @@ KindEditor.plugin('hide', function(K) {
 		
 		
 		html = [
-				'<div style="padding:20px;height:130px;">',
+				'<div style="padding:20px;height:160px;">',
 					//tabs
 					'<div class="tabs"></div>',
 					//选项1
 					'<div class="tab1" style="display:none;">',
 						//密码
 						'<div class="ke-dialog-row">',
-						'<label for="inputValue_10" style="width:60px;">密码</label>',
+						'<label for="inputValue_10" style="width:34px;">密码</label>',
 						'<input type="text" id="inputValue_10" class="ke-input-text ke-input-number" name="inputValue_10" value="'+options.hidePassword+'" maxlength="20" style="width:200px;" /> ',
 						'</div>',
 					'</div>',
@@ -142,7 +142,7 @@ KindEditor.plugin('hide', function(K) {
 					'</div>',
 					'<div>',
 						//提示
-						'<div style="color: #747474;position: absolute;left: 21px;bottom: 18px;">',
+						'<div style="color: #909399;position: absolute;left: 21px;bottom: 18px;">',
 						'提示：Shift + 回车 换行不换段',
 						'</div>',
 					'</div>',
@@ -152,7 +152,7 @@ KindEditor.plugin('hide', function(K) {
 			
 		dialog = self.createDialog({
 			name : name,
-			width : 450,
+			width : 600,
 			title : self.lang(name),
 			body : html,
 			yesBtn : {

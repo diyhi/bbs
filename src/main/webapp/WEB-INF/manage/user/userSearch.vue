@@ -12,9 +12,9 @@
 							</el-radio-group>
 						</el-tooltip>
 					</el-form-item>
-					<el-form-item :error="error.userName" v-if="searchType ==1">
-						<el-tooltip content="请输入用户名用户名" placement="top">
-							<el-input v-model.trim="userName" maxlength="50" placeholder="用户名"></el-input>
+					<el-form-item :error="error.account" v-if="searchType ==1">
+						<el-tooltip content="请输入账号" placement="top">
+							<el-input v-model.trim="account" maxlength="50" placeholder="账号"></el-input>
 						</el-tooltip>
 					</el-form-item>
 					<el-form-item :error="error.start_point" style="width: 180px;" v-if="searchType ==2">
@@ -50,7 +50,7 @@
 			<div class="data-table" >
 				<el-table ref="multipleTable" :data="tableData" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange" stripe empty-text="没有内容">
 					<el-table-column type="selection" ></el-table-column>
-					<el-table-column prop="userName" label="用户名称" align="center" ></el-table-column>
+					<el-table-column prop="account" label="账号" align="center" ></el-table-column>
 					<el-table-column prop="nickname" label="呢称" align="center" ></el-table-column>
 					<el-table-column label="头像" align="center" min-width="100">
 						<template #default="scope">
@@ -72,6 +72,7 @@
 							<el-tag effect="dark"  v-if="scope.row.type==20" class="tag-wrapper" >手机用户</el-tag>
 							<el-tag effect="dark"  v-if="scope.row.type==30" type="info" class="tag-wrapper" >邮箱用户</el-tag>
 							<el-tag effect="dark"  v-if="scope.row.type==40" type="success" class="tag-wrapper" >微信用户</el-tag>
+							<el-tag effect="dark"  v-if="scope.row.type==80" class="tag-wrapper-purple" >其他用户</el-tag>
 				    	</template>
 					</el-table-column>
 					<el-table-column prop="point" label="积分" align="center" ></el-table-column>
@@ -121,7 +122,7 @@ export default({
 			
 			
 			searchType :1,//搜索类型
-			userName :'',//用户名
+			account :'',//账号
 			start_point :'',//起始积分
 			end_point :'',//结束积分
 			start_registrationDate :'',//起始注册日期
@@ -132,7 +133,7 @@ export default({
 			
 			error :{
 				searchType :'',
-				userName :'',
+				account :'',
 				start_point :'',//起始积分
 				end_point :'',//结束积分
 				start_registrationDate :'',//起始注册日期
@@ -156,8 +157,8 @@ export default({
 		if(this.$route.query.searchType != undefined && this.$route.query.searchType != ''){
 			this.searchType = this.$route.query.searchType;
 		}
-		if(this.$route.query.userName != undefined && this.$route.query.userName !=''){
-			this.userName = decodeURIComponent(this.$route.query.userName);
+		if(this.$route.query.account != undefined && this.$route.query.account !=''){
+			this.account = decodeURIComponent(this.$route.query.account);
 		}
 		
 		if(this.$route.query.start_point != undefined && this.$route.query.start_point !=''){
@@ -182,7 +183,7 @@ export default({
 		
 		let parameterObj = new Object();
 		parameterObj.searchType = encodeURIComponent(this.searchType);
-		parameterObj.userName = encodeURIComponent(this.userName);
+		parameterObj.account = encodeURIComponent(this.account);
 		parameterObj.start_point = encodeURIComponent(this.start_point);
 		parameterObj.end_point = encodeURIComponent(this.end_point);
 		parameterObj.start_registrationDate = encodeURIComponent(this.start_registrationDate);
@@ -198,7 +199,7 @@ export default({
 			let parameObj = JSON.parse(decrypt);
 			
 			this.searchType = decodeURIComponent(parameObj.searchType);
-			this.userName = decodeURIComponent(parameObj.userName);
+			this.account = decodeURIComponent(parameObj.account);
 			this.start_point = decodeURIComponent(parameObj.start_point);
 			this.end_point = decodeURIComponent(parameObj.end_point);
 			this.start_registrationDate = decodeURIComponent(parameObj.start_registrationDate);
@@ -222,7 +223,7 @@ export default({
 			_self.$ajax.get('control/user/search', {
 			    params: {
 			    	searchType :_self.searchType,//搜索类型
-			    	userName :_self.userName,
+			    	account :_self.account,
 			    	start_point :_self.start_point,
 					end_point :_self.end_point,
 					start_registrationDate :_self.start_registrationDate,
@@ -280,7 +281,7 @@ export default({
   				path: '/admin/control/user/search', 
   				query:{ 
   					searchType :this.searchType,//搜索类型
-  					userName :encodeURIComponent(this.userName),
+  					account :encodeURIComponent(this.account),
   					start_point : encodeURIComponent(this.start_point),
 					end_point :encodeURIComponent(this.end_point),
 					start_registrationDate :encodeURIComponent(this.start_registrationDate),
@@ -313,7 +314,7 @@ export default({
 				path: '/admin/control/user/search', 
 				query:{ 
 					searchType :_self.searchType,//搜索类型
-					userName :encodeURIComponent(_self.userName),
+					account :encodeURIComponent(_self.account),
 					
 					start_point :encodeURIComponent(_self.start_point),
 					end_point :encodeURIComponent(_self.end_point),

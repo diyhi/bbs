@@ -56,11 +56,11 @@
 								<img src="${userDynamic.avatarPath}100x100/${userDynamic.avatarName}" >
 							<#else>
 								<!--[if (IE)]><img src="${commonPath}images/min_avata.png"><![endif]-->
-								<!--[if !(IE)]><!--><img avatar="${(userDynamic.nickname != null && userDynamic.nickname??) ?string(userDynamic.nickname , userDynamic.userName)}" ><!--<![endif]-->
+								<!--[if !(IE)]><!--><img avatar="${(userDynamic.nickname != null && userDynamic.nickname??) ?string(userDynamic.nickname , userDynamic.account)}" ><!--<![endif]-->
 							</#if> 
 							<cite>
 								<a class="userName" href="user/control/home?userName=${userDynamic.userName}">
-									${(userDynamic.nickname != null && userDynamic.nickname??) ?string(userDynamic.nickname , userDynamic.userName)}
+									${(userDynamic.nickname != null && userDynamic.nickname??) ?string(userDynamic.nickname , userDynamic.account)}
 								</a>
 							</cite> 
 						</div>

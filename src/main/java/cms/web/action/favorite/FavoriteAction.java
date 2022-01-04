@@ -118,7 +118,15 @@ public class FavoriteAction {
 			pageView.setQueryResult(qr);
 			User user = userService.findUserById(id);
 			if(user != null){
-				returnValue.put("currentUser", user);
+				User currentUser = new User();
+				currentUser.setId(user.getId());
+				currentUser.setAccount(user.getAccount());
+				currentUser.setNickname(user.getNickname());
+				if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
+					currentUser.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+					currentUser.setAvatarName(user.getAvatarName());
+				}
+				returnValue.put("currentUser", currentUser);
 			}
 			
 			returnValue.put("pageView", pageView);
@@ -167,6 +175,7 @@ public class FavoriteAction {
 				for(Favorites favorites : qr.getResultlist()){
 					User user = userManage.query_cache_findUserByUserName(favorites.getUserName());
 					if(user != null){
+						favorites.setAccount(user.getAccount());
 						favorites.setNickname(user.getNickname());
 						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
 							favorites.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
@@ -223,6 +232,7 @@ public class FavoriteAction {
 				for(Favorites favorites : qr.getResultlist()){
 					User user = userManage.query_cache_findUserByUserName(favorites.getUserName());
 					if(user != null){
+						favorites.setAccount(user.getAccount());
 						favorites.setNickname(user.getNickname());
 						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
 							favorites.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());

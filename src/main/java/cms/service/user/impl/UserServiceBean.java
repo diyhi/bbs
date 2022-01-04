@@ -29,6 +29,7 @@ import cms.service.besa.DaoSupport;
 import cms.service.favorite.FavoriteService;
 import cms.service.follow.FollowService;
 import cms.service.like.LikeService;
+import cms.service.membershipCard.MembershipCardGiftTaskService;
 import cms.service.message.PrivateMessageService;
 import cms.service.message.RemindService;
 import cms.service.message.SystemNotifyService;
@@ -54,7 +55,7 @@ import net.sf.cglib.beans.BeanCopier;
 @Transactional
 //@Repository
 public class UserServiceBean extends DaoSupport<User> implements UserService {
-	 private static final Logger logger = LogManager.getLogger(UserServiceBean.class);
+	private static final Logger logger = LogManager.getLogger(UserServiceBean.class);
 	
 	@Resource PointLogConfig pointLogConfig;
 	@Resource UserGradeService userGradeService;
@@ -75,7 +76,7 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 	@Resource QuestionService questionService;
 	@Resource AnswerService answerService;
 	@Resource RedEnvelopeService redEnvelopeService;
-	
+	@Resource MembershipCardGiftTaskService membershipCardGiftTaskService;
 	
 	/**
 	 * 根据条件分页查询用户信息
@@ -145,7 +146,7 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 		}
 		
 		//mysql强制使用索引:force index(索引名或者主键PRI)
-		String sql ="select t2.id, t2.userName,t2.nickname,t2.avatarName, t2.email, t2.registrationDate, t2.point, t2.state,t2.type,t2.platformUserId from(select o.id from user o force index(user_idx) "+(param != null && !"".equals(param.trim()) ? " where "+param:" ")+orderBy+" limit ?,?)t1,user t2 where t1.id=t2.id";
+		String sql ="select t2.id, t2.userName,t2.account,t2.nickname, t2.mobile,t2.cancelAccountTime, t2.avatarName, t2.email, t2.registrationDate, t2.point, t2.state,t2.type,t2.platformUserId from(select o.id from user o force index(user_idx) "+(param != null && !"".equals(param.trim()) ? " where "+param:" ")+orderBy+" limit ?,?)t1,user t2 where t1.id=t2.id";
 
 		Query query =  em.createNativeQuery(sql);
 		int placeholder = 1;//占位符参数
@@ -170,14 +171,17 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 				User user = new User();
 				user.setId(ObjectConversion.conversion(object[0], ObjectConversion.LONG));
 				user.setUserName(ObjectConversion.conversion(object[1], ObjectConversion.STRING));
-				user.setNickname(ObjectConversion.conversion(object[2], ObjectConversion.STRING));
-				user.setAvatarName(ObjectConversion.conversion(object[3], ObjectConversion.STRING));
-				user.setEmail(ObjectConversion.conversion(object[4], ObjectConversion.STRING));
-				user.setRegistrationDate(ObjectConversion.conversion(object[5], ObjectConversion.TIMESTAMP));
-				user.setPoint(ObjectConversion.conversion(object[6], ObjectConversion.LONG));
-				user.setState(ObjectConversion.conversion(object[7], ObjectConversion.INTEGER));
-				user.setType(ObjectConversion.conversion(object[8], ObjectConversion.INTEGER));
-				user.setPlatformUserId(ObjectConversion.conversion(object[9], ObjectConversion.STRING));
+				user.setAccount(ObjectConversion.conversion(object[2], ObjectConversion.STRING));
+				user.setNickname(ObjectConversion.conversion(object[3], ObjectConversion.STRING));
+				user.setMobile(ObjectConversion.conversion(object[4], ObjectConversion.STRING));
+				user.setCancelAccountTime(ObjectConversion.conversion(object[5], ObjectConversion.LONG));
+				user.setAvatarName(ObjectConversion.conversion(object[6], ObjectConversion.STRING));
+				user.setEmail(ObjectConversion.conversion(object[7], ObjectConversion.STRING));
+				user.setRegistrationDate(ObjectConversion.conversion(object[8], ObjectConversion.TIMESTAMP));
+				user.setPoint(ObjectConversion.conversion(object[9], ObjectConversion.LONG));
+				user.setState(ObjectConversion.conversion(object[10], ObjectConversion.INTEGER));
+				user.setType(ObjectConversion.conversion(object[11], ObjectConversion.INTEGER));
+				user.setPlatformUserId(ObjectConversion.conversion(object[12], ObjectConversion.STRING));
 				userList.add(user);
 			}
 		}
@@ -389,6 +393,24 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 		return null;
 		
 	}
+	/**
+	 * 根据账号查询当前用户
+	 * @param account 账号
+	 * @return
+	 */
+	@Transactional(readOnly=true,propagation=Propagation.NOT_SUPPORTED)
+	public User findUserByAccount(String account){
+		Query query =  em.createQuery("select o from User o where o.account=?1");
+		//设置参数 
+		query.setParameter(1, account);
+		List<User> userList = query.getResultList();
+		for(User user : userList){	
+			return user;
+		}
+		return null;
+		
+	}
+	
 	
 	/**
 	 * 根据平台用户Id查询当前用户
@@ -602,6 +624,24 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 		return query.executeUpdate();
 	}
 	/**
+	 * 注销账号
+	 * @param userName 用户名称
+	 * @param appendContent 追加内容
+	 * @param cancelAccountTime 注销账号时间
+	 * @param securityDigest 安全摘要
+	 */
+	public Integer cancelAccount(String userName,String appendContent,Long cancelAccountTime,Long securityDigest){
+		Query query = em.createQuery("update User o set " +
+				" o.account=CONCAT(o.account,?1),o.platformUserId=CONCAT(o.platformUserId,?2),o.securityDigest=?3,o.cancelAccountTime=?4, o.userVersion=o.userVersion+1 where o.userName=?5 and o.cancelAccountTime=?6")
+		.setParameter(1, appendContent)
+		.setParameter(2, appendContent)
+		.setParameter(3, securityDigest)
+		.setParameter(4, cancelAccountTime)
+		.setParameter(5, userName)
+		.setParameter(6, -1L);
+		return query.executeUpdate();
+	}
+	/**
 	 * 标记删除
 	 * @param idList 用户Id集合
 	 * @return
@@ -709,6 +749,9 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 		
 		//删除收红包
 		redEnvelopeService.deleteReceiveRedEnvelope(idList);
+		
+		//删除会员卡赠送项
+		membershipCardGiftTaskService.deleteMembershipCardGiftItemByUserName(userNameList);
 		
 		return j;
 	}

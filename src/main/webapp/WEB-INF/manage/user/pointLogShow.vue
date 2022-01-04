@@ -10,7 +10,7 @@
                		<el-popover effect="light" trigger="hover" placement="bottom">
 			        	<template #default>
 			        		<p >呢称: {{currentUser.nickname}}</p>
-				            <p>用户名称: {{currentUser.userName}}</p>
+				            <p>账号: {{currentUser.account}}</p>
 			        	</template>
 			        	<template #reference>
 			          		<div class="avatar-wrapper" >
@@ -24,8 +24,8 @@
 			        	</template>
 			        </el-popover>
                	</div>
-               	<div class="userName" title="用户名称">
-               		{{currentUser.userName}}
+               	<div class="userName" title="账号">
+               		{{currentUser.account}}
                		<div class="nickname" title="呢称">
                			{{currentUser.nickname}}
                			 <i class="tag">积分日志详细</i>
@@ -53,13 +53,13 @@
 					</el-col>
 				</el-row>
 				<el-row :gutter="10" type="flex">
-					<el-col :span="4"><div class="name">操作用户名称：</div></el-col>
+					<el-col :span="4"><div class="name">操作用户账号：</div></el-col>
 					<el-col :span="20">
 						<div class="content">
-							{{pointLog.operationUserName}}
+							{{pointLog.operationAccount}}
 							<el-tag effect="dark"  v-if="pointLog.operationUserType==0" class="tag-wrapper">系统</el-tag>
-							<el-tag effect="dark"  v-if="pointLog.operationUserType==1" type="success" class="tag-wrapper" >会员</el-tag>
-							<el-tag effect="dark"  v-if="pointLog.operationUserType==2" type="info" class="tag-wrapper" >员工</el-tag>
+							<el-tag effect="dark"  v-if="pointLog.operationUserType==1" type="success" class="tag-wrapper" >员工</el-tag>
+							<el-tag effect="dark"  v-if="pointLog.operationUserType==2" type="info" class="tag-wrapper" >会员</el-tag>
 					
 						</div>
 					</el-col>

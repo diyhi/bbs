@@ -291,5 +291,25 @@ public class MembershipCardGiftTaskBean extends DaoSupport<MembershipCardGiftTas
 		return qr;
 	}
 	
-	
+	/**
+	 * 根据用户名称删除会员卡赠送项
+	 * @param userNameList 用户名称集合
+	 */
+	public Integer deleteMembershipCardGiftItemByUserName(List<String> userNameList){
+		int j = 0;
+		int tableNumber = membershipCardGiftItemConfig.getTableQuantity();
+		for(int i = 0; i<tableNumber; i++){
+			if(i == 0){//默认对象
+				//删除
+				Query query = em.createQuery("delete from MembershipCardGiftItem o where o.userName in(:userName)")
+						.setParameter("userName", userNameList);
+				j += query.executeUpdate();
+			}else{//带下划线对象
+				Query query = em.createQuery("delete from MembershipCardGiftItem_"+i+" o where o.userName in(:userName)")
+						.setParameter("userName", userNameList);
+				j += query.executeUpdate();
+			}
+		}
+		return j;
+	}
 }

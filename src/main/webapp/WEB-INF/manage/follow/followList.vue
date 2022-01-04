@@ -10,7 +10,7 @@
                		<el-popover effect="light" trigger="hover" placement="bottom">
 			        	<template #default>
 			        		<p >呢称: {{currentUser.nickname}}</p>
-				            <p>用户名称: {{currentUser.userName}}</p>
+				            <p>账号: {{currentUser.account}}</p>
 			        	</template>
 			        	<template #reference>
 			          		<div class="avatar-wrapper" >
@@ -24,8 +24,8 @@
 			        	</template>
 			        </el-popover>
                	</div>
-               	<div class="userName" title="用户名称">
-               		{{currentUser.userName}}
+               	<div class="userName" title="账号">
+               		{{currentUser.account}}
                		<div class="nickname" title="呢称">
                			{{currentUser.nickname}}
                			 <i class="tag">关注</i>
@@ -39,7 +39,7 @@
 							<el-popover effect="light" trigger="hover" placement="top">
 					        	<template #default>
 					        		<p v-if="scope.row.friendNickname != null &&  scope.row.friendNickname != ''">呢称: {{scope.row.friendNickname}}</p>
-						            <p>用户名称: {{scope.row.friendUserName}}</p>
+						            <p>账号: {{scope.row.friendAccount}}</p>
 					        	</template>
 					        	<template #reference>
 					          		<div class="avatar-wrapper" >
@@ -50,7 +50,7 @@
 											<el-avatar :size="48" :src="scope.row.friendAvatarPath+'100x100/'+scope.row.friendAvatarName"></el-avatar>
 										</div>
 										
-										<div class="avatar-text">{{scope.row.friendUserName}}</div>
+										<div class="avatar-text">{{scope.row.friendAccount}}</div>
 									</div>
 					        	</template>
 					        </el-popover>

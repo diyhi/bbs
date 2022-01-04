@@ -1957,10 +1957,13 @@ CREATE TABLE `user` (
   `deposit` decimal(14,4) DEFAULT NULL,
   `platformUserId` varchar(90) DEFAULT NULL,
   `type` int(11) DEFAULT NULL,
+  `account` varchar(65) DEFAULT NULL,
+  `cancelAccountTime` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `UK4bakctviobmdk6ddh2nwg08c2` (`userName`),
   UNIQUE KEY `UKmtrfpdps3j0ce18c8xglgjf7n` (`platformUserId`),
-  KEY `user_idx` (`state`)
+  UNIQUE KEY `UKdnq7r8jcmlft7l8l4j79l1h74` (`account`),
+  KEY `user_idx` (`state`),
+  KEY `user_2_idx` (`userName`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 

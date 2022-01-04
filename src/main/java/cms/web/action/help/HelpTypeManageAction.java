@@ -66,7 +66,7 @@ public class HelpTypeManageAction {
 		//错误
 		Map<String,String> error = new HashMap<String,String>();
 		Map<String,Object> returnValue = new HashMap<String,Object>();
-		if(parentId != null){//判断父类ID是否存在;
+		if(parentId != null && parentId >0L){//判断父类ID是否存在;
 			HelpType pt = helpTypeService.findById(parentId);
 			if(pt != null){
 				returnValue.put("parentHelpType",pt);//返回消息

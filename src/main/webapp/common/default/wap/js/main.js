@@ -483,7 +483,7 @@ var index_component = Vue.extend({
 								for(var i=0;i<_self.topicList.length; i++){
 									var topic = _self.topicList[i];
 									if(topic.avatarName == null || topic.avatarName == ''){
-										var char = (topic.nickname != null && topic.nickname !="") ? topic.nickname : topic.userName;
+										var char = (topic.nickname != null && topic.nickname !="") ? topic.nickname : topic.account;
 										//元素的实际宽度
 										var width= _self.$refs['avatarData_'+topic.id][0].offsetWidth;
 										_self.$refs['avatarData_'+topic.id][0].src = letterAvatar(char, width);	
@@ -1411,7 +1411,7 @@ var thread_component = Vue.extend({
 							//生成首字符头像
 							_self.$nextTick(function() {
 								if(_self.topic.avatarName == null || _self.topic.avatarName == ''){
-									var char = (_self.topic.nickname != null && _self.topic.nickname !="") ? _self.topic.nickname : _self.topic.userName;
+									var char = (_self.topic.nickname != null && _self.topic.nickname !="") ? _self.topic.nickname : _self.topic.account;
 									//元素的实际宽度
 									var width= _self.$refs.topicUserAvatar.offsetWidth;
 									_self.$refs.topicUserAvatar.src = letterAvatar(char, width);	
@@ -1454,7 +1454,7 @@ var thread_component = Vue.extend({
 							//生成首字符头像
 							_self.$nextTick(function() {
 								if(_self.giveRedEnvelope.avatarName == null || _self.giveRedEnvelope.avatarName == ''){
-									var char = (_self.giveRedEnvelope.nickname != null && _self.giveRedEnvelope.nickname !="") ? _self.giveRedEnvelope.nickname : _self.giveRedEnvelope.userName;
+									var char = (_self.giveRedEnvelope.nickname != null && _self.giveRedEnvelope.nickname !="") ? _self.giveRedEnvelope.nickname : _self.giveRedEnvelope.account;
 									//元素的实际宽度
 									var width= _self.$refs.giveRedEnvelopeUserAvatar.offsetWidth;
 									_self.$refs.giveRedEnvelopeUserAvatar.src = letterAvatar(char, width);	
@@ -1505,7 +1505,7 @@ var thread_component = Vue.extend({
 										for(var i=0;i<receiveRedEnvelopeList.length; i++){
 											var receiveRedEnvelope = receiveRedEnvelopeList[i];
 											if(receiveRedEnvelope.receiveAvatarName == null || receiveRedEnvelope.receiveAvatarName == ''){
-												var char = (receiveRedEnvelope.receiveNickname != null && receiveRedEnvelope.receiveNickname !="") ? receiveRedEnvelope.receiveNickname : receiveRedEnvelope.receiveUserName;
+												var char = (receiveRedEnvelope.receiveNickname != null && receiveRedEnvelope.receiveNickname !="") ? receiveRedEnvelope.receiveNickname : receiveRedEnvelope.receiveAccount;
 												//元素的实际宽度
 												var width= _self.$refs['redEnvelopeAvatarData_'+receiveRedEnvelope.id][0].offsetWidth;
 												_self.$refs['redEnvelopeAvatarData_'+receiveRedEnvelope.id][0].src = letterAvatar(char, width);
@@ -2185,14 +2185,14 @@ var thread_component = Vue.extend({
 											
 										}
 										if(quote.avatarName == undefined || quote.avatarName == null || quote.avatarName == ''){
-											var char = (quote.nickname != null && quote.nickname != '') ? quote.nickname : quote.userName;
+											var char = (quote.nickname != null && quote.nickname != '') ? quote.nickname : quote.account;
 											var width = 16;//头像宽
 											avatarHtml += "<img src=\""+letterAvatar(char, width)+"\">";
 											
 										}
 											
 										avatarHtml += "</router-link>";
-										quoteContent = "<div class=\"quoteComment\">"+quoteContent+"<span class=\"userName\">"+avatarHtml+"<router-link tag=\"span\" :to=\"{path: '/user/control/home', query: {userName: '"+quote.userName+"'}}\">"+(quote.nickname != null && quote.nickname != '' ? escapeHtml(quote.nickname) : quote.userName)+"</router-link>&nbsp;的评论：</span><br/>"+quote.content+"</div>";
+										quoteContent = "<div class=\"quoteComment\">"+quoteContent+"<span class=\"userName\">"+avatarHtml+"<router-link tag=\"span\" :to=\"{path: '/user/control/home', query: {userName: '"+quote.userName+"'}}\">"+(quote.nickname != null && quote.nickname != '' ? escapeHtml(quote.nickname) : escapeHtml(quote.account))+"</router-link>&nbsp;的评论：</span><br/>"+quote.content+"</div>";
 	
 									}
 									_self.$set(_self.quoteData, comment.id, escapeVueHtml(quoteContent));
@@ -2215,7 +2215,7 @@ var thread_component = Vue.extend({
 									for(var i=0;i<_self.commentList.length; i++){
 										var comment = _self.commentList[i];
 										if(comment.avatarName == null || comment.avatarName == ''){
-											var char = (comment.nickname != null && comment.nickname !="") ? comment.nickname : comment.userName;
+											var char = (comment.nickname != null && comment.nickname !="") ? comment.nickname : comment.account;
 											//元素的实际宽度
 											var width= _self.$refs['commentAvatarData_'+comment.id][0].offsetWidth;
 											_self.$refs['commentAvatarData_'+comment.id][0].src = letterAvatar(char, width);
@@ -2228,7 +2228,7 @@ var thread_component = Vue.extend({
 											for(var j=0;j<comment.replyList.length; j++){
 												var reply = comment.replyList[j];
 												if(reply.avatarName == null || reply.avatarName == ''){
-													var char = (reply.nickname != null && reply.nickname !="") ? reply.nickname : reply.userName;
+													var char = (reply.nickname != null && reply.nickname !="") ? reply.nickname : reply.account;
 													//元素的实际宽度
 													var width= _self.$refs['replyAvatarData_'+reply.id][0].offsetWidth;
 													_self.$refs['replyAvatarData_'+reply.id][0].src = letterAvatar(char, width);	
@@ -3700,7 +3700,7 @@ var askList_component = Vue.extend({
 									for(var i=0;i<_self.questionList.length; i++){
 										var question = _self.questionList[i];
 										if(question.avatarName == null || question.avatarName == ''){
-											var char = (question.nickname != null && question.nickname !="") ? question.nickname : question.userName;
+											var char = (question.nickname != null && question.nickname !="") ? question.nickname : question.account;
 											//元素的实际宽度
 											var width= _self.$refs['questionAvatarData_'+question.id][0].offsetWidth;
 											_self.$refs['questionAvatarData_'+question.id][0].src = letterAvatar(char, width);	
@@ -4011,7 +4011,7 @@ var question_component = Vue.extend({
 							//生成首字符头像
 							_self.$nextTick(function() {
 								if(_self.question.avatarName == null || _self.question.avatarName == ''){
-									var char = (_self.question.nickname != null && _self.question.nickname !="") ? _self.question.nickname : _self.question.userName;
+									var char = (_self.question.nickname != null && _self.question.nickname !="") ? _self.question.nickname : _self.question.account;
 									//元素的实际宽度
 									var width= _self.$refs.questionUserAvatar.offsetWidth;
 									_self.$refs.questionUserAvatar.src = letterAvatar(char, width);	
@@ -4369,7 +4369,7 @@ var question_component = Vue.extend({
 									for(var i=0;i<_self.answerList.length; i++){
 										var answer = _self.answerList[i];
 										if(answer.avatarName == null || answer.avatarName == ''){
-											var char = (answer.nickname != null && answer.nickname !="") ? answer.nickname : answer.userName;
+											var char = (answer.nickname != null && answer.nickname !="") ? answer.nickname : answer.account;
 											//元素的实际宽度
 											var width= _self.$refs['answerAvatarData_'+answer.id][0].offsetWidth;
 											_self.$refs['answerAvatarData_'+answer.id][0].src = letterAvatar(char, width);	
@@ -4379,7 +4379,7 @@ var question_component = Vue.extend({
 											for(var j=0;j<answer.answerReplyList.length; j++){
 												var reply = answer.answerReplyList[j];
 												if(reply.avatarName == null || reply.avatarName == ''){
-													var char = (reply.nickname != null && reply.nickname !="") ? reply.nickname : reply.userName;
+													var char = (reply.nickname != null && reply.nickname !="") ? reply.nickname : reply.account;
 													//元素的实际宽度
 													var width= _self.$refs['answerReplyAvatarData_'+reply.id][0].offsetWidth;
 													_self.$refs['answerReplyAvatarData_'+reply.id][0].src = letterAvatar(char, width);	
@@ -6370,6 +6370,7 @@ var searchBar_component = Vue.extend({
 		//提交搜索
 		submitSearch : function() {
 			if (this.keyword != null && this.keyword != "") {
+				this.$refs.searchInput.$refs.input.blur();//取消焦点，让软键盘隐藏
 				this.$router.push({
 					path : '/search',
 					query : {
@@ -6465,7 +6466,7 @@ var search_component = Vue.extend({
 										var searchResult = _self.searchResultList[i];
 										if(searchResult.indexModule == 10){
 											if(searchResult.topic.avatarName == null || searchResult.topic.avatarName == ''){
-												var char = (searchResult.topic.nickname != null && searchResult.topic.nickname !="") ? searchResult.topic.nickname : searchResult.topic.userName;
+												var char = (searchResult.topic.nickname != null && searchResult.topic.nickname !="") ? searchResult.topic.nickname : searchResult.topic.account;
 												//元素的实际宽度
 												var width= _self.$refs['searchResultTopicAvatarData_'+searchResult.topic.id][0].offsetWidth;
 												_self.$refs['searchResultTopicAvatarData_'+searchResult.topic.id][0].src = letterAvatar(char, width);	
@@ -6473,7 +6474,7 @@ var search_component = Vue.extend({
 											
 										}else if(searchResult.indexModule == 20){
 											if(searchResult.question.avatarName == null || searchResult.question.avatarName == ''){
-												var char = (searchResult.question.nickname != null && searchResult.question.nickname !="") ? searchResult.question.nickname : searchResult.question.userName;
+												var char = (searchResult.question.nickname != null && searchResult.question.nickname !="") ? searchResult.question.nickname : searchResult.question.account;
 												//元素的实际宽度
 												var width= _self.$refs['searchResultQuestionAvatarData_'+searchResult.question.id][0].offsetWidth;
 												_self.$refs['searchResultQuestionAvatarData_'+searchResult.question.id][0].src = letterAvatar(char, width);	
@@ -6989,7 +6990,7 @@ var register_component = Vue.extend({
 			registerType_tab_10 : 'active',//注册类型选中样式
 			registerType_tab_20 : '',//注册类型选中样式
 			
-			userName_field : true,//表单用户名字段
+			account_field : true,//表单账号
 			mobile_field : false,//表单手机号字段
 			issue_field : true,//表单密码提示问题字段
 			answer_field : true,//表单密码提示答案字段
@@ -7003,7 +7004,7 @@ var register_component = Vue.extend({
 			captchaValue : '',
 			showCaptcha : false,
 			imgUrl : '',
-			userName : '', //用户名
+			account : '', //账号
 			password : '', //密码
 			confirmPassword : '', //确认密码
 			issue : '', //密码提示问题
@@ -7019,7 +7020,7 @@ var register_component = Vue.extend({
 				text : '获取短信校验码',
 			},
 			error : {
-				userName : '', //用户名
+				account : '', //账号
 				password : '', //密码
 				confirmPassword : '', //确认密码
 				issue : '', //密码提示问题
@@ -7061,7 +7062,7 @@ var register_component = Vue.extend({
 				this.registerType_tab_10 = "active";
 				this.registerType_tab_20 = "";
 				
-				this.userName_field = true;
+				this.account_field = true;
 				this.mobile_field = false;
 				this.issue_field = true;
 				this.answer_field = true;
@@ -7072,7 +7073,7 @@ var register_component = Vue.extend({
 				this.registerType_tab_10 = "";
 				this.registerType_tab_20 = "active";
 				
-				this.userName_field = false;
+				this.account_field = false;
 				this.mobile_field = true;
 				this.issue_field = false;
 				this.answer_field = false;
@@ -7342,7 +7343,7 @@ var register_component = Vue.extend({
 			_self.allowSubmit = true;//提交按钮disabled状态
 			
 			//清除错误
-			_self.error.userName = '';//用户名
+			_self.error.account = '';//账号
 			_self.error.password = ''; //密码
 			_self.error.confirmPassword  = '';//确认密码
 			_self.error.issue = '';//密码提示问题
@@ -7371,10 +7372,10 @@ var register_component = Vue.extend({
 			if(_self.type == 10){//10:本地账号密码用户
 				parameter += "&type=10";
 				
-				//用户名
-				var userName = _self.userName;
-				if (userName != "") {
-					parameter += "&userName=" + encodeURIComponent(userName);
+				//账号
+				var account = _self.account;
+				if (account != "") {
+					parameter += "&account=" + encodeURIComponent(account);
 				}
 				
 			}else if(_self.type == 20){//20: 手机用户
@@ -7503,8 +7504,8 @@ var register_component = Vue.extend({
 						} else { //失败
 							for (var error in value_error) {
 								var errorValue = value_error[error];
-								if (error == "userName") { //用户名
-									_self.error.userName = errorValue;
+								if (error == "account") { //账号
+									_self.error.account = errorValue;
 								} else if (error == "password") { //密码
 									_self.error.password = errorValue;
 								} else if (error == "issue") { //密码提示问题
@@ -7548,11 +7549,11 @@ var register_component = Vue.extend({
 				}
 			});
 		},
-		//验证用户名
+		//验证账号
 		verificationUserName : function() {
 			var _self = this;
-			var parameter = "&userName=" + encodeURIComponent(_self.userName);
-			_self.error.userName = "";
+			var parameter = "&account=" + encodeURIComponent(_self.account);
+			_self.error.account = "";
 
 			$.ajax({
 				type : "GET",
@@ -7563,7 +7564,7 @@ var register_component = Vue.extend({
 				success : function success(result) {
 					if (result != "") {
 						if (result == "true") {
-							_self.error.userName = "用户名已存在";
+							_self.error.account = "账号已存在";
 						}
 					}
 				}
@@ -7706,18 +7707,18 @@ var findPassWord_step1_component = Vue.extend({
 			type_tab_10 : 'active',//用户类型选中样式
 			type_tab_20 : '',//用户类型选中样式
 			
-			userName_field : true,//表单用户名字段
+			account_field : true,//表单账号字段
 			mobile_field : false,//表单手机号字段
 			
 			type : 10,//用户类型
 			mobile : '',//手机号
-			userName : '',
+			account : '',
 			imgUrl : '',
 			captchaKey : '',
 			captchaValue : '',
 			error : {
 				mobile : '',//手机号
-				userName : '',
+				account : '',
 				captchaValue : ''
 			},
 			
@@ -7735,14 +7736,14 @@ var findPassWord_step1_component = Vue.extend({
 				this.type_tab_10 = "active";
 				this.type_tab_20 = "";
 				
-				this.userName_field = true;
+				this.account_field = true;
 				this.mobile_field = false;
 			}else if(type == 20){
 				this.type =20;//用户类型
 				this.type_tab_10 = "";
 				this.type_tab_20 = "active";
 				
-				this.userName_field = false;
+				this.account_field = false;
 				this.mobile_field = true;
 			}
 			
@@ -7784,10 +7785,10 @@ var findPassWord_step1_component = Vue.extend({
 			if(_self.type == 10){//10:本地账号密码用户
 				parameter += "&type=10";
 				
-				//用户名
-				var userName = _self.userName;
-				if (userName != "") {
-					parameter += "&userName=" + encodeURIComponent(userName);
+				//账号
+				var account = _self.account;
+				if (account != "") {
+					parameter += "&account=" + encodeURIComponent(account);
 				}
 				
 			}else if(_self.type == 20){//20: 手机用户
@@ -7856,8 +7857,8 @@ var findPassWord_step1_component = Vue.extend({
 								var error_html = "";
 								for (var error in value_error) {
 									if (error != "") {
-										if (error == "userName") {
-											_self.error.userName = value_error[error];
+										if (error == "account") {
+											_self.error.account = value_error[error];
 										} else if (error == "captchaValue") {
 											_self.error.captchaValue = value_error[error];
 										} else if (error == "token") {
@@ -7948,7 +7949,7 @@ var findPassWord_step2_component = Vue.extend({
 	template : '#findPassWord_step2-template',
 	data : function data() {
 		return {
-			userName_field : true,//表单用户名字段
+			account_field : true,//表单账号字段
 			mobile_field : false,//表单手机号字段
 			issue_field : true,//表单密码提示问题字段
 			answer_field : true,//表单密码提示答案字段
@@ -7956,6 +7957,7 @@ var findPassWord_step2_component = Vue.extend({
 
 			type : 10,
 			userName : '',
+			account : '',
 			mobile: '',
 			issue : '',
 			answer : '',
@@ -7967,7 +7969,7 @@ var findPassWord_step2_component = Vue.extend({
 			error : {
 				mobile : '',//手机号
 				smsCode : '',//手机验证码
-				userName : '',
+				account : '',
 				password : '',
 				confirmPassword : '',
 				answer : '',
@@ -8034,16 +8036,16 @@ var findPassWord_step2_component = Vue.extend({
 						if (value_success == "true") {
 							_self.issue = value_user.issue;
 							_self.type = value_user.type;
-							
+							_self.account = value_user.account;
 							
 							if(_self.type == 10){
-								_self.userName_field = true;
+								_self.account_field = true;
 								_self.mobile_field = false;
 								_self.issue_field = true;
 								_self.answer_field = true;
 								_self.smsCode_field = false;
 							}else if(_self.type == 20){
-								_self.userName_field = false;
+								_self.account_field = false;
 								_self.mobile_field = true;
 								_self.issue_field = false;
 								_self.answer_field = false;
@@ -8058,8 +8060,8 @@ var findPassWord_step2_component = Vue.extend({
 								var error_html = "";
 								for (var error in value_error) {
 									if (error != "") {
-										if (error == "userName") {
-											_self.error.userName = value_error[error];
+										if (error == "account") {
+											_self.error.account = value_error[error];
 										}
 									}
 								}
@@ -8139,7 +8141,7 @@ var findPassWord_step2_component = Vue.extend({
 				url : "findPassWord/step2",
 				data : parameter,
 				success : function success(result) {
-					if (result != "") {console.log(result);
+					if (result != "") {
 						var returnValue = $.parseJSON(result);
 
 						var value_success = "";
@@ -8432,12 +8434,12 @@ var login_component = Vue.extend({
 			type_tab_10 : 'active',//用户类型选中样式
 			type_tab_20 : '',//用户类型选中样式
 			
-			userName_field : true,//表单用户名字段
+			account_field : true,//表单账号字段
 			mobile_field : false,//表单手机号字段
 			
 			type : 10,//用户类型
 			mobile : '',//手机号
-			userName : '',
+			account : '',
 			password : '',
 			rememberMe:false,
 			showCaptcha : false,
@@ -8447,7 +8449,7 @@ var login_component = Vue.extend({
 			captchaValue : '',
 			error : {
 				mobile : '',
-				userName : '',
+				account : '',
 				password : '',
 				captchaValue : ''
 			},
@@ -8533,14 +8535,14 @@ var login_component = Vue.extend({
 				this.type_tab_10 = "active";
 				this.type_tab_20 = "";
 				
-				this.userName_field = true;
+				this.account_field = true;
 				this.mobile_field = false;
 			}else if(type == 20){
 				this.type =20;//用户类型
 				this.type_tab_10 = "";
 				this.type_tab_20 = "active";
 				
-				this.userName_field = false;
+				this.account_field = false;
 				this.mobile_field = true;
 			}
 			
@@ -8604,7 +8606,7 @@ var login_component = Vue.extend({
 
 			_self.allowSubmit = true;//提交按钮disabled状态
 			//清除错误
-			_self.error.userName = "";
+			_self.error.account = "";
 			_self.error.password = "";
 			_self.error.mobile = "";
 			_self.error.captchaValue = "";
@@ -8617,10 +8619,10 @@ var login_component = Vue.extend({
 			if(_self.type == 10){//10:本地账号密码用户
 				parameter += "&type=10";
 				
-				//用户名
-				var userName = _self.userName;
-				if (userName != "") {
-					parameter += "&userName=" + encodeURIComponent(userName);
+				//账号
+				var account = _self.account;
+				if (account != "") {
+					parameter += "&account=" + encodeURIComponent(account);
 				}
 				
 			}else if(_self.type == 20){//20: 手机用户
@@ -8716,8 +8718,8 @@ var login_component = Vue.extend({
 								var error_html = "";
 								for (var error in key_error) {
 									if (error != "") {
-										if (error == "userName") {
-											_self.error.userName = key_error[error];
+										if (error == "account") {
+											_self.error.account = key_error[error];
 										} else if (error == "password") {
 											_self.error.password = key_error[error];
 										} else if (error == "mobile") {
@@ -8882,20 +8884,19 @@ var home_component = Vue.extend({
 
 		this.userName = getUrlParam("userName");
 		
-		
 		//this.loadHome(function (){});
 		//设置缓存
-		this.$store.commit('setCacheComponents',  ['home']);
+		//this.$store.commit('setCacheComponents',  ['home']);
 		//查询消息
 		this.unreadMessageCount();
 		
 	}, 
 	beforeRouteLeave: function (to, from, next) {
-		if (to.path == '/thread' || to.path == '/question') {//前往的URI路径需要缓存组件，其他情况下不需要缓存
-			this.$store.commit('setCacheComponents',  ['home']);
-		} else {
-			this.$store.commit('setCacheComponents',  []);
-		}
+		//if (to.path == '/thread' || to.path == '/question') {//前往的URI路径需要缓存组件，其他情况下不需要缓存
+		//	this.$store.commit('setCacheComponents',  ['home']);
+		//} else {
+		//	this.$store.commit('setCacheComponents',  []);
+		//}
 		next();
 	},
 	activated: function () {//当再次进入（前进或者后退）时，触发 (keepAlive缓存机制才会触发的钩子函数)
@@ -9549,7 +9550,7 @@ var home_component = Vue.extend({
 										for(var i=0;i<new_userDynamicList.length; i++){
 											var userDynamic = new_userDynamicList[i];
 											if(userDynamic.avatarName == null || userDynamic.avatarName == ''){
-												var char = (userDynamic.nickname != null && userDynamic.nickname !="") ? userDynamic.nickname : userDynamic.userName;
+												var char = (userDynamic.nickname != null && userDynamic.nickname !="") ? userDynamic.nickname : userDynamic.account;
 												//元素的实际宽度
 												var width= _self.$refs['userDynamicAvatarData_'+userDynamic.id][0].offsetWidth;
 												_self.$refs['userDynamicAvatarData_'+userDynamic.id][0].src = letterAvatar(char, width);	
@@ -12054,7 +12055,7 @@ var privateMessage_component = Vue.extend({
 										for(var i=0;i<new_privateMessageList.length; i++){
 											var privateMessage = new_privateMessageList[i];
 											if(privateMessage.friendAvatarName == null || privateMessage.friendAvatarName == ''){
-												var char = (privateMessage.friendNickname != null && privateMessage.friendNickname !="") ? privateMessage.friendNickname : privateMessage.friendUserName;
+												var char = (privateMessage.friendNickname != null && privateMessage.friendNickname !="") ? privateMessage.friendNickname : privateMessage.friendAccount;
 												//元素的实际宽度
 												var width= _self.$refs['privateMessageAvatarData_'+privateMessage.id][0].offsetWidth;
 												_self.$refs['privateMessageAvatarData_'+privateMessage.id][0].src = letterAvatar(char, width);	
@@ -12218,8 +12219,11 @@ var privateMessageChat_component = Vue.extend({
 									pageView = returnValue[key];
 								}
 							}
+							if(chatUser != null && (chatUser.nickname == null || chatUser.nickname != '')){
+								_self.friendUserNameTitle = "与 "+chatUser.account+" 的对话";
+							}
 							if(chatUser != null && chatUser.nickname != null && chatUser.nickname != ''){
-								_self.friendUserNameTitle = "与 "+chatUser.userName+" ("+chatUser.nickname+") 的对话";
+								_self.friendUserNameTitle = "与 "+chatUser.account+" ("+chatUser.nickname+") 的对话";
 							}
 							
 							//第一个Id
@@ -12235,14 +12239,18 @@ var privateMessageChat_component = Vue.extend({
 								
 								//生成首字符头像
 								_self.$nextTick(function() {
-									if (new_privateMessageChatList != null && new_privateMessageChatList.length > 0) {
-										for(var i=0;i<new_privateMessageChatList.length; i++){
-											var privateMessageChat = new_privateMessageChatList[i];
-											if(privateMessageChat.senderAvatarName == null || privateMessageChat.senderAvatarName == ''){
-												var char = (privateMessageChat.senderNickname != null && privateMessageChat.senderNickname !="") ? privateMessageChat.senderNickname : privateMessageChat.senderUserName;
+									if (_self.privateMessageChatList != null && _self.privateMessageChatList.length > 0) {
+										for(var i=0;i<_self.privateMessageChatList.length; i++){
+											var privateMessageChat = _self.privateMessageChatList[i];
+											if((privateMessageChat.image == undefined || privateMessageChat.image == null) && (privateMessageChat.senderAvatarName == null || privateMessageChat.senderAvatarName == '')){
+
+												var char = (privateMessageChat.senderNickname != null && privateMessageChat.senderNickname !="") ? privateMessageChat.senderNickname : privateMessageChat.senderAccount;
 												//元素的实际宽度
 												var width= _self.$refs['privateMessageChatAvatarData_'+privateMessageChat.id][0].offsetWidth;
-												_self.$refs['privateMessageChatAvatarData_'+privateMessageChat.id][0].src = letterAvatar(char, width);	
+												//_self.$refs['privateMessageChatAvatarData_'+privateMessageChat.id][0].src = letterAvatar(char, width);	
+												//设置base64图片进image属性
+												privateMessageChat.image = letterAvatar(char, width);
+												_self.$set(_self.privateMessageChatList, i, privateMessageChat);
 											}
 										}
 									}
@@ -12520,11 +12528,11 @@ var privateMessageChat_component = Vue.extend({
 		
 		//初始化
 		initialization : function() {
-				
+			
 			var friendUserName = getUrlParam("friendUserName");
 			if(friendUserName != null){
 				this.friendUserName = friendUserName;
-				this.friendUserNameTitle = "与 "+friendUserName+" 的对话";
+			//	this.friendUserNameTitle = "与 "+friendUserName+" 的对话";
 			}
 			this.queryPrivateMessageChat();
 			
@@ -12721,14 +12729,16 @@ var remind_component = Vue.extend({
 								
 								//生成首字符头像
 								_self.$nextTick(function() {
-									if (new_remindList != null && new_remindList.length > 0) {
-										for(var i=0;i<new_remindList.length; i++){
-											var remind = new_remindList[i];
-											if(remind.senderAvatarName == null || remind.senderAvatarName == ''){
-												var char = (remind.senderNickname != null && remind.senderNickname !="") ? remind.senderNickname : remind.senderUserName;
+									if (_self.remindList != null && _self.remindList.length > 0) {
+										for(var i=0;i<_self.remindList.length; i++){
+											var remind = _self.remindList[i];
+											if((remind.image == undefined || remind.image == null) && (remind.senderAvatarName == null || remind.senderAvatarName == '')){
+												var char = (remind.senderNickname != null && remind.senderNickname !="") ? remind.senderNickname : remind.senderAccount;
 												//元素的实际宽度
 												var width= _self.$refs['remindSenderAvatarData_'+remind.id][0].offsetWidth;
-												_self.$refs['remindSenderAvatarData_'+remind.id][0].src = letterAvatar(char, width);	
+												//_self.$refs['remindSenderAvatarData_'+remind.id][0].src = letterAvatar(char, width);
+												remind.image = letterAvatar(char, width);
+												_self.$set(_self.remindList, i, remind);
 											}
 										}
 									}
@@ -13264,7 +13274,7 @@ var follow_component = Vue.extend({
 										for(var i=0;i<new_followList.length; i++){
 											var follow = new_followList[i];
 											if(follow.friendAvatarName == null || follow.friendAvatarName == ''){
-												var char = (follow.friendNickname != null && follow.friendNickname !="") ? follow.friendNickname : follow.friendUserName;
+												var char = (follow.friendNickname != null && follow.friendNickname !="") ? follow.friendNickname : follow.friendAccount;
 												//元素的实际宽度
 												var width= _self.$refs['followUserAvatarData_'+follow.id][0].offsetWidth;
 												_self.$refs['followUserAvatarData_'+follow.id][0].src = letterAvatar(char, width);	
@@ -13403,7 +13413,7 @@ var follower_component = Vue.extend({
 										for(var i=0;i<new_followerList.length; i++){
 											var follower = new_followerList[i];
 											if(follower.friendAvatarName == null || follower.friendAvatarName == ''){
-												var char = (follower.friendNickname != null && follower.friendNickname !="") ? follower.friendNickname : follower.friendUserName;
+												var char = (follower.friendNickname != null && follower.friendNickname !="") ? follower.friendNickname : follower.friendAccount;
 												//元素的实际宽度
 												var width= _self.$refs['followerUserAvatarData_'+follower.id][0].offsetWidth;
 												_self.$refs['followerUserAvatarData_'+follower.id][0].src = letterAvatar(char, width);	
@@ -14568,7 +14578,7 @@ var redEnvelopeAmountDistributionList_component = Vue.extend({
 											for(var i=0;i<new_receiveRedEnvelopeList.length; i++){
 												var receiveRedEnvelope = new_receiveRedEnvelopeList[i];
 												if(receiveRedEnvelope.receiveAvatarName == null || receiveRedEnvelope.receiveAvatarName == ''){
-													var char = (receiveRedEnvelope.receiveNickname != null && receiveRedEnvelope.receiveNickname !="") ? receiveRedEnvelope.receiveNickname : receiveRedEnvelope.receiveUserName;
+													var char = (receiveRedEnvelope.receiveNickname != null && receiveRedEnvelope.receiveNickname !="") ? receiveRedEnvelope.receiveNickname : receiveRedEnvelope.receiveAccount;
 													//元素的实际宽度
 													var width= _self.$refs['receiveRedEnvelopeAvatarData_'+receiveRedEnvelope.id][0].offsetWidth;
 													_self.$refs['receiveRedEnvelopeAvatarData_'+receiveRedEnvelope.id][0].src = letterAvatar(char, width);	
@@ -14645,7 +14655,7 @@ var receiveRedEnvelopeList_component = Vue.extend({
 										for(var i=0;i<new_receiveRedEnvelopeList.length; i++){
 											var receiveRedEnvelope = new_receiveRedEnvelopeList[i];
 											if(receiveRedEnvelope.giveAvatarName == null || receiveRedEnvelope.giveAvatarName == ''){
-												var char = (receiveRedEnvelope.giveNickname != null && receiveRedEnvelope.giveNickname !="") ? receiveRedEnvelope.giveNickname : receiveRedEnvelope.giveUserName;
+												var char = (receiveRedEnvelope.giveNickname != null && receiveRedEnvelope.giveNickname !="") ? receiveRedEnvelope.giveNickname : receiveRedEnvelope.giveAccount;
 												
 												//元素的实际宽度
 												var width= _self.$refs['receiveRedEnvelopeAvatarData_'+receiveRedEnvelope.id][0].offsetWidth;

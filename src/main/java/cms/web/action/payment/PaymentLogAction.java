@@ -19,6 +19,7 @@ import cms.service.payment.PaymentService;
 import cms.service.setting.SettingService;
 import cms.service.user.UserService;
 import cms.utils.JsonUtils;
+import cms.web.action.fileSystem.FileManage;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -36,6 +37,7 @@ public class PaymentLogAction{
 	@Resource PaymentService paymentService;//通过接口引用代理返回的对象
 	@Resource UserService userService;
 	@Resource SettingService settingService;
+	@Resource FileManage fileManage;
 
 	@ResponseBody
 	@RequestMapping("/control/paymentLog/list")  
@@ -60,7 +62,16 @@ public class PaymentLogAction{
 				//将查询结果集传给分页List
 				pageView.setQueryResult(qr);
 				
-				returnValue.put("currentUser", user);
+				User currentUser = new User();
+				currentUser.setId(user.getId());
+				currentUser.setAccount(user.getAccount());
+				currentUser.setNickname(user.getNickname());
+				if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
+					currentUser.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+					currentUser.setAvatarName(user.getAvatarName());
+				}
+				returnValue.put("currentUser", currentUser);
+
 				returnValue.put("pageView", pageView);
 			}
 		}else{

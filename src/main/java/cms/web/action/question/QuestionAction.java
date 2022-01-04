@@ -35,6 +35,7 @@ import cms.service.question.AnswerService;
 import cms.service.question.QuestionService;
 import cms.service.question.QuestionTagService;
 import cms.service.setting.SettingService;
+import cms.service.user.UserService;
 import cms.utils.HtmlEscape;
 import cms.utils.JsonUtils;
 import cms.utils.Verification;
@@ -58,7 +59,7 @@ public class QuestionAction {
 	@Resource QuestionLuceneManage questionLuceneManage;
 	@Resource FileManage fileManage;
 	@Resource UserManage userManage;
-	
+	@Resource UserService userService;
 	
 	
 	@ResponseBody
@@ -115,11 +116,15 @@ public class QuestionAction {
 			for(Question question : qr.getResultlist()){
 				User user = userManage.query_cache_findUserByUserName(question.getUserName());
 				if(user != null){
+					question.setAccount(user.getAccount());
 					question.setNickname(user.getNickname());
 					if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
 						question.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 						question.setAvatarName(user.getAvatarName());
 					}		
+				}
+				if(question.getIsStaff()){//如果为员工
+					question.setAccount(question.getUserName());//员工用户名和账号是同一个
 				}
 			}
 		}
@@ -137,7 +142,7 @@ public class QuestionAction {
 	 * @param keyword 关键词
 	 * @param tagId 标签Id
 	 * @param tagName 标签名称
-	 * @param userName 用户名称
+	 * @param account 账号
 	 * @param start_postTime 起始发表时间
 	 * @param end_postTime 结束发表时间
 	 * @param request
@@ -148,7 +153,7 @@ public class QuestionAction {
 	@ResponseBody
 	@RequestMapping("/control/question/search") 
 	public String search(ModelMap model,PageForm pageForm,
-			Integer dataSource,String keyword,String tagId,String tagName,String userName,
+			Integer dataSource,String keyword,String tagId,String tagName,String account,
 			String start_postTime,String end_postTime,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
@@ -178,9 +183,14 @@ public class QuestionAction {
 				error.put("tagId", "请选择标签");
 			}
 		}
-		//用户名
-		if(userName != null && !"".equals(userName.trim())){
-			_userName = userName.trim();
+		//账号
+		if(account != null && !"".equals(account.trim())){
+			User user = userService.findUserByAccount(account.trim());
+			if(user != null){
+				_userName = user.getUserName();
+			}else{
+				_userName = account.trim();
+			}
 		}
 		//起始发表时间	
 		if(start_postTime != null && !"".equals(start_postTime.trim())){
@@ -248,13 +258,16 @@ public class QuestionAction {
 									
 									User user = userManage.query_cache_findUserByUserName(pi.getUserName());
 									if(user != null){
+										pi.setAccount(user.getAccount());
 										pi.setNickname(user.getNickname());
 										if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
 											pi.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 											pi.setAvatarName(user.getAvatarName());
 										}		
 									}
-									
+									if(pi.getIsStaff()){//如果为员工
+										pi.setAccount(pi.getUserName());//员工用户名和账号是同一个
+									}
 									
 									new_questionList.add(pi);
 									break;
@@ -322,11 +335,15 @@ public class QuestionAction {
 					
 					User user = userManage.query_cache_findUserByUserName(t.getUserName());
 					if(user != null){
+						t.setAccount(user.getAccount());
 						t.setNickname(user.getNickname());
 						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
 							t.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 							t.setAvatarName(user.getAvatarName());
 						}		
+					}
+					if(t.getIsStaff()){//如果为员工
+						t.setAccount(t.getUserName());//员工用户名和账号是同一个
 					}
 				}
 			}
@@ -425,11 +442,15 @@ public class QuestionAction {
 			for(Question question : qr.getResultlist()){
 				User user = userManage.query_cache_findUserByUserName(question.getUserName());
 				if(user != null){
+					question.setAccount(user.getAccount());
 					question.setNickname(user.getNickname());
 					if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
 						question.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 						question.setAvatarName(user.getAvatarName());
 					}		
+				}
+				if(question.getIsStaff()){//如果为员工
+					question.setAccount(question.getUserName());//员工用户名和账号是同一个
 				}
 			}
 		}
@@ -487,13 +508,16 @@ public class QuestionAction {
     		
 				User user = userManage.query_cache_findUserByUserName(o.getUserName());
 				if(user != null){
+					o.setAccount(user.getAccount());
 					o.setNickname(user.getNickname());
 					if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
 						o.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 						o.setAvatarName(user.getAvatarName());
 					}		
 				}
-    			
+				if(o.getIsStaff()){//如果为员工
+					o.setAccount(o.getUserName());//员工用户名和账号是同一个
+				}
     			
     		}
 			List<Question> questionList = questionService.findTitleByIdList(questionIdList);
@@ -563,11 +587,15 @@ public class QuestionAction {
     			
     			User user = userManage.query_cache_findUserByUserName(o.getUserName());
 				if(user != null){
+					o.setAccount(user.getAccount());
 					o.setNickname(user.getNickname());
 					if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
 						o.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 						o.setAvatarName(user.getAvatarName());
 					}		
+				}
+				if(o.getIsStaff()){//如果为员工
+					o.setAccount(o.getUserName());//员工用户名和账号是同一个
 				}
     		}
 			List<Question> questionList = questionService.findTitleByIdList(questionIdList);

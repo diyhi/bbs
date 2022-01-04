@@ -28,15 +28,18 @@ public class UnhideEntity implements Serializable{
 	/** 取消隐藏的用户名称 **/
 	@Column(length=30)
 	protected String userName;
+	/** 账号 **/
+	@Transient
+	protected String account;
 	/** 呢称 **/
 	@Transient
-	private String nickname;
+	protected String nickname;
 	/** 头像路径 **/
 	@Transient
-	private String avatarPath;
+	protected String avatarPath;
 	/** 头像名称 **/
 	@Transient
-	private String avatarName;
+	protected String avatarName;
 	
 	
 	
@@ -159,6 +162,14 @@ public class UnhideEntity implements Serializable{
 
 	public void setAvatarName(String avatarName) {
 		this.avatarName = avatarName;
+	}
+
+	public String getAccount() {
+		return account;
+	}
+
+	public void setAccount(String account) {
+		this.account = account;
 	}
 
 	

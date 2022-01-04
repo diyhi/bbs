@@ -186,9 +186,9 @@
 			<td>Id</td>
 		</tr>
 		<tr> 
-			<td>userName</td> 
+			<td>account</td> 
 			<td>String</td>
-			<td>会员用户名</td>
+			<td>账号</td>
 		</tr>
 	</tbody> 
 </table>
@@ -239,9 +239,9 @@
 	</thead> 
 	 <tbody> 
 	 	<tr> 
-			<td>userName</td> 
+			<td>account</td> 
 			<td>String</td>
-			<td>会员用户名错误</td>
+			<td>账号错误</td>
 		</tr>
 		<tr> 
 			<td>mobile</td> 
@@ -305,10 +305,10 @@
 	</thead> 
 	 <tbody>
 	 	<tr> 
-			<td>userName</td> 
+			<td>account</td> 
 			<td>String</td>
 			<td>按需填写</td>
-			<td>会员用户名</td> 
+			<td>账号</td> 
 		</tr>
 		<tr> 
 			<td>type</td> 
@@ -370,11 +370,11 @@
 	<input type="hidden" id="token" name="token" value="${token}">
       
       
-	<#-- 用户名 -->   
-    <input id="userName" name="userName" type="text" maxLength="40" value="" />
+	<#-- 账号 -->   
+    <input id="account" name="account" type="text" maxLength="40" value="" />
       
     <#-- 用户名错误 --> 
-    ${(error['userName'])!}
+    ${(error['account'])!}
     
     <#-- 密码 -->  
     <input id="password" name="password" type="password" maxLength="20" value="" />
@@ -431,9 +431,9 @@ function getParameter(){
 		parameter += "&captchaValue="+encodeURIComponent(captchaValue.value);
 	}
 
-	//用户名
-	var userName = document.getElementById("userName").value;
-	parameter += "&userName="+encodeURIComponent(userName);
+	//账号
+	var account = document.getElementById("account").value;
+	parameter += "&account="+encodeURIComponent(account);
 	//密码需SHA256加密
 	var password = document.getElementById("password").value;
 	if(password != ""){

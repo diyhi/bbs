@@ -51,12 +51,12 @@
 						            
 						        	<#if receiveRedEnvelope.giveAvatarName == null || receiveRedEnvelope.giveAvatarName == ''>    
 										<!-- 首字符头像-->
-						         		<img avatar="${(receiveRedEnvelope.giveNickname != null && receiveRedEnvelope.giveNickname??) ?string(receiveRedEnvelope.giveNickname , receiveRedEnvelope.giveUserName)}" >
+						         		<img avatar="${(receiveRedEnvelope.giveNickname != null && receiveRedEnvelope.giveNickname??) ?string(receiveRedEnvelope.giveNickname , receiveRedEnvelope.giveAccount)}" >
 						            </#if> 
 								</a>
 							</div>
 							<a href="user/control/home?userName=${receiveRedEnvelope.giveUserName}" target="_blank" class="link userName">
-								${receiveRedEnvelope.giveUserName}
+								${receiveRedEnvelope.giveAccount}
 								<#if receiveRedEnvelope.giveNickname != null && receiveRedEnvelope.giveNickname??>    
 									（呢称：${receiveRedEnvelope.giveNickname}）
 								</#if> 

@@ -31,6 +31,9 @@ public class ReceiveRedEnvelopeEntity implements Serializable{
 	/** 收红包的用户名称 **/
 	@Transient
 	protected String receiveUserName;
+	/** 收红包的账号 **/
+	@Transient
+	protected String receiveAccount;
 	/** 收红包的用户呢称 **/
 	@Transient
 	protected String receiveNickname;
@@ -51,6 +54,9 @@ public class ReceiveRedEnvelopeEntity implements Serializable{
 	/** 发红包的用户名称 **/
 	@Transient
 	protected String giveUserName;
+	/** 发红包的账号 **/
+	@Transient
+	protected String giveAccount;
 	/** 发红包的用户呢称 **/
 	@Transient
 	protected String giveNickname;
@@ -160,6 +166,18 @@ public class ReceiveRedEnvelopeEntity implements Serializable{
 	}
 	public void setReceiveAvatarName(String receiveAvatarName) {
 		this.receiveAvatarName = receiveAvatarName;
+	}
+	public String getReceiveAccount() {
+		return receiveAccount;
+	}
+	public void setReceiveAccount(String receiveAccount) {
+		this.receiveAccount = receiveAccount;
+	}
+	public String getGiveAccount() {
+		return giveAccount;
+	}
+	public void setGiveAccount(String giveAccount) {
+		this.giveAccount = giveAccount;
 	}
 	
 }

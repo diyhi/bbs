@@ -137,6 +137,7 @@ public class TopicUnhidePlatformShareAction {
 				
 				User post_user = userService.findUserByUserName(topicUnhidePlatformShare.getPostUserName());
 				if(post_user != null){
+					topicUnhidePlatformShare.setPostAccount(post_user.getAccount());
 					topicUnhidePlatformShare.setPostNickname(post_user.getNickname());
 					if(post_user.getAvatarName() != null && !"".equals(post_user.getAvatarName().trim())){
 						topicUnhidePlatformShare.setPostAvatarPath(fileManage.fileServerAddress()+post_user.getAvatarPath());
@@ -145,11 +146,17 @@ public class TopicUnhidePlatformShareAction {
 				}
 				User unlock_user = userService.findUserByUserName(topicUnhidePlatformShare.getUnlockUserName());
 				if(unlock_user != null){
+					topicUnhidePlatformShare.setUnlockAccount(unlock_user.getAccount());
 					topicUnhidePlatformShare.setUnlockNickname(unlock_user.getNickname());
 					if(unlock_user.getAvatarName() != null && !"".equals(unlock_user.getAvatarName().trim())){
 						topicUnhidePlatformShare.setUnlockAvatarPath(fileManage.fileServerAddress()+unlock_user.getAvatarPath());
 						topicUnhidePlatformShare.setUnlockAvatarName(unlock_user.getAvatarName());
 					}		
+				}
+				
+				if(topicUnhidePlatformShare.isStaff()){//如果为员工
+					topicUnhidePlatformShare.setPostAccount(topicUnhidePlatformShare.getPostUserName());//员工用户名和账号是同一个
+					topicUnhidePlatformShare.setUnlockAccount(topicUnhidePlatformShare.getUnlockUserName());//员工用户名和账号是同一个
 				}
 			}
 		}

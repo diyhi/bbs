@@ -123,6 +123,7 @@ public class RemindManageAction {
 						User sender_user = userMap.get(remind.getSenderUserId());
 						if(sender_user != null){
 							remind.setSenderUserName(sender_user.getUserName());
+							remind.setSenderAccount(sender_user.getAccount());
 							remind.setSenderNickname(sender_user.getNickname());
 							if(sender_user.getAvatarName() != null && !"".equals(sender_user.getAvatarName().trim())){
 								remind.setSenderAvatarPath(fileManage.fileServerAddress()+sender_user.getAvatarPath());//发送者头像路径
@@ -140,7 +141,15 @@ public class RemindManageAction {
 			pageView.setQueryResult(qr);
 			User user = userService.findUserById(id);
 			if(user != null){
-				returnValue.put("currentUser", user);
+				User currentUser = new User();
+				currentUser.setId(user.getId());
+				currentUser.setAccount(user.getAccount());
+				currentUser.setNickname(user.getNickname());
+				if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
+					currentUser.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+					currentUser.setAvatarName(user.getAvatarName());
+				}
+				returnValue.put("currentUser", currentUser);
 			}
 			
 			returnValue.put("pageView", pageView);

@@ -24,9 +24,9 @@
 						</el-select>
 					</el-form-item>
 					</el-tooltip>
-					<el-form-item :error="error.userName" style="width: 180px;">
+					<el-form-item :error="error.account" style="width: 180px;">
 						<el-tooltip content="不限制请留空" placement="top">
-							<el-input v-model.trim="userName" maxlength="30" clearable="true" placeholder="用户名称"></el-input>
+							<el-input v-model.trim="account" maxlength="30" clearable="true" placeholder="账号"></el-input>
 						</el-tooltip>
 					</el-form-item>
 					<el-tooltip content="不限制请留空" placement="top">
@@ -113,7 +113,7 @@
 							<el-popover effect="light" trigger="hover" placement="top">
 					        	<template #default>
 					        		<p v-if="scope.row.isStaff == false">呢称: {{scope.row.nickname}}</p>
-						            <p>用户名称: {{scope.row.userName}}</p>
+						            <p>账号: {{scope.row.account}}</p>
 					        	</template>
 					        	<template #reference v-if="scope.row.isStaff == false">
 					          		<div class="avatar-wrapper" >
@@ -124,7 +124,7 @@
 											<el-avatar :size="48" :src="scope.row.avatarPath+'100x100/'+scope.row.avatarName"></el-avatar>
 										</div>
 										
-										<div class="avatar-text">{{scope.row.userName}}</div>
+										<div class="avatar-text">{{scope.row.account}}</div>
 									</div>
 					        	</template>
 					        	
@@ -133,7 +133,7 @@
 										<el-badge value="员工" type="warning" class="avatar-badge">
 											<el-avatar :size="48" icon="el-icon-user-solid"></el-avatar>
 										</el-badge>
-										<div class="avatar-text">{{scope.row.userName}}</div>
+										<div class="avatar-text">{{scope.row.account}}</div>
 									</div>
 					        	</template>
 					        </el-popover>
@@ -173,7 +173,7 @@ export default({
 			keyword :'',//关键词
 			tagId :'',//标签Id
 			tagName :'',//标签名称
-			userName :'',//用户名称
+			account :'',//账号
 			start_postTime :'',//发表日期 起始
 			end_postTime :'',//发表日期 结束
 			
@@ -184,7 +184,7 @@ export default({
 				dataSource :'',
 				keyword :'',
 				tagId :'',
-				userName :'',
+				account :'',
 				start_postTime :'',
 				end_postTime :'',
 			},
@@ -233,8 +233,8 @@ export default({
 		if(this.$route.query.keyword != undefined && this.$route.query.keyword != ''){
 			this.keyword = decodeURIComponent(this.$route.query.keyword);
 		}
-		if(this.$route.query.userName != undefined && this.$route.query.userName !=''){
-			this.userName = decodeURIComponent(this.$route.query.userName);
+		if(this.$route.query.account != undefined && this.$route.query.account !=''){
+			this.account = decodeURIComponent(this.$route.query.account);
 		}
 		if(this.$route.query.start_postTime != undefined && this.$route.query.start_postTime != ''){
 			this.start_postTime_format = decodeURIComponent(this.$route.query.start_postTime);
@@ -277,7 +277,7 @@ export default({
 			    	keyword :_self.keyword,
 			    	tagId :_self.tagId,
 			    	tagName : _self.tagName,
-			    	userName :_self.userName,
+			    	account :_self.account,
 					start_postTime :_self.start_postTime,
 					end_postTime :_self.end_postTime,
 			    	page :_self.currentpage
@@ -327,7 +327,7 @@ export default({
 					keyword :encodeURIComponent(this.keyword),
 					tagId :this.tagId,
 					tagName :encodeURIComponent(this.tagName),
-					userName :encodeURIComponent(this.userName),
+					account :encodeURIComponent(this.account),
 					start_postTime :encodeURIComponent(this.start_postTime),
 					end_postTime :encodeURIComponent(this.end_postTime),
 					page : page
@@ -363,7 +363,7 @@ export default({
 					keyword :encodeURIComponent(_self.keyword),
 					tagId :_self.tagId,
 					tagName : encodeURIComponent(_self.tagName),
-					userName :encodeURIComponent(_self.userName),
+					account :encodeURIComponent(_self.account),
 					start_postTime :encodeURIComponent(_self.start_postTime),
 					end_postTime :encodeURIComponent(_self.end_postTime),
 					page : 1,

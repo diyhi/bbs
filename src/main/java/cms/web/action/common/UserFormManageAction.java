@@ -154,6 +154,15 @@ public class UserFormManageAction {
 					if(before_c.equalsIgnoreCase("register")){
 						isRegister = true;
 					}
+					if(before_a.equalsIgnoreCase("login")){
+						isRegister = true;
+					}
+					if(before_b.equalsIgnoreCase("login")){
+						isRegister = true;
+					}
+					if(before_c.equalsIgnoreCase("login")){
+						isRegister = true;
+					}
 				}else{
 					//如果没有参数,则跳到首页
 					uri = "index";
@@ -310,34 +319,34 @@ public class UserFormManageAction {
 							error.put("captchaValue", ErrorView._14.name());//验证码参数错误
 						}	
 					}
-					if(formbean.getUserName() != null && !"".equals(formbean.getUserName().trim())){
-						if(formbean.getUserName().trim().length() < 3){
-							error.put("userName", ErrorView._811.name());//用户名称小于3个字符
+					if(formbean.getAccount() != null && !"".equals(formbean.getAccount().trim())){
+						if(formbean.getAccount().trim().length() < 3){
+							error.put("account", ErrorView._811.name());//账号小于3个字符
 						}
-						if(formbean.getUserName().trim().length() > 25){
-							error.put("userName", ErrorView._812.name());//用户名称大于25个字符
+						if(formbean.getAccount().trim().length() > 25){
+							error.put("account", ErrorView._812.name());//账号大于25个字符
 						}
-						if(Verification.isNumericLettersUnderscore(formbean.getUserName().trim()) == false){
-							error.put("userName", ErrorView._813.name());//用户名只能输入由数字、26个英文字母或者下划线组成
+						if(Verification.isNumericLettersUnderscore(formbean.getAccount().trim()) == false){
+							error.put("account", ErrorView._813.name());//账号只能输入由数字、26个英文字母或者下划线组成
 						}
 						List<DisableUserName> disableUserNameList = userService.findAllDisableUserName_cache();
 						if(disableUserNameList != null && disableUserNameList.size() >0){
 							for(DisableUserName disableUserName : disableUserNameList){
-								boolean flag = matcher.match(disableUserName.getName(), formbean.getUserName().trim());  //参数一: ant匹配风格   参数二:输入URL
+								boolean flag = matcher.match(disableUserName.getName(), formbean.getAccount().trim());  //参数一: ant匹配风格   参数二:输入URL
 								if(flag){
-									error.put("userName", ErrorView._863.name());//该用户名不允许注册
+									error.put("account", ErrorView._863.name());//该账号不允许注册
 								}
 							}
 						}
 						
 						
-						User u = userService.findUserByUserName(formbean.getUserName().trim());
+						User u = userService.findUserByAccount(formbean.getAccount().trim());
 						if(u != null){
-							error.put("userName", ErrorView._814.name());//该用户名已注册
+							error.put("account", ErrorView._814.name());//该账号已注册
 						}	
-						user.setUserName(formbean.getUserName().trim());
+						user.setAccount(formbean.getAccount().trim());
 					}else{
-						error.put("userName", ErrorView._815.name());//用户名称不能为空
+						error.put("account", ErrorView._815.name());//账号不能为空
 					}
 					
 					if(formbean.getIssue() != null && !"".equals(formbean.getIssue().trim())){//密码提示问题
@@ -367,7 +376,7 @@ public class UserFormManageAction {
 						}
 						user.setEmail(formbean.getEmail().trim());
 					}
-					
+					user.setUserName(UUIDUtil.getUUID22());
 					user.setPlatformUserId(user.getUserName());
 				}else if(formbean.getType().equals(20) && allowRegisterAccount.isMobile()){//20: 手机用户
 					
@@ -395,7 +404,9 @@ public class UserFormManageAction {
 						user.setMobile(formbean.getMobile().trim());
 						//是否实名认证
 						user.setRealNameAuthentication(true);
-						user.setUserName(userManage.queryUserIdentifier(20)+"-"+UUIDUtil.getUUID22());//会员用户名
+						String id = UUIDUtil.getUUID22();
+						user.setUserName(id);//会员用户名
+						user.setAccount(userManage.queryUserIdentifier(20)+"-"+id);//用户名和账号可以用不相同的UUID
 						user.setPlatformUserId(userManage.thirdPartyUserIdToPlatformUserId(formbean.getMobile().trim(),20));
 				    }else{
 				    	error.put("mobile", ErrorView._851.name());//手机号不能为空
@@ -678,14 +689,14 @@ public class UserFormManageAction {
 					oAuthManage.addOpenId(openId,refreshToken);
 				}
 				
-				oAuthManage.addAccessToken(accessToken, new AccessUser(user.getId(),user.getUserName(),user.getNickname(),fileManage.fileServerAddress()+user.getAvatarPath(),user.getAvatarName(), user.getSecurityDigest(),false,openId));
-				oAuthManage.addRefreshToken(refreshToken, new RefreshUser(accessToken,user.getId(),user.getUserName(),user.getNickname(),fileManage.fileServerAddress()+user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),false,openId));
+				oAuthManage.addAccessToken(accessToken, new AccessUser(user.getId(),user.getUserName(),user.getAccount(),user.getNickname(),fileManage.fileServerAddress()+user.getAvatarPath(),user.getAvatarName(), user.getSecurityDigest(),false,openId));
+				oAuthManage.addRefreshToken(refreshToken, new RefreshUser(accessToken,user.getId(),user.getUserName(),user.getAccount(),user.getNickname(),fileManage.fileServerAddress()+user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),false,openId));
 	
 				//将访问令牌添加到Cookie
 				WebUtil.addCookie(response, "cms_accessToken", accessToken, 0);
 				//将刷新令牌添加到Cookie
 				WebUtil.addCookie(response, "cms_refreshToken", refreshToken, 0);
-				AccessUserThreadLocal.set(new AccessUser(user.getId(),user.getUserName(),user.getNickname(),fileManage.fileServerAddress()+user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),false,openId));
+				AccessUserThreadLocal.set(new AccessUser(user.getId(),user.getUserName(),user.getAccount(),user.getNickname(),fileManage.fileServerAddress()+user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),false,openId));
 				
 				//删除缓存
 				userManage.delete_cache_findUserById(user.getId());
@@ -739,10 +750,14 @@ public class UserFormManageAction {
     			}else{
     				_jumpUrl = "index";
     			}
+    			if("login".equalsIgnoreCase(_jumpUrl)){
+    				_jumpUrl = "index";
+    			}
+    			
     			
     			returnValue.put("success", "true");
     			returnValue.put("jumpUrl", _jumpUrl);
-    			returnValue.put("systemUser", new AccessUser(user.getId(),user.getUserName(),user.getNickname(),fileManage.fileServerAddress()+user.getAvatarPath(),user.getAvatarName(),null,false,""));//登录用户
+    			returnValue.put("systemUser", new AccessUser(user.getId(),user.getUserName(),user.getAccount(),user.getNickname(),fileManage.fileServerAddress()+user.getAvatarPath(),user.getAvatarName(),null,false,""));//登录用户
     			
     		}
     		
@@ -793,7 +808,7 @@ public class UserFormManageAction {
 	
 	/**
 	 * 会员注册校验/验证码校验
-	 * @param userName 会员用户名
+	 * @param account 账号
 	 * @param mobile 手机号
 	 * @param response
 	 * @return true 禁止  false 允许
@@ -801,21 +816,21 @@ public class UserFormManageAction {
 	 */
 	@RequestMapping(value="/userVerification",method=RequestMethod.GET) 
 	@ResponseBody//方式来做ajax,直接返回字符串
-	public String verification(ModelMap model,String userName,String mobile,String captchaKey,String captchaValue,
+	public String verification(ModelMap model,String account,String mobile,String captchaKey,String captchaValue,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		if(userName != null && !"".equals(userName.trim())){
+		if(account != null && !"".equals(account.trim())){
 			List<DisableUserName> disableUserNameList = userService.findAllDisableUserName_cache();
 			if(disableUserNameList != null && disableUserNameList.size() >0){
 				for(DisableUserName disableUserName : disableUserNameList){
-					boolean flag = matcher.match(disableUserName.getName(), userName.trim());  //参数一: ant匹配风格   参数二:输入URL
+					boolean flag = matcher.match(disableUserName.getName(), account.trim());  //参数一: ant匹配风格   参数二:输入URL
 					if(flag){
 						return "true";
 					}
 				}
 			}
 
-			User u = userService.findUserByUserName(userName.trim());
+			User u = userService.findUserByAccount(account.trim());
 			if(u != null){
 				return "true";
 			}
@@ -926,10 +941,10 @@ public class UserFormManageAction {
 		if(systemSetting.getLogin_submitQuantity() <=0){//每分钟连续登录密码错误N次时出现验证码
 			isCaptcha = true;
 		}else{
-			String userName = WebUtil.getCookieByName(request.getCookies(),"cms_userName");
-			if(userName != null && !"".equals(userName.trim())){
+			String account = WebUtil.getCookieByName(request.getCookies(),"cms_account");
+			if(account != null && !"".equals(account.trim())){
 				//是否需要验证码  true:要  false:不要
-				isCaptcha = captchaManage.login_isCaptcha(userName);
+				isCaptcha = captchaManage.login_isCaptcha(account);
 			}
 		}
 
@@ -1001,7 +1016,7 @@ public class UserFormManageAction {
 	/**
 	 * 会员登录
 	 * @param model
-	 * @param userName 用户名称
+	 * @param account 账号
 	 * @param password 密码
 	 * @param type 用户类型
 	 * @param mobile 手机号
@@ -1018,7 +1033,7 @@ public class UserFormManageAction {
 	 * @throws Exception
 	 */
 	@RequestMapping(value="/login",method=RequestMethod.POST) 
-	public String login(ModelMap model,String userName, String password,Integer type,String mobile,Boolean rememberMe,String jumpUrl,
+	public String login(ModelMap model,String account, String password,Integer type,String mobile,Boolean rememberMe,String jumpUrl,
 			RedirectAttributes redirectAttrs,
 			String token,String captchaKey,String captchaValue,
 			String thirdPartyOpenId,
@@ -1036,12 +1051,12 @@ public class UserFormManageAction {
 		List<Integer> numbers = Arrays.asList(10,20); 
 		if(type != null && numbers.contains(type)){
 			if(type.equals(10)){//10:本地账号密码用户
-				if(userName == null || "".equals(userName.trim())){
-					//用户名不能为空
-					error.put("userName", ErrorView._815.name());//用户名称不能为空
+				if(account == null || "".equals(account.trim())){
+					//账号不能为空
+					error.put("account", ErrorView._815.name());//账号不能为空
 				}else{
-					userName = userName.trim();
-					isCaptcha = captchaManage.login_isCaptcha(userName);
+					account = account.trim();
+					isCaptcha = captchaManage.login_isCaptcha(account);
 					
 				}
 			}else if(type.equals(20)){//20: 手机用户
@@ -1122,7 +1137,7 @@ public class UserFormManageAction {
 		if(error.size() == 0){	
 			if(type.equals(10)){//10:本地账号密码用户
 				//验证用户名
-				user = userService.findUserByUserName(userName);
+				user = userService.findUserByAccount(account);
 			}else if(type.equals(20)){//20: 手机用户
 				String platformUserId = userManage.thirdPartyUserIdToPlatformUserId(mobile,20);
 				user = userService.findUserByPlatformUserId(platformUserId);
@@ -1143,11 +1158,17 @@ public class UserFormManageAction {
 				//密码
 				password = SHA.sha256Hex(password.trim()+"["+user.getSalt()+"]");
 				
+				if(user.getCancelAccountTime() != -1L){
+					error.put("account", ErrorView._859.name());//用户不存在
+				}
+				
 				//判断密码
-				if(user.getState() >1 ){
-					//禁止用户
-					error.put("userName", ErrorView._824.name());//禁止用户
-				}else if(password.equals(user.getPassword())){
+				if(user.getState() >1){
+					//禁止账号
+					error.put("account", ErrorView._824.name());//禁止账号
+				}
+				
+				if(error.size() ==0 && password.equals(user.getPassword())){
 					
 					
 					//访问令牌
@@ -1176,8 +1197,8 @@ public class UserFormManageAction {
 						oAuthManage.addOpenId(openId,refreshToken);
 					}
 					
-					oAuthManage.addAccessToken(accessToken, new AccessUser(user.getId(),user.getUserName(),user.getNickname(),fileManage.fileServerAddress()+user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),rememberMe,openId));
-					oAuthManage.addRefreshToken(refreshToken, new RefreshUser(accessToken,user.getId(),user.getUserName(),user.getNickname(),fileManage.fileServerAddress()+user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),rememberMe,openId));
+					oAuthManage.addAccessToken(accessToken, new AccessUser(user.getId(),user.getUserName(),user.getAccount(),user.getNickname(),fileManage.fileServerAddress()+user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),rememberMe,openId));
+					oAuthManage.addRefreshToken(refreshToken, new RefreshUser(accessToken,user.getId(),user.getUserName(),user.getAccount(),user.getNickname(),fileManage.fileServerAddress()+user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),rememberMe,openId));
 					
 					
 					
@@ -1191,11 +1212,10 @@ public class UserFormManageAction {
 					WebUtil.addCookie(response, "cms_accessToken", accessToken, maxAge);
 					//将刷新令牌添加到Cookie
 					WebUtil.addCookie(response, "cms_refreshToken", refreshToken, maxAge);
-					AccessUserThreadLocal.set(new AccessUser(user.getId(),user.getUserName(),user.getNickname(),fileManage.fileServerAddress()+user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),rememberMe,openId));
+					AccessUserThreadLocal.set(new AccessUser(user.getId(),user.getUserName(),user.getAccount(),user.getNickname(),fileManage.fileServerAddress()+user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),rememberMe,openId));
 					
 					//异步执行会员卡赠送任务(长期任务类型)
 					membershipCardGiftTaskManage.async_triggerMembershipCardGiftTask(user.getUserName());
-					
 					
 				}else{
 					//密码错误
@@ -1203,8 +1223,8 @@ public class UserFormManageAction {
 				}
 			}else{
 				if(type.equals(10)){//10:本地账号密码用户
-					//用户名错误
-					error.put("userName",  ErrorView._825.name());//用户名错误
+					//账号错误
+					error.put("account",  ErrorView._825.name());//账号错误
 				}else if(type.equals(20)){//20: 手机用户
 					error.put("mobile",  ErrorView._867.name());//手机号错误
 				}
@@ -1215,19 +1235,19 @@ public class UserFormManageAction {
 		//登录失败处理
 		if(error.size() >0){
 			//统计每分钟原来提交次数
-			Integer original = settingManage.getSubmitQuantity("login", userName);
+			Integer original = settingManage.getSubmitQuantity("login", account);
     		if(original != null){
-    			settingManage.addSubmitQuantity("login", userName,original+1);//刷新每分钟原来提交次数
+    			settingManage.addSubmitQuantity("login", account,original+1);//刷新每分钟原来提交次数
     		}else{
-    			settingManage.addSubmitQuantity("login", userName,1);//刷新每分钟原来提交次数
+    			settingManage.addSubmitQuantity("login", account,1);//刷新每分钟原来提交次数
     		}
 
 			//添加用户名到Cookie
-			WebUtil.addCookie(response, "cms_userName", userName, 60);
+			WebUtil.addCookie(response, "cms_account", account, 60);
 		}else{
 			//删除每分钟原来提交次数
-			settingManage.deleteSubmitQuantity("login", userName);
-			WebUtil.deleteCookie(response, "cms_userName");
+			settingManage.deleteSubmitQuantity("login", account);
+			WebUtil.deleteCookie(response, "cms_account");
 		}
 		
 		Map<String,String> returnError = new HashMap<String,String>();//错误
@@ -1254,6 +1274,9 @@ public class UserFormManageAction {
 		}else{
 			_jumpUrl = "index";
 		}
+		if("login".equalsIgnoreCase(_jumpUrl)){
+			_jumpUrl = "index";
+		}
 			
 		if(isAjax){//Ajax方式返回数据
     		Map<String,Object> ajax_return = new HashMap<String,Object>();//返回
@@ -1261,13 +1284,11 @@ public class UserFormManageAction {
     			ajax_return.put("success", "false");
     			ajax_return.put("error", returnError);
     			
-    			
-    			
     			//重新判断是否需要验证码
     			if(type != null && numbers.contains(type)){
     				if(type.equals(10)){//10:本地账号密码用户
-    					if(userName != null && !"".equals(userName.trim())){
-    						isCaptcha = captchaManage.login_isCaptcha(userName);
+    					if(account != null && !"".equals(account.trim())){
+    						isCaptcha = captchaManage.login_isCaptcha(account);
     					}
     				}else if(type.equals(20)){//20: 手机用户
     					if(mobile != null && !"".equals(mobile.trim())){
@@ -1276,14 +1297,13 @@ public class UserFormManageAction {
     					}
     				}
     			}
-    			
     			if(isCaptcha){
     				ajax_return.put("captchaKey", UUIDUtil.getUUID32());
     			}
     		}else{
     			ajax_return.put("success", "true");
     			ajax_return.put("jumpUrl", _jumpUrl);
-    			ajax_return.put("systemUser", new AccessUser(user.getId(),user.getUserName(),user.getNickname(),fileManage.fileServerAddress()+user.getAvatarPath(),user.getAvatarName(),null,false,""));//登录用户
+    			ajax_return.put("systemUser", new AccessUser(user.getId(),user.getUserName(),user.getAccount(),user.getNickname(),fileManage.fileServerAddress()+user.getAvatarPath(),user.getAvatarName(),null,false,""));//登录用户
     		}
     		
     		
@@ -1366,7 +1386,6 @@ public class UserFormManageAction {
 				//删除访问令牌
     			oAuthManage.deleteAccessToken(accessToken.trim());
 			}
-			
 			WebUtil.deleteCookie(response, "cms_refreshToken");
 			WebUtil.deleteCookie(response, "cms_accessToken");
 		}
@@ -1438,7 +1457,7 @@ public class UserFormManageAction {
 	/**
 	 * 找回密码 第一步
 	 * @param model
-	 * @param userName 用户名
+	 * @param account 账号
 	 * @param type 用户类型
 	 * @param mobile 手机号
 	 * @param captchaKey
@@ -1451,7 +1470,7 @@ public class UserFormManageAction {
 	 * @throws Exception
 	 */
 	@RequestMapping(value="/findPassWord/step1",method=RequestMethod.POST) 
-	public String findPassWord_step1(ModelMap model,String userName,Integer type,String mobile,
+	public String findPassWord_step1(ModelMap model,String account,Integer type,String mobile,
 			String captchaKey,String captchaValue,
 			String token,RedirectAttributes redirectAttrs,
 			HttpServletRequest request, HttpServletResponse response)
@@ -1480,11 +1499,11 @@ public class UserFormManageAction {
 	    List<Integer> numbers = Arrays.asList(10,20); 
 		if(type != null && numbers.contains(type)){
 			if(type.equals(10)){//10:本地账号密码用户
-				if(userName == null || "".equals(userName.trim())){
+				if(account == null || "".equals(account.trim())){
 					//用户名不能为空
-					error.put("userName", ErrorView._815.name());//用户名称不能为空
+					error.put("account", ErrorView._815.name());//账号不能为空
 				}else{
-					userName = userName.trim();
+					account = account.trim();
 					
 				}
 			}else if(type.equals(20)){//20: 手机用户
@@ -1531,30 +1550,42 @@ public class UserFormManageAction {
 		}else{
 			error.put("captchaValue", ErrorView._14.name());//验证码参数错误
 		}  
+		
+		String userName = "";
+		
 	    if(error.size()==0){
 	    	if(type.equals(10)){//10:本地账号密码用户
-		    	 User user = userManage.query_cache_findUserByUserName(userName.trim());
-		    	 if(user == null){
-		    		 error.put("userName", ErrorView._910.name());//用户不存在
-		    	 }else{
-		    		 if(user.getType() != 10){
-		    			 error.put("userName", ErrorView._920.name());//用户不是本地密码账户
-		    		 }
+	    		User user = userService.findUserByAccount(account.trim());
+		    	if(user == null){
+		    		 error.put("account", ErrorView._910.name());//用户不存在
+		    	}else{
+		    		if(user.getCancelAccountTime() != -1L){
+						error.put("account", ErrorView._859.name());//用户不存在
+		    		}
 		    		 
-		    	 }
+		    		if(user.getType() != 10){
+		    			error.put("account", ErrorView._920.name());//用户不是本地密码账户
+		    		}else{
+		    			userName = user.getUserName();
+		    		}
+		    		 
+		    	}
 			}else if(type.equals(20)){//20: 手机用户
 				String platformUserId = userManage.thirdPartyUserIdToPlatformUserId(mobile.trim(),20);
 				User mobile_user = userService.findUserByPlatformUserId(platformUserId);
 				if(mobile_user == null){
-		    		 error.put("mobile", ErrorView._869.name());//手机用户不存在
-		    	 }else{
-		    		 if(mobile_user.getType() != 20){
-		    			 error.put("mobile", ErrorView._870.name());//手机号不是手机账户
-		    		 }else{
-		    			 userName = mobile_user.getUserName();
-		    		 }
+		    		error.put("mobile", ErrorView._869.name());//手机用户不存在
+		    	}else{
+		    		if(mobile_user.getCancelAccountTime() != -1L){
+		    			error.put("mobile", ErrorView._859.name());//用户不存在
+		    		}
+		    		if(mobile_user.getType() != 20){
+		    			error.put("mobile", ErrorView._870.name());//手机号不是手机账户
+		    		}else{
+		    			userName = mobile_user.getUserName();
+		    		}
 		    		 
-		    	 }
+		    	}
 				
 			}
 	    }
@@ -1633,20 +1664,25 @@ public class UserFormManageAction {
 	    
 	    Map<String,String> error = new HashMap<String,String>();
 	    if(userName != null && !"".equals(userName.trim())){
-	    	 User user = userService.findUserByUserName(userName.trim());
-	    	 if(user != null){
-	    		 newUser.setId(user.getId());
-	    		 newUser.setUserName(user.getUserName());
-	    		 newUser.setIssue(user.getIssue());
-	    		 newUser.setType(user.getType());
-	    		 
-	    		 model.addAttribute("user", newUser);
-	    		 returnValue.put("user", newUser);
+	    	User user = userService.findUserByUserName(userName.trim());
+	    	if(user != null){
+	    		if(user.getCancelAccountTime() != -1L){
+					error.put("account", ErrorView._859.name());//用户不存在
+			    }else{
+			    	 newUser.setId(user.getId());
+		    		 newUser.setUserName(user.getUserName());
+		    		 newUser.setAccount(user.getAccount());
+		    		 newUser.setIssue(user.getIssue());
+		    		 newUser.setType(user.getType());
+		    		 
+		    		 model.addAttribute("user", newUser);
+		    		 returnValue.put("user", newUser);
+			    }
 	    	 }else{
-	    		 error.put("userName", ErrorView._910.name());//用户不存在
+	    		 error.put("account", ErrorView._910.name());//用户不存在
 	    	 }
 	    }else{
-	    	error.put("userName", ErrorView._815.name());//用户名称不能为空
+	    	error.put("account", ErrorView._815.name());//用户名称不能为空
 	    }
   
 	    //显示验证码
@@ -1738,7 +1774,7 @@ public class UserFormManageAction {
 		if(formbean.getType() != null && numbers.contains(formbean.getType())){
 			if(formbean.getUserName() == null || "".equals(formbean.getUserName().trim())){
 				//用户名不能为空
-				error.put("userName", ErrorView._815.name());//用户名称不能为空
+				error.put("account", ErrorView._815.name());//用户名称不能为空
 			}else{
 				if(formbean.getType().equals(10)){//10:本地账号密码用户
 
@@ -1774,12 +1810,18 @@ public class UserFormManageAction {
 					if(error.size()==0){
 						user = userService.findUserByUserName(formbean.getUserName().trim());
 						if(user == null){
-							error.put("userName", ErrorView._825.name());//用户名错误
+							error.put("account", ErrorView._825.name());//用户名错误
 						}else{
+							
+							if(user.getCancelAccountTime() != -1L){
+								error.put("account", ErrorView._859.name());//用户不存在
+				    		}
+							
 							if(user.getType() != 10){
-				    			error.put("userName", ErrorView._920.name());//用户不是本地密码账户
-				    		}else{
-				    			if(formbean.getAnswer() != null && !"".equals(formbean.getAnswer().trim())){//密码提示答案
+				    			error.put("account", ErrorView._920.name());//用户不是本地密码账户
+				    		}
+							if(error.size()==0){
+								if(formbean.getAnswer() != null && !"".equals(formbean.getAnswer().trim())){//密码提示答案
 				    				if(formbean.getAnswer().trim().length() != 64){//判断是否是64位SHA256
 				    					 error.put("answer", ErrorView._819.name());//密码提示答案长度错误
 				    				}else{
@@ -1793,7 +1835,7 @@ public class UserFormManageAction {
 				    			 }else{
 				    				 error.put("answer", ErrorView._820.name());//密码提示答案不能为空
 				    			 }
-				    		}
+							}
 						}
 					}
 					
@@ -1805,11 +1847,14 @@ public class UserFormManageAction {
 					if(error.size()==0){
 						user = userService.findUserByUserName(formbean.getUserName().trim());
 						if(user == null){
-							error.put("userName", ErrorView._825.name());//用户名错误
+							error.put("account", ErrorView._825.name());//用户名错误
 						}else{
-							 if(user.getType() != 20){
-				    			 error.put("userName", ErrorView._870.name());//手机号不是手机账户
-				    		 }
+							if(user.getType() != 20){
+				    			error.put("account", ErrorView._870.name());//手机号不是手机账户
+				    		}
+							if(user.getCancelAccountTime() != -1L){
+								error.put("account", ErrorView._859.name());//用户不存在
+					    	}
 						}
 					}
 					

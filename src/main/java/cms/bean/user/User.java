@@ -1,6 +1,5 @@
 package cms.bean.user;
 
-import java.io.File;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -29,9 +28,9 @@ import org.joda.time.DateTime;
  */
 @Entity
 @Table(name="user",uniqueConstraints = {
-		@UniqueConstraint(columnNames={"userName"}),
+		@UniqueConstraint(columnNames={"account"}),
 		@UniqueConstraint(columnNames={"platformUserId"}
-	)},indexes = {@Index(name="user_idx", columnList="state")}
+	)},indexes = {@Index(name="user_idx", columnList="state"),@Index(name="user_2_idx", columnList="userName")}
 )//给user字段添加唯一性约束
 public class User implements Serializable{
 	private static final long serialVersionUID = 3692366870616346904L;
@@ -39,9 +38,17 @@ public class User implements Serializable{
 	/** ID **/
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	/** 会员用户名 **/
+	/** 会员用户名 从5.6版开始，会员用户名由含有大小写的UUID生成，登录对接账号(account)字段 **/
 	@Column(length=30)
 	private String userName;
+	
+	/** 账号 在注册时不能含有横杆和冒号   注销账号后，字段值会加上双冒号和注册时间，例如 test::1640590418623  **/
+	@Column(length=65)
+	private String account;
+	
+	/** 注销账号时间  **/
+	private Long cancelAccountTime = -1L;
+	
 	/** 呢称 **/
 	@Column(length=50)
 	private String nickname;
@@ -68,7 +75,9 @@ public class User implements Serializable{
 	/** 密码提示答案 **/
 	@Column(length=80)
 	private String answer;
-	/** 绑定手机 **/
+	
+	
+	/** 实名认证绑定手机 **/
 	@Column(length=20)
 	private String mobile;
 	/** 是否实名认证 **/
@@ -86,9 +95,9 @@ public class User implements Serializable{
 	@Column(precision=14, scale=4) 
 	private BigDecimal deposit = new BigDecimal("0");
 	
-	/** 用户类型 10:本地账号密码用户 20: 手机用户 30: 邮箱用户 40:微信用户 **/
+	/** 用户类型 10:本地账号密码用户 20: 手机用户 30: 邮箱用户 40:微信用户 80:其他用户**/
 	private Integer type = 10;
-	/** 平台用户Id   本地账号密码用户类型为'会员用户名';  手机用户类型为'手机号-mobile';  邮箱用户类型为'邮箱-email';  第三方用户类型的为'第三方用户Id-第三方平台标记',例如微信为'unionid-weixin' **/
+	/** 平台用户Id   本地账号密码用户类型为'会员用户名';  手机用户类型为'手机号-mobile';  邮箱用户类型为'邮箱-email';  第三方用户类型的为'第三方用户Id-第三方平台标记',例如微信为'unionid-weixin'    注销后本字段值会加上双冒号和注册时间，例如 oORvU5oUs7AAAsBhw59G3jkUCQlk-weixin::1640850298000 **/
 	@Column(length=90)
 	private String platformUserId;
 	
@@ -273,6 +282,18 @@ public class User implements Serializable{
 	}
 	public void setPlatformUserId(String platformUserId) {
 		this.platformUserId = platformUserId;
+	}
+	public String getAccount() {
+		return account;
+	}
+	public void setAccount(String account) {
+		this.account = account;
+	}
+	public Long getCancelAccountTime() {
+		return cancelAccountTime;
+	}
+	public void setCancelAccountTime(Long cancelAccountTime) {
+		this.cancelAccountTime = cancelAccountTime;
 	}
 
 }

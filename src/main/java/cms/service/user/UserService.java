@@ -73,6 +73,12 @@ public interface UserService extends DAO<User> {
 	 */
 	public User findUserByNickname(String nickname);
 	/**
+	 * 根据账号查询当前用户
+	 * @param account 账号
+	 * @return
+	 */
+	public User findUserByAccount(String account);
+	/**
 	 * 根据平台用户Id查询当前用户
 	 * @param platformUserId 平台用户Id
 	 * @return
@@ -135,6 +141,14 @@ public interface UserService extends DAO<User> {
 	 * @param avatarName 头像名称
 	 */
 	public Integer updateUserAvatar(String userName,String avatarName);
+	/**
+	 * 注销账号
+	 * @param userName 用户名称
+	 * @param appendContent 追加内容
+	 * @param cancelAccountTime 注销账号时间
+	 * @param securityDigest 安全摘要
+	 */
+	public Integer cancelAccount(String userName,String appendContent,Long cancelAccountTime,Long securityDigest);
 	/**
 	 * 标记删除
 	 * @param idList Id集合

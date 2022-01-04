@@ -24,6 +24,7 @@ import cms.service.setting.SettingService;
 import cms.service.user.UserService;
 import cms.utils.JsonUtils;
 import cms.utils.Verification;
+import cms.web.action.fileSystem.FileManage;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
@@ -44,6 +45,7 @@ public class PaymentLogManageAction{
 	@Resource PaymentService paymentService;//通过接口引用代理返回的对象
 	@Resource SettingService settingService;
 	@Resource UserService userService;
+	@Resource FileManage fileManage;
 	
 	/**
 	 * 支付日志管理 详细显示
@@ -68,9 +70,18 @@ public class PaymentLogManageAction{
 					returnValue.put("paymentLog", paymentLog);
 				}
 			}
-			User _user = userService.findUserById(id);
-			if(_user != null){
-				returnValue.put("currentUser", _user);
+			User user = userService.findUserById(id);
+			if(user != null){
+				User currentUser = new User();
+				currentUser.setId(user.getId());
+				currentUser.setAccount(user.getAccount());
+				currentUser.setNickname(user.getNickname());
+				if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
+					currentUser.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+					currentUser.setAvatarName(user.getAvatarName());
+				}
+				returnValue.put("currentUser", currentUser);
+
 			}
 		}else{
 			error.put("paymentRunningNumber", "支付流水号不能为空");

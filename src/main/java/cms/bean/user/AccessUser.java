@@ -14,6 +14,8 @@ public class AccessUser implements Serializable{
 	private Long userId;
 	/** 会员用户名 **/
 	private String userName;
+	/** 账号 **/
+	private String account;
 	/** 呢称 **/
 	private String nickname;
 	/** 头像路径 **/
@@ -31,10 +33,11 @@ public class AccessUser implements Serializable{
 	private String openId;
 	
 	public AccessUser() {}
-	public AccessUser(Long userId, String userName, String nickname, String avatarPath, String avatarName,
+	public AccessUser(Long userId, String userName,String account, String nickname, String avatarPath, String avatarName,
 			Long securityDigest, boolean rememberMe,String openId) {
 		this.userId = userId;
 		this.userName = userName;
+		this.account = account;
 		this.nickname = nickname;
 		this.avatarPath = avatarPath;
 		this.avatarName = avatarName;
@@ -90,4 +93,11 @@ public class AccessUser implements Serializable{
 	public void setOpenId(String openId) {
 		this.openId = openId;
 	}
+	public String getAccount() {
+		return account;
+	}
+	public void setAccount(String account) {
+		this.account = account;
+	}
+	
 }

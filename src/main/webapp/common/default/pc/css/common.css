@@ -602,7 +602,8 @@ html,body{
 	max-width: calc(100% - 20px);
 	text-overflow: ellipsis;
 	white-space: nowrap;
-	overflow: hidden
+	overflow: hidden;
+	pointer-events: none;
 }
 .form .form-field .form-field-container .form-field-label .required{
 	font-size: 14px;
@@ -2013,6 +2014,36 @@ html,body{
 .commentModule .commentList .commentInfo .commentContent img {max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;vertical-align: sub;}
 /* 自动换行 */
 .commentModule .commentList .commentInfo .commentContent pre{white-space:pre-wrap;}
+.commentModule .commentList .commentInfo .commentContent pre code{/*连续字母数字换行*/
+	word-break: break-all;
+}
+.commentModule .commentList .commentInfo .commentContent table {
+    width: 100%;
+}
+.commentModule .commentList .commentInfo .commentContent table th {
+	font-weight: 600
+}
+.commentModule .commentList .commentInfo .commentContent table td,
+.commentModule .commentList .commentInfo .commentContent table th {
+	border: 1px solid #E5E6EB;
+	padding: 6px 13px
+}
+.commentModule .commentList .commentInfo .commentContent table tr {
+	background-color: #fff;
+	border-top: 1px solid #E5E6EB;
+}
+.commentModule .commentList .commentInfo .commentContent table tr:nth-child(2n) {
+	background-color: #F7F8FA;
+}
+.commentModule .commentList .commentInfo .commentContent ol li{ 
+	list-style-type:decimal;
+	list-style-position:inside;
+}
+.commentModule .commentList .commentInfo .commentContent ul li{ 
+	margin-left:20px;
+	list-style-type:disc;
+}
+
 
 .commentModule .commentList .quote{
 	padding:5px 8px;border-bottom:none;text-align: left;margin-top: 20px;
@@ -6492,6 +6523,35 @@ html,body{
 .answerModule .answerList .answer .answerContent img {max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;vertical-align: sub;}
 /* 自动换行 */
 .answerModule .answerList .answer .answerContent pre{white-space:pre-wrap;}
+.answerModule .answerList .answer .answerContent pre code{/*连续字母数字换行*/
+	word-break: break-all;
+}
+.answerModule .answerList .answer .answerContent table {
+    width: 100%;
+}
+.answerModule .answerList .answer .answerContent table th {
+	font-weight: 600
+}
+.answerModule .answerList .answer .answerContent table td,
+.answerModule .answerList .answer .answerContent table th {
+	border: 1px solid #E5E6EB;
+	padding: 6px 13px
+}
+.answerModule .answerList .answer .answerContent table tr {
+	background-color: #fff;
+	border-top: 1px solid #E5E6EB;
+}
+.answerModule .answerList .answer .answerContent table tr:nth-child(2n) {
+	background-color: #F7F8FA;
+}
+.answerModule .answerList .answer .answerContent ol li{ 
+	list-style-type:decimal;
+	list-style-position:inside;
+}
+.answerModule .answerList .answer .answerContent ul li{ 
+	margin-left:20px;
+	list-style-type:disc;
+}
 
 .answerModule .answerList .tipBottom {
 	font-size: 13px;
@@ -8146,8 +8206,6 @@ html,body{
 	min-width: 0;
 	*height: 2px;
 }
-
-
 
 
 

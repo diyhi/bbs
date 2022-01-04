@@ -50,12 +50,12 @@
 						            
 						        	<#if follower.friendAvatarName == null || follower.friendAvatarName == ''>    
 										<!-- 首字符头像-->
-						         		<img avatar="${(follower.friendNickname != null && follower.friendNickname??) ?string(follower.friendNickname , follower.friendUserName)}" >
+						         		<img avatar="${(follower.friendNickname != null && follower.friendNickname??) ?string(follower.friendNickname , follower.friendAccount)}" >
 						            </#if> 
 								</a>
 							</div>
 							<a href="user/control/home?userName=${follower.friendUserName}" target="_blank" class="link userName">
-								${follower.friendUserName}
+								${follower.friendAccount}
 								<#if follower.friendNickname != null && follower.friendNickname??>    
 									(${follower.friendNickname})
 								</#if> 

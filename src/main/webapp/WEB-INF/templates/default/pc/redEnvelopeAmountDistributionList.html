@@ -51,7 +51,9 @@
 				</#if>
 			</span>
 			<span class="text"><span class="name">发放数量：</span>${giveRedEnvelope.giveQuantity}</span>
-			<span class="text"><span class="name">已领取数量：</span>${giveRedEnvelope.giveQuantity - giveRedEnvelope.remainingQuantity}</span>
+			<#if giveRedEnvelope.remainingQuantity != null > 
+				<span class="text"><span class="name">已领取数量：</span>${giveRedEnvelope.giveQuantity - giveRedEnvelope.remainingQuantity}</span>
+		 	</#if>
 		 	<span class="text"><span class="name">时间：</span>${giveRedEnvelope.giveTime}</span>
 			<span class="topic">
 				<a href="thread?topicId=${giveRedEnvelope.bindTopicId}" target="_blank" class="link">${giveRedEnvelope.bindTopicTitle}</a>
@@ -80,12 +82,12 @@
 							            
 							        	<#if receiveRedEnvelope.receiveAvatarName == null || receiveRedEnvelope.receiveAvatarName == ''>    
 											<!-- 首字符头像-->
-							         		<img avatar="${(receiveRedEnvelope.receiveNickname != null && receiveRedEnvelope.receiveNickname??) ?string(receiveRedEnvelope.receiveNickname , receiveRedEnvelope.receiveUserName)}" >
+							         		<img avatar="${(receiveRedEnvelope.receiveNickname != null && receiveRedEnvelope.receiveNickname??) ?string(receiveRedEnvelope.receiveNickname , receiveRedEnvelope.receiveAccount)}" >
 							            </#if> 
 									</a>
 								</div>
 								<a href="user/control/home?userName=${receiveRedEnvelope.receiveUserName}" target="_blank" class="link userName">
-									${receiveRedEnvelope.receiveUserName}
+									${receiveRedEnvelope.receiveAccount}
 									<#if receiveRedEnvelope.receiveNickname != null && receiveRedEnvelope.receiveNickname??>    
 										（呢称：${receiveRedEnvelope.receiveNickname}）
 									</#if> 

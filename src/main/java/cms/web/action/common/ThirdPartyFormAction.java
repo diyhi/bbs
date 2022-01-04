@@ -228,10 +228,12 @@ public class ThirdPartyFormAction {
 
 										String encodedRedirectURL = response.encodeRedirectURL(parameter);
 										
-										
-										response.sendRedirect((Configuration.getPath() != null && !"".equals(Configuration.getPath()) ?Configuration.getPath()+"/" : "/")+encodedRedirectURL);
-										return null;
-										
+										if("login".equalsIgnoreCase(encodedRedirectURL)){
+											return "redirect:/index";
+										}else{
+											response.sendRedirect((Configuration.getPath() != null && !"".equals(Configuration.getPath()) ?Configuration.getPath()+"/" : "/")+encodedRedirectURL);
+											return null;
+										}
 									}else{
 										return "redirect:/index";
 										
@@ -318,7 +320,10 @@ public class ThirdPartyFormAction {
 
 				if(allowRegisterAccount != null && allowRegisterAccount.isWeChat()){
 					user = new User();
-					user.setUserName(userManage.queryUserIdentifier(40)+"-"+UUIDUtil.getUUID22());//会员用户名
+					String id = UUIDUtil.getUUID22();
+					user.setUserName(id);//会员用户名
+					user.setAccount(userManage.queryUserIdentifier(40)+"-"+id);//账号
+				
 					user.setSalt(UUIDUtil.getUUID32());//盐值
 					user.setSecurityDigest(new Date().getTime());//安全摘要
 					user.setAllowUserDynamic(true);//是否允许显示用户动态
@@ -376,14 +381,14 @@ public class ThirdPartyFormAction {
 					oAuthManage.addOpenId(openId,refreshToken);
 				}
 				
-				oAuthManage.addAccessToken(accessToken, new AccessUser(user.getId(),user.getUserName(),user.getNickname(),fileManage.fileServerAddress()+user.getAvatarPath(),user.getAvatarName(), user.getSecurityDigest(),false,openId));
-				oAuthManage.addRefreshToken(refreshToken, new RefreshUser(accessToken,user.getId(),user.getUserName(),user.getNickname(),fileManage.fileServerAddress()+user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),false,openId));
+				oAuthManage.addAccessToken(accessToken, new AccessUser(user.getId(),user.getUserName(),user.getAccount(),user.getNickname(),fileManage.fileServerAddress()+user.getAvatarPath(),user.getAvatarName(), user.getSecurityDigest(),false,openId));
+				oAuthManage.addRefreshToken(refreshToken, new RefreshUser(accessToken,user.getId(),user.getUserName(),user.getAccount(),user.getNickname(),fileManage.fileServerAddress()+user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),false,openId));
 
 				//将访问令牌添加到Cookie
 				WebUtil.addCookie(response, "cms_accessToken", accessToken, 0);
 				//将刷新令牌添加到Cookie
 				WebUtil.addCookie(response, "cms_refreshToken", refreshToken, 0);
-				AccessUserThreadLocal.set(new AccessUser(user.getId(),user.getUserName(),user.getNickname(),fileManage.fileServerAddress()+user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),false,openId));
+				AccessUserThreadLocal.set(new AccessUser(user.getId(),user.getUserName(),user.getAccount(),user.getNickname(),fileManage.fileServerAddress()+user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),false,openId));
 				
 				//删除缓存
 				userManage.delete_cache_findUserById(user.getId());

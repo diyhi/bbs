@@ -5773,14 +5773,32 @@ function _bindContextmenuEvent() {
 		});
 		if (items.length > 0) {
 			e.preventDefault();
+			var y_position = e.clientY;
+			if(e.screenY <e.clientY){
+				if(document.querySelector(".el-main")){//使用element-plus是获取窗口高度
+					var top = document.querySelector(".el-main").offsetTop;
+			        var parent = document.querySelector(".el-main").offsetParent;
+			        if (parent != null) {
+			            top += parent.offsetTop;
+			            parent = parent.offsetParent;
+			        }
+					y_position = e.screenY - top;
+				}else{
+					y_position = e.screenY;
+				}
+			}
 			var pos = K(self.edit.iframe).pos(),
 				menu = _menu({
 					x : pos.x + e.clientX,
-					y : pos.y + e.clientY,
+					//y : pos.y + e.clientY,
+					y : pos.y + y_position,
 					width : maxWidth,
 					css : { visibility: 'hidden' },
 					shadowMode : self.shadowMode
 				});
+			
+			
+			
 			_each(items, function() {
 				if (this.title) {
 					menu.addItem(this);
@@ -5796,6 +5814,9 @@ function _bindContextmenuEvent() {
 		}
 	});
 }
+
+
+
 function _bindNewlineEvent() {
 	var self = this, doc = self.edit.doc, newlineTag = self.newlineTag;
 	if (_IE && newlineTag !== 'br') {
@@ -6903,6 +6924,16 @@ K.plugin = _plugin;
 K.lang = _lang;
 
 
+//绑定在textarea文本框上的事件
+K.textareaListener = function(element) {
+	return function(){
+		if(!element.fullscreenMode){//如果不是全屏
+			element.edit.setHeight(this.scrollHeight);
+			
+		}
+	}
+};
+
 _plugin('core', function(K) {
 	var self = this,
 		shortcutKeys = {
@@ -6943,13 +6974,37 @@ _plugin('core', function(K) {
 		}
 	});
 	self.clickToolbar('source', function() {
+		
+		
 		if (self.edit.designMode) {
 			self.toolbar.disableAll(true);
 			self.edit.design(false);
 			self.toolbar.select('source');
-			var autoheight = self.edit.doc.body.scrollHeight;
-			self.edit.setHeight(autoheight);
+			var autoheight = self.edit.doc.body.scrollHeight;//富文本框高度
+			var textareaHeight = self.edit.textarea[0].scrollHeight;//textarea框高度 self.edit.textarea.doc.activeElement.scrollHeight
+			
+			var minHeight = K.removeUnit(self.height);
+			
+			
+			if(!self.fullscreenMode){//如果不是全屏
+				if(textareaHeight < minHeight){
+					self.edit.setHeight(minHeight);
+				}else{
+					self.edit.setHeight(textareaHeight);
+				}
+			}
+			
+
+			if (self.edit.textarea[0].getAttribute("bindInputEventListener") != "true") {//如果还没绑定input事件
+				self.edit.textarea.doc.activeElement.addEventListener("input",K.textareaListener(self));
+				//标记已绑定事件
+				self.edit.textarea[0].setAttribute("bindInputEventListener","true");
+			}
+			
+			
+			
 		} else {
+			
 			self.toolbar.disableAll(false);
 			self.edit.design(true);
 			self.toolbar.unselect('source');
@@ -6971,6 +7026,24 @@ _plugin('core', function(K) {
 	});
 	self.clickToolbar('fullscreen', function() {
 		self.fullscreen();
+		
+		var autoheight = self.edit.doc.body.scrollHeight;//富文本框高度
+		var textareaHeight = self.edit.textarea[0].scrollHeight;//textarea框高度 self.edit.textarea.doc.activeElement.scrollHeight
+		
+		var minHeight = K.removeUnit(self.height);
+		
+		
+		if(!self.fullscreenMode){//如果不是全屏
+			if(textareaHeight < minHeight){
+				self.edit.setHeight(minHeight);
+			}else{
+				self.edit.setHeight(textareaHeight);
+			}
+		}
+		if (!self.fullscreenMode && self.edit.designMode) {//如果不是全屏并且是富文本模式
+			self.edit.trigger();//触发事件
+		}
+		
 	});
 	if (self.fullscreenShortcut) {
 		var loaded = false;
@@ -7620,7 +7693,7 @@ _plugin('core', function(K) {
 			 							'图片 <span id="kindeditor_pasteImageUpload_imageName"></span> 上传中..',
 			 							'</div>',
 			 							//提示
-			 							'<div style="color: #747474;position: absolute;left: 21px;bottom: 18px;">',
+			 							'<div style="color: #909399;position: absolute;left: 21px;bottom: 18px;">',
 			 							'提示：上传完成会自动关闭本窗口',
 			 							'</div>',
 			 							'</div>'].join('');
@@ -8277,7 +8350,7 @@ KindEditor.plugin('autoheight', function(K) {
 /*******************************************************************************
 * KindEditor - WYSIWYG HTML Editor for Internet
 * Copyright (C) 2006-2011 kindsoft.net
-*
+* 百度地图
 * @author Roddy <luolonghao@gmail.com>
 * @site http://www.kindsoft.net/
 * @licence http://www.kindsoft.net/license.php
@@ -8285,9 +8358,9 @@ KindEditor.plugin('autoheight', function(K) {
 KindEditor.plugin('baidumap', function(K) {
 	var self = this, name = 'baidumap', lang = self.lang(name + '.');
 	var mapWidth = K.undef(self.mapWidth, 558);
-	var mapHeight = K.undef(self.mapHeight, 360);
+	var mapHeight = K.undef(self.mapHeight, 380);
 	self.clickToolbar(name, function() {
-		var html = ['<div style="padding:10px 20px;">',
+		var html = ['<div style="padding:20px 20px;">',
 			'<div class="ke-header">',
 			'<div class="ke-left">',
 			lang.address + ' <input id="kindeditor_plugin_map_address" name="address" class="ke-input-text" value="" style="width:200px;" /> ',
@@ -8300,11 +8373,11 @@ KindEditor.plugin('baidumap', function(K) {
 			'</div>',
 			'<div class="ke-clearfix"></div>',
 			'</div>',
-			'<div class="ke-map" style="width:' + mapWidth + 'px;height:' + mapHeight + 'px;"></div>',
+			'<div class="ke-map" style="width:' + mapWidth + 'px;height:' + (mapHeight+20) + 'px;"></div>',
 			'</div>'].join('');
 		var dialog = self.createDialog({
 			name : name,
-			width : mapWidth + 42,
+			width : mapWidth + 51,
 			title : self.lang(name),
 			body : html,
 			yesBtn : {
@@ -8539,7 +8612,7 @@ KindEditor.plugin('code', function(K) {
 	self.plugin.code = {
 		add : function() {
 			var lang = self.lang(name + '.'),
-			html = ['<div style="padding:10px 20px;">',
+			html = ['<div style="padding:20px 20px;">',
 				'<div class="ke-dialog-row">',
 				'<select class="ke-code-type">',
 				'<option value="js">JavaScript</option>',
@@ -8558,15 +8631,15 @@ KindEditor.plugin('code', function(K) {
 				'<option value="">其它</option>',
 				'</select>',
 				'</div>',
-				'<textarea class="ke-textarea" style="width:408px;height:260px;"></textarea>',
+				'<textarea class="ke-textarea" style="width:549px;height:260px;"></textarea>',
 				//提示
-				'<div style="color: #747474;position: absolute;left: 21px;bottom: 18px;">',
+				'<div style="color: #909399;position: absolute;left: 21px;bottom: 18px;">',
 				'提示：Shift + 回车 换行不换段',
 				'</div>',
 				'</div>'].join(''),
 			dialog = self.createDialog({
 				name : name,
-				width : 450,
+				width : 600,
 				title : self.lang(name),
 				body : html,
 				yesBtn : {
@@ -9765,7 +9838,7 @@ KindEditor.plugin('link', function(K) {
 /*******************************************************************************
 * KindEditor - WYSIWYG HTML Editor for Internet
 * Copyright (C) 2006-2011 kindsoft.net
-* 视频
+* 视音频
 * @author Roddy <luolonghao@gmail.com>
 * @site http://www.kindsoft.net/
 * @licence http://www.kindsoft.net/license.php
@@ -9789,7 +9862,7 @@ KindEditor.plugin('media', function(K) {
 				'<div class="tabs"></div>',
 				//选项1
 				'<div class="tab1" style="display:none;">',    
-				'<textarea name="videoCode" class="ke-textarea" style="width:408px;height:115px;" placeholder="代码格式如：<iframe src=https://.. ></iframe>"></textarea>',
+				'<textarea name="videoCode" class="ke-textarea" style="width:449px;height:130px;" placeholder="代码格式如：<iframe src=https://.. ></iframe>"></textarea>',
 				'</div>',
 				//选项2          
 				'<div class="tab2" style="display:none;">',
@@ -9832,8 +9905,8 @@ KindEditor.plugin('media', function(K) {
 			].join('');
 			var dialog = self.createDialog({
 				name : name,
-				width : 450,
-				height : 280,
+				width : 500,
+				height : 320,
 				title : self.lang(name),
 				body : html,
 				yesBtn : {
@@ -10059,7 +10132,7 @@ KindEditor.plugin('media', function(K) {
 /*******************************************************************************
 * KindEditor - WYSIWYG HTML Editor for Internet
 * Copyright (C) 2006-2011 kindsoft.net
-* 图片批量上传
+* 批量图片上传
 * @author Roddy <luolonghao@gmail.com>
 * @site http://www.kindsoft.net/
 * @licence http://www.kindsoft.net/license.php
@@ -10739,7 +10812,7 @@ KindEditor.plugin('multiimage', function(K) {
 		var dialog = self.createDialog({
 			name : name,
 			width : 650,
-			height : 530,
+			height : 540,
 			title : self.lang(name),
 			body : html,
 			previewBtn : {
@@ -10906,7 +10979,7 @@ KindEditor.plugin('plainpaste', function(K) {
 /*******************************************************************************
 * KindEditor - WYSIWYG HTML Editor for Internet
 * Copyright (C) 2006-2011 kindsoft.net
-*
+* 预览
 * @author Roddy <luolonghao@gmail.com>
 * @site http://www.kindsoft.net/
 * @licence http://www.kindsoft.net/license.php
@@ -10915,8 +10988,8 @@ KindEditor.plugin('preview', function(K) {
 	var self = this, name = 'preview', undefined;
 	self.clickToolbar(name, function() {
 		var lang = self.lang(name + '.'),
-			html = '<div style="padding:10px 20px;">' +
-				'<iframe class="ke-textarea" frameborder="0" style="width:708px;height:400px;"></iframe>' +
+			html = '<div style="padding:20px 20px;">' +
+				'<iframe class="ke-textarea" frameborder="0" style="width:699px;height:400px;"></iframe>' +
 				'</div>',
 			dialog = self.createDialog({
 				name : name,
@@ -11668,7 +11741,7 @@ KindEditor.plugin('table', function(K) {
 /*******************************************************************************
 * KindEditor - WYSIWYG HTML Editor for Internet
 * Copyright (C) 2006-2011 kindsoft.net
-*
+* 插入模板
 * @author Roddy <luolonghao@gmail.com>
 * @site http://www.kindsoft.net/
 * @licence http://www.kindsoft.net/license.php
@@ -11681,7 +11754,7 @@ KindEditor.plugin('template', function(K) {
 	}
 	self.clickToolbar(name, function() {
 		var lang = self.lang(name + '.'),
-			arr = ['<div style="padding:10px 20px;">',
+			arr = ['<div style="padding:20px 20px;">',
 				'<div class="ke-header">',
 				'<div class="ke-left">',
 				lang. selectTemplate + ' <select>'];
@@ -11695,7 +11768,7 @@ KindEditor.plugin('template', function(K) {
 				'</div>',
 				'<div class="ke-clearfix"></div>',
 				'</div>',
-				'<iframe class="ke-textarea" frameborder="0" style="width:458px;height:260px;background-color:#FFF;"></iframe>',
+				'<iframe class="ke-textarea" frameborder="0" style="width:449px;height:260px;background-color:#FFF;"></iframe>',
 				'</div>'].join('');
 		var dialog = self.createDialog({
 			name : name,

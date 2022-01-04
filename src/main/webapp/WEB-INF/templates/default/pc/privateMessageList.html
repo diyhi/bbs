@@ -48,12 +48,12 @@
 										<img src="${privateMessage.friendAvatarPath}${privateMessage.friendAvatarName}" class='avatar' height='64px' width='64px'>
 									<#else>
 										<!--[if (IE)]><img src="${commonPath}images/min_avata.png"><![endif]-->
-										<!--[if !(IE)]><!--><img height='64px' width='64px' avatar="${(privateMessage.friendNickname != null && privateMessage.friendNickname??) ?string(privateMessage.friendNickname , privateMessage.friendUserName)}" ><!--<![endif]-->
+										<!--[if !(IE)]><!--><img height='64px' width='64px' avatar="${(privateMessage.friendNickname != null && privateMessage.friendNickname??) ?string(privateMessage.friendNickname , privateMessage.friendAccount)}" ><!--<![endif]-->
 									</#if>
 								</a>
 								<cite>
 									<a href="user/control/home?userName=${privateMessage.friendUserName}">
-									${(privateMessage.friendNickname != null && privateMessage.friendNickname??) ?string(privateMessage.friendNickname , privateMessage.friendUserName)}
+									${(privateMessage.friendNickname != null && privateMessage.friendNickname??) ?string(privateMessage.friendNickname , privateMessage.friendAccount)}
 									</a>
 								</cite> 
 								<div class="tipBottom">

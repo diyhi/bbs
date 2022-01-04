@@ -144,6 +144,7 @@ public class QuestionManageAction {
 				if(question.getIsStaff() == false){//会员
 					User user = userManage.query_cache_findUserByUserName(question.getUserName());
 					if(user != null){
+						question.setAccount(user.getAccount());
 						question.setNickname(user.getNickname());
 						question.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 						question.setAvatarName(user.getAvatarName());
@@ -153,6 +154,9 @@ public class QuestionManageAction {
 							question.setUserRoleNameList(userRoleNameList);//用户角色名称集合
 						}
 					}
+					
+				}else{
+					question.setAccount(question.getUserName());//员工用户名和账号是同一个
 					
 				}
 				List<QuestionTag> questionTagList = questionTagService.findAllQuestionTag();
@@ -241,11 +245,15 @@ public class QuestionManageAction {
 						if(answer.getIsStaff() == false){//会员
 							User user = userManage.query_cache_findUserByUserName(answer.getUserName());
 							if(user != null){
+								answer.setAccount(user.getAccount());
 								answer.setNickname(user.getNickname());
 								answer.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 								answer.setAvatarName(user.getAvatarName());
 								userRoleNameMap.put(answer.getUserName(), null);
 							}
+						}else{
+							answer.setAccount(answer.getUserName());//员工用户名和账号是同一个
+							
 						}
 						
 						if(answer.getIp() != null && !"".equals(answer.getIp().trim())){
@@ -262,11 +270,15 @@ public class QuestionManageAction {
 								if(answerReply.getIsStaff() == false){//会员
 									User user = userManage.query_cache_findUserByUserName(answerReply.getUserName());
 									if(user != null){
+										answerReply.setAccount(user.getAccount());
 										answerReply.setNickname(user.getNickname());
 										answerReply.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 										answerReply.setAvatarName(user.getAvatarName());
 										userRoleNameMap.put(answerReply.getUserName(), null);
 									}
+									
+								}else{
+									answerReply.setAccount(answerReply.getUserName());//员工用户名和账号是同一个
 									
 								}
 								if(answer.getId().equals(answerReply.getAnswerId())){

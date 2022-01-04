@@ -17,7 +17,7 @@
 									<img src="${giveRedEnvelope.avatarPath}${giveRedEnvelope.avatarName}" >
 								<#else>
 									<!--[if (IE)]><img src="${commonPath}images/min_avata.png"><![endif]-->
-									<!--[if !(IE)]><!--><img avatar="${(giveRedEnvelope.nickname != null && giveRedEnvelope.nickname??) ?string(giveRedEnvelope.nickname , giveRedEnvelope.userName)}" ><!--<![endif]-->
+									<!--[if !(IE)]><!--><img avatar="${(giveRedEnvelope.nickname != null && giveRedEnvelope.nickname??) ?string(giveRedEnvelope.nickname , giveRedEnvelope.account)}" ><!--<![endif]-->
 								</#if>
 							</span>
 							<span>给大家发个红包</span>
@@ -127,13 +127,13 @@
 								
 								for(var i = 0; i<result.records.length; i++){
 									var receiveRedEnvelope = result.records[i];
-									var data = (receiveRedEnvelope.receiveNickname != null && receiveRedEnvelope.receiveNickname !='' ? _.escape(receiveRedEnvelope.receiveNickname) : receiveRedEnvelope.receiveUserName)+" 获得 "+receiveRedEnvelope.amount+" 元";
+									var data = (receiveRedEnvelope.receiveNickname != null && receiveRedEnvelope.receiveNickname !='' ? _.escape(receiveRedEnvelope.receiveNickname) : receiveRedEnvelope.receiveAccount)+" 获得 "+receiveRedEnvelope.amount+" 元";
 									var image = receiveRedEnvelope.receiveAvatarPath+"100x100/"+receiveRedEnvelope.receiveAvatarName;
 									if(receiveRedEnvelope.receiveAvatarName != null){
 										html += "<img class='avatar redEnvelopeData' data='"+_.escape(data)+"' src='"+_.escape(image)+"'>";
 									
 									}else{
-										var avatar = (receiveRedEnvelope.receiveNickname != null && receiveRedEnvelope.receiveNickname !='' ? _.escape(receiveRedEnvelope.receiveNickname) : receiveRedEnvelope.receiveUserName);
+										var avatar = (receiveRedEnvelope.receiveNickname != null && receiveRedEnvelope.receiveNickname !='' ? _.escape(receiveRedEnvelope.receiveNickname) : receiveRedEnvelope.receiveAccount);
 										
 										
 										html += "<img class='avatar redEnvelopeData' data='"+_.escape(data)+"' avatar='"+_.escape(avatar)+"'>";

@@ -13,8 +13,8 @@
 						    <el-radio :label="20">手机用户</el-radio>
 						</el-radio-group>
 					</el-form-item>
-					<el-form-item label="会员用户名" :required="true" :error="error.userName" v-if="type == 10">
-						<el-row><el-col :span="12"><el-input v-model.trim="userName" maxlength="30" clearable="true" show-word-limit></el-input></el-col></el-row>
+					<el-form-item label="账号" :required="true" :error="error.account" v-if="type == 10">
+						<el-row><el-col :span="12"><el-input v-model.trim="account" maxlength="30" clearable="true" show-word-limit></el-input></el-col></el-row>
 						<div class="form-help" >会员用户名只能输入由数字、26个英文字母或者下划线组成</div>
 					</el-form-item>
 					<el-form-item label="手机" :required="type == 10? false :true" :error="error.mobile" >
@@ -133,7 +133,7 @@ export default({
 	data : function data() {
 		return {
 			type : 10,
-			userName :'',
+			account :'',
 			mobile :'',
 			nickname :'',
 			password :'',
@@ -149,7 +149,7 @@ export default({
 
 			error : {
 				type :'',
-				userName :'',
+				account :'',
 				mobile :'',
 				nickname :'',
 				password :'',
@@ -342,7 +342,7 @@ export default({
 			let formData = new FormData();
 			
 			formData.append('type', _self.type);
-			formData.append('userName', _self.userName);
+			formData.append('account', _self.account);
 			formData.append('mobile', _self.mobile);
 			formData.append('nickname', _self.nickname);
 			formData.append('password', _self.password);

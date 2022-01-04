@@ -106,12 +106,12 @@ function deleteFollow(followId){
 						            
 						        	<#if follow.friendAvatarName == null || follow.friendAvatarName == ''>    
 										<!-- 首字符头像-->
-						         		<img avatar="${(follow.friendNickname != null && follow.friendNickname??) ?string(follow.friendNickname , follow.friendUserName)}" >
+						         		<img avatar="${(follow.friendNickname != null && follow.friendNickname??) ?string(follow.friendNickname , follow.friendAccount)}" >
 						            </#if> 
 								</a>
 							</div>
 							<a href="user/control/home?userName=${follow.friendUserName}" target="_blank" class="link userName">
-								${follow.friendUserName}
+								${follow.friendAccount}
 								<#if follow.friendNickname != null && follow.friendNickname??>    
 									（呢称：${follow.friendNickname}）
 								</#if> 

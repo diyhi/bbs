@@ -590,19 +590,19 @@
 						<img src="${user.avatarPath}${user.avatarName}">
 					<#else>
 						<!--[if (IE)]><img src="${commonPath}images/min_avata.png"><![endif]-->
-						<!--[if !(IE)]><!--><img avatar="${(user.nickname != null && user.nickname??) ?string(user.nickname , user.userName)}" ><!--<![endif]-->
+						<!--[if !(IE)]><!--><img avatar="${(user.nickname != null && user.nickname??) ?string(user.nickname , user.account)}" ><!--<![endif]-->
 					</#if> 
 		        </div>
 				
 				<div class="box">
         			<div class="form">
 						<div class="form-field" >
-			        		<div id="userName_field_error" class="form-field-container">
+			        		<div id="account_field_error" class="form-field-container">
 				        		<div class="form-field-radio">
 				        			<div class="form-field-radio-container">
 					        			<div class="form-field-radio-input">
-					        				<div>${user.userName}</div>
-					        				<label class="form-field-label form-field-active">用户名</label>
+					        				<div>${user.account}</div>
+					        				<label class="form-field-label form-field-active">账号</label>
 					        			</div>
 				        			</div>
 				        		</div>

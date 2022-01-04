@@ -17,11 +17,15 @@
 							<img src="${comment.avatarPath}100x100/${comment.avatarName}" >
 						<#else>
 							<!--[if (IE)]><img src="${commonPath}images/min_avata.png"><![endif]-->
-							<!--[if !(IE)]><!--><img avatar="${(comment.nickname != null && comment.nickname??) ?string(comment.nickname , comment.userName)}" ><!--<![endif]-->
+							<!--[if !(IE)]><!--><img avatar="${(comment.nickname != null && comment.nickname??) ?string(comment.nickname , comment.account)}" ><!--<![endif]-->
 						</#if> 
 						<div class="info-container">
 							<a class="userName" href="user/control/home?userName=${comment.userName}">
-								${(comment.nickname != null && comment.nickname??) ?string(comment.nickname , comment.userName)}
+								${(comment.nickname != null && comment.nickname??) ?string(comment.nickname , comment.account)}
+								
+								<#if comment.account == null || comment.account == ''>
+									&nbsp;
+								</#if> 
 							</a>
 							<#list comment.userRoleNameList as roleName>
 								<span class="userRoleName">${roleName}</span>
@@ -41,8 +45,8 @@
 					<div class="quote">
 						<#assign quoteContent = ""> 
 						<#list comment.quoteList as quote>
-							<#assign avatarHtml = "<a class='avatarBox' href='user/control/home?userName="+quote.userName?html+"'>"+(quote.avatarName != null && quote.avatarName??) ?string("<img src='"+quote.avatarPath?html+"100x100/"+quote.avatarName?html+"'>" , "<img avatar='"+(quote.nickname != null && quote.nickname??) ?string(quote.nickname?html , quote.userName?html)+"'>")+"</a>"> 
-							<#assign quoteContent = "<div class='quoteComment'>"+quoteContent+"<span class='userName'>"+avatarHtml+"<a href='user/control/home?userName="+quote.userName?html+"'>"+(quote.nickname != null && quote.nickname??) ?string(quote.nickname?html , quote.userName?html)+"</a>"+"&nbsp;的评论：</span><br/>"+quote.content+"</div>"> 
+							<#assign avatarHtml = "<a class='avatarBox' href='user/control/home?userName="+quote.userName?html+"'>"+(quote.avatarName != null && quote.avatarName??) ?string("<img src='"+quote.avatarPath?html+"100x100/"+quote.avatarName?html+"'>" , "<img avatar='"+(quote.nickname != null && quote.nickname??) ?string(quote.nickname?html , quote.account?html)+"'>")+"</a>"> 
+							<#assign quoteContent = "<div class='quoteComment'>"+quoteContent+"<span class='userName'>"+avatarHtml+"<a href='user/control/home?userName="+quote.userName?html+"'>"+(quote.nickname != null && quote.nickname??) ?string(quote.nickname?html , quote.account?html)+"</a>"+"&nbsp;的评论：</span><br/>"+quote.content+"</div>"> 
 						</#list>
 						<#noescape>${quoteContent}</#noescape>
 					</div>
@@ -61,11 +65,14 @@
 													<img src="${reply.avatarPath}100x100/${reply.avatarName}" >
 												<#else>
 													<!--[if (IE)]><img src="${commonPath}images/min_avata.png"><![endif]-->
-													<!--[if !(IE)]><!--><img avatar="${(reply.nickname != null && reply.nickname??) ?string(reply.nickname , reply.userName)}" ><!--<![endif]-->
+													<!--[if !(IE)]><!--><img avatar="${(reply.nickname != null && reply.nickname??) ?string(reply.nickname , reply.account)}" ><!--<![endif]-->
 												</#if> 
 											</a>
 									    	<a class="userName" href="user/control/home?userName=${reply.userName}">
-												${(reply.nickname != null && reply.nickname??) ?string(reply.nickname , reply.userName)}
+												${(reply.nickname != null && reply.nickname??) ?string(reply.nickname , reply.account)}
+												<#if reply.account == null || reply.account == ''>
+													&nbsp;
+												</#if> 
 											</a>
 											
 											<#if reply.userRoleNameList?size gt 0>

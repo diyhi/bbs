@@ -39,6 +39,9 @@ public class QuestionRewardPlatformShare implements Serializable{
 	/** 提问题的用户名称 **/
 	@Column(length=80)
 	private String postUserName;
+	/** 提问题的用户账号 **/
+	@Transient
+	private String postAccount;
 	/** 提问题的用户呢称 **/
 	@Transient
 	private String postNickname;
@@ -55,6 +58,9 @@ public class QuestionRewardPlatformShare implements Serializable{
 	/** 回答问题的用户名称 **/ 
 	@Column(length=30)
 	private String answerUserName;
+	/** 回答问题的用户账号 **/
+	@Transient
+	private String answerAccount;
 	/** 回答问题的用户呢称 **/
 	@Transient
 	private String answerNickname;
@@ -253,6 +259,26 @@ public class QuestionRewardPlatformShare implements Serializable{
 
 	public void setAnswerAvatarName(String answerAvatarName) {
 		this.answerAvatarName = answerAvatarName;
+	}
+
+
+	public String getPostAccount() {
+		return postAccount;
+	}
+
+
+	public void setPostAccount(String postAccount) {
+		this.postAccount = postAccount;
+	}
+
+
+	public String getAnswerAccount() {
+		return answerAccount;
+	}
+
+
+	public void setAnswerAccount(String answerAccount) {
+		this.answerAccount = answerAccount;
 	}
 
 

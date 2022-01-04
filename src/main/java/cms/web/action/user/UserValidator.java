@@ -30,19 +30,19 @@ public class UserValidator implements Validator{
 		
 		if(user.getType() != null){
 			if(user.getType().equals(10)){//10:本地账号密码用户
-				if(user.getUserName() != null && !"".equals(user.getUserName().trim())){
-					if(Verification.isNumericLettersUnderscore(user.getUserName().trim()) == false){
-						errors.rejectValue("userName","errors.required", new String[]{"用户名只能输入由数字、26个英文字母或者下划线组成"},"");
+				if(user.getAccount() != null && !"".equals(user.getAccount().trim())){
+					if(Verification.isNumericLettersUnderscore(user.getAccount().trim()) == false){
+						errors.rejectValue("account","errors.required", new String[]{"账号只能输入由数字、26个英文字母或者下划线组成"},"");
 					}
-					if(user.getUserName().length()>30){
-						errors.rejectValue("userName","errors.required", new String[]{"用户名不能超过30个字符"},"");
+					if(user.getAccount().length()>30){
+						errors.rejectValue("account","errors.required", new String[]{"账号不能超过30个字符"},"");
 					}
-					User u = userService.findUserByUserName(user.getUserName().trim());
+					User u = userService.findUserByAccount(user.getAccount().trim());
 					if(u != null){
-						errors.rejectValue("userName","errors.required", new String[]{"该用户名已注册"},"");
+						errors.rejectValue("account","errors.required", new String[]{"该账号已注册"},"");
 					}
 				}else{
-					errors.rejectValue("userName","errors.required", new String[]{"请填写用户名"},"");
+					errors.rejectValue("account","errors.required", new String[]{"请填写账号"},"");
 				}
 				if(user.getIssue() == null || "".equals(user.getIssue().trim())){
 					errors.rejectValue("issue","errors.required", new String[]{"密码提示问题不能为空"},"");

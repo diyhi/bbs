@@ -48,7 +48,7 @@
 										<img src="${remind.senderAvatarPath}${remind.senderAvatarName}" class='avatar' height='64px' width='64px'>
 									<#else>
 										<!--[if (IE)]><img  class='avatar' height='64px' width='64px' src="${commonPath}images/min_avata.png"><![endif]-->
-										<!--[if !(IE)]><!--><img class='avatar' height='64px' width='64px' avatar="${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}" ><!--<![endif]-->
+										<!--[if !(IE)]><!--><img class='avatar' height='64px' width='64px' avatar="${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderAccount)}" ><!--<![endif]-->
 									</#if>
 								</a>
 								
@@ -66,7 +66,7 @@
 								<#if remind.typeCode == 10>
 									<cite>
 										<a href="user/control/home?userName=${remind.senderUserName}">
-											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
+											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderAccount)}
 										</a>
 									</cite> 
 									在
@@ -78,7 +78,7 @@
 								<#elseif remind.typeCode == 20>
 									<cite>
 										<a href="user/control/home?userName=${remind.senderUserName}">
-											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
+											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderAccount)}
 										</a>
 									</cite> 
 									在
@@ -89,7 +89,7 @@
 								<#elseif remind.typeCode == 30>
 									<cite>
 										<a href="user/control/home?userName=${remind.senderUserName}">
-											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
+											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderAccount)}
 										</a>
 									</cite> 
 									在
@@ -100,7 +100,7 @@
 								<#elseif remind.typeCode == 40>
 									<cite>
 										<a href="user/control/home?userName=${remind.senderUserName}">
-											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
+											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderAccount)}
 										</a>
 									</cite> 
 									在
@@ -111,7 +111,7 @@
 								<#elseif remind.typeCode == 50>
 									<cite>
 										<a href="user/control/home?userName=${remind.senderUserName}">
-											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
+											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderAccount)}
 										</a>
 									</cite> 
 									在
@@ -122,7 +122,7 @@
 								<#elseif remind.typeCode == 60>
 									<cite>
 										<a href="user/control/home?userName=${remind.senderUserName}">
-											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
+											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderAccount)}
 										</a>
 									</cite> 
 									在
@@ -133,7 +133,7 @@
 								<#elseif remind.typeCode == 70>
 									<cite>
 										<a href="user/control/home?userName=${remind.senderUserName}">
-											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
+											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderAccount)}
 										</a>
 									</cite> 
 									在
@@ -144,7 +144,7 @@
 								<#elseif remind.typeCode == 80>
 									<cite>
 										<a href="user/control/home?userName=${remind.senderUserName}">
-											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
+											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderAccount)}
 										</a>
 									</cite>
 									关注了我
@@ -152,7 +152,7 @@
 									我关注的
 									<cite>
 										<a href="user/control/home?userName=${remind.senderUserName}">
-											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
+											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderAccount)}
 										</a>
 									</cite> 
 									发表了话题
@@ -163,7 +163,7 @@
 									我关注的
 									<cite>
 										<a href="user/control/home?userName=${remind.senderUserName}">
-											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
+											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderAccount)}
 										</a>
 									</cite> 
 									在
@@ -175,7 +175,7 @@
 									我关注的
 									<cite>
 										<a href="user/control/home?userName=${remind.senderUserName}">
-											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
+											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderAccount)}
 										</a>
 									</cite> 
 									在
@@ -187,7 +187,7 @@
 								<#elseif remind.typeCode == 120>
 									<cite>
 										<a href="user/control/home?userName=${remind.senderUserName}">
-											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
+											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderAccount)}
 										</a>
 									</cite> 
 									在
@@ -198,7 +198,7 @@
 								<#elseif remind.typeCode == 130>
 									<cite>
 										<a href="user/control/home?userName=${remind.senderUserName}">
-											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
+											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderAccount)}
 										</a>
 									</cite> 
 									在
@@ -209,7 +209,7 @@
 								<#elseif remind.typeCode == 140>
 									<cite>
 										<a href="user/control/home?userName=${remind.senderUserName}">
-											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
+											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderAccount)}
 										</a>
 									</cite> 
 									在
@@ -220,7 +220,7 @@
 								<#elseif remind.typeCode == 150>
 									<cite>
 										<a href="user/control/home?userName=${remind.senderUserName}">
-											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderUserName)}
+											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderAccount)}
 										</a>
 									</cite> 
 									在

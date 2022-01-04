@@ -39,6 +39,9 @@ public class TopicUnhidePlatformShare implements Serializable{
 	/** 发布话题的用户名称 **/
 	@Column(length=80)
 	private String postUserName;
+	/** 发布话题的用户账号 **/
+	@Transient
+	private String postAccount;
 	/** 发布话题的用户呢称 **/
 	@Transient
 	private String postNickname;
@@ -54,6 +57,9 @@ public class TopicUnhidePlatformShare implements Serializable{
 	/** 解锁话题的用户名称 **/ 
 	@Column(length=30)
 	private String unlockUserName;
+	/** 解锁话题的用户账号 **/ 
+	@Transient
+	private String unlockAccount;
 	/** 解锁话题的用户呢称 **/
 	@Transient
 	private String unlockNickname;
@@ -252,6 +258,26 @@ public class TopicUnhidePlatformShare implements Serializable{
 
 	public void setUnlockAvatarName(String unlockAvatarName) {
 		this.unlockAvatarName = unlockAvatarName;
+	}
+
+
+	public String getPostAccount() {
+		return postAccount;
+	}
+
+
+	public void setPostAccount(String postAccount) {
+		this.postAccount = postAccount;
+	}
+
+
+	public String getUnlockAccount() {
+		return unlockAccount;
+	}
+
+
+	public void setUnlockAccount(String unlockAccount) {
+		this.unlockAccount = unlockAccount;
 	}
 	
 	

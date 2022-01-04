@@ -19,6 +19,8 @@ import cms.service.setting.SettingService;
 import cms.service.user.UserService;
 import cms.utils.IpAddress;
 import cms.utils.JsonUtils;
+import cms.web.action.fileSystem.FileManage;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,6 +35,8 @@ public class UserLoginLogAction {
 	
 	@Resource UserService userService;
 	@Resource SettingService settingService;
+	@Resource FileManage fileManage;
+	
 	/**
 	 * 用户登录日志列表
 	 * @param userId 用户Id
@@ -69,9 +73,17 @@ public class UserLoginLogAction {
 			
 			//将查询结果集传给分页List
 			pageView.setQueryResult(qr);	
-			User _user = userService.findUserById(id);
-			if(_user != null){
-				returnValue.put("currentUser", _user);
+			User user = userService.findUserById(id);
+			if(user != null){
+				User currentUser = new User();
+				currentUser.setId(user.getId());
+				currentUser.setAccount(user.getAccount());
+				currentUser.setNickname(user.getNickname());
+				if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
+					currentUser.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+					currentUser.setAvatarName(user.getAvatarName());
+				}
+				returnValue.put("currentUser", currentUser);
 			}
 			returnValue.put("pageView", pageView);
 		}else{

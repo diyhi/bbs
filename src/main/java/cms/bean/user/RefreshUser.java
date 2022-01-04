@@ -16,6 +16,8 @@ public class RefreshUser implements Serializable{
 	private Long userId;
 	/** 会员用户名 **/
 	private String userName;
+	/** 账号 **/
+	private String account;
 	/** 呢称 **/
 	private String nickname;
 	/** 头像路径 **/
@@ -31,11 +33,12 @@ public class RefreshUser implements Serializable{
 	private String openId;
 	
 	public RefreshUser() {}
-	public RefreshUser(String accessToken, Long userId, String userName, String nickname, String avatarPath,
+	public RefreshUser(String accessToken, Long userId, String userName, String account, String nickname, String avatarPath,
 			String avatarName, Long securityDigest, boolean rememberMe,String openId) {
 		this.accessToken = accessToken;
 		this.userId = userId;
 		this.userName = userName;
+		this.account = account;
 		this.nickname = nickname;
 		this.avatarPath = avatarPath;
 		this.avatarName = avatarName;
@@ -100,6 +103,12 @@ public class RefreshUser implements Serializable{
 	}
 	public void setOpenId(String openId) {
 		this.openId = openId;
+	}
+	public String getAccount() {
+		return account;
+	}
+	public void setAccount(String account) {
+		this.account = account;
 	}
 	
 	

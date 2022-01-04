@@ -140,13 +140,13 @@
 									<img src="${question.avatarPath}${question.avatarName}" >
 								<#else>
 									<!--[if (IE)]><img src="${commonPath}images/min_avata.png"><![endif]-->
-									<!--[if !(IE)]><!--><img avatar="${(question.nickname != null && question.nickname??) ?string(question.nickname , question.userName)}" ><!--<![endif]-->
+									<!--[if !(IE)]><!--><img avatar="${(question.nickname != null && question.nickname??) ?string(question.nickname , question.account)}" ><!--<![endif]-->
 								</#if>
 							</a>
 						</div>
 						<p class="name">
 							<a href="user/control/home?userName=${question.userName}" target="_blank">
-								${(question.nickname != null && question.nickname??) ?string(question.nickname , question.userName)}
+								${(question.nickname != null && question.nickname??) ?string(question.nickname , question.account)}
 							</a>
 						</p>
 						<#if question.userRoleNameList?size gt 0>

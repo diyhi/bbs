@@ -37,7 +37,7 @@
 			<a href="user/control/privateMessageList" class="back-to-list">&lt&lt返回私信列表</a> 
 			<div class="chatInfo">
 				<b>与 <a href="user/control/home?userName=${chatUser.userName}" target="_blank">
-					${chatUser.userName} 
+					${chatUser.account} 
 					<#if chatUser.nickname != null && chatUser.nickname??>
 						(${chatUser.nickname})
 					</#if> 
@@ -100,7 +100,7 @@
 									if(privateMessage.friendNickname != null && privateMessage.friendNickname != ''){
 										html += "<!--[if !(IE)]><!--><img width='48px' height='48px' avatar='"+_.escape(privateMessage.friendNickname)+"' ><!--<![endif]-->";
 									}else{
-										html += "<!--[if !(IE)]><!--><img width='48px' height='48px' avatar='"+privateMessage.friendUserName+"' ><!--<![endif]-->";
+										html += "<!--[if !(IE)]><!--><img width='48px' height='48px' avatar='"+privateMessage.friendAccount+"' ><!--<![endif]-->";
 									}
 
 								}
@@ -110,7 +110,7 @@
 								if (privateMessage.friendNickname != null && privateMessage.friendNickname){//如果有呢称则显示呢称
 									html += 			"<a class='userName' href='user/control/privateMessageChatList?friendUserName="+privateMessage.friendUserName+"'>"+_.escape(privateMessage.friendNickname)+"</a>";
 								}else{
-									html += 			"<a class='userName' href='user/control/privateMessageChatList?friendUserName="+privateMessage.friendUserName+"'>"+privateMessage.friendUserName+"</a>";
+									html += 			"<a class='userName' href='user/control/privateMessageChatList?friendUserName="+privateMessage.friendUserName+"'>"+privateMessage.friendAccount+"</a>";
 								}
 								
 								html += 		"</div>";
@@ -147,7 +147,7 @@
 										<img src="${privateMessage.senderAvatarPath}${privateMessage.senderAvatarName}" >
 									<#else>
 										<!--[if (IE)]><img src="${commonPath}images/min_avata.png"><![endif]-->
-										<!--[if !(IE)]><!--><img avatar="${(privateMessage.senderNickname != null && privateMessage.senderNickname??) ?string(privateMessage.senderNickname , privateMessage.senderUserName)}" ><!--<![endif]-->
+										<!--[if !(IE)]><!--><img avatar="${(privateMessage.senderNickname != null && privateMessage.senderNickname??) ?string(privateMessage.senderNickname , privateMessage.senderAccount)}" ><!--<![endif]-->
 									</#if> 
 								</a>
 								<div>
@@ -168,7 +168,7 @@
 										<img src="${privateMessage.senderAvatarPath}${privateMessage.senderAvatarName}" >
 									<#else>
 										<!--[if (IE)]><img src="${commonPath}images/min_avata.png"><![endif]-->
-										<!--[if !(IE)]><!--><img avatar="${(privateMessage.senderNickname != null && privateMessage.senderNickname??) ?string(privateMessage.senderNickname , privateMessage.senderUserName)}" ><!--<![endif]-->
+										<!--[if !(IE)]><!--><img avatar="${(privateMessage.senderNickname != null && privateMessage.senderNickname??) ?string(privateMessage.senderNickname , privateMessage.senderAccount)}" ><!--<![endif]-->
 									</#if> 
 								</a>
 								<div>

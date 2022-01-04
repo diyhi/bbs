@@ -170,6 +170,7 @@ public class TopicManageAction {
 				if(topic.getIsStaff() == false){//会员
 					User user = userManage.query_cache_findUserByUserName(topic.getUserName());
 					if(user != null){
+						topic.setAccount(user.getAccount());
 						topic.setNickname(user.getNickname());
 						topic.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 						topic.setAvatarName(user.getAvatarName());
@@ -179,6 +180,9 @@ public class TopicManageAction {
 							topic.setUserRoleNameList(userRoleNameList);//用户角色名称集合
 						}
 					}
+					
+				}else{
+					topic.setAccount(topic.getUserName());//员工用户名和账号是同一个
 					
 				}
 				
@@ -311,11 +315,15 @@ public class TopicManageAction {
 						if(comment.getIsStaff() == false){//会员
 							User user = userManage.query_cache_findUserByUserName(comment.getUserName());
 							if(user != null){
+								comment.setAccount(user.getAccount());
 								comment.setNickname(user.getNickname());
 								comment.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 								comment.setAvatarName(user.getAvatarName());
 								userRoleNameMap.put(comment.getUserName(), null);
 							}
+							
+						}else{
+							comment.setAccount(comment.getUserName());//员工用户名和账号是同一个
 							
 						}
 						commentIdList.add(comment.getId());
@@ -331,11 +339,15 @@ public class TopicManageAction {
 									if(quote.getIsStaff() == false){//会员
 										User user = userManage.query_cache_findUserByUserName(quote.getUserName());
 										if(user != null){
+											quote.setAccount(user.getAccount());
 											quote.setNickname(user.getNickname());
 											quote.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 											quote.setAvatarName(user.getAvatarName());
 											userRoleNameMap.put(quote.getUserName(), null);
 										}
+										
+									}else{
+										quote.setAccount(quote.getUserName());//员工用户名和账号是同一个
 										
 									}
 									
@@ -360,11 +372,15 @@ public class TopicManageAction {
 								if(reply.getIsStaff() == false){//会员
 									User user = userManage.query_cache_findUserByUserName(reply.getUserName());
 									if(user != null){
+										reply.setAccount(user.getAccount());
 										reply.setNickname(user.getNickname());
 										reply.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 										reply.setAvatarName(user.getAvatarName());
 										userRoleNameMap.put(reply.getUserName(), null);
 									}
+									
+								}else{
+									reply.setAccount(reply.getUserName());//员工用户名和账号是同一个
 									
 								}
 								

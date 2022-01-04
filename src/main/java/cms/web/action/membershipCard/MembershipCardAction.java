@@ -117,6 +117,7 @@ public class MembershipCardAction {
 
 				User user = userManage.query_cache_findUserByUserName(t.getUserName());
 				if(user != null){
+					t.setAccount(user.getAccount());
 					t.setNickname(user.getNickname());
 					if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
 						t.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());

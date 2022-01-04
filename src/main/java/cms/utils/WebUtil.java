@@ -1,9 +1,16 @@
 package cms.utils;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.channels.FileChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -24,6 +31,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 
 /**
@@ -252,7 +260,100 @@ public class WebUtil {
         return new ResponseEntity<byte[]>(body, headers, status);
     }
 	
-	
+	/**
+	 * 断点续传流式下载 适合大文件(以流的形式向页面输出数据)
+	 * @param physicalPath 完整路径(路径+文件名称)
+	 * @param fileName 文件名称
+	 * @param request
+	 * @return
+	*/
+	public static ResponseEntity<StreamingResponseBody> rangeDownloadResponse(String physicalPath, String fileName,String rangeHeader, HttpServletRequest request,HttpServletResponse response) {
+		
+		Path filePath = Paths.get(physicalPath);
+		
+        Long fileLength = 0L;
+        try {
+        	fileLength = FileChannel.open(filePath).size();
+        } catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			if (logger.isErrorEnabled()) {
+		          logger.error("读取文件长度错误"+physicalPath,e);
+		    }
+			return ResponseEntity.badRequest().build();
+		}
+        
+        long rangeStart = 0L;
+        long rangeEnd = fileLength;
+        
+        
+        if (rangeHeader != null) {
+            //example: bytes=0-1023 表示从0取到1023，长度为1024
+            String[] ranges = rangeHeader.substring("bytes=".length()).split("-");
+            rangeStart = Long.parseLong(ranges[0]);
+            if (ranges.length > 1) {
+                rangeEnd = Long.parseLong(ranges[1]) + 1;
+            }
+        }
+        final long skip = rangeStart;
+        final long contentLength = rangeEnd - rangeStart;
+		
+		
+		StreamingResponseBody streamingResponseBody = new StreamingResponseBody() {
+	        @Override
+	        public void writeTo(OutputStream outputStream) throws IOException { 
+	        	try( InputStream inputStream = Files.newInputStream(filePath);
+            			BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);	
+            		){
+            		
+            		bufferedInputStream.skip(skip);
+	                byte[] bytes = new byte[1024];
+	                long readSum = 0;
+	                int readCount = 0;
+	                while ((readCount = bufferedInputStream.read(bytes)) != -1) {
+	                    if (readSum + readCount > contentLength) {
+	                    	if(contentLength - readSum >=0L){
+	                    		outputStream.write(bytes, 0, (int) (contentLength - readSum));
+	                    	}
+	                    } else {
+	                        outputStream.write(bytes, 0, readCount);
+	                    }
+	                    readSum = readSum + readCount;
+	                }
+	                outputStream.flush();
+	                
+            	}
+			   
+	        }
+	    };
+	   
+	    String header = request.getHeader("User-Agent").toUpperCase();
+	    try {
+        	//一般来说下载文件是使用201状态码的，但是IE浏览器不支持    手机UC浏览器要设置status = HttpStatus.OK;下载m3u8文件才正常
+            if (header.contains("MSIE") || header.contains("TRIDENT") || header.contains("EDGE") || header.contains("UCBROWSER")) {
+                fileName = URLEncoder.encode(fileName, "UTF-8");
+                fileName = fileName.replace("+", "%20");    // IE下载文件名空格变+号问题
+            }
+        } catch (UnsupportedEncodingException e) {
+        	if (logger.isErrorEnabled()) {
+	            logger.error("转换IE系列浏览器方法错误",e);
+	        }
+        }
+	    
+ 
+	    
+	    HttpHeaders headers = new HttpHeaders();
+	    headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+	    headers.setContentDispositionFormData("attachment", fileName);
+	    headers.setContentLength(fileLength);  
+	    headers.add("Accept-Ranges","bytes");
+	    headers.add("Content-Range", "bytes " + rangeStart + "-" + (rangeEnd - 1) + "/" + fileLength);
+	    if(rangeHeader != null){
+	    	 return new ResponseEntity<StreamingResponseBody>(streamingResponseBody, headers, HttpStatus.PARTIAL_CONTENT);// HttpStatus.PARTIAL_CONTENT: 206
+	    }else{
+	    	return new ResponseEntity<StreamingResponseBody>(streamingResponseBody, headers, HttpStatus.OK);
+	    }
+	}
 	
 	/**
 	 * 文本中的URL转超链接

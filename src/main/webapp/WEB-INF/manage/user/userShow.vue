@@ -32,6 +32,7 @@
 				
 				<el-button type="primary" plain size="small"  @click="$router.push({path: '/admin/control/userLoginLog/list', query:{ id : $route.query.id,userName : encodeURIComponent(user.userName),beforeUrl:($route.query.beforeUrl != undefined ? $route.query.beforeUrl:'')}})">登录日志</el-button>
 				<el-button type="primary" plain size="small"  @click="changeAvatarUI()">更换头像</el-button>
+				<el-button type="primary" plain size="small"  @click="cancelAccount()">注销账号</el-button>
 			</div>
 			
 			
@@ -166,18 +167,30 @@
 			
 			<div class="data-view" >
 				<el-row :gutter="10" type="flex">
-					<el-col :span="4"><div class="name">会员用户名：</div></el-col>
-					<el-col :span="20"><div class="content">{{user.userName}}</div></el-col>
+					<el-col :span="4"><div class="name">账号：</div></el-col>
+					<el-col :span="20"><div class="content">{{user.account}}</div></el-col>
 				</el-row>
 				<el-row :gutter="10" type="flex">
 					<el-col :span="4"><div class="name">呢称：</div></el-col>
 					<el-col :span="10"><div class="content">{{user.nickname}}</div></el-col>
 					<el-col :span="10">
 						
-						<el-image class="avatar" v-if="user.avatarName != null && user.avatarName != ''" style="width: 120px; height: 120px" fit="contain" :src="user.avatarPath + user.avatarName+'?version='+user.userVersion" :preview-src-list="[user.avatarPath+user.avatarName+'?version='+user.userVersion]" hide-on-click-modal ></el-image>
+						<el-image class="avatar" v-if="user.avatarName != null && user.avatarName != ''" style="width: 120px; height: 120px;" fit="contain" :src="user.avatarPath + user.avatarName+'?version='+user.userVersion" :preview-src-list="[user.avatarPath+user.avatarName+'?version='+user.userVersion]" hide-on-click-modal ></el-image>
 						
 					
 					</el-col>
+				</el-row>
+				<el-row :gutter="10" type="flex" v-if="user.cancelAccountTime != '-1'">
+					<el-col :span="4"><div class="name">注销账号时间：</div></el-col>
+					<el-col :span="20"><div class="content remind">{{user.cancelAccountTime}}</div></el-col>
+				</el-row>
+				<el-row :gutter="10" type="flex">
+					<el-col :span="4"><div class="name">注册时间：</div></el-col>
+					<el-col :span="20"><div class="content">{{user.registrationDate}}</div></el-col>
+				</el-row>
+				<el-row :gutter="10" type="flex" v-if="user.type == 20">
+					<el-col :span="4"><div class="name">手机号：</div></el-col>
+					<el-col :span="20"><div class="content">{{user.mobile}}</div></el-col>
 				</el-row>
 				<el-row :gutter="10" type="flex">
 					<el-col :span="4"><div class="name">类型：</div></el-col>
@@ -187,6 +200,7 @@
 							<span v-if="user.type == 20">手机用户</span>
 							<span v-if="user.type == 30">邮箱用户</span>
 							<span v-if="user.type == 40">微信用户</span>
+							<span v-if="user.type == 80">其他用户</span>
 						</div>
 					</el-col>
 				</el-row>
@@ -474,9 +488,9 @@ export default({
 	methods : {
 		//隐藏行
 		tableRowClassName: function({ row, rowIndex }) {
-			if(!row.selected){
-				return 'hidden-row';
-			}
+			//if(!row.selected){
+			//	return 'hidden-row';
+			//}
       		return '';
     	},
 	
@@ -488,7 +502,7 @@ export default({
 			
 			_self.$ajax.get('control/user/manage', {
 			    params: {
-			    	method : 'edit',
+			    	method : 'show',
 			    	id : _self.id,
 			    }
 			})
@@ -509,6 +523,11 @@ export default({
 			    				_self.userCustomList = mapData[key];
 			    			}else if(key == "user"){
 			    				_self.user = mapData[key];
+			    				
+			    				if(_self.user.cancelAccountTime != "-1"){
+			    					_self.user.cancelAccountTime = dayjs(parseInt(_self.user.cancelAccountTime)).format('YYYY-MM-DD HH:mm:ss');
+			    				}
+			    				
 		    				}
 			    		}
 			    	}else if(returnValue.code === 500){//错误
@@ -705,6 +724,7 @@ export default({
 				console.log(error);
 			});
 	    },
+	    
 	  	//提交表单
   		submitForm : function() {
   			let _self = this;
@@ -1048,6 +1068,65 @@ export default({
   			
   	    },
  	 	
+	    //注销账号
+	    cancelAccount: function(){
+	    	let _self = this;
+	    	this.$confirm('此操作将注销该账号, 是否继续?', '提示', {
+	            confirmButtonText: '确定',
+	            cancelButtonText: '取消',
+	            type: 'warning'
+	        }).then(() => {
+	        	let formData = new FormData();
+		    	formData.append('id', _self.user.id);
+		    	
+		    	
+				this.$ajax({
+			        method: 'post',
+			        url: 'control/user/manage?method=cancelAccount',
+			        data: formData
+				})
+				.then(function (response) {
+					if(response == null){
+						return;
+					}
+				    let result = response.data;
+				    if(result){
+				    	let returnValue = JSON.parse(result);
+				    	if(returnValue.code === 200){//成功
+				    		_self.$message.success("注销账号成功");
+				    		_self.queryUser();
+				    	}else if(returnValue.code === 500){//错误
+				    		
+				    		let errorMap = returnValue.data;
+				    		let htmlContent = "";
+				    		let count = 0;
+				    		for (let key in errorMap) {   
+				    			count++;
+				    			htmlContent += "<p>"+count + ". " + errorMap[key]+"</p>";
+				    			
+				    	    }
+				    		_self.$alert(htmlContent, '错误', {
+				    			showConfirmButton :false,
+				    			dangerouslyUseHTMLString: true
+				    		})
+				    		.catch(function (error) {
+								console.log(error);
+							});
+				    		
+				    		
+				    	}
+				    }
+				})
+				.catch(function (error) {
+					console.log(error);
+				});
+	        	
+	        }).catch((error) => {
+	        	console.log(error);
+	        });
+	    	
+	    },
+	    
   	    
 	}
 });

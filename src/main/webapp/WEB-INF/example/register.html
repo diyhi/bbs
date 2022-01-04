@@ -332,6 +332,11 @@
 			<td>String</td>
 			<td>会员用户名</td>
 		</tr>
+		<tr> 
+			<td>account</td> 
+			<td>String</td>
+			<td>账号</td>
+		</tr>
 	</tbody> 
 </table>
 
@@ -357,7 +362,7 @@
 		<tr> 
 			<td rowspan="3">选填参数</td> 
 			<td>
-				userName：会员用户名<br>
+				account：账号<br>
 			</td>
 			<td rowspan="3">
 				当前三组参数每次提交只能填一组
@@ -395,9 +400,9 @@
 	</thead> 
 	<tbody> 
 		<tr> 
-			<td>userName</td> 
+			<td>account</td> 
 			<td>String</td>
-			<td>会员用户名</td>
+			<td>账号</td>
 		</tr>
 		<tr> 
 			<td>email</td> 
@@ -429,9 +434,9 @@
 			<td>用户自定义注册功能项参数值错误</td>
 		</tr>
 		<tr> 
-			<td>userName</td> 
+			<td>account</td> 
 			<td>String</td>
-			<td>用户名称错误</td>
+			<td>账号错误</td>
 		</tr>
 		<tr> 
 			<td>type</td> 
@@ -494,10 +499,10 @@
 	</thead> 
 	 <tbody>
 	 	<tr> 
-			<td>userName</td> 
+			<td>account</td> 
 			<td>String</td>
 			<td>按需填写</td>
-			<td>会员用户名</td> 
+			<td>账号</td> 
 		</tr>
 		<tr> 
 			<td>type</td> 
@@ -587,10 +592,10 @@
 	<!-- 令牌标记 -->
 	<input type="hidden" id="token" name="token" value="${token}">
 
-	<#-- 用户名 -->
-	<input type="text" id="userName" name="userName" value="<#if user??>${user.userName}</#if>" />
-	<#-- 用户名错误 -->
-	${(error['userName'])!}
+	<#-- 账号 -->
+	<input type="text" id="account" name="account" value="<#if user??>${user.account}</#if>" />
+	<#-- 账号错误 -->
+	${(error['account'])!}
 
 	<#-- 密码 -->
 	<input type="password" id="password" name="password" value=""/>
@@ -747,9 +752,9 @@
 			parameter += "&captchaValue="+encodeURIComponent(captchaValue.value);
 		}
 
-		//用户名
-		var userName = document.getElementById("userName").value;
-		parameter += "&userName="+encodeURIComponent(userName);
+		//账号
+		var account = document.getElementById("account").value;
+		parameter += "&account="+encodeURIComponent(account);
 		//密码需SHA256加密
 		var password = document.getElementById("password").value;
 		if(password != ""){

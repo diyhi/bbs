@@ -44,16 +44,16 @@
 					<input type="hidden" id="token" name="token" value="${token}">
 		        	<div class="form-field">
 		        		<!-- form-field-container form-field-error -->
-		        		<div id="userName_field_error" class="form-field-container">
+		        		<div id="account_field_error" class="form-field-container">
 			        		<div class="form-field-text" >
 			        			<div class="form-field-input-container">
-				        			<input id="userName" maxLength="40" class="form-field-text-input" type="text" value="" onfocus="inputBoxClickTip(this);" onblur="inputBoxOutTip(this);">
-				        			<!-- <label class="mi-floating-label form-field-active ">用户名</label>-->
-				        			<label class="form-field-label">用户名</label>
+				        			<input id="account" maxLength="40" class="form-field-text-input" type="text" value="" onfocus="inputBoxClickTip(this);" onblur="inputBoxOutTip(this);">
+				        			<!-- <label class="mi-floating-label form-field-active ">账号</label>-->
+				        			<label class="form-field-label">账号</label>
 			        			</div>
 			        		</div>
 			        		
-		        			<div id="userName_prompt_error" class="form-field-prompt-error"></div>
+		        			<div id="account_prompt_error" class="form-field-prompt-error"></div>
 		        		</div>
 		        	</div>
 		        	<div class="form-field" >
@@ -446,7 +446,7 @@
 	
 	function selectRegisterAccountType(id){
 		if(id == "local_tab"){//本地账号密码用户
-			$("#userName_field_error").parent().show();
+			$("#account_field_error").parent().show();
 			$("#mobile_field_error").parent().hide();
 			$("#issue_field_error").parent().show();
 			$("#answer_field_error").parent().show();
@@ -454,7 +454,7 @@
 			$("#smsCode_field_error").parent().hide();
 		}
 		if(id == "mobile_tab"){//手机用户
-			$("#userName_field_error").parent().hide();
+			$("#account_field_error").parent().hide();
 			$("#mobile_field_error").parent().show();
 			$("#issue_field_error").parent().hide();
 			$("#answer_field_error").parent().hide();
@@ -480,29 +480,29 @@
 		$("#"+field+"_prompt_error").hide();
 		$("#"+field+"_field_error").removeClass("form-field-error");
 		
-		if(field == "userName"){//用户名
-			var userName = $("#"+field).val().trim();
-			if(userName == ""){
-				$("#"+field+"_prompt_error").html("用户名不能为空");
+		if(field == "account"){//账号
+			var account = $("#"+field).val().trim();
+			if(account == ""){
+				$("#"+field+"_prompt_error").html("账号不能为空");
 				$("#"+field+"_prompt_error").show();
 				$("#"+field+"_field_error").addClass("form-field-error");
 				return false;
 			}
-			if(getStringLeng(userName) < 3){
-				$("#"+field+"_prompt_error").html("用户名长度不能小于3位");
+			if(getStringLeng(account) < 3){
+				$("#"+field+"_prompt_error").html("账号长度不能小于3位");
 				$("#"+field+"_prompt_error").show();
 				$("#"+field+"_field_error").addClass("form-field-error");
 				return false;
 			}
-			if(getStringLeng(userName) > 20){
-				$("#"+field+"_prompt_error").html("用户名长度不能大于20位");
+			if(getStringLeng(account) > 20){
+				$("#"+field+"_prompt_error").html("账号长度不能大于20位");
 				$("#"+field+"_prompt_error").show();
 				$("#"+field+"_field_error").addClass("form-field-error");
 				return false;
 			}
 			var pattern =  /^\w+$/;
-			if(!pattern.test(userName)){
-				$("#"+field+"_prompt_error").html("用户名只能输入由数字、26个英文字母或者下划线组成");
+			if(!pattern.test(account)){
+				$("#"+field+"_prompt_error").html("账号只能输入由数字、26个英文字母或者下划线组成");
 				$("#"+field+"_prompt_error").show();
 				$("#"+field+"_field_error").addClass("form-field-error");
 				return false;
@@ -510,12 +510,12 @@
 			
 			get_request(function(value){
 	            		if(value == "true"){
-	            			$("#"+field+"_prompt_error").html("该用户名已存在");
+	            			$("#"+field+"_prompt_error").html("该账号已存在");
 							$("#"+field+"_prompt_error").show();
 							$("#"+field+"_field_error").addClass("form-field-error");
 	            		}
 	            	},
-			 			"userVerification.htm?userName="+userName+"&timestamp=" + new Date().getTime(), true);
+			 			"userVerification.htm?account="+account+"&timestamp=" + new Date().getTime(), true);
 			
 			
 		}
@@ -704,8 +704,8 @@
 		//用户类型
 		if($("#local_tab").find("a").hasClass("active")){
 			parameter += "&type=10";
-			//用户名
-			parameter += "&userName="+encodeURIComponent($("#userName").val().trim());
+			//账号
+			parameter += "&account="+encodeURIComponent($("#account").val().trim());
 		}
 		if($("#mobile_tab").find("a").hasClass("active")){
 			parameter += "&type=20";
@@ -925,7 +925,7 @@
 		var isVerification = true;
 		
 		if($("#local_tab").find("a").hasClass("active")){
-			if(verification("userName") == false){
+			if(verification("account") == false){
 				isVerification = false;
 			}
 			if(verification("password") == false){

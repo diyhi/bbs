@@ -182,7 +182,10 @@ public class MembershipCardGiftTaskManage {
 			param += " and o.point >= ?"+ (paramValue.size()+1);
 			paramValue.add(membershipCardGiftTask.getRestrictionGroup().getTotalPoint());
 		}
-		
+		//未注销账号的用户
+		param += " and o.cancelAccountTime = ?"+ (paramValue.size()+1);
+		paramValue.add(-1L);
+				
 		//删除第一个and
 		param = StringUtils.difference(" and", param);
 		

@@ -202,6 +202,11 @@
 			<td colspan="2">私信对方用户名称</td>
 		</tr>
 		<tr> 
+			<td>friendAccount</td> 
+			<td>String</td>
+			<td colspan="2">私信对方账号</td>
+		</tr>
+		<tr> 
 			<td>friendAvatarPath</td> 
 			<td>String</td>
 			<td>私信对方头像路径</td>
@@ -218,9 +223,9 @@
 			<td colspan="2">发送者用户Id</td>
 		</tr>
 		<tr> 
-			<td>senderUserName</td> 
+			<td>senderAccount</td> 
 			<td>String</td>
-			<td colspan="2">发送者用户名称</td>
+			<td colspan="2">发送者账号</td>
 		</tr>
 		<tr> 
 			<td>senderAvatarPath</td> 
@@ -278,6 +283,11 @@
 			<td>会员用户名</td>
 		</tr>
 		<tr> 
+			<td>account</td> 
+			<td>String</td>
+			<td>账号</td>
+		</tr>
+		<tr> 
 			<td>nickname</td> 
 			<td>String</td>
 			<td>呢称</td>
@@ -302,14 +312,14 @@
 <h2 style="margin:0;padding:0; margin-top: 10px;">示例</h2>
 <textarea name="exampleCode">
 <#-- 对方用户  -->
-与<a href="user/control/home?userName=${chatUser.userName}" target="_blank"> ${chatUser.userName} </a>的对话
+与<a href="user/control/home?userName=${chatUser.userName}" target="_blank"> ${chatUser.account} </a>的对话
 
 	
 <#-- 私信 -->
 <#if pageView.records?exists && pageView.records?size gt 0 >    
 	<#list pageView.records as privateMessage>
-		<#-- 发送者用户名称 -->
-		${privateMessage.senderUserName}
+		<#-- 发送者账号 -->
+		${privateMessage.senderAccount}
 		<#-- 阅读时间 -->
 		${privateMessage.readTime}
 	</#list>

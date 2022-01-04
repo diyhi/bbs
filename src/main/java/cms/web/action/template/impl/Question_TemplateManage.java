@@ -237,6 +237,7 @@ public class Question_TemplateManage {
 				if(question.getIsStaff() == false){//会员
 					User user = userManage.query_cache_findUserByUserName(question.getUserName());
 					if(user != null){
+						question.setAccount(user.getAccount());
 						question.setNickname(user.getNickname());
 						question.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 						question.setAvatarName(user.getAvatarName());
@@ -245,8 +246,14 @@ public class Question_TemplateManage {
 						if(userRoleNameList != null && userRoleNameList.size() >0){
 							question.setUserRoleNameList(userRoleNameList);//用户角色名称集合
 						}
+						
+						if(user.getCancelAccountTime() != -1L){//账号已注销
+							question.setUserInfoStatus(-30);
+						}
 					}
 					
+				}else{
+					question.setAccount(question.getUserName());//员工用户名和账号是同一个
 				}
 			}
 			
@@ -269,7 +276,20 @@ public class Question_TemplateManage {
 					}
 				}
 			}
-			
+			//非正常状态用户清除显示数据
+			for(Question question : qr.getResultlist()){
+				if(question.getUserInfoStatus() <0){
+					question.setUserName(null);
+					question.setAccount(null);
+					question.setNickname(null);
+					question.setAvatarPath(null);
+					question.setAvatarName(null);
+					question.setUserRoleNameList(new ArrayList<String>());
+					question.setTitle("");
+					question.setContent("");
+					question.getAppendQuestionItemList().clear();
+				}
+			}
 		}
 		
 		
@@ -427,6 +447,7 @@ public class Question_TemplateManage {
 				if(question.getIsStaff() == false){//会员
 					user = userManage.query_cache_findUserByUserName(question.getUserName());
 					if(user != null){
+						question.setAccount(user.getAccount());
 						question.setNickname(user.getNickname());
 						question.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 						question.setAvatarName(user.getAvatarName());
@@ -435,11 +456,28 @@ public class Question_TemplateManage {
 						if(userRoleNameList != null && userRoleNameList.size() >0){
 							question.setUserRoleNameList(userRoleNameList);//用户角色名称集合
 						}
+						
+						if(user.getCancelAccountTime() != -1L){//账号已注销
+							question.setUserInfoStatus(-30);
+						}
 					}
 					
+				}else{
+					question.setAccount(question.getUserName());//员工用户名和账号是同一个
 				}
 				
-				
+				//非正常状态用户清除显示数据
+				if(question.getUserInfoStatus() <0){
+					question.setUserName(null);
+					question.setAccount(null);
+					question.setNickname(null);
+					question.setAvatarPath(null);
+					question.setAvatarName(null);
+					question.setUserRoleNameList(new ArrayList<String>());
+					question.setTitle("");
+					question.setContent("");
+					question.getAppendQuestionItemList().clear();
+				}
 				
 				return question;
 			}
@@ -709,11 +747,29 @@ public class Question_TemplateManage {
 				if(answer.getIsStaff() == false){//会员
 					User user = userManage.query_cache_findUserByUserName(answer.getUserName());
 					if(user != null){
+						answer.setAccount(user.getAccount());
 						answer.setNickname(user.getNickname());
 						answer.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 						answer.setAvatarName(user.getAvatarName());
 						userRoleNameMap.put(answer.getUserName(), null);
+						
+						if(user.getCancelAccountTime() != -1L){//账号已注销
+							answer.setUserInfoStatus(-30);
+						}
 					}
+				}else{
+					answer.setAccount(answer.getUserName());//员工用户名和账号是同一个
+				}
+				
+				//非正常状态用户清除显示数据
+				if(answer.getUserInfoStatus() <0){
+					answer.setUserName(null);
+					answer.setAccount(null);
+					answer.setNickname(null);
+					answer.setAvatarPath(null);
+					answer.setAvatarName(null);
+					answer.setUserRoleNameList(new ArrayList<String>());
+					answer.setContent("");
 				}
 			}
 			
@@ -758,15 +814,33 @@ public class Question_TemplateManage {
 							if(answerReply.getIsStaff() == false){//会员
 								User user = userManage.query_cache_findUserByUserName(answerReply.getUserName());
 								if(user != null){
+									answerReply.setAccount(user.getAccount());
 									answerReply.setNickname(user.getNickname());
 									answerReply.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 									answerReply.setAvatarName(user.getAvatarName());
 									
 									List<String> roleNameList = userRoleManage.queryUserRoleName(answerReply.getUserName());
 									answerReply.setUserRoleNameList(roleNameList);
+									
+									if(user.getCancelAccountTime() != -1L){//账号已注销
+										answerReply.setUserInfoStatus(-30);
+									}
 								}
 								
 								
+							}else{
+								answerReply.setAccount(answerReply.getUserName());//员工用户名和账号是同一个
+							}
+							
+							//非正常状态用户清除显示数据
+							if(answerReply.getUserInfoStatus() <0){
+								answerReply.setUserName(null);
+								answerReply.setAccount(null);
+								answerReply.setNickname(null);
+								answerReply.setAvatarPath(null);
+								answerReply.setAvatarName(null);
+								answerReply.setUserRoleNameList(new ArrayList<String>());
+								answerReply.setContent("");
 							}
 							
 							answer.addAnswerReply(answerReply);

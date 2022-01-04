@@ -138,6 +138,7 @@ public class QuestionRewardPlatformShareAction {
 				
 				User post_user = userService.findUserByUserName(questionRewardPlatformShare.getPostUserName());
 				if(post_user != null){
+					questionRewardPlatformShare.setPostAccount(post_user.getAccount());
 					questionRewardPlatformShare.setPostNickname(post_user.getNickname());
 					if(post_user.getAvatarName() != null && !"".equals(post_user.getAvatarName().trim())){
 						questionRewardPlatformShare.setPostAvatarPath(fileManage.fileServerAddress()+post_user.getAvatarPath());
@@ -146,11 +147,17 @@ public class QuestionRewardPlatformShareAction {
 				}
 				User answer_user = userService.findUserByUserName(questionRewardPlatformShare.getAnswerUserName());
 				if(answer_user != null){
+					questionRewardPlatformShare.setAnswerAccount(answer_user.getAccount());
 					questionRewardPlatformShare.setAnswerNickname(answer_user.getNickname());
 					if(answer_user.getAvatarName() != null && !"".equals(answer_user.getAvatarName().trim())){
 						questionRewardPlatformShare.setAnswerAvatarPath(fileManage.fileServerAddress()+answer_user.getAvatarPath());
 						questionRewardPlatformShare.setAnswerAvatarName(answer_user.getAvatarName());
 					}		
+				}
+				
+				if(questionRewardPlatformShare.isStaff()){//如果为员工
+					questionRewardPlatformShare.setPostAccount(questionRewardPlatformShare.getPostUserName());//员工用户名和账号是同一个
+					questionRewardPlatformShare.setAnswerAccount(questionRewardPlatformShare.getAnswerUserName());//员工用户名和账号是同一个
 				}
 			}
 		}

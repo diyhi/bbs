@@ -101,6 +101,7 @@ public class MembershipCardGiftTaskManageAction {
 					}
 					User user = userManage.query_cache_findUserByUserName(membershipCardGiftItem.getUserName());
 					if(user != null){
+						membershipCardGiftItem.setAccount(user.getAccount());
 						membershipCardGiftItem.setNickname(user.getNickname());
 						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
 							membershipCardGiftItem.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());

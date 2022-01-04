@@ -180,6 +180,11 @@
 			<td colspan="2">提醒发送用户名称</td>
 		</tr>
 		<tr> 
+			<td colspan="2">senderAccount</td> 
+			<td>String</td>
+			<td colspan="2">提醒发送账号</td>
+		</tr>
+		<tr> 
 			<td colspan="2">senderNickname</td> 
 			<td>String</td>
 			<td colspan="2">提醒发送用户呢称</td>
@@ -565,8 +570,8 @@
 <textarea name="exampleCode">
 <#if pageView.records?exists && pageView.records?size gt 0 >    
 	<#list pageView.records as remind>
-		<#-- 提醒发送用户名称 -->
-		${remind.senderUserName}
+		<#-- 提醒发送账号 -->
+		${remind.senderAccount}
 		<#-- 阅读时间 -->
 		${remind.readTime}
 	</#list>

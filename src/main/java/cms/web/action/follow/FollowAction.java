@@ -70,6 +70,7 @@ public class FollowAction {
 				for(Follow follow : qr.getResultlist()){
 					User user = userService.findUserByUserName(follow.getFriendUserName());
 					if(user != null){
+						follow.setFriendAccount(user.getAccount());
 						follow.setFriendNickname(user.getNickname());
 						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
 							follow.setFriendAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
@@ -82,7 +83,15 @@ public class FollowAction {
 			pageView.setQueryResult(qr);
 			User user = userService.findUserById(id);
 			if(user != null){
-				returnValue.put("currentUser", user);
+				User currentUser = new User();
+				currentUser.setId(user.getId());
+				currentUser.setAccount(user.getAccount());
+				currentUser.setNickname(user.getNickname());
+				if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
+					currentUser.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+					currentUser.setAvatarName(user.getAvatarName());
+				}
+				returnValue.put("currentUser", currentUser);
 			}
 			
 			returnValue.put("pageView", pageView);
@@ -129,6 +138,7 @@ public class FollowAction {
 				for(Follower follower : qr.getResultlist()){
 					User user = userService.findUserByUserName(follower.getFriendUserName());
 					if(user != null){
+						follower.setFriendAccount(user.getAccount());
 						follower.setFriendNickname(user.getNickname());
 						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
 							follower.setFriendAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
@@ -141,7 +151,15 @@ public class FollowAction {
 			pageView.setQueryResult(qr);
 			User user = userService.findUserById(id);
 			if(user != null){
-				returnValue.put("currentUser", user);
+				User currentUser = new User();
+				currentUser.setId(user.getId());
+				currentUser.setAccount(user.getAccount());
+				currentUser.setNickname(user.getNickname());
+				if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
+					currentUser.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+					currentUser.setAvatarName(user.getAvatarName());
+				}
+				returnValue.put("currentUser", currentUser);
 			}
 			returnValue.put("pageView", pageView);
 		}else{

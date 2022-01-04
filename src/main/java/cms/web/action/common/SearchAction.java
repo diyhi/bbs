@@ -153,6 +153,7 @@ public class SearchAction {
 									}
 									if(t.getIsStaff() == false){//会员
 										User user = userManage.query_cache_findUserByUserName(t.getUserName());
+										t.setAccount(user.getAccount());
 										t.setNickname(user.getNickname());
 										t.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 										t.setAvatarName(user.getAvatarName());
@@ -160,6 +161,8 @@ public class SearchAction {
 										
 										userRoleNameMap.put(t.getUserName(), null);
 										
+									}else{
+										t.setAccount(t.getUserName());//员工用户名和账号是同一个
 									}
 									searchResult.setTopic(t);
 									continue A;
@@ -179,6 +182,7 @@ public class SearchAction {
 									}
 									if(t.getIsStaff() == false){//会员
 										User user = userManage.query_cache_findUserByUserName(t.getUserName());
+										t.setAccount(user.getAccount());
 										t.setNickname(user.getNickname());
 										t.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 										t.setAvatarName(user.getAvatarName());
@@ -186,6 +190,8 @@ public class SearchAction {
 										
 										userRoleNameMap.put(t.getUserName(), null);
 										
+									}else{
+										t.setAccount(t.getUserName());//员工用户名和账号是同一个
 									}
 									searchResult.setQuestion(t);
 									continue A;

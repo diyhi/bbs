@@ -64,4 +64,9 @@ public interface MembershipCardGiftTaskService extends DAO<MembershipCardGiftTas
 	 * @param maxResult 获取多少条数据
 	 */
 	public QueryResult<MembershipCardGiftItem> findMembershipCardGiftItemPage(Long membershipCardGiftTaskId,int firstIndex, int maxResult);
+	/**
+	 * 根据用户名称删除会员卡赠送项
+	 * @param userNameList 用户名称集合
+	 */
+	public Integer deleteMembershipCardGiftItemByUserName(List<String> userNameList);
 }

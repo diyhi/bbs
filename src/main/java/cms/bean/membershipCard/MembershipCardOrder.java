@@ -29,6 +29,8 @@ public class MembershipCardOrder implements Serializable{
 	/** 用户名称 **/
 	@Column(length=30)
 	private String userName;
+	@Transient
+	private String account;
 	/** 呢称 **/
 	@Transient
 	private String nickname;
@@ -269,6 +271,16 @@ public class MembershipCardOrder implements Serializable{
 
 	public void setAvatarName(String avatarName) {
 		this.avatarName = avatarName;
+	}
+
+
+	public String getAccount() {
+		return account;
+	}
+
+
+	public void setAccount(String account) {
+		this.account = account;
 	}
 	
 	

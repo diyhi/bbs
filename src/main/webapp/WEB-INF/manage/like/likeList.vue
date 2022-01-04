@@ -10,7 +10,7 @@
                		<el-popover effect="light" trigger="hover" placement="bottom">
 			        	<template #default>
 			        		<p >呢称: {{currentUser.nickname}}</p>
-				            <p>用户名称: {{currentUser.userName}}</p>
+				            <p>账号: {{currentUser.account}}</p>
 			        	</template>
 			        	<template #reference>
 			          		<div class="avatar-wrapper" >
@@ -24,8 +24,8 @@
 			        	</template>
 			        </el-popover>
                	</div>
-               	<div class="userName" title="用户名称">
-               		{{currentUser.userName}}
+               	<div class="userName" title="账号">
+               		{{currentUser.account}}
                		<div class="nickname" title="呢称">
                			{{currentUser.nickname}}
                			 <i class="tag">点赞</i>

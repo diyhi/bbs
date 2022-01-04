@@ -345,6 +345,7 @@ public class RedEnvelopeManage {
     			User user = userManage.query_cache_findUserById(receiveRedEnvelope.getReceiveUserId());
     			
     			if(user != null){
+    				receiveRedEnvelope.setReceiveAccount(user.getAccount());
         			receiveRedEnvelope.setReceiveNickname(user.getNickname());
         			receiveRedEnvelope.setReceiveUserName(user.getUserName());
         			if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){

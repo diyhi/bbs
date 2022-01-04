@@ -175,6 +175,11 @@
 			<td colspan="2">私信对方用户名称</td>
 		</tr>
 		<tr> 
+			<td>friendAccount</td> 
+			<td>String</td>
+			<td colspan="2">私信对方账号</td>
+		</tr>
+		<tr> 
 			<td>friendNickname</td> 
 			<td>String</td>
 			<td colspan="2">私信对方用户呢称</td>
@@ -199,6 +204,11 @@
 			<td>senderUserName</td> 
 			<td>String</td>
 			<td colspan="2">发送者用户名称</td>
+		</tr>
+		<tr> 
+			<td>senderAccount</td> 
+			<td>String</td>
+			<td colspan="2">发送者账号</td>
 		</tr>
 		<tr> 
 			<td>senderNickname</td> 
@@ -245,8 +255,8 @@
 <textarea name="exampleCode">
 <#if pageView.records?exists && pageView.records?size gt 0 >    
 	<#list pageView.records as privateMessage>
-		<#-- 发送者用户名称 -->
-		${privateMessage.senderUserName}
+		<#-- 发送者账号 -->
+		${privateMessage.senderAccount}
 		<#-- 阅读时间 -->
 		${privateMessage.readTime}
 	</#list>

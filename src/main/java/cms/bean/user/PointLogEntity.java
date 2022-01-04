@@ -11,6 +11,7 @@ import javax.persistence.Lob;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 /**
  * 积分日志Entity
@@ -35,6 +36,9 @@ public class PointLogEntity implements Serializable{
 	/**操作用户名称 **/ 
 	@Column(length=50)
 	private String operationUserName;
+	/** 操作用户账号 **/
+	@Transient
+	private String operationAccount;
 	/** 用户名称 **/
 	@Column(length=30)
 	private String userName;
@@ -133,6 +137,14 @@ public class PointLogEntity implements Serializable{
 
 	public void setRemark(String remark) {
 		this.remark = remark;
+	}
+
+	public String getOperationAccount() {
+		return operationAccount;
+	}
+
+	public void setOperationAccount(String operationAccount) {
+		this.operationAccount = operationAccount;
 	}
 
 	

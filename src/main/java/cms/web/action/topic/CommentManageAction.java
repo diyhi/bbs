@@ -726,7 +726,7 @@ public class CommentManageAction {
 					newComment.setUserName(username);
 					newComment.setIp(IpAddress.getClientIpAddress(request));
 					newComment.setQuote(JsonUtils.toJSONString(old_quoteList));
-					
+					newComment.setStatus(20);
 					//保存评论
 					commentService.saveComment(newComment);
 					

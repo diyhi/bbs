@@ -23,7 +23,7 @@
 									<img src="${question.avatarPath}100x100/${question.avatarName}">
 								<#else>
 									<!--[if (IE)]><img src="${commonPath}images/min_avata.png"><![endif]-->
-									<!--[if !(IE)]><!--><img avatar="${(question.nickname != null && question.nickname??) ?string(question.nickname , question.userName)}" ><!--<![endif]-->
+									<!--[if !(IE)]><!--><img avatar="${(question.nickname != null && question.nickname??) ?string(question.nickname , question.account)}" ><!--<![endif]-->
 								</#if>                                                        
 				            </a>   
 				        </div>
@@ -32,7 +32,7 @@
 							<ul class="info">
 					        	<li>
 					            	<a class="userName" href="user/control/home?userName=${question.userName}">
-					            		${(question.nickname != null && question.nickname??) ?string(question.nickname , question.userName)}
+					            		${(question.nickname != null && question.nickname??) ?string(question.nickname , question.account)}
 					            	</a>
 					            	<#list question.userRoleNameList as roleName>
 										<span class="userRoleName">${roleName}</span>

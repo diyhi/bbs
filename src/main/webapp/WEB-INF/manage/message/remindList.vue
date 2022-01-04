@@ -10,7 +10,7 @@
                		<el-popover effect="light" trigger="hover" placement="bottom">
 			        	<template #default>
 			        		<p >呢称: {{currentUser.nickname}}</p>
-				            <p>用户名称: {{currentUser.userName}}</p>
+				            <p>账号: {{currentUser.account}}</p>
 			        	</template>
 			        	<template #reference>
 			          		<div class="avatar-wrapper" >
@@ -24,8 +24,8 @@
 			        	</template>
 			        </el-popover>
                	</div>
-               	<div class="userName" title="用户名称">
-               		{{currentUser.userName}}
+               	<div class="userName" title="账号">
+               		{{currentUser.account}}
                		<div class="nickname" title="呢称">
                			{{currentUser.nickname}}
                			 <i class="tag">提醒</i>
@@ -39,7 +39,7 @@
 							<el-popover effect="light" trigger="hover" placement="top">
 					        	<template #default>
 						            <p v-if="scope.row.senderNickname != null && scope.row.senderNickname != ''">呢称: {{scope.row.senderNickname}}</p>
-						            <p>用户名称: {{scope.row.senderUserName}}</p>
+						            <p>账号: {{scope.row.senderAccount}}</p>
 					        	</template>
 					        	<template #reference>
 					          		<div class="avatar-wrapper" >
@@ -50,7 +50,7 @@
 											<el-avatar :size="48" :src="scope.row.senderAvatarPath+'100x100/'+scope.row.senderAvatarName"></el-avatar>
 										</div>
 										
-										<div class="avatar-text">{{scope.row.senderUserName}}</div>
+										<div class="avatar-text">{{scope.row.senderAccount}}</div>
 									</div>
 					        	</template>
 					        </el-popover>
@@ -84,13 +84,13 @@
 								关注了我
 							</span>
 							<span v-if="scope.row.typeCode == 90">
-								我关注的 {{scope.row.senderUserName}} 发表了话题 <el-link class="sourceTitle" href="javascript:void(0);" @click="$store.commit('setCacheNumber'); $router.push({path: '/admin/control/topic/manage/view', query:{ topicId : scope.row.topicId}})">{{scope.row.topicTitle}}</el-link>
+								我关注的 {{scope.row.senderAccount}} 发表了话题 <el-link class="sourceTitle" href="javascript:void(0);" @click="$store.commit('setCacheNumber'); $router.push({path: '/admin/control/topic/manage/view', query:{ topicId : scope.row.topicId}})">{{scope.row.topicTitle}}</el-link>
 							</span>
 							<span v-if="scope.row.typeCode == 100">
-								我关注的 {{scope.row.senderUserName}} 在 <el-link class="sourceTitle" href="javascript:void(0);" @click="$store.commit('setCacheNumber'); $router.push({path: '/admin/control/topic/manage/view', query:{ topicId : scope.row.topicId,commentId:scope.row.friendTopicCommentId}})">{{scope.row.topicTitle}}</el-link> 发表了评论
+								我关注的 {{scope.row.senderAccount}} 在 <el-link class="sourceTitle" href="javascript:void(0);" @click="$store.commit('setCacheNumber'); $router.push({path: '/admin/control/topic/manage/view', query:{ topicId : scope.row.topicId,commentId:scope.row.friendTopicCommentId}})">{{scope.row.topicTitle}}</el-link> 发表了评论
 							</span>
 							<span v-if="scope.row.typeCode == 110">
-								我关注的 {{scope.row.senderUserName}} 在 <el-link class="sourceTitle" href="javascript:void(0);" @click="$store.commit('setCacheNumber'); $router.push({path: '/admin/control/topic/manage/view', query:{ topicId : scope.row.topicId,commentId:scope.row.friendTopicCommentId, replyId:scope.row.friendTopicReplyId}})">{{scope.row.topicTitle}}</el-link> 发表了回复
+								我关注的 {{scope.row.senderAccount}} 在 <el-link class="sourceTitle" href="javascript:void(0);" @click="$store.commit('setCacheNumber'); $router.push({path: '/admin/control/topic/manage/view', query:{ topicId : scope.row.topicId,commentId:scope.row.friendTopicCommentId, replyId:scope.row.friendTopicReplyId}})">{{scope.row.topicTitle}}</el-link> 发表了回复
 							</span>
 							
 							<span v-if="scope.row.typeCode == 120">

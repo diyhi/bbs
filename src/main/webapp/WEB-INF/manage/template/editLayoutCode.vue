@@ -90,6 +90,8 @@ export default({
 			wap_html: '',
 			editor_pc:'',
 			editor_wap:'',
+			
+			
 			isPCHtmlExist:false,//是否存在电脑版html文件
 			isWapHtmlExist:false,//是否存在手机版html文件
 			example_editor:[],
@@ -268,9 +270,13 @@ export default({
 			let formData = new FormData();
 			if(_self.editor_pc != null && _self.editor_pc != ''){
 				formData.append('pc_code', _self.editor_pc.getValue());	
+			}else{
+				formData.append('pc_code', _self.pc_html);	
 			}
 			if(_self.editor_wap != null && _self.editor_wap != ''){
 				formData.append('wap_code', _self.editor_wap.getValue());
+			}else{
+				formData.append('wap_code', _self.wap_html);
 			}
 			if(_self.id != null){
 				formData.append('layoutId', _self.id);

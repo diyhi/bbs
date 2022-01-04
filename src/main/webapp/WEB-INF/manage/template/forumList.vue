@@ -444,9 +444,13 @@ export default({
 			let formData = new FormData();
 			if(_self.editor_pc != null && _self.editor_pc != ''){
 				formData.append('pc_code', _self.editor_pc.getValue());	
+			}else{
+				formData.append('pc_code', _self.pc_html);	
 			}
 			if(_self.editor_wap != null && _self.editor_wap != ''){
 				formData.append('wap_code', _self.editor_wap.getValue());
+			}else{
+				formData.append('wap_code', _self.wap_html);
 			}
 			if(_self.id != null){
 				formData.append('forumId', _self.id);

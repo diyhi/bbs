@@ -77,7 +77,7 @@
 				    	<div class="topInfo">                                   
 				            <div class="top-box">
 				            	<router-link class="userName" tag="span" :to="{path: '/user/control/home', query: {userName: topic.userName}}">
-					            	{{topic.nickname != null && topic.nickname != '' ? topic.nickname : topic.userName}}
+					            	{{topic.nickname != null && topic.nickname != '' ? topic.nickname : topic.account}}
 					            </router-link>
 				            	<span class="staff" v-if="topic.isStaff">官方人员</span>
 				            	<span class="userRoleName" v-for="roleName in topic.userRoleNameList">{{roleName}}</span>
@@ -322,7 +322,7 @@
 			                <div class="topInfo">                                   
 					            <div class="top-box">
 					            	<router-link class="userName" tag="span" :to="{path: '/user/control/home', query: {userName: topic.userName}}">
-					            		{{topic.nickname != null && topic.nickname != '' ? topic.nickname : topic.userName}}
+					            		{{topic.nickname != null && topic.nickname != '' ? topic.nickname : topic.account}}
 					            	</router-link>
 					            	<span class="staff" v-if="topic.isStaff">官方人员</span>
 					            	<span class="userRoleName" v-for="roleName in topic.userRoleNameList">{{roleName}}</span>
@@ -367,8 +367,8 @@
 					<div class="receiveRedEnvelopeUser">
 						<div class="box" >
 							<span v-for="(receiveRedEnvelope,index) in receiveRedEnvelopeList" >
-								<img :class="(receiveRedEnvelope.id == selectedReceiveRedEnvelopeId) ? 'avatar active' : 'avatar'"  @click="selectReceiveRedEnvelopeUser(receiveRedEnvelope.id)"  v-tooltip="{ content: ''+(receiveRedEnvelope.receiveNickname != null && receiveRedEnvelope.receiveNickname !='' ? receiveRedEnvelope.receiveNickname : receiveRedEnvelope.receiveUserName)+' 获得 '+receiveRedEnvelope.amount+' 元', show: ((receiveRedEnvelope.id == selectedReceiveRedEnvelopeId) ? true : false),trigger: 'manual'}" :src="receiveRedEnvelope.receiveAvatarPath+'100x100/'+receiveRedEnvelope.receiveAvatarName" v-if="receiveRedEnvelope.receiveAvatarName != null && receiveRedEnvelope.receiveAvatarName != ''">
-								<img :class="(receiveRedEnvelope.id == selectedReceiveRedEnvelopeId) ? 'avatar active' : 'avatar'"  @click="selectReceiveRedEnvelopeUser(receiveRedEnvelope.id)"  v-tooltip="{ content: ''+(receiveRedEnvelope.receiveNickname != null && receiveRedEnvelope.receiveNickname !='' ? receiveRedEnvelope.receiveNickname : receiveRedEnvelope.receiveUserName)+' 获得 '+receiveRedEnvelope.amount+' 元', show: ((receiveRedEnvelope.id == selectedReceiveRedEnvelopeId) ? true : false),trigger: 'manual' }" :ref="'redEnvelopeAvatarData_'+receiveRedEnvelope.id"   v-if="receiveRedEnvelope.receiveAvatarName == null || receiveRedEnvelope.receiveAvatarName==''">
+								<img :class="(receiveRedEnvelope.id == selectedReceiveRedEnvelopeId) ? 'avatar active' : 'avatar'"  @click="selectReceiveRedEnvelopeUser(receiveRedEnvelope.id)"  v-tooltip="{ content: ''+(receiveRedEnvelope.receiveNickname != null && receiveRedEnvelope.receiveNickname !='' ? receiveRedEnvelope.receiveNickname : receiveRedEnvelope.receiveAccount)+' 获得 '+receiveRedEnvelope.amount+' 元', show: ((receiveRedEnvelope.id == selectedReceiveRedEnvelopeId) ? true : false),trigger: 'manual'}" :src="receiveRedEnvelope.receiveAvatarPath+'100x100/'+receiveRedEnvelope.receiveAvatarName" v-if="receiveRedEnvelope.receiveAvatarName != null && receiveRedEnvelope.receiveAvatarName != ''">
+								<img :class="(receiveRedEnvelope.id == selectedReceiveRedEnvelopeId) ? 'avatar active' : 'avatar'"  @click="selectReceiveRedEnvelopeUser(receiveRedEnvelope.id)"  v-tooltip="{ content: ''+(receiveRedEnvelope.receiveNickname != null && receiveRedEnvelope.receiveNickname !='' ? receiveRedEnvelope.receiveNickname : receiveRedEnvelope.receiveAccount)+' 获得 '+receiveRedEnvelope.amount+' 元', show: ((receiveRedEnvelope.id == selectedReceiveRedEnvelopeId) ? true : false),trigger: 'manual' }" :ref="'redEnvelopeAvatarData_'+receiveRedEnvelope.id"   v-if="receiveRedEnvelope.receiveAvatarName == null || receiveRedEnvelope.receiveAvatarName==''">
 
 							</span>
 						</div>
@@ -428,7 +428,7 @@
 							<span class="info" >
 								<!-- router-link渲染成<h2>标签-->
 						    	<router-link tag="h2" class="clearfix" :to="{path: '/user/control/home', query: {userName: comment.userName}}">
-						        	<div class="userName">{{comment.nickname != null && comment.nickname != '' ? comment.nickname : comment.userName}}</div>
+						        	<div class="userName">{{comment.nickname != null && comment.nickname != '' ? comment.nickname : comment.account}}</div>
 						        	<div class="userTag">	        
 								        <i class="userRoleName" v-for="roleName in comment.userRoleNameList" >{{roleName}}</i>
 								        <i class="staff" v-if="comment.isStaff">官方人员</i>
@@ -471,8 +471,12 @@
 									        </router-link>
 		                                    <!-- router-link渲染成<span>标签-->
 									    	<router-link class="userName" tag="span" :to="{path: '/user/control/home', query: {userName: reply.userName}}">
-									           {{reply.nickname != null && reply.nickname != '' ? reply.nickname : reply.userName}}
+									           {{reply.nickname != null && reply.nickname != '' ? reply.nickname : reply.account}}
 									        </router-link>
+									        <span class="userName" v-if="reply.account == null || reply.account == ''">
+									        	&nbsp;
+									        </span>
+									        
 									        <div class="userTag">
 									        	<i class="staff" v-if="reply.isStaff">官方人员</i>
 										        <i class="master" v-if="reply.userName == topic.userName && reply.isStaff == topic.isStaff">作者</i>
@@ -801,7 +805,7 @@
 			    	<div class="topInfo">                                   
 			            <div class="top-box">
 			            	<router-link class="userName" tag="span" :to="{path: '/user/control/home', query: {userName: question.userName}}">
-				            	{{question.nickname != null && question.nickname != '' ? question.nickname : question.userName}}
+				            	{{question.nickname != null && question.nickname != '' ? question.nickname : question.account}}
 				            </router-link>
 			            	<span class="staff" v-if="question.isStaff">官方人员</span>
 			            	<span class="userRoleName" v-for="roleName in question.userRoleNameList">{{roleName}}</span>
@@ -905,7 +909,7 @@
 			                <div class="topInfo">                                   
 					            <div class="top-box">
 					            	<router-link class="userName" tag="span" :to="{path: '/user/control/home', query: {userName: question.userName}}">
-					            		{{question.nickname != null && question.nickname != '' ? question.nickname : question.userName}}
+					            		{{question.nickname != null && question.nickname != '' ? question.nickname : question.account}}
 					            	</router-link>
 					            	<span class="staff" v-if="question.isStaff">官方人员</span>
 					            	<span class="userRoleName" v-for="roleName in question.userRoleNameList">{{roleName}}</span>
@@ -999,7 +1003,7 @@
 							<span class="info" >
 								<!-- router-link渲染成<h2>标签-->
 						    	<router-link tag="h2" class="clearfix" :to="{path: '/user/control/home', query: {userName: answer.userName}}">
-						        	<div class="userName">{{answer.nickname != null && answer.nickname != '' ? answer.nickname : answer.userName}}</div>
+						        	<div class="userName">{{answer.nickname != null && answer.nickname != '' ? answer.nickname : answer.account}}</div>
 						        	<div class="userTag">
 								        <i class="userRoleName" v-for="roleName in answer.userRoleNameList" >{{roleName}}</i>
 								        <i class="staff" v-if="answer.isStaff">官方人员</i>
@@ -1034,8 +1038,11 @@
 									        </router-link>
 		                                    <!-- router-link渲染成<span>标签-->
 									    	<router-link class="userName" tag="span" :to="{path: '/user/control/home', query: {userName: reply.userName}}">
-									           {{reply.nickname != null && reply.nickname != '' ? reply.nickname : reply.userName}}
+									           {{reply.nickname != null && reply.nickname != '' ? reply.nickname : reply.account}}
 									        </router-link>
+									        <span class="userName" v-if="reply.account == null || reply.account == ''">
+									        	&nbsp;
+									        </span>
 									        <div class="userTag">
 										        <i class="master" v-if="reply.userName == question.userName && reply.isStaff == question.isStaff">作者</i>
 									        </div>  
@@ -1448,7 +1455,7 @@
 <!-- 搜索框 -->
 <template id="searchBar-template">
 	<div>
-		<mt-search v-model.trim="keyword" cancel-text="取消" placeholder="搜索" @keyup.13.native="submitSearch" :value="keyword"></mt-search>
+		<mt-search ref="searchInput" v-model.trim="keyword" cancel-text="取消" placeholder="搜索" @keyup.13.native="submitSearch" :value="keyword"></mt-search>
 	</div>
 </template>
 
@@ -1478,7 +1485,7 @@
 				    	<div class="topInfo">                                   
 				            <div class="top-box">
 				            	<router-link class="userName" tag="span" :to="{path: '/user/control/home', query: {userName: searchResult.topic.userName}}">
-					            	{{searchResult.topic.nickname != null && searchResult.topic.nickname != '' ? searchResult.topic.nickname : searchResult.topic.userName}}
+					            	{{searchResult.topic.nickname != null && searchResult.topic.nickname != '' ? searchResult.topic.nickname : searchResult.topic.account}}
 					            </router-link>
 				            	<span class="staff" v-if="searchResult.topic.isStaff">官方人员</span>
 				            	<span class="userRoleName" v-for="roleName in searchResult.topic.userRoleNameList">{{roleName}}</span>
@@ -1521,7 +1528,7 @@
 				    	<div class="topInfo">                                   
 				            <div class="top-box">
 				            	<router-link class="userName" tag="span" :to="{path: '/user/control/home', query: {userName: searchResult.question.userName}}">
-					            	{{searchResult.question.nickname != null && searchResult.question.nickname != '' ? searchResult.question.nickname : searchResult.question.userName}}
+					            	{{searchResult.question.nickname != null && searchResult.question.nickname != '' ? searchResult.question.nickname : searchResult.question.account}}
 					            </router-link>
 				            	<span class="staff" v-if="searchResult.question.isStaff">官方人员</span>
 				            	<span class="userRoleName" v-for="roleName in searchResult.question.userRoleNameList">{{roleName}}</span>
@@ -1673,10 +1680,10 @@
         
 		<div class="registerInfo ">
 			<ul>
-				<li v-show="userName_field"><!-- @change.native="verificationUserName"这个属性与微信浏览器有可能会不兼容 -->
-		        	<mt-field v-model.trim="userName" label="用户名" placeholder="必填" type="text" ></mt-field>
+				<li v-show="account_field"><!-- @change.native="verificationUserName"这个属性与微信浏览器有可能会不兼容 -->
+		        	<mt-field v-model.trim="account" label="账号" placeholder="必填" type="text" ></mt-field>
 		        	<p class="tips">
-				    	<span>{{error.userName}}</span>
+				    	<span>{{error.account}}</span>
 				    </p>
 		        </li>
 		        <li v-show="mobile_field">
@@ -1827,10 +1834,10 @@
 	       	</div>
 			<div class="findPassWordTable">
 				<ul>
-					<li v-show="userName_field">
-						<mt-field v-model.trim="userName" label="用户名" placeholder="请输入用户名"  type="text"></mt-field>
+					<li v-show="account_field">
+						<mt-field v-model.trim="account" label="账号" placeholder="请输入用户名"  type="text"></mt-field>
 			        	<p class="tips">
-					    	<span>{{error.userName}}</span>
+					    	<span>{{error.account}}</span>
 					    </p>
 					</li>
 					<li v-show="mobile_field">
@@ -1878,10 +1885,10 @@
         	</div>
 			<div class="findPassWordTable">
 				<ul>
-					<li v-show="userName_field">
-			        	<mt-cell title="用户名" :value="userName"></mt-cell>
+					<li v-show="account_field">
+			        	<mt-cell title="账号" :value="account"></mt-cell>
 			        	<p class="tips">
-					    	<span>{{error.userName}}</span>
+					    	<span>{{error.account}}</span>
 					    </p>
 					</li>
 					<li v-show="mobile_field">
@@ -1967,10 +1974,10 @@
 	        	</div>
 	       	</div>
 			
-			<li v-show="userName_field">
-	        	<mt-field v-model.trim="userName" label="用户名" placeholder="请输入用户名"  type="text"></mt-field>
+			<li v-show="account_field">
+	        	<mt-field v-model.trim="account" label="账号" placeholder="请输入用户名"  type="text"></mt-field>
 	        	<p class="tips">
-			    	<span>{{error.userName}}</span>
+			    	<span>{{error.account}}</span>
 			    </p>
 	        </li>
 	        <li v-show="mobile_field">
@@ -2038,9 +2045,9 @@
 		    	
 		        <i class="avatar cms-user2" v-if="user.avatarName == null || user.avatarName == ''"></i>
 		        <i class="avatarImg" v-if="user.avatarName != null && user.avatarName != ''"><img :src="avatarUrl"></i>
-		        <p class="userName">{{user.userName}} <i class="userRoleName" v-for="(roleName,index) in user.userRoleNameList" >{{roleName}}</i></p>
+		        <p class="userName">{{user.account}} <i class="userRoleName" v-for="(roleName,index) in user.userRoleNameList" >{{roleName}}</i></p>
 		        <p class="nickname" v-if="user.nickname != null && user.nickname != ''">{{user.nickname}}</p>
-		        <p class="grade" v-if="user.isStaff == false">{{user.gradeName}}</p>
+		        <p class="grade" v-if="user.gradeName != null">{{user.gradeName}}</p>
 		        
 		       
 		      
@@ -2170,7 +2177,7 @@
 					<span class="info" >
 						<!-- router-link渲染成<h2>标签-->
 				    	<router-link tag="h2" :to="{path: '/user/control/home', query: {userName: userDynamic.userName}}">
-				           {{userDynamic.nickname != null && userDynamic.nickname != '' ? userDynamic.nickname : userDynamic.userName}}
+				           {{userDynamic.nickname != null && userDynamic.nickname != '' ? userDynamic.nickname : userDynamic.account}}
 				        </router-link> 
 	                    <p class="time">{{userDynamic.postTime}}</p>
 	                </span>                    
@@ -2911,7 +2918,7 @@
 				        </div>
 						<div class="head">
 							<span class="info" >
-			                    <h2>{{privateMessage.friendNickname != null && privateMessage.friendNickname != '' ? privateMessage.friendNickname : privateMessage.friendUserName}}<span class="badge" v-if="privateMessage.status == 10">未读</span></h2>
+			                    <h2>{{privateMessage.friendNickname != null && privateMessage.friendNickname != '' ? privateMessage.friendNickname : privateMessage.friendAccount}}<span class="badge" v-if="privateMessage.status == 10">未读</span></h2>
 			                        	
 			                    <p class="time">{{privateMessage.sendTime}}</p>
 			                </span>
@@ -2953,9 +2960,8 @@
 					<!-- router-link渲染成<a>标签-->
 			    	<router-link tag="a" :to="{path: '/user/control/home', query: {userName: privateMessage.senderUserName}}">
 			        	<img :src="privateMessage.senderAvatarPath+'100x100/'+privateMessage.senderAvatarName" v-if="privateMessage.senderAvatarName != null && privateMessage.senderAvatarName != ''">
-				        <img :src="$store.state.commonPath+'images/min_avata.png'" v-if="privateMessage.senderAvatarName == null || privateMessage.senderAvatarName == ''">     
-			        	<!-- 首字符头像-->
-				        <img :ref="'privateMessageChatAvatarData_'+privateMessage.id"  v-if="privateMessage.senderAvatarName == null || privateMessage.senderAvatarName == ''">
+				        <!-- 首字符头像-->
+				        <img :ref="'privateMessageChatAvatarData_'+privateMessage.id" :src="privateMessage.image"  v-if="privateMessage.senderAvatarName == null || privateMessage.senderAvatarName == ''">
 				        
 			        </router-link>
 					<div>
@@ -2972,9 +2978,8 @@
 					<!-- router-link渲染成<a>标签-->
 			    	<router-link tag="a" :to="{path: '/user/control/home', query: {userName: privateMessage.senderUserName}}">
 			        	<img :src="privateMessage.senderAvatarPath+'100x100/'+privateMessage.senderAvatarName" v-if="privateMessage.senderAvatarName != null && privateMessage.senderAvatarName != ''">
-				        <img :src="$store.state.commonPath+'images/min_avata.png'" v-if="privateMessage.senderAvatarName == null || privateMessage.senderAvatarName == ''">     
-			        	<!-- 首字符头像-->
-				        <img :ref="'privateMessageChatAvatarData_'+privateMessage.id"  v-if="privateMessage.senderAvatarName == null || privateMessage.senderAvatarName == ''">
+				        <!-- 首字符头像-->
+				        <img :ref="'privateMessageChatAvatarData_'+privateMessage.id" :src="privateMessage.image"  v-if="privateMessage.senderAvatarName == null || privateMessage.senderAvatarName == ''">
 				        
 			        </router-link>
 					<div>
@@ -3136,7 +3141,7 @@
 						<div class="avatarBox">
 				            <img :src="remind.senderAvatarPath+'100x100/'+remind.senderAvatarName" v-if="remind.senderAvatarName != null && remind.senderAvatarName != ''">
 				            <!-- 首字符头像-->
-				        	<img :ref="'remindSenderAvatarData_'+remind.id"  v-if="remind.senderAvatarName == null || remind.senderAvatarName == ''">
+				        	<img :ref="'remindSenderAvatarData_'+remind.id" :src="remind.image"  v-if="remind.senderAvatarName == null || remind.senderAvatarName == ''">
 						
 				        </div>
 						<div class="head">
@@ -3150,7 +3155,7 @@
 							<div class="content">
 								<div v-if="remind.typeCode == 10">
 									<router-link class="link" :to="{path: '/user/control/home', query: {userName: remind.senderUserName}}">
-							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderUserName}}
+							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderAccount}}
 							        </router-link>
 									在
 									<router-link class="link" :to="{path: '/thread', query: {topicId: remind.topicId, commentId:remind.friendTopicCommentId}}">
@@ -3160,7 +3165,7 @@
 								</div>
 								<div v-if="remind.typeCode == 20">
 									<router-link class="link" :to="{path: '/user/control/home', query: {userName: remind.senderUserName}}">
-							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderUserName}}
+							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderAccount}}
 							        </router-link>
 									在
 									<router-link class="link" :to="{path: '/thread', query: {topicId: remind.topicId, commentId:remind.friendTopicCommentId}}">
@@ -3170,7 +3175,7 @@
 								</div>
 								<div v-if="remind.typeCode == 30">
 									<router-link class="link" :to="{path: '/user/control/home', query: {userName: remind.senderUserName}}">
-							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderUserName}}
+							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderAccount}}
 							        </router-link>
 									在
 									<router-link class="link" :to="{path: '/thread', query: {topicId: remind.topicId, commentId:remind.friendTopicCommentId}}">
@@ -3180,7 +3185,7 @@
 								</div>
 								<div v-if="remind.typeCode == 40">
 									<router-link class="link" :to="{path: '/user/control/home', query: {userName: remind.senderUserName}}">
-							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderUserName}}
+							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderAccount}}
 							        </router-link>
 									在
 									<router-link class="link" :to="{path: '/thread', query: {topicId: remind.topicId, commentId:remind.topicCommentId}}">
@@ -3190,7 +3195,7 @@
 								</div>
 								<div v-if="remind.typeCode == 50">
 									<router-link class="link" :to="{path: '/user/control/home', query: {userName: remind.senderUserName}}">
-							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderUserName}}
+							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderAccount}}
 							        </router-link>
 									在
 									<router-link class="link" :to="{path: '/thread', query: {topicId: remind.topicId, commentId:remind.friendTopicCommentId}}">
@@ -3200,7 +3205,7 @@
 								</div>
 								<div v-if="remind.typeCode == 60">
 									<router-link class="link" :to="{path: '/user/control/home', query: {userName: remind.senderUserName}}">
-							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderUserName}}
+							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderAccount}}
 							        </router-link>
 									在
 									<router-link class="link" :to="{path: '/thread', query: {topicId: remind.topicId}}">
@@ -3210,7 +3215,7 @@
 								</div>
 								<div v-if="remind.typeCode == 70">
 									<router-link class="link" :to="{path: '/user/control/home', query: {userName: remind.senderUserName}}">
-							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderUserName}}
+							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderAccount}}
 							        </router-link>
 									在
 									<router-link class="link" :to="{path: '/thread', query: {topicId: remind.topicId}}">
@@ -3220,14 +3225,14 @@
 								</div>
 								<div v-if="remind.typeCode == 80">
 									<router-link class="link" :to="{path: '/user/control/home', query: {userName: remind.senderUserName}}">
-							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderUserName}}
+							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderAccount}}
 							        </router-link>
 									关注了我
 								</div>
 								<div v-if="remind.typeCode == 90">
 									我关注的
 									<router-link class="link" :to="{path: '/user/control/home', query: {userName: remind.senderUserName}}">
-							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderUserName}}
+							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderAccount}}
 							        </router-link>
 									发表了话题
 									<router-link class="link" :to="{path: '/thread', query: {topicId: remind.topicId}}">
@@ -3237,7 +3242,7 @@
 								<div v-if="remind.typeCode == 100">
 									我关注的
 									<router-link class="link" :to="{path: '/user/control/home', query: {userName: remind.senderUserName}}">
-							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderUserName}}
+							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderAccount}}
 							        </router-link>
 									在
 									<router-link class="link" :to="{path: '/thread', query: {topicId: remind.topicId, commentId:remind.friendTopicCommentId}}">
@@ -3248,7 +3253,7 @@
 								<div v-if="remind.typeCode == 110">
 									我关注的
 									<router-link class="link" :to="{path: '/user/control/home', query: {userName: remind.senderUserName}}">
-							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderUserName}}
+							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderAccount}}
 							        </router-link>
 									在
 									<router-link class="link" :to="{path: '/thread', query: {topicId: remind.topicId, commentId:remind.friendTopicCommentId}}">
@@ -3260,7 +3265,7 @@
 								
 								<div v-if="remind.typeCode == 120">
 									<router-link class="link" :to="{path: '/user/control/home', query: {userName: remind.senderUserName}}">
-							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderUserName}}
+							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderAccount}}
 							        </router-link>
 									在
 									<router-link class="link" :to="{path: '/question', query: {questionId: remind.questionId, commentId:remind.friendQuestionAnswerId}}">
@@ -3270,7 +3275,7 @@
 								</div>
 								<div v-if="remind.typeCode == 130">
 									<router-link class="link" :to="{path: '/user/control/home', query: {userName: remind.senderUserName}}">
-							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderUserName}}
+							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderAccount}}
 							        </router-link>
 									在
 									<router-link class="link" :to="{path: '/question', query: {questionId: remind.questionId, answerId:remind.friendQuestionAnswerId}}">
@@ -3280,7 +3285,7 @@
 								</div>
 								<div v-if="remind.typeCode == 140">
 									<router-link class="link" :to="{path: '/user/control/home', query: {userName: remind.senderUserName}}">
-							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderUserName}}
+							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderAccount}}
 							        </router-link>
 									在
 									<router-link class="link" :to="{path: '/question', query: {questionId: remind.questionId, answerId:remind.questionAnswerId}}">
@@ -3290,7 +3295,7 @@
 								</div>
 								<div v-if="remind.typeCode == 150">
 									<router-link class="link" :to="{path: '/user/control/home', query: {userName: remind.senderUserName}}">
-							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderUserName}}
+							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderAccount}}
 							        </router-link>
 									在
 									<router-link class="link" :to="{path: '/question', query: {questionId: remind.questionId, answerId:remind.friendQuestionAnswerId}}">
@@ -3363,7 +3368,7 @@
 			<div v-infinite-scroll="queryTopicFavorite" infinite-scroll-disabled="loading" infinite-scroll-distance="10">
 				<ul>
 					<li v-for="favorite in favoriteList">
-						<mt-cell :title="favorite.userName" :label="favorite.addtime" @click.native="toUser(favorite.userName)" is-link></mt-cell>
+						<mt-cell :title="favorite.account" :label="favorite.addtime" @click.native="toUser(favorite.userName)" is-link></mt-cell>
 					</li>
 				
 				</ul>
@@ -3417,7 +3422,7 @@
 			<div v-infinite-scroll="queryTopicLike" infinite-scroll-disabled="loading" infinite-scroll-distance="10">
 				<ul>
 					<li v-for="like in likeList">
-						<mt-cell :title="like.userName" :label="like.addtime" @click.native="toUser(like.userName)" is-link></mt-cell>
+						<mt-cell :title="like.account" :label="like.addtime" @click.native="toUser(like.userName)" is-link></mt-cell>
 					</li>
 				
 				</ul>
@@ -3439,8 +3444,8 @@
 			<div v-infinite-scroll="queryTopicUnhide" infinite-scroll-disabled="loading" infinite-scroll-distance="10">
 				<ul>
 					<li v-for="topicUnhide in topicUnhideList">
-						<mt-cell :title="topicUnhide.userName" :label="topicUnhide.cancelTime" v-if="topicUnhide.hideTagType == 10"  value="输入密码" @click.native="toUser(topicUnhide.userName)" is-link></mt-cell>
-						<mt-cell :title="topicUnhide.userName" :label="topicUnhide.cancelTime" v-if="topicUnhide.hideTagType == 40"  value="积分购买" @click.native="toUser(topicUnhide.userName)" is-link></mt-cell>
+						<mt-cell :title="topicUnhide.account" :label="topicUnhide.cancelTime" v-if="topicUnhide.hideTagType == 10"  value="输入密码" @click.native="toUser(topicUnhide.userName)" is-link></mt-cell>
+						<mt-cell :title="topicUnhide.account" :label="topicUnhide.cancelTime" v-if="topicUnhide.hideTagType == 40"  value="积分购买" @click.native="toUser(topicUnhide.userName)" is-link></mt-cell>
 					</li>
 				
 				</ul>
@@ -3478,7 +3483,7 @@
 			            
 			            	<!-- router-link渲染成<p>标签 --> 
 			            	<router-link tag="span" class="userName" :to="{path: '/user/control/home', query: {userName: follow.friendUserName}}">
-								{{follow.friendUserName}}<span v-if="follow.friendNickname != null && follow.friendNickname != ''"> （呢称：{{follow.friendNickname}}）</span>
+								{{follow.friendAccount}}<span v-if="follow.friendNickname != null && follow.friendNickname != ''"> （呢称：{{follow.friendNickname}}）</span>
 							</router-link>               
 						</div>
 					</div>
@@ -3517,7 +3522,7 @@
 			            
 			            	<!-- router-link渲染成<p>标签 --> 
 			            	<router-link tag="span" class="userName" :to="{path: '/user/control/home', query: {userName: follower.friendUserName}}">
-								{{follower.friendUserName}}<span v-if="follower.friendNickname != null && follower.friendNickname != ''"> （呢称：{{follower.friendNickname}}）</span>
+								{{follower.friendAccount}}<span v-if="follower.friendNickname != null && follower.friendNickname != ''"> （呢称：{{follower.friendNickname}}）</span>
 							</router-link>               
 						</div>
 					</div>
@@ -3951,7 +3956,7 @@
 							<span class="info" >
 								<!-- router-link渲染成<h2>标签-->
 						    	<router-link tag="h2" class="clearfix" :to="{path: '/user/control/home', query: {userName: receiveRedEnvelope.receiveUserName}}">
-						        	<div class="userName">{{receiveRedEnvelope.receiveNickname != null && receiveRedEnvelope.receiveNickname != '' ? receiveRedEnvelope.receiveNickname : receiveRedEnvelope.receiveUserName}}</div>
+						        	<div class="userName">{{receiveRedEnvelope.receiveNickname != null && receiveRedEnvelope.receiveNickname != '' ? receiveRedEnvelope.receiveNickname : receiveRedEnvelope.receiveAccount}}</div>
 						        </router-link>
 	                        	
 	                          	<div class="time clearfix">{{receiveRedEnvelope.receiveTime}}</div>
@@ -3994,7 +3999,7 @@
 							<span class="info" >
 								<!-- router-link渲染成<h2>标签-->
 						    	<router-link tag="h2" class="clearfix" :to="{path: '/user/control/home', query: {userName: receiveRedEnvelope.giveUserName}}">
-						        	<div class="userName">{{receiveRedEnvelope.giveNickname != null && receiveRedEnvelope.giveNickname != '' ? receiveRedEnvelope.giveNickname : receiveRedEnvelope.giveUserName}}</div>
+						        	<div class="userName">{{receiveRedEnvelope.giveNickname != null && receiveRedEnvelope.giveNickname != '' ? receiveRedEnvelope.giveNickname : receiveRedEnvelope.giveAccount}}</div>
 						        </router-link>
 	                        	
 	                          	<div class="time clearfix">{{receiveRedEnvelope.receiveTime}}</div>

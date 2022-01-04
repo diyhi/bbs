@@ -17,6 +17,7 @@ import cms.bean.user.User;
 import cms.service.setting.SettingService;
 import cms.service.user.UserService;
 import cms.utils.JsonUtils;
+import cms.web.action.fileSystem.FileManage;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -32,6 +33,8 @@ public class PointLogAction{
 
 	@Resource UserService userService;
 	@Resource SettingService settingService;
+	@Resource FileManage fileManage;
+	@Resource UserManage userManage;
 	
 	@ResponseBody
 	@RequestMapping("/control/pointLog/list")
@@ -51,10 +54,31 @@ public class PointLogAction{
 			if(user != null){
 				QueryResult<PointLog> qr =  userService.findPointLogPage(user.getId(),user.getUserName(),firstIndex, pageView.getMaxresult());
 				
+				if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
+					for(PointLog pointLog : qr.getResultlist()){
+						if(pointLog.getOperationUserType().equals(1)){//员工
+							pointLog.setOperationAccount(pointLog.getOperationUserName());//员工用户名和账号是同一个
+						}else if(pointLog.getOperationUserType().equals(2)){//会员
+							User _user = userManage.query_cache_findUserByUserName(pointLog.getOperationUserName());
+							if(_user != null){
+								pointLog.setOperationAccount(_user.getAccount());
+							}
+						}
+					}
+				}
+				
 				//将查询结果集传给分页List
 				pageView.setQueryResult(qr);
 				
-				returnValue.put("currentUser", user);
+				User currentUser = new User();
+				currentUser.setId(user.getId());
+				currentUser.setAccount(user.getAccount());
+				currentUser.setNickname(user.getNickname());
+				if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
+					currentUser.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+					currentUser.setAvatarName(user.getAvatarName());
+				}
+				returnValue.put("currentUser", currentUser);
 				returnValue.put("pageView", pageView);
 			}
 			

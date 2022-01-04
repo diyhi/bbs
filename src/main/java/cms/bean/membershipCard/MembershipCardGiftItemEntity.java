@@ -31,6 +31,9 @@ public class MembershipCardGiftItemEntity implements Serializable{
 	/** 会员卡赠送任务Id **/
 	protected Long membershipCardGiftTaskId;
 	
+	/** 账号 **/
+	@Transient
+	protected String account;
 	/** 呢称 **/
 	@Transient
 	protected String nickname;
@@ -131,6 +134,12 @@ public class MembershipCardGiftItemEntity implements Serializable{
 	}
 	public void setAvatarName(String avatarName) {
 		this.avatarName = avatarName;
+	}
+	public String getAccount() {
+		return account;
+	}
+	public void setAccount(String account) {
+		this.account = account;
 	}
 
 	

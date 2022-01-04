@@ -63,6 +63,15 @@ http://www.springframework.org/schema/task http://www.springframework.org/schema
                 </bean>
 			 </list>
 		</property>
+		<!-- 超时时间，单位/毫秒;  -1表示无限制;  86400000表示24小时; 如果未设置此值，则使用基础实现的默认超时，例如，在带有Servlet 3的Tomcat上为10秒。-->
+		<property name="asyncRequestTimeout" value="86400000"/>
+		
+		<!-- 此处指定自定义线程池，否则异步处理会使用默认线程池SimpleAsyncTaskExecutor，这个线程大小无限制 -->
+		<!-- 会提示An Executor is required to handle java.util.concurrent.Callable return values.-->
+		<!-- Please, configure a TaskExecutor in the MVC config under "async support".-->
+		<!-- The SimpleAsyncTaskExecutor currently in use is not suitable under load. -->
+		<!-- 异步使用ThreadPoolTaskExecutor替换默认的SimpleAsyncTaskExecutor 本配置线程池参数在beans.xml文件中-->
+        <property name="taskExecutor" ref="taskExecutor"/>
 	</bean>
 	
 	

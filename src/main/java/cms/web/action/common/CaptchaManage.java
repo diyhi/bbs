@@ -171,10 +171,10 @@ public class CaptchaManage {
 	/**---------------------------------- 用户登录 ---------------------------------------**/
 	/**
 	 * 是否显示验证码
-	 * @param userName 用户名称
+	 * @param account 账号
 	 * @return 
 	 */
-	public boolean login_isCaptcha(String userName){
+	public boolean login_isCaptcha(String account){
 
 		//是否需要验证码  true:要  false:不要
 		boolean isCaptcha = false;
@@ -183,7 +183,7 @@ public class CaptchaManage {
 			isCaptcha = true;
 		}else{
 			//用户每分钟提交次数
-			Integer quantity = settingManage.getSubmitQuantity("login", userName); 
+			Integer quantity = settingManage.getSubmitQuantity("login", account); 
 			
 			//如果每用户每分钟提交超过设定次数，则需验证码
 			if(quantity != null && quantity >= settingService.findSystemSetting_cache().getLogin_submitQuantity()){

@@ -34,6 +34,9 @@ public class Answer implements Serializable{
 	/** 用户名称 **/
 	@Column(length=30)
 	private String userName;
+	/** 账号 **/
+	@Transient
+	private String account;
 	/** 呢称 **/
 	@Transient
 	private String nickname;
@@ -43,6 +46,9 @@ public class Answer implements Serializable{
 	/** 头像名称 **/
 	@Transient
 	private String avatarName;
+	/** 用户信息状态 -30.账号已注销(不显示数据) -20.账号已逻辑删除(不显示数据) -10.账号已禁用(不显示数据)  0.正常 10.账号已禁用(显示数据) 20.账号已逻辑删除(显示数据) **/
+	@Transient
+	private Integer userInfoStatus = 0;
 	/** IP **/
 	@Column(length=45)
 	private String ip;
@@ -230,6 +236,22 @@ public class Answer implements Serializable{
 
 	public void setLastUpdateTime(Date lastUpdateTime) {
 		this.lastUpdateTime = lastUpdateTime;
+	}
+
+	public String getAccount() {
+		return account;
+	}
+
+	public void setAccount(String account) {
+		this.account = account;
+	}
+
+	public Integer getUserInfoStatus() {
+		return userInfoStatus;
+	}
+
+	public void setUserInfoStatus(Integer userInfoStatus) {
+		this.userInfoStatus = userInfoStatus;
 	}
 	
 	

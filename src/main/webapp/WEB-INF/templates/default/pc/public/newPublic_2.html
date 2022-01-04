@@ -34,7 +34,7 @@
 								</#if> 
 							</a>
 						</div>
-						<a class="userName" href="user/control/home">${(systemUser.nickname != null && systemUser.nickname??) ?string(systemUser.nickname , systemUser.userName)}</a>
+						<a class="userName" href="user/control/home">${(systemUser.nickname != null && systemUser.nickname??) ?string(systemUser.nickname , systemUser.account)}</a>
 					</li>
 					<li><a href="user/control/home">用户中心<span id="allMessage-badge" class="badge" style="position: absolute; margin-top: 14px; display: none;"></span></a></li>
 					<li><a href="" onClick="javascript:document.getElementById('logout').submit();return false;">退出</a></li>

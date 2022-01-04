@@ -94,7 +94,15 @@ public class LikeAction {
 			pageView.setQueryResult(qr);
 			User user = userService.findUserById(id);
 			if(user != null){
-				returnValue.put("currentUser", user);
+				User currentUser = new User();
+				currentUser.setId(user.getId());
+				currentUser.setAccount(user.getAccount());
+				currentUser.setNickname(user.getNickname());
+				if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
+					currentUser.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+					currentUser.setAvatarName(user.getAvatarName());
+				}
+				returnValue.put("currentUser", currentUser);
 			}
 			
 			returnValue.put("pageView", pageView);
@@ -143,6 +151,7 @@ public class LikeAction {
 				for(Like like : qr.getResultlist()){
 					User user = userManage.query_cache_findUserByUserName(like.getUserName());
 					if(user != null){
+						like.setAccount(user.getAccount());
 						like.setNickname(user.getNickname());
 						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
 							like.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());

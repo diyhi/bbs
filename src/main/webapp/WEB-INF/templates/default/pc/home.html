@@ -46,7 +46,7 @@
 							<img src="${user.avatarPath}${user.avatarName}">
 						<#else>
 							<!--[if (IE)]><img src="${commonPath}images/min_avata.png"><![endif]-->
-							<!--[if !(IE)]><!--><img width="140px" height="140px" avatar="${(user.nickname != null && user.nickname??) ?string(user.nickname , user.userName)}" ><!--<![endif]-->
+							<!--[if !(IE)]><!--><img width="140px" height="140px" avatar="${(user.nickname != null && user.nickname??) ?string(user.nickname , user.account)}" ><!--<![endif]-->
 						</#if>
 					</div>
 					<div class="counts clearfix">
@@ -84,7 +84,7 @@
 					</div>
 				</div>
 				<div class="head-line">
-					<div class="name">${user.userName}</div>
+					<div class="name">${user.account}</div>
 					<#if user.gradeName != null>
 						<div class="grade" >${user.gradeName}</div> 
 					</#if>
@@ -291,7 +291,7 @@
 							if(userDynamic.nickname != null && userDynamic.nickname != ''){
 								html += "<!--[if !(IE)]><!--><img avatar='"+_.escape(userDynamic.nickname)+"' ><!--<![endif]-->";
 							}else{
-								html += "<!--[if !(IE)]><!--><img avatar='"+userDynamic.userName+"' ><!--<![endif]-->";
+								html += "<!--[if !(IE)]><!--><img avatar='"+userDynamic.account+"' ><!--<![endif]-->";
 							}
 
 						}
@@ -302,7 +302,7 @@
 						if(userDynamic.nickname != null && userDynamic.nickname != ''){
 							html += _.escape(userDynamic.nickname);
 						}else{
-							html += userDynamic.userName;
+							html += userDynamic.account;
 						}
 						html += 			"</a>";
 						html += 		"</cite> ";

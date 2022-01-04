@@ -105,6 +105,7 @@ public class PrivateMessageManageAction {
 						User friend_user = userMap.get(privateMessage.getFriendUserId());
 						if(friend_user != null){
 							privateMessage.setFriendUserName(friend_user.getUserName());//私信对方用户名称
+							privateMessage.setFriendAccount(friend_user.getAccount());
 							privateMessage.setFriendNickname(friend_user.getNickname());
 							if(friend_user.getAvatarName() != null && !"".equals(friend_user.getAvatarName().trim())){
 								privateMessage.setFriendAvatarPath(fileManage.fileServerAddress()+friend_user.getAvatarPath());//私信对方头像路径
@@ -114,6 +115,7 @@ public class PrivateMessageManageAction {
 						User sender_user = userMap.get(privateMessage.getSenderUserId());
 						if(sender_user != null){
 							privateMessage.setSenderUserName(sender_user.getUserName());//私信发送者用户名称
+							privateMessage.setSenderAccount(sender_user.getAccount());
 							privateMessage.setSenderNickname(sender_user.getNickname());
 							if(sender_user.getAvatarName() != null && !"".equals(sender_user.getAvatarName().trim())){
 								privateMessage.setSenderAvatarPath(fileManage.fileServerAddress()+sender_user.getAvatarPath());//发送者头像路径
@@ -233,6 +235,7 @@ public class PrivateMessageManageAction {
 						
 						if(friend_user != null){
 							privateMessage.setFriendUserName(friend_user.getUserName());//私信对方用户名称
+							privateMessage.setFriendAccount(friend_user.getAccount());
 							privateMessage.setFriendNickname(friend_user.getNickname());
 							if(friend_user.getAvatarName() != null && !"".equals(friend_user.getAvatarName().trim())){
 								privateMessage.setFriendAvatarPath(fileManage.fileServerAddress()+friend_user.getAvatarPath());//私信对方头像路径
@@ -242,6 +245,7 @@ public class PrivateMessageManageAction {
 						User sender_user = userMap.get(privateMessage.getSenderUserId());
 						if(sender_user != null){
 							privateMessage.setSenderUserName(sender_user.getUserName());//私信发送者用户名称
+							privateMessage.setSenderAccount(sender_user.getAccount());
 							privateMessage.setSenderNickname(sender_user.getNickname());
 							if(sender_user.getAvatarName() != null && !"".equals(sender_user.getAvatarName().trim())){
 								privateMessage.setSenderAvatarPath(fileManage.fileServerAddress()+sender_user.getAvatarPath());//发送者头像路径

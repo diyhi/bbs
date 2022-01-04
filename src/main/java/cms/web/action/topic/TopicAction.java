@@ -35,6 +35,7 @@ import cms.service.setting.SettingService;
 import cms.service.topic.CommentService;
 import cms.service.topic.TagService;
 import cms.service.topic.TopicService;
+import cms.service.user.UserService;
 import cms.utils.HtmlEscape;
 import cms.utils.JsonUtils;
 import cms.utils.Verification;
@@ -58,6 +59,7 @@ public class TopicAction {
 	@Resource FileManage fileManage;
 	@Resource UserManage userManage;
 	@Resource TopicManage topicManage;
+	@Resource UserService userService;
 	
 	@ResponseBody
 	@RequestMapping("/control/topic/list") 
@@ -108,11 +110,16 @@ public class TopicAction {
 			//	User user = userService.findUserByUserName(topic.getUserName());
 				User user = userManage.query_cache_findUserByUserName(topic.getUserName());
 				if(user != null){
+					topic.setAccount(user.getAccount());
 					topic.setNickname(user.getNickname());
 					if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
 						topic.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 						topic.setAvatarName(user.getAvatarName());
 					}		
+				}
+				
+				if(topic.getIsStaff()){//如果为员工
+					topic.setAccount(topic.getUserName());//员工用户名和账号是同一个
 				}
 			}
 			
@@ -133,7 +140,7 @@ public class TopicAction {
 	 * @param keyword 关键词
 	 * @param tagId 标签Id
 	 * @param tagName 标签名称
-	 * @param userName 用户名称
+	 * @param account 账号
 	 * @param start_postTime 起始发表时间
 	 * @param end_postTime 结束发表时间
 	 * @param request
@@ -144,7 +151,7 @@ public class TopicAction {
 	@ResponseBody
 	@RequestMapping("/control/topic/search") 
 	public String search(ModelMap model,PageForm pageForm,
-			Integer dataSource,String keyword,String tagId,String tagName,String userName,
+			Integer dataSource,String keyword,String tagId,String tagName,String account,
 			String start_postTime,String end_postTime,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
@@ -174,9 +181,14 @@ public class TopicAction {
 				error.put("tagId", "请选择标签");
 			}
 		}
-		//用户名
-		if(userName != null && !"".equals(userName.trim())){
-			_userName = userName.trim();
+		//账号
+		if(account != null && !"".equals(account.trim())){
+			User user = userService.findUserByAccount(account.trim());
+			if(user != null){
+				_userName = user.getUserName();
+			}else{
+				_userName = account.trim();
+			}
 		}
 		//起始发表时间	
 		if(start_postTime != null && !"".equals(start_postTime.trim())){
@@ -243,11 +255,15 @@ public class TopicAction {
 									
 									User user = userManage.query_cache_findUserByUserName(pi.getUserName());
 									if(user != null){
+										pi.setAccount(user.getAccount());
 										pi.setNickname(user.getNickname());
 										if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
 											pi.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 											pi.setAvatarName(user.getAvatarName());
 										}		
+									}
+									if(pi.getIsStaff()){//如果为员工
+										pi.setAccount(pi.getUserName());//员工用户名和账号是同一个
 									}
 									new_topicList.add(pi);
 									break;
@@ -317,11 +333,15 @@ public class TopicAction {
 					
 					User user = userManage.query_cache_findUserByUserName(t.getUserName());
 					if(user != null){
+						t.setAccount(user.getAccount());
 						t.setNickname(user.getNickname());
 						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
 							t.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 							t.setAvatarName(user.getAvatarName());
 						}		
+					}
+					if(t.getIsStaff()){//如果为员工
+						t.setAccount(t.getUserName());//员工用户名和账号是同一个
 					}
 				}
 			}
@@ -407,11 +427,15 @@ public class TopicAction {
 			for(Topic topic : qr.getResultlist()){
 				User user = userManage.query_cache_findUserByUserName(topic.getUserName());
 				if(user != null){
+					topic.setAccount(user.getAccount());
 					topic.setNickname(user.getNickname());
 					if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
 						topic.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 						topic.setAvatarName(user.getAvatarName());
 					}		
+				}
+				if(topic.getIsStaff()){//如果为员工
+					topic.setAccount(topic.getUserName());//员工用户名和账号是同一个
 				}
 			}
 		}
@@ -471,13 +495,16 @@ public class TopicAction {
 				for(Comment o :qr.getResultlist()){
 					User user = userManage.query_cache_findUserByUserName(o.getUserName());
 					if(user != null){
+						o.setAccount(user.getAccount());
 						o.setNickname(user.getNickname());
 						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
 							o.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 							o.setAvatarName(user.getAvatarName());
 						}		
 					}
-					
+					if(o.getIsStaff()){//如果为员工
+						o.setAccount(o.getUserName());//员工用户名和账号是同一个
+					}
 					for(Topic topic : topicList){
 						if(topic.getId().equals(o.getTopicId())){
 							o.setTopicTitle(topic.getTitle());
@@ -544,13 +571,16 @@ public class TopicAction {
     			
 				User user = userManage.query_cache_findUserByUserName(o.getUserName());
 				if(user != null){
+					o.setAccount(user.getAccount());
 					o.setNickname(user.getNickname());
 					if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
 						o.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 						o.setAvatarName(user.getAvatarName());
 					}		
 				}
-    			
+				if(o.getIsStaff()){//如果为员工
+					o.setAccount(o.getUserName());//员工用户名和账号是同一个
+				}
     			
     		}
 			List<Topic> topicList = topicService.findTitleByIdList(topicIdList);
@@ -608,6 +638,7 @@ public class TopicAction {
 
 					User user = userManage.query_cache_findUserByUserName(o.getUserName());
 					if(user != null){
+						o.setAccount(user.getAccount());
 						o.setNickname(user.getNickname());
 						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
 							o.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());

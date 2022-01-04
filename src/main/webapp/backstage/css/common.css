@@ -150,6 +150,17 @@ ul {
 .el-table .hidden-row {
 	display: none;
 }
+/* 图片弹出层 */
+.el-image__inner.el-image__preview{
+	z-index: 99 !important;
+}
+.el-image-viewer__actions{
+	background-color: rgba(0,0,0,0.2) !important;
+}
+.el-image-viewer__btn{
+	opacity: inherit !important;
+}
+
 
 
 #app {
@@ -371,7 +382,15 @@ ul {
 .main .data-table .button-wrapper .el-button--mini{
 	font-size: 14px;
 }
-
+.main .data-table .multipleInfo-wrapper{
+	
+}
+.main .data-table .multipleInfo-wrapper-blue{
+	color: #409eff;
+}
+.main .data-table .multipleInfo-wrapper-green{
+	color: #67c23a;
+}
 .main .data-table .avatar-wrapper{
 	height: 76px;
 }
@@ -499,6 +518,9 @@ ul {
 }
 .main .data-view .content{
 	text-align: left;line-height: 30px;font-size: 15px;
+}
+.main .data-view .remind{
+	color: #F56C6C;
 }
 .main .data-view .avatar{
 	position: absolute;
@@ -1888,9 +1910,43 @@ background-position: 0px 2px, 4px 35px, 29px 31px, 34px 6px;
 	color: #26a2ff;
 }
 .commentModule .commentList .item .main .commentContent p{font-size:16px;word-wrap:break-word}
+/* 自动换行 */
+.commentModule .commentList .item .main .commentContent pre{white-space:pre-wrap;}
+.commentModule .commentList .item .main .commentContent pre code{/*连续字母数字换行*/
+	word-break: break-all;
+}
 .commentModule .commentList .item .main .commentContent img {
 	max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;vertical-align: sub;
 }
+.commentModule .commentList .item .main .commentContent table {
+    width: 100%;
+}
+.commentModule .commentList .item .main .commentContent table th {
+	font-weight: 600
+}
+.commentModule .commentList .item .main .commentContent table td,
+.commentModule .commentList .item .main .commentContent table th {
+	border: 1px solid #E5E6EB;
+	padding: 6px 13px
+}
+.commentModule .commentList .item .main .commentContent table tr {
+	background-color: #fff;
+	border-top: 1px solid #E5E6EB;
+}
+.commentModule .commentList .item .main .commentContent table tr:nth-child(2n) {
+	background-color: #F7F8FA;
+}
+.commentModule .commentList .item .main .commentContent ol li{ 
+	list-style-type:decimal;
+	list-style-position:inside;
+}
+.commentModule .commentList .item .main .commentContent ul li{ 
+	margin-left:20px;
+	list-style-type:disc;
+}
+
+
+
 .commentModule .commentList .item .main .quote{
 	 padding:5px 8px;border-bottom:none;text-align: left;margin-left: 5px;
 }
@@ -2859,10 +2915,41 @@ background-position: 0px 2px, 4px 35px, 29px 31px, 34px 6px;
 	color: #26a2ff;
 }
 .answerModule .answerList .item .main .answerContent p{font-size:16px;word-wrap:break-word}
+
+/* 自动换行 */
+.answerModule .answerList .item .main .answerContent pre{white-space:pre-wrap;}
+.answerModule .answerList .item .main .answerContent pre code{/*连续字母数字换行*/
+	word-break: break-all;
+}
 .answerModule .answerList .item .main .answerContent img {
 	max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;vertical-align: sub;
 }
-
+.answerModule .answerList .item .main .answerContent table {
+    width: 100%;
+}
+.answerModule .answerList .item .main .answerContent table th {
+	font-weight: 600
+}
+.answerModule .answerList .item .main .answerContent table td,
+.answerModule .answerList .item .main .answerContent table th {
+	border: 1px solid #E5E6EB;
+	padding: 6px 13px
+}
+.answerModule .answerList .item .main .answerContent table tr {
+	background-color: #fff;
+	border-top: 1px solid #E5E6EB;
+}
+.answerModule .answerList .item .main .answerContent table tr:nth-child(2n) {
+	background-color: #F7F8FA;
+}
+.answerModule .answerList .item .main .answerContent ol li{ 
+	list-style-type:decimal;
+	list-style-position:inside;
+}
+.answerModule .answerList .item .main .answerContent ul li{ 
+	margin-left:20px;
+	list-style-type:disc;
+}
 
 
 

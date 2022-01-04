@@ -71,7 +71,7 @@
 		                		<el-popover effect="light" trigger="hover" placement="top">
 						        	<template #default>
 						        		<p v-if="topic.isStaff == false">呢称: {{topic.nickname}}</p>
-							            <p>用户名称: {{topic.userName}}</p>
+							            <p>账号: {{topic.account}}</p>
 							            <p v-if="topic.userRoleNameList != null && topic.userRoleNameList.length >0" >角色: 
 							            	<span class="topicViewModule_topic-wrap_head_topicInfo_userRoleName" v-for="roleName in topic.userRoleNameList" >{{roleName}}</span>
 							            </p> 
@@ -98,8 +98,8 @@
 						        	</template>
 						        </el-popover>
 		                	</div>
-		                	<div class="userName" title="用户名称">
-		                		{{topic.userName}}
+		                	<div class="userName" title="账号">
+		                		{{topic.account}}
 		                		<div class="nickname" title="呢称">
 		                			{{topic.nickname}}
 		                			<span class="topicViewModule_topic-wrap_head_topicInfo_userRoleName" v-if="topic.userRoleNameList != null && topic.userRoleNameList.length >0" v-for="roleName in topic.userRoleNameList" title="角色">{{roleName}}</span> 
@@ -142,7 +142,7 @@
 		                		<el-popover effect="light" trigger="hover" placement="top">
 						        	<template #default>
 						        		<p v-if="comment.isStaff == false">呢称: {{comment.nickname}}</p>
-							            <p>用户名称: {{comment.userName}}</p>
+							            <p>账号: {{comment.account}}</p>
 							            <p v-if="comment.userRoleNameList != null && comment.userRoleNameList.length >0" >角色: 
 							            	<span class="topicViewModule_topic-wrap_head_topicInfo_userRoleName" v-for="roleName in comment.userRoleNameList" >{{roleName}}</span>
 							            </p> 
@@ -175,7 +175,7 @@
 						    	<h2 class="clearfix" >
 						    		
 						        	<div class="userName">
-						        		{{comment.userName}}
+						        		{{comment.account}}
 						        		<div class="nickname" >
 						        			{{comment.nickname}}
 						        			<i class="userRoleName" v-for="roleName in comment.userRoleNameList" >{{roleName}}</i>
@@ -210,7 +210,7 @@
 						                		<el-popover effect="light" trigger="hover" placement="top">
 										        	<template #default>
 										        		<p v-if="reply.isStaff == false">呢称: {{reply.nickname}}</p>
-											            <p>用户名称: {{reply.userName}}</p>
+											            <p>账号: {{reply.account}}</p>
 											            <p v-if="reply.userRoleNameList != null && reply.userRoleNameList.length >0" >角色: 
 											            	<span class="topicViewModule_topic-wrap_head_topicInfo_userRoleName" v-for="roleName in reply.userRoleNameList" >{{roleName}}</span>
 											            </p> 
@@ -241,7 +241,7 @@
 										    	<h2 class="clearfix" >
 										    		
 										        	<div class="userName">
-										        		{{reply.userName}}
+										        		{{reply.account}}
 										        		<div class="nickname" >
 										        			{{reply.nickname}}
 										        			<i class="userRoleName" v-for="roleName in reply.userRoleNameList" >{{roleName}}</i>
@@ -811,7 +811,7 @@ export default({
 											   	//	avatarHtml += 			"<p>呢称: "+quote.nickname+"</p>";
 											   		avatarHtml += 			"<p>呢称: "+escapeHtml(quote.nickname)+"</p>";
 												}   	
-												avatarHtml += 				"<p>用户名称: "+quote.userName+"</p>";
+												avatarHtml += 				"<p>账号: "+quote.account+"</p>";
 											    if(quote.userRoleNameList != null && quote.userRoleNameList.length >0){
 											        avatarHtml += 			"<p>角色: ";
 											        for (let k = 0; k <quote.userRoleNameList.length; k++) {
@@ -853,7 +853,7 @@ export default({
 												avatarHtml += "<span class=\"info\" >";
 												avatarHtml += 		"<h2 class=\"clearfix\" >";
 											    avatarHtml += 			"<div class=\"userName\">";
-											    avatarHtml += 				""+quote.userName+"";
+											    avatarHtml += 				""+quote.account+"";
 											    avatarHtml += 				"<div class=\"nickname\" >";
 											    
 											    if(quote.isStaff == false){
@@ -2515,6 +2515,7 @@ export default({
 	        });
 		
 		},
+		
 	}
 });
 

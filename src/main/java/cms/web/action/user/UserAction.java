@@ -74,6 +74,7 @@ public class UserAction {
 	public String execute(User formbean,PageForm pageForm,Boolean visible,ModelMap model,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {	
+	
 		
 		
 		//调用分页算法代码
@@ -124,7 +125,9 @@ public class UserAction {
 
 				userView.setId(user.getId());
 				userView.setUserName(user.getUserName());
+				userView.setAccount(user.getAccount());
 				userView.setNickname(user.getNickname());
+				userView.setCancelAccountTime(user.getCancelAccountTime());
 				userView.setAllowUserDynamic(user.getAllowUserDynamic());
 				userView.setEmail(user.getEmail());
 				userView.setIssue(user.getIssue());
@@ -158,7 +161,7 @@ public class UserAction {
 	 * @param pageForm
 	 * @param model
 	 * @param queryType 查询类型
-	 * @param userName 用户名称
+	 * @param account 账号
 	 * @param start_deposit 起始预存款
 	 * @param end_deposit 结束预存款 
 	 * @param start_point 起始积分
@@ -175,7 +178,7 @@ public class UserAction {
 	@ResponseBody
 	@RequestMapping("/control/user/search") 
 	public String search(ModelMap model,PageForm pageForm,
-			Integer searchType,String userName,
+			Integer searchType,String account,
 			String start_point,String end_point,
 			String start_registrationDate,String end_registrationDate,
 			HttpServletRequest request, HttpServletResponse response)
@@ -195,10 +198,15 @@ public class UserAction {
 		
 		//验证参数
 		if(searchType.equals(1)){//用户名
-			if(userName != null && !"".equals(userName.trim())){
-				_userName = userName.trim();
+			if(account != null && !"".equals(account.trim())){
+				User user = userService.findUserByAccount(account.trim());
+				if(user != null){
+					_userName = user.getUserName();
+				}else{
+					error.put("account", "账号不存在");
+				}	
 			}else{
-				error.put("userName", "请填写用户名");
+				error.put("account", "请填写账号");
 			}	
 		}
 		if(searchType.equals(2)){//筛选条件

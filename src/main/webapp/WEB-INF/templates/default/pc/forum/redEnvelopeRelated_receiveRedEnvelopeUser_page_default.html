@@ -6,9 +6,9 @@
 			<div class="box">
 				<#list redEnvelopeRelated_receiveRedEnvelopeUser_page.records as receiveRedEnvelope>
 					<#if receiveRedEnvelope.receiveAvatarName != null>
-						<span class="avatar redEnvelopeData" data="${(receiveRedEnvelope.receiveNickname != null && receiveRedEnvelope.receiveNickname??) ?string(receiveRedEnvelope.receiveNickname , receiveRedEnvelope.receiveUserName)} 获得 ${receiveRedEnvelope.amount} 元"  style="background: url('${baseURL}${receiveRedEnvelope.receiveAvatarPath}100x100/${receiveRedEnvelope.receiveAvatarName}') center center;background-repeat:no-repeat;background-size: cover; background-position:0px 0px;  "></span>
+						<span class="avatar redEnvelopeData" data="${(receiveRedEnvelope.receiveNickname != null && receiveRedEnvelope.receiveNickname??) ?string(receiveRedEnvelope.receiveNickname , receiveRedEnvelope.receiveAccount)} 获得 ${receiveRedEnvelope.amount} 元"  style="background: url('${baseURL}${receiveRedEnvelope.receiveAvatarPath}100x100/${receiveRedEnvelope.receiveAvatarName}') center center;background-repeat:no-repeat;background-size: cover; background-position:0px 0px;  "></span>
 					<#else>
-						<img class="avatar redEnvelopeData" data="${(receiveRedEnvelope.receiveNickname != null && receiveRedEnvelope.receiveNickname??) ?string(receiveRedEnvelope.receiveNickname , receiveRedEnvelope.receiveUserName)} 获得 ${receiveRedEnvelope.amount} 元"  avatar="${(receiveRedEnvelope.receiveNickname != null && receiveRedEnvelope.receiveNickname??) ?string(receiveRedEnvelope.receiveNickname , receiveRedEnvelope.receiveUserName)}" >
+						<img class="avatar redEnvelopeData" data="${(receiveRedEnvelope.receiveNickname != null && receiveRedEnvelope.receiveNickname??) ?string(receiveRedEnvelope.receiveNickname , receiveRedEnvelope.receiveAccount)} 获得 ${receiveRedEnvelope.amount} 元"  avatar="${(receiveRedEnvelope.receiveNickname != null && receiveRedEnvelope.receiveNickname??) ?string(receiveRedEnvelope.receiveNickname , receiveRedEnvelope.receiveAccount)}" >
 					</#if> 
 				
 				</#list>

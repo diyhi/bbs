@@ -12,7 +12,7 @@
 							<el-popover effect="light" trigger="hover" placement="top">
 					        	<template #default>
 					        		<p>呢称: {{scope.row.nickname}}</p>
-						            <p>用户名称: {{scope.row.userName}}</p>
+						            <p>账号: {{scope.row.account}}</p>
 					        	</template>
 					        	<template #reference >
 					          		<div class="avatar-wrapper" >
@@ -23,7 +23,7 @@
 											<el-avatar :size="48" :src="scope.row.avatarPath+'100x100/'+scope.row.avatarName"></el-avatar>
 										</div>
 										
-										<div class="avatar-text">{{scope.row.userName}}</div>
+										<div class="avatar-text">{{scope.row.account}}</div>
 									</div>
 					        	</template>
 					        </el-popover>

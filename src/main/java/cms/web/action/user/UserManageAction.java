@@ -137,6 +137,7 @@ public class UserManageAction {
 	@Resource FileManage fileManage;
 	@Resource MessageSource messageSource;
 	@Resource MembershipCardGiftTaskManage membershipCardGiftTaskManage;
+	
 	/**
 	 * 用户管理 查看
 	 */
@@ -547,16 +548,18 @@ public class UserManageAction {
 			User user = new User();
 			
 			if(formbean.getType().equals(10)){//10:本地账号密码用户
-				user.setUserName(formbean.getUserName().trim());
+				user.setAccount(formbean.getAccount().trim());
+				user.setUserName(UUIDUtil.getUUID22());
 				user.setIssue(formbean.getIssue().trim());
 				//密码提示答案由  密码提示答案原文sha256  进行sha256组成
 				user.setAnswer(SHA.sha256Hex(SHA.sha256Hex(formbean.getAnswer().trim())));
 				user.setPlatformUserId(user.getUserName());
 			}else if(formbean.getType().equals(20)){//20: 手机用户
-				user.setUserName(userManage.queryUserIdentifier(20)+"-"+UUIDUtil.getUUID22());//会员用户名
+				String id = UUIDUtil.getUUID22();
+				user.setUserName(id);//会员用户名
+				user.setAccount(userManage.queryUserIdentifier(20)+"-"+id);//用户名和账号可以用不相同的UUID
 				user.setPlatformUserId(userManage.thirdPartyUserIdToPlatformUserId(formbean.getMobile().trim(),20));
 			}
-			
 			
 			
 			user.setSalt(UUIDUtil.getUUID32());
@@ -1393,6 +1396,7 @@ public class UserManageAction {
 						user = userManage.query_cache_findUserByUserName(topic.getUserName());
 					}
 					if(user != null){
+						topic.setAccount(user.getAccount());
 						topic.setNickname(user.getNickname());
 						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
 							topic.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
@@ -1479,6 +1483,7 @@ public class UserManageAction {
 						user = userManage.query_cache_findUserByUserName(comment.getUserName());
 					}
 					if(user != null){
+						comment.setAccount(user.getAccount());
 						comment.setNickname(user.getNickname());
 						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
 							comment.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
@@ -1568,6 +1573,7 @@ public class UserManageAction {
 						user = userManage.query_cache_findUserByUserName(reply.getUserName());
 					}
 					if(user != null){
+						reply.setAccount(user.getAccount());
 						reply.setNickname(user.getNickname());
 						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
 							reply.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
@@ -1654,6 +1660,7 @@ public class UserManageAction {
 						user = userManage.query_cache_findUserByUserName(question.getUserName());
 					}
 					if(user != null){
+						question.setAccount(user.getAccount());
 						question.setNickname(user.getNickname());
 						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
 							question.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
@@ -1740,6 +1747,7 @@ public class UserManageAction {
 						user = userManage.query_cache_findUserByUserName(answer.getUserName());
 					}
 					if(user != null){
+						answer.setAccount(user.getAccount());
 						answer.setNickname(user.getNickname());
 						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
 							answer.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
@@ -1825,6 +1833,7 @@ public class UserManageAction {
 						user = userManage.query_cache_findUserByUserName(answerReply.getUserName());
 					}
 					if(user != null){
+						answerReply.setAccount(user.getAccount());
 						answerReply.setNickname(user.getNickname());
 						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
 							answerReply.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
@@ -2433,10 +2442,10 @@ public class UserManageAction {
 							Object new_paymentLog = paymentManage.createPaymentLogObject(paymentLog);
 							userService.subtractUserDeposit(user.getUserName(),deposit,new_paymentLog);
 						}
-						
 						//删除缓存
 						userManage.delete_cache_findUserById(user.getId());
 						userManage.delete_cache_findUserByUserName(user.getUserName());
+						
 						return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 					}
 					
@@ -2491,6 +2500,7 @@ public class UserManageAction {
 							Object new_pointLog = pointManage.createPointLogObject(pointLog);
 							userService.subtractUserPoint(user.getUserName(),point,new_pointLog);
 						}
+						
 						//删除缓存
 						userManage.delete_cache_findUserById(user.getId());
 						userManage.delete_cache_findUserByUserName(user.getUserName());
@@ -2506,4 +2516,65 @@ public class UserManageAction {
 		
 		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
+	
+	/**
+	 * 用户管理 注销账号
+	 * @param model
+	 * @param id 用户Id
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@ResponseBody
+	@RequestMapping(params="method=cancelAccount",method=RequestMethod.POST)
+	public String cancelAccount(ModelMap model,Long id,Integer type,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		Map<String,String> error = new HashMap<String,String>();//错误
+		
+		if(id != null){
+			User user = userService.findUserById(id);
+			if(user != null){
+				if(user.getCancelAccountTime() == -1L){
+					userService.cancelAccount(user.getUserName(),"::"+String.valueOf(user.getRegistrationDate().getTime()),new Date().getTime(),new Date().getTime());
+					
+					//删除缓存用户状态
+					userManage.delete_userState(user.getUserName());
+					//删除缓存
+					userManage.delete_cache_findUserById(user.getId());
+					userManage.delete_cache_findUserByUserName(user.getUserName());
+					userRoleManage.delete_cache_findRoleGroupByUserName(user.getUserName());
+					return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+					
+				}else{
+					error.put("account", "不能重复注销");
+				}
+			}else{
+				error.put("account", "用户不存在");
+			}
+		}else{
+			error.put("account", "参数错误");
+		}
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+	}
+	
+	
+	/**
+	 * 用户管理 恢复注销的账号
+	 * @param model
+	 * @param id 用户Id
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 
+	@ResponseBody
+	@RequestMapping(params="method=restoreAccount",method=RequestMethod.POST)
+	public String restoreAccount(ModelMap model,Long id,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		Map<String,String> error = new HashMap<String,String>();//错误
+		
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+	}*/
+	
 }

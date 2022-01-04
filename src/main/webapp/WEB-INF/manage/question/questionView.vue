@@ -106,7 +106,7 @@
 		                		<el-popover effect="light" trigger="hover" placement="top">
 						        	<template #default>
 						        		<p v-if="question.isStaff == false">呢称: {{question.nickname}}</p>
-							            <p>用户名称: {{question.userName}}</p>
+							            <p>账号: {{question.account}}</p>
 							            <p v-if="question.userRoleNameList != null && question.userRoleNameList.length >0" >角色: 
 							            	<span class="questionViewModule_question-wrap_head_questionInfo_userRoleName" v-for="roleName in question.userRoleNameList" >{{roleName}}</span>
 							            </p> 
@@ -133,8 +133,8 @@
 						        	</template>
 						        </el-popover>
 		                	</div>
-		                	<div class="userName" title="用户名称">
-		                		{{question.userName}}
+		                	<div class="userName" title="账号">
+		                		{{question.account}}
 		                		<div class="nickname" title="呢称">
 		                			{{question.nickname}}
 		                			<span class="questionViewModule_question-wrap_head_questionInfo_userRoleName" v-if="question.userRoleNameList != null && question.userRoleNameList.length >0" v-for="roleName in question.userRoleNameList" title="角色">{{roleName}}</span> 
@@ -221,7 +221,7 @@
 		                		<el-popover effect="light" trigger="hover" placement="top">
 						        	<template #default>
 						        		<p v-if="answer.isStaff == false">呢称: {{answer.nickname}}</p>
-							            <p>用户名称: {{answer.userName}}</p>
+							            <p>账号: {{answer.account}}</p>
 							            <p v-if="answer.userRoleNameList != null && answer.userRoleNameList.length >0" >角色: 
 							            	<span class="questionViewModule_question-wrap_head_questionInfo_userRoleName" v-for="roleName in answer.userRoleNameList" >{{roleName}}</span>
 							            </p> 
@@ -254,7 +254,7 @@
 						    	<h2 class="clearfix" >
 						    		
 						        	<div class="userName">
-						        		{{answer.userName}}
+						        		{{answer.account}}
 						        		<div class="nickname" >
 						        			{{answer.nickname}}
 						        			<i class="userRoleName" v-for="roleName in answer.userRoleNameList" >{{roleName}}</i>
@@ -289,7 +289,7 @@
 						                		<el-popover effect="light" trigger="hover" placement="top">
 										        	<template #default>
 										        		<p v-if="reply.isStaff == false">呢称: {{reply.nickname}}</p>
-											            <p>用户名称: {{reply.userName}}</p>
+											            <p>账号: {{reply.account}}</p>
 											            <p v-if="reply.userRoleNameList != null && reply.userRoleNameList.length >0" >角色: 
 											            	<span class="questionViewModule_question-wrap_head_questionInfo_userRoleName" v-for="roleName in reply.userRoleNameList" >{{roleName}}</span>
 											            </p> 
@@ -320,7 +320,7 @@
 										    	<h2 class="clearfix" >
 										    		
 										        	<div class="userName">
-										        		{{reply.userName}}
+										        		{{reply.account}}
 										        		<div class="nickname" >
 										        			{{reply.nickname}}
 										        			<i class="userRoleName" v-for="roleName in reply.userRoleNameList" >{{roleName}}</i>
