@@ -94,7 +94,9 @@
 							<#if topic.lastUpdateTime != null>
 								<div class="lastUpdateTime">最后修改时间：${topic.lastUpdateTime}</div>
 							</#if>
-
+							<#if topic.account == null || topic.account == ''>
+								<div class="cancelAccount">此用户账号已注销</div>
+							</#if>
 		                	<#noescape>${topic.content}</#noescape>
 							
 							

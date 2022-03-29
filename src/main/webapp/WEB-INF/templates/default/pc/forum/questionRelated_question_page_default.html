@@ -61,6 +61,9 @@
 					        	</li>
 					        </ul>
 							<h2 class="title clearfix">
+								<#if question.account == null || question.account == ''>
+									<span class="cancelAccount">此用户账号已注销</span>
+								</#if>
 								<a href="question?questionId=${question.id}" target="_blank">
 					            	${question.title}
 					            </a>

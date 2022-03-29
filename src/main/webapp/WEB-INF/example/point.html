@@ -23,7 +23,7 @@
 			</td>
 		</tr>
 		<tr> 
-			<td rowspan="2">返回值</td> 
+			<td rowspan="3">返回值</td> 
 			<td>积分日志分页</td> 
 			<td>
 				变量：pageView<br>
@@ -35,6 +35,13 @@
 			<td>
 				变量：user<br>
 				类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_40'); return false;">User</a>
+			</td>
+		</tr>
+		<tr> 
+			<td>奖励积分信息</td> 
+			<td>
+				变量：rewardPointInfo<br>
+				类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_80'); return false;">RewardPointInfo</a>
 			</td>
 		</tr>
 	</tbody> 
@@ -280,6 +287,52 @@
 		</tr>
 	</tbody> 
 </table>
+
+<table id="anchor_80" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">奖励积分信息 rewardPointInfo</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>topic_rewardPoint</td> 
+			<td>long</td>
+			<td>发表话题奖励积分</td>
+		</tr>
+		<tr> 
+			<td>comment_rewardPoint</td> 
+			<td>long</td>
+			<td>发表评论奖励积分</td>
+		</tr>
+		<tr> 
+			<td>reply_rewardPoint</td> 
+			<td>long</td>
+			<td>发表回复奖励积分</td>
+		</tr>
+		<tr> 
+			<td>question_rewardPoint</td> 
+			<td>long</td>
+			<td>提交问题奖励积分</td>
+		</tr>
+		<tr> 
+			<td>answer_rewardPoint</td> 
+			<td>long</td>
+			<td>提交答案奖励积分</td>
+		</tr>
+		<tr> 
+			<td>answerReply_rewardPoint</td> 
+			<td>long</td>
+			<td>提交答案回复奖励积分</td>
+		</tr>
+	</tbody> 
+</table>
+
 <h2 style="margin:0;padding:0; margin-top: 10px;">示例</h2>
 <textarea name="exampleCode">
 <#-- 积分  -->

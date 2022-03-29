@@ -73,7 +73,7 @@
 		    		<#if pageView.records?exists && pageView.records?size gt 0 >    
 						<#list pageView.records as receiveRedEnvelope>
 						<TR>
-							<TD class="dataTD followModule" style="text-align: left! important;">
+							<TD class="dataTD redEnvelopeAmountDistributionModule" style="text-align: left! important;">
 								<div class="avatarBox">
 									<a href="user/control/home?userName=${receiveRedEnvelope.receiveUserName}" target="_blank" class="link">
 										<#if receiveRedEnvelope.receiveAvatarName != null && receiveRedEnvelope.receiveAvatarName != ''>    
@@ -92,7 +92,9 @@
 										（呢称：${receiveRedEnvelope.receiveNickname}）
 									</#if> 
 								</a>
-							
+								<#if receiveRedEnvelope.receiveAccount == null || receiveRedEnvelope.receiveAccount == ''>    
+									<span class="cancelAccount userName" >此用户账号已注销</span>
+								</#if> 
 							</TD>
 							<TD class="dataTD">
 								${receiveRedEnvelope.amount}

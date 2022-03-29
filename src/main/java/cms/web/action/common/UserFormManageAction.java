@@ -1232,21 +1232,33 @@ public class UserFormManageAction {
 			
 		}
 		
+		//登录标记
+		String loginAccount = null;
+		if(type != null){
+			if(type.equals(10)){//10:本地账号密码用户
+				loginAccount = account;
+			}else if(type.equals(20)){//20: 手机用户 密码登录
+				if(mobile != null && !"".equals(mobile.trim())){
+					loginAccount = userManage.thirdPartyUserIdToPlatformUserId(mobile.trim(),20);
+				}
+			}
+		}
+		
 		//登录失败处理
 		if(error.size() >0){
 			//统计每分钟原来提交次数
-			Integer original = settingManage.getSubmitQuantity("login", account);
+			Integer original = settingManage.getSubmitQuantity("login", loginAccount);
     		if(original != null){
-    			settingManage.addSubmitQuantity("login", account,original+1);//刷新每分钟原来提交次数
+    			settingManage.addSubmitQuantity("login", loginAccount,original+1);//刷新每分钟原来提交次数
     		}else{
-    			settingManage.addSubmitQuantity("login", account,1);//刷新每分钟原来提交次数
+    			settingManage.addSubmitQuantity("login", loginAccount,1);//刷新每分钟原来提交次数
     		}
 
 			//添加用户名到Cookie
-			WebUtil.addCookie(response, "cms_account", account, 60);
+			WebUtil.addCookie(response, "cms_account", loginAccount, 60);
 		}else{
 			//删除每分钟原来提交次数
-			settingManage.deleteSubmitQuantity("login", account);
+			settingManage.deleteSubmitQuantity("login", loginAccount);
 			WebUtil.deleteCookie(response, "cms_account");
 		}
 		

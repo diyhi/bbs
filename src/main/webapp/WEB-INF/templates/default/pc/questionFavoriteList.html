@@ -41,7 +41,14 @@
 					<#list pageView.records as favorites>
 					<TR>
 						<TD class="dataTD">
-							<a href="user/control/home?userName=${favorites.userName}" target="_blank" class="link">${favorites.account}</a>
+							<#if favorites.account == null || favorites.account == ''>
+								<div class="cancelAccount">此用户账号已注销</div>
+							<#else>
+								<a href="user/control/home?userName=${favorites.userName}" target="_blank" class="link">${favorites.account}</a>
+								<#if favorites.nickname != null && favorites.nickname??>    
+									(呢称：${favorites.nickname})
+								</#if> 
+							</#if>
 						</TD>
 						<TD class="dataTD">
 							${favorites.addtime}	

@@ -76,6 +76,7 @@
 				        </div>
 				    	<div class="topInfo">                                   
 				            <div class="top-box">
+				            	<span class="cancelNickname" v-if="topic.account == null || topic.account == ''">已注销</span>
 				            	<router-link class="userName" tag="span" :to="{path: '/user/control/home', query: {userName: topic.userName}}">
 					            	{{topic.nickname != null && topic.nickname != '' ? topic.nickname : topic.account}}
 					            </router-link>
@@ -88,8 +89,10 @@
 				            
 				        </div>
 				        <div class="clearfix"></div>
-				      
+						
 				      	<div class="titleBox">
+				      		<div class="cancelAccount" v-if="topic.account == null || topic.account == ''">此用户账号已注销</div>
+						
 				      		<router-link tag="span" class="title" :to="{path: '/thread', query: {topicId: topic.id}}" >{{topic.title}}</router-link>
 				      		<i class="topicRoleName" v-for="(roleName,index) in topic.allowRoleViewList" ><span>{{roleName}}</span></i>
 				      		
@@ -321,6 +324,7 @@
 			            <div class="left">
 			                <div class="topInfo">                                   
 					            <div class="top-box">
+					            	<span class="cancelNickname" v-if="topic.account == null || topic.account == ''">已注销</span>
 					            	<router-link class="userName" tag="span" :to="{path: '/user/control/home', query: {userName: topic.userName}}">
 					            		{{topic.nickname != null && topic.nickname != '' ? topic.nickname : topic.account}}
 					            	</router-link>
@@ -368,7 +372,8 @@
 						<div class="box" >
 							<span v-for="(receiveRedEnvelope,index) in receiveRedEnvelopeList" >
 								<img :class="(receiveRedEnvelope.id == selectedReceiveRedEnvelopeId) ? 'avatar active' : 'avatar'"  @click="selectReceiveRedEnvelopeUser(receiveRedEnvelope.id)"  v-tooltip="{ content: ''+(receiveRedEnvelope.receiveNickname != null && receiveRedEnvelope.receiveNickname !='' ? receiveRedEnvelope.receiveNickname : receiveRedEnvelope.receiveAccount)+' 获得 '+receiveRedEnvelope.amount+' 元', show: ((receiveRedEnvelope.id == selectedReceiveRedEnvelopeId) ? true : false),trigger: 'manual'}" :src="receiveRedEnvelope.receiveAvatarPath+'100x100/'+receiveRedEnvelope.receiveAvatarName" v-if="receiveRedEnvelope.receiveAvatarName != null && receiveRedEnvelope.receiveAvatarName != ''">
-								<img :class="(receiveRedEnvelope.id == selectedReceiveRedEnvelopeId) ? 'avatar active' : 'avatar'"  @click="selectReceiveRedEnvelopeUser(receiveRedEnvelope.id)"  v-tooltip="{ content: ''+(receiveRedEnvelope.receiveNickname != null && receiveRedEnvelope.receiveNickname !='' ? receiveRedEnvelope.receiveNickname : receiveRedEnvelope.receiveAccount)+' 获得 '+receiveRedEnvelope.amount+' 元', show: ((receiveRedEnvelope.id == selectedReceiveRedEnvelopeId) ? true : false),trigger: 'manual' }" :ref="'redEnvelopeAvatarData_'+receiveRedEnvelope.id"   v-if="receiveRedEnvelope.receiveAvatarName == null || receiveRedEnvelope.receiveAvatarName==''">
+								<img :class="(receiveRedEnvelope.id == selectedReceiveRedEnvelopeId) ? 'avatar active' : 'avatar'"  @click="selectReceiveRedEnvelopeUser(receiveRedEnvelope.id)"  v-tooltip="{ content: ''+(receiveRedEnvelope.receiveNickname != null && receiveRedEnvelope.receiveNickname !='' ? receiveRedEnvelope.receiveNickname : receiveRedEnvelope.receiveAccount)+' 获得 '+receiveRedEnvelope.amount+' 元', show: ((receiveRedEnvelope.id == selectedReceiveRedEnvelopeId) ? true : false),trigger: 'manual' }" :ref="'redEnvelopeAvatarData_'+receiveRedEnvelope.id"   v-if="(receiveRedEnvelope.receiveAvatarName == null || receiveRedEnvelope.receiveAvatarName=='') && (receiveRedEnvelope.receiveAccount != null && receiveRedEnvelope.receiveAccount !='')">
+								<img :class="(receiveRedEnvelope.id == selectedReceiveRedEnvelopeId) ? 'avatar active' : 'avatar'"  @click="selectReceiveRedEnvelopeUser(receiveRedEnvelope.id)"  v-tooltip="{ content: '此用户账号已注销'+' 获得 '+receiveRedEnvelope.amount+' 元', show: ((receiveRedEnvelope.id == selectedReceiveRedEnvelopeId) ? true : false),trigger: 'manual' }" :ref="'redEnvelopeAvatarData_'+receiveRedEnvelope.id"   v-if="(receiveRedEnvelope.receiveAvatarName == null || receiveRedEnvelope.receiveAvatarName=='') && (receiveRedEnvelope.receiveAccount == null || receiveRedEnvelope.receiveAccount =='')">
 
 							</span>
 						</div>
@@ -403,6 +408,8 @@
 				
 					<div class="main" v-viewer="pictureOptions" >
 						<div v-if="topic.lastUpdateTime != null" class="lastUpdateTime" >最后修改时间：{{topic.lastUpdateTime}}</div>
+						
+						<div class="cancelAccount" v-if="topic.account == null || topic.account == ''">此用户账号已注销</div>
 						<!-- 内容 v-lazy-container为延迟加载-->
 						<component v-lazy-container="{ selector: 'img'}" v-bind:is ="hideTagComponent(topic.content)" v-bind="$props" /> 
 						
@@ -428,6 +435,8 @@
 							<span class="info" >
 								<!-- router-link渲染成<h2>标签-->
 						    	<router-link tag="h2" class="clearfix" :to="{path: '/user/control/home', query: {userName: comment.userName}}">
+						        	<div class="cancelNickname" v-if="comment.account == null || comment.account == ''">已注销</div>
+						        	
 						        	<div class="userName">{{comment.nickname != null && comment.nickname != '' ? comment.nickname : comment.account}}</div>
 						        	<div class="userTag">	        
 								        <i class="userRoleName" v-for="roleName in comment.userRoleNameList" >{{roleName}}</i>
@@ -451,6 +460,7 @@
 							</div>
 							
 							<p class="commentContent" v-viewer="pictureOptions">
+								
 								<component v-lazy-container="{ selector: 'img'}" v-bind:is ="commentDataComponent(comment.content)" v-bind="$props" />
 							</p>
 							<!-- 
@@ -473,10 +483,9 @@
 									    	<router-link class="userName" tag="span" :to="{path: '/user/control/home', query: {userName: reply.userName}}">
 									           {{reply.nickname != null && reply.nickname != '' ? reply.nickname : reply.account}}
 									        </router-link>
-									        <span class="userName" v-if="reply.account == null || reply.account == ''">
-									        	&nbsp;
+									        <span class="userName cancelNickname" v-if="reply.account == null || reply.account == ''">
+									        	&nbsp;已注销
 									        </span>
-									        
 									        <div class="userTag">
 									        	<i class="staff" v-if="reply.isStaff">官方人员</i>
 										        <i class="master" v-if="reply.userName == topic.userName && reply.isStaff == topic.isStaff">作者</i>
@@ -489,7 +498,10 @@
 											</span>
 										</div>
 										<div style="clear:both; height: 0; line-height: 0; font-size: 0;"></div>
-										<div class="replyContent">{{reply.content}}</div>
+										<div class="replyContent">
+											<div class="cancelAccount" v-if="reply.account == null || reply.account == ''">此用户账号已注销</div>
+											{{reply.content}}
+										</div>
 									</li>
 								</ul>
 								
@@ -804,6 +816,7 @@
 			        </div>
 			    	<div class="topInfo">                                   
 			            <div class="top-box">
+			            	<span class="cancelNickname" v-if="question.account == null || question.account == ''">已注销</span>
 			            	<router-link class="userName" tag="span" :to="{path: '/user/control/home', query: {userName: question.userName}}">
 				            	{{question.nickname != null && question.nickname != '' ? question.nickname : question.account}}
 				            </router-link>
@@ -820,7 +833,8 @@
 				    <div class="clearfix"></div>
 			      
 			      	<div class="title">
-			      		 <router-link tag="span" :to="{path: '/question', query: {questionId: question.id}}" >{{question.title}}</router-link>
+			      		<div class="cancelAccount" v-if="question.account == null || question.account == ''">此用户账号已注销</div>
+			      		<router-link tag="span" :to="{path: '/question', query: {questionId: question.id}}" >{{question.title}}</router-link>
 			      	</div>
 
 			        <div class="summary">
@@ -908,6 +922,7 @@
 			            <div class="left">
 			                <div class="topInfo">                                   
 					            <div class="top-box">
+					            	<span class="cancelNickname" v-if="question.account == null || question.account == ''">已注销</span>
 					            	<router-link class="userName" tag="span" :to="{path: '/user/control/home', query: {userName: question.userName}}">
 					            		{{question.nickname != null && question.nickname != '' ? question.nickname : question.account}}
 					            	</router-link>
@@ -1003,6 +1018,7 @@
 							<span class="info" >
 								<!-- router-link渲染成<h2>标签-->
 						    	<router-link tag="h2" class="clearfix" :to="{path: '/user/control/home', query: {userName: answer.userName}}">
+						    		<div class="cancelNickname" v-if="answer.account == null || answer.account == ''">已注销</div>
 						        	<div class="userName">{{answer.nickname != null && answer.nickname != '' ? answer.nickname : answer.account}}</div>
 						        	<div class="userTag">
 								        <i class="userRoleName" v-for="roleName in answer.userRoleNameList" >{{roleName}}</i>
@@ -1040,8 +1056,8 @@
 									    	<router-link class="userName" tag="span" :to="{path: '/user/control/home', query: {userName: reply.userName}}">
 									           {{reply.nickname != null && reply.nickname != '' ? reply.nickname : reply.account}}
 									        </router-link>
-									        <span class="userName" v-if="reply.account == null || reply.account == ''">
-									        	&nbsp;
+									        <span class="cancelNickname" v-if="reply.account == null || reply.account == ''">
+									        	&nbsp;已注销
 									        </span>
 									        <div class="userTag">
 										        <i class="master" v-if="reply.userName == question.userName && reply.isStaff == question.isStaff">作者</i>
@@ -1054,7 +1070,10 @@
 											</span>
 										</div>
 										<div style="clear:both; height: 0; line-height: 0; font-size: 0;"></div>
-										<div class="replyContent">{{reply.content}}</div>
+										<div class="replyContent">
+											<div class="cancelAccount" v-if="reply.account == null || reply.account == ''">此用户账号已注销</div>
+											{{reply.content}}
+										</div>
 									</li>
 								</ul>
 								
@@ -1730,7 +1749,9 @@
 		        	
 		        	<div class="selectName" v-if="userCustom.chooseType ==4" >{{userCustom.name}}</div>
 		        	
-		        	<v-select v-model="userBoundField[index]"  :multiple="userCustom.multiple" placeholder="请选择" :options="checkbox(userCustom)" v-if="userCustom.chooseType ==4"></v-select>
+		        	<v-select v-model="userBoundField[index]"  :multiple="userCustom.multiple" placeholder="请选择" :options="checkbox(userCustom)" v-if="userCustom.chooseType ==4">
+		        		<span slot="no-options" @click="$refs.select.open = false"></span>
+		        	</v-select>
 		        	
 		        	
 		        	
@@ -2586,6 +2607,18 @@
 			</router-link>
 		</mt-header>
 		<div class="pointModule">
+			<div class="rewardPointInfoModule" >
+		        <div class="rewardPointInfo clearfix">
+		        	<div class="details"><span class="text">发表话题奖励积分:</span><span class="val">{{rewardPointInfo.topic_rewardPoint}}</span></div>
+		        	<div class="details"><span class="text">发表评论奖励积分:</span><span class="val">{{rewardPointInfo.comment_rewardPoint}}</span></div>
+		        	<div class="details"><span class="text">发表回复奖励积分:</span><span class="val">{{rewardPointInfo.reply_rewardPoint}}</span></div>
+		        	<div class="details"><span class="text">提交问题奖励积分:</span><span class="val">{{rewardPointInfo.question_rewardPoint}}</span></div>
+		        	<div class="details"><span class="text">提交答案奖励积分:</span><span class="val">{{rewardPointInfo.answer_rewardPoint}}</span></div>
+		        	<div class="details"><span class="text">提交答案回复奖励积分:</span><span class="val">{{rewardPointInfo.answerReply_rewardPoint}}</span></div>
+		        </div>
+				
+			</div>
+			
 			<div class="pointList"  v-infinite-scroll="queryPoint" infinite-scroll-disabled="loading" infinite-scroll-distance="10">
 				<ul>
 					<li v-for="pointLog in pointLogList">
@@ -2609,6 +2642,9 @@
 				
 				</ul>
 			</div>
+			
+			
+			
 		</div>
 	</div>
 </template>
@@ -2671,7 +2707,9 @@
 	        	
 	        	<div class="selectName" v-if="userCustom.chooseType ==4" >{{userCustom.name}}</div>
 	        	
-	        	<v-select v-model="userBoundField[index]"  :multiple="userCustom.multiple" placeholder="请选择" :options="checkbox(userCustom)" v-if="userCustom.chooseType ==4"></v-select>
+	        	<v-select v-model="userBoundField[index]"  :multiple="userCustom.multiple" placeholder="请选择" :options="checkbox(userCustom)" v-if="userCustom.chooseType ==4">
+	        		<span slot="no-options" @click="$refs.select.open = false"></span>
+	        	</v-select>
 	        	
 	        	
 	        	
@@ -2919,7 +2957,7 @@
 						<div class="head">
 							<span class="info" >
 			                    <h2>{{privateMessage.friendNickname != null && privateMessage.friendNickname != '' ? privateMessage.friendNickname : privateMessage.friendAccount}}<span class="badge" v-if="privateMessage.status == 10">未读</span></h2>
-			                        	
+			                    <div class="cancelNickname" v-if="privateMessage.friendAccount == null || privateMessage.friendAccount == ''">已注销</div>  	
 			                    <p class="time">{{privateMessage.sendTime}}</p>
 			                </span>
 			                <span class="operating"><span class="delete-btn"  @click="deletePrivateMessage(privateMessage.friendUserName)"><span class="cms-trash" style="font-size: 11px;margin-right: 1px;"></span>删除</span></span>                     
@@ -3157,6 +3195,9 @@
 									<router-link class="link" :to="{path: '/user/control/home', query: {userName: remind.senderUserName}}">
 							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderAccount}}
 							        </router-link>
+							      
+									<span class="cancelAccount" v-if="remind.senderAccount == null || remind.senderAccount == ''">此用户账号已注销</span>
+										
 									在
 									<router-link class="link" :to="{path: '/thread', query: {topicId: remind.topicId, commentId:remind.friendTopicCommentId}}">
 							            {{remind.topicTitle}}
@@ -3167,6 +3208,8 @@
 									<router-link class="link" :to="{path: '/user/control/home', query: {userName: remind.senderUserName}}">
 							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderAccount}}
 							        </router-link>
+									<span class="cancelAccount" v-if="remind.senderAccount == null || remind.senderAccount == ''">此用户账号已注销</span>
+									
 									在
 									<router-link class="link" :to="{path: '/thread', query: {topicId: remind.topicId, commentId:remind.friendTopicCommentId}}">
 							            {{remind.topicTitle}}
@@ -3177,6 +3220,8 @@
 									<router-link class="link" :to="{path: '/user/control/home', query: {userName: remind.senderUserName}}">
 							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderAccount}}
 							        </router-link>
+									<span class="cancelAccount" v-if="remind.senderAccount == null || remind.senderAccount == ''">此用户账号已注销</span>
+									
 									在
 									<router-link class="link" :to="{path: '/thread', query: {topicId: remind.topicId, commentId:remind.friendTopicCommentId}}">
 							            {{remind.topicTitle}}
@@ -3187,6 +3232,8 @@
 									<router-link class="link" :to="{path: '/user/control/home', query: {userName: remind.senderUserName}}">
 							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderAccount}}
 							        </router-link>
+									<span class="cancelAccount" v-if="remind.senderAccount == null || remind.senderAccount == ''">此用户账号已注销</span>
+									
 									在
 									<router-link class="link" :to="{path: '/thread', query: {topicId: remind.topicId, commentId:remind.topicCommentId}}">
 							            {{remind.topicTitle}}
@@ -3197,6 +3244,8 @@
 									<router-link class="link" :to="{path: '/user/control/home', query: {userName: remind.senderUserName}}">
 							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderAccount}}
 							        </router-link>
+									<span class="cancelAccount" v-if="remind.senderAccount == null || remind.senderAccount == ''">此用户账号已注销</span>
+									
 									在
 									<router-link class="link" :to="{path: '/thread', query: {topicId: remind.topicId, commentId:remind.friendTopicCommentId}}">
 							            {{remind.topicTitle}}
@@ -3207,6 +3256,8 @@
 									<router-link class="link" :to="{path: '/user/control/home', query: {userName: remind.senderUserName}}">
 							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderAccount}}
 							        </router-link>
+									<span class="cancelAccount" v-if="remind.senderAccount == null || remind.senderAccount == ''">此用户账号已注销</span>
+									
 									在
 									<router-link class="link" :to="{path: '/thread', query: {topicId: remind.topicId}}">
 							            {{remind.topicTitle}}
@@ -3217,6 +3268,8 @@
 									<router-link class="link" :to="{path: '/user/control/home', query: {userName: remind.senderUserName}}">
 							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderAccount}}
 							        </router-link>
+									<span class="cancelAccount" v-if="remind.senderAccount == null || remind.senderAccount == ''">此用户账号已注销</span>
+									
 									在
 									<router-link class="link" :to="{path: '/thread', query: {topicId: remind.topicId}}">
 							            {{remind.topicTitle}}
@@ -3227,6 +3280,8 @@
 									<router-link class="link" :to="{path: '/user/control/home', query: {userName: remind.senderUserName}}">
 							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderAccount}}
 							        </router-link>
+									<span class="cancelAccount" v-if="remind.senderAccount == null || remind.senderAccount == ''">此用户账号已注销</span>
+									
 									关注了我
 								</div>
 								<div v-if="remind.typeCode == 90">
@@ -3234,6 +3289,8 @@
 									<router-link class="link" :to="{path: '/user/control/home', query: {userName: remind.senderUserName}}">
 							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderAccount}}
 							        </router-link>
+									<span class="cancelAccount" v-if="remind.senderAccount == null || remind.senderAccount == ''">此用户账号已注销</span>
+									
 									发表了话题
 									<router-link class="link" :to="{path: '/thread', query: {topicId: remind.topicId}}">
 							            {{remind.topicTitle}}
@@ -3244,6 +3301,8 @@
 									<router-link class="link" :to="{path: '/user/control/home', query: {userName: remind.senderUserName}}">
 							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderAccount}}
 							        </router-link>
+									<span class="cancelAccount" v-if="remind.senderAccount == null || remind.senderAccount == ''">此用户账号已注销</span>
+									
 									在
 									<router-link class="link" :to="{path: '/thread', query: {topicId: remind.topicId, commentId:remind.friendTopicCommentId}}">
 							            {{remind.topicTitle}}
@@ -3252,6 +3311,8 @@
 								</div>
 								<div v-if="remind.typeCode == 110">
 									我关注的
+									<span class="cancelAccount" v-if="remind.senderAccount == null || remind.senderAccount == ''">此用户账号已注销</span>
+									
 									<router-link class="link" :to="{path: '/user/control/home', query: {userName: remind.senderUserName}}">
 							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderAccount}}
 							        </router-link>
@@ -3267,6 +3328,8 @@
 									<router-link class="link" :to="{path: '/user/control/home', query: {userName: remind.senderUserName}}">
 							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderAccount}}
 							        </router-link>
+									<span class="cancelAccount" v-if="remind.senderAccount == null || remind.senderAccount == ''">此用户账号已注销</span>
+									
 									在
 									<router-link class="link" :to="{path: '/question', query: {questionId: remind.questionId, commentId:remind.friendQuestionAnswerId}}">
 							            {{remind.questionTitle}}
@@ -3277,6 +3340,8 @@
 									<router-link class="link" :to="{path: '/user/control/home', query: {userName: remind.senderUserName}}">
 							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderAccount}}
 							        </router-link>
+									<span class="cancelAccount" v-if="remind.senderAccount == null || remind.senderAccount == ''">此用户账号已注销</span>
+									
 									在
 									<router-link class="link" :to="{path: '/question', query: {questionId: remind.questionId, answerId:remind.friendQuestionAnswerId}}">
 							            {{remind.questionTitle}}
@@ -3287,6 +3352,8 @@
 									<router-link class="link" :to="{path: '/user/control/home', query: {userName: remind.senderUserName}}">
 							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderAccount}}
 							        </router-link>
+									<span class="cancelAccount" v-if="remind.senderAccount == null || remind.senderAccount == ''">此用户账号已注销</span>
+									
 									在
 									<router-link class="link" :to="{path: '/question', query: {questionId: remind.questionId, answerId:remind.questionAnswerId}}">
 							            {{remind.questionTitle}}
@@ -3297,6 +3364,8 @@
 									<router-link class="link" :to="{path: '/user/control/home', query: {userName: remind.senderUserName}}">
 							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderAccount}}
 							        </router-link>
+									<span class="cancelAccount" v-if="remind.senderAccount == null || remind.senderAccount == ''">此用户账号已注销</span>
+									
 									在
 									<router-link class="link" :to="{path: '/question', query: {questionId: remind.questionId, answerId:remind.friendQuestionAnswerId}}">
 							            {{remind.questionTitle}}
@@ -3368,7 +3437,8 @@
 			<div v-infinite-scroll="queryTopicFavorite" infinite-scroll-disabled="loading" infinite-scroll-distance="10">
 				<ul>
 					<li v-for="favorite in favoriteList">
-						<mt-cell :title="favorite.account" :label="favorite.addtime" @click.native="toUser(favorite.userName)" is-link></mt-cell>
+						<mt-cell :title="(favorite.nickname != null && favorite.nickname != '') ? favorite.account+' (呢称：'+favorite.nickname+')' : favorite.account"  :label="favorite.addtime" v-if="favorite.account != null && favorite.account != ''"  @click.native="toUser(favorite.userName)" is-link></mt-cell>
+						<mt-cell title="此用户账号已注销" :label="favorite.addtime" v-if="favorite.account == null || favorite.account == ''"></mt-cell>
 					</li>
 				
 				</ul>
@@ -3422,7 +3492,8 @@
 			<div v-infinite-scroll="queryTopicLike" infinite-scroll-disabled="loading" infinite-scroll-distance="10">
 				<ul>
 					<li v-for="like in likeList">
-						<mt-cell :title="like.account" :label="like.addtime" @click.native="toUser(like.userName)" is-link></mt-cell>
+						<mt-cell :title="(like.nickname != null && like.nickname != '') ? like.account+' (呢称：'+like.nickname+')' : like.account"  :label="like.addtime" v-if="like.account != null && like.account != ''" @click.native="toUser(like.userName)" is-link></mt-cell>
+						<mt-cell title="此用户账号已注销" :label="like.addtime" v-if="like.account == null || like.account == ''" ></mt-cell>
 					</li>
 				
 				</ul>
@@ -3444,8 +3515,12 @@
 			<div v-infinite-scroll="queryTopicUnhide" infinite-scroll-disabled="loading" infinite-scroll-distance="10">
 				<ul>
 					<li v-for="topicUnhide in topicUnhideList">
-						<mt-cell :title="topicUnhide.account" :label="topicUnhide.cancelTime" v-if="topicUnhide.hideTagType == 10"  value="输入密码" @click.native="toUser(topicUnhide.userName)" is-link></mt-cell>
-						<mt-cell :title="topicUnhide.account" :label="topicUnhide.cancelTime" v-if="topicUnhide.hideTagType == 40"  value="积分购买" @click.native="toUser(topicUnhide.userName)" is-link></mt-cell>
+						<mt-cell :title="(topicUnhide.nickname != null && topicUnhide.nickname != '') ? topicUnhide.account+' (呢称：'+topicUnhide.nickname+')' : topicUnhide.account" :label="topicUnhide.cancelTime" v-if="topicUnhide.hideTagType == 10 && topicUnhide.account != null && topicUnhide.account != ''"  value="输入密码" @click.native="toUser(topicUnhide.userName)" is-link></mt-cell>
+					
+						<mt-cell title="此用户账号已注销" :label="topicUnhide.cancelTime" v-if="topicUnhide.hideTagType == 10 && (topicUnhide.account == null || topicUnhide.account == '')"  value="输入密码" ></mt-cell>
+						
+						<mt-cell :title="(topicUnhide.nickname != null && topicUnhide.nickname != '') ? topicUnhide.account+' (呢称：'+topicUnhide.nickname+')' : topicUnhide.account" :label="topicUnhide.cancelTime" v-if="topicUnhide.hideTagType == 40 && topicUnhide.account != null && topicUnhide.account != ''"  value="积分购买" @click.native="toUser(topicUnhide.userName)" is-link></mt-cell>
+						<mt-cell title="此用户账号已注销" :label="topicUnhide.cancelTime" v-if="topicUnhide.hideTagType == 40 && (topicUnhide.account == null || topicUnhide.account == '')"  value="积分购买" ></mt-cell>
 					</li>
 				
 				</ul>
@@ -3484,7 +3559,9 @@
 			            	<!-- router-link渲染成<p>标签 --> 
 			            	<router-link tag="span" class="userName" :to="{path: '/user/control/home', query: {userName: follow.friendUserName}}">
 								{{follow.friendAccount}}<span v-if="follow.friendNickname != null && follow.friendNickname != ''"> （呢称：{{follow.friendNickname}}）</span>
-							</router-link>               
+							</router-link> 
+							
+							<span class="userName" v-if="follow.friendAccount == null || follow.friendAccount == ''">此用户账号已注销</span>                
 						</div>
 					</div>
 				</div>
@@ -3523,7 +3600,9 @@
 			            	<!-- router-link渲染成<p>标签 --> 
 			            	<router-link tag="span" class="userName" :to="{path: '/user/control/home', query: {userName: follower.friendUserName}}">
 								{{follower.friendAccount}}<span v-if="follower.friendNickname != null && follower.friendNickname != ''"> （呢称：{{follower.friendNickname}}）</span>
-							</router-link>               
+							</router-link> 
+							
+							<span class="userName" v-if="follower.friendAccount == null || follower.friendAccount == ''">此用户账号已注销</span>              
 						</div>
 					</div>
 				</div>
@@ -3958,8 +4037,9 @@
 						    	<router-link tag="h2" class="clearfix" :to="{path: '/user/control/home', query: {userName: receiveRedEnvelope.receiveUserName}}">
 						        	<div class="userName">{{receiveRedEnvelope.receiveNickname != null && receiveRedEnvelope.receiveNickname != '' ? receiveRedEnvelope.receiveNickname : receiveRedEnvelope.receiveAccount}}</div>
 						        </router-link>
-	                        	
-	                          	<div class="time clearfix">{{receiveRedEnvelope.receiveTime}}</div>
+						        <div class="cancelNickname" v-if="receiveRedEnvelope.receiveAccount == null || receiveRedEnvelope.receiveAccount == ''">已注销</div>
+						        
+	                        	<div class="time clearfix">{{receiveRedEnvelope.receiveTime}}</div>
 	                        </span>                   
 	                    </div>
 			            
@@ -4001,7 +4081,8 @@
 						    	<router-link tag="h2" class="clearfix" :to="{path: '/user/control/home', query: {userName: receiveRedEnvelope.giveUserName}}">
 						        	<div class="userName">{{receiveRedEnvelope.giveNickname != null && receiveRedEnvelope.giveNickname != '' ? receiveRedEnvelope.giveNickname : receiveRedEnvelope.giveAccount}}</div>
 						        </router-link>
-	                        	
+	                        	<div class="cancelNickname" v-if="receiveRedEnvelope.giveAccount == null || receiveRedEnvelope.giveAccount == ''">已注销</div>
+	                          	
 	                          	<div class="time clearfix">{{receiveRedEnvelope.receiveTime}}</div>
 	                        </span>                   
 	                    </div>
@@ -4069,7 +4150,8 @@
 <script src="${commonPath}js/cryptoJS/core-min.js" type="text/javascript"></script>
 <script src="${commonPath}js/cryptoJS/sha256-min.js" type="text/javascript"></script>
 <script src="${commonPath}js/lodash.min.js" type="text/javascript"></script>
-<script src="${commonPath}js/vue-select.js" type="text/javascript"></script>
+<link href="${commonPath}js/vue-select/vue-select.css" type="text/css" rel="stylesheet">
+<script src="${commonPath}js/vue-select/vue-select.js" type="text/javascript"></script>
 <script src="${commonPath}js/scrollTool.js" type="text/javascript"></script>
 <script src="${commonPath}js/vue.min.js" type="text/javascript"></script>
 <script src="${commonPath}js/vue-router.min.js" type="text/javascript"></script>
@@ -4097,7 +4179,7 @@
 <script src="${commonPath}js/prism/default-block/prism.js" type="text/javascript"></script> 
 <script src="${commonPath}js/prism/default-block/clipboard.min.js" type="text/javascript"></script> 
 
-<script src="${commonPath}js/main.js?asdw" type="text/javascript"></script>
+<script src="${commonPath}js/main.js?asdws" type="text/javascript"></script>
 
 
 
@@ -4110,8 +4192,12 @@
 	    background: #26a2ff;
 	    color: #fff;
 	}
+	.v-select{
+		font-size: 15px;
+		margin-bottom: 8px;
+	}
 	.v-select li {
-		line-height: 25px;
+		line-height: 30px;
 	}
 	
 image[lazy=loading] {

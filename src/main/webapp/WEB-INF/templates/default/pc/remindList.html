@@ -65,6 +65,9 @@
 							<div class="content" >
 								<#if remind.typeCode == 10>
 									<cite>
+										<#if remind.senderAccount == null || remind.senderAccount == ''>
+											<span class="cancelAccount">此用户账号已注销</span>
+										</#if>
 										<a href="user/control/home?userName=${remind.senderUserName}">
 											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderAccount)}
 										</a>
@@ -77,6 +80,9 @@
 									
 								<#elseif remind.typeCode == 20>
 									<cite>
+										<#if remind.senderAccount == null || remind.senderAccount == ''>
+											<span class="cancelAccount">此用户账号已注销</span>
+										</#if>
 										<a href="user/control/home?userName=${remind.senderUserName}">
 											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderAccount)}
 										</a>
@@ -88,6 +94,9 @@
 									回复了我的话题
 								<#elseif remind.typeCode == 30>
 									<cite>
+										<#if remind.senderAccount == null || remind.senderAccount == ''>
+											<span class="cancelAccount">此用户账号已注销</span>
+										</#if>
 										<a href="user/control/home?userName=${remind.senderUserName}">
 											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderAccount)}
 										</a>
@@ -99,6 +108,9 @@
 									引用了我的评论
 								<#elseif remind.typeCode == 40>
 									<cite>
+										<#if remind.senderAccount == null || remind.senderAccount == ''>
+											<span class="cancelAccount">此用户账号已注销</span>
+										</#if>
 										<a href="user/control/home?userName=${remind.senderUserName}">
 											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderAccount)}
 										</a>
@@ -110,6 +122,9 @@
 									回复了我的评论
 								<#elseif remind.typeCode == 50>
 									<cite>
+										<#if remind.senderAccount == null || remind.senderAccount == ''>
+											<span class="cancelAccount">此用户账号已注销</span>
+										</#if>
 										<a href="user/control/home?userName=${remind.senderUserName}">
 											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderAccount)}
 										</a>
@@ -121,6 +136,9 @@
 									回复了我回复过的评论
 								<#elseif remind.typeCode == 60>
 									<cite>
+										<#if remind.senderAccount == null || remind.senderAccount == ''>
+											<span class="cancelAccount">此用户账号已注销</span>
+										</#if>
 										<a href="user/control/home?userName=${remind.senderUserName}">
 											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderAccount)}
 										</a>
@@ -132,6 +150,9 @@
 									解锁了我的话题
 								<#elseif remind.typeCode == 70>
 									<cite>
+										<#if remind.senderAccount == null || remind.senderAccount == ''>
+											<span class="cancelAccount">此用户账号已注销</span>
+										</#if>
 										<a href="user/control/home?userName=${remind.senderUserName}">
 											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderAccount)}
 										</a>
@@ -143,6 +164,9 @@
 									赞了我的话题
 								<#elseif remind.typeCode == 80>
 									<cite>
+										<#if remind.senderAccount == null || remind.senderAccount == ''>
+											<span class="cancelAccount">此用户账号已注销</span>
+										</#if>
 										<a href="user/control/home?userName=${remind.senderUserName}">
 											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderAccount)}
 										</a>
@@ -151,6 +175,9 @@
 								<#elseif remind.typeCode == 90>
 									我关注的
 									<cite>
+										<#if remind.senderAccount == null || remind.senderAccount == ''>
+											<span class="cancelAccount">此用户账号已注销</span>
+										</#if>
 										<a href="user/control/home?userName=${remind.senderUserName}">
 											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderAccount)}
 										</a>
@@ -162,6 +189,9 @@
 								<#elseif remind.typeCode == 100>
 									我关注的
 									<cite>
+										<#if remind.senderAccount == null || remind.senderAccount == ''>
+											<span class="cancelAccount">此用户账号已注销</span>
+										</#if>
 										<a href="user/control/home?userName=${remind.senderUserName}">
 											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderAccount)}
 										</a>
@@ -174,6 +204,9 @@
 								<#elseif remind.typeCode == 110>
 									我关注的
 									<cite>
+										<#if remind.senderAccount == null || remind.senderAccount == ''>
+											<span class="cancelAccount">此用户账号已注销</span>
+										</#if>
 										<a href="user/control/home?userName=${remind.senderUserName}">
 											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderAccount)}
 										</a>
@@ -186,6 +219,9 @@
 									
 								<#elseif remind.typeCode == 120>
 									<cite>
+										<#if remind.senderAccount == null || remind.senderAccount == ''>
+											<span class="cancelAccount">此用户账号已注销</span>
+										</#if>
 										<a href="user/control/home?userName=${remind.senderUserName}">
 											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderAccount)}
 										</a>
@@ -197,6 +233,9 @@
 									回答了我的问题
 								<#elseif remind.typeCode == 130>
 									<cite>
+										<#if remind.senderAccount == null || remind.senderAccount == ''>
+											<span class="cancelAccount">此用户账号已注销</span>
+										</#if>
 										<a href="user/control/home?userName=${remind.senderUserName}">
 											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderAccount)}
 										</a>
@@ -208,6 +247,9 @@
 									回复了我的问题
 								<#elseif remind.typeCode == 140>
 									<cite>
+										<#if remind.senderAccount == null || remind.senderAccount == ''>
+											<span class="cancelAccount">此用户账号已注销</span>
+										</#if>
 										<a href="user/control/home?userName=${remind.senderUserName}">
 											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderAccount)}
 										</a>
@@ -219,6 +261,9 @@
 									回复了我的答案
 								<#elseif remind.typeCode == 150>
 									<cite>
+										<#if remind.senderAccount == null || remind.senderAccount == ''>
+											<span class="cancelAccount">此用户账号已注销</span>
+										</#if>
 										<a href="user/control/home?userName=${remind.senderUserName}">
 											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderAccount)}
 										</a>

@@ -48,7 +48,12 @@
 						<i class="cms-trophy-solid" ></i><span>最佳答案</span>-->
 					</div>
 					
-					<div class="answerContent"><#noescape>${answer.content}</#noescape></div>
+					<div class="answerContent">
+						<#if answer.account == null || answer.account == ''>
+							<div class="cancelAccount">此用户账号已注销</div>
+						</#if>
+						<#noescape>${answer.content}</#noescape>
+					</div>
 					<div class="clearfix"></div>
 					<#if answer.totalReply gt 0> 
 						<div class="replyList">
@@ -90,7 +95,12 @@
 											</span>
 										</div>
 										<div style="clear:both; height: 0; line-height: 0; font-size: 0;"></div>
-										<div class="replyContent">${reply.content}</div>
+										<div class="replyContent">
+											<#if reply.account == null || reply.account == ''>
+												<div class="cancelAccount">此用户账号已注销</div>
+											</#if>
+											${reply.content}
+										</div>
 										<div id="editAnswerReply-post_${reply.id}" ></div>
 									</li>
 								</#list>

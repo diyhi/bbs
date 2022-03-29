@@ -6,12 +6,12 @@
 				<el-table ref="multipleTable" :data="tableData" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange" stripe empty-text="没有内容">
 					<el-table-column label="接口产品" align="center" width="150">
 						<template #default="scope">
-							<span v-if="scope.row.interfaceProduct == 1">阿里云通信</c:if>
+							<span v-if="scope.row.interfaceProduct == 1">阿里云通信</span>
 						</template>
 					</el-table-column>
 					<el-table-column label="发送服务" align="center" width="150">
 						<template #default="scope">
-							<span v-if="scope.row.serviceId == 1">绑定手机</c:if>
+							<span v-if="scope.row.serviceId == 1">绑定手机</span>
 						</template>
 					</el-table-column>
 					<el-table-column prop="createDate" label="发送时间" align="center" width="170"></el-table-column>

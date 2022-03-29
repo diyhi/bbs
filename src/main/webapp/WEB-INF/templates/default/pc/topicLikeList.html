@@ -41,7 +41,15 @@
 					<#list pageView.records as like>
 					<TR>
 						<TD class="dataTD">
-							<a href="user/control/home?userName=${like.userName}" target="_blank" class="link">${like.account}</a>
+							
+							<#if like.account == null || like.account == ''>
+								<div class="cancelAccount">此用户账号已注销</div>
+							<#else>
+								<a href="user/control/home?userName=${like.userName}" target="_blank" class="link">${like.account}</a>
+								<#if like.nickname != null && like.nickname??>    
+									(呢称：${like.nickname})
+								</#if> 
+							</#if>
 						</TD>
 						<TD class="dataTD">
 							${like.addtime}	

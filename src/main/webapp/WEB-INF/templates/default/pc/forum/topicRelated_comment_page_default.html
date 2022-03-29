@@ -45,13 +45,24 @@
 					<div class="quote">
 						<#assign quoteContent = ""> 
 						<#list comment.quoteList as quote>
+							<#assign quoteCancelAccountHtml = "">
+							<#if quote.account == null || quote.account == ''>
+								<#assign quoteCancelAccountHtml = "<div class='cancelAccount'>此用户账号已注销</div>">
+							</#if>
 							<#assign avatarHtml = "<a class='avatarBox' href='user/control/home?userName="+quote.userName?html+"'>"+(quote.avatarName != null && quote.avatarName??) ?string("<img src='"+quote.avatarPath?html+"100x100/"+quote.avatarName?html+"'>" , "<img avatar='"+(quote.nickname != null && quote.nickname??) ?string(quote.nickname?html , quote.account?html)+"'>")+"</a>"> 
-							<#assign quoteContent = "<div class='quoteComment'>"+quoteContent+"<span class='userName'>"+avatarHtml+"<a href='user/control/home?userName="+quote.userName?html+"'>"+(quote.nickname != null && quote.nickname??) ?string(quote.nickname?html , quote.account?html)+"</a>"+"&nbsp;的评论：</span><br/>"+quote.content+"</div>"> 
+							<#assign quoteContent = "<div class='quoteComment'>"+quoteContent+"<span class='userName'>"+avatarHtml+"<a href='user/control/home?userName="+quote.userName?html+"'>"+(quote.nickname != null && quote.nickname??) ?string(quote.nickname?html , quote.account?html)+"</a>"+"&nbsp;的评论：</span><br/>"+quote.content+quoteCancelAccountHtml+"</div>"> 
+							
+						
 						</#list>
 						<#noescape>${quoteContent}</#noescape>
 					</div>
 					</#if> 
-					<div class="commentContent"><#noescape>${comment.content}</#noescape></div>
+					<div class="commentContent">
+						<#if comment.account == null || comment.account == ''>
+							<div class="cancelAccount">此用户账号已注销</div>
+						</#if>
+						<#noescape>${comment.content}</#noescape>
+					</div>
 					<div class="clearfix"></div>
 					<#if comment.totalReply gt 0> 
 						<div class="replyList">
@@ -97,7 +108,12 @@
 											</span>
 										</div>
 										<div style="clear:both; height: 0; line-height: 0; font-size: 0;"></div>
-										<div id="editCommentReply-replyContent_${reply.id}" class="replyContent">${reply.content}</div>
+										<div id="editCommentReply-replyContent_${reply.id}" class="replyContent">
+											<#if reply.account == null || reply.account == ''>
+												<div class="cancelAccount">此用户账号已注销</div>
+											</#if>
+											${reply.content}
+										</div>
 										<div id="editCommentReply-post_${reply.id}" ></div>
 									</li>
 								</#list>

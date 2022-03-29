@@ -162,7 +162,7 @@ public class RedEnvelopeAction{
 				//排序
 				boolean sort = true;//true:正序 false:倒序
 				
-				QueryResult<ReceiveRedEnvelope> qr = redEnvelopeManage.queryReceiveRedEnvelopeByCondition(giveRedEnvelope,true,firstindex, pageView.getMaxresult(),sort);
+				QueryResult<ReceiveRedEnvelope> qr = redEnvelopeManage.queryReceiveRedEnvelopeByCondition(giveRedEnvelope,true,firstindex, pageView.getMaxresult(),sort,true);
 				    
 
 		

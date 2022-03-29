@@ -19,7 +19,7 @@
 					</el-table-column>
 					<el-table-column label="标签名称" align="center" min-width="100">
 						<template #default="scope">
-				            <span v-for="(questionTagAssociation,index) in scope.row.questionTagAssociationList" class="tag-wrapper tag-spacing tag-color-blue">{{questionTagAssociation.questionTagName}}</span></c:if>
+				            <span v-for="(questionTagAssociation,index) in scope.row.questionTagAssociationList" class="tag-wrapper tag-spacing tag-color-blue">{{questionTagAssociation.questionTagName}}</span>
 				        </template>
 					</el-table-column>
 					<el-table-column label="状态" align="center" width="100">

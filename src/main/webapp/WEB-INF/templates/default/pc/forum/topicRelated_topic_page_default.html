@@ -38,6 +38,9 @@
 					            	</#if>
 					        	</li>
 					        </ul>
+					        <#if topic.account == null || topic.account == ''>
+								<div class="cancelAccount">此用户账号已注销</div>
+							</#if>
 							<h2 class="title clearfix">
 								<a href="thread?topicId=${topic.id}" target="_blank">${topic.title}</a>
 					            <#list topic.allowRoleViewList as roleName>

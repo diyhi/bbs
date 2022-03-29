@@ -931,6 +931,11 @@ html,body{
 	margin-top: 8px;
 	margin-bottom: 8px;
 }
+.tabModule .tab-box .tab_current{
+	display: block;
+	margin-top: 8px;
+	margin-bottom: 8px;
+}
 .tabModule .tab-box .tab:link,
 .tabModule .tab-box .tab:visited,
 .tabModule .tab-box .tab:active {
@@ -1179,6 +1184,20 @@ html,body{
     background-color: #57A9FB;
     position: relative;
     top: -6px;
+}
+
+.topicModule .topic-box .topicList .topicItem .content .cancelAccount{
+	display: inline-block;
+    vertical-align: middle;
+    padding: 6px 6px;
+    font-size: 14px;
+    line-height: 14px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color: #A9AEB8;
+    background-color: #F7F8FA;
+    margin-bottom: 6px;
 }
 .topicModule .topic-box .topicList .topicItem .content .title {
 	margin: 0 5px 0 0;
@@ -1665,6 +1684,19 @@ html,body{
 .topicContentModule .left .topic-wrap .topicBox .topicContent .lastUpdateTime{
 	text-align: center;line-height: 40px;padding-bottom: 30px;color: #86909C;
 }
+.topicContentModule .left .topic-wrap .topicBox .topicContent .cancelAccount{
+	display: inline-block;
+    vertical-align: middle;
+    padding: 6px 6px;
+    font-size: 14px;
+    line-height: 14px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color: #A9AEB8;
+    background-color: #F7F8FA;
+    margin-bottom: 6px;
+}
 .topicContentModule .left .topic-wrap .topicBox .topicContent{border-top:1px solid #F2F3F5;margin-top:5px;padding:20px 0px;color:#272E3B;font-size:16px; line-height:1.75; word-wrap:break-word;min-height: 100px;}
 .topicContentModule .left .topic-wrap .topicBox .topicContent a{
 	color: #1890ff;
@@ -2009,6 +2041,18 @@ html,body{
 }
 .commentModule .commentList .commentInfo .commentTime{margin-top:3px; margin-bottom:5px;color:#A9AEB8;;font-size: 13px;}
 .commentModule .commentList .commentInfo .commentTime a{color:#A9AEB8;}
+.commentModule .commentList .commentInfo .commentContent .cancelAccount{
+	display: inline-block;
+    vertical-align: middle;
+    padding: 6px 6px;
+    font-size: 14px;
+    line-height: 14px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color: #A9AEB8;
+    background-color: #F7F8FA;
+}
 .commentModule .commentList .commentInfo .commentContent{padding:0px;word-wrap:break-word;color:#272E3B;font-size:15px; line-height:1.75; margin-top: 20px;}
 /* 评论图片尺寸 */
 .commentModule .commentList .commentInfo .commentContent img {max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;vertical-align: sub;}
@@ -2047,6 +2091,18 @@ html,body{
 
 .commentModule .commentList .quote{
 	padding:5px 8px;border-bottom:none;text-align: left;margin-top: 20px;
+}
+.commentModule .commentList .quote .cancelAccount{
+	display: inline-block;
+    vertical-align: middle;
+    padding: 6px 6px;
+    font-size: 14px;
+    line-height: 14px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color: #A9AEB8;
+    background-color: #F7F8FA;
 }
 .commentModule .commentList .quote .quoteComment{
 	background:#F7F8FA;padding:5px 8px 8px 8px;border:1px solid #E5E6EB;line-height:140%;margin-bottom:6px;line-height: 28px;border-radius: 3px;
@@ -2205,7 +2261,18 @@ html,body{
 	padding-bottom: 8px;
 	
 }
-
+.commentModule .commentList .replyList .box li .replyContent .cancelAccount{
+	display: inline-block;
+    vertical-align: middle;
+    padding: 6px 6px;
+    font-size: 14px;
+    line-height: 14px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color: #A9AEB8;
+    background-color: #F7F8FA;
+}
 
 .commentModule .commentList .tipBottom {
 	font-size: 13px;
@@ -3991,6 +4058,18 @@ html,body{
 	padding-bottom:80px;
 }
 .privateMessageModule .privateMessageList{list-style:none;}
+.privateMessageModule .privateMessageList .cancelAccount{
+	display: inline-block;
+    vertical-align: middle;
+    padding: 6px 6px;
+    font-size: 14px;
+    line-height: 14px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color: #A9AEB8;
+    background-color: #F7F8FA;
+}
 .privateMessageModule .privateMessageList .privateMessage{padding:12px 10px 7px 86px;border-bottom:1px solid #F2F3F5;}
 .privateMessageModule .privateMessageList .author{position:relative;}
 .privateMessageModule .privateMessageList .author img{
@@ -4059,7 +4138,21 @@ html,body{
 .privateMessageChatTop .chatInfo{
 	margin-left: 240px;
 }
-
+.privateMessageChatTop .cancelAccount{
+	display: inline-block;
+    vertical-align: middle;
+    padding: 6px 6px;
+    font-size: 14px;
+    line-height: 14px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color: #A9AEB8;
+    background-color: #F7F8FA;
+   	font-weight:normal;
+   	position: relative;
+   	top: -1px;
+}
 .privateMessageChatTop b{
 	display: inline-block;
 	font-size: 15px;
@@ -4098,6 +4191,24 @@ html,body{
 .recentlyChatUserModule .recentlyChatUserList .info .userName:hover{
 	color: #1890ff;
 }
+.recentlyChatUserModule .recentlyChatUserList .info .cancelAccount{
+	font-style:normal; 
+	margin-left: 70px;
+	display: inline-block;
+    vertical-align: middle;
+    padding: 6px 6px;
+    font-size: 14px;
+    line-height: 14px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color: #A9AEB8;
+    background-color: #F7F8FA;
+   	font-weight:normal;
+   	position: relative;
+   	top: 12px;
+}
+
 /* 私信对话右边栏 */
 .privateMessageChatRight{
 	display: inline; float: right; margin-top: 10px;width: 920px;
@@ -4447,6 +4558,20 @@ html,body{
 	behavior: url(common/default/pc/js/css3pie/PIE.htc);  /*通知IE浏览器调用脚本作用于当前类*/
 }
 .remindModule .remindList cite{font-style:normal;font-size: 15px;}
+.remindModule .remindList cite .cancelAccount{
+	display: inline-block;
+    vertical-align: middle;
+    padding: 6px 6px;
+    font-size: 14px;
+    line-height: 14px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color: #A9AEB8;
+    background-color: #F7F8FA;
+   	position: relative;
+   	top:-1px;
+}
 .remindModule .remindList .time{margin-bottom:5px;margin-top:6px; color:#C9CDD4;line-height: 20px;}
 .remindModule .remindList .time a{}
 .remindModule .remindList .remind .content{padding:0px;word-wrap:break-word;color:#6B7785;line-height: 24px;font-size: 15px;margin-right: 120px;margin-top: 10px;}
@@ -5821,6 +5946,21 @@ html,body{
 	line-height: 28px;
 	
 }
+.askListModule .question-box .questionList .questionItem .content .title .cancelAccount{
+	display: inline-block;
+    vertical-align: middle;
+    padding: 4px 6px 4px 6px;
+    font-size: 14px;
+    line-height: 14px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color: #A9AEB8;
+    background-color: #F7F8FA;
+    font-weight:100;
+    position:relative;/** 这两行让标签上移 **/
+    top:-2px;
+}
 .askListModule .question-box .questionList .questionItem .content .title a{
 	color: #272E3B;
 }
@@ -6113,6 +6253,18 @@ html,body{
 	color: #cca558; margin-right: 5px;font-weight: 700;font-size: 18px;position: relative;top: 1px;
 }
 .questionContentModule .left .question-wrap .questionBox .content{margin-top:5px;padding:20px 0px;color:#272E3B;font-size:16px; line-height:1.75; word-wrap:break-word;min-height: 100px;}
+.questionContentModule .left .question-wrap .questionBox .content .cancelAccount{
+	display: inline-block;
+    vertical-align: middle;
+    padding: 6px 6px;
+    font-size: 14px;
+    line-height: 14px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color: #A9AEB8;
+    background-color: #F7F8FA;
+}
 .questionContentModule .left .questionBox .content a{
 	color: #1890ff;
 }
@@ -6520,6 +6672,18 @@ html,body{
 .answerModule .answerList .answerTime a{color:#A9AEB8;}
 
 .answerModule .answerList .answer .answerContent{padding:0px;word-wrap:break-word;color:#272E3B;font-size:15px; line-height:1.75; margin-top: 20px;}
+.answerModule .answerList .answer .answerContent .cancelAccount{
+	display: inline-block;
+    vertical-align: middle;
+    padding: 6px 6px;
+    font-size: 14px;
+    line-height: 14px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color: #A9AEB8;
+    background-color: #F7F8FA;
+}
 .answerModule .answerList .answer .answerContent img {max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;vertical-align: sub;}
 /* 自动换行 */
 .answerModule .answerList .answer .answerContent pre{white-space:pre-wrap;}
@@ -6716,6 +6880,18 @@ html,body{
 	padding-top: 8px;
 	padding-bottom: 8px;
 	
+}
+.answerModule .answerList .replyList .box li .replyContent .cancelAccount{
+	display: inline-block;
+    vertical-align: middle;
+    padding: 6px 6px;
+    font-size: 14px;
+    line-height: 14px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color: #A9AEB8;
+    background-color: #F7F8FA;
 }
 /* 回复答案  */
 .answerModule .answerList .answerReply-post{
@@ -7782,7 +7958,41 @@ html,body{
 .followerModule .userName {
 	font-size: 15px;position: relative;top: -12px;padding-left: 5px;
 }
-
+/* 发红包金额分配 */
+.redEnvelopeAmountDistributionModule{
+	position: relative;
+}
+.redEnvelopeAmountDistributionModule .avatarBox{
+	display:inline-block;border-radius:100%;
+	padding-top: 8px;
+	margin-left: 3px;
+}
+.redEnvelopeAmountDistributionModule .avatarBox img{
+	border-radius:100%;
+	width: 36px;
+}
+.redEnvelopeAmountDistributionModule .userName {
+	font-size: 15px;position: relative;top: -12px;padding-left: 5px;
+}
+/* 收红包 */
+.receiveRedEnvelopeModule{
+	position: relative;
+}
+.receiveRedEnvelopeModule .avatarBox{
+	display:inline-block;border-radius:100%;
+	padding-top: 8px;
+	margin-left: 3px;
+}
+.receiveRedEnvelopeModule .avatarBox img{
+	border-radius:100%;
+	width: 36px;
+}
+.receiveRedEnvelopeModule .userName {
+	font-size: 15px;position: relative;top: -12px;padding-left: 5px;
+}
+.receiveRedEnvelopeModule .cancel {
+	font-size: 15px;position: relative;top: -12px;margin-left: 5px;
+}
 
 /* 帮助分类 */
 .helpTypeModule{
@@ -8098,7 +8308,20 @@ html,body{
 	list-style-type:disc;
 }
 
+/* 积分日志 */
+.pointLogModule{
+	
+}
 
+
+/* 奖励积分信息 */
+.rewardPointInfoModule{
+	padding: 30px 0 30px 30px;
+	background: #fff;
+	position: relative;
+}
+.rewardPointInfoModule .text{font-size: 15px; margin-right: 40px;}
+.rewardPointInfoModule .text .name{color: #99a9bf;}
 
 
 
@@ -8171,6 +8394,18 @@ html,body{
 }
 .dataTable .dataList .empty{
 	text-align:center;height: 55px; line-height: 55px;color: #A9AEB8;background:#fff;
+}
+.dataTable .dataList .cancelAccount{
+	display: inline-block;
+    vertical-align: middle;
+    padding: 6px 6px;
+    font-size: 14px;
+    line-height: 14px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color: #A9AEB8;
+    background-color: #F7F8FA;
 }
 .dataTable .pageList {
 	margin-top: 20px; float: right; line-height: 22px;

@@ -111,6 +111,9 @@ function deleteFollow(followId){
 								</a>
 							</div>
 							<a href="user/control/home?userName=${follow.friendUserName}" target="_blank" class="link userName">
+								<#if follow.friendAccount == null || follow.friendAccount == ''>
+									<span class="cancelAccount">此用户账号已注销</span>
+								</#if>
 								${follow.friendAccount}
 								<#if follow.friendNickname != null && follow.friendNickname??>    
 									（呢称：${follow.friendNickname}）

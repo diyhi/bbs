@@ -31,6 +31,7 @@ import cms.service.setting.SettingService;
 import cms.utils.CommentedProperties;
 import cms.utils.FileUtil;
 import cms.utils.JsonUtils;
+import cms.utils.SecureLink;
 import cms.utils.UUIDUtil;
 import cms.web.action.TextFilterManage;
 import cms.web.action.fileSystem.FileManage;
@@ -90,7 +91,23 @@ public class HelpManageAction {
 				//处理富文本路径
 				help.setContent(fileManage.processRichTextFilePath(help.getContent(),"help"));
 				
-				
+				if(help.getContent() != null && !"".equals(help.getContent().trim()) && systemSetting.getFileSecureLinkSecret() != null && !"".equals(systemSetting.getFileSecureLinkSecret().trim())){
+					List<String> serverAddressList = fileManage.fileServerAllAddress();
+					//解析上传的文件完整路径名称
+					Map<String,String> analysisFullFileNameMap = textFilterManage.analysisFullFileName(help.getContent(),"help",serverAddressList);
+					if(analysisFullFileNameMap != null && analysisFullFileNameMap.size() >0){
+						
+						
+						Map<String,String> newFullFileNameMap = new HashMap<String,String>();//新的完整路径名称 key: 完整路径名称 value: 重定向接口
+						for (Map.Entry<String,String> entry : analysisFullFileNameMap.entrySet()) {
+
+							newFullFileNameMap.put(entry.getKey(), SecureLink.createDownloadRedirectLink(entry.getKey(),entry.getValue(),-1L,systemSetting.getFileSecureLinkSecret()));
+						}
+						
+						help.setContent(textFilterManage.processFullFileName(help.getContent(),"help",newFullFileNameMap,serverAddressList));
+						
+					}
+				}
 				if(help.getContent() != null && !"".equals(help.getContent().trim())){
 					//处理视频播放器标签
 					String content = textFilterManage.processVideoPlayer(help.getContent(),-1L,systemSetting.getFileSecureLinkSecret());

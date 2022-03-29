@@ -85,10 +85,12 @@ public class RedEnvelope_TemplateManage {
 				User user = userManage.query_cache_findUserById(giveRedEnvelope.getUserId());
 				if(user != null){
 					giveRedEnvelope.setUserName(user.getUserName());
-					giveRedEnvelope.setAccount(user.getAccount());
-					giveRedEnvelope.setNickname(user.getNickname());
-					giveRedEnvelope.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
-					giveRedEnvelope.setAvatarName(user.getAvatarName());
+					if(user.getCancelAccountTime().equals(-1L)){
+						giveRedEnvelope.setAccount(user.getAccount());
+						giveRedEnvelope.setNickname(user.getNickname());
+						giveRedEnvelope.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+						giveRedEnvelope.setAvatarName(user.getAvatarName());
+					}
 				}
 				
 				if(accessUser != null){
@@ -163,7 +165,7 @@ public class RedEnvelope_TemplateManage {
 						//当前页
 						int firstIndex = (pageForm.getPage()-1)*pageView.getMaxresult();
 						
-						QueryResult<ReceiveRedEnvelope> qr = redEnvelopeManage.queryReceiveRedEnvelopeByCondition(giveRedEnvelope,false,firstIndex, pageView.getMaxresult(),sort);
+						QueryResult<ReceiveRedEnvelope> qr = redEnvelopeManage.queryReceiveRedEnvelopeByCondition(giveRedEnvelope,false,firstIndex, pageView.getMaxresult(),sort,false);
 						    
 						//将查询结果集传给分页List
 						pageView.setQueryResult(qr);

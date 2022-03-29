@@ -2192,17 +2192,38 @@ var thread_component = Vue.extend({
 										}
 											
 										avatarHtml += "</router-link>";
-										quoteContent = "<div class=\"quoteComment\">"+quoteContent+"<span class=\"userName\">"+avatarHtml+"<router-link tag=\"span\" :to=\"{path: '/user/control/home', query: {userName: '"+quote.userName+"'}}\">"+(quote.nickname != null && quote.nickname != '' ? escapeHtml(quote.nickname) : escapeHtml(quote.account))+"</router-link>&nbsp;的评论：</span><br/>"+quote.content+"</div>";
+										if(quote.account == null || quote.account == ''){
+											avatarHtml += "<span class='cancelNickname'>已注销</span>";
+											
+										}
+										
+										var cancelAccount = "";
+										if(quote.account == null || quote.account == ''){
+											
+											cancelAccount += "<div class='cancelAccount'>此用户账号已注销</div>";
+										}
+										
+										
+										
+										quoteContent = "<div class=\"quoteComment\">"+quoteContent+"<span class=\"userName\">"+avatarHtml+"<router-link tag=\"span\" :to=\"{path: '/user/control/home', query: {userName: '"+quote.userName+"'}}\">"+(quote.nickname != null && quote.nickname != '' ? escapeHtml(quote.nickname) : escapeHtml(quote.account))+"</router-link>&nbsp;的评论：</span><br/>"+quote.content+cancelAccount+"</div>";
 	
 									}
 									_self.$set(_self.quoteData, comment.id, escapeVueHtml(quoteContent));
 								}
 								
+								
+								var cancelAccount = "";
+								if(comment.account == null || comment.account == ''){
+									
+									cancelAccount += "<div class='cancelAccount'>此用户账号已注销</div>";
+								}
+								
+								
 								//处理图片放大标签
 								var contentNode = document.createElement("div");
 								contentNode.innerHTML = comment.content;
 								_self.bindNode(contentNode);
-								comment.content = escapeVueHtml(contentNode.innerHTML);
+								comment.content = escapeVueHtml(contentNode.innerHTML)+cancelAccount;
 								
 							}
 
@@ -3982,12 +4003,18 @@ var question_component = Vue.extend({
 						var question = $.parseJSON(result);
 						if (question != null) {
 							
+							var cancelAccount = "";
+							if(question.account == null || question.account == ''){
+								
+								cancelAccount += "<div class='cancelAccount'>此用户账号已注销</div>";
+							}
+							
 							//处理隐藏标签
 							var contentNode = document.createElement("div");
 							contentNode.innerHTML = question.content;
 							
 							_self.bindNode(contentNode);
-							question.content = escapeVueHtml(contentNode.innerHTML);
+							question.content = escapeVueHtml(contentNode.innerHTML)+cancelAccount;
 					
 							if(question.appendQuestionItemList != null && question.appendQuestionItemList.length >0){
 								for(var i=0; i<question.appendQuestionItemList.length; i++){
@@ -4354,11 +4381,18 @@ var question_component = Vue.extend({
 								var answer = new_answerList[i];
 								_self.$set(_self.replyExpandOrShrink, answer.id, false); //是否展开	
 								
+								
+								var cancelAccount = "";
+								if(answer.account == null || answer.account == ''){
+									
+									cancelAccount += "<div class='cancelAccount'>此用户账号已注销</div>";
+								}
+								
 								//处理图片放大标签
 								var contentNode = document.createElement("div");
 								contentNode.innerHTML = answer.content;
 								_self.bindNode(contentNode);
-								answer.content = escapeVueHtml(contentNode.innerHTML);
+								answer.content = escapeVueHtml(contentNode.innerHTML)+cancelAccount;
 							}
 							_self.answerList = new_answerList;
 							
@@ -7293,6 +7327,22 @@ var register_component = Vue.extend({
 				}
 				this.userBoundField.push(checked);
 			} else if (userCustom.chooseType == 4) { //下拉列表
+				var checked = new Array();
+
+				A:for (var itemValue in userCustom.itemValue) {
+					for (var i = 0; i < userCustom.userInputValueList.length; i++) {
+						var userInputValue = userCustom.userInputValueList[i];
+						if (itemValue == userInputValue.options) {
+							var o = new Object();
+							o.label = userCustom.itemValue[itemValue];
+							o.value = itemValue;
+							checked.push(o);
+							continue A;
+						}
+					}
+				}
+				this.userBoundField.push(checked);
+				/**
 				if (userCustom.multiple == true) { //允许多选
 					var checked = new Array();
 
@@ -7327,7 +7377,7 @@ var register_component = Vue.extend({
 					}
 					this.userBoundField.push(o);
 				}
-
+				**/
 
 			} else if (userCustom.chooseType == 5) { //文本域
 				var content = "";
@@ -7434,8 +7484,14 @@ var register_component = Vue.extend({
 							parameter += "&userCustom_" + userCustom.id + "=" + fieldValue[value];
 						}
 					} else if (userCustom.chooseType == 4) { //下拉列表
-						for (var value in fieldValue) {
-							parameter += "&userCustom_" + userCustom.id + "=" + fieldValue[value].value;
+						if (userCustom.multiple == true) { //允许多选
+							for (var value in fieldValue) {
+								parameter += "&userCustom_" + userCustom.id + "=" + fieldValue[value].value;
+							}
+						}else{
+							for (var value in fieldValue) {
+								parameter += "&userCustom_" + userCustom.id + "=" + fieldValue[value];
+							}
 						}
 					} else if (userCustom.chooseType == 5) { //文本域
 						parameter += "&userCustom_" + userCustom.id + "=" + encodeURIComponent(fieldValue);
@@ -10530,6 +10586,7 @@ var point_component = Vue.extend({
 			loading : false, //加载中
 			currentpage : 0, //当前页码
 			totalpage : 1, //总页数
+			rewardPointInfo:''
 		}
 	},
 	created : function created() {
@@ -10566,6 +10623,9 @@ var point_component = Vue.extend({
 									_self.currentpage = pageView.currentpage;
 									_self.totalpage = pageView.totalpage;
 
+								}else if(key == "rewardPointInfo"){
+									_self.rewardPointInfo = returnValue[key];
+									
 								}
 							}
 						}
@@ -10700,6 +10760,22 @@ var editUser_component = Vue.extend({
 				}
 				this.userBoundField.push(checked);
 			} else if (userCustom.chooseType == 4) { //下拉列表
+				var checked = new Array();
+
+				A:for (var itemValue in userCustom.itemValue) {
+					for (var i = 0; i < userCustom.userInputValueList.length; i++) {
+						var userInputValue = userCustom.userInputValueList[i];
+						if (itemValue == userInputValue.options) {
+							var o = new Object();
+							o.label = userCustom.itemValue[itemValue];
+							o.value = itemValue;
+							checked.push(o);
+							continue A;
+						}
+					}
+				}
+				this.userBoundField.push(checked);
+				/**
 				if (userCustom.multiple == true) { //允许多选
 					var checked = new Array();
 
@@ -10734,7 +10810,7 @@ var editUser_component = Vue.extend({
 					}
 					this.userBoundField.push(o);
 				}
-
+				**/
 
 			} else if (userCustom.chooseType == 5) { //文本域
 				var content = "";
@@ -10789,13 +10865,14 @@ var editUser_component = Vue.extend({
 							parameter += "&userCustom_" + userCustom.id + "=" + fieldValue[value];
 						}
 					} else if (userCustom.chooseType == 4) { //下拉列表
-						if(userCustom.multiple){//如果可选择多个选项
+						if (userCustom.multiple == true) { //允许多选
 							for (var value in fieldValue) {
-								
 								parameter += "&userCustom_" + userCustom.id + "=" + fieldValue[value].value;
 							}
 						}else{
-							parameter += "&userCustom_" + userCustom.id + "=" + fieldValue.value;
+							for (var value in fieldValue) {
+								parameter += "&userCustom_" + userCustom.id + "=" + fieldValue[value];
+							}
 						}
 					} else if (userCustom.chooseType == 5) { //文本域
 						parameter += "&userCustom_" + userCustom.id + "=" + encodeURIComponent(fieldValue);

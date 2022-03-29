@@ -36,7 +36,11 @@
 		<div class="privateMessageChatTop">
 			<a href="user/control/privateMessageList" class="back-to-list">&lt&lt返回私信列表</a> 
 			<div class="chatInfo">
-				<b>与 <a href="user/control/home?userName=${chatUser.userName}" target="_blank">
+				<b>与 
+					<#if chatUser.account == null || chatUser.account == ''>
+						<span class="cancelAccount">此用户账号已注销</span>
+					</#if>
+					<a href="user/control/home?userName=${chatUser.userName}" target="_blank">
 					${chatUser.account} 
 					<#if chatUser.nickname != null && chatUser.nickname??>
 						(${chatUser.nickname})
@@ -100,7 +104,12 @@
 									if(privateMessage.friendNickname != null && privateMessage.friendNickname != ''){
 										html += "<!--[if !(IE)]><!--><img width='48px' height='48px' avatar='"+_.escape(privateMessage.friendNickname)+"' ><!--<![endif]-->";
 									}else{
-										html += "<!--[if !(IE)]><!--><img width='48px' height='48px' avatar='"+privateMessage.friendAccount+"' ><!--<![endif]-->";
+										if(privateMessage.friendAccount != null && privateMessage.friendAccount != ''){
+											html += "<!--[if !(IE)]><!--><img width='48px' height='48px' avatar='"+privateMessage.friendAccount+"' ><!--<![endif]-->";
+										}else{
+											html += "<!--[if !(IE)]><!--><img width='48px' height='48px' avatar='' ><!--<![endif]-->";
+										}
+									
 									}
 
 								}
@@ -110,7 +119,12 @@
 								if (privateMessage.friendNickname != null && privateMessage.friendNickname){//如果有呢称则显示呢称
 									html += 			"<a class='userName' href='user/control/privateMessageChatList?friendUserName="+privateMessage.friendUserName+"'>"+_.escape(privateMessage.friendNickname)+"</a>";
 								}else{
-									html += 			"<a class='userName' href='user/control/privateMessageChatList?friendUserName="+privateMessage.friendUserName+"'>"+privateMessage.friendAccount+"</a>";
+									if(privateMessage.friendAccount != null && privateMessage.friendAccount != ''){
+										html += 		"<a class='userName' href='user/control/privateMessageChatList?friendUserName="+privateMessage.friendUserName+"'>"+privateMessage.friendAccount+"</a>";
+									}else{
+										html += 		"<a href='user/control/privateMessageChatList?friendUserName="+privateMessage.friendUserName+"'><span class='cancelAccount'>此用户账号已注销</span></a>";
+									}
+									
 								}
 								
 								html += 		"</div>";

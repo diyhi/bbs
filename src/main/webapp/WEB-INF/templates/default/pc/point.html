@@ -26,8 +26,33 @@
 
 		<#-- 引入服务导航 -->
 		<@include action="${newPublic_4}"/>
-		<!-- 支付日志 -->
-		<div class="dataTable">
+		
+		
+		<!-- 奖励积分信息 -->
+		<div class="rewardPointInfoModule">
+			<span class="text">
+				<span class="name">发表话题奖励积分：</span>${rewardPointInfo.topic_rewardPoint}
+			</span>
+			<span class="text">
+				<span class="name">发表评论奖励积分：</span>${rewardPointInfo.comment_rewardPoint}
+			</span>
+			<span class="text">
+				<span class="name">发表回复奖励积分：</span>${rewardPointInfo.reply_rewardPoint}
+			</span>
+			<span class="text">
+				<span class="name">提交问题奖励积分：</span>${rewardPointInfo.question_rewardPoint}
+			</span>
+			<span class="text">
+				<span class="name">提交答案奖励积分：</span>${rewardPointInfo.answer_rewardPoint}
+			</span>
+			<span class="text">
+				<span class="name">提交答案回复奖励积分：</span>${rewardPointInfo.answerReply_rewardPoint}
+			</span>
+		</div>
+		<div class="clearfix" style="height: 10px;background: #f8f8f9;"></div>
+		
+		<!-- 积分日志 -->
+		<div class="dataTable pointLogModule">
 			<TABLE class="dataList" width="100%">
 				<THEAD>
 					<TR class="dataThead">
@@ -90,10 +115,14 @@
 		    		</#if> 
 		    	</TBODY>
 			</TABLE>
-			<DIV class=pageList>
+			<DIV class="pageList pointLogPage">
 				<@include action="${newPublic_1}"/>
 			</DIV>
 		</div>
+		
+		
+		
+		
 		</div>
 	</div>
 	<#--引入页脚-->

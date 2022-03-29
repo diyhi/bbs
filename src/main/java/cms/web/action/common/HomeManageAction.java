@@ -69,6 +69,7 @@ import cms.bean.user.FormCaptcha;
 import cms.bean.user.PointLog;
 import cms.bean.user.RefreshUser;
 import cms.bean.user.ResourceEnum;
+import cms.bean.user.RewardPointInfo;
 import cms.bean.user.User;
 import cms.bean.user.UserCustom;
 import cms.bean.user.UserDynamic;
@@ -625,6 +626,20 @@ public class HomeManageAction {
 			returnValue.put("user",viewUser);
 		}
 		
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting != null){
+			RewardPointInfo rewardPointInfo = new RewardPointInfo();
+			rewardPointInfo.setTopic_rewardPoint(systemSetting.getTopic_rewardPoint());
+			rewardPointInfo.setComment_rewardPoint(systemSetting.getComment_rewardPoint());
+			rewardPointInfo.setReply_rewardPoint(systemSetting.getReply_rewardPoint());
+			rewardPointInfo.setQuestion_rewardPoint(systemSetting.getQuestion_rewardPoint());
+			rewardPointInfo.setAnswer_rewardPoint(systemSetting.getAnswer_rewardPoint());
+			rewardPointInfo.setAnswerReply_rewardPoint(systemSetting.getAnswerReply_rewardPoint());
+
+			model.addAttribute("rewardPointInfo",rewardPointInfo);
+			returnValue.put("rewardPointInfo",rewardPointInfo);
+			
+		}
 		
 		if(isAjax == true){
 			WebUtil.writeToWeb(JsonUtils.toJSONString(returnValue), "json", response);
@@ -2390,11 +2405,13 @@ public class HomeManageAction {
 					User friend_user = userMap.get(privateMessage.getFriendUserId());
 					if(friend_user != null){
 						privateMessage.setFriendUserName(friend_user.getUserName());//私信对方用户名称
-						privateMessage.setFriendAccount(friend_user.getAccount());
-						privateMessage.setFriendNickname(friend_user.getNickname());
-						if(friend_user.getAvatarName() != null && !"".equals(friend_user.getAvatarName().trim())){
-							privateMessage.setFriendAvatarPath(fileManage.fileServerAddress()+friend_user.getAvatarPath());//私信对方头像路径
-							privateMessage.setFriendAvatarName(friend_user.getAvatarName());//私信对方头像名称
+						if(friend_user.getCancelAccountTime().equals(-1L)){
+							privateMessage.setFriendAccount(friend_user.getAccount());
+							privateMessage.setFriendNickname(friend_user.getNickname());
+							if(friend_user.getAvatarName() != null && !"".equals(friend_user.getAvatarName().trim())){
+								privateMessage.setFriendAvatarPath(fileManage.fileServerAddress()+friend_user.getAvatarPath());//私信对方头像路径
+								privateMessage.setFriendAvatarName(friend_user.getAvatarName());//私信对方头像名称
+							}	
 						}			
 					}
 					User sender_user = userMap.get(privateMessage.getSenderUserId());
@@ -2526,11 +2543,13 @@ public class HomeManageAction {
 							User sender_user = userMap.get(privateMessage.getSenderUserId());
 							if(sender_user != null){
 								privateMessage.setSenderUserName(sender_user.getUserName());//私信发送者用户名称
-								privateMessage.setSenderAccount(sender_user.getAccount());
-								privateMessage.setSenderNickname(sender_user.getNickname());
-								if(sender_user.getAvatarName() != null && !"".equals(sender_user.getAvatarName().trim())){
-									privateMessage.setSenderAvatarPath(fileManage.fileServerAddress()+sender_user.getAvatarPath());//发送者头像路径
-									privateMessage.setSenderAvatarName(sender_user.getAvatarName());//发送者头像名称
+								if(sender_user.getCancelAccountTime().equals(-1L)){
+									privateMessage.setSenderAccount(sender_user.getAccount());
+									privateMessage.setSenderNickname(sender_user.getNickname());
+									if(sender_user.getAvatarName() != null && !"".equals(sender_user.getAvatarName().trim())){
+										privateMessage.setSenderAvatarPath(fileManage.fileServerAddress()+sender_user.getAvatarPath());//发送者头像路径
+										privateMessage.setSenderAvatarName(sender_user.getAvatarName());//发送者头像名称
+									}
 								}
 							}
 							
@@ -2556,26 +2575,30 @@ public class HomeManageAction {
 		}
 		
 		if(chatUser != null){
-			//仅显示指定的字段
-			User viewUser = new User();
-			viewUser.setId(chatUser.getId());
-			viewUser.setUserName(chatUser.getUserName());//会员用户名
-			viewUser.setAccount(chatUser.getAccount());//账号
-			viewUser.setNickname(chatUser.getNickname());//呢称
-			viewUser.setRegistrationDate(chatUser.getRegistrationDate());//注册日期
-
-			List<UserGrade> userGradeList = userGradeService.findAllGrade_cache();//取得用户所有等级
-			if(userGradeList != null && userGradeList.size() >0){
-				for(UserGrade userGrade : userGradeList){
-					if(chatUser.getPoint() >= userGrade.getNeedPoint()){
-						viewUser.setGradeId(userGrade.getId());//等级Id
-						viewUser.setGradeName(userGrade.getName());//将等级值设进等级参数里
-						break;
-					}
-				} 
+			if(chatUser.getCancelAccountTime().equals(-1L)){
+				//仅显示指定的字段
+				User viewUser = new User();
+				viewUser.setId(chatUser.getId());
+				viewUser.setUserName(chatUser.getUserName());//会员用户名
+				viewUser.setAccount(chatUser.getAccount());//账号
+				viewUser.setNickname(chatUser.getNickname());//呢称
+				viewUser.setRegistrationDate(chatUser.getRegistrationDate());//注册日期
+	
+				List<UserGrade> userGradeList = userGradeService.findAllGrade_cache();//取得用户所有等级
+				if(userGradeList != null && userGradeList.size() >0){
+					for(UserGrade userGrade : userGradeList){
+						if(chatUser.getPoint() >= userGrade.getNeedPoint()){
+							viewUser.setGradeId(userGrade.getId());//等级Id
+							viewUser.setGradeName(userGrade.getName());//将等级值设进等级参数里
+							break;
+						}
+					} 
+				}
+	
+				chatUser = viewUser;
+			}else{
+				chatUser = null;
 			}
-
-			chatUser = viewUser;
 		}
 		
 		
@@ -3389,7 +3412,7 @@ public class HomeManageAction {
 					for(Remind remind : qr.getResultlist()){
 						
 						User sender_user = userMap.get(remind.getSenderUserId());
-						if(sender_user != null){
+						if(sender_user != null && sender_user.getCancelAccountTime().equals(-1L)){
 							remind.setSenderUserName(sender_user.getUserName());//发送者用户名称
 							remind.setSenderAccount(sender_user.getAccount());//发送者账号
 							remind.setSenderNickname(sender_user.getNickname());
@@ -3571,13 +3594,15 @@ public class HomeManageAction {
 	  						favorites.setTopicTitle(topic.getTitle());
 	  					}
 	  					User user = userManage.query_cache_findUserByUserName(favorites.getUserName());
-	  					if(user != null){
+	  					if(user != null && user.getCancelAccountTime().equals(-1L)){
 	  						favorites.setAccount(user.getAccount());
 	  						favorites.setNickname(user.getNickname());
 							if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
 								favorites.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());//头像路径
 								favorites.setAvatarName(user.getAvatarName());//头像名称
 							}
+						}else{
+							favorites.setUserName(null);
 						}
 	  				}
 	  			}
@@ -3639,13 +3664,15 @@ public class HomeManageAction {
 	  						favorites.setQuestionTitle(question.getTitle());
 	  					}
 	  					User user = userManage.query_cache_findUserByUserName(favorites.getUserName());
-	  					if(user != null){
+	  					if(user != null && user.getCancelAccountTime().equals(-1L)){
 	  						favorites.setAccount(user.getAccount());
 	  						favorites.setNickname(user.getNickname());
 							if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
 								favorites.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());//头像路径
 								favorites.setAvatarName(user.getAvatarName());//头像名称
 							}
+						}else{
+							favorites.setUserName(null);
 						}
 	  				}
 	  			}
@@ -3902,11 +3929,13 @@ public class HomeManageAction {
 	  			if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
 	  				for(TopicUnhide topicUnhide : qr.getResultlist()){
 	  					User user = userManage.query_cache_findUserByUserName(topicUnhide.getUserName());
-						if(user != null){
+	  					if(user != null && user.getCancelAccountTime().equals(-1L)){
 							topicUnhide.setAccount(user.getAccount());
 							topicUnhide.setNickname(user.getNickname());
 							topicUnhide.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 							topicUnhide.setAvatarName(user.getAvatarName());
+						}else{
+							topicUnhide.setUserName(null);
 						}
 	  				}
 	  			}
@@ -4302,14 +4331,16 @@ public class HomeManageAction {
 	  						like.setTopicTitle(topic.getTitle());
 	  					}
 	  					User user = userManage.query_cache_findUserByUserName(like.getUserName());
-	  					if(user != null){
-	  						like.setAccount(user.getAccount());
+	  					if(user != null && user.getCancelAccountTime().equals(-1L)){
+  							like.setAccount(user.getAccount());
 	  						like.setNickname(user.getNickname());
 							if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
 								like.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());//头像路径
 								like.setAvatarName(user.getAvatarName());//头像名称
 							}
-						}
+  						}else{
+  							like.setUserName(null);
+  						}
 	  				}
 	  			}
 	  			//将查询结果集传给分页List
@@ -4531,13 +4562,15 @@ public class HomeManageAction {
 		if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
 			for(Follow follow : qr.getResultlist()){
 				User user = userManage.query_cache_findUserByUserName(follow.getFriendUserName());//查询缓存
-				if(user != null){
+				if(user != null && user.getCancelAccountTime().equals(-1L)){
 					follow.setFriendAccount(user.getAccount());
 					follow.setFriendNickname(user.getNickname());
 					if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
 						follow.setFriendAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 						follow.setFriendAvatarName(user.getAvatarName());
 					}		
+				}else{
+					follow.setFriendUserName(null);
 				}
 			}
 		}
@@ -4586,13 +4619,15 @@ public class HomeManageAction {
 		if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
 			for(Follower follower : qr.getResultlist()){
 				User user = userManage.query_cache_findUserByUserName(follower.getFriendUserName());//查询缓存
-				if(user != null){
+				if(user != null && user.getCancelAccountTime().equals(-1L)){
 					follower.setFriendAccount(user.getAccount());
 					follower.setFriendNickname(user.getNickname());
 					if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
 						follower.setFriendAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
 						follower.setFriendAvatarName(user.getAvatarName());
 					}		
+				}else{
+					follower.setFriendUserName(null);
 				}
 			}
 		}
@@ -5194,7 +5229,7 @@ public class HomeManageAction {
 				//排序
 				boolean sort = false;//true:正序 false:倒序
 				
-				QueryResult<ReceiveRedEnvelope> qr = redEnvelopeManage.queryReceiveRedEnvelopeByCondition(giveRedEnvelope,false,firstindex, pageView.getMaxresult(),sort);
+				QueryResult<ReceiveRedEnvelope> qr = redEnvelopeManage.queryReceiveRedEnvelopeByCondition(giveRedEnvelope,false,firstindex, pageView.getMaxresult(),sort,false);
 				    
 				if(giveRedEnvelope.getBindTopicId() != null && giveRedEnvelope.getBindTopicId() >0L){
 					Topic topic = topicManage.queryTopicCache(giveRedEnvelope.getBindTopicId());//查询缓存
@@ -5254,7 +5289,7 @@ public class HomeManageAction {
 		if(qr.getResultlist() != null && qr.getResultlist().size() >0){
 			for(ReceiveRedEnvelope receiveRedEnvelope : qr.getResultlist()){
 				User user = userManage.query_cache_findUserById(receiveRedEnvelope.getGiveUserId());
-        		if(user != null){
+				if(user != null && user.getCancelAccountTime().equals(-1L)){
         			receiveRedEnvelope.setGiveNickname(user.getNickname());
         			receiveRedEnvelope.setGiveUserName(user.getUserName());
         			receiveRedEnvelope.setGiveAccount(user.getAccount());

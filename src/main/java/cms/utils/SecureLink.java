@@ -82,4 +82,24 @@ public class SecureLink {
 	    .build().toString();
 		return newLink;
 	}
+	
+	/**
+	 * 生成安全URI
+	 * @param link 链接 例如 http://127.0.0.1/bbs-bucket/file/topic/2020-10-11/file/6197f199f6234f2791416282d94a805cb1.rar
+	 * @param fileName 文件名称
+	 * @param secret 密钥
+	 * @param expires 有效时间 单位/秒
+	 * @return
+	 */
+	public static String createSecureLink(String link,String secret,Long expires){
+		String uri = UriComponentsBuilder.fromUriString(link).build().getPath();
+		String time = String.valueOf((System.currentTimeMillis() / 1000) + expires);
+		String md5 = org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(DigestUtils.md5(secret +  uri + time));
+		
+		String newLink = UriComponentsBuilder.fromUriString(link)
+	    .replaceQueryParam("md5", md5)
+	    .replaceQueryParam("expires", time)
+	    .build().toString();
+		return newLink;
+	}
 }

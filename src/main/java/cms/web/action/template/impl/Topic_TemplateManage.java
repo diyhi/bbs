@@ -219,12 +219,36 @@ public class Topic_TemplateManage {
 		if(qr.getResultlist() != null && qr.getResultlist().size() >0){
 			SystemSetting systemSetting = settingService.findSystemSetting_cache();
 			
-			
 			for(Topic topic : qr.getResultlist()){
+
+				//话题内容隐藏标签MD5
+				String topicContentDigest_link = "";
+				String topicContentDigest_video = "";
+				String topicContentDigest_hide = "";
+				
+				String processContent = topic.getContent();
+				
+				
+				//处理隐藏标签
+				if(processContent != null && !"".equals(processContent.trim())){
+					List<Integer> visibleTagList = this.getVisibleTagList(accessUser,topic);
+					
+					
+					Integer topicContentUpdateMark = topicManage.query_cache_markUpdateTopicStatus(topic.getId(), Integer.parseInt(RandomStringUtils.randomNumeric(8)));
+					
+					//生成处理'隐藏标签'Id
+					String processHideTagId = topicManage.createProcessHideTagId(topic.getId(),topicContentUpdateMark, visibleTagList);
+					
+					//处理隐藏标签
+					processContent = topicManage.query_cache_processHiddenTag(processContent,visibleTagList,processHideTagId+"|"+topicContentDigest_link+"|"+ topicContentDigest_video);
+					
+					topicContentDigest_hide = cms.utils.MD5.getMD5(processHideTagId);
+				}
+				
 				//处理视频播放器标签
-				if(topic.getContent() != null && !"".equals(topic.getContent().trim())){
+				if(processContent != null && !"".equals(processContent.trim())){
 					//处理富文本路径
-					topic.setContent(fileManage.processRichTextFilePath(topic.getContent(),"topic"));
+					processContent = fileManage.processRichTextFilePath(processContent,"topic");
 					
 					Integer topicContentUpdateMark = topicManage.query_cache_markUpdateTopicStatus(topic.getId(), Integer.parseInt(RandomStringUtils.randomNumeric(8)));
 					
@@ -232,13 +256,11 @@ public class Topic_TemplateManage {
 					String processVideoPlayerId = mediaProcessQueueManage.createProcessVideoPlayerId(topic.getId(),topicContentUpdateMark);
 					
 					//处理视频信息
-					List<MediaInfo> mediaInfoList = mediaProcessQueueManage.query_cache_processVideoInfo(topic.getContent(),processVideoPlayerId,topic.getTagId(),systemSetting.getFileSecureLinkSecret());
-					
+					List<MediaInfo> mediaInfoList = mediaProcessQueueManage.query_cache_processVideoInfo(processContent,processVideoPlayerId+"|"+topicContentDigest_hide,topic.getTagId(),systemSetting.getFileSecureLinkSecret());
 					topic.setMediaInfoList(mediaInfoList);
 					
 				}
 			}
-			
 			
 			//查询标签名称
 			List<Tag> tagList = tagService.findAllTag_cache();
@@ -329,6 +351,7 @@ public class Topic_TemplateManage {
 					entry.setValue(flag);
 				}
 			}
+			
 			
 			for(Topic topic : qr.getResultlist()){
 				if(topic.getIsStaff() == false){//会员

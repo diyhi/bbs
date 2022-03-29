@@ -336,7 +336,7 @@ export default({
 			
 			_self.$ajax({
 		        method: 'post',
-		        url: 'control/help/manage?method=add',
+		        url: 'control/help/manage?method=add&t=',
 		        data: formData
 			})
 			.then(function (response) {

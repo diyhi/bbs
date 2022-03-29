@@ -279,8 +279,9 @@ public class RedEnvelopeManage {
      * @param firstIndex 索引开始,即从哪条记录开始
 	 * @param maxResult 获取多少条数据
 	 * @param sort 排序 true:正序 false:倒序
+	 * @param isCancelAccountInfo 是否显示注销用户信息
      */
-    public QueryResult<ReceiveRedEnvelope> queryReceiveRedEnvelopeByCondition(GiveRedEnvelope giveRedEnvelope,boolean includeNotReceive,int firstIndex, int maxResult,boolean sort){
+    public QueryResult<ReceiveRedEnvelope> queryReceiveRedEnvelopeByCondition(GiveRedEnvelope giveRedEnvelope,boolean includeNotReceive,int firstIndex, int maxResult,boolean sort,boolean isCancelAccountInfo){
     	List<ReceiveRedEnvelope> receiveRedEnvelopeList = new ArrayList<ReceiveRedEnvelope>();
     	if(giveRedEnvelope.getType().equals(20)){//20.公共随机红包(随机金额)
     		if(includeNotReceive){//如果包含未领取红包
@@ -345,13 +346,16 @@ public class RedEnvelopeManage {
     			User user = userManage.query_cache_findUserById(receiveRedEnvelope.getReceiveUserId());
     			
     			if(user != null){
-    				receiveRedEnvelope.setReceiveAccount(user.getAccount());
-        			receiveRedEnvelope.setReceiveNickname(user.getNickname());
-        			receiveRedEnvelope.setReceiveUserName(user.getUserName());
-        			if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-        				receiveRedEnvelope.setReceiveAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
-        				receiveRedEnvelope.setReceiveAvatarName(user.getAvatarName());
-        			}	
+    				receiveRedEnvelope.setReceiveUserName(user.getUserName());
+    				if(isCancelAccountInfo || user.getCancelAccountTime().equals(-1L)){
+    					receiveRedEnvelope.setReceiveAccount(user.getAccount());
+            			receiveRedEnvelope.setReceiveNickname(user.getNickname());
+            			
+            			if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
+            				receiveRedEnvelope.setReceiveAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+            				receiveRedEnvelope.setReceiveAvatarName(user.getAvatarName());
+            			}
+    				}
         			ReceiveRedEnvelope valid_receiveRedEnvelope = redEnvelopeService.findByReceiveRedEnvelopeId(this.createReceiveRedEnvelopeId(giveRedEnvelope.getId(),user.getId()));
         			if(valid_receiveRedEnvelope != null){
         				receiveRedEnvelope.setReceiveTime(valid_receiveRedEnvelope.getReceiveTime());

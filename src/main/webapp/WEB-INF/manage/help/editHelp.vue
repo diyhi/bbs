@@ -352,7 +352,7 @@ export default({
 			
 			_self.$ajax({
 		        method: 'post',
-		        url: 'control/help/manage?method=edit',
+		        url: 'control/help/manage?method=edit&t=',
 		        data: formData
 			})
 			.then(function (response) {

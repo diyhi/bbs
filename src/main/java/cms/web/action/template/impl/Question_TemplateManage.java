@@ -286,6 +286,7 @@ public class Question_TemplateManage {
 					question.setAvatarName(null);
 					question.setUserRoleNameList(new ArrayList<String>());
 					question.setTitle("");
+					question.setSummary("");
 					question.setContent("");
 					question.getAppendQuestionItemList().clear();
 				}

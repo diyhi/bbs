@@ -1987,20 +1987,35 @@ export default({
 				if( _self.page_Forum_TopicRelated_Topic.page_topic_tagId != undefined){
 					formData.append('page_topic_tagId', _self.page_Forum_TopicRelated_Topic.page_topic_tagId);
 				}
-				
-				formData.append('page_topic_tag_transferPrameter', _self.page_Forum_TopicRelated_Topic.page_topic_tag_transferPrameter);
-				formData.append('page_topic_sort', _self.page_Forum_TopicRelated_Topic.page_topic_sort);
-				formData.append('page_topic_maxResult', _self.page_Forum_TopicRelated_Topic.page_topic_maxResult);
-				formData.append('page_topic_pageCount', _self.page_Forum_TopicRelated_Topic.page_topic_pageCount);
+				if(_self.page_Forum_TopicRelated_Topic.page_topic_tag_transferPrameter != null){
+					formData.append('page_topic_tag_transferPrameter', _self.page_Forum_TopicRelated_Topic.page_topic_tag_transferPrameter);
+				}
+				if(_self.page_Forum_TopicRelated_Topic.page_topic_sort != null){
+					formData.append('page_topic_sort', _self.page_Forum_TopicRelated_Topic.page_topic_sort);
+				}
+				if(_self.page_Forum_TopicRelated_Topic.page_topic_maxResult != null){
+					formData.append('page_topic_maxResult', _self.page_Forum_TopicRelated_Topic.page_topic_maxResult);
+				}
+				if(_self.page_Forum_TopicRelated_Topic.page_topic_pageCount != null){
+					formData.append('page_topic_pageCount', _self.page_Forum_TopicRelated_Topic.page_topic_pageCount);
+				}
 			}
 			
 			if(_self.forumType == '话题' && _self.forumChildType == '评论列表' && _self.displayType == '分页'){
-				formData.append('page_comment_sort', _self.page_Forum_CommentRelated_Comment.page_comment_sort);
-				formData.append('page_comment_maxResult', _self.page_Forum_CommentRelated_Comment.page_comment_maxResult);
-				formData.append('page_comment_pageCount', _self.page_Forum_CommentRelated_Comment.page_comment_pageCount);
+				if(_self.page_Forum_TopicRelated_Topic.page_topic_tag_transferPrameter != null){
+					formData.append('page_comment_sort', _self.page_Forum_CommentRelated_Comment.page_comment_sort);
+				}
+				if(_self.page_Forum_CommentRelated_Comment.page_comment_maxResult != null){
+					formData.append('page_comment_maxResult', _self.page_Forum_CommentRelated_Comment.page_comment_maxResult);
+				}
+				if(_self.page_Forum_CommentRelated_Comment.page_comment_pageCount != null){
+					formData.append('page_comment_pageCount', _self.page_Forum_CommentRelated_Comment.page_comment_pageCount);
+				}
 			}
 			if(_self.forumType == '话题' && _self.forumChildType == '相似话题' && _self.displayType == '集合'){
-				formData.append('collection_likeTopic_maxResult', _self.collection_Forum_TopicRelated_LikeTopic.collection_likeTopic_maxResult);
+				if(_self.collection_Forum_TopicRelated_LikeTopic.collection_likeTopic_maxResult != null){
+					formData.append('collection_likeTopic_maxResult', _self.collection_Forum_TopicRelated_LikeTopic.collection_likeTopic_maxResult);
+				}
 			}
 			if(_self.forumType == '问答' && _self.forumChildType == '问题列表' && _self.displayType == '分页'){
 				if(_self.page_Forum_QuestionRelated_Question.tagIdGroup != null && _self.page_Forum_QuestionRelated_Question.tagIdGroup.length >0){
@@ -2010,25 +2025,54 @@ export default({
 						break;
 					}
 				}
-				formData.append('page_question_tag_transferPrameter', _self.page_Forum_QuestionRelated_Question.page_question_tag_transferPrameter);
-				formData.append('page_question_sort', _self.page_Forum_QuestionRelated_Question.page_question_sort);
-				formData.append('page_question_filterCondition', _self.page_Forum_QuestionRelated_Question.page_question_filterCondition);
-				formData.append('page_question_filterCondition_transferPrameter', _self.page_Forum_QuestionRelated_Question.page_question_filterCondition_transferPrameter);
-				formData.append('page_question_sort', _self.page_Forum_QuestionRelated_Question.page_question_sort);
-				formData.append('page_question_maxResult', _self.page_Forum_QuestionRelated_Question.page_question_maxResult);
-				formData.append('page_question_pageCount', _self.page_Forum_QuestionRelated_Question.page_question_pageCount);
+				if(_self.page_Forum_QuestionRelated_Question.page_question_tag_transferPrameter != null){
+					formData.append('page_question_tag_transferPrameter', _self.page_Forum_QuestionRelated_Question.page_question_tag_transferPrameter);
+				}
+				if(_self.page_Forum_QuestionRelated_Question.page_question_sort != null){
+					formData.append('page_question_sort', _self.page_Forum_QuestionRelated_Question.page_question_sort);
+				}
+				if(_self.page_Forum_QuestionRelated_Question.page_question_filterCondition != null){
+					formData.append('page_question_filterCondition', _self.page_Forum_QuestionRelated_Question.page_question_filterCondition);
+				}
+				if(_self.page_Forum_QuestionRelated_Question.page_question_filterCondition_transferPrameter != null){
+					formData.append('page_question_filterCondition_transferPrameter', _self.page_Forum_QuestionRelated_Question.page_question_filterCondition_transferPrameter);
+				}
+				if(_self.page_Forum_QuestionRelated_Question.page_question_sort != null){
+					formData.append('page_question_sort', _self.page_Forum_QuestionRelated_Question.page_question_sort);
+				}
+				if( _self.page_Forum_QuestionRelated_Question.page_question_maxResult != null){
+					formData.append('page_question_maxResult', _self.page_Forum_QuestionRelated_Question.page_question_maxResult);
+				}
+				if(_self.page_Forum_QuestionRelated_Question.page_question_pageCount != null){
+					formData.append('page_question_pageCount', _self.page_Forum_QuestionRelated_Question.page_question_pageCount);
+				}
+				
 			}
 			if(_self.forumType == '问答' && _self.forumChildType == '答案列表' && _self.displayType == '分页'){
-				formData.append('page_answer_sort', _self.page_Forum_AnswerRelated_Answer.page_answer_sort);
-				formData.append('page_answer_maxResult', _self.page_Forum_AnswerRelated_Answer.page_answer_maxResult);
-				formData.append('page_answer_pageCount', _self.page_Forum_AnswerRelated_Answer.page_answer_pageCount);
+				if(_self.page_Forum_AnswerRelated_Answer.page_answer_sort != null){
+					formData.append('page_answer_sort', _self.page_Forum_AnswerRelated_Answer.page_answer_sort);
+				}
+				if(_self.page_Forum_AnswerRelated_Answer.page_answer_maxResult != null){
+					formData.append('page_answer_maxResult', _self.page_Forum_AnswerRelated_Answer.page_answer_maxResult);
+				}
+				if(_self.page_Forum_AnswerRelated_Answer.page_answer_pageCount != null){
+					formData.append('page_answer_pageCount', _self.page_Forum_AnswerRelated_Answer.page_answer_pageCount);
+				}
+				
 			}
 			if(_self.forumType == '问答' && _self.forumChildType == '相似问题' && _self.displayType == '集合'){
-				formData.append('collection_likeQuestion_maxResult', _self.collection_Forum_QuestionRelated_LikeQuestion.collection_likeQuestion_maxResult);
+				if(_self.collection_Forum_QuestionRelated_LikeQuestion.collection_likeQuestion_maxResult != null){
+					formData.append('collection_likeQuestion_maxResult', _self.collection_Forum_QuestionRelated_LikeQuestion.collection_likeQuestion_maxResult);
+				}
 			}
 			if(_self.forumType == '红包' && _self.forumChildType == '领取红包用户列表' && _self.displayType == '分页'){
-				formData.append('page_receiveRedEnvelopeUser_sort', _self.page_Forum_RedEnvelopeRelated_ReceiveRedEnvelopeUser.page_receiveRedEnvelopeUser_sort);
-				formData.append('page_receiveRedEnvelopeUser_maxResult', _self.page_Forum_RedEnvelopeRelated_ReceiveRedEnvelopeUser.page_receiveRedEnvelopeUser_maxResult);
+				if(_self.page_Forum_RedEnvelopeRelated_ReceiveRedEnvelopeUser.page_receiveRedEnvelopeUser_sort != null){
+					formData.append('page_receiveRedEnvelopeUser_sort', _self.page_Forum_RedEnvelopeRelated_ReceiveRedEnvelopeUser.page_receiveRedEnvelopeUser_sort);
+				}
+				if(_self.page_Forum_RedEnvelopeRelated_ReceiveRedEnvelopeUser.page_receiveRedEnvelopeUser_maxResult != null){
+					formData.append('page_receiveRedEnvelopeUser_maxResult', _self.page_Forum_RedEnvelopeRelated_ReceiveRedEnvelopeUser.page_receiveRedEnvelopeUser_maxResult);
+				}
+				
 			}
 			if(_self.forumType == '广告' && _self.forumChildType == '图片广告' && _self.displayType == '集合'){
 				for(let i=0; i<_self.collection_Forum_AdvertisingRelated_imageList.tableList.length; i++){
@@ -2074,12 +2118,25 @@ export default({
 						break;
 					}
 				}
-				formData.append('monolayer_help_helpType_transferPrameter', _self.monolayer_Forum_HelpRelated_Help.monolayer_help_helpType_transferPrameter);
-				formData.append('monolayer_help_quantity', _self.monolayer_Forum_HelpRelated_Help.monolayer_help_quantity);
-				formData.append('monolayer_help_more', _self.monolayer_Forum_HelpRelated_Help.monolayer_help_more);
-				formData.append('monolayer_help_maxResult', _self.monolayer_Forum_HelpRelated_Help.monolayer_help_maxResult);
-				formData.append('monolayer_help_pageCount', _self.monolayer_Forum_HelpRelated_Help.monolayer_help_pageCount);
-				formData.append('monolayer_help_sort', _self.monolayer_Forum_HelpRelated_Help.monolayer_help_sort);
+				if(_self.monolayer_Forum_HelpRelated_Help.monolayer_help_helpType_transferPrameter != null){
+					formData.append('monolayer_help_helpType_transferPrameter', _self.monolayer_Forum_HelpRelated_Help.monolayer_help_helpType_transferPrameter);
+				}
+				if(_self.monolayer_Forum_HelpRelated_Help.monolayer_help_quantity != null){
+					formData.append('monolayer_help_quantity', _self.monolayer_Forum_HelpRelated_Help.monolayer_help_quantity);
+				}
+				if(_self.monolayer_Forum_HelpRelated_Help.monolayer_help_more != null){
+					formData.append('monolayer_help_more', _self.monolayer_Forum_HelpRelated_Help.monolayer_help_more);
+				}
+				if(_self.monolayer_Forum_HelpRelated_Help.monolayer_help_maxResult != null){
+					formData.append('monolayer_help_maxResult', _self.monolayer_Forum_HelpRelated_Help.monolayer_help_maxResult);
+				}
+				if(_self.monolayer_Forum_HelpRelated_Help.monolayer_help_pageCount != null){
+					formData.append('monolayer_help_pageCount', _self.monolayer_Forum_HelpRelated_Help.monolayer_help_pageCount);
+				}
+				if(_self.monolayer_Forum_HelpRelated_Help.monolayer_help_sort != null){
+					formData.append('monolayer_help_sort', _self.monolayer_Forum_HelpRelated_Help.monolayer_help_sort);
+				}
+				
 			}
 			if(_self.forumType == '在线帮助' && _self.forumChildType == '在线帮助列表' && _self.displayType == '分页'){
 				if(_self.page_Forum_HelpRelated_Help.helpTypeIdGroup != null && _self.page_Forum_HelpRelated_Help.helpTypeIdGroup.length >0){
@@ -2089,10 +2146,19 @@ export default({
 						break;
 					}
 				}
-				formData.append('page_help_helpType_transferPrameter', _self.page_Forum_HelpRelated_Help.page_help_helpType_transferPrameter);
-				formData.append('page_help_maxResult', _self.page_Forum_HelpRelated_Help.page_help_maxResult);
-				formData.append('page_help_pageCount', _self.page_Forum_HelpRelated_Help.page_help_pageCount);
-				formData.append('page_help_sort', _self.page_Forum_HelpRelated_Help.page_help_sort);
+				if(_self.page_Forum_HelpRelated_Help.page_help_helpType_transferPrameter != null){
+					formData.append('page_help_helpType_transferPrameter', _self.page_Forum_HelpRelated_Help.page_help_helpType_transferPrameter);
+				}
+				if(_self.page_Forum_HelpRelated_Help.page_help_maxResult != null){
+					formData.append('page_help_maxResult', _self.page_Forum_HelpRelated_Help.page_help_maxResult);
+				}
+				if(_self.page_Forum_HelpRelated_Help.page_help_pageCount != null){
+					formData.append('page_help_pageCount', _self.page_Forum_HelpRelated_Help.page_help_pageCount);
+				}
+				if(_self.page_Forum_HelpRelated_Help.page_help_sort != null){
+					formData.append('page_help_sort', _self.page_Forum_HelpRelated_Help.page_help_sort);
+				}
+				
 			}
 			if(_self.forumType == '在线帮助' && _self.forumChildType == '推荐在线帮助' && _self.displayType == '集合'){
 				if(_self.collection_Forum_HelpRelated_RecommendHelp.tableList != null && _self.collection_Forum_HelpRelated_RecommendHelp.tableList.length >0){	

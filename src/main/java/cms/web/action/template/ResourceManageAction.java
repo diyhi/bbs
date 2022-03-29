@@ -286,6 +286,11 @@ public class ResourceManageAction {
 				formatList.add("txt");
 				formatList.add("css");
 				formatList.add("js");
+				formatList.add("ico");
+				formatList.add("eot");
+				formatList.add("ttf");
+				formatList.add("woff");
+				
 				//允许上传大小
 				long uploadSize = 1024 * 1024 * 200;//单位为字节  
 				

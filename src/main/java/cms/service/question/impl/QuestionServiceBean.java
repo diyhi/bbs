@@ -543,7 +543,10 @@ public class QuestionServiceBean extends DaoSupport<Question> implements Questio
 			//增加用户预存款
 			userService.addUserDeposit(userName, amount, paymentLogObject);
 		}
-		
+		//删除标签关联
+		Query deleteQuestionTagAssociation = em.createQuery("delete from QuestionTagAssociation o where o.questionId=?1")
+			.setParameter(1, questionId);
+		deleteQuestionTagAssociation.executeUpdate();
 		return i;
 	}
 	

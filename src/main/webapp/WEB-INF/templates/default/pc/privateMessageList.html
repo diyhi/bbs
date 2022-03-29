@@ -52,6 +52,9 @@
 									</#if>
 								</a>
 								<cite>
+									<#if privateMessage.friendAccount == null || privateMessage.friendAccount == ''>
+										<span class="cancelAccount">此用户账号已注销</span>
+									</#if>
 									<a href="user/control/home?userName=${privateMessage.friendUserName}">
 									${(privateMessage.friendNickname != null && privateMessage.friendNickname??) ?string(privateMessage.friendNickname , privateMessage.friendAccount)}
 									</a>

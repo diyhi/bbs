@@ -55,6 +55,9 @@
 								</a>
 							</div>
 							<a href="user/control/home?userName=${follower.friendUserName}" target="_blank" class="link userName">
+								<#if follower.friendAccount == null || follower.friendAccount == ''>
+									<span class="cancelAccount">此用户账号已注销</span>
+								</#if> 
 								${follower.friendAccount}
 								<#if follower.friendNickname != null && follower.friendNickname??>    
 									(${follower.friendNickname})

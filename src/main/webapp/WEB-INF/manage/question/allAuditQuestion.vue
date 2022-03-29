@@ -11,12 +11,12 @@
 					<el-table-column prop="title" label="标题" min-width="200">
 						<template #default="scope">
 							{{scope.row.title}}
-							<span v-if="scope.row.giveRedEnvelopeId != null && scope.row.giveRedEnvelopeId != ''" class="redEnvelope">红包</span></c:if>
+							<span v-if="scope.row.giveRedEnvelopeId != null && scope.row.giveRedEnvelopeId != ''" class="redEnvelope">红包</span>
 				    	</template>
 					</el-table-column>
 					<el-table-column label="标签名称" align="center" min-width="100">
 						<template #default="scope">
-				            <span v-for="(questionTagAssociation,index) in scope.row.questionTagAssociationList" class="tag-wrapper tag-spacing tag-color-blue">{{questionTagAssociation.questionTagName}}</span></c:if>
+				            <span v-for="(questionTagAssociation,index) in scope.row.questionTagAssociationList" class="tag-wrapper tag-spacing tag-color-blue">{{questionTagAssociation.questionTagName}}</span>
 				        </template>
 					</el-table-column>
 					<el-table-column label="状态" align="center" width="100">

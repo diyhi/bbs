@@ -11,7 +11,7 @@
 					<el-table-column prop="title" label="话题标题" min-width="200">
 						<template #default="scope">
 							{{scope.row.title}}
-							<span v-if="scope.row.giveRedEnvelopeId != null && scope.row.giveRedEnvelopeId != ''" class="redEnvelope">红包</span></c:if>
+							<span v-if="scope.row.giveRedEnvelopeId != null && scope.row.giveRedEnvelopeId != ''" class="redEnvelope">红包</span>
 				    	</template>
 					</el-table-column>
 					<el-table-column prop="tagName" label="标签名称" align="center" min-width="80"></el-table-column>

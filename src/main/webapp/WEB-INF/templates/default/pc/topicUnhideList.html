@@ -42,7 +42,14 @@
 					<#list pageView.records as topicUnhide>
 					<TR>
 						<TD class="dataTD">
-							<a href="user/control/home?userName=${topicUnhide.userName}" target="_blank" class="link">${topicUnhide.account}</a>
+							<#if topicUnhide.account == null || topicUnhide.account == ''>
+								<div class="cancelAccount">此用户账号已注销</div>
+							<#else>
+								<a href="user/control/home?userName=${topicUnhide.userName}" target="_blank" class="link">${topicUnhide.account}</a>
+								<#if topicUnhide.nickname != null && topicUnhide.nickname??>    
+									(呢称：${topicUnhide.nickname})
+								</#if> 
+							</#if>
 						</TD>
 						<TD class="dataTD">
 							${topicUnhide.cancelTime}	

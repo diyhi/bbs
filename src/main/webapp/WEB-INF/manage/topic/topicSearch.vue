@@ -58,7 +58,7 @@
 				            <span v-html="scope.row.title"></span>
 				            <span class="essence" v-if="scope.row.essence == true">精华</span>
 		                	<span class="top" v-if="scope.row.sort >0">置顶</span>
-				            <span v-if="scope.row.giveRedEnvelopeId != null && scope.row.giveRedEnvelopeId != ''" class="redEnvelope">红包</span></c:if>
+				            <span v-if="scope.row.giveRedEnvelopeId != null && scope.row.giveRedEnvelopeId != ''" class="redEnvelope">红包</span>
 				        </template>
 					</el-table-column>
 					<el-table-column prop="tagName" label="标签名称" align="center" min-width="80"></el-table-column>

@@ -127,7 +127,15 @@
 								
 								for(var i = 0; i<result.records.length; i++){
 									var receiveRedEnvelope = result.records[i];
-									var data = (receiveRedEnvelope.receiveNickname != null && receiveRedEnvelope.receiveNickname !='' ? _.escape(receiveRedEnvelope.receiveNickname) : receiveRedEnvelope.receiveAccount)+" 获得 "+receiveRedEnvelope.amount+" 元";
+									var data = "";
+									
+									if(receiveRedEnvelope.receiveAccount != null && receiveRedEnvelope.receiveAccount != ''){
+										data = (receiveRedEnvelope.receiveNickname != null && receiveRedEnvelope.receiveNickname !='' ? _.escape(receiveRedEnvelope.receiveNickname) : receiveRedEnvelope.receiveAccount)+" 获得 "+receiveRedEnvelope.amount+" 元";
+									
+									}else{
+										data = "此用户账号已注销 获得 "+receiveRedEnvelope.amount+" 元";
+									
+									}
 									var image = receiveRedEnvelope.receiveAvatarPath+"100x100/"+receiveRedEnvelope.receiveAvatarName;
 									if(receiveRedEnvelope.receiveAvatarName != null){
 										html += "<img class='avatar redEnvelopeData' data='"+_.escape(data)+"' src='"+_.escape(image)+"'>";

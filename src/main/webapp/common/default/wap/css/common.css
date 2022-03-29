@@ -264,9 +264,15 @@ html,body{
 	padding:1px 5px;
 	font-size: 12px;
 }
-
+.indexModule .topicList .item .topInfo .top-box .cancelNickname{
+	color: transparent;
+    text-shadow: 0 0 5px rgba(0,0,0,0.4);
+    filter: DXImageTransform.Microsoft.Blur(pixelradius=2);
+    zoom: 1;
+}
 .indexModule .topicList .item .topInfo .bottom-box{font-size:14px;color:#aaa;}
 .indexModule .topicList .item .topInfo .bottom-box .time{font-style:normal;}
+
 
 .indexModule .topicList .item .titleBox{
 	position:relative;
@@ -279,6 +285,20 @@ html,body{
 	-webkit-box-orient: vertical;
 	-webkit-line-clamp: 2;
 	overflow: hidden;
+}
+.indexModule .topicList .item .titleBox .cancelAccount{
+	display: inline-block;
+    vertical-align: middle;
+    padding: 4px 4px;
+    font-size: 14px;
+    line-height: 14px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color: #A9AEB8;
+    background-color: #F7F8FA;
+    position: relative;
+    top: -5px;
 }
 .indexModule .topicList .item .titleBox .title{
 	font-size:16px;
@@ -677,6 +697,12 @@ html,body{
 	padding:1px 5px;
 	font-size: 12px;
 }
+.topicContentModule .head-box .userInfo .left .topInfo .top-box .cancelNickname{
+	color: transparent;
+    text-shadow: 0 0 5px rgba(0,0,0,0.4);
+    filter: DXImageTransform.Microsoft.Blur(pixelradius=2);
+    zoom: 1;
+}
 .topicContentModule .head-box .userInfo .left .topInfo .bottom-box{font-size:14px;color:#aaa;}
 .topicContentModule .head-box .userInfo .left .topInfo .bottom-box .time{font-style:normal;}
 .topicContentModule .head-box .userInfo .right{float:right!important;}
@@ -931,6 +957,18 @@ html,body{
 .topicContentModule .topicDetail .main .lastUpdateTime{
 	text-align: center;line-height: 40px;padding-bottom: 30px;color: #939499;
 }
+.topicContentModule .topicDetail .main .cancelAccount{
+	display: inline-block;
+    vertical-align: middle;
+    padding: 6px 6px;
+    font-size: 14px;
+    line-height: 14px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color: #A9AEB8;
+    background-color: #F7F8FA;
+}
 .topicContentModule .topicDetail .main a{
 	font-size: 15px;
 	line-height: 1.8;
@@ -1110,6 +1148,15 @@ html,body{
 .topicContentModule .commentList .item .head .info h2 .userName{
 	float: left;margin-right: 3px;
 }
+.topicContentModule .commentList .item .head .info .cancelNickname{
+	font-weight:normal;
+	float: left;
+	margin-right: 3px;
+	color: transparent;
+    text-shadow: 0 0 5px rgba(0,0,0,0.4);
+    filter: DXImageTransform.Microsoft.Blur(pixelradius=2);
+    zoom: 1;
+}
 .topicContentModule .commentList .item .head .userTag{
 	float: left;margin-top: -1px;
 }
@@ -1171,6 +1218,20 @@ html,body{
 	margin-bottom: 10px;
 	color:#222;font-size: 15px;
 }
+.topicContentModule .commentList .item .main .cancelAccount{
+	display: inline-block;
+    vertical-align: middle;
+    padding: 4px 4px;
+    font-size: 14px;
+    line-height: 14px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color: #A9AEB8;
+    background-color: #F7F8FA;
+    position: relative;
+    top: -1px;
+}
 .topicContentModule .commentList .item .main .commentContent a{
 	font-size: 15px;
 	color: #26a2ff;
@@ -1198,6 +1259,25 @@ html,body{
 	width: 16px;
 	
 }
+.topicContentModule .commentList .item .main .quote .cancelNickname{
+	color: transparent;
+    text-shadow: 0 0 5px rgba(0,0,0,0.4);
+    filter: DXImageTransform.Microsoft.Blur(pixelradius=2);
+    zoom: 1;
+}
+.topicContentModule .commentList .item .main .quote .cancelAccount{
+	display: inline-block;
+    vertical-align: middle;
+    padding: 4px 4px;
+    font-size: 14px;
+    line-height: 14px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color: #A9AEB8;
+    background-color: #F7F8FA;
+}
+
 .topicContentModule .commentList .replyList {
 	border-top: 1px solid #eee;
 	padding: 10px 0 10px;
@@ -1258,6 +1338,12 @@ html,body{
 
 	float: left;
 }
+.topicContentModule .commentList .replyList .box li .reply-top .cancelNickname{
+	color: transparent;
+    text-shadow: 0 0 5px rgba(0,0,0,0.4);
+    filter: DXImageTransform.Microsoft.Blur(pixelradius=2);
+    zoom: 1;
+}
 .topicContentModule .commentList .replyList .box li .reply-top .userTag{
 	float: left;margin-top: -5px;
 }
@@ -1295,6 +1381,18 @@ html,body{
 	line-height:24px;
 	color:#222;
 	
+}
+.topicContentModule .commentList .replyList .box li .cancelAccount{
+	display: inline-block;
+    vertical-align: middle;
+    padding: 4px 4px;
+    font-size: 14px;
+    line-height: 14px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color: #A9AEB8;
+    background-color: #F7F8FA;
 }
 .topicContentModule .commentList .replyList .link {
 	text-align: right;
@@ -1524,6 +1622,12 @@ html,body{
 	padding:1px 5px;
 	font-size: 12px;
 }
+.askListModule .questionList .item .topInfo .top-box .cancelNickname{
+	color: transparent;
+    text-shadow: 0 0 5px rgba(0,0,0,0.4);
+    filter: DXImageTransform.Microsoft.Blur(pixelradius=2);
+    zoom: 1;
+}
 .askListModule .questionList .item .topInfo .bottom-box{font-size:14px;color:#aaa;}
 .askListModule .questionList .item .topInfo .bottom-box .time{font-style:normal;}
 .askListModule .questionList .item .topInfo .solve{
@@ -1549,6 +1653,18 @@ html,body{
 	-webkit-box-orient: vertical;
 	-webkit-line-clamp: 2;
 	overflow: hidden;
+}
+.askListModule .questionList .item .cancelAccount{
+	display: inline-block;
+    vertical-align: middle;
+    padding: 4px 4px;
+    font-size: 14px;
+    line-height: 14px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color: #A9AEB8;
+    background-color: #F7F8FA;
 }
 .askListModule .questionList .item .summary{
 	
@@ -1653,6 +1769,12 @@ html,body{
 	padding:1px 5px;
 	font-size: 12px;
 }
+.questionContentModule .head-box .userInfo .left .topInfo .top-box .cancelNickname{
+	color: transparent;
+    text-shadow: 0 0 5px rgba(0,0,0,0.4);
+    filter: DXImageTransform.Microsoft.Blur(pixelradius=2);
+    zoom: 1;
+}
 .questionContentModule .head-box .userInfo .left .topInfo .bottom-box{font-size:14px;color:#aaa;}
 .questionContentModule .head-box .userInfo .left .topInfo .bottom-box .time{font-style:normal;}
 .questionContentModule .head-box .userInfo .right{float:right!important;}
@@ -1737,6 +1859,19 @@ html,body{
 .questionContentModule .questionDetail .main .lastUpdateTime{
 	text-align: center;line-height: 40px;padding-bottom: 30px;color: #939499;
 }
+.questionContentModule .questionDetail .main .cancelAccount{
+	display: inline-block;
+    vertical-align: middle;
+    padding: 6px 6px;
+    font-size: 14px;
+    line-height: 14px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color: #A9AEB8;
+    background-color: #F7F8FA;
+}
+
 .questionContentModule .questionDetail .main a{
 	font-size: 15px;
 	line-height: 1.8;
@@ -1887,6 +2022,14 @@ html,body{
 .questionContentModule .answerList .item .head .info h2 .userName{
 	float: left;margin-right: 2px;
 }
+.questionContentModule .answerList .item .head .info h2 .cancelNickname{
+	color: transparent;
+    text-shadow: 0 0 5px rgba(0,0,0,0.4);
+    filter: DXImageTransform.Microsoft.Blur(pixelradius=2);
+    zoom: 1;
+    float: left;margin-right: 4px;font-weight:normal;
+}
+
 .questionContentModule .answerList .item .head .userTag{
 	float: left;margin-top: -1px;
 }
@@ -2006,7 +2149,18 @@ html,body{
 	line-height: 26px;
 	margin: 0 0 10px
 }
-
+.questionContentModule .answerList .item .main .cancelAccount{
+	display: inline-block;
+    vertical-align: middle;
+    padding: 4px 4px;
+    font-size: 14px;
+    line-height: 14px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color: #A9AEB8;
+    background-color: #F7F8FA;
+}
 .questionContentModule .answerList .item .main .answerContent {
 	margin-bottom: 10px;
 	color:#222;font-size: 15px;
@@ -2062,7 +2216,16 @@ html,body{
 .questionContentModule .answerList .replyList .box li .reply-top{
 	height: 23px;
 }
+.questionContentModule .answerList .replyList .box li .reply-top .cancelNickname{
+	color: transparent;
+    text-shadow: 0 0 5px rgba(0,0,0,0.4);
+    filter: DXImageTransform.Microsoft.Blur(pixelradius=2);
+    zoom: 1;
+    font-weight:normal;
+    margin-left: 28px;margin-top:-4px;
 
+	float: left;
+}
 
 .questionContentModule .answerList .replyList .box li .reply-top .avatarBox{
 	position:absolute;border-radius:100%;
@@ -2114,6 +2277,18 @@ html,body{
 	line-height:24px;
 	color:#222;
 	
+}
+.questionContentModule .answerList .replyList .box li .cancelAccount{
+	display: inline-block;
+    vertical-align: middle;
+    padding: 4px 4px;
+    font-size: 14px;
+    line-height: 14px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color: #A9AEB8;
+    background-color: #F7F8FA;
 }
 .questionContentModule .answerList .replyList .link {
 	text-align: right;
@@ -3027,7 +3202,7 @@ html,body{
 
 /* 登录 */
 .loginModule{
-	width: 99%;margin-top:40px;  margin-left: auto;margin-right: auto;
+	width: 99%;padding-top: 40px; margin-left: auto;margin-right: auto;
 }
 .loginModule .tabs-nav {
 	font-size:17px;
@@ -3103,6 +3278,11 @@ html,body{
 }
 .loginModule .otherLogin .link .icon-10{
 	background-image:url('../images/weixin.svg');
+	width: 35px;
+	height: 35px;
+}
+.loginModule .otherLogin .link .icon-50{
+	background-image:url('../images/other-login.svg');
 	width: 35px;
 	height: 35px;
 }
@@ -3910,7 +4090,30 @@ html,body{
 	margin-left: 10px;line-height: 18px;margin-bottom: 2px;color:#878787;font-size: 12px;margin-right: 10px;
 }
 
-
+.pointModule .rewardPointInfoModule{
+	min-height:80px;
+	margin-top:8px;
+	margin-left: 8px;
+	margin-right: 8px;
+	margin-bottom: 8px;
+	border-radius: 8px;
+	background: #fcfcfc;
+}
+.pointModule .rewardPointInfoModule .rewardPointInfo{
+	margin-top:8px;
+	margin-left:8px;
+	margin-right:8px;
+}
+.pointModule .rewardPointInfoModule .rewardPointInfo .details {
+	float: left;font-size: 14px;;line-height: 30px;color: #999;margin-left: -8px;
+}
+.pointModule .rewardPointInfoModule .rewardPointInfo .details .text{
+	line-height: 28px;
+	margin-left: 8px;
+}
+.pointModule .rewardPointInfoModule .rewardPointInfo .details .val{
+	margin-left: 8px;margin-right: 20px;
+}
 
 
 /* 实名认证 */
@@ -3964,7 +4167,7 @@ html,body{
 
 /* 修改用户信息 */
 .editUserTable{
-	width: 99%;margin-top:40px;  margin-left: auto;margin-right: auto;
+	width: 99%;padding-top: 40px; margin-left: auto;margin-right: auto;
 }
 .editUserTable ul{
 	
@@ -4035,6 +4238,12 @@ html,body{
 	color:#aaa;
 	font-size:14px;
 	line-height: 16px
+}
+.privateMessageModule .privateMessageList .item .head .info .cancelNickname{
+	color: transparent;
+    text-shadow: 0 0 5px rgba(0,0,0,0.4);
+    filter: DXImageTransform.Microsoft.Blur(pixelradius=2);
+    zoom: 1;
 }
 .privateMessageModule .privateMessageList .item .head .time {
 	font-size: 12px;
@@ -4439,7 +4648,7 @@ html,body{
 	font-size: 14px;
 }
 .systemNotifyModule .systemNotifyList .item .main {
-	padding: 0 8px 0 8px;
+	padding: 0 8px 0 4px;
 	font-size: 16px;
 	line-height: 26px;
 	margin: 0 0 10px
@@ -4531,6 +4740,19 @@ html,body{
 	font-size: 15px;
 	color:#26a2ff;
 }
+.remindModule .remindList .item .main .cancelAccount{
+	display: inline-block;
+    vertical-align: middle;
+    padding: 4px 4px;
+    font-size: 14px;
+    line-height: 14px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color: #A9AEB8;
+    background-color: #F7F8FA;
+}
+
 
 /** 收藏夹 **/
 .favoriteModule{
@@ -5378,6 +5600,12 @@ html,body{
 	float: left;
 	margin-left: 44px;
 }
+.redEnvelopeAmountDistributionListModule .redEnvelopeAmountDistributionList .item .head .info .cancelNickname{
+	color: transparent;
+    text-shadow: 0 0 5px rgba(0,0,0,0.4);
+    filter: DXImageTransform.Microsoft.Blur(pixelradius=2);
+    zoom: 1;
+}
 .redEnvelopeAmountDistributionListModule .redEnvelopeAmountDistributionList .item .head .info h2 {
 	color:#aaa;
 	font-size:14px;
@@ -5387,6 +5615,7 @@ html,body{
 .redEnvelopeAmountDistributionListModule .redEnvelopeAmountDistributionList .item .head .info h2 .userName{
 	float: left;margin-right: 3px;
 }
+
 .redEnvelopeAmountDistributionListModule .redEnvelopeAmountDistributionList .item .head .time {
 	font-size: 12px;
 	color:#aaa;
@@ -5434,6 +5663,12 @@ html,body{
 	display: block;
 	float: left;
 	margin-left: 44px;
+}
+.receiveRedEnvelopeListModule .receiveRedEnvelopeListList .item .head .info .cancelNickname{
+	color: transparent;
+    text-shadow: 0 0 5px rgba(0,0,0,0.4);
+    filter: DXImageTransform.Microsoft.Blur(pixelradius=2);
+    zoom: 1;
 }
 .receiveRedEnvelopeListModule .receiveRedEnvelopeListList .item .head .info h2 {
 	color:#aaa;

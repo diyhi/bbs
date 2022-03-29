@@ -82,7 +82,7 @@
 							<div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
 							<template #tip>
 							    <div class="el-upload__tip">
-							    	只允许上传 gif、jpg、jpeg、bmp、png、svg、map、txt、css、js 文件，且单文件不超过 200MB
+							    	只允许上传 gif、jpg、jpeg、bmp、png、svg、map、txt、css、js、ico、eot、ttf、woff 文件，且单文件不超过 200MB
 							    </div>
 							</template>
 						</el-upload>
