@@ -1,5 +1,6 @@
 # 巡云轻论坛系统<br><br>
 ##  Spring Boot 版本轻论坛请移步至 [https://gitee.com/diyhi/bbs-pro](https://gitee.com/diyhi/bbs-pro)
+##  前台前后端分离电脑版前端请移步至 [https://gitee.com/diyhi/bbs-web-pc ](https://gitee.com/diyhi/bbs-web-pc )
 <br>
 
 #### 项目介绍
