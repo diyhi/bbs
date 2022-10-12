@@ -8,13 +8,13 @@ xmlns:mvc="http://www.springframework.org/schema/mvc"
 xmlns:context="http://www.springframework.org/schema/context" 
 xsi:schemaLocation="
 http://www.springframework.org/schema/beans 
-http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
-http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
-http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
+http://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
 http://www.springframework.org/schema/mvc
-http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+http://www.springframework.org/schema/mvc/spring-mvc.xsd
 http://www.springframework.org/schema/context 
-http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+http://www.springframework.org/schema/context/spring-context.xsd">
 
 	<!-- 对web包中的所有类进行扫描，以完成Bean创建和自动依赖注入的功能 ;mvc 的只扫描controller组件 注意使用 use-default-filters="false"-->
 	<context:component-scan base-package="cms" use-default-filters="false" > 
@@ -28,19 +28,34 @@ http://www.springframework.org/schema/context/spring-context-4.3.xsd">
     <mvc:resources location="/file/" mapping="/file/**"/>
       
      
-
+	<!-- 模板拦截器(将模板显示功能加入指定的页面中)  -->
+	<bean id="templetesInterceptor" class="cms.web.filter.TempletesInterceptor"/>
 
 	<!-- 处理器映射 -->
 	<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping">  
 		<!-- 自定义拦截器  这里只拦截页面 -->
-		<property name="interceptors">  
+		<property name="interceptors" >  
 	        <list>  
 	        	<!-- 模板拦截器(将模板显示功能加入指定的页面中)  -->
-	            <bean class="cms.web.filter.TempletesInterceptor"/>
+	        	<ref bean="templetesInterceptor"/>
 	        </list>  
 	    </property>  
+	    <property name="useSuffixPatternMatch" value="true"></property>
+	    <property name="useTrailingSlashMatch" value="true"></property>
 	</bean> 
 
+	<!-- 空白页URL映射处理 -->
+	<bean class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">  
+		<property name="mappings">
+			<props>
+		 		<prop key="/**">blankAction</prop>
+			</props>
+		</property>
+		<property name="order" value="2147483647"></property>
+		<property name="interceptors" ref="templetesInterceptor"></property>
+	</bean> 
+
+	
     
 	<!-- FreeMarker页面解析器--> 
 	<bean id="freemarkerViewResolver" class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
@@ -61,6 +76,8 @@ http://www.springframework.org/schema/context/spring-context-4.3.xsd">
 		
 	</bean>
 
+
+	
 	
 	<!-- 文件上传 
     <bean id="multipartResolver"  

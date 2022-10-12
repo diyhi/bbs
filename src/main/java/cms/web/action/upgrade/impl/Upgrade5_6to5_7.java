@@ -31,7 +31,7 @@ import cms.utils.SpringConfigTool;
 import cms.web.action.fileSystem.localImpl.LocalFileManage;
 import cms.web.action.upgrade.UpgradeManage;
 /**
- * 5.6升级到5.6版本执行程序
+ * 5.6升级到5.7版本执行程序
  *
  */
 public class Upgrade5_6to5_7 {

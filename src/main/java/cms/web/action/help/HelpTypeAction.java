@@ -83,7 +83,7 @@ public class HelpTypeAction {
 		
 		if(qr.getResultlist() != null && qr.getResultlist().size() >0){
 			for(HelpType helpType :pageView.getRecords()){
-				helpType.setImage(fileManage.fileServerAddress()+helpType.getImage());
+				helpType.setImage(fileManage.fileServerAddress(request)+helpType.getImage());
 			}
 		}
 		

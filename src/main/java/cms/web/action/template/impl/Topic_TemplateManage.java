@@ -7,10 +7,13 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
@@ -54,6 +57,7 @@ import cms.web.action.topic.CommentManage;
 import cms.web.action.topic.TopicManage;
 import cms.web.action.user.UserManage;
 import cms.web.action.user.UserRoleManage;
+import cms.web.taglib.Configuration;
 
 /**
  * 话题 -- 模板方法实现
@@ -114,6 +118,7 @@ public class Topic_TemplateManage {
 		int pageCount=10;// 页码显示总数
 		int sort = 1;//排序
 		Long tagId = null;//标签Id
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();  
 		
 		String requestURI = "";
 		String queryString = "";
@@ -256,7 +261,7 @@ public class Topic_TemplateManage {
 					String processVideoPlayerId = mediaProcessQueueManage.createProcessVideoPlayerId(topic.getId(),topicContentUpdateMark);
 					
 					//处理视频信息
-					List<MediaInfo> mediaInfoList = mediaProcessQueueManage.query_cache_processVideoInfo(processContent,processVideoPlayerId+"|"+topicContentDigest_hide,topic.getTagId(),systemSetting.getFileSecureLinkSecret());
+					List<MediaInfo> mediaInfoList = mediaProcessQueueManage.query_cache_processVideoInfo(Configuration.getUrl(request),processContent,processVideoPlayerId+"|"+topicContentDigest_hide,topic.getTagId(),systemSetting.getFileSecureLinkSecret());
 					topic.setMediaInfoList(mediaInfoList);
 					
 				}
@@ -322,7 +327,7 @@ public class Topic_TemplateManage {
 						List<ImageInfo> imageInfoList = JsonUtils.toGenericObject(topic.getImage().trim(),new TypeReference< List<ImageInfo> >(){});
 						if(imageInfoList != null && imageInfoList.size() >0){
 							for(ImageInfo imageInfo : imageInfoList){
-								imageInfo.setPath(fileManage.fileServerAddress()+imageInfo.getPath());
+								imageInfo.setPath(fileManage.fileServerAddress(request)+imageInfo.getPath());
 							}
 							topic.setImageInfoList(imageInfoList);
 						}
@@ -359,7 +364,7 @@ public class Topic_TemplateManage {
 					if(user != null){
 						topic.setAccount(user.getAccount());
 						topic.setNickname(user.getNickname());
-						topic.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+						topic.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 						topic.setAvatarName(user.getAvatarName());
 						
 						if(user.getCancelAccountTime() != -1L){//账号已注销
@@ -480,7 +485,7 @@ public class Topic_TemplateManage {
 	 * @param parameter 参数
 	 */
 	public Topic content_entityBean(Forum forum,Map<String,Object> parameter,Map<String,Object> runtimeParameter){
-		
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();  
 		
 		Long topicId = null;
 		String ip = null;
@@ -558,7 +563,7 @@ public class Topic_TemplateManage {
 					if(user != null){
 						topic.setAccount(user.getAccount());
 						topic.setNickname(user.getNickname());
-						topic.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+						topic.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 						topic.setAvatarName(user.getAvatarName());
 						
 						List<String> userRoleNameList = userRoleManage.queryUserRoleName(user.getUserName());
@@ -592,7 +597,7 @@ public class Topic_TemplateManage {
 				
 				//处理文件防盗链
 				if(topic.getContent() != null && !"".equals(topic.getContent().trim()) && systemSetting.getFileSecureLinkSecret() != null && !"".equals(systemSetting.getFileSecureLinkSecret().trim())){
-					List<String> serverAddressList = fileManage.fileServerAllAddress();
+					List<String> serverAddressList = fileManage.fileServerAllAddress(request);
 					
 					
 					//解析上传的文件完整路径名称
@@ -603,7 +608,7 @@ public class Topic_TemplateManage {
 						Map<String,String> newFullFileNameMap = new HashMap<String,String>();//新的完整路径名称 key: 完整路径名称 value: 重定向接口
 						for (Map.Entry<String,String> entry : analysisFullFileNameMap.entrySet()) {
 							
-							newFullFileNameMap.put(entry.getKey(), SecureLink.createDownloadRedirectLink(entry.getKey(),entry.getValue(),topic.getTagId(),systemSetting.getFileSecureLinkSecret()));
+							newFullFileNameMap.put(entry.getKey(), Configuration.getUrl(request)+SecureLink.createDownloadRedirectLink(entry.getKey(),entry.getValue(),topic.getTagId(),systemSetting.getFileSecureLinkSecret()));
 						}
 						
 						Integer topicContentUpdateMark = topicManage.query_cache_markUpdateTopicStatus(topicId, Integer.parseInt(RandomStringUtils.randomNumeric(8)));
@@ -626,7 +631,7 @@ public class Topic_TemplateManage {
 					String processVideoPlayerId = mediaProcessQueueManage.createProcessVideoPlayerId(topicId,topicContentUpdateMark);
 					
 					//处理视频播放器标签
-					String content = mediaProcessQueueManage.query_cache_processVideoPlayer(topic.getContent(),processVideoPlayerId+"|"+topicContentDigest_link,topic.getTagId(),systemSetting.getFileSecureLinkSecret());
+					String content = mediaProcessQueueManage.query_cache_processVideoPlayer(Configuration.getUrl(request),topic.getContent(),processVideoPlayerId+"|"+topicContentDigest_link,topic.getTagId(),systemSetting.getFileSecureLinkSecret());
 					topic.setContent(content);
 					
 					topicContentDigest_video = cms.utils.MD5.getMD5(processVideoPlayerId);
@@ -943,6 +948,7 @@ public class Topic_TemplateManage {
 		int sort = 1;//排序
 		Long topicId = null;//话题Id
 		Long commentId = null;//评论Id
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();  
 		
 		//排序
 		if(forum_CommentRelated_Comment.getComment_sort() != null && forum_CommentRelated_Comment.getComment_sort() >0){
@@ -1082,7 +1088,7 @@ public class Topic_TemplateManage {
 					if(user != null){
 						comment.setAccount(user.getAccount());
 						comment.setNickname(user.getNickname());
-						comment.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+						comment.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 						comment.setAvatarName(user.getAvatarName());
 						userRoleNameMap.put(comment.getUserName(), null);
 						
@@ -1133,7 +1139,9 @@ public class Topic_TemplateManage {
 			List<Comment> quote_commentList = commentService.findByCommentIdList(query_quoteUpdateIdList);
 			if(quote_commentList != null && quote_commentList.size() >0){
 				for(Comment comment : quote_commentList){
-					new_quoteList.put(comment.getId(), textFilterManage.filterText(textFilterManage.specifyHtmlTagToText(comment.getContent())));
+					if(comment.getStatus().equals(20)){
+						new_quoteList.put(comment.getId(), textFilterManage.filterText(textFilterManage.specifyHtmlTagToText(comment.getContent())));
+					}
 				}
 			}
 		}
@@ -1151,12 +1159,18 @@ public class Topic_TemplateManage {
 						for(Quote quote :quoteList){
 							if(new_quoteList.containsKey(quote.getCommentId())){
 								quote.setContent(new_quoteList.get(quote.getCommentId()));
+							}else{
+								//如果引用的评论已删除
+								Comment quoteComment = commentManage.query_cache_findByCommentId(quote.getCommentId());
+								if(quoteComment == null || !quoteComment.getStatus().equals(20)){
+									quote.setContent("");
+								}
 							}
 							if(quote.getIsStaff() == false){//会员
 								User user = userManage.query_cache_findUserByUserName(quote.getUserName());
 								quote.setAccount(user.getAccount());
 								quote.setNickname(user.getNickname());
-								quote.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+								quote.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 								quote.setAvatarName(user.getAvatarName());
 
 								if(user.getCancelAccountTime() != -1L){//账号已注销
@@ -1217,7 +1231,7 @@ public class Topic_TemplateManage {
 								if(user != null){
 									reply.setAccount(user.getAccount());
 									reply.setNickname(user.getNickname());
-									reply.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+									reply.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 									reply.setAvatarName(user.getAvatarName());
 									
 									List<String> roleNameList = userRoleManage.queryUserRoleName(reply.getUserName());

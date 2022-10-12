@@ -82,7 +82,7 @@
 			        	
 			        }
 				},
-					"queryAlreadyCollected.htm?topicId="+topicId+"&timestamp=" + new Date().getTime(), true);
+					"queryAlreadyCollected?topicId="+topicId+"&timestamp=" + new Date().getTime(), true);
 			}
 			queryAlreadyCollected();
 		</script>
@@ -125,7 +125,7 @@
 		        	document.getElementById("favoriteCount").innerHTML = data;
 		        }
 			},
-				"queryFavoriteCount.htm?topicId="+topicId+"&timestamp=" + new Date().getTime(), true);
+				"queryFavoriteCount?topicId="+topicId+"&timestamp=" + new Date().getTime(), true);
 							           
 		}
 		queryFavoriteCount();

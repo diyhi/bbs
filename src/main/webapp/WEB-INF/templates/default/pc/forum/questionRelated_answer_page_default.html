@@ -196,7 +196,7 @@ function replyLayer(answerId,userName){
 			$("#answerReply-post_"+answerId).html(value);
 		}
 	},
-	getBasePath()+"answer_reply.htm?"+parameter+"&timestamp=" + new Date().getTime(), true);
+	getBasePath()+"answer_reply?"+parameter+"&timestamp=" + new Date().getTime(), true);
 	
 }
 function cancelReply(answerId){
@@ -232,7 +232,7 @@ function editAnswerLayer(answerId,userName){
 			$("#editAnswer-post_"+answerId).html(value);
 		}
 	},
-	getBasePath()+"user/editAnswer.htm?"+parameter+"&timestamp=" + new Date().getTime(), true);
+	getBasePath()+"user/editAnswer?"+parameter+"&timestamp=" + new Date().getTime(), true);
 
 
 

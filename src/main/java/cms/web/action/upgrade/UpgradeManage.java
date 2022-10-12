@@ -157,6 +157,16 @@ public class UpgradeManage {
 	}
 	
 	/**
+	 * 读取初始论坛版本号
+	 * @return
+	 */
+	public String readOriginalVersion(){
+		
+		return FileUtil.readFileToString("WEB-INF"+File.separator+"data"+File.separator+"install"+File.separator+"originalVersion.txt","UTF-8");
+    	
+	}
+	
+	/**
 	 * 查询/添加任务运行标记
 	 * @param count 次数  -1为查询方式
 	 * @return

@@ -155,10 +155,12 @@ public class SearchAction {
 										User user = userManage.query_cache_findUserByUserName(t.getUserName());
 										t.setAccount(user.getAccount());
 										t.setNickname(user.getNickname());
-										t.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+										t.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 										t.setAvatarName(user.getAvatarName());
 										
-										
+										if(user.getCancelAccountTime() != -1L){//账号已注销
+											t.setUserInfoStatus(-30);
+										}
 										userRoleNameMap.put(t.getUserName(), null);
 										
 									}else{
@@ -184,10 +186,12 @@ public class SearchAction {
 										User user = userManage.query_cache_findUserByUserName(t.getUserName());
 										t.setAccount(user.getAccount());
 										t.setNickname(user.getNickname());
-										t.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+										t.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 										t.setAvatarName(user.getAvatarName());
 										
-										
+										if(user.getCancelAccountTime() != -1L){//账号已注销
+											t.setUserInfoStatus(-30);
+										}
 										userRoleNameMap.put(t.getUserName(), null);
 										
 									}else{
@@ -367,6 +371,15 @@ public class SearchAction {
 							}
 							
 						}
+						//非正常状态用户清除显示数据
+						if(topic.getUserInfoStatus() <0){
+							topic.setUserName(null);
+							topic.setAccount(null);
+							topic.setNickname(null);
+							topic.setAvatarPath(null);
+							topic.setAvatarName(null);
+							topic.setUserRoleNameList(new ArrayList<String>());
+						}
 					}else if(searchResult.getIndexModule().equals(20)){//问题模块
 						Question question = searchResult.getQuestion();
 						//用户角色名称集合
@@ -378,6 +391,15 @@ public class SearchAction {
 								}
 								break;
 							}
+						}
+						//非正常状态用户清除显示数据
+						if(question.getUserInfoStatus() <0){
+							question.setUserName(null);
+							question.setAccount(null);
+							question.setNickname(null);
+							question.setAvatarPath(null);
+							question.setAvatarName(null);
+							question.setUserRoleNameList(new ArrayList<String>());
 						}
 					}
 				}

@@ -93,7 +93,7 @@
 							            	flag = false;
 						            	}
 						            },
-								 		"checkCaptcha.htm?captchaKey="+captchaKey+"&captchaValue="+parameter_trim+"&timestamp=" + new Date().getTime(), false);
+								 		"checkCaptcha?captchaKey="+captchaKey+"&captchaValue="+parameter_trim+"&timestamp=" + new Date().getTime(), false);
 						            	
 								}else{
 									document.getElementById(identificationNumber+"_"+"captchaValue_error").innerHTML = "验证码不能为空";
@@ -200,7 +200,7 @@
 									}
 					        	}
 							},
-								"user/control/answer/addAnswerReply.htm?timestamp=" + new Date().getTime(), true,parameter);
+								"user/control/answer/addAnswerReply?timestamp=" + new Date().getTime(), true,parameter);
 						}else{
 							//按钮设置 disabled="disabled"
 							document.getElementById(identificationNumber+"_submitForm").disabled=false;

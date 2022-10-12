@@ -191,19 +191,8 @@ public class TopicFormAction {
 		}
 			
 		
-		//判断令牌
-		if(token != null && !"".equals(token.trim())){	
-			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌
-			if(token_sessionid != null && !"".equals(token_sessionid.trim())){
-				if(!token_sessionid.equals(token)){
-					error.put("token", ErrorView._13.name());//令牌错误
-				}
-			}else{
-				error.put("token", ErrorView._12.name());//令牌过期
-			}
-		}else{
-			error.put("token", ErrorView._11.name());//令牌为空
-		}
+		//处理CSRF令牌
+		csrfTokenManage.processCsrfToken(request, token,error);
 		
 		//验证码
 		boolean isCaptcha = captchaManage.topic_isCaptcha(accessUser.getUserName());
@@ -947,19 +936,8 @@ public class TopicFormAction {
 			error.put("topic", ErrorView._21.name());//只读模式不允许提交数据
 		}
 		
-		//判断令牌
-		if(token != null && !"".equals(token.trim())){	
-			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌
-			if(token_sessionid != null && !"".equals(token_sessionid.trim())){
-				if(!token_sessionid.equals(token)){
-					error.put("token", ErrorView._13.name());//令牌错误
-				}
-			}else{
-				error.put("token", ErrorView._12.name());//令牌过期
-			}
-		}else{
-			error.put("token", ErrorView._11.name());//令牌为空
-		}
+		//处理CSRF令牌
+		csrfTokenManage.processCsrfToken(request, token,error);
 		
 		//验证码
 		boolean isCaptcha = captchaManage.topic_isCaptcha(accessUser.getUserName());
@@ -1554,7 +1532,13 @@ public class TopicFormAction {
 			}else{
 				error.put("topic", ErrorView._115.name());//修改话题失败
 			}
-
+			//统计每分钟原来提交次数
+			Integer original = settingManage.getSubmitQuantity("topic", accessUser.getUserName());
+    		if(original != null){
+    			settingManage.addSubmitQuantity("topic", accessUser.getUserName(),original+1);//刷新每分钟原来提交次数
+    		}else{
+    			settingManage.addSubmitQuantity("topic", accessUser.getUserName(),1);//刷新每分钟原来提交次数
+    		}
 		}
 
 		
@@ -1871,7 +1855,7 @@ public class TopicFormAction {
 												fileManage.writeFile(pathDir, newFileName,file.getBytes());
 												//上传成功
 												returnJson.put("error", 0);//0成功  1错误
-												returnJson.put("url", fileManage.fileServerAddress()+"file/topic/"+date+"/image/"+newFileName);
+												returnJson.put("url", Configuration.getUrl(request)+"file/topic/"+date+"/image/"+newFileName);
 												return JsonUtils.toJSONString(returnJson);
 											}else{
 												errorMessage = "文件超出允许上传大小";
@@ -1931,7 +1915,7 @@ public class TopicFormAction {
 												fileManage.writeFile(pathDir, newFileName,file.getBytes());
 												//上传成功
 												returnJson.put("error", 0);//0成功  1错误
-												returnJson.put("url", fileManage.fileServerAddress()+"file/topic/"+date+"/file/"+newFileName);
+												returnJson.put("url", Configuration.getUrl(request)+"file/topic/"+date+"/file/"+newFileName);
 												returnJson.put("title", file.getOriginalFilename());//旧文件名称
 												return JsonUtils.toJSONString(returnJson);
 											}else{
@@ -1990,7 +1974,7 @@ public class TopicFormAction {
 												fileManage.writeFile(pathDir, newFileName,file.getBytes());
 												//上传成功
 												returnJson.put("error", 0);//0成功  1错误
-												returnJson.put("url", fileManage.fileServerAddress()+"file/topic/"+date+"/media/"+newFileName);
+												returnJson.put("url", Configuration.getUrl(request)+"file/topic/"+date+"/media/"+newFileName);
 												returnJson.put("title", file.getOriginalFilename());//旧文件名称
 												return JsonUtils.toJSONString(returnJson);
 											}else{
@@ -2069,19 +2053,8 @@ public class TopicFormAction {
 		}
 			
 		
-		//判断令牌
-		if(token != null && !"".equals(token.trim())){	
-			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌
-			if(token_sessionid != null && !"".equals(token_sessionid.trim())){
-				if(!token_sessionid.equals(token)){
-					error.put("token", ErrorView._13.name());//令牌错误
-				}
-			}else{
-				error.put("token", ErrorView._12.name());//令牌过期
-			}
-		}else{
-			error.put("token", ErrorView._11.name());//令牌为空
-		}
+		//处理CSRF令牌
+		csrfTokenManage.processCsrfToken(request, token,error);
 		
 		//统计每分钟原来提交次数
 		Integer quantity = settingManage.getSubmitQuantity("topicUnhide", accessUser.getUserName());
@@ -2372,7 +2345,7 @@ public class TopicFormAction {
 				
 				
 				//异步执行会员卡赠送任务(长期任务类型)
-				membershipCardGiftTaskManage.async_triggerMembershipCardGiftTask(_user.getUserName());
+				membershipCardGiftTaskManage.async_triggerMembershipCardGiftTask(accessUser.getUserName());
 				
 				
 				

@@ -84,7 +84,7 @@
 			        	
 			        }
 				},
-					"queryAlreadyLiked.htm?topicId="+topicId+"&timestamp=" + new Date().getTime(), true);
+					"queryAlreadyLiked?topicId="+topicId+"&timestamp=" + new Date().getTime(), true);
 			}
 			queryAlreadyLiked();
 		</script>
@@ -127,7 +127,7 @@
 		        	document.getElementById("likeCount").innerHTML = data;
 		        }
 			},
-				"queryLikeCount.htm?topicId="+topicId+"&timestamp=" + new Date().getTime(), true);
+				"queryLikeCount?topicId="+topicId+"&timestamp=" + new Date().getTime(), true);
 							           
 		}
 		queryLikeCount();

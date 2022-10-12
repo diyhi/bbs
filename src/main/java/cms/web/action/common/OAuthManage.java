@@ -1,6 +1,7 @@
 package cms.web.action.common;
 
 import java.util.Date;
+import java.util.Enumeration;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 import cms.bean.user.AccessUser;
 import cms.bean.user.RefreshUser;
 import cms.bean.user.User;
+import cms.bean.user.UserAuthorization;
 import cms.bean.user.UserLoginLog;
 import cms.bean.user.UserState;
 import cms.service.user.UserService;
@@ -131,7 +133,15 @@ public class OAuthManage {
 	 * 获取登录用户
 	 */
 	public AccessUser getUserName(HttpServletRequest request){
+		
+		//从Cookie获取
 		String accessToken = WebUtil.getCookieByName(request, "cms_accessToken");
+		
+		//从Header获取
+		UserAuthorization headerUserAuthorization = WebUtil.getAuthorization(request);
+		if(headerUserAuthorization != null){
+			accessToken = headerUserAuthorization.getAccessToken();
+		}
 		if(accessToken != null && !"".equals(accessToken.trim())){
 			AccessUser accessUser = oAuthManage.getAccessUserByAccessToken(accessToken.trim());
 			return accessUser;
@@ -143,20 +153,20 @@ public class OAuthManage {
 	/**
 	 * 令牌续期
 	 * @param oldRefreshToken 旧刷新令牌号
-	 * @param refreshUser 刷新令牌
+	 * @param refreshUser 刷新用户
+	 * @param newAccessToken 新访问令牌  值为UUIDUtil.getUUID32()
+	 * @param newRefreshToken 新刷新令牌  值为UUIDUtil.getUUID32()
 	 * @param request
 	 * @param response
 	 * @return 返回true表示续期成功
 	 */
-	public boolean tokenRenewal(String oldRefreshToken,RefreshUser refreshUser,HttpServletRequest request,HttpServletResponse response){
+	public boolean tokenRenewal(String oldRefreshToken,RefreshUser refreshUser,String newAccessToken,String newRefreshToken,
+			HttpServletRequest request,HttpServletResponse response){
 		UserState userState = userManage.query_userState(refreshUser.getUserName().trim());//用户状态
 		if(userState == null || !userState.getSecurityDigest().equals(refreshUser.getSecurityDigest())){
 			return false;
 		}
 		
-		//访问令牌续期
-		String new_accessToken = UUIDUtil.getUUID32();
-		String new_refreshToken = UUIDUtil.getUUID32();
 		
 		
 		User user = userManage.query_cache_findUserById(refreshUser.getUserId());
@@ -166,17 +176,17 @@ public class OAuthManage {
 			//呢称
 			String nickname = user.getNickname();
 			//头像路径
-			String avatarPath = fileManage.fileServerAddress()+user.getAvatarPath();
+			String avatarPath = fileManage.fileServerAddress(request)+user.getAvatarPath();
 			//头像名称
 			String avatarName = user.getAvatarName();
 			
-			oAuthManage.addAccessToken(new_accessToken, new AccessUser(refreshUser.getUserId(),refreshUser.getUserName(),account,nickname,avatarPath,avatarName, refreshUser.getSecurityDigest(),refreshUser.isRememberMe(),refreshUser.getOpenId()));
-			refreshUser.setAccessToken(new_accessToken);
-			oAuthManage.addRefreshToken(new_refreshToken, refreshUser);
+			oAuthManage.addAccessToken(newAccessToken, new AccessUser(refreshUser.getUserId(),refreshUser.getUserName(),account,nickname,avatarPath,avatarName, refreshUser.getSecurityDigest(),refreshUser.isRememberMe(),refreshUser.getOpenId()));
+			refreshUser.setAccessToken(newAccessToken);
+			oAuthManage.addRefreshToken(newRefreshToken, refreshUser);
 			
 			if(refreshUser.getOpenId() != null && !"".equals(refreshUser.getOpenId().trim())){
 				//第三方openId
-				oAuthManage.addOpenId(refreshUser.getOpenId(),new_refreshToken);
+				oAuthManage.addOpenId(refreshUser.getOpenId(),newRefreshToken);
 			}
 			
 			
@@ -195,9 +205,9 @@ public class OAuthManage {
 			}
 			
 			//将访问令牌添加到Cookie
-			WebUtil.addCookie(response, "cms_accessToken", new_accessToken, maxAge);
+			WebUtil.addCookie(response, "cms_accessToken", newAccessToken, maxAge);
 			//将刷新令牌添加到Cookie
-			WebUtil.addCookie(response, "cms_refreshToken", new_refreshToken, maxAge);
+			WebUtil.addCookie(response, "cms_refreshToken", newRefreshToken, maxAge);
 			
 			//写入登录日志
 			UserLoginLog userLoginLog = new UserLoginLog();

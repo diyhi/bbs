@@ -83,7 +83,7 @@
 			        	
 			        }
 				},
-					"queryAlreadyFavoriteQuestion.htm?questionId="+questionId+"&timestamp=" + new Date().getTime(), true);
+					"queryAlreadyFavoriteQuestion?questionId="+questionId+"&timestamp=" + new Date().getTime(), true);
 			}
 			queryAlreadyFavoriteQuestion();
 		</script>
@@ -127,7 +127,7 @@
 		        	document.getElementById("favoriteCount").innerHTML = data;
 		        }
 			},
-				"queryQuestionFavoriteCount.htm?questionId="+questionId+"&timestamp=" + new Date().getTime(), true);
+				"queryQuestionFavoriteCount?questionId="+questionId+"&timestamp=" + new Date().getTime(), true);
 							           
 		}
 		queryQuestionFavoriteCount();

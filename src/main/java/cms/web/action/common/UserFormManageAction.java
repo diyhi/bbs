@@ -34,6 +34,7 @@ import cms.bean.user.DisableUserName;
 import cms.bean.user.FormCaptcha;
 import cms.bean.user.RefreshUser;
 import cms.bean.user.User;
+import cms.bean.user.UserAuthorization;
 import cms.bean.user.UserCustom;
 import cms.bean.user.UserGrade;
 import cms.bean.user.UserInputValue;
@@ -263,19 +264,8 @@ public class UserFormManageAction {
 			error.put("register", ErrorView._21.name());//只读模式不允许提交数据
 		}
 		
-		//判断令牌
-		if(token != null && !"".equals(token.trim())){	
-			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌
-			if(token_sessionid != null && !"".equals(token_sessionid.trim())){
-				if(!token_sessionid.equals(token)){
-					error.put("token", ErrorView._13.name());
-				}
-			}else{
-				error.put("token", ErrorView._12.name());
-			}
-		}else{
-			error.put("token", ErrorView._11.name());
-		}
+		//处理CSRF令牌
+		csrfTokenManage.processCsrfToken(request, token,error);
 		
 		boolean isCaptcha = false;
 		//用户自定义注册功能项参数
@@ -643,7 +633,10 @@ public class UserFormManageAction {
 			error.put("register", ErrorView._862.name());//不允许注册
 		}
 		
-
+		//访问令牌
+		String accessToken = UUIDUtil.getUUID32();
+		//刷新令牌
+		String refreshToken = UUIDUtil.getUUID32();
 		if(error.size() == 0){
 			user.setType(formbean.getType());//用户类型
 			
@@ -678,10 +671,7 @@ public class UserFormManageAction {
 	
 				//自动登录
 				
-				//访问令牌
-				String accessToken = UUIDUtil.getUUID32();
-				//刷新令牌
-				String refreshToken = UUIDUtil.getUUID32();
+				
 	
 				String openId = "";//第三方openId
 				if(thirdPartyOpenId != null && !"".equals(thirdPartyOpenId.trim())){
@@ -689,14 +679,14 @@ public class UserFormManageAction {
 					oAuthManage.addOpenId(openId,refreshToken);
 				}
 				
-				oAuthManage.addAccessToken(accessToken, new AccessUser(user.getId(),user.getUserName(),user.getAccount(),user.getNickname(),fileManage.fileServerAddress()+user.getAvatarPath(),user.getAvatarName(), user.getSecurityDigest(),false,openId));
-				oAuthManage.addRefreshToken(refreshToken, new RefreshUser(accessToken,user.getId(),user.getUserName(),user.getAccount(),user.getNickname(),fileManage.fileServerAddress()+user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),false,openId));
+				oAuthManage.addAccessToken(accessToken, new AccessUser(user.getId(),user.getUserName(),user.getAccount(),user.getNickname(),fileManage.fileServerAddress(request)+user.getAvatarPath(),user.getAvatarName(), user.getSecurityDigest(),false,openId));
+				oAuthManage.addRefreshToken(refreshToken, new RefreshUser(accessToken,user.getId(),user.getUserName(),user.getAccount(),user.getNickname(),fileManage.fileServerAddress(request)+user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),false,openId));
 	
 				//将访问令牌添加到Cookie
 				WebUtil.addCookie(response, "cms_accessToken", accessToken, 0);
 				//将刷新令牌添加到Cookie
 				WebUtil.addCookie(response, "cms_refreshToken", refreshToken, 0);
-				AccessUserThreadLocal.set(new AccessUser(user.getId(),user.getUserName(),user.getAccount(),user.getNickname(),fileManage.fileServerAddress()+user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),false,openId));
+				AccessUserThreadLocal.set(new AccessUser(user.getId(),user.getUserName(),user.getAccount(),user.getNickname(),fileManage.fileServerAddress(request)+user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),false,openId));
 				
 				//删除缓存
 				userManage.delete_cache_findUserById(user.getId());
@@ -757,8 +747,9 @@ public class UserFormManageAction {
     			
     			returnValue.put("success", "true");
     			returnValue.put("jumpUrl", _jumpUrl);
-    			returnValue.put("systemUser", new AccessUser(user.getId(),user.getUserName(),user.getAccount(),user.getNickname(),fileManage.fileServerAddress()+user.getAvatarPath(),user.getAvatarName(),null,false,""));//登录用户
-    			
+    			returnValue.put("systemUser", new AccessUser(user.getId(),user.getUserName(),user.getAccount(),user.getNickname(),fileManage.fileServerAddress(request)+user.getAvatarPath(),user.getAvatarName(),null,false,""));//登录用户
+    			returnValue.put("accessToken", accessToken);
+    			returnValue.put("refreshToken", refreshToken);
     		}
     		
     		WebUtil.writeToWeb(JsonUtils.toJSONString(returnValue), "json", response);
@@ -883,7 +874,7 @@ public class UserFormManageAction {
 			throws Exception {
 		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
 		
-		//处理微信浏览器被清理缓存后公众号自动登录
+		//处理微信浏览器被清理缓存后公众号自动登录(本段代码功能已迁移到recoverWeChatBrowserSession方法，因需兼容前后端一体模板，本段代码暂时保留)
 		if(code != null && !"".equals(code.trim()) && WebUtil.isWeChatBrowser(request)){//如果是微信客户端
 			
 			WeiXinOpenId weiXinOpenId = thirdPartyManage.queryWeiXinOpenId(code.trim());
@@ -1086,20 +1077,8 @@ public class UserFormManageAction {
 			rememberMe =false;
 		}
 		
-		//判断令牌
-		if(token != null && !"".equals(token.trim())){	
-			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌
-			if(token_sessionid != null && !"".equals(token_sessionid.trim())){
-				if(!token_sessionid.equals(token)){
-					error.put("token", ErrorView._13.name());
-				}
-			}else{
-				error.put("token", ErrorView._12.name());
-			}
-		}else{
-			error.put("token", ErrorView._11.name());
-		}
-
+		//处理CSRF令牌
+		csrfTokenManage.processCsrfToken(request, token,error);
 		
 		if(isCaptcha){//如果需要验证码		
 			//验证验证码
@@ -1132,7 +1111,11 @@ public class UserFormManageAction {
 			}
 			
 		}
-		
+
+		//访问令牌
+		String accessToken = UUIDUtil.getUUID32();
+		//刷新令牌
+		String refreshToken = UUIDUtil.getUUID32();
 		User user = null;
 		if(error.size() == 0){	
 			if(type.equals(10)){//10:本地账号密码用户
@@ -1171,10 +1154,6 @@ public class UserFormManageAction {
 				if(error.size() ==0 && password.equals(user.getPassword())){
 					
 					
-					//访问令牌
-					String accessToken = UUIDUtil.getUUID32();
-					//刷新令牌
-					String refreshToken = UUIDUtil.getUUID32();
 
 					//删除缓存用户状态
 					userManage.delete_userState(user.getUserName());
@@ -1197,8 +1176,8 @@ public class UserFormManageAction {
 						oAuthManage.addOpenId(openId,refreshToken);
 					}
 					
-					oAuthManage.addAccessToken(accessToken, new AccessUser(user.getId(),user.getUserName(),user.getAccount(),user.getNickname(),fileManage.fileServerAddress()+user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),rememberMe,openId));
-					oAuthManage.addRefreshToken(refreshToken, new RefreshUser(accessToken,user.getId(),user.getUserName(),user.getAccount(),user.getNickname(),fileManage.fileServerAddress()+user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),rememberMe,openId));
+					oAuthManage.addAccessToken(accessToken, new AccessUser(user.getId(),user.getUserName(),user.getAccount(),user.getNickname(),fileManage.fileServerAddress(request)+user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),rememberMe,openId));
+					oAuthManage.addRefreshToken(refreshToken, new RefreshUser(accessToken,user.getId(),user.getUserName(),user.getAccount(),user.getNickname(),fileManage.fileServerAddress(request)+user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),rememberMe,openId));
 					
 					
 					
@@ -1212,7 +1191,7 @@ public class UserFormManageAction {
 					WebUtil.addCookie(response, "cms_accessToken", accessToken, maxAge);
 					//将刷新令牌添加到Cookie
 					WebUtil.addCookie(response, "cms_refreshToken", refreshToken, maxAge);
-					AccessUserThreadLocal.set(new AccessUser(user.getId(),user.getUserName(),user.getAccount(),user.getNickname(),fileManage.fileServerAddress()+user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),rememberMe,openId));
+					AccessUserThreadLocal.set(new AccessUser(user.getId(),user.getUserName(),user.getAccount(),user.getNickname(),fileManage.fileServerAddress(request)+user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),rememberMe,openId));
 					
 					//异步执行会员卡赠送任务(长期任务类型)
 					membershipCardGiftTaskManage.async_triggerMembershipCardGiftTask(user.getUserName());
@@ -1315,7 +1294,9 @@ public class UserFormManageAction {
     		}else{
     			ajax_return.put("success", "true");
     			ajax_return.put("jumpUrl", _jumpUrl);
-    			ajax_return.put("systemUser", new AccessUser(user.getId(),user.getUserName(),user.getAccount(),user.getNickname(),fileManage.fileServerAddress()+user.getAvatarPath(),user.getAvatarName(),null,false,""));//登录用户
+    			ajax_return.put("systemUser", new AccessUser(user.getId(),user.getUserName(),user.getAccount(),user.getNickname(),fileManage.fileServerAddress(request)+user.getAvatarPath(),user.getAvatarName(),null,false,""));//登录用户
+    			ajax_return.put("accessToken", accessToken);
+    			ajax_return.put("refreshToken", refreshToken);
     		}
     		
     		
@@ -1352,6 +1333,8 @@ public class UserFormManageAction {
 	
 	/**
 	 * 会员退出
+	 * @param model
+	 * @param token
 	 * @param request
 	 * @param response
 	 * @return
@@ -1365,38 +1348,34 @@ public class UserFormManageAction {
 		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
 		
 		Map<String,String> error = new HashMap<String,String>();
-		//判断令牌
-		if(token != null && !"".equals(token.trim())){	
-			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌
-			if(token_sessionid != null && !"".equals(token_sessionid.trim())){
-				if(!token_sessionid.equals(token)){
-					error.put("token", ErrorView._13.name());
-				}
-			}else{
-				error.put("token", ErrorView._12.name());
-			}
-		}else{
-			error.put("token", ErrorView._11.name());
-		}
 		
+		//处理CSRF令牌
+		csrfTokenManage.processCsrfToken(request, token,error);
+			
+		String _refreshToken = WebUtil.getCookieByName(request, "cms_refreshToken");
+		String _accessToken = WebUtil.getCookieByName(request, "cms_accessToken");
+		
+		//从Header获取
+		UserAuthorization headerUserAuthorization = WebUtil.getAuthorization(request);
+		if(headerUserAuthorization != null){
+			_accessToken = headerUserAuthorization.getAccessToken();
+			_refreshToken = headerUserAuthorization.getRefreshToken();
+		}
 		
 		if(error.size() ==0){
 			//获取登录用户
 		  	AccessUser accessUser = AccessUserThreadLocal.get();
 			if(accessUser != null){
 				userManage.delete_userState(accessUser.getUserName());
+				
 			}
-			
-
-			String refreshToken = WebUtil.getCookieByName(request, "cms_refreshToken");
-			String accessToken = WebUtil.getCookieByName(request, "cms_accessToken");
-			if(refreshToken != null && !"".equals(refreshToken.trim())){
+			if(_refreshToken != null && !"".equals(_refreshToken.trim())){
 				//删除刷新令牌
-    			oAuthManage.deleteRefreshToken(refreshToken);
+    			oAuthManage.deleteRefreshToken(_refreshToken);
 			}
-			if(accessToken != null && !"".equals(accessToken.trim())){
+			if(_accessToken != null && !"".equals(_accessToken.trim())){
 				//删除访问令牌
-    			oAuthManage.deleteAccessToken(accessToken.trim());
+    			oAuthManage.deleteAccessToken(_accessToken.trim());
 			}
 			WebUtil.deleteCookie(response, "cms_refreshToken");
 			WebUtil.deleteCookie(response, "cms_accessToken");
@@ -1493,19 +1472,8 @@ public class UserFormManageAction {
 	    Map<String,String> error = new HashMap<String,String>();
 	   
 	    
-	    //判断令牌
-	    if(token != null && !"".equals(token.trim())){	
-  			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌
-  			if(token_sessionid != null && !"".equals(token_sessionid.trim())){
-  				if(!token_sessionid.equals(token)){
-  					error.put("token", ErrorView._13.name());
-  				}
-  			}else{
-  				error.put("token", ErrorView._12.name());
-  			}
-  		}else{
-  			error.put("token", ErrorView._11.name());
-  		}
+	    //处理CSRF令牌
+	  	csrfTokenManage.processCsrfToken(request, token,error);
   		
 	    
 	    List<Integer> numbers = Arrays.asList(10,20); 
@@ -1766,19 +1734,9 @@ public class UserFormManageAction {
 		if(systemSetting.getCloseSite().equals(2)){
 			error.put("user", ErrorView._21.name());//只读模式不允许提交数据
 		}
-		//判断令牌
-		if(token != null && !"".equals(token.trim())){	
-			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌
-			if(token_sessionid != null && !"".equals(token_sessionid.trim())){
-				if(!token_sessionid.equals(token)){
-					error.put("token", ErrorView._13.name());
-				}
-			}else{
-				error.put("token", ErrorView._12.name());
-			}
-		}else{
-			error.put("token", ErrorView._11.name());
-		}
+		
+		//处理CSRF令牌
+		csrfTokenManage.processCsrfToken(request, token,error);
 		
 		User user = null;
 		
@@ -2004,6 +1962,111 @@ public class UserFormManageAction {
 		}
 	}
 	
-	
+	/**
+	 * 会话续期
+	 * @param model
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/refreshToken",method=RequestMethod.POST) 
+	@ResponseBody
+	public String refreshToken(ModelMap model,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {	
+		
+		Map<String,Object> returnValue = new HashMap<String,Object>();
+		
+		//从Header获取
+		UserAuthorization headerUserAuthorization = WebUtil.getAuthorization(request);
+		if(headerUserAuthorization != null){
+			String accessToken = headerUserAuthorization.getAccessToken();
+			String refreshToken = headerUserAuthorization.getRefreshToken();
 
+			if(accessToken != null && !"".equals(accessToken.trim()) && refreshToken != null && !"".equals(refreshToken.trim())){
+
+				RefreshUser refreshUser = oAuthManage.getRefreshUserByRefreshToken(refreshToken);
+				if(refreshUser != null){
+					String newAccessToken = UUIDUtil.getUUID32();
+					String newRefreshToken = UUIDUtil.getUUID32();
+					//令牌续期
+					boolean flag = oAuthManage.tokenRenewal(refreshToken,refreshUser,newAccessToken,newRefreshToken,request,response);
+					
+					if(flag){
+						returnValue.put("accessToken", newAccessToken);
+						returnValue.put("refreshToken", newRefreshToken);
+						
+						AccessUser accessUser = AccessUserThreadLocal.get();
+						returnValue.put("systemUser",accessUser);//登录用户
+						return JsonUtils.toJSONString(returnValue);
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * 恢复微信浏览器会话
+	 * 微信浏览器被清理缓存后公众号自动登录
+	 * @param model
+	 * @param code
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/recoverWeChatBrowserSession",method=RequestMethod.POST) 
+	@ResponseBody
+	public String recoverWeChatBrowserSession(ModelMap model,String code,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {	
+		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
+		
+		if(code != null && !"".equals(code.trim()) && WebUtil.isWeChatBrowser(request)){//如果是微信客户端
+			WeiXinOpenId weiXinOpenId = thirdPartyManage.queryWeiXinOpenId(code.trim());
+			if(weiXinOpenId != null && weiXinOpenId.getOpenId() != null && !"".equals(weiXinOpenId.getOpenId())){
+				//添加到缓存
+				thirdPartyManage.addWeiXinOpenId(code.trim(), weiXinOpenId);
+			
+				
+				//刷新令牌号
+				String refreshToken = oAuthManage.getRefreshTokenByOpenId(weiXinOpenId.getOpenId());
+				if(refreshToken != null && !"".equals(refreshToken.trim())){
+
+					
+					RefreshUser refreshUser = oAuthManage.getRefreshUserByRefreshToken(refreshToken.trim());
+					if(refreshUser != null){
+						
+						//存放时间 单位/秒
+						int maxAge = 0;
+						if(refreshUser.isRememberMe()){
+							maxAge = WebUtil.cookieMaxAge;//默认Cookie有效期
+						}
+						//将令牌写入Cookie
+						
+						//将访问令牌添加到Cookie
+						WebUtil.addCookie(response, "cms_accessToken", refreshUser.getAccessToken(), maxAge);
+						//将刷新令牌添加到Cookie
+						WebUtil.addCookie(response, "cms_refreshToken", refreshToken, maxAge);
+
+						AccessUser accessUser = oAuthManage.getAccessUserByAccessToken(refreshUser.getAccessToken());
+					
+						returnValue.put("systemUser", accessUser);//登录用户
+						returnValue.put("accessToken", refreshUser.getAccessToken());
+		    			returnValue.put("refreshToken", refreshToken);
+		    			
+						
+					}
+					
+				}
+				returnValue.put("openId", weiXinOpenId.getOpenId());
+			}
+		}
+		
+		WebUtil.writeToWeb(JsonUtils.toJSONString(returnValue), "json", response);
+		return null;
+	
+	}
 }

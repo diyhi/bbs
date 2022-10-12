@@ -71,6 +71,7 @@ import cms.bean.user.RefreshUser;
 import cms.bean.user.ResourceEnum;
 import cms.bean.user.RewardPointInfo;
 import cms.bean.user.User;
+import cms.bean.user.UserAuthorization;
 import cms.bean.user.UserCustom;
 import cms.bean.user.UserDynamic;
 import cms.bean.user.UserGrade;
@@ -284,7 +285,7 @@ public class HomeManageAction {
     			viewUser.setGradeName(new_user.getGradeName());//等级名称
     			viewUser.setMobile(new_user.getMobile());//绑定手机
     			viewUser.setRealNameAuthentication(new_user.isRealNameAuthentication());//是否实名认证
-    			viewUser.setAvatarPath(fileManage.fileServerAddress()+new_user.getAvatarPath());//头像路径
+    			viewUser.setAvatarPath(fileManage.fileServerAddress(request)+new_user.getAvatarPath());//头像路径
     			viewUser.setAvatarName(new_user.getAvatarName());//头像名称
     			
     			if(userRoleNameList != null && userRoleNameList.size() >0){
@@ -303,7 +304,7 @@ public class HomeManageAction {
       			other_user.setPoint(new_user.getPoint());//当前积分
       			other_user.setGradeId(new_user.getGradeId());//等级Id
       			other_user.setGradeName(new_user.getGradeName());//等级名称
-      			other_user.setAvatarPath(fileManage.fileServerAddress()+new_user.getAvatarPath());//头像路径
+      			other_user.setAvatarPath(fileManage.fileServerAddress(request)+new_user.getAvatarPath());//头像路径
       			other_user.setAvatarName(new_user.getAvatarName());//头像名称
       			if(userRoleNameList != null && userRoleNameList.size() >0){
       				other_user.setUserRoleNameList(userRoleNameList);//话题允许查看的角色名称集合
@@ -747,7 +748,7 @@ public class HomeManageAction {
 		viewUser.setPoint(user.getPoint());//当前积分
 		viewUser.setGradeId(user.getGradeId());//等级Id
 		viewUser.setGradeName(user.getGradeName());//将等级值设进等级参数里
-		viewUser.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());//头像路径
+		viewUser.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());//头像路径
 		viewUser.setAvatarName(user.getAvatarName());//头像名称
 		viewUser.setType(user.getType());
 		viewUser.setPlatformUserId(user.getPlatformUserId());
@@ -841,19 +842,8 @@ public class HomeManageAction {
 		User new_user = new User();
 		
 		
-		//判断令牌
-		if(token != null && !"".equals(token.trim())){	
-			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌
-			if(token_sessionid != null && !"".equals(token_sessionid.trim())){
-				if(!token_sessionid.equals(token)){
-					error.put("token", ErrorView._13.name());
-				}
-			}else{
-				error.put("token", ErrorView._12.name());
-			}
-		}else{
-			error.put("token", ErrorView._11.name());
-		}
+		//处理CSRF令牌
+		csrfTokenManage.processCsrfToken(request, token,error);
 		
 		
 		List<UserCustom> userCustomList = userCustomService.findAllUserCustom_cache();
@@ -1108,6 +1098,12 @@ public class HomeManageAction {
 		
 		new_user.setUserVersion(user.getUserVersion());
 		
+		//访问令牌
+		String accessToken = null;
+		//刷新令牌
+		String refreshToken = null;
+		//新的访问用户对象
+		AccessUser newAccessUser = null;
 		
 		//提交
 		if(error.size() == 0){
@@ -1179,28 +1175,36 @@ public class HomeManageAction {
 					User _user = userService.findUserByUserName(accessUser.getUserName());
 					
 					String _accessToken = WebUtil.getCookieByName(request, "cms_accessToken");
+					String _refreshToken = WebUtil.getCookieByName(request, "cms_refreshToken");
+					//从Header获取
+					UserAuthorization headerUserAuthorization = WebUtil.getAuthorization(request);
+					if(headerUserAuthorization != null){
+						_accessToken = headerUserAuthorization.getAccessToken();
+						_refreshToken = headerUserAuthorization.getRefreshToken();
+					}
 					if(_accessToken != null && !"".equals(_accessToken.trim())){
 						//删除访问令牌
 		    			oAuthManage.deleteAccessToken(_accessToken.trim());
 					}
-					String _refreshToken = WebUtil.getCookieByName(request, "cms_refreshToken");
+					
 					if(_refreshToken != null && !"".equals(_refreshToken.trim())){
 						//删除刷新令牌
 		    			oAuthManage.deleteRefreshToken(_refreshToken);
 					}
 					
+					
 					//访问令牌
-					String accessToken = UUIDUtil.getUUID32();
+					accessToken = UUIDUtil.getUUID32();
 					//刷新令牌
-					String refreshToken = UUIDUtil.getUUID32();
-
+					refreshToken = UUIDUtil.getUUID32();
+					
 					//获取cookie的存活时间
 					int maxAge = WebUtil.getCookieMaxAge(request, "cms_accessToken"); //存放时间 单位/秒
 					boolean rememberMe = maxAge >0 ? true :false;
 					
 					
-					oAuthManage.addAccessToken(accessToken, new AccessUser(_user.getId(),_user.getUserName(),_user.getAccount(),_user.getNickname(),fileManage.fileServerAddress()+_user.getAvatarPath(),_user.getAvatarName(),_user.getSecurityDigest(),rememberMe,accessUser.getOpenId()));
-					oAuthManage.addRefreshToken(refreshToken, new RefreshUser(accessToken,_user.getId(),_user.getUserName(),_user.getAccount(),_user.getNickname(),fileManage.fileServerAddress()+_user.getAvatarPath(),_user.getAvatarName(),_user.getSecurityDigest(),rememberMe,accessUser.getOpenId()));
+					oAuthManage.addAccessToken(accessToken, new AccessUser(_user.getId(),_user.getUserName(),_user.getAccount(),_user.getNickname(),fileManage.fileServerAddress(request)+_user.getAvatarPath(),_user.getAvatarName(),_user.getSecurityDigest(),rememberMe,accessUser.getOpenId()));
+					oAuthManage.addRefreshToken(refreshToken, new RefreshUser(accessToken,_user.getId(),_user.getUserName(),_user.getAccount(),_user.getNickname(),fileManage.fileServerAddress(request)+_user.getAvatarPath(),_user.getAvatarName(),_user.getSecurityDigest(),rememberMe,accessUser.getOpenId()));
 					
 					//第三方openId
 					oAuthManage.addOpenId(accessUser.getOpenId(),refreshToken);
@@ -1209,9 +1213,9 @@ public class HomeManageAction {
 					WebUtil.addCookie(response, "cms_accessToken", accessToken, maxAge);
 					//将刷新令牌添加到Cookie
 					WebUtil.addCookie(response, "cms_refreshToken", refreshToken, maxAge);
-					AccessUserThreadLocal.set(new AccessUser(_user.getId(),_user.getUserName(),_user.getAccount(),_user.getNickname(),fileManage.fileServerAddress()+_user.getAvatarPath(),_user.getAvatarName(),_user.getSecurityDigest(),rememberMe,accessUser.getOpenId()));
 					
-					
+					newAccessUser = new AccessUser(_user.getId(),_user.getUserName(),_user.getAccount(),_user.getNickname(),fileManage.fileServerAddress(request)+_user.getAvatarPath(),_user.getAvatarName(),_user.getSecurityDigest(),rememberMe,accessUser.getOpenId());
+					AccessUserThreadLocal.set(newAccessUser);
 					
 					
 					
@@ -1241,7 +1245,10 @@ public class HomeManageAction {
     			returnValue.put("error", returnError);
     		}else{
     			returnValue.put("success", "true");
-    			
+    			returnValue.put("systemUser", newAccessUser);//登录用户
+        		
+    			returnValue.put("accessToken", accessToken);
+    			returnValue.put("refreshToken", refreshToken);
     		}
     		WebUtil.writeToWeb(JsonUtils.toJSONString(returnValue), "json", response);
 			return null;
@@ -1517,9 +1524,19 @@ public class HomeManageAction {
 			
 			
 			String accessToken = WebUtil.getCookieByName(request, "cms_accessToken");
+			//从Header获取
+			UserAuthorization headerUserAuthorization = WebUtil.getAuthorization(request);
+			if(headerUserAuthorization != null){
+				accessToken = headerUserAuthorization.getAccessToken();
+			}
 			if(accessToken != null && !"".equals(accessToken.trim())){
 				//删除访问令牌
     			oAuthManage.deleteAccessToken(accessToken.trim());
+    			
+    			//修改‘访问用户’的头像名称
+    			accessUser.setAvatarName(newFileName);
+    			//添加访问令牌
+    			oAuthManage.addAccessToken(accessToken.trim(), accessUser);
 			}
 		}
 		
@@ -1642,19 +1659,8 @@ public class HomeManageAction {
 	    //获取登录用户
 	  	AccessUser accessUser = AccessUserThreadLocal.get();
 	   
-	    //判断令牌
-	    if(token != null && !"".equals(token.trim())){	
-  			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌
-  			if(token_sessionid != null && !"".equals(token_sessionid.trim())){
-  				if(!token_sessionid.equals(token)){
-  					error.put("token", ErrorView._13.name());
-  				}
-  			}else{
-  				error.put("token", ErrorView._12.name());
-  			}
-  		}else{
-  			error.put("token", ErrorView._11.name());
-  		}
+	  	//处理CSRF令牌
+	  	csrfTokenManage.processCsrfToken(request, token,error);
   		
 	    User new_user = userService.findUserByUserName(accessUser.getUserName());;
 	    
@@ -1795,19 +1801,8 @@ public class HomeManageAction {
 		Map<String,String> error = new HashMap<String,String>();
 		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
 	    
-	    //判断令牌
-	    if(token != null && !"".equals(token.trim())){	
-  			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌
-  			if(token_sessionid != null && !"".equals(token_sessionid.trim())){
-  				if(!token_sessionid.equals(token)){
-  					error.put("token", ErrorView._13.name());
-  				}
-  			}else{
-  				error.put("token", ErrorView._12.name());
-  			}
-  		}else{
-  			error.put("token", ErrorView._11.name());
-  		}
+		//处理CSRF令牌
+		csrfTokenManage.processCsrfToken(request, token,error);
 	    
 	    if(module == null || module <1 || module >3){
 	    	error.put("message", "模块错误");
@@ -1972,19 +1967,8 @@ public class HomeManageAction {
 	    //获取登录用户
 	  	AccessUser accessUser = AccessUserThreadLocal.get();
 	   
-	    //判断令牌
-	    if(token != null && !"".equals(token.trim())){	
-  			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌
-  			if(token_sessionid != null && !"".equals(token_sessionid.trim())){
-  				if(!token_sessionid.equals(token)){
-  					error.put("token", ErrorView._13.name());
-  				}
-  			}else{
-  				error.put("token", ErrorView._12.name());
-  			}
-  		}else{
-  			error.put("token", ErrorView._11.name());
-  		}
+	  	//处理CSRF令牌
+	  	csrfTokenManage.processCsrfToken(request, token,error);
   		
 	    User new_user = userManage.query_cache_findUserByUserName(accessUser.getUserName());
   		if(new_user != null){
@@ -2127,19 +2111,8 @@ public class HomeManageAction {
 	    //获取登录用户
 	  	AccessUser accessUser = AccessUserThreadLocal.get();
 	   
-	    //判断令牌
-	    if(token != null && !"".equals(token.trim())){	
-  			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌
-  			if(token_sessionid != null && !"".equals(token_sessionid.trim())){
-  				if(!token_sessionid.equals(token)){
-  					error.put("token", ErrorView._13.name());
-  				}
-  			}else{
-  				error.put("token", ErrorView._12.name());
-  			}
-  		}else{
-  			error.put("token", ErrorView._11.name());
-  		}
+	  	//处理CSRF令牌
+	  	csrfTokenManage.processCsrfToken(request, token,error);
   		
 	    User new_user = userService.findUserByUserName(accessUser.getUserName());
   		
@@ -2199,8 +2172,11 @@ public class HomeManageAction {
 	    	error.put("smsCode", ErrorView._852.name());//手机验证码不能为空
 	    }
 	    
-	    //删除绑定手机验证码标记
-	    smsManage.smsCode_delete(3,new_user.getPlatformUserId(), mobile.trim());
+	    if(mobile != null && !"".equals(mobile.trim())){
+	    	//删除绑定手机验证码标记
+		    smsManage.smsCode_delete(3,new_user.getPlatformUserId(), mobile.trim());
+	    }
+	    
 	    
 	    if(error.size() ==0){
 	    	if(new_user != null){
@@ -2409,7 +2385,7 @@ public class HomeManageAction {
 							privateMessage.setFriendAccount(friend_user.getAccount());
 							privateMessage.setFriendNickname(friend_user.getNickname());
 							if(friend_user.getAvatarName() != null && !"".equals(friend_user.getAvatarName().trim())){
-								privateMessage.setFriendAvatarPath(fileManage.fileServerAddress()+friend_user.getAvatarPath());//私信对方头像路径
+								privateMessage.setFriendAvatarPath(fileManage.fileServerAddress(request)+friend_user.getAvatarPath());//私信对方头像路径
 								privateMessage.setFriendAvatarName(friend_user.getAvatarName());//私信对方头像名称
 							}	
 						}			
@@ -2420,7 +2396,7 @@ public class HomeManageAction {
 						privateMessage.setSenderAccount(sender_user.getAccount());
 						privateMessage.setSenderNickname(sender_user.getNickname());
 						if(sender_user.getAvatarName() != null && !"".equals(sender_user.getAvatarName().trim())){
-							privateMessage.setSenderAvatarPath(fileManage.fileServerAddress()+sender_user.getAvatarPath());//发送者头像路径
+							privateMessage.setSenderAvatarPath(fileManage.fileServerAddress(request)+sender_user.getAvatarPath());//发送者头像路径
 							privateMessage.setSenderAvatarName(sender_user.getAvatarName());//发送者头像名称
 						}
 					}
@@ -2536,7 +2512,7 @@ public class HomeManageAction {
 								privateMessage.setFriendAccount(friend_user.getAccount());
 								privateMessage.setFriendNickname(friend_user.getNickname());
 								if(friend_user.getAvatarName() != null && !"".equals(friend_user.getAvatarName().trim())){
-									privateMessage.setFriendAvatarPath(fileManage.fileServerAddress()+friend_user.getAvatarPath());//私信对方头像路径
+									privateMessage.setFriendAvatarPath(fileManage.fileServerAddress(request)+friend_user.getAvatarPath());//私信对方头像路径
 									privateMessage.setFriendAvatarName(friend_user.getAvatarName());//私信对方头像名称
 								}
 							}
@@ -2547,7 +2523,7 @@ public class HomeManageAction {
 									privateMessage.setSenderAccount(sender_user.getAccount());
 									privateMessage.setSenderNickname(sender_user.getNickname());
 									if(sender_user.getAvatarName() != null && !"".equals(sender_user.getAvatarName().trim())){
-										privateMessage.setSenderAvatarPath(fileManage.fileServerAddress()+sender_user.getAvatarPath());//发送者头像路径
+										privateMessage.setSenderAvatarPath(fileManage.fileServerAddress(request)+sender_user.getAvatarPath());//发送者头像路径
 										privateMessage.setSenderAvatarName(sender_user.getAvatarName());//发送者头像名称
 									}
 								}
@@ -2695,19 +2671,8 @@ public class HomeManageAction {
 		}
 			
 		
-		//判断令牌
-		if(token != null && !"".equals(token.trim())){	
-			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌
-			if(token_sessionid != null && !"".equals(token_sessionid.trim())){
-				if(!token_sessionid.equals(token)){
-					error.put("token", ErrorView._13.name());//令牌错误
-				}
-			}else{
-				error.put("token", ErrorView._12.name());//令牌过期
-			}
-		}else{
-			error.put("token", ErrorView._11.name());//令牌为空
-		}
+		//处理CSRF令牌
+		csrfTokenManage.processCsrfToken(request, token,error);
 		
 		//验证码
 		boolean isCaptcha = captchaManage.privateMessage_isCaptcha(accessUser.getUserName());
@@ -2916,19 +2881,8 @@ public class HomeManageAction {
 			error.put("privateMessage", ErrorView._21.name());//只读模式不允许提交数据
 		}
 		
-		//判断令牌
-		if(token != null && !"".equals(token.trim())){	
-			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌
-			if(token_sessionid != null && !"".equals(token_sessionid.trim())){
-				if(!token_sessionid.equals(token)){
-					error.put("token", ErrorView._13.name());
-				}
-			}else{
-				error.put("token", ErrorView._12.name());
-			}
-		}else{
-			error.put("token", ErrorView._11.name());
-		}
+		//处理CSRF令牌
+		csrfTokenManage.processCsrfToken(request, token,error);
 		
 		//获取登录用户
 	  	AccessUser accessUser = AccessUserThreadLocal.get();
@@ -3171,19 +3125,8 @@ public class HomeManageAction {
 			error.put("systemNotify", ErrorView._21.name());//只读模式不允许提交数据
 		}
 		
-		//判断令牌
-		if(token != null && !"".equals(token.trim())){	
-			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌
-			if(token_sessionid != null && !"".equals(token_sessionid.trim())){
-				if(!token_sessionid.equals(token)){
-					error.put("token", ErrorView._13.name());
-				}
-			}else{
-				error.put("token", ErrorView._12.name());
-			}
-		}else{
-			error.put("token", ErrorView._11.name());
-		}
+		//处理CSRF令牌
+		csrfTokenManage.processCsrfToken(request, token,error);
 		
 		if(subscriptionSystemNotifyId == null || "".equals(subscriptionSystemNotifyId.trim())){
 			error.put("systemNotify", ErrorView._1100.name());//订阅系统通知Id不能为空
@@ -3417,7 +3360,7 @@ public class HomeManageAction {
 							remind.setSenderAccount(sender_user.getAccount());//发送者账号
 							remind.setSenderNickname(sender_user.getNickname());
 							if(sender_user.getAvatarName() != null && !"".equals(sender_user.getAvatarName().trim())){
-								remind.setSenderAvatarPath(fileManage.fileServerAddress()+sender_user.getAvatarPath());//发送者头像路径
+								remind.setSenderAvatarPath(fileManage.fileServerAddress(request)+sender_user.getAvatarPath());//发送者头像路径
 								remind.setSenderAvatarName(sender_user.getAvatarName());//发送者头像名称
 							}
 						}
@@ -3466,19 +3409,8 @@ public class HomeManageAction {
 			error.put("remind", ErrorView._21.name());//只读模式不允许提交数据
 		}
 		
-		//判断令牌
-		if(token != null && !"".equals(token.trim())){	
-			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌
-			if(token_sessionid != null && !"".equals(token_sessionid.trim())){
-				if(!token_sessionid.equals(token)){
-					error.put("token", ErrorView._13.name());
-				}
-			}else{
-				error.put("token", ErrorView._12.name());
-			}
-		}else{
-			error.put("token", ErrorView._11.name());
-		}
+		//处理CSRF令牌
+		csrfTokenManage.processCsrfToken(request, token,error);
 		
 		//获取登录用户
 	  	AccessUser accessUser = AccessUserThreadLocal.get();
@@ -3598,7 +3530,7 @@ public class HomeManageAction {
 	  						favorites.setAccount(user.getAccount());
 	  						favorites.setNickname(user.getNickname());
 							if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-								favorites.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());//头像路径
+								favorites.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());//头像路径
 								favorites.setAvatarName(user.getAvatarName());//头像名称
 							}
 						}else{
@@ -3668,7 +3600,7 @@ public class HomeManageAction {
 	  						favorites.setAccount(user.getAccount());
 	  						favorites.setNickname(user.getNickname());
 							if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-								favorites.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());//头像路径
+								favorites.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());//头像路径
 								favorites.setAvatarName(user.getAvatarName());//头像名称
 							}
 						}else{
@@ -3772,19 +3704,8 @@ public class HomeManageAction {
 			error.put("favorite", ErrorView._21.name());//只读模式不允许提交数据
 		}
 		
-		//判断令牌
-		if(token != null && !"".equals(token.trim())){	
-			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌
-			if(token_sessionid != null && !"".equals(token_sessionid.trim())){
-				if(!token_sessionid.equals(token)){
-					error.put("token", ErrorView._13.name());
-				}
-			}else{
-				error.put("token", ErrorView._12.name());
-			}
-		}else{
-			error.put("token", ErrorView._11.name());
-		}
+		//处理CSRF令牌
+		csrfTokenManage.processCsrfToken(request, token,error);
 		
 		//获取登录用户
 	  	AccessUser accessUser = AccessUserThreadLocal.get();
@@ -3932,7 +3853,7 @@ public class HomeManageAction {
 	  					if(user != null && user.getCancelAccountTime().equals(-1L)){
 							topicUnhide.setAccount(user.getAccount());
 							topicUnhide.setNickname(user.getNickname());
-							topicUnhide.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+							topicUnhide.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 							topicUnhide.setAvatarName(user.getAvatarName());
 						}else{
 							topicUnhide.setUserName(null);
@@ -4013,7 +3934,7 @@ public class HomeManageAction {
 					if(user != null){
 						userDynamic.setAccount(user.getAccount());
 						userDynamic.setNickname(user.getNickname());
-						userDynamic.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+						userDynamic.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 						userDynamic.setAvatarName(user.getAvatarName());
 					}
 					
@@ -4044,7 +3965,7 @@ public class HomeManageAction {
 							}
 							//处理文件防盗链
 							if(topicInfo.getContent() != null && !"".equals(topicInfo.getContent().trim()) && systemSetting.getFileSecureLinkSecret() != null && !"".equals(systemSetting.getFileSecureLinkSecret().trim())){
-								List<String> serverAddressList = fileManage.fileServerAllAddress();
+								List<String> serverAddressList = fileManage.fileServerAllAddress(request);
 								//解析上传的文件完整路径名称
 								Map<String,String> analysisFullFileNameMap = topicManage.query_cache_analysisFullFileName(topicInfo.getContent(),topicInfo.getId(),serverAddressList);
 								if(analysisFullFileNameMap != null && analysisFullFileNameMap.size() >0){
@@ -4053,7 +3974,7 @@ public class HomeManageAction {
 									Map<String,String> newFullFileNameMap = new HashMap<String,String>();//新的完整路径名称 key: 完整路径名称 value: 重定向接口
 									for (Map.Entry<String,String> entry : analysisFullFileNameMap.entrySet()) {
 
-										newFullFileNameMap.put(entry.getKey(), SecureLink.createDownloadRedirectLink(entry.getKey(),entry.getValue(),topicInfo.getTagId(),systemSetting.getFileSecureLinkSecret()));
+										newFullFileNameMap.put(entry.getKey(), Configuration.getUrl(request)+SecureLink.createDownloadRedirectLink(entry.getKey(),entry.getValue(),topicInfo.getTagId(),systemSetting.getFileSecureLinkSecret()));
 									}
 									
 									Integer topicContentUpdateMark = topicManage.query_cache_markUpdateTopicStatus(topicInfo.getId(), Integer.parseInt(RandomStringUtils.randomNumeric(8)));
@@ -4077,7 +3998,7 @@ public class HomeManageAction {
 								String processVideoPlayerId = mediaProcessQueueManage.createProcessVideoPlayerId(topicInfo.getId(),topicContentUpdateMark);
 								
 								//处理视频播放器标签
-								String content = mediaProcessQueueManage.query_cache_processVideoPlayer(topicInfo.getContent(),processVideoPlayerId+"|"+topicContentDigest_link,topicInfo.getTagId(),systemSetting.getFileSecureLinkSecret());
+								String content = mediaProcessQueueManage.query_cache_processVideoPlayer(Configuration.getUrl(request),topicInfo.getContent(),processVideoPlayerId+"|"+topicContentDigest_link,topicInfo.getTagId(),systemSetting.getFileSecureLinkSecret());
 								topicInfo.setContent(content);
 								
 								topicContentDigest_video = cms.utils.MD5.getMD5(processVideoPlayerId);
@@ -4335,7 +4256,7 @@ public class HomeManageAction {
   							like.setAccount(user.getAccount());
 	  						like.setNickname(user.getNickname());
 							if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-								like.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());//头像路径
+								like.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());//头像路径
 								like.setAvatarName(user.getAvatarName());//头像名称
 							}
   						}else{
@@ -4431,19 +4352,8 @@ public class HomeManageAction {
 			error.put("like", ErrorView._21.name());//只读模式不允许提交数据
 		}
 		
-		//判断令牌
-		if(token != null && !"".equals(token.trim())){	
-			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌
-			if(token_sessionid != null && !"".equals(token_sessionid.trim())){
-				if(!token_sessionid.equals(token)){
-					error.put("token", ErrorView._13.name());
-				}
-			}else{
-				error.put("token", ErrorView._12.name());
-			}
-		}else{
-			error.put("token", ErrorView._11.name());
-		}
+		//处理CSRF令牌
+		csrfTokenManage.processCsrfToken(request, token,error);
 		
 		//获取登录用户
 	  	AccessUser accessUser = AccessUserThreadLocal.get();
@@ -4566,7 +4476,7 @@ public class HomeManageAction {
 					follow.setFriendAccount(user.getAccount());
 					follow.setFriendNickname(user.getNickname());
 					if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-						follow.setFriendAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+						follow.setFriendAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 						follow.setFriendAvatarName(user.getAvatarName());
 					}		
 				}else{
@@ -4623,7 +4533,7 @@ public class HomeManageAction {
 					follower.setFriendAccount(user.getAccount());
 					follower.setFriendNickname(user.getNickname());
 					if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-						follower.setFriendAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+						follower.setFriendAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 						follower.setFriendAvatarName(user.getAvatarName());
 					}		
 				}else{
@@ -4664,20 +4574,9 @@ public class HomeManageAction {
 			error.put("follow", ErrorView._21.name());//只读模式不允许提交数据
 		}
 		
-		//判断令牌
-		if(token != null && !"".equals(token.trim())){	
-			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌
-			if(token_sessionid != null && !"".equals(token_sessionid.trim())){
-				if(!token_sessionid.equals(token)){
-					error.put("token", ErrorView._13.name());
-				}
-			}else{
-				error.put("token", ErrorView._12.name());
-			}
-		}else{
-			error.put("token", ErrorView._11.name());
-		}
-		
+		//处理CSRF令牌
+		csrfTokenManage.processCsrfToken(request, token,error);
+				
 		//获取登录用户
 	  	AccessUser accessUser = AccessUserThreadLocal.get();
 	  	Follow follow = null;
@@ -5294,7 +5193,7 @@ public class HomeManageAction {
         			receiveRedEnvelope.setGiveUserName(user.getUserName());
         			receiveRedEnvelope.setGiveAccount(user.getAccount());
         			if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-        				receiveRedEnvelope.setGiveAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+        				receiveRedEnvelope.setGiveAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
         				receiveRedEnvelope.setGiveAvatarName(user.getAvatarName());
         			}		
         		}

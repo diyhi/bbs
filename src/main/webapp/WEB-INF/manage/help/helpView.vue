@@ -12,6 +12,7 @@
 						<span class="tag">{{help.helpTypeName}}</span>
 					</div>
 					<div class="operat">
+						<el-link class="item" href="javascript:void(0);" @click="addMediaProcessQueue(help.id)">添加媒体处理任务</el-link>
 						<el-link class="item" href="javascript:void(0);" @click="$router.push({path: '/admin/control/help/manage/edit', query:{ visible:($route.query.visible != undefined ? $route.query.visible:''),helpView_beforeUrl:($route.query.helpView_beforeUrl != undefined ? $route.query.helpView_beforeUrl:''),helpId :help.id, page:($route.query.page != undefined ? $route.query.page:''), helpPage:($route.query.page != undefined ? $route.query.page:'')}})">修改</el-link>
 						<el-link class="item" href="javascript:void(0);" @click="deleteHelp(help.id)">删除</el-link>
 					</div>
@@ -31,7 +32,7 @@
 							</div>
 		            	</div>
 					</div>
-					<div class="main"  >
+					<div class="main" :ref="'help_'+help.id" >
 						<component v-bind:is ="helpComponent(help.content)" v-bind="$props" /> 
 					</div>
 				</div>
@@ -61,6 +62,29 @@ export default({
 		    playerNodeList: [],//视频节点对象集合
 		    
 		};
+	},
+	
+	//keep-alive 进入时
+	activated: function () {
+		let _self = this;
+		
+	},
+	// keep-alive 离开时
+	deactivated : function () {
+	
+	},
+	//生命周期钩子 -- 响应数据修改时运行
+	updated : function () {
+		let _self = this;
+		_self.$nextTick(function() {
+			if(_self.id != ''){
+				let helpRefValue = _self.$refs['help_'+_self.id];
+				if(helpRefValue != undefined){
+					_self.renderBindNode(helpRefValue); 
+				}
+	            
+			}
+		})
 	},
 	beforeRouteEnter (to, from, next) {
 		//上级路由编码
@@ -398,11 +422,30 @@ export default({
 	    				
 	    				childNode.appendChild(dom);
 	    				//渲染代码
-	    				Prism.highlightElement(dom);
+	    				//Prism.highlightElement(dom);
 	            		
 	            	}
 	            	
 	            	this.bindNode(childNode);
+	            }
+	        }
+	    },
+	    //递归渲染绑定节点
+	    renderBindNode: function(node){	
+	         //先找到子节点
+	        let nodeList = node.childNodes;
+	        for(let i = 0;i < nodeList.length;i++){
+	            //childNode获取到到的节点包含了各种类型的节点
+	            //但是我们只需要元素节点  通过nodeType去判断当前的这个节点是不是元素节点
+	            let childNode = nodeList[i];
+	            let random = Math.random().toString().slice(2);
+	            //判断是否是元素节点。如果节点是元素(Element)节点，则 nodeType 属性将返回 1。如果节点是属性(Attr)节点，则 nodeType 属性将返回 2。
+	            if(childNode.nodeType == 1){
+	                //处理代码标签
+	                if(childNode.nodeName.toLowerCase() == "pre" ){
+	                    Prism.highlightAllUnder(childNode);
+	                }
+	                this.renderBindNode(childNode);
 	            }
 	        }
 	    },
@@ -466,6 +509,61 @@ export default({
 			
 			
 			
+		},
+		//添加媒体处理任务
+		addMediaProcessQueue : function(helpId) {
+			let _self = this;
+			this.$confirm('此操作将添加媒体处理任务, 是否继续?', '提示', {
+	            confirmButtonText: '确定',
+	            cancelButtonText: '取消',
+	            type: 'warning'
+	        }).then(() => {
+	        	let formData = new FormData();
+		    	
+		    	formData.append('id', helpId);
+		    	formData.append('module', 60);
+		    	
+		    	
+		    	
+				this.$ajax({
+			        method: 'post',
+			        url: 'control/mediaProcessQueue/manage?method=addMediaProcessQueue',
+			        data: formData
+				})
+				.then(function (response) {
+					if(response == null){
+						return;
+					}
+				    let result = response.data;
+				    if(result){
+				    	
+				    	let returnValue = JSON.parse(result);
+				    	if(returnValue.code === 200){//成功
+				    		_self.$message.success("操作成功");
+				    	}else if(returnValue.code === 500){//错误
+				    		
+				    		let errorMap = returnValue.data;
+				    		for (let key in errorMap) {
+				    			
+			    				_self.$message({
+						            showClose: true,
+						            message: errorMap[key],
+						            type: 'error'
+						        });
+				    			
+				    	    }
+				    		
+				    		
+				    	}
+				    }
+				})
+				.catch(function (error) {
+					console.log(error);
+				});
+	        }).catch((error) => {
+	        	console.log(error);
+	        });
+		
 		},
 	}
 });

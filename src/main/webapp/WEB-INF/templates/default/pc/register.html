@@ -301,7 +301,7 @@
 						<label>
 							<input type="checkbox" class="formCheckbox" name="agreebbrule"  checked="checked">
 							<span class="formCheckbox-core"></span>
-							<span class="formCheckbox-text">同意<a href="agreement.htm" target="_blank">网站服务条款</a></span>
+							<span class="formCheckbox-text">同意<a href="agreement" target="_blank">网站服务条款</a></span>
 						</label>
 					</span>
         		</div>
@@ -515,7 +515,7 @@
 							$("#"+field+"_field_error").addClass("form-field-error");
 	            		}
 	            	},
-			 			"userVerification.htm?account="+account+"&timestamp=" + new Date().getTime(), true);
+			 			"userVerification?account="+account+"&timestamp=" + new Date().getTime(), true);
 			
 			
 		}
@@ -542,7 +542,7 @@
 							$("#"+field+"_field_error").addClass("form-field-error");
 	            		}
 	            	},
-			 			"userVerification.htm?mobile="+mobile+"&timestamp=" + new Date().getTime(), true);
+			 			"userVerification?mobile="+mobile+"&timestamp=" + new Date().getTime(), true);
 		
 		}
 		if(field == "password"){//密码
@@ -670,7 +670,7 @@
 						$("#"+field+"_field_error").addClass("form-field-error");
 	            	}
 	            },
-			 		"userVerification.htm?captchaKey="+captchaKey+"&captchaValue="+captchaValue+"&timestamp=" + new Date().getTime(), true);
+			 		"userVerification?captchaKey="+captchaKey+"&captchaValue="+captchaValue+"&timestamp=" + new Date().getTime(), true);
 	            	
 			}
 		}

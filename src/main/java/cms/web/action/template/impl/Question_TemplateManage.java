@@ -8,9 +8,12 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
@@ -104,6 +107,7 @@ public class Question_TemplateManage {
 		int sort = 1;//排序
 		Long questionTagId = null;//问题标签Id
 		Integer filterCondition = null;//条件过滤
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();  
 		
 		String requestURI = "";
 		String queryString = "";
@@ -239,7 +243,7 @@ public class Question_TemplateManage {
 					if(user != null){
 						question.setAccount(user.getAccount());
 						question.setNickname(user.getNickname());
-						question.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+						question.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 						question.setAvatarName(user.getAvatarName());
 						
 						List<String> userRoleNameList = userRoleManage.queryUserRoleName(user.getUserName());
@@ -343,7 +347,7 @@ public class Question_TemplateManage {
 	 * @param parameter 参数
 	*/
 	public Question content_entityBean(Forum forum,Map<String,Object> parameter,Map<String,Object> runtimeParameter){
-		
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();  
 		
 		Long questionId = null;
 		String ip = null;
@@ -450,7 +454,7 @@ public class Question_TemplateManage {
 					if(user != null){
 						question.setAccount(user.getAccount());
 						question.setNickname(user.getNickname());
-						question.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+						question.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 						question.setAvatarName(user.getAvatarName());
 						
 						List<String> userRoleNameList = userRoleManage.queryUserRoleName(user.getUserName());
@@ -611,6 +615,7 @@ public class Question_TemplateManage {
 		int sort = 1;//排序
 		Long questionId = null;//问题Id
 		Long answerId = null;//答案Id
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();  
 		
 		//排序
 		if(forum_AnswerRelated_Answer.getAnswer_sort() != null && forum_AnswerRelated_Answer.getAnswer_sort() >0){
@@ -750,7 +755,7 @@ public class Question_TemplateManage {
 					if(user != null){
 						answer.setAccount(user.getAccount());
 						answer.setNickname(user.getNickname());
-						answer.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+						answer.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 						answer.setAvatarName(user.getAvatarName());
 						userRoleNameMap.put(answer.getUserName(), null);
 						
@@ -817,7 +822,7 @@ public class Question_TemplateManage {
 								if(user != null){
 									answerReply.setAccount(user.getAccount());
 									answerReply.setNickname(user.getNickname());
-									answerReply.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+									answerReply.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 									answerReply.setAvatarName(user.getAvatarName());
 									
 									List<String> roleNameList = userRoleManage.queryUserRoleName(answerReply.getUserName());

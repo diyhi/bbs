@@ -26,7 +26,7 @@
 
 		<#-- 引入服务导航 -->
 		<@include action="${newPublic_4}"/>
-		<form action="user/control/payment.htm?paymentModule=${url_paymentModule}&token=${token}" method="post" >
+		<form action="user/control/payment?paymentModule=${url_paymentModule}&token=${token}" method="post" >
 		
 		<div class="paymentModule">
 	        <div class="banks">
@@ -145,7 +145,7 @@ function paymentVerification(){
 			}
 		}
 	},
-		"user/control/paymentVerification.htm?paymentModule="+paymentModule+parameter+"&timestamp=" + new Date().getTime(), true);
+		"user/control/paymentVerification?paymentModule="+paymentModule+parameter+"&timestamp=" + new Date().getTime(), true);
 
 
 

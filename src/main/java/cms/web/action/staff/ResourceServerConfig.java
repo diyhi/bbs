@@ -1,6 +1,9 @@
 package cms.web.action.staff;
 
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -20,6 +23,9 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.header.HeaderWriter;
+import org.springframework.security.web.header.writers.CacheControlHeadersWriter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import cms.web.filter.CsrfSecurityRequestMatcher;
 
@@ -74,6 +80,45 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter{
       
         http
         	.headers().frameOptions().sameOrigin();//允许加载本站点内的页面
+        
+	//.cacheControl().disable();//禁用页面缓存标头 Cache-Control: no-cache
+        
+        
+        AntPathRequestMatcher[] filterMatchers = {
+    		    new AntPathRequestMatcher("/backstage/**"),
+    		    new AntPathRequestMatcher("/common/**"),
+    		    new AntPathRequestMatcher("/file/**")
+    		};
+        
+        //禁用页面缓存标头 Cache-Control: no-cache
+        //spring security 默认会有禁止缓存标头Cache-Control: no-cache，不配置此项前端某些图片延迟加载插件的图片会重复请求两次
+        http
+        	.headers().addHeaderWriter(new HeaderWriter() {
+
+            CacheControlHeadersWriter originalWriter = new CacheControlHeadersWriter();
+
+            @Override
+            public void writeHeaders(HttpServletRequest request, HttpServletResponse response) {
+                //Collection<String> headerNames = response.getHeaderNames();
+               
+                for (AntPathRequestMatcher rm : filterMatchers) {
+        			if (rm.matches(request)) { 
+        				//String requestUri = request.getRequestURI();
+        				//默认
+        				//Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+                    	//Pragma: no-cache
+                    	//Expires: 0
+                        //清空页面缓存标头
+                    	response.setHeader("Cache-Control", ""); // HTTP 1.1.
+                    	response.setHeader("Pragma", ""); // HTTP 1.0.
+                    	response.setHeader("Expires", ""); //
+        			}
+        		}
+                
+                originalWriter.writeHeaders(request, response);
+  
+            }
+        });
         
         http
         	.csrf().requireCsrfProtectionMatcher(csrfSecurityRequestMatcher)//要使用csrf保护的请求匹配器

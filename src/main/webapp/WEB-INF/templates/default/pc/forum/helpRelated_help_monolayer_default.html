@@ -3,9 +3,9 @@
 	<#list helpRelated_help_monolayer.records as help>
 		<#if !help_has_next>
 			<#--最后一个 -->
-			<a href="help.htm?helpId=${help.id}" title="${help.name}" class="help_border">${help.name}</a>
+			<a href="help?helpId=${help.id}" title="${help.name}" class="help_border">${help.name}</a>
 		<#else>	
-			<a href="help.htm?helpId=${help.id}" title="">${help.name}</a>
+			<a href="help?helpId=${help.id}" title="">${help.name}</a>
 		</#if>
 	</#list>
 </@function>

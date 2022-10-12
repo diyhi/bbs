@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 import cms.bean.DataView;
 import cms.bean.PageView;
@@ -26,9 +27,12 @@ import cms.utils.SecureLink;
 import cms.utils.Verification;
 import cms.web.action.TextFilterManage;
 import cms.web.action.fileSystem.FileManage;
+import cms.web.taglib.Configuration;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 
 /**
@@ -394,6 +398,7 @@ public class Help_TemplateManage {
 	 * @param parameter 参数
 	 */
 	public Help content_entityBean(Forum forum,Map<String,Object> parameter,Map<String,Object> runtimeParameter){
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();  
 		
 		Long helpId = null;
 		if(parameter != null && parameter.size() >0){
@@ -421,7 +426,7 @@ public class Help_TemplateManage {
 				SystemSetting systemSetting = settingService.findSystemSetting_cache();
 				
 				if(help.getContent() != null && !"".equals(help.getContent().trim()) && systemSetting.getFileSecureLinkSecret() != null && !"".equals(systemSetting.getFileSecureLinkSecret().trim())){
-					List<String> serverAddressList = fileManage.fileServerAllAddress();
+					List<String> serverAddressList = fileManage.fileServerAllAddress(request);
 					//解析上传的文件完整路径名称
 					Map<String,String> analysisFullFileNameMap = textFilterManage.analysisFullFileName(help.getContent(),"help",serverAddressList);
 					if(analysisFullFileNameMap != null && analysisFullFileNameMap.size() >0){
@@ -430,7 +435,7 @@ public class Help_TemplateManage {
 						Map<String,String> newFullFileNameMap = new HashMap<String,String>();//新的完整路径名称 key: 完整路径名称 value: 重定向接口
 						for (Map.Entry<String,String> entry : analysisFullFileNameMap.entrySet()) {
 
-							newFullFileNameMap.put(entry.getKey(), SecureLink.createDownloadRedirectLink(entry.getKey(),entry.getValue(),-1L,systemSetting.getFileSecureLinkSecret()));
+							newFullFileNameMap.put(entry.getKey(), Configuration.getUrl(request)+SecureLink.createDownloadRedirectLink(entry.getKey(),entry.getValue(),-1L,systemSetting.getFileSecureLinkSecret()));
 						}
 						
 						help.setContent(textFilterManage.processFullFileName(help.getContent(),"help",newFullFileNameMap,serverAddressList));
@@ -438,8 +443,9 @@ public class Help_TemplateManage {
 					}
 				}
 				if(help.getContent() != null && !"".equals(help.getContent().trim())){
+					
 					//处理视频播放器标签
-					String content = textFilterManage.processVideoPlayer(help.getContent(),-1L,systemSetting.getFileSecureLinkSecret());
+					String content = textFilterManage.processVideoPlayer(Configuration.getUrl(request),help.getContent(),-1L,systemSetting.getFileSecureLinkSecret());
 					help.setContent(content);
 				}
 				

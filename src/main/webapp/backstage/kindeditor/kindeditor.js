@@ -1042,7 +1042,7 @@ function _mediaImg(blankPath, attrs) {
 	var width = attrs.width,
 		height = attrs.height,
 		type = attrs.type || _mediaType(attrs.src),
-		srcTag = _mediaVideo(attrs);  //视频
+		srcTag = _mediaVideo(attrs),  //视频
 		style = '';
 	
 	if (/\D/.test(width)) {
@@ -1472,7 +1472,7 @@ function _queryAll(expr, root) {
 		return select(parts[0], root);
 	}
 	var isChild = false, part, els, subResults, val, v, i, j, k, length, len, l;
-	for (i = 0, lenth = parts.length; i < lenth; i++) {
+	for (i = 0, length = parts.length; i < length; i++) {
 		part = parts[i];
 		if (part === '>') {
 			isChild = true;
@@ -10004,6 +10004,7 @@ KindEditor.plugin('media', function(K) {
 			urlBox.val('http://');
 		
 			var tabs;
+			var tabIndexBox;
 			tabs = K.tabs({
 				src : K('.tabs', div),
 				afterSelect : function(i) {

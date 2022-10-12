@@ -88,20 +88,8 @@ public class FavoriteFormAction {
 			error.put("favorites", ErrorView._21.name());//只读模式不允许提交数据
 		}
 		
-		//判断令牌
-		if(token != null && !"".equals(token.trim())){	
-			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌
-			if(token_sessionid != null && !"".equals(token_sessionid.trim())){
-				if(!token_sessionid.equals(token)){
-					error.put("token", ErrorView._13.name());//令牌错误
-				}
-			}else{
-				error.put("token", ErrorView._12.name());//令牌过期
-			}
-		}else{
-			error.put("token", ErrorView._11.name());//令牌为空
-		}
-
+		//处理CSRF令牌
+		csrfTokenManage.processCsrfToken(request, token,error);
 
 		//获取登录用户
 	  	AccessUser accessUser = AccessUserThreadLocal.get();

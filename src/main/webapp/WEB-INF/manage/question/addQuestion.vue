@@ -17,7 +17,7 @@
 					</el-form-item>
 					
 					<el-form-item label="排序" :required="true" :error="error.sort">
-						<el-input-number v-model="sort" controls-position="right" :min="0" :max="999999999"></el-input-number>
+						<el-input-number v-model="sort" ref="sort_ref" controls-position="right" :min="0" :max="999999999"></el-input-number>
 						<div class="form-help" >数字越大越在前</div>
 					</el-form-item>
 					<el-form-item label="允许回答" :required="true" :error="error.allow">
@@ -394,7 +394,7 @@ export default({
 				}
 			}
 			if(_self.sort != null){
-				formData.append('sort', _self.sort);
+				formData.append('sort', _self.$refs.sort_ref.displayValue);
 			}
 			formData.append('allow', _self.allow);
 			formData.append('status', _self.status);

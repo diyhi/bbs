@@ -4,10 +4,12 @@ package cms.web.action.fileSystem;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 import cms.bean.setting.SystemSetting;
 import cms.bean.thumbnail.Thumbnail;
@@ -23,6 +25,8 @@ import cms.web.action.fileSystem.localImpl.LocalFileManage;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 /**
  * 文件管理
@@ -37,7 +41,6 @@ public class FileManage {
 	@Resource TextFilterManage textFilterManage;
 	@Resource ThumbnailManage thumbnailManage;
 	
-	
 	/**
 	 * 获得正在使用的文件系统
 	 * @return 0.本地系统 10.SeaweedFS 20.MinIO 30.阿里云OSS
@@ -49,32 +52,66 @@ public class FileManage {
 	}
 	/**
 	 * 未实现
-	 * 获取文件服务器地址 如http://s3-1.diyhi.com/
-	 * 如有多个地址，则随机返回一个地址，分布式文件系统服务器会自动302跳转(302暂时性转移)到正确的地址
+	 * 如有多个地址，则随机返回一个地址，分布式文件存储系统服务器会自动302跳转(302暂时性转移)到正确的地址
+	 * 本地文件存储系统返回‘空值’
 	 * @return
 	 */
     public String fileServerAddress(){
+    	return this.fileServerAddress(null);
+    }
+	/**
+	 * 未实现
+	 * 获取文件服务器地址 如http://s3-1.diyhi.com/
+	 * 如有多个地址，则随机返回一个地址，分布式文件系统服务器会自动302跳转(302暂时性转移)到正确的地址
+	 * 本地文件存储系统返回‘访问地址’
+	 * @return
+	 */
+    public String fileServerAddress(HttpServletRequest request){
+    	if(request != null){
+			return Configuration.getUrl(request);//本地文件存储系统
+		}
     	return "";//本地文件系统
     }
     
     /**
      * 未实现
 	 * 获取文件服务器所有地址 如http://s3-1.diyhi.com/
-	 * 如有多个地址，则随机返回一个地址，分布式文件存储系统服务器会自动302跳转(302暂时性转移)到正确的地址
+	 * 如有多个地址，分布式文件存储系统服务器会自动302跳转(302暂时性转移)到正确的地址
+	 * 本地文件存储系统返回‘空值’
 	 * @return
 	 */
     public List<String> fileServerAllAddress(){
-    	return null;//本地文件存储系统
+    	return this.fileServerAllAddress(null);
+    }
+    /**
+     * 未实现
+	 * 获取文件服务器所有地址 如http://s3-1.diyhi.com/
+	 * 如有多个地址，分布式文件存储系统服务器会自动302跳转(302暂时性转移)到正确的地址
+	 * 本地文件存储系统返回‘访问地址’
+	 * @return
+	 */
+    public List<String> fileServerAllAddress(HttpServletRequest request){
+    	if(request != null){
+    		List<String> newEndpoint = new ArrayList<String>();
+			newEndpoint.add(Configuration.getUrl(request)); //本地文件存储系统
+			return newEndpoint;
+		}
+    	return null;
     }
     
     /**
-     * 未实现
 	 * 处理富文本文件路径
 	 * @param html 富文本内容
 	 * @param item 项目
 	 * @return
 	 */
 	public String processRichTextFilePath(String html,String item){
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();  
+
+		if(html != null && !"".equals(html.trim())){
+			return textFilterManage.processFilePath(html, item, this.fileServerAddress(request));
+		}
+    	
 		return html;
 	}
     
@@ -296,7 +333,7 @@ public class FileManage {
 	 */
  	public String createSignLink(String link,String fileName,String secret,Long expires){
  
-		String newSecureLink = SecureLink.createSecureLink(Configuration.getPath()+"/"+link,fileName,secret,expires);
+		String newSecureLink = SecureLink.createSecureLink(link,fileName,secret,expires);
 		if(Configuration.getPath() != null && !"".equals(Configuration.getPath().trim())){
 			//删除虚拟路径
 			newSecureLink = StringUtils.removeStartIgnoreCase(newSecureLink, Configuration.getPath()+"/");//移除开始部分的相同的字符,不区分大小写

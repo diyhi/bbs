@@ -1,10 +1,13 @@
 package cms.web.filter;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -18,14 +21,19 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.queryString.util.MultiMap;
 import org.queryString.util.UrlEncoded;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import cms.bean.user.AccessUser;
 import cms.bean.user.RefreshUser;
+import cms.bean.user.UserAuthorization;
 import cms.bean.user.UserState;
 import cms.service.user.UserService;
 import cms.utils.Base64;
+import cms.utils.CommentedProperties;
 import cms.utils.SpringConfigTool;
+import cms.utils.UUIDUtil;
 import cms.utils.WebUtil;
 import cms.utils.threadLocal.AccessUserThreadLocal;
 import cms.web.action.common.OAuthManage;
@@ -49,6 +57,33 @@ public class LoginFilter implements Filter {
 		HttpServletRequest request = (HttpServletRequest)req;
 		HttpServletResponse response = (HttpServletResponse)res;
 
+		//处理跨域请求
+		String allowedOrigins = (String) CommentedProperties.readCrossOrigin().get("allowedOrigins");
+    	if(allowedOrigins != null && !"".equals(allowedOrigins.trim())){
+    		String[] origin = allowedOrigins.split(",");
+    		
+    		Set<String> allowedOriginSet= new HashSet<String>(Arrays.asList(origin));
+    	    String originHeader = request.getHeader("Origin");
+    	    if (allowedOriginSet.contains(originHeader)){
+    	    	response.setHeader("Access-Control-Allow-Origin", originHeader);
+                response.setHeader("Access-Control-Allow-Credentials", "true");
+                response.setHeader("Access-Control-Allow-Methods", "GET, HEAD, POST, PUT, PATCH, DELETE");
+              //  response.setHeader("Access-Control-Max-Age", "86400");
+                response.setHeader("Access-Control-Allow-Headers", "Origin,X-Requested-With,Content-Type,Cache-Control,Accept,Authorization,BBS-XSRF-TOKEN,Set-Cookie");//表示访问请求中允许携带哪些Header信息  Cookie,token
+
+                //暴露哪些头部信息(因为跨域访问默认不能获取全部头部信息)
+               // response.setHeader("Access-Control-Expose-Headers", HttpHeaders.CONTENT_DISPOSITION);
+             
+                
+        		// 如果是OPTIONS则结束请求
+                if (HttpMethod.OPTIONS.toString().equals(request.getMethod())) {
+                    response.setStatus(HttpStatus.NO_CONTENT.value());
+                    return;
+                }
+    	    	
+    	    }
+    	}
+		
 		boolean isJump = false;
 		
 		OAuthManage oAuthManage = (OAuthManage)SpringConfigTool.getContext().getBean("oAuthManage");
@@ -78,6 +113,14 @@ public class LoginFilter implements Filter {
 		}else{
 			String accessToken = WebUtil.getCookieByName(request, "cms_accessToken");
 			String refreshToken = WebUtil.getCookieByName(request, "cms_refreshToken");
+			
+			//从Header获取
+			UserAuthorization headerUserAuthorization = WebUtil.getAuthorization(request);
+			if(headerUserAuthorization != null){
+				accessToken = headerUserAuthorization.getAccessToken();
+				refreshToken = headerUserAuthorization.getRefreshToken();
+			}
+			
 			if(accessToken != null && !"".equals(accessToken.trim()) && refreshToken != null && !"".equals(refreshToken.trim())){
 
 				RefreshUser refreshUser = oAuthManage.getRefreshUserByRefreshToken(refreshToken.trim());
@@ -90,10 +133,15 @@ public class LoginFilter implements Filter {
 						userManage.delete_userState(refreshUser.getUserName());
 						isJump = true;
 					}else if(accessToken.equals(refreshUser.getAccessToken())){
-						//令牌续期
-						boolean flag = oAuthManage.tokenRenewal(refreshToken,refreshUser,request,response);
-						
-						if(!flag){//如果续期不成功
+						//前后端一体的架构才执行令牌续期。前后端分离架构由浏览器访问cms.web.action.common.UserFormManageAction.java的refreshToken进行续期
+						if(headerUserAuthorization == null){
+							//令牌续期
+							boolean flag = oAuthManage.tokenRenewal(refreshToken,refreshUser,UUIDUtil.getUUID32(),UUIDUtil.getUUID32(),request,response);
+							
+							if(!flag){//如果续期不成功
+								isJump = true;
+							}
+						}else{
 							isJump = true;
 						}
 					}else{
@@ -219,6 +267,8 @@ public class LoginFilter implements Filter {
 						response.setStatus(508);//508服务器处理请求时检测到一个无限循环
 						return;
 					}
+					response.setStatus(401);//401前台访问无授权页面
+					return;
 				}else{
 					String contextPath = request.getContextPath();
 					

@@ -367,17 +367,70 @@
 			<td colspan="2"><a style="color: #317ee7" onclick="anchorJump('#anchor_600'); return false;">参数表</a></td>
 		</tr>
 		<tr> 
-			<td width="30%" rowspan="2">提交返回</td> 
-			<td width="30%" rowspan="2">JSON格式值 类型:Map&ltString,Object></td>
+			<td width="30%" rowspan="5">提交返回</td> 
+			<td width="30%" rowspan="5">JSON格式值 类型:Map&ltString,Object></td>
 			<td width="40%">键参数：success<br>值内容说明：成功返回true 失败返回false<br>值类型：String</td> 
 		</tr>
 		<tr> 
 			<td>键参数：error<br>值内容说明：错误值集合<br>值类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_70'); return false;">Map&ltString,String></a></td> 
 		</tr>
+		<tr> 
+			<td>键参数：systemUser<br>值内容说明：登录用户；success为true时有值<br>值类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_30'); return false;">AccessUser</a></td> 
+		</tr>
+		<tr> 
+			<td>键参数：accessToken<br>值内容说明：访问令牌</td> 
+		</tr>
+		<tr> 
+			<td>键参数：refreshToken<br>值内容说明：刷新令牌</td> 
+		</tr>
 	</tbody> 
 </table>
 
-
+<table id="anchor_30" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="4">用户 AccessUser</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%" colspan="2">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>id</td> 
+			<td>long</td>
+			<td colspan="2">Id</td>
+		</tr>
+		<tr> 
+			<td>userName</td> 
+			<td>String</td>
+			<td colspan="2">会员用户名</td>
+		</tr>
+		<tr> 
+			<td>account</td> 
+			<td>String</td>
+			<td colspan="2">账号</td>
+		</tr>
+		<tr> 
+			<td>nickname</td> 
+			<td>String</td>
+			<td colspan="2">呢称</td>
+		</tr>
+		<tr> 
+			<td>avatarPath</td> 
+			<td>String</td>
+			<td>头像路径</td>
+			<td width="15%" rowspan="2">页面上显示200*200头像示例${systemUser.avatarPath}${systemUser.avatarName}   &nbsp;&nbsp;显示100*100头像示例${systemUser.avatarPath}100x100/${systemUser.avatarName}</td> 
+		</tr>
+		<tr> 
+			<td>avatarName</td> 
+			<td>String</td>
+			<td>头像名称</td>
+		</tr>
+	</tbody> 
+</table>
 
 
 <table id="anchor_70"  class="exampleTable" > 

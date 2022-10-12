@@ -66,7 +66,7 @@
 										$("#appendQuestion-post").html(value);
 									}
 								},
-								getBasePath()+"user/appendQuestion.htm?"+parameter+"&timestamp=" + new Date().getTime(), true);
+								getBasePath()+"user/appendQuestion?"+parameter+"&timestamp=" + new Date().getTime(), true);
 								
 							}
 							function cancelAppendQuestion(){
@@ -190,7 +190,7 @@
 									        document.getElementById("answerCount").innerHTML = data;
 								        }
 									},
-										"queryAnswerCount.htm?userName="+userName+"&timestamp=" + new Date().getTime(), true);
+										"queryAnswerCount?userName="+userName+"&timestamp=" + new Date().getTime(), true);
 								}
 								queryAnswerCount();
 								
@@ -204,7 +204,7 @@
 									        document.getElementById("followerCount").innerHTML = data;
 								        }
 									},
-										"queryFollowerCount.htm?userName="+userName+"&timestamp=" + new Date().getTime(), true);
+										"queryFollowerCount?userName="+userName+"&timestamp=" + new Date().getTime(), true);
 								}
 								queryFollowerCount();
 								
@@ -219,7 +219,7 @@
 									        document.getElementById("followCount").innerHTML = data;
 								        }
 									},
-										"queryFollowCount.htm?userName="+userName+"&timestamp=" + new Date().getTime(), true);
+										"queryFollowCount?userName="+userName+"&timestamp=" + new Date().getTime(), true);
 								}
 								queryFollowCount();
 							</script>

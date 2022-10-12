@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 import cms.bean.QueryResult;
 import cms.bean.payment.PaymentLog;
@@ -28,6 +29,8 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
@@ -282,6 +285,7 @@ public class RedEnvelopeManage {
 	 * @param isCancelAccountInfo 是否显示注销用户信息
      */
     public QueryResult<ReceiveRedEnvelope> queryReceiveRedEnvelopeByCondition(GiveRedEnvelope giveRedEnvelope,boolean includeNotReceive,int firstIndex, int maxResult,boolean sort,boolean isCancelAccountInfo){
+    	HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();  
     	List<ReceiveRedEnvelope> receiveRedEnvelopeList = new ArrayList<ReceiveRedEnvelope>();
     	if(giveRedEnvelope.getType().equals(20)){//20.公共随机红包(随机金额)
     		if(includeNotReceive){//如果包含未领取红包
@@ -352,7 +356,7 @@ public class RedEnvelopeManage {
             			receiveRedEnvelope.setReceiveNickname(user.getNickname());
             			
             			if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-            				receiveRedEnvelope.setReceiveAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+            				receiveRedEnvelope.setReceiveAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
             				receiveRedEnvelope.setReceiveAvatarName(user.getAvatarName());
             			}
     				}

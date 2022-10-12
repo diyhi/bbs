@@ -18,12 +18,16 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.header.HeaderWriter;
+import org.springframework.security.web.header.writers.CacheControlHeadersWriter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.util.UriUtils;
 
 import cms.web.filter.CsrfSecurityRequestMatcher;
@@ -51,34 +55,26 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
     }
 
 	/**
+	 * https://github.com/spring-projects/spring-security/issues/10938
      * 设置不需要拦截的静态资源
+     * web.ignoring()完全绕过spring security的所有filter
+     * permitAll，会给没有登录的用户适配一个AnonymousAuthenticationToken，设置到SecurityContextHolder，方便后面的filter可以统一处理authentication
+     * 不配置此项前端某些js文件会请求两次，图片延迟加载插件的图片会请求两次
+     * 
+     * 5.6版本会出现警告
+     * You are asking Spring Security to ignore Ant [pattern='/backstage/**']. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+	 * You are asking Spring Security to ignore Ant [pattern='/common/**']. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+	 * You are asking Spring Security to ignore Ant [pattern='/file/**']. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+     * 
      * @param web
      * @throws Exception
      
     @Override
     public void configure(WebSecurity web) {
-        web.ignoring().antMatchers("/backstage/**","/common/**","/file/**");
-    }*/
-	/**
-     * 设置不需要拦截的静态资源
-     * web.ignoring()完全绕过spring security的所有filter
-     * permitAll，会给没有登录的用户适配一个AnonymousAuthenticationToken，设置到SecurityContextHolder，方便后面的filter可以统一处理authentication
-     * 不配置此项前端某些js文件会请求两次，图片延迟加载插件的图片会请求两次
-     * @param web
-     * @throws Exception
-     */
-    @Override
-    public void configure(WebSecurity web) {
-     //   web.ignoring().antMatchers("/**/*.jpg","/**/*.jpeg","/**/*.png","/**/*.gif","/**/*.bmp","/**/*.css","/**/*.js");
-    
+     
     	 web.ignoring().antMatchers("/backstage/**","/common/**","/file/**");
-    	/**web.ignoring()
-    	 .antMatchers("/backstage/**")
-         .antMatchers("/common/**")
-         .antMatchers("/file/**");**/
-    }
+    }**/
     
-
 	
 	/**
      * 配置权限(ResourceServerConfig.java的优先级(@Order(3))比本配置高，它存在时本配置(@Order(100))不会生效)
@@ -117,6 +113,43 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
 	
     	http
      		.headers().frameOptions().sameOrigin();//允许加载本站点内的页面
+    	
+    	AntPathRequestMatcher[] filterMatchers = {
+ 		    new AntPathRequestMatcher("/backstage/**"),
+ 		    new AntPathRequestMatcher("/common/**"),
+ 		    new AntPathRequestMatcher("/file/**")
+ 		};
+	
+    	//禁用页面缓存标头 Cache-Control: no-cache
+        //spring security 默认会有禁止缓存标头Cache-Control: no-cache，不配置此项前端某些图片延迟加载插件的图片会重复请求两次
+        http
+        	.headers().addHeaderWriter(new HeaderWriter() {
+
+            CacheControlHeadersWriter originalWriter = new CacheControlHeadersWriter();
+
+            @Override
+            public void writeHeaders(HttpServletRequest request, HttpServletResponse response) {
+                //Collection<String> headerNames = response.getHeaderNames();
+               
+                for (AntPathRequestMatcher rm : filterMatchers) {
+        			if (rm.matches(request)) { 
+        				//String requestUri = request.getRequestURI();
+        				//默认
+        				//Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+                    	//Pragma: no-cache
+                    	//Expires: 0
+                        //清空页面缓存标头
+                    	response.setHeader("Cache-Control", ""); // HTTP 1.1.
+                    	response.setHeader("Pragma", ""); // HTTP 1.0.
+                    	response.setHeader("Expires", ""); //
+        			}
+        		}
+                
+                originalWriter.writeHeaders(request, response);
+  
+            }
+        });
+    	
     	http
     		.csrf().requireCsrfProtectionMatcher(csrfSecurityRequestMatcher())//要使用csrf保护的请求匹配器
     		.csrfTokenRepository(new CookieCsrfTokenRepository());//将CSRF令牌存储在自定义Cookie中 CookieServerCsrfTokenRepository

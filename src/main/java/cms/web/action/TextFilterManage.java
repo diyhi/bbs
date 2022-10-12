@@ -23,6 +23,7 @@ import cms.utils.FileUtil;
 import cms.utils.HtmlEscape;
 import cms.utils.SecureLink;
 import cms.utils.Verification;
+import cms.utils.WebUtil;
 import cms.web.taglib.Configuration;
 
 import org.apache.commons.lang3.StringUtils;
@@ -76,7 +77,8 @@ public class TextFilterManage {
 		if(editorTag == null || editorTag.isJustifyleft()){//左对齐
 			//左对齐
 			whitelist.addTags("p")
-			.addAttributes("p", "align");
+			.addAttributes("p", "align")
+			.addAttributes("p", "style");
 			
 			//vue-html5-editor
 			whitelist.addTags("div")
@@ -85,7 +87,8 @@ public class TextFilterManage {
 		if(editorTag == null || editorTag.isJustifycenter()){//居中
 			//居中
 			whitelist.addTags("p")
-			.addAttributes("p", "align");
+			.addAttributes("p", "align")
+			.addAttributes("p", "style");
 			
 			//vue-html5-editor
 			whitelist.addTags("div")
@@ -94,7 +97,8 @@ public class TextFilterManage {
 		if(editorTag == null || editorTag.isJustifyright()){//右对齐
 			//右对齐
 			whitelist.addTags("p")
-			.addAttributes("p", "align");
+			.addAttributes("p", "align")
+			.addAttributes("p", "style");
 			
 			//vue-html5-editor
 			whitelist.addTags("div")
@@ -486,7 +490,7 @@ public class TextFilterManage {
 						 this.isBindURL(request,imageUrl.trim(),"common/") ||
 						 this.isBindURL(request,imageUrl.trim(),"backstage/")) {  
 					 
-					//内置svg表情图片
+					//前后端一体架构内置svg表情图片
 					 if (this.isBindURL(request,imageUrl.trim(),"common/") ||
 							 this.isBindURL(request,imageUrl.trim(),"backstage/")) {  
 						 String extension = FileUtil.getExtension(imageUrl);
@@ -507,7 +511,18 @@ public class TextFilterManage {
 	                 
 	                 
 	             }else{
-	            	 element.attr("src",  imageUrl);  
+	            	//前后端分离架构内置svg表情图片
+	            	 if(this.isFrontEndURL(request,imageUrl.trim())){
+	            		 String processUrl = this.deleteFrontEndURL(request,imageUrl.trim());
+	            		 String extension = FileUtil.getExtension(imageUrl);
+						 if(extension != null && "svg".equalsIgnoreCase(extension.trim())){
+							 element.attr("width",  "32px");  
+							 element.attr("height",  "32px");  
+						 }
+	            		 element.attr("src",  processUrl);   
+	            	 }else{
+	            		 element.attr("src",  imageUrl);  
+	            	 }
 	             }
 				 
 				 
@@ -679,6 +694,72 @@ public class TextFilterManage {
 		return new Object[]{doc.body().html(),imageNameList,isImage,flashNameList,isFlash,mediaNameList,isMedia,fileNameList,isFile,isMap};
 	}
     
+	/**
+	 * 处理富文本文件路径
+	 * @param html 富文本内容
+	 * @param item 项目
+	 * @param url
+	 * @return
+	 */
+	public String processFilePath(String html,String item,String url){
+		if(!StringUtils.isBlank(html)){
+			Document doc = Jsoup.parseBodyFragment(html);
+			
+			//图片
+			Elements image_elements = doc.select("img[src]");  
+			for (Element element : image_elements) {
+				 String imageUrl = element.attr("src"); 
+				 
+				 if(StringUtils.startsWithIgnoreCase(imageUrl, "file/"+item+"/")){
+					 element.attr("src",  url + imageUrl);
+	             }
+			}
+			Elements embed_pngs = doc.select("embed[src]");  
+			for (Element element : embed_pngs) {  
+				 String type = element.attr("type"); 
+				 if("application/x-shockwave-flash".equalsIgnoreCase(type)){//flash
+					//<embed src="http://127.0.0.1:8080/shop/file/information/1/2013-11-04/flash/6c72272190254f419478ddd2e2c774bc.swf" type="application/x-shockwave-flash" width="550" height="400" quality="high" />
+					 String flashUrl = element.attr("src"); 
+					 if(flashUrl != null && !"".equals(flashUrl.trim())){
+						 if(StringUtils.startsWithIgnoreCase(flashUrl, "file/"+item+"/")){
+							 element.attr("src",  url + flashUrl);
+						 }
+					 } 
+				 }else if("video/x-ms-asf-plugin".equalsIgnoreCase(type)){//音视频
+					 String mediaUrl = element.attr("src"); 
+					 if(mediaUrl != null && !"".equals(mediaUrl.trim())){
+						 if(StringUtils.startsWithIgnoreCase(mediaUrl, "file/"+item+"/")){
+							 element.attr("src",  url + mediaUrl);
+						 }
+					 }
+				 }
+			}
+			
+			
+			Elements video_pngs = doc.select("video[src]");  
+			for (Element element : video_pngs) {  
+				String videoUrl = element.attr("src"); 
+				 if(videoUrl != null && !"".equals(videoUrl.trim())){
+					 if(StringUtils.startsWithIgnoreCase(videoUrl, "file/"+item+"/")){
+						 element.attr("src",  url + videoUrl);
+					 }
+				 } 
+			}
+			
+			Elements file_pngs = doc.select("a[href]");  
+			for (Element element : file_pngs) {  
+				String fileUrl = element.attr("href");
+				if(fileUrl != null && !"".equals(fileUrl.trim())){
+					
+					if(StringUtils.startsWithIgnoreCase(fileUrl, "file/"+item+"/")){
+						element.attr("href",  url + fileUrl);
+					}
+				}
+			}
+			html = doc.body().html();
+		}
+		return html;
+	}
 	
 	/**
 	 * 获取URL中的根域名
@@ -1533,12 +1614,13 @@ public class TextFilterManage {
 	
 	/**
 	 * 处理视频播放器标签
+	 * @param localUrl 获取网站URL Configuration.getUrl(request)
 	 * @param html 富文本内容
 	 * @param tagId 话题标签  -1表示管理后台打开链接，不校验权限
 	 * @param secret 密钥
 	 * @return
 	 */
-	public String processVideoPlayer(String html,Long tagId,String secret){
+	public String processVideoPlayer(String localUrl,String html,Long tagId,String secret){
 		
 		if(!StringUtils.isBlank(html)){
 			Document doc = Jsoup.parseBodyFragment(html);
@@ -1554,7 +1636,7 @@ public class TextFilterManage {
 				
 				String url = "";
 				if(secret != null && !"".equals(secret.trim())){
-					url = SecureLink.createVideoRedirectLink(src,tagId,secret);
+					url = localUrl+SecureLink.createVideoRedirectLink(src,tagId,secret);
 				}else{
 					url = src;
 				}
@@ -1571,12 +1653,13 @@ public class TextFilterManage {
 	
 	/**
 	 * 处理视频信息
+	 * @param localUrl 获取网站URL Configuration.getUrl(request)
 	 * @param html 富文本内容
 	 * @param tagId 话题标签  -1表示管理后台打开链接，不校验权限
 	 * @param secret 密钥
 	 * @return
 	 */
-	public List<MediaInfo> processVideoInfo(String html,Long tagId,String secret){
+	public List<MediaInfo> processVideoInfo(String localUrl,String html,Long tagId,String secret){
 		List<MediaInfo> mediaInfoList = new ArrayList<MediaInfo>();
 		
 		if(!StringUtils.isBlank(html)){
@@ -1589,7 +1672,7 @@ public class TextFilterManage {
 				
 				String url = "";
 				if(secret != null && !"".equals(secret.trim())){
-					url = SecureLink.createVideoRedirectLink(src,tagId,secret);
+					url = localUrl+SecureLink.createVideoRedirectLink(src,tagId,secret);
 				}else{
 					url = src;
 				}
@@ -1724,5 +1807,42 @@ public class TextFilterManage {
 		
 		return validUrlList;
 	}
-	
+	/**
+	 * 判断指定URL是否为前端网址
+	 * @param request
+	 * @param processUrl 待处理URL
+	 * @return
+	 */
+	public boolean isFrontEndURL(HttpServletRequest request,String processUrl){  
+		String domain = WebUtil.getRefererDomain(request);
+		
+		if(domain == null || "".equals(domain.trim())){
+			domain = Configuration.getUrl(request);
+		}
+		if(StringUtils.startsWithIgnoreCase(processUrl.trim(),domain)) { //判断开始部分是否与二参数相同。不区分大小写 
+			return true;
+        }
+		
+		return false;
+	}
+
+	/**
+	 * 删除前端网址
+	 * @param request
+	 * @param processUrl 待处理URL
+	 * @return
+	 */
+	public String deleteFrontEndURL(HttpServletRequest request,String processUrl){  
+		String domain = WebUtil.getRefererDomain(request);
+		
+		if(domain == null || "".equals(domain.trim())){
+			domain = Configuration.getUrl(request);
+		}
+		
+		if(StringUtils.startsWithIgnoreCase(processUrl.trim(),domain)) { //判断开始部分是否与二参数相同。不区分大小写 
+			return StringUtils.removeStartIgnoreCase(processUrl, domain);//移除开始部分的相同的字符,不区分大小写
+        }
+		
+		return processUrl;
+	}
 }

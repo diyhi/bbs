@@ -1617,6 +1617,7 @@ CREATE TABLE `templates` (
   `name` varchar(255) DEFAULT NULL,
   `thumbnailSuffix` varchar(20) DEFAULT NULL,
   `uses` bit(1) NOT NULL,
+  `verifyCSRF` bit(1) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

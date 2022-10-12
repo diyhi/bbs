@@ -16,6 +16,8 @@ import org.queryString.util.UrlEncoded;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.AbstractController;
 
 import cms.bean.template.Forum;
 import cms.bean.template.Layout;
@@ -33,21 +35,20 @@ import cms.web.action.template.TemplateMain;
  * 根据相应的URI读取相关'空白页'
  *
  */
-@Controller
-public class BlankAction {
+@Controller("blankAction")
+public class BlankAction extends AbstractController{
 	@Resource(name="templateServiceBean")
 	private TemplateService templateService;
 	
 	@Resource TemplateMain templateMain;//模板管理入口
 	@Resource AccessSourceDeviceManage accessSourceDeviceManage;
 	
-	@RequestMapping("/**")
-	public String execute(ModelMap model,
-			HttpServletRequest request,HttpServletResponse response)throws Exception {
+	@Override
+	protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		  // 判断Url并分发到不同的Action，并统一控制转向   
 		    String currentURI=request.getRequestURI();//获取当前的全部URI
 		    String dirName = templateService.findTemplateDir_cache();
-		
+
 			String accessPath = accessSourceDeviceManage.accessDevices(request);
 		  
 			
@@ -74,10 +75,10 @@ public class BlankAction {
 		        	    		response.setHeader("Pragma", "No-cache");   
 			        		    response.setHeader("Cache-Control", "no-cache,no-store,max-age=0");   
 			        		    response.setDateHeader("Expires", 1);
-
+			    
 			        			//去掉.html后缀
 			        			String layouts = StringUtils.substringBefore(layout.getLayoutFile(),".");//返回指定字符串之前的所有字符
-			        			return "templates/"+layout.getDirName()+"/"+accessPath+"/public/"+layouts;
+			        			return new ModelAndView("templates/"+layout.getDirName()+"/"+accessPath+"/public/"+layouts);
 		        	    	}else{//返回数据为json方式
 		        	    		
 		        	    		
@@ -113,9 +114,9 @@ public class BlankAction {
 		    //UserRoleManage类在检查权限时可能会返回message内容
 		    Object parameter = request.getAttribute("message");
 		    if(parameter == null){ //如果上一环节没有传递参数
-		    	model.addAttribute("message","页面不存在");//返回消息  
+		    	request.setAttribute("message","页面不存在");//返回消息  
 		    }
-		    return "templates/"+dirName+"/"+accessPath+"/message";
+		    return new ModelAndView("templates/"+dirName+"/"+accessPath+"/message");
 	}
 	
 	/**

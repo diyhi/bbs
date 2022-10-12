@@ -113,7 +113,7 @@ public class TopicAction {
 					topic.setAccount(user.getAccount());
 					topic.setNickname(user.getNickname());
 					if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-						topic.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+						topic.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 						topic.setAvatarName(user.getAvatarName());
 					}		
 				}
@@ -258,7 +258,7 @@ public class TopicAction {
 										pi.setAccount(user.getAccount());
 										pi.setNickname(user.getNickname());
 										if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-											pi.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+											pi.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 											pi.setAvatarName(user.getAvatarName());
 										}		
 									}
@@ -336,7 +336,7 @@ public class TopicAction {
 						t.setAccount(user.getAccount());
 						t.setNickname(user.getNickname());
 						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-							t.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+							t.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 							t.setAvatarName(user.getAvatarName());
 						}		
 					}
@@ -430,7 +430,7 @@ public class TopicAction {
 					topic.setAccount(user.getAccount());
 					topic.setNickname(user.getNickname());
 					if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-						topic.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+						topic.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 						topic.setAvatarName(user.getAvatarName());
 					}		
 				}
@@ -498,7 +498,7 @@ public class TopicAction {
 						o.setAccount(user.getAccount());
 						o.setNickname(user.getNickname());
 						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-							o.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+							o.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 							o.setAvatarName(user.getAvatarName());
 						}		
 					}
@@ -574,7 +574,7 @@ public class TopicAction {
 					o.setAccount(user.getAccount());
 					o.setNickname(user.getNickname());
 					if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-						o.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+						o.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 						o.setAvatarName(user.getAvatarName());
 					}		
 				}
@@ -641,7 +641,7 @@ public class TopicAction {
 						o.setAccount(user.getAccount());
 						o.setNickname(user.getNickname());
 						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-							o.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+							o.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 							o.setAvatarName(user.getAvatarName());
 						}		
 					}

@@ -911,7 +911,7 @@ html,body{
 }
 
 
-/* 话题题标签 */
+/* 话题标签 */
 .tabModule {
 	margin-top:10px;
     padding: 8px 18px 8px 18px;
@@ -927,11 +927,6 @@ html,body{
 	margin-right: 90px;
 }
 .tabModule .tab-box .tab{
-	display: block;
-	margin-top: 8px;
-	margin-bottom: 8px;
-}
-.tabModule .tab-box .tab_current{
 	display: block;
 	margin-top: 8px;
 	margin-bottom: 8px;
@@ -953,6 +948,11 @@ html,body{
     background-color: #e5e6eb;
     color: #4E5969;
     text-decoration: none;
+}
+.tabModule .tab-box .tab_current{
+	display: block;
+	margin-top: 8px;
+	margin-bottom: 8px;
 }
 .tabModule .tab-box .tab_current:link,
 .tabModule .tab-box .tab_current:visited,
@@ -1185,7 +1185,6 @@ html,body{
     position: relative;
     top: -6px;
 }
-
 .topicModule .topic-box .topicList .topicItem .content .cancelAccount{
 	display: inline-block;
     vertical-align: middle;
@@ -1681,9 +1680,6 @@ html,body{
 .topicContentModule .left .topic-wrap .topicBox .topicInfo .comment{
 	float: left;margin-left: 3px;
 }
-.topicContentModule .left .topic-wrap .topicBox .topicContent .lastUpdateTime{
-	text-align: center;line-height: 40px;padding-bottom: 30px;color: #86909C;
-}
 .topicContentModule .left .topic-wrap .topicBox .topicContent .cancelAccount{
 	display: inline-block;
     vertical-align: middle;
@@ -1696,6 +1692,9 @@ html,body{
     color: #A9AEB8;
     background-color: #F7F8FA;
     margin-bottom: 6px;
+}
+.topicContentModule .left .topic-wrap .topicBox .topicContent .lastUpdateTime{
+	text-align: center;padding-top: 20px;padding-bottom: 30px;color: #86909C;
 }
 .topicContentModule .left .topic-wrap .topicBox .topicContent{border-top:1px solid #F2F3F5;margin-top:5px;padding:20px 0px;color:#272E3B;font-size:16px; line-height:1.75; word-wrap:break-word;min-height: 100px;}
 .topicContentModule .left .topic-wrap .topicBox .topicContent a{
@@ -1803,7 +1802,12 @@ html,body{
 }
 .topicContentModule .left .topic-wrap .topicBox .topicContent hide .highlight{font-weight:bold;}
 /*border:#a9a9a9 solid 2px;  边框#b2b5bc #777777*/
-.topicContentModule .left .topic-wrap .topicBox .topicContent hide .input-box{pointer-events: none;margin: auto; margin-top: 10px;margin-bottom:25px; border:#6B7785 solid 2px; width:226px; height:26px; overflow:hidden; border-radius: 2px;}
+.topicContentModule .left .topic-wrap .topicBox .topicContent hide .input-box{
+	pointer-events: none;
+	margin: auto; 
+	margin-top: 10px;
+	margin-bottom:25px; 
+	border:#6B7785 solid 2px; width:226px; height:26px; position: relative; border-radius: 2px;}
 .topicContentModule .left .topic-wrap .topicBox .topicContent hide .input-box:hover{
 	border:#4E5969 solid 2px;
 }
@@ -1811,12 +1815,46 @@ html,body{
 	border:transparent solid 0px; background:#4E5969;
 }
 .topicContentModule .left .topic-wrap .topicBox .topicContent hide .input-box .text{ pointer-events:auto;width:145px; height:26px; line-height:26px; border:0; float:left; font-size:14px; color:#4E5969; text-indent: 6px; vertical-align:middle;outline:none; background: #F7F8FA;}
-.topicContentModule .left .topic-wrap .topicBox .topicContent hide .input-box .button{pointer-events:auto; width:79px;*width:76px; height:26px; line-height:28px; border:0; background:#6B7785; font-size:15px; color:#fff; float:right; cursor:pointer;text-decoration: none; outline: none}
+.topicContentModule .left .topic-wrap .topicBox .topicContent hide .input-box .button{
+	position: absolute;
+    top: 0px;
+    right: -2px;
+    pointer-events:auto; 
+    display: inline-block;
+    white-space:nowrap;
+    width:80px;
+    height:28px; 
+    vertical-align: middle;
+    font-size: 15px;
+    line-height: 26px;
+    -webkit-border-radius: 0px 2px 2px 0px;
+    -moz-border-radius: 0px 2px 2px 0px;
+    border-radius: 0px 2px 2px 0px;
+    color:#fff;
+    background-color:#6B7785;
+    cursor:pointer;
+    user-select:none;
+}
 .topicContentModule .left .topic-wrap .topicBox .topicContent hide .input-box .button:hover{background:#4E5969;}/*background:#606060;*/
-.topicContentModule .left .topic-wrap .topicBox .topicContent hide .submit-box{margin: auto; margin-top: 10px;margin-bottom:25px; border:#6B7785 solid 2px; width:96px; height:26px; overflow:hidden; border-radius: 2px;}
-.topicContentModule .left .topic-wrap .topicBox .topicContent hide .submit-box:hover{border:#4E5969 solid 2px;}
-.topicContentModule .left .topic-wrap .topicBox .topicContent hide .submit-box .button{ pointer-events:auto;width:96px; height:26px; line-height:28px; border:0; background:#6B7785; font-size:15px; color:#fff; float:right; cursor:pointer;text-decoration: none; outline: none}
-.topicContentModule .left .topic-wrap .topicBox .topicContent hide .submit-box .button:hover{background:#4E5969;}
+.topicContentModule .left .topic-wrap .topicBox .topicContent hide .submit-box{
+	margin-top: 10px;
+    margin-bottom:5px; 
+    display: inline-block;
+    white-space:nowrap;
+    width:80px;
+    height:30px; 
+    vertical-align: middle;
+    font-size: 15px;
+    line-height: 30px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color:#fff;
+    background-color:#6B7785;
+    cursor:pointer;
+    user-select:none;
+}
+.topicContentModule .left .topic-wrap .topicBox .topicContent hide .submit-box:hover{background:#4E5969;}
 .topicContentModule .left .topic-wrap .topicBox .topicContent hide .input-box .text::-webkit-input-placeholder {
 	color: #6B7785;
 }
@@ -5032,6 +5070,38 @@ html,body{
     margin: auto;
     color: #fff;
 }
+.userDynamicModule .userDynamicList .userDynamic .topicContent .dplayer-process {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 99;
+}
+.userDynamicModule .userDynamicList .userDynamic .topicContent .dplayer-process .box{
+	position: relative;
+	width: 100%;
+	height: 100%;
+}
+.userDynamicModule .userDynamicList .userDynamic .topicContent .dplayer-process .box .prompt{
+   	width: 250px;
+    height: 80px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+   	padding :0px 30px;
+   	border-radius :3px;
+   	color: #fff;
+   	line-height: 50px;
+   	font-size: 16px;
+   	background-color:rgb(0,0,0);
+	opacity:0.7;
+	filter:alpha(opacity=70);
+	text-align: center;
+}
 
 
 /* 隐藏标签 IE8以下浏览器不支持自定义标签，需要在页头<head>标签内执行document.createElement('hide') */
@@ -5061,7 +5131,12 @@ html,body{
 }
 .userDynamicModule .userDynamicList .userDynamic .topicContent hide .highlight{font-weight:bold;}
 /*border:#a9a9a9 solid 2px;  边框#b2b5bc #777777*/
-.userDynamicModule .userDynamicList .userDynamic .topicContent hide .input-box{pointer-events: none;margin: auto; margin-top: 10px;margin-bottom:25px; border:#6B7785 solid 2px; width:226px; height:26px; overflow:hidden; border-radius: 2px;}
+.userDynamicModule .userDynamicList .userDynamic .topicContent hide .input-box{
+	pointer-events: none;
+	margin: auto; 
+	margin-top: 10px;
+	margin-bottom:25px; 
+	border:#6B7785 solid 2px; width:226px; height:26px; position: relative; border-radius: 2px;}
 .userDynamicModule .userDynamicList .userDynamic .topicContent hide .input-box:hover{
 	border:#4E5969 solid 2px;
 }
@@ -5069,12 +5144,46 @@ html,body{
 	border:transparent solid 0px; background:#4E5969;
 }
 .userDynamicModule .userDynamicList .userDynamic .topicContent hide .input-box .text{ pointer-events:auto;width:145px; height:26px; line-height:26px; border:0; float:left; font-size:14px; color:#4E5969; text-indent: 6px; vertical-align:middle;outline:none; background: #F7F8FA;}
-.userDynamicModule .userDynamicList .userDynamic .topicContent hide .input-box .button{pointer-events:auto; width:79px;*width:76px; height:26px; line-height:28px; border:0; background:#6B7785; font-size:15px; color:#fff; float:right; cursor:pointer;text-decoration: none; outline: none}
+.userDynamicModule .userDynamicList .userDynamic .topicContent hide .input-box .button{
+	position: absolute;
+    top: 0px;
+    right: -2px;
+    pointer-events:auto; 
+    display: inline-block;
+    white-space:nowrap;
+    width:80px;
+    height:28px; 
+    vertical-align: middle;
+    font-size: 15px;
+    line-height: 26px;
+    -webkit-border-radius: 0px 2px 2px 0px;
+    -moz-border-radius: 0px 2px 2px 0px;
+    border-radius: 0px 2px 2px 0px;
+    color:#fff;
+    background-color:#6B7785;
+    cursor:pointer;
+    user-select:none;
+}
 .userDynamicModule .userDynamicList .userDynamic .topicContent hide .input-box .button:hover{background:#4E5969;}/*background:#606060;*/
-.userDynamicModule .userDynamicList .userDynamic .topicContent hide .submit-box{margin: auto; margin-top: 10px;margin-bottom:25px; border:#6B7785 solid 2px; width:96px; height:26px; overflow:hidden; border-radius: 2px;}
-.userDynamicModule .userDynamicList .userDynamic .topicContent hide .submit-box:hover{border:#4E5969 solid 2px;}
-.userDynamicModule .userDynamicList .userDynamic .topicContent hide .submit-box .button{ pointer-events:auto;width:96px; height:26px; line-height:28px; border:0; background:#6B7785; font-size:15px; color:#fff; float:right; cursor:pointer;text-decoration: none; outline: none}
-.userDynamicModule .userDynamicList .userDynamic .topicContent hide .submit-box .button:hover{background:#4E5969;}
+.userDynamicModule .userDynamicList .userDynamic .topicContent hide .submit-box{
+	margin-top: 10px;
+    margin-bottom:5px; 
+    display: inline-block;
+    white-space:nowrap;
+    width:80px;
+    height:30px; 
+    vertical-align: middle;
+    font-size: 15px;
+    line-height: 30px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color:#fff;
+    background-color:#6B7785;
+    cursor:pointer;
+    user-select:none;
+}
+.userDynamicModule .userDynamicList .userDynamic .topicContent hide .submit-box:hover{background:#4E5969;}
 .userDynamicModule .userDynamicList .userDynamic .topicContent hide .input-box .text::-webkit-input-placeholder {
 	color: #6B7785;
 }
@@ -5337,7 +5446,7 @@ html,body{
 .membershipCardModule .detail .line-blue {
 	margin: 12px auto 0;
 	width: 100px;
-	border-bottom: 4px solid #20a0ff;'
+	border-bottom: 4px solid #20a0ff;
 }
 
 .membershipCardModule .detail .line-gray {

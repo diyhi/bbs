@@ -34,7 +34,7 @@
 									</el-select>
 								</el-form-item>
 								<el-form-item label="排序" :required="true" :error="error.sort">
-									<el-input-number v-model="sort" controls-position="right" @change="handleChange" :min="0" :max="999999999"></el-input-number>
+									<el-input-number ref="sort_ref" v-model="sort" controls-position="right" :min="0" :max="999999999"></el-input-number>
 									<div class="form-help" >数字越大越在前</div>
 								</el-form-item>
 								<el-form-item label="允许评论" :required="true" :error="error.allow">
@@ -127,8 +127,9 @@
 					</div>
 					<div class="main"  >
 						<div v-if="topic.lastUpdateTime != null" class="lastUpdateTime" >最后修改时间：{{topic.lastUpdateTime}}</div>
-						<component v-bind:is ="topicComponent(topic.content)" v-bind="$props" /> 
-						
+						<div :ref="'topic_'+topic.id">
+							<component v-bind:is ="topicComponent(topic.content)" v-bind="$props" /> 
+						</div>
 					</div>
 					
 				</div>
@@ -195,7 +196,7 @@
 							</div>
 							
 
-							<p class="commentContent" >
+							<p class="commentContent" :ref="'comment_'+comment.id">
 								<component v-bind:is ="commentDataComponent(comment.content)" v-bind="$props" />
 							</p> 
 							
@@ -538,7 +539,10 @@ export default({
 				_self.editTopicEditorCreateParameObject.userGradeList
 			);
 		}
+		
+		
 	},
+	
 	// keep-alive 离开时
 	deactivated : function () {
 		if(this.addCommentEditor != ""){
@@ -559,6 +563,30 @@ export default({
 		if(this.editTopicEditor != ""){
 			this.editTopicEditor.remove();
 		}
+	},
+	
+	//生命周期钩子 -- 响应数据修改时运行
+	updated : function () {
+		let _self = this;
+		_self.$nextTick(function() {
+			if(_self.topicId != ''){
+				let topicRefValue = _self.$refs['topic_'+_self.topicId];
+				if(topicRefValue != undefined){
+					_self.renderBindNode(topicRefValue); 
+				}
+            	
+			}
+			if(_self.commentList != null && _self.commentList.length > 0){
+				for (let i = 0; i <_self.commentList.length; i++) {
+					let comment = _self.commentList[i];
+					let commentRefValue = _self.$refs['comment_'+comment.id];
+					if(commentRefValue != undefined){
+						_self.renderBindNode(commentRefValue); 
+					}
+					
+				}
+			}
+		})
 	},
 	beforeRouteEnter (to, from, next) {
 		//上级路由编码
@@ -1186,7 +1214,7 @@ export default({
 	    				
 	    				childNode.appendChild(dom);
 	    				//渲染代码
-	    				Prism.highlightElement(dom);
+	    				//Prism.highlightElement(dom);
 	            		
 	            	}
 	            	
@@ -1194,6 +1222,28 @@ export default({
 	            }
 	        }
 	    },
+	    
+	    //递归渲染绑定节点
+	    renderBindNode: function(node){	
+	         //先找到子节点
+	        let nodeList = node.childNodes;
+	        for(let i = 0;i < nodeList.length;i++){
+	            //childNode获取到到的节点包含了各种类型的节点
+	            //但是我们只需要元素节点  通过nodeType去判断当前的这个节点是不是元素节点
+	            let childNode = nodeList[i];
+	            let random = Math.random().toString().slice(2);
+	            //判断是否是元素节点。如果节点是元素(Element)节点，则 nodeType 属性将返回 1。如果节点是属性(Attr)节点，则 nodeType 属性将返回 2。
+	            if(childNode.nodeType == 1){
+	                //处理代码标签
+	                if(childNode.nodeName.toLowerCase() == "pre" ){
+	                    Prism.highlightAllUnder(childNode);
+	                }
+	                this.renderBindNode(childNode);
+	            }
+	        }
+	    },
+	    
+	    
 	    //分页
 		page: function(page) {
 		
@@ -1922,7 +1972,7 @@ export default({
 				formData.append('tagId', _self.tagId); 
 			}
 			if(_self.sort != null && _self.sort >=0){
-				formData.append('sort', _self.sort);
+				formData.append('sort', _self.$refs.sort_ref.displayValue);
 			}
 			formData.append('allow', _self.allow);
 			formData.append('status', _self.status);
@@ -2514,8 +2564,7 @@ export default({
 	        	console.log(error);
 	        });
 		
-		},
-		
+		}
 	}
 });
 

@@ -103,12 +103,13 @@ public class TemplateServiceBean extends DaoSupport<Layout> implements TemplateS
 	 */
 	@CacheEvict(value="templateServiceBean_cache",allEntries=true)
 	public Integer updateTemplate(Templates templates){
-		Query query = em.createQuery("update Templates o set o.name=?1,o.introduction=?2,o.thumbnailSuffix=?3 where o.dirName=?4");
+		Query query = em.createQuery("update Templates o set o.name=?1,o.introduction=?2,o.thumbnailSuffix=?3,o.verifyCSRF=?4 where o.dirName=?5");
 		//给SQL语句设置参数
 		query.setParameter(1, templates.getName());
 		query.setParameter(2, templates.getIntroduction());
 		query.setParameter(3, templates.getThumbnailSuffix());
-		query.setParameter(4, templates.getDirName());
+		query.setParameter(4, templates.getVerifyCSRF());
+		query.setParameter(5, templates.getDirName());
 		return query.executeUpdate();	
 	}
 	

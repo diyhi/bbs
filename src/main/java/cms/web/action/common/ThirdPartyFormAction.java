@@ -16,7 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import cms.bean.ErrorView;
 import cms.bean.setting.AllowRegisterAccount;
@@ -27,6 +28,7 @@ import cms.bean.thirdParty.WeiXinUserInfo;
 import cms.bean.user.AccessUser;
 import cms.bean.user.RefreshUser;
 import cms.bean.user.User;
+import cms.bean.user.UserAuthorization;
 import cms.bean.user.UserLoginLog;
 import cms.service.setting.SettingService;
 import cms.service.template.TemplateService;
@@ -113,6 +115,68 @@ public class ThirdPartyFormAction {
 			RedirectAttributes redirectAttrs,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
+		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+		
+		if(isAjax){
+			
+			
+			Map<String,Object> returnValue = new HashMap<String,Object>();
+			String domain = WebUtil.getRefererDomain(request);
+			
+			if(domain != null && !"".equals(domain.trim())){
+				if(interfaceProduct != null){
+					if(interfaceProduct.equals(10)){//微信
+						if(accessSourceDeviceManage.accessDevices(request).equals("pc")){//电脑端
+							WeChatConfig weChatConfig = thirdPartyManage.queryWeChatConfig();
+					    	if(weChatConfig != null){
+								String appid = weChatConfig.getOp_appID();//开放平台唯一标识
+								String redirect_uri = domain+"thirdParty/loginRedirect";
+								
+								if(jumpUrl != null && !"".equals(jumpUrl.trim())){
+									redirect_uri = domain+"thirdParty/loginRedirect?jumpUrl="+jumpUrl.trim();//Base64安全编码;
+								}
+								redirect_uri = java.net.URLEncoder.encode(redirect_uri,"utf-8");   
+								String csrfToken = csrfTokenManage.getToken(request);//获取CSRF令牌;
+								
+								String state = interfaceProduct+"_"+(csrfToken != null ? csrfToken : "");
+								
+								//授权接口
+								returnValue.put("redirectUrl", "https://open.weixin.qq.com/connect/qrconnect?appid="+appid+"&redirect_uri="+redirect_uri+"&response_type=code&scope=snsapi_login&state="+state+"#wechat_redirect");
+								
+					    	}
+						}else if(accessSourceDeviceManage.accessDevices(request).equals("wap")){//手机端
+							WeChatConfig weChatConfig = thirdPartyManage.queryWeChatConfig();
+					    	if(weChatConfig != null){
+								String appid = weChatConfig.getOa_appID();//公众号唯一标识
+								
+								String redirect_uri = domain+"thirdParty/loginRedirect";
+								
+								if(jumpUrl != null && !"".equals(jumpUrl.trim())){
+									redirect_uri = domain+"thirdParty/loginRedirect?jumpUrl="+jumpUrl.trim();//Base64安全编码;
+								}
+								redirect_uri = java.net.URLEncoder.encode(redirect_uri,"utf-8");   
+								
+								String csrfToken = csrfTokenManage.getToken(request);//获取CSRF令牌;
+								
+								String state = interfaceProduct+"_"+(csrfToken != null ? csrfToken : "");
+								
+								//授权接口
+								returnValue.put("redirectUrl", "https://open.weixin.qq.com/connect/oauth2/authorize?appid="+appid+"&redirect_uri="+redirect_uri+"&response_type=code&scope=snsapi_userinfo&state="+state+"&connect_redirect=1#wechat_redirect");
+								
+					    	}
+						}
+					}
+				}
+			}
+			
+			
+			
+			WebUtil.writeToWeb(JsonUtils.toJSONString(returnValue), "json", response);
+			return null;
+		}
+		
+		
+		
 		if(interfaceProduct != null && interfaceProduct.equals(10)){//微信
 			if(accessSourceDeviceManage.accessDevices(request).equals("pc")){//电脑端
 				WeChatConfig weChatConfig = thirdPartyManage.queryWeChatConfig();
@@ -125,7 +189,11 @@ public class ThirdPartyFormAction {
 						redirect_uri = Configuration.getUrl(request)+"thirdParty/loginRedirect?jumpUrl="+jumpUrl.trim();//Base64安全编码;
 					}
 					redirect_uri = java.net.URLEncoder.encode(redirect_uri,"utf-8");   
-					String state = csrfTokenManage.getToken(request);//获取令牌;
+					String csrfToken = csrfTokenManage.getToken(request);//获取CSRF令牌;
+					
+					String state = interfaceProduct+"_"+csrfToken;
+					
+					
 					
 					return "redirect:https://open.weixin.qq.com/connect/qrconnect?appid="+appid+"&redirect_uri="+redirect_uri+"&response_type=code&scope=snsapi_login&state="+state+"#wechat_redirect";
 					
@@ -142,7 +210,9 @@ public class ThirdPartyFormAction {
 					}
 					redirect_uri = java.net.URLEncoder.encode(redirect_uri,"utf-8");   
 					
-					String state = csrfTokenManage.getToken(request);//获取令牌;
+					String csrfToken = csrfTokenManage.getToken(request);//获取CSRF令牌;
+					
+					String state = interfaceProduct+"_"+csrfToken;
 					
 					return "redirect:https://open.weixin.qq.com/connect/oauth2/authorize?appid="+appid+"&redirect_uri="+redirect_uri+"&response_type=code&scope=snsapi_userinfo&state="+state+"&connect_redirect=1#wechat_redirect";
 					
@@ -151,11 +221,13 @@ public class ThirdPartyFormAction {
 			
 		}
 		
+		
+		
 		//当前模板使用的目录
 		String dirName = templateService.findTemplateDir_cache();
 		
 		model.addAttribute("message","第三方登录链接错误");//返回消息  
-		return "templates/"+dirName+"/"+accessSourceDeviceManage.accessDevices(request)+"/message";
+		return "/templates/"+dirName+"/"+accessSourceDeviceManage.accessDevices(request)+"/message";
 	}
 	
 	
@@ -165,7 +237,7 @@ public class ThirdPartyFormAction {
 	 * 第三方登录重定向
 	 * @param model
 	 * @param code 微信公众号code
-	 * @param state 微信公众号state 存放csrf令牌
+	 * @param state 自定义参数   微信公众号state 存放csrf令牌
 	 * @param jumpUrl 重定向参数
 	 * @param redirectAttrs
 	 * @param request
@@ -180,86 +252,96 @@ public class ThirdPartyFormAction {
 		
 		Map<String,String> error = new HashMap<String,String>();
 		
+		Integer interfaceProduct = -1;//接口产品
+		
+		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+		UserAuthorization userAuthorization = null;
+		
 		//判断令牌
 		if(state != null && !"".equals(state.trim())){	
-			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌
-			if(token_sessionid != null && !"".equals(token_sessionid.trim())){
-				if(!token_sessionid.equals(state)){
-					error.put("token", ErrorView._13.name());
-				}
-			}else{
-				error.put("token", ErrorView._12.name());
+			String[] param_arr = state.trim().split("_");
+			interfaceProduct = Integer.parseInt(param_arr[0]);
+			String csrfToken = null;
+			if(param_arr.length ==2){
+				csrfToken = param_arr[1];
 			}
+			
+			csrfTokenManage.processCsrfToken(request, csrfToken,error);
+			
+			
 		}else{
-			error.put("token", ErrorView._11.name());
+			error.put("state", "自定义参数不能为空");
 		}
 
 		if(error.size() ==0){
-			WeChatConfig weChatConfig = thirdPartyManage.queryWeChatConfig();
-			if(weChatConfig != null){
-				String appid = "";//应用唯一标识
-				String secret = "";//应用密钥
-				
-				if(accessSourceDeviceManage.accessDevices(request).equals("pc")){//电脑端
-					appid = weChatConfig.getOp_appID();
-					secret = weChatConfig.getOp_appSecret();
-				}else if(accessSourceDeviceManage.accessDevices(request).equals("wap")){//手机端
-					//微信浏览器端
-					appid = weChatConfig.getOa_appID();
-					secret = weChatConfig.getOa_appSecret();
-				}
-				
-				if(appid != null && !"".equals(appid.trim()) && secret != null && !"".equals(secret.trim())){
-					WeiXinUserInfo weiXinUserInfo = thirdPartyManage.queryWeiXinUserInfo(code,appid,secret);
-					if(weiXinUserInfo != null){
-						if(weiXinUserInfo.getErrorCode() == null || "".equals(weiXinUserInfo.getErrorCode())){
-							
-	
-							if(weiXinUserInfo.getUnionId() != null && !"".equals(weiXinUserInfo.getUnionId())){
-								this.createUserInfo(weiXinUserInfo.getUnionId(),weiXinUserInfo.getOpenId(), error,request, response);
+			if(interfaceProduct.equals(10)){//微信
+				WeChatConfig weChatConfig = thirdPartyManage.queryWeChatConfig();
+				if(weChatConfig != null){
+					String appid = "";//应用唯一标识
+					String secret = "";//应用密钥
+					
+					if(accessSourceDeviceManage.accessDevices(request).equals("pc")){//电脑端
+						appid = weChatConfig.getOp_appID();
+						secret = weChatConfig.getOp_appSecret();
+					}else if(accessSourceDeviceManage.accessDevices(request).equals("wap")){//手机端
+						//微信浏览器端
+						appid = weChatConfig.getOa_appID();
+						secret = weChatConfig.getOa_appSecret();
+					}
+					
+					if(appid != null && !"".equals(appid.trim()) && secret != null && !"".equals(secret.trim())){
+						WeiXinUserInfo weiXinUserInfo = thirdPartyManage.queryWeiXinUserInfo(code,appid,secret);
+						if(weiXinUserInfo != null){
+							if(weiXinUserInfo.getErrorCode() == null || "".equals(weiXinUserInfo.getErrorCode())){
 								
-								
-								if(error.size() ==0){
-									//重定向到
-									if(jumpUrl != null && !"".equals(jumpUrl.trim())){
+		
+								if(weiXinUserInfo.getUnionId() != null && !"".equals(weiXinUserInfo.getUnionId())){
+									userAuthorization = this.createWeiXinUserInfo(weiXinUserInfo.getUnionId(),weiXinUserInfo.getOpenId(), error,request, response);
+									
+									
+									if(error.size() ==0 && !isAjax){
+										//重定向到
+										if(jumpUrl != null && !"".equals(jumpUrl.trim())){
 
-										//Base64解码后参数进行URL编码
-										String parameter = WebUtil.parameterEncoded(Base64.decodeBase64URL(jumpUrl));
+											//Base64解码后参数进行URL编码
+											String parameter = WebUtil.parameterEncoded(Base64.decodeBase64URL(jumpUrl));
 
-										String encodedRedirectURL = response.encodeRedirectURL(parameter);
-										
-										if("login".equalsIgnoreCase(encodedRedirectURL)){
-											return "redirect:/index";
+											String encodedRedirectURL = response.encodeRedirectURL(parameter);
+											
+											if("login".equalsIgnoreCase(encodedRedirectURL)){
+												return "redirect:/index";
+											}else{
+												response.sendRedirect((Configuration.getPath() != null && !"".equals(Configuration.getPath()) ?Configuration.getPath()+"/" : "/")+encodedRedirectURL);
+												return null;
+											}
 										}else{
-											response.sendRedirect((Configuration.getPath() != null && !"".equals(Configuration.getPath()) ?Configuration.getPath()+"/" : "/")+encodedRedirectURL);
-											return null;
+											return "redirect:/index";
+											
 										}
-									}else{
-										return "redirect:/index";
-										
 									}
+									
+									
+								}else{
+									error.put("weiXinUserInfo", "微信unionid为空，请将公众号绑定到微信开放平台");
 								}
-								
-								
 							}else{
-								error.put("weiXinUserInfo", "微信unionid为空，请将公众号绑定到微信开放平台");
+								error.put("weiXinUserInfo", weiXinUserInfo.getErrorCode()+" -- "+weiXinUserInfo.getErrorMessage());
 							}
 						}else{
-							error.put("weiXinUserInfo", weiXinUserInfo.getErrorCode()+" -- "+weiXinUserInfo.getErrorMessage());
+							
+							error.put("weiXinUserInfo", "查询微信用户基本信息为空");
 						}
-					}else{
-						
-						error.put("weiXinUserInfo", "查询微信用户基本信息为空");
 					}
+					
+					
+				}else{
+					error.put("weChatConfig", "微信配置信息不存在");
 				}
-				
-				
-			}else{
-				error.put("weChatConfig", "微信配置信息不存在");
 			}
-			
-			
 		}
+		
+		
+		
 		
 		Map<String,String> returnError = new HashMap<String,String>();//错误
 		if(error.size() >0){
@@ -272,6 +354,26 @@ public class ThirdPartyFormAction {
     			}
     			
 			}
+		}
+		
+		if(isAjax){
+			Map<String,Object> returnValue = new HashMap<String,Object>();
+			
+			if(error != null && error.size() >0){
+    			returnValue.put("success", "false");
+    			returnValue.put("error", returnError);
+    			
+    		}else{
+    			returnValue.put("success", "true");
+    			returnValue.put("userAuthorization", userAuthorization);
+    		}
+			
+			WebUtil.writeToWeb(JsonUtils.toJSONString(returnValue), "json", response);
+			return null;
+		}
+		
+		
+		if(error.size() >0){
     		if(accessSourceDeviceManage.accessDevices(request).equals("wap")){//单页使用
     			String htmlContent = "<html><head><meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0'><style type='text/css'>html,body{height: 100%; margin: 0;padding: 0;}</style></head>"
     					+ "<body><div style='width: 100%;height: 100%;display:flex; justify-content:center;align-items:center; font-size: 16px;color: #666;'>"
@@ -284,25 +386,26 @@ public class ThirdPartyFormAction {
     		}
 		}
 		
-		
-		
 		model.addAttribute("message","登录重定向失败");//返回消息  
 		if(error.size() >0){
 			model.addAttribute("message",returnError.entrySet().iterator().next().getValue());//返回消息
 		}
 		//当前模板使用的目录
 		String dirName = templateService.findTemplateDir_cache();
-		return "templates/"+dirName+"/"+accessSourceDeviceManage.accessDevices(request)+"/message";
+		return "/templates/"+dirName+"/"+accessSourceDeviceManage.accessDevices(request)+"/message";
 		
 	}
 	
 	/**
-	 * 生成第三方用户信息
+	 * 生成微信用户信息
 	 * @param unionId 第三方用户信息唯一凭证
 	 * @param openId 用户的唯一标识
 	 * @param error 错误信息集合
+	 * @param request
+	 * @param response
+	 * @return
 	 */
-	private void createUserInfo(String unionId,String openId,Map<String,String> error,
+	private UserAuthorization createWeiXinUserInfo(String unionId,String openId,Map<String,String> error,
 			HttpServletRequest request, HttpServletResponse response){
 
 		String platformUserId = userManage.thirdPartyUserIdToPlatformUserId(unionId,40);
@@ -323,7 +426,6 @@ public class ThirdPartyFormAction {
 					String id = UUIDUtil.getUUID22();
 					user.setUserName(id);//会员用户名
 					user.setAccount(userManage.queryUserIdentifier(40)+"-"+id);//账号
-				
 					user.setSalt(UUIDUtil.getUUID32());//盐值
 					user.setSecurityDigest(new Date().getTime());//安全摘要
 					user.setAllowUserDynamic(true);//是否允许显示用户动态
@@ -381,14 +483,15 @@ public class ThirdPartyFormAction {
 					oAuthManage.addOpenId(openId,refreshToken);
 				}
 				
-				oAuthManage.addAccessToken(accessToken, new AccessUser(user.getId(),user.getUserName(),user.getAccount(),user.getNickname(),fileManage.fileServerAddress()+user.getAvatarPath(),user.getAvatarName(), user.getSecurityDigest(),false,openId));
-				oAuthManage.addRefreshToken(refreshToken, new RefreshUser(accessToken,user.getId(),user.getUserName(),user.getAccount(),user.getNickname(),fileManage.fileServerAddress()+user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),false,openId));
+				AccessUser accessUser = new AccessUser(user.getId(),user.getUserName(),user.getAccount(),user.getNickname(),fileManage.fileServerAddress(request)+user.getAvatarPath(),user.getAvatarName(), user.getSecurityDigest(),false,openId);
+				oAuthManage.addAccessToken(accessToken, accessUser);
+				oAuthManage.addRefreshToken(refreshToken, new RefreshUser(accessToken,user.getId(),user.getUserName(),user.getAccount(),user.getNickname(),fileManage.fileServerAddress(request)+user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),false,openId));
 
 				//将访问令牌添加到Cookie
 				WebUtil.addCookie(response, "cms_accessToken", accessToken, 0);
 				//将刷新令牌添加到Cookie
 				WebUtil.addCookie(response, "cms_refreshToken", refreshToken, 0);
-				AccessUserThreadLocal.set(new AccessUser(user.getId(),user.getUserName(),user.getAccount(),user.getNickname(),fileManage.fileServerAddress()+user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),false,openId));
+				AccessUserThreadLocal.set(new AccessUser(user.getId(),user.getUserName(),user.getAccount(),user.getNickname(),fileManage.fileServerAddress(request)+user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),false,openId));
 				
 				//删除缓存
 				userManage.delete_cache_findUserById(user.getId());
@@ -397,13 +500,15 @@ public class ThirdPartyFormAction {
 				//异步执行会员卡赠送任务(长期任务类型)
 				membershipCardGiftTaskManage.async_triggerMembershipCardGiftTask(user.getUserName());
 				
+				return new UserAuthorization(accessToken,refreshToken, accessUser);
 			}else{
 				error.put("register", ErrorView._824.name());//禁止用户
 			}
 			
 			
 		}
-		
+		return null;
 	}
+	
 	
 }

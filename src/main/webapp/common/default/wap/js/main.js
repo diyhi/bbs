@@ -970,6 +970,7 @@ var index_component = Vue.extend({
 		validation_captchaValue : function(event) {
 			var _self = this;
 			var cv = this.captchaValue.trim();
+			_self.error.captchaValue = "";
 			if (cv.length < 4) {
 				_self.error.captchaValue = "请填写完整验证码";
 			}
@@ -3536,6 +3537,7 @@ var thread_component = Vue.extend({
 		validation_captchaValue : function validation_captchaValue(event) {
 			var _self = this;
 			var cv = this.captchaValue.trim();
+			_self.error.captchaValue = "";
 			if (cv.length < 4) {
 				_self.error.captchaValue = "请填写完整验证码";
 			}
@@ -5531,6 +5533,7 @@ var question_component = Vue.extend({
 		validation_captchaValue : function validation_captchaValue(event) {
 			var _self = this;
 			var cv = this.captchaValue.trim();
+			_self.error.captchaValue = "";
 			if (cv.length < 4) {
 				_self.error.captchaValue = "请填写完整验证码";
 			}
@@ -6068,6 +6071,7 @@ var addQuestion_component = Vue.extend({
 		validation_captchaValue : function() {
 			var _self = this;
 			var cv = this.captchaValue.trim();
+			_self.error.captchaValue = "";
 			if (cv.length < 4) {
 				_self.error.captchaValue = "请填写完整验证码";
 			}
@@ -6347,6 +6351,7 @@ var appendQuestion_component = Vue.extend({
 		validation_captchaValue : function() {
 			var _self = this;
 			var cv = this.captchaValue.trim();
+			_self.error.captchaValue = "";
 			if (cv.length < 4) {
 				_self.error.captchaValue = "请填写完整验证码";
 			}
@@ -7671,6 +7676,7 @@ var register_component = Vue.extend({
 		validation_captchaValue : function validation_captchaValue(event) {
 			var _self = this;
 			var cv = this.captchaValue.trim();
+			_self.error.captchaValue = "";
 			if (cv.length < 4) {
 				_self.error.captchaValue = "请填写完整验证码";
 			}
@@ -7956,6 +7962,7 @@ var findPassWord_step1_component = Vue.extend({
 		validation_captchaValue : function validation_captchaValue(event) {
 			var _self = this;
 			var cv = this.captchaValue.trim();
+			_self.error.captchaValue = "";
 			if (cv.length < 4) {
 				_self.error.captchaValue = "请填写完整验证码";
 			}
@@ -8318,6 +8325,7 @@ var findPassWord_step2_component = Vue.extend({
 			var _self = this;
 			
 			var cv = this.captchaValue.trim();
+			_self.error.captchaValue = "";
 			if (cv.length < 4) {
 				_self.error.captchaValue = "请填写完整验证码";
 			}
@@ -8825,6 +8833,7 @@ var login_component = Vue.extend({
 		validation_captchaValue : function validation_captchaValue(event) {
 			var _self = this;
 			var cv = this.captchaValue.trim();
+			_self.error.captchaValue = "";
 			if (cv.length < 4) {
 				_self.error.captchaValue = "请填写完整验证码";
 			}
@@ -9492,6 +9501,11 @@ var home_component = Vue.extend({
 		queryUserDynamicList : function() {
 			var _self = this;
 			
+			if(_self.totalpage == _self.currentpage){//如果是最后一页，则不再加载
+				_self.loading = true;
+				return;
+			}
+			
 			if (_self.user.userName != undefined && _self.currentpage < _self.totalpage) {
 				//先改总页数为0，避免请求为空时死循环
 				_self.totalpage = 0;
@@ -9500,6 +9514,9 @@ var home_component = Vue.extend({
 				if(_self.userName != null && _self.userName != ""){//用户名称
 					data += "&userName=" + _self.userName;
 				}
+				
+				
+				
 				$.ajax({
 					type : "GET",
 					cache : false,
@@ -9558,6 +9575,12 @@ var home_component = Vue.extend({
 										});
 										
 									}else if(userDynamic.module == 200){
+										//处理图片标签
+										var contentNode = document.createElement("div");
+										contentNode.innerHTML = userDynamic.commentContent;
+										_self.bindNode(contentNode,null);
+										userDynamic.commentContent = escapeVueHtml(contentNode.innerHTML);
+									}else if(userDynamic.module == 300){
 										//处理图片标签
 										var contentNode = document.createElement("div");
 										contentNode.innerHTML = userDynamic.commentContent;
@@ -11332,6 +11355,7 @@ var phoneBinding_component = Vue.extend({
 		validation_captchaValue : function validation_captchaValue(event) {
 			var _self = this;
 			var cv = this.captchaValue.trim();
+			_self.error.captchaValue = "";
 			if (cv.length < 4) {
 				_self.error.captchaValue = "请填写完整验证码";
 			}
@@ -11649,6 +11673,7 @@ var updatePhoneBinding_step1_component = Vue.extend({
 		validation_captchaValue : function validation_captchaValue(event) {
 			var _self = this;
 			var cv = this.captchaValue.trim();
+			_self.error.captchaValue = "";
 			if (cv.length < 4) {
 				_self.error.captchaValue = "请填写完整验证码";
 			}
@@ -11973,6 +11998,7 @@ var updatePhoneBinding_step2_component = Vue.extend({
 		validation_captchaValue : function validation_captchaValue(event) {
 			var _self = this;
 			var cv = this.captchaValue.trim();
+			_self.error.captchaValue = "";
 			if (cv.length < 4) {
 				_self.error.captchaValue = "请填写完整验证码";
 			}
@@ -12567,6 +12593,7 @@ var privateMessageChat_component = Vue.extend({
 		validation_captchaValue : function validation_captchaValue(event) {
 			var _self = this;
 			var cv = this.captchaValue.trim();
+			_self.error.captchaValue = "";
 			if (cv.length < 4) {
 				_self.error.captchaValue = "请填写完整验证码";
 			}
@@ -14439,6 +14466,7 @@ var editTopic_component = Vue.extend({
 		validation_captchaValue : function() {
 			var _self = this;
 			var cv = this.captchaValue.trim();
+			_self.error.captchaValue = "";
 			if (cv.length < 4) {
 				_self.error.captchaValue = "请填写完整验证码";
 			}

@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>bbs</groupId>
 	<artifactId>bbs</artifactId>
-	<version>5.7</version>
+	<version>5.8</version>
 	<packaging>war</packaging>
 	<name>bbs</name>
 	<description/>
@@ -354,7 +354,7 @@
 		<dependency>
 		    <groupId>com.fasterxml.jackson.core</groupId>
 		    <artifactId>jackson-annotations</artifactId>
-		    <version>2.9.3</version>
+		    <version>2.13.3</version>
 		     <exclusions>
 				<exclusion>
 					<groupId>*</groupId>
@@ -365,7 +365,7 @@
 		<dependency>
 		    <groupId>com.fasterxml.jackson.core</groupId>
 		    <artifactId>jackson-core</artifactId>
-		    <version>2.9.3</version>
+		    <version>2.13.3</version>
 		     <exclusions>
 				<exclusion>
 					<groupId>*</groupId>
@@ -376,7 +376,7 @@
 		<dependency>
 		    <groupId>com.fasterxml.jackson.core</groupId>
 		    <artifactId>jackson-databind</artifactId>
-		    <version>2.9.3</version>
+		    <version>2.13.3</version>
 		     <exclusions>
 				<exclusion>
 					<groupId>*</groupId>
@@ -620,7 +620,7 @@
 		<dependency>
 		    <groupId>org.springframework</groupId>
 		    <artifactId>spring-aop</artifactId>
-		    <version>5.0.7.RELEASE</version>
+		    <version>5.3.18</version>
 		     <exclusions>
 				<exclusion>
 					<groupId>*</groupId>
@@ -631,7 +631,7 @@
 		<dependency>
 		    <groupId>org.springframework</groupId>
 		    <artifactId>spring-beans</artifactId>
-		    <version>5.0.7.RELEASE</version>
+		    <version>5.3.18</version>
 		     <exclusions>
 				<exclusion>
 					<groupId>*</groupId>
@@ -642,7 +642,7 @@
 		<dependency>
 		    <groupId>org.springframework</groupId>
 		    <artifactId>spring-context</artifactId>
-		    <version>5.0.7.RELEASE</version>
+		    <version>5.3.18</version>
 		     <exclusions>
 				<exclusion>
 					<groupId>*</groupId>
@@ -653,7 +653,7 @@
 		<dependency>
 		    <groupId>org.springframework</groupId>
 		    <artifactId>spring-context-support</artifactId>
-		    <version>5.0.7.RELEASE</version>
+		    <version>5.3.18</version>
 		     <exclusions>
 				<exclusion>
 					<groupId>*</groupId>
@@ -664,7 +664,7 @@
 		<dependency>
 		    <groupId>org.springframework</groupId>
 		    <artifactId>spring-core</artifactId>
-		    <version>5.0.7.RELEASE</version>
+		    <version>5.3.18</version>
 		     <exclusions>
 				<exclusion>
 					<groupId>*</groupId>
@@ -675,7 +675,7 @@
 		<dependency>
 	    	<groupId>org.springframework</groupId>
 		    <artifactId>spring-expression</artifactId>
-		    <version>5.0.7.RELEASE</version>
+		    <version>5.3.18</version>
 		     <exclusions>
 				<exclusion>
 					<groupId>*</groupId>
@@ -686,7 +686,7 @@
 		<dependency>
 		    <groupId>org.springframework</groupId>
 		    <artifactId>spring-jdbc</artifactId>
-		    <version>5.0.7.RELEASE</version>
+		    <version>5.3.18</version>
 		     <exclusions>
 				<exclusion>
 					<groupId>*</groupId>
@@ -697,7 +697,7 @@
 		<dependency>
 		    <groupId>org.springframework</groupId>
 		    <artifactId>spring-messaging</artifactId>
-		    <version>5.0.7.RELEASE</version>
+		    <version>5.3.18</version>
 		     <exclusions>
 				<exclusion>
 					<groupId>*</groupId>
@@ -708,7 +708,7 @@
 		<dependency>
 		    <groupId>org.springframework</groupId>
 		    <artifactId>spring-orm</artifactId>
-		    <version>5.0.7.RELEASE</version>
+		    <version>5.3.18</version>
 		     <exclusions>
 				<exclusion>
 					<groupId>*</groupId>
@@ -719,7 +719,7 @@
 		<dependency>
 		    <groupId>org.springframework</groupId>
 		    <artifactId>spring-tx</artifactId>
-		    <version>5.0.7.RELEASE</version>
+		    <version>5.3.18</version>
 		     <exclusions>
 				<exclusion>
 					<groupId>*</groupId>
@@ -730,7 +730,7 @@
 		<dependency>
 		    <groupId>org.springframework</groupId>
 		    <artifactId>spring-web</artifactId>
-		    <version>5.0.7.RELEASE</version>
+		    <version>5.3.18</version>
 		     <exclusions>
 				<exclusion>
 					<groupId>*</groupId>
@@ -741,7 +741,7 @@
 		<dependency>
 		    <groupId>org.springframework</groupId>
 		    <artifactId>spring-webmvc</artifactId>
-		    <version>5.0.7.RELEASE</version>
+		    <version>5.3.18</version>
 		     <exclusions>
 				<exclusion>
 					<groupId>*</groupId>
@@ -752,7 +752,7 @@
 		<dependency>
 		    <groupId>org.springframework</groupId>
 		    <artifactId>spring-websocket</artifactId>
-		    <version>5.0.7.RELEASE</version>
+		    <version>5.3.18</version>
 		     <exclusions>
 				<exclusion>
 					<groupId>*</groupId>
@@ -765,7 +765,7 @@
 		<dependency>
 		    <groupId>org.springframework.security</groupId>
 		    <artifactId>spring-security-acl</artifactId>
-		    <version>5.0.6.RELEASE</version>
+		    <version>5.6.2</version>
 		     <exclusions>
 				<exclusion>
 					<groupId>*</groupId>
@@ -776,7 +776,7 @@
 		<dependency>
 		    <groupId>org.springframework.security</groupId>
 		    <artifactId>spring-security-aspects</artifactId>
-		    <version>5.0.6.RELEASE</version>
+		    <version>5.6.2</version>
 		     <exclusions>
 				<exclusion>
 					<groupId>*</groupId>
@@ -787,7 +787,7 @@
 		<dependency>
 		    <groupId>org.springframework.security</groupId>
 		    <artifactId>spring-security-config</artifactId>
-		    <version>5.0.6.RELEASE</version>
+		    <version>5.6.2</version>
 		     <exclusions>
 				<exclusion>
 					<groupId>*</groupId>
@@ -798,7 +798,7 @@
 		<dependency>
 		    <groupId>org.springframework.security</groupId>
 		    <artifactId>spring-security-core</artifactId>
-		    <version>5.0.6.RELEASE</version>
+		    <version>5.6.2</version>
 		     <exclusions>
 				<exclusion>
 					<groupId>*</groupId>
@@ -809,7 +809,7 @@
 		<dependency>
 		    <groupId>org.springframework.security</groupId>
 		    <artifactId>spring-security-crypto</artifactId>
-		    <version>5.0.6.RELEASE</version>
+		    <version>5.6.2</version>
 		     <exclusions>
 				<exclusion>
 					<groupId>*</groupId>
@@ -820,7 +820,7 @@
 		<dependency>
 		    <groupId>org.springframework.security</groupId>
 		    <artifactId>spring-security-web</artifactId>
-		    <version>5.0.6.RELEASE</version>
+		    <version>5.6.2</version>
 		     <exclusions>
 				<exclusion>
 					<groupId>*</groupId>
@@ -831,7 +831,7 @@
 		<dependency>
 		    <groupId>org.springframework.security</groupId>
 		    <artifactId>spring-security-oauth2-core</artifactId>
-		    <version>5.0.6.RELEASE</version>
+		    <version>5.6.2</version>
 		     <exclusions>
 				<exclusion>
 					<groupId>*</groupId>
@@ -842,7 +842,7 @@
 		<dependency>
 		    <groupId>org.springframework.security</groupId>
 		    <artifactId>spring-security-oauth2-client</artifactId>
-		    <version>5.0.6.RELEASE</version>
+		    <version>5.6.2</version>
 		     <exclusions>
 				<exclusion>
 					<groupId>*</groupId>

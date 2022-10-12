@@ -5,7 +5,7 @@
 <div class="helpNavigation">
 	<div class="navigation">
 		<a href="">首页</a> &gt; 
-		<a href="help.htm">帮助</a> &gt; 
+		<a href="help">帮助</a> &gt; 
 		<#-- 返回的是Map<String,String>类型 -->
 		
 		<#assign helpNavigation = helpRelated_helpNavigation_collection>
@@ -14,7 +14,7 @@
 			<#if !key_has_next><#-- 如果是最后一个 -->
 				<span>${value}</span>
 			<#else>
-				<a href="help.htm?helpTypeId=${key}" >${value}</a> &gt; 
+				<a href="help?helpTypeId=${key}" >${value}</a> &gt; 
 			</#if>
 		    
 		</#list> 

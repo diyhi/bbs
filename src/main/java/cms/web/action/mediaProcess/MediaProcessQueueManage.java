@@ -54,6 +54,7 @@ public class MediaProcessQueueManage {
 	
     /**
 	 * 查询缓存 处理视频播放器标签(缓存不做删除处理，到期自动失效，由话题'随机数'做参数,确保查询为最新值)
+	 * @param localUrl 获取网站URL Configuration.getUrl(request)
 	 * @param html 富文本内容
 	 * @param processVideoPlayerId 处理'视频播放器'Id
 	 * @param tagId 标签Id  -1表示管理后台打开链接，不校验权限
@@ -61,13 +62,14 @@ public class MediaProcessQueueManage {
 	 * @return
 	 */
 	@Cacheable(value="mediaProcessQueueManage_cache_processVideoPlayer",key="#processVideoPlayerId")
-	public String query_cache_processVideoPlayer(String html,String processVideoPlayerId,Long tagId,String secret){
+	public String query_cache_processVideoPlayer(String localUrl,String html,String processVideoPlayerId,Long tagId,String secret){
 		
-		return textFilterManage.processVideoPlayer(html,tagId,secret);
+		return textFilterManage.processVideoPlayer(localUrl,html,tagId,secret);
 	}
 	
 	 /**
 	 * 查询缓存 处理视频信息(缓存不做删除处理，到期自动失效，由话题'随机数'做参数,确保查询为最新值)
+	 * @param localUrl 获取网站URL Configuration.getUrl(request)
 	 * @param html 富文本内容
 	 * @param processVideoPlayerId 处理'视频播放器'Id
 	 * @param tagId 标签Id  -1表示管理后台打开链接，不校验权限
@@ -75,11 +77,10 @@ public class MediaProcessQueueManage {
 	 * @return
 	 */
 	@Cacheable(value="mediaProcessQueueManage_cache_processVideoInfo",key="#processVideoPlayerId")
-	public List<MediaInfo> query_cache_processVideoInfo(String html,String processVideoPlayerId,Long tagId,String secret){
+	public List<MediaInfo> query_cache_processVideoInfo(String localUrl,String html,String processVideoPlayerId,Long tagId,String secret){
 		
-		return textFilterManage.processVideoInfo(html,tagId,secret);
+		return textFilterManage.processVideoInfo(localUrl,html,tagId,secret);
 	}
-	
 	
 	
 	/**

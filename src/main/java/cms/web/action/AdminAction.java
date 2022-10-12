@@ -149,7 +149,7 @@ public class AdminAction {
 	public String index(ModelMap model,HttpServletRequest request, HttpServletResponse response)throws Exception{
 		//List<String> templatePathList = WebUtil.templatePathList();
 		//model.addAttribute("templatePathList", templatePathList);
-		return "manage/index";	
+		return "/manage/index";	
 	}
 	
 	
@@ -161,7 +161,7 @@ public class AdminAction {
 	public ResponseEntity<byte[]> component(ModelMap model,@PathVariable String path,@PathVariable String name,
 			HttpServletRequest request, HttpServletResponse response)throws Exception{
 		
-		String fullPath = PathUtil.path()+File.separator+"WEB-INF"+File.separator+"manage"+File.separator+FileUtil.toRelativePath(path)+File.separator+FileUtil.toRelativePath(name+".vue");
+		String fullPath = PathUtil.path()+File.separator+"WEB-INF"+File.separator+"manage"+File.separator+FileUtil.toRelativePath(path)+File.separator+FileUtil.toRelativePath(FileUtil.getBaseName(name)+".vue");
 		
 		File file = new File(fullPath);
 		if(!file.exists()){

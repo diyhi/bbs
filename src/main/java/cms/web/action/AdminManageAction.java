@@ -115,7 +115,7 @@ public class AdminManageAction {
 			WebUtil.writeToWeb(JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue)), "json", response);
 			return null;
 		}else{
-			return "manage/index";	
+			return "/manage/index";	
 		}
 	}
 	

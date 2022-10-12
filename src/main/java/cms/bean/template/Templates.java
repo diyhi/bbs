@@ -38,7 +38,9 @@ public class Templates implements Serializable{
 	/** 站点栏目 JSON数据**/
 	@Lob
 	private String columns;
-	
+	/** 是否验证CSRF **/
+	@Column(nullable=false)
+	private Boolean verifyCSRF = true;
 	/** 模板简介 **/
 	@Lob
 	private String introduction;
@@ -105,6 +107,14 @@ public class Templates implements Serializable{
 
 	public void setThumbnailSuffix(String thumbnailSuffix) {
 		this.thumbnailSuffix = thumbnailSuffix;
+	}
+
+	public Boolean getVerifyCSRF() {
+		return verifyCSRF;
+	}
+
+	public void setVerifyCSRF(Boolean verifyCSRF) {
+		this.verifyCSRF = verifyCSRF;
 	}
 
 

@@ -4,8 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import cms.bean.PageForm;
 import cms.bean.PageView;
@@ -47,7 +50,7 @@ public class RedEnvelope_TemplateManage {
 	 * @param parameter 参数
 	 */
 	public GiveRedEnvelope content_entityBean(Forum forum,Map<String,Object> parameter,Map<String,Object> runtimeParameter){
-		
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();  
 		String giveRedEnvelopeId = null;
 
 		AccessUser accessUser = null;
@@ -88,7 +91,7 @@ public class RedEnvelope_TemplateManage {
 					if(user.getCancelAccountTime().equals(-1L)){
 						giveRedEnvelope.setAccount(user.getAccount());
 						giveRedEnvelope.setNickname(user.getNickname());
-						giveRedEnvelope.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+						giveRedEnvelope.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 						giveRedEnvelope.setAvatarName(user.getAvatarName());
 					}
 				}

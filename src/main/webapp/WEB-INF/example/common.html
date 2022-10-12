@@ -196,6 +196,16 @@
 			<td>String</td>
 			<td>头像名称</td>
 		</tr>
+		<tr> 
+			<td>openId</td> 
+			<td>String</td>
+			<td colspan="2">第三方用户的唯一标识 例如微信的openid</td>
+		</tr>
+		<tr> 
+			<td>loginInterface</td> 
+			<td>Integer</td>
+			<td colspan="2">登录接口 0.本地 10.微信 50.其他开放平台</td>
+		</tr>
 	</tbody> 
 </table>
 
@@ -600,6 +610,126 @@
 </table>
 
 
+
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">基本信息</th>
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td>请求路径</td> 
+			<td colspan="2">baseInfo.htm</td>
+		</tr>
+		<tr> 
+			<td>请求方式</td> 
+			<td colspan="2">GET</td>
+		</tr> 
+		<tr> 
+			<td width="30%" rowspan="12">提交返回</td> 
+			<td width="30%" rowspan="12">JSON格式值 类型:Map&ltString,Object></td>
+			<td width="40%">键参数：title<br>值内容说明：站点名称<br>值类型：String</td> 
+		</tr>
+		<tr> 
+			<td>键参数：keywords<br>值内容说明：站点关键词<br>值类型：String</td> 
+		</tr>
+		<tr> 
+			<td>键参数：description<br>值内容说明：站点描述<br>值类型：String</td> 
+		</tr>
+		<tr> 
+			<td>键参数：baseURL<br>值内容说明：系统路径<br>值类型：String</td> 
+		</tr>
+		<tr> 
+			<td>键参数：commonPath<br>值内容说明：资源路径<br>值类型：String</td> 
+		</tr>
+		<tr> 
+			<td>键参数：contextPath<br>值内容说明：系统虚拟目录<br>值类型：String</td> 
+		</tr>
+		<tr> 
+			<td>键参数：templateDir<br>值内容说明：模板目录名称<br>值类型：String</td> 
+		</tr>
+		<tr> 
+			<td>键参数：systemUser<br>值内容说明：登录用户<br>值类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_40'); return false;">AccessUser</a></td> 
+		</tr>
+		<tr> 
+			<td>键参数：baseURI<br>值内容说明：系统资源标识符<br>值类型：String</td> 
+		</tr>
+		<tr> 
+			<td>键参数：fileStorageSystem<br>值内容说明：文件存储系统 0.本地系统 10.SeaweedFS 20.MinIO 30.阿里云OSS<br>值类型：Integer</td> 
+		</tr>
+		<tr> 
+			<td>键参数：supportAccessDevice<br>值内容说明：支持访问设备 1.自动识别终端 2.电脑端 3.移动端<br>值类型：Integer</td> 
+		</tr>
+    	<tr> 
+			<td>键参数：weixin_oa_appid<br>值内容说明：微信公众号appid<br>值类型：String</td> 
+		</tr>
+
+	</tbody> 
+</table>
+
+
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">会话续期</th>
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td>请求路径</td> 
+			<td colspan="2">refreshToken.htm</td>
+		</tr>
+		<tr> 
+			<td>请求方式</td> 
+			<td colspan="2">POST</td>
+		</tr> 
+		<tr> 
+			<td width="30%" rowspan="11">提交返回</td> 
+			<td width="30%" rowspan="11">JSON格式值 类型:Map&ltString,Object></td>
+			<td width="40%">键参数：accessToken<br>值内容说明：访问令牌<br>值类型：String</td> 
+		</tr>
+		<tr> 
+			<td>键参数：refreshToken<br>值内容说明：刷新令牌<br>值类型：String</td> 
+		</tr>
+		<tr> 
+			<td>键参数：systemUser<br>值内容说明：登录用户<br>值类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_40'); return false;">AccessUser</a></td> 
+		</tr>
+	</tbody> 
+</table>
+
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">恢复微信浏览器会话</th>
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td>请求路径</td> 
+			<td colspan="2">recoverWeChatBrowserSession.htm</td>
+		</tr>
+		<tr> 
+			<td>请求方式</td> 
+			<td colspan="2">POST</td>
+		</tr> 
+		<tr> 
+			<td width="30%" rowspan="11">提交返回</td> 
+			<td width="30%" rowspan="11">JSON格式值 类型:Map&ltString,Object></td>
+			<td width="40%">键参数：accessToken<br>值内容说明：访问令牌<br>值类型：String</td> 
+		</tr>
+		<tr> 
+			<td>键参数：refreshToken<br>值内容说明：刷新令牌<br>值类型：String</td> 
+		</tr>
+		<tr> 
+			<td>键参数：systemUser<br>值内容说明：登录用户<br>值类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_40'); return false;">AccessUser</a></td> 
+		</tr>
+		<tr> 
+			<td>键参数：openId<br>值内容说明：用户的唯一标识 每个用户对每个公众号的OpenID是唯一的。对于不同公众号，同一用户的openid不同<br>值类型：String</td> 
+		</tr>
+	</tbody> 
+</table>
+
 <table class="exampleTable" > 
 	<thead> 
 		<tr> 
@@ -618,6 +748,9 @@
 		</tr>
 		<tr> 
 			<td>因为手机版采用单页应用设计,框架不支持加上网页后缀,建议电脑版网页链接不要加上后缀(.htm)，让手机版和网页版URL保持一致</td>
+		</tr>
+		<tr> 
+			<td>前后端分离模板使用localStorage存储Token时，ajax发送header需要加上Authorization属性验证权限，值格式为“Bearer 访问令牌,刷新令牌”。例如：Authorization: Bearer a7f9ffe9b01c467ea9b1dccfcf5e6951,1024d6e2c9394b489d384a5867620a07</td>
 		</tr>
 	</tbody> 
 </table>

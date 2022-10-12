@@ -58,6 +58,9 @@ public class CommentedProperties{
 	//OAuth2配置参数
 	private static Map<String,Object> oauth2Map = null;
 	
+	//crossOrigin配置参数
+	private static Map<String,Object> crossOriginMap = null;
+	
 	/**
 	 * 内部属性表
 	 */
@@ -947,5 +950,49 @@ public class CommentedProperties{
 	}
 	
 	
+	/**
+	 * 读取crossOrigin.properties参数
+	 * @return
+	 */
+	public static Map<String,Object> readCrossOrigin(){	
+		if(crossOriginMap != null && crossOriginMap.size() >0){
+			return crossOriginMap;
+		}
+		//OAuth2配置参数
+		Map<String,Object> _crossOriginMap = new HashMap<String,Object>();
+		
+		
+		org.springframework.core.io.Resource resource = new ClassPathResource("/crossOrigin.properties");//读取配置文件
+		CommentedProperties props = new CommentedProperties();
+
+		try {
+			props.load(resource.getInputStream(),"utf-8");
+			
+			Set<String> propertyNameList = props.propertyNames();
+			if(propertyNameList != null && propertyNameList.size() >0){
+				for(String propertyName : propertyNameList){
+					if(propertyName.trim().equals("allowedOrigins")){
+						String value = props.getProperty(propertyName.trim());
+						if(value != null && !"".equals(value.trim())){
+							_crossOriginMap.put("allowedOrigins", value.trim());
+						}
+					}
+					
+					
+				}
+				
+				crossOriginMap = _crossOriginMap;
+			}
+	
+		} catch (IOException e) {
+			if (logger.isErrorEnabled()) {
+	            logger.error("读取配置文件crossOrigin.properties错误",e);
+	        }
+		}
+		return _crossOriginMap;	
+
+	}
+	
+
 	
 }

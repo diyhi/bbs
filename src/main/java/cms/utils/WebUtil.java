@@ -11,6 +11,7 @@ import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -32,6 +33,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import cms.bean.user.UserAuthorization;
 
 
 /**
@@ -49,7 +54,7 @@ public class WebUtil {
 	public static int cookieMaxAge = 30*24*60*60;
 	
 	
-    /**
+	/**
      * 添加cookie
      * @param response
      * @param name cookie的名称
@@ -57,6 +62,18 @@ public class WebUtil {
      * @param maxAge cookie存放的时间(以秒为单位,假如存放三天,即3*24*60*60; 如果值为0,cookie将随浏览器关闭而清除)
      */
     public static void addCookie(HttpServletResponse response, String name, String value, int maxAge) {
+    	addCookie(response,name,value,maxAge,true);
+    }
+    /**
+     * 添加cookie
+     * @param response
+     * @param name cookie的名称
+     * @param value cookie的值
+     * @param maxAge cookie存放的时间(以秒为单位,假如存放三天,即3*24*60*60; 如果值为0,cookie将随浏览器关闭而清除)
+     * @param httpOnly 标记是否对Cookie使用 HttpOnly 标志。如果设置为true，客户端的 JavaScript 将无法访问Cookie
+     */
+    public static void addCookie(HttpServletResponse response, String name, String value, int maxAge,boolean httpOnly) {
+    	
     	if(value != null && !"".equals(value.trim())){
     		try {
     			value = URLEncoder.encode(value,"utf-8");
@@ -70,9 +87,10 @@ public class WebUtil {
     	}
     	
         Cookie cookie = new Cookie(name, value);
-        cookie.setHttpOnly(true);
+        cookie.setHttpOnly(httpOnly);
         cookie.setPath("/");//根目录下的所有程序都可以访问cookie
         if (maxAge>0) cookie.setMaxAge(maxAge);
+        
         response.addCookie(cookie); ; 
     }
     
@@ -457,5 +475,48 @@ public class WebUtil {
 		}
 		return uri_before+new_url_parameter;
 		
+	}
+	
+	/**
+	 * 获取Header中的访问令牌
+	 */
+	public static UserAuthorization getAuthorization(HttpServletRequest request){
+		//从Header获取
+		Enumeration<String> headers = request.getHeaders("Authorization");
+		while (headers.hasMoreElements()) { // 通常只有一个（大多数服务器强制执行）
+			String value = headers.nextElement();
+			String mark = "Bearer";
+			if ((value.toLowerCase().startsWith(mark.toLowerCase()))) {
+				String authHeaderValue = value.substring(mark.length()).trim();
+				if(authHeaderValue != null && !"".equals(authHeaderValue)){
+					String tokenArray[] = authHeaderValue.split(",");
+					if(tokenArray != null && tokenArray.length ==2){
+						return new UserAuthorization(tokenArray[0].trim(),tokenArray[1].trim());	
+					}
+				}
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * 获取Referer中的域名
+	 */
+	public static String getRefererDomain(HttpServletRequest request){
+		String referer = request.getHeader("referer");
+		String domain = "";
+		if(referer != null && !"".equals(referer.trim())){
+			UriComponents refererComponent = UriComponentsBuilder.fromUriString(referer).build();
+			
+			//域名 http://localhost:3000/
+			UriComponents domainComponent = UriComponentsBuilder.newInstance()
+			        .scheme(refererComponent.getScheme())
+			        .host(refererComponent.getHost())
+			        .port(refererComponent.getPort())
+			        .path("/")
+			        .build();
+			domain = domainComponent.toUriString();
+		}
+		return domain;
 	}
 }

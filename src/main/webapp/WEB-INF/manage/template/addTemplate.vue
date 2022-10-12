@@ -16,6 +16,10 @@
 					<el-form-item label="模板目录" :required="true" :error="error.dirName">
 						<el-row><el-col :span="12"><el-input v-model.trim="dirName" maxlength="40" clearable="true" show-word-limit></el-input></el-col></el-row>
 					</el-form-item>
+					<el-form-item label="是否验证CSRF(跨站请求伪造)">
+						<el-switch v-model="verifyCSRF" ></el-switch>
+						<div class="form-help" >前后端一体模板必需启用CSRF(跨站请求伪造)验证，前后端分离模板可以关闭本项验证</div>
+					</el-form-item>
 					<el-form-item label="模板简介"  :error="error.introduction"  >
 						<el-input type="textarea" v-model="introduction" :autosize="{minRows: 3}" placeholder="请输入内容" ></el-input>						
 					</el-form-item>
@@ -63,7 +67,7 @@ export default({
 			name :'',
 			dirName : '',
 			introduction : '',
-			
+			verifyCSRF:true,
 			localImageUrl: '',//本地图片地址 例如blob:http://127.0.0.1:8080/cfab3833-cbb0-4072-a576-feaf8fb19e5f
 	        isImageViewer: false,//是否显示图片查看器
 			error : {
@@ -71,6 +75,7 @@ export default({
 				dirName :'',
 				introduction : '',
 				thumbnailSuffix: '',
+				
 			},
 			submitForm_disabled:false,//提交按钮是否禁用
 		};
@@ -129,7 +134,7 @@ export default({
 				formData.append('introduction', _self.introduction);
 				
 			}
-			
+			formData.append('verifyCSRF', _self.verifyCSRF);
 			
 			let fileList = _self.$refs.uploadImg.uploadFiles;
 			if(fileList != null && fileList.length >0){

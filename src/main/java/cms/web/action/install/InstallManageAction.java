@@ -382,7 +382,7 @@ public class InstallManageAction extends HttpServlet{
 				conn = DriverManager.getConnection(databaseLink, install.getDatabaseUser().trim(), install.getDatabasePassword().trim());	
 				
 				//通过查询运行设置字符集的命令
-                conn.prepareStatement("set names utf8mb4").executeQuery();
+                conn.prepareStatement("set names utf8mb4").executeUpdate();
 		
 				String path = PathUtil.path()+File.separator+"WEB-INF"+File.separator+"data"+File.separator+"install"+File.separator;
 				//导入SQL结构文件
@@ -458,7 +458,15 @@ public class InstallManageAction extends HttpServlet{
 		if(error.size() ==0){
 			//写入禁止安装系统
 			FileUtil.writeStringToFile("WEB-INF"+File.separator+"data"+File.separator+"install"+File.separator+"status.txt","1","utf-8",false);
+			
+			//读取当前系统版本
+			String currentVersion = FileUtil.readFileToString("WEB-INF"+File.separator+"data"+File.separator+"systemVersion.txt","utf-8");
+
+			
+			//写入初始版本号
+			FileUtil.writeStringToFile("WEB-INF"+File.separator+"data"+File.separator+"install"+File.separator+"originalVersion.txt",currentVersion,"utf-8",false);
 		}
+		
 		
 		
 		

@@ -16,7 +16,7 @@
 						</el-select>
 					</el-form-item>
 					<el-form-item label="排序" :required="true" :error="error.sort">
-						<el-input-number v-model="sort" controls-position="right" @change="handleChange" :min="0" :max="999999999"></el-input-number>
+						<el-input-number v-model="sort" ref="sort_ref" controls-position="right" @change="handleChange" :min="0" :max="999999999"></el-input-number>
 						<div class="form-help" >数字越大越在前</div>
 					</el-form-item>
 					<el-form-item label="允许评论" :required="true" :error="error.allow">
@@ -240,7 +240,7 @@ export default({
 				formData.append('tagId', _self.tagId); 
 			}
 			if(_self.sort != null && _self.sort >=0){
-				formData.append('sort', _self.sort);
+				formData.append('sort', _self.$refs.sort_ref.displayValue);
 			}
 			formData.append('allow', _self.allow);
 			formData.append('status', _self.status);

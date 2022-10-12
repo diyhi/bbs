@@ -387,7 +387,7 @@ public class TemplateManage {
 		layout_likeList.setSort(1000);//排序
 		layout_likeList.setReferenceCode("user/control/likeList");
 		layoutList.add(layout_likeList);
-		/**
+		
 		//话题点赞列表
 		Layout layout_topicLikeList = new Layout();
 		layout_topicLikeList.setId(UUIDUtil.getUUID32());
@@ -398,7 +398,7 @@ public class TemplateManage {
 		layout_topicLikeList.setSort(1100);//排序
 		layout_topicLikeList.setReferenceCode("user/control/topicLikeList");
 		layoutList.add(layout_topicLikeList);
-		**/
+		
 		//关注列表
 		Layout layout_followList = new Layout();
 		layout_followList.setId(UUIDUtil.getUUID32());

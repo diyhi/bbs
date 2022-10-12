@@ -17,6 +17,10 @@
 					<el-form-item label="模板目录" :required="true" :error="error.dirName">
 						<el-row><el-col :span="12">{{dirName}}</el-col></el-row>
 					</el-form-item>
+					<el-form-item label="是否验证CSRF(跨站请求伪造)">
+						<el-switch v-model="verifyCSRF" ></el-switch>
+						<div class="form-help" >前后端一体模板必需启用CSRF(跨站请求伪造)验证，前后端分离模板可以关闭本项验证</div>
+					</el-form-item>
 					<el-form-item label="模板简介"  :error="error.introduction"  >
 						<el-input type="textarea" v-model="introduction" :autosize="{minRows: 3}" placeholder="请输入内容" ></el-input>						
 					</el-form-item>
@@ -64,6 +68,7 @@ export default({
 			name :'',
 			dirName : '',
 			introduction : '',
+			verifyCSRF : true,
 			imagePath : '',
 			
 			fileList:[],//上传的文件列表
@@ -138,6 +143,7 @@ export default({
 			    		if(templates != null){
 			    			_self.name =templates.name;
 							_self.introduction = templates.introduction;
+							_self.verifyCSRF = templates.verifyCSRF;
 			    			if(templates.thumbnailSuffix != null && templates.thumbnailSuffix != ''){
 			    				_self.imagePath = "common/"+ templates.dirName +"/templates."+templates.thumbnailSuffix;
 			    				_self.fileList.push({
@@ -199,6 +205,10 @@ export default({
 				formData.append('introduction', _self.introduction);
 				
 			}
+			if(_self.verifyCSRF != null){
+				formData.append('verifyCSRF', _self.verifyCSRF);
+			}
+			
 			if(_self.imagePath != null){
 				formData.append('imagePath', _self.imagePath);
 			}

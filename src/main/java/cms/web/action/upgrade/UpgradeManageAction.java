@@ -83,7 +83,9 @@ public class UpgradeManageAction {
 		
 		//读取当前系统版本
 		String currentVersion = FileUtil.readFileToString("WEB-INF"+File.separator+"data"+File.separator+"systemVersion.txt","utf-8");
-
+		//校验版本
+		boolean verificationVersion = false;
+		
 		List<UpgradeSystem> upgradeSystemList = upgradeService.findAllUpgradeSystem();
 		UpgradeSystem notCompletedUpgrade = null;//未完成升级
 		
@@ -105,8 +107,18 @@ public class UpgradeManageAction {
 					break;
 				}
 			}
+		}else{
+			
+			
+			String originalVersion = upgradeManage.readOriginalVersion();
+
+			if(originalVersion != null && !"".equals(originalVersion.trim())){
+				if(!currentVersion.trim().equals(originalVersion.trim())){
+					verificationVersion = true;
+				}
+			}
 		}
-		if(notCompletedUpgrade == null){
+		if(notCompletedUpgrade == null && verificationVersion){
 			
 			try {
 				String[] extensions = {"zip","ZIP"};//后缀名{"doc", "pdf"}

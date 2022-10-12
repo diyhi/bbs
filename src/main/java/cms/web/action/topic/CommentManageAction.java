@@ -494,7 +494,7 @@ public class CommentManageAction {
 	@RequestMapping(params="method=uploadImage",method=RequestMethod.POST)
 	@ResponseBody//方式来做ajax,直接返回字符串
 	public String uploadImage(ModelMap model,Long topicId,String userName, Boolean isStaff,String fileName,
-			MultipartFile file, HttpServletResponse response) throws Exception {
+			MultipartFile file, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		String number = topicManage.generateFileNumber(userName, isStaff);
 		
@@ -588,7 +588,7 @@ public class CommentManageAction {
 				
 								//上传成功
 								returnJson.put("error", 0);//0成功  1错误
-								returnJson.put("url", fileManage.fileServerAddress()+"file/comment/"+topicId+"/"+newFileName);
+								returnJson.put("url", fileManage.fileServerAddress(request)+"file/comment/"+topicId+"/"+newFileName);
 								
 								return JsonUtils.toJSONString(returnJson);
 							}else{

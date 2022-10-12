@@ -243,7 +243,7 @@ public class HelpTypeManageAction {
 			HelpType helpType = helpTypeService.findById(typeId);
 			if(helpType != null){
 				if(helpType.getImage() != null && !"".equals(helpType.getImage())){
-					returnValue.put("imagePath",fileManage.fileServerAddress()+helpType.getImage());
+					returnValue.put("imagePath",fileManage.fileServerAddress(request)+helpType.getImage());
 				}
 				returnValue.put("helpType",helpType);//返回消息
 			}

@@ -56,7 +56,7 @@
 									<div class="form-help" >最多允许使用预存款{{maxDeposit}}</div>
 								</el-form-item>
 								<el-form-item label="排序" :required="true" :error="error.sort">
-									<el-input-number v-model="sort" controls-position="right" @change="handleChange" :min="0" :max="999999999"></el-input-number>
+									<el-input-number v-model="sort" ref="sort_ref" controls-position="right" @change="handleChange" :min="0" :max="999999999"></el-input-number>
 									<div class="form-help" >数字越大越在前</div>
 								</el-form-item>
 								<el-form-item label="允许回答" :required="true" :error="error.allow">
@@ -169,7 +169,9 @@
 		                	</div>
 		                </div>
 						<div v-if="question.lastUpdateTime != null" class="lastUpdateTime" >最后修改时间：{{question.lastUpdateTime}}</div>
-						<component v-bind:is ="questionComponent(question.content)" v-bind="$props" />
+						<div :ref="'question_'+question.id">
+							<component v-bind:is ="questionComponent(question.content)" v-bind="$props" />
+						</div>
 					</div>
 					<div :class="(index%2)==0 ? 'appendBox odd' : 'appendBox even'" v-for="(appendQuestionItem,index) in question.appendQuestionItemList">
 						<div class="appendHead">
@@ -185,7 +187,7 @@
 							
 							
 						</div>
-	                	<div class="appendContent" >
+	                	<div class="appendContent" :ref="'appendQuestion_'+appendQuestionItem.id">
 	                		<component v-bind:is ="questionComponent(appendQuestionItem.content)" v-bind="$props" />
 	                	</div> 
 	                	
@@ -274,7 +276,7 @@
 							</div>
 						</div>
 	                    <div class="main">
-							<p class="answerContent" >
+							<p class="answerContent" :ref="'answer_'+answer.id">
 								<component v-bind:is ="answerDataComponent(answer.content)" v-bind="$props" />
 							</p> 
 							
@@ -655,6 +657,44 @@ export default({
 		
 		
 	},
+	//生命周期钩子 -- 响应数据修改时运行
+	updated : function () {
+		let _self = this;
+		_self.$nextTick(function() {
+			if(_self.questionId != ''){
+				_self.$nextTick(function() {
+					let questionRefValue = _self.$refs['question_'+_self.questionId];
+					if(questionRefValue != undefined){
+						_self.renderBindNode(questionRefValue); 
+					}
+    				
+    				if(_self.question != '' && _self.question.appendQuestionItemList != null && _self.question.appendQuestionItemList.length >0){
+						for(var i=0; i<_self.question.appendQuestionItemList.length; i++){
+							var appendQuestionItem = _self.question.appendQuestionItemList[i];
+							
+							let appendQuestionRefValue = _self.$refs['appendQuestion_'+appendQuestionItem.id];
+							if(appendQuestionRefValue != undefined){
+								_self.renderBindNode(appendQuestionRefValue); 
+							}
+    						
+							
+						}
+						
+					}
+				});
+								
+			}
+			if(_self.answerList != null && _self.answerList != '' && _self.answerList.length > 0){
+				for (let i = 0; i <_self.answerList.length; i++) {
+					let answer = _self.answerList[i];
+					let answerRefValue = _self.$refs['answer_'+answer.id];
+					if(answerRefValue != undefined){
+						_self.renderBindNode(answerRefValue);
+					}
+				}
+			}
+		})
+	},
 	beforeRouteEnter (to, from, next) {
 		//上级路由编码
 		if(to.query.questionView_beforeUrl == undefined || to.query.questionView_beforeUrl==''){//前一个URL
@@ -848,6 +888,7 @@ export default({
 								
 								_self.question = question;
 								
+								
 			    			}else if(key == "availableTag"){//答案富文本框支持标签
 			    				_self.availableTag = mapData[key];
 				    			
@@ -920,6 +961,7 @@ export default({
 									
 									
 									_self.$nextTick(function() {
+										
 										//跳转到锚点
 										if(_self.answerId != null && _self.answerId != ""){
 										
@@ -1088,7 +1130,7 @@ export default({
 	    				
 	    				childNode.appendChild(dom);
 	    				//渲染代码
-	    				Prism.highlightElement(dom);
+	    				//Prism.highlightElement(dom);
 	            		
 	            	}
 	            	
@@ -1096,6 +1138,26 @@ export default({
 	            }
 	        }
 	    },
+	    //递归渲染绑定节点
+	    renderBindNode: function(node){	
+	         //先找到子节点
+	        let nodeList = node.childNodes;
+	        for(let i = 0;i < nodeList.length;i++){
+	            //childNode获取到到的节点包含了各种类型的节点
+	            //但是我们只需要元素节点  通过nodeType去判断当前的这个节点是不是元素节点
+	            let childNode = nodeList[i];
+	            let random = Math.random().toString().slice(2);
+	            //判断是否是元素节点。如果节点是元素(Element)节点，则 nodeType 属性将返回 1。如果节点是属性(Attr)节点，则 nodeType 属性将返回 2。
+	            if(childNode.nodeType == 1){
+	                //处理代码标签
+	                if(childNode.nodeName.toLowerCase() == "pre" ){
+	                    Prism.highlightAllUnder(childNode);
+	                }
+	                this.renderBindNode(childNode);
+	            }
+	        }
+	    },
+	    
 	    //分页
 		page: function(page) {
 		
@@ -2187,7 +2249,7 @@ export default({
 				}
 			}
 			if(_self.sort != null){
-				formData.append('sort', _self.sort);
+				formData.append('sort', _self.$refs.sort_ref.displayValue);
 			}
 			
 			if(_self.point != null){

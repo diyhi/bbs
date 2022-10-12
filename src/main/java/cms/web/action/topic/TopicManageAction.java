@@ -74,6 +74,7 @@ import cms.web.action.payment.PaymentManage;
 import cms.web.action.redEnvelope.RedEnvelopeManage;
 import cms.web.action.user.UserManage;
 import cms.web.action.user.UserRoleManage;
+import cms.web.taglib.Configuration;
 
 
 /**
@@ -140,7 +141,7 @@ public class TopicManageAction {
 				
 				SystemSetting systemSetting = settingService.findSystemSetting_cache();
 				if(topic.getContent() != null && !"".equals(topic.getContent().trim()) && systemSetting.getFileSecureLinkSecret() != null && !"".equals(systemSetting.getFileSecureLinkSecret().trim())){
-					List<String> serverAddressList = fileManage.fileServerAllAddress();
+					List<String> serverAddressList = fileManage.fileServerAllAddress(request);
 					//解析上传的文件完整路径名称
 					Map<String,String> analysisFullFileNameMap = textFilterManage.analysisFullFileName(topic.getContent(),"topic",serverAddressList);
 					if(analysisFullFileNameMap != null && analysisFullFileNameMap.size() >0){
@@ -149,7 +150,7 @@ public class TopicManageAction {
 						Map<String,String> newFullFileNameMap = new HashMap<String,String>();//新的完整路径名称 key: 完整路径名称 value: 重定向接口
 						for (Map.Entry<String,String> entry : analysisFullFileNameMap.entrySet()) {
 
-							newFullFileNameMap.put(entry.getKey(), SecureLink.createDownloadRedirectLink(entry.getKey(),entry.getValue(),-1L,systemSetting.getFileSecureLinkSecret()));
+							newFullFileNameMap.put(entry.getKey(), Configuration.getUrl(request)+SecureLink.createDownloadRedirectLink(entry.getKey(),entry.getValue(),-1L,systemSetting.getFileSecureLinkSecret()));
 						}
 						
 						topic.setContent(textFilterManage.processFullFileName(topic.getContent(),"topic",newFullFileNameMap,serverAddressList));
@@ -163,7 +164,7 @@ public class TopicManageAction {
 				}
 				if(topic.getContent() != null && !"".equals(topic.getContent().trim())){
 					//处理视频播放器标签
-					String content = textFilterManage.processVideoPlayer(topic.getContent(),-1L,systemSetting.getFileSecureLinkSecret());
+					String content = textFilterManage.processVideoPlayer(Configuration.getUrl(request),topic.getContent(),-1L,systemSetting.getFileSecureLinkSecret());
 					topic.setContent(content);
 				}
 				
@@ -172,7 +173,7 @@ public class TopicManageAction {
 					if(user != null){
 						topic.setAccount(user.getAccount());
 						topic.setNickname(user.getNickname());
-						topic.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+						topic.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 						topic.setAvatarName(user.getAvatarName());
 						
 						List<String> userRoleNameList = userRoleManage.queryUserRoleName(user.getUserName());
@@ -317,7 +318,7 @@ public class TopicManageAction {
 							if(user != null){
 								comment.setAccount(user.getAccount());
 								comment.setNickname(user.getNickname());
-								comment.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+								comment.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 								comment.setAvatarName(user.getAvatarName());
 								userRoleNameMap.put(comment.getUserName(), null);
 							}
@@ -341,7 +342,7 @@ public class TopicManageAction {
 										if(user != null){
 											quote.setAccount(user.getAccount());
 											quote.setNickname(user.getNickname());
-											quote.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+											quote.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 											quote.setAvatarName(user.getAvatarName());
 											userRoleNameMap.put(quote.getUserName(), null);
 										}
@@ -374,7 +375,7 @@ public class TopicManageAction {
 									if(user != null){
 										reply.setAccount(user.getAccount());
 										reply.setNickname(user.getNickname());
-										reply.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+										reply.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 										reply.setAvatarName(user.getAvatarName());
 										userRoleNameMap.put(reply.getUserName(), null);
 									}
@@ -768,7 +769,7 @@ public class TopicManageAction {
 	@ResponseBody
 	@RequestMapping(params="method=upload",method=RequestMethod.POST)
 	public String upload(ModelMap model,String dir,String userName, Boolean isStaff,String fileName,
-			MultipartFile file, HttpServletResponse response) throws Exception {
+			MultipartFile file,HttpServletRequest request,  HttpServletResponse response) throws Exception {
 		
 		String number = topicManage.generateFileNumber(userName, isStaff);
 		
@@ -942,7 +943,7 @@ public class TopicManageAction {
 							
 							//上传成功
 							returnJson.put("error", 0);//0成功  1错误
-							returnJson.put("url", fileManage.fileServerAddress()+"file/topic/"+date+"/image/"+newFileName);
+							returnJson.put("url", fileManage.fileServerAddress(request)+"file/topic/"+date+"/image/"+newFileName);
 							returnJson.put("title", file.getOriginalFilename());//旧文件名称
 							return JsonUtils.toJSONString(returnJson);
 						}else{
@@ -977,7 +978,7 @@ public class TopicManageAction {
 							
 							//上传成功
 							returnJson.put("error", 0);//0成功  1错误
-							returnJson.put("url", fileManage.fileServerAddress()+"file/topic/"+date+"/flash/"+newFileName);
+							returnJson.put("url", fileManage.fileServerAddress(request)+"file/topic/"+date+"/flash/"+newFileName);
 							returnJson.put("title", file.getOriginalFilename());//旧文件名称
 							return JsonUtils.toJSONString(returnJson);
 						}else{
@@ -1010,7 +1011,7 @@ public class TopicManageAction {
 
 							//上传成功
 							returnJson.put("error", 0);//0成功  1错误
-							returnJson.put("url", fileManage.fileServerAddress()+"file/topic/"+date+"/media/"+newFileName);
+							returnJson.put("url", fileManage.fileServerAddress(request)+"file/topic/"+date+"/media/"+newFileName);
 							returnJson.put("title", file.getOriginalFilename());//旧文件名称
 							return JsonUtils.toJSONString(returnJson);
 						}else{
@@ -1042,7 +1043,7 @@ public class TopicManageAction {
 
 							//上传成功
 							returnJson.put("error", 0);//0成功  1错误
-							returnJson.put("url", fileManage.fileServerAddress()+"file/topic/"+date+"/file/"+newFileName);
+							returnJson.put("url", fileManage.fileServerAddress(request)+"file/topic/"+date+"/file/"+newFileName);
 							returnJson.put("title", file.getOriginalFilename());//旧文件名称
 							return JsonUtils.toJSONString(returnJson);
 						}else{

@@ -3,9 +3,12 @@ package cms.web.filter;
 
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -19,6 +22,7 @@ import cms.bean.user.UserState;
 import cms.service.setting.SettingService;
 import cms.service.template.TemplateService;
 import cms.service.user.UserService;
+import cms.utils.CommentedProperties;
 import cms.utils.IpAddress;
 import cms.utils.SpringConfigTool;
 import cms.utils.UUIDUtil;
@@ -41,10 +45,12 @@ import cms.web.taglib.Configuration;
 import org.apache.commons.lang3.StringUtils;
 import org.queryString.util.MultiMap;
 import org.queryString.util.UrlEncoded;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 
 
@@ -52,7 +58,7 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
  * 模板拦截器(将模板显示功能加入指定的页面中)
  *
  */
-public class TempletesInterceptor extends HandlerInterceptorAdapter {
+public class TempletesInterceptor implements HandlerInterceptor {
 	@Resource OAuthManage oAuthManage;
 	@Resource TemplateService templateService;
 	
@@ -90,7 +96,35 @@ public class TempletesInterceptor extends HandlerInterceptorAdapter {
 	  
 	public boolean preHandle(HttpServletRequest request,HttpServletResponse response, 
 			Object handler) throws Exception { 
-		//System.out.println(request.getRequestURI()+" -- "+request.getQueryString()+" -- "+request.getMethod());
+	//	System.out.println(request.getRequestURI()+" -- "+request.getQueryString()+" -- "+request.getMethod());
+		
+		/**
+		//处理跨域请求
+		String allowedOrigins = (String) CommentedProperties.readCrossOrigin().get("allowedOrigins");
+    	if(allowedOrigins != null && !"".equals(allowedOrigins.trim())){
+    		String[] origin = allowedOrigins.split(",");
+    		
+    		Set<String> allowedOriginSet= new HashSet<String>(Arrays.asList(origin));
+    	    String originHeader = request.getHeader("Origin");
+    	    if (allowedOriginSet.contains(originHeader)){
+    	    	response.setHeader("Access-Control-Allow-Origin", originHeader);
+                response.setHeader("Access-Control-Allow-Credentials", "true");
+                response.setHeader("Access-Control-Allow-Methods", "GET, HEAD, POST, PUT, PATCH, DELETE");
+              //  response.setHeader("Access-Control-Max-Age", "86400");
+                response.setHeader("Access-Control-Allow-Headers", "Origin,X-Requested-With,Content-Type,Cache-Control,Accept,Authorization,BBS-XSRF-TOKEN,Set-Cookie,showLoading,loadingMask,loadingTarget");//表示访问请求中允许携带哪些Header信息  Cookie,token
+
+                //暴露哪些头部信息(因为跨域访问默认不能获取全部头部信息)
+               // response.setHeader("Access-Control-Expose-Headers", HttpHeaders.CONTENT_DISPOSITION);
+             
+                
+        		// 如果是OPTIONS则结束请求
+                if (HttpMethod.OPTIONS.toString().equals(request.getMethod())) {
+                    response.setStatus(HttpStatus.NO_CONTENT.value());
+                    return false;
+                }
+    	    	
+    	    }
+    	}**/
 		
 		//拦截用户角色处理 注解参考： @RoleAnnotation(resourceCode=ResourceEnum._2001000)
 		if(handler instanceof HandlerMethod){
@@ -236,6 +270,7 @@ public class TempletesInterceptor extends HandlerInterceptorAdapter {
     		    		csrf_token = CSRFTokenThreadLocal.get();
     		    	}
     		    	
+    		    	//需要同时在cms.web.action.common.BaseInfoAction.java添加返回信息
     		    	//执行自定义标签		
 					request.setAttribute("commonPath", "common/"+dirName+"/"+accessSourceDeviceManage.accessDevices(request)+"/");//资源路径
 	    			request.setAttribute("contextPath",request.getContextPath());//系统虚拟目录

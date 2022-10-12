@@ -36,6 +36,7 @@ import cms.utils.UUIDUtil;
 import cms.web.action.TextFilterManage;
 import cms.web.action.fileSystem.FileManage;
 import cms.web.action.mediaProcess.MediaProcessQueueManage;
+import cms.web.taglib.Configuration;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -92,7 +93,7 @@ public class HelpManageAction {
 				help.setContent(fileManage.processRichTextFilePath(help.getContent(),"help"));
 				
 				if(help.getContent() != null && !"".equals(help.getContent().trim()) && systemSetting.getFileSecureLinkSecret() != null && !"".equals(systemSetting.getFileSecureLinkSecret().trim())){
-					List<String> serverAddressList = fileManage.fileServerAllAddress();
+					List<String> serverAddressList = fileManage.fileServerAllAddress(request);
 					//解析上传的文件完整路径名称
 					Map<String,String> analysisFullFileNameMap = textFilterManage.analysisFullFileName(help.getContent(),"help",serverAddressList);
 					if(analysisFullFileNameMap != null && analysisFullFileNameMap.size() >0){
@@ -101,7 +102,7 @@ public class HelpManageAction {
 						Map<String,String> newFullFileNameMap = new HashMap<String,String>();//新的完整路径名称 key: 完整路径名称 value: 重定向接口
 						for (Map.Entry<String,String> entry : analysisFullFileNameMap.entrySet()) {
 
-							newFullFileNameMap.put(entry.getKey(), SecureLink.createDownloadRedirectLink(entry.getKey(),entry.getValue(),-1L,systemSetting.getFileSecureLinkSecret()));
+							newFullFileNameMap.put(entry.getKey(), Configuration.getUrl(request)+SecureLink.createDownloadRedirectLink(entry.getKey(),entry.getValue(),-1L,systemSetting.getFileSecureLinkSecret()));
 						}
 						
 						help.setContent(textFilterManage.processFullFileName(help.getContent(),"help",newFullFileNameMap,serverAddressList));
@@ -110,7 +111,7 @@ public class HelpManageAction {
 				}
 				if(help.getContent() != null && !"".equals(help.getContent().trim())){
 					//处理视频播放器标签
-					String content = textFilterManage.processVideoPlayer(help.getContent(),-1L,systemSetting.getFileSecureLinkSecret());
+					String content = textFilterManage.processVideoPlayer(Configuration.getUrl(request),help.getContent(),-1L,systemSetting.getFileSecureLinkSecret());
 					help.setContent(content);
 				}
 				
@@ -380,7 +381,7 @@ public class HelpManageAction {
 	@ResponseBody
 	@RequestMapping(params="method=upload",method=RequestMethod.POST)
 	public String upload(ModelMap model,Long helpTypeId,String dir,String fileName,
-			MultipartFile file, HttpServletResponse response) throws Exception {
+			MultipartFile file, HttpServletRequest request,HttpServletResponse response) throws Exception {
 
 		Map<String,Object> returnJson = new HashMap<String,Object>();
 		String errorMessage  = "";
@@ -557,7 +558,7 @@ public class HelpManageAction {
 				
 							//上传成功
 							returnJson.put("error", 0);//0成功  1错误
-							returnJson.put("url", fileManage.fileServerAddress()+"file/help/"+helpTypeId+"/"+date+"/image/"+newFileName);
+							returnJson.put("url", fileManage.fileServerAddress(request)+"file/help/"+helpTypeId+"/"+date+"/image/"+newFileName);
 							return JsonUtils.toJSONString(returnJson);
 							
 						}else{
@@ -591,7 +592,7 @@ public class HelpManageAction {
 							
 							//上传成功
 							returnJson.put("error", 0);//0成功  1错误
-							returnJson.put("url", fileManage.fileServerAddress()+"file/help/"+helpTypeId+"/"+date+"/flash/"+newFileName);
+							returnJson.put("url", fileManage.fileServerAddress(request)+"file/help/"+helpTypeId+"/"+date+"/flash/"+newFileName);
 							return JsonUtils.toJSONString(returnJson);
 						}else{
 							errorMessage = "当前文件类型不允许上传";
@@ -625,7 +626,7 @@ public class HelpManageAction {
 
 							//上传成功
 							returnJson.put("error", 0);//0成功  1错误
-							returnJson.put("url", fileManage.fileServerAddress()+"file/help/"+helpTypeId+"/"+date+"/media/"+newFileName);
+							returnJson.put("url", fileManage.fileServerAddress(request)+"file/help/"+helpTypeId+"/"+date+"/media/"+newFileName);
 							return JsonUtils.toJSONString(returnJson);
 						}else{
 							errorMessage = "当前文件类型不允许上传";
@@ -654,7 +655,7 @@ public class HelpManageAction {
 							
 							//上传成功
 							returnJson.put("error", 0);//0成功  1错误
-							returnJson.put("url", fileManage.fileServerAddress()+"file/help/"+helpTypeId+"/"+date+"/file/"+newFileName);
+							returnJson.put("url", fileManage.fileServerAddress(request)+"file/help/"+helpTypeId+"/"+date+"/file/"+newFileName);
 							returnJson.put("title", file.getOriginalFilename());//旧文件名称
 							return JsonUtils.toJSONString(returnJson);
 						}else{

@@ -137,19 +137,8 @@ public class AnswerFormAction {
 		}
 		
 		
-		//判断令牌
-		if(token != null && !"".equals(token.trim())){	
-			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌
-			if(token_sessionid != null && !"".equals(token_sessionid.trim())){
-				if(!token_sessionid.equals(token)){
-					error.put("token", ErrorView._13.name());//令牌错误
-				}
-			}else{
-				error.put("token", ErrorView._12.name());//令牌过期
-			}
-		}else{
-			error.put("token", ErrorView._11.name());//令牌为空
-		}
+		//处理CSRF令牌
+		csrfTokenManage.processCsrfToken(request, token,error);
 		
 		//验证码
 		boolean isCaptcha = captchaManage.answer_isCaptcha(accessUser.getUserName());
@@ -497,19 +486,8 @@ public class AnswerFormAction {
 			error.put("answer", ErrorView._21.name());//只读模式不允许提交数据
 		}
 		
-		//判断令牌
-		if(token != null && !"".equals(token.trim())){	
-			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌
-			if(token_sessionid != null && !"".equals(token_sessionid.trim())){
-				if(!token_sessionid.equals(token)){
-					error.put("token", ErrorView._13.name());//令牌错误
-				}
-			}else{
-				error.put("token", ErrorView._12.name());//令牌过期
-			}
-		}else{
-			error.put("token", ErrorView._11.name());//令牌为空
-		}
+		//处理CSRF令牌
+		csrfTokenManage.processCsrfToken(request, token,error);
 		
 		//验证码
 		boolean isCaptcha = captchaManage.answer_isCaptcha(accessUser.getUserName());
@@ -758,7 +736,13 @@ public class AnswerFormAction {
 			}else{
 				error.put("answer", ErrorView._242.name());//修改答案失败
 			}
-
+			//统计每分钟原来提交次数
+			Integer original = settingManage.getSubmitQuantity("answer", accessUser.getUserName());
+    		if(original != null){
+    			settingManage.addSubmitQuantity("answer", accessUser.getUserName(),original+1);//刷新每分钟原来提交次数
+    		}else{
+    			settingManage.addSubmitQuantity("answer", accessUser.getUserName(),1);//刷新每分钟原来提交次数
+    		}
 		}
 		
 
@@ -859,20 +843,8 @@ public class AnswerFormAction {
 			error.put("answer", ErrorView._21.name());//只读模式不允许提交数据
 		}
 		
-		//判断令牌
-		if(token != null && !"".equals(token.trim())){	
-			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌
-			if(token_sessionid != null && !"".equals(token_sessionid.trim())){
-				if(!token_sessionid.equals(token)){
-					error.put("token", ErrorView._13.name());//令牌错误
-				}
-			}else{
-				error.put("token", ErrorView._12.name());//令牌过期
-			}
-		}else{
-			error.put("token", ErrorView._11.name());//令牌为空
-		}
-
+		//处理CSRF令牌
+		csrfTokenManage.processCsrfToken(request, token,error);
 		
 		Answer answer = null;
 		Question question = null;
@@ -1146,7 +1118,7 @@ public class AnswerFormAction {
 											
 											//上传成功
 											returnJson.put("error", 0);//0成功  1错误
-											returnJson.put("url", fileManage.fileServerAddress()+"file/answer/"+questionId+"/"+newFileName);
+											returnJson.put("url", fileManage.fileServerAddress(request)+"file/answer/"+questionId+"/"+newFileName);
 											
 											return JsonUtils.toJSONString(returnJson);
 										}else{
@@ -1218,19 +1190,9 @@ public class AnswerFormAction {
 		if(systemSetting.getCloseSite().equals(2)){
 			error.put("answerReply", ErrorView._21.name());//只读模式不允许提交数据
 		}
-		//判断令牌
-		if(token != null && !"".equals(token.trim())){	
-			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌
-			if(token_sessionid != null && !"".equals(token_sessionid.trim())){
-				if(!token_sessionid.equals(token)){
-					error.put("token", ErrorView._13.name());//令牌错误
-				}
-			}else{
-				error.put("token", ErrorView._12.name());//令牌过期
-			}
-		}else{
-			error.put("token", ErrorView._11.name());//令牌为空
-		}
+		//处理CSRF令牌
+		csrfTokenManage.processCsrfToken(request, token,error);
+		
 		//验证码
 		boolean isCaptcha = captchaManage.answer_isCaptcha(accessUser.getUserName());
 		if(isCaptcha){//如果需要验证码
@@ -1539,7 +1501,7 @@ public class AnswerFormAction {
 			
 			
 			//异步执行会员卡赠送任务(长期任务类型)
-			membershipCardGiftTaskManage.async_triggerMembershipCardGiftTask(_user.getUserName());
+			membershipCardGiftTaskManage.async_triggerMembershipCardGiftTask(accessUser.getUserName());
 			
 			
 			//统计每分钟原来提交次数
@@ -1644,22 +1606,11 @@ public class AnswerFormAction {
 			error.put("reply", ErrorView._21.name());//只读模式不允许提交数据
 		}
 		
-		//判断令牌
-		if(token != null && !"".equals(token.trim())){	
-			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌
-			if(token_sessionid != null && !"".equals(token_sessionid.trim())){
-				if(!token_sessionid.equals(token)){
-					error.put("token", ErrorView._13.name());//令牌错误
-				}
-			}else{
-				error.put("token", ErrorView._12.name());//令牌过期
-			}
-		}else{
-			error.put("token", ErrorView._11.name());//令牌为空
-		}
+		//处理CSRF令牌
+		csrfTokenManage.processCsrfToken(request, token,error);
 		
 		//验证码
-		boolean isCaptcha = captchaManage.comment_isCaptcha(accessUser.getUserName());
+		boolean isCaptcha = captchaManage.answer_isCaptcha(accessUser.getUserName());
 		if(isCaptcha){//如果需要验证码
 			//验证验证码
 			if(captchaKey != null && !"".equals(captchaKey.trim())){
@@ -1837,7 +1788,13 @@ public class AnswerFormAction {
 			}else{
 				error.put("reply", ErrorView._121.name());//修改回复失败
 			}
-
+			//统计每分钟原来提交次数
+			Integer original = settingManage.getSubmitQuantity("answer", accessUser.getUserName());
+    		if(original != null){
+    			settingManage.addSubmitQuantity("answer", accessUser.getUserName(),original+1);//刷新每分钟原来提交次数
+    		}else{
+    			settingManage.addSubmitQuantity("answer", accessUser.getUserName(),1);//刷新每分钟原来提交次数
+    		}
 		}
 		
 		
@@ -1939,20 +1896,8 @@ public class AnswerFormAction {
 			error.put("reply", ErrorView._21.name());//只读模式不允许提交数据
 		}
 		
-		//判断令牌
-		if(token != null && !"".equals(token.trim())){	
-			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌
-			if(token_sessionid != null && !"".equals(token_sessionid.trim())){
-				if(!token_sessionid.equals(token)){
-					error.put("token", ErrorView._13.name());//令牌错误
-				}
-			}else{
-				error.put("token", ErrorView._12.name());//令牌过期
-			}
-		}else{
-			error.put("token", ErrorView._11.name());//令牌为空
-		}
-		
+		//处理CSRF令牌
+		csrfTokenManage.processCsrfToken(request, token,error);
 		
 		Question question = null;
 		AnswerReply reply = null;

@@ -23,10 +23,9 @@ public class IndexAction {
 	
 	@Resource AccessSourceDeviceManage accessSourceDeviceManage;
 	
-	@RequestMapping("/index")
+	@RequestMapping(value = {"/", "/index"})
 	public String execute(HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		
 		//当前模板使用的目录
 		String dirName = templateService.findTemplateDir_cache();
 

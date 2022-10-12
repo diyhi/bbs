@@ -132,10 +132,10 @@ public class PageViewAction {
 				}
 				
 				if(pv.getUrl() != null && !"".equals(pv.getUrl().trim())){
-					pv.setUrl(UrlEncoded.decodeString(pv.getUrl().trim()));
+					pv.setUrl(org.springframework.web.util.UriUtils.decode(pv.getUrl().trim(), "utf-8"));
 				}
 				if(pv.getReferrer() != null && !"".equals(pv.getReferrer().trim())){
-					pv.setReferrer(UrlEncoded.decodeString(pv.getReferrer().trim()));
+					pv.setReferrer(org.springframework.web.util.UriUtils.decode(pv.getReferrer().trim(), "utf-8"));
 				}
 			}
 		}

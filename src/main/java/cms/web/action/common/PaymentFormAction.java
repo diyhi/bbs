@@ -128,6 +128,7 @@ public class PaymentFormAction {
 							continue;
 						}
 					}
+					onlinePaymentInterface.setDynamicParameter(null);
 					onlinePaymentInterface.setBankList(onlinePaymentInterfaceManage.getBankList(onlinePaymentInterface.getInterfaceProduct()));
 					
 				}
@@ -153,13 +154,13 @@ public class PaymentFormAction {
 				for (Map.Entry<String,String> entry : error.entrySet()) {
 					if(entry.getKey().equals("message")){
 						model.addAttribute("message",entry.getValue());//提示
-			  			return "templates/"+dirName+"/"+accessPath+"/message";
+			  			return "/templates/"+dirName+"/"+accessPath+"/message";
 					}
 					
 				}
 			}
 			
-			return "templates/"+dirName+"/"+accessPath+"/payment";	
+			return "/templates/"+dirName+"/"+accessPath+"/payment";	
 		}
 		
 		
@@ -249,19 +250,9 @@ public class PaymentFormAction {
 			error.put("message", ErrorView._21.name());//只读模式不允许提交数据
 		}
 		
-		//判断令牌
-		if(token != null && !"".equals(token.trim())){	
-			String token_sessionid = csrfTokenManage.getToken(request);//获取令牌
-			if(token_sessionid != null && !"".equals(token_sessionid.trim())){
-				if(!token_sessionid.equals(token)){
-					error.put("token", ErrorView._13.name());
-				}
-			}else{
-				error.put("token", ErrorView._12.name());
-			}
-		}else{
-			error.put("token", ErrorView._11.name());
-		}
+		//处理CSRF令牌
+		csrfTokenManage.processCsrfToken(request, token,error);
+				
 		//获取登录用户
 	  	AccessUser accessUser = AccessUserThreadLocal.get();
 		
@@ -312,6 +303,7 @@ public class PaymentFormAction {
 							continue;
 						}
 					}
+					onlinePaymentInterface.setDynamicParameter(null);
 					onlinePaymentInterface.setBankList(onlinePaymentInterfaceManage.getBankList(onlinePaymentInterface.getInterfaceProduct()));
 					
 				}
@@ -448,7 +440,7 @@ public class PaymentFormAction {
 			}
 			
 			model.addAttribute("message", "支付失败");
-			return "templates/"+dirName+"/"+accessPath+"/message";	
+			return "/templates/"+dirName+"/"+accessPath+"/message";	
 		}
 	}
 	
@@ -472,7 +464,6 @@ public class PaymentFormAction {
 			HttpServletRequest request, HttpServletResponse response)throws Exception {
 		BigDecimal paymentAmount = new BigDecimal("0");
 		
-		
 		if(interfaceProduct.equals(1)){//1.支付宝即时到账 
 			//获取支付宝POST过来反馈信息
 			Map<String,String> params = new HashMap<String,String>();
@@ -488,7 +479,6 @@ public class PaymentFormAction {
 				//乱码解决，这段代码在出现乱码时使用。如果mysign和sign不相等也可以使用这段代码转化
 				//valueStr = new String(valueStr.getBytes("ISO-8859-1"), "gbk");
 				params.put(name, valueStr);
-				
 			}
 			
 			boolean signVerified = AlipaySignature.rsaCheckV1(params, alipayConfig_PC.getAlipayPublicKey(interfaceProduct),alipayConfig_PC.CHARSET, alipayConfig_PC.SIGNTYPE); //调用SDK验证签名
@@ -720,7 +710,7 @@ public class PaymentFormAction {
 			WebUtil.writeToWeb(JsonUtils.toJSONString(returnValue), "json", response);
 			return null;
 		}else{
-			return "templates/"+dirName+"/"+accessSourceDeviceManage.accessDevices(request)+"/paymentCompleted";	
+			return "/templates/"+dirName+"/"+accessSourceDeviceManage.accessDevices(request)+"/paymentCompleted";	
 		}
 	}
 	
@@ -795,11 +785,17 @@ public class PaymentFormAction {
 		String createHtmlText = null;
 
 		if(interfaceProduct.equals(1)){//1.支付宝即时到账 
+			String domain = WebUtil.getRefererDomain(request);
+			
+			if(domain == null || "".equals(domain.trim())){
+				domain = Configuration.getUrl(request);
+			}
+			
 			// 服务器异步通知页面路径  需http://格式的完整路径，不能加?id=123这类自定义参数，必须外网可以正常访问
 			String notify_url = Configuration.getUrl(request)+"notify/"+interfaceProduct;
 
 			// 页面跳转同步通知页面路径 需http://格式的完整路径，不能加?id=123这类自定义参数，必须外网可以正常访问
-			String return_url = Configuration.getUrl(request)+"paymentCompleted/"+interfaceProduct+"/"+paymentModule+"/"+parameterId;
+			String return_url = domain +"paymentCompleted/"+interfaceProduct+"/"+paymentModule+"/"+parameterId;
 			
 			AlipayClient client = alipayConfig_PC.getAlipayClient(interfaceProduct);
 			
@@ -837,13 +833,18 @@ public class PaymentFormAction {
 					response.getWriter().print(form);	
 					response.getWriter().close();
 				}
-				
 			}
 		}else if(interfaceProduct.equals(4)){//4.支付宝手机网站(alipay.trade.wap.pay)
+			String domain = WebUtil.getRefererDomain(request);
+			
+			if(domain == null || "".equals(domain.trim())){
+				domain = Configuration.getUrl(request);
+			}
+			
 			// 服务器异步通知页面路径  需http://格式的完整路径，不能加?id=123这类自定义参数，必须外网可以正常访问
 			String notify_url = Configuration.getUrl(request)+"notify/"+interfaceProduct;
 			// 页面跳转同步通知页面路径 需http://格式的完整路径，不能加?id=123这类自定义参数，必须外网可以正常访问
-			String return_url = Configuration.getUrl(request)+"paymentCompleted/"+interfaceProduct+"/"+paymentModule+"/"+parameterId;
+			String return_url = domain+"paymentCompleted/"+interfaceProduct+"/"+paymentModule+"/"+parameterId;
 		 
 		    // SDK 公共请求类，包含公共请求参数，以及封装了签名与验签，开发者无需关注签名与验签     
 		    //调用RSA签名方式

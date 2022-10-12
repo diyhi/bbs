@@ -47,7 +47,7 @@ public class UnhideEntity implements Serializable{
 	/** 消费积分 **/
 	protected Long point;
 	
-	/** 消费余额  精度为12位，小数点位数为2位**/
+	/** 消费金额  精度为12位，小数点位数为2位**/
 	protected BigDecimal amount;
 	
 	/** 取消隐藏时间 **/

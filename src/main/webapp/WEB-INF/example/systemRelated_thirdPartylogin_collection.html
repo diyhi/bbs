@@ -1,0 +1,373 @@
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">返回值</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="20%">类型</th> 
+			<th width="50%">说明</th> 
+		</tr>
+	</thead> 
+	 <tbody> 
+		<tr> 
+			<td>systemRelated_thirdPartylogin_collection</td> 
+			<td>List&lt<a style="color: #317ee7" onclick="anchorJump('#anchor_10'); return false;">SupportLoginInterface</a>></td>
+			<td>支持登录接口集合</td> 
+		</tr> 
+	</tbody> 
+</table>
+<table id="anchor_10" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">支持登录接口 SupportLoginInterface</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>name</td> 
+			<td>String</td>
+			<td>名称</td>
+		</tr>
+		<tr> 
+			<td>thirdPartyLoginInterfaceId</td> 
+			<td>Integer</td>
+			<td>第三方登录接口Id</td>
+		</tr>
+		<tr> 
+			<td>interfaceProduct</td> 
+			<td>Integer</td>
+			<td>接口产品  10.微信公众号  50.其他开放平台</td>
+		</tr>
+	</tbody> 
+</table>
+<h2 style="margin:0;padding:0; margin-top: 10px;">示例</h2>
+<textarea name="exampleCode">
+<@function>	
+<#if systemRelated_thirdPartyLogin_collection?? && systemRelated_thirdPartyLogin_collection?size gt 0>
+	<#assign supportLoginInterfaceList = systemRelated_thirdPartyLogin_collection>
+	<#list supportLoginInterfaceList as supportLoginInterface>
+	    <a href="thirdParty/loginLink?interfaceProduct=${supportLoginInterface.interfaceProduct}&jumpUrl=${url_jumpUrl}" class="icon-${supportLoginInterface.interfaceProduct}" title="${supportLoginInterface.name}"></a>
+	</#list>
+</#if>
+</@function>
+</textarea>
+
+
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">第三方登录链接 - 提交表单 - 默认方式</th>
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td width="30%" >请求路径</td> 
+			<td width="70%" colspan="2">thirdParty/loginLink.htm</td>
+		</tr>
+		<tr> 
+			<td>请求方式</td> 
+			<td colspan="2">GET</td>
+		</tr>
+		<tr> 
+			<td>请求参数</td> 
+			<td colspan="2"><a style="color: #317ee7" onclick="anchorJump('#anchor_600'); return false;">参数表</a></td>
+		</tr>
+		<tr> 
+			<td>提交成功返回</td> 
+			<td colspan="2">请求成功后重定向到第三方登录页</td>
+		</tr>
+		<tr> 
+			<td>提交失败返回</td> 
+			<td colspan="2">跳转到message模板页显示错误</td> 
+		</tr>
+	</tbody> 
+</table>
+
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">第三方登录链接 - 提交表单 - AJAX方式</th>
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td>请求路径</td> 
+			<td colspan="2">thirdParty/loginLink.htm</td>
+		</tr>
+		<tr> 
+			<td>请求方式</td> 
+			<td colspan="2">GET</td>
+		</tr> 
+		<tr> 
+			<td>自定义请求头</td> 
+			<td colspan="2">协议头：X-Requested-With  值：XMLHttpRequest</td>
+		</tr>
+		<tr> 
+			<td>请求参数</td> 
+			<td colspan="2"><a style="color: #317ee7" onclick="anchorJump('#anchor_600'); return false;">参数表</a></td>
+		</tr>
+		<tr> 
+			<td width="30%" rowspan="3">提交返回</td> 
+			<td width="30%" rowspan="3">JSON格式值 类型:Map&ltString,Object></td>
+			<td width="40%">键参数：redirectUrl<br>值内容说明：成功返回重定向地址 失败不返回内容<br>值类型：String</td> 
+		</tr>
+	</tbody> 
+</table>
+
+<table id="anchor_600" class="exampleTable" > 
+	<thead>
+		<tr> 
+			<th colspan="5">提交第三方登录参数</th>
+		</tr>
+		<tr> 
+			<th width="30%">参数</th> 
+			<th width="20%">类型</th> 
+			<th width="10%">是否必填</th> 
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	 <tbody> 
+		<tr> 
+			<td>interfaceProduct</td> 
+			<td>Long</td>
+			<td>是</td>
+			<td>接口产品</td> 
+		</tr>
+		<tr> 
+			<td>jumpUrl</td> 
+			<td>String</td>
+			<td>否</td>
+			<td>'提交表单 - 默认方式'提交成功后跳转路径,不填写默认跳转到表单提交页；参数必须经过encodeBase64URL编码后才能提交。例${encodeBase64URL('/index')}</td> 
+		</tr>
+		
+	</tbody> 
+</table>
+
+<h2 style="margin:0;padding:0; margin-top: 10px;">示例</h2>
+<textarea name="exampleCode">
+<a href="thirdParty/loginLink?interfaceProduct=${supportLoginInterface.interfaceProduct}&jumpUrl=${url_jumpUrl}" class="icon-${supportLoginInterface.interfaceProduct}" title="${supportLoginInterface.name}"></a>
+	
+</textarea>
+
+
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">第三方登录重定向 - 提交表单 - 默认方式</th>
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td width="30%" >请求路径</td> 
+			<td width="70%" colspan="2">thirdParty/loginRedirect.htm</td>
+		</tr>
+		<tr> 
+			<td>请求方式</td> 
+			<td colspan="2">GET</td>
+		</tr>
+		<tr> 
+			<td>请求参数</td> 
+			<td colspan="2"><a style="color: #317ee7" onclick="anchorJump('#anchor_700'); return false;">参数表</a></td>
+		</tr>
+		<tr> 
+			<td>提交成功返回</td> 
+			<td colspan="2">请求成功后重定向到/index页或jumpUrl参数对应的页</td>
+		</tr>
+		<tr> 
+			<td>提交失败返回</td> 
+			<td colspan="2">跳转到message模板页显示错误</td> 
+		</tr>
+	</tbody> 
+</table>
+
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">第三方登录重定向 - 提交表单 - AJAX方式</th>
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td>请求路径</td> 
+			<td colspan="2">thirdParty/loginRedirect.htm</td>
+		</tr>
+		<tr> 
+			<td>请求方式</td> 
+			<td colspan="2">GET</td>
+		</tr> 
+		<tr> 
+			<td>自定义请求头</td> 
+			<td colspan="2">协议头：X-Requested-With  值：XMLHttpRequest</td>
+		</tr>
+		<tr> 
+			<td>请求参数</td> 
+			<td colspan="2"><a style="color: #317ee7" onclick="anchorJump('#anchor_700'); return false;">参数表</a></td>
+		</tr>
+		<tr> 
+			<td width="30%" rowspan="3">提交返回</td> 
+			<td width="30%" rowspan="3">JSON格式值 类型:Map&ltString,Object></td>
+			<td width="40%">键参数：success<br>值内容说明：成功返回true 失败返回false<br>值类型：String</td> 
+		</tr>
+		<tr> 
+			<td>键参数：error<br>值内容说明：错误值集合<br>值类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_70'); return false;">Map&ltString,String></a></td> 
+		</tr>
+		<tr> 
+			<td>键参数：userAuthorization<br>值内容说明：用户授权<br>值类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_110'); return false;">UserAuthorization</a></td> 
+		</tr>
+	</tbody> 
+</table>
+<table id="anchor_700" class="exampleTable" > 
+	<thead>
+		<tr> 
+			<th colspan="5">提交第三方登录重定向参数</th>
+		</tr>
+		<tr> 
+			<th width="30%">参数</th> 
+			<th width="20%">类型</th> 
+			<th width="10%">是否必填</th> 
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	 <tbody> 
+		<tr> 
+			<td>code</td> 
+			<td>String</td>
+			<td>是</td>
+			<td>请求‘第三方登录链接’获取的 code 参数</td> 
+		</tr>
+		<tr> 
+			<td>state</td> 
+			<td>String</td>
+			<td>是</td>
+			<td>自定义参数   存放接口产品和csrf令牌 格式：10_tythwrweffdgfterteewbd</td> 
+		</tr>
+		<tr> 
+			<td>jumpUrl</td> 
+			<td>String</td>
+			<td>否</td>
+			<td>'提交表单 - 默认方式'提交成功后跳转路径,不填写默认跳转到表单提交页；参数必须经过encodeBase64URL编码后才能提交。例${encodeBase64URL('/index')}</td> 
+		</tr>
+		
+	</tbody> 
+</table>
+
+<table id="anchor_70"  class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">‘第三方登录重定向’错误值 error</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td>state</td> 
+			<td>String</td>
+			<td>自定义参数不能为空错误</td>
+		</tr>
+		<tr> 
+			<td>weiXinUserInfo</td> 
+			<td>String</td>
+			<td>微信授权信息错误</td>
+		</tr>
+		<tr> 
+			<td>otherUserInfo</td> 
+			<td>String</td>
+			<td>其它开放平台授权信息错误</td>
+		</tr>
+	</tbody> 
+</table>
+
+<table id="anchor_110" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="4">用户授权 UserAuthorization</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%" colspan="2">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>accessToken</td> 
+			<td>String</td>
+			<td colspan="2">访问令牌</td>
+		</tr>
+		<tr> 
+			<td>refreshToken</td> 
+			<td>String</td>
+			<td colspan="2">刷新令牌</td>
+		</tr>
+		<tr> 
+			<td>accessUser</td> 
+			<td><a style="color: #317ee7" onclick="anchorJump('#anchor_40'); return false;"> AccessUser</a></td>
+			<td colspan="2">访问用户</td>
+		</tr>
+	</tbody> 
+</table>
+<table id="anchor_40" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="4">用户 AccessUser</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%" colspan="2">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>id</td> 
+			<td>long</td>
+			<td colspan="2">Id</td>
+		</tr>
+		<tr> 
+			<td>userName</td> 
+			<td>String</td>
+			<td colspan="2">会员用户名</td>
+		</tr>
+		<tr> 
+			<td>account</td> 
+			<td>String</td>
+			<td colspan="2">账号</td>
+		</tr>
+		<tr> 
+			<td>nickname</td> 
+			<td>String</td>
+			<td colspan="2">呢称</td>
+		</tr>
+		<tr> 
+			<td>avatarPath</td> 
+			<td>String</td>
+			<td>头像路径</td>
+			<td width="15%" rowspan="2">页面上显示200*200头像示例${accessUser.avatarPath}${accessUser.avatarName}   &nbsp;&nbsp;显示100*100头像示例${accessUser.avatarPath}100x100/${accessUser.avatarName}</td> 
+		</tr>
+		<tr> 
+			<td>avatarName</td> 
+			<td>String</td>
+			<td>头像名称</td>
+		</tr>
+		<tr> 
+			<td>openId</td> 
+			<td>String</td>
+			<td colspan="2">第三方用户的唯一标识 例如微信的openid</td>
+		</tr>
+		<tr> 
+			<td>loginInterface</td> 
+			<td>Integer</td>
+			<td colspan="2">登录接口 0.本地 10.微信 50.其他开放平台</td>
+		</tr>
+	</tbody> 
+</table>

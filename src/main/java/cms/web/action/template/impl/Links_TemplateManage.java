@@ -4,9 +4,11 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.stereotype.Component;
-
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import cms.bean.links.Links;
 import cms.bean.template.Forum;
@@ -27,10 +29,11 @@ public class Links_TemplateManage {
 	 * @param forum
 	 */
 	public List<Links> links_collection(Forum forum,Map<String,Object> parameter,Map<String,Object> runtimeParameter){
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();  
 		List<Links> linksList = linksService.findAllLinks_cache();
 		if(linksList != null && linksList.size() >0){
 			for(Links links : linksList){
-				links.setImage(fileManage.fileServerAddress()+links.getImage());
+				links.setImage(fileManage.fileServerAddress(request)+links.getImage());
 			}
 		}
 		return linksList;
