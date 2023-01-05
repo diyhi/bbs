@@ -31,7 +31,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Document.OutputSettings;
-import org.jsoup.safety.Whitelist;
+import org.jsoup.safety.Safelist;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
@@ -48,17 +48,17 @@ public class TextFilterManage {
 	 * 过滤参数
 	 * @return
 	 */
-	private Whitelist filterParameter(EditorTag editorTag){
+	private Safelist filterParameter(EditorTag editorTag){
 			
 		
-	//	Whitelist whitelist = Whitelist.basicWithImages();
+	//	Safelist safelist = Safelist.basicWithImages();
 
-		Whitelist whitelist = Whitelist.none();//只保留文本，其他所有的html内容均被删除
+		Safelist safelist = Safelist.none();//只保留文本，其他所有的html内容均被删除
 		
 		if(editorTag == null){
 			//插入模板
-			whitelist.addTags("h3");
-			whitelist.addTags("table","tbody","tr","td")
+			safelist.addTags("h3");
+			safelist.addTags("table","tbody","tr","td")
 				.addAttributes("table","style")
 				.addAttributes("table","cellspacing")
 				.addAttributes("table","cellpadding")
@@ -67,7 +67,7 @@ public class TextFilterManage {
 		}
 		//隐藏标签
 		if(editorTag == null || editorTag.isHidePassword() || editorTag.isHideComment() || editorTag.isHideGrade() || editorTag.isHidePoint() || editorTag.isHideAmount()){
-			whitelist.addTags("hide")
+			safelist.addTags("hide")
 				.addAttributes("hide","class")
 				.addAttributes("hide","hide-type")
 				.addAttributes("hide","input-value")
@@ -76,63 +76,63 @@ public class TextFilterManage {
 		
 		if(editorTag == null || editorTag.isJustifyleft()){//左对齐
 			//左对齐
-			whitelist.addTags("p")
+			safelist.addTags("p")
 			.addAttributes("p", "align")
 			.addAttributes("p", "style");
 			
 			//vue-html5-editor
-			whitelist.addTags("div")
+			safelist.addTags("div")
 			.addAttributes("div", "style");
 		}
 		if(editorTag == null || editorTag.isJustifycenter()){//居中
 			//居中
-			whitelist.addTags("p")
+			safelist.addTags("p")
 			.addAttributes("p", "align")
 			.addAttributes("p", "style");
 			
 			//vue-html5-editor
-			whitelist.addTags("div")
+			safelist.addTags("div")
 			.addAttributes("div", "style");
 		}
 		if(editorTag == null || editorTag.isJustifyright()){//右对齐
 			//右对齐
-			whitelist.addTags("p")
+			safelist.addTags("p")
 			.addAttributes("p", "align")
 			.addAttributes("p", "style");
 			
 			//vue-html5-editor
-			whitelist.addTags("div")
+			safelist.addTags("div")
 			.addAttributes("div", "style");
 		}
 		if(editorTag == null || editorTag.isInsertorderedlist()){//编号
 			//编号
-			whitelist.addTags("ol","li","div","br")
+			safelist.addTags("ol","li","div","br")
 			.addAttributes("div", "align");
 		}
 		if(editorTag == null || editorTag.isInsertunorderedlist()){//项目符号
 			//项目符号
-			whitelist.addTags("ul","li","div","br")
+			safelist.addTags("ul","li","div","br")
 			.addAttributes("div", "align");
 		}
 		if(editorTag == null || editorTag.isCode()){//代码
 			//代码
-			whitelist.addTags("pre")
+			safelist.addTags("pre","code")
 			.addAttributes("pre","class");
 		}
 		if(editorTag == null){
 			//增加缩进
-			whitelist.addTags("blockquote");
+			safelist.addTags("blockquote");
 			//下标
-			whitelist.addTags("sub");
+			safelist.addTags("sub");
 			//上标
-			whitelist.addTags("sup");
+			safelist.addTags("sup");
 			//一键排版
-			whitelist.addTags("p")//增加白名单标签
+			safelist.addTags("p")//增加白名单标签
 			.addAttributes("p","style");
 			
 		
 			//段落
-			whitelist.addTags("h1","h2","h3","h4","h5","h6")
+			safelist.addTags("h1","h2","h3","h4","h5","h6")
 			.addAttributes("h1","style","align")
 			.addAttributes("h2","style","align")
 			.addAttributes("h3","style","align")
@@ -141,24 +141,25 @@ public class TextFilterManage {
 			.addAttributes("h6","style","align");
 			
 			
+			
 		}
 		if(editorTag == null || editorTag.isFontname()){//字体
 			//字体
-			whitelist.addTags("span")//增加白名单标签
+			safelist.addTags("span")//增加白名单标签
 			.addAttributes("span","style");//给标签添加属性。Tag是属性名，keys对应的是一个个属性值。例如：addAttributes("a", "href", "class") 表示：给标签a添加href和class属性，即允许标签a包含href和class属性。如果想给每一个标签添加一组属性，使用:all。例如： addAttributes(":all", "class").即给每个标签添加class属性。
 	//			.addProtocols("span", "style", "font-family");//第一个参数：标签 ;第二个参数：标签属性;第三个以后参数：标签属性参数
 			
 		
 			
 			//vue-html5-editor
-			whitelist.addTags("font")
+			safelist.addTags("font")
 			.addAttributes("font","face");
 			
 			
 		}
 		if(editorTag == null || editorTag.isFontsize()){//文字大小
 			//文字大小
-			whitelist.addTags("span")
+			safelist.addTags("span")
 			.addAttributes("span","style");
 			
 			
@@ -167,20 +168,20 @@ public class TextFilterManage {
 		}
 		if(editorTag == null || editorTag.isForecolor()){//文字颜色
 			//文字颜色
-			whitelist.addTags("span")
+			safelist.addTags("span")
 			.addAttributes("span","style");
 	
 	
 	//		.addProtocols("span", "style", "color");
 			
 			//vue-html5-editor
-			whitelist.addTags("font")
+			safelist.addTags("font")
 			.addAttributes("font","color").addAttributes("font","style");
 			
 		}
 		if(editorTag == null || editorTag.isHilitecolor()){//文字背景
 			//文字背景
-			whitelist.addTags("span")
+			safelist.addTags("span")
 			.addAttributes("span","style");
 	//		style_attribute.add("background-color");
 			
@@ -191,56 +192,56 @@ public class TextFilterManage {
 		
 		if(editorTag == null || editorTag.isBold()){//粗体
 			//粗体
-			whitelist.addTags("strong");
+			safelist.addTags("strong");
 			//vue-html5-editor
-			whitelist.addTags("b");
+			safelist.addTags("b");
 			
 		
 		}
 		if(editorTag == null || editorTag.isItalic()){//斜体
 			//斜体
-			whitelist.addTags("em");
+			safelist.addTags("em");
 			
 			//vue-html5-editor
-			whitelist.addTags("i");
+			safelist.addTags("i");
 			
 		}
 		if(editorTag == null || editorTag.isUnderline()){//下划线
 			//下划线
-			whitelist.addTags("u");
+			safelist.addTags("u");
 		}
 		
 		
 		if(editorTag == null){
 			//删除线
-			whitelist.addTags("s");
+			safelist.addTags("s");
 			
 			//vue-html5-editor
-			whitelist.addTags("strike");
+			safelist.addTags("strike");
 
 		
 			//表格边框颜色
-			whitelist.addTags("table")
+			safelist.addTags("table")
 			.addAttributes("table", "bordercolor");
 		
 		
 		
 			//插入动态地图
-			whitelist.addTags("iframe")
+			safelist.addTags("iframe")
 			.addAttributes("iframe", "style","src","frameborder")
 			.addProtocols("iframe", "src", "http", "https");
 			
 			
 			//插入横线
-			whitelist.addTags("hr");
+			safelist.addTags("hr");
 			
 			//插入分页符
-			whitelist.addTags("hr")
+			safelist.addTags("hr")
 			.addAttributes("hr", "class","style");
 		}
 		if(editorTag == null || editorTag.isLink()){//超级链接
 			//超级链接
-			whitelist.addTags("a")
+			safelist.addTags("a")
 			.addAttributes("a", "href", "title","target")
 			.addProtocols("a", "href", "ftp", "http", "https", "mailto")
 			.addEnforcedAttribute("a", "rel", "nofollow");
@@ -251,19 +252,19 @@ public class TextFilterManage {
 
 		if(editorTag == null || editorTag.isEmoticons()){//插入表情
 			//插入表情
-			whitelist.addTags("img")
+			safelist.addTags("img")
 			.addAttributes("img", "align", "alt", "src", "title", "border")
 			.addProtocols("img", "src", "http", "https");
 		}
 		if(editorTag == null || editorTag.isImage()){//图片
 			//图片
-			whitelist.addTags("img")
+			safelist.addTags("img")
 			.addAttributes("img", "align", "alt", "src", "title")
 			.addProtocols("img", "src", "http", "https");
 		}
 		if(editorTag == null){
 			//flash 
-			whitelist.addTags("embed")
+			safelist.addTags("embed")
 			.addAttributes("embed", "type", "width","height", "quality", "src","autostart","loop")
 			.addProtocols("embed", "src", "http", "https")
 			.addEnforcedAttribute("embed", "allownetworking", "internal")
@@ -271,13 +272,13 @@ public class TextFilterManage {
 		}
 		if(editorTag == null || editorTag.isEmbedVideo()){
 			//iframe 嵌入视频
-			whitelist.addTags("iframe")
+			safelist.addTags("iframe")
 			.addAttributes("iframe", "src", "frameborder","scrolling", "border", "allow","framespacing","allowfullscreen");
 		}
 		
 		if(editorTag == null || editorTag.isUploadVideo()){
 			//video 上传视频
-			whitelist.addTags("video")
+			safelist.addTags("video")
 			.addAttributes("video", "controls", "src","loop")//"autoplay",
 			.addProtocols("video", "src", "http", "https")
 		//	.addEnforcedAttribute("video", "type", "video/mp4")
@@ -285,7 +286,7 @@ public class TextFilterManage {
 		}
 		
 		
-		return whitelist;
+		return safelist;
 	
 	}
 	
@@ -297,11 +298,11 @@ public class TextFilterManage {
 	public String filterTag_br(String html) {  
 		if(StringUtils.isBlank(html)) return ""; 
 		
-		Whitelist whitelist = Whitelist.none();//只保留文本，其他所有的html内容均被删除
-		whitelist.addTags("br");
+		Safelist safelist = Safelist.none();//只保留文本，其他所有的html内容均被删除
+		safelist.addTags("br");
 		
-	    return Jsoup.clean(html, whitelist); 
-		//return Jsoup.clean(html,"", whitelist,new OutputSettings().prettyPrint(false)); //prettyPrint(是否重新格式化)
+	    return Jsoup.clean(html, safelist); 
+		//return Jsoup.clean(html,"", safelist,new OutputSettings().prettyPrint(false)); //prettyPrint(是否重新格式化)
 	}
 	
 	
@@ -313,10 +314,10 @@ public class TextFilterManage {
 	 */
 	public String filterTag(HttpServletRequest request,String html) {  
 		if(StringUtils.isBlank(html)) return ""; 
-		Whitelist whitelist = this.filterParameter(null);
+		Safelist safelist = this.filterParameter(null);
 	
-	    //return Jsoup.clean(html, Configuration.getUrl(request),whitelist); 
-		return Jsoup.clean(html, Configuration.getUrl(request),whitelist,new OutputSettings().prettyPrint(false)); //prettyPrint(是否重新格式化)
+	    //return Jsoup.clean(html, Configuration.getUrl(request),safelist); 
+		return Jsoup.clean(html, Configuration.getUrl(request),safelist,new OutputSettings().prettyPrint(false)); //prettyPrint(是否重新格式化)
 	}
 	
 	/**
@@ -328,12 +329,12 @@ public class TextFilterManage {
 	 */
 	public String filterTag(HttpServletRequest request,String html,EditorTag editorTag) {  
 		if(StringUtils.isBlank(html)) return ""; 
-		Whitelist whitelist = this.filterParameter(editorTag);
+		Safelist safelist = this.filterParameter(editorTag);
 		
 	
-		//return Jsoup.clean(html, Configuration.getUrl(request),whitelist); 
+		//return Jsoup.clean(html, Configuration.getUrl(request),safelist); 
 	
-		return Jsoup.clean(html, Configuration.getUrl(request),whitelist,new OutputSettings().prettyPrint(false)); //prettyPrint(是否重新格式化)
+		return Jsoup.clean(html, Configuration.getUrl(request),safelist,new OutputSettings().prettyPrint(false)); //prettyPrint(是否重新格式化)
 	}
 	
 	/**
@@ -343,13 +344,13 @@ public class TextFilterManage {
 	 */
 	public String filterText(String html) {  
 		if(StringUtils.isBlank(html)) return ""; 
-		return Jsoup.clean(html, Whitelist.none()); //只保留文本，其他所有的html内容均被删除
+		return Jsoup.clean(html, Safelist.none()); //只保留文本，其他所有的html内容均被删除
 		
 		//doc.text()或Jsoup.clean提取出文本，注意text会将p等标签转为空格而不是换行符，而clean默认会转为换行符。
 		
 		
 		//只保留文本，其他所有的html内容均被删除
-		//return Jsoup.clean(html, "",Whitelist.none(),new OutputSettings().prettyPrint(false)); //prettyPrint(是否重新格式化)
+		//return Jsoup.clean(html, "",Safelist.none(),new OutputSettings().prettyPrint(false)); //prettyPrint(是否重新格式化)
 	}
 	/**
 	 * 过滤标签并删除<hide>标签所有内容,只返回文本
@@ -361,8 +362,8 @@ public class TextFilterManage {
 		String newHtml = this.deleteHiddenTag(html);
 		if(StringUtils.isBlank(newHtml)) return ""; 
 		//只保留文本，其他所有的html内容均被删除
-		return Jsoup.clean(newHtml, Whitelist.none()); 
-		//return Jsoup.clean(newHtml,"", Whitelist.none(),new OutputSettings().prettyPrint(false)); //prettyPrint(是否重新格式化)
+		return Jsoup.clean(newHtml, Safelist.none()); 
+		//return Jsoup.clean(newHtml,"", Safelist.none(),new OutputSettings().prettyPrint(false)); //prettyPrint(是否重新格式化)
 	}
 	
 	/**
