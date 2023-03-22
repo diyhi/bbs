@@ -1536,7 +1536,7 @@ background-position: 0px 2px, 4px 35px, 29px 31px, 34px 6px;
 	font-size:24px;
 	border:none;
 	line-height:34px; 
-	margin:9px 0 18px 0;redEnvelope
+	margin:9px 0 18px 0;
 }
 .topicViewModule .topic-wrap .head .title .essence{
 	display: inline-block;
@@ -1997,7 +1997,7 @@ background-position: 0px 2px, 4px 35px, 29px 31px, 34px 6px;
 	font-size: 12px;
 	font-style: normal;
 	font-weight: normal;
-	position: relative;top: -1px;margin-right: 5px;
+	position: relative;top: -1px;margin-left: 5px;
 }
 .commentModule .commentList .item .main .quote .quoteComment .userInfo .el-badge__content{
 	transform: scale(0.7);top: -10px;

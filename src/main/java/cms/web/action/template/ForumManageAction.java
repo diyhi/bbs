@@ -64,6 +64,7 @@ import cms.utils.Verification;
 import cms.web.action.TextFilterManage;
 import cms.web.action.fileSystem.localImpl.LocalFileManage;
 import cms.web.action.forumCode.ForumCodeManage;
+import cms.web.taglib.Configuration;
 
 /**
  * 模板管理 版块管理
@@ -513,7 +514,13 @@ public class ForumManageAction{
 					//用户自定义HTML
 					if(forum.getForumChildType().equals("用户自定义HTML")){
 						if("entityBean".equals(forum.getDisplayType())){//集合
-							returnValue.put("entityBean_Forum_CustomForumRelated_CustomHTML",JsonUtils.toGenericObject(forum.getFormValue(), new TypeReference<Forum_CustomForumRelated_CustomHTML>(){}));	
+							Forum_CustomForumRelated_CustomHTML forum_CustomForumRelated_CustomHTML = JsonUtils.toGenericObject(forum.getFormValue(), new TypeReference<Forum_CustomForumRelated_CustomHTML>(){});
+							
+							if(forum_CustomForumRelated_CustomHTML.getHtml_content() != null && !"".equals(forum_CustomForumRelated_CustomHTML.getHtml_content().trim())){
+								//处理富文本路径
+								forum_CustomForumRelated_CustomHTML.setHtml_content(textFilterManage.processFilePath(forum_CustomForumRelated_CustomHTML.getHtml_content(), "template", Configuration.getUrl(request)));
+							}
+							returnValue.put("entityBean_Forum_CustomForumRelated_CustomHTML",forum_CustomForumRelated_CustomHTML);	
 						}
 					}
 					//热门搜索词
@@ -1548,7 +1555,11 @@ public class ForumManageAction{
 				String entityBean_customForum_htmlContent = request.getParameter("entityBean_customForum_htmlContent");//用户自定义HTML内容
 				
 				
-				
+				//删除富文本文件本地路径（如 <img src="http://127.0.0.1:8080/file/template/eee/image/d1a03287a6d24da7a616056a7ecc4bd7.jpg" 转为file/template/eee/image/d1a03287a6d24da7a616056a7ecc4bd7.jpg ）
+				if(entityBean_customForum_htmlContent != null && !"".equals(entityBean_customForum_htmlContent.trim())){
+					entityBean_customForum_htmlContent = textFilterManage.deleteLocalRichTextFilePath(request,entityBean_customForum_htmlContent,"template");
+				}
+						
 				entityBean_Forum_CustomForumRelated_CustomHTML.setHtml_id(UUIDUtil.getUUID32());
 				entityBean_Forum_CustomForumRelated_CustomHTML.setHtml_content(entityBean_customForum_htmlContent);
 				forum.setFormValue(JsonUtils.toJSONString(entityBean_Forum_CustomForumRelated_CustomHTML));//加入表单值
@@ -1593,7 +1604,7 @@ public class ForumManageAction{
 	@ResponseBody
 	@RequestMapping(params="method=upload",method=RequestMethod.POST)
 	public String upload(ModelMap model,String layoutId,String dir,
-			MultipartFile file, HttpServletResponse response) throws Exception {
+			MultipartFile file, HttpServletRequest request,HttpServletResponse response) throws Exception {
 		//当前图片类型
 		Map<String,Object> returnJson = new HashMap<String,Object>();
 		
@@ -1628,7 +1639,8 @@ public class ForumManageAction{
 	
 					boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),formatList);
 					
-				
+					
+					
 					if(authentication && size/1024 <= imageSize){
 						
 						
@@ -1650,7 +1662,7 @@ public class ForumManageAction{
 						
 						//上传成功
 						returnJson.put("error", 0);//0成功  1错误
-						returnJson.put("url", "file/template/"+layout.getDirName()+"/image/"+newFileName);
+						returnJson.put("url", Configuration.getUrl(request)+"file/template/"+layout.getDirName()+"/image/"+newFileName);
 						return JsonUtils.toJSONString(returnJson);
 						
 					}
@@ -1682,7 +1694,7 @@ public class ForumManageAction{
 						
 						//上传成功
 						returnJson.put("error", 0);//0成功  1错误
-						returnJson.put("url", "file/template/"+layout.getDirName()+"/flash/"+newFileName);
+						returnJson.put("url", Configuration.getUrl(request)+"file/template/"+layout.getDirName()+"/flash/"+newFileName);
 						return JsonUtils.toJSONString(returnJson);
 					}
 					
@@ -1725,7 +1737,7 @@ public class ForumManageAction{
 						
 						//上传成功
 						returnJson.put("error", 0);//0成功  1错误
-						returnJson.put("url", "file/template/"+layout.getDirName()+"/media/"+newFileName);
+						returnJson.put("url", Configuration.getUrl(request)+"file/template/"+layout.getDirName()+"/media/"+newFileName);
 						return JsonUtils.toJSONString(returnJson);
 					}
 				}else if(dir.equals("file")){
@@ -1753,7 +1765,7 @@ public class ForumManageAction{
 						
 						//上传成功
 						returnJson.put("error", 0);//0成功  1错误
-						returnJson.put("url", "file/template/"+layout.getDirName()+"/file/"+newFileName);
+						returnJson.put("url", Configuration.getUrl(request)+"file/template/"+layout.getDirName()+"/file/"+newFileName);
 						returnJson.put("title", file.getOriginalFilename());//旧文件名称
 						return JsonUtils.toJSONString(returnJson);
 					}
@@ -1767,8 +1779,6 @@ public class ForumManageAction{
 		returnJson.put("message", "上传失败");
 		return JsonUtils.toJSONString(returnJson);
 	}
-	
-	
 	
 	/**
 	 * 版块管理 删除

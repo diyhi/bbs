@@ -216,7 +216,7 @@
 						        <el-menu-item index="5-500700-1">缩略图列表</el-menu-item>
 						    </el-submenu>
 						</el-menu>
-					<el-scrollbar>
+					</el-scrollbar>
 			    	
 			    </el-aside>
 			    <div class="leftNavigationArrow">
@@ -490,7 +490,7 @@
 			        	<div v-text="error.captchaValue" v-show="error.captchaValue != ''"  class="form-field-prompt-error"></div>
 	                </div>
 	            	<div class="loginButton">
-						<span @click="submitData" @keyup.enter="submitData" tabindex="4">登&nbsp;录</span>
+						<span @mousedown="submitData" @keyup.enter="submitData" tabindex="4">登&nbsp;录</span>
 						<div v-text="error.userInfo" v-if="error.userInfo != ''" class="form-error"></div>
 						<div v-text="error.login" v-if="error.login != ''" class="form-error"></div>
 					</div>  

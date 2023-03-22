@@ -107,17 +107,16 @@ public class UpgradeManageAction {
 					break;
 				}
 			}
-		}else{
-			
-			
-			String originalVersion = upgradeManage.readOriginalVersion();
-
-			if(originalVersion != null && !"".equals(originalVersion.trim())){
-				if(!currentVersion.trim().equals(originalVersion.trim())){
-					verificationVersion = true;
-				}
-			}
 		}
+		
+		
+		String originalVersion = upgradeManage.readOriginalVersion();
+
+		if(originalVersion != null && !"".equals(originalVersion.trim())){
+			verificationVersion = true;
+		}
+		
+		
 		if(notCompletedUpgrade == null && verificationVersion){
 			
 			try {
@@ -154,7 +153,7 @@ public class UpgradeManageAction {
 									//排序
 									String sort = props.getProperty("sort");
 									
-									if(currentVersion.equals(oldSystemVersion)){
+									if(currentVersion.equals(oldSystemVersion) && !newSystemVersion.equals(originalVersion)){
 										notCompletedUpgrade = new UpgradeSystem();
 										notCompletedUpgrade.setId(newSystemVersion);
 										notCompletedUpgrade.setOldSystemVersion(oldSystemVersion);

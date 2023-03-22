@@ -72,16 +72,17 @@ public class AdminManageAction {
 
 	/**
 	 * 员工登录页面显示
+	 * @param username 员工账号
 	 * @param request
 	 * @param response
 	 * @return
 	 * @throws Exception
 	 */
 	@RequestMapping(value="/admin/login",method=RequestMethod.GET) 
-	public String loginUI(ModelMap model,
+	public String loginUI(ModelMap model,String username,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-	
+
 		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
 		
 		if(isAjax){//如果是AJAX方式访问
@@ -97,9 +98,8 @@ public class AdminManageAction {
 			if(loginFailureNumber <=0){//每分钟连续登录密码错误N次时出现验证码
 				isCaptcha = true;
 			}else{
-				String staffName = WebUtil.getCookieByName(request.getCookies(),"cms_staffName");
-				if(staffName != null && !"".equals(staffName.trim())){
-					Integer errorCount = staffManage.getLoginFailureCount(staffName);//查询错误次数
+				if(username != null && !"".equals(username.trim())){
+					Integer errorCount = staffManage.getLoginFailureCount(username);//查询错误次数
 					if(errorCount != null && errorCount >= loginFailureNumber){
 						isCaptcha = true;
 					}
@@ -163,9 +163,8 @@ public class AdminManageAction {
   			isCaptcha = true;
   		}else{
 
-  			String staffName = WebUtil.getCookieByName(request.getCookies(),"cms_staffName");
-  			if(staffName != null && !"".equals(staffName.trim())){
-  				Integer errorCount = staffManage.getLoginFailureCount(staffName.trim());//先查询错误次数
+  			if(username != null && !"".equals(username.trim())){
+  				Integer errorCount = staffManage.getLoginFailureCount(username.trim());//先查询错误次数
   	  			
   				if(errorCount != null && errorCount >= loginFailureNumber){
   					isCaptcha = true;
@@ -173,7 +172,6 @@ public class AdminManageAction {
   			}
   			
   		}
-  		
   		
   		if(isCaptcha){
   			if (captchaKey == null || "".equals(captchaKey.trim())) {
@@ -183,24 +181,26 @@ public class AdminManageAction {
   	        	error.put("captchaValue","验证码值不能为空");
   	        }
   			
-  	        //增加验证码重试次数
-			Integer original = settingManage.getSubmitQuantity("captcha", captchaKey.trim());
-    		if(original != null){
-    			settingManage.addSubmitQuantity("captcha", captchaKey.trim(),original+1);//刷新每分钟原来提交次数
-    		}else{
-    			settingManage.addSubmitQuantity("captcha", captchaKey.trim(),1);//刷新每分钟原来提交次数
-    		}
-  			
-  			String _captcha = captchaManage.captcha_generate(captchaKey.trim(),"");
-  	        if(_captcha != null && !"".equals(_captcha.trim())){
-  	        	if(!_captcha.equalsIgnoreCase(captchaValue.trim())){
-  	        		error.put("captchaValue","验证码错误");
-  	        	}
-  			}else{
-  				error.put("captchaValue","验证码过期");
-  			}
-  			//删除验证码
-  			captchaManage.captcha_delete(captchaKey);
+  	        if(captchaKey != null && !"".equals(captchaKey.trim()) && captchaValue != null && !"".equals(captchaValue.trim())){
+  	        	//增加验证码重试次数
+  				Integer original = settingManage.getSubmitQuantity("captcha", captchaKey.trim());
+  	    		if(original != null){
+  	    			settingManage.addSubmitQuantity("captcha", captchaKey.trim(),original+1);//刷新每分钟原来提交次数
+  	    		}else{
+  	    			settingManage.addSubmitQuantity("captcha", captchaKey.trim(),1);//刷新每分钟原来提交次数
+  	    		}
+  	  			
+  	  			String _captcha = captchaManage.captcha_generate(captchaKey.trim(),"");
+  	  	        if(_captcha != null && !"".equals(_captcha.trim())){
+  	  	        	if(!_captcha.equalsIgnoreCase(captchaValue.trim())){
+  	  	        		error.put("captchaValue","验证码错误");
+  	  	        	}
+  	  			}else{
+  	  				error.put("captchaValue","验证码过期");
+  	  			}
+  	  			//删除验证码
+  	  			captchaManage.captcha_delete(captchaKey);
+  	        }
   		}
 		
 			
@@ -233,6 +233,9 @@ public class AdminManageAction {
 	    	try(CloseableHttpResponse httpResponse = httpClient.execute(httpPost)) {	
 	    		//{"access_token":"0e2ql02rNxZ199fbTHr4kq9TX_A","token_type":"bearer","refresh_token":"7Q0wEwoHNZtO-zZ6BFzdd-HQVpA","expires_in":49,"scope":"all"}   		
 	    		String data = EntityUtils.toString(httpResponse.getEntity(),"UTF-8");
+	    		
+	    		
+	    		
 	    		if(data != null && !"".equals(data.trim())){
 	    			Map<String,Object> content_map = JsonUtils.toObject(data, HashMap.class);
 					if(content_map != null && content_map.size() >0){
@@ -251,7 +254,6 @@ public class AdminManageAction {
 						}
 					}
 	    		}
-	    		
 	    		
 	    	} catch (IOException e) {
 	    		if (logger.isErrorEnabled()) {

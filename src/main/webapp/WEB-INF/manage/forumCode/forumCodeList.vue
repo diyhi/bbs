@@ -106,7 +106,7 @@
 						
 						<el-row>
 							<el-col :span="24">
-								 <el-button class="submitButton" type="primary" @click="editForumCode_submitForm" :disabled="submitForm_disabled">提交</el-button>
+								 <el-button class="submitButton" type="primary" @click="editForumSource_submitForm" :disabled="submitForm_disabled">提交</el-button>
 							</el-col>
 						</el-row>
 					</div>
@@ -859,7 +859,7 @@ export default({
     	
     	},
     	//提交源码编辑
-		editForumCode_submitForm : function() {
+		editForumSource_submitForm : function() {
 			let _self = this;
 			_self.submitForm_disabled = true;
 			

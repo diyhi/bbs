@@ -114,7 +114,7 @@ public class RedEnvelopeAction{
 				currentUser.setAccount(user.getAccount());
 				currentUser.setNickname(user.getNickname());
 				if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-					currentUser.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+					currentUser.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 					currentUser.setAvatarName(user.getAvatarName());
 				}
 				returnValue.put("currentUser", currentUser);
@@ -177,7 +177,7 @@ public class RedEnvelopeAction{
 						currentUser.setAccount(user.getAccount());
 						currentUser.setNickname(user.getNickname());
 						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-							currentUser.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+							currentUser.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 							currentUser.setAvatarName(user.getAvatarName());
 						}
 						returnValue.put("currentUser", currentUser);
@@ -244,7 +244,7 @@ public class RedEnvelopeAction{
 				currentUser.setAccount(_user.getAccount());
 				currentUser.setNickname(_user.getNickname());
 				if(_user.getAvatarName() != null && !"".equals(_user.getAvatarName().trim())){
-					currentUser.setAvatarPath(fileManage.fileServerAddress()+_user.getAvatarPath());
+					currentUser.setAvatarPath(fileManage.fileServerAddress(request)+_user.getAvatarPath());
 					currentUser.setAvatarName(_user.getAvatarName());
 				}
 				returnValue.put("currentUser", currentUser);
@@ -260,7 +260,7 @@ public class RedEnvelopeAction{
 	        			receiveRedEnvelope.setGiveNickname(user.getNickname());
 	        			receiveRedEnvelope.setGiveUserName(user.getUserName());
 	        			if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-	        				receiveRedEnvelope.setGiveAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+	        				receiveRedEnvelope.setGiveAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 	        				receiveRedEnvelope.setGiveAvatarName(user.getAvatarName());
 	        			}		
 	        		}

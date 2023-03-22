@@ -149,10 +149,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
   
             }
         });
+        
+        http
+    	.csrf()
+    	.disable();//关闭csrf保护
     	
-    	http
-    		.csrf().requireCsrfProtectionMatcher(csrfSecurityRequestMatcher())//要使用csrf保护的请求匹配器
-    		.csrfTokenRepository(new CookieCsrfTokenRepository());//将CSRF令牌存储在自定义Cookie中 CookieServerCsrfTokenRepository
+    //	http
+    //		.csrf().requireCsrfProtectionMatcher(csrfSecurityRequestMatcher())//要使用csrf保护的请求匹配器
+    //		.csrfTokenRepository(new CookieCsrfTokenRepository());//将CSRF令牌存储在自定义Cookie中 CookieServerCsrfTokenRepository
     	
     	//http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);//让 Spring Security 不创建和使用 session
     	

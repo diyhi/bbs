@@ -763,6 +763,158 @@ public class TextFilterManage {
 	}
 	
 	/**
+	 * 删除富文本文件本地路径（如 <img src="http://127.0.0.1:8080/file/template/eee/image/d1a03287a6d24da7a616056a7ecc4bd7.jpg" 转为file/template/eee/image/d1a03287a6d24da7a616056a7ecc4bd7.jpg ）
+	 * @param request
+	 * @param html 内容
+	 * @param item 项目
+	 * @return
+	 */
+	public String deleteLocalRichTextFilePath(HttpServletRequest request,String html,String item) {
+		Document doc = Jsoup.parseBodyFragment(html);
+		
+		
+		//图片
+		Elements image_elements = doc.select("img[src]");  
+		for (Element element : image_elements) {
+			//font-size:14px;font-family:NSimSun;
+			String imageUrl = element.attr("src"); 
+			if(imageUrl != null && !"".equals(imageUrl.trim())){
+				 //上传图片
+				 if (this.isLocalBindURL(request,imageUrl.trim(),"file/") ||
+						 this.isLocalBindURL(request,imageUrl.trim(),"common/") ||
+						 this.isLocalBindURL(request,imageUrl.trim(),"backstage/")) {  
+					 
+					//前后端一体架构内置svg表情图片
+					 if (this.isLocalBindURL(request,imageUrl.trim(),"common/") ||
+							 this.isLocalBindURL(request,imageUrl.trim(),"backstage/")) {  
+						 String extension = FileUtil.getExtension(imageUrl);
+						 if(extension != null && "svg".equalsIgnoreCase(extension.trim())){
+							 element.attr("width",  "32px");  
+							 element.attr("height",  "32px");  
+						 }
+		             }
+					 
+					 String processUrl = this.deleteLocalBindURL(request,imageUrl.trim());
+					 element.attr("src",  processUrl);
+	                 
+	                 
+	                 
+	                 
+	             }else{
+	            	 //前后端分离架构内置svg表情图片
+	            	 if(this.isFrontEndURL(request,imageUrl.trim())){
+	            		 String processUrl = this.deleteFrontEndURL(request,imageUrl.trim());
+	            		 String extension = FileUtil.getExtension(imageUrl);
+						 if(extension != null && "svg".equalsIgnoreCase(extension.trim())){
+							 element.attr("width",  "32px");  
+							 element.attr("height",  "32px");  
+						 }
+	            		 element.attr("src",  processUrl);   
+	            	 }else{
+	            		 element.attr("src",  imageUrl);  
+	            	 }
+	             }
+				 
+				 
+				 
+			 }
+			  
+		}
+		
+		
+		Elements embed_pngs = doc.select("embed[src]");  
+		for (Element element : embed_pngs) {  
+			 String type = element.attr("type"); 
+			 if("application/x-shockwave-flash".equalsIgnoreCase(type)){//flash
+				//<embed src="http://127.0.0.1:8080/shop/file/information/1/2013-11-04/flash/6c72272190254f419478ddd2e2c774bc.swf" type="application/x-shockwave-flash" width="550" height="400" quality="high" />
+				 String flashUrl = element.attr("src"); 
+				 if(flashUrl != null && !"".equals(flashUrl.trim())){
+					 
+					 if(this.isLocalBindURL(request,flashUrl.trim(),"file/"+item+"/")){
+						 String processUrl = this.deleteLocalBindURL(request,flashUrl.trim());
+						 element.attr("src",  processUrl);
+					 }
+				 } 
+			 }else if("video/x-ms-asf-plugin".equalsIgnoreCase(type)){//音视频
+				 String mediaUrl = element.attr("src"); 
+				 if(mediaUrl != null && !"".equals(mediaUrl.trim())){
+					 if(this.isLocalBindURL(request,mediaUrl.trim(),"file/"+item+"/")){
+						 String processUrl = this.deleteLocalBindURL(request,mediaUrl.trim());
+						 element.attr("src",  processUrl);
+					 }
+				 }
+				 
+			 }
+		}
+		
+		Elements video_pngs = doc.select("video[src]");  
+		for (Element element : video_pngs) {  
+			String videoUrl = element.attr("src"); 
+			 if(videoUrl != null && !"".equals(videoUrl.trim())){
+				 if(this.isLocalBindURL(request,videoUrl.trim(),"file/"+item+"/")){
+					 String processUrl = this.deleteLocalBindURL(request,videoUrl.trim());
+					 element.attr("src",  processUrl);
+				 }
+			 } 
+		}
+		
+		
+		//富文本嵌入视频地址白名单
+		List<String> embedVideoWhiteList = CommentedProperties.readRichTextAllowEmbedVideoWhiteList();
+		 
+		//插入动态地图和嵌入视频
+		Elements iframe_pngs = doc.select("iframe[src]");  
+		for (Element element : iframe_pngs) {  
+			//<iframe style="width:560px;height:362px;" src="http://127.0.0.1:8080/shop/backstage/kindeditor/plugins/baidumap/index.html?center=121.473704%2C31.230393&zoom=11&width=558&height=360&markers=121.473704%2C31.230393&markerStyles=l%2CA" frameborder="0">
+			 String iframeUrl = element.attr("src"); 
+			 if(iframeUrl != null && !"".equals(iframeUrl.trim())){
+				 iframeUrl = StringUtils.deleteWhitespace(iframeUrl);//删除字符串中的空白字符 
+
+				 element.attr("src",  ""); 
+				 
+				 if(embedVideoWhiteList != null && embedVideoWhiteList.size() >0){
+					 for(String embedVideoWhite : embedVideoWhiteList){
+						 if(embedVideoWhite != null && !"".equals(embedVideoWhite.trim())){
+							 String domain = this.getTopPrivateDomain(iframeUrl);
+							 if(domain != null && domain.equalsIgnoreCase(embedVideoWhite.trim())){
+								 element.attr("src",  iframeUrl);
+								 break;
+							 }
+						 }
+					 }
+				 }
+				 
+				 if (iframeUrl.trim().startsWith(Configuration.getUrl(request)+"backstage/kindeditor/plugins/baidumap/index.html")) {//插入动态地图
+					 //从左往右查到相等的字符开始，保留后边的，不包含等于的字符
+					 iframeUrl =StringUtils.substringAfter(iframeUrl, Configuration.getUrl(request));  
+	                 element.attr("src",  iframeUrl);  
+	             }
+				 
+				 
+			 }
+		}
+		
+		
+		
+		Elements file_pngs = doc.select("a[href]");  
+		for (Element element : file_pngs) {  
+			String fileUrl = element.attr("href");
+			if(fileUrl != null && !"".equals(fileUrl.trim())){
+				if(this.isLocalBindURL(request,fileUrl.trim(),"file/"+item+"/")){
+					 String processUrl = this.deleteLocalBindURL(request,fileUrl.trim());
+					 element.attr("href",  processUrl);
+				}
+			}
+		}
+
+		//prettyPrint(是否重新格式化)、outline(是否强制所有标签换行)、indentAmount(缩进长度)    doc.outputSettings().indentAmount(0).prettyPrint(false);
+		doc.outputSettings().prettyPrint(false);
+		return doc.body().html();
+		
+	}
+	
+	
+	/**
 	 * 获取URL中的根域名
 	 * 必须 http 或 https 或 // 开头
 	 * @param url
@@ -1844,6 +1996,55 @@ public class TextFilterManage {
 			return StringUtils.removeStartIgnoreCase(processUrl, domain);//移除开始部分的相同的字符,不区分大小写
         }
 		
+		return processUrl;
+	}
+	
+	/**
+	 * 判断是否为本地绑定网址
+	 * @param request
+	 * @param processUrl 待处理URL
+	 * @param append 绑定网址追加URL
+	 * @return
+	 */
+	public boolean isLocalBindURL(HttpServletRequest request,String processUrl,String append){  
+		List<String> validUrlList = new ArrayList<String>();
+		String url = Configuration.getUrl(request);
+		url = StringUtils.removeStartIgnoreCase(url, "http:");//移除开始部分的相同的字符,不区分大小写
+		url = StringUtils.removeStartIgnoreCase(url, "https:");//移除开始部分的相同的字符,不区分大小写
+		validUrlList.add("http:"+url);
+		validUrlList.add("https:"+url);
+		validUrlList.add(url);
+		
+		
+		for(String validUrl : validUrlList){
+			if(StringUtils.startsWithIgnoreCase(processUrl.trim(),validUrl+append)) { //判断开始部分是否与二参数相同。不区分大小写 
+				return true;
+            }
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * 删除本地绑定网址
+	 * @param request
+	 * @param processUrl 待处理URL
+	 * @return
+	 */
+	public String deleteLocalBindURL(HttpServletRequest request,String processUrl){  
+		List<String> validUrlList = new ArrayList<String>();
+		String url = Configuration.getUrl(request);
+		url = StringUtils.removeStartIgnoreCase(url, "http:");//移除开始部分的相同的字符,不区分大小写
+		url = StringUtils.removeStartIgnoreCase(url, "https:");//移除开始部分的相同的字符,不区分大小写
+		validUrlList.add("http:"+url);
+		validUrlList.add("https:"+url);
+		validUrlList.add(url);
+		
+		for(String validUrl : validUrlList){
+			if(StringUtils.startsWithIgnoreCase(processUrl.trim(),validUrl)) { //判断开始部分是否与二参数相同。不区分大小写 
+				return StringUtils.removeStartIgnoreCase(processUrl, validUrl);//移除开始部分的相同的字符,不区分大小写
+            }
+		}
 		return processUrl;
 	}
 }

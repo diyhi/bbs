@@ -199,7 +199,7 @@ public class LinksManageAction {
 			Links links = linksService.findById(linksId);
 			if(links != null){
 				if(links.getImage() != null && !"".equals(links.getImage())){
-					returnValue.put("imagePath",fileManage.fileServerAddress()+links.getImage());
+					returnValue.put("imagePath",fileManage.fileServerAddress(request)+links.getImage());
 				}
 				returnValue.put("links",links);//返回消息
 			}else{

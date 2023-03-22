@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>bbs</groupId>
 	<artifactId>bbs</artifactId>
-	<version>5.8</version>
+	<version>5.9</version>
 	<packaging>war</packaging>
 	<name>bbs</name>
 	<description/>
@@ -432,7 +432,7 @@
 		<dependency>
 		    <groupId>org.jsoup</groupId>
 		    <artifactId>jsoup</artifactId>
-		    <version>1.15.3</version>
+		    <version>1.15.4</version>
 		     <exclusions>
 				<exclusion>
 					<groupId>*</groupId>

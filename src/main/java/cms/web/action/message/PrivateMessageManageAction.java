@@ -108,7 +108,7 @@ public class PrivateMessageManageAction {
 							privateMessage.setFriendAccount(friend_user.getAccount());
 							privateMessage.setFriendNickname(friend_user.getNickname());
 							if(friend_user.getAvatarName() != null && !"".equals(friend_user.getAvatarName().trim())){
-								privateMessage.setFriendAvatarPath(fileManage.fileServerAddress()+friend_user.getAvatarPath());//私信对方头像路径
+								privateMessage.setFriendAvatarPath(fileManage.fileServerAddress(request)+friend_user.getAvatarPath());//私信对方头像路径
 								privateMessage.setFriendAvatarName(friend_user.getAvatarName());//私信对方头像名称
 							}
 						}
@@ -118,7 +118,7 @@ public class PrivateMessageManageAction {
 							privateMessage.setSenderAccount(sender_user.getAccount());
 							privateMessage.setSenderNickname(sender_user.getNickname());
 							if(sender_user.getAvatarName() != null && !"".equals(sender_user.getAvatarName().trim())){
-								privateMessage.setSenderAvatarPath(fileManage.fileServerAddress()+sender_user.getAvatarPath());//发送者头像路径
+								privateMessage.setSenderAvatarPath(fileManage.fileServerAddress(request)+sender_user.getAvatarPath());//发送者头像路径
 								privateMessage.setSenderAvatarName(sender_user.getAvatarName());//发送者头像名称
 							}
 						}
@@ -133,6 +133,9 @@ public class PrivateMessageManageAction {
 			pageView.setQueryResult(qr);
 			User user = userService.findUserById(id);
 			if(user != null){
+				if(user.getAvatarPath() != null && !"".equals(user.getAvatarPath())){
+					user.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
+				}
 				returnValue.put("currentUser", user);
 			}
 			
@@ -238,7 +241,7 @@ public class PrivateMessageManageAction {
 							privateMessage.setFriendAccount(friend_user.getAccount());
 							privateMessage.setFriendNickname(friend_user.getNickname());
 							if(friend_user.getAvatarName() != null && !"".equals(friend_user.getAvatarName().trim())){
-								privateMessage.setFriendAvatarPath(fileManage.fileServerAddress()+friend_user.getAvatarPath());//私信对方头像路径
+								privateMessage.setFriendAvatarPath(fileManage.fileServerAddress(request)+friend_user.getAvatarPath());//私信对方头像路径
 								privateMessage.setFriendAvatarName(friend_user.getAvatarName());//私信对方头像名称
 							}
 						}
@@ -248,7 +251,7 @@ public class PrivateMessageManageAction {
 							privateMessage.setSenderAccount(sender_user.getAccount());
 							privateMessage.setSenderNickname(sender_user.getNickname());
 							if(sender_user.getAvatarName() != null && !"".equals(sender_user.getAvatarName().trim())){
-								privateMessage.setSenderAvatarPath(fileManage.fileServerAddress()+sender_user.getAvatarPath());//发送者头像路径
+								privateMessage.setSenderAvatarPath(fileManage.fileServerAddress(request)+sender_user.getAvatarPath());//发送者头像路径
 								privateMessage.setSenderAvatarName(sender_user.getAvatarName());//发送者头像名称
 							}
 						}

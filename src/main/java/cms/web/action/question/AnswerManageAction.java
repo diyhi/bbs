@@ -521,7 +521,7 @@ public class AnswerManageAction {
 	@ResponseBody
 	@RequestMapping(params="method=uploadImage",method=RequestMethod.POST)
 	public String uploadImage(ModelMap model,Long questionId,String userName, Boolean isStaff,String fileName,
-			MultipartFile file, HttpServletResponse response) throws Exception {
+			MultipartFile file,HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		String number = questionManage.generateFileNumber(userName, isStaff);
 		
@@ -616,7 +616,7 @@ public class AnswerManageAction {
 				
 								//上传成功
 								returnJson.put("error", 0);//0成功  1错误
-								returnJson.put("url", fileManage.fileServerAddress()+"file/answer/"+questionId+"/"+newFileName);
+								returnJson.put("url", fileManage.fileServerAddress(request)+"file/answer/"+questionId+"/"+newFileName);
 								
 								return JsonUtils.toJSONString(returnJson);
 							}else{

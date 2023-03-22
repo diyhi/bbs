@@ -140,7 +140,7 @@ public class TopicUnhidePlatformShareAction {
 					topicUnhidePlatformShare.setPostAccount(post_user.getAccount());
 					topicUnhidePlatformShare.setPostNickname(post_user.getNickname());
 					if(post_user.getAvatarName() != null && !"".equals(post_user.getAvatarName().trim())){
-						topicUnhidePlatformShare.setPostAvatarPath(fileManage.fileServerAddress()+post_user.getAvatarPath());
+						topicUnhidePlatformShare.setPostAvatarPath(fileManage.fileServerAddress(request)+post_user.getAvatarPath());
 						topicUnhidePlatformShare.setPostAvatarName(post_user.getAvatarName());
 					}		
 				}
@@ -149,7 +149,7 @@ public class TopicUnhidePlatformShareAction {
 					topicUnhidePlatformShare.setUnlockAccount(unlock_user.getAccount());
 					topicUnhidePlatformShare.setUnlockNickname(unlock_user.getNickname());
 					if(unlock_user.getAvatarName() != null && !"".equals(unlock_user.getAvatarName().trim())){
-						topicUnhidePlatformShare.setUnlockAvatarPath(fileManage.fileServerAddress()+unlock_user.getAvatarPath());
+						topicUnhidePlatformShare.setUnlockAvatarPath(fileManage.fileServerAddress(request)+unlock_user.getAvatarPath());
 						topicUnhidePlatformShare.setUnlockAvatarName(unlock_user.getAvatarName());
 					}		
 				}

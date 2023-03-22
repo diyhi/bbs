@@ -120,7 +120,7 @@ public class MembershipCardAction {
 					t.setAccount(user.getAccount());
 					t.setNickname(user.getNickname());
 					if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-						t.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+						t.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 						t.setAvatarName(user.getAvatarName());
 					}		
 				}

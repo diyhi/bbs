@@ -38,6 +38,7 @@ import cms.service.user.UserGradeService;
 import cms.service.user.UserService;
 import cms.utils.JsonUtils;
 import cms.utils.Verification;
+import cms.web.action.fileSystem.FileManage;
 
 /**
  * 用户管理 分页显示 查询结果显示
@@ -56,7 +57,7 @@ public class UserAction {
 	
 	@Resource SettingService settingService;
 	@Resource UserManage userManage;
-	
+	@Resource FileManage fileManage;
 	
 	/**
 	 * 用户列表
@@ -145,7 +146,7 @@ public class UserAction {
 				userView.setUserRoleNameList(user.getUserRoleNameList());
 				userView.setGradeId(user.getGradeId());
 				userView.setGradeName(user.getGradeName());
-				userView.setAvatarPath(user.getAvatarPath());
+				userView.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 				userView.setAvatarName(user.getAvatarName());
 				userViewList.add(userView);
 			}
@@ -585,6 +586,10 @@ public class UserAction {
 						}
 					} 
 				}
+				if(user.getAvatarPath() != null && !"".contentEquals(user.getAvatarPath().trim())){
+					user.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
+				}
+				
 			}
 		}
 		

@@ -5,7 +5,7 @@
 			<div class="nav-breadcrumb">
 				<el-breadcrumb separator-class="el-icon-arrow-right">
 					<el-breadcrumb-item @click="$router.push({path: '/admin/control/questionTag/list'});">全部标签</el-breadcrumb-item>
-					<el-breadcrumb-item v-for="(value, key) in navigation" @click="$router.push({path: '/admin/control/questionTag/list',query:{parentId:key}});" @click="queryQuestionTag(1,key)">{{value}}</el-breadcrumb-item>
+					<el-breadcrumb-item v-for="(value, key) in navigation" @click="$router.push({path: '/admin/control/questionTag/list',query:{parentId:key}});">{{value}}</el-breadcrumb-item>
 				</el-breadcrumb>
 			</div>
 			<div class="navbar">

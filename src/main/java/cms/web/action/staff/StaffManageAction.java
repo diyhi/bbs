@@ -306,6 +306,7 @@ public class StaffManageAction {
 				}
 				
 				sysUsers.setPassword("");//密码不显示
+				sysUsers.setUserPassword("");
 				returnValue.put("sysRolesList",sysRolesList);
 				returnValue.put("sysUsers",sysUsers);
 				returnValue.put("isSysAdmin",isSysAdmin);

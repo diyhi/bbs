@@ -146,7 +146,7 @@ public class QuestionManageAction {
 					if(user != null){
 						question.setAccount(user.getAccount());
 						question.setNickname(user.getNickname());
-						question.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+						question.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 						question.setAvatarName(user.getAvatarName());
 						
 						List<String> userRoleNameList = userRoleManage.queryUserRoleName(user.getUserName());
@@ -247,7 +247,7 @@ public class QuestionManageAction {
 							if(user != null){
 								answer.setAccount(user.getAccount());
 								answer.setNickname(user.getNickname());
-								answer.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+								answer.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 								answer.setAvatarName(user.getAvatarName());
 								userRoleNameMap.put(answer.getUserName(), null);
 							}
@@ -272,7 +272,7 @@ public class QuestionManageAction {
 									if(user != null){
 										answerReply.setAccount(user.getAccount());
 										answerReply.setNickname(user.getNickname());
-										answerReply.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+										answerReply.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 										answerReply.setAvatarName(user.getAvatarName());
 										userRoleNameMap.put(answerReply.getUserName(), null);
 									}
@@ -807,7 +807,7 @@ public class QuestionManageAction {
 	@ResponseBody
 	@RequestMapping(params="method=upload",method=RequestMethod.POST)
 	public String upload(ModelMap model,String dir,String userName, Boolean isStaff,String fileName,
-			MultipartFile file, HttpServletResponse response) throws Exception {
+			MultipartFile file, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		String number = questionManage.generateFileNumber(userName, isStaff);
 		
@@ -979,7 +979,7 @@ public class QuestionManageAction {
 							
 							//上传成功
 							returnJson.put("error", 0);//0成功  1错误
-							returnJson.put("url", fileManage.fileServerAddress()+"file/question/"+date+"/image/"+newFileName);
+							returnJson.put("url", fileManage.fileServerAddress(request)+"file/question/"+date+"/image/"+newFileName);
 							return JsonUtils.toJSONString(returnJson);
 						}else{
 							errorMessage = "当前文件类型不允许上传";
@@ -1013,7 +1013,7 @@ public class QuestionManageAction {
 							
 							//上传成功
 							returnJson.put("error", 0);//0成功  1错误
-							returnJson.put("url", fileManage.fileServerAddress()+"file/question/"+date+"/flash/"+newFileName);
+							returnJson.put("url", fileManage.fileServerAddress(request)+"file/question/"+date+"/flash/"+newFileName);
 							return JsonUtils.toJSONString(returnJson);
 						}
 						
@@ -1047,7 +1047,7 @@ public class QuestionManageAction {
 
 							//上传成功
 							returnJson.put("error", 0);//0成功  1错误
-							returnJson.put("url", fileManage.fileServerAddress()+"file/question/"+date+"/media/"+newFileName);
+							returnJson.put("url", fileManage.fileServerAddress(request)+"file/question/"+date+"/media/"+newFileName);
 							return JsonUtils.toJSONString(returnJson);
 						}else{
 							errorMessage = "当前文件类型不允许上传";
@@ -1078,7 +1078,7 @@ public class QuestionManageAction {
 
 							//上传成功
 							returnJson.put("error", 0);//0成功  1错误
-							returnJson.put("url", fileManage.fileServerAddress()+"file/question/"+date+"/file/"+newFileName);
+							returnJson.put("url", fileManage.fileServerAddress(request)+"file/question/"+date+"/file/"+newFileName);
 							returnJson.put("title", file.getOriginalFilename());//旧文件名称
 							return JsonUtils.toJSONString(returnJson);
 						}else{

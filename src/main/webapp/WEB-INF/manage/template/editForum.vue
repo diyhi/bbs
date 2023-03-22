@@ -812,7 +812,7 @@ export default({
 	        this.page_Forum_TopicRelated_Topic.page_topic_tagId = val[0];
 	        
 	        for(let option in this.page_Forum_TopicRelated_Topic.tagOptions){
-	        	if(this.page_Forum_TopicRelated_Topic.tagOptions[option].value == this.tagId){
+	        	if(this.page_Forum_TopicRelated_Topic.tagOptions[option].value == this.page_Forum_TopicRelated_Topic.page_topic_tagId){
 	        		this.page_Forum_TopicRelated_Topic.page_topic_tagName = this.page_Forum_TopicRelated_Topic.tagOptions[option].label;
 	        		break;
 	        	}

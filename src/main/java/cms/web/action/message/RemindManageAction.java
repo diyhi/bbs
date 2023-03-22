@@ -126,7 +126,7 @@ public class RemindManageAction {
 							remind.setSenderAccount(sender_user.getAccount());
 							remind.setSenderNickname(sender_user.getNickname());
 							if(sender_user.getAvatarName() != null && !"".equals(sender_user.getAvatarName().trim())){
-								remind.setSenderAvatarPath(fileManage.fileServerAddress()+sender_user.getAvatarPath());//发送者头像路径
+								remind.setSenderAvatarPath(fileManage.fileServerAddress(request)+sender_user.getAvatarPath());//发送者头像路径
 								remind.setSenderAvatarName(sender_user.getAvatarName());//发送者头像名称
 							}
 						}
@@ -146,7 +146,7 @@ public class RemindManageAction {
 				currentUser.setAccount(user.getAccount());
 				currentUser.setNickname(user.getNickname());
 				if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-					currentUser.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+					currentUser.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 					currentUser.setAvatarName(user.getAvatarName());
 				}
 				returnValue.put("currentUser", currentUser);

@@ -1080,7 +1080,7 @@ function _embedVideoImg(blankPath, attrs) {
 	var width = attrs.width,
 	height = attrs.height,
 	type = attrs.type || _mediaType(attrs.src),
-	srcTag = _embedVideo(attrs);  //视频
+	srcTag = _embedVideo(attrs),  //视频
 	style = '';
 
 	if (/\D/.test(width)) {

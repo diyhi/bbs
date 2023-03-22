@@ -273,7 +273,7 @@
 										<div style="clear:both; height: 0; line-height: 0; font-size: 0;"></div>
 										<div class="editCommentReply-formModule" v-show="editReplyFormView.get(reply.id)">
 											<div class="editReply-wrap">
-												<el-form label-width="auto"  @submit.native.prevent>
+												<el-form label-width="100"  @submit.native.prevent>
 													<el-form-item label="状态" :required="true" >
 														<el-radio-group v-model="editReplyStatusField[index][index2]">
 														    <el-radio :label="10">待审核</el-radio>
@@ -298,7 +298,7 @@
 						</div>
 						
 						<div class="addReply-post" v-show="addReplyFormView.get(comment.id)">
-							<el-form label-width="auto"  @submit.native.prevent>
+							<el-form @submit.native.prevent>
 								<el-form-item >
 									<el-input type="textarea" :autosize="{minRows: 5}" placeholder="请输入内容" v-model="addReplyContentField[index]"></el-input>
 								</el-form-item>
@@ -380,7 +380,7 @@
 				    
 				    
 				    <div class="addComment" >
-						<el-form label-width="auto"  @submit.native.prevent>
+						<el-form @submit.native.prevent>
 							<el-form-item :error="error.content">
 								<textarea ref="commentContent" style="width:100%;height:300px;visibility:hidden;"></textarea>
 							</el-form-item>
@@ -1538,13 +1538,8 @@ export default({
 			    		
 			    		
 			    		
-			    		let quoteEditor = _self.quoteEditorMap.get(commentId);
-						if(quoteEditor != null){
-							quoteEditor.html("");//清空字段
-							quoteEditor.remove();
-							_self.quoteEditorMap.delete(commentId);
-							_self.quoteEditorCreateParameMap.delete(commentId);
-						}
+			    		//清除评论列表
+			    		_self.clearCommentList();
 						_self.quoteFormView.set(commentId,false);
 			    		
 			    	
@@ -1797,14 +1792,9 @@ export default({
 			    		
 			    		
 			    		
+			    		//清除评论列表
+			    		_self.clearCommentList();
 			    		
-			    		let editCommentEditor = _self.editCommentEditorMap.get(commentId);
-						if(editCommentEditor != null){
-						//	editCommentEditor.html("");//清空字段
-							editCommentEditor.remove();
-							_self.editCommentEditorMap.delete(commentId);
-							_self.editCommentEditorCreateParameMap.delete(commentId);
-						}
 						_self.editCommentFormView.set(commentId,false);
 			    		
 			    		
@@ -2149,6 +2139,7 @@ export default({
 			    		_self.$store.commit('setCacheNumber');
 			    		
 			    		
+			    		
 						_self.addReplyFormView.set(commentId,false);
 			    		if(_self.commentList != null && _self.commentList.length > 0){
 							for (let i = 0; i <_self.commentList.length; i++) {
@@ -2160,6 +2151,8 @@ export default({
 								
 							}
 						}
+						//清除评论列表
+			    		_self.clearCommentList();
 			    		_self.queryTopic();
 			    	}else if(returnValue.code === 500){//错误
 			    		let errorMap = returnValue.data;
@@ -2255,7 +2248,8 @@ export default({
 			    		//删除缓存
 			    		_self.$store.commit('setCacheNumber');
 			    		
-			    		
+			    		//清除评论列表
+			    		_self.clearCommentList();
 						_self.editReplyFormView.set(replyId,false);
 			    		
 			    		
@@ -2310,10 +2304,6 @@ export default({
 				    	let returnValue = JSON.parse(result);
 				    	if(returnValue.code === 200){//成功
 				    		_self.$message.success("操作成功");
-				    		
-				    		if(_self.topic.status < 100){
-				    			_self.queryTopic();
-				    		}
 				    		
 				    		_self.$router.push({
 				    			path: _self.sourceUrlObject.path, 
@@ -2564,7 +2554,40 @@ export default({
 	        	console.log(error);
 	        });
 		
-		}
+		},
+		
+		//清除评论列表
+		clearCommentList : function() {
+			let _self = this;
+	        _self.quoteData.clear();
+	        _self.commentList.length =0;
+	        _self.editReplyContentField = {};
+	
+			_self.editCommentEditorMap.forEach(function(value,key){
+				if(value != null){
+	                value.html("");//清空字段
+					value.remove();
+	            }
+		　　});
+	
+			
+	        _self.editCommentEditorMap.clear();
+	        _self.editCommentEditorCreateParameMap.clear();
+	
+			_self.quoteEditorMap.forEach(function(value,key){
+				if(value != null){
+	                value.html("");//清空字段
+					value.remove();
+	            }
+		　　});
+	        _self.quoteEditorMap.clear();
+	        _self.quoteEditorCreateParameMap.clear();
+	        
+	        _self.editCommentFormView.clear();
+	        _self.quoteFormView.clear();
+	        _self.addReplyFormView.clear();
+	        _self.editReplyFormView.clear();
+	    }
 	}
 });
 

@@ -104,7 +104,7 @@ public class MembershipCardGiftTaskManageAction {
 						membershipCardGiftItem.setAccount(user.getAccount());
 						membershipCardGiftItem.setNickname(user.getNickname());
 						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-							membershipCardGiftItem.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+							membershipCardGiftItem.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 							membershipCardGiftItem.setAvatarName(user.getAvatarName());
 						}		
 					}

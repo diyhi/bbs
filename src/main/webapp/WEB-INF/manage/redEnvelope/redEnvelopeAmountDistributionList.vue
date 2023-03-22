@@ -156,6 +156,10 @@ export default({
 			this.userName = decodeURIComponent(this.$route.query.userName);
 			
 		}
+		if(this.$route.query.topicId != undefined && this.$route.query.topicId != ''){
+			this.topicId = this.$route.query.topicId;
+			
+		}
 		if(this.$route.query.page != undefined && this.$route.query.page != ''){
 			this.currentpage = this.$route.query.page;
 		}
@@ -179,6 +183,7 @@ export default({
 					giveRedEnvelopeId :_self.giveRedEnvelopeId,
 					id :_self.id,
 					userName :_self.userName,
+					topicId :_self.topicId,
 				  	page :_self.currentpage
 				 }
 			})

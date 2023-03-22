@@ -141,7 +141,7 @@ public class QuestionRewardPlatformShareAction {
 					questionRewardPlatformShare.setPostAccount(post_user.getAccount());
 					questionRewardPlatformShare.setPostNickname(post_user.getNickname());
 					if(post_user.getAvatarName() != null && !"".equals(post_user.getAvatarName().trim())){
-						questionRewardPlatformShare.setPostAvatarPath(fileManage.fileServerAddress()+post_user.getAvatarPath());
+						questionRewardPlatformShare.setPostAvatarPath(fileManage.fileServerAddress(request)+post_user.getAvatarPath());
 						questionRewardPlatformShare.setPostAvatarName(post_user.getAvatarName());
 					}		
 				}
@@ -150,7 +150,7 @@ public class QuestionRewardPlatformShareAction {
 					questionRewardPlatformShare.setAnswerAccount(answer_user.getAccount());
 					questionRewardPlatformShare.setAnswerNickname(answer_user.getNickname());
 					if(answer_user.getAvatarName() != null && !"".equals(answer_user.getAvatarName().trim())){
-						questionRewardPlatformShare.setAnswerAvatarPath(fileManage.fileServerAddress()+answer_user.getAvatarPath());
+						questionRewardPlatformShare.setAnswerAvatarPath(fileManage.fileServerAddress(request)+answer_user.getAvatarPath());
 						questionRewardPlatformShare.setAnswerAvatarName(answer_user.getAvatarName());
 					}		
 				}

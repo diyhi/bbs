@@ -52,7 +52,7 @@
 					<div class="dialog-nav-breadcrumb">
 						<el-breadcrumb separator-class="el-icon-arrow-right">
 							<el-breadcrumb-item @click="queryHelpTypeList(1,'')">全部标签</el-breadcrumb-item>
-							<el-breadcrumb-item v-for="(value, key) in navigation" @click="queryHelpTypeList(1,key)">{{value}}</el-breadcrumb-item>
+							<el-breadcrumb-item v-for="(value, key) in move.navigation" @click="queryHelpTypeList(1,key)">{{value}}</el-breadcrumb-item>
 							
 						</el-breadcrumb>
 					</div>

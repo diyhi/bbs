@@ -99,7 +99,7 @@ public class LikeAction {
 				currentUser.setAccount(user.getAccount());
 				currentUser.setNickname(user.getNickname());
 				if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-					currentUser.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+					currentUser.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 					currentUser.setAvatarName(user.getAvatarName());
 				}
 				returnValue.put("currentUser", currentUser);
@@ -154,7 +154,7 @@ public class LikeAction {
 						like.setAccount(user.getAccount());
 						like.setNickname(user.getNickname());
 						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-							like.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+							like.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 							like.setAvatarName(user.getAvatarName());
 						}		
 					}

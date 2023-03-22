@@ -123,7 +123,7 @@ public class FavoriteAction {
 				currentUser.setAccount(user.getAccount());
 				currentUser.setNickname(user.getNickname());
 				if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-					currentUser.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+					currentUser.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 					currentUser.setAvatarName(user.getAvatarName());
 				}
 				returnValue.put("currentUser", currentUser);
@@ -178,7 +178,7 @@ public class FavoriteAction {
 						favorites.setAccount(user.getAccount());
 						favorites.setNickname(user.getNickname());
 						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-							favorites.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+							favorites.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 							favorites.setAvatarName(user.getAvatarName());
 						}		
 					}
@@ -235,7 +235,7 @@ public class FavoriteAction {
 						favorites.setAccount(user.getAccount());
 						favorites.setNickname(user.getNickname());
 						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-							favorites.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+							favorites.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 							favorites.setAvatarName(user.getAvatarName());
 						}		
 					}

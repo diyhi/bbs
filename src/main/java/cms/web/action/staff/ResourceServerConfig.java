@@ -1,6 +1,8 @@
 package cms.web.action.staff;
 
 
+import java.util.Arrays;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -26,7 +28,11 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.header.HeaderWriter;
 import org.springframework.security.web.header.writers.CacheControlHeadersWriter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import cms.utils.CommentedProperties;
 import cms.web.filter.CsrfSecurityRequestMatcher;
 
 /**
@@ -82,7 +88,11 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter{
         	.headers().frameOptions().sameOrigin();//允许加载本站点内的页面
         
 	//.cacheControl().disable();//禁用页面缓存标头 Cache-Control: no-cache
-        
+        String allowedOrigins = (String) CommentedProperties.readCrossOrigin().get("allowedOrigins");
+      	if(allowedOrigins != null && !"".equals(allowedOrigins.trim())){
+      		 http
+         	.cors().configurationSource(corsConfigurationSource());//cors跨域
+      	}
         
         AntPathRequestMatcher[] filterMatchers = {
     		    new AntPathRequestMatcher("/backstage/**"),
@@ -121,8 +131,11 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter{
         });
         
         http
-        	.csrf().requireCsrfProtectionMatcher(csrfSecurityRequestMatcher)//要使用csrf保护的请求匹配器
-        	.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());//将CSRF令牌存储在自定义Cookie中 CookieServerCsrfTokenRepository   不允许JS读取可以设置new CookieCsrfTokenRepository()
+    	.csrf()
+    	.disable();//关闭csrf保护
+     //   http
+     //   	.csrf().requireCsrfProtectionMatcher(csrfSecurityRequestMatcher)//要使用csrf保护的请求匹配器
+      //  	.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());//将CSRF令牌存储在自定义Cookie中 CookieServerCsrfTokenRepository   不允许JS读取可以设置new CookieCsrfTokenRepository()
 
         http.addFilterAfter(customFilterSecurityInterceptor(), FilterSecurityInterceptor.class);
         
@@ -193,4 +206,31 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter{
         return interceptor;
     }
 	
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+    	String allowedOrigins = (String) CommentedProperties.readCrossOrigin().get("allowedOrigins");
+      	if(allowedOrigins != null && !"".equals(allowedOrigins.trim())){
+      		String[] origin = allowedOrigins.split(",");
+      		CorsConfiguration configuration = new CorsConfiguration();
+      		//开放哪些ip、端口、域名的访问权限，星号表示开放所有域
+      		configuration.setAllowedOrigins(Arrays.asList(origin));
+      		//是否允许发送Cookie信息
+            configuration.setAllowCredentials(true);
+            //开放哪些Http方法，允许跨域访问
+            configuration.setAllowedMethods(Arrays.asList("GET","HEAD","POST","PUT","PATCH","DELETE"));
+            //允许HTTP请求中的携带哪些Header信息
+            configuration.setAllowedHeaders(Arrays.asList("Origin","X-Requested-With","Content-Type","Cache-Control","Accept","Authorization","BBS-XSRF-TOKEN","Set-Cookie"));
+            //暴露哪些头部信息（因为跨域访问默认不能获取全部头部信息）
+            //configuration.addExposedHeader("*");
+            //预检请求的缓存时间（秒），即在这段间内对于相同的跨域请求不会再次预检了
+            configuration.setMaxAge(18000L);
+            
+            UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+            source.registerCorsConfiguration("/**",configuration);//添加映射路径
+            return source;
+      	}
+  		
+      	return null;
+    }
+    
 }

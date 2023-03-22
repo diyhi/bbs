@@ -63,6 +63,7 @@ import cms.web.action.fileSystem.FileManage;
 import cms.web.action.lucene.QuestionLuceneInit;
 import cms.web.action.lucene.TopicLuceneInit;
 import cms.web.action.lucene.TopicLuceneManage;
+import cms.web.action.topic.TopicManage;
 import cms.web.action.user.UserManage;
 import cms.web.action.user.UserRoleManage;
 
@@ -83,7 +84,7 @@ public class SearchAction {
 	@Resource TextFilterManage textFilterManage;
 	@Resource QuestionService questionService;
 	@Resource FileManage fileManage;
-	
+	@Resource TopicManage topicManage;
 	
 	/**
 	 * 搜索
@@ -563,7 +564,14 @@ public class SearchAction {
 						if(isHide){//如果显示隐藏内容
 							_content = textFilterManage.filterText(_content);
 						}else{
-							_content = textFilterManage.filterHideText(_content);
+							if(_indexModule == null || "10".equals(_indexModule)){//话题模块
+								Topic topic = topicManage.queryTopicCache(Long.parseLong(_id));//查询缓存 
+								if(topic != null){
+									_content = textFilterManage.filterHideText(topic.getContent());
+								}
+							}else{
+								_content = textFilterManage.filterHideText(_content);
+							}
 						}
 						
 		                TokenStream tokenStream = analyzer_keyword.tokenStream("content",new StringReader(_content));    

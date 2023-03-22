@@ -1698,17 +1698,10 @@ export default({
 			    		//删除缓存
 			    		_self.$store.commit('setCacheNumber');
 			    		
-			    		
-			    		
-			    		
-			    		let editAnswerEditor = _self.editAnswerEditorMap.get(answerId);
-						if(editAnswerEditor != null){
-						//	editAnswerEditor.html("");//清空字段
-							editAnswerEditor.remove();
-							_self.editAnswerEditorMap.delete(answerId);
-							_self.editAnswerEditorCreateParameMap.delete(answerId);
-						}
-						_self.editAnswerFormView.set(answerId,false);
+			    	
+						
+						//清除答案列表
+						_self.clearAnswerList();
 			    		
 			    		
 			    		
@@ -2583,6 +2576,9 @@ export default({
 								
 							}
 						}
+						//清除答案列表
+						_self.clearAnswerList();
+						
 			    		_self.queryQuestion();
 			    	}else if(returnValue.code === 500){//错误
 			    		let errorMap = returnValue.data;
@@ -2679,7 +2675,8 @@ export default({
 			    		_self.$store.commit('setCacheNumber');
 			    		
 			    		
-						_self.editReplyFormView.set(replyId,false);
+						//清除答案列表
+						_self.clearAnswerList();
 			    		
 			    		
 			    		
@@ -2989,6 +2986,26 @@ export default({
 	        });
 		
 		},
+		
+		//清除答案列表
+		clearAnswerList : function() {
+			let _self = this;
+			_self.answerList.length =0;
+	        _self.editReplyContentField = {};
+	
+	        for (const [key, value] of Object.entries(_self.editAnswerEditorMap)){
+	            if(value != null){
+	                value.html("");//清空字段
+					value.remove();
+	            }
+	        }
+	        _self.editAnswerEditorMap.clear();
+	        _self.editAnswerEditorCreateParameMap.clear();
+	
+	        _self.editAnswerFormView.clear();
+	        _self.addReplyFormView.clear();
+	        _self.editReplyFormView.clear();
+	    }
 		
 	}
 });

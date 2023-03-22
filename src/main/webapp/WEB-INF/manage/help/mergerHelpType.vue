@@ -80,7 +80,7 @@ export default({
 			typeIdList: [],//可选择Id集合
 			dialogParentId:'',//分类选择父Id
 			type_form:false,//是否显示分类选择表单
-			
+			dialogNavigation :'',
 			
 			
 			
@@ -210,7 +210,7 @@ export default({
 			
 			_self.tableData = [];
 			_self.typeIdList = [];
-			_self.navigation = '';
+			_self.dialogNavigation = '';
 			
 			_self.dialogParentId = parentId;
 			_self.$ajax.get('control/helpType/manage', {
@@ -249,7 +249,7 @@ export default({
 									_self.isShowPage = true;//显示分页栏
 					    		}
 			    			}else if(key == "navigation"){
-			    				_self.navigation = mapData[key];
+			    				_self.dialogNavigation = mapData[key];
 			    			}
 			    		}
 			    	}else if(returnValue.code === 500){//错误

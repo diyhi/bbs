@@ -32,11 +32,9 @@
 						    <el-radio :label="3">在线帮助</el-radio>
 						</el-radio-group>
 					</el-form-item>
-					<el-form-item label="返回数据" v-if="type == 4" :required="true" :error="error.returnData">
-						<el-radio-group v-model="returnData">
-						    <el-radio :label="0">html</el-radio>
-						    <el-radio :label="1">json</el-radio>
-						</el-radio-group>
+					<el-form-item label="返回数据" v-if="type == 4">
+						<span v-if="returnData == 0">html</span>
+                    	<span v-if="returnData == 1">json</span>
 					</el-form-item>
 	
 					<el-form-item label="URL名称" v-if="type == 4" :required="true" :error="error.referenceCode">

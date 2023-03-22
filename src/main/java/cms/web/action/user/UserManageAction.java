@@ -155,7 +155,7 @@ public class UserManageAction {
 				user.setPassword(null);//密码不显示
 				user.setAnswer(null);//密码提示答案不显示
 				user.setSalt(null);//盐值不显示
-				user.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+				user.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 				
 				
 				if(user.getType() >10){
@@ -520,7 +520,6 @@ public class UserManageAction {
 								
 								userRole.setValidPeriodEnd(validPeriodEnd);//错误回显需要
 								UserRoleGroup userRoleGroup = new UserRoleGroup();
-								userRoleGroup.setUserName(formbean.getUserName() != null ?formbean.getUserName().trim() :formbean.getUserName());
 								userRoleGroup.setUserRoleId(userRole.getId());
 								userRoleGroup.setValidPeriodEnd(validPeriodEnd);
 								userRoleGroupList.add(userRoleGroup);
@@ -593,6 +592,12 @@ public class UserManageAction {
 				}
 			}
 
+			if(userRoleGroupList != null && userRoleGroupList.size() >0){
+				for(UserRoleGroup userRoleGroup : userRoleGroupList){
+					userRoleGroup.setUserName(user.getUserName());
+				}
+			}
+			
 			try {
 				userService.saveUser(user,all_userInputValueList,userRoleGroupList);
 			} catch (Exception e) {
@@ -1399,7 +1404,7 @@ public class UserManageAction {
 						topic.setAccount(user.getAccount());
 						topic.setNickname(user.getNickname());
 						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-							topic.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+							topic.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 							topic.setAvatarName(user.getAvatarName());
 						}		
 					}
@@ -1486,7 +1491,7 @@ public class UserManageAction {
 						comment.setAccount(user.getAccount());
 						comment.setNickname(user.getNickname());
 						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-							comment.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+							comment.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 							comment.setAvatarName(user.getAvatarName());
 						}		
 					}
@@ -1576,7 +1581,7 @@ public class UserManageAction {
 						reply.setAccount(user.getAccount());
 						reply.setNickname(user.getNickname());
 						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-							reply.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+							reply.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 							reply.setAvatarName(user.getAvatarName());
 						}		
 					}
@@ -1663,7 +1668,7 @@ public class UserManageAction {
 						question.setAccount(user.getAccount());
 						question.setNickname(user.getNickname());
 						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-							question.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+							question.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 							question.setAvatarName(user.getAvatarName());
 						}		
 					}
@@ -1750,7 +1755,7 @@ public class UserManageAction {
 						answer.setAccount(user.getAccount());
 						answer.setNickname(user.getNickname());
 						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-							answer.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+							answer.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 							answer.setAvatarName(user.getAvatarName());
 						}		
 					}
@@ -1836,7 +1841,7 @@ public class UserManageAction {
 						answerReply.setAccount(user.getAccount());
 						answerReply.setNickname(user.getNickname());
 						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-							answerReply.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+							answerReply.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 							answerReply.setAvatarName(user.getAvatarName());
 						}		
 					}

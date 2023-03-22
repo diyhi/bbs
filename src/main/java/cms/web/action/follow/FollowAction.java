@@ -73,7 +73,7 @@ public class FollowAction {
 						follow.setFriendAccount(user.getAccount());
 						follow.setFriendNickname(user.getNickname());
 						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-							follow.setFriendAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+							follow.setFriendAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 							follow.setFriendAvatarName(user.getAvatarName());
 						}		
 					}
@@ -88,7 +88,7 @@ public class FollowAction {
 				currentUser.setAccount(user.getAccount());
 				currentUser.setNickname(user.getNickname());
 				if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-					currentUser.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+					currentUser.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 					currentUser.setAvatarName(user.getAvatarName());
 				}
 				returnValue.put("currentUser", currentUser);
@@ -141,7 +141,7 @@ public class FollowAction {
 						follower.setFriendAccount(user.getAccount());
 						follower.setFriendNickname(user.getNickname());
 						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-							follower.setFriendAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+							follower.setFriendAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 							follower.setFriendAvatarName(user.getAvatarName());
 						}		
 					}
@@ -156,7 +156,7 @@ public class FollowAction {
 				currentUser.setAccount(user.getAccount());
 				currentUser.setNickname(user.getNickname());
 				if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-					currentUser.setAvatarPath(fileManage.fileServerAddress()+user.getAvatarPath());
+					currentUser.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 					currentUser.setAvatarName(user.getAvatarName());
 				}
 				returnValue.put("currentUser", currentUser);

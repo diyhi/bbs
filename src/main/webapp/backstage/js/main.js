@@ -1465,8 +1465,14 @@ var login_component = {
 		//加载登录页
 		loadLogin : function () {
 			let _self = this;
+			let username = _self.username;
+			if (username != "") {
+				username = encodeURIComponent(username);
+			}
+			
 			this.$ajax.get('admin/login', {
 			    params: {
+			    	username:username
 			    },
 			    headers: {
 			      	'showLoading': false,//是否显示图标

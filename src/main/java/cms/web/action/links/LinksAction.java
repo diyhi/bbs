@@ -37,7 +37,7 @@ public class LinksAction {
 		List<Links> linksList = linksService.findAllLinks();
 		if(linksList != null && linksList.size() >0){
 			for(Links links : linksList){
-				links.setImage(fileManage.fileServerAddress()+links.getImage());
+				links.setImage(fileManage.fileServerAddress(request)+links.getImage());
 			}
 		}
 		

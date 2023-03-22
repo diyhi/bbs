@@ -39,8 +39,8 @@
 					</el-table-column>
 					<el-table-column label="访问需要登录" align="center" width="110">
 						<template #default="scope">
-							<el-tag effect="dark" type="success" v-if="type != 5 && type != 6 && scope.row.accessRequireLogin==true" class="tag-wrapper" >需要</el-tag>
-					        <el-tag effect="dark" type="success" v-if="type != 5 && type != 6 && accessRequireLoginLayoutList.get(scope.row.id)" class="tag-wrapper" >默认需要</el-tag>
+							<el-tag effect="dark" type="success" v-if="scope.row.type != 5 && scope.row.type != 6 && scope.row.accessRequireLogin==true" class="tag-wrapper" >需要</el-tag>
+					        <el-tag effect="dark" type="success" v-if="scope.row.type != 5 && scope.row.type != 6 && accessRequireLoginLayoutList.get(scope.row.id)" class="tag-wrapper" >默认需要</el-tag>
 					        
 					        
 					        

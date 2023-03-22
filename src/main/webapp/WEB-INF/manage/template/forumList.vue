@@ -299,7 +299,7 @@ export default({
 	    	let _self = this;
     		_self.editForumSourceForm = true;
     		_self.id = row.id;
-    		_self.nodeName= row.module,
+    		_self.nodeName= row.module;
     	
     		_self.$ajax.get('control/forumCode/manage', {
 			    params: {
