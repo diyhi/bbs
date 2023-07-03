@@ -699,18 +699,34 @@ public class AnswerManageAction {
 	 * 答案回复  添加
 	 * @param model
 	 * @param answerId 答案Id
+	 * @param friendReplyId 对方回复Id
 	 */
 	@ResponseBody
 	@RequestMapping(params="method=addAnswerReply",method=RequestMethod.POST)
-	public String addAnswerReply(ModelMap model,Long answerId,String content,
+	public String addAnswerReply(ModelMap model,Long answerId,String content,Long friendReplyId,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Answer answer = null;
+		AnswerReply friendReply = null;
+		AnswerReply answerReply = new AnswerReply();
+		
 		Map<String,String> error = new HashMap<String,String>();
 		if(answerId == null || answerId <=0){
 			error.put("answerId", "答案Id不能为空");
 		}else{
 			answer = answerService.findByAnswerId(answerId);
 		}
+		
+		if(friendReplyId != null && friendReplyId >0){
+			friendReply = answerService.findReplyByReplyId(friendReplyId);
+			if(friendReply != null){
+				if(!friendReply.getAnswerId().equals(answerId)){
+					error.put("friendReplyId", "对方回复Id和答案Id不对应");
+				}
+			}else{
+				error.put("friendReplyId", "对方回复Id不存在");
+			}
+		}
+		
 		
 		
 		if(content != null && !"".equals(content.trim())){
@@ -730,7 +746,6 @@ public class AnswerManageAction {
 					
 				
 					//回复
-					AnswerReply answerReply = new AnswerReply();
 					answerReply.setAnswerId(answer.getId());
 					answerReply.setIsStaff(true);
 					answerReply.setUserName(username);
@@ -738,12 +753,6 @@ public class AnswerManageAction {
 					answerReply.setQuestionId(answer.getQuestionId());
 					answerReply.setStatus(20);
 					answerReply.setIp(IpAddress.getClientIpAddress(request));
-					//保存答案回复
-					answerService.saveReply(answerReply);
-
-					
-					//修改问题最后回答时间
-					questionService.updateQuestionAnswerTime(answer.getQuestionId(),new Date());
 				}else{	
 					error.put("content", "回复内容不能为空");
 					
@@ -756,6 +765,19 @@ public class AnswerManageAction {
 		}
 		
 		if(error.size()==0){
+			if(friendReply != null){
+				answerReply.setFriendReplyId(friendReplyId);
+				answerReply.setFriendReplyIdGroup(friendReply.getFriendReplyIdGroup()+friendReplyId+",");
+				answerReply.setIsFriendStaff(friendReply.getIsStaff());
+				answerReply.setFriendUserName(friendReply.getUserName());
+			}
+			
+			//保存答案回复
+			answerService.saveReply(answerReply);
+
+			
+			//修改问题最后回答时间
+			questionService.updateQuestionAnswerTime(answer.getQuestionId(),new Date());
 			
 			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 		}

@@ -221,4 +221,28 @@ public class CaptchaManage {
 		}
 		return isCaptcha;
 	}
+	
+	/**---------------------------------- 举报 ---------------------------------------**/
+	/**
+	 * 是否显示验证码
+	 * @param userName 用户名称
+	 * @return 验证码标记
+	 */
+	public boolean report_isCaptcha(String userName){
+		boolean isCaptcha = false;
+		
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.getReport_submitQuantity() <=0){//为0时每次都出现验证码
+			isCaptcha = true;
+		}else{
+			//用户每分钟提交次数
+			Integer quantity = settingManage.getSubmitQuantity("report", userName); 
+			
+			//如果每用户每分钟提交超过设定次数，则需验证码
+			if(quantity != null && quantity >= systemSetting.getReport_submitQuantity()){
+				isCaptcha = true;
+			}
+		}
+		return isCaptcha;
+	}
 }

@@ -3,6 +3,7 @@ package cms.utils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.LinkedHashSet;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -127,16 +128,69 @@ public class IpAddress {
 	
 	
 	/**
+	 * 查询省份IP归属地
+	 * @param ip
+	 * @return
+	 */
+	public static String queryProvinceAddress(String ip){
+		if(searcher != null){
+			try {
+
+				String region = searcher.memorySearch(ip).getRegion();
+				if(region != null && !"".equals(region.trim())){
+					String [] regionGroup = region.split("\\|");
+					if(regionGroup != null && regionGroup.length >=5){
+						
+						if(regionGroup[2] != null && !regionGroup[2].equals("0")){
+							return regionGroup[2];
+						}
+						
+						if(regionGroup[0] != null && !regionGroup[0].equals("0")){
+							return regionGroup[0];
+						}
+						if(regionGroup[4] != null && !regionGroup[4].equals("0")){
+							return regionGroup[4];
+						}
+					}
+				}
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+			//	e.printStackTrace();
+				if (logger.isErrorEnabled()) {
+		            logger.error("IP地址查询错误",e);
+		        }
+			}
+		}
+		return "";
+	}
+	
+	
+	/**
 	 * IP归属地格式化
 	 * @param ipAddress
 	 * @return
 	 */
 	private static String format(String ipAddress){
 		if(ipAddress != null && !"".equals(ipAddress.trim())){
-			ipAddress = StringUtils.replace(ipAddress, "|0", " ");//0替换成空串
-			ipAddress = StringUtils.replace(ipAddress, "|", " ");//竖线替换成空格
+			ipAddress = StringUtils.replace(ipAddress, "|0", "");//0替换成空串
+			LinkedHashSet<String> hashSet = new LinkedHashSet<String>();
+			String [] regionGroup = ipAddress.split("\\|");
+			if(regionGroup != null && regionGroup.length >0){
+				for(String info: regionGroup){
+					if(info !=null && !info.equals("0")){
+						hashSet.add(info);
+					}
+				}
+			}
+			if(hashSet != null && hashSet.size() >0){
+				return StringUtils.join(hashSet.toArray(), " ");
+			}
+			
+			//ipAddress = StringUtils.replace(ipAddress, "|0", " ");//0替换成空串
+			//ipAddress = StringUtils.replace(ipAddress, "|", " ");//竖线替换成空格
 		}
-		return ipAddress;
+		return "";
 	}
 
 }

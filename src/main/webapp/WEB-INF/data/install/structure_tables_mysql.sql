@@ -35,6 +35,10 @@ CREATE TABLE `answerreply` (
   `status` int(11) DEFAULT NULL,
   `userName` varchar(30) DEFAULT NULL,
   `lastUpdateTime` datetime DEFAULT NULL,
+  `friendReplyId` bigint(20) DEFAULT NULL,
+  `friendReplyIdGroup` longtext,
+  `friendUserName` varchar(30) DEFAULT NULL,
+  `isFriendStaff` bit(1) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `answerReply_1_idx` (`answerId`,`status`),
   KEY `answerReply_2_idx` (`questionId`),
@@ -1238,10 +1242,57 @@ CREATE TABLE `reply` (
   `userName` varchar(30) DEFAULT NULL,
   `status` int(11) DEFAULT NULL,
   `lastUpdateTime` datetime DEFAULT NULL,
+  `friendReplyId` bigint(20) DEFAULT NULL,
+  `friendReplyIdGroup` longtext,
+  `friendUserName` varchar(30) DEFAULT NULL,
+  `isFriendStaff` bit(1) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `reply_1_idx` (`commentId`,`status`),
   KEY `reply_2_idx` (`topicId`),
   KEY `reply_3_idx` (`userName`,`isStaff`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "report"
+#
+
+CREATE TABLE `report` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `imageData` longtext,
+  `postTime` datetime DEFAULT NULL,
+  `processCompleteTime` datetime DEFAULT NULL,
+  `processResult` longtext,
+  `reason` longtext,
+  `remark` longtext,
+  `reportTypeId` varchar(36) DEFAULT NULL,
+  `status` int(11) DEFAULT NULL,
+  `ip` varchar(45) DEFAULT NULL,
+  `module` int(11) DEFAULT NULL,
+  `parameterId` varchar(65) DEFAULT NULL,
+  `userName` varchar(30) DEFAULT NULL,
+  `extraParameterId` varchar(130) DEFAULT NULL,
+  `staffAccount` varchar(30) DEFAULT NULL,
+  `version` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `report_1_idx` (`parameterId`,`module`,`status`),
+  KEY `report_2_idx` (`userName`,`status`),
+  KEY `report_3_idx` (`parameterId`,`userName`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
+# Structure for table "reporttype"
+#
+
+CREATE TABLE `reporttype` (
+  `id` varchar(36) NOT NULL,
+  `childNodeNumber` int(11) DEFAULT NULL,
+  `giveReason` bit(1) DEFAULT NULL,
+  `name` varchar(190) DEFAULT NULL,
+  `parentId` varchar(36) DEFAULT NULL,
+  `parentIdGroup` varchar(190) DEFAULT NULL,
+  `sort` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `reportType_1_idx` (`sort`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 #
@@ -1556,6 +1607,10 @@ CREATE TABLE `systemsetting` (
   `allowRegisterAccount` longtext,
   `giveRedEnvelopeAmountMax` decimal(12,2) DEFAULT NULL,
   `giveRedEnvelopeAmountMin` decimal(12,2) NOT NULL,
+  `allowReport` bit(1) NOT NULL,
+  `report_submitQuantity` int(11) DEFAULT NULL,
+  `showIpAddress` bit(1) NOT NULL,
+  `reportMaxImageUpload` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

@@ -47,34 +47,46 @@
 							<a href="askList?questionTagId=${questionTag.questionTagId}"  class="tag">${questionTag.questionTagName}</a>		
 						</#list>
 			        </div>
-			        <#if question.userName == systemUser.userName>
-						<div class="appendQuestion" >
-							<span onclick="appendQuestionLayer('${question.id}');"><i class="cms-append" ></i>追加提问</span>
+			        
+			        <div class="rightInfo">
+			        	<div class="report" onclick="addReportUI('${question.id}',40)">
+							<span><i class="cms-error-warning-line" ></i>举报</span>
 						</div>
-						
-						
-						<script type="text/javascript">
-							//追加提问展开层
-							function appendQuestionLayer(questionId){
-								var parameter = "";//URI参数
-								parameter += "questionId="+questionId;
-								
-								
-								//回复页面
-								get_request(function(value){
-									if(value != ""){
-										$("#appendQuestion-post").html(value);
-									}
-								},
-								getBasePath()+"user/appendQuestion?"+parameter+"&timestamp=" + new Date().getTime(), true);
-								
-							}
-							function cancelAppendQuestion(){
-								$("#appendQuestion-post").html("");
-							}
-						</script> 
-						
-					</#if>
+			        	<#if question.userName == systemUser.userName>
+							<div class="appendQuestion" >
+								<span onclick="appendQuestionLayer('${question.id}');"><i class="cms-append" ></i>追加提问</span>
+							</div>
+							
+							
+							<script type="text/javascript">
+								//追加提问展开层
+								function appendQuestionLayer(questionId){
+									var parameter = "";//URI参数
+									parameter += "questionId="+questionId;
+									
+									
+									//回复页面
+									get_request(function(value){
+										if(value != ""){
+											$("#appendQuestion-post").html(value);
+										}
+									},
+									getBasePath()+"user/appendQuestion?"+parameter+"&timestamp=" + new Date().getTime(), true);
+									
+								}
+								function cancelAppendQuestion(){
+									$("#appendQuestion-post").html("");
+								}
+							</script> 
+							
+						</#if>
+			        	<#if question.ipAddress != null && question.ipAddress??>
+							<div class="ipAddress">
+								<span><i class="cms-map-pin-line" ></i>${question.ipAddress}</span>
+							</div>
+						</#if>
+			        </div>
+			        
 		        	<div class="questionBox">
 		                <div class="title">${question.title}</div>
 		                
@@ -99,7 +111,7 @@
 		                	</div>
 		                </div>
 		                </#if>
-						<div class="content" >
+						<div class="${(RequestParameters.reportModule != null && RequestParameters.reportModule=='40')?string('content reportMark','content')}">
 							<#if question.account == null || question.account == ''>
 								<div class="cancelAccount">此用户账号已注销</div>
 							</#if>
@@ -324,6 +336,31 @@
 		    }
 	    });
 	});
+	
+	//添加举报页
+	function addReportUI(parameterId,module) {
+		
+		
+		var parameter = "";//URI参数
+		parameter += "parameterId="+parameterId;
+		parameter += "&module="+module;
+		
+		//举报页面
+		get_request(function(value){
+			if(value != ""){
+				layer.open({
+				    type: 1, 
+				    title:"举报",
+				    content: value, 
+				    area: ['700px', '500px'],//宽高
+					end: function(layero, index){
+					}
+				});
+				//$("#editComment-post_"+commentId).html(value);
+			}
+		},
+		getBasePath()+"user/addReport?"+parameter+"&timestamp=" + new Date().getTime(), true);
+	}
 </script>
 
 

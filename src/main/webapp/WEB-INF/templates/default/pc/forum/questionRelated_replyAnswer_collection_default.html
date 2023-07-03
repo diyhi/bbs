@@ -18,6 +18,8 @@
 				<div class="form-action">
 					<#-- 获取评论Id -->
 					<input type="hidden" id="${identificationNumber}_answerId" name="answerId" value="${url_answerId}">
+					<#-- 获取回复Id -->
+					<input type="hidden" id="${identificationNumber}_replyId" name="replyId" value="${url_replyId}">
 					<#-- 获取令牌 -->
 					<input type="hidden" id="token" name="token" value="${token!}">
 					
@@ -27,7 +29,7 @@
 						</span>
 						<!-- 调用方法在questionRelated_answer_page页 -->
 						<span class="cancelButton-box" >
-							<button type="button" class="cancelButton" onClick="javascript:cancelReply('${url_answerId}')">取消</button>
+							<button type="button" class="cancelButton" onClick="javascript:cancelReply('${url_answerId}','${url_replyId}')">取消</button>
 						</span>
 					</div>
 					<#-- identificationNumber:识别号：用来区别每次请求 -->
@@ -132,6 +134,8 @@
 							var parameter = "";
 							//答案Id
 							parameter += "&answerId="+document.getElementById(identificationNumber+"_answerId").value;
+							//回复Id
+							parameter += "&friendReplyId="+document.getElementById(identificationNumber+"_replyId").value;
 							//获取令牌
 							parameter += "&token="+document.getElementById("token").value;
 							

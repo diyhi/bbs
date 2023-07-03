@@ -396,17 +396,17 @@
 				            	 <div class="tagName">{{topic.tagName}}</div>
 				            </span>
 				            <p class="right">
-								<span class="editTopic" v-if="topic.userName == $store.state.user.userName">
-									<router-link tag="span" :to="{path: '/user/editTopic', query: {topicId: topic.id}}" ><i class="editTopic-icon cms-pencil-alt" ></i>编辑</router-link>
-								</span>
-					
+				            
+				            	<span v-if="topic.ipAddress != null && topic.ipAddress != ''"><span class="ipAddress-icon cms-map-pin-line" ></span>{{topic.ipAddress}}</span>
 				            	<span class="count-icon cms-commentCount" ></span>{{topic.commentTotal}} 
 								<span class="view-icon cms-view" ></span>{{topic.viewTotal}}
+								<span class="fast cms-ellipsis-v-solid" @click="topicOperatingUI(topic.userName,topic.id)" ></span>
+	                        
 				            </p>
 				        </div> 
 					</div>
 				
-					<div class="main" v-viewer="pictureOptions" >
+					<div class="main" :class="$route.query.reportModule !=undefined && parseInt($route.query.reportModule) == 10 ? 'reportMark' : ''" v-viewer="pictureOptions" >
 						<div v-if="topic.lastUpdateTime != null" class="lastUpdateTime" >最后修改时间：{{topic.lastUpdateTime}}</div>
 						
 						<div class="cancelAccount" v-if="topic.account == null || topic.account == ''">此用户账号已注销</div>
@@ -423,7 +423,7 @@
 					</div> 
 				</div>
 				<div class="commentList">
-					<div class="item" v-for="(comment,index) in commentList" :id="'anchor_'+comment.id">
+					<div class="item" :class="$route.query.reportModule !=undefined && parseInt($route.query.reportModule) == 20 && comment.id == $route.query.commentId ? 'reportMark' : ''" v-for="(comment,index) in commentList" :id="'anchor_'+comment.id">
 						<div class="head">
 							<!-- router-link渲染成<div>标签-->
 					    	<router-link class="avatarBox"  tag="div" :to="{path: '/user/control/home', query: {userName: comment.userName}}">
@@ -445,9 +445,10 @@
 							        </div>
 						        </router-link>
 	                        	
-	                          	<div class="time clearfix">{{comment.postTime}}</div>
+	                          	<div class="time clearfix">{{comment.postTime}}<span v-if="comment.ipAddress != null && comment.ipAddress != ''"><span class="separate">·</span>{{comment.ipAddress}}</span></div>
 	                        </span>
-	                        <span class="floor">{{index+1}}楼</span>                     
+	                        <span class="fast cms-ellipsis-v-solid" @click="commentOperatingUI(comment.userName,comment.id)" ></span>
+	                        <span class="floor">{{index+1}}楼</span>              
 	                    </div>
 	                    <div class="main">
 	                    	<!--
@@ -463,44 +464,69 @@
 								
 								<component v-lazy-container="{ selector: 'img'}" v-bind:is ="commentDataComponent(comment.content)" v-bind="$props" />
 							</p>
-							<!-- 
-							<p class="commentContent" v-html="comment.content"></p>
-							 -->
-							 
 		                    <div class="replyList" v-if="comment.replyList.length >0">
 								<ul class="box">
 								
-									<li v-for="(reply,index2) in comment.replyList" v-show="(replyExpandOrShrink[comment.id]) || (replyExpandOrShrink[comment.id] == false && index2 <2)">
-								        <div class="reply-top" >
-									        <!-- router-link渲染成<div>标签-->
-									    	<router-link class="avatarBox"  tag="div" :to="{path: '/user/control/home', query: {userName: reply.userName}}">
-									        	<img :src="reply.avatarPath+'100x100/'+reply.avatarName" v-if="reply.avatarName != null && reply.avatarName != ''">
-									            <!-- 首字符头像-->
-				         						<img :ref="'replyAvatarData_'+reply.id"  v-if="reply.avatarName == null || reply.avatarName == ''">
-				         	
-									        </router-link>
-		                                    <!-- router-link渲染成<span>标签-->
-									    	<router-link class="userName" tag="span" :to="{path: '/user/control/home', query: {userName: reply.userName}}">
-									           {{reply.nickname != null && reply.nickname != '' ? reply.nickname : reply.account}}
-									        </router-link>
-									        <span class="userName cancelNickname" v-if="reply.account == null || reply.account == ''">
-									        	&nbsp;已注销
-									        </span>
-									        <div class="userTag">
-									        	<i class="staff" v-if="reply.isStaff">官方人员</i>
-										        <i class="master" v-if="reply.userName == topic.userName && reply.isStaff == topic.isStaff">作者</i>
-									        </div>  
-											<span class="time">
-												<span @click="editReplyUI(reply.id)" v-if="reply.userName == $store.state.user.userName"><span class="cms-pencil-alt" style="font-size: 10px;margin-right: 1px;"></span>编辑</span>
-												<span @click="deleteReply(reply.id)" v-if="reply.userName == $store.state.user.userName"><span class="cms-trash" style="font-size: 10px;margin-right: 1px;"></span>删除</span>
-											
-												{{reply.postTime}}
-											</span>
-										</div>
-										<div style="clear:both; height: 0; line-height: 0; font-size: 0;"></div>
-										<div class="replyContent">
-											<div class="cancelAccount" v-if="reply.account == null || reply.account == ''">此用户账号已注销</div>
-											{{reply.content}}
+									<li v-for="(reply,index2) in comment.replyList" v-show="(replyExpandOrShrink[comment.id]) || (replyExpandOrShrink[comment.id] == false && index2 <viewNumber)" :key="reply.id" :replyId="reply.id" :ref="'replyData_'+reply.id" >
+								        <div :class="$route.query.reportModule !=undefined && parseInt($route.query.reportModule) == 30 && reply.id == $route.query.replyId ? 'reply-reportMark' : ''">
+									        <div class="reply-top" >
+										        <!-- router-link渲染成<div>标签-->
+										    	<router-link class="avatarBox"  tag="div" :to="{path: '/user/control/home', query: {userName: reply.userName}}">
+										        	<img :src="reply.avatarPath+'100x100/'+reply.avatarName" v-if="reply.avatarName != null && reply.avatarName != ''">
+										            <!-- 首字符头像-->
+					         						<img :ref="'replyAvatarData_'+reply.id"  v-if="reply.avatarName == null || reply.avatarName == ''">
+					         	
+										        </router-link>
+										        <span class="info" >
+													<!-- router-link渲染成<h2>标签-->
+											    	<router-link tag="span" class="left-box clearfix" :to="{path: '/user/control/home', query: {userName: reply.userName}}">
+											        	<div class="cancelNickname" v-if="reply.account == null || reply.account == ''">已注销</div>
+											        	
+											        	<div class="userName">{{reply.nickname != null && reply.nickname != '' ? reply.nickname : reply.account}}</div>
+											        	<div class="userTag">	        
+													        <i class="staff" v-if="reply.isStaff">官方人员</i>
+													        <i class="master" v-if="reply.userName == topic.userName && reply.isStaff == topic.isStaff">作者</i>
+												        </div>
+											        </router-link>
+						                        	
+						                          	<div class="time clearfix">{{reply.postTime}}<span v-if="reply.ipAddress != null && reply.ipAddress != ''"><span class="separate">·</span>{{reply.ipAddress}}</span></div>
+						                        </span>
+						                        <span class="fast cms-ellipsis-v-solid" @click="replyOperatingUI(reply)" ></span>
+		                        
+											</div>
+											<div style="clear:both; height: 0; line-height: 0; font-size: 0;"></div>
+											<!-- 回复对方用户 -->
+	                                        <div class="friendInfo-wrap" v-if="reply.friendUserName != null && reply.friendUserName != ''">
+	                                        	<div class="friendInfo">
+	                                            	<div class="icon-container">
+	                                            		<i class="icon cms-caret-right"></i>
+	                                            	</div>
+	                                            	
+	                                            	<div class="avatarImg-container">
+	                                                   <router-link v-if="reply.friendUserName!= null && reply.friendUserName != ''" tag="a" :to="{path:'/user/control/home',query: {userName: reply.friendUserName}}">
+	                                                       <span class="avatarImg">
+	                                                           <img v-if="reply.friendAvatarName != null" :src="reply.friendAvatarPath+'100x100/'+reply.friendAvatarName" class="img">
+	                                                       
+	                                                           <img v-if="reply.friendAvatarName == null" :ref="'replyFriendAvatarData_'+reply.id"  class="img"/>
+	                                                       </span>
+	                                                   </router-link>
+	                                            	</div>
+	                                            	
+	                                            	<div class="nameInfo-container">
+	                                                	<span class="nameInfo" >
+	                                                    	<span v-if="reply.friendAccount == null || reply.friendAccount == ''" class="cancelNickname">已注销</span>
+	                                                    	<router-link tag="a" v-if="reply.friendAccount != null && reply.friendAccount != ''" class="userName" :to="{path:'/user/control/home',query: {userName: reply.friendUserName}}">
+	                                                        	<span v-if="reply.friendNickname != null && reply.friendNickname != ''">{{reply.friendNickname}}</span>
+	                                                        	<span v-if="reply.friendNickname == null || reply.friendNickname == ''">{{reply.friendAccount}}</span>
+	                                                    	</router-link>
+	                                                	</span>
+	                                            	</div>
+	                                        	</div>
+	                                       </div>
+											<div class="replyContent">
+												<div class="cancelAccount" v-if="reply.account == null || reply.account == ''">此用户账号已注销</div>
+												{{reply.content}}
+											</div>
 										</div>
 									</li>
 								</ul>
@@ -511,14 +537,6 @@
 								</div>
 								
 							</div>                           
-						</div>
-						<div class="bottomInfo">
-							<div class="toolbar">
-								<span class="edit-btn"  @click="editCommentUI(comment.id)" v-if="comment.userName == $store.state.user.userName"><span class="cms-pencil-alt" style="font-size: 12px;margin-right: 1px;"></span>编辑</span>
-								<span class="edit-btn"  @click="deleteComment(comment.id)" v-if="comment.userName == $store.state.user.userName"><span class="cms-trash" style="font-size: 12px;margin-right: 1px;"></span>删除</span>
-								<span class="quote-btn"  @click="addQuoteUI(comment.id)"><span class="cms-quote" style="font-size: 12px;margin-right: 1px;"></span>引用</span>
-								<span class="reply-btn"  @click="addReplyUI(comment.id)"><span class="cms-reply" style="font-size: 12px;margin-right: 1px;"></span>回复</span>
-							</div>
 						</div>
 					</div>
 					<div class="commentPage page">
@@ -576,6 +594,54 @@
 								</ul>
 							</div>
 							
+						</div>
+					</div>
+				</mt-popup>
+				
+				<!-- 添加回复对方 -->
+				<mt-popup v-model="popup_addReplyFriend" position="right" style="width: 100%;height: 100%;">
+					<mt-header fixed title="回复对方" style="background: #fafafa; color: #000000;font-size: 14px">
+				    	<mt-button icon="back" @click.native="popup_addReplyFriend = false" slot="left" >返回</mt-button>
+				    	<router-link to="/index" slot="right" @click.native="popup_addReplyFriend = false" >
+				    		<span class="cms-home" style="font-size: 18px;color: #595959;"></span>
+						</router-link>
+					</mt-header> 
+					<div ref="addReplyFriendFormScroll" class="addReplyFriendScroll">
+						<div class="box" >
+							<div class="addReplyFriendForm" >
+								<ul>
+									<li class="friendUser">
+										@{{friendUser}}
+									</li>
+									<li>
+										<mt-field v-model.trim="addReplyFriendContent" label="回复" placeholder="输入回复内容" type="textarea" rows="5" ></mt-field>
+										<p class="tips">
+									    	<span>{{error.addReplyFriendContent}}</span>	
+									    </p>
+									</li>
+									
+									<li v-if="showCaptcha" >
+							        	<input type="hidden" v-model="captchaKey">
+							        	<mt-field v-model.trim="captchaValue"  @change.native="validation_captchaValue" label="验证码" placeholder="请输入验证码"  type="text">
+											
+										</mt-field>
+										<div style="position: absolute;right: 0px;margin-top: -45px; ">
+											<img :src="imgUrl" @click="replaceCaptcha" height="45px" width="120px" >
+										</div>
+										<p class="tips">
+									    	<span>{{error.captchaValue}}</span>	
+									    </p>
+							        </li>
+							       
+							        <li style="margin-left: 5px;margin-right: 5px; margin-top: 10px; ">
+										<mt-button  type="primary" size="large"  @click.native="addReplyFriend">提交</mt-button>
+										<p class="tips">
+									    	<span>{{error.reply}}</span>	
+									    </p>
+										
+									</li>
+								</ul>
+							</div>
 						</div>
 					</div>
 				</mt-popup>
@@ -772,6 +838,102 @@
 			</div>
 		</div>
 		
+		<!-- 举报-->
+		<div v-show="show_report">
+			<mt-header fixed title="举报" style="background: #fafafa; color: #000000;font-size: 14px">
+		    	<mt-button icon="back" @click.native="showTopic(true)" slot="left" >返回</mt-button>
+		    	<router-link to="/index" slot="right">
+		    		<span class="cms-home" style="font-size: 18px;color: #595959;"></span>
+				</router-link>
+			</mt-header> 
+			<div class="topicContentModule" style="margin-top: -40px;">
+				<div ref="addReportFormScroll" class="addReportScroll">
+					<div class="box" >
+						<div class="addReportForm" >
+							<ul>
+								<li>
+									<div class="reportType-group" v-for="reportType in reportTypeList">
+										<!--  仅有一级分类 -->
+										<div v-if="reportType.childType.length ==0">
+											<mt-radio title="" v-model="reportTypeId" :options="[{label: reportType.name,value: reportType.id}]" @change="selectReportType(reportTypeList)"></mt-radio>
+											
+										</div>
+										<div v-else>
+											<!-- 含有多级分类 -->
+											<mt-radio :title="reportType.name" v-model="reportTypeId" :options="reportOptions(reportType.childType)" @change="selectReportType(reportType.childType)"></mt-radio>
+										</div>
+									</div>
+									<p class="tips">
+								    	<span>{{error.reportTypeId}}</span>	
+								    </p>
+								</li>
+							
+							
+								<li v-if="show_giveReason">
+									<mt-field v-model.trim="reason" label="理由" placeholder="请填写举报理由" type="textarea" rows="5" ></mt-field>
+									<p class="tips">
+								    	<span>{{error.reason}}</span>	
+								    </p>
+								</li>
+								<li v-if="show_giveReason && reportMaxImageUpload >0">
+						        	<div class="image-form" >
+					       				<ul class="uploadImagelist">
+					       					
+					       					<li class="uploadImageItem" v-for="(file,index) in fileList" v-viewer.rebuild="{navbar:true, title:false, toolbar:false, loop:false}">
+					       						<div>
+					        						<img class="thumbnail" :src="preview(file)">
+					        						<span class="item-delete">
+					        							<i class="icon cms-themify-close"  @click="deleteImage(index)"></i> 
+					        						</span>
+					        					</div>
+					        				</li>
+					        				 
+					        			</ul>
+					        			
+					        			<div class="uploadImageInput" @click="selectFileWindow();">
+					        				<i class="cms-add-line"></i> 
+					        			</div>
+					       				<input ref="imageInput" class="imageInput" type="file" accept=".jpg,.jpeg,.gif,.png,.bmp" @change="selectFile()">
+						        		<p class="tips" style="font-size: 12px">
+									    	<span>{{error.imageFile}}</span>	
+									    </p>
+						        	</div>
+								</li>
+								
+								<li v-if="showCaptcha" >
+						        	<input type="hidden" v-model="captchaKey">
+						        	<mt-field v-model.trim="captchaValue"  @change.native="validation_captchaValue" label="验证码" placeholder="请输入验证码"  type="text">
+										
+									</mt-field>
+									<div style="position: absolute;right: 0px;margin-top: -45px; ">
+										<img :src="imgUrl" @click="replaceCaptcha" height="45px" width="120px" >
+									</div>
+									<p class="tips">
+								    	<span>{{error.captchaValue}}</span>	
+								    </p>
+						        </li>
+						       
+						        <li style="margin-left: 5px;margin-right: 5px; margin-top: 10px; ">
+									<mt-button  type="primary" size="large"  @click.native="addReport">提交</mt-button>
+									<p class="tips">
+								    	<span>{{error.report}}</span>	
+								    </p>
+									
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<!-- cancel-text 取消按钮的文本。若设为空字符串，则不显示取消按钮 -->
+		<mt-actionsheet :actions="topicOperatingData" v-model="topicOperating" cancel-text=""></mt-actionsheet>
+		<!-- cancel-text 取消按钮的文本。若设为空字符串，则不显示取消按钮 -->
+		<mt-actionsheet :actions="commentOperatingData" v-model="commentOperating" cancel-text=""></mt-actionsheet>
+		<!-- cancel-text 取消按钮的文本。若设为空字符串，则不显示取消按钮 -->
+		<mt-actionsheet :actions="replyOperatingData" v-model="replyOperating" cancel-text=""></mt-actionsheet>
+			
 	</div>
 </template>
 
@@ -953,15 +1115,14 @@
 				            	<div class="tagName" v-for="questionTagAssociation in question.questionTagAssociationList" >{{questionTagAssociation.questionTagName}}</div>
 				            </span>
 				            <p class="right">
-				            	<span class="appendQuestion" v-if="question.userName == $store.state.user.userName">
-									<router-link tag="span" :to="{path: '/user/appendQuestion', query: {questionId: question.id}}"><i class="appendQuestion-icon cms-pencil-alt" ></i>追加</router-link>
-								</span>
+				            	<span v-if="question.ipAddress != null && question.ipAddress != ''"><span class="ipAddress-icon cms-map-pin-line" ></span>{{question.ipAddress}}</span>
 				            	<span class="count-icon cms-commentCount" ></span>{{question.answerTotal}} 
 								<span class="view-icon cms-view" ></span>{{question.viewTotal}}
+								<span class="fast cms-ellipsis-v-solid" @click="questionOperatingUI(question.userName,question.id)" ></span>
 				            </p>
 				        </div> 
 					</div>
-					<div class="main"> 
+					<div class="main" :class="$route.query.reportModule !=undefined && parseInt($route.query.reportModule) == 40 ? 'reportMark' : ''"> 
 					 
 		                <div class="reward" v-if="question.amount > 0 || question.point > 0">
 		                	<div class="rewardInfo" >
@@ -1006,7 +1167,7 @@
 				
 				
 				<div class="answerList">
-					<div :class="answer.adoption ? 'item active' : 'item'" v-for="(answer,index) in answerList" :id="'anchor_'+answer.id">
+					<div :class="[answer.adoption ? 'item active' : 'item',$route.query.reportModule !=undefined && parseInt($route.query.reportModule) == 50 && answer.id == $route.query.answerId ? 'reportMark' : '']" v-for="(answer,index) in answerList" :id="'anchor_'+answer.id">
 						<div class="head">
 							<!-- router-link渲染成<div>标签-->
 					    	<router-link class="avatarBox"  tag="div" :to="{path: '/user/control/home', query: {userName: answer.userName}}">
@@ -1027,8 +1188,9 @@
 							        </div>
 						        </router-link>
 	                        	
-	                          	<div class="time clearfix">{{answer.postTime}}</div>
+	                          	<div class="time clearfix">{{answer.postTime}}<span v-if="answer.ipAddress != null && answer.ipAddress != ''"><span class="separate">·</span>{{answer.ipAddress}}</span></div>
 	                        </span>
+	                        <span class="fast cms-ellipsis-v-solid" @click="answerOperatingUI(answer.userName,answer.id,question.adoptionAnswerId)" ></span>
 	                        <span class="floor" v-if="answer.adoption == false">{{index+1}}楼</span>                  
 	                    </div>
 	                    <div class="adoption">
@@ -1044,54 +1206,76 @@
 		                    <div class="replyList" v-if="answer.answerReplyList.length >0">
 								<ul class="box">
 								
-									<li v-for="(reply,index2) in answer.answerReplyList" v-show="(replyExpandOrShrink[answer.id]) || (replyExpandOrShrink[answer.id] == false && index2 <2)">
-								        <div class="reply-top" >
-									        <!-- router-link渲染成<div>标签-->
-									    	<router-link class="avatarBox"  tag="div" :to="{path: '/user/control/home', query: {userName: reply.userName}}">
-									        	<img :src="reply.avatarPath+'100x100/'+reply.avatarName" v-if="reply.avatarName != null && reply.avatarName != ''">
-									            <!-- 首字符头像-->
-				         						<img :ref="'answerReplyAvatarData_'+reply.id"  v-if="reply.avatarName == null || reply.avatarName == ''">
-									        </router-link>
-		                                    <!-- router-link渲染成<span>标签-->
-									    	<router-link class="userName" tag="span" :to="{path: '/user/control/home', query: {userName: reply.userName}}">
-									           {{reply.nickname != null && reply.nickname != '' ? reply.nickname : reply.account}}
-									        </router-link>
-									        <span class="cancelNickname" v-if="reply.account == null || reply.account == ''">
-									        	&nbsp;已注销
-									        </span>
-									        <div class="userTag">
-										        <i class="master" v-if="reply.userName == question.userName && reply.isStaff == question.isStaff">作者</i>
-									        </div>  
-											<span class="time">
-												<span @click="editReplyUI(reply.id)" v-if="reply.userName == $store.state.user.userName"><span class="cms-pencil-alt" style="font-size: 10px;margin-right: 1px;"></span>编辑</span>
-												<span @click="deleteReply(reply.id)" v-if="reply.userName == $store.state.user.userName"><span class="cms-trash" style="font-size: 10px;margin-right: 1px;"></span>删除</span>
-											
-												{{reply.postTime}}
-											</span>
-										</div>
-										<div style="clear:both; height: 0; line-height: 0; font-size: 0;"></div>
-										<div class="replyContent">
-											<div class="cancelAccount" v-if="reply.account == null || reply.account == ''">此用户账号已注销</div>
-											{{reply.content}}
+									<li v-for="(reply,index2) in answer.answerReplyList" v-show="(replyExpandOrShrink[answer.id]) || (replyExpandOrShrink[answer.id] == false && index2 <viewNumber)" :key="reply.id" :replyId="reply.id" :ref="'replyData_'+reply.id" >
+								        <div :class="$route.query.reportModule !=undefined && parseInt($route.query.reportModule) == 60 && reply.id == $route.query.replyId ? 'reply-reportMark' : ''">
+									        <div class="reply-top" >
+										        <!-- router-link渲染成<div>标签-->
+										    	<router-link class="avatarBox"  tag="div" :to="{path: '/user/control/home', query: {userName: reply.userName}}">
+										        	<img :src="reply.avatarPath+'100x100/'+reply.avatarName" v-if="reply.avatarName != null && reply.avatarName != ''">
+										            <!-- 首字符头像-->
+					         						<img :ref="'answerReplyAvatarData_'+reply.id"  v-if="reply.avatarName == null || reply.avatarName == ''">
+										        </router-link>
+										        <span class="info" >
+		                                    	<!-- router-link渲染成<span>标签-->
+											    	<router-link tag="span" class="left-box clearfix" :to="{path: '/user/control/home', query: {userName: reply.userName}}">
+											        	<div class="cancelNickname" v-if="reply.account == null || reply.account == ''">已注销</div>
+											        	
+											        	<div class="userName">{{reply.nickname != null && reply.nickname != '' ? reply.nickname : reply.account}}</div>
+											        	<div class="userTag">	        
+													        <i class="staff" v-if="reply.isStaff">官方人员</i>
+													        <i class="master" v-if="reply.userName == question.userName && reply.isStaff == question.isStaff">作者</i>
+												        </div>
+											        </router-link>
+						                        	
+						                          	<div class="time clearfix">{{reply.postTime}}<span v-if="reply.ipAddress != null && reply.ipAddress != ''"><span class="separate">·</span>{{reply.ipAddress}}</span></div>
+						                        </span>
+							                    <span class="fast cms-ellipsis-v-solid" @click="replyOperatingUI(reply)" ></span>
+			                        
+											</div>
+										    	
+											<div style="clear:both; height: 0; line-height: 0; font-size: 0;"></div>
+											<!-- 回复对方用户 -->
+	                                        <div class="friendInfo-wrap" v-if="reply.friendUserName != null && reply.friendUserName != ''">
+	                                        	<div class="friendInfo">
+	                                            	<div class="icon-container">
+	                                            		<i class="icon cms-caret-right"></i>
+	                                            	</div>
+	                                            	
+	                                            	<div class="avatarImg-container">
+	                                                   <router-link v-if="reply.friendUserName!= null && reply.friendUserName != ''" tag="a" :to="{path:'/user/control/home',query: {userName: reply.friendUserName}}">
+	                                                       <span class="avatarImg">
+	                                                           <img v-if="reply.friendAvatarName != null" :src="reply.friendAvatarPath+'100x100/'+reply.friendAvatarName" class="img">
+	                                                       
+	                                                           <img v-if="reply.friendAvatarName == null" :ref="'answerReplyFriendAvatarData_'+reply.id"  class="img"/>
+	                                                       </span>
+	                                                   </router-link>
+	                                            	</div>
+	                                            	
+	                                            	<div class="nameInfo-container">
+	                                                	<span class="nameInfo" >
+	                                                    	<span v-if="reply.friendAccount == null || reply.friendAccount == ''" class="cancelNickname">已注销</span>
+	                                                    	<router-link tag="a" v-if="reply.friendAccount != null && reply.friendAccount != ''" class="userName" :to="{path:'/user/control/home',query: {userName: reply.friendUserName}}">
+	                                                        	<span v-if="reply.friendNickname != null && reply.friendNickname != ''">{{reply.friendNickname}}</span>
+	                                                        	<span v-if="reply.friendNickname == null || reply.friendNickname == ''">{{reply.friendAccount}}</span>
+	                                                    	</router-link>
+	                                                	</span>
+	                                            	</div>
+	                                        	</div>
+	                                       	</div>
+											<div class="replyContent">
+												<div class="cancelAccount" v-if="reply.account == null || reply.account == ''">此用户账号已注销</div>
+												{{reply.content}}
+											</div>
 										</div>
 									</li>
 								</ul>
 								
-								<div class="link" v-if="answer.answerReplyList.length >2">
+								<div class="link" v-if="answer.answerReplyList.length >viewNumber">
 									<span @click="telescopicReply(answer.id);" v-if="replyExpandOrShrink[answer.id]">点击收缩</span>
-									<span @click="telescopicReply(answer.id);" v-else>剩余{{answer.answerReplyList.length-2}}条</span>
+									<span @click="telescopicReply(answer.id);" v-else>剩余{{answer.answerReplyList.length-viewNumber}}条</span>
 								</div>
 								
 							</div>                
-						</div>
-						<div class="bottomInfo">
-							<div class="toolbar">
-								<span class="edit-btn"  @click="editAnswerUI(answer.id)" v-if="answer.userName == $store.state.user.userName"><span class="cms-pencil-alt" style="font-size: 12px;margin-right: 1px;"></span>编辑</span>
-								<span class="edit-btn"  @click="deleteAnswer(answer.id)" v-if="answer.userName == $store.state.user.userName"><span class="cms-trash" style="font-size: 12px;margin-right: 1px;"></span>删除</span>
-								
-								<span class="quote-btn"  @click="adoptionAnswer(answer.id)" v-if="question.userName == $store.state.user.userName && question.adoptionAnswerId == 0"><span class="cms-check-circle-solid" style="font-size: 12px;margin-right: 1px;"></span>采纳</span>
-								<span class="reply-btn"  @click="addReplyUI(answer.id)"><span class="cms-reply" style="font-size: 12px;margin-right: 1px;"></span>回复</span>
-							</div>
 						</div>
 					</div>
 					<div class="answerPage page">
@@ -1152,6 +1336,54 @@
 					</div>
 				</mt-popup> 
 				
+				<!-- 添加回复对方 -->
+				<mt-popup v-model="popup_addReplyFriend" position="right" style="width: 100%;height: 100%;">
+					<mt-header fixed title="回复对方" style="background: #fafafa; color: #000000;font-size: 14px">
+				    	<mt-button icon="back" @click.native="popup_addReplyFriend = false" slot="left" >返回</mt-button>
+				    	<router-link to="/index" slot="right" @click.native="popup_addReplyFriend = false" >
+				    		<span class="cms-home" style="font-size: 18px;color: #595959;"></span>
+						</router-link>
+					</mt-header> 
+					<div ref="addReplyFriendFormScroll" class="addReplyFriendScroll">
+						<div class="box" >
+							<div class="addReplyFriendForm" >
+								<ul>
+									<li class="friendUser">
+										@{{friendUser}}
+									</li>
+									<li>
+										<mt-field v-model.trim="addReplyFriendContent" label="回复" placeholder="输入回复内容" type="textarea" rows="5" ></mt-field>
+										<p class="tips">
+									    	<span>{{error.addReplyFriendContent}}</span>	
+									    </p>
+									</li>
+									
+									<li v-if="showCaptcha" >
+							        	<input type="hidden" v-model="captchaKey">
+							        	<mt-field v-model.trim="captchaValue"  @change.native="validation_captchaValue" label="验证码" placeholder="请输入验证码"  type="text">
+											
+										</mt-field>
+										<div style="position: absolute;right: 0px;margin-top: -45px; ">
+											<img :src="imgUrl" @click="replaceCaptcha" height="45px" width="120px" >
+										</div>
+										<p class="tips">
+									    	<span>{{error.captchaValue}}</span>	
+									    </p>
+							        </li>
+							       
+							        <li style="margin-left: 5px;margin-right: 5px; margin-top: 10px; ">
+										<mt-button  type="primary" size="large"  @click.native="addReplyFriend">提交</mt-button>
+										<p class="tips">
+									    	<span>{{error.reply}}</span>	
+									    </p>
+										
+									</li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</mt-popup>
+				
 				<!-- 修改回复 -->
 				<mt-popup v-model="popup_editReply" position="right" style="width: 100%;height: 100%;">
 					<mt-header fixed title="修改回复" style="background: #fafafa; color: #000000;font-size: 14px">
@@ -1198,6 +1430,96 @@
 				</mt-popup>
 			</div>
 		</div>
+		
+		<!-- 举报-->
+		<div v-show="show_report">
+			<mt-header fixed title="举报" style="background: #fafafa; color: #000000;font-size: 14px">
+		    	<mt-button icon="back" @click.native="showQuestion(true)" slot="left" >返回</mt-button>
+		    	<router-link to="/index" slot="right">
+		    		<span class="cms-home" style="font-size: 18px;color: #595959;"></span>
+				</router-link>
+			</mt-header> 
+			<div class="questionContentModule" style="margin-top: -40px;">
+				<div ref="addReportFormScroll" class="addReportScroll">
+					<div class="box" >
+						<div class="addReportForm" >
+							<ul>
+								<li>
+									<div class="reportType-group" v-for="reportType in reportTypeList">
+										<!--  仅有一级分类 -->
+										<div v-if="reportType.childType.length ==0">
+											<mt-radio title="" v-model="reportTypeId" :options="[{label: reportType.name,value: reportType.id}]" @change="selectReportType(reportTypeList)"></mt-radio>
+											
+										</div>
+										<div v-else>
+											<!-- 含有多级分类 -->
+											<mt-radio :title="reportType.name" v-model="reportTypeId" :options="reportOptions(reportType.childType)" @change="selectReportType(reportType.childType)"></mt-radio>
+										</div>
+									</div>
+									<p class="tips">
+								    	<span>{{error.reportTypeId}}</span>	
+								    </p>
+								</li>
+							
+							
+								<li v-if="show_giveReason">
+									<mt-field v-model.trim="reason" label="理由" placeholder="请填写举报理由" type="textarea" rows="5" ></mt-field>
+									<p class="tips">
+								    	<span>{{error.reason}}</span>	
+								    </p>
+								</li>
+								<li v-if="show_giveReason && reportMaxImageUpload >0">
+						        	<div class="image-form" >
+					       				<ul class="uploadImagelist">
+					       					
+					       					<li class="uploadImageItem" v-for="(file,index) in fileList" v-viewer.rebuild="{navbar:true, title:false, toolbar:false, loop:false}">
+					       						<div>
+					        						<img class="thumbnail" :src="preview(file)">
+					        						<span class="item-delete">
+					        							<i class="icon cms-themify-close"  @click="deleteImage(index)"></i> 
+					        						</span>
+					        					</div>
+					        				</li>
+					        				 
+					        			</ul>
+					        			
+					        			<div class="uploadImageInput" @click="selectFileWindow();">
+					        				<i class="cms-add-line"></i> 
+					        			</div>
+					       				<input ref="imageInput" class="imageInput" type="file" accept=".jpg,.jpeg,.gif,.png,.bmp" @change="selectFile()">
+						        		<p class="tips" style="font-size: 12px">
+									    	<span>{{error.imageFile}}</span>	
+									    </p>
+						        	</div>
+								</li>
+								
+								<li v-if="showCaptcha" >
+						        	<input type="hidden" v-model="captchaKey">
+						        	<mt-field v-model.trim="captchaValue"  @change.native="validation_captchaValue" label="验证码" placeholder="请输入验证码"  type="text">
+										
+									</mt-field>
+									<div style="position: absolute;right: 0px;margin-top: -45px; ">
+										<img :src="imgUrl" @click="replaceCaptcha" height="45px" width="120px" >
+									</div>
+									<p class="tips">
+								    	<span>{{error.captchaValue}}</span>	
+								    </p>
+						        </li>
+						       
+						        <li style="margin-left: 5px;margin-right: 5px; margin-top: 10px; ">
+									<mt-button  type="primary" size="large"  @click.native="addReport">提交</mt-button>
+									<p class="tips">
+								    	<span>{{error.report}}</span>	
+								    </p>
+									
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
 		<!-- 发表答案 -->
 		<div v-show="show_answerEditor">
 			<mt-header fixed title="发表答案" style="background: #fafafa; color: #000000;font-size: 14px">
@@ -1291,7 +1613,12 @@
 			</div>
 		</div>
  
-	 	
+	 	<!-- cancel-text 取消按钮的文本。若设为空字符串，则不显示取消按钮 -->
+		<mt-actionsheet :actions="questionOperatingData" v-model="questionOperating" cancel-text=""></mt-actionsheet>
+		<!-- cancel-text 取消按钮的文本。若设为空字符串，则不显示取消按钮 -->
+		<mt-actionsheet :actions="answerOperatingData" v-model="answerOperating" cancel-text=""></mt-actionsheet>
+		<!-- cancel-text 取消按钮的文本。若设为空字符串，则不显示取消按钮 -->
+		<mt-actionsheet :actions="replyOperatingData" v-model="replyOperating" cancel-text=""></mt-actionsheet>
 	</div>
 </template>
 
@@ -2069,8 +2396,10 @@
 		        <p class="userName">{{user.account}} <i class="userRoleName" v-for="(roleName,index) in user.userRoleNameList" >{{roleName}}</i></p>
 		        <p class="nickname" v-if="user.nickname != null && user.nickname != ''">{{user.nickname}}</p>
 		        <p class="grade" v-if="user.gradeName != null">{{user.gradeName}}</p>
-		        
-		       
+		        <p class="ipAddress" v-if="user.ipAddress != null && user.ipAddress != ''">
+		    		<span class="cms-map-pin-line icon"></span>
+		    		<span class="ipAddressText">{{user.ipAddress}}</span>
+			    </p>
 		      
 		        <span class="privateMessageBox" v-if="user.userName != null && user.userName != $store.state.user.userName ">
 		        	<div class="followButton" @click="addFollow(user.userName)">{{following == true ? '已关注':'关注'}}</div>
@@ -2083,6 +2412,7 @@
 				</span>
 		        
 		    </div>
+		    
 		    <div class="setting" @click="displayUserSetting();" ><span class="cms-settings"></span></div>
 		    
 	    </div>
@@ -2169,6 +2499,10 @@
 		    		<div class="icon cms-realNameAuthentication" ></div> 
 		    		<span class="name">绑定手机</span>
 		    	</router-link>
+		    	<router-link to="/user/control/reportList"  class="item" tag="div">
+		    		<div class="icon cms-error-warning-line" ></div> 
+		    		<span class="name">举报</span>
+		    	</router-link>
 		    	<router-link to="/user/control/point"  class="item" tag="div">
 		    		<div class="icon cms-point" ></div> 
 		    		<span class="name">积分记录</span>
@@ -2177,10 +2511,6 @@
 		    		<div class="icon cms-login" ></div> 
 		    		<span class="name">登录日志</span>
 		    	</router-link>
-		    	<div  class="item" >
-		    		<div class="icon " ></div> 
-		    		<span class="name"></span>
-		    	</div>
 	    	</div>
 	    </div>
 		
@@ -3191,6 +3521,7 @@
 			            <div class="main">
 							<!-- router-link渲染成<p>标签-->
 							<div class="content">
+								<!--reportModule为前端借用‘举报’功能标记模块提示项的参数   10:话题  20:评论  30:评论回复  40:问题  50:答案   60:答案回复-->
 								<div v-if="remind.typeCode == 10">
 									<router-link class="link" :to="{path: '/user/control/home', query: {userName: remind.senderUserName}}">
 							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderAccount}}
@@ -3199,7 +3530,7 @@
 									<span class="cancelAccount" v-if="remind.senderAccount == null || remind.senderAccount == ''">此用户账号已注销</span>
 										
 									在
-									<router-link class="link" :to="{path: '/thread', query: {topicId: remind.topicId, commentId:remind.friendTopicCommentId}}">
+									<router-link class="link" :to="{path: '/thread', query: {topicId: remind.topicId, commentId:remind.friendTopicCommentId,reportModule:20}}">
 							            {{remind.topicTitle}}
 							        </router-link>
 									评论了我的话题
@@ -3211,7 +3542,7 @@
 									<span class="cancelAccount" v-if="remind.senderAccount == null || remind.senderAccount == ''">此用户账号已注销</span>
 									
 									在
-									<router-link class="link" :to="{path: '/thread', query: {topicId: remind.topicId, commentId:remind.friendTopicCommentId}}">
+									<router-link class="link" :to="{path: '/thread', query: {topicId: remind.topicId, commentId:remind.friendTopicCommentId,replyId:remind.friendTopicReplyId,reportModule:30}}">
 							            {{remind.topicTitle}}
 							        </router-link>
 									回复了我的话题
@@ -3223,7 +3554,7 @@
 									<span class="cancelAccount" v-if="remind.senderAccount == null || remind.senderAccount == ''">此用户账号已注销</span>
 									
 									在
-									<router-link class="link" :to="{path: '/thread', query: {topicId: remind.topicId, commentId:remind.friendTopicCommentId}}">
+									<router-link class="link" :to="{path: '/thread', query: {topicId: remind.topicId, commentId:remind.friendTopicCommentId,reportModule:20}}">
 							            {{remind.topicTitle}}
 							        </router-link>
 									引用了我的评论
@@ -3235,7 +3566,7 @@
 									<span class="cancelAccount" v-if="remind.senderAccount == null || remind.senderAccount == ''">此用户账号已注销</span>
 									
 									在
-									<router-link class="link" :to="{path: '/thread', query: {topicId: remind.topicId, commentId:remind.topicCommentId}}">
+									<router-link class="link" :to="{path: '/thread', query: {topicId: remind.topicId, commentId:remind.topicCommentId,replyId:remind.friendTopicReplyId,reportModule:30}}">
 							            {{remind.topicTitle}}
 							        </router-link>
 									回复了我的评论
@@ -3247,10 +3578,22 @@
 									<span class="cancelAccount" v-if="remind.senderAccount == null || remind.senderAccount == ''">此用户账号已注销</span>
 									
 									在
-									<router-link class="link" :to="{path: '/thread', query: {topicId: remind.topicId, commentId:remind.friendTopicCommentId}}">
+									<router-link class="link" :to="{path: '/thread', query: {topicId: remind.topicId, commentId:remind.friendTopicCommentId,replyId:remind.friendTopicReplyId,reportModule:30}}">
 							            {{remind.topicTitle}}
 							        </router-link>
 									回复了我回复过的评论
+								</div>
+								<div v-if="remind.typeCode == 55">
+									<router-link class="link" :to="{path: '/user/control/home', query: {userName: remind.senderUserName}}">
+							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderAccount}}
+							        </router-link>
+									<span class="cancelAccount" v-if="remind.senderAccount == null || remind.senderAccount == ''">此用户账号已注销</span>
+									
+									在
+									<router-link class="link" :to="{path: '/thread', query: {topicId: remind.topicId, commentId:remind.friendTopicCommentId,replyId:remind.friendTopicReplyId,reportModule:30}}">
+							            {{remind.topicTitle}}
+							        </router-link>
+									回复了我的评论回复
 								</div>
 								<div v-if="remind.typeCode == 60">
 									<router-link class="link" :to="{path: '/user/control/home', query: {userName: remind.senderUserName}}">
@@ -3304,7 +3647,7 @@
 									<span class="cancelAccount" v-if="remind.senderAccount == null || remind.senderAccount == ''">此用户账号已注销</span>
 									
 									在
-									<router-link class="link" :to="{path: '/thread', query: {topicId: remind.topicId, commentId:remind.friendTopicCommentId}}">
+									<router-link class="link" :to="{path: '/thread', query: {topicId: remind.topicId, commentId:remind.friendTopicCommentId,reportModule:20}}">
 							            {{remind.topicTitle}}
 							        </router-link>
 									发表了评论
@@ -3317,7 +3660,7 @@
 							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderAccount}}
 							        </router-link>
 									在
-									<router-link class="link" :to="{path: '/thread', query: {topicId: remind.topicId, commentId:remind.friendTopicCommentId}}">
+									<router-link class="link" :to="{path: '/thread', query: {topicId: remind.topicId, commentId:remind.friendTopicCommentId,replyId:remind.friendTopicReplyId,reportModule:30}}">
 							            {{remind.topicTitle}}
 							        </router-link>
 									发表了话题回复
@@ -3331,7 +3674,7 @@
 									<span class="cancelAccount" v-if="remind.senderAccount == null || remind.senderAccount == ''">此用户账号已注销</span>
 									
 									在
-									<router-link class="link" :to="{path: '/question', query: {questionId: remind.questionId, commentId:remind.friendQuestionAnswerId}}">
+									<router-link class="link" :to="{path: '/question', query: {questionId: remind.questionId, answerId:remind.friendQuestionAnswerId,reportModule:50}}">
 							            {{remind.questionTitle}}
 							        </router-link>
 									回答了我的问题
@@ -3343,7 +3686,7 @@
 									<span class="cancelAccount" v-if="remind.senderAccount == null || remind.senderAccount == ''">此用户账号已注销</span>
 									
 									在
-									<router-link class="link" :to="{path: '/question', query: {questionId: remind.questionId, answerId:remind.friendQuestionAnswerId}}">
+									<router-link class="link" :to="{path: '/question', query: {questionId: remind.questionId, answerId:remind.friendQuestionAnswerId,replyId:remind.friendQuestionReplyId,reportModule:60}}">
 							            {{remind.questionTitle}}
 							        </router-link>
 									回复了我的问题
@@ -3355,7 +3698,7 @@
 									<span class="cancelAccount" v-if="remind.senderAccount == null || remind.senderAccount == ''">此用户账号已注销</span>
 									
 									在
-									<router-link class="link" :to="{path: '/question', query: {questionId: remind.questionId, answerId:remind.questionAnswerId}}">
+									<router-link class="link" :to="{path: '/question', query: {questionId: remind.questionId, answerId:remind.questionAnswerId,replyId:remind.friendQuestionReplyId,reportModule:60}}">
 							            {{remind.questionTitle}}
 							        </router-link>
 									回复了我的答案
@@ -3367,12 +3710,23 @@
 									<span class="cancelAccount" v-if="remind.senderAccount == null || remind.senderAccount == ''">此用户账号已注销</span>
 									
 									在
-									<router-link class="link" :to="{path: '/question', query: {questionId: remind.questionId, answerId:remind.friendQuestionAnswerId}}">
+									<router-link class="link" :to="{path: '/question', query: {questionId: remind.questionId, answerId:remind.friendQuestionAnswerId,replyId:remind.friendQuestionReplyId,reportModule:60}}">
 							            {{remind.questionTitle}}
 							        </router-link>
 									回复了我回复过的答案
 								</div>
-			
+								<div v-if="remind.typeCode == 160">
+									<router-link class="link" :to="{path: '/user/control/home', query: {userName: remind.senderUserName}}">
+							            {{remind.senderNickname != null && remind.senderNickname != '' ? remind.senderNickname : remind.senderAccount}}
+							        </router-link>
+									<span class="cancelAccount" v-if="remind.senderAccount == null || remind.senderAccount == ''">此用户账号已注销</span>
+									
+									在
+									<router-link class="link" :to="{path: '/question', query: {questionId: remind.questionId, answerId:remind.friendQuestionAnswerId,replyId:remind.friendQuestionReplyId,reportModule:60}}">
+							            {{remind.questionTitle}}
+							        </router-link>
+									回复了我的答案回复
+								</div>
 							</div>               
 						</div>
 					</div>
@@ -4099,7 +4453,86 @@
 </template>
 
 
-
+<!-- 举报 -->
+<template id="reportList-template">
+	<div>
+		<mt-header fixed title="举报" style="background: #fafafa; color: #000000;font-size: 14px">
+	    	<mt-button icon="back" @click.native="back();" slot="left" style='font-size:12px'>返回</mt-button>
+	    	<router-link to="/index" slot="right">
+			    <span class="cms-home" style="font-size: 18px;color: #595959;"></span>
+			</router-link>
+		</mt-header>
+		<div class="reportListModule">
+			<div v-infinite-scroll="queryReport" infinite-scroll-disabled="loading" infinite-scroll-distance="10">
+				<div class="reportList">
+					<ul>
+						<li class="item" v-for="report in reportList">
+							<div class="top-container clearfix">                                   
+					            <span class="bLeft">
+					                <div class="type" >{{report.reportTypeName}}</div> 
+					            </span>
+					            <p class="bRight">
+					            	<i class="time">{{report.postTime}}</i>
+					            </p> 
+					        </div>
+					        <div class="middle-container clearfix">
+						        <div class="reason" >{{report.reason}}</div>
+						        <div class="moduleInfo clearfix">
+						        	<mt-button type="default" v-if="report.module == 10" @click="router.push({path: '/thread', query:{ topicId : report.parameterId, reportModule:report.module}})"  plain style="border: 1px solid #eee;color: #a9a9a9;border-radius: 6px;height: 30px;font-size: 16px;">查看话题</mt-button>
+									<mt-button type="default" v-if="report.module == 20" @click="router.push({path: '/thread', query:{ topicId : report.extraParameterId,commentId:report.parameterId, reportModule:report.module}})" plain style="border: 1px solid #eee;color: #a9a9a9;border-radius: 6px;height: 30px;font-size: 16px;">查看评论</mt-button>
+									<mt-button type="default" v-if="report.module == 30" @click="router.push({path: '/thread', query:{ topicId : report.extraParameterId.split('-')[0], commentId:report.extraParameterId.split('-')[1], replyId:report.parameterId, reportModule:report.module}})" plain style="border: 1px solid #eee;color: #a9a9a9;border-radius: 6px;height: 30px;font-size: 16px;">查看评论回复</mt-button>
+									<mt-button type="default" v-if="report.module == 40" @click="router.push({path: '/question', query:{ questionId : report.parameterId, reportModule:report.module}})" plain style="border: 1px solid #eee;color: #a9a9a9;border-radius: 6px;height: 30px;font-size: 16px;">查看问题</mt-button>
+									<mt-button type="default" v-if="report.module == 50" @click="router.push({path: '/question', query:{ questionId : report.extraParameterId,answerId:report.parameterId, reportModule:report.module}})" plain style="border: 1px solid #eee;color: #a9a9a9;border-radius: 6px;height: 30px;font-size: 16px;">查看答案</mt-button>
+									<mt-button type="default" v-if="report.module == 60" @click="router.push({path: '/question', query:{ questionId : report.extraParameterId.split('-')[0], answerId:report.extraParameterId.split('-')[1], replyId:report.parameterId, reportModule:report.module}})" plain style="border: 1px solid #eee;color: #a9a9a9;border-radius: 6px;height: 30px;font-size: 16px;">查看答案回复</mt-button>	
+						        </div>
+					        </div>
+					        <div class="imageInfo clearfix" v-if="report.imageInfoList.length >0" v-viewer="pictureOptions">
+								<div class="image-box">
+									<div class="image-box image-column">
+										<!-- 本地存储 -->
+										<div v-for="(imageInfo,index) in report.imageInfoList" v-if="$store.state.fileStorageSystem ==0" class="image" v-lazy:background-image="imageInfo.path+imageInfo.name" >
+											<img class="zoom" :src="$store.state.commonPath+'images/null.gif'" :key="index":data-src="imageInfo.path+imageInfo.name" >
+											<div class="ratio" ></div>
+										</div>
+										<!-- SeaweedFS存储 -->
+										<div v-for="(imageInfo,index) in report.imageInfoList" v-if="$store.state.fileStorageSystem ==10" class="image" v-lazy:background-image="imageInfo.path+imageInfo.name+'?width=240'" >
+											<img class="zoom" :src="$store.state.commonPath+'images/null.gif'" :key="index":data-src="imageInfo.path+imageInfo.name" >
+											<div class="ratio" ></div>
+										</div>
+										<!-- MinIO存储 -->
+										<div v-for="(imageInfo,index) in report.imageInfoList" v-if="$store.state.fileStorageSystem ==20" class="image" v-lazy:background-image="imageInfo.path+imageInfo.name+'?width=240'" >
+											<img class="zoom" :src="$store.state.commonPath+'images/null.gif'" :key="index":data-src="imageInfo.path+imageInfo.name" >
+											<div class="ratio" ></div>
+										</div>
+										<!-- 阿里云OSS存储 -->
+										<div v-for="(imageInfo,index) in report.imageInfoList" v-if="$store.state.fileStorageSystem ==30" class="image" v-lazy:background-image="imageInfo.path+imageInfo.name+'?x-oss-process=image/resize,w_240'" >
+											<img class="zoom" :src="$store.state.commonPath+'images/null.gif'" :key="index":data-src="imageInfo.path+imageInfo.name" >
+											<div class="ratio" ></div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="processResultInfo clearfix" v-if="report.processResult != null && report.processResult != ''">
+					        	<div class="details"><span class="text">处理结果:</span><span class="val">{{report.processResult}}</span></div>
+					        	
+					        </div>
+					        <div class="bottom-container clearfix">
+					        	<div class="status" >
+				                    <mt-badge size="small" type="primary" v-if="report.status ==10">待处理</mt-badge>
+				                    <mt-badge size="small" color="#ff976a" v-if="report.status ==40">投拆失败</mt-badge>
+				                    <mt-badge size="small" type="success" v-if="report.status ==50">投诉成功</mt-badge>
+				                </div> 
+				                <div class="processCompleteTime" >
+				                	 {{report.processCompleteTime}}
+				                </div>
+                            </div>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>
 
 <!-- 公共模块 -->
 <template id="bottomTab-template">
@@ -4163,14 +4596,14 @@
 <script src="${commonPath}js/v-viewer/viewer.min.js?1" type="text/javascript"></script> 
 <script src="${commonPath}js/v-viewer/v-viewer.min.js" type="text/javascript"></script> 
 
-<link href="${baseURL}${commonPath}css/common.css?fdaxsdd3" type="text/css" rel="stylesheet">
+<link href="${baseURL}${commonPath}css/common.css?fdeaxsdd3e" type="text/css" rel="stylesheet">
 <script src="${commonPath}js/better-scroll.min.js?2d" type="text/javascript"></script> 
 <script src="${commonPath}js/DPlayer/hls.min.js" type="text/javascript"></script>
 <script src="${commonPath}js/DPlayer/DPlayer.min.js" type="text/javascript"></script>
 
 <script src="${commonPath}js/vue-cropper.js" type="text/javascript"></script>
  <script src="${commonPath}js/v-readmore.min.js" type="text/javascript"></script>
-<script src="${commonPath}js/wangeditor/wangEditor.js?5sdd" type="text/javascript"></script>
+<script src="${commonPath}js/wangeditor/wangEditor.js?5ssdd" type="text/javascript"></script>
 <script src="${commonPath}js/vue-lazyload.js" type="text/javascript"></script> 
 <script src="${commonPath}js/v-tooltip/v-tooltip.min.js" type="text/javascript"></script> 
 <link href="${commonPath}js/v-tooltip/v-tooltip.css" type="text/css" rel="stylesheet">
@@ -4179,7 +4612,7 @@
 <script src="${commonPath}js/prism/default-block/prism.js" type="text/javascript"></script> 
 <script src="${commonPath}js/prism/default-block/clipboard.min.js" type="text/javascript"></script> 
 
-<script src="${commonPath}js/main.js?asdws" type="text/javascript"></script>
+<script src="${commonPath}js/main.js?asdrsws" type="text/javascript"></script>
 
 
 

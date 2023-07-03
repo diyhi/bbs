@@ -820,17 +820,31 @@ public class CommentManageAction {
 	 * 回复  添加
 	 * @param model
 	 * @param commentId 评论Id
+	 * @param friendReplyId 对方回复Id
 	 */
 	@ResponseBody
 	@RequestMapping(params="method=addReply",method=RequestMethod.POST)
-	public String addReply(ModelMap model,Long commentId,String content,
+	public String addReply(ModelMap model,Long commentId,String content,Long friendReplyId,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Comment comment = null;
+		Reply friendReply = null;
+		Reply reply = new Reply();
 		Map<String,String> error = new HashMap<String,String>();
 		if(commentId == null || commentId <=0){
 			error.put("commentId", "评论Id不能为空");
 		}else{
 			comment = commentService.findByCommentId(commentId);
+		}
+		
+		if(friendReplyId != null && friendReplyId >0){
+			friendReply = commentService.findReplyByReplyId(friendReplyId);
+			if(friendReply != null){
+				if(!friendReply.getCommentId().equals(commentId)){
+					error.put("friendReplyId", "对方回复Id和评论Id不对应");
+				}
+			}else{
+				error.put("friendReplyId", "对方回复Id不存在");
+			}
 		}
 		
 		
@@ -851,7 +865,6 @@ public class CommentManageAction {
 					
 				
 					//回复
-					Reply reply = new Reply();
 					reply.setCommentId(comment.getId());
 					reply.setIsStaff(true);
 					reply.setUserName(username);
@@ -859,12 +872,7 @@ public class CommentManageAction {
 					reply.setTopicId(comment.getTopicId());
 					reply.setStatus(20);
 					reply.setIp(IpAddress.getClientIpAddress(request));
-					//保存评论
-					commentService.saveReply(reply);
-
 					
-					//修改话题最后回复时间
-					topicService.updateTopicReplyTime(comment.getTopicId(),new Date());
 				}else{	
 					error.put("content", "回复内容不能为空");
 					
@@ -877,6 +885,19 @@ public class CommentManageAction {
 		}
 		
 		if(error.size()==0){
+			if(friendReply != null){
+				reply.setFriendReplyId(friendReplyId);
+				reply.setFriendReplyIdGroup(friendReply.getFriendReplyIdGroup()+friendReplyId+",");
+				reply.setIsFriendStaff(friendReply.getIsStaff());
+				reply.setFriendUserName(friendReply.getUserName());
+			}
+			
+			//保存评论
+			commentService.saveReply(reply);
+
+			
+			//修改话题最后回复时间
+			topicService.updateTopicReplyTime(comment.getTopicId(),new Date());
 			
 			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 		}

@@ -168,7 +168,14 @@
 						        <el-menu-item index="4-400400-1">解锁话题隐藏内容分成</el-menu-item>
 						        <el-menu-item index="4-400400-2">问答悬赏平台分成</el-menu-item>
 						    </el-submenu>
-						    
+						    <el-submenu index="4-400600">
+						        <template #title>
+						        	<i class="el-icon-warning-outline icon"></i>
+						        	<span>举报管理</span>
+						        </template>
+						        <el-menu-item index="4-400600-1">举报分类</el-menu-item>
+						        <el-menu-item index="4-400600-2">举报列表</el-menu-item>
+						    </el-submenu>
 						</el-menu>
 						
 						<el-menu v-if="topNavigationActiveIndex ==5 || mini" :default-active="leftNavigationMenuActive" :collapse="isLeftNavigationMenuCollapse" text-color="#606266" class="navigation-menu-left" @open="leftNavigationMenuOpen" @close="leftNavigationMenuClose"  @select="leftNavigationMenuSelect" :default-openeds="leftNavigationMenuOpeneds">
@@ -289,7 +296,7 @@
 						                      		<el-avatar icon="el-icon-user-solid"></el-avatar>
 						                     	</div>
 						                     	<div class="user-info">
-													<span class="name">{{sysUsers.fullName}}</span>
+													<span class="name">{{sysUsers.fullName != null && sysUsers.fullName != '' ? sysUsers.fullName : sysUsers.userAccount}}</span>
 													<span class="role">{{sysUsers.userDuty}}</span>
 												</div>
 												<div class="more"><i class="el-icon-arrow-down"></i></div>
@@ -416,9 +423,10 @@
 				</div>
 				<div class="item">
 					<div class="box">
-						<div class="icon-container"></div>
+						<div class="icon-container"><div class="round round_bg_8"><i class="el-icon-warning-outline icon color_8"></i></div></div>
 						<div class="info-container">
-							
+							<div class="digital">{{reportCount}}</div>
+							<div class="text">待处理举报总数</div>
 						</div>
 					</div>
 				</div>

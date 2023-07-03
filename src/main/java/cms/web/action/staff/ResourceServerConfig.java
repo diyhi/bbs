@@ -222,6 +222,8 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter{
             configuration.setAllowedHeaders(Arrays.asList("Origin","X-Requested-With","Content-Type","Cache-Control","Accept","Authorization","BBS-XSRF-TOKEN","Set-Cookie"));
             //暴露哪些头部信息（因为跨域访问默认不能获取全部头部信息）
             //configuration.addExposedHeader("*");
+            configuration.addExposedHeader("Message");//Message为cms.web.action.staff.WebSecurityConfig.java的accessDeniedHandler方法返回的消息头。 response.addHeader("Access-Control-Expose-Headers", "Message");
+            
             //预检请求的缓存时间（秒），即在这段间内对于相同的跨域请求不会再次预检了
             configuration.setMaxAge(18000L);
             

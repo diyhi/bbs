@@ -87,11 +87,24 @@
 						</el-row>
 						<div class="form-help" >0为每次都出现验证码</div>
 					</el-form-item>
+					<el-form-item label="举报每分钟提交超过" :error="error.report_submitQuantity" v-show="activeTag == 10">
+						<el-row >
+							<el-col :span="6"><el-input v-model.trim="report_submitQuantity" :required="true" maxlength="8" clearable="true" show-word-limit></el-input></el-col>
+						</el-row>
+						<div class="form-help" >0为每次都出现验证码</div>
+					</el-form-item>
+					<el-form-item label="举报图片允许最大上传数量" :error="error.reportMaxImageUpload" v-show="activeTag == 10">
+						<el-row >
+							<el-col :span="6"><el-input v-model.trim="reportMaxImageUpload" :required="true" maxlength="8" clearable="true" show-word-limit></el-input></el-col>
+						</el-row>
+						<div class="form-help" >0为不允许上传图片</div>
+					</el-form-item>
 					<el-form-item label="提交问题最多可选择标签数量" :error="error.maxQuestionTagQuantity" v-show="activeTag == 10">
 						<el-row >
 							<el-col :span="6"><el-input v-model.trim="maxQuestionTagQuantity" :required="true" maxlength="8" clearable="true" show-word-limit></el-input></el-col>
 						</el-row>
 					</el-form-item>
+					
 					<el-form-item label="发表话题奖励积分" :error="error.topic_rewardPoint" v-show="activeTag == 10">
 						<el-row >
 							<el-col :span="6"><el-input v-model.trim="topic_rewardPoint" :required="true" maxlength="8" clearable="true" show-word-limit></el-input></el-col>
@@ -214,6 +227,18 @@
 					</el-form-item>
 					<el-form-item label="实名用户才允许提交答案" :error="error.realNameUserAllowAnswer" v-show="activeTag == 10">
 						<el-radio-group v-model="realNameUserAllowAnswer">
+						    <el-radio :label="true">是</el-radio>
+						    <el-radio :label="false">否</el-radio>
+						</el-radio-group>
+					</el-form-item>
+					<el-form-item label="全局允许提交举报" :error="error.allowReport" v-show="activeTag == 10">
+						<el-radio-group v-model="allowReport">
+						    <el-radio :label="true">是</el-radio>
+						    <el-radio :label="false">否</el-radio>
+						</el-radio-group>
+					</el-form-item>
+					<el-form-item label="是否显示IP归属地" :error="error.showIpAddress" v-show="activeTag == 10">
+						<el-radio-group v-model="showIpAddress">
 						    <el-radio :label="true">是</el-radio>
 						    <el-radio :label="false">否</el-radio>
 						</el-radio-group>
@@ -1028,6 +1053,8 @@ export default({
 			question_submitQuantity:'',
 			answer_submitQuantity:'',
 			privateMessage_submitQuantity:'',
+			report_submitQuantity:'',
+			reportMaxImageUpload:'',
 			maxQuestionTagQuantity:'',
 			topic_rewardPoint:'',
 			comment_rewardPoint:'',
@@ -1050,6 +1077,8 @@ export default({
 			realNameUserAllowComment:false,
 			realNameUserAllowQuestion:false,
 			realNameUserAllowAnswer:false,
+			allowReport:true,
+			showIpAddress:false,
 			questionRewardPointMin:'',
 			questionRewardPointMax:'',
 			questionRewardAmountMin:'',
@@ -1087,6 +1116,8 @@ export default({
 				question_submitQuantity:'',
 				answer_submitQuantity:'',
 				privateMessage_submitQuantity:'',
+				report_submitQuantity:'',
+				reportMaxImageUpload:'',
 				maxQuestionTagQuantity:'',
 				topic_rewardPoint:'',
 				comment_rewardPoint:'',
@@ -1109,6 +1140,8 @@ export default({
 				realNameUserAllowComment :'',
 				realNameUserAllowQuestion :'',
 				realNameUserAllowAnswer :'',
+				allowReport :'',
+				showIpAddress :'',
 				questionRewardPointMin:'',
 				questionRewardPointMax:'',
 				questionRewardAmountMin:'',
@@ -1231,6 +1264,12 @@ export default({
 			    				if(systemSetting.privateMessage_submitQuantity != null){
 			    					_self.privateMessage_submitQuantity = systemSetting.privateMessage_submitQuantity;
 			    				}
+			    				if(systemSetting.report_submitQuantity != null){
+			    					_self.report_submitQuantity = systemSetting.report_submitQuantity;
+			    				}
+			    				if(systemSetting.reportMaxImageUpload != null){
+			    					_self.reportMaxImageUpload = systemSetting.reportMaxImageUpload;
+			    				}
 			    				if(systemSetting.maxQuestionTagQuantity != null){
 			    					_self.maxQuestionTagQuantity = systemSetting.maxQuestionTagQuantity;
 			    				}
@@ -1279,6 +1318,8 @@ export default({
 			    				_self.realNameUserAllowComment= systemSetting.realNameUserAllowComment;
 			    				_self.realNameUserAllowQuestion= systemSetting.realNameUserAllowQuestion;
 			    				_self.realNameUserAllowAnswer= systemSetting.realNameUserAllowAnswer;
+			    				_self.allowReport = systemSetting.allowReport;
+			    				_self.showIpAddress = systemSetting.showIpAddress;
 			    				
 			    				if(systemSetting.questionRewardPointMin != null){
 			    					_self.questionRewardPointMin = systemSetting.questionRewardPointMin;
@@ -1544,6 +1585,12 @@ export default({
 			if(_self.privateMessage_submitQuantity != null){
 				formData.append('privateMessage_submitQuantity', _self.privateMessage_submitQuantity);
 			}
+			if(_self.report_submitQuantity != null){
+				formData.append('report_submitQuantity', _self.report_submitQuantity);
+			}
+			if(_self.reportMaxImageUpload != null){
+				formData.append('reportMaxImageUpload', _self.reportMaxImageUpload);
+			}
 			if(_self.maxQuestionTagQuantity != null){
 				formData.append('maxQuestionTagQuantity', _self.maxQuestionTagQuantity);
 			}
@@ -1610,6 +1657,13 @@ export default({
 			if(_self.realNameUserAllowAnswer != null){
 				formData.append('realNameUserAllowAnswer', _self.realNameUserAllowAnswer);
 			}
+			if(_self.allowReport != null){
+				formData.append('allowReport', _self.allowReport);
+			}
+			if(_self.showIpAddress != null){
+				formData.append('showIpAddress', _self.showIpAddress);
+			}
+			
 			if(_self.questionRewardPointMin != null){
 				formData.append('questionRewardPointMin', _self.questionRewardPointMin);
 			}

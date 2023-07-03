@@ -549,6 +549,17 @@ public class TemplateManage {
 		layout_receiveRedEnvelopeList.setSort(2400);//排序
 		layout_receiveRedEnvelopeList.setReferenceCode("user/control/receiveRedEnvelopeList");
 		layoutList.add(layout_receiveRedEnvelopeList);
+			
+		//举报列表
+		Layout layout_reportList = new Layout();
+		layout_reportList.setId(UUIDUtil.getUUID32());
+		layout_reportList.setName("举报列表");
+		layout_reportList.setDirName(dirName);
+		layout_reportList.setLayoutFile("reportList.html");
+		layout_reportList.setType(1);//默认页
+		layout_reportList.setSort(2500);//排序
+		layout_reportList.setReferenceCode("user/control/reportList");
+		layoutList.add(layout_reportList);
 				
 		return layoutList;
 	}

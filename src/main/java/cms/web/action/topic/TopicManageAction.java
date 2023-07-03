@@ -384,12 +384,27 @@ public class TopicManageAction {
 									reply.setAccount(reply.getUserName());//员工用户名和账号是同一个
 									
 								}
-								
+								if(reply.getFriendUserName() != null && !"".equals(reply.getFriendUserName().trim())){
+									if(reply.getIsFriendStaff() == false){//会员
+										User user = userManage.query_cache_findUserByUserName(reply.getFriendUserName());
+										if(user != null){
+											reply.setFriendAccount(user.getAccount());
+											reply.setFriendNickname(user.getNickname());
+											reply.setFriendAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
+											reply.setFriendAvatarName(user.getAvatarName());
+										}
+										
+									}else{
+										reply.setFriendAccount(reply.getFriendUserName());//员工用户名和账号是同一个
+										
+									}
+								}
 								if(comment.getId().equals(reply.getCommentId())){
 									comment.addReply(reply);
 								}
 							}
-							
+							//回复排序
+							commentManage.replySort(comment.getReplyList());
 						}
 					}
 				}

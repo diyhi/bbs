@@ -1198,6 +1198,86 @@ public class UserServiceBean extends DaoSupport<User> implements UserService {
 	}
 	
 	/**
+	 * 查询最近一条登录日志
+	 * @param userId 用户Id
+	 */
+	@Transactional(readOnly=true,propagation=Propagation.NOT_SUPPORTED)
+	public UserLoginLog findFirstUserLoginLog(Long userId){
+		QueryResult<UserLoginLog> qr = new QueryResult<UserLoginLog>();
+		Query query  = null;
+		
+		
+		//表编号
+		int tableNumber = userLoginLogConfig.userIdRemainder(userId);
+		if(tableNumber == 0){//默认对象为HistoryOrder
+			query = em.createQuery("select o from UserLoginLog o where o.userId=?1 ORDER BY o.logonTime desc")
+			.setParameter(1, userId);
+			//索引开始,即从哪条记录开始
+			query.setFirstResult(0);
+			//获取多少条数据
+			query.setMaxResults(1);
+			List<UserLoginLog> userLoginLogList= query.getResultList();
+			qr.setResultlist(userLoginLogList);
+			
+			query = em.createQuery("select count(o) from UserLoginLog o where o.userId=?1")
+					.setParameter(1, userId);
+			qr.setTotalrecord((Long)query.getSingleResult());
+		}else{//带下划线对象
+			query = em.createQuery("select o from UserLoginLog_"+tableNumber+" o where o.userId=?1 ORDER BY o.logonTime desc")
+			.setParameter(1, userId);
+			//索引开始,即从哪条记录开始
+			query.setFirstResult(0);
+			//获取多少条数据
+			query.setMaxResults(1);
+			List<?> userLoginLog_List= query.getResultList();
+			
+			
+			
+			try {
+				//带下划线对象
+				Class<?> c = Class.forName("cms.bean.user.UserLoginLog_"+tableNumber);
+				Object object  = c.newInstance();
+				BeanCopier copier = BeanCopier.create(object.getClass(),UserLoginLog.class, false); 
+				List<UserLoginLog> userLoginLogList= new ArrayList<UserLoginLog>();
+				for(int j = 0;j< userLoginLog_List.size(); j++) {  
+					Object obj = userLoginLog_List.get(j);
+					UserLoginLog userLoginLog = new UserLoginLog();
+					copier.copy(obj,userLoginLog, null);
+					userLoginLogList.add(userLoginLog);
+				}
+				qr.setResultlist(userLoginLogList);
+				
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+			//	e.printStackTrace();
+				if (logger.isErrorEnabled()) {
+		            logger.error("查询最近一条登录日志",e);
+		        }
+			} catch (InstantiationException e) {
+				// TODO Auto-generated catch block
+			//	e.printStackTrace();
+				if (logger.isErrorEnabled()) {
+		            logger.error("查询最近一条登录日志",e);
+		        }
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+			//	e.printStackTrace();
+				if (logger.isErrorEnabled()) {
+		            logger.error("查询最近一条登录日志",e);
+		        }
+			}
+		}
+		
+		if(qr.getResultlist() != null && qr.getResultlist().size() >0){
+			for(UserLoginLog userLoginLog : qr.getResultlist()){
+				return userLoginLog;
+			}
+		}
+		
+		return null;
+	}
+	
+	/**
 	 * 删除用户登录日志
 	 * @param userIdList 用户Id集合
 	 */

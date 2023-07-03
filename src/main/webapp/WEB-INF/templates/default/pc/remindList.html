@@ -63,6 +63,7 @@
 							</div>
 							<div class="time">${remind.sendTime}</div>
 							<div class="content" >
+								<!--reportModule为前端借用‘举报’功能标记模块提示项的参数   10:话题  20:评论  30:评论回复  40:问题  50:答案   60:答案回复-->
 								<#if remind.typeCode == 10>
 									<cite>
 										<#if remind.senderAccount == null || remind.senderAccount == ''>
@@ -74,7 +75,7 @@
 									</cite> 
 									在
 									<cite>
-										<a href="thread?topicId=${remind.topicId}&commentId=${remind.friendTopicCommentId}">${remind.topicTitle}</a>
+										<a href="thread?topicId=${remind.topicId}&commentId=${remind.friendTopicCommentId}&reportModule=20">${remind.topicTitle}</a>
 									</cite> 
 									评论了我的话题
 									
@@ -89,7 +90,7 @@
 									</cite> 
 									在
 									<cite>
-										<a href="thread?topicId=${remind.topicId}&commentId=${remind.friendTopicCommentId}">${remind.topicTitle}</a>
+										<a href="thread?topicId=${remind.topicId}&commentId=${remind.friendTopicCommentId}&replyId=${remind.friendTopicReplyId}&reportModule=30">${remind.topicTitle}</a>
 									</cite> 
 									回复了我的话题
 								<#elseif remind.typeCode == 30>
@@ -103,7 +104,7 @@
 									</cite> 
 									在
 									<cite>
-										<a href="thread?topicId=${remind.topicId}&commentId=${remind.friendTopicCommentId}">${remind.topicTitle}</a>
+										<a href="thread?topicId=${remind.topicId}&commentId=${remind.friendTopicCommentId}&reportModule=20">${remind.topicTitle}</a>
 									</cite> 
 									引用了我的评论
 								<#elseif remind.typeCode == 40>
@@ -117,7 +118,7 @@
 									</cite> 
 									在
 									<cite>
-										<a href="thread?topicId=${remind.topicId}&commentId=${remind.topicCommentId}">${remind.topicTitle}</a>
+										<a href="thread?topicId=${remind.topicId}&commentId=${remind.topicCommentId}&replyId=${remind.friendTopicReplyId}&reportModule=30">${remind.topicTitle}</a>
 									</cite> 
 									回复了我的评论
 								<#elseif remind.typeCode == 50>
@@ -131,9 +132,23 @@
 									</cite> 
 									在
 									<cite>
-										<a href="thread?topicId=${remind.topicId}&commentId=${remind.friendTopicCommentId}">${remind.topicTitle}</a>
+										<a href="thread?topicId=${remind.topicId}&commentId=${remind.friendTopicCommentId}&replyId=${remind.friendTopicReplyId}&reportModule=30">${remind.topicTitle}</a>
 									</cite> 
 									回复了我回复过的评论
+								<#elseif remind.typeCode == 55>
+									<cite>
+										<#if remind.senderAccount == null || remind.senderAccount == ''>
+											<span class="cancelAccount">此用户账号已注销</span>
+										</#if>
+										<a href="user/control/home?userName=${remind.senderUserName}">
+											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderAccount)}
+										</a>
+									</cite> 
+									在
+									<cite>
+										<a href="thread?topicId=${remind.topicId}&commentId=${remind.friendTopicCommentId}&replyId=${remind.friendTopicReplyId}&reportModule=30">${remind.topicTitle}</a>
+									</cite> 
+									回复了我的评论回复
 								<#elseif remind.typeCode == 60>
 									<cite>
 										<#if remind.senderAccount == null || remind.senderAccount == ''>
@@ -198,7 +213,7 @@
 									</cite> 
 									在
 									<cite>
-										<a href="thread?topicId=${remind.topicId}&commentId=${remind.friendTopicCommentId}">${remind.topicTitle}</a>
+										<a href="thread?topicId=${remind.topicId}&commentId=${remind.friendTopicCommentId}&reportModule=20">${remind.topicTitle}</a>
 									</cite>
 									发表了评论
 								<#elseif remind.typeCode == 110>
@@ -213,7 +228,7 @@
 									</cite> 
 									在
 									<cite>
-										<a href="thread?topicId=${remind.topicId}&commentId=${remind.friendTopicCommentId}">${remind.topicTitle}</a>
+										<a href="thread?topicId=${remind.topicId}&commentId=${remind.friendTopicCommentId}&replyId=${remind.friendTopicReplyId}&reportModule=30">${remind.topicTitle}</a>
 									</cite>
 									发表了话题回复
 									
@@ -228,7 +243,7 @@
 									</cite> 
 									在
 									<cite>
-										<a href="question?questionId=${remind.questionId}&answerId=${remind.friendQuestionAnswerId}">${remind.questionTitle}</a>
+										<a href="question?questionId=${remind.questionId}&answerId=${remind.friendQuestionAnswerId}&reportModule=50">${remind.questionTitle}</a>
 									</cite> 
 									回答了我的问题
 								<#elseif remind.typeCode == 130>
@@ -242,7 +257,7 @@
 									</cite> 
 									在
 									<cite>
-										<a href="question?questionId=${remind.questionId}&answerId=${remind.friendQuestionAnswerId}">${remind.questionTitle}</a>
+										<a href="question?questionId=${remind.questionId}&answerId=${remind.friendQuestionAnswerId}&replyId=${remind.friendQuestionReplyId}&reportModule=60">${remind.questionTitle}</a>
 									</cite> 
 									回复了我的问题
 								<#elseif remind.typeCode == 140>
@@ -256,7 +271,7 @@
 									</cite> 
 									在
 									<cite>
-										<a href="question?questionId=${remind.questionId}&answerId=${remind.questionAnswerId}">${remind.questionTitle}</a>
+										<a href="question?questionId=${remind.questionId}&answerId=${remind.questionAnswerId}&replyId=${remind.friendQuestionReplyId}&reportModule=60">${remind.questionTitle}</a>
 									</cite> 
 									回复了我的答案
 								<#elseif remind.typeCode == 150>
@@ -270,9 +285,23 @@
 									</cite> 
 									在
 									<cite>
-										<a href="question?questionId=${remind.questionId}&answerId=${remind.friendQuestionAnswerId}">${remind.questionTitle}</a>
+										<a href="question?questionId=${remind.questionId}&answerId=${remind.friendQuestionAnswerId}&replyId=${remind.friendQuestionReplyId}&reportModule=60">${remind.questionTitle}</a>
 									</cite> 
 									回复了我回复过的答案
+								<#elseif remind.typeCode == 160>
+									<cite>
+										<#if remind.senderAccount == null || remind.senderAccount == ''>
+											<span class="cancelAccount">此用户账号已注销</span>
+										</#if>
+										<a href="user/control/home?userName=${remind.senderUserName}">
+											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderAccount)}
+										</a>
+									</cite> 
+									在
+									<cite>
+										<a href="question?questionId=${remind.questionId}&answerId=${remind.friendQuestionAnswerId}&replyId=${remind.friendQuestionReplyId}&reportModule=60">${remind.questionTitle}</a>
+									</cite> 
+									回复了我的答案回复
 								</#if>
 							</div>
 							<div class="clearfix"></div>

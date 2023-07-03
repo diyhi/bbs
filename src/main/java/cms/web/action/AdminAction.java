@@ -17,6 +17,7 @@ import cms.bean.staff.SysUsers;
 import cms.service.feedback.FeedbackService;
 import cms.service.question.AnswerService;
 import cms.service.question.QuestionService;
+import cms.service.report.ReportService;
 import cms.service.staff.StaffService;
 import cms.service.topic.CommentService;
 import cms.service.topic.TopicService;
@@ -51,7 +52,7 @@ public class AdminAction {
 	@Resource AnswerService answerService;
 	@Resource FeedbackService feedbackService;
 	@Resource FileManage fileManage;
-	
+	@Resource ReportService reportService;
 	
 	/**
 	 * 后台管理框架页
@@ -137,6 +138,9 @@ public class AdminAction {
 		
 		Long feedbackCount = feedbackService.feedbackCount();
 		returnValue.put("feedbackCount", feedbackCount);
+		
+		Long reportCount = reportService.reportCount();
+		returnValue.put("reportCount", reportCount);
 		
 		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));	
 	}

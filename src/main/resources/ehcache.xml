@@ -474,7 +474,11 @@
 		overflowToDisk="true"
 		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="1200" 
 		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>
-		
+	<!-- 举报分类 - 查询所有举报分类 -->	
+	<cache name="findAllReportType_cache" maxElementsInMemory="1" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>		
 		
 			
 </ehcache>

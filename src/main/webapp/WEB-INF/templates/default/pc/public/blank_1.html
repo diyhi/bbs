@@ -67,11 +67,22 @@
 			        <div class="topicTag">
 						<a href="?tagId=${topic.tagId}" class="tag">${topic.tagName}</a>
 					</div>
-					<#if topic.userName == systemUser.userName>
-						<div class="editTopic" >
-							<a href="user/editTopic?topicId=${topic.id}" ><i class="cms-pencil-alt" ></i>编辑</a>
+					<div class="rightInfo">
+						<div class="report" onclick="addReportUI('${topic.id}',10)">
+							<span><i class="cms-error-warning-line" ></i>举报</span>
 						</div>
-					</#if>
+						<#if topic.userName == systemUser.userName>
+							<div class="editTopic" >
+								<a href="user/editTopic?topicId=${topic.id}" ><i class="cms-pencil-alt" ></i>编辑</a>
+							</div>
+						</#if>
+						<#if topic.ipAddress != null && topic.ipAddress??>
+							<div class="ipAddress">
+								<span><i class="cms-map-pin-line" ></i>${topic.ipAddress}</span>
+							</div>
+						</#if>
+						
+					</div>
 		        	<div class="topicBox">
 		                <div class="title">
 		                ${topic.title}
@@ -90,10 +101,11 @@
 		                	<div class="comment">${topic.commentTotal}个评论</div>
 		                </div>
 		                <!-- topicId属性用来支持JS获取隐藏内容 -->
-						<div class="topicContent" topicId="${topic.id}">
+						<div topicId="${topic.id}" class="${(RequestParameters.reportModule != null && RequestParameters.reportModule=='10')?string('topicContent reportMark','topicContent')}">
 							<#if topic.lastUpdateTime != null>
 								<div class="lastUpdateTime">最后修改时间：${topic.lastUpdateTime}</div>
 							</#if>
+
 							<#if topic.account == null || topic.account == ''>
 								<div class="cancelAccount">此用户账号已注销</div>
 							</#if>
@@ -362,6 +374,37 @@
 		    }
 	    });
 	});
+	
+	
+	
+	//添加举报页
+	function addReportUI(parameterId,module) {
+		
+		
+		var parameter = "";//URI参数
+		parameter += "parameterId="+parameterId;
+		parameter += "&module="+module;
+		
+		//举报页面
+		get_request(function(value){
+			if(value != ""){
+				layer.open({
+				    type: 1, 
+				    title:"举报",
+				    content: value, 
+				    area: ['700px', '500px'],//宽高
+					end: function(layero, index){
+					}
+				});
+				//$("#editComment-post_"+commentId).html(value);
+			}
+		},
+		getBasePath()+"user/addReport?"+parameter+"&timestamp=" + new Date().getTime(), true);
+	}
+	
+	
+	
+	
 </script>
 
 

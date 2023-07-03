@@ -121,6 +121,9 @@ public class User implements Serializable{
 	/** 头像名称 **/
 	@Column(length=50)
 	private String avatarName;
+	/** IP归属地 **/
+	@Transient
+	private String ipAddress;
 	
 	public Long getId() {
 		return id;
@@ -294,6 +297,12 @@ public class User implements Serializable{
 	}
 	public void setCancelAccountTime(Long cancelAccountTime) {
 		this.cancelAccountTime = cancelAccountTime;
+	}
+	public String getIpAddress() {
+		return ipAddress;
+	}
+	public void setIpAddress(String ipAddress) {
+		this.ipAddress = ipAddress;
 	}
 
 }

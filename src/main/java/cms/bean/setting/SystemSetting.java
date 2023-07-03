@@ -59,6 +59,10 @@ public class SystemSetting implements Serializable{
 	private Integer privateMessage_submitQuantity = 5;
 	/** 提交问题最多可选择标签数量 **/
 	private Integer maxQuestionTagQuantity = 5;
+	/** 举报每分钟提交超过N次出现验证码 **/
+	private Integer report_submitQuantity = 5;
+	/** 举报图片允许最大上传数量   0为不允许上传图片 **/
+	private Integer reportMaxImageUpload = 3;
 	
 	
 	/** 发表话题奖励积分 **/
@@ -87,6 +91,12 @@ public class SystemSetting implements Serializable{
 	private boolean realNameUserAllowTopic = false;
 	/** 实名用户才允许提交评论 **/
 	private boolean realNameUserAllowComment = false;
+	
+	/** 允许提交举报 **/
+	private boolean allowReport = true;
+	
+	/** 是否显示IP归属地 **/
+	private boolean showIpAddress = false;
 	
 	/** 提交问题每分钟提交超过N次出现验证码 **/
 	private Integer question_submitQuantity = 5;
@@ -699,6 +709,38 @@ public class SystemSetting implements Serializable{
 
 	public void setGiveRedEnvelopeAmountMax(BigDecimal giveRedEnvelopeAmountMax) {
 		this.giveRedEnvelopeAmountMax = giveRedEnvelopeAmountMax;
+	}
+
+	public Integer getReport_submitQuantity() {
+		return report_submitQuantity;
+	}
+
+	public void setReport_submitQuantity(Integer report_submitQuantity) {
+		this.report_submitQuantity = report_submitQuantity;
+	}
+
+	public boolean isAllowReport() {
+		return allowReport;
+	}
+
+	public void setAllowReport(boolean allowReport) {
+		this.allowReport = allowReport;
+	}
+
+	public boolean isShowIpAddress() {
+		return showIpAddress;
+	}
+
+	public void setShowIpAddress(boolean showIpAddress) {
+		this.showIpAddress = showIpAddress;
+	}
+
+	public Integer getReportMaxImageUpload() {
+		return reportMaxImageUpload;
+	}
+
+	public void setReportMaxImageUpload(Integer reportMaxImageUpload) {
+		this.reportMaxImageUpload = reportMaxImageUpload;
 	}
 
 

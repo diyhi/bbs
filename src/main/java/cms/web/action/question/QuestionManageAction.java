@@ -281,11 +281,27 @@ public class QuestionManageAction {
 									answerReply.setAccount(answerReply.getUserName());//员工用户名和账号是同一个
 									
 								}
+								if(answerReply.getFriendUserName() != null && !"".equals(answerReply.getFriendUserName().trim())){
+									if(answerReply.getIsFriendStaff() == false){//会员
+										User user = userManage.query_cache_findUserByUserName(answerReply.getFriendUserName());
+										if(user != null){
+											answerReply.setFriendAccount(user.getAccount());
+											answerReply.setFriendNickname(user.getNickname());
+											answerReply.setFriendAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
+											answerReply.setFriendAvatarName(user.getAvatarName());
+										}
+										
+									}else{
+										answerReply.setFriendAccount(answerReply.getFriendUserName());//员工用户名和账号是同一个
+										
+									}
+								}
 								if(answer.getId().equals(answerReply.getAnswerId())){
 									answer.addAnswerReply(answerReply);
 								}
 							}
-							
+							//回复排序
+							answerManage.replySort(answer.getAnswerReplyList());
 						}
 					}
 				}

@@ -14,10 +14,11 @@
 					</div>
 					<div class="operat">
 						<el-link class="item" href="javascript:void(0);" v-if="topic.status == 10" @click="auditTopic(topic.id);">审核</el-link>
-						<el-link class="item" href="javascript:void(0);" @click="$router.push({path: '/admin/control/topicLike/list', query:{ visible:($route.query.visible != undefined ? $route.query.visible:''),topicView_beforeUrl:($route.query.topicView_beforeUrl != undefined ? $route.query.topicView_beforeUrl:''),topicId :topic.id, commentId:($route.query.commentId != undefined ? $route.query.commentId:''),page:($route.query.page != undefined ? $route.query.page:''), topicPage:($route.query.page != undefined ? $route.query.page:'')}})">点赞用户</el-link>
-						<el-link class="item" href="javascript:void(0);" v-if="topic.giveRedEnvelopeId != null && topic.giveRedEnvelopeId != ''" @click="$router.push({path: '/admin/control/redEnvelope/redEnvelopeAmountDistribution/list', query:{giveRedEnvelopeId:topic.giveRedEnvelopeId, visible:($route.query.visible != undefined ? $route.query.visible:''),topicView_beforeUrl:($route.query.topicView_beforeUrl != undefined ? $route.query.topicView_beforeUrl:''),topicId :topic.id, commentId:($route.query.commentId != undefined ? $route.query.commentId:''),page:($route.query.page != undefined ? $route.query.page:''), topicPage:($route.query.page != undefined ? $route.query.page:'')}})">红包</el-link>
-						<el-link class="item" href="javascript:void(0);" @click="$router.push({path: '/admin/control/topicFavorite/list', query:{ visible:($route.query.visible != undefined ? $route.query.visible:''),topicView_beforeUrl:($route.query.topicView_beforeUrl != undefined ? $route.query.topicView_beforeUrl:''),topicId :topic.id, commentId:($route.query.commentId != undefined ? $route.query.commentId:''),page:($route.query.page != undefined ? $route.query.page:''), topicPage:($route.query.page != undefined ? $route.query.page:'')}})">收藏用户</el-link>
-						<el-link class="item" href="javascript:void(0);" @click="$store.commit('setCacheNumber'); $router.push({path: '/admin/control/topic/topicUnhideList', query:{ visible:($route.query.visible != undefined ? $route.query.visible:''),topicView_beforeUrl:($route.query.topicView_beforeUrl != undefined ? $route.query.topicView_beforeUrl:''),topicId :topic.id, commentId:($route.query.commentId != undefined ? $route.query.commentId:''),page:($route.query.page != undefined ? $route.query.page:''), topicPage:($route.query.page != undefined ? $route.query.page:'')}})">解锁隐藏内容用户</el-link>
+						<el-link class="item" href="javascript:void(0);" @click="$router.push({path: '/admin/control/topicLike/list', query:{ visible:($route.query.visible != undefined ? $route.query.visible:''),topicView_beforeUrl:($route.query.topicView_beforeUrl != undefined ? $route.query.topicView_beforeUrl:''),topicId :topic.id, commentId:($route.query.commentId != undefined ? $route.query.commentId:''),topicPage:($route.query.page != undefined ? $route.query.page:'')}})">点赞用户</el-link>
+						<el-link class="item" href="javascript:void(0);" v-if="topic.giveRedEnvelopeId != null && topic.giveRedEnvelopeId != ''" @click="$router.push({path: '/admin/control/redEnvelope/redEnvelopeAmountDistribution/list', query:{giveRedEnvelopeId:topic.giveRedEnvelopeId, visible:($route.query.visible != undefined ? $route.query.visible:''),topicView_beforeUrl:($route.query.topicView_beforeUrl != undefined ? $route.query.topicView_beforeUrl:''),topicId :topic.id, commentId:($route.query.commentId != undefined ? $route.query.commentId:''),topicPage:($route.query.page != undefined ? $route.query.page:'')}})">红包</el-link>
+						<el-link class="item" href="javascript:void(0);" @click="$router.push({path: '/admin/control/topicFavorite/list', query:{ visible:($route.query.visible != undefined ? $route.query.visible:''),topicView_beforeUrl:($route.query.topicView_beforeUrl != undefined ? $route.query.topicView_beforeUrl:''),topicId :topic.id, commentId:($route.query.commentId != undefined ? $route.query.commentId:''),topicPage:($route.query.page != undefined ? $route.query.page:'')}})">收藏用户</el-link>
+						<el-link class="item" href="javascript:void(0);" @click="$router.push({path: '/admin/control/topicReport/list', query:{ visible:($route.query.visible != undefined ? $route.query.visible:''),topicView_beforeUrl:($route.query.topicView_beforeUrl != undefined ? $route.query.topicView_beforeUrl:''),topicId :topic.id, commentId:($route.query.commentId != undefined ? $route.query.commentId:''),topicPage:($route.query.page != undefined ? $route.query.page:''), parameterId:topic.id,module:10}})">举报</el-link>
+                    	<el-link class="item" href="javascript:void(0);" @click="$store.commit('setCacheNumber'); $router.push({path: '/admin/control/topic/topicUnhideList', query:{ visible:($route.query.visible != undefined ? $route.query.visible:''),topicView_beforeUrl:($route.query.topicView_beforeUrl != undefined ? $route.query.topicView_beforeUrl:''),topicId :topic.id, commentId:($route.query.commentId != undefined ? $route.query.commentId:''),topicPage:($route.query.page != undefined ? $route.query.page:'')}})">解锁隐藏内容用户</el-link>
 						<el-link class="item" href="javascript:void(0);" @click="editTopicUI();">修改</el-link>
 						<el-link class="item" href="javascript:void(0);" @click="deleteTopic(topic.id)">删除</el-link>
 					</div>
@@ -125,7 +126,7 @@
 		                	</div>
 		                </div>
 					</div>
-					<div class="main"  >
+					<div class="main"  :class="$route.query.reportModule !=undefined && parseInt($route.query.reportModule) == 10 ? 'reportMark' : ''">
 						<div v-if="topic.lastUpdateTime != null" class="lastUpdateTime" >最后修改时间：{{topic.lastUpdateTime}}</div>
 						<div :ref="'topic_'+topic.id">
 							<component v-bind:is ="topicComponent(topic.content)" v-bind="$props" /> 
@@ -137,7 +138,7 @@
 			
 			<div class="commentModule">
 				<div class="commentList">
-					<div class="item" v-for="(comment,index) in commentList" :key="comment.id" :commentId="comment.id"  :ref="handleNodes">
+					<div class="item" :class="$route.query.reportModule !=undefined && parseInt($route.query.reportModule) == 20 && comment.id == $route.query.commentId ? 'reportMark' : ''" v-for="(comment,index) in commentList" :key="comment.id" :commentId="comment.id"  :ref="handleNodes">
 						<div class="head">
 							<div class="avatarBox">
 		                		<el-popover effect="light" trigger="hover" placement="top">
@@ -203,95 +204,157 @@
 							
 							<div class="clearfix"></div>
 							<div class="replyList" v-if="comment.replyList.length >0">
-								<ul class="box">
-									<li v-for="(reply,index2) in comment.replyList" :key="reply.id"  :replyId="reply.id" :ref="handleReplyNodes">
-										
-								        <div class="reply-top" >
-									    	<div class="avatarBox">
-						                		<el-popover effect="light" trigger="hover" placement="top">
-										        	<template #default>
-										        		<p v-if="reply.isStaff == false">呢称: {{reply.nickname}}</p>
-											            <p>账号: {{reply.account}}</p>
-											            <p v-if="reply.userRoleNameList != null && reply.userRoleNameList.length >0" >角色: 
-											            	<span class="topicViewModule_topic-wrap_head_topicInfo_userRoleName" v-for="roleName in reply.userRoleNameList" >{{roleName}}</span>
-											            </p> 
-											            
-											            
-										        	</template>
-										        	<template #reference v-if="reply.isStaff == false">
-										          		<div class="avatar-wrapper" >
-															<div class="avatar-badge" v-if="reply.avatarName == null || reply.avatarName == ''">
-																<el-avatar shape="square" :size="48" icon="el-icon-user-solid"></el-avatar>
-															</div>
-															<div class="avatar-badge" v-if="reply.avatarName != null && reply.avatarName != ''">
-																<el-avatar shape="square" :size="48" :src="reply.avatarPath+'100x100/'+reply.avatarName"></el-avatar>
-															</div>
-														</div>
-										        	</template>
-										        	
-										        	<template #reference v-if="reply.isStaff == true">
-										        		<div class="avatar-wrapper">
-															<el-badge value="员工" type="warning" class="avatar-badge">
-																<el-avatar shape="square" :size="48" icon="el-icon-user-solid"></el-avatar>
-															</el-badge>
-														</div>
-										        	</template>
-										        </el-popover>
-						                	</div>
-						                	<span class="info" >
-										    	<h2 class="clearfix" >
-										    		
-										        	<div class="userName">
-										        		{{reply.account}}
-										        		<div class="nickname" >
-										        			{{reply.nickname}}
-										        			<i class="userRoleName" v-for="roleName in reply.userRoleNameList" >{{roleName}}</i>
-														    <i class="master" v-if="reply.userName == topic.userName && reply.isStaff == topic.isStaff">作者</i>
-										        		</div>
-										        	</div>
-										        	
-										        </h2>
-					                        	
-					                          	<div class="time clearfix">{{reply.postTime}}</div>
-					                        </span>
-					                        
-					                        <div class="operatInfo">
-					                        	<span class="orange-tag" v-if="reply.status ==10" title="回复状态">待审核</span>
-												<span class="green-tag" v-if="reply.status ==20" title="回复状态">已发布</span>
-												<span class="red-tag" v-if="reply.status ==110" title="回复状态">待审核用户删除</span>
-												<span class="red-tag" v-if="reply.status ==120" title="回复状态">已发布用户删除</span>
-												<span class="red-tag" v-if="reply.status ==100010" title="回复状态">待审核员工删除</span>
-												<span class="red-tag" v-if="reply.status ==100020" title="回复状态">已发布员工删除</span>
-					                        	<el-link class="operat-btn" href="javascript:void(0);" v-if="reply.status ==10"  @click="auditReply(reply.id)">审核</el-link>
-					                        	<el-link class="operat-btn" href="javascript:void(0);" @click="editReplyUI(reply)">修改</el-link>
-					                        	<el-link class="operat-btn" href="javascript:void(0);" v-if="reply.status >100"  @click="recoveryReply(reply.id)">恢复</el-link>
-					                        	<el-link class="operat-btn" href="javascript:void(0);" @click="deleteReply(reply.id)">删除</el-link>
-					                        
-					                        </div>
-					                        
-										</div>
-										<div style="clear:both; height: 0; line-height: 0; font-size: 0;"></div>
-										<div class="editCommentReply-formModule" v-show="editReplyFormView.get(reply.id)">
-											<div class="editReply-wrap">
-												<el-form label-width="100"  @submit.native.prevent>
-													<el-form-item label="状态" :required="true" >
-														<el-radio-group v-model="editReplyStatusField[index][index2]">
-														    <el-radio :label="10">待审核</el-radio>
-														    <el-radio :label="20">已发布</el-radio>
-														</el-radio-group>
-													</el-form-item>
-													<el-form-item label="内容" :required="true">
-														<el-input type="textarea" :autosize="{minRows: 5}" placeholder="请输入内容" v-model="editReplyContentField[index][index2]"></el-input>
-													</el-form-item>
-													<el-form-item>
-													    <el-button class="submitButton" type="primary" @mousedown.native="editReply(reply.id)" :disabled="editReply_disabled.get(reply.id)">提交</el-button>
-													    <el-button class="submitButton" type="primary" plain @mousedown.native="cancelEditReply(reply.id);">取消</el-button>
-													</el-form-item>
-												</el-form>
+								 <ul class="timeline box">
+									<li class="timeline-item replyItem-container" v-for="(reply,index2) in comment.replyList" :key="reply.id"  :replyId="reply.id" :ref="handleReplyNodes">
+										<div class="tail" v-if="line.get(reply.id)"></div>
+                                    	<div class="node node--normal" v-if="dot.get(reply.id)"></div>
+										<div class="replyItem">
+											<div :class="$route.query.reportModule !=undefined && parseInt($route.query.reportModule) == 30 && reply.id == $route.query.replyId ? 'reply-reportMark' : ''">
+                                        		<div class="reply-top" >
+											    	<div class="avatarBox">
+								                		<el-popover effect="light" trigger="hover" placement="top">
+												        	<template #default>
+												        		<p v-if="reply.isStaff == false">呢称: {{reply.nickname}}</p>
+													            <p>账号: {{reply.account}}</p>
+													            <p v-if="reply.userRoleNameList != null && reply.userRoleNameList.length >0" >角色: 
+													            	<span class="topicViewModule_topic-wrap_head_topicInfo_userRoleName" v-for="roleName in reply.userRoleNameList" >{{roleName}}</span>
+													            </p> 
+													            
+													            
+												        	</template>
+												        	<template #reference v-if="reply.isStaff == false">
+												          		<div class="avatar-wrapper" >
+																	<div class="avatar-badge" v-if="reply.avatarName == null || reply.avatarName == ''">
+																		<el-avatar shape="square" :size="48" icon="el-icon-user-solid"></el-avatar>
+																	</div>
+																	<div class="avatar-badge" v-if="reply.avatarName != null && reply.avatarName != ''">
+																		<el-avatar shape="square" :size="48" :src="reply.avatarPath+'100x100/'+reply.avatarName"></el-avatar>
+																	</div>
+																</div>
+												        	</template>
+												        	
+												        	<template #reference v-if="reply.isStaff == true">
+												        		<div class="avatar-wrapper">
+																	<el-badge value="员工" type="warning" class="avatar-badge">
+																		<el-avatar shape="square" :size="48" icon="el-icon-user-solid"></el-avatar>
+																	</el-badge>
+																</div>
+												        	</template>
+												        </el-popover>
+								                	</div>
+								                	<span class="info" >
+												    	<h2 class="clearfix" >
+												    		
+												        	<div class="userName">
+												        		{{reply.account}}
+												        		<div class="nickname" >
+												        			{{reply.nickname}}
+												        			<i class="userRoleName" v-for="roleName in reply.userRoleNameList" >{{roleName}}</i>
+																    <i class="master" v-if="reply.userName == topic.userName && reply.isStaff == topic.isStaff">作者</i>
+												        		</div>
+												        	</div>
+												        	
+												        </h2>
+							                        	
+							                          	<div class="time clearfix">{{reply.postTime}}</div>
+							                        </span>
+							                        <span class="friendInfo" v-if="reply.friendUserName != null && reply.friendUserName != ''">
+	                                                    <span class="arrow">
+	                                                    	<i class="el-icon-caret-right"></i>
+	                                                    </span>
+	                                                    <div class="friendAvatarBox">
+	                                                        <el-popover effect="light" trigger="hover" placement="top">
+	                                                            <template #default>
+	                                                                <p v-if="reply.isFriendStaff == false">呢称: {{reply.friendNickname}}</p>
+	                                                                <p>账号: {{reply.friendAccount}}</p>
+	                                                            </template>
+	                                                            <template #reference v-if="reply.isFriendStaff == false">
+	                                                                <div class="avatar-wrapper" >
+	                                                                    <div class="avatar-badge" v-if="reply.friendAvatarName == null || reply.friendAvatarName == ''">
+	                                                                        <el-avatar shape="square" :size="48" icon="el-icon-user-solid"></el-avatar>
+	                                                                    </div>
+	                                                                    <div class="avatar-badge" v-if="reply.friendAvatarName != null && reply.friendAvatarName != ''">
+	                                                                        <el-avatar shape="square" :size="48" :src="reply.friendAvatarPath+'100x100/'+reply.friendAvatarName"></el-avatar>
+	                                                                    </div>
+	                                                                </div>
+	                                                            </template>
+	                                                            
+	                                                            <template #reference v-if="reply.isFriendStaff == true">
+	                                                                <div class="avatar-wrapper">
+	                                                                    <el-badge value="员工" type="warning" class="avatar-badge">
+	                                                                        <el-avatar shape="square" :size="48" icon="el-icon-user-solid"></el-avatar>
+	                                                                    </el-badge>
+	                                                                </div>
+	                                                            </template>
+	                                                        </el-popover>
+	                                                    </div>
+	                                                
+	                                                    <h2 class="namedInfo clearfix" >
+	                                                        <div class="userName">
+	                                                            {{reply.friendAccount}}
+	                                                            <div class="nickname" >
+	                                                                {{reply.friendNickname}}
+	                                                                <i class="master" v-if="reply.friendUserName == topic.userName && reply.isFriendStaff == topic.isStaff">作者</i>
+	                                                            </div>
+	                                                        </div>
+	                                                    </h2>
+	                                                </span>
+							                        
+							                        <div class="operatInfo">
+							                        	<span class="orange-tag" v-if="reply.status ==10" title="回复状态">待审核</span>
+														<span class="green-tag" v-if="reply.status ==20" title="回复状态">已发布</span>
+														<span class="red-tag" v-if="reply.status ==110" title="回复状态">待审核用户删除</span>
+														<span class="red-tag" v-if="reply.status ==120" title="回复状态">已发布用户删除</span>
+														<span class="red-tag" v-if="reply.status ==100010" title="回复状态">待审核员工删除</span>
+														<span class="red-tag" v-if="reply.status ==100020" title="回复状态">已发布员工删除</span>
+							                        	<el-link class="operat-btn" href="javascript:void(0);" v-if="reply.status ==10"  @click="auditReply(reply.id)">审核</el-link>
+							                        	<el-link class="operat-btn" href="javascript:void(0);" @click="addReplyFriendUI(reply.id)">回复</el-link>
+		                                                    
+							                        	<el-link class="operat-btn" href="javascript:void(0);" @click="editReplyUI(reply)">修改</el-link>
+							                        	<el-link class="operat-btn" href="javascript:void(0);" v-if="reply.status >100"  @click="recoveryReply(reply.id)">恢复</el-link>
+							                        	<el-link class="operat-btn" href="javascript:void(0);" @click="$router.push({path: '/admin/control/topicReport/list', query:{ visible:($route.query.visible != undefined ? $route.query.visible:''),topicView_beforeUrl:($route.query.topicView_beforeUrl != undefined ? $route.query.topicView_beforeUrl:''),topicId :topic.id, commentId:($route.query.commentId != undefined ? $route.query.commentId:''),topicPage:($route.query.page != undefined ? $route.query.page:''), parameterId:reply.id,module:30}})">举报</el-link>
+                    
+							                        	<el-link class="operat-btn" href="javascript:void(0);" @click="deleteReply(reply.id)">删除</el-link>
+							                        
+							                        </div>
+							                        
+												</div>
+												<div style="clear:both; height: 0; line-height: 0; font-size: 0;"></div>
+												<div class="editCommentReply-formModule" v-show="editReplyFormView.get(reply.id)">
+													<div class="editReply-wrap">
+														<el-form label-width="100"  @submit.native.prevent>
+															<el-form-item label="状态" :required="true" >
+																<el-radio-group v-model="editReplyStatusField[index][index2]">
+																    <el-radio :label="10">待审核</el-radio>
+																    <el-radio :label="20">已发布</el-radio>
+																</el-radio-group>
+															</el-form-item>
+															<el-form-item label="内容" :required="true">
+																<el-input type="textarea" :autosize="{minRows: 5}" placeholder="请输入内容" v-model="editReplyContentField[index][index2]"></el-input>
+															</el-form-item>
+															<el-form-item>
+															    <el-button class="submitButton" type="primary" @mousedown.native="editReply(reply.id)" :disabled="editReply_disabled.get(reply.id)">提交</el-button>
+															    <el-button class="submitButton" type="primary" plain @mousedown.native="cancelEditReply(reply.id);">取消</el-button>
+															</el-form-item>
+														</el-form>
+													</div>
+												</div>
+												
+												<div class="replyContent" @click="clickReplyLevel(comment.id,reply.id)">{{reply.content}}</div>
+												<!-- 回复对方 -->
+		                                        <div class="addReplyFriend-post" v-show="addReplyFriendFormView.get(reply.id)">
+		                                            <el-form @submit.native.prevent>
+		                                                <el-form-item >
+		                                                    <el-input type="textarea" :autosize="{minRows: 5}" placeholder="请输入内容" v-model="addReplyFriendContentField[reply.id]"></el-input>
+		                                                </el-form-item>
+		                                                <el-form-item>
+		                                                    <el-button class="submitButton" size="large" type="primary" @mousedown.native="addReplyFriend(comment.id,reply.id)" :disabled="addReplyFriend_disabled.get(reply.id)">提交</el-button>
+		                                                    <el-button class="submitButton" size="large" type="primary" plain @mousedown.native="cancelAddReplyFriend(reply.id);">取消</el-button>
+		                                                </el-form-item>
+		                                            </el-form>
+		                                        </div>
 											</div>
 										</div>
-										
-										<div class="replyContent">{{reply.content}}</div>
 									</li>
 								</ul>
 							</div>                  
@@ -363,6 +426,8 @@
 					            <el-link class="operat-btn" href="javascript:void(0);" @click="addQuoteUI(comment.id)">引用</el-link>
 					            <el-link class="operat-btn" href="javascript:void(0);" @click="editCommentUI(comment)">修改</el-link>
 					            <el-link class="operat-btn" href="javascript:void(0);" v-if="comment.status >100" @click="recoveryComment(comment.id)">恢复</el-link>
+					            <el-link class="operat-btn" href="javascript:void(0);" @click="$router.push({path: '/admin/control/topicReport/list', query:{ visible:($route.query.visible != undefined ? $route.query.visible:''),topicView_beforeUrl:($route.query.topicView_beforeUrl != undefined ? $route.query.topicView_beforeUrl:''),topicId :topic.id, commentId:($route.query.commentId != undefined ? $route.query.commentId:''),topicPage:($route.query.page != undefined ? $route.query.page:''), parameterId:comment.id,module:20}})">举报</el-link>
+                   
 					            <el-link class="operat-btn" href="javascript:void(0);" @click="deleteComment(comment.id)">删除</el-link>
 					            
 								
@@ -465,6 +530,7 @@ export default({
 		    playerIdList: [],//视频播放Id列表
 		    playerObjectList: [],//视频播放对象集合
 		    playerNodeList: [],//视频节点对象集合
+		    playerHlsList: [],//视频播放流对象集合
 		    
 		    commentElementNodes:[],//评论列表项Element节点集合
 		    quoteElementNodes:[],//引用评论项Element节点集合
@@ -475,6 +541,7 @@ export default({
 		    addQuote_disabled : new Map(),//提交引用按钮是否禁用 map格式 key:评论Id value:是否禁用
 		    editComment_disabled : new Map(),//提交修改评论按钮是否禁用 map格式 key:评论Id value:是否禁用
 		    editTopic_disabled:false,//提交修改话题按钮是否禁用
+		    addReplyFriend_disabled: new Map(),//提交添加回复按钮是否禁用 map格式 key:一语论Id value:是否禁用
 		    addReply_disabled: new Map(),//提交添加回复按钮是否禁用 map格式 key:一语论Id value:是否禁用
 		    editReply_disabled: new Map(),//提交修改回复按钮是否禁用 map格式 key:回复Id value:是否禁用
 		    
@@ -487,6 +554,11 @@ export default({
 			
 			addReplyContentField : [], //添加回复内容项绑定
 			addReplyFormView : new Map(),//添加回复表单  key:评论Id value:是否显示
+			
+			addReplyFriendContentField : {}, //添加回复对方内容项绑定 key:回复Id value:内容 示例{回复Id-1 : 内容,回复Id-2 : 内容}
+			addReplyFriendFormView : new Map(),//添加回复对方表单  key:回复Id value:是否显示
+	        line : new Map(),//楼中楼的线  key:回复Id value:是否显示
+	        dot : new Map(),//楼中楼的点  key:回复Id value:是否显示
 			
 			sourceUrlObject:{},//来源URL对象
 			
@@ -924,7 +996,8 @@ export default({
 												editReplyStatusField_reply_array.push(reply.status);
 												editReplyContentField_reply_array.push(reply.content);
 			    								
-												
+												_self.addReplyFriendFormView.set(reply.id,false);
+                                                Object.assign(_self.addReplyFriendContentField, {[reply.id] : ''}); 
 											}
 										}
 										
@@ -1049,7 +1122,12 @@ export default({
 				
 				playerObject.destroy();//销毁播放器
 			}
+			for(let i=0; i< _self.playerHlsList.length; i++){
+	            let hls = _self.playerHlsList[i];
+	            hls.destroy();//销毁视频流
+	        }
 			_self.playerObjectList.length = 0;//清空数组
+			_self.playerHlsList.length = 0;//清空数组
 			_self.playerIdList.length = 0;//清空数组
 			_self.playerNodeList.length = 0;//清空数组
 		},
@@ -1081,18 +1159,48 @@ export default({
 					document.getElementById(playerId).appendChild(dom);
 				}else{
 					if(cover != undefined && cover != "" && thumbnail != undefined && thumbnail != ""){//切片视频
+	        			let hls = null;
 	        			dp = new DPlayer({
 	            			container: document.getElementById(playerId),//播放器容器元素
 	            			screenshot: false,//开启截图，如果开启，视频和视频封面需要开启跨域
 	            			
 	            			video: {
 	            			    url: url,
-	            			    type: 'hls',
 	            			    pic: cover,//视频封面
-	            			    thumbnails: thumbnail//视频预览图
+	            			    thumbnails: thumbnail,//视频预览图
+	            			    type: 'customHls',
+	                            customType: {
+	                                customHls: function (video, player) {
+	                                    hls = new Hls();
+	                                    hls.loadSource(video.src);
+	                                    hls.attachMedia(video);
+	                                    hls.config.xhrSetup = (xhr, url) => {
+	                                        if(url.startsWith(_self.$store.state.baseURL+"videoRedirect?")){//如果访问视频重定向页
+	                                            
+	                                            //如果使用重定向跳转时会自动将标头Authorization发送到seaweedfs，seaweedfs会报501错误 A header you provided implies functionality that is not implemented
+	                                            //这里发送X-Requested-With标头到后端，让后端返回需要跳转的地址
+	                                            let videoRedirectDate = {};
+	                                            nativeQueryVideoRedirect(url,function(date){
+	                                                videoRedirectDate = date;
+	                                            });
+	                                            if(videoRedirectDate != null && Object.keys(videoRedirectDate).length>0 && videoRedirectDate.redirect != ''){
+	                                                //告诉hls重新发送ts请求
+	                                                xhr.open("GET", videoRedirectDate.redirect, true);//用重定向后的地址请求
+	                                            }
+	                                            
+	                                            
+	                                        }else{
+	                                            // 请求ts的url 添加参数 props.fileid
+	                                            //url = url + "?t=" + props.fileid;
+	                                            // 这一步必须 告诉hls重新发送ts请求
+	                                            xhr.open("GET", url, true);
+	                                        }
+	                                    };
+	                                },
+	                            },
 	            			}
 	            		});
-	    				
+	    				_self.playerHlsList.push(hls);
 	        		}else{
 	        			dp = new DPlayer({
 	            			container: document.getElementById(playerId),//播放器容器元素
@@ -2071,6 +2179,88 @@ export default({
 	    },
 		
 		
+		//添加回复对方表单
+		addReplyFriendUI : function(replyId) {
+			let _self = this;
+			if(_self.addReplyFriendFormView.get(replyId) == true){//如果已打开
+	            return;
+	        }
+	        
+	        _self.addReplyFriendFormView.set(replyId,true);
+		
+		},
+		//取消添加回复对方
+		cancelAddReplyFriend : function(replyId) {
+	        let _self = this;
+			_self.addReplyFriendFormView.set(replyId,false);
+	        
+	    },
+		//添加回复对方
+		addReplyFriend : function(commentId,replyId) {
+			let _self = this;
+			
+			_self.addReplyFriend_disabled.set(replyId,true);
+	
+	        //清除错误
+			for (let key in _self.error) { 
+    			_self.error[key] = "";
+    	    }
+	
+	        let formData = new FormData();
+				
+	        formData.append('commentId',  commentId); 
+	
+	        formData.append('friendReplyId',  replyId); 
+	        
+	        formData.append('content', _self.addReplyFriendContentField[replyId]); 
+		
+			_self.$ajax({
+			    method: 'post',
+			    url: 'control/comment/manage?method=addReply',
+			    data: formData
+			})
+			.then(function (response) {
+				if(response == null){
+					return;
+				}
+				
+			    let result = response.data;
+			    if(result){
+			    	let returnValue = JSON.parse(result);
+			    	if(returnValue.code === 200){//成功
+			    		_self.$message.success("提交成功");
+			    		
+			    		//删除缓存
+			    		_self.$store.commit('setCacheNumber');
+			    		
+			    		_self.addReplyFriendFormView.set(replyId,false);
+			    		
+			    		
+						//清除评论列表
+			    		_self.clearCommentList();
+			    		
+			    		_self.queryTopic();
+			    	}else if(returnValue.code === 500){//错误
+			    		let errorMap = returnValue.data;
+			    		for (let key in errorMap) {
+			    			
+		    				_self.$message({
+					            showClose: true,
+					            message: errorMap[key],
+					            type: 'error'
+					        });
+			    			
+			    	    }
+			    		
+			    	}
+			    }
+			    _self.addReplyFriend_disabled.set(commentId,false);
+			})
+			.catch(function (error) {
+				console.log(error);
+			});
+		},
+		
 		//添加回复表单
 		addReplyUI : function(commentId) {
 			let _self = this;
@@ -2139,7 +2329,6 @@ export default({
 			    		_self.$store.commit('setCacheNumber');
 			    		
 			    		
-			    		
 						_self.addReplyFormView.set(commentId,false);
 			    		if(_self.commentList != null && _self.commentList.length > 0){
 							for (let i = 0; i <_self.commentList.length; i++) {
@@ -2153,6 +2342,7 @@ export default({
 						}
 						//清除评论列表
 			    		_self.clearCommentList();
+			    		
 			    		_self.queryTopic();
 			    	}else if(returnValue.code === 500){//错误
 			    		let errorMap = returnValue.data;
@@ -2304,6 +2494,7 @@ export default({
 				    	let returnValue = JSON.parse(result);
 				    	if(returnValue.code === 200){//成功
 				    		_self.$message.success("操作成功");
+				    		
 				    		
 				    		_self.$router.push({
 				    			path: _self.sourceUrlObject.path, 
@@ -2556,13 +2747,14 @@ export default({
 		
 		},
 		
+		
 		//清除评论列表
 		clearCommentList : function() {
 			let _self = this;
 	        _self.quoteData.clear();
 	        _self.commentList.length =0;
 	        _self.editReplyContentField = {};
-	
+			_self.addReplyFriendContentField = {};
 			_self.editCommentEditorMap.forEach(function(value,key){
 				if(value != null){
 	                value.html("");//清空字段
@@ -2587,7 +2779,111 @@ export default({
 	        _self.quoteFormView.clear();
 	        _self.addReplyFormView.clear();
 	        _self.editReplyFormView.clear();
-	    }
+	        
+	        _self.addReplyFriendFormView.clear();
+	    },
+	    //点击回复层级
+	    clickReplyLevel : function(commentId,replyId) {
+			let _self = this;
+	       	//是否点击已选中的项
+			let isSelectedItem = false;
+		
+		
+			if(_self.dot.size >0){
+				let lastFriendReplyId = [..._self.dot][_self.dot.size-1];//最后一个元素
+				if(lastFriendReplyId[0] == replyId){
+					isSelectedItem = true;
+				}
+			}
+		
+			_self.dot.clear();
+			_self.line.clear();
+			if(!isSelectedItem){
+				_self.showReplyLevel(commentId,replyId);
+			}
+	       
+		},
+	
+		//展示回复层级
+		showReplyLevel : function(commentId,replyId) {
+			let _self = this;
+	       	let dotArray = new Array();
+			let replyList = [];
+			if(_self.commentList != null && _self.commentList.length > 0){
+	            A:for (let i = 0; i <_self.commentList.length; i++) {
+	                let comment = _self.commentList[i];
+					
+	                 if(comment.id == commentId){
+	                    //回复
+	                    if(comment.replyList != null && comment.replyList.length >0){
+	                        replyList = comment.replyList;
+	                        for (let j = 0; j <comment.replyList.length; j++) {
+	                            let reply = comment.replyList[j];
+	                            if(reply.id == replyId && reply.friendUserName != null && reply.friendUserName != ''){
+	                                let friendReplyIdArray = reply.friendReplyIdGroup.split(",");
+	                                for (let k = 0; k <friendReplyIdArray.length; k++) {
+	                                    let friendReplyId = friendReplyIdArray[k];
+	                                    if(friendReplyId != '' && friendReplyId != '0'){
+	                                        dotArray.push(friendReplyId);
+	                                    }
+	                                }
+	                                break A;
+	                            }
+	                        }
+	                    }
+	                 }                       
+	                
+	            }
+	        }
+	
+			//第一个有效层级
+			let firstLevel = '';
+	
+			A:for (let i = 0; i <dotArray.length; i++) {
+				let friendReplyId = dotArray[i];
+				for (let j = 0; j <replyList.length; j++) {
+					let reply = replyList[j];
+					if(reply.id == friendReplyId){
+						firstLevel = friendReplyId;
+						break A;
+					}
+				}
+			}
+	
+			//过滤无效的点
+			A:for (let i = dotArray.length - 1; i >= 0; i--) {
+				let friendReplyId = dotArray[i];
+				for (let j = 0; j <replyList.length; j++) {
+					let reply = replyList[j];
+					if(reply.id == friendReplyId){
+						continue A;
+					}
+				}
+				dotArray.splice(i, 1);
+			}
+	
+			if(dotArray.length >0){
+				for (let i = 0; i <dotArray.length; i++) {
+					let friendReplyId = dotArray[i];
+					_self.dot.set(friendReplyId,true);//楼中楼的点
+				}
+				for (let i = 0; i <replyList.length; i++) {
+					let reply = replyList[i];
+					if(reply.id == firstLevel){
+						_self.line.set(reply.id,true);//楼中楼的线
+						continue;
+					}
+					if(reply.id == replyId){
+						break;
+					}
+					if(_self.line.size >0){
+						_self.line.set(reply.id,true);//楼中楼的线
+					}
+				}
+	
+				_self.dot.set(replyId,true);//楼中楼点击的层
+			}
+		}
 	}
 });
 

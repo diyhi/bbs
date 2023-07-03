@@ -867,6 +867,15 @@ html,body{
 	zoom: 1;
 	background: #fff;
 	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
+	position: relative;
+}
+.topicContentModule .topicDetail .reportMark:before{
+    content: " ";
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    bottom:0px;
+    border-left: 5px solid #f89898;
 }
 .topicContentModule .topicDetail .head {
 	position: relative;
@@ -941,11 +950,12 @@ html,body{
     
 }
 .topicContentModule .topicDetail .head .info .right{float:right!important;font-size:13px;color:#aaa;position: relative;top: 5px;}
-.topicContentModule .topicDetail .head .info .right .editTopic{font-size: 12px;color: #aaa;margin-right: 10px;}
-.topicContentModule .topicDetail .head .info .right .editTopic-icon{font-size: 12px;color: #aaa; margin-right: 2px;position: relative;top: 1px;}
-.topicContentModule .topicDetail .head .info .right .count-icon{font-size: 12px;color: #aaa;margin-right: 2px;position: relative;top: 1px;}
+.topicContentModule .topicDetail .head .info .right .ipAddress-icon{font-size: 12px;color: #aaa;margin-right: 2px;position: relative;top: 1px;}
+.topicContentModule .topicDetail .head .info .right .count-icon{font-size: 12px;color: #aaa;margin-left: 10px;margin-right: 2px;position: relative;top: 1px;}
 .topicContentModule .topicDetail .head .info .right .view-icon{font-size: 12px;margin-right: 2px;color: #aaa;margin-left: 10px;position: relative;top: 1px;}
-
+.topicContentModule .topicDetail .head .info .right .fast{
+	font-size: 12px;color: #aaa;margin-left: 5px;position: relative;top: 1px;
+}
 
 .topicContentModule .topicDetail .main {
 	margin: 10px 8px 10px 8px;
@@ -1100,7 +1110,7 @@ html,body{
 	box-shadow: 0 -4px 4px -4px rgba(0,0,0,.02);
 	background: #fff;
 	margin-top: 10px;
-}
+}  
 .topicContentModule .commentList .badge {
 	white-space:nowrap; 
 	font-style:normal;
@@ -1117,6 +1127,17 @@ html,body{
 	margin-right: 8px;
 	margin-top: 2px;
 	padding-bottom: 2px;
+}
+.topicContentModule .commentList .reportMark{
+	position:relative;
+}
+.topicContentModule .commentList .reportMark:before{
+    content: " ";
+    position: absolute;
+    top: 0px;
+    left: -8px;
+    bottom:0px;
+    border-left: 5px solid #f89898;
 }
 .topicContentModule .commentList .item .head {
 	min-height: 50px;
@@ -1199,6 +1220,11 @@ html,body{
 	margin-top: 5px;
 	line-height: 12px
 }
+.topicContentModule .commentList .item .head .time .separate{
+	margin-left: 6px;
+    margin-right: 6px;
+}
+
 .topicContentModule .commentList .item .head .floor {
 	float: right;
 	margin-right:5px;
@@ -1207,15 +1233,23 @@ html,body{
 	position: relative;
 	top: -1px;
 }
+.topicContentModule .commentList .item .head .fast {
+	float: right;
+	margin-right:5px;
+	font-size: 12px;
+	color:#aaa;
+	position: relative;
+	top: 2px;
+}
 .topicContentModule .commentList .item .main {
 	padding: 0 8px 0 8px;
 	font-size: 16px;
 	line-height: 26px;
-	margin: 0 0 10px
+	margin: 0 0 5px
 }
 
 .topicContentModule .commentList .item .main .commentContent {
-	margin-bottom: 10px;
+	margin-bottom: 15px;
 	color:#222;font-size: 15px;
 }
 .topicContentModule .commentList .item .main .cancelAccount{
@@ -1280,12 +1314,11 @@ html,body{
 
 .topicContentModule .commentList .replyList {
 	border-top: 1px solid #eee;
-	padding: 10px 0 10px;
 	margin-left: 36px;
+	margin-top:7px;
 	position: relative;
 	font-size: 14px;
 	line-height: 22px;
-	margin-top: 15px
 }
 .topicContentModule .commentList .replyList:before {
 	position: absolute;
@@ -1305,9 +1338,21 @@ html,body{
 }
 .topicContentModule .commentList .replyList .box li {
 	*zoom: 1;
-	margin-bottom: 10px;
 	border-bottom: 1px dashed #eee;
-	padding-bottom: 5px;
+}
+.topicContentModule .commentList .replyList .box li .reply-reportMark{
+	position: relative;
+}
+.topicContentModule .commentList .replyList .box li .reply-reportMark:before{
+    content: " ";
+    position: absolute;
+    top: -10px;
+    left: -18px;
+    bottom:-5px;
+    border-left: 5px solid #f89898;
+}
+.topicContentModule .commentList .replyList .box li:last-child{
+	border-bottom: 1px dashed transparent;
 }
 .topicContentModule .commentList .replyList .box li:before,
 .topicContentModule .commentList .replyList .box li:after {
@@ -1318,47 +1363,66 @@ html,body{
 .topicContentModule .commentList .replyList .box li:after {
 	clear: both;
 }
+
 .topicContentModule .commentList .replyList .box li .reply-top{
 	height: 23px;
+	margin-top: 10px;
 }
-
-
 .topicContentModule .commentList .replyList .box li .reply-top .avatarBox{
 	position:absolute;border-radius:100%;
-	
-	
 }
 .topicContentModule .commentList .replyList .box li .reply-top .avatarBox img{
 	border-radius:100%;
-	width: 24px;
-	margin-top: -7px;left: 0px;
+	width: 32px;
 }
-.topicContentModule .commentList .replyList .box li .reply-top .userName {
-	color:#aaa;margin-left: 28px;margin-top:-4px;
-
+.topicContentModule .commentList .replyList .box li .reply-top .info {
+	display: block;
 	float: left;
+	margin-left: 38px;
 }
-.topicContentModule .commentList .replyList .box li .reply-top .cancelNickname{
+.topicContentModule .commentList .replyList .box li .reply-top .info .left-box {
+	color:#aaa;
+	font-size:14px;
+	line-height: 16px;
+}
+.topicContentModule .commentList .replyList .box li .reply-top .info .left-box .userName{
+	float: left;margin-right: 3px;
+}
+.topicContentModule .commentList .replyList .box li .reply-top .info .cancelNickname{
+	font-weight:normal;
+	float: left;
+	margin-right: 3px;
 	color: transparent;
     text-shadow: 0 0 5px rgba(0,0,0,0.4);
     filter: DXImageTransform.Microsoft.Blur(pixelradius=2);
     zoom: 1;
 }
 .topicContentModule .commentList .replyList .box li .reply-top .userTag{
-	float: left;margin-top: -5px;
+	float: left;margin-top: -1px;
 }
 .topicContentModule .commentList .replyList .box li .reply-top .userTag .master{
-	white-space:nowrap; 
-	font-style:normal;
-	margin-left:5px;
+	white-space:nowrap;
 	color:#fff;
 	background-color:#4cc8ff;
 	border-radius:4px;
-	padding:1px 5px 0px;
+	padding:1px 5px;
 	font-size: 12px;
+	font-style: normal;
+	font-weight: normal;
+}
+.topicContentModule .commentList .replyList .box li .reply-top .userTag .userRoleName{
+	margin-left:3px;
+	white-space:nowrap;
+	color:#e2b46e;
+	background-color:#f8e7c4;
+	border-radius:4px;
+	padding:1px 5px;
+	font-size: 12px;
+	font-style: normal;
+	font-weight: normal;
 }
 .topicContentModule .commentList .replyList .box li .reply-top .userTag .staff{
-	margin-left:5px;
+	margin-left:3px;
 	white-space:nowrap;
 	color:#15d327;
 	background-color:#cafcc7;
@@ -1368,15 +1432,88 @@ html,body{
 	font-style: normal;
 	font-weight: normal;
 }
-
 .topicContentModule .commentList .replyList .box li .reply-top .time {
-	float: right;
-	color:#aaa;
 	font-size: 12px;
-	margin-right: 2px;
-	margin-top:-5px;
+	color:#aaa;
+	margin-top: 4px;
+	line-height: 12px
+}
+.topicContentModule .commentList .replyList .box li .reply-top .time .separate{
+	margin-left: 6px;
+    margin-right: 6px;
+}
+.topicContentModule .commentList .replyList .box li .reply-top .floor {
+	float: right;
+	margin-right:5px;
+	font-size: 12px;
+	color:#aaa;
+	position: relative;
+	top: -1px;
+}
+.topicContentModule .commentList .replyList .box li .reply-top .fast {
+	float: right;
+	margin-right:5px;
+	font-size: 12px;
+	color:#aaa;
+	position: relative;
+	top: 2px;
+}
+
+.topicContentModule .commentList .replyList .box li .friendInfo-wrap{
+   margin-top: 8px;
+   background: #fff;
+   padding: 6px 0px;
+   border-radius: 4px;
+}                            
+.topicContentModule .commentList .replyList .box li .friendInfo-wrap .friendInfo{
+    background: #f5f5f5;
+    color: #999;
+    line-height: 38px;
+    border-radius: 4px;
+    display: flex;
+}
+.topicContentModule .commentList .replyList .box li .friendInfo-wrap .friendInfo .icon-container{
+    margin-left: 12px;
+    position: relative;
+    top: 2px;
+    color: #999;
+}
+.topicContentModule .commentList .replyList .box li .friendInfo-wrap .friendInfo .avatarImg-container{
+    margin-left: 12px;
+    position: relative;
+    top: -1px;
+}
+.topicContentModule .commentList .replyList .box li .friendInfo-wrap .friendInfo .avatarImg-container img {
+    width: 22px;
+    height: 22px;
+    border-radius:22px;
+    vertical-align: middle;
+}
+.topicContentModule .commentList .replyList .box li .friendInfo-wrap .friendInfo .nameInfo-container {
+    flex: 1;
+    margin-left: 6px;
+    margin-right: 6px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+.topicContentModule .commentList .replyList .box li .friendInfo-wrap .friendInfo .nameInfo-container .userName {
+    color: #999;
+    font-size: 14px;
+    position: relative;
+    top: 1px;
+}
+.topicContentModule .commentList .replyList .box li .friendInfo-wrap .friendInfo .nameInfo-container .cancelNickname{
+    font-weight:normal;
+    margin-right: 3px;
+    color: transparent;
+    text-shadow: 0 0 5px rgba(0,0,0,0.4);
+    zoom: 1;
+    user-select:none;
 }
 .topicContentModule .commentList .replyList .box li .replyContent{
+	margin-top:10px;
+	margin-bottom:10px;
 	font-size: 14px;
 	line-height:24px;
 	color:#222;
@@ -1396,33 +1533,20 @@ html,body{
 }
 .topicContentModule .commentList .replyList .link {
 	text-align: right;
+	margin-top: 5px;
 }
 .topicContentModule .commentList .replyList .link span {
 	font-size: 14px;
 	color: #26a2ff;
 }
 .topicContentModule .commentList .item .bottomInfo {
-	height: 22px;
+	height:22px;
 	overflow: hidden;
 	text-align: right;
 }
 .topicContentModule .commentList .item .bottomInfo .toolbar {
 	height: 100%;
 	margin-right:4px;
-}
-.topicContentModule .commentList .item .bottomInfo .toolbar .edit-btn{
-	color: #999;
-	font-size: 14px;
-	margin-right: 30px;
-}
-.topicContentModule .commentList .item .bottomInfo .toolbar .quote-btn{
-	color: #999;
-	font-size: 14px;
-}
-.topicContentModule .commentList .item .bottomInfo .toolbar .reply-btn{
-	margin-left:30px;
-	color: #999;
-	font-size: 14px;
 }
 .topicContentModule .commentList .commentPage{
 	padding-top: 5px;padding-bottom: 10px;
@@ -1466,6 +1590,117 @@ html,body{
 .topicContentModule .addQuoteScroll .box .addQuoteForm .tips{line-height:30px; margin-left: 115px}
 .topicContentModule .addQuoteScroll .box .addQuoteForm .tips span{color: red;}
 
+
+.topicContentModule .addReportScroll {
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    right:0;
+    margin-bottom: 0;
+    border-bottom: none;
+    -webkit-overflow-scrolling: touch;
+    overflow-scrolling: touch;
+}
+.topicContentModule .addReportScroll .box{
+	padding-top: 40px;
+	padding-bottom: 10px;
+}
+.topicContentModule .addReportScroll .box .addReportForm{margin-left:5px; margin-right: 5px;}
+
+.topicContentModule .addReportScroll .box .addReportForm .reportType-group .mint-cell-wrapper{
+	background-image: linear-gradient(180deg, #fff, #fff 50%, transparent 50%);/*白色边框线*/
+}
+.topicContentModule .addReportScroll .box .addReportForm .reportType-group .mint-cell:last-child {
+    background-image: linear-gradient(0deg, #fff, #fff 50%, transparent 50%); /*白色边框线*/
+}
+.topicContentModule .addReportScroll .box .addReportForm .tips{line-height:30px; margin-left: 8px}
+.topicContentModule .addReportScroll .box .addReportForm .tips span{color: red;}
+.topicContentModule .addReportScroll .box .image-form {
+	margin:30px 5px 8px 5px;
+    position: relative;
+    font-size: 14px;
+    font-size: 0;
+}
+.topicContentModule .addReportScroll .box .image-form::after {
+    clear: both;
+}
+.topicContentModule .addReportScroll .box .image-form::after, .image-form::before {
+    display: table;
+    content: "";
+}
+.topicContentModule .addReportScroll .box .image-form .uploadImagelist {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: inline;
+    vertical-align: top;
+}
+.topicContentModule .addReportScroll .box .image-form .uploadImagelist .uploadImageItem {
+    overflow: hidden;
+    background-color: #fff;
+    border: 1px solid #c0ccda;
+    border-radius: 6px;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 74px;
+    height: 74px;
+    margin: 0 8px 8px 0;
+    display: inline-block;
+    
+    -webkit-transition: all .5s cubic-bezier(.55,0,.1,1);
+    transition: all .5s cubic-bezier(.55,0,.1,1);
+    font-size: 14px;
+    color: #606266;
+    line-height: 1.8;
+    position: relative;
+}
+.topicContentModule .addReportScroll .box .image-form .uploadImagelist .uploadImageItem .thumbnail {
+    width: 100%;
+    height: 100%;
+}
+.topicContentModule .addReportScroll .box .image-form .uploadImagelist .uploadImageItem .item-delete {
+   width: 14px;
+   height: 14px;
+   background: rgba(0, 0, 0, .7);
+   border-radius: 0 0 0 12px;
+   position: absolute;
+   top: 0;
+   right: 0;
+}
+.topicContentModule .addReportScroll .box .image-form .uploadImagelist .uploadImageItem .item-delete .icon{
+	position: absolute;
+    top: 0;
+    right: 0;
+    color: #fff;
+    font-size: 14px;
+    transform: scale(.7) translate(10%,-10%);
+}
+.topicContentModule .addReportScroll .box .image-form .uploadImageInput {
+    background-color: #fbfdff;
+    border: 1px dashed #c0ccda;
+    border-radius: 6px;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 74px;
+    height: 74px;
+    cursor: pointer;
+    line-height: 73px;
+    vertical-align: top;
+    display: inline-block;
+    text-align: center;
+    outline: 0;
+}
+.topicContentModule .addReportScroll .box .image-form .uploadImageInput i {
+	line-height: 73px;
+    font-size: 28px;
+    color: #8c939d;
+    
+}
+.topicContentModule .addReportScroll .box .image-form .imageInput {
+    display: none;
+}
+
+
 .topicContentModule .addReplyScroll {
     width: 100%;
     height: 100%;
@@ -1500,6 +1735,30 @@ html,body{
 .topicContentModule .editCommentScroll .box .editCommentForm{margin-left:5px; margin-right: 5px;}
 .topicContentModule .editCommentScroll .box .editCommentForm .tips{line-height:30px; margin-left: 115px}
 .topicContentModule .editCommentScroll .box .editCommentForm .tips span{color: red;}
+
+
+.topicContentModule .addReplyFriendScroll {
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    right:0;
+    margin-bottom: 0;
+    border-bottom: none;
+    -webkit-overflow-scrolling: touch;
+    overflow-scrolling: touch;
+}
+.topicContentModule .addReplyFriendScroll .box{
+	padding-top: 40px;
+}
+.topicContentModule .addReplyFriendScroll .friendUser{
+	margin: 10px 10px 10px 10px;
+	line-height: 28px;
+	font-size: 14px;
+}
+.topicContentModule .addReplyFriendScroll .box .addReplyFriendForm{margin-left:5px; margin-right: 5px;}
+.topicContentModule .addReplyFriendScroll .box .addReplyFriendForm .tips{line-height:30px; margin-left: 115px}
+.topicContentModule .addReplyFriendScroll .box .addReplyFriendForm .tips span{color: red;}
+
 
 .topicContentModule .editReplyScroll {
     width: 100%;
@@ -1786,6 +2045,15 @@ html,body{
 	padding-bottom:2px;
 	background: #fff;
 	box-shadow: 0 0px 3px 0 rgba(0,0,0,.02), 0 4px 8px 0 rgba(0,0,0,.02);
+	position: relative;
+}
+.questionContentModule .questionDetail .reportMark:before{
+    content: " ";
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    bottom:0px;
+    border-left: 5px solid #f89898;
 }
 .questionContentModule .questionDetail .head {
 	position: relative;
@@ -1819,11 +2087,12 @@ html,body{
     color: #999;
 }
 .questionContentModule .questionDetail .head .info .right{float:right!important;font-size:13px;color:#aaa;position: relative;top: 4px;}
-.questionContentModule .questionDetail .head .info .right .appendQuestion{font-size: 12px;color: #aaa;margin-right: 10px;position: relative;top: 1px;}
-.questionContentModule .questionDetail .head .info .right .appendQuestion-icon{font-size: 12px;color: #aaa; margin-right: 2px;position: relative;top: 1px;}
-.questionContentModule .questionDetail .head .info .right .count-icon{font-size: 12px;color: #aaa;margin-right: 2px;position: relative;top: 1px;}
+.questionContentModule .questionDetail .head .info .right .ipAddress-icon{font-size: 12px;color: #aaa;margin-right: 2px;position: relative;top: 1px;}
+.questionContentModule .questionDetail .head .info .right .count-icon{font-size: 12px;color: #aaa;margin-left: 10px;margin-right: 2px;position: relative;top: 1px;}
 .questionContentModule .questionDetail .head .info .right .view-icon{font-size: 12px;margin-right: 2px;color: #aaa;margin-left: 10px;position: relative;top: 1px;}
-
+.questionContentModule .questionDetail .head .info .right  .fast{
+	font-size: 12px;color: #aaa;margin-left: 5px;position: relative;top: 1px;
+}
 .questionContentModule .questionDetail .main {
 	margin: 10px 8px 10px 8px;
 	min-height: 80px;
@@ -2072,11 +2341,23 @@ html,body{
 	margin-top: 6px;
 	line-height: 12px
 }
+.questionContentModule .answerList .item .head .time .separate{
+    margin-left: 6px;
+    margin-right: 6px;
+}
 .questionContentModule .answerList .item .head .floor {
 	float: right;
 	margin-right:5px;
 	font-size: 12px;
 	color:#aaa;
+}
+.questionContentModule .answerList .item .head .fast {
+	float: right;
+	margin-right:5px;
+	font-size: 12px;
+	color:#aaa;
+	position: relative;
+	top: 2px;
 }
 .questionContentModule .answerList .active{
 	position:relative;
@@ -2089,6 +2370,7 @@ html,body{
 	left: -10px;
 	bottom:0px;
 	border-left: 5px solid #fe9d2d;
+	
 }
 .questionContentModule .answerList .item .adoption{
 	display: none;
@@ -2099,6 +2381,17 @@ html,body{
 	position: absolute;
 	right: 0px;
 	top: 0px;
+}
+.questionContentModule .answerList .reportMark{
+	position:relative;
+}
+.questionContentModule .answerList .reportMark:before{
+    content: " ";
+    position: absolute;
+    top: 0px;
+    left: -8px;
+    bottom:0px;
+    border-left: 5px solid #f89898;
 }
 .ribbon-wrapper {
 	width: 70px;
@@ -2162,7 +2455,7 @@ html,body{
     background-color: #F7F8FA;
 }
 .questionContentModule .answerList .item .main .answerContent {
-	margin-bottom: 10px;
+	margin-bottom: 15px;
 	color:#222;font-size: 15px;
 }
 .questionContentModule .answerList .item .main .answerContent a{
@@ -2173,6 +2466,233 @@ html,body{
 .questionContentModule .answerList .item .main .answerContent img {
 	max-width:100%;height:auto;border:none;background:none;margin:0;padding:0;vertical-align: sub;
 }
+.questionContentModule .answerList .replyList {
+	border-top: 1px solid #eee;
+	margin-left: 36px;
+	margin-top:7px;
+	position: relative;
+	font-size: 14px;
+	line-height: 22px;
+}
+.questionContentModule .answerList .replyList:before {
+	position: absolute;
+	display: block;
+	width: 6px;
+	height: 6px;
+	border-top: 1px solid #eee;
+	border-left: 1px solid #eee;
+	-webkit-transform: rotate(45deg);
+	-moz-transform: rotate(45deg);
+	-o-transform: rotate(45deg);
+	transform: rotate(45deg);
+	content: "";
+	background-color: #fff;
+	top: -4px;
+	left: 30px
+}
+.questionContentModule .answerList .replyList .box li {
+	*zoom: 1;
+	border-bottom: 1px dashed #eee;
+}
+.questionContentModule .answerList .replyList .box li .reply-reportMark{
+	position: relative;
+}
+.questionContentModule .answerList .replyList .box li .reply-reportMark:before{
+    content: " ";
+    position: absolute;
+    top: -10px;
+    left: -18px;
+    bottom:-5px;
+    border-left: 5px solid #f89898;
+}
+.questionContentModule .answerList .replyList .box li:last-child{
+	border-bottom: 1px dashed transparent;
+}
+.questionContentModule .answerList .replyList .box li:before,
+.questionContentModule .answerList .replyList .box li:after {
+	content: "";
+	display: table;
+	font: 0/0 a
+}
+.questionContentModule .answerList .replyList .box li:after {
+	clear: both;
+}
+.questionContentModule .answerList .replyList .box li .reply-top{
+	height: 23px;
+	margin-top: 10px;
+}
+.questionContentModule .answerList .replyList .box li .reply-top .avatarBox{
+	position:absolute;border-radius:100%;
+}
+.questionContentModule .answerList .replyList .box li .reply-top .avatarBox img{
+	border-radius:100%;
+	width: 32px;
+}
+.questionContentModule .answerList .replyList .box li .reply-top .info {
+	display: block;
+	float: left;
+	margin-left: 38px;
+}
+.questionContentModule .answerList .replyList .box li .reply-top .info .left-box {
+	color:#aaa;
+	font-size:14px;
+	line-height: 16px;
+}
+.questionContentModule .answerList .replyList .box li .reply-top .info .left-box .userName{
+	float: left;margin-right: 3px;
+}
+.questionContentModule .answerList .replyList .box li .reply-top .info .cancelNickname{
+	font-weight:normal;
+	float: left;
+	margin-right: 3px;
+	color: transparent;
+    text-shadow: 0 0 5px rgba(0,0,0,0.4);
+    filter: DXImageTransform.Microsoft.Blur(pixelradius=2);
+    zoom: 1;
+}
+.questionContentModule .answerList .replyList .box li .reply-top .userTag{
+	float: left;margin-top: -1px;
+}
+.questionContentModule .answerList .replyList .box li .reply-top .userTag .master{
+	white-space:nowrap;
+	color:#fff;
+	background-color:#4cc8ff;
+	border-radius:4px;
+	padding:1px 5px;
+	font-size: 12px;
+	font-style: normal;
+	font-weight: normal;
+}
+.questionContentModule .answerList .replyList .box li .reply-top .userTag .userRoleName{
+	margin-left:3px;
+	white-space:nowrap;
+	color:#e2b46e;
+	background-color:#f8e7c4;
+	border-radius:4px;
+	padding:1px 5px;
+	font-size: 12px;
+	font-style: normal;
+	font-weight: normal;
+}
+.questionContentModule .answerList .replyList .box li .reply-top .userTag .staff{
+	margin-left:3px;
+	white-space:nowrap;
+	color:#15d327;
+	background-color:#cafcc7;
+	border-radius:4px;
+	padding:1px 5px;
+	font-size: 12px;
+	font-style: normal;
+	font-weight: normal;
+}
+.questionContentModule .answerList .replyList .box li .reply-top .time {
+	font-size: 12px;
+	color:#aaa;
+	margin-top: 4px;
+	line-height: 12px
+}
+.questionContentModule .answerList .replyList .box li .reply-top .time .separate{
+    margin-left: 6px;
+    margin-right: 6px;
+}
+.questionContentModule .answerList .replyList .box li .reply-top .floor {
+	float: right;
+	margin-right:5px;
+	font-size: 12px;
+	color:#aaa;
+	position: relative;
+	top: -1px;
+}
+.questionContentModule .answerList .replyList .box li .reply-top .fast {
+	float: right;
+	margin-right:5px;
+	font-size: 12px;
+	color:#aaa;
+	position: relative;
+	top: 2px;
+}
+.questionContentModule .answerList .replyList .box li .friendInfo-wrap{
+   margin-top: 8px;
+   background: #fff;
+   padding: 6px 0px;
+   border-radius: 4px;
+}                            
+.questionContentModule .answerList .replyList .box li .friendInfo-wrap .friendInfo{
+    background: #f5f5f5;
+    color: #999;
+    line-height: 38px;
+    border-radius: 4px;
+    display: flex;
+}
+.questionContentModule .answerList .replyList .box li .friendInfo-wrap .friendInfo .icon-container{
+    margin-left: 12px;
+    position: relative;
+    top: 2px;
+    color: #999;
+}
+.questionContentModule .answerList .replyList .box li .friendInfo-wrap .friendInfo .avatarImg-container{
+    margin-left: 12px;
+    position: relative;
+    top: -1px;
+}
+.questionContentModule .answerList .replyList .box li .friendInfo-wrap .friendInfo .avatarImg-container img {
+    width: 22px;
+    height: 22px;
+    border-radius:22px;
+    vertical-align: middle;
+}
+.questionContentModule .answerList .replyList .box li .friendInfo-wrap .friendInfo .nameInfo-container {
+    flex: 1;
+    margin-left: 6px;
+    margin-right: 6px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+.questionContentModule .answerList .replyList .box li .friendInfo-wrap .friendInfo .nameInfo-container .userName {
+    color: #999;
+    font-size: 14px;
+    position: relative;
+    top: 1px;
+}
+.questionContentModule .answerList .replyList .box li .friendInfo-wrap .friendInfo .nameInfo-container .cancelNickname{
+    font-weight:normal;
+    margin-right: 3px;
+    color: transparent;
+    text-shadow: 0 0 5px rgba(0,0,0,0.4);
+    zoom: 1;
+    user-select:none;
+}
+.questionContentModule .answerList .replyList .box li .replyContent{
+	margin-top:10px;
+	margin-bottom:10px;
+	font-size: 14px;
+	line-height:24px;
+	color:#222;
+	
+}
+.questionContentModule .answerList .replyList .box li .cancelAccount{
+	display: inline-block;
+    vertical-align: middle;
+    padding: 4px 4px;
+    font-size: 14px;
+    line-height: 14px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color: #A9AEB8;
+    background-color: #F7F8FA;
+}
+.questionContentModule .answerList .replyList .link {
+	text-align: right;
+	margin-top: 5px;
+}
+.questionContentModule .answerList .replyList .link span {
+	font-size: 14px;
+	color: #26a2ff;
+}
+
+/**
 .questionContentModule .answerList .replyList {
 	border-top: 1px solid #eee;
 	padding: 10px 0 10px;
@@ -2296,29 +2816,15 @@ html,body{
 .questionContentModule .answerList .replyList .link span {
 	font-size: 14px;
 	color: #26a2ff;
-}
+}**/
 .questionContentModule .answerList .item .bottomInfo {
-	height: 24px;
+	height: 22px;
 	overflow: hidden;
 	text-align: right;
 }
 .questionContentModule .answerList .item .bottomInfo .toolbar {
 	height: 100%;
 	margin-right:4px;
-}
-.questionContentModule .answerList .item .bottomInfo .toolbar .edit-btn{
-	color: #999;
-	font-size: 14px;
-	margin-right: 30px;
-}
-.questionContentModule .answerList .item .bottomInfo .toolbar .quote-btn{
-	color: #999;
-	font-size: 14px;
-	margin-right: 30px;
-}
-.questionContentModule .answerList .item .bottomInfo .toolbar .reply-btn{
-	color: #999;
-	font-size: 14px;
 }
 .questionContentModule .answerList .commentPage{
 	padding-top: 5px;padding-bottom: 10px;
@@ -2361,6 +2867,115 @@ html,body{
 .questionContentModule .addReplyScroll .box .addReplyForm .tips span{color: red;}
 
 
+.questionContentModule .addReportScroll {
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    right:0;
+    margin-bottom: 0;
+    border-bottom: none;
+    -webkit-overflow-scrolling: touch;
+    overflow-scrolling: touch;
+}
+.questionContentModule .addReportScroll .box{
+	padding-top: 40px;
+	padding-bottom: 10px;
+}
+.questionContentModule .addReportScroll .box .addReportForm{margin-left:5px; margin-right: 5px;}
+
+.questionContentModule .addReportScroll .box .addReportForm .reportType-group .mint-cell-wrapper{
+	background-image: linear-gradient(180deg, #fff, #fff 50%, transparent 50%);/*白色边框线*/
+}
+.questionContentModule .addReportScroll .box .addReportForm .reportType-group .mint-cell:last-child {
+    background-image: linear-gradient(0deg, #fff, #fff 50%, transparent 50%); /*白色边框线*/
+}
+.questionContentModule .addReportScroll .box .addReportForm .tips{line-height:30px; margin-left: 8px}
+.questionContentModule .addReportScroll .box .addReportForm .tips span{color: red;}
+.questionContentModule .addReportScroll .box .image-form {
+	margin:30px 5px 8px 5px;
+    position: relative;
+    font-size: 14px;
+    font-size: 0;
+}
+.questionContentModule .addReportScroll .box .image-form::after {
+    clear: both;
+}
+.questionContentModule .addReportScroll .box .image-form::after, .image-form::before {
+    display: table;
+    content: "";
+}
+.questionContentModule .addReportScroll .box .image-form .uploadImagelist {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: inline;
+    vertical-align: top;
+}
+.questionContentModule .addReportScroll .box .image-form .uploadImagelist .uploadImageItem {
+    overflow: hidden;
+    background-color: #fff;
+    border: 1px solid #c0ccda;
+    border-radius: 6px;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 74px;
+    height: 74px;
+    margin: 0 8px 8px 0;
+    display: inline-block;
+    
+    -webkit-transition: all .5s cubic-bezier(.55,0,.1,1);
+    transition: all .5s cubic-bezier(.55,0,.1,1);
+    font-size: 14px;
+    color: #606266;
+    line-height: 1.8;
+    position: relative;
+}
+.questionContentModule .addReportScroll .box .image-form .uploadImagelist .uploadImageItem .thumbnail {
+    width: 100%;
+    height: 100%;
+}
+.questionContentModule .addReportScroll .box .image-form .uploadImagelist .uploadImageItem .item-delete {
+   width: 14px;
+   height: 14px;
+   background: rgba(0, 0, 0, .7);
+   border-radius: 0 0 0 12px;
+   position: absolute;
+   top: 0;
+   right: 0;
+}
+.questionContentModule .addReportScroll .box .image-form .uploadImagelist .uploadImageItem .item-delete .icon{
+	position: absolute;
+    top: 0;
+    right: 0;
+    color: #fff;
+    font-size: 14px;
+    transform: scale(.7) translate(10%,-10%);
+}
+.questionContentModule .addReportScroll .box .image-form .uploadImageInput {
+    background-color: #fbfdff;
+    border: 1px dashed #c0ccda;
+    border-radius: 6px;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 74px;
+    height: 74px;
+    cursor: pointer;
+    line-height: 73px;
+    vertical-align: top;
+    display: inline-block;
+    text-align: center;
+    outline: 0;
+}
+.questionContentModule .addReportScroll .box .image-form .uploadImageInput i {
+	line-height: 73px;
+    font-size: 28px;
+    color: #8c939d;
+    
+}
+.questionContentModule .addReportScroll .box .image-form .imageInput {
+    display: none;
+}
+
 .questionContentModule .editAnswerScroll {
     width: 100%;
     height: 100%;
@@ -2378,6 +2993,30 @@ html,body{
 .questionContentModule .editAnswerScroll .box .editAnswerForm .tips{line-height:30px; margin-left: 115px}
 .questionContentModule .editAnswerScroll .box .editAnswerForm .tips span{color: red;}
 .questionContentModule .editAnswerScroll .box .editAnswerForm .w-e-text pre{white-space:pre-wrap;}
+
+.questionContentModule .addReplyFriendScroll {
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    right:0;
+    margin-bottom: 0;
+    border-bottom: none;
+    -webkit-overflow-scrolling: touch;
+    overflow-scrolling: touch;
+}
+.questionContentModule .addReplyFriendScroll .box{
+	padding-top: 40px;
+}
+.questionContentModule .addReplyFriendScroll .friendUser{
+	margin: 10px 10px 10px 10px;
+	line-height: 28px;
+	font-size: 14px;
+}
+.questionContentModule .addReplyFriendScroll .box .addReplyFriendForm{margin-left:5px; margin-right: 5px;}
+.questionContentModule .addReplyFriendScroll .box .addReplyFriendForm .tips{line-height:30px; margin-left: 115px}
+.questionContentModule .addReplyFriendScroll .box .addReplyFriendForm .tips span{color: red;}
+
+
 .questionContentModule .editReplyScroll {
     width: 100%;
     height: 100%;
@@ -3330,6 +3969,16 @@ html,body{
 	font-size: 14px;
 }
 .homeModule .homeHeader .user .grade{line-height:25px;background-repeat:no-repeat;background-position:left center;background-size:auto 100%;font-size:12px;height:23px;min-width:40px;display:inline-block;background-color:#56b7ff;border-radius:20px;text-align:center;padding-left: 10px;padding-right: 10px;}
+
+.homeModule .homeHeader .user .ipAddress{
+	font-weight:normal;font-size: 12px;
+}
+.homeModule .homeHeader .user .ipAddress .icon{
+	color: #fff; position: relative;top: 1px;
+}
+.homeModule .homeHeader .user .ipAddress .ipAddressText{
+	color: #fff; 
+}
 .homeModule .homeHeader .privateMessageBox{
 	position: absolute;right: 5px;bottom: 5px;
 }
@@ -3822,7 +4471,6 @@ html,body{
 	font-size: 14px;
 	position: relative;
 }
-
 .homeModule .setting{position: absolute;right: 12px;top: 12px; font-size: 20px; color: #fff; }
 
 /* 用户设置滚动层 */
@@ -5693,6 +6341,126 @@ html,body{
 	margin-left: 44px;
 }
 
+/** 举报 **/
+.reportListModule{
+	padding-top: 40px;
+	padding-bottom: 40px;/*没此属性UC浏览器无法下拉加载*/
+}
+.reportListModule .reportList {}
+.reportListModule .reportList .item{position:relative;}
+.reportListModule .reportList .item .top-container{height:24px;line-height:24px;padding:5px 10px 0px 10px;}
+.reportListModule .reportList .item .top-container .bLeft{float:left!important;display:inline-block;}
+.reportListModule .reportList .item .top-container .bLeft .type{
+	background-color: #f5f5f5;
+    font-size: 12px;
+    line-height: 12px;
+    display: inline-block;
+    padding: 4px 4px 4px 4px;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+    text-decoration: none;
+    color: #999;
+}
+.reportListModule .reportList .item .top-container .bRight{float:right!important;font-size:14px;color:#aaa;}
+.reportListModule .reportList .item .top-container .bRight .time{font-style:normal;}
+
+.reportListModule .reportList .item .middle-container{
+	position:relative;
+	min-height: 36px;
+}
+.reportListModule .reportList .item .middle-container .reason{
+	color: #595959;
+	padding:10px 135px 0px 10px;
+	font-size:14px;
+    line-height:28px; 
+}
+.reportListModule .reportList .item .middle-container .moduleInfo{
+	position:absolute;right: 10px;top: 10px;
+}
+
+.reportListModule .reportList .item .imageInfo{
+    position:relative;
+    padding:10px 7px 0px 10px;
+}
+
+.reportListModule .reportList .item .imageInfo .image-box{
+    display: -webkit-box;     /* OLD - iOS 6-, Safari 3.1-6 */
+    display: -moz-box;       /* OLD - Firefox 19- (buggy but mostly works) */
+    display: -ms-flexbox;     /* TWEENER - IE 10 */
+    display: -webkit-flex;   /* NEW - Chrome */
+    display: flex;           /* NEW, Spec - Opera 12.1, Firefox 20+ */
+   
+	-webkit-flex-wrap: wrap;
+    -moz-flex-wrap: wrap;
+    -ms-flex-wrap: wrap;
+    -o-flex-wrap: wrap;
+    flex-wrap: wrap;
+	max-width: 100%;
+}
+.reportListModule .reportList .item .imageInfo .image-box .image-column{
+	width: 100%;
+}
+.reportListModule .reportList .item .imageInfo .image-box .image-column .image{
+	width: calc((100% - 9px)/3);/*每行3张图片，每张图片3px间隔 */
+	max-width: 240px;
+	flex: 0 1 auto;
+	position: relative;
+	margin-top: 3px;
+	margin-right: 3px;
+	background-position: 50%;
+	background-repeat: no-repeat;
+	background-size: cover;
+	cursor: zoom-in;
+}
+/*控制图片的高度和宽度一样，padding-top基于父元素的宽度*/
+.reportListModule .reportList .item .imageInfo .image-box .image-column .image .ratio{
+    pointer-events: none;
+    padding-top: 100%;
+}
+.reportListModule .reportList .item .imageInfo .image-box .image-column .image .zoom{
+    position: absolute;
+   
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+}
+.reportListModule .reportList .item .processResultInfo{
+	margin-top:8px;
+	margin-left:8px;
+	margin-right:8px;
+	
+}
+.reportListModule .reportList .item .processResultInfo .details {
+	float: left;font-size: 14px;;line-height: 30px;color: #999;margin-left: -8px;
+}
+.reportListModule .reportList .item .processResultInfo .details .text{
+	line-height: 28px;
+	margin-left: 8px;
+}
+.reportListModule .reportList .item .processResultInfo .details .val{
+	margin-left: 8px;margin-right: 20px;
+}
+.reportListModule .reportList .item .bottom-container {
+	min-height: 26px;
+	margin:4px 10px 0px;
+	padding-top:12px;
+	font-size: 0;
+	border-bottom:1px solid #eee;
+}
+.reportListModule .reportList .item .bottom-container .status {
+	display: block;
+	float: left;
+	font-size: 14px;
+}
+.reportListModule .reportList .item .bottom-container .processCompleteTime {
+	display: block;
+	float: right;
+	color: #07c160;
+	font-size: 14px;
+	position: relative;
+	top: 3px;
+}
 
 /* 发现 */
 .findModule{

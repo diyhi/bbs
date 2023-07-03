@@ -270,7 +270,6 @@ var _INLINE_TAG_MAP = _toMap('a,abbr,acronym,b,basefont,bdo,big,br,button,cite,c
 	_FILL_ATTR_MAP = _toMap('checked,compact,declare,defer,disabled,ismap,multiple,nohref,noresize,noshade,nowrap,readonly,selected'),
 	_VALUE_TAG_MAP = _toMap('input,button,textarea,select');
 
-
 function _getBasePath() {
 	var els = document.getElementsByTagName('script'), src;
 	for (var i = 0, len = els.length; i < len; i++) {
@@ -291,9 +290,8 @@ function _getPageBasePath() {
         }   
     }   
     return '';   
-}   
-K.pageBasePath = _getPageBasePath();  
-
+}  
+K.pageBasePath = _getPageBasePath();
 K.options = {
 	designMode : true,
 	fullscreenMode : false,
@@ -301,6 +299,7 @@ K.options = {
 	wellFormatMode : true,
 	shadowMode : true,
 	loadStyleMode : true,
+	baseURL : '',//后端地址
 	basePath : K.basePath,
 	themesPath : K.basePath + 'themes/',
 	langPath : K.basePath + 'lang/',
@@ -1121,12 +1120,14 @@ function _tmpl(str, data) {
 /**
  * POST方式提交
  * @param callback
+ * @param baseURL 后端地址
  * @param urlAddress 提交URL
  * @param async true（异步）或 false（同步）
  * @param formContent 表单内容
  * @param isAuthorization 是否带有权限信息
+ * @param isXRequestedWith 是否X-Requested-With信息
  */
-function _post_ajax(callback, urlAddress, async,formContent,isAuthorization){  
+function _post_ajax(callback, baseURL,urlAddress, async,formContent,isAuthorization,isXRequestedWith){  
 	var xmlhttp;
 	if (window.XMLHttpRequest) {
 		try {
@@ -1150,20 +1151,23 @@ function _post_ajax(callback, urlAddress, async,formContent,isAuthorization){
 	xmlhttp.open('POST', urlAddress, async);
     //定义传输的文件HTTP头信息    
 //	xmlhttp.setRequestHeader("Content-Type","application/x-www-form-urlencoded"); 
-//	xmlhttp.setRequestHeader("X-Requested-With","XMLHttpRequest");//标记报头为AJAX
+	if(isXRequestedWith){
+		xmlhttp.setRequestHeader("X-Requested-With","XMLHttpRequest");//标记报头为AJAX
+	}
+
 	
 	if(isAuthorization){
 		//从sessionStorage中获取登录令牌
 		var oauth2Token = window.sessionStorage.getItem('oauth2Token');
 		if(oauth2Token != null){
 			var oauth2Object = JSON.parse(oauth2Token);
+			//让每个请求携带会话token  ['Authorization']
 			xmlhttp.setRequestHeader("Authorization",'Bearer '+oauth2Object.access_token);
 		}
-		
-		var csrfToken = K.getCookie('XSRF-TOKEN');
-		xmlhttp.setRequestHeader("X-XSRF-TOKEN",csrfToken);
+
+		//var csrfToken = K.getCookie('XSRF-TOKEN');
+		//xmlhttp.setRequestHeader("X-XSRF-TOKEN",csrfToken);
 	}
-	
 	
 	xmlhttp.onreadystatechange = function(){
         if (xmlhttp.readyState == 4) {//readystate 
@@ -1172,6 +1176,15 @@ function _post_ajax(callback, urlAddress, async,formContent,isAuthorization){
 					
 						
 					callback(xmlhttp);
+						
+					
+				}else if(xmlhttp.status == 401){
+					
+					//会话续期
+					_refreshToken(baseURL,function (){ 
+						_post_ajax(callback, baseURL,urlAddress, async,formContent,isAuthorization,isXRequestedWith);
+
+					})
 						
 					
 				}else{
@@ -1188,15 +1201,56 @@ function _post_ajax(callback, urlAddress, async,formContent,isAuthorization){
 	
 	
 }
+
+
+/**
+ * 会话续期
+ * @param baseURL 后端地址
+ * @param callback 回调
+ */
+function _refreshToken(baseURL,callback){ 
+
+	var formData = new FormData();
+	//从sessionStorage中获取登录令牌
+	var oauth2Token = window.sessionStorage.getItem('oauth2Token');
+	if(oauth2Token != null){
+		var oauth2Object = JSON.parse(oauth2Token);
+		formData.append('refresh_token',oauth2Object.refresh_token);
+	}else{
+		return;
+	}
+
+
+	_post_ajax(function(xmlhttp){
+		var result = xmlhttp.responseText;
+		if(result != ""){
+			var returnValue = JSON.parse(result);
+			if(returnValue.code === 200){//成功
+				var oauth2Object = returnValue.data;
+				//写入sessionStorage中
+				window.sessionStorage.setItem('oauth2Token', JSON.stringify(oauth2Object));
+				if(oauth2Object.access_token != ''){
+					callback();
+				}
+			}
+		}
+	},
+	baseURL,baseURL+"admin/refreshToken", false,formData,false,true);
+}
+
+
+
 /**
  * PUT方式提交
  * @param callback
+ * @param baseURL 后端地址
  * @param urlAddress 提交URL
  * @param async true（异步）或 false（同步）
  * @param formContent 表单内容
  * @param isAuthorization 是否带有权限信息
+ * @param isXRequestedWith 是否X-Requested-With信息
  */
-function _put_ajax(callback, urlAddress, async,formContent,isAuthorization){  
+function _put_ajax(callback, baseURL,urlAddress, async,formContent,isAuthorization,isXRequestedWith){  
 	var xmlhttp;
 	if (window.XMLHttpRequest) {
 		try {
@@ -1219,6 +1273,10 @@ function _put_ajax(callback, urlAddress, async,formContent,isAuthorization){
 	
 	xmlhttp.open('PUT', urlAddress, async);
 	
+	if(isXRequestedWith){
+		xmlhttp.setRequestHeader("X-Requested-With","XMLHttpRequest");//标记报头为AJAX
+	}
+
 	if(isAuthorization){
 		//从sessionStorage中获取登录令牌
 		var oauth2Token = window.sessionStorage.getItem('oauth2Token');
@@ -1227,8 +1285,8 @@ function _put_ajax(callback, urlAddress, async,formContent,isAuthorization){
 			xmlhttp.setRequestHeader("Authorization",'Bearer '+oauth2Object.access_token);
 		}
 		
-		var csrfToken = K.getCookie('XSRF-TOKEN');
-		xmlhttp.setRequestHeader("X-XSRF-TOKEN",csrfToken);
+		//var csrfToken = K.getCookie('XSRF-TOKEN');
+		//xmlhttp.setRequestHeader("X-XSRF-TOKEN",csrfToken);
 	}
 
 	xmlhttp.onreadystatechange = function(){
@@ -1289,6 +1347,7 @@ K.clearMsWord = _clearMsWord;
 K.tmpl = _tmpl;
 K.post_ajax = _post_ajax
 K.put_ajax = _put_ajax
+K.refreshToken = _refreshToken
 K.getCookie=_getCookie
 
 
@@ -4991,7 +5050,6 @@ _extend(KUploadButton, {
 	submit : function() {
 		var self = this,
 			iframe = self.iframe;
-		
 		//上传模块
 		if(self.options.uploadModule == 10){// 0.本地 10.SeaweedFS 20.MinIO 30.阿里云OSS
 			/**
@@ -5097,8 +5155,8 @@ _extend(KUploadButton, {
 					   
 						K.post_ajax(function(xmlhttp){
 							if(xmlhttp.status == 200){
-								K.popupMessage(KindEditor.lang('uploadSuccess'));
 								
+								K.popupMessage(KindEditor.lang('uploadSuccess'));
 								var tempForm = document.createElement('form');
 								self.fileBox.before(tempForm);
 								K(tempForm).append(self.fileBox);
@@ -5128,14 +5186,14 @@ _extend(KUploadButton, {
 							}
 							
 						},
-						beforeUrl, true,data);
+						self.options.baseURL,beforeUrl, true,data,false ,false);
 					}else{
 						K.popupMessage(fileData.message);
 						return;
 					}
 				}
 			},
-			uploadURL+"&"+parameter, true,'',true);
+			self.options.baseURL,uploadURL+"&"+parameter, true,'',true,true);
 		}else if(self.options.uploadModule == 20){//20.MinIO
 			var fileName = self.fileBox[0].value.substring(self.fileBox[0].value.lastIndexOf("\\")+1); 
 			var uploadURL = self.options.url || self.options.form[0].action;
@@ -5200,14 +5258,14 @@ _extend(KUploadButton, {
 								self.options.afterUpload.call(self, data);
 							}
 						},
-						beforeUrl, true,data);
+						self.options.baseURL,beforeUrl, true,data,false,false);
 					}else{
 						K.popupMessage(fileData.message);
 						return;
 					}
 				}
 			},
-			uploadURL+"&"+parameter, true,'',true);
+			self.options.baseURL,uploadURL+"&"+parameter, true,'',true,true);
 						
 			
 		}else if(self.options.uploadModule == 30){//30.阿里云OSS
@@ -5278,14 +5336,14 @@ _extend(KUploadButton, {
 								self.options.afterUpload.call(self, data);
 							}
 						},
-						beforeUrl, true,data);
+						self.options.baseURL,beforeUrl, true,data,false,false);
 					}else{
 						K.popupMessage(fileData.message);
 						return;
 					}
 				}
 			},
-			uploadURL+"&"+parameter, true,'',true);
+			self.options.baseURL,uploadURL+"&"+parameter, true,'',true,true);
 		}else{//0.本地
 			
 			var fileName = self.fileBox[0].value.substring(self.fileBox[0].value.lastIndexOf("\\")+1); 
@@ -5343,7 +5401,7 @@ _extend(KUploadButton, {
 					}
 				}
 			},
-			uploadURL+"&"+parameter, true,data,true);
+			self.options.baseURL,uploadURL+"&"+parameter, true,data,true,true);
 			
 			
 			
@@ -7473,7 +7531,6 @@ _plugin('core', function(K) {
 									
 									K.popupMessage(KindEditor.lang('uploadSuccess'));
 									
-									
 									self.exec('insertimage', beforeUrl+newFileName, fileName, undefined, undefined, undefined, undefined);
 			 						
 			 						
@@ -7490,14 +7547,14 @@ _plugin('core', function(K) {
 								}
 								
 							},
-							beforeUrl, true,data);
+							self.options.baseURL,beforeUrl, true,data,false,false);
 						}else{
 							K.popupMessage(fileData.message);
 							return;
 						}
 					}
 				},
-				uploadURL+"&"+parameter, true,'',true);
+				self.options.baseURL,uploadURL+"&"+parameter, true,'',true,true);
 			}else if(self.options.uploadModule == 20){//20.MinIO
 				var fileName = file.name; 
 				var uploadURL = K.addParam(uploadJson, appendParam);
@@ -7553,14 +7610,14 @@ _plugin('core', function(K) {
 									
 								}
 							},
-							beforeUrl, true,data);
+							self.options.baseURL,beforeUrl, true,data,false,false);
 						}else{
 							K.popupMessage(fileData.message);
 							return;
 						}
 					}
 				},
-				uploadURL+"&"+parameter, true,'',true);
+				self.options.baseURL,uploadURL+"&"+parameter, true,'',true,true);
 				
 			}else if(self.options.uploadModule == 30){//30.阿里云OSS
 				var fileName = file.name; 
@@ -7618,14 +7675,14 @@ _plugin('core', function(K) {
 									
 								}
 							},
-							beforeUrl, true,data);
+							self.options.baseURL,beforeUrl, true,data,false,false);
 						}else{
 							K.popupMessage(fileData.message);
 							return;
 						}
 					}
 				},
-				uploadURL+"&"+parameter, true,'',true);
+				self.options.baseURL,uploadURL+"&"+parameter, true,'',true,true);
 				
 				
 			}else{//0.本地
@@ -7667,7 +7724,7 @@ _plugin('core', function(K) {
 						}
 					}
 				},
-				uploadURL+"&"+parameter, true,data,true);
+				self.options.baseURL,uploadURL+"&"+parameter, true,data,true,true);
 				
 				
 			}
@@ -9105,7 +9162,8 @@ KindEditor.plugin('flash', function(K) {
 		extraParams = K.undef(self.extraFileUploadParams, {}),
 		filePostName = K.undef(self.filePostName, 'imgFile'),
 		uploadJson = K.undef(self.uploadJson, self.basePath + 'php/upload_json.php'),
-		uploadModule = K.undef(self.uploadModule, self.basePath + 'php/upload_json.php');
+		uploadModule = K.undef(self.uploadModule, self.basePath + 'php/upload_json.php'),
+		baseURL = K.undef(self.baseURL, '');
 	self.plugin.flash = {
 		edit : function() {
 			var html = [
@@ -9178,6 +9236,7 @@ KindEditor.plugin('flash', function(K) {
 					extraParams : extraParams,
 					url : K.addParam(uploadJson, 'dir=flash'),
 					uploadModule : uploadModule,
+					baseURL : baseURL,
 					afterUpload : function(data) {
 						dialog.hideLoading();
 						if (data.error === 0) {
@@ -9261,6 +9320,7 @@ KindEditor.plugin('image', function(K) {
 		allowFileManager = K.undef(self.allowFileManager, false),
 		uploadJson = K.undef(self.uploadJson, self.basePath + 'php/upload_json.php'),
 		uploadModule = K.undef(self.uploadModule, 0),
+		baseURL = K.undef(self.baseURL, ''),
 		imageTabIndex = K.undef(self.imageTabIndex, 0),
 		imgPath = self.pluginsPath + 'image/images/',
 		extraParams = K.undef(self.extraFileUploadParams, {}),
@@ -9424,6 +9484,7 @@ KindEditor.plugin('image', function(K) {
 			target : target,
 			width: 70,
 			uploadModule : uploadModule,
+			baseURL: baseURL,
 			afterUpload : function(data) {
 				dialog.hideLoading();
 				if (data.error === 0) {
@@ -9609,6 +9670,7 @@ KindEditor.plugin('insertfile', function(K) {
 		formatUploadUrl = K.undef(self.formatUploadUrl, true),
 		uploadJson = K.undef(self.uploadJson, self.basePath + 'php/upload_json.php'),
 		uploadModule = K.undef(self.uploadModule, 0),
+		baseURL = K.undef(self.baseURL, ''),
 		extraParams = K.undef(self.extraFileUploadParams, {}),
 		filePostName = K.undef(self.filePostName, 'imgFile'),
 		lang = self.lang(name + '.');
@@ -9667,6 +9729,7 @@ KindEditor.plugin('insertfile', function(K) {
 				url : K.addParam(uploadJson, 'dir=file'),
 				extraParams : extraParams,
 				uploadModule : uploadModule,
+				baseURL:baseURL,
 				afterUpload : function(data) {
 					dialog.hideLoading();
 					if (data.error === 0) {
@@ -9852,8 +9915,9 @@ KindEditor.plugin('media', function(K) {
 		filePostName = K.undef(self.filePostName, 'imgFile'),
 		uploadJson = K.undef(self.uploadJson, self.basePath + 'php/upload_json.php'),
 		uploadModule = K.undef(self.uploadModule, 0),
+		baseURL = K.undef(self.baseURL, ''),
 		items = K.undef(self.items, []),
-		tabIndex = K.undef(0, 0);;
+		tabIndex = K.undef(0, 0);
 	self.plugin.media = {
 		edit : function() {
 			var html = [
@@ -10057,6 +10121,7 @@ KindEditor.plugin('media', function(K) {
 					width : 60,//上传按钮宽度
 					url : K.addParam(uploadJson, 'dir=media'),
 					uploadModule : uploadModule,
+					baseURL:baseURL,
 					afterUpload : function(data) {
 						dialog.hideLoading();
 						if (data.error === 0) {
@@ -10346,7 +10411,7 @@ K.extend(KSWFUpload, {
 						}
 					}
 				},
-				options.uploadUrl+"&"+parameter, false,'',true);//同步
+				self.options.baseURL,options.uploadUrl+"&"+parameter, false,'',true, true);//同步
 			});
 			//当有文件被添加进队列的时候，添加到页面预览
 			uploader.on( 'fileQueued', function(file){
@@ -10386,7 +10451,7 @@ K.extend(KSWFUpload, {
 				//uploader.removeFile(file, true); // 启用多次上传同一个图片
 		    });
 		    //文件上传失败
-		    uploader.on( 'uploadError', function(file,reason){
+		    uploader.on( 'uploadError', function(file,type, status, statusText){
 		    	if (file) {
 					var itemDiv = K('div[data-id="' + file.id + '"]', self.bodyDiv).eq(0);
 					showError(itemDiv, self.options.errorMessage);
@@ -10456,7 +10521,7 @@ K.extend(KSWFUpload, {
 						}
 					}
 				},
-				options.uploadUrl+"&"+parameter, false,'',true);//同步
+				self.options.baseURL,options.uploadUrl+"&"+parameter, false,'',true,true);//同步
 			});
 			//当有文件被添加进队列的时候，添加到页面预览
 			uploader.on( 'fileQueued', function(file){
@@ -10495,7 +10560,7 @@ K.extend(KSWFUpload, {
 				//uploader.removeFile(file, true); // 启用多次上传同一个图片
 		    });
 		    //文件上传失败
-		    uploader.on( 'uploadError', function(file,reason){
+		    uploader.on( 'uploadError', function(file,type, status, statusText){
 		    	if (file) {
 					var itemDiv = K('div[data-id="' + file.id + '"]', self.bodyDiv).eq(0);
 					showError(itemDiv, self.options.errorMessage);
@@ -10568,7 +10633,7 @@ K.extend(KSWFUpload, {
 						}
 					}
 				},
-				options.uploadUrl+"&"+parameter, false,'',true);//同步
+				self.options.baseURL,options.uploadUrl+"&"+parameter, false,'',true,true);//同步
 			});
 			//当有文件被添加进队列的时候，添加到页面预览
 			uploader.on( 'fileQueued', function(file){
@@ -10610,7 +10675,7 @@ K.extend(KSWFUpload, {
 				//uploader.removeFile(file, true); // 启用多次上传同一个图片
 		    });
 		    //文件上传失败
-		    uploader.on( 'uploadError', function(file,reason){
+		    uploader.on( 'uploadError', function(file,type, status, statusText){
 		    	if (file) {
 					var itemDiv = K('div[data-id="' + file.id + '"]', self.bodyDiv).eq(0);
 					showError(itemDiv, self.options.errorMessage);
@@ -10659,11 +10724,13 @@ K.extend(KSWFUpload, {
 				 		"Authorization": "Bearer " +oauth2Object.access_token
 					});
 				}
-				
-				var csrfToken = K.getCookie('XSRF-TOKEN');
 				$.extend(headers, {
-			 		"X-XSRF-TOKEN": csrfToken
+			 		'X-Requested-With': 'XMLHttpRequest'
 				});
+				//var csrfToken = K.getCookie('XSRF-TOKEN');
+				//$.extend(headers, {
+			 	//	"X-XSRF-TOKEN": csrfToken
+				//});
 				
 			});
 			//当有文件被添加进队列的时候，添加到页面预览
@@ -10701,7 +10768,13 @@ K.extend(KSWFUpload, {
 				//uploader.removeFile(file, true); // 启用多次上传同一个图片
 		    });
 		    //文件上传失败
-		    uploader.on( 'uploadError', function(file,reason){
+		    uploader.on( 'uploadError', function(file,type, status, statusText){
+				
+				if(status == 401){
+					K.refreshToken(options.baseURL,function(){
+						uploader.retry();//重试
+					})
+				}
 		    	if (file) {
 					var itemDiv = K('div[data-id="' + file.id + '"]', self.bodyDiv).eq(0);
 					showError(itemDiv, self.options.errorMessage);
@@ -10790,6 +10863,7 @@ KindEditor.plugin('multiimage', function(K) {
 		formatUploadUrl = K.undef(self.formatUploadUrl, true),
 		uploadJson = K.undef(self.uploadJson, self.basePath + 'php/upload_json.php'),
 		uploadModule = K.undef(self.uploadModule, 0),
+		baseURL = K.undef(self.baseURL, ''),
 		imgPath = self.pluginsPath + 'multiimage/images/',
 		extensions = K.undef(self.extensions, 'jpg,jpeg,png,gif,png,bmp'),//允许上传文件后缀
 		imageSizeLimit = K.undef(self.imageSizeLimit, '1MB'),//验证文件总大小是否超出限制, 超出则不允许加入队列
@@ -10858,6 +10932,7 @@ KindEditor.plugin('multiimage', function(K) {
 			buttonHeight : 23,
 			fileIconUrl : imgPath + 'image.png',
 			uploadModule : self.uploadModule,
+			baseURL: self.baseURL,
 			uploadDesc : uploadDesc,
 			startButtonValue : lang.startUpload,
 			uploadUrl : K.addParam(uploadJson, 'dir=image'),

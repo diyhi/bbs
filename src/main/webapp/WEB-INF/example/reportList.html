@@ -1,0 +1,268 @@
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">页面访问</th>
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td  width="30%">请求路径</td> 
+			<td  width="70%" colspan="2">user/control/reportList.htm</td>
+		</tr>
+		<tr> 
+			<td>请求方式</td> 
+			<td colspan="2">GET</td>
+		</tr> 
+		<tr> 
+			<td>请求参数</td> 
+			<td>页码</td> 
+			<td>
+				变量：page<br>
+				类型：Integer<br>
+				是否必填：否
+			</td>
+		</tr>
+		<tr> 
+			<td width="30%" >返回值</td> 
+			<td width="30%" >用户举报分页</td> 
+			<td width="40%" >
+				变量：pageView<br>
+				类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_10'); return false;">PageView</a>
+			</td>
+		</tr>
+	</tbody> 
+</table>
+
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">页面访问 - AJAX方式</th>
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td  width="30%">请求路径</td> 
+			<td  width="70%" colspan="2">user/control/reportList.htm</td>
+		</tr>
+		<tr> 
+			<td>请求方式</td> 
+			<td colspan="2">GET</td>
+		</tr>
+		<tr> 
+			<td>自定义请求头</td> 
+			<td colspan="2">协议头：X-Requested-With  值：XMLHttpRequest</td>
+		</tr>
+		<tr> 
+			<td>请求参数</td> 
+			<td>页码</td> 
+			<td>
+				变量：page<br>
+				类型：Integer<br>
+				是否必填：否
+			</td>
+		</tr>
+		<tr> 
+			<td width="30%" >请求成功返回</td> 
+			<td width="30%" >JSON格式值 类型:<a style="color: #317ee7" onclick="anchorJump('#anchor_10'); return false;">PageView</a></td>
+			<td width="40%">值内容说明：用户举报分页</td> 
+		</tr>	
+	</tbody> 
+</table>
+
+<table id="anchor_10" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">分页 PageView</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>records</td> 
+			<td>List&lt<a style="color: #317ee7" onclick="anchorJump('#anchor_20'); return false;">Report</a>></td>
+			<td>数据展示列表</td>
+		</tr>
+		<tr> 
+			<td>pageIndex</td> 
+			<td><a style="color: #317ee7" onclick="anchorJump('#anchor_30'); return false;">PageIndex</a></td>
+			<td>页码索引</td>
+		</tr>
+		<tr> 
+			<td>totalpage</td> 
+			<td>long</td>
+			<td>总页数</td>
+		</tr>
+		<tr> 
+			<td>maxresult</td> 
+			<td>long</td>
+			<td>每页显示记录数</td>
+		</tr>
+		<tr> 
+			<td>currentpage</td> 
+			<td>long</td>
+			<td>当前页</td>
+		</tr>
+		<tr> 
+			<td>pagecount</td> 
+			<td>long</td>
+			<td>页码显示总数</td>
+		</tr>
+		<tr> 
+			<td>onUrl</td> 
+			<td>String</td>
+			<td>上一页URL</td>
+		</tr>
+		<tr> 
+			<td>nextUrl</td> 
+			<td>String</td>
+			<td>下一页URL</td>
+		</tr>
+	</tbody> 
+</table>
+<table id="anchor_30" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">分页索引 PageIndex</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>startindex</td> 
+			<td>long</td>
+			<td>分页开始索引</td>
+		</tr>
+		<tr> 
+			<td>endindex</td> 
+			<td>long</td>
+			<td>分页结束索引</td>
+		</tr>
+	</tbody> 
+</table>
+<table id="anchor_20" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">用户举报 Report</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>id</td> 
+			<td>String</td>
+			<td>Id</td>
+		</tr>
+		<tr> 
+			<td>userId</td> 
+			<td>String</td>
+			<td>用户Id</td>
+		</tr>
+		<tr> 
+			<td>reportTypeId</td> 
+			<td>String</td>
+			<td>举报分类Id</td>
+		</tr>
+		<tr> 
+			<td>reportTypeName</td> 
+			<td>String</td>
+			<td>举报分类名称</td>
+		</tr>
+		<tr> 
+			<td>parameterId</td> 
+			<td>String</td>
+			<td>参数Id (话题Id；  评论Id；  评论回复Id；  问题Id；  答案Id；  答案回复Id)</td>
+		</tr>
+		<tr> 
+			<td>extraParameterId</td> 
+			<td>String</td>
+			<td>扩展参数Id (模块值10：空；  模块值20：话题Id； 模块值30：话题Id-评论Id；  模块值40：空；  模块值50：问题Id；  模块值60：问题Id-答案Id)</td>
+		</tr>
+		<tr> 
+			<td>module</td> 
+			<td>Integer</td>
+			<td>模块  10:话题  20:评论  30:评论回复  40:问题  50:答案   60:答案回复</td>
+		</tr>
+		<tr> 
+			<td>reason</td> 
+			<td>String</td>
+			<td>举报理由</td>
+		</tr>
+		<tr> 
+			<td>processResult</td> 
+			<td>String</td>
+			<td>处理结果</td>
+		</tr>
+		<tr> 
+			<td>imageInfoList</td> 
+			<td>List&lt<a style="color: #317ee7" onclick="anchorJump('#anchor_120'); return false;">ImageInfo</a>></td>
+			<td>图片</td>
+		</tr>
+		<tr> 
+			<td>postTime</td> 
+			<td>Date</td>
+			<td>举报时间</td>
+		</tr>
+		<tr> 
+			<td>processCompleteTime</td> 
+			<td>Date</td>
+			<td>处理完成时间   处理状态(40:投诉失败  50:投诉成功)为处理完成状态</td>
+		</tr>
+		<tr> 
+			<td>status</td> 
+			<td>Integer</td>
+			<td>处理状态  10:待处理  40:投诉失败  50:投诉成功   1010:待处理【用户删除】  1020:需补充理由【用户删除】  1030:已补充理由【用户删除】  1040:投诉失败【用户删除】  1050:投诉成功【用户删除】     100010:待处理【员工删除】  100020:需补充理由【员工删除】  100030:已补充理由【员工删除】  100040:投诉失败【员工删除】  100050:投诉成功【员工删除】 </td>
+		</tr>
+	</tbody> 
+</table>
+
+<table id="anchor_120" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">图片信息 ImageInfo</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>path</td> 
+			<td>String</td>
+			<td>图片路径</td>
+		</tr>
+		<tr> 
+			<td>name</td> 
+			<td>String</td>
+			<td>图片名称</td>
+		</tr>
+	</tbody> 
+</table>
+
+<h2 style="margin:0;padding:0; margin-top: 10px;">示例</h2>
+<textarea name="exampleCode">
+<#if pageView.records?exists && pageView.records?size gt 0 >    
+	<#list pageView.records as report>
+		<#-- 举报时间 -->
+		${report.postTime}
+		<#-- 举报分类 -->
+		${report.reportTypeName}
+	</#list>
+</#if> 
+<#if !pageView.records?exists || pageView.totalrecord == 0 > 
+	还没有举报记录
+</#if> 
+</textarea>

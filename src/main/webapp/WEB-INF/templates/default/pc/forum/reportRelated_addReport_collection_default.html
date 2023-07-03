@@ -1,0 +1,451 @@
+<#--  添加举报 集合-->
+<@function> 
+	<#--  返回Map<String,Object>类型 -->
+	<#assign returnValue = reportRelated_addReport_collection>
+	
+	<#-- 允许提交举报 -->
+	<#if returnValue['allowReport'] == true>
+		<!-- 文件系统 -->
+		<input type="hidden" id="fileSystem"  value="${returnValue['fileSystem']}">
+		
+		<div class="addReportModule">
+			<div class="reportType-container">
+				<#list returnValue['reportTypeList'] as reportType>	
+					<div class="reportType-group">
+						<#--  仅有一级分类 -->
+						<#if reportType.childType?size == 0>
+							<ul class="reportType-list">
+								<li class="reportType-item">
+									<div class="form-field-radio">
+					        			<div class="form-field-radio-container">
+					        				<div class="form-field-radio-input">
+												<label>
+													<input type="radio" class="formRadio" name="reportTypeId_${identificationNumber}" value="${reportType.id}" onchange="selectReportType('${identificationNumber}','${reportType.id}',${reportType.giveReason?string('true','false')})">
+									                <span class="formRadio-core"></span>
+													<span class="formRadio-text">${reportType.name}</span> 
+												</label>
+						        			</div>
+					        			</div>
+					        		</div>
+								</li>
+							</ul>
+						<#else>
+							<#-- 含有多级分类 -->
+							<p class="reportType-name">${reportType.name}</p>
+							<ul class="reportType-list">
+								<#list reportType.childType as childReportType>	
+									<li class="reportType-item">
+										<div class="form-field-radio">
+						        			<div class="form-field-radio-container">
+						        				<div class="form-field-radio-input">
+													<label>
+														<input type="radio" class="formRadio" name="reportTypeId_${identificationNumber}" value="${childReportType.id}" onchange="selectReportType('${identificationNumber}','${childReportType.id}',${childReportType.giveReason?string('true','false')})">
+										                <span class="formRadio-core"></span>
+														<span class="formRadio-text">${childReportType.name}</span> 
+													</label>
+							        			</div>
+						        			</div>
+						        		</div>
+									</li>
+								</#list>
+							</ul>
+						</#if>
+					</div>
+				</#list>
+				<span id="${identificationNumber}_reportTypeId_error" name="error" class="error">${(error['reportTypeId'])!}</span> 	
+			</div>
+			<div class="reason-form">
+				<div id="reason_field_${identificationNumber}" class="form-field" style="display: none;">
+	        		<div id="reason_${identificationNumber}_field_error" class="form-field-container">
+		        		<div class="form-field-radio">
+		        			<div class="form-field-radio-container">
+		        				<div class="form-field-radio-input">
+			        				<textarea class="formTextarea" id="reason_${identificationNumber}" rows="5" cols="60" placeholder="请填写举报理由"></textarea>
+			        			</div>
+		        			</div>
+		        		</div>
+		        		<span id="${identificationNumber}_reason_error" name="error" class="error">${(error['reason'])!}</span> 	
+	        		</div>
+	        	</div>
+	        	<#if returnValue['reportMaxImageUpload'] gt 0>	
+		        	<div id="image_field_${identificationNumber}" class="image-form" style="display: none;">
+	       				<ul id="preview_${identificationNumber}" class="uploadImagelist">
+	       					<!-- 
+	       					<li class="uploadImageItem">
+	       						<div>
+	        						<img class="thumbnail" src="">
+	        						<span class="actions">
+		        						<span class="item-preview">
+		        							<i class="cms-zoom-in-line" ></i>
+		        						</span>
+		        						<span class="item-delete">
+		        							<i class="cms-trash" ></i> 
+		        						</span>
+	        						</span>
+	        					</div>
+	        				</li>
+	        				 -->
+	        			</ul>
+	        			
+	        			<div class="uploadImageInput" onclick="selectFileWindow('${identificationNumber}');">
+	        				<i class="cms-add-line"></i> 
+	        			</div>
+	       				<input class="imageInput" type="file" id="image_${identificationNumber}" accept=".jpg,.jpeg,.gif,.png,.bmp" onchange="selectFile(this,'${identificationNumber}')">
+	        		
+		        		<div id="${identificationNumber}_imageFile_error" name="error" class="error">${(error['imageFile'])!}</div> 	
+		        	</div>
+	        	</#if>
+	        	<#-- 获取令牌 -->
+				<input type="hidden" id="token" name="token" value="${token!}">
+				
+				<#-- 图片允许最大上传数量 -->
+				<input type="hidden" id="reportMaxImageUpload_${identificationNumber}" value="${returnValue['reportMaxImageUpload']}">
+				
+				<#-- 获取参数Id -->
+				<input type="hidden" id="parameterId_${identificationNumber}" value="${url_parameterId}">
+				<#-- 获取模块 -->
+				<input type="hidden" id="module_${identificationNumber}" value="${url_module}">
+				
+				<div class="reason-action">
+					<div class="clearfix">
+						<div class="reportSubmit">
+							<span class="submitButton"><INPUT id="${identificationNumber}_submitForm"  type="button" value="提交" onClick="javascript:ajax_addReportSubmit('${identificationNumber}')"></span>
+				        </div>
+				        
+				        <#-- identificationNumber:识别号：用来区别每次请求 -->
+						<#-- 验证码 -->
+						<#if returnValue['captchaKey'] != "">	
+							<div class="captchaModule">
+								<div class="captcha_div">
+									<div class="captchaBox">
+										<input type="hidden" id="${identificationNumber}_captchaKey" name="captchaKey" value="${(returnValue['captchaKey'])!}">
+										<input id="${identificationNumber}_captchaValue" name="captchaValue" type="text" maxLength="5" autocomplete="off" tabindex="3" onfocus="inputBoxTip_click(this);" onblur="inputBoxTip_leave('${identificationNumber}',this);"/>
+										<label class="promptTag" id="${identificationNumber}_captchaValueBoxTip"  for="captchaValue">验证码</label>
+									</div>
+									<a class="captchaImage" href="javascript:void(0);" >
+										<img id="${identificationNumber}_captcha" src="captcha/${(returnValue['captchaKey'])!}.jpg" onClick="replaceCaptcha('${identificationNumber}');" tabindex="4" />
+									</a>
+									<a  href="javascript:void(0);" onClick="replaceCaptcha('${identificationNumber}');" tabindex="5">换一幅</a>
+								</div>
+								<p class="tips">
+									
+									<#-- 验证码错误 -->
+									<span id="${identificationNumber}_captchaValue_error" name="error">${(error['captchaValue'])!}</span>
+									
+								</p>
+							</div>
+						</#if>
+					</div>
+					<div id="${identificationNumber}_report_error" name="error" class="error">${error['report']}</div>
+				</div>
+				
+				<script language="javascript" type="text/javascript">
+					//选择举报分类
+					function selectReportType(identificationNumber,reportTypeId,giveReason){
+						if(giveReason == true){
+							document.getElementById("reason_field_"+identificationNumber).style.display="";
+							if(document.getElementById("image_field_"+identificationNumber)){
+								document.getElementById("image_field_"+identificationNumber).style.display="";
+							}
+							
+						}else{
+							document.getElementById("reason_field_"+identificationNumber).style.display="none";
+							if(document.getElementById("image_field_"+identificationNumber)){
+								document.getElementById("image_field_"+identificationNumber).style.display="none";
+							}
+						}
+					}
+					
+					//文件列表(删除时索引不变，仅设置为空值)
+					var fileList = [];
+					
+					//弹出窗口
+					function selectFileWindow(identificationNumber){
+						var reportMaxImageUpload = document.getElementById("reportMaxImageUpload_"+identificationNumber).value;
+						
+						var count = 0;
+						//图片
+						for(var i=0; i<fileList.length; i++){
+							var file = fileList[i];
+							
+							if(file != null){
+								count++;
+							}
+							
+						}
+						
+						if(reportMaxImageUpload >0  && count < reportMaxImageUpload){
+							document.getElementById("image_"+identificationNumber).click(); 
+						}else{
+							layer.msg('已达到图片允许上传数量', 
+								{
+								  time: 3000 //3秒关闭（如果不配置，默认是3秒）
+								}
+							);
+						}
+						
+					}
+					
+					//选择文件
+					function selectFile(obj,identificationNumber){
+						var files = obj.files;
+						if(files.length > 0){
+							fileList.push(files[0]);
+							createPreviewContainer(identificationNumber);
+							preview(files[0],identificationNumber);
+							$("#thumbnail_"+identificationNumber+"_"+fileList.length).simplebox();//绑定放大事件到图片
+						}
+					}
+					
+					//创建本地图片预览容器
+					function createPreviewContainer(identificationNumber){
+						
+						var previewContainer = document.getElementById("preview_"+identificationNumber);		//获取添加容器对象
+										
+						var element = document.createElement("li");
+						element.className = 'uploadImageItem';
+						element.id = "imageItem_"+identificationNumber+"_"+fileList.length;
+						previewContainer.appendChild(element);
+						
+						var html = '<div>';
+						html +=			'<img id="thumbnail_'+identificationNumber+'_'+fileList.length+'" class="thumbnail">';
+						html +=			 '<span class="actions">';
+						html +=			 	'<span class="item-preview" onclick="zoomImage('+fileList.length+',\''+identificationNumber+'\')">';
+						html +=			 		'<i class="cms-zoom-in-line"></i>';
+						html +=			 	'</span>';
+						html +=			 	'<span class="item-delete" onclick="deleteImage('+fileList.length+',\''+identificationNumber+'\')">';
+						html +=			 		'<i class="cms-trash" ></i>';
+						html +=			 	'</span>';
+						html +=			 '</span>';
+						html +=		'</div>';
+						element.innerHTML = html;
+					}
+					
+					//本地图片预览
+					function preview(file,identificationNumber){
+						var fileURL = URL.createObjectURL(file);
+						document.getElementById("thumbnail_"+identificationNumber+"_"+fileList.length).setAttribute("src", fileURL);
+						/**
+						// 新建读取对象
+		                var reader = new FileReader();
+		                //以dataUrl的方式读取
+		                reader.readAsDataURL(file);
+		                // 当文件读取完毕时
+		                reader.onload = function(e) {
+		                    var urlData = this.result;
+		                    document.getElementById("thumbnail_"+identificationNumber+"_"+fileList.length).setAttribute("src", urlData);
+		                };**/
+					}
+					
+					//放大图片
+					function zoomImage(number,identificationNumber){
+						document.getElementById("thumbnail_"+identificationNumber+"_"+number).click();
+					}
+					
+					//删除图片
+					function deleteImage(number,identificationNumber){
+						fileList.splice(number-1,1,null);
+						
+						var imageItem = document.getElementById("imageItem_"+identificationNumber+"_"+number);
+						imageItem.parentNode.removeChild(imageItem);
+					}
+				
+					//点击输入框提示 
+					function inputBoxTip_click(obj){
+						document.getElementById(obj.id+"BoxTip").style.display="none";
+					
+					}
+					//离开输入框提示
+					function inputBoxTip_leave(identificationNumber,obj){
+						if(obj.value != ""){
+							document.getElementById(obj.id+"BoxTip").style.display="none";
+						}else{
+							document.getElementById(obj.id+"BoxTip").style.display="";
+						}
+						verificationCode(identificationNumber);
+					}
+					
+					//校对验证码 identificationNumber:识别号：用来区别每次请求
+					function verificationCode(identificationNumber){
+						var flag = true;
+						if( document.getElementById(identificationNumber+"_"+"captchaKey") != null){
+							
+							var captchaKey = document.getElementById(identificationNumber+"_"+"captchaKey").value;
+							var parameter = document.getElementById(identificationNumber+"_"+"captchaValue").value;
+							if(parameter != ""){
+							
+								var parameter_trim = trim(parameter);
+								if(parameter_trim != ""){
+									//ajax使用同步提交
+									get_request(function(value){
+						            	if(value == "false"){
+						            	
+							            	document.getElementById(identificationNumber+"_"+"captchaValue_error").innerHTML = "验证码错误";
+							            	flag = false;
+						            	}
+						            },
+								 		"checkCaptcha?captchaKey="+captchaKey+"&captchaValue="+parameter_trim+"&timestamp=" + new Date().getTime(), false);
+						            	
+								}else{
+									document.getElementById(identificationNumber+"_"+"captchaValue_error").innerHTML = "验证码不能为空";
+									flag = false;
+								}
+							}else{
+								document.getElementById(identificationNumber+"_"+"captchaValue_error").innerHTML = "验证码不能为空";
+								flag = false;
+							}
+							if(flag == true){
+								document.getElementById(identificationNumber+"_"+"captchaValue_error").innerHTML = "";
+							}
+						}
+					
+						return flag;
+					}
+					//更换验证码
+					function replaceCaptcha(identificationNumber){
+						var captchaKey = document.getElementById(identificationNumber+"_"+"captchaKey").value;
+						document.getElementById(identificationNumber+"_"+"captcha").src = "captcha/"+captchaKey+".jpg?" + Math.random(); 
+					}
+					
+					//Ajax方式提交
+					function ajax_addReportSubmit(identificationNumber){
+						//按钮设置 disabled="disabled"
+						document.getElementById(identificationNumber+"_submitForm").disabled=true;
+						//清空所有错误提示
+						var error_tag = getElementsByName_pseudo("span", "error");
+						for(var i = 0;i < error_tag.length; i++) {
+							error_tag[i].innerHTML="";
+						
+						}
+						
+						
+						if(verificationCode() == true){
+						
+							var parameter = "";
+							var formData = new FormData();
+							
+							//获取令牌
+							formData.append("token", document.getElementById("token").value);
+							
+							formData.append("parameterId", document.getElementById("parameterId_"+identificationNumber).value);//获取URL参数
+							formData.append("module", document.getElementById("module_"+identificationNumber).value);//获取URL参数
+						
+					
+							
+							//获取验证码key
+							var captchaKey = document.getElementById(identificationNumber+"_"+"captchaKey");
+							if(captchaKey != null){
+								formData.append("captchaKey", captchaKey.value);
+							}
+							
+							//获取验证码value
+							var captchaValue = document.getElementById(identificationNumber+"_"+"captchaValue");
+							if(captchaValue != null){
+								formData.append("captchaValue", captchaValue.value);
+							}
+							
+							//举报分类
+							var reportTypeId = document.getElementsByName("reportTypeId_"+identificationNumber);
+							if(reportTypeId != null){
+								for(var i =0; i<reportTypeId.length; i++){
+									if (reportTypeId[i].checked) {
+										formData.append("reportTypeId", reportTypeId[i].value);
+										
+									}
+								}
+							}
+							
+							//理由
+							var reason = document.getElementById("reason_"+identificationNumber);
+							if(reason && reason.value){
+								formData.append("reason", reason.value);
+							}
+							
+							//图片
+							for(var i=0; i<fileList.length; i++){
+								var file = fileList[i];
+								
+								if(file != null){
+									formData.append("imageFile", file);
+								}
+								
+							}
+							
+							$.ajax({
+								type : "POST",
+								cache : false,
+								async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+								url : "user/control/report/add",
+								data : formData,
+								contentType : false, // 不设置内容类型
+								processData : false, // 不处理数据
+								success : function success(result) {
+									for(var returnValue in result){
+								
+										if(returnValue == "success"){
+						        			if(result[returnValue] == "true"){
+						        				//需引入layer
+						        				
+						        				layer.msg('提交成功,3秒后自动关闭本页', 
+													{
+													  time: 3000 //3秒关闭（如果不配置，默认是3秒）
+													},function(){//关闭后的操作
+														layer.closeAll(); //关闭所有层
+													}
+												);
+						        				
+						        			}
+						        		}else if(returnValue == "error"){
+						        			
+						        			var error = result[returnValue];
+						        			for(var key in error){
+						        				var error_html = document.getElementById(identificationNumber+"_"+key+"_error");
+						        	
+						        				if(error_html != null){
+						        					error_html.innerHTML = error[key];
+						        				}
+						        				
+						        			}
+						        			//按钮设置 disabled="disabled"
+											document.getElementById(identificationNumber+"_submitForm").disabled=false;
+						        		}else if(returnValue == "captchaKey"){//显示验证码
+				        					
+											var captchaKey = result[returnValue];
+											if(captchaKey != ""){
+												//设置验证码Key
+												if(document.getElementById(identificationNumber+"_"+"captchaKey")!= null){
+				
+													document.getElementById(identificationNumber+"_"+"captchaKey").value = captchaKey;
+													//设置验证码图片
+													replaceCaptcha(identificationNumber);
+												}	
+											}
+										}
+									}
+								},
+								error: function(xhr, error) {
+									//jquery请求session过期跳转
+									timeoutJump(xhr);
+								}
+							});
+						}else{
+							//按钮设置 disabled="disabled"
+							document.getElementById(identificationNumber+"_submitForm").disabled=false;
+						}
+					} 
+				</script>
+			</div>
+		</div>
+	<#else>
+		<div class="addReport-disableFormModule">
+			<div class="disableForm-wrap">
+				<div class="respond">
+					<p>举报已关闭</p>
+				</div>
+			</div>
+		</div>
+	</#if>
+</@function>
+
+
+

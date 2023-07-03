@@ -1163,6 +1163,7 @@ public class AnswerFormAction {
 	 * 回复  添加
 	 * @param model
 	 * @param answerId 答案回复Id
+	 * @param friendReplyId 对方回复Id
 	 * @param content
 	 * @param token
 	 * @param captchaKey
@@ -1173,7 +1174,7 @@ public class AnswerFormAction {
 	 * @throws Exception
 	 */
 	@RequestMapping(value="/addAnswerReply", method=RequestMethod.POST)
-	public String addAnswerReply(ModelMap model,Long answerId,String content,
+	public String addAnswerReply(ModelMap model,Long answerId,Long friendReplyId,String content,
 			String token,String captchaKey,String captchaValue,String jumpUrl,
 			RedirectAttributes redirectAttrs,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -1228,6 +1229,7 @@ public class AnswerFormAction {
 		}
 		
 		Answer answer = null;
+		AnswerReply friendAnswerReply = null;
 		Question question = null;
 		if(answerId == null || answerId <=0){
 			error.put("answerReply", ErrorView._205.name());//答案不存在
@@ -1251,6 +1253,16 @@ public class AnswerFormAction {
 				}else{
 					error.put("answerReply",ErrorView._207.name());//问题不存在
 					
+				}
+				if(friendReplyId != null && friendReplyId >0){
+					friendAnswerReply = answerService.findReplyByReplyId(friendReplyId);
+					if(friendAnswerReply != null){
+						if(!friendAnswerReply.getAnswerId().equals(answerId)){
+							error.put("friendReplyId", ErrorView._246.name());//对方回复Id和答案Id不对应
+						}
+					}else{
+						error.put("friendReplyId", ErrorView._247.name());//对方回复Id不存在
+					}
 				}
 			}else{
 				error.put("answerReply", ErrorView._205.name());//答案不存在
@@ -1356,6 +1368,12 @@ public class AnswerFormAction {
 		
 		//保存
 		if(error.size() ==0){
+			if(friendAnswerReply != null){
+				answerReply.setFriendReplyId(friendReplyId);
+				answerReply.setFriendReplyIdGroup(friendAnswerReply.getFriendReplyIdGroup()+friendReplyId+",");
+				answerReply.setIsFriendStaff(friendAnswerReply.getIsStaff());
+				answerReply.setFriendUserName(friendAnswerReply.getUserName());
+			}
 			//保存回复
 			answerService.saveReply(answerReply);
 			
@@ -1400,8 +1418,8 @@ public class AnswerFormAction {
 				User _user = userManage.query_cache_findUserByUserName(question.getUserName());
 				//别人回复了我的问题
 				if(_user != null && !_user.getId().equals(accessUser.getUserId())){//作者回复不发提醒给自己
-					//如果别人回复了问题发布者的答案，则不发本类型提醒给问题发布者
-					if(!answer.getUserName().equals(question.getUserName())){
+					//如果别人回复了问题发布者的答案，则不发本类型提醒给问题发布者；如果回复了问题发布者的回复，则不发本类型提醒给问题发布者
+					if(!answer.getUserName().equals(question.getUserName()) && !question.getUserName().equals(answerReply.getFriendUserName())){
 						Remind remind = new Remind();
 						remind.setId(remindManage.createRemindId(_user.getId()));
 						remind.setReceiverUserId(_user.getId());//接收提醒用户Id
@@ -1424,8 +1442,10 @@ public class AnswerFormAction {
 			
 			User _user = userManage.query_cache_findUserByUserName(answer.getUserName());
 			//别人回复了我的答案
-			if(!answer.getIsStaff() && _user != null && !_user.getId().equals(accessUser.getUserId())){//不发提醒给自己
-
+			if(!answer.getIsStaff() && _user != null 
+					&& !_user.getId().equals(accessUser.getUserId())//不发提醒给自己
+					&& !answer.getUserName().equals(answerReply.getFriendUserName())//如果回复了答案发布者的回复，则不发本类型提醒给答案发布者
+					){
 				Remind remind = new Remind();
 				remind.setId(remindManage.createRemindId(_user.getId()));
 				remind.setReceiverUserId(_user.getId());//接收提醒用户Id
@@ -1466,6 +1486,10 @@ public class AnswerFormAction {
 						continue;
 					}
 
+					//如果是被回复用户，则不发本类型提醒。由后面的代码发（160:别人回复了我的答案回复）类型提醒
+					if(_reply.getUserName().equals(answerReply.getFriendUserName())){
+						continue;
+					}
 					//如果同一个用户有多条回复,只发一条提醒
 					if(userNameList.contains(_reply.getUserName())){
 						continue;
@@ -1476,15 +1500,43 @@ public class AnswerFormAction {
 					
 					_user = userManage.query_cache_findUserByUserName(_reply.getUserName());
 					
+					if(_user != null){
+						//提醒
+						Remind remind = new Remind();
+						remind.setId(remindManage.createRemindId(_user.getId()));
+						remind.setReceiverUserId(_user.getId());//接收提醒用户Id
+						remind.setSenderUserId(accessUser.getUserId());//发送用户Id
+						remind.setTypeCode(150);//150:别人回复了我回复过的答案
+						remind.setSendTimeFormat(postTime.getTime());//发送时间格式化
+						remind.setQuestionId(_reply.getQuestionId());//问题Id
+						remind.setQuestionReplyId(_reply.getId());//我的问题回复Id
+						
+						
+						remind.setFriendQuestionAnswerId(answer.getId());//对方的问题答案Id
+						remind.setFriendQuestionReplyId(answerReply.getId());//对方的问题回复Id
+						
+						
+						Object remind_object = remindManage.createRemindObject(remind);
+						remindService.saveRemind(remind_object);
+						
+						//删除提醒缓存
+						remindManage.delete_cache_findUnreadRemindByUserId(_user.getId());
+					}
+				}
+			}
+			
+			if(friendAnswerReply != null && !friendAnswerReply.getIsStaff()){
+				_user = userManage.query_cache_findUserByUserName(friendAnswerReply.getUserName());
+				if(_user != null && !_user.getId().equals(accessUser.getUserId())){//不发提醒给自己
 					//提醒
 					Remind remind = new Remind();
 					remind.setId(remindManage.createRemindId(_user.getId()));
 					remind.setReceiverUserId(_user.getId());//接收提醒用户Id
 					remind.setSenderUserId(accessUser.getUserId());//发送用户Id
-					remind.setTypeCode(150);//150:别人回复了我回复过的答案
+					remind.setTypeCode(160);//160:别人回复了我的答案回复
 					remind.setSendTimeFormat(postTime.getTime());//发送时间格式化
-					remind.setQuestionId(_reply.getQuestionId());//问题Id
-					remind.setQuestionReplyId(_reply.getId());//我的问题回复Id
+					remind.setQuestionId(friendAnswerReply.getQuestionId());//问题Id
+					remind.setQuestionReplyId(friendAnswerReply.getId());//我的问题回复Id
 					
 					
 					remind.setFriendQuestionAnswerId(answer.getId());//对方的问题答案Id
@@ -1495,10 +1547,9 @@ public class AnswerFormAction {
 					remindService.saveRemind(remind_object);
 					
 					//删除提醒缓存
-					remindManage.delete_cache_findUnreadRemindByUserId(_user.getId());
-				}
+					remindManage.delete_cache_findUnreadRemindByUserId(_user.getId());	
+				}	
 			}
-			
 			
 			//异步执行会员卡赠送任务(长期任务类型)
 			membershipCardGiftTaskManage.async_triggerMembershipCardGiftTask(accessUser.getUserName());

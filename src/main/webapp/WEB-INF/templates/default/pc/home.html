@@ -32,6 +32,7 @@
 </head>
 <body>
 
+
 <#-- 引入页头 -->
 <@include action="${newPublic_2}"/>
 <div class="skeleton">
@@ -98,6 +99,11 @@
 						<i class="userRoleName">${roleName}</i>				
 					</#list>
 				</div>
+				<#if user.ipAddress != null && user.ipAddress??>
+					<div class="ipAddress" >
+						<span><i class="cms-map-pin-line"></i> ${user.ipAddress}</span>
+					</div> 
+				</#if>
 				<div class="clearfix"></div>
 				<div class="action-button">
 					<#if user.userName != null && user.userName != systemUser.userName>
@@ -109,6 +115,7 @@
 						</span>
 					</#if>
 				</div>
+				
 			</div>						
 		</div>
 		
@@ -234,6 +241,12 @@
 						<a class="a-pic" href="user/control/realNameAuthentication" >
 							<div class="img cms-realNameAuthentication" ></div> 
 							<h4 class="title">绑定手机</h4>	
+						</a>
+					</li>
+					 <li class="item">
+						<a class="a-pic" href="user/control/reportList" >
+							<div class="img cms-error-warning-line" ></div> 	
+							<h4 class="title">举报</h4>
 						</a>
 					</li>
 		            <li class="item">

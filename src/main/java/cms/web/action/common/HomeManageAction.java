@@ -56,9 +56,12 @@ import cms.bean.question.QuestionTag;
 import cms.bean.question.QuestionTagAssociation;
 import cms.bean.redEnvelope.GiveRedEnvelope;
 import cms.bean.redEnvelope.ReceiveRedEnvelope;
+import cms.bean.report.Report;
+import cms.bean.report.ReportType;
 import cms.bean.setting.SystemSetting;
 import cms.bean.topic.Comment;
 import cms.bean.topic.HideTagType;
+import cms.bean.topic.ImageInfo;
 import cms.bean.topic.Reply;
 import cms.bean.topic.Tag;
 import cms.bean.topic.Topic;
@@ -91,6 +94,7 @@ import cms.service.question.AnswerService;
 import cms.service.question.QuestionService;
 import cms.service.question.QuestionTagService;
 import cms.service.redEnvelope.RedEnvelopeService;
+import cms.service.report.ReportTypeService;
 import cms.service.setting.SettingService;
 import cms.service.template.TemplateService;
 import cms.service.topic.CommentService;
@@ -209,7 +213,7 @@ public class HomeManageAction {
 	@Resource MediaProcessQueueManage mediaProcessQueueManage;
 	@Resource RedEnvelopeService redEnvelopeService;
 	@Resource RedEnvelopeManage redEnvelopeManage;
-	
+	@Resource ReportTypeService reportTypeService;
 	
 	//?  匹配任何单字符
 	//*  匹配0或者任意数量的字符
@@ -248,7 +252,7 @@ public class HomeManageAction {
 	  	}
 	  	
 	  	
-	  	
+	  	SystemSetting systemSetting = settingService.findSystemSetting_cache();
 	  	
 	    //获取登录用户
   		User new_user = userManage.query_cache_findUserByUserName(_userName);
@@ -287,7 +291,12 @@ public class HomeManageAction {
     			viewUser.setRealNameAuthentication(new_user.isRealNameAuthentication());//是否实名认证
     			viewUser.setAvatarPath(fileManage.fileServerAddress(request)+new_user.getAvatarPath());//头像路径
     			viewUser.setAvatarName(new_user.getAvatarName());//头像名称
-    			
+    			if(systemSetting.isShowIpAddress() && new_user.getId() != null){
+    				UserLoginLog userLoginLog = userService.findFirstUserLoginLog(new_user.getId());
+    				if(userLoginLog != null){
+    					viewUser.setIpAddress(IpAddress.queryProvinceAddress(userLoginLog.getIp()));
+    				}
+				}
     			if(userRoleNameList != null && userRoleNameList.size() >0){
     				viewUser.setUserRoleNameList(userRoleNameList);//话题允许查看的角色名称集合
     			}
@@ -309,6 +318,12 @@ public class HomeManageAction {
       			if(userRoleNameList != null && userRoleNameList.size() >0){
       				other_user.setUserRoleNameList(userRoleNameList);//话题允许查看的角色名称集合
     			}
+      			if(systemSetting.isShowIpAddress() && new_user.getId() != null){
+    				UserLoginLog userLoginLog = userService.findFirstUserLoginLog(new_user.getId());
+    				if(userLoginLog != null){
+    					other_user.setIpAddress(IpAddress.queryProvinceAddress(userLoginLog.getIp()));
+    				}
+				}
       			model.addAttribute("user", other_user);
           		returnValue.put("user", other_user);
       		}
@@ -371,7 +386,7 @@ public class HomeManageAction {
 		QueryResult<Topic> qr = topicService.getScrollData(Topic.class, firstindex, pageView.getMaxresult(),_jpql, params.toArray(),orderby);
 		if(qr.getResultlist() != null && qr.getResultlist().size() >0){
 			for(Topic o :qr.getResultlist()){
-    			o.setIpAddress(null);//IP地址不显示
+    			o.setIp(null);//IP地址不显示
     		}
 			List<Tag> tagList = tagService.findAllTag_cache();
 			if(tagList != null && tagList.size() >0){
@@ -448,7 +463,7 @@ public class HomeManageAction {
 		if(qr.getResultlist() != null && qr.getResultlist().size() >0){
 			List<Long> topicIdList = new ArrayList<Long>();
 			for(Comment o :qr.getResultlist()){
-    			o.setIpAddress(null);//IP地址不显示
+    			o.setIp(null);//IP地址不显示
     			
     			o.setContent(textFilterManage.filterText(textFilterManage.specifyHtmlTagToText(o.getContent())));
     			if(!topicIdList.contains(o.getTopicId())){
@@ -531,7 +546,7 @@ public class HomeManageAction {
 		if(qr.getResultlist() != null && qr.getResultlist().size() >0){
 			List<Long> topicIdList = new ArrayList<Long>();
 			for(Reply o :qr.getResultlist()){
-    			o.setIpAddress(null);//IP地址不显示
+    			o.setIp(null);//IP地址不显示
     			
     			if(!topicIdList.contains(o.getTopicId())){
     				topicIdList.add(o.getTopicId());
@@ -4817,7 +4832,7 @@ public class HomeManageAction {
 		QueryResult<Question> qr = questionService.getScrollData(Question.class, firstindex, pageView.getMaxresult(),_jpql, params.toArray(),orderby);
 		if(qr.getResultlist() != null && qr.getResultlist().size() >0){
 			for(Question o :qr.getResultlist()){
-    			o.setIpAddress(null);//IP地址不显示
+    			o.setIp(null);//IP地址不显示
     		}
 			
 			List<QuestionTag> questionTagList = questionTagService.findAllQuestionTag_cache();
@@ -4908,7 +4923,7 @@ public class HomeManageAction {
 		if(qr.getResultlist() != null && qr.getResultlist().size() >0){
 			List<Long> questionIdList = new ArrayList<Long>();
 			for(Answer o :qr.getResultlist()){
-    			o.setIpAddress(null);//IP地址不显示
+    			o.setIp(null);//IP地址不显示
     			
     			o.setContent(textFilterManage.filterText(textFilterManage.specifyHtmlTagToText(o.getContent())));
     			if(!questionIdList.contains(o.getQuestionId())){
@@ -4991,7 +5006,7 @@ public class HomeManageAction {
 		if(qr.getResultlist() != null && qr.getResultlist().size() >0){
 			List<Long> questionIdList = new ArrayList<Long>();
 			for(AnswerReply o :qr.getResultlist()){
-    			o.setIpAddress(null);//IP地址不显示
+    			o.setIp(null);//IP地址不显示
     			
     			if(!questionIdList.contains(o.getQuestionId())){
     				questionIdList.add(o.getQuestionId());
@@ -5224,6 +5239,99 @@ public class HomeManageAction {
 		}else{
 			String dirName = templateService.findTemplateDir_cache();
 		    return "templates/"+dirName+"/"+accessSourceDeviceManage.accessDevices(request)+"/receiveRedEnvelopeList";	
+		}
+	}
+	
+	/**
+	 * 举报列表
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/user/control/reportList",method=RequestMethod.GET) 
+	public String reportUI(ModelMap model,PageForm pageForm,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		
+  		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+		
+		
+		//调用分页算法代码
+		PageView<Report> pageView = new PageView<Report>(settingService.findSystemSetting_cache().getForestagePageNumber(),pageForm.getPage(),10,request.getRequestURI(),request.getQueryString());
+		//当前页
+		int firstindex = (pageForm.getPage()-1)*pageView.getMaxresult();
+		
+		//获取登录用户
+	  	AccessUser accessUser = AccessUserThreadLocal.get();
+    		
+		StringBuffer jpql = new StringBuffer("");
+		//存放参数值
+		List<Object> params = new ArrayList<Object>();
+		jpql.append(" and o.userName=?"+ (params.size()+1));
+		params.add(accessUser.getUserName());
+		
+		jpql.append(" and o.status<?"+ (params.size()+1));
+		params.add(1000);
+		
+		//删除第一个and
+		String _jpql = org.apache.commons.lang3.StringUtils.difference(" and", jpql.toString());
+		
+		//排序
+		LinkedHashMap<String,String> orderby = new LinkedHashMap<String,String>();
+		
+		orderby.put("id", "desc");//根据id字段降序排序
+	
+		
+		QueryResult<Report> qr = answerService.getScrollData(Report.class, firstindex, pageView.getMaxresult(),_jpql, params.toArray(),orderby);
+		if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
+			
+			List<ReportType> reportTypeList = reportTypeService.findAllReportType();
+			if(reportTypeList != null && reportTypeList.size() >0){
+				for(Report report : qr.getResultlist()){
+					for(ReportType reportType : reportTypeList){
+						if(report.getReportTypeId().equals(reportType.getId())){
+							report.setReportTypeName(reportType.getName());
+							break;
+						}
+					}
+					
+				}
+			}
+			
+			
+			for(Report report : qr.getResultlist()){
+			
+				
+				if(report.getImageData() != null && !"".equals(report.getImageData().trim())){
+					List<ImageInfo> imageInfoList = JsonUtils.toGenericObject(report.getImageData().trim(),new TypeReference< List<ImageInfo> >(){});
+					if(imageInfoList != null && imageInfoList.size() >0){
+						for(ImageInfo imageInfo : imageInfoList){
+							imageInfo.setPath(fileManage.fileServerAddress(request)+imageInfo.getPath());
+						}
+						report.setImageInfoList(imageInfoList);
+					}
+				}
+				
+				//不显示的信息
+				report.setStaffAccount(null);
+				report.setRemark(null);
+				report.setIp(null);
+			}
+			
+			
+		}
+		
+		//将查询结果集传给分页List
+		pageView.setQueryResult(qr);		
+    	
+		model.addAttribute("pageView", pageView);
+		
+		if(isAjax){
+			WebUtil.writeToWeb(JsonUtils.toJSONString(pageView), "json", response);
+			return null;
+		}else{
+			String dirName = templateService.findTemplateDir_cache();
+		    return "templates/"+dirName+"/"+accessSourceDeviceManage.accessDevices(request)+"/reportList";	
 		}
 	}
 	

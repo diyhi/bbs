@@ -46,6 +46,30 @@ public class Reply implements Serializable{
 	/** 头像名称 **/
 	@Transient
 	private String avatarName;
+	
+	/** 对方回复Id **/
+	private Long friendReplyId;
+	/** 对方回复Id组 **/
+	@Lob
+	private String friendReplyIdGroup = ",0,";
+	/** 对方是否是员工   true:员工   false:会员 **/
+	private Boolean isFriendStaff = false;
+	/** 对方用户名称 **/
+	@Column(length=30)
+	private String friendUserName;
+	/** 对方账号 **/
+	@Transient
+	private String friendAccount;
+	/** 对方呢称 **/
+	@Transient
+	private String friendNickname;
+	/** 对方头像路径 **/
+	@Transient
+	private String friendAvatarPath;
+	/** 对方头像名称 **/
+	@Transient
+	private String friendAvatarName;
+	
 	/** 用户信息状态 -30.账号已注销(不显示数据) -20.账号已逻辑删除(不显示数据) -10.账号已禁用(不显示数据)  0.正常 10.账号已禁用(显示数据) 20.账号已逻辑删除(显示数据) **/
 	@Transient
 	private Integer userInfoStatus = 0;
@@ -186,6 +210,54 @@ public class Reply implements Serializable{
 	}
 	public void setUserInfoStatus(Integer userInfoStatus) {
 		this.userInfoStatus = userInfoStatus;
+	}
+	public Long getFriendReplyId() {
+		return friendReplyId;
+	}
+	public void setFriendReplyId(Long friendReplyId) {
+		this.friendReplyId = friendReplyId;
+	}
+	public String getFriendReplyIdGroup() {
+		return friendReplyIdGroup;
+	}
+	public void setFriendReplyIdGroup(String friendReplyIdGroup) {
+		this.friendReplyIdGroup = friendReplyIdGroup;
+	}
+	public Boolean getIsFriendStaff() {
+		return isFriendStaff;
+	}
+	public void setIsFriendStaff(Boolean isFriendStaff) {
+		this.isFriendStaff = isFriendStaff;
+	}
+	public String getFriendUserName() {
+		return friendUserName;
+	}
+	public void setFriendUserName(String friendUserName) {
+		this.friendUserName = friendUserName;
+	}
+	public String getFriendAccount() {
+		return friendAccount;
+	}
+	public void setFriendAccount(String friendAccount) {
+		this.friendAccount = friendAccount;
+	}
+	public String getFriendNickname() {
+		return friendNickname;
+	}
+	public void setFriendNickname(String friendNickname) {
+		this.friendNickname = friendNickname;
+	}
+	public String getFriendAvatarPath() {
+		return friendAvatarPath;
+	}
+	public void setFriendAvatarPath(String friendAvatarPath) {
+		this.friendAvatarPath = friendAvatarPath;
+	}
+	public String getFriendAvatarName() {
+		return friendAvatarName;
+	}
+	public void setFriendAvatarName(String friendAvatarName) {
+		this.friendAvatarName = friendAvatarName;
 	}
 	
 	

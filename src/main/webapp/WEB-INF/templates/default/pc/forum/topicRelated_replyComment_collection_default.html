@@ -18,6 +18,8 @@
 				<div class="form-action">
 					<#-- 获取评论Id -->
 					<input type="hidden" id="${identificationNumber}_commentId" name="commentId" value="${url_commentId}">
+					<#-- 获取回复Id -->
+					<input type="hidden" id="${identificationNumber}_replyId" name="replyId" value="${url_replyId}">
 					<#-- 获取令牌 -->
 					<input type="hidden" id="token" name="token" value="${token!}">
 					
@@ -27,7 +29,7 @@
 						</span>
 						<!-- 调用方法在topicRelated_comment_page页 -->
 						<span class="cancelButton-box" >
-							<button type="button" class="cancelButton" onClick="javascript:cancelReply('${url_commentId}')">取消</button>
+							<button type="button" class="cancelButton" onClick="javascript:cancelReply('${url_commentId}','${url_replyId}')">取消</button>
 						</span>
 					</div>
 					<#-- identificationNumber:识别号：用来区别每次请求 -->
@@ -133,6 +135,8 @@
 							var parameter = "";
 							//评论Id
 							parameter += "&commentId="+document.getElementById(identificationNumber+"_commentId").value;
+							//回复Id
+							parameter += "&friendReplyId="+document.getElementById(identificationNumber+"_replyId").value;
 							//获取令牌
 							parameter += "&token="+document.getElementById("token").value;
 							

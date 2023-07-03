@@ -165,11 +165,17 @@ export default({
 			    		
 			    		//删除缓存
 			    		_self.$store.commit('setCacheNumber');
+			    		let page = (_self.$route.query.page != undefined ? _self.$route.query.page:'')
+			    		if((_self.$route.query.sourceParentId == null || _self.$route.query.sourceParentId == ''
+                            && _self.$route.query.parentId != null && _self.$route.query.parentId != '') ){
+                            
+                            page = "1";
+                        }
 			    		_self.$router.push({
 							path : '/admin/control/questionTag/list',
 							query:{
 								parentId: _self.parentId,
-								page:(_self.$route.query.page != undefined ? _self.$route.query.page:'')
+								page:page
 							}
 						});
 			    	}else if(returnValue.code === 500){//错误

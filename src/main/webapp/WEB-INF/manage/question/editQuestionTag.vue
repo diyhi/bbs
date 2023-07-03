@@ -173,10 +173,15 @@ export default({
 			    		
 			    		//删除缓存
 			    		_self.$store.commit('setCacheNumber');
+			    		
+			    		let parentId = _self.parentId;
+                        if(_self.parentId == '0'){
+                            parentId = ''
+                        }
 			    		_self.$router.push({
 							path : '/admin/control/questionTag/list',
 							query:{
-								parentId: _self.parentId,
+								parentId: parentId,
 								page:(_self.$route.query.page != undefined ? _self.$route.query.page:'')
 							}
 						});

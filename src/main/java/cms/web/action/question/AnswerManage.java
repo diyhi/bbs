@@ -1,6 +1,8 @@
 package cms.web.action.question;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -129,6 +131,29 @@ public class AnswerManage {
 		return JsonUtils.toJSONString(tag);
 	}
 	
+	/**
+	 * 回复排序
+	 * @param replyList
+	 */
+	public void replySort(List<AnswerReply> replyList){
+		Collections.sort(replyList, new Comparator<AnswerReply>(){
+			@Override
+			public int compare(AnswerReply o1, AnswerReply o2) {
+				long s_1 = o1.getId();
+				long s_2 = o2.getId();
+				if(s_1 <s_2){
+        			return -1;
+        			
+        		}else{
+        			if(s_1 == s_2){
+            			return 0;
+            		}else{
+            			return 1;
+            		}
+        		}  
+			}   
+		});
+	}
 	
 	/**
 	 * 查询答案缓存

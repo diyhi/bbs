@@ -1,6 +1,8 @@
 package cms.web.action.topic;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -130,6 +132,29 @@ public class CommentManage {
 		return JsonUtils.toJSONString(tag);
 	}
 	
+	/**
+	 * 回复排序
+	 * @param replyList
+	 */
+	public void replySort(List<Reply> replyList){
+		Collections.sort(replyList, new Comparator<Reply>(){
+			@Override
+			public int compare(Reply o1, Reply o2) {
+				long s_1 = o1.getId();
+				long s_2 = o2.getId();
+				if(s_1 <s_2){
+        			return -1;
+        			
+        		}else{
+        			if(s_1 == s_2){
+            			return 0;
+            		}else{
+            			return 1;
+            		}
+        		}  
+			}   
+		});
+	}
 	
 	/**
 	 * 查询评论缓存

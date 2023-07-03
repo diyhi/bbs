@@ -255,6 +255,12 @@ public interface UserService extends DAO<User> {
 	public QueryResult<UserLoginLog> findUserLoginLogPage(Long userId,int firstIndex, int maxResult);
 
 	/**
+	 * 查询最近一条登录日志
+	 * @param userId 用户Id
+	 */
+	public UserLoginLog findFirstUserLoginLog(Long userId);
+	
+	/**
 	 * 删除用户登录日志
 	 * @param endTime 结束时间
 	 */

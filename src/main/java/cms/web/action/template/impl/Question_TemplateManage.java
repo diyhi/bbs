@@ -37,6 +37,7 @@ import cms.service.question.AnswerService;
 import cms.service.question.QuestionService;
 import cms.service.question.QuestionTagService;
 import cms.service.setting.SettingService;
+import cms.utils.IpAddress;
 import cms.utils.JsonUtils;
 import cms.utils.UUIDUtil;
 import cms.utils.Verification;
@@ -233,7 +234,7 @@ public class Question_TemplateManage {
 		
 		if(qr.getResultlist() != null && qr.getResultlist().size() >0){
 			for(Question question : qr.getResultlist()){
-				question.setIpAddress(null);//IP地址不显示
+				question.setIp(null);//IP地址不显示
 				question.setContent(null);//问题内容不显示
 				if(question.getPostTime().equals(question.getLastAnswerTime())){//如果发贴时间等于回复时间，则不显示回复时间
 					question.setLastAnswerTime(null);
@@ -384,7 +385,7 @@ public class Question_TemplateManage {
 		}
 		if(questionId != null && questionId > 0L){
 			Question question = questionManage.query_cache_findById(questionId);//查询缓存
-			
+			SystemSetting systemSetting = settingService.findSystemSetting_cache();
 			if(question != null){
 					
 				if(ip != null){
@@ -405,7 +406,10 @@ public class Question_TemplateManage {
 						}
 					}	
 				}
-				question.setIpAddress(null);//IP地址不显示
+				if(accessUser != null && systemSetting.isShowIpAddress()){
+					question.setIpAddress(IpAddress.queryProvinceAddress(question.getIp()));
+				}
+				question.setIp(null);//IP地址不显示
 				
 				if(question.getContent() != null && !"".equals(question.getContent().trim())){
 					//处理富文本路径
@@ -656,6 +660,7 @@ public class Question_TemplateManage {
 		}
 		String requestURI = "";
 		String queryString = "";
+		AccessUser accessUser = null;
 		//获取运行时参数
 		if(runtimeParameter != null && runtimeParameter.size() >0){		
 			for(Map.Entry<String,Object> paramIter : runtimeParameter.entrySet()) {
@@ -663,6 +668,8 @@ public class Question_TemplateManage {
 					requestURI = (String)paramIter.getValue();
 				}else if("queryString".equals(paramIter.getKey())){
 					queryString = (String)paramIter.getValue();
+				}else if("accessUser".equals(paramIter.getKey())){
+					accessUser = (AccessUser)paramIter.getValue();
 				}
 			}
 		}
@@ -740,6 +747,7 @@ public class Question_TemplateManage {
 		
 		List<Long> answerIdList = new ArrayList<Long>();
 		List<Answer> answerList = qr.getResultlist();
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
 		
 		
 		Map<String,List<String>> userRoleNameMap = new HashMap<String,List<String>>();//用户角色名称 key:用户名称Id 角色名称集合
@@ -749,7 +757,10 @@ public class Question_TemplateManage {
 					//处理富文本路径
 					answer.setContent(fileManage.processRichTextFilePath(answer.getContent(),"answer"));
 				}
-				answer.setIpAddress(null);//IP地址不显示
+				if(accessUser != null && systemSetting.isShowIpAddress()){
+					answer.setIpAddress(IpAddress.queryProvinceAddress(answer.getIp()));
+				}
+				answer.setIp(null);//IP地址不显示
 				if(answer.getIsStaff() == false){//会员
 					User user = userManage.query_cache_findUserByUserName(answer.getUserName());
 					if(user != null){
@@ -816,7 +827,10 @@ public class Question_TemplateManage {
 				for(Answer answer : answerList){
 					for(AnswerReply answerReply : replyList){
 						if(answer.getId().equals(answerReply.getAnswerId())){
-							answerReply.setIpAddress(null);//IP地址不显示
+							if(accessUser != null && systemSetting.isShowIpAddress()){
+								answerReply.setIpAddress(IpAddress.queryProvinceAddress(answerReply.getIp()));
+							}
+							answerReply.setIp(null);//IP地址不显示
 							if(answerReply.getIsStaff() == false){//会员
 								User user = userManage.query_cache_findUserByUserName(answerReply.getUserName());
 								if(user != null){
@@ -837,6 +851,21 @@ public class Question_TemplateManage {
 							}else{
 								answerReply.setAccount(answerReply.getUserName());//员工用户名和账号是同一个
 							}
+							if(answerReply.getFriendUserName() != null && !"".equals(answerReply.getFriendUserName().trim())){
+								if(answerReply.getIsFriendStaff() == false){//会员
+									User user = userManage.query_cache_findUserByUserName(answerReply.getFriendUserName());
+									if(user != null && user.getState().equals(1) && user.getCancelAccountTime().equals(-1L)){
+										answerReply.setFriendAccount(user.getAccount());
+										answerReply.setFriendNickname(user.getNickname());
+										answerReply.setFriendAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
+										answerReply.setFriendAvatarName(user.getAvatarName());
+									}
+									
+								}else{
+									answerReply.setFriendAccount(answerReply.getFriendUserName());//员工用户名和账号是同一个
+									
+								}
+							}
 							
 							//非正常状态用户清除显示数据
 							if(answerReply.getUserInfoStatus() <0){
@@ -852,7 +881,8 @@ public class Question_TemplateManage {
 							answer.addAnswerReply(answerReply);
 						}
 					}
-					
+					//回复排序
+					answerManage.replySort(answer.getAnswerReplyList());
 				}
 			}
 		}
@@ -939,7 +969,7 @@ public class Question_TemplateManage {
 		if(accessUser != null && answerId != null && answerId >0L){
 			Answer answer = answerManage.query_cache_findByAnswerId(answerId);//查询缓存
 			if(answer != null && answer.getStatus() <100 && answer.getUserName().equals(accessUser.getUserName())){
-				answer.setIpAddress(null);//IP地址不显示
+				answer.setIp(null);//IP地址不显示
 				if(answer.getContent() != null && !"".equals(answer.getContent().trim())){
 					//处理富文本路径
 					answer.setContent(fileManage.processRichTextFilePath(answer.getContent(),"answer"));
@@ -1038,7 +1068,7 @@ public class Question_TemplateManage {
 		if(accessUser != null && replyId != null && replyId >0L){
 			AnswerReply answerReply = answerManage.query_cache_findReplyByReplyId(replyId);//查询缓存
 			if(answerReply != null && answerReply.getStatus() <100 && answerReply.getUserName().equals(accessUser.getUserName())){
-				answerReply.setIpAddress(null);//IP地址不显示
+				answerReply.setIp(null);//IP地址不显示
 	
 				value.put("reply",answerReply);
 				

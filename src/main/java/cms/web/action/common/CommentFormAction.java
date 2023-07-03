@@ -1597,6 +1597,7 @@ public class CommentFormAction {
 	 * 回复  添加
 	 * @param model
 	 * @param commentId 评论Id
+	 * @param friendReplyId 对方回复Id
 	 * @param content
 	 * @param token
 	 * @param captchaKey
@@ -1607,7 +1608,7 @@ public class CommentFormAction {
 	 * @throws Exception
 	 */
 	@RequestMapping(value="/addReply", method=RequestMethod.POST)
-	public String addReply(ModelMap model,Long commentId,String content,
+	public String addReply(ModelMap model,Long commentId,Long friendReplyId,String content,
 			String token,String captchaKey,String captchaValue,String jumpUrl,
 			RedirectAttributes redirectAttrs,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -1663,6 +1664,7 @@ public class CommentFormAction {
 		}
 		
 		Comment comment = null;
+		Reply friendReply = null;
 		Topic topic = null;
 		if(commentId == null || commentId <=0){
 			error.put("reply", ErrorView._105.name());//评论不存在
@@ -1686,6 +1688,16 @@ public class CommentFormAction {
 				}else{
 					error.put("reply",ErrorView._107.name());//话题不存在
 					
+				}
+				if(friendReplyId != null && friendReplyId >0){
+					friendReply = commentService.findReplyByReplyId(friendReplyId);
+					if(friendReply != null){
+						if(!friendReply.getCommentId().equals(commentId)){
+							error.put("friendReplyId", ErrorView._145.name());//对方回复Id和评论Id不对应
+						}
+					}else{
+						error.put("friendReplyId", ErrorView._146.name());//对方回复Id不存在
+					}
 				}
 			}else{
 				error.put("reply", ErrorView._105.name());//评论不存在
@@ -1786,6 +1798,12 @@ public class CommentFormAction {
 		}
 		//保存
 		if(error.size() ==0){
+			if(friendReply != null){
+				reply.setFriendReplyId(friendReplyId);
+				reply.setFriendReplyIdGroup(friendReply.getFriendReplyIdGroup()+friendReplyId+",");
+				reply.setIsFriendStaff(friendReply.getIsStaff());
+				reply.setFriendUserName(friendReply.getUserName());
+			}
 			//保存回复
 			commentService.saveReply(reply);
 			
@@ -1830,8 +1848,9 @@ public class CommentFormAction {
 				User _user = userManage.query_cache_findUserByUserName(topic.getUserName());
 				//别人回复了我的话题
 				if(_user != null && !_user.getId().equals(accessUser.getUserId())){//楼主回复不发提醒给自己
-					//如果别人回复了话题发布者的评论，则不发本类型提醒给话题发布者
-					if(!comment.getUserName().equals(topic.getUserName())){
+					//如果别人回复了话题发布者的评论，则不发本类型提醒给话题发布者；如果回复了话题发布者的回复，则不发本类型提醒给话题发布者
+					if(!comment.getUserName().equals(topic.getUserName()) && !topic.getUserName().equals(reply.getFriendUserName())){
+					
 						Remind remind = new Remind();
 						remind.setId(remindManage.createRemindId(_user.getId()));
 						remind.setReceiverUserId(_user.getId());//接收提醒用户Id
@@ -1853,9 +1872,11 @@ public class CommentFormAction {
 			}
 			
 			User _user = userManage.query_cache_findUserByUserName(comment.getUserName());
-			//别人回复了我的评论
-			if(!comment.getIsStaff() && _user != null && !_user.getId().equals(accessUser.getUserId())){//不发提醒给自己
-
+			//别人回复了我的评论 
+			if(!comment.getIsStaff() && _user != null 
+					&& !_user.getId().equals(accessUser.getUserId())//不发提醒给自己
+					&& !comment.getUserName().equals(reply.getFriendUserName())//如果回复了评论发布者的回复，则不发本类型提醒给评论发布者
+					){
 				Remind remind = new Remind();
 				remind.setId(remindManage.createRemindId(_user.getId()));
 				remind.setReceiverUserId(_user.getId());//接收提醒用户Id
@@ -1895,6 +1916,11 @@ public class CommentFormAction {
 					if(_reply.getUserName().equals(accessUser.getUserName())){
 						continue;
 					}
+					
+					//如果是被回复用户，则不发本类型提醒。由后面的代码发（55:别人回复了我的评论回复）类型提醒
+					if(_reply.getUserName().equals(reply.getFriendUserName())){
+						continue;
+					}
 
 					//如果同一个用户有多条回复,只发一条提醒
 					if(userNameList.contains(_reply.getUserName())){
@@ -1906,15 +1932,43 @@ public class CommentFormAction {
 					
 					_user = userManage.query_cache_findUserByUserName(_reply.getUserName());
 					
+					if(_user != null){
+						//提醒
+						Remind remind = new Remind();
+						remind.setId(remindManage.createRemindId(_user.getId()));
+						remind.setReceiverUserId(_user.getId());//接收提醒用户Id
+						remind.setSenderUserId(accessUser.getUserId());//发送用户Id
+						remind.setTypeCode(50);//50:别人回复了我回复过的评论
+						remind.setSendTimeFormat(postTime.getTime());//发送时间格式化
+						remind.setTopicId(_reply.getTopicId());//话题Id
+						remind.setTopicReplyId(_reply.getId());//我的话题回复Id
+						
+						
+						remind.setFriendTopicCommentId(comment.getId());//对方的话题评论Id
+						remind.setFriendTopicReplyId(reply.getId());//对方的话题回复Id
+						
+						
+						Object remind_object = remindManage.createRemindObject(remind);
+						remindService.saveRemind(remind_object);
+						
+						//删除提醒缓存
+						remindManage.delete_cache_findUnreadRemindByUserId(_user.getId());
+					}
+				}
+			}
+			
+			if(friendReply != null && !friendReply.getIsStaff()){
+				_user = userManage.query_cache_findUserByUserName(friendReply.getUserName());
+				if(_user != null && !_user.getId().equals(accessUser.getUserId())){//不发提醒给自己
 					//提醒
 					Remind remind = new Remind();
 					remind.setId(remindManage.createRemindId(_user.getId()));
 					remind.setReceiverUserId(_user.getId());//接收提醒用户Id
 					remind.setSenderUserId(accessUser.getUserId());//发送用户Id
-					remind.setTypeCode(50);//50:别人回复了我回复过的评论
+					remind.setTypeCode(55);//55:别人回复了我的评论回复
 					remind.setSendTimeFormat(postTime.getTime());//发送时间格式化
-					remind.setTopicId(_reply.getTopicId());//话题Id
-					remind.setTopicReplyId(_reply.getId());//我的话题回复Id
+					remind.setTopicId(friendReply.getTopicId());//话题Id
+					remind.setTopicReplyId(friendReply.getId());//我的话题回复Id
 					
 					
 					remind.setFriendTopicCommentId(comment.getId());//对方的话题评论Id

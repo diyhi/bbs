@@ -167,6 +167,43 @@ ul {
   height: 100%;
 }
 
+
+/* 回复时间线 */
+.timeline{
+	margin:0;
+    font-size:14px;
+    list-style:none;
+}
+.timeline .timeline-item {
+	position: relative;
+}
+.timeline .timeline-item:last-child .tail{
+    display:none
+}
+.timeline .timeline-item .tail {
+    position: absolute;
+    left: 4px;
+    top: 80px;
+    height: 100%;
+    border-left: 2px solid #79bbff;
+}
+.timeline .timeline-item .node--normal {
+    left: -1px;
+    width: 12px;
+    height: 12px;
+}
+.timeline .timeline-item .node {
+    position: absolute;
+    background-color: #79bbff;
+    border-color: #79bbff;
+    border-radius: 50%;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 80px;
+}
+
 .main{
 	background: #fff;
 }
@@ -305,6 +342,19 @@ ul {
     color: #fff;
     background-color: #8D4EDA !important;
     border-color: #8D4EDA !important;
+}
+.main .data-table .link{
+	 color: #409eff;
+}
+.main .data-table .image-preview{
+    margin-left: 5px;
+    margin-bottom: 5px;
+}
+.main .data-table .processCompleteTime{
+    color: #67C23A;
+}
+.main .data-table .staffAccount{
+    color: #67C23A;
 }
 .main .data-table .tag-spacing{
 	margin-right: 4px;
@@ -610,7 +660,9 @@ ul {
 .main .data-form .submitButton{
 	font-size: 15px;padding: 8px 20px;margin-top: 20px;
 }
-
+.main .data-form .radio .el-radio{
+	margin-top: 14px;
+}
 .main .data-form .el-form-item__error{
 	font-size: 14px; padding-top: 8px;
 }
@@ -1520,7 +1572,6 @@ background-position: 0px 2px, 4px 35px, 29px 31px, 34px 6px;
 .topicViewModule .el-link--default:hover {
 	color: #409EFF !important;
 }
-
 .topicViewModule .editTopic{
 	margin-left: 10px;margin-right: 10px; margin-top: 40px; margin-bottom: 10px;
 }
@@ -1656,7 +1707,15 @@ background-position: 0px 2px, 4px 35px, 29px 31px, 34px 6px;
 	margin-left: 6px;
 }
 
-
+/**举报标记 **/
+.topicViewModule .topic-wrap .reportMark:before{
+    content: " ";
+    position: absolute;
+    top: 0px;
+    left: -8px;
+    bottom:0px;
+    border-left: 5px solid #f89898;
+}
 
 .topicViewModule .topic-wrap .main {
 	margin: 0px 10px 10px 10px;
@@ -2011,7 +2070,18 @@ background-position: 0px 2px, 4px 35px, 29px 31px, 34px 6px;
 }
 
 
-
+/** 举报标记 **/
+.commentModule .commentList .reportMark{
+    position:relative;
+}
+.commentModule .commentList .reportMark:before{
+    content: " ";
+    position: absolute;
+    top: 0px;
+    left: -18px;
+    bottom:0px;
+    border-left: 5px solid #f89898;
+}
 
 .commentModule .commentList .replyList {
 	padding: 10px 0 0px;
@@ -2039,57 +2109,71 @@ background-position: 0px 2px, 4px 35px, 29px 31px, 34px 6px;
 	top: -4px;
 	left: 60px
 }
-.commentModule .commentList .replyList .box li {
-	*zoom: 1;
-	margin-bottom: 10px;
-	border-bottom: 1px solid #f1f1f1;
-	padding-bottom: 5px;
-	margin-left: 10px;
-	margin-right:10px;
+.commentModule .commentList .replyList .box .replyItem-container{
+	position: relative;
+    left: -30px;
+    
 }
-.commentModule .commentList .replyList .box li:last-child{
-	border-bottom: 1px solid #fff;
-	
+.commentModule .commentList .replyList .box .replyItem-container:last-child .replyItem{
+    border-bottom: 1px solid #fff;
 }
-.commentModule .commentList .replyList .box li:before,
-.commentModule .commentList .replyList .box li:after {
+.commentModule .commentList .replyList .box .replyItem-container:before,
+.commentModule .commentList .replyList .box .replyItem-container:after {
 	content: "";
 	display: table;
 	font: 0/0 a
 }
-.commentModule .commentList .replyList .box li:after {
+.commentModule .commentList .replyList .box .replyItem-container:after {
 	clear: both;
 }
-.commentModule .commentList .replyList .box li .reply-top{
+.commentModule .commentList .replyList .box .replyItem-container .replyItem {
+	*zoom: 1;
+	margin-bottom: 10px;
+	border-bottom: 1px solid #f1f1f1;
+	padding-bottom: 5px;
+	margin-left: 40px;
+	margin-right:-20px;
+}
+.commentModule .commentList .replyList .box .replyItem-container .replyItem .reply-reportMark{
+	position: relative;
+}
+.commentModule .commentList .replyList .box .replyItem-container .replyItem .reply-reportMark:before{
+    content: " ";
+    position: absolute;
+    top: -10px;
+    left: -18px;
+    bottom:-5px;
+    border-left: 5px solid #f89898;
+}
+.commentModule .commentList .replyList .box .replyItem-container .replyItem .reply-top{
 	position:relative;
 }
-
-.commentModule .commentList .replyList .box li .reply-top .avatarBox{
+.commentModule .commentList .replyList .box .replyItem-container .replyItem .reply-top .avatarBox{
 	position:absolute;display:inline-block;
 	left: 0px;top:6px;
 	
 }
-.commentModule .commentList .replyList .box li .reply-top .el-badge__content.is-fixed{
+.commentModule .commentList .replyList .box .replyItem-container .replyItem .reply-top .el-badge__content.is-fixed{
 	transform: scale(0.9);right: -24px;top: -9px;
 }
-.commentModule .commentList .replyList .box li .reply-top .info {
+.commentModule .commentList .replyList .box .replyItem-container .replyItem .reply-top .info {
 	display: block;
 	float: left;
 	margin-left: 58px;
 }
-.commentModule .commentList .replyList .box li .reply-top .info h2 {
+.commentModule .commentList .replyList .box .replyItem-container .replyItem .reply-top .info h2 {
 	color:#909399;
 	font-size:14px;
 	float: left;
 }
-.commentModule .commentList .replyList .box li .reply-top .info h2 .userName{
+.commentModule .commentList .replyList .box .replyItem-container .replyItem .reply-top .info h2 .userName{
 	margin-right: 5px;
 	position: relative;top: 34px;font-size:14px;
 }
-.commentModule .commentList .replyList .box li .reply-top .info h2 .userName .nickname{
+.commentModule .commentList .replyList .box .replyItem-container .replyItem .reply-top .info h2 .userName .nickname{
 	position: absolute;top: -20px;left: 0px;white-space: nowrap;font-size:14px;
 }
-.commentModule .commentList .replyList .box li .reply-top .info .master{
+.commentModule .commentList .replyList .box .replyItem-container .replyItem .reply-top .info .master{
 	white-space:nowrap;
 	color:#fff;
 	background-color:#4cc8ff;
@@ -2100,7 +2184,7 @@ background-position: 0px 2px, 4px 35px, 29px 31px, 34px 6px;
 	font-weight: normal;
 	position: relative;top: -1px;margin-right: 5px;
 }
-.commentModule .commentList .replyList .box li .reply-top .info .userRoleName{
+.commentModule .commentList .replyList .box .replyItem-container .replyItem .reply-top .info .userRoleName{
 	white-space:nowrap;
 	color:#e2b46e;
 	background-color:#f8e7c4;
@@ -2111,14 +2195,56 @@ background-position: 0px 2px, 4px 35px, 29px 31px, 34px 6px;
 	font-weight: normal;
 	position: relative;top: -1px;margin-right: 5px;
 }
-.commentModule .commentList .replyList .box li .reply-top .time {
+.commentModule .commentList .replyList .box .replyItem-container .replyItem .reply-top .friendInfo {
+	display: block;
+    float: left;
+    margin-left: 80px;
+    position:relative;
+}
+.commentModule .commentList .replyList .box .replyItem-container .replyItem .reply-top .friendInfo .arrow{
+	float: left;
+    color: #b1b3b8;
+    position: relative;
+    top: 21px;
+    left: -45px;
+}
+.commentModule .commentList .replyList .box .replyItem-container .replyItem .reply-top .friendInfo .friendAvatarBox{
+	position:absolute;display:inline-block;
+    left: 0px;top:6px;
+}
+.commentModule .commentList .replyList .box .replyItem-container .replyItem .reply-top .friendInfo .namedInfo {
+    color:#909399;
+    font-size:14px;
+    float: left;
+    margin-left: 42px;
+}
+.commentModule .commentList .replyList .box .replyItem-container .replyItem .reply-top .friendInfo .namedInfo .userName {
+	margin-right: 5px;
+    position: relative;top: 34px;font-size:14px;
+}
+.commentModule .commentList .replyList .box .replyItem-container .replyItem .reply-top .friendInfo .namedInfo .userName .nickname{
+	position: absolute;top: -20px;left: 0px;white-space: nowrap;font-size:14px;
+}
+.commentModule .commentList .replyList .box .replyItem-container .replyItem .reply-top .friendInfo .master{
+    white-space:nowrap;
+    color:#fff;
+    background-color:#4cc8ff;
+    border-radius:4px;
+    padding:1px 5px;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: normal;
+    position: relative;top: -1px;margin-right: 5px;
+}
+
+.commentModule .commentList .replyList .box .replyItem-container .replyItem .reply-top .time {
 	color:#909399;float: left;position: relative;top: 34px;margin-left: 5px;font-size:14px;
 }
 
-.commentModule .commentList .replyList .box li .reply-top .operatInfo {
+.commentModule .commentList .replyList .box .replyItem-container .replyItem .reply-top .operatInfo {
 	float: right;
 }
-.commentModule .commentList .replyList .box li .reply-top .operatInfo .operat-btn{
+.commentModule .commentList .replyList .box .replyItem-container .replyItem .reply-top .operatInfo .operat-btn{
 	margin-left: 10px;
 	line-height:24px;
 	position: relative;
@@ -2130,7 +2256,7 @@ background-position: 0px 2px, 4px 35px, 29px 31px, 34px 6px;
 .commentModule .el-link--default:hover {
 	color: #409EFF !important;
 }
-.commentModule .commentList .replyList .box li .reply-top .operatInfo .green-tag{
+.commentModule .commentList .replyList .box .replyItem-container .replyItem .reply-top .operatInfo .green-tag{
 	display: inline-block;
     font-size: 14px;
     line-height: 14px;
@@ -2140,7 +2266,7 @@ background-position: 0px 2px, 4px 35px, 29px 31px, 34px 6px;
 	background-color:#e1f3d8;
 	margin-left: 6px;
 }
-.commentModule .commentList .replyList .box li .reply-top .operatInfo .orange-tag{
+.commentModule .commentList .replyList .box .replyItem-container .replyItem .reply-top .operatInfo .orange-tag{
 	display: inline-block;
     font-size: 14px;
     line-height: 14px;
@@ -2150,7 +2276,7 @@ background-position: 0px 2px, 4px 35px, 29px 31px, 34px 6px;
 	background-color:#faecd8;
 	margin-left: 6px;
 }
-.commentModule .commentList .replyList .box li .reply-top .operatInfo .red-tag{
+.commentModule .commentList .replyList .box .replyItem-container .replyItem .reply-top .operatInfo .red-tag{
 	display: inline-block;
     font-size: 14px;
     line-height: 14px;
@@ -2160,7 +2286,7 @@ background-position: 0px 2px, 4px 35px, 29px 31px, 34px 6px;
 	background-color:#fde2e2;
 	margin-left: 6px;
 }
-.commentModule .commentList .replyList .box li .replyContent{
+.commentModule .commentList .replyList .box .replyItem-container .replyItem .replyContent{
 	font-size: 15px;
 	line-height:26px;
 	color:#666;
@@ -2561,7 +2687,15 @@ background-position: 0px 2px, 4px 35px, 29px 31px, 34px 6px;
 	margin-left: 6px;
 }
 
-
+/**举报标记 **/
+.questionViewModule .question-wrap .reportMark:before{
+    content: " ";
+    position: absolute;
+    top: 0px;
+    left: -8px;
+    bottom:0px;
+    border-left: 5px solid #f89898;
+}
 
 .questionViewModule .question-wrap .main {
 	margin: 0px 10px 10px 10px;
@@ -2951,7 +3085,18 @@ background-position: 0px 2px, 4px 35px, 29px 31px, 34px 6px;
 	list-style-type:disc;
 }
 
-
+/** 举报标记 **/
+.answerModule .answerList .reportMark{
+    position:relative;
+}
+.answerModule .answerList .reportMark:before{
+    content: " ";
+    position: absolute;
+    top: 0px;
+    left: -18px;
+    bottom:0px;
+    border-left: 5px solid #f89898;
+}
 
 .answerModule .answerList .replyList {
 	padding: 10px 0 0px;
@@ -2979,57 +3124,71 @@ background-position: 0px 2px, 4px 35px, 29px 31px, 34px 6px;
 	top: -4px;
 	left: 60px
 }
-.answerModule .answerList .replyList .box li {
-	*zoom: 1;
-	margin-bottom: 10px;
-	border-bottom: 1px solid #f1f1f1;
-	padding-bottom: 5px;
-	margin-left: 10px;
-	margin-right:10px;
+.answerModule .answerList .replyList .box .replyItem-container{
+	position: relative;
+    left: -30px;
+    
 }
-.answerModule .answerList .replyList .box li:last-child{
-	border-bottom: 1px solid #fff;
-	
+.answerModule .answerList .replyList .box .replyItem-container:last-child .replyItem{
+    border-bottom: 1px solid #fff;
 }
-.answerModule .answerList .replyList .box li:before,
-.answerModule .answerList .replyList .box li:after {
+.answerModule .answerList .replyList .box .replyItem-container:before,
+.answerModule .answerList .replyList .box .replyItem-container:after {
 	content: "";
 	display: table;
 	font: 0/0 a
 }
-.answerModule .answerList .replyList .box li:after {
+.answerModule .answerList .replyList .box .replyItem-container:after {
 	clear: both;
 }
-.answerModule .answerList .replyList .box li .reply-top{
+.answerModule .answerList .replyList .box .replyItem-container .replyItem {
+	*zoom: 1;
+	margin-bottom: 10px;
+	border-bottom: 1px solid #f1f1f1;
+	padding-bottom: 5px;
+	margin-left: 40px;
+	margin-right:-20px;
+}
+.answerModule .answerList .replyList .box .replyItem-container .replyItem .reply-reportMark{
+	position: relative;
+}
+.answerModule .answerList .replyList .box .replyItem-container .replyItem .reply-reportMark:before{
+    content: " ";
+    position: absolute;
+    top: -10px;
+    left: -18px;
+    bottom:-5px;
+    border-left: 5px solid #f89898;
+}
+.answerModule .answerList .replyList .box .replyItem-container .replyItem .reply-top{
 	position:relative;
 }
-
-.answerModule .answerList .replyList .box li .reply-top .avatarBox{
+.answerModule .answerList .replyList .box .replyItem-container .replyItem .reply-top .avatarBox{
 	position:absolute;display:inline-block;
 	left: 0px;top:6px;
 	
 }
-.answerModule .answerList .replyList .box li .reply-top .el-badge__content.is-fixed{
+.answerModule .answerList .replyList .box .replyItem-container .replyItem .reply-top .el-badge__content.is-fixed{
 	transform: scale(0.9);right: -24px;top: -9px;
 }
-.answerModule .answerList .replyList .box li .reply-top .info {
+.answerModule .answerList .replyList .box .replyItem-container .replyItem .reply-top .info {
 	display: block;
 	float: left;
 	margin-left: 58px;
 }
-.answerModule .answerList .replyList .box li .reply-top .info h2 {
+.answerModule .answerList .replyList .box .replyItem-container .replyItem .reply-top .info h2 {
 	color:#909399;
 	font-size:14px;
 	float: left;
 }
-.answerModule .answerList .replyList .box li .reply-top .info h2 .userName{
+.answerModule .answerList .replyList .box .replyItem-container .replyItem .reply-top .info h2 .userName{
 	margin-right: 5px;
 	position: relative;top: 34px;font-size:14px;
 }
-.answerModule .answerList .replyList .box li .reply-top .info h2 .userName .nickname{
+.answerModule .answerList .replyList .box .replyItem-container .replyItem .reply-top .info h2 .userName .nickname{
 	position: absolute;top: -20px;left: 0px;white-space: nowrap;font-size:14px;
 }
-.answerModule .answerList .replyList .box li .reply-top .info .master{
+.answerModule .answerList .replyList .box .replyItem-container .replyItem .reply-top .info .master{
 	white-space:nowrap;
 	color:#fff;
 	background-color:#4cc8ff;
@@ -3040,7 +3199,7 @@ background-position: 0px 2px, 4px 35px, 29px 31px, 34px 6px;
 	font-weight: normal;
 	position: relative;top: -1px;margin-right: 5px;
 }
-.answerModule .answerList .replyList .box li .reply-top .info .userRoleName{
+.answerModule .answerList .replyList .box .replyItem-container .replyItem .reply-top .info .userRoleName{
 	white-space:nowrap;
 	color:#e2b46e;
 	background-color:#f8e7c4;
@@ -3051,14 +3210,55 @@ background-position: 0px 2px, 4px 35px, 29px 31px, 34px 6px;
 	font-weight: normal;
 	position: relative;top: -1px;margin-right: 5px;
 }
-.answerModule .answerList .replyList .box li .reply-top .time {
+.answerModule .answerList .replyList .box .replyItem-container .replyItem .reply-top .friendInfo {
+	display: block;
+    float: left;
+    margin-left: 80px;
+    position:relative;
+}
+.answerModule .answerList .replyList .box .replyItem-container .replyItem .reply-top .friendInfo .arrow{
+	float: left;
+    color: #b1b3b8;
+    position: relative;
+    top: 21px;
+    left: -45px;
+}
+.answerModule .answerList .replyList .box .replyItem-container .replyItem .reply-top .friendInfo .friendAvatarBox{
+	position:absolute;display:inline-block;
+    left: 0px;top:6px;
+}
+.answerModule .answerList .replyList .box .replyItem-container .replyItem .reply-top .friendInfo .namedInfo {
+    color:#909399;
+    font-size:14px;
+    float: left;
+    margin-left: 42px;
+}
+.answerModule .answerList .replyList .box .replyItem-container .replyItem .reply-top .friendInfo .namedInfo .userName {
+	margin-right: 5px;
+    position: relative;top: 34px;font-size:14px;
+}
+.answerModule .answerList .replyList .box .replyItem-container .replyItem .reply-top .friendInfo .namedInfo .userName .nickname{
+	position: absolute;top: -20px;left: 0px;white-space: nowrap;font-size:14px;
+}
+.answerModule .answerList .replyList .box .replyItem-container .replyItem .reply-top .friendInfo .master{
+    white-space:nowrap;
+    color:#fff;
+    background-color:#4cc8ff;
+    border-radius:4px;
+    padding:1px 5px;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: normal;
+    position: relative;top: -1px;margin-right: 5px;
+}
+.answerModule .answerList .replyList .box .replyItem-container .replyItem .reply-top .time {
 	color:#909399;float: left;position: relative;top: 34px;margin-left: 5px;font-size:14px;
 }
 
-.answerModule .answerList .replyList .box li .reply-top .operatInfo {
+.answerModule .answerList .replyList .box .replyItem-container .replyItem .reply-top .operatInfo {
 	float: right;
 }
-.answerModule .answerList .replyList .box li .reply-top .operatInfo .operat-btn{
+.answerModule .answerList .replyList .box .replyItem-container .replyItem .reply-top .operatInfo .operat-btn{
 	margin-left: 10px;
 	line-height:24px;
 	position: relative;
@@ -4653,11 +4853,74 @@ background-position: 0px 2px, 4px 35px, 29px 31px, 34px 6px;
 }
 
 
+/** 选择举报分类 **/
+.selectReportTypeModule{
+    background: #fff;
+}
+.selectReportTypeModule .reportType-container{
+    display: flex;
+    flex-direction: column;
+}
+.selectReportTypeModule .reportType-container .reportType-group{
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+.selectReportTypeModule .reportType-container .reportType-group .reportType-name{
+    margin-bottom: 15px;
+    font-size: 14px;
+    text-align: left;
+    color: #b1b3b8;
+}
+.selectReportTypeModule .reportType-container .reportType-group .reportType-list{
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    white-space: nowrap;
+}
+.selectReportTypeModule .reportType-container .reportType-group .reportType-list .reportType-item{
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0;
+    margin: 0;
+    margin-right:30px;
+    list-style: none;
+    white-space: nowrap;
+}
+.selectReportTypeModule .reportType-container .reportType-group .reportType-list .el-radio-group{
+	display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    font-size: 0;
+}
+.selectReportTypeModule .reportType-container .reportType-group .reportType-list .el-radio-group .el-radio__label{
+	position: relative;
+	top:-1px;
+}
+.selectReportTypeModule .reportType-container .reportType-group .reportType-list .multiple-radio .el-radio{
+	margin-top: 6px;
+	margin-bottom: 6px;
+}
 
-
-
-
-
+.topicReportModule{}
+.topicReportModule .headInfo{
+	margin-top: 6px;
+    margin-left:8px;
+    margin-right:8px;
+    border-bottom:1px solid #eee;
+    padding-bottom:4px;
+    margin-bottom:5px;
+    text-align: center;
+}
+.topicReportModule .headInfo .title{
+	margin-left:4px;
+    font-size: 16px;
+    line-height:26px;
+    color:#909399;
+    padding:6px 0;
+}
 
 
 

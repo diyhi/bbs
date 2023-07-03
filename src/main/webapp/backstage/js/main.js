@@ -347,6 +347,7 @@ var index_component = {
 	        		["4-400300", true],
 	        		["4-400400", true],
 	        		["4-400500", true],
+	        		["4-400600", true],
 	        		["5-500100", true]]
 	        ),
 	        
@@ -1303,6 +1304,7 @@ var home_component = {
 			auditAnswerCount: 0,//待审核答案数量
 			auditAnswerReplyCount: 0,//待审核答案回复数量	
 			feedbackCount: 0,//留言数量
+			reportCount: 0,//待处理举报总数
 		};
 	},
 	
@@ -1347,6 +1349,8 @@ var home_component = {
 			    				_self.auditAnswerReplyCount = mapData[key];
 			    			}else if(key == "feedbackCount"){//留言数量
 			    				_self.feedbackCount = mapData[key];
+			    			}else if(key == "reportCount"){//待处理举报总数
+			    				_self.reportCount = mapData[key];
 			    			}
 			    			
 			    			
@@ -2199,6 +2203,40 @@ var routes = [
 	              	{path : '/admin/control/topicUnhidePlatformShare/list',component : () => loadModule('./admin/component/platformShare/topicUnhidePlatformShareList.vue', options), name:'topicUnhidePlatformShareList',meta: {index:'4-400400-1',title:'解锁话题隐藏内容分成',cacheNumber:'0'}},//解锁话题隐藏内容分成
 	             	{path : '/admin/control/questionRewardPlatformShare/list',component : () => loadModule('./admin/component/platformShare/questionRewardPlatformShareList.vue', options), name:'questionRewardPlatformShareList',meta: {index:'4-400400-2',title:'问答悬赏平台分成',cacheNumber:'0'}},//问答悬赏平台分成
 	              	
+	             	{path : '/admin/control/reportType/list',component : () => loadModule('./admin/component/report/reportTypeList.vue', options), name:'reportTypeList',meta: {index:'4-400600-1',title:'举报分类列表',cacheNumber:'0'}},//举报分类列表
+	              	{path : '/admin/control/reportType/manage/add',component : () => loadModule('./admin/component/report/addReportType.vue', options),name:'addReportType',meta: {parent:'4-400600-1',title:'添加举报分类'},
+	              		beforeEnter: (to, from, next) => {
+	              			if(from.name == 'reportTypeList'){//如果来自举报分类列表,则删除缓存
+	              				store.commit('setCacheNumber');
+	              			}
+	              			next();
+	              		}
+	              	},//添加举报分类
+	              	{path : '/admin/control/reportType/manage/edit',component : () => loadModule('./admin/component/report/editReportType.vue', options),name:'editReportType',meta: {parent:'4-400600-1',title:'修改举报分类'},
+	              		beforeEnter: (to, from, next) => {
+	              			if(from.name == 'reportTypeList'){//如果来自举报分类列表,则删除缓存
+	              				store.commit('setCacheNumber');
+	              			}
+	              			next();
+	              		}
+	              	},//修改举报分类
+	              	{path : '/admin/control/report/list',component : () => loadModule('./admin/component/report/reportList.vue',options), name:'reportList',meta: {index:'4-400600-2',title:'举报列表',cacheNumber:'0'}},//举报列表
+	              	
+	              	{path : '/admin/control/report/manage/edit',component : () => loadModule('./admin/component/report/editReport.vue',options) ,name:'editReport',meta: {parent:'4-400600-2',title:'修改举报'},
+	              		beforeEnter: (to, from, next) => {
+	              			if(from.name == 'reportList'){//如果来自举报列表,则删除缓存
+	              				store.commit('setCacheNumber');
+	              			}
+	              			next();
+	              		}
+	              	},//修改举报
+	              	{path : '/admin/control/topicReport/list',component : () => loadModule('./admin/component/report/topicReportList.vue',options), name:'topicReportList',meta: {parent:'4-400600-2',title:'话题举报列表'}},//话题举报列表
+	              	{path : '/admin/control/questionReport/list',component : () => loadModule('./admin/component/report/questionReportList.vue',options), name:'questionReportList',meta: {parent:'4-400600-2',title:'问答举报列表'}},//问答举报列表
+	              	{path : '/admin/control/userReport/list',component : () => loadModule('./admin/component/report/userReportList.vue',options), name:'userReportList',meta: {parent:'4-400600-2',title:'用户举报列表'}},//用户举报列表
+	              	
+	             	
+	             	
+	             	
 	              	{path : '/admin/control/systemSetting/manage/edit',component : () => loadModule('./admin/component/setting/editSystemSetting.vue', options), name:'editSystemSetting',meta: {index:'5-500100-1',title:'基本设置',cacheNumber:'0'}},//基本设置
 	              	{path : '/admin/control/systemSetting/manage/maintainData',component : () => loadModule('./admin/component/setting/maintainData.vue', options), name:'maintainData',meta: {index:'5-500100-2',title:'维护数据',cacheNumber:'0'}},//维护数据
 	              	{path : '/admin/control/filterWord/manage/view',component : () => loadModule('./admin/component/setting/viewFilterWord.vue', options), name:'viewFilterWord',meta: {index:'5-500100-3',title:'敏感词',cacheNumber:'0'}},//敏感词
@@ -3076,6 +3114,7 @@ function createEditor(ref,availableTag,uploadPath,userGradeList ) {
 		allowPreviewEmoticons : true,//true或false，true时鼠标放在表情上可以预览表情
 		allowImageUpload : true,//true时显示图片上传按钮
 		allowFlashUpload :true,
+		baseURL : baseURL,//后端地址
 		uploadModule : parseInt(fileStorageSystem),//上传模块 0.本地 10.SeaweedFS 20.MinIO 30.阿里云OSS
 		uploadJson :baseURL+uploadPath,//指定浏览远程图片的服务器端程序
 		filePostName:'file',//文件上传字段 默认imgFile  第三方文件服务器不受本参数影响

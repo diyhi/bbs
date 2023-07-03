@@ -94,7 +94,7 @@
 	pointer-events: none;
 	cursor: pointer;
 	will-change: transform;
-	z-index: 999;
+	z-index: 99999999;
 	
 	/**
 	position: absolute;

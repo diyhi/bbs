@@ -315,7 +315,7 @@ public class FileManage {
     			localFileManage.lockRemoveFile("links",maxDeleteTime);//删除友情链接文件
     			localFileManage.lockRemoveFile("membershipCard",maxDeleteTime);//会员卡
     			
-    		    
+    			localFileManage.lockRemoveFile("report",maxDeleteTime);//删除举报图片文件
     		}
     	}
     	

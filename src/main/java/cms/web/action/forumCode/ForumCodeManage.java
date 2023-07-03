@@ -153,6 +153,10 @@ public class ForumCodeManage {
 		childNode16.add(new ForumCodeNode(16001,"站点栏目列表","columnRelated_column_",Arrays.asList(new String[]{"集合"})));
 		forumCodeNodeList.add(new ForumCodeNode(116,"站点栏目",childNode16));//添加一级节点
 		
+		//举报
+		List<ForumCodeNode> childNode2100 =  new ArrayList<ForumCodeNode>();//添加二级节点
+		childNode2100.add(new ForumCodeNode(210001,"添加举报","reportRelated_addReport_",Arrays.asList(new String[]{"集合"})));
+		forumCodeNodeList.add(new ForumCodeNode(2100,"举报",childNode2100));//添加一级节点
 		//
 		List<ForumCodeNode> childNode17 =  new ArrayList<ForumCodeNode>();//添加二级节点
 		childNode17.add(new ForumCodeNode(17001,"用户自定义HTML","customForumRelated_customHTML_",Arrays.asList(new String[]{"实体对象"})));

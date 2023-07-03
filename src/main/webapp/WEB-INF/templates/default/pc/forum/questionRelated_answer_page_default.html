@@ -9,7 +9,7 @@
 	<div class="answerModule" >
 		<ol class="answerList">
 			<#list pageView.records as answer>
-				<div class="answer <#if answer.adoption == true> active</#if>" id="anchor_${answer.id}">
+				<div class="answer <#if answer.adoption == true> active</#if> <#if RequestParameters.reportModule != null && RequestParameters.reportModule=='50' && answer.id == RequestParameters.answerId> reportMark</#if>" id="anchor_${answer.id}">
 					<div class="answer-author">
 						<a href="user/control/home?userName=${answer.userName}">
 							<#if answer.avatarName != null>
@@ -59,49 +59,112 @@
 						<div class="replyList">
 							<ul class="box">
 								<#list answer.answerReplyList as reply>
-									<li>
-										
-								        <div class="reply-top" >
-									    	<a class="avatarBox" href="user/control/home?userName=${reply.userName}">
-												<#if reply.avatarName != null>
-													<img src="${reply.avatarPath}100x100/${reply.avatarName}" >
-												<#else>
-													<!--[if (IE)]><img src="${commonPath}images/min_avata.png"><![endif]-->
-													<!--[if !(IE)]><!--><img class="round" avatar="${(reply.nickname != null && reply.nickname??) ?string(reply.nickname , reply.account)}" ><!--<![endif]-->
+									<li id="anchor_reply_${reply.id}">
+										<div class="${(RequestParameters.reportModule != null && RequestParameters.reportModule=='60' && reply.id == RequestParameters.replyId)?string('reply-reportMark','')}">
+									        <div class="reply-top" >
+									        	<div class="reply-author">
+											    	<a class="avatarBox" href="user/control/home?userName=${reply.userName}">
+														<#if reply.avatarName != null>
+															<img src="${reply.avatarPath}100x100/${reply.avatarName}" >
+														<#else>
+															<!--[if (IE)]><img src="${commonPath}images/min_avata.png"><![endif]-->
+															<!--[if !(IE)]><!--><img class="round" avatar="${(reply.nickname != null && reply.nickname??) ?string(reply.nickname , reply.account)}" ><!--<![endif]-->
+														</#if>
+													</a>
+											    	<a class="userName" href="user/control/home?userName=${reply.userName}">
+														${(reply.nickname != null && reply.nickname??) ?string(reply.nickname , reply.account)}
+													</a>
+													<#if reply.userRoleNameList?size gt 0>
+														<#list reply.userRoleNameList as roleName>
+															<span class="userRoleName">${roleName}</span>
+														</#list>
+													</#if>
+													<#if reply.isStaff>
+												        <span class="staff">官方人员</span>
+													</#if>
+													<#if reply.userName == question.userName && reply.isStaff == question.isStaff>
+														<span class="master">作者</span>
+													</#if>
+												</div>
+												<#if reply.friendUserName != null && reply.friendUserName??>
+													<div class="friendInfo">
+		                                                <span class="arrow"><i class="cms-caret-right" ></i></span>
+		                                                <#if reply.friendUserName!= null && reply.friendUserName??>
+			                                            	<a class="friendAvatarBox" href="user/control/home?userName=${reply.friendUserName}">
+			                                                    <#if reply.friendAvatarName != null>
+																	<img src="${reply.friendAvatarPath}100x100/${reply.friendAvatarName}" class="img">
+																<#else>
+			                                                    	<img avatar="${(reply.friendNickname != null && reply.friendNickname??) ?string(reply.friendNickname , reply.friendAccount)}" width="40" height="40" class="img">
+																</#if> 
+			                                                </a>
+		                                                </#if>
+		                                                <h2 class="nameInfo" >
+		                                                	<#if reply.friendAccount == null || !reply.friendAccount??>
+		                                                    	<span class="cancelNickname">已注销</span>  
+		                                                    </#if> 
+		                                                    
+		                                                    <#if reply.friendAccount != null && reply.friendAccount??>
+			                                                    <a class="userName" href="user/control/home?userName=${reply.friendUserName}">
+			                                                    	<#if reply.friendNickname != null && reply.friendNickname??>
+																		${reply.friendNickname}
+																	<#else>
+																		${reply.friendAccount}
+																	</#if> 
+																	<#if reply.friendAccount == null || reply.friendAccount == ''>
+																		&nbsp;
+																	</#if> 
+																</a>
+															</#if>
+		                                                    <#if reply.friendAccount != null && reply.friendAccount?? && reply.friendUserName == question.userName && reply.isFriendStaff == question.isStaff>
+		                                                    	<span class="master">作者</span>
+		                                                 	</#if>
+		                                                </h2>
+		                                            </div>
 												</#if>
-											</a>
-									    	<a class="userName" href="user/control/home?userName=${reply.userName}">
-												${(reply.nickname != null && reply.nickname??) ?string(reply.nickname , reply.account)}
-											</a>
-											<#if reply.userRoleNameList?size gt 0>
-												<#list reply.userRoleNameList as roleName>
-													<span class="userRoleName">${roleName}</span>
-												</#list>
-											</#if>
-											<#if reply.isStaff>
-										        <span class="staff">官方人员</span>
-											</#if>
-											<#if reply.userName == question.userName && reply.isStaff == question.isStaff>
-												<span class="master">作者</span>
-											</#if>
-											<span class="time">
-												<#if systemUser != null && reply.userName ==  systemUser.userName>
-													<a href="javascript:" onclick="editReplyLayer('${reply.id}','${(reply.nickname != null && reply.nickname??) ?string(reply.nickname , reply.userName)}');"><i class="cms-pencil-alt" ></i>编辑</a>&nbsp;
+												<div class="ipAddress replyPopModule" >
+	                                               	<#if reply.ipAddress != null && reply.ipAddress??>
+	                                               		<i class="ipAddress-icon cms-map-pin-line"></i>
+	                                               		<span class="ipAddress-text">${reply.ipAddress}</span>
+	                                               	</#if>
+													<span class="more hide" >
+											    		<span>&nbsp;</span><i class="cms-ellipsis-v-solid"></i>
+											    		<div class="nav-pop-list" >
+													        <div class="ul-navlist">
+													        	<#if systemUser != null>
+																	<div class="li-list">
+																		<a href="javascript:" onclick="addReplyFriendLayer('${answer.id}','${reply.id}');"><i class="cms-reply" ></i>回复</a>
+																	</div>
+																</#if>
+												        		<#if systemUser != null && reply.userName ==  systemUser.userName>
+																	<div class="li-list">
+																		<a href="javascript:" onclick="editReplyLayer('${reply.id}','${(reply.nickname != null && reply.nickname??) ?string(reply.nickname , reply.userName)}');"><i class="cms-pencil-alt" ></i>编辑</a>
+																	</div>
+																</#if>
+												        		<#if systemUser != null>
+																	<div class="li-list">
+																		<a href="javascript:" onclick="addReportUI('${reply.id}',60)"><i class="cms-error-warning-line" ></i>举报</a>
+																	</div>
+																</#if>
+												        		<#if systemUser != null && reply.userName ==  systemUser.userName>
+																	<div class="li-list">
+																		<a href="javascript:" onclick="deleteReplyLayer('${reply.id}');"><i class="cms-trash" ></i>删除</a>
+																	</div>
+																</#if>
+													        </div>
+													    </div>
+											    	</span>
+												</div>
+											</div>
+											<div style="clear:both; height: 0; line-height: 0; font-size: 0;"></div>
+											<div class="replyContent">
+												<#if reply.account == null || reply.account == ''>
+													<div class="cancelAccount">此用户账号已注销</div>
 												</#if>
-												<#if systemUser != null && reply.userName ==  systemUser.userName>
-													<a href="javascript:" onclick="deleteReplyLayer('${reply.id}');"><i class="cms-trash" ></i>删除</a>&nbsp;
-												</#if>
-												${reply.postTime}
-											</span>
+												${reply.content}
+											</div>
+											<div id="answerReplyFriend-post_${reply.id}" ></div>
+											<div id="editAnswerReply-post_${reply.id}" ></div>
 										</div>
-										<div style="clear:both; height: 0; line-height: 0; font-size: 0;"></div>
-										<div class="replyContent">
-											<#if reply.account == null || reply.account == ''>
-												<div class="cancelAccount">此用户账号已注销</div>
-											</#if>
-											${reply.content}
-										</div>
-										<div id="editAnswerReply-post_${reply.id}" ></div>
 									</li>
 								</#list>
 							</ul>
@@ -116,7 +179,9 @@
 					
 					<div class="tipBottom">
 						<span class="a-toolbar">
-							
+							<#if question.ipAddress != null && question.ipAddress??>
+                              	<span class="ipAddress-text"><i class="ipAddress-icon cms-map-pin-line"></i>${question.ipAddress}</span>
+                            </#if>
 							<#if question.userName == systemUser.userName && question.adoptionAnswerId == 0>
 								<#-- 执行的相关JS需调用本页的方法引入采纳答案页 -->
 								<a href="javascript:" onclick="adoptionAnswerLayer('${answer.id}');"><i class="cms-check-circle-solid" ></i>采纳</a>
@@ -126,6 +191,10 @@
 							<#if systemUser != null && answer.userName ==  systemUser.userName  && answer.adoption == false>
 								<a href="javascript:" onclick="editAnswerLayer('${answer.id}','${(answer.nickname != null && answer.nickname??) ?string(answer.nickname , answer.userName)}');"><i class="cms-pencil-alt" ></i>编辑</a>
 							</#if>
+							<#if systemUser != null>
+								<a href="javascript:" onclick="addReportUI('${answer.id}',50)"><i class="cms-error-warning-line" ></i>举报</a>
+							</#if>
+							
 							<#if systemUser != null && answer.userName ==  systemUser.userName>
 								<a href="javascript:" onclick="deleteAnswerLayer('${answer.id}');"><i class="cms-trash" ></i>删除</a>
 							</#if>
@@ -155,12 +224,21 @@
 //滚动到描点(当上级跳转来后台'我的答案' '我的答案回复'时)
 $(function() {
 	var answerId = getUrlParam("answerId");//URL中的答案Id
-	if(answerId != null && answerId != ""){
+	var replyId = getUrlParam("replyId");//URL中的回复Id
+	if(answerId != null && answerId != "" && (replyId == null || replyId == '')){
 		var anchor = $("#anchor_" + answerId); //获得锚点   
 		
 	    if (anchor.length > 0) {//判断对象是否存在   
 	        var pos = anchor.offset().top;  
 	      //  var poshigh = anchor.height();  
+	        $("html,body").animate({ scrollTop: pos }, 500);  
+	    }
+	}
+	
+	if(replyId != null && replyId != ''){
+		var anchor_reply = $("#anchor_reply_" + replyId); //获得锚点   
+		if (anchor_reply.length > 0) {//判断对象是否存在   
+	        var pos = anchor_reply.offset().top;  
 	        $("html,body").animate({ scrollTop: pos }, 500);  
 	    }
 	}
@@ -199,8 +277,43 @@ function replyLayer(answerId,userName){
 	getBasePath()+"answer_reply?"+parameter+"&timestamp=" + new Date().getTime(), true);
 	
 }
-function cancelReply(answerId){
-	$("#answerReply-post_"+answerId).html("");
+function cancelReply(answerId,replyId){
+	if(answerId){
+		$("#answerReply-post_"+answerId).html("");
+	}
+	if(replyId){
+		$("#answerReplyFriend-post_"+replyId).html("");
+	}
+}
+
+//回复对方展开层
+function addReplyFriendLayer(answerId,replyId){
+	//判断是否已登录
+	var isLogin = document.getElementById("isLogin").value;
+	if(isLogin == "false"){
+		layer.open({
+		    type: 1, 
+		    title:"提示",
+		    content: "<div style='line-height: 36px; font-size: 15px;text-align:center; margin-left: 8px;margin-right: 8px;'>请先登录</div>", 
+		    area: ['260px', '120px'],//宽高
+			success: function(layero, index){
+				 
+			}
+		});
+		return false;
+	}
+	
+	var parameter = "";//URI参数
+	parameter += "&answerId="+answerId;
+	parameter += "&replyId="+replyId;
+
+	//回复页面
+	get_request(function(value){
+		if(value != ""){
+			$("#answerReplyFriend-post_"+replyId).html(value);
+		}
+	},
+	getBasePath()+"answer_reply?"+parameter+"&timestamp=" + new Date().getTime(), true);
 }
 
 

@@ -43,6 +43,7 @@ import cms.service.topic.CommentService;
 import cms.service.topic.TagService;
 import cms.service.topic.TopicService;
 import cms.service.user.UserGradeService;
+import cms.utils.IpAddress;
 import cms.utils.JsonUtils;
 import cms.utils.SecureLink;
 import cms.utils.UUIDUtil;
@@ -304,7 +305,7 @@ public class Topic_TemplateManage {
 						
 					}
 					
-					topic.setIpAddress(null);//IP地址不显示
+					topic.setIp(null);//IP地址不显示
 					topic.setContent(null);//话题内容不显示
 					if(topic.getPostTime().equals(topic.getLastReplyTime())){//如果发贴时间等于回复时间，则不显示回复时间
 						topic.setLastReplyTime(null);
@@ -526,7 +527,8 @@ public class Topic_TemplateManage {
 			if(topic != null){
 				//检查权限
 				userRoleManage.checkPermission(ResourceEnum._1001000,topic.getTagId());
-
+				SystemSetting systemSetting = settingService.findSystemSetting_cache();
+				
 				
 				if(ip != null){
 					topicManage.addView(topicId, ip);
@@ -546,7 +548,10 @@ public class Topic_TemplateManage {
 						}
 					}	
 				}
-				topic.setIpAddress(null);//IP地址不显示
+				if(accessUser != null && systemSetting.isShowIpAddress()){
+					topic.setIpAddress(IpAddress.queryProvinceAddress(topic.getIp()));
+				}
+				topic.setIp(null);//IP地址不显示
 				List<Tag> tagList = tagService.findAllTag_cache();
 				if(tagList != null && tagList.size() >0){
 					for(Tag tag :tagList){
@@ -584,8 +589,6 @@ public class Topic_TemplateManage {
 					topic.setAllowRoleViewList(topicRoleNameList);//话题允许查看的角色名称集合
 				}
 				
-				
-				SystemSetting systemSetting = settingService.findSystemSetting_cache();
 				
 				//话题内容摘要MD5
 				String topicContentDigest_link = "";
@@ -867,7 +870,7 @@ public class Topic_TemplateManage {
 		if(accessUser != null && topicId != null && topicId >0L){
 			Topic topic = topicManage.queryTopicCache(topicId);//查询缓存
 			if(topic != null && topic.getStatus() <100 && topic.getUserName().equals(accessUser.getUserName())){
-				topic.setIpAddress(null);//IP地址不显示
+				topic.setIp(null);//IP地址不显示
 				
 				if(topic.getContent() != null && !"".equals(topic.getContent().trim())){
 					//处理富文本路径
@@ -989,6 +992,7 @@ public class Topic_TemplateManage {
 		}
 		String requestURI = "";
 		String queryString = "";
+		AccessUser accessUser = null;
 		//获取运行时参数
 		if(runtimeParameter != null && runtimeParameter.size() >0){		
 			for(Map.Entry<String,Object> paramIter : runtimeParameter.entrySet()) {
@@ -996,6 +1000,8 @@ public class Topic_TemplateManage {
 					requestURI = (String)paramIter.getValue();
 				}else if("queryString".equals(paramIter.getKey())){
 					queryString = (String)paramIter.getValue();
+				}else if("accessUser".equals(paramIter.getKey())){
+					accessUser = (AccessUser)paramIter.getValue();
 				}
 			}
 		}
@@ -1076,13 +1082,19 @@ public class Topic_TemplateManage {
 		Map<Long,String> new_quoteList = new HashMap<Long,String>();//key:自定义评论Id value:自定义评论内容(文本)
 		
 		Map<String,List<String>> userRoleNameMap = new HashMap<String,List<String>>();//用户角色名称 key:用户名称Id 角色名称集合
+		
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		
 		if(commentList != null && commentList.size() >0){
 			for(Comment comment : commentList){
 				if(comment.getContent() != null && !"".equals(comment.getContent().trim())){
 					//处理富文本路径
 					comment.setContent(fileManage.processRichTextFilePath(comment.getContent(),"comment"));
 				}
-				comment.setIpAddress(null);//IP地址不显示
+				if(accessUser != null && systemSetting.isShowIpAddress()){
+					comment.setIpAddress(IpAddress.queryProvinceAddress(comment.getIp()));
+				}
+				comment.setIp(null);//IP地址不显示
 				if(comment.getIsStaff() == false){//会员
 					User user = userManage.query_cache_findUserByUserName(comment.getUserName());
 					if(user != null){
@@ -1166,6 +1178,7 @@ public class Topic_TemplateManage {
 									quote.setContent("");
 								}
 							}
+							quote.setIp(null);//IP地址不显示
 							if(quote.getIsStaff() == false){//会员
 								User user = userManage.query_cache_findUserByUserName(quote.getUserName());
 								quote.setAccount(user.getAccount());
@@ -1225,7 +1238,10 @@ public class Topic_TemplateManage {
 				for(Comment comment : commentList){
 					for(Reply reply : replyList){
 						if(comment.getId().equals(reply.getCommentId())){
-							reply.setIpAddress(null);//IP地址不显示
+							if(accessUser != null && systemSetting.isShowIpAddress()){
+								reply.setIpAddress(IpAddress.queryProvinceAddress(reply.getIp()));
+							}
+							reply.setIp(null);//IP地址不显示
 							if(reply.getIsStaff() == false){//会员
 								User user = userManage.query_cache_findUserByUserName(reply.getUserName());
 								if(user != null){
@@ -1246,6 +1262,22 @@ public class Topic_TemplateManage {
 								reply.setAccount(reply.getUserName());//员工用户名和账号是同一个
 							}
 							
+							if(reply.getFriendUserName() != null && !"".equals(reply.getFriendUserName().trim())){
+								if(reply.getIsFriendStaff() == false){//会员
+									User user = userManage.query_cache_findUserByUserName(reply.getFriendUserName());
+									if(user != null && user.getState().equals(1) && user.getCancelAccountTime().equals(-1L)){
+										reply.setFriendAccount(user.getAccount());
+										reply.setFriendNickname(user.getNickname());
+										reply.setFriendAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
+										reply.setFriendAvatarName(user.getAvatarName());
+									}
+									
+								}else{
+									reply.setFriendAccount(reply.getFriendUserName());//员工用户名和账号是同一个
+									
+								}
+							}
+							
 							//非正常状态用户清除显示数据
 							if(reply.getUserInfoStatus() <0){
 								reply.setUserName(null);
@@ -1260,7 +1292,8 @@ public class Topic_TemplateManage {
 							comment.addReply(reply);
 						}
 					}
-					
+					//回复排序
+					commentManage.replySort(comment.getReplyList());
 				}
 			}
 		}
@@ -1405,7 +1438,7 @@ public class Topic_TemplateManage {
 		if(accessUser != null && commentId != null && commentId >0L){
 			Comment comment = commentManage.query_cache_findByCommentId(commentId);//查询缓存
 			if(comment != null && comment.getStatus() <100 && comment.getUserName().equals(accessUser.getUserName())){
-				comment.setIpAddress(null);//IP地址不显示
+				comment.setIp(null);//IP地址不显示
 				if(comment.getContent() != null && !"".equals(comment.getContent().trim())){
 					//处理富文本路径
 					comment.setContent(fileManage.processRichTextFilePath(comment.getContent(),"comment"));
@@ -1507,7 +1540,7 @@ public class Topic_TemplateManage {
 		if(accessUser != null && replyId != null && replyId >0L){
 			Reply reply = commentManage.query_cache_findReplyByReplyId(replyId);//查询缓存
 			if(reply != null && reply.getStatus() <100 && reply.getUserName().equals(accessUser.getUserName())){
-				reply.setIpAddress(null);//IP地址不显示
+				reply.setIp(null);//IP地址不显示
 	
 				value.put("reply",reply);
 				

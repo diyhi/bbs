@@ -126,13 +126,15 @@ public class LoginFilter implements Filter {
 				RefreshUser refreshUser = oAuthManage.getRefreshUserByRefreshToken(refreshToken.trim());
 
 				if(refreshUser != null){
+					/**
 					if("0".equals(refreshUser.getAccessToken())){//如果刷新令牌重复执行，则修改用户的安全摘要，让当前用户重新登录
 						UserService userService = (UserService)SpringConfigTool.getContext().getBean("userServiceBean");
 						
 						userService.updateUserSecurityDigest(refreshUser.getUserName(),new Date().getTime());
 						userManage.delete_userState(refreshUser.getUserName());
 						isJump = true;
-					}else if(accessToken.equals(refreshUser.getAccessToken())){
+					}else **/
+					if(accessToken.equals(refreshUser.getAccessToken())){
 						//前后端一体的架构才执行令牌续期。前后端分离架构由浏览器访问cms.web.action.common.UserFormManageAction.java的refreshToken进行续期
 						if(headerUserAuthorization == null){
 							//令牌续期

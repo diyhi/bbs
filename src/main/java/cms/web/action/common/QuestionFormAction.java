@@ -473,8 +473,6 @@ public class QuestionFormAction {
 		
 		
 		if(error.size() == 0){
-			Date time = new Date();
-			question.setPostTime(time);
 			
 			//用户悬赏积分日志
 			PointLog reward_pointLog = null;
@@ -489,7 +487,7 @@ public class QuestionFormAction {
 				reward_pointLog.setPoint(rewardPoint);//积分
 				reward_pointLog.setUserName(accessUser.getUserName());//用户名称
 				reward_pointLog.setRemark("");
-				reward_pointLog.setTimes(time);
+				reward_pointLog.setTimes(d);
 			}
 			
 			//用户悬赏金额日志
@@ -506,7 +504,7 @@ public class QuestionFormAction {
 				reward_paymentLog.setAmount(rewardAmount);//金额
 				reward_paymentLog.setInterfaceProduct(0);//接口产品
 				reward_paymentLog.setUserName(accessUser.getUserName());//用户名称
-				reward_paymentLog.setTimes(time);
+				reward_paymentLog.setTimes(d);
 				
 			}
 			
