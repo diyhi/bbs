@@ -25,7 +25,7 @@ import cms.bean.MediaInfo;
  *
  */
 @Entity
-@Table(indexes = {@Index(name="topic_idx", columnList="tagId,status"),@Index(name="topic_3_idx", columnList="userName,postTime"),@Index(name="topic_5_idx", columnList="status,sort,lastReplyTime")})
+@Table(indexes = {@Index(name="topic_idx", columnList="tagId,status"),@Index(name="topic_3_idx", columnList="userName,postTime"),@Index(name="topic_5_idx", columnList="status,sort,lastReplyTime"),@Index(name="topic_6_idx", columnList="weight")})
 public class Topic implements Serializable{
 	private static final long serialVersionUID = -684257451052921859L;
 	
@@ -49,7 +49,12 @@ public class Topic implements Serializable{
 	@Lob
 	private String summary;
 	
+	/** 是否使用Markdown **/
+	private Boolean isMarkdown;
 	
+	/** Markdown内容 **/
+	@Lob
+	private String markdownContent;
 	
 	/** 发表时间 **/
 	@Temporal(TemporalType.TIMESTAMP)
@@ -130,6 +135,9 @@ public class Topic implements Serializable{
 	private Boolean essence = false;
 	/** 状态 10.待审核 20.已发布 110.待审核删除 120.已发布删除 **/
 	private Integer status = 10;
+	
+	/** 权重 = P表示热度因子(评论数+点赞数+浏览数)；T表示距离发帖的时间（单位为小时）；G表示"重力因子"（gravityth power），即将帖子排名往下拉的力量，默认值为1.8;  权重小于0时表示强制下沉，不再在热门榜上显示;  超出时间限制的热门话题权重在重新计算时设置为0        KaTeX公式表示：Score = \dfrac{P-1}{(T+2)^G} **/
+	private Double weight = 0d;
 	
 	public Long getId() {
 		return id;
@@ -317,6 +325,24 @@ public class Topic implements Serializable{
 	}
 	public void setUserInfoStatus(Integer userInfoStatus) {
 		this.userInfoStatus = userInfoStatus;
+	}
+	public Boolean getIsMarkdown() {
+		return isMarkdown;
+	}
+	public void setIsMarkdown(Boolean isMarkdown) {
+		this.isMarkdown = isMarkdown;
+	}
+	public String getMarkdownContent() {
+		return markdownContent;
+	}
+	public void setMarkdownContent(String markdownContent) {
+		this.markdownContent = markdownContent;
+	}
+	public Double getWeight() {
+		return weight;
+	}
+	public void setWeight(Double weight) {
+		this.weight = weight;
 	}
 	
 }

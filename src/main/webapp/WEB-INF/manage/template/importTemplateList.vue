@@ -144,6 +144,7 @@ export default({
 		        method: 'post',
 		        url: 'control/template/manage?method=upload',
 		        data: formData,
+		        timeout: 0,// 定义请求超时时间
 		        onUploadProgress: progressEvent => {
 		            if (progressEvent.lengthComputable) {
                     	let rate = progressEvent.loaded / progressEvent.total;  //已上传的比例
@@ -241,6 +242,7 @@ export default({
 				  	'showLoading': false,//是否显示图标
 				},
 			    responseType: 'blob',// 表明返回服务器返回的数据类型
+			    timeout: 0,// 定义请求超时时间
 			    onDownloadProgress: (evt) => {
 					// 对原生进度事件的处理
 					_self.downloadProgressPercent = parseInt(evt.loaded / evt.total * 100);

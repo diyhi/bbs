@@ -41,6 +41,11 @@ public class Question implements Serializable{
 	/** 问题内容 **/
 	@Lob
 	private String content;
+	/** 是否使用Markdown **/
+	private Boolean isMarkdown;
+	/** Markdown内容 **/
+	@Lob
+	private String markdownContent;
 	/** 内容摘要 **/
 	@Lob
 	private String summary;
@@ -321,6 +326,26 @@ public class Question implements Serializable{
 
 	public void setUserInfoStatus(Integer userInfoStatus) {
 		this.userInfoStatus = userInfoStatus;
+	}
+
+
+	public Boolean getIsMarkdown() {
+		return isMarkdown;
+	}
+
+
+	public void setIsMarkdown(Boolean isMarkdown) {
+		this.isMarkdown = isMarkdown;
+	}
+
+
+	public String getMarkdownContent() {
+		return markdownContent;
+	}
+
+
+	public void setMarkdownContent(String markdownContent) {
+		this.markdownContent = markdownContent;
 	}
 	
 	

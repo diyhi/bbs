@@ -33,7 +33,9 @@ public class Links_TemplateManage {
 		List<Links> linksList = linksService.findAllLinks_cache();
 		if(linksList != null && linksList.size() >0){
 			for(Links links : linksList){
-				links.setImage(fileManage.fileServerAddress(request)+links.getImage());
+				if(links.getImage() != null && !"".equals(links.getImage().trim())){
+					links.setImage(fileManage.fileServerAddress(request)+links.getImage());
+				}
 			}
 		}
 		return linksList;

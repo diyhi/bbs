@@ -69,6 +69,17 @@ public interface TopicService extends DAO<Topic>{
 	 */
 	public List<Topic> findTopicByPage(String userName,Date postTime,int firstIndex, int maxResult);
 	/**
+	 * 查询热门话题
+	 * @param maxResult 需要获取的记录数
+	 * @return
+	 */
+	public List<Topic> findHotTopic(int maxResult);
+	/**
+	 * 查询热门话题 - 缓存
+	 * @return
+	 */
+	public List<Topic> findHotTopic_cache(int maxResult);
+	/**
 	 * 保存话题
 	 * @param topic
 	 * @param giveRedEnvelope 发红包
@@ -129,6 +140,12 @@ public interface TopicService extends DAO<Topic>{
 	 * @return
 	 */
 	public int addViewCount(Map<Long,Long> countMap);
+	/**
+	 * 增加权重
+	 * @param countMap key: 话题Id value:权重
+	 * @return
+	 */
+	public int addWeightCount(Map<Long,Double> countMap);
 	/**
 	 * 修改话题状态
 	 * @param topicId 话题Id

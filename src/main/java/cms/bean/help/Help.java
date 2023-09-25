@@ -43,6 +43,11 @@ public class Help implements Serializable{
 	/** 帮助内容 **/
 	@Lob
 	private String content;
+	/** 是否使用Markdown **/
+	private Boolean isMarkdown;
+	/** Markdown内容 **/
+	@Lob
+	private String markdownContent;
 	/** 发表时间 **/
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date times = new Date();
@@ -120,6 +125,18 @@ public class Help implements Serializable{
 
 	public void setVisible(boolean visible) {
 		this.visible = visible;
+	}
+	public Boolean getIsMarkdown() {
+		return isMarkdown;
+	}
+	public void setIsMarkdown(Boolean isMarkdown) {
+		this.isMarkdown = isMarkdown;
+	}
+	public String getMarkdownContent() {
+		return markdownContent;
+	}
+	public void setMarkdownContent(String markdownContent) {
+		this.markdownContent = markdownContent;
 	}
 	
 	

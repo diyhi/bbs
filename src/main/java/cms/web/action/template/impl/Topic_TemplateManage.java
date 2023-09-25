@@ -24,6 +24,7 @@ import cms.bean.QueryResult;
 import cms.bean.setting.SystemSetting;
 import cms.bean.template.Forum;
 import cms.bean.template.Forum_CommentRelated_Comment;
+import cms.bean.template.Forum_TopicRelated_HotTopic;
 import cms.bean.template.Forum_TopicRelated_LikeTopic;
 import cms.bean.template.Forum_TopicRelated_Topic;
 import cms.bean.topic.Comment;
@@ -55,6 +56,7 @@ import cms.web.action.lucene.TopicLuceneManage;
 import cms.web.action.mediaProcess.MediaProcessQueueManage;
 import cms.web.action.setting.SettingManage;
 import cms.web.action.topic.CommentManage;
+import cms.web.action.topic.HotTopicManage;
 import cms.web.action.topic.TopicManage;
 import cms.web.action.user.UserManage;
 import cms.web.action.user.UserRoleManage;
@@ -85,7 +87,7 @@ public class Topic_TemplateManage {
 	@Resource UserRoleManage userRoleManage;
 	@Resource FileManage fileManage;
 	@Resource MediaProcessQueueManage mediaProcessQueueManage;
-	
+	@Resource HotTopicManage hotTopicManage;
 	/**
 	 * 话题列表  -- 分页
 	 * @param forum
@@ -478,7 +480,27 @@ public class Topic_TemplateManage {
 		return null;
 	}
 	
-	
+	/**
+	 * 话题-- 热门话题-- 集合
+	 * @param forum
+	 */
+	public List<Topic> topic_hot_collection(Forum forum,Map<String,Object> parameter,Map<String,Object> runtimeParameter){
+		
+		String formValueJSON = forum.getFormValue();//表单值
+		if(formValueJSON != null && !"".equals(formValueJSON)){
+			Forum_TopicRelated_HotTopic forum_TopicRelated_HotTopic = JsonUtils.toObject(formValueJSON,Forum_TopicRelated_HotTopic.class);
+			if(forum_TopicRelated_HotTopic != null){
+				Integer hotTopic_maxResult = 10;
+				if(forum_TopicRelated_HotTopic.getHotTopic_maxResult() != null && forum_TopicRelated_HotTopic.getHotTopic_maxResult() >0){
+					hotTopic_maxResult = forum_TopicRelated_HotTopic.getHotTopic_maxResult();
+				}
+				
+				return topicService.findHotTopic_cache(hotTopic_maxResult);
+				
+			}
+		}
+		return null;
+	}
 	
 	/**
 	 * 话题-- 话题内容 -- 实体对象
@@ -534,6 +556,10 @@ public class Topic_TemplateManage {
 					topicManage.addView(topicId, ip);
 				}
 				
+
+				//添加热门话题
+				hotTopicManage.addHotTopic(topic);
+				
 				if(topic.getStatus() >20){//20:已发布
 					return null;
 					
@@ -548,6 +574,7 @@ public class Topic_TemplateManage {
 						}
 					}	
 				}
+				
 				if(accessUser != null && systemSetting.isShowIpAddress()){
 					topic.setIpAddress(IpAddress.queryProvinceAddress(topic.getIp()));
 				}
@@ -827,6 +854,7 @@ public class Topic_TemplateManage {
 		value.put("userGradeList", JsonUtils.toJSONString(userGradeList));
 		
 		value.put("fileSystem", fileManage.getFileSystem());
+		value.put("supportEditor", systemSetting.getSupportEditor());
 		return value;
 	}
 	
@@ -913,6 +941,7 @@ public class Topic_TemplateManage {
 		List<UserGrade> userGradeList = userGradeService.findAllGrade_cache();
 		value.put("userGradeList", JsonUtils.toJSONString(userGradeList));
 		value.put("fileSystem", fileManage.getFileSystem());
+		value.put("supportEditor", systemSetting.getSupportEditor());
 		return value;
 	}
 	
@@ -1337,6 +1366,7 @@ public class Topic_TemplateManage {
 		
 		value.put("availableTag", commentManage.availableTag());//评论编辑器允许使用标签
 		value.put("fileSystem", fileManage.getFileSystem());
+		value.put("supportEditor", systemSetting.getSupportEditor());
 		return value;
 	}
 	
@@ -1395,6 +1425,7 @@ public class Topic_TemplateManage {
 		}
 		value.put("availableTag", commentManage.availableTag());//评论编辑器允许使用标签
 		value.put("fileSystem", fileManage.getFileSystem());
+		value.put("supportEditor", systemSetting.getSupportEditor());
 		return value;
 	}
 	
@@ -1461,6 +1492,7 @@ public class Topic_TemplateManage {
 		}
 		value.put("availableTag", commentManage.availableTag());//评论编辑器允许使用标签
 		value.put("fileSystem", fileManage.getFileSystem());
+		value.put("supportEditor", systemSetting.getSupportEditor());
 		return value;
 	}
 	

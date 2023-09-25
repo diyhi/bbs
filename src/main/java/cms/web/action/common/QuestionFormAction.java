@@ -462,6 +462,7 @@ public class QuestionFormAction {
 				question.setUserName(accessUser.getUserName());
 				question.setIsStaff(false);
 				question.setContent(value);
+				question.setIsMarkdown(false);
 			}else{
 				error.put("content", "问题内容不能为空");
 			}	
@@ -889,6 +890,7 @@ public class QuestionFormAction {
 			AppendQuestionItem appendQuestionItem = new AppendQuestionItem();
 			appendQuestionItem.setId(UUIDUtil.getUUID32());
 			appendQuestionItem.setContent(appendContent.trim());
+			appendQuestionItem.setIsMarkdown(false);
 			appendQuestionItem.setPostTime(new Date());
 			appendContent_json = JsonUtils.toJSONString(appendQuestionItem);
 		}else{

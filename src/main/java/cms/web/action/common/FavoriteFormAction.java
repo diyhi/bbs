@@ -38,6 +38,7 @@ import cms.web.action.AccessSourceDeviceManage;
 import cms.web.action.CSRFTokenManage;
 import cms.web.action.favorite.FavoriteManage;
 import cms.web.action.question.QuestionManage;
+import cms.web.action.topic.HotTopicManage;
 import cms.web.action.topic.TopicManage;
 import cms.web.action.user.RoleAnnotation;
 import cms.web.taglib.Configuration;
@@ -184,6 +185,7 @@ public class FavoriteFormAction {
 					
 					favoriteManage.delete_cache_findTopicFavoriteById(topicFavoriteId);
 					favoriteManage.delete_cache_findFavoriteCountByTopicId(favorites.getTopicId());
+					
 				}
 				if(question != null){
 					//保存收藏

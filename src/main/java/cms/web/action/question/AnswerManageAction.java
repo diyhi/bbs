@@ -34,6 +34,7 @@ import cms.bean.question.Answer;
 import cms.bean.question.AnswerReply;
 import cms.bean.question.Question;
 import cms.bean.setting.EditorTag;
+import cms.bean.setting.SystemSetting;
 import cms.bean.staff.SysUsers;
 import cms.bean.user.PointLog;
 import cms.bean.user.User;
@@ -118,6 +119,7 @@ public class AnswerManageAction {
 				Answer answer= new Answer();
 				answer.setQuestionId(questionId);
 				answer.setContent(value);
+				answer.setIsMarkdown(false);
 				answer.setIsStaff(true);
 				answer.setUserName(username);
 				answer.setIp(IpAddress.getClientIpAddress(request));
@@ -185,6 +187,8 @@ public class AnswerManageAction {
 					username =((UserDetails)obj).getUsername();	
 				}
 				returnValue.put("userName", username);
+				SystemSetting systemSetting = settingService.findSystemSetting_cache();
+				returnValue.put("supportEditor", systemSetting.getSupportEditor());
 			}else{
 				error.put("answerId", "答案Id不能为空");
 			}

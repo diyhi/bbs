@@ -1,0 +1,18 @@
+<#--  热门话题 集合-->
+<@function > 
+<#if topicRelated_hotTopic_collection?? && topicRelated_hotTopic_collection?size gt 0 >  
+	<div class="hotTopicModule clearfix">
+		<div class="hotTopic">
+		    <div class="title">热门话题</div>
+		    <ul class="topicList">
+		    	<#list topicRelated_hotTopic_collection as hotTopic>
+			        <li class="topic-title ">
+			            <a  href="thread?topicId=${hotTopic.id}" title="${hotTopic.title}" target="_blank">${hotTopic.title}</a>
+			        </li>
+		        </#list>
+		       
+			</ul>
+		</div>
+	</div>
+</#if>
+</@function>

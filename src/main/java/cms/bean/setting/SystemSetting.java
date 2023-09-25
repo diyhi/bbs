@@ -37,6 +37,9 @@ public class SystemSetting implements Serializable{
 	/** 支持访问设备 1.自动识别终端 2.电脑端 3.移动端 **/
 	private Integer supportAccessDevice = 1;
 	
+	/** 支持编辑器 10.仅富文本编辑器 20.仅Markdown编辑器  30.富文本编辑器优先 40.Markdown编辑器优先 **/
+	private Integer supportEditor = 10;
+	
 	/** 是否允许注册
 	private boolean allowRegister = true; **/
 	/** 允许注册账号类型 json AllowRegisterAccount格式数据**/
@@ -174,6 +177,11 @@ public class SystemSetting implements Serializable{
 	/** 后台分页数量 **/
 	private Integer backstagePageNumber = 20;
 	
+	/** 话题热度因子加权    例如：评论=200|点赞=100|浏览量=1|重力因子=1.8    以竖线符号分割各热度因子，因子的分数越高，在热度因子中占比重越大；如果不设参数，则因子的加权值默认为1；因子加权值“评论|点赞|浏览量”可以为0至9999之间的整数，“重力因子”可以为0.1至2之间的数  **/
+	private String topicHeatFactor;
+	
+	/** 热门话题仅推荐发布N小时内的话题  空值为不限制 **/
+	private Integer topicHotRecommendedTime;
 
 	/** 每用户每24小时内发送短信次数 **/
 	private Integer userSentSmsCount = 10;
@@ -741,6 +749,30 @@ public class SystemSetting implements Serializable{
 
 	public void setReportMaxImageUpload(Integer reportMaxImageUpload) {
 		this.reportMaxImageUpload = reportMaxImageUpload;
+	}
+
+	public Integer getSupportEditor() {
+		return supportEditor;
+	}
+
+	public void setSupportEditor(Integer supportEditor) {
+		this.supportEditor = supportEditor;
+	}
+
+	public String getTopicHeatFactor() {
+		return topicHeatFactor;
+	}
+
+	public void setTopicHeatFactor(String topicHeatFactor) {
+		this.topicHeatFactor = topicHeatFactor;
+	}
+
+	public Integer getTopicHotRecommendedTime() {
+		return topicHotRecommendedTime;
+	}
+
+	public void setTopicHotRecommendedTime(Integer topicHotRecommendedTime) {
+		this.topicHotRecommendedTime = topicHotRecommendedTime;
 	}
 
 

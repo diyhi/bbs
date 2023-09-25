@@ -85,6 +85,7 @@
 													<#if reply.userName == question.userName && reply.isStaff == question.isStaff>
 														<span class="master">作者</span>
 													</#if>
+													<div class="time">${reply.postTime}</div>
 												</div>
 												<#if reply.friendUserName != null && reply.friendUserName??>
 													<div class="friendInfo">
@@ -94,7 +95,7 @@
 			                                                    <#if reply.friendAvatarName != null>
 																	<img src="${reply.friendAvatarPath}100x100/${reply.friendAvatarName}" class="img">
 																<#else>
-			                                                    	<img avatar="${(reply.friendNickname != null && reply.friendNickname??) ?string(reply.friendNickname , reply.friendAccount)}" width="40" height="40" class="img">
+			                                                    	<img avatar="${(reply.friendNickname != null && reply.friendNickname??) ?string(reply.friendNickname , reply.friendAccount)}" width="20" height="20" class="img">
 																</#if> 
 			                                                </a>
 		                                                </#if>

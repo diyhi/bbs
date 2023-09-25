@@ -264,8 +264,8 @@ public class AnswerFormAction {
 		
 		if(content != null && !"".equals(content.trim())){
 			//过滤标签
-			content = textFilterManage.filterTag(request,content,settingManage.readEditorTag());
-			Object[] object = textFilterManage.filterHtml(request,content,"answer",settingManage.readEditorTag());
+			content = textFilterManage.filterTag(request,content,settingManage.readAnswerEditorTag());
+			Object[] object = textFilterManage.filterHtml(request,content,"answer",settingManage.readAnswerEditorTag());
 			String value = (String)object[0];
 			imageNameList = (List<String>)object[1];
 			boolean isImage = (Boolean)object[2];//是否含有图片
@@ -283,6 +283,7 @@ public class AnswerFormAction {
 					value = sensitiveWordFilterManage.filterSensitiveWord(value, wordReplace);
 				}
 				answer.setContent(value);
+				answer.setIsMarkdown(false);
 				answer.setIsStaff(false);
 				answer.setUserName(accessUser.getUserName());
 			}else{
@@ -621,8 +622,8 @@ public class AnswerFormAction {
 			
 			if(content != null && !"".equals(content.trim())){
 				//过滤标签
-				content = textFilterManage.filterTag(request,content,settingManage.readEditorTag());
-				Object[] object = textFilterManage.filterHtml(request,content,"answer",settingManage.readEditorTag());
+				content = textFilterManage.filterTag(request,content,settingManage.readAnswerEditorTag());
+				Object[] object = textFilterManage.filterHtml(request,content,"answer",settingManage.readAnswerEditorTag());
 				String value = (String)object[0];
 				imageNameList = (List<String>)object[1];
 				boolean isImage = (Boolean)object[2];//是否含有图片

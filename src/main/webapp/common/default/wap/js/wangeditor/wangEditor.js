@@ -3915,116 +3915,149 @@ Hide.prototype = {
     },
 	
     /**
-	 * 跳出<hide>标签
-	 * event 事件
-	 * node 选中节点
-	 */
-    jumpHideLabel: function jumpHideLabel(event,node) {
-    	var editor = this.editor;
-    	var elem = node[0];
+   	 * 跳出<hide>标签
+   	 * event 事件
+   	 * node 选中节点
+   	 */
+    jumpHideLabel: function jumpHideLabel(event,node,menuElem) {
+   	var editor = this.editor;
+       var elem = node[0];
+       var nodeName = node.getNodeName();
+       if(nodeName == "HIDE"){
+           elem = node[0];
+       }else{
+           var $hide = node.parentUntil('HIDE');
+           if ($hide != null){
+               elem = $hide[0];
+           }
+       }
 
- 	  
- 	   //<hide>标签左下角相对屏幕坐标X轴
-  	   var hide_clientRect_x = elem.getBoundingClientRect().left; 
-  	   //<hide>标签左下角相对屏幕坐标Y轴
-  	   var hide_clientRect_y = elem.getBoundingClientRect().bottom; 
-  	   //小按钮宽
+	  
+	   //<hide>标签左下角相对屏幕坐标X轴
+ 	   var hide_clientRect_x = elem.getBoundingClientRect().left; 
+ 	   //<hide>标签左下角相对屏幕坐标Y轴
+ 	   var hide_clientRect_y = elem.getBoundingClientRect().bottom; 
+ 	   //小按钮宽
 	    var buttonWidth = 12;
 	    //小按钮高
 	    var buttonWidth = 12;
 	    //小按钮左上角坐标X轴
- 	    var button_left_top_x = hide_clientRect_x-12;
- 	    //小按钮左上角坐标Y轴
- 	    var button_left_top_y = hide_clientRect_y-12;
- 	    //小按钮右下角坐标X轴
- 	    var button_right_bottom_x = hide_clientRect_x;
- 	    //小按钮右下角坐标Y轴
- 	    var button_right_bottom_y = hide_clientRect_y;
-  	   
- 	    //判断鼠标的坐标是否在这一区域
- 	  	if( event.clientX > button_left_top_x && event.clientX <button_right_bottom_x && event.clientY >button_left_top_y && event.clientY < button_right_bottom_y){
- 	  		/**
- 	         var editor = this.editor;
- 	         var $textElem = editor.$textElem;
- 	         var $children = $textElem.children();
- 	         var $last = $children.last();
- 	         $textElem.append($('<p><br></p>'));
- 	         editor.selection.createRangeByElem($last, false, true);
- 	         editor.selection.restoreSelection();
- 	 	    **/
+	    var button_left_top_x = hide_clientRect_x-12;
+	    //小按钮左上角坐标Y轴
+	    var button_left_top_y = hide_clientRect_y-12;
+	    //小按钮右下角坐标X轴
+	    var button_right_bottom_x = hide_clientRect_x;
+	    //小按钮右下角坐标Y轴
+	    var button_right_bottom_y = hide_clientRect_y;
+ 	   
+       
+	    //判断鼠标的坐标是否在这一区域
+	  	if( event.clientX > button_left_top_x && event.clientX <button_right_bottom_x && event.clientY >button_left_top_y && event.clientY < button_right_bottom_y){
+	  		/**
+	         var editor = this.editor;
+	         var $textElem = editor.$textElem;
+	         var $children = $textElem.children();
+	         var $last = $children.last();
+	         $textElem.append($('<p><br></p>'));
+	         editor.selection.createRangeByElem($last, false, true);
+	         editor.selection.restoreSelection();
+	 	    **/
+           this._active = false;
+           menuElem.removeClass('w-e-active');
+	 	    
+	 	    
+	 	    var editor = this.editor;
+	 		    
+	 	    var $containerElem = editor.selection.getSelectionContainerElem();
+	 	    // 判断选区内容是否在编辑内容之内
+	         if (!$containerElem) {
+	             return;
+	         }
+	 	    
+            /**
+	 	    var parent = $containerElem;
 
- 	 	    
- 	 	    
- 	 	    var editor = this.editor;
- 	 		    
- 	 	    var $containerElem = editor.selection.getSelectionContainerElem();
- 	 	    // 判断选区内容是否在编辑内容之内
- 	      //   if (!$containerElem) {
- 	     //        return;
- 	      //   }
- 	 	    
- 	 	    var parent = $containerElem;
- 	 	    var _nodeName = parent.getNodeName();
+           while (parent.parent()) {
+               var nodeName = parent.getNodeName();
+               if(nodeName == "HIDE"){
+                   parent = parent.parent();
+                   break;
+               }
+               if(nodeName == "BODY"){
+                   parent = null;
+                   break;
+               }
+               parent = parent.parent();
+           } */
+	 	    
+           var current = node;
+           if($containerElem.getNodeName() != "HIDE"){
+               var $hide = node.parentUntil('HIDE');
+               if ($hide != null){
+                   current = $hide;
+               }
+           }
 
-	 	 	if(_nodeName != "HIDE"){//当前节点为hide
-	 	 		parent = parent.parent();
- 	 	    }else{
- 	 	    	while (parent.parent()) {
- 		 			var nodeName = parent.getNodeName();
- 		 			if(nodeName == "HIDE"){
- 		 				parent = parent.parent();
- 		 				break;
- 		 			}
- 		 			if(nodeName == "BODY"){
- 		 				parent = null;
- 		 				break;
- 		 			}
- 		 			parent = parent.parent();
- 		 		}
- 	 	    }
-	 	 	
-	    	if (parent != null){
-	         	var $children = parent.children();
-	         	var $last = $children.last();
-	         	
-	         	parent.append($('<p><br></p>'));
-	            editor.selection.createRangeByElem(parent, false, true);
-	    	}
- 	         editor.selection.restoreSelection();
- 	         
- 	  	}
-  	   
- 	  	
-    },
+           var $p = $('<p><br></p>');
+           
+           $p.insertAfter(current);
+           editor.selection.createRangeByElem( $p, false,true);
+	        editor.selection.restoreSelection();
+	         
+	  	}
+ 	   
+	  	
+   },
 	
 	
-	// 试图改变 active 状态
-    tryChangeActive: function tryChangeActive(e) {
-    	var editor = this.editor;
-        var $elem = this.$elem;
-        var $selectionELem = editor.selection.getSelectionContainerElem();
-        if (!$selectionELem) {
-            return;
-        }
-        
-        var $hide = $selectionELem.parentUntil('HIDE');
-        if ($hide != null){
-        	 this._active = true;
-             $elem.addClass('w-e-active');
-        	 return;
-        }
+// 试图改变 active 状态
+   tryChangeActive: function tryChangeActive(e) {
+   	var editor = this.editor;
+       var $elem = this.$elem;
+       var $selectionELem = editor.selection.getSelectionContainerElem();
+       if (!$selectionELem) {
+           return;
+       }
+       
+       var $hide = $selectionELem.parentUntil('HIDE');
+       if ($hide != null){
+           this._active = true;
+           $elem.addClass('w-e-active');
+           this.jumpHideLabel(e,$selectionELem,$elem);
+           return;
+      }
+      var nodeName = $selectionELem.getNodeName();
+      if (nodeName === 'HIDE') {
+          this._active = true;
+          $elem.addClass('w-e-active');
+          this.jumpHideLabel(e,$selectionELem,$elem);
+      } else {
+          this._active = false;
+          $elem.removeClass('w-e-active');
+      }
 
-        var nodeName = $selectionELem.getNodeName();
-        if (nodeName === 'HIDE') {
-            this._active = true;
+       /**
+       var $hide = $selectionELem.parentUntil('HIDE');
+       console.log("试图改变 active 状态2--",$hide);
+      
+       if ($hide != null){
+       	 this._active = true;
             $elem.addClass('w-e-active');
-            this.jumpHideLabel(e,$selectionELem);
-        } else {
-            this._active = false;
-            $elem.removeClass('w-e-active');
-        }
+       	 return;
+       }
+     
+       var nodeName = $selectionELem.getNodeName();
+       console.log("试图改变 active 状态3",nodeName);
+       if (nodeName === 'HIDE') {
+           this._active = true;
+           $elem.addClass('w-e-active');
+           this.jumpHideLabel(e,$selectionELem);
+       } else {
+           this._active = false;
+           $elem.removeClass('w-e-active');
+       }**/
 
-    }
+   }
 	
 };
 
@@ -4485,6 +4518,12 @@ Text.prototype = {
                 insertEmptyP($selectionElem);
                 return;
             }
+            
+            var nodeName = $selectionElem.getNodeName();
+            if (nodeName === 'HIDE') {
+            	
+                return;
+            }
             /**
             var nodeName = $selectionElem.getNodeName();
             if (nodeName === 'HIDE') {
@@ -4524,12 +4563,13 @@ Text.prototype = {
             pHandle(e);
         });
 
-        // <pre><code></code></pre> 回车时 特殊处理
+     // <pre><code></code></pre> 回车时 特殊处理
         function codeHandle(e) {
             var $selectionElem = editor.selection.getSelectionContainerElem();
             if (!$selectionElem) {
                 return;
             }
+            
             var $parentElem = $selectionElem.parent();
             var selectionNodeName = $selectionElem.getNodeName();
             var parentNodeName = $parentElem.getNodeName();
@@ -4538,9 +4578,10 @@ Text.prototype = {
                 // 必须原生支持 insertHTML 命令
                 return;
             }
-            
-            //处理隐藏标签
-            if (selectionNodeName === 'HIDE') {
+
+
+            var $hide = $selectionElem.parentUntil('HIDE');
+            if (selectionNodeName == 'HIDE' || $hide != null){
                 //软回车效果
                 if (window.getSelection) {
                 	var selection = window.getSelection(),
@@ -4558,14 +4599,82 @@ Text.prototype = {
                 }
                 // 阻止默认行为, 防止回车换行
                 e.preventDefault();
+            }
+           
+
+
+
+            
+            if (selectionNodeName != 'HIDE') {
+                if (selectionNodeName !== 'CODE' || parentNodeName !== 'PRE') {
+                    // 不符合要求 忽略
+                    return;
+                }
+                // 处理：光标定位到代码末尾，联系点击两次回车，即跳出代码块
+                if (editor._willBreakCode === true) {
+                    // 此时可以跳出代码块
+                    // 插入 <p> ，并将选取定位到 <p>
+                    var $p = $('<p><br></p>');
+                    $p.insertAfter($parentElem);
+                    editor.selection.createRangeByElem($p, true);
+                    editor.selection.restoreSelection();
+
+                    // 修改状态
+                    editor._willBreakCode = false;
+
+                    e.preventDefault();
+                    return;
+                }
+
+                var _startOffset = editor.selection.getRange().startOffset;
 
                 
+                
+                // 处理：回车时，不能插入 <br> 而是插入 \n ，因为是在 pre 标签里面
+                editor.cmd.do('insertHTML', '\n');
+                editor.selection.saveRange();
+                if (editor.selection.getRange().startOffset === _startOffset) {
+                    // 没起作用，再来一遍
+                    editor.cmd.do('insertHTML', '\n');
+                }
+
+                var codeLength = $selectionElem.html().length;
+                if (editor.selection.getRange().startOffset + 1 === codeLength) {
+                    // 说明光标在代码最后的位置，执行了回车操作
+                    // 记录下来，以便下次回车时候跳出 code
+                    editor._willBreakCode = true;
+                }
+
+                // 阻止默认行为, 防止回车换行
+                e.preventDefault();
+            }
+
+            /**
+            //处理隐藏标签
+            if (selectionNodeName === 'HIDE') {
+
+                //软回车效果
+                if (window.getSelection) {
+                	var selection = window.getSelection(),
+                    range = selection.getRangeAt(0),
+                    br = document.createElement("br");
+                    range.deleteContents();
+                    range.insertNode(br);
+                    range.setStartAfter(br);
+                    range.setEndAfter(br);
+                    range.collapse(false);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                    
+                   
+                }
+                // 阻止默认行为, 防止回车换行
+                e.preventDefault();
             }else{
             	if (selectionNodeName !== 'CODE' || parentNodeName !== 'PRE') {
                     // 不符合要求 忽略
                     return;
                 }
-
                 // 处理：光标定位到代码末尾，联系点击两次回车，即跳出代码块
                 if (editor._willBreakCode === true) {
                     // 此时可以跳出代码块
@@ -4604,9 +4713,7 @@ Text.prototype = {
                 // 阻止默认行为, 防止回车换行
                 e.preventDefault();
             	
-            }
-            
-            
+            }**/
         }
 
         $textElem.on('keydown', function (e) {
@@ -4630,6 +4737,36 @@ Text.prototype = {
             if (e.keyCode !== 8) {
                 return;
             }
+            var $selectionElem = editor.selection.getSelectionContainerElem();
+
+            //退格键删除隐藏标签
+            if($selectionElem.getNodeName() == "HIDE"){
+                //<hide class="inputValue_20" hide-type="20"></hide>
+                if($selectionElem.children() != undefined && $selectionElem.children().length == undefined 
+                        && $selectionElem.text() == ''){
+
+                    $selectionElem.remove();
+                    editor.selection.restoreSelection();
+                    e.preventDefault();
+                    return;
+                }
+
+
+                //<hide class="inputValue_20" hide-type="20"><br></hide>
+                if($selectionElem.children() != undefined && $selectionElem.children().length == 1
+                        && $selectionElem.text() == ''
+                        && $selectionElem.children()[0].outerHTML == '<br>'){// $selectionElem.children()[0]为 HTMLBRElement类型数据    Object.prototype.toString.call($selectionElem.children()[0])
+                   
+                    $selectionElem.remove();
+                    editor.selection.restoreSelection();
+                    e.preventDefault();
+                    return;
+                }
+            }
+            
+
+
+            //按下退格键
             var txtHtml = $textElem.html().toLowerCase().trim();
             if (txtHtml === '<p><br></p>') {
                 // 最后剩下一个空行，就不再删除了
@@ -4642,6 +4779,7 @@ Text.prototype = {
             if (e.keyCode !== 8) {
                 return;
             }
+            //释放退格键
             var $p = void 0;
             var txtHtml = $textElem.html().toLowerCase().trim();
 

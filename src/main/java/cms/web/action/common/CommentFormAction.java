@@ -65,6 +65,7 @@ import cms.web.action.membershipCard.MembershipCardGiftTaskManage;
 import cms.web.action.message.RemindManage;
 import cms.web.action.setting.SettingManage;
 import cms.web.action.topic.CommentManage;
+import cms.web.action.topic.HotTopicManage;
 import cms.web.action.topic.TopicManage;
 import cms.web.action.user.PointManage;
 import cms.web.action.user.UserDynamicManage;
@@ -106,6 +107,7 @@ public class CommentFormAction {
 	@Resource UserRoleManage userRoleManage;
 	@Resource CommentManage commentManage;
 	@Resource MembershipCardGiftTaskManage membershipCardGiftTaskManage;
+	@Resource HotTopicManage hotTopicManage;
 	
 	/**
 	 * 评论   添加
@@ -281,6 +283,7 @@ public class CommentFormAction {
 					value = sensitiveWordFilterManage.filterSensitiveWord(value, wordReplace);
 				}
 				comment.setContent(value);
+				comment.setIsMarkdown(false);
 				comment.setIsStaff(false);
 				comment.setUserName(accessUser.getUserName());
 			}else{
@@ -294,7 +297,8 @@ public class CommentFormAction {
 			comment.setIp(IpAddress.getClientIpAddress(request));
 			//保存评论
 			commentService.saveComment(comment);
-			
+			//添加热门话题
+			hotTopicManage.addHotTopic(topic);
 			
 			PointLog pointLog = new PointLog();
 			pointLog.setId(pointManage.createPointLogId(accessUser.getUserId()));
@@ -848,6 +852,7 @@ public class CommentFormAction {
 						value = sensitiveWordFilterManage.filterSensitiveWord(value, wordReplace);
 					}
 					newComment.setContent(value);
+					newComment.setIsMarkdown(false);
 					newComment.setIsStaff(false);
 					newComment.setQuoteIdGroup(old_customQuoteId);
 					newComment.setUserName(accessUser.getUserName());
@@ -869,6 +874,8 @@ public class CommentFormAction {
 		if(error.size() ==0){
 			//保存评论
 			commentService.saveComment(newComment);
+			//添加热门话题
+			hotTopicManage.addHotTopic(topic);
 			
 			PointLog pointLog = new PointLog();
 			pointLog.setId(pointManage.createPointLogId(accessUser.getUserId()));

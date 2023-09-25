@@ -28,6 +28,7 @@ import cms.bean.PageForm;
 import cms.bean.RequestResult;
 import cms.bean.ResultCode;
 import cms.bean.setting.EditorTag;
+import cms.bean.setting.SystemSetting;
 import cms.bean.staff.SysUsers;
 import cms.bean.topic.Comment;
 import cms.bean.topic.Quote;
@@ -108,6 +109,7 @@ public class CommentManageAction {
 				Comment comment = new Comment();
 				comment.setTopicId(topicId);
 				comment.setContent(value);
+				comment.setIsMarkdown(false);
 				comment.setIsStaff(true);
 				comment.setUserName(username);
 				comment.setIp(IpAddress.getClientIpAddress(request));
@@ -180,6 +182,8 @@ public class CommentManageAction {
 					username =((UserDetails)obj).getUsername();	
 				}
 				returnValue.put("userName", username);
+				SystemSetting systemSetting = settingService.findSystemSetting_cache();
+				returnValue.put("supportEditor", systemSetting.getSupportEditor());
 			}else{
 				error.put("commentId", "评论不存在");
 			}
@@ -648,7 +652,8 @@ public class CommentManageAction {
 			username =((UserDetails)obj).getUsername();	
 		}
 		returnValue.put("userName", username);
-		
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		returnValue.put("supportEditor", systemSetting.getSupportEditor());
 		if(error.size()==0){
 			
 			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
@@ -721,6 +726,7 @@ public class CommentManageAction {
 					Comment newComment = new Comment();
 					newComment.setTopicId(comment.getTopicId());
 					newComment.setContent(value);
+					newComment.setIsMarkdown(false);
 					newComment.setIsStaff(true);
 					newComment.setQuoteIdGroup(old_quoteId);
 					newComment.setUserName(username);

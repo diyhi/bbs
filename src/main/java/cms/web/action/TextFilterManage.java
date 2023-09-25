@@ -242,7 +242,7 @@ public class TextFilterManage {
 		if(editorTag == null || editorTag.isLink()){//超级链接
 			//超级链接
 			safelist.addTags("a")
-			.addAttributes("a", "href", "title","target")
+			.addAttributes("a", "href", "title","target","linkType")
 			.addProtocols("a", "href", "ftp", "http", "https", "mailto")
 			.addEnforcedAttribute("a", "rel", "nofollow");
 		}
@@ -317,7 +317,7 @@ public class TextFilterManage {
 		Safelist safelist = this.filterParameter(null);
 	
 	    //return Jsoup.clean(html, Configuration.getUrl(request),safelist); 
-		return Jsoup.clean(html, Configuration.getUrl(request),safelist,new OutputSettings().prettyPrint(false)); //prettyPrint(是否重新格式化)
+		return Jsoup.clean(html, domain(request),safelist,new OutputSettings().prettyPrint(false)); //prettyPrint(是否重新格式化)
 	}
 	
 	/**
@@ -334,7 +334,7 @@ public class TextFilterManage {
 	
 		//return Jsoup.clean(html, Configuration.getUrl(request),safelist); 
 	
-		return Jsoup.clean(html, Configuration.getUrl(request),safelist,new OutputSettings().prettyPrint(false)); //prettyPrint(是否重新格式化)
+		return Jsoup.clean(html, domain(request),safelist,new OutputSettings().prettyPrint(false)); //prettyPrint(是否重新格式化)
 	}
 	
 	/**
@@ -750,10 +750,12 @@ public class TextFilterManage {
 			Elements file_pngs = doc.select("a[href]");  
 			for (Element element : file_pngs) {  
 				String fileUrl = element.attr("href");
+				element.attr("linkType",  "");
 				if(fileUrl != null && !"".equals(fileUrl.trim())){
 					
 					if(StringUtils.startsWithIgnoreCase(fileUrl, "file/"+item+"/")){
 						element.attr("href",  url + fileUrl);
+						element.attr("linkType",  "download");
 					}
 				}
 			}
@@ -1967,7 +1969,7 @@ public class TextFilterManage {
 	 * @return
 	 */
 	public boolean isFrontEndURL(HttpServletRequest request,String processUrl){  
-		String domain = WebUtil.getRefererDomain(request);
+		String domain = WebUtil.getOriginDomain(request);
 		
 		if(domain == null || "".equals(domain.trim())){
 			domain = Configuration.getUrl(request);
@@ -1986,7 +1988,7 @@ public class TextFilterManage {
 	 * @return
 	 */
 	public String deleteFrontEndURL(HttpServletRequest request,String processUrl){  
-		String domain = WebUtil.getRefererDomain(request);
+		String domain = WebUtil.getOriginDomain(request);
 		
 		if(domain == null || "".equals(domain.trim())){
 			domain = Configuration.getUrl(request);
@@ -2046,5 +2048,19 @@ public class TextFilterManage {
             }
 		}
 		return processUrl;
+	}
+	
+	/**
+	 * 获取前端地址
+	 * @param request
+	 * @return
+	 */
+	public String domain(HttpServletRequest request){  
+		String domain = WebUtil.getOriginDomain(request);
+		if(domain == null || "".equals(domain.trim())){
+			domain = Configuration.getUrl(request);
+		}
+		
+		return domain;
 	}
 }

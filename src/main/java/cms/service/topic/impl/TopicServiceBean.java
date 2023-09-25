@@ -12,6 +12,7 @@ import javax.persistence.Query;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -284,6 +285,52 @@ public class TopicServiceBean extends DaoSupport<Topic> implements TopicService{
 		return topicList;
 	}
 	
+	/**
+	 * 查询热门话题
+	 * @param maxResult 需要获取的记录数
+	 * @return
+	 */
+	@Transactional(readOnly=true,propagation=Propagation.NOT_SUPPORTED)
+	public List<Topic> findHotTopic(int maxResult){
+		List<Topic> topicList = new ArrayList<Topic>();
+		String sql = "select o.id,o.title,o.commentTotal,o.viewTotal" +
+				" from Topic o ORDER BY o.weight desc";
+
+		Query query = em.createQuery(sql);	
+		//获取多少条数据
+		query.setMaxResults(maxResult);
+			
+		List<Object[]> objectList = query.getResultList();
+		if(objectList != null && objectList.size() >0){
+			for(int i = 0; i<objectList.size(); i++){
+				Object[] obj = (Object[])objectList.get(i);
+				Long id = (Long)obj[0];
+				String title = (String)obj[1];
+				Long commentTotal= (Long)obj[2];
+				Long viewTotal= (Long)obj[3];
+
+				Topic topic = new Topic();
+				topic.setId(id);
+				topic.setTitle(title);
+				topic.setCommentTotal(commentTotal);
+				topic.setViewTotal(viewTotal);
+				topicList.add(topic);
+				
+			}
+		}
+		return topicList;
+		
+	}
+	
+	/**
+	 * 查询热门话题 - 缓存
+	 * @return
+	 */
+	@Transactional(readOnly=true,propagation=Propagation.NOT_SUPPORTED)
+	@Cacheable(value="topicServiceBean_cache_findHotTopic",key="'findHotTopic_default'")
+	public List<Topic> findHotTopic_cache(int maxResult){
+		return this.findHotTopic(maxResult);
+	}
 	
 	/**
 	 * 保存话题
@@ -456,6 +503,21 @@ public class TopicServiceBean extends DaoSupport<Topic> implements TopicService{
 		int i = 0;
 		for (Map.Entry<Long, Long> entry : countMap.entrySet()) { 
 			Query query = em.createQuery("update Topic o set o.viewTotal=o.viewTotal+?1 where o.id=?2")
+					.setParameter(1, entry.getValue())
+					.setParameter(2, entry.getKey());
+			i = i+query.executeUpdate();
+		}
+		return i;
+	}
+	/**
+	 * 增加权重
+	 * @param countMap key: 话题Id value:权重
+	 * @return
+	 */
+	public int addWeightCount(Map<Long,Double> countMap){
+		int i = 0;
+		for (Map.Entry<Long, Double> entry : countMap.entrySet()) { 
+			Query query = em.createQuery("update Topic o set o.weight=?1 where o.id=?2")
 					.setParameter(1, entry.getValue())
 					.setParameter(2, entry.getKey());
 			i = i+query.executeUpdate();

@@ -78,6 +78,11 @@ public class Comment implements Serializable{
 	/** 评论内容 **/
 	@Lob
 	private String content;
+	/** 是否使用Markdown **/
+	private Boolean isMarkdown;
+	/** Markdown内容 **/
+	@Lob
+	private String markdownContent;
 	/** 评论时间 **/
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date postTime = new Date();
@@ -332,6 +337,26 @@ public class Comment implements Serializable{
 
 	public void setUserInfoStatus(Integer userInfoStatus) {
 		this.userInfoStatus = userInfoStatus;
+	}
+
+
+	public Boolean getIsMarkdown() {
+		return isMarkdown;
+	}
+
+
+	public void setIsMarkdown(Boolean isMarkdown) {
+		this.isMarkdown = isMarkdown;
+	}
+
+
+	public String getMarkdownContent() {
+		return markdownContent;
+	}
+
+
+	public void setMarkdownContent(String markdownContent) {
+		this.markdownContent = markdownContent;
 	}
 	
 }

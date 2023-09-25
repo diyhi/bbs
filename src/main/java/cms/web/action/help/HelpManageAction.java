@@ -136,6 +136,9 @@ public class HelpManageAction {
 	public String addUI(Help help,Long helpTypeId,ModelMap model,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
+		Map<String,Object> returnValue = new LinkedHashMap<String,Object>();
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		returnValue.put("supportEditor", systemSetting.getSupportEditor());
 		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 	}
 	
@@ -253,6 +256,7 @@ public class HelpManageAction {
 					}
 					help.setUserName(username);
 					help.setContent(new_value);
+					help.setIsMarkdown(false);
 				}else{
 					error.put("content", "帮助内容不能为空");
 				}	

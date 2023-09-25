@@ -43,6 +43,7 @@ import cms.bean.question.Question;
 import cms.bean.question.QuestionIndex;
 import cms.bean.question.QuestionTag;
 import cms.bean.question.QuestionTagAssociation;
+import cms.bean.setting.SystemSetting;
 import cms.bean.staff.SysUsers;
 import cms.bean.user.PointLog;
 import cms.bean.user.User;
@@ -176,9 +177,11 @@ public class QuestionManageAction {
 					}
 					question.setQuestionTagAssociationList(questionTagAssociationList);
 				}
+				SystemSetting systemSetting = settingService.findSystemSetting_cache();
 				
 				returnValue.put("question", question);
 				returnValue.put("availableTag", answerManage.availableTag());
+				returnValue.put("supportEditor", systemSetting.getSupportEditor());
 				
 				PageForm pageForm = new PageForm();
 				pageForm.setPage(page);
@@ -381,6 +384,8 @@ public class QuestionManageAction {
 			username =((UserDetails)obj).getUsername();	
 		}
 		returnValue.put("userName", username);
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		returnValue.put("supportEditor", systemSetting.getSupportEditor());
 		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
 	}
 	
@@ -491,6 +496,7 @@ public class QuestionManageAction {
 				question.setUserName(username);
 				question.setIsStaff(true);
 				question.setContent(value);
+				question.setIsMarkdown(false);
 			}else{
 				error.put("content", "问题内容不能为空");
 			}	
@@ -713,6 +719,7 @@ public class QuestionManageAction {
 			AppendQuestionItem appendQuestionItem = new AppendQuestionItem();
 			appendQuestionItem.setId(UUIDUtil.getUUID32());
 			appendQuestionItem.setContent(appendContent.trim());
+			appendQuestionItem.setIsMarkdown(false);
 			appendQuestionItem.setPostTime(new Date());
 			appendContent_json = JsonUtils.toJSONString(appendQuestionItem);
 		}else{

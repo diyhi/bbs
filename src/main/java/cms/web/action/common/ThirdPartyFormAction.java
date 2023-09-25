@@ -121,7 +121,7 @@ public class ThirdPartyFormAction {
 			
 			
 			Map<String,Object> returnValue = new HashMap<String,Object>();
-			String domain = WebUtil.getRefererDomain(request);
+			String domain = WebUtil.getOriginDomain(request);
 			
 			if(domain != null && !"".equals(domain.trim())){
 				if(interfaceProduct != null){

@@ -1,0 +1,69 @@
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">返回值</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="20%">类型</th> 
+			<th width="50%">说明</th> 
+		</tr>
+	</thead> 
+	 <tbody> 
+		<tr> 
+			<td>topicRelated_hotTopic_collection</td> 
+			<td>List&lt<a style="color: #317ee7" onclick="anchorJump('#anchor_10'); return false;">Topic</a>&gt</td>
+			<td>热门话题集合</td> 
+		</tr> 
+	</tbody> 
+</table>
+<table id="anchor_10" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">话题 Topic</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>id</td> 
+			<td>Long</td>
+			<td>Id</td>
+		</tr>
+		<tr> 
+			<td>title</td> 
+			<td>String</td>
+			<td>标题</td>
+		</tr>
+		<tr> 
+			<td>commentTotal</td> 
+			<td>String</td>
+			<td>评论总数</td>
+		</tr>
+		<tr> 
+			<td>viewTotal</td> 
+			<td>String</td>
+			<td>查看总数</td>
+		</tr>
+	</tbody> 
+</table>
+
+
+
+<h2 style="margin:0;padding:0; margin-top: 10px;">示例</h2>
+<textarea name="exampleCode">
+<@function > 	
+	<#if topicRelated_hotTopic_collection?? && topicRelated_hotTopic_collection?size gt 0 >  
+    	<#list topicRelated_hotTopic_collection as hotTopic>
+			<a href="thread?topicId=${hotTopic.id}" title="${hotTopic.title}" target="_blank">
+	            ${hotTopic.title}
+	        </a>	
+		</#list>
+	</#if>
+</@function>
+
+</textarea>

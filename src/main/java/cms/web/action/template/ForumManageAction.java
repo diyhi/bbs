@@ -44,6 +44,7 @@ import cms.bean.template.Forum_QuestionRelated_LikeQuestion;
 import cms.bean.template.Forum_QuestionRelated_Question;
 import cms.bean.template.Forum_RedEnvelopeRelated_ReceiveRedEnvelopeUser;
 import cms.bean.template.Forum_SystemRelated_SearchWord;
+import cms.bean.template.Forum_TopicRelated_HotTopic;
 import cms.bean.template.Forum_TopicRelated_LikeTopic;
 import cms.bean.template.Forum_TopicRelated_Topic;
 import cms.bean.template.Layout;
@@ -468,6 +469,11 @@ public class ForumManageAction{
 					if(forum.getForumChildType().equals("相似话题")){
 						if("collection".equals(forum.getDisplayType())){//集合
 							returnValue.put("collection_Forum_TopicRelated_LikeTopic",JsonUtils.toGenericObject(forum.getFormValue(), new TypeReference<Forum_TopicRelated_LikeTopic>(){}));	
+						}
+					}
+					if(forum.getForumChildType().equals("热门话题")){
+						if("collection".equals(forum.getDisplayType())){//集合
+							returnValue.put("collection_Forum_TopicRelated_HotTopic",JsonUtils.toGenericObject(forum.getFormValue(), new TypeReference<Forum_TopicRelated_HotTopic>(){}));	
 						}
 					}
 					if(forum.getForumChildType().equals("评论列表")){
@@ -1174,7 +1180,28 @@ public class ForumManageAction{
 				
 			}
 		}
-		
+		Forum_TopicRelated_HotTopic collection_Forum_TopicRelated_HotTopic = new Forum_TopicRelated_HotTopic();
+		if(formbean.getForumChildType().equals("热门话题")){
+			if("collection".equals(displayType)){//集合
+				String collection_hotTopic_maxResult = request.getParameter("collection_hotTopic_maxResult");//显示记录数
+				
+				Integer hotTopic_maxResult = null;//显示记录数
+				
+				//显示记录数
+				if(collection_hotTopic_maxResult != null && !"".equals(collection_hotTopic_maxResult.trim())){	
+					boolean collection_hotTopic_maxResult_Verification = Verification.isPositiveIntegerZero(collection_hotTopic_maxResult.trim());//非负整数（正整数+ 0）
+					if(!collection_hotTopic_maxResult_Verification){
+						forumError.put("collection_hotTopic_maxResult", "请填写数字！");
+					}else{
+						hotTopic_maxResult = Integer.parseInt(collection_hotTopic_maxResult.trim());
+					}
+				}
+				collection_Forum_TopicRelated_HotTopic.setHotTopic_id(UUIDUtil.getUUID32());
+				collection_Forum_TopicRelated_HotTopic.setHotTopic_maxResult(hotTopic_maxResult);//显示记录数
+				forum.setFormValue(JsonUtils.toJSONString(collection_Forum_TopicRelated_HotTopic));//加入表单值
+				
+			}
+		}
 		
 		Forum_QuestionRelated_Question page_Forum_QuestionRelated_Question = new Forum_QuestionRelated_Question();
 		

@@ -785,7 +785,7 @@ public class PaymentFormAction {
 		String createHtmlText = null;
 
 		if(interfaceProduct.equals(1)){//1.支付宝即时到账 
-			String domain = WebUtil.getRefererDomain(request);
+			String domain = WebUtil.getOriginDomain(request);
 			
 			if(domain == null || "".equals(domain.trim())){
 				domain = Configuration.getUrl(request);
@@ -835,7 +835,7 @@ public class PaymentFormAction {
 				}
 			}
 		}else if(interfaceProduct.equals(4)){//4.支付宝手机网站(alipay.trade.wap.pay)
-			String domain = WebUtil.getRefererDomain(request);
+			String domain = WebUtil.getOriginDomain(request);
 			
 			if(domain == null || "".equals(domain.trim())){
 				domain = Configuration.getUrl(request);

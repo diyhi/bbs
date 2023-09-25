@@ -38,6 +38,15 @@
 						    <el-radio :label="3">移动端</el-radio>
 						</el-radio-group>
 					</el-form-item>
+					<el-form-item label="支持编辑器" :error="error.supportEditor" v-show="activeTag == 10">
+						<el-radio-group v-model="supportEditor">
+						    <el-radio :label="10">仅富文本编辑器</el-radio>
+						    <el-radio :label="20" disabled>仅Markdown编辑器</el-radio>
+						    <el-radio :label="30" disabled>富文本编辑器优先</el-radio>
+						    <el-radio :label="40" disabled>Markdown编辑器优先</el-radio>
+						</el-radio-group>
+						<div class="form-help" >仅支持前后端分离模板</div>
+					</el-form-item>
 					<el-form-item label="允许注册账号类型" :error="error.allowRegisterAccount" v-show="activeTag == 10">
 						<el-checkbox v-model="allowRegisterAccountObject.local">本地账号密码用户</el-checkbox>
 						<el-checkbox v-model="allowRegisterAccountObject.mobile">手机用户</el-checkbox>
@@ -242,6 +251,26 @@
 						    <el-radio :label="true">是</el-radio>
 						    <el-radio :label="false">否</el-radio>
 						</el-radio-group>
+					</el-form-item>
+					<el-form-item label="话题热度因子加权" :error="error.topicHeatFactor" v-show="activeTag == 10">
+						<el-row :gutter="12">
+							<el-col :span="12"><el-input v-model.trim="topicHeatFactor" maxlength="100" clearable="true" show-word-limit></el-input></el-col>
+						</el-row>
+						<div class="form-help" >以竖线符号分割各热度因子，因子的分数越高，在热度因子中占比重越大；如果不设参数，则因子的加权值默认为1；因子加权值“评论|点赞|浏览量”可以为0至9999之间的整数，“重力因子”可以为0.1至2之间的数。示例：评论=20|点赞=10|浏览量=1|重力因子=1.8    </div>
+					</el-form-item>
+					<el-form-item label="热门话题" :error="error.topicHotRecommendedTime" v-show="activeTag == 10">
+						<div class="singleRowTable">
+							<div class="leftCell">
+								仅推荐发布
+							</div>
+							<div>
+								<el-input v-model.trim="topicHotRecommendedTime" maxlength="8" clearable="true" show-word-limit></el-input>
+							</div>
+							<div class="rightCell">
+								小时内的话题
+							</div>
+						</div>
+						<div class="form-help" >空值为不限制</div>
 					</el-form-item>
 					<el-form-item label="解锁话题隐藏内容平台分成比例" :error="error.topicUnhidePlatformShareProportion" v-show="activeTag == 10">
 						<el-row :gutter="12">
@@ -1045,6 +1074,7 @@ export default({
 			closeSite:1,
 			closeSitePrompt:'',
 			supportAccessDevice:1,
+			supportEditor:10,
 			allowRegisterAccountObject:'',
 			registerCaptcha:false,
 			login_submitQuantity:'',
@@ -1079,6 +1109,8 @@ export default({
 			realNameUserAllowAnswer:false,
 			allowReport:true,
 			showIpAddress:false,
+			topicHeatFactor:'',
+			topicHotRecommendedTime:'',
 			questionRewardPointMin:'',
 			questionRewardPointMax:'',
 			questionRewardAmountMin:'',
@@ -1108,6 +1140,7 @@ export default({
 				closeSite :'',
 				closeSitePrompt:'',
 				supportAccessDevice :'',
+				supportEditor :'',
 				allowRegisterAccountObject:'',
 				registerCaptcha :'',
 				login_submitQuantity:'',
@@ -1142,6 +1175,8 @@ export default({
 				realNameUserAllowAnswer :'',
 				allowReport :'',
 				showIpAddress :'',
+				topicHeatFactor:'',
+				topicHotRecommendedTime:'',
 				questionRewardPointMin:'',
 				questionRewardPointMax:'',
 				questionRewardAmountMin:'',
@@ -1242,6 +1277,7 @@ export default({
 			    					_self.closeSitePrompt = systemSetting.closeSitePrompt;
 			    				}
 			    				_self.supportAccessDevice = systemSetting.supportAccessDevice;
+			    				_self.supportEditor = systemSetting.supportEditor;
 			    				if(systemSetting.allowRegisterAccountObject != null){
 			    					_self.allowRegisterAccountObject = systemSetting.allowRegisterAccountObject;
 			    				}
@@ -1320,7 +1356,12 @@ export default({
 			    				_self.realNameUserAllowAnswer= systemSetting.realNameUserAllowAnswer;
 			    				_self.allowReport = systemSetting.allowReport;
 			    				_self.showIpAddress = systemSetting.showIpAddress;
-			    				
+			    				if(systemSetting.topicHeatFactor != null){
+			    					_self.topicHeatFactor = systemSetting.topicHeatFactor;
+			    				}
+			    				if(systemSetting.topicHotRecommendedTime != null){
+			    					_self.topicHotRecommendedTime = systemSetting.topicHotRecommendedTime;
+			    				}
 			    				if(systemSetting.questionRewardPointMin != null){
 			    					_self.questionRewardPointMin = systemSetting.questionRewardPointMin;
 			    				}
@@ -1557,6 +1598,9 @@ export default({
 			if(_self.supportAccessDevice != null){
 				formData.append('supportAccessDevice', _self.supportAccessDevice);
 			}
+			if(_self.supportEditor != null){
+				formData.append('supportEditor', _self.supportEditor);
+			}
 			if(_self.allowRegisterAccountObject != null){
 				formData.append('allowRegisterAccountObject.local', _self.allowRegisterAccountObject.local);
 				formData.append('allowRegisterAccountObject.mobile', _self.allowRegisterAccountObject.mobile);
@@ -1663,7 +1707,12 @@ export default({
 			if(_self.showIpAddress != null){
 				formData.append('showIpAddress', _self.showIpAddress);
 			}
-			
+			if(_self.topicHeatFactor != null){
+				formData.append('topicHeatFactor', _self.topicHeatFactor);
+			}
+			if(_self.topicHotRecommendedTime != null){
+				formData.append('topicHotRecommendedTime', _self.topicHotRecommendedTime);
+			}
 			if(_self.questionRewardPointMin != null){
 				formData.append('questionRewardPointMin', _self.questionRewardPointMin);
 			}

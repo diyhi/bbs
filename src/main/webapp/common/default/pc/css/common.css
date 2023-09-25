@@ -2364,15 +2364,15 @@ html,body{
 }
 .commentModule .commentList .replyList .box li .reply-top .friendInfo .friendAvatarBox img{
     border-radius:100%;
-    width: 40px;
-    height: 40px;
-    margin-top: -1px;
+    width: 20px;
+    height: 20px;
+    margin-top: 9px;
 }
 .commentModule .commentList .replyList .box li .reply-top .friendInfo .nameInfo {
     color:#86909c;
     font-size:14px;
     float: left;
-    margin-left: 36px;
+    margin-left: 15px;
 }
 .commentModule .commentList .replyList .box li .reply-top .friendInfo .nameInfo .cancelNickname{
     font-weight:normal;
@@ -2383,14 +2383,14 @@ html,body{
     user-select:none;
     font-size: 14px;
     display: inline-block;
-    position: relative;top: 9px;
+    position: relative;top: 8px;
 }
 .commentModule .commentList .replyList .box li .reply-top .friendInfo .nameInfo .userName {
     display: inline-block;
     color: #86909c;
     font-size: 14px;
     position: relative;
-    top: 11px;
+    top: 9px;
     max-width: 130px;
     overflow:hidden; 
     text-overflow:ellipsis;
@@ -2410,7 +2410,7 @@ html,body{
     color:#fff;
     background-color:#4cc8ff;
     position: relative;
-    top: 4px;
+    top: 2px;
 }
 .commentModule .commentList .replyList .box li .reply-top .ipAddress {
     float: right;
@@ -3636,13 +3636,13 @@ html,body{
 	margin-right: 10px;
 }
 .linkModule .link-box .links-text {
-	padding: 0px 0px 10px 0px;
+	padding: 10px 0px 10px 0px;
 }
 .linkModule .link-box .links-text li {
 	float: left;
 	width: 170px;
 	font-size: 14px;
-	line-height: 22px;
+	line-height: 36px;
 	margin-right: 10px;
 }
 
@@ -6166,7 +6166,7 @@ html,body{
 }
 .askListModule .question-box .questionList .questionItem .content .info .lastAnswerTime{
 	margin-left: 10px;position: relative;top: 1px;
-	font-size: 13px;
+	font-size: 14px;
 }
 
 .askListModule .question-box .questionList .questionItem .content .info .reward{
@@ -7280,15 +7280,15 @@ html,body{
 }
 .answerModule .answerList .replyList .box li .reply-top .friendInfo .friendAvatarBox img{
     border-radius:100%;
-    width: 40px;
-    height: 40px;
-    margin-top: -1px;
+    width: 20px;
+    height: 20px;
+    margin-top: 9px;
 }
 .answerModule .answerList .replyList .box li .reply-top .friendInfo .nameInfo {
     color:#86909c;
     font-size:14px;
     float: left;
-    margin-left: 36px;
+    margin-left: 15px;
 }
 .answerModule .answerList .replyList .box li .reply-top .friendInfo .nameInfo .cancelNickname{
     font-weight:normal;
@@ -7299,14 +7299,14 @@ html,body{
     user-select:none;
     font-size: 14px;
     display: inline-block;
-    position: relative;top: 9px;
+    position: relative;top: 8px;
 }
 .answerModule .answerList .replyList .box li .reply-top .friendInfo .nameInfo .userName {
     display: inline-block;
     color: #86909c;
     font-size: 14px;
     position: relative;
-    top: 11px;
+    top: 9px;
     max-width: 130px;
     overflow:hidden; 
     text-overflow:ellipsis;
@@ -7326,7 +7326,7 @@ html,body{
     color:#fff;
     background-color:#4cc8ff;
     position: relative;
-    top: 4px;
+    top: 2px;
 }
 .answerModule .answerList .replyList .box li .reply-top .ipAddress {
     float: right;

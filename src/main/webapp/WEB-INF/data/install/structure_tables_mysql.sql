@@ -15,6 +15,8 @@ CREATE TABLE `answer` (
   `userName` varchar(30) DEFAULT NULL,
   `adoption` bit(1) DEFAULT NULL,
   `lastUpdateTime` datetime DEFAULT NULL,
+  `isMarkdown` bit(1) DEFAULT NULL,
+  `markdownContent` longtext,
   PRIMARY KEY (`id`),
   KEY `answer_1_idx` (`questionId`,`status`,`adoption`),
   KEY `answer_2_idx` (`userName`,`isStaff`)
@@ -62,6 +64,8 @@ CREATE TABLE `comment` (
   `userName` varchar(30) DEFAULT NULL,
   `status` int(11) DEFAULT NULL,
   `lastUpdateTime` datetime DEFAULT NULL,
+  `isMarkdown` bit(1) DEFAULT NULL,
+  `markdownContent` longtext,
   PRIMARY KEY (`id`),
   KEY `comment_1_idx` (`topicId`,`status`),
   KEY `comment_2_idx` (`quoteIdGroup`(191)),
@@ -340,6 +344,8 @@ CREATE TABLE `help` (
   `times` datetime DEFAULT NULL,
   `userName` varchar(30) DEFAULT NULL,
   `visible` bit(1) NOT NULL,
+  `isMarkdown` bit(1) DEFAULT NULL,
+  `markdownContent` longtext,
   PRIMARY KEY (`id`),
   KEY `help_idx` (`helpTypeId`,`visible`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -921,6 +927,8 @@ CREATE TABLE `question` (
   `adoptionAnswerId` bigint(20) DEFAULT NULL,
   `amount` decimal(12,2) NOT NULL,
   `point` bigint(20) DEFAULT NULL,
+  `isMarkdown` bit(1) DEFAULT NULL,
+  `markdownContent` longtext,
   PRIMARY KEY (`id`),
   KEY `question_1_idx` (`userName`,`postTime`),
   KEY `question_4_idx` (`status`,`sort`,`lastAnswerTime`),
@@ -1611,6 +1619,9 @@ CREATE TABLE `systemsetting` (
   `report_submitQuantity` int(11) DEFAULT NULL,
   `showIpAddress` bit(1) NOT NULL,
   `reportMaxImageUpload` int(11) DEFAULT NULL,
+  `supportEditor` int(11) DEFAULT NULL,
+  `topicHeatFactor` varchar(255) DEFAULT NULL,
+  `topicHotRecommendedTime` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -1745,10 +1756,14 @@ CREATE TABLE `topic` (
   `lastUpdateTime` datetime DEFAULT NULL,
   `giveRedEnvelopeId` varchar(32) DEFAULT NULL,
   `essence` bit(1) DEFAULT NULL,
+  `isMarkdown` bit(1) DEFAULT NULL,
+  `markdownContent` longtext,
+  `weight` double DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `topic_idx` (`tagId`,`status`),
   KEY `topic_3_idx` (`userName`,`postTime`),
-  KEY `topic_5_idx` (`status`,`sort`,`lastReplyTime`)
+  KEY `topic_5_idx` (`status`,`sort`,`lastReplyTime`),
+  KEY `topic_6_idx` (`weight`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 

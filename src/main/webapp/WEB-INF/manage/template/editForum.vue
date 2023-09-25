@@ -72,7 +72,12 @@
 							<el-row><el-col :span="8"><el-input v-model.trim="collection_Forum_TopicRelated_LikeTopic.collection_likeTopic_maxResult" maxlength="9" clearable="true" show-word-limit></el-input></el-col></el-row>
 						</el-form-item>
 					</div>
-
+					<!-- 话题部分--热门话题  集合-->
+					<div v-if="forumType == '话题' && forumChildType == '热门话题' && displayType == '集合'">
+						<el-form-item label="显示记录数" :error="error.collection_Forum_TopicRelated_HotTopic.collection_hotTopic_maxResult" >
+							<el-row><el-col :span="8"><el-input v-model.trim="collection_Forum_TopicRelated_HotTopic.collection_hotTopic_maxResult" maxlength="9" clearable="true" show-word-limit></el-input></el-col></el-row>
+						</el-form-item>
+					</div>
 
 
 					<!-- 问题部分--问题列表  分页-->
@@ -486,6 +491,9 @@ export default({
 			collection_Forum_TopicRelated_LikeTopic :{//话题部分--相似话题  集合
 				collection_likeTopic_maxResult: '',
 			},
+			collection_Forum_TopicRelated_HotTopic :{//话题部分--热门话题  集合
+				collection_hotTopic_maxResult: '',
+			},
 			
 			page_Forum_QuestionRelated_Question :{//问题部分--问题列表  分页	
 				tagIdGroup :[],//标签Id组
@@ -677,6 +685,10 @@ export default({
 				collection_Forum_TopicRelated_LikeTopic :{//话题部分--相似话题  集合
 					collection_likeTopic_maxResult: '',
 				},
+				collection_Forum_TopicRelated_HotTopic :{//话题部分--热门话题  集合
+					collection_hotTopic_maxResult: '',
+				},
+				
 				page_Forum_QuestionRelated_Question :{//问题部分--问题列表  分页
 					page_question_tagId: '',
 					page_question_tagName :'',//标签名称
@@ -1761,6 +1773,12 @@ export default({
 									_self.collection_Forum_TopicRelated_LikeTopic.collection_likeTopic_maxResult = collection_Forum_TopicRelated_LikeTopic.likeTopic_maxResult;
 										
 			    				}
+			    			}else if(key == "collection_Forum_TopicRelated_HotTopic"){
+			    				let collection_Forum_TopicRelated_HotTopic = mapData[key];
+			    				if(collection_Forum_TopicRelated_HotTopic != null){
+									_self.collection_Forum_TopicRelated_HotTopic.collection_hotTopic_maxResult = collection_Forum_TopicRelated_HotTopic.hotTopic_maxResult;
+										
+			    				}
 			    			}else if(key == "page_Forum_QuestionRelated_Question"){
 			    				let page_Forum_QuestionRelated_Question = mapData[key];
 			    				if(page_Forum_QuestionRelated_Question != null){
@@ -2017,6 +2035,12 @@ export default({
 					formData.append('collection_likeTopic_maxResult', _self.collection_Forum_TopicRelated_LikeTopic.collection_likeTopic_maxResult);
 				}
 			}
+			if(_self.forumType == '话题' && _self.forumChildType == '热门话题' && _self.displayType == '集合'){
+				if(_self.collection_Forum_TopicRelated_HotTopic.collection_hotTopic_maxResult != null){
+					formData.append('collection_hotTopic_maxResult', _self.collection_Forum_TopicRelated_HotTopic.collection_hotTopic_maxResult);
+				}
+			}
+			
 			if(_self.forumType == '问答' && _self.forumChildType == '问题列表' && _self.displayType == '分页'){
 				if(_self.page_Forum_QuestionRelated_Question.tagIdGroup != null && _self.page_Forum_QuestionRelated_Question.tagIdGroup.length >0){
 					for(let i=0; i<_self.page_Forum_QuestionRelated_Question.tagIdGroup.length; i++){

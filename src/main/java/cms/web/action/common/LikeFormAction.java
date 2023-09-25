@@ -39,6 +39,7 @@ import cms.web.action.AccessSourceDeviceManage;
 import cms.web.action.CSRFTokenManage;
 import cms.web.action.like.LikeManage;
 import cms.web.action.message.RemindManage;
+import cms.web.action.topic.HotTopicManage;
 import cms.web.action.topic.TopicManage;
 import cms.web.action.user.RoleAnnotation;
 import cms.web.action.user.UserManage;
@@ -63,7 +64,7 @@ public class LikeFormAction {
 	@Resource CSRFTokenManage csrfTokenManage;
 	@Resource TopicManage topicManage;
 	@Resource SettingService settingService;
-	
+	@Resource HotTopicManage hotTopicManage;
 	
 	/**
 	 * 点赞   添加
@@ -142,7 +143,8 @@ public class LikeFormAction {
 				likeManage.delete_cache_findTopicLikeById(topicLikeId);
 				likeManage.delete_cache_findLikeCountByTopicId(like.getTopicId());
 				
-				
+				//添加热门话题
+				hotTopicManage.addHotTopic(topic);
 				
 				User _user = userManage.query_cache_findUserByUserName(topic.getUserName());
 				if(_user != null && !_user.getId().equals(accessUser.getUserId())){//楼主点赞不发提醒给自己

@@ -608,6 +608,7 @@ public class TopicFormAction {
 				topic.setUserName(accessUser.getUserName());
 				topic.setIsStaff(false);
 				topic.setContent(validValue);
+				topic.setIsMarkdown(false);
 			}else{
 				error.put("content", "话题内容不能为空");
 			}	

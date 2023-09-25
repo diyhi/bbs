@@ -37,6 +37,7 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import cms.bean.user.UserAuthorization;
+import cms.web.taglib.Configuration;
 
 
 /**
@@ -507,6 +508,27 @@ public class WebUtil {
 		String domain = "";
 		if(referer != null && !"".equals(referer.trim())){
 			UriComponents refererComponent = UriComponentsBuilder.fromUriString(referer).build();
+			
+			//域名 http://localhost:3000/
+			UriComponents domainComponent = UriComponentsBuilder.newInstance()
+			        .scheme(refererComponent.getScheme())
+			        .host(refererComponent.getHost())
+			        .port(refererComponent.getPort())
+			        .path("/")
+			        .build();
+			domain = domainComponent.toUriString();
+		}
+		return domain;
+	}
+	
+	/**
+	 * 获取Origin中的域名
+	 */
+	public static String getOriginDomain(HttpServletRequest request){
+		String origin = request.getHeader("Origin");
+		String domain = "";
+		if(origin != null && !"".equals(origin.trim())){
+			UriComponents refererComponent = UriComponentsBuilder.fromUriString(origin).build();
 			
 			//域名 http://localhost:3000/
 			UriComponents domainComponent = UriComponentsBuilder.newInstance()

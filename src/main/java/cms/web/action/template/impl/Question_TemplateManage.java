@@ -544,6 +544,7 @@ public class Question_TemplateManage {
 		
 		value.put("availableTag", questionManage.availableTag());//问题编辑器允许使用标签
 		value.put("fileSystem", fileManage.getFileSystem());
+		value.put("supportEditor", systemSetting.getSupportEditor());
 		return value;
 	}
 	
@@ -581,6 +582,7 @@ public class Question_TemplateManage {
 		
 		value.put("availableTag", questionManage.availableTag());//问题编辑器允许使用标签
 		value.put("fileSystem", fileManage.getFileSystem());
+		value.put("supportEditor", systemSetting.getSupportEditor());
 		return value;
 	}
 	
@@ -926,6 +928,7 @@ public class Question_TemplateManage {
 		
 		value.put("availableTag", answerManage.availableTag());//答案编辑器允许使用标签
 		value.put("fileSystem", fileManage.getFileSystem());
+		value.put("supportEditor", systemSetting.getSupportEditor());
 		return value;
 	}
 	
@@ -991,6 +994,7 @@ public class Question_TemplateManage {
 		}
 		value.put("availableTag", answerManage.availableTag());//答案编辑器允许使用标签
 		value.put("fileSystem", fileManage.getFileSystem());
+		value.put("supportEditor", systemSetting.getSupportEditor());
 		return value;
 	}
 	

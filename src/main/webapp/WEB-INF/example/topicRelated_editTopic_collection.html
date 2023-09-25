@@ -13,10 +13,10 @@
 	 <tbody> 
 		<tr> 
 		<tr> 
-			<td rowspan="6">topicRelated_editTopic_collection</td> 
-			<td rowspan="6">Map&ltString,Object></td>
+			<td rowspan="7">topicRelated_editTopic_collection</td> 
+			<td rowspan="7">Map&ltString,Object></td>
 			<td>键参数：availableTag<br>值内容说明：话题编辑器允许使用标签(配合KindEditor编辑器使用)<br>值类型：JSON格式List&ltString></td>
-			<td rowspan="6">修改话题界面显示返回值</td> 
+			<td rowspan="7">修改话题界面显示返回值</td> 
 		</tr>
 		<tr> 
 			<td>键参数：captchaKey<br>值内容说明：验证码编号 (根据'全站设置 - 基本设置 - 发表话题每分钟提交超过'参数计算是否含有值)<br>值类型：String </td>
@@ -32,6 +32,9 @@
 		</tr>
 		<tr> 
 			<td>键参数：fileSystem<br>值内容说明：文件系统 0.本地 10.SeaweedFS 20.MinIO 30.阿里云OSS<br>值类型：int</td>
+		</tr>
+		<tr> 
+			<td>键参数：supportEditor<br>值内容说明：支持编辑器 10.仅富文本编辑器 20.仅Markdown编辑器  30.富文本编辑器优先 40.Markdown编辑器优先<br>值类型：int</td>
 		</tr>
 	</tbody> 
 </table>
@@ -260,6 +263,16 @@
 			<td>String</td>
 			<td>话题内容</td>
 		</tr>
+		<tr> 
+			<td>isMarkdown</td> 
+			<td>Boolean</td>
+			<td>是否使用Markdown</td> 
+		</tr>
+		<tr> 
+			<td>markdownContent</td> 
+			<td>String</td>
+			<td>Markdown内容</td> 
+		</tr>
 	</tbody> 
 </table>
 
@@ -321,8 +334,20 @@
 	  	<tr> 
 			<td>content</td> 
 			<td>String</td>
-			<td>是</td>
+			<td>按需填写</td>
 			<td>话题内容</td> 
+		</tr>
+		<tr> 
+			<td>isMarkdown</td> 
+			<td>Boolean</td>
+			<td>按需填写</td>
+			<td>是否使用Markdown</td> 
+		</tr>
+		<tr> 
+			<td>markdownContent</td> 
+			<td>String</td>
+			<td>按需填写</td>
+			<td>Markdown内容</td> 
 		</tr>
 		<tr> 
 			<td>token</td> 

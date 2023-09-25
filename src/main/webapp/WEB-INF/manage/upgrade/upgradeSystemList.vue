@@ -606,6 +606,7 @@ export default({
 		        method: 'post',
 		        url: 'control/upgrade/manage?method=uploadUpgradePackage',
 		        data: formData,
+		        timeout: 0,// 定义请求超时时间
 		        onUploadProgress: progressEvent => {
 		            if (progressEvent.lengthComputable) {
                     	let rate = progressEvent.loaded / progressEvent.total;  //已上传的比例

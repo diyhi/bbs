@@ -208,6 +208,8 @@ public class TopicManageAction {
 				
 				returnValue.put("availableTag", commentManage.availableTag());
 				
+				returnValue.put("supportEditor", systemSetting.getSupportEditor());
+				
 				PageForm pageForm = new PageForm();
 				pageForm.setPage(page);
 				
@@ -505,7 +507,8 @@ public class TopicManageAction {
 		returnValue.put("userName", username);
 		List<UserGrade> userGradeList = userGradeService.findAllGrade();
 		returnValue.put("userGradeList", userGradeList);
-
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		returnValue.put("supportEditor", systemSetting.getSupportEditor());
 		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
 	}
 	
@@ -623,6 +626,7 @@ public class TopicManageAction {
 					topic.setUserName(username);
 					topic.setIsStaff(true);
 					topic.setContent(validValue);
+					topic.setIsMarkdown(false);
 				}else{
 					error.put("content", "话题内容不能为空");
 				}	
