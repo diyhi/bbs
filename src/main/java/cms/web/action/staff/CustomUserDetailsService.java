@@ -56,16 +56,16 @@ public class CustomUserDetailsService implements UserDetailsService {
 		if(!user.isEnabled()){
 			throw new UsernameNotFoundException("用户已被禁用"); 
 		}
-		
+		/**
 		//如果是管理员则有所有权限
 		if(user.isIssys()){
 			auths = staffService.loadAllAuthorities();
 		}else{
 			//得到用户的权限
 			auths = staffService.loadUserAuthoritiesByName(username);
-		}
+		}**/
 		
-		return new SysUsers(user.getUserId(), user.getUserAccount(), user.getFullName(),
+		return new SysUsers(user.getUserId(), user.getUserAccount(), user.getFullName(),user.getNickname(),user.getAvatarName(),
 			//	 user.getUserPassword(),user.getUserDesc(), user.getEnabled(),user.isIssys(), 
 				user.getUserPassword(),user.getUserDesc(), user.isEnabled(),user.isIssys(), user.getSecurityDigest(),
 				 user.getUserDuty(), true, true, true, auths);

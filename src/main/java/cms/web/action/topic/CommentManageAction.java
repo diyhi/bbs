@@ -76,8 +76,8 @@ public class CommentManageAction {
 	 * 评论  添加
 	 */
 	@ResponseBody
-	@RequestMapping(params="method=add",method=RequestMethod.POST)
-	public String add(ModelMap model,Long topicId,String content,
+	@RequestMapping(params="method=addComment",method=RequestMethod.POST)
+	public String addComment(ModelMap model,Long topicId,String content,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		Map<String,String> error = new HashMap<String,String>();
@@ -154,8 +154,8 @@ public class CommentManageAction {
 	 * 评论  修改页面显示
 	 */
 	@ResponseBody
-	@RequestMapping(params="method=edit",method=RequestMethod.GET)
-	public String editUI(ModelMap model,Long commentId,
+	@RequestMapping(params="method=editComment",method=RequestMethod.GET)
+	public String editCommentUI(ModelMap model,Long commentId,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Map<String,String> error = new HashMap<String,String>();
 		Map<String,Object> returnValue = new HashMap<String,Object>();
@@ -203,8 +203,8 @@ public class CommentManageAction {
 	 * 评论  修改
 	 */
 	@ResponseBody
-	@RequestMapping(params="method=edit",method=RequestMethod.POST)
-	public String edit(PageForm pageForm,ModelMap model,Long commentId,String content,Integer status,
+	@RequestMapping(params="method=editComment",method=RequestMethod.POST)
+	public String editComment(PageForm pageForm,ModelMap model,Long commentId,String content,Integer status,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		Comment comment = null;
@@ -348,8 +348,8 @@ public class CommentManageAction {
 	 * @param commentId 评论Id
 	 */
 	@ResponseBody
-	@RequestMapping(params="method=delete",method=RequestMethod.POST)
-	public String delete(ModelMap model,Long[] commentId,
+	@RequestMapping(params="method=deleteComment",method=RequestMethod.POST)
+	public String deleteComment(ModelMap model,Long[] commentId,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		Map<String,String> error = new HashMap<String,String>();

@@ -74,6 +74,9 @@
 							<span v-if="scope.row.typeCode == 50">
 								在 <el-link class="sourceTitle" href="javascript:void(0);" @click="$store.commit('setCacheNumber'); $router.push({path: '/admin/control/topic/manage/view', query:{ topicId : scope.row.topicId,commentId:scope.row.friendTopicCommentId, replyId:scope.row.friendTopicReplyId}})">{{scope.row.topicTitle}}</el-link> 回复了我回复过的评论
 							</span>
+							<span v-if="scope.row.typeCode == 55">
+                            	在 <el-link class="sourceTitle" href="javascript:void(0);" @click="$store.commit('setCacheNumber'); $router.push({path: '/admin/control/topic/manage/view', query:{ topicId : scope.row.topicId,commentId:scope.row.friendTopicCommentId, replyId:scope.row.friendTopicReplyId}})">{{scope.row.topicTitle}}</el-link> 回复了我的评论回复
+                        	</span>
 							<span v-if="scope.row.typeCode == 60">
 								在 <el-link class="sourceTitle" href="javascript:void(0);" @click="$store.commit('setCacheNumber'); $router.push({path: '/admin/control/topic/manage/view', query:{ topicId : scope.row.topicId}})">{{scope.row.topicTitle}}</el-link> 解锁了我的话题
 							</span>
@@ -105,6 +108,18 @@
 							<span v-if="scope.row.typeCode == 150">
 								在 <el-link class="sourceTitle" href="javascript:void(0);" @click="$store.commit('setCacheNumber'); $router.push({path: '/admin/control/question/manage/view', query:{ questionId : scope.row.questionId,answerId:scope.row.questionAnswerId, replyId:scope.row.friendQuestionReplyId}})">{{scope.row.questionTitle}}</el-link> 回复了我回复过的答案
 							</span>
+							<span v-if="scope.row.typeCode == 160">
+                            	在 <el-link class="sourceTitle" href="javascript:void(0);" @click="$store.commit('setCacheNumber'); $router.push({path: '/admin/control/question/manage/view', query:{ questionId : scope.row.questionId,answerId:scope.row.questionAnswerId, replyId:scope.row.friendQuestionReplyId}})">{{scope.row.questionTitle}}</el-link> 回复了我的答案回复
+	                        </span>
+	                        <span v-if="scope.row.typeCode == 170">
+								我关注的 {{scope.row.senderAccount}} 提了问题 <el-link class="sourceTitle" href="javascript:void(0);" @click="$store.commit('setCacheNumber'); $router.push({path: '/admin/control/question/manage/view', query:{ questionId : scope.row.questionId}})">{{scope.row.questionTitle}}</el-link>
+	                        </span>
+	                        <span v-if="scope.row.typeCode == 180">
+								我关注的 {{scope.row.senderAccount}} 在 <el-link class="sourceTitle" href="javascript:void(0);" @click="$store.commit('setCacheNumber'); $router.push({path: '/admin/control/question/manage/view', query:{ questionId : scope.row.questionId,answerId:scope.row.friendQuestionAnswerId}})">{{scope.row.questionTitle}}</el-link> 回答了问题
+	                        </span>
+	                        <span v-if="scope.row.typeCode == 190">
+								我关注的 {{scope.row.senderAccount}} 在 <el-link class="sourceTitle" href="javascript:void(0);" @click="$store.commit('setCacheNumber'); $router.push({path: '/admin/control/question/manage/view', query:{ questionId : scope.row.questionId,answerId:scope.row.friendQuestionAnswerId, replyId:scope.row.friendQuestionReplyId}})">{{scope.row.questionTitle}}</el-link> 发表了答案回复
+	                        </span>
 				    	</template>
 					</el-table-column>
 					<el-table-column prop="sendTime" label="发送时间" align="center" width="150"></el-table-column>
@@ -262,7 +277,7 @@ export default({
 		    	
 				this.$ajax({
 			        method: 'post',
-			        url: 'control/remind/manage?method=reductionRemind',
+			        url: 'control/remind/manage?method=reductionRemind&a=a',//a=a参数的作用是仅增加连接符&
 			        data: formData
 				})
 				.then(function (response) {

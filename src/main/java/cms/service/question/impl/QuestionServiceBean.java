@@ -231,6 +231,59 @@ public class QuestionServiceBean extends DaoSupport<Question> implements Questio
 	}
 	
 	/**
+	 * 分页查询问题
+	 * @param userName用户名称
+	 * @param postTime 问题发表时间
+	 * @param firstIndex 开始索引
+	 * @param maxResult 需要获取的记录数
+	 * @return
+	 */
+	@Transactional(readOnly=true,propagation=Propagation.NOT_SUPPORTED)
+	public List<Question> findQuestionByPage(String userName,Date postTime,int firstIndex, int maxResult){
+		List<Question> questionList = new ArrayList<Question>();
+		
+		String sql = "select o.id,o.title,o.content,o.appendContent," +
+				"o.postTime,o.userName,o.isStaff,o.status " +
+				" from Question o where o.userName=?1 and o.postTime>?2";
+
+		Query query = em.createQuery(sql);	
+		query.setParameter(1, userName);
+		query.setParameter(2, postTime);
+		//索引开始,即从哪条记录开始
+		query.setFirstResult(firstIndex);
+		//获取多少条数据
+		query.setMaxResults(maxResult);
+			
+		List<Object[]> objectList = query.getResultList();
+		if(objectList != null && objectList.size() >0){
+			for(int i = 0; i<objectList.size(); i++){
+				Object[] obj = (Object[])objectList.get(i);
+				Long id = (Long)obj[0];
+				String title = (String)obj[1];
+				String content = (String)obj[2];
+				String appendContent = (String)obj[3];
+				Date _postTime = (Date)obj[4];
+				String _userName = (String)obj[5];
+				Boolean isStaff = (Boolean)obj[6];
+				Integer status = (Integer)obj[7];
+
+				Question question = new Question();
+				question.setId(id);
+				question.setTitle(title);
+				question.setContent(content);
+				question.setAppendContent(appendContent);
+				question.setPostTime(_postTime);
+				question.setUserName(_userName);
+				question.setIsStaff(isStaff);
+				question.setStatus(status);
+				questionList.add(question);
+				
+			}
+		}
+		return questionList;
+	}
+	
+	/**
 	 * 根据问题Id查询问题标签关联
 	 * @param questionId 问题Id
 	 * @return

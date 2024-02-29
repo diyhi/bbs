@@ -2,6 +2,7 @@ package cms.web.action.user;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1991,31 +1992,33 @@ public class UserManageAction {
 					
 					newFileName = UUIDUtil.getUUID32()+ ".jpg";
 					
-					BufferedImage bufferImage = ImageIO.read(file.getInputStream());  
-		            //获取图片的宽和高  
-		            int srcWidth = bufferImage.getWidth();  
-		            int srcHeight = bufferImage.getHeight();  
-					if(srcWidth > maxWidth){
-						error.put("file","超出最大宽度");
-					}
-					if(srcHeight > maxHeight){
-						error.put("file","超出最大高度");
-					}
-					if(error.size() == 0){
-						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-							String oldPathFile = pathDir +user.getAvatarName();
-							//删除旧头像
-							fileManage.deleteFile(oldPathFile);
-							String oldPathFile_100 = pathDir_100+user.getAvatarName();
-							//删除旧头像100*100
-							fileManage.deleteFile(oldPathFile_100);
+					try (InputStream is = file.getInputStream()){
+						BufferedImage bufferImage = ImageIO.read(is);  
+			            //获取图片的宽和高  
+			            int srcWidth = bufferImage.getWidth();  
+			            int srcHeight = bufferImage.getHeight();  
+						if(srcWidth > maxWidth){
+							error.put("file","超出最大宽度");
 						}
-						
-						//保存文件
-						fileManage.writeFile(pathDir, newFileName,file.getBytes());
+						if(srcHeight > maxHeight){
+							error.put("file","超出最大高度");
+						}
+						if(error.size() == 0){
+							if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
+								String oldPathFile = pathDir +user.getAvatarName();
+								//删除旧头像
+								fileManage.deleteFile(oldPathFile);
+								String oldPathFile_100 = pathDir_100+user.getAvatarName();
+								//删除旧头像100*100
+								fileManage.deleteFile(oldPathFile_100);
+							}
+							
+							//保存文件
+							fileManage.writeFile(pathDir, newFileName,file.getBytes());
 
-						//生成100*100缩略图
-						fileManage.createImage(file.getInputStream(),pathDir_100+newFileName,"jpg",100,100);
+							//生成100*100缩略图
+							fileManage.createImage(file.getInputStream(),pathDir_100+newFileName,"jpg",100,100);
+						}
 					}
 				}else{
 					
@@ -2048,35 +2051,37 @@ public class UserManageAction {
 								fileManage.deleteFile(oldPathFile_100);
 							}
 
-							BufferedImage bufferImage = ImageIO.read(file.getInputStream());  
-				            //获取图片的宽和高  
-				            int srcWidth = bufferImage.getWidth();  
-				            int srcHeight = bufferImage.getHeight();  
-							
-							//取得文件后缀
-							String suffix = FileUtil.getExtension(fileName).toLowerCase();
-							//构建文件名称
-							newFileName = UUIDUtil.getUUID32()+ "." + suffix;
-							
-							if(srcWidth <=200 && srcHeight <=200){	
-								//保存文件
-								fileManage.writeFile(pathDir, newFileName,file.getBytes());
+							try (InputStream is = file.getInputStream()){
+								BufferedImage bufferImage = ImageIO.read(is);  
+					            //获取图片的宽和高  
+					            int srcWidth = bufferImage.getWidth();  
+					            int srcHeight = bufferImage.getHeight();  
 								
-								if(srcWidth <=100 && srcHeight <=100){
+								//取得文件后缀
+								String suffix = FileUtil.getExtension(fileName).toLowerCase();
+								//构建文件名称
+								newFileName = UUIDUtil.getUUID32()+ "." + suffix;
+								
+								if(srcWidth <=200 && srcHeight <=200){	
 									//保存文件
-									fileManage.writeFile(pathDir_100, newFileName,file.getBytes());
+									fileManage.writeFile(pathDir, newFileName,file.getBytes());
+									
+									if(srcWidth <=100 && srcHeight <=100){
+										//保存文件
+										fileManage.writeFile(pathDir_100, newFileName,file.getBytes());
+									}else{
+										//生成100*100缩略图
+										fileManage.createImage(file.getInputStream(),pathDir_100+newFileName,suffix,100,100);
+									}
 								}else{
-									//生成100*100缩略图
-									fileManage.createImage(file.getInputStream(),pathDir_100+newFileName,suffix,100,100);
-								}
-							}else{
-								//生成200*200缩略图
-								fileManage.createImage(file.getInputStream(),pathDir+newFileName,suffix,x,y,width,height,200,200);
+									//生成200*200缩略图
+									fileManage.createImage(file.getInputStream(),pathDir+newFileName,suffix,x,y,width,height,200,200);
 
-								//生成100*100缩略图
-								fileManage.createImage(file.getInputStream(),pathDir_100+newFileName,suffix,x,y,width,height,100,100);
-	    
-							}	
+									//生成100*100缩略图
+									fileManage.createImage(file.getInputStream(),pathDir_100+newFileName,suffix,x,y,width,height,100,100);
+		    
+								}	
+							}
 						}else{
 							error.put("file","当前文件类型不允许上传");//当前文件类型不允许上传
 						}	

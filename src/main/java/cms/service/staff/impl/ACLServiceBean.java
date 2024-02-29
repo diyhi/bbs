@@ -12,6 +12,7 @@ import javax.persistence.Query;
 import cms.bean.PermissionObject;
 import cms.bean.QueryResult;
 import cms.bean.SaveResourcesObject;
+import cms.bean.staff.PermissionMenu;
 import cms.bean.staff.SysPermission;
 import cms.bean.staff.SysPermissionResources;
 import cms.bean.staff.SysResources;
@@ -99,7 +100,66 @@ public class ACLServiceBean extends DaoSupport implements ACLService {
 		return query.getResultList();
 	}
 	
+	/**
+	 * 根据权限Id集合取得权限菜单
+	 */
+	@Transactional(readOnly=true,propagation=Propagation.NOT_SUPPORTED)
+	public List<PermissionMenu> findPermissionMenuByPermissionIdList(List<String> permissionIdList) {
+
+		Query query = em.createQuery("select b.name,b.url,c.methods from SysPermissionResources a,SysResources b,SysPermission c where a.resourceId=b.id and c.id=a.permissionId and a.permissionId in(:permissionIdList) and b.urlParentId is null");
+		query.setParameter("permissionIdList", permissionIdList);
+		
+		
+		List objectList = query.getResultList();
+		
+		//角色名称
+		List<PermissionMenu> permissionMenuList = new ArrayList<PermissionMenu>();
+		if(objectList != null && objectList.size() >0){
+			Iterator iter = objectList.iterator(); 
+			while (iter.hasNext()){ 
+				Object[] o = (Object[]) iter.next(); 
+				String _name = (String) o[0]; 
+				String _url = (String) o[1]; 
+				String _methods = (String) o[2]; 
+				PermissionMenu permissionMenu = new PermissionMenu();
+				permissionMenu.setName(_name);
+				permissionMenu.setUrl(_url);
+				permissionMenu.setMethods(_methods);
+				permissionMenuList.add(permissionMenu);
+			}
+		}
+		
+		
+		return permissionMenuList;
+	}
 	
+	/**
+	 * 获取所有权限菜单
+	 */
+	@Transactional(readOnly=true,propagation=Propagation.NOT_SUPPORTED)
+	public List<PermissionMenu> findAllPermissionMenu() {
+		Query query = em.createQuery("select b.name,b.url,c.methods from SysPermissionResources a,SysResources b,SysPermission c where a.resourceId=b.id and c.id=a.permissionId and b.urlParentId is null");
+		
+		List objectList = query.getResultList();
+		
+		//角色名称
+		List<PermissionMenu> permissionMenuList = new ArrayList<PermissionMenu>();
+		if(objectList != null && objectList.size() >0){
+			Iterator iter = objectList.iterator(); 
+			while (iter.hasNext()){ 
+				Object[] o = (Object[]) iter.next(); 
+				String _name = (String) o[0]; 
+				String _url = (String) o[1]; 
+				String _methods = (String) o[2]; 
+				PermissionMenu permissionMenu = new PermissionMenu();
+				permissionMenu.setName(_name);
+				permissionMenu.setUrl(_url);
+				permissionMenu.setMethods(_methods);
+				permissionMenuList.add(permissionMenu);
+			}
+		}
+		return permissionMenuList;
+	}
 	/******************* SysPermissionDao权限 *********************/
 	/**
 	 * 得到权限列表。

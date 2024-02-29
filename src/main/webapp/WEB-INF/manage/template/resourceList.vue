@@ -749,7 +749,7 @@ export default({
 	    	
 			_self.$ajax({
 		        method: 'post',
-		        url: 'control/resource/manage?method=upload',
+		        url: 'control/resource/manage?method=upload&a=a',//a=a参数的作用是仅增加连接符&
 		        data: formData,
 		        timeout: 0,// 定义请求超时时间
 		        onUploadProgress: progressEvent => {

@@ -79,6 +79,18 @@ public class TopicManage {
 	}
 	
 	/**
+	 * 读取话题本地展示次数
+	 * @param topicId 话题Id
+	 */
+	public Long readLocalView(Long topicId){
+		Long count = countMap.asMap().get(topicId);
+		if(count != null){
+			return count;
+		}
+		return 0L;
+	}
+	
+	/**
 	 * 提交话题展示次数到数据库(定时提交)
 	 */
 	@Scheduled(fixedDelay=600000)//10分钟

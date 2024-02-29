@@ -1,5 +1,8 @@
 package cms.web.action.staff;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,6 +12,9 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Resource;
+import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import cms.bean.PageForm;
 import cms.bean.RequestResult;
@@ -18,10 +24,14 @@ import cms.bean.staff.SysUsers;
 import cms.bean.staff.SysUsersRoles;
 import cms.service.staff.ACLService;
 import cms.service.staff.StaffService;
+import cms.utils.FileUtil;
 import cms.utils.JsonUtils;
 import cms.utils.SHA;
 import cms.utils.UUIDUtil;
+import cms.utils.Verification;
+import cms.web.action.fileSystem.FileManage;
 
+import org.joda.time.DateTime;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -29,6 +39,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 /**
  * 员工管理
@@ -44,7 +55,7 @@ public class StaffManageAction {
 	@Resource StaffManage staffManage;
 	//Spring security加密
 	@Resource PasswordEncoder passwordEncoder;
-	
+	@Resource FileManage fileManage;
 	
 	/**
 	 * 员工管理 添加界面显示
@@ -90,8 +101,8 @@ public class StaffManageAction {
 	 */
 	@ResponseBody
 	@RequestMapping(params="method=addStaff",method=RequestMethod.POST)
-	public String addStaff(ModelMap model,SysUsers formbean,String[] sysRolesId,String repeatPassword
-			) throws Exception {
+	public String addStaff(ModelMap model,SysUsers formbean,String[] sysRolesId,String repeatPassword,
+			MultipartFile file,HttpServletRequest request,HttpServletResponse response) throws Exception {
 		
 		Map<String,String> error = new HashMap<String,String>();
 		
@@ -105,10 +116,28 @@ public class StaffManageAction {
 			if(formbean.getUserAccount().trim().length() >30){
 				error.put("userAccount", "不能超过30个字符");
 			}
-			SysUsers su = (SysUsers)staffService.findByUserAccount(formbean.getUserAccount().trim());
-			if(su != null){
+			SysUsers s1 = (SysUsers)staffService.findByUserAccount(formbean.getUserAccount().trim());
+			if(s1 != null){
 				error.put("userAccount", "该账号已存在");
 			}
+			
+			SysUsers s2 = staffManage.query_cache_findByNickname(formbean.getUserAccount().trim());
+			if(s2 != null){
+				error.put("nickname", "账号不能和员工呢称相同");
+			}
+		}
+		
+		if(formbean.getNickname() != null && !"".equals(formbean.getNickname().trim())){
+			SysUsers s1 = staffManage.query_cache_findByUserAccount(formbean.getNickname().trim());
+			if(s1 != null){
+				error.put("nickname", "呢称不能和员工账号相同");
+			}
+			SysUsers s2 = staffManage.query_cache_findByNickname(formbean.getNickname().trim());
+			if(s2 != null){
+				error.put("nickname", "呢称不能和员工呢称相同");
+			}
+			
+			sysUsers.setNickname(formbean.getNickname() != null ? formbean.getNickname().trim() : formbean.getNickname());
 		}
 		
 		String sha256_password = "";
@@ -128,6 +157,194 @@ public class StaffManageAction {
 		}else{
 			error.put("repeatPassword", "重复密码不能为空");
 		}
+		
+		
+		String _width = request.getParameter("width");
+		String _height = request.getParameter("height");
+		String _x = request.getParameter("x");
+		String _y = request.getParameter("y");
+		
+		
+		Integer width = null;//宽
+		Integer height = null;//高
+		Integer x = 0;//坐标X轴
+		Integer y = 0;//坐标Y轴
+		
+		if(_width != null && !"".equals(_width.trim())){
+			if(Verification.isPositiveInteger(_width.trim())){
+				if(_width.trim().length() >=8){
+					error.put("width", "不能超过8位数字");//不能超过8位数字
+				}else{
+					width = Integer.parseInt(_width.trim());
+				}
+				
+				
+			}else{
+				error.put("width", "宽度必须大于0");//宽度必须大于0
+			}
+			
+		}
+		if(_height != null && !"".equals(_height.trim())){
+			if(Verification.isPositiveInteger(_height.trim())){
+				if(_height.trim().length() >=8){
+					error.put("height", "不能超过8位数字");//不能超过8位数字
+				}else{
+					height = Integer.parseInt(_height.trim());
+				}
+				
+			}else{
+				error.put("height", "高度必须大于0 ");//高度必须大于0 
+			}
+		}
+		
+		if(_x != null && !"".equals(_x.trim())){
+			if(Verification.isPositiveIntegerZero(_x.trim())){
+				if(_x.trim().length() >=8){
+					error.put("x", "不能超过8位数字");//不能超过8位数字
+				}else{
+					x = Integer.parseInt(_x.trim());
+				}
+				
+			}else{
+				error.put("x", "X轴必须大于或等于0");//X轴必须大于或等于0
+			}
+			
+		}
+		
+		if(_y != null && !"".equals(_y.trim())){
+			if(Verification.isPositiveIntegerZero(_y.trim())){
+				if(_y.trim().length() >=8){
+					error.put("y","不能超过8位数字");//不能超过8位数字
+				}else{
+					y = Integer.parseInt(_y.trim());
+				}
+				
+			}else{
+				error.put("y","Y轴必须大于或等于0");//Y轴必须大于或等于0
+			}
+			
+		}
+		
+		String newFileName = "";
+		if(error.size() == 0 && file !=null && !file.isEmpty()){
+			//当前文件名称
+			String fileName = file.getOriginalFilename();
+			
+			//文件大小
+			Long size = file.getSize();
+			
+			
+			
+			//允许上传图片大小 单位KB
+			long imageSize = 5*1024L;
+			
+			Integer maxWidth = 200;//最大宽度
+			Integer maxHeight = 200;//最大高度
+			
+			
+			//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
+			String pathDir = "file"+File.separator+"staffAvatar"+File.separator;
+			//生成文件保存目录
+			fileManage.createFolder(pathDir);
+			//100*100目录
+			String pathDir_100 = "file"+File.separator+"staffAvatar"+File.separator +"100x100" +File.separator;
+			//生成文件保存目录
+			fileManage.createFolder(pathDir_100);
+			
+			
+			if(size/1024 <= imageSize){
+				if("blob".equalsIgnoreCase(fileName)){//Blob类型
+					newFileName = UUIDUtil.getUUID32()+ ".jpg";
+					
+					try (InputStream is = file.getInputStream()){
+						BufferedImage bufferImage = ImageIO.read(is);  
+						//获取图片的宽和高  
+			            int srcWidth = bufferImage.getWidth();  
+			            int srcHeight = bufferImage.getHeight();  
+						if(srcWidth > maxWidth){
+							error.put("file","超出最大宽度");
+						}
+						if(srcHeight > maxHeight){
+							error.put("file","超出最大高度");
+						}
+						if(error.size() == 0){
+							
+							//保存文件
+							fileManage.writeFile(pathDir, newFileName,file.getBytes());
+
+							//生成100*100缩略图
+							fileManage.createImage(file.getInputStream(),pathDir_100+newFileName,"jpg",100,100);
+						}
+					}
+					
+		            
+				}else{
+					//允许上传图片格式
+					List<String> formatList = new ArrayList<String>();
+					formatList.add("gif");
+					formatList.add("jpg");
+					formatList.add("jpeg");
+					formatList.add("bmp");
+					formatList.add("png");
+					
+					if(size/1024 <= imageSize){
+						
+						//验证文件类型
+						boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),formatList);
+				
+						if(authentication){
+							//生成文件保存目录
+							fileManage.createFolder(pathDir);
+							//生成文件保存目录
+							fileManage.createFolder(pathDir_100);
+							
+							try (InputStream is = file.getInputStream()){
+								BufferedImage bufferImage = ImageIO.read(is);  
+					            //获取图片的宽和高  
+					            int srcWidth = bufferImage.getWidth();  
+					            int srcHeight = bufferImage.getHeight();  
+								
+								//取得文件后缀
+								String suffix = FileUtil.getExtension(fileName).toLowerCase();
+								//构建文件名称
+								newFileName = UUIDUtil.getUUID32()+ "." + suffix;
+								
+								if(srcWidth <=200 && srcHeight <=200){	
+									//保存文件
+									fileManage.writeFile(pathDir, newFileName,file.getBytes());
+									
+									if(srcWidth <=100 && srcHeight <=100){
+										//保存文件
+										fileManage.writeFile(pathDir_100, newFileName,file.getBytes());
+									}else{
+										//生成100*100缩略图
+										fileManage.createImage(file.getInputStream(),pathDir_100+newFileName,suffix,100,100);
+									}
+								}else{
+									//生成200*200缩略图
+									fileManage.createImage(file.getInputStream(),pathDir+newFileName,suffix,x,y,width,height,200,200);
+
+									//生成100*100缩略图
+									fileManage.createImage(file.getInputStream(),pathDir_100+newFileName,suffix,x,y,width,height,100,100);
+		    
+								}	
+							}
+						}else{
+							error.put("file","当前文件类型不允许上传");//当前文件类型不允许上传
+						}	
+					}else{
+						error.put("file","文件超出允许上传大小");//文件超出允许上传大小
+					}
+				}
+				
+				
+			}else{
+				error.put("file", "文件超出允许上传大小");
+			}
+		}
+		
+		
+		
 		
 		if(error.size() == 0){
 			List<SysRoles> sysRolesList = aclService.findRolesList();
@@ -152,6 +369,8 @@ public class StaffManageAction {
 			}else{
 				sysUsers.setIssys(false);
 			}
+			
+			
 		
 			sysUsers.setUserAccount(formbean.getUserAccount() != null ? formbean.getUserAccount().trim() : "");//用户账号
 			sysUsers.setFullName(formbean.getFullName());//姓名
@@ -164,6 +383,7 @@ public class StaffManageAction {
 			sysUsers.setEnabled(formbean.isEnabled());//是否使用
 			sysUsers.setUsername(sysUsers.getUserAccount());//账号
 			sysUsers.setSecurityDigest(UUIDUtil.getUUID32());
+			sysUsers.setAvatarName(newFileName);
 			List<String> select_rolesIdList = new ArrayList<String>();//选中可用的角色ID
 
 			if(issys){//如果是超级用户,则有可添加系统所有角色
@@ -200,6 +420,10 @@ public class StaffManageAction {
 			}
 			
 			staffService.saveUser(sysUsers, userRoles);
+			if(sysUsers.getNickname() != null && !"".equals(sysUsers.getNickname().trim())){
+				staffManage.delete_cache_findByNickname(sysUsers.getNickname());
+			}
+			
 			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 		}
 		
@@ -212,8 +436,8 @@ public class StaffManageAction {
 	 */
 	@ResponseBody
 	@RequestMapping(params="method=editStaff",method=RequestMethod.GET)
-	public String editStaffUI(ModelMap model,String userId
-			) throws Exception {
+	public String editStaffUI(ModelMap model,String userId,
+			HttpServletRequest request,HttpServletResponse response) throws Exception {
 		Map<String,String> error = new HashMap<String,String>();
 		Map<String,Object> returnValue = new LinkedHashMap<String,Object>();
 		
@@ -307,6 +531,7 @@ public class StaffManageAction {
 				
 				sysUsers.setPassword("");//密码不显示
 				sysUsers.setUserPassword("");
+				sysUsers.setAvatarPath(fileManage.fileServerAddress(request)+sysUsers.getAvatarPath());
 				returnValue.put("sysRolesList",sysRolesList);
 				returnValue.put("sysUsers",sysUsers);
 				returnValue.put("isSysAdmin",isSysAdmin);
@@ -326,13 +551,15 @@ public class StaffManageAction {
 	@ResponseBody
 	@RequestMapping(params="method=editStaff",method=RequestMethod.POST)
 	public String editStaff(ModelMap model,String userId,SysUsers formbean,String[] sysRolesId,
-			String repeatPassword,PageForm pageForm) throws Exception {
+			String repeatPassword,MultipartFile file,
+			HttpServletRequest request,HttpServletResponse response) throws Exception {
 		Map<String,String> error = new HashMap<String,String>();
 		
 		if(userId != null && !"".equals(userId.trim())){
 			SysUsers sysUsers = (SysUsers)staffService.find(SysUsers.class, userId);
 			if(sysUsers != null){
 				String sha256_password = "";
+				String old_nickname = sysUsers.getNickname();
 				boolean isSecurityDigest = false;//是否修改安全摘要
 				
 				
@@ -382,7 +609,26 @@ public class StaffManageAction {
 				if(sysUsers.isEnabled() != formbean.isEnabled()){//如果修改是否允许使用
 					isSecurityDigest = true;
 				}
+				
+				if(formbean.getNickname() != null && !"".equals(formbean.getNickname().trim())){
+					
+					if(sysUsers.getNickname() == null || !sysUsers.getNickname().equals(formbean.getNickname().trim())){
+						SysUsers s = staffManage.query_cache_findByNickname(formbean.getNickname().trim());
+						if(s != null){
+							error.put("nickname", "呢称不能和员工呢称相同");
+						}
+					}
+					if(!sysUsers.getUserAccount().equals(formbean.getNickname().trim())){
+						SysUsers s = staffManage.query_cache_findByUserAccount(formbean.getNickname().trim());
+						if(s != null){
+							error.put("nickname", "呢称不能和员工账号相同");
+						}
+						
+					}
+				}
+				
 				sysUsers.setFullName(formbean.getFullName());	
+				sysUsers.setNickname(formbean.getNickname() != null ? formbean.getNickname().trim() : formbean.getNickname());
 				sysUsers.setUserDesc(formbean.getUserDesc());
 				sysUsers.setUserDuty(formbean.getUserDuty());
 				sysUsers.setEnabled(formbean.isEnabled());
@@ -457,6 +703,202 @@ public class StaffManageAction {
 						}
 					}
 				}
+				
+				
+				
+				String _width = request.getParameter("width");
+				String _height = request.getParameter("height");
+				String _x = request.getParameter("x");
+				String _y = request.getParameter("y");
+				
+				
+				Integer width = null;//宽
+				Integer height = null;//高
+				Integer x = 0;//坐标X轴
+				Integer y = 0;//坐标Y轴
+				
+				if(_width != null && !"".equals(_width.trim())){
+					if(Verification.isPositiveInteger(_width.trim())){
+						if(_width.trim().length() >=8){
+							error.put("width", "不能超过8位数字");//不能超过8位数字
+						}else{
+							width = Integer.parseInt(_width.trim());
+						}
+						
+						
+					}else{
+						error.put("width", "宽度必须大于0");//宽度必须大于0
+					}
+					
+				}
+				if(_height != null && !"".equals(_height.trim())){
+					if(Verification.isPositiveInteger(_height.trim())){
+						if(_height.trim().length() >=8){
+							error.put("height", "不能超过8位数字");//不能超过8位数字
+						}else{
+							height = Integer.parseInt(_height.trim());
+						}
+						
+					}else{
+						error.put("height", "高度必须大于0 ");//高度必须大于0 
+					}
+				}
+				
+				if(_x != null && !"".equals(_x.trim())){
+					if(Verification.isPositiveIntegerZero(_x.trim())){
+						if(_x.trim().length() >=8){
+							error.put("x", "不能超过8位数字");//不能超过8位数字
+						}else{
+							x = Integer.parseInt(_x.trim());
+						}
+						
+					}else{
+						error.put("x", "X轴必须大于或等于0");//X轴必须大于或等于0
+					}
+					
+				}
+				
+				if(_y != null && !"".equals(_y.trim())){
+					if(Verification.isPositiveIntegerZero(_y.trim())){
+						if(_y.trim().length() >=8){
+							error.put("y","不能超过8位数字");//不能超过8位数字
+						}else{
+							y = Integer.parseInt(_y.trim());
+						}
+						
+					}else{
+						error.put("y","Y轴必须大于或等于0");//Y轴必须大于或等于0
+					}
+					
+				}
+				
+				String newFileName = "";
+				
+				if(error.size() == 0 && file !=null && !file.isEmpty()){
+					//当前文件名称
+					String fileName = file.getOriginalFilename();
+					
+					//文件大小
+					Long size = file.getSize();
+					
+					
+					
+					//允许上传图片大小 单位KB
+					long imageSize = 5*1024L;
+					
+					Integer maxWidth = 200;//最大宽度
+					Integer maxHeight = 200;//最大高度
+					
+					
+					//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
+					String pathDir = "file"+File.separator+"staffAvatar"+File.separator;
+					//生成文件保存目录
+					fileManage.createFolder(pathDir);
+					//100*100目录
+					String pathDir_100 = "file"+File.separator+"staffAvatar"+File.separator +"100x100" +File.separator;
+					//生成文件保存目录
+					fileManage.createFolder(pathDir_100);
+					
+					
+					if(size/1024 <= imageSize){
+						if("blob".equalsIgnoreCase(fileName)){//Blob类型
+							newFileName = UUIDUtil.getUUID32()+ ".jpg";
+							
+							try (InputStream is = file.getInputStream()){
+								BufferedImage bufferImage = ImageIO.read(is);  
+					            //获取图片的宽和高  
+					            int srcWidth = bufferImage.getWidth();  
+					            int srcHeight = bufferImage.getHeight();  
+								if(srcWidth > maxWidth){
+									error.put("file","超出最大宽度");
+								}
+								if(srcHeight > maxHeight){
+									error.put("file","超出最大高度");
+								}
+								if(error.size() == 0){
+									
+									//保存文件
+									fileManage.writeFile(pathDir, newFileName,file.getBytes());
+
+									//生成100*100缩略图
+									fileManage.createImage(file.getInputStream(),pathDir_100+newFileName,"jpg",100,100);
+								}
+							}
+							
+						}else{
+							//允许上传图片格式
+							List<String> formatList = new ArrayList<String>();
+							formatList.add("gif");
+							formatList.add("jpg");
+							formatList.add("jpeg");
+							formatList.add("bmp");
+							formatList.add("png");
+							
+							if(size/1024 <= imageSize){
+								
+								//验证文件类型
+								boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),formatList);
+						
+								if(authentication){
+									//生成文件保存目录
+									fileManage.createFolder(pathDir);
+									//生成文件保存目录
+									fileManage.createFolder(pathDir_100);
+									
+									
+									try (InputStream is = file.getInputStream()){
+										BufferedImage bufferImage = ImageIO.read(is);  
+							            //获取图片的宽和高  
+							            int srcWidth = bufferImage.getWidth();  
+							            int srcHeight = bufferImage.getHeight(); 
+							            
+							            //取得文件后缀
+										String suffix = FileUtil.getExtension(fileName).toLowerCase();
+										//构建文件名称
+										newFileName = UUIDUtil.getUUID32()+ "." + suffix;
+										
+										if(srcWidth <=200 && srcHeight <=200){	
+											//保存文件
+											fileManage.writeFile(pathDir, newFileName,file.getBytes());
+											
+											
+											if(srcWidth <=100 && srcHeight <=100){
+												//保存文件
+												fileManage.writeFile(pathDir_100, newFileName,file.getBytes());
+											}else{
+												//生成100*100缩略图
+												fileManage.createImage(file.getInputStream(),pathDir_100+newFileName,suffix,100,100);
+											}
+										}else{
+											//生成200*200缩略图
+											fileManage.createImage(file.getInputStream(),pathDir+newFileName,suffix,x,y,width,height,200,200);
+											
+											//生成100*100缩略图
+											fileManage.createImage(file.getInputStream(),pathDir_100+newFileName,suffix,x,y,width,height,100,100);
+				    
+										}
+									}
+									
+									
+						           
+									
+								}else{
+									error.put("file","当前文件类型不允许上传");//当前文件类型不允许上传
+								}	
+							}else{
+								error.put("file","文件超出允许上传大小");//文件超出允许上传大小
+							}
+						}
+						
+						
+					}else{
+						error.put("file", "文件超出允许上传大小");
+					}
+				}
+				
+				
+				
+				
 
 				Set<SysUsersRoles> userRoles = new HashSet<SysUsersRoles>();
 				for (String rolesId : select_rolesIdList) {
@@ -467,8 +909,28 @@ public class StaffManageAction {
 					if(isSecurityDigest){
 						sysUsers.setSecurityDigest(UUIDUtil.getUUID32());
 					}
+					String old_avatarName = sysUsers.getAvatarName();
+					if(newFileName != null && !"".equals(newFileName.trim())){
+						sysUsers.setAvatarName(newFileName);
+					}
 					staffService.updateUser(sysUsers, userRoles);
 					staffManage.delete_staffSecurityDigest(sysUsers.getUserAccount());
+					staffManage.delete_staffPermissionMenu(sysUsers.getUserAccount());
+					staffManage.delete_userAuthoritiesByName(sysUsers.getUserAccount());
+					staffManage.delete_cache_findByUserAccount(sysUsers.getUserAccount());
+					if(old_nickname != null && !"".equals(old_nickname.trim())){
+						staffManage.delete_cache_findByNickname(old_nickname);
+					}
+					
+					if(old_avatarName != null && !"".equals(old_avatarName.trim()) && newFileName != null && !"".equals(newFileName.trim())){
+						String pathFile = "file"+File.separator+"staffAvatar"+File.separator +old_avatarName;
+						//删除头像
+						fileManage.deleteFile(pathFile);
+						
+						String pathFile_100 = "file"+File.separator+"staffAvatar"+File.separator +"100x100" +File.separator+old_avatarName;
+						//删除头像100*100
+						fileManage.deleteFile(pathFile_100);
+					}
 				}
 			}else{
 				error.put("userId", "员工不存在");
@@ -483,6 +945,373 @@ public class StaffManageAction {
 			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
 		}
 	}
+	
+	
+	/**
+	 * 员工管理 修改自身信息界面显示
+	 */
+	@ResponseBody
+	@RequestMapping(params="method=editSelfInfo",method=RequestMethod.GET)
+	public String editSelfInfoUI(ModelMap model,
+			HttpServletRequest request,HttpServletResponse response) throws Exception {
+		
+		Map<String,String> error = new HashMap<String,String>();
+		Map<String,Object> returnValue = new LinkedHashMap<String,Object>();
+		
+		
+		String userId = "";//用户Id
+		Object principal  =  SecurityContextHolder.getContext().getAuthentication().getPrincipal(); 
+		if(principal instanceof SysUsers){
+			userId =((SysUsers)principal).getUserId();
+		}
+		
+		
+		if(userId != null && !"".equals(userId.trim())){
+			SysUsers sysUsers = (SysUsers)staffService.find(SysUsers.class, userId);
+			if(sysUsers != null){
+				
+				List<SysRoles> sysRolesList = aclService.findRolesList();	
+				//选中用户角色Id
+				List<String> select_roleIdList = staffService.findRoleIdByUserAccount(sysUsers.getUserAccount());
+				if(sysRolesList != null && sysRolesList.size() >0){
+					for(SysRoles sr : sysRolesList){
+						
+						if(select_roleIdList != null && select_roleIdList.size() >0 && select_roleIdList.contains(sr.getId())){
+							sr.setSelected(true);//是否选中
+						}
+						
+						
+						if(sysUsers.isIssys()){
+							sr.setSelected(true);//是否选中
+						}
+						
+					}
+				}
+				
+				sysUsers.setPassword("");//密码不显示
+				sysUsers.setUserPassword("");
+				sysUsers.setAvatarPath(fileManage.fileServerAddress(request)+sysUsers.getAvatarPath());
+				returnValue.put("sysRolesList",sysRolesList);
+				returnValue.put("sysUsers",sysUsers);
+				return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
+			}else{
+				error.put("userId", "员工不存在");
+			}
+		}else{
+			error.put("userId", "员工Id不能为空");
+		}
+		
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		
+	}
+	
+	/**
+	 * 员工管理 修改自身信息
+	 */
+	@ResponseBody
+	@RequestMapping(params="method=editSelfInfo",method=RequestMethod.POST)
+	public String editSelfInfo(ModelMap model,SysUsers formbean,
+			String repeatPassword,MultipartFile file,
+			HttpServletRequest request,HttpServletResponse response) throws Exception {
+		Map<String,String> error = new HashMap<String,String>();
+		
+		
+		String userId = "";//用户Id
+		Object principal  =  SecurityContextHolder.getContext().getAuthentication().getPrincipal(); 
+		if(principal instanceof SysUsers){
+			userId =((SysUsers)principal).getUserId();
+		}
+		
+		if(userId != null && !"".equals(userId.trim())){
+			SysUsers sysUsers = (SysUsers)staffService.find(SysUsers.class, userId);
+			if(sysUsers != null){
+				String sha256_password = "";
+				String old_nickname = sysUsers.getNickname();
+				boolean isSecurityDigest = false;//是否修改安全摘要
+				
+				
+				if(formbean.getUserPassword() != null && !"".equals(formbean.getUserPassword().trim())){
+					if(repeatPassword != null && !"".equals(repeatPassword.trim())){
+						if(formbean.getUserPassword().equals(repeatPassword)){
+							sha256_password = SHA.sha256Hex(formbean.getUserPassword().trim());
+							isSecurityDigest = true;
+						}else{
+							error.put("userPassword", "两次输入密码不相同");
+						}
+					}else{
+						error.put("userPassword", "重复密码不能为空");
+					}
+				}
+				
+				
+				sysUsers.setUsername(sysUsers.getUserAccount());
+				
+				if(sha256_password != null && !"".equals(sha256_password)){
+					// 密码通过盐值加密以备存储入数据库
+					String newPassword = passwordEncoder.encode(sha256_password);
+					sysUsers.setUserPassword(newPassword);
+				}
+				if(formbean.getNickname() != null && !"".equals(formbean.getNickname().trim())){
+					
+					if(sysUsers.getNickname() == null || !sysUsers.getNickname().equals(formbean.getNickname().trim())){
+						SysUsers s = staffManage.query_cache_findByNickname(formbean.getNickname().trim());
+						if(s != null){
+							error.put("nickname", "呢称不能和员工呢称相同");
+						}
+					}
+					if(!sysUsers.getUserAccount().equals(formbean.getNickname().trim())){
+						SysUsers s = staffManage.query_cache_findByUserAccount(formbean.getNickname().trim());
+						if(s != null){
+							error.put("nickname", "呢称不能和员工账号相同");
+						}
+						
+					}
+				}
+				
+				
+				
+				sysUsers.setFullName(formbean.getFullName());	
+				sysUsers.setNickname(formbean.getNickname() != null ? formbean.getNickname().trim() : formbean.getNickname());
+				sysUsers.setUserDuty(formbean.getUserDuty());
+
+			
+				
+				
+				String _width = request.getParameter("width");
+				String _height = request.getParameter("height");
+				String _x = request.getParameter("x");
+				String _y = request.getParameter("y");
+				
+				
+				Integer width = null;//宽
+				Integer height = null;//高
+				Integer x = 0;//坐标X轴
+				Integer y = 0;//坐标Y轴
+				
+				if(_width != null && !"".equals(_width.trim())){
+					if(Verification.isPositiveInteger(_width.trim())){
+						if(_width.trim().length() >=8){
+							error.put("width", "不能超过8位数字");//不能超过8位数字
+						}else{
+							width = Integer.parseInt(_width.trim());
+						}
+						
+						
+					}else{
+						error.put("width", "宽度必须大于0");//宽度必须大于0
+					}
+					
+				}
+				if(_height != null && !"".equals(_height.trim())){
+					if(Verification.isPositiveInteger(_height.trim())){
+						if(_height.trim().length() >=8){
+							error.put("height", "不能超过8位数字");//不能超过8位数字
+						}else{
+							height = Integer.parseInt(_height.trim());
+						}
+						
+					}else{
+						error.put("height", "高度必须大于0 ");//高度必须大于0 
+					}
+				}
+				
+				if(_x != null && !"".equals(_x.trim())){
+					if(Verification.isPositiveIntegerZero(_x.trim())){
+						if(_x.trim().length() >=8){
+							error.put("x", "不能超过8位数字");//不能超过8位数字
+						}else{
+							x = Integer.parseInt(_x.trim());
+						}
+						
+					}else{
+						error.put("x", "X轴必须大于或等于0");//X轴必须大于或等于0
+					}
+					
+				}
+				
+				if(_y != null && !"".equals(_y.trim())){
+					if(Verification.isPositiveIntegerZero(_y.trim())){
+						if(_y.trim().length() >=8){
+							error.put("y","不能超过8位数字");//不能超过8位数字
+						}else{
+							y = Integer.parseInt(_y.trim());
+						}
+						
+					}else{
+						error.put("y","Y轴必须大于或等于0");//Y轴必须大于或等于0
+					}
+					
+				}
+				
+				String newFileName = "";
+				
+				if(error.size() == 0 && file !=null && !file.isEmpty()){
+					//当前文件名称
+					String fileName = file.getOriginalFilename();
+					
+					//文件大小
+					Long size = file.getSize();
+					
+					
+					
+					//允许上传图片大小 单位KB
+					long imageSize = 5*1024L;
+					
+					Integer maxWidth = 200;//最大宽度
+					Integer maxHeight = 200;//最大高度
+					
+					
+					//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
+					String pathDir = "file"+File.separator+"staffAvatar"+File.separator;
+					//生成文件保存目录
+					fileManage.createFolder(pathDir);
+					//100*100目录
+					String pathDir_100 = "file"+File.separator+"staffAvatar"+File.separator +"100x100" +File.separator;
+					//生成文件保存目录
+					fileManage.createFolder(pathDir_100);
+					
+					
+					if(size/1024 <= imageSize){
+						if("blob".equalsIgnoreCase(fileName)){//Blob类型
+							newFileName = UUIDUtil.getUUID32()+ ".jpg";
+							
+							try (InputStream is = file.getInputStream()){
+								BufferedImage bufferImage = ImageIO.read(is);  
+					            //获取图片的宽和高  
+					            int srcWidth = bufferImage.getWidth();  
+					            int srcHeight = bufferImage.getHeight();  
+								if(srcWidth > maxWidth){
+									error.put("file","超出最大宽度");
+								}
+								if(srcHeight > maxHeight){
+									error.put("file","超出最大高度");
+								}
+								if(error.size() == 0){
+									
+									//保存文件
+									fileManage.writeFile(pathDir, newFileName,file.getBytes());
+
+									//生成100*100缩略图
+									fileManage.createImage(file.getInputStream(),pathDir_100+newFileName,"jpg",100,100);
+								}
+							}
+							
+						}else{
+							//允许上传图片格式
+							List<String> formatList = new ArrayList<String>();
+							formatList.add("gif");
+							formatList.add("jpg");
+							formatList.add("jpeg");
+							formatList.add("bmp");
+							formatList.add("png");
+							
+							if(size/1024 <= imageSize){
+								
+								//验证文件类型
+								boolean authentication = FileUtil.validateFileSuffix(file.getOriginalFilename(),formatList);
+						
+								if(authentication){
+									//生成文件保存目录
+									fileManage.createFolder(pathDir);
+									//生成文件保存目录
+									fileManage.createFolder(pathDir_100);
+									
+									
+									try (InputStream is = file.getInputStream()){
+										BufferedImage bufferImage = ImageIO.read(is);  
+							            //获取图片的宽和高  
+							            int srcWidth = bufferImage.getWidth();  
+							            int srcHeight = bufferImage.getHeight(); 
+							            
+							            //取得文件后缀
+										String suffix = FileUtil.getExtension(fileName).toLowerCase();
+										//构建文件名称
+										newFileName = UUIDUtil.getUUID32()+ "." + suffix;
+										
+										if(srcWidth <=200 && srcHeight <=200){	
+											//保存文件
+											fileManage.writeFile(pathDir, newFileName,file.getBytes());
+											
+											
+											if(srcWidth <=100 && srcHeight <=100){
+												//保存文件
+												fileManage.writeFile(pathDir_100, newFileName,file.getBytes());
+											}else{
+												//生成100*100缩略图
+												fileManage.createImage(file.getInputStream(),pathDir_100+newFileName,suffix,100,100);
+											}
+										}else{
+											//生成200*200缩略图
+											fileManage.createImage(file.getInputStream(),pathDir+newFileName,suffix,x,y,width,height,200,200);
+											
+											//生成100*100缩略图
+											fileManage.createImage(file.getInputStream(),pathDir_100+newFileName,suffix,x,y,width,height,100,100);
+				    
+										}
+									}
+									
+									
+						           
+									
+								}else{
+									error.put("file","当前文件类型不允许上传");//当前文件类型不允许上传
+								}	
+							}else{
+								error.put("file","文件超出允许上传大小");//文件超出允许上传大小
+							}
+						}
+						
+						
+					}else{
+						error.put("file", "文件超出允许上传大小");
+					}
+				}
+				
+				
+				
+				
+				if(error.size() == 0){
+					if(isSecurityDigest){
+						sysUsers.setSecurityDigest(UUIDUtil.getUUID32());
+					}
+					String old_avatarName = sysUsers.getAvatarName();
+					if(newFileName != null && !"".equals(newFileName.trim())){
+						sysUsers.setAvatarName(newFileName);
+					}
+					staffService.updateUser(sysUsers);
+					staffManage.delete_staffSecurityDigest(sysUsers.getUserAccount());
+					staffManage.delete_staffPermissionMenu(sysUsers.getUserAccount());
+					staffManage.delete_userAuthoritiesByName(sysUsers.getUserAccount());
+					staffManage.delete_cache_findByUserAccount(sysUsers.getUserAccount());
+					if(old_nickname != null && !"".equals(old_nickname.trim())){
+						staffManage.delete_cache_findByNickname(old_nickname);
+					}
+					
+					if(old_avatarName != null && !"".equals(old_avatarName.trim()) && newFileName != null && !"".equals(newFileName.trim())){
+						String pathFile = "file"+File.separator+"staffAvatar"+File.separator +old_avatarName;
+						//删除头像
+						fileManage.deleteFile(pathFile);
+						
+						String pathFile_100 = "file"+File.separator+"staffAvatar"+File.separator +"100x100" +File.separator+old_avatarName;
+						//删除头像100*100
+						fileManage.deleteFile(pathFile_100);
+					}
+				}
+			}else{
+				error.put("userId", "员工不存在");
+			}
+		}else{
+			error.put("userId", "员工Id不能为空");
+		}
+		
+		if(error.size() >0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
+		}else{
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+		}
+	}
+	
+	
 	/**
 	 * 员工管理 删除
 	 */
@@ -538,6 +1367,24 @@ public class StaffManageAction {
 			if(error.size() == 0){
 				staffService.deleteUser(sysUsers.getUserId(),sysUsers.getUserAccount());
 				staffManage.delete_staffSecurityDigest(sysUsers.getUserAccount());
+				staffManage.delete_staffPermissionMenu(sysUsers.getUserAccount());
+				staffManage.delete_userAuthoritiesByName(sysUsers.getUserAccount());
+				staffManage.delete_cache_findByUserAccount(sysUsers.getUserAccount());
+				if(sysUsers.getNickname() != null && !"".equals(sysUsers.getNickname().trim())){
+					staffManage.delete_cache_findByNickname(sysUsers.getNickname());
+				}
+				
+				if(sysUsers.getAvatarName() != null && !"".equals(sysUsers.getAvatarName().trim())){
+					
+					
+					String pathFile = "file"+File.separator+"staffAvatar"+File.separator +sysUsers.getAvatarName();
+					//删除头像
+					fileManage.deleteFile(pathFile);
+					
+					String pathFile_100 = "file"+File.separator+"staffAvatar"+File.separator +"100x100" +File.separator+sysUsers.getAvatarName();
+					//删除头像100*100
+					fileManage.deleteFile(pathFile_100);
+				}
 			}
 			
 		}else{

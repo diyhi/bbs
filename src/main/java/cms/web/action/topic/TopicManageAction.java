@@ -72,6 +72,7 @@ import cms.web.action.fileSystem.FileManage;
 import cms.web.action.mediaProcess.MediaProcessQueueManage;
 import cms.web.action.payment.PaymentManage;
 import cms.web.action.redEnvelope.RedEnvelopeManage;
+import cms.web.action.staff.StaffManage;
 import cms.web.action.user.UserManage;
 import cms.web.action.user.UserRoleManage;
 import cms.web.taglib.Configuration;
@@ -108,6 +109,8 @@ public class TopicManageAction {
 	@Resource RedEnvelopeService redEnvelopeService;
 	@Resource PaymentManage paymentManage;
 	@Resource RedEnvelopeManage redEnvelopeManage;
+	@Resource StaffManage staffManage;
+	
 	/**
 	 * 话题   查看
 	 * @param topicId
@@ -183,6 +186,15 @@ public class TopicManageAction {
 					}
 					
 				}else{
+					SysUsers sysUsers = staffManage.query_cache_findByUserAccount(topic.getUserName());
+					if(sysUsers != null){
+						topic.setNickname(sysUsers.getNickname());
+						if(sysUsers.getAvatarName() != null && !"".equals(sysUsers.getAvatarName().trim())){
+							topic.setAvatarPath(fileManage.fileServerAddress(request)+sysUsers.getAvatarPath());
+							topic.setAvatarName(sysUsers.getAvatarName());
+						}	
+					}
+					
 					topic.setAccount(topic.getUserName());//员工用户名和账号是同一个
 					
 				}
@@ -326,6 +338,14 @@ public class TopicManageAction {
 							}
 							
 						}else{
+							SysUsers sysUsers = staffManage.query_cache_findByUserAccount(comment.getUserName());
+							if(sysUsers != null){
+								comment.setNickname(sysUsers.getNickname());
+								if(sysUsers.getAvatarName() != null && !"".equals(sysUsers.getAvatarName().trim())){
+									comment.setAvatarPath(fileManage.fileServerAddress(request)+sysUsers.getAvatarPath());
+									comment.setAvatarName(sysUsers.getAvatarName());
+								}	
+							}
 							comment.setAccount(comment.getUserName());//员工用户名和账号是同一个
 							
 						}
@@ -350,6 +370,14 @@ public class TopicManageAction {
 										}
 										
 									}else{
+										SysUsers sysUsers = staffManage.query_cache_findByUserAccount(quote.getUserName());
+										if(sysUsers != null){
+											quote.setNickname(sysUsers.getNickname());
+											if(sysUsers.getAvatarName() != null && !"".equals(sysUsers.getAvatarName().trim())){
+												quote.setAvatarPath(fileManage.fileServerAddress(request)+sysUsers.getAvatarPath());
+												quote.setAvatarName(sysUsers.getAvatarName());
+											}	
+										}
 										quote.setAccount(quote.getUserName());//员工用户名和账号是同一个
 										
 									}
@@ -383,6 +411,14 @@ public class TopicManageAction {
 									}
 									
 								}else{
+									SysUsers sysUsers = staffManage.query_cache_findByUserAccount(reply.getUserName());
+									if(sysUsers != null){
+										reply.setNickname(sysUsers.getNickname());
+										if(sysUsers.getAvatarName() != null && !"".equals(sysUsers.getAvatarName().trim())){
+											reply.setAvatarPath(fileManage.fileServerAddress(request)+sysUsers.getAvatarPath());
+											reply.setAvatarName(sysUsers.getAvatarName());
+										}	
+									}
 									reply.setAccount(reply.getUserName());//员工用户名和账号是同一个
 									
 								}
@@ -397,6 +433,14 @@ public class TopicManageAction {
 										}
 										
 									}else{
+										SysUsers sysUsers = staffManage.query_cache_findByUserAccount(reply.getFriendUserName());
+										if(sysUsers != null){
+											reply.setFriendNickname(sysUsers.getNickname());
+											if(sysUsers.getAvatarName() != null && !"".equals(sysUsers.getAvatarName().trim())){
+												reply.setFriendAvatarPath(fileManage.fileServerAddress(request)+sysUsers.getAvatarPath());
+												reply.setFriendAvatarName(sysUsers.getAvatarName());
+											}	
+										}
 										reply.setFriendAccount(reply.getFriendUserName());//员工用户名和账号是同一个
 										
 									}

@@ -7,6 +7,7 @@ import java.util.Map;
 import cms.bean.PermissionObject;
 import cms.bean.QueryResult;
 import cms.bean.SaveResourcesObject;
+import cms.bean.staff.PermissionMenu;
 import cms.bean.staff.SysPermission;
 import cms.bean.staff.SysPermissionResources;
 import cms.bean.staff.SysResources;
@@ -39,6 +40,14 @@ public interface ACLService extends DAO{
 	 * @return
 	 */
 	public List<SysResources> findSysResourcesBysysResourcesId(List<String> sysResourcesIdList);
+	/**
+	 * 根据权限Id集合取得权限菜单
+	 */
+	public List<PermissionMenu> findPermissionMenuByPermissionIdList(List<String> permissionIdList);
+	/**
+	 * 获取所有权限菜单
+	 */
+	public List<PermissionMenu> findAllPermissionMenu();
 	
 	/******************* SysPermissionDao权限 *********************/
 	/**

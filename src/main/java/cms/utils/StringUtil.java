@@ -121,8 +121,8 @@ public class StringUtil {
      * @return
      */
     public static String replaceSpace(String html){
-    	return html.toLowerCase().replaceAll("(?i)&nbsp;","");
-    	
+    	//return html.toLowerCase().replaceAll("(?i)&nbsp;","");
+    	return html.replaceAll("(?i)&nbsp;","");
     }
    
     /** 

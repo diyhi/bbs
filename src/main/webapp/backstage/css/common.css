@@ -971,13 +971,19 @@ ul {
 }
 .manageModule .el-header .header-box .homeMenu .nav-list-user .avatarImg{
 	display:inline-block;border-radius:100%;float: left;margin-top: 8px;
+}
+.manageModule .el-header .header-box .homeMenu .nav-list-user .avatarImg .avatar{
+	border-radius:100%;
+}
+.manageModule .el-header .header-box .homeMenu .nav-list-user .avatarIcon{
+	display:inline-block;border-radius:100%;float: left;margin-top: 8px;
 	
 }
-.manageModule .el-header .header-box .homeMenu .nav-list-user .avatarImg .el-avatar {
+.manageModule .el-header .header-box .homeMenu .nav-list-user .avatarIcon .el-avatar {
 	background: #ebebeb;
 	color: #cccccc;
 }
-.manageModule .el-header .header-box .homeMenu .nav-list-user .avatarImg .el-avatar--icon {
+.manageModule .el-header .header-box .homeMenu .nav-list-user .avatarIcon .el-avatar--icon {
     font-size: 28px;
 }
 .manageModule .el-header .header-box .homeMenu .nav-list-user .user-info {
@@ -2168,10 +2174,13 @@ background-position: 0px 2px, 4px 35px, 29px 31px, 34px 6px;
 }
 .commentModule .commentList .replyList .box .replyItem-container .replyItem .reply-top .info h2 .userName{
 	margin-right: 5px;
-	position: relative;top: 34px;font-size:14px;
+	position: relative;top: 14px;font-size:14px;
 }
 .commentModule .commentList .replyList .box .replyItem-container .replyItem .reply-top .info h2 .userName .nickname{
-	position: absolute;top: -20px;left: 0px;white-space: nowrap;font-size:14px;
+	min-height: 22px; white-space: nowrap;font-size:14px;
+}
+.commentModule .commentList .replyList .box .replyItem-container .replyItem .reply-top .info h2 .userName .account .time{
+	font-weight:normal;color:#909399;margin-left: 10px;font-size:14px;
 }
 .commentModule .commentList .replyList .box .replyItem-container .replyItem .reply-top .info .master{
 	white-space:nowrap;
@@ -2220,10 +2229,10 @@ background-position: 0px 2px, 4px 35px, 29px 31px, 34px 6px;
 }
 .commentModule .commentList .replyList .box .replyItem-container .replyItem .reply-top .friendInfo .namedInfo .userName {
 	margin-right: 5px;
-    position: relative;top: 34px;font-size:14px;
+    position: relative;top: 36px;font-size:14px;
 }
 .commentModule .commentList .replyList .box .replyItem-container .replyItem .reply-top .friendInfo .namedInfo .userName .nickname{
-	position: absolute;top: -20px;left: 0px;white-space: nowrap;font-size:14px;
+	position: absolute;top: -22px;left: 0px;white-space: nowrap;font-size:14px;
 }
 .commentModule .commentList .replyList .box .replyItem-container .replyItem .reply-top .friendInfo .master{
     white-space:nowrap;
@@ -2236,11 +2245,6 @@ background-position: 0px 2px, 4px 35px, 29px 31px, 34px 6px;
     font-weight: normal;
     position: relative;top: -1px;margin-right: 5px;
 }
-
-.commentModule .commentList .replyList .box .replyItem-container .replyItem .reply-top .time {
-	color:#909399;float: left;position: relative;top: 34px;margin-left: 5px;font-size:14px;
-}
-
 .commentModule .commentList .replyList .box .replyItem-container .replyItem .reply-top .operatInfo {
 	float: right;
 }
@@ -3183,10 +3187,13 @@ background-position: 0px 2px, 4px 35px, 29px 31px, 34px 6px;
 }
 .answerModule .answerList .replyList .box .replyItem-container .replyItem .reply-top .info h2 .userName{
 	margin-right: 5px;
-	position: relative;top: 34px;font-size:14px;
+	position: relative;top: 14px;font-size:14px;
 }
 .answerModule .answerList .replyList .box .replyItem-container .replyItem .reply-top .info h2 .userName .nickname{
-	position: absolute;top: -20px;left: 0px;white-space: nowrap;font-size:14px;
+	min-height: 22px; white-space: nowrap;font-size:14px;
+}
+.answerModule .answerList .replyList .box .replyItem-container .replyItem .reply-top .info h2 .userName .account .time{
+	font-weight:normal;color:#909399;margin-left: 10px;font-size:14px;
 }
 .answerModule .answerList .replyList .box .replyItem-container .replyItem .reply-top .info .master{
 	white-space:nowrap;
@@ -3235,10 +3242,10 @@ background-position: 0px 2px, 4px 35px, 29px 31px, 34px 6px;
 }
 .answerModule .answerList .replyList .box .replyItem-container .replyItem .reply-top .friendInfo .namedInfo .userName {
 	margin-right: 5px;
-    position: relative;top: 34px;font-size:14px;
+    position: relative;top: 36px;font-size:14px;
 }
 .answerModule .answerList .replyList .box .replyItem-container .replyItem .reply-top .friendInfo .namedInfo .userName .nickname{
-	position: absolute;top: -20px;left: 0px;white-space: nowrap;font-size:14px;
+	position: absolute;top: -22px;left: 0px;white-space: nowrap;font-size:14px;
 }
 .answerModule .answerList .replyList .box .replyItem-container .replyItem .reply-top .friendInfo .master{
     white-space:nowrap;
@@ -3250,9 +3257,6 @@ background-position: 0px 2px, 4px 35px, 29px 31px, 34px 6px;
     font-style: normal;
     font-weight: normal;
     position: relative;top: -1px;margin-right: 5px;
-}
-.answerModule .answerList .replyList .box .replyItem-container .replyItem .reply-top .time {
-	color:#909399;float: left;position: relative;top: 34px;margin-left: 5px;font-size:14px;
 }
 
 .answerModule .answerList .replyList .box .replyItem-container .replyItem .reply-top .operatInfo {
@@ -3632,6 +3636,18 @@ background-position: 0px 2px, 4px 35px, 29px 31px, 34px 6px;
 }
 .userModule .el-form-item__error {
     position: relative;
+}
+.userModule .avatar{
+    border-radius:3px;
+}
+.userModule .defaultAvatar{
+    font-size: 48px;
+}
+.userModule .confirmAvatar-preview{
+	width: 120px;
+    height: 120px;
+    border-radius:3px;
+    overflow: hidden;
 }
 
 /** 私信对话 **/
@@ -4530,6 +4546,77 @@ background-position: 0px 2px, 4px 35px, 29px 31px, 34px 6px;
 	margin-left: 12px;
 }
 .changeAvatarModule .bottomInfo .button-box .container .uploadImage{
+	font-size: 15px;
+	padding: 8px 20px;
+	margin-left: 12px;
+}
+
+/* 设置头像 */
+.settingAvatarModule {
+	padding-left: 8px;padding-right: 8px;
+	padding-top: 8px;
+	padding-bottom: 12px;
+	background: #fcfcfc;
+}
+.settingAvatarModule .original-box{
+	width: 400px;
+	height: 400px;
+	background-color: #f6f6f6;
+}
+.settingAvatarModule .original-box img{
+	display: block;
+	max-width: 100%;
+}
+/* 截图预览 -- 正方型 */
+.settingAvatarModule .preview-pane-square {
+	display: block;
+	position: absolute;
+	left:450px;
+	top: 84px;
+	z-index: 2100;	
+}
+.settingAvatarModule .preview-pane-square .preview-square {
+	width: 120px;
+	height: 120px;
+	overflow: hidden;
+}
+/* 截图预览 -- 圆型 */
+.settingAvatarModule .preview-pane-round {
+	display: block;
+	position: absolute;
+	left:450px;
+	top: 250px;
+	z-index: 2100;	
+}
+.settingAvatarModule .preview-pane-round .preview-round {
+	width: 120px;
+	height: 120px;
+	border-radius:100%;
+	overflow: hidden;
+}
+.settingAvatarModule .bottomInfo{
+	margin-top: 8px;
+	border-top: 1px solid #E4E7ED; 
+	line-height:34px; 
+	position: relative;
+	padding-top: 6px;
+}
+.settingAvatarModule .bottomInfo .button-box{
+	margin-top:15px;
+	width:100%;
+	text-align:right;
+}
+
+.settingAvatarModule .bottomInfo .button-box .container {
+	display: flex;
+	justify-content: flex-end;
+}
+.settingAvatarModule .bottomInfo .button-box .container .selectImage{
+	font-size: 15px;
+	padding: 8px 20px;
+	margin-left: 12px;
+}
+.settingAvatarModule .bottomInfo .button-box .container .settingImage{
 	font-size: 15px;
 	padding: 8px 20px;
 	margin-left: 12px;

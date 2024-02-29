@@ -292,7 +292,10 @@
 			                		<div class="nav-list-user">
 			                			<el-dropdown>
 			                      			<div>
-												<div class="avatarImg">
+												<div v-if="sysUsers.avatarName != null && sysUsers.avatarName != ''" class="avatarImg">
+						                      		<el-image class="avatar" style="width: 40px; height: 40px;" fit="contain" :src="sysUsers.avatarPath + sysUsers.avatarName" ></el-image>
+						                     	</div>
+						                     	<div v-if="sysUsers.avatarName == null || sysUsers.avatarName == ''" class="avatarIcon">
 						                      		<el-avatar icon="el-icon-user-solid"></el-avatar>
 						                     	</div>
 						                     	<div class="user-info">
@@ -303,7 +306,9 @@
 											</div>
 											<template #dropdown>
 											    <el-dropdown-menu>
-											    	<el-dropdown-item icon="el-icon-s-tools" @click="$router.push({path: '/admin/control/staff/manage/editStaff',query:{ userId: sysUsers.userId}})">个人设置</el-dropdown-item>
+											    	<el-dropdown-item icon="el-icon-s-tools" v-if="sysUsers.issys" @click="jumpPage('admin/control/staff/manage/editStaff?userId='+sysUsers.userId)">个人设置</el-dropdown-item>
+											    	<el-dropdown-item icon="el-icon-s-tools" v-if="!sysUsers.issys" @click="jumpPage('admin/control/staff/manage/editSelfInfo')">个人设置</el-dropdown-item>
+											    	
 											    	<el-dropdown-item icon="el-icon-switch-button" @click="logout()">退出登录</el-dropdown-item>
 											    </el-dropdown-menu>
 											</template>

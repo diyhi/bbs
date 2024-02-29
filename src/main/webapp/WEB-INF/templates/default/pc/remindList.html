@@ -34,7 +34,14 @@
 		<@include action="${newPublic_4}"/>
 		
 		
-		<div class="remindTitle"><h2>全部提醒</h2></div>
+		<div class="remindTitle">
+            <h2>全部提醒</h2>
+            <div class="markAsReadButton">
+            	<span class="buttonBox">
+					<button type="button" class="payButton" onclick="javascript:allRemindMarkAsRead()">全部标记已读</button>
+				</span>
+            </div>
+        </div>
 		
 		
 		<#if pageView.records?exists> 
@@ -78,7 +85,9 @@
 										<a href="thread?topicId=${remind.topicId}&commentId=${remind.friendTopicCommentId}&reportModule=20">${remind.topicTitle}</a>
 									</cite> 
 									评论了我的话题
-									
+									<div class="summary">
+                                        ${remind.summary}
+                                    </div>
 								<#elseif remind.typeCode == 20>
 									<cite>
 										<#if remind.senderAccount == null || remind.senderAccount == ''>
@@ -93,6 +102,9 @@
 										<a href="thread?topicId=${remind.topicId}&commentId=${remind.friendTopicCommentId}&replyId=${remind.friendTopicReplyId}&reportModule=30">${remind.topicTitle}</a>
 									</cite> 
 									回复了我的话题
+									<div class="summary">
+                                        ${remind.summary}
+                                    </div>
 								<#elseif remind.typeCode == 30>
 									<cite>
 										<#if remind.senderAccount == null || remind.senderAccount == ''>
@@ -107,6 +119,9 @@
 										<a href="thread?topicId=${remind.topicId}&commentId=${remind.friendTopicCommentId}&reportModule=20">${remind.topicTitle}</a>
 									</cite> 
 									引用了我的评论
+									<div class="summary">
+                                        ${remind.summary}
+                                    </div>
 								<#elseif remind.typeCode == 40>
 									<cite>
 										<#if remind.senderAccount == null || remind.senderAccount == ''>
@@ -121,6 +136,9 @@
 										<a href="thread?topicId=${remind.topicId}&commentId=${remind.topicCommentId}&replyId=${remind.friendTopicReplyId}&reportModule=30">${remind.topicTitle}</a>
 									</cite> 
 									回复了我的评论
+									<div class="summary">
+                                        ${remind.summary}
+                                    </div>
 								<#elseif remind.typeCode == 50>
 									<cite>
 										<#if remind.senderAccount == null || remind.senderAccount == ''>
@@ -135,6 +153,9 @@
 										<a href="thread?topicId=${remind.topicId}&commentId=${remind.friendTopicCommentId}&replyId=${remind.friendTopicReplyId}&reportModule=30">${remind.topicTitle}</a>
 									</cite> 
 									回复了我回复过的评论
+									<div class="summary">
+                                        ${remind.summary}
+                                    </div>
 								<#elseif remind.typeCode == 55>
 									<cite>
 										<#if remind.senderAccount == null || remind.senderAccount == ''>
@@ -149,6 +170,9 @@
 										<a href="thread?topicId=${remind.topicId}&commentId=${remind.friendTopicCommentId}&replyId=${remind.friendTopicReplyId}&reportModule=30">${remind.topicTitle}</a>
 									</cite> 
 									回复了我的评论回复
+									<div class="summary">
+                                        ${remind.summary}
+                                    </div>
 								<#elseif remind.typeCode == 60>
 									<cite>
 										<#if remind.senderAccount == null || remind.senderAccount == ''>
@@ -163,6 +187,9 @@
 										<a href="thread?topicId=${remind.topicId}">${remind.topicTitle}</a>
 									</cite> 
 									解锁了我的话题
+									<div class="summary">
+                                        ${remind.summary}
+                                    </div>
 								<#elseif remind.typeCode == 70>
 									<cite>
 										<#if remind.senderAccount == null || remind.senderAccount == ''>
@@ -177,6 +204,9 @@
 										<a href="thread?topicId=${remind.topicId}">${remind.topicTitle}</a>
 									</cite> 
 									赞了我的话题
+									<div class="summary">
+                                        ${remind.summary}
+                                    </div>
 								<#elseif remind.typeCode == 80>
 									<cite>
 										<#if remind.senderAccount == null || remind.senderAccount == ''>
@@ -201,6 +231,9 @@
 									<cite>
 										<a href="thread?topicId=${remind.topicId}">${remind.topicTitle}</a>
 									</cite>
+									<div class="summary">
+                                        ${remind.summary}
+                                    </div>
 								<#elseif remind.typeCode == 100>
 									我关注的
 									<cite>
@@ -216,6 +249,9 @@
 										<a href="thread?topicId=${remind.topicId}&commentId=${remind.friendTopicCommentId}&reportModule=20">${remind.topicTitle}</a>
 									</cite>
 									发表了评论
+									<div class="summary">
+                                        ${remind.summary}
+                                    </div>
 								<#elseif remind.typeCode == 110>
 									我关注的
 									<cite>
@@ -231,7 +267,9 @@
 										<a href="thread?topicId=${remind.topicId}&commentId=${remind.friendTopicCommentId}&replyId=${remind.friendTopicReplyId}&reportModule=30">${remind.topicTitle}</a>
 									</cite>
 									发表了话题回复
-									
+									<div class="summary">
+                                        ${remind.summary}
+                                    </div>
 								<#elseif remind.typeCode == 120>
 									<cite>
 										<#if remind.senderAccount == null || remind.senderAccount == ''>
@@ -246,6 +284,9 @@
 										<a href="question?questionId=${remind.questionId}&answerId=${remind.friendQuestionAnswerId}&reportModule=50">${remind.questionTitle}</a>
 									</cite> 
 									回答了我的问题
+									<div class="summary">
+                                        ${remind.summary}
+                                    </div>
 								<#elseif remind.typeCode == 130>
 									<cite>
 										<#if remind.senderAccount == null || remind.senderAccount == ''>
@@ -260,6 +301,9 @@
 										<a href="question?questionId=${remind.questionId}&answerId=${remind.friendQuestionAnswerId}&replyId=${remind.friendQuestionReplyId}&reportModule=60">${remind.questionTitle}</a>
 									</cite> 
 									回复了我的问题
+									<div class="summary">
+                                        ${remind.summary}
+                                    </div>
 								<#elseif remind.typeCode == 140>
 									<cite>
 										<#if remind.senderAccount == null || remind.senderAccount == ''>
@@ -274,6 +318,9 @@
 										<a href="question?questionId=${remind.questionId}&answerId=${remind.questionAnswerId}&replyId=${remind.friendQuestionReplyId}&reportModule=60">${remind.questionTitle}</a>
 									</cite> 
 									回复了我的答案
+									<div class="summary">
+                                        ${remind.summary}
+                                    </div>
 								<#elseif remind.typeCode == 150>
 									<cite>
 										<#if remind.senderAccount == null || remind.senderAccount == ''>
@@ -288,6 +335,9 @@
 										<a href="question?questionId=${remind.questionId}&answerId=${remind.friendQuestionAnswerId}&replyId=${remind.friendQuestionReplyId}&reportModule=60">${remind.questionTitle}</a>
 									</cite> 
 									回复了我回复过的答案
+									<div class="summary">
+                                        ${remind.summary}
+                                    </div>
 								<#elseif remind.typeCode == 160>
 									<cite>
 										<#if remind.senderAccount == null || remind.senderAccount == ''>
@@ -302,6 +352,62 @@
 										<a href="question?questionId=${remind.questionId}&answerId=${remind.friendQuestionAnswerId}&replyId=${remind.friendQuestionReplyId}&reportModule=60">${remind.questionTitle}</a>
 									</cite> 
 									回复了我的答案回复
+									<div class="summary">
+                                        ${remind.summary}
+                                    </div>
+								<#elseif remind.typeCode == 170>
+									我关注的
+									<cite>
+										<#if remind.senderAccount == null || remind.senderAccount == ''>
+											<span class="cancelAccount">此用户账号已注销</span>
+										</#if>
+										<a href="user/control/home?userName=${remind.senderUserName}">
+											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderAccount)}
+										</a>
+									</cite> 
+									提了问题
+									<cite>
+										<a href="question?questionId=${remind.questionId}">${remind.questionTitle}</a>
+									</cite>
+									<div class="summary">
+                                        ${remind.summary}
+                                    </div>
+								<#elseif remind.typeCode == 180>
+									我关注的
+									<cite>
+										<#if remind.senderAccount == null || remind.senderAccount == ''>
+											<span class="cancelAccount">此用户账号已注销</span>
+										</#if>
+										<a href="user/control/home?userName=${remind.senderUserName}">
+											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderAccount)}
+										</a>
+									</cite> 
+									在
+									<cite>
+										<a href="question?questionId=${remind.questionId}&answerId=${remind.friendQuestionAnswerId}&reportModule=50">${remind.questionTitle}</a>
+									</cite>
+									回答了问题
+									<div class="summary">
+                                        ${remind.summary}
+                                    </div>
+								<#elseif remind.typeCode == 190>
+									我关注的
+									<cite>
+										<#if remind.senderAccount == null || remind.senderAccount == ''>
+											<span class="cancelAccount">此用户账号已注销</span>
+										</#if>
+										<a href="user/control/home?userName=${remind.senderUserName}">
+											${(remind.senderNickname != null && remind.senderNickname??) ?string(remind.senderNickname , remind.senderAccount)}
+										</a>
+									</cite> 
+									在
+									<cite>
+										<a href="question?questionId=${remind.questionId}&answerId=${remind.friendQuestionAnswerId}&replyId=${remind.friendQuestionReplyId}&reportModule=60">${remind.questionTitle}</a>
+									</cite>
+									发表了答案回复
+									<div class="summary">
+                                        ${remind.summary}
+                                    </div>
 								</#if>
 							</div>
 							<div class="clearfix"></div>
@@ -327,6 +433,58 @@
 
 
 <script type="text/javascript" language="javascript"> 
+
+//全部提醒状态标记为已读
+function allRemindMarkAsRead(){
+	var parameter = "";//URI参数
+	//从meta标签获取令牌
+	parameter += "&token="+getCsrf();
+	
+	if(parameter.indexOf("&") == 0){
+		parameter = parameter.substring(1,parameter.length);
+	}
+	post_request(function(value){
+		if(value != ""){
+			var returnValue = JSON.parse(value);//JSON转为对象
+			for(var key in returnValue){
+				if(key == "success"){	
+					var success = returnValue[key];	
+					if(success == "true"){
+						layer.msg('标记全部提醒已读成功,3秒后刷新页面', 
+							{
+							  time: 3000 //3秒关闭（如果不配置，默认是3秒）
+							},function(){
+								//关闭后的操作
+					        	document.location.reload();//刷新页面
+							}
+						);
+					}
+				}else if(key == "error"){
+					var errorValue = returnValue[key];
+					var htmlValue = "";
+					var i = 0;
+					for(var error in errorValue){
+						if(error != ""){	
+							i++;
+							htmlValue += "&nbsp;&nbsp;"+i+"、"+errorValue[error]+"<br>";
+						}
+					}
+					
+					layer.open({
+					  type: 1,
+					  title: '错误', 
+					  skin: 'layui-layer-rim', //加上边框
+					  area: ['300px', '150px'], //宽高
+					  content: htmlValue
+					});
+					
+				}
+			}
+		}
+	},
+		getBasePath()+"user/control/allRemindMarkAsRead?timestamp=" + new Date().getTime(), true,parameter);	
+}
+
 
 //删除提醒
 function deleteRemind(remindId){

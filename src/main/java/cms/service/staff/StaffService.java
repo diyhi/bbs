@@ -42,11 +42,18 @@ public interface StaffService extends DAO{
 	 */
 	public List<String> findPermissionIdByUserAccount(String userAccount);
 	/**
-	 * 根据用户账号返回SysUsers实例对象。
-	 *@param userAccount 用户账号，比如admin等。
+	 * 根据员工账号返回SysUsers实例对象。
+	 *@param account 员工账号，比如admin等。
 	 *@return SysUsers实例对象。
 	 */
-	public SysUsers findByUserAccount(String userAccount);
+	public SysUsers findByUserAccount(String account);
+	
+	/**
+	 * 根据员工呢称返回SysUsers实例对象。
+	 *@param nickname 呢称
+	 *@return SysUsers实例对象。
+	 */
+	public SysUsers findByNickname(String nickname);
 	/**
 	 * 根据员工名称查询员工安全摘要
 	 * @param userName 用户名称
@@ -64,6 +71,11 @@ public interface StaffService extends DAO{
 	 * @param usersRoleList 用户角色
 	 */
 	public void updateUser(SysUsers sysUsers, Set<SysUsersRoles> usersRoleList);
+	/**
+	 * 修改员工
+	 * @param sysUsers 用户
+	 */
+	public void updateUser(SysUsers sysUsers);
 	/**
 	 * 删除员工
 	 * @param staffId 员工Id

@@ -4683,6 +4683,7 @@ html,body{
 	margin-right:10px;
     border-bottom:1px dotted #E5E6EB;
     background: #fff;
+    position: relative;
 }
 .systemNotifyTitle h2{
 	line-height:46px;
@@ -4691,6 +4692,31 @@ html,body{
     margin-left: 10px;
     color: #6B7785;
 }
+.systemNotifyTitle .markAsReadButton{
+    position: absolute;
+    right: 0px;
+    top: 6px;
+}
+.systemNotifyTitle .markAsReadButton .buttonBox{margin-left: 100px; margin-top: -26px;}
+.systemNotifyTitle .markAsReadButton .buttonBox .payButton{
+	color: #20a0ff;
+    border-color: #20a0ff;
+    outline: none;
+    display: inline-block;
+    padding: 0 16px;
+    font-size: 14px;
+    line-height: 32px;
+    text-align: center;
+    cursor: pointer;
+    background: none;
+    border: 1px solid;
+    border-radius: 3px;
+    margin: 0;
+	
+}
+.systemNotifyTitle .markAsReadButton .buttonBox .payButton:hover {  
+    background: #E8F3FF;  
+} 
 
 
 .systemNotifyModule{
@@ -4740,6 +4766,7 @@ html,body{
 	margin-right:10px;
     border-bottom:1px dotted #E5E6EB;
     background: #fff;
+    position: relative;
 }
 .remindTitle h2{
 	line-height:46px;
@@ -4748,6 +4775,31 @@ html,body{
     margin-left: 10px;
     color: #6B7785;
 }
+.remindTitle .markAsReadButton{
+    position: absolute;
+    right: 0px;
+    top: 6px;
+}
+.remindTitle .markAsReadButton .buttonBox{margin-left: 100px; margin-top: -26px;}
+.remindTitle .markAsReadButton .buttonBox .payButton{
+	color: #20a0ff;
+    border-color: #20a0ff;
+    outline: none;
+    display: inline-block;
+    padding: 0 16px;
+    font-size: 14px;
+    line-height: 32px;
+    text-align: center;
+    cursor: pointer;
+    background: none;
+    border: 1px solid;
+    border-radius: 3px;
+    margin: 0;
+	
+}
+.remindTitle .markAsReadButton .buttonBox .payButton:hover {  
+    background: #E8F3FF;  
+} 
 
 .remindModule{
 	padding: 0px 10px 10px 10px;
@@ -4790,6 +4842,11 @@ html,body{
 }
 .remindModule .remindList .remind .content a:hover{
 	color: #40a9ff;
+}
+.remindModule .remindList .remind .content .summary{
+    margin-top: 10px;
+    word-break: break-all;
+    color: #a9aeb8;
 }
 .remindModule .remindList .tipBottom {
 	font-size: 14px;

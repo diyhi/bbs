@@ -27,6 +27,7 @@ import cms.bean.question.Question;
 import cms.bean.question.QuestionTag;
 import cms.bean.question.QuestionTagAssociation;
 import cms.bean.setting.SystemSetting;
+import cms.bean.staff.SysUsers;
 import cms.bean.template.Forum;
 import cms.bean.template.Forum_AnswerRelated_Answer;
 import cms.bean.template.Forum_QuestionRelated_LikeQuestion;
@@ -48,6 +49,7 @@ import cms.web.action.lucene.QuestionLuceneManage;
 import cms.web.action.question.AnswerManage;
 import cms.web.action.question.QuestionManage;
 import cms.web.action.setting.SettingManage;
+import cms.web.action.staff.StaffManage;
 import cms.web.action.user.UserManage;
 import cms.web.action.user.UserRoleManage;
 
@@ -72,7 +74,7 @@ public class Question_TemplateManage {
 	@Resource CaptchaManage captchaManage;
 	@Resource QuestionLuceneManage questionLuceneManage;
 	@Resource FileManage fileManage;
-	
+	@Resource StaffManage staffManage;
 	
 	/**
 	 * 问题列表  -- 分页
@@ -239,6 +241,9 @@ public class Question_TemplateManage {
 				if(question.getPostTime().equals(question.getLastAnswerTime())){//如果发贴时间等于回复时间，则不显示回复时间
 					question.setLastAnswerTime(null);
 				}
+				
+				question.setViewTotal(question.getViewTotal()+questionManage.readLocalView(question.getId()));
+				
 				if(question.getIsStaff() == false){//会员
 					User user = userManage.query_cache_findUserByUserName(question.getUserName());
 					if(user != null){
@@ -258,6 +263,14 @@ public class Question_TemplateManage {
 					}
 					
 				}else{
+					SysUsers sysUsers = staffManage.query_cache_findByUserAccount(question.getUserName());
+					if(sysUsers != null){
+						question.setNickname(sysUsers.getNickname());
+						if(sysUsers.getAvatarName() != null && !"".equals(sysUsers.getAvatarName().trim())){
+							question.setAvatarPath(fileManage.fileServerAddress(request)+sysUsers.getAvatarPath());
+							question.setAvatarName(sysUsers.getAvatarName());
+						}	
+					}
 					question.setAccount(question.getUserName());//员工用户名和账号是同一个
 				}
 			}
@@ -392,6 +405,8 @@ public class Question_TemplateManage {
 					questionManage.addView(questionId, ip);
 				}
 				
+				question.setViewTotal(question.getViewTotal()+questionManage.readLocalView(question.getId()));
+				
 				if(question.getStatus() >20){//20:已发布
 					return null;
 					
@@ -472,6 +487,14 @@ public class Question_TemplateManage {
 					}
 					
 				}else{
+					SysUsers sysUsers = staffManage.query_cache_findByUserAccount(question.getUserName());
+					if(sysUsers != null){
+						question.setNickname(sysUsers.getNickname());
+						if(sysUsers.getAvatarName() != null && !"".equals(sysUsers.getAvatarName().trim())){
+							question.setAvatarPath(fileManage.fileServerAddress(request)+sysUsers.getAvatarPath());
+							question.setAvatarName(sysUsers.getAvatarName());
+						}	
+					}
 					question.setAccount(question.getUserName());//员工用户名和账号是同一个
 				}
 				
@@ -777,6 +800,14 @@ public class Question_TemplateManage {
 						}
 					}
 				}else{
+					SysUsers sysUsers = staffManage.query_cache_findByUserAccount(answer.getUserName());
+					if(sysUsers != null){
+						answer.setNickname(sysUsers.getNickname());
+						if(sysUsers.getAvatarName() != null && !"".equals(sysUsers.getAvatarName().trim())){
+							answer.setAvatarPath(fileManage.fileServerAddress(request)+sysUsers.getAvatarPath());
+							answer.setAvatarName(sysUsers.getAvatarName());
+						}	
+					}
 					answer.setAccount(answer.getUserName());//员工用户名和账号是同一个
 				}
 				
@@ -809,15 +840,16 @@ public class Question_TemplateManage {
 			for(Answer answer : answerList){
 				answerIdList.add(answer.getId());
 
-				
-				//用户角色名称集合
-				for (Map.Entry<String, List<String>> entry : userRoleNameMap.entrySet()) {
-					if(entry.getKey().equals(answer.getUserName())){
-						List<String> roleNameList = entry.getValue();
-						if(roleNameList != null && roleNameList.size() >0){
-							answer.setUserRoleNameList(roleNameList);
+				if(!answer.getIsStaff()){
+					//用户角色名称集合
+					for (Map.Entry<String, List<String>> entry : userRoleNameMap.entrySet()) {
+						if(entry.getKey().equals(answer.getUserName())){
+							List<String> roleNameList = entry.getValue();
+							if(roleNameList != null && roleNameList.size() >0){
+								answer.setUserRoleNameList(roleNameList);
+							}
+							break;
 						}
-						break;
 					}
 				}
 			}
@@ -851,6 +883,14 @@ public class Question_TemplateManage {
 								
 								
 							}else{
+								SysUsers sysUsers = staffManage.query_cache_findByUserAccount(answerReply.getUserName());
+								if(sysUsers != null){
+									answerReply.setNickname(sysUsers.getNickname());
+									if(sysUsers.getAvatarName() != null && !"".equals(sysUsers.getAvatarName().trim())){
+										answerReply.setAvatarPath(fileManage.fileServerAddress(request)+sysUsers.getAvatarPath());
+										answerReply.setAvatarName(sysUsers.getAvatarName());
+									}	
+								}
 								answerReply.setAccount(answerReply.getUserName());//员工用户名和账号是同一个
 							}
 							if(answerReply.getFriendUserName() != null && !"".equals(answerReply.getFriendUserName().trim())){
@@ -864,6 +904,14 @@ public class Question_TemplateManage {
 									}
 									
 								}else{
+									SysUsers sysUsers = staffManage.query_cache_findByUserAccount(answerReply.getFriendUserName());
+									if(sysUsers != null){
+										answerReply.setFriendNickname(sysUsers.getNickname());
+										if(sysUsers.getAvatarName() != null && !"".equals(sysUsers.getAvatarName().trim())){
+											answerReply.setFriendAvatarPath(fileManage.fileServerAddress(request)+sysUsers.getAvatarPath());
+											answerReply.setFriendAvatarName(sysUsers.getAvatarName());
+										}	
+									}
 									answerReply.setFriendAccount(answerReply.getFriendUserName());//员工用户名和账号是同一个
 									
 								}

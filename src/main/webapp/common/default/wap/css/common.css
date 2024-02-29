@@ -893,6 +893,7 @@ html,body{
 	line-height:0;
 }
 .topicContentModule .topicDetail .head .titleBox .title {
+	display:inline;
 	color: #222;
 	font-weight: 300;
 	font-size: 20px;
@@ -5383,6 +5384,12 @@ html,body{
 .remindModule .remindList .item .main .content {
 	margin-bottom: 2px;
 	color:#595959;
+}
+.remindModule .remindList .item .main .content .summary{
+    margin-top: 5px;
+    margin-bottom:5px;
+    word-break: break-all;
+    color: #a9aeb8;
 }
 .remindModule .remindList .item .main .link {
 	font-size: 15px;

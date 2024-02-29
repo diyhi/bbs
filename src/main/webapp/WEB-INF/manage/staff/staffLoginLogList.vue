@@ -105,7 +105,23 @@ export default({
 			    			}
 			    		}
 			    	}else if(returnValue.code === 500){//错误
+			    		let errorMap = returnValue.data;
+			    		let htmlContent = "";
+			    		let count = 0;
+			    		for (let key in errorMap) {   
+			    			count++;
+			    			htmlContent += "<p>"+count + ". " + errorMap[key]+"</p>";
+			    			
+			    	    }
 			    		
+			    		
+			    		_self.$alert(htmlContent, '错误', {
+			    			showConfirmButton :false,
+			    			dangerouslyUseHTMLString: true
+			    		})
+			    		.catch(function (error) {
+							console.log(error);
+						});
 			    		
 			    	}
 			    }

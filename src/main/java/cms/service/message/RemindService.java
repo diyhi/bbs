@@ -25,6 +25,11 @@ public interface RemindService extends DAO<Remind>{
 	 */
 	public Integer updateRemindStatus(Long userId,List<String> unreadRemindIdList);
 	/**
+	 * 设置全部提醒状态为已读
+	 * @param userId 用户Id
+	 */
+	public Integer updateAllRemindStatus(Long userId);
+	/**
 	 * 软删除提醒
 	 * @param userId 用户Id
 	 * @param remindId 提醒Id

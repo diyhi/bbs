@@ -9,7 +9,22 @@
 				<el-table ref="multipleTable" :data="tableData" @selection-change="handleSelectionChange" tooltip-effect="dark" style="width: 100%" stripe empty-text="没有内容">
 					<el-table-column type="selection" v-if="false"></el-table-column>
 					<el-table-column prop="userAccount" label="用户名" align="center"></el-table-column>
+					<el-table-column prop="nickname" label="呢称" align="center"></el-table-column>
 					<el-table-column prop="fullName" label="姓名" align="center"></el-table-column>
+					<el-table-column label="头像" align="center" min-width="60">
+						<template #default="scope">
+				        	
+			          		<div class="user-avatar-wrapper" >
+								<div class="avatar-badge" v-if="scope.row.avatarName == null || scope.row.avatarName == ''">
+									<el-avatar :size="48" icon="el-icon-user-solid"></el-avatar>
+								</div>
+								<div class="avatar-badge" v-if="scope.row.avatarName != null && scope.row.avatarName != ''">
+									<el-avatar :size="48" :src="scope.row.avatarPath+'100x100/'+scope.row.avatarName"></el-avatar>
+								</div>
+							</div>
+				        	
+				    	</template>
+					</el-table-column>
 					<el-table-column label="角色" align="center" width="200">
 						<template #default="scope">
 							<el-tag effect="dark"  v-if="scope.row.issys==true" type="danger" class="tag-wrapper" >超级管理员</el-tag>

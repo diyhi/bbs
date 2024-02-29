@@ -198,7 +198,7 @@
 	<!-- 话题展示IP记录 -->	
 	<cache name="topicManage_cache_ipRecord" maxElementsInMemory="9999999" 
 		overflowToDisk="true"
-		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="86400" 
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="1800" 
 		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>
 	
 	<!-- 问题标签 - 查询所有问题标签 -->	
@@ -209,7 +209,7 @@
 	<!-- 问题展示IP记录 -->	
 	<cache name="questionManage_cache_ipRecord" maxElementsInMemory="9999999" 
 		overflowToDisk="true"
-		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="86400" 
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="1800" 
 		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>
 	<!-- 问题 - 问题缓存 -->		
 	<cache name="questionManage_cache_findById" maxElementsInMemory="99999999" 
@@ -249,6 +249,16 @@
 		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
 	
 	
+	<!-- 根据账号查询当前员工 -->
+	<cache name="staffManage_cache_findByUserAccount" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
+	<!-- 根据呢称查询当前员工 -->
+	<cache name="staffManage_cache_findByNickname" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
 	<!-- 查询员工安全摘要 -->
 	<cache name="staffManage_cache_staffSecurityDigest" maxElementsInMemory="900000" 
 		overflowToDisk="true"
@@ -258,6 +268,21 @@
 	<cache name="staffManage_cache_loginFailureCount" maxElementsInMemory="100000" 
 		overflowToDisk="true"
 		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="120" 
+		memoryStoreEvictionPolicy="LFU" />	
+	<!-- 查询员工的权限菜单 -->
+	<cache name="staffManage_cache_queryStaffPermissionMenu" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="1800" 
+		memoryStoreEvictionPolicy="LFU" />	
+	<!-- 查询所有权限  -->	
+	<cache name="staffManage_cache_queryAllAuthorities" maxElementsInMemory="1" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
+	<!-- 查询员工的权限 -->
+	<cache name="staffManage_cache_queryUserAuthoritiesByName" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="1800" 
 		memoryStoreEvictionPolicy="LFU" />	
 	<!-- 查询用户状态 -->
 	<cache name="userManage_cache_userState" maxElementsInMemory="900000" 
@@ -483,7 +508,8 @@
 	<cache name="findAllReportType_cache" maxElementsInMemory="1" 
 		overflowToDisk="true"
 		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
-		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>		
-		
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
+			
+	
 			
 </ehcache>

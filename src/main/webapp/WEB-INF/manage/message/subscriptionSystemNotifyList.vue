@@ -197,7 +197,7 @@ export default({
 
 				this.$ajax({
 			        method: 'post',
-			        url: 'control/systemNotify/manage?method=reductionSubscriptionSystemNotify',
+			        url: 'control/systemNotify/manage?method=reductionSubscriptionSystemNotify&a=a',//a=a参数的作用是仅增加连接符&
 			        data: formData
 				})
 				.then(function (response) {

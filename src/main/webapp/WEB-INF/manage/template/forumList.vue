@@ -462,7 +462,7 @@ export default({
 			
 			_self.$ajax({
 		        method: 'post',
-		        url: 'control/forumCode/manage?method=source',
+		        url: 'control/forumCode/manage?method=source&a=a',//a=a参数的作用是仅增加连接符&
 		        data: formData
 			})
 			.then(function (response) {
@@ -656,7 +656,7 @@ export default({
 		    	
 				this.$ajax({
 			        method: 'post',
-			        url: 'control/forum/manage?method=delete',
+			        url: 'control/forum/manage?method=delete&a=a',//a=a参数的作用是仅增加连接符&
 			        data: formData
 				})
 				.then(function (response) {

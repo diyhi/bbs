@@ -1,5 +1,6 @@
 package cms.web.action.staff;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -54,8 +55,32 @@ public class CustomAccessDecisionManager implements AccessDecisionManager{
 			}else{
 				throw new AccessDeniedException("没有权限访问 - 员工安全摘要为空");
 			}
+			
+			Collection<GrantedAuthority> auths = new ArrayList<GrantedAuthority>();
+			//如果是管理员则有所有权限
+			if(sysUsers.isIssys()){
+				auths = staffManage.query_allAuthorities();
+			}else{
+				//得到用户的权限
+				auths = staffManage.query_userAuthoritiesByName(userAccount);
+			}
+			//所请求的资源拥有的权限(一个资源对多个权限)   
+			Iterator<ConfigAttribute> ite = configAttributes.iterator();
+			
+			while(ite.hasNext()){
+				
+				ConfigAttribute ca = ite.next();
+				//访问所请求资源所需要的权限   
+				String needRole = ((SecurityConfig)ca).getAttribute();
+				//ga 为用户所被赋予的权限。 needRole 为访问相应的资源应该具有的权限。
+				for( GrantedAuthority ga: auths){
+					if(needRole.trim().equals(ga.getAuthority().trim())){
+						return;
+					}
+				}	
+			}
 		}
-		
+		/**
 		//所请求的资源拥有的权限(一个资源对多个权限)   
 		Iterator<ConfigAttribute> ite = configAttributes.iterator();
 		
@@ -70,7 +95,7 @@ public class CustomAccessDecisionManager implements AccessDecisionManager{
 					return;
 				}
 			}	
-		}
+		}**/
 		throw new AccessDeniedException("没有权限访问");
 		
 	}	

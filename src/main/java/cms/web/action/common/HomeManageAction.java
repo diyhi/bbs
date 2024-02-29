@@ -2,6 +2,7 @@ package cms.web.action.common;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -59,6 +60,7 @@ import cms.bean.redEnvelope.ReceiveRedEnvelope;
 import cms.bean.report.Report;
 import cms.bean.report.ReportType;
 import cms.bean.setting.SystemSetting;
+import cms.bean.staff.SysUsers;
 import cms.bean.topic.Comment;
 import cms.bean.topic.HideTagType;
 import cms.bean.topic.ImageInfo;
@@ -121,6 +123,7 @@ import cms.web.action.CSRFTokenManage;
 import cms.web.action.TextFilterManage;
 import cms.web.action.favorite.FavoriteManage;
 import cms.web.action.fileSystem.FileManage;
+import cms.web.action.filterWord.SensitiveWordFilterManage;
 import cms.web.action.follow.FollowManage;
 import cms.web.action.follow.FollowerManage;
 import cms.web.action.like.LikeManage;
@@ -134,6 +137,7 @@ import cms.web.action.question.QuestionManage;
 import cms.web.action.redEnvelope.RedEnvelopeManage;
 import cms.web.action.setting.SettingManage;
 import cms.web.action.sms.SmsManage;
+import cms.web.action.staff.StaffManage;
 import cms.web.action.topic.CommentManage;
 import cms.web.action.topic.TopicManage;
 import cms.web.action.user.RoleAnnotation;
@@ -214,6 +218,9 @@ public class HomeManageAction {
 	@Resource RedEnvelopeService redEnvelopeService;
 	@Resource RedEnvelopeManage redEnvelopeManage;
 	@Resource ReportTypeService reportTypeService;
+	@Resource SensitiveWordFilterManage sensitiveWordFilterManage;
+	@Resource StaffManage staffManage;
+	
 	
 	//?  匹配任何单字符
 	//*  匹配0或者任意数量的字符
@@ -1081,6 +1088,20 @@ public class HomeManageAction {
 				error.put("nickname", ErrorView._833.name());//呢称不能和其他用户名相同
 			}
 			
+			User u2 = userService.findUserByAccount(formbean.getNickname().trim());
+			if(u2 != null){
+				error.put("nickname", ErrorView._836.name());//呢称不能和其他账号相同
+			}
+			
+			SysUsers s1 = staffManage.query_cache_findByUserAccount(formbean.getNickname().trim());
+			if(s1 != null){
+				error.put("nickname", ErrorView._837.name());//呢称不能和员工账号相同
+			}
+			SysUsers s2 = staffManage.query_cache_findByNickname(formbean.getNickname().trim());
+			if(s2 != null){
+				error.put("nickname", ErrorView._838.name());//呢称不能和员工呢称相同
+			}
+			
 			List<DisableUserName> disableUserNameList = userService.findAllDisableUserName_cache();
 			if(disableUserNameList != null && disableUserNameList.size() >0){
 				for(DisableUserName disableUserName : disableUserNameList){
@@ -1446,32 +1467,34 @@ public class HomeManageAction {
 					
 					newFileName = UUIDUtil.getUUID32()+ ".png";
 					
-					BufferedImage bufferImage = ImageIO.read(imgFile.getInputStream());  
-		            //获取图片的宽和高  
-		            int srcWidth = bufferImage.getWidth();  
-		            int srcHeight = bufferImage.getHeight();  
-					if(srcWidth > maxWidth){
-						error.put("imgFile",ErrorView._1290.name());//超出最大宽度
-					}
-					if(srcHeight > maxHeight){
-						error.put("imgFile",ErrorView._1300.name());//超出最大高度
-					}
-					if(error.size() == 0){
-						if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
-							String oldPathFile = pathDir +user.getAvatarName();
-							//删除旧头像
-							fileManage.deleteFile(oldPathFile);
-							String oldPathFile_100 = pathDir_100+user.getAvatarName();
-							//删除旧头像100*100
-							fileManage.deleteFile(oldPathFile_100);
+					try (InputStream is = imgFile.getInputStream()){
+						BufferedImage bufferImage = ImageIO.read(is);  
+			            //获取图片的宽和高  
+			            int srcWidth = bufferImage.getWidth();  
+			            int srcHeight = bufferImage.getHeight();  
+						if(srcWidth > maxWidth){
+							error.put("imgFile",ErrorView._1290.name());//超出最大宽度
 						}
-						
-						//保存文件
-						fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
+						if(srcHeight > maxHeight){
+							error.put("imgFile",ErrorView._1300.name());//超出最大高度
+						}
+						if(error.size() == 0){
+							if(user.getAvatarName() != null && !"".equals(user.getAvatarName().trim())){
+								String oldPathFile = pathDir +user.getAvatarName();
+								//删除旧头像
+								fileManage.deleteFile(oldPathFile);
+								String oldPathFile_100 = pathDir_100+user.getAvatarName();
+								//删除旧头像100*100
+								fileManage.deleteFile(oldPathFile_100);
+							}
+							
+							//保存文件
+							fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
 
-						//生成100*100缩略图
-						fileManage.createImage(imgFile.getInputStream(),pathDir_100+newFileName,"png",100,100);
-						
+							//生成100*100缩略图
+							fileManage.createImage(imgFile.getInputStream(),pathDir_100+newFileName,"png",100,100);
+							
+						}
 					}
 				}else{//图片类型
 					//验证文件类型
@@ -1487,38 +1510,38 @@ public class HomeManageAction {
 							fileManage.deleteFile(oldPathFile_100);
 						}
 						
-						
-						BufferedImage bufferImage = ImageIO.read(imgFile.getInputStream());  
-			            //获取图片的宽和高  
-			            int srcWidth = bufferImage.getWidth();  
-			            int srcHeight = bufferImage.getHeight();  
-						
-						//取得文件后缀
-						String suffix = FileUtil.getExtension(fileName).toLowerCase();
-						
-						//构建文件名称
-						newFileName = UUIDUtil.getUUID32()+ "." + suffix;
-						
-						if(srcWidth <=200 && srcHeight <=200){	
-							//保存文件
-							fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
+						try (InputStream is = imgFile.getInputStream()){
+							BufferedImage bufferImage = ImageIO.read(is);  
+				            //获取图片的宽和高  
+				            int srcWidth = bufferImage.getWidth();  
+				            int srcHeight = bufferImage.getHeight();  
 							
-							if(srcWidth <=100 && srcHeight <=100){
+							//取得文件后缀
+							String suffix = FileUtil.getExtension(fileName).toLowerCase();
+							
+							//构建文件名称
+							newFileName = UUIDUtil.getUUID32()+ "." + suffix;
+							
+							if(srcWidth <=200 && srcHeight <=200){	
 								//保存文件
-								fileManage.writeFile(pathDir_100, newFileName,imgFile.getBytes());
-							}else{
-								//生成100*100缩略图
-								fileManage.createImage(imgFile.getInputStream(),pathDir_100+newFileName,suffix,100,100);
+								fileManage.writeFile(pathDir, newFileName,imgFile.getBytes());
 								
-							}
-						}else{
-							//生成200*200缩略图
-							fileManage.createImage(imgFile.getInputStream(),pathDir+newFileName,suffix,x,y,width,height,200,200);
+								if(srcWidth <=100 && srcHeight <=100){
+									//保存文件
+									fileManage.writeFile(pathDir_100, newFileName,imgFile.getBytes());
+								}else{
+									//生成100*100缩略图
+									fileManage.createImage(imgFile.getInputStream(),pathDir_100+newFileName,suffix,100,100);
+									
+								}
+							}else{
+								//生成200*200缩略图
+								fileManage.createImage(imgFile.getInputStream(),pathDir+newFileName,suffix,x,y,width,height,200,200);
 
-							//生成100*100缩略图
-							fileManage.createImage(imgFile.getInputStream(),pathDir_100+newFileName,suffix,x,y,width,height,100,100);   
-						}		
-						
+								//生成100*100缩略图
+								fileManage.createImage(imgFile.getInputStream(),pathDir_100+newFileName,suffix,x,y,width,height,100,100);   
+							}	
+						}
 					}else{
 						error.put("imgFile",ErrorView._1310.name());//当前文件类型不允许上传
 					}
@@ -3058,6 +3081,10 @@ public class HomeManageAction {
 		if(unreadSystemNotifyIdList != null && unreadSystemNotifyIdList.size() >0){
 			//将未读订阅系统通知设置为已读
 			systemNotifyService.updateSubscriptionSystemNotifyStatus(accessUser.getUserId(), unreadSystemNotifyIdList);
+			
+			//删除缓存
+			systemNotifyManage.delete_cache_findMinUnreadSystemNotifyIdByUserId(user.getId());
+			systemNotifyManage.delete_cache_findMaxReadSystemNotifyIdByUserId(user.getId());
 		}
 		
 
@@ -3117,6 +3144,99 @@ public class HomeManageAction {
 			systemNotifyManage.delete_cache_findMinUnreadSystemNotifyIdByUserId(userId);
 			systemNotifyManage.delete_cache_findMaxReadSystemNotifyIdByUserId(userId);
 		}
+	}
+	
+	/**
+	 * 全部系统通知标记为已读
+	 * @param model
+	 * @param jumpUrl 跳转地址   页面post方式提交有效
+	 * @param token 令牌标记
+	 */
+	@RequestMapping(value="/user/control/allSystemNotifyMarkAsRead", method=RequestMethod.POST)
+	public String allSystemNotifyMarkAsRead(ModelMap model,String jumpUrl,String token,
+			RedirectAttributes redirectAttrs,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		
+		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+		Map<String,String> error = new HashMap<String,String>();//错误
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.getCloseSite().equals(2)){
+			error.put("systemNotify", ErrorView._21.name());//只读模式不允许提交数据
+		}
+		
+		//处理CSRF令牌
+		csrfTokenManage.processCsrfToken(request, token,error);
+			
+
+		//获取登录用户
+	  	AccessUser accessUser = AccessUserThreadLocal.get();
+	  	
+	 
+
+		if(error.size() == 0){
+			int i = systemNotifyService.updateAllSubscriptionSystemNotifyStatus(accessUser.getUserId());
+			
+			//删除缓存
+			systemNotifyManage.delete_cache_findMinUnreadSystemNotifyIdByUserId(accessUser.getUserId());
+			systemNotifyManage.delete_cache_findMaxReadSystemNotifyIdByUserId(accessUser.getUserId());
+
+		}
+		
+		Map<String,String> returnError = new HashMap<String,String>();//错误
+		if(error.size() >0){
+			//将枚举数据转为错误提示字符
+    		for (Map.Entry<String,String> entry : error.entrySet()) {
+    			if(ErrorView.get(entry.getValue()) != null){
+    				returnError.put(entry.getKey(),  ErrorView.get(entry.getValue()));
+    			}else{
+    				returnError.put(entry.getKey(),  entry.getValue());
+    			}
+    			
+			}
+		}
+		
+		if(isAjax == true){
+    		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
+    		
+    		if(error != null && error.size() >0){
+    			returnValue.put("success", "false");
+    			returnValue.put("error", returnError);
+    		}else{
+    			returnValue.put("success", "true");
+    			
+    		}
+
+    		WebUtil.writeToWeb(JsonUtils.toJSONString(returnValue), "json", response);
+			return null;
+		}else{
+			String dirName = templateService.findTemplateDir_cache();
+			String accessPath = accessSourceDeviceManage.accessDevices(request);
+			if(error != null && error.size() >0){//如果有错误
+				
+				for (Map.Entry<String,String> entry : returnError.entrySet()) {		 
+					model.addAttribute("message",entry.getValue());//提示
+		  			return "/templates/"+dirName+"/"+accessPath+"/message";
+				}
+					
+			}
+			
+			
+			if(jumpUrl != null && !"".equals(jumpUrl.trim())){
+				String url = Base64.decodeBase64URL(jumpUrl.trim());
+				return "redirect:"+url;
+			}else{//默认跳转
+				model.addAttribute("message", "全部系统通知标记为已读成功");
+				String referer = request.getHeader("referer");
+				if(RefererCompare.compare(request, "login")){//如果是登录页面则跳转到首页
+					referer = Configuration.getUrl(request);
+				}
+				model.addAttribute("urlAddress", referer);
+				
+				return "/templates/"+dirName+"/"+accessPath+"/jump";	
+			}
+		}
+		
 	}
 	
 	
@@ -3311,79 +3431,265 @@ public class HomeManageAction {
 	  	AccessUser accessUser = AccessUserThreadLocal.get();
 	  	
 	  	
-		//调用分页算法代码
-		PageView<Remind> pageView = new PageView<Remind>(settingService.findSystemSetting_cache().getForestagePageNumber(),pageForm.getPage(),10,request.getRequestURI(),request.getQueryString());
-		//当前页
-		int firstIndex = (pageForm.getPage()-1)*pageView.getMaxresult();
-		
-		//用户Id集合
-		Set<Long> userIdList = new HashSet<Long>();
-		//用户集合
-		Map<Long,User> userMap = new HashMap<Long,User>();
-		
-		//未读提醒Id集合
-		List<String> unreadRemindIdList = new ArrayList<String>();
-		
-		
-		QueryResult<Remind> qr = remindService.findRemindByUserId(accessUser.getUserId(),100,firstIndex,pageView.getMaxresult());
-		if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
-			for(Remind remind : qr.getResultlist()){
-				userIdList.add(remind.getSenderUserId());//发送用户Id
-				
-				if(remind .getStatus().equals(10)){
-					unreadRemindIdList.add(remind.getId());
-				}
-				
-				remind.setSendTime(new Timestamp(remind.getSendTimeFormat()));
-				if(remind.getReadTimeFormat() != null){
-					remind.setReadTime(new Timestamp(remind.getReadTimeFormat()));
-				}
-				
-				if(remind.getTopicId() != null && remind.getTopicId() >0L){
-					Topic topic = topicManage.queryTopicCache(remind.getTopicId());//查询缓存
-					if(topic != null){
-						remind.setTopicTitle(topic.getTitle());
-					}
-					
-				}
-				if(remind.getQuestionId() != null && remind.getQuestionId() >0L){
-					Question question = questionManage.query_cache_findById(remind.getQuestionId());//查询缓存
-					if(question != null){
-						remind.setQuestionTitle(question.getTitle());
-					}
-					
-				}
-				
-				
-			}
+	  	//调用分页算法代码
+  		PageView<Remind> pageView = new PageView<Remind>(settingService.findSystemSetting_cache().getForestagePageNumber(),pageForm.getPage(),10,request.getRequestURI(),request.getQueryString());
+  		//当前页
+  		int firstIndex = (pageForm.getPage()-1)*pageView.getMaxresult();
+  		
+  		//用户Id集合
+  		Set<Long> userIdList = new HashSet<Long>();
+  		//用户集合
+  		Map<Long,User> userMap = new HashMap<Long,User>();
+  		
+  		//未读提醒Id集合
+  		List<String> unreadRemindIdList = new ArrayList<String>();
+  		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+  		
+  		
+  		List<Tag> tagList = tagService.findAllTag_cache();
+  		Map<Long,List<String>> tagRoleNameMap = new HashMap<Long,List<String>>();//标签角色名称 key:标签Id 角色名称集合
+  		Map<Long,Boolean> userViewPermissionMap = new HashMap<Long,Boolean>();//用户如果对话题项是否有查看权限  key:标签Id value:是否有查看权限
+  		Map<Long,Long> tagMap = new HashMap<Long,Long>();//话题标签  key:话题Id value:标签Id
+  		
+  		QueryResult<Remind> qr = remindService.findRemindByUserId(accessUser.getUserId(),100,firstIndex,pageView.getMaxresult());
+  		if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
+  			for(Remind remind : qr.getResultlist()){
+  				userIdList.add(remind.getSenderUserId());//发送用户Id
+  				
+  				if(remind .getStatus().equals(10)){
+  					unreadRemindIdList.add(remind.getId());
+  				}
+  				
+  				remind.setSendTime(new Timestamp(remind.getSendTimeFormat()));
+  				if(remind.getReadTimeFormat() != null){
+  					remind.setReadTime(new Timestamp(remind.getReadTimeFormat()));
+  				}
+  				
+  				
+  				
+  				
+  				if(remind.getTopicId() != null && remind.getTopicId() >0L){
+  					Topic topic = topicManage.queryTopicCache(remind.getTopicId());//查询缓存
+  					if(topic != null){
+  						remind.setTopicTitle(topic.getTitle());
+  						if(topic.getStatus().equals(20)){
+  							
+  							if(remind.getTypeCode().equals(60)//60:别人解锁了我的话题
+  									|| remind.getTypeCode().equals(70)//70.别人点赞了我的话题
+  								){
+  								remind.setSummary(topic.getSummary());
+  							}
+  							
+  							if(remind.getTypeCode().equals(90)){//90.我关注的人发表了话题
+  								remind.setSummary(topic.getSummary());
+  								if(tagList != null && tagList.size() >0){
+  									for(Tag tag :tagList){
+  										if(topic.getTagId().equals(tag.getId())){
+  											tagRoleNameMap.put(topic.getTagId(), null);
+  											userViewPermissionMap.put(topic.getTagId(), null);
+  											tagMap.put(topic.getId(), topic.getTagId());
+  											break;
+  										}
+  										
+  									}
+  								}
+  							}
+  						}
+  					}
+  					
+  				}
+  				if(remind.getFriendTopicCommentId() != null && remind.getFriendTopicCommentId() >0L){
+  					Comment comment = commentManage.query_cache_findByCommentId(remind.getFriendTopicCommentId());//查询缓存
+  					if(comment != null 
+  							&& comment.getStatus().equals(20)
+  							&& (remind.getTypeCode().equals(10)//10:别人评论了我的话题
+  							|| remind.getTypeCode().equals(30)//30:别人引用了我的评论
+  							|| remind.getTypeCode().equals(100)//100.我关注的人发表了评论
+  						)){
+  						//不含标签内容
+  						String text = textFilterManage.filterText(textFilterManage.specifyHtmlTagToText(comment.getContent()));
+  						//清除空格&nbsp;
+  						String trimSpace = cms.utils.StringUtil.replaceSpace(text).trim();
+  						//摘要
+  						if(trimSpace != null && !"".equals(trimSpace)){
+  							if(systemSetting.isAllowFilterWord()){
+  								String wordReplace = "";
+  								if(systemSetting.getFilterWordReplace() != null){
+  									wordReplace = systemSetting.getFilterWordReplace();
+  								}
+  								trimSpace = sensitiveWordFilterManage.filterSensitiveWord(trimSpace, wordReplace);
+  							}
+  							if(trimSpace.length() >180){
+  								remind.setSummary(trimSpace.substring(0, 180)+"..");
+  							}else{
+  								remind.setSummary(trimSpace+"..");
+  							}
+  						}
+  					}
+  				}
+  				if(remind.getFriendTopicReplyId() != null && remind.getFriendTopicReplyId() >0L){
+  					Reply reply = commentManage.query_cache_findReplyByReplyId(remind.getFriendTopicReplyId());//查询缓存
+  					if(reply != null
+  							&& reply.getStatus().equals(20)
+  							&& (remind.getTypeCode().equals(20)//20:别人回复了我的话题
+  							|| remind.getTypeCode().equals(40)//40:别人回复了我的评论
+  							|| remind.getTypeCode().equals(50)//50:别人回复了我回复过的评论
+  							|| remind.getTypeCode().equals(55)//55:别人回复了我的评论回复
+  							|| remind.getTypeCode().equals(110)//110.我关注的人发表了回复
+  						)){
+  						//清除空格&nbsp;
+  						String trimSpace = cms.utils.StringUtil.replaceSpace(reply.getContent()).trim();
+  						//摘要
+  						if(trimSpace != null && !"".equals(trimSpace)){
+  							if(systemSetting.isAllowFilterWord()){
+  								String wordReplace = "";
+  								if(systemSetting.getFilterWordReplace() != null){
+  									wordReplace = systemSetting.getFilterWordReplace();
+  								}
+  								trimSpace = sensitiveWordFilterManage.filterSensitiveWord(trimSpace, wordReplace);
+  							}
+  							if(trimSpace.length() >180){
+  								remind.setSummary(trimSpace.substring(0, 180)+"..");
+  							}else{
+  								remind.setSummary(trimSpace+"..");
+  							}
+  						}
+  					}
+  				}
+  				
+  				
+  				if(remind.getQuestionId() != null && remind.getQuestionId() >0L){
+  					Question question = questionManage.query_cache_findById(remind.getQuestionId());//查询缓存
+  					if(question != null){
+  						remind.setQuestionTitle(question.getTitle());
+  						if(question.getStatus().equals(20) 
+  								&& remind.getTypeCode().equals(170) //170:我关注的人提了问题
+  								){
+  							remind.setSummary(question.getSummary());
+  						}
+  					}
+  				}
+  				if(remind.getFriendQuestionAnswerId() != null && remind.getFriendQuestionAnswerId() >0L){
+  					Answer answer = answerManage.query_cache_findByAnswerId(remind.getFriendQuestionAnswerId());//查询缓存
+  					if(answer != null 
+  							&& answer.getStatus().equals(20)
+  							&& (remind.getTypeCode().equals(120)//120:别人回答了我的问题
+  							|| remind.getTypeCode().equals(180)//180.我关注的人回答了问题
+  						)){
+  						//不含标签内容
+  						String text = textFilterManage.filterText(textFilterManage.specifyHtmlTagToText(answer.getContent()));
+  						//清除空格&nbsp;
+  						String trimSpace = cms.utils.StringUtil.replaceSpace(text).trim();
+  						//摘要
+  						if(trimSpace != null && !"".equals(trimSpace)){
+  							if(systemSetting.isAllowFilterWord()){
+  								String wordReplace = "";
+  								if(systemSetting.getFilterWordReplace() != null){
+  									wordReplace = systemSetting.getFilterWordReplace();
+  								}
+  								trimSpace = sensitiveWordFilterManage.filterSensitiveWord(trimSpace, wordReplace);
+  							}
+  							if(trimSpace.length() >180){
+  								remind.setSummary(trimSpace.substring(0, 180)+"..");
+  							}else{
+  								remind.setSummary(trimSpace+"..");
+  							}
+  						}
+  					}
+  				}
+  				if(remind.getFriendQuestionReplyId() != null && remind.getFriendQuestionReplyId() >0L){
+  					AnswerReply answerReply = answerManage.query_cache_findReplyByReplyId(remind.getFriendQuestionReplyId());//查询缓存
+  					if(answerReply != null
+  							&& answerReply.getStatus().equals(20)
+  							&& (remind.getTypeCode().equals(130)//130:别人回复了我的问题
+  							|| remind.getTypeCode().equals(140)//140:别人回复了我的答案
+  							|| remind.getTypeCode().equals(150)//150:别人回复了我回复过的答案
+  							|| remind.getTypeCode().equals(160)//160:别人回复了我的答案回复
+  							|| remind.getTypeCode().equals(190)//190.我关注的人发表了答案回复
+  						)){
+  						//清除空格&nbsp;
+  						String trimSpace = cms.utils.StringUtil.replaceSpace(answerReply.getContent()).trim();
+  						//摘要
+  						if(trimSpace != null && !"".equals(trimSpace)){
+  							if(systemSetting.isAllowFilterWord()){
+  								String wordReplace = "";
+  								if(systemSetting.getFilterWordReplace() != null){
+  									wordReplace = systemSetting.getFilterWordReplace();
+  								}
+  								trimSpace = sensitiveWordFilterManage.filterSensitiveWord(trimSpace, wordReplace);
+  							}
+  							if(trimSpace.length() >180){
+  								remind.setSummary(trimSpace.substring(0, 180)+"..");
+  							}else{
+  								remind.setSummary(trimSpace+"..");
+  							}
+  						}
+  					}
+  				}
+  				
+  			}
+  			
+  			
+  			if(tagRoleNameMap != null && tagRoleNameMap.size() >0){
+  				for (Map.Entry<Long, List<String>> entry : tagRoleNameMap.entrySet()) {
+  					List<String> roleNameList = userRoleManage.queryAllowViewTopicRoleName(entry.getKey());
+  					entry.setValue(roleNameList);
+  				}
+  			}
+  			if(userViewPermissionMap != null && userViewPermissionMap.size()>0){
+  				for (Map.Entry<Long,Boolean> entry : userViewPermissionMap.entrySet()) {
+  					//是否有当前功能操作权限
+  					boolean flag = userRoleManage.isPermission(ResourceEnum._1001000,entry.getKey());
+  					entry.setValue(flag);
+  				}
+  			}
+  			
+  			
+  			if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
+  				for(Remind remind : qr.getResultlist()){
+  					//用户如果对话题项无查看权限，则不显示摘要
+  					for (Map.Entry<Long,Boolean> entry : userViewPermissionMap.entrySet()) {
+  						if(entry.getKey().equals(tagMap.get(remind.getTopicId()))
+  								&& remind.getTypeCode().equals(90)//90.我关注的人发表了话题
+  								){
+  							if(entry.getValue() != null && !entry.getValue()){
+  								remind.setSummary("");
+  							}
+  							break;
+  						}
+  						
+  					}
+  				}
+  			}
+  			
 
-			if(userIdList != null && userIdList.size() >0){
-				for(Long userId : userIdList){
-					User user = userManage.query_cache_findUserById(userId);
-					if(user != null){
-						userMap.put(userId, user);
-					}
-				}
-			}
-			if(userMap != null && userMap.size() >0){
-				if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
-					for(Remind remind : qr.getResultlist()){
-						
-						User sender_user = userMap.get(remind.getSenderUserId());
-						if(sender_user != null && sender_user.getCancelAccountTime().equals(-1L)){
-							remind.setSenderUserName(sender_user.getUserName());//发送者用户名称
-							remind.setSenderAccount(sender_user.getAccount());//发送者账号
-							remind.setSenderNickname(sender_user.getNickname());
-							if(sender_user.getAvatarName() != null && !"".equals(sender_user.getAvatarName().trim())){
-								remind.setSenderAvatarPath(fileManage.fileServerAddress(request)+sender_user.getAvatarPath());//发送者头像路径
-								remind.setSenderAvatarName(sender_user.getAvatarName());//发送者头像名称
-							}
-						}
-						
-					}
-				}
-			}
-		}
+  			if(userIdList != null && userIdList.size() >0){
+  				for(Long userId : userIdList){
+  					User user = userManage.query_cache_findUserById(userId);
+  					if(user != null){
+  						userMap.put(userId, user);
+  					}
+  				}
+  			}
+  			if(userMap != null && userMap.size() >0){
+  				if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
+  					for(Remind remind : qr.getResultlist()){
+  						
+  						User sender_user = userMap.get(remind.getSenderUserId());
+  						if(sender_user != null && sender_user.getCancelAccountTime().equals(-1L)){
+  							remind.setSenderUserName(sender_user.getUserName());//发送者用户名称
+  							remind.setSenderAccount(sender_user.getAccount());//发送者账号
+  							remind.setSenderNickname(sender_user.getNickname());
+  							if(sender_user.getAvatarName() != null && !"".equals(sender_user.getAvatarName().trim())){
+  								remind.setSenderAvatarPath(fileManage.fileServerAddress(request)+sender_user.getAvatarPath());//发送者头像路径
+  								remind.setSenderAvatarName(sender_user.getAvatarName());//发送者头像名称
+  							}
+  						}
+  						
+  					}
+  				}
+  			}
+  		}
 		
 		if(unreadRemindIdList != null && unreadRemindIdList.size() >0){
 			//将未读提醒设置为已读
@@ -3401,6 +3707,95 @@ public class HomeManageAction {
 		}else{
 			model.addAttribute("pageView", pageView);
 			return "templates/"+dirName+"/"+accessPath+"/remindList";	
+		}
+	}
+	
+	/**
+	 * 全部提醒状态标记为已读
+	 * @param model
+	 * @param jumpUrl 跳转地址   页面post方式提交有效
+	 * @param token 令牌标记
+	 * @param remindId 提醒Id
+	 */
+	@RequestMapping(value="/user/control/allRemindMarkAsRead", method=RequestMethod.POST)
+	public String allRemindMarkAsRead(ModelMap model,String jumpUrl,String token,
+			RedirectAttributes redirectAttrs,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		
+		boolean isAjax = WebUtil.submitDataMode(request);//是否以Ajax方式提交数据
+		Map<String,String> error = new HashMap<String,String>();//错误
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.getCloseSite().equals(2)){
+			error.put("remind", ErrorView._21.name());//只读模式不允许提交数据
+		}
+		
+		//处理CSRF令牌
+		csrfTokenManage.processCsrfToken(request, token,error);
+			
+		//获取登录用户
+	  	AccessUser accessUser = AccessUserThreadLocal.get();
+	  	
+	
+  		
+		if(error.size() == 0){
+			int i = remindService.updateAllRemindStatus(accessUser.getUserId());
+			//删除提醒缓存
+			remindManage.delete_cache_findUnreadRemindByUserId(accessUser.getUserId());
+		}
+		
+		Map<String,String> returnError = new HashMap<String,String>();//错误
+		if(error.size() >0){
+			//将枚举数据转为错误提示字符
+    		for (Map.Entry<String,String> entry : error.entrySet()) {
+    			if(ErrorView.get(entry.getValue()) != null){
+    				returnError.put(entry.getKey(),  ErrorView.get(entry.getValue()));
+    			}else{
+    				returnError.put(entry.getKey(),  entry.getValue());
+    			}
+    			
+			}
+		}
+		
+		if(isAjax == true){
+    		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
+    		
+    		if(error != null && error.size() >0){
+    			returnValue.put("success", "false");
+    			returnValue.put("error", returnError);
+    		}else{
+    			returnValue.put("success", "true");
+    			
+    		}
+
+    		WebUtil.writeToWeb(JsonUtils.toJSONString(returnValue), "json", response);
+			return null;
+		}else{
+			String dirName = templateService.findTemplateDir_cache();
+			String accessPath = accessSourceDeviceManage.accessDevices(request);
+			if(error != null && error.size() >0){//如果有错误
+				
+				for (Map.Entry<String,String> entry : returnError.entrySet()) {		 
+					model.addAttribute("message",entry.getValue());//提示
+		  			return "/templates/"+dirName+"/"+accessPath+"/message";
+				}
+					
+			}
+			
+			
+			if(jumpUrl != null && !"".equals(jumpUrl.trim())){
+				String url = Base64.decodeBase64URL(jumpUrl.trim());
+				return "redirect:"+url;
+			}else{//默认跳转
+				model.addAttribute("message", "标记全部提醒已读成功");
+				String referer = request.getHeader("referer");
+				if(RefererCompare.compare(request, "login")){//如果是登录页面则跳转到首页
+					referer = Configuration.getUrl(request);
+				}
+				model.addAttribute("urlAddress", referer);
+				
+				return "/templates/"+dirName+"/"+accessPath+"/jump";	
+			}
 		}
 	}
 	
@@ -3962,6 +4357,7 @@ public class HomeManageAction {
 							userDynamic.setTopicTitle(topicInfo.getTitle());
 							userDynamic.setTopicViewTotal(topicInfo.getViewTotal());
 							userDynamic.setTopicCommentTotal(topicInfo.getCommentTotal());
+							userDynamic.setIsMarkdown(topicInfo.getIsMarkdown());
 							
 							List<String> topicRoleNameList = userRoleManage.queryAllowViewTopicRoleName(topicInfo.getTagId());
 							
@@ -4149,6 +4545,7 @@ public class HomeManageAction {
 								comment.setContent(fileManage.processRichTextFilePath(comment.getContent(),"comment"));
 							}
 							userDynamic.setCommentContent(comment.getContent());
+							userDynamic.setIsMarkdown(comment.getIsMarkdown());
 						}
 						
 					}
@@ -4160,6 +4557,7 @@ public class HomeManageAction {
 								comment.setContent(fileManage.processRichTextFilePath(comment.getContent(),"comment"));
 							}
 							userDynamic.setCommentContent(comment.getContent());
+							userDynamic.setIsMarkdown(comment.getIsMarkdown());
 						}
 						Comment quoteComment = commentManage.query_cache_findByCommentId(userDynamic.getQuoteCommentId());
 						if(quoteComment != null && quoteComment.getStatus().equals(20)){
@@ -4185,6 +4583,7 @@ public class HomeManageAction {
 							userDynamic.setQuestionViewTotal(questionInfo.getViewTotal());
 							userDynamic.setQuestionAnswerTotal(questionInfo.getAnswerTotal());
 							userDynamic.setQuestionContent(questionInfo.getContent());
+							userDynamic.setIsMarkdown(questionInfo.getIsMarkdown());
 						}
 						
 					}
@@ -4196,6 +4595,7 @@ public class HomeManageAction {
 								answer.setContent(fileManage.processRichTextFilePath(answer.getContent(),"answer"));
 							}
 							userDynamic.setAnswerContent(answer.getContent());
+							userDynamic.setIsMarkdown(answer.getIsMarkdown());
 						}
 						
 					}

@@ -59,6 +59,15 @@ public interface AnswerService  extends DAO<Answer>{
 	 */
 	public List<String> findAnswerContentByPage(int firstIndex, int maxResult,String userName,boolean isStaff);
 	/**
+	 * 分页查询答案
+	 * @param userName 用户名称
+	 * @param postTime 评论发表时间
+	 * @param firstIndex
+	 * @param maxResult
+	 * @return
+	 */
+	public List<Answer> findAnswerByPage(String userName,Date postTime,int firstIndex, int maxResult);
+	/**
 	 * 保存答案
 	 * @param answer
 	 */
@@ -188,6 +197,15 @@ public interface AnswerService  extends DAO<Answer>{
 	 * @return
 	 */
 	public List<AnswerReply> findByAnswerReplyIdList(List<Long> answerReplyIdList);
+	/**
+	 * 分页查询回复
+	 * @param userName 用户名称
+	 * @param postTime 回复发表时间
+	 * @param firstIndex
+	 * @param maxResult
+	 * @return
+	 */
+	public List<AnswerReply> findReplyByPage(String userName,Date postTime,int firstIndex, int maxResult);
 	/**
 	 * 修改回复
 	 * @param answerReplyId 回复Id

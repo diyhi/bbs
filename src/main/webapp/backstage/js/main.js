@@ -585,6 +585,13 @@ var index_component = {
 			}
 		},
 		
+		//跳转网页
+		jumpPage : function(url) {
+			let baseURL = app.config.globalProperties.$store.state.baseURL;
+			
+			window.location.href=baseURL + url;
+		},
+		
 		//查询后台管理框架页信息
 		queryManageFramework : function() {
 			let _self = this;
@@ -1991,6 +1998,7 @@ var routes = [
 	              			next();
 	              		}
 	              	},//修改员工
+	              	{path : '/admin/control/staff/manage/editSelfInfo',component : () => loadModule('./admin/component/staff/editSelfInfo.vue', options),name:'editSelfInfo',meta: {parent:'2-200300-1',title:'修改员工自身信息'}},//修改员工自身信息
 	              	{path : '/admin/control/staffLoginLog/list',component : () => loadModule('./admin/component/staff/staffLoginLogList.vue', options),name:'staffLoginLogList',meta: {parent:'2-200300-1',title:'员工登录日志'},
 	              		beforeEnter: (to, from, next) => {
 	              			if(from.name == 'staffList'){//如果来自员工列表,则删除缓存
@@ -1999,7 +2007,7 @@ var routes = [
 	              			next();
 	              		}
 	              	},//员工登录日志
-	            	{path : '/admin/control/roles/list',component : () => loadModule('./admin/component/staff/rolesList.vue', options), name:'rolesList',meta: {index:'2-200300-2',title:'角色列表',cacheNumber:'0'}},//角色列表
+	              	{path : '/admin/control/roles/list',component : () => loadModule('./admin/component/staff/rolesList.vue', options), name:'rolesList',meta: {index:'2-200300-2',title:'角色列表',cacheNumber:'0'}},//角色列表
 	            	{path : '/admin/control/acl/manage/addRoles',component : () => loadModule('./admin/component/staff/addRoles.vue', options),name:'addRoles',meta: {parent:'2-200300-2',title:'添加角色'},
 	              		beforeEnter: (to, from, next) => {
 	              			if(from.name == 'rolesList'){//如果来自角色列表,则删除缓存

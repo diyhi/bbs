@@ -27,7 +27,7 @@
 						<div class="editTopic">
 							<el-form label-width="auto"  @submit.native.prevent>
 								<el-form-item label="标题" :required="true" :error="error.title">
-									<el-input v-model.trim="title" maxlength="100" clearable="true" show-word-limit></el-input>
+									<el-input v-model.trim="title" maxlength="150" clearable="true" show-word-limit></el-input>
 								</el-form-item>
 								<el-form-item label="标签" :required="true" :error="error.tagId">
 									<el-select v-model="tagIdGroup" @focus="queryTagList" @change="selectedTag" no-match-text="还没有标签" placeholder="选择标签">
@@ -71,7 +71,7 @@
 		                	<div class="avatar">
 		                		<el-popover effect="light" trigger="hover" placement="top">
 						        	<template #default>
-						        		<p v-if="topic.isStaff == false">呢称: {{topic.nickname}}</p>
+						        		<p v-if="topic.nickname != null && topic.nickname != ''">呢称: {{topic.nickname}}</p>
 							            <p>账号: {{topic.account}}</p>
 							            <p v-if="topic.userRoleNameList != null && topic.userRoleNameList.length >0" >角色: 
 							            	<span class="topicViewModule_topic-wrap_head_topicInfo_userRoleName" v-for="roleName in topic.userRoleNameList" >{{roleName}}</span>
@@ -92,9 +92,12 @@
 						        	
 						        	<template #reference v-if="topic.isStaff == true">
 						        		<div class="avatar-wrapper">
-											<el-badge value="员工" type="warning" class="avatar-badge">
+											<el-badge value="员工" type="warning" class="avatar-badge" v-if="topic.avatarName == null || topic.avatarName == ''">
 												<el-avatar shape="square" :size="64" icon="el-icon-user-solid"></el-avatar>
 											</el-badge>
+											<el-badge value="员工" type="warning" class="avatar-badge" v-if="topic.avatarName != null && topic.avatarName != ''">
+		                                        <el-avatar shape="square" :size="64" :src="topic.avatarPath+'100x100/'+topic.avatarName"></el-avatar>
+		                                    </el-badge>
 										</div>
 						        	</template>
 						        </el-popover>
@@ -143,7 +146,7 @@
 							<div class="avatarBox">
 		                		<el-popover effect="light" trigger="hover" placement="top">
 						        	<template #default>
-						        		<p v-if="comment.isStaff == false">呢称: {{comment.nickname}}</p>
+						        		<p v-if="comment.nickname != null && comment.nickname != ''">呢称: {{comment.nickname}}</p>
 							            <p>账号: {{comment.account}}</p>
 							            <p v-if="comment.userRoleNameList != null && comment.userRoleNameList.length >0" >角色: 
 							            	<span class="topicViewModule_topic-wrap_head_topicInfo_userRoleName" v-for="roleName in comment.userRoleNameList" >{{roleName}}</span>
@@ -164,9 +167,12 @@
 						        	
 						        	<template #reference v-if="comment.isStaff == true">
 						        		<div class="avatar-wrapper">
-											<el-badge value="员工" type="warning" class="avatar-badge">
+											<el-badge value="员工" type="warning" class="avatar-badge" v-if="comment.avatarName == null || comment.avatarName == ''">
 												<el-avatar shape="square" :size="64" icon="el-icon-user-solid"></el-avatar>
 											</el-badge>
+											<el-badge value="员工" type="warning" class="avatar-badge" v-if="comment.avatarName != null && comment.avatarName != ''">
+		                                        <el-avatar shape="square" :size="64" :src="comment.avatarPath+'100x100/'+comment.avatarName"></el-avatar>
+		                                    </el-badge>
 										</div>
 						        	</template>
 						        </el-popover>
@@ -214,7 +220,7 @@
 											    	<div class="avatarBox">
 								                		<el-popover effect="light" trigger="hover" placement="top">
 												        	<template #default>
-												        		<p v-if="reply.isStaff == false">呢称: {{reply.nickname}}</p>
+												        		<p v-if="reply.nickname != null && reply.nickname != ''">呢称: {{reply.nickname}}</p>
 													            <p>账号: {{reply.account}}</p>
 													            <p v-if="reply.userRoleNameList != null && reply.userRoleNameList.length >0" >角色: 
 													            	<span class="topicViewModule_topic-wrap_head_topicInfo_userRoleName" v-for="roleName in reply.userRoleNameList" >{{roleName}}</span>
@@ -235,8 +241,11 @@
 												        	
 												        	<template #reference v-if="reply.isStaff == true">
 												        		<div class="avatar-wrapper">
-																	<el-badge value="员工" type="warning" class="avatar-badge">
+																	<el-badge value="员工" type="warning" class="avatar-badge" v-if="reply.avatarName == null || reply.avatarName == ''">
 																		<el-avatar shape="square" :size="48" icon="el-icon-user-solid"></el-avatar>
+																	</el-badge>
+																	<el-badge value="员工" type="warning" class="avatar-badge" v-if="reply.avatarName != null && reply.avatarName != ''">
+																		<el-avatar shape="square" :size="48" :src="reply.avatarPath+'100x100/'+reply.avatarName"></el-avatar>
 																	</el-badge>
 																</div>
 												        	</template>
@@ -246,17 +255,15 @@
 												    	<h2 class="clearfix" >
 												    		
 												        	<div class="userName">
-												        		{{reply.account}}
 												        		<div class="nickname" >
 												        			{{reply.nickname}}
 												        			<i class="userRoleName" v-for="roleName in reply.userRoleNameList" >{{roleName}}</i>
 																    <i class="master" v-if="reply.userName == topic.userName && reply.isStaff == topic.isStaff">作者</i>
 												        		</div>
+												        		<div class="account" >{{reply.account}}<span class="time">{{reply.postTime}}</span></div>
 												        	</div>
 												        	
 												        </h2>
-							                        	
-							                          	<div class="time clearfix">{{reply.postTime}}</div>
 							                        </span>
 							                        <span class="friendInfo" v-if="reply.friendUserName != null && reply.friendUserName != ''">
 	                                                    <span class="arrow">
@@ -265,7 +272,7 @@
 	                                                    <div class="friendAvatarBox">
 	                                                        <el-popover effect="light" trigger="hover" placement="top">
 	                                                            <template #default>
-	                                                                <p v-if="reply.isFriendStaff == false">呢称: {{reply.friendNickname}}</p>
+	                                                                <p v-if="reply.friendNickname != null && reply.friendNickname != ''">呢称: {{reply.friendNickname}}</p>
 	                                                                <p>账号: {{reply.friendAccount}}</p>
 	                                                            </template>
 	                                                            <template #reference v-if="reply.isFriendStaff == false">
@@ -281,9 +288,12 @@
 	                                                            
 	                                                            <template #reference v-if="reply.isFriendStaff == true">
 	                                                                <div class="avatar-wrapper">
-	                                                                    <el-badge value="员工" type="warning" class="avatar-badge">
+	                                                                    <el-badge value="员工" type="warning" class="avatar-badge" v-if="reply.friendAvatarName == null || reply.friendAvatarName == ''">
 	                                                                        <el-avatar shape="square" :size="48" icon="el-icon-user-solid"></el-avatar>
 	                                                                    </el-badge>
+	                                                                    <el-badge value="员工" type="warning" class="avatar-badge" v-if="reply.friendAvatarName != null && reply.friendAvatarName != ''">
+																			<el-avatar shape="square" :size="48" :src="reply.friendAvatarPath+'100x100/'+reply.friendAvatarName"></el-avatar>
+																		</el-badge>
 	                                                                </div>
 	                                                            </template>
 	                                                        </el-popover>
@@ -907,7 +917,7 @@ export default({
 											    avatarHtml += 		   	"<template #default>";
 												
 												
-												if(quote.isStaff == false){
+												if(quote.nickname  != null && quote.nickname != ''){
 											   	//	avatarHtml += 			"<p>呢称: "+quote.nickname+"</p>";
 											   		avatarHtml += 			"<p>呢称: "+escapeHtml(quote.nickname)+"</p>";
 												}   	
@@ -941,9 +951,16 @@ export default({
 											    if(quote.isStaff == true){
 											   		avatarHtml += 			"<template #reference>";
 											   		avatarHtml += 				"<div class=\"avatar-wrapper\" >";   		
-											   		avatarHtml += 					"<el-badge value=\"员工\" type=\"warning\" class=\"avatar-badge\">";
-											   		avatarHtml += 						"<el-avatar shape=\"square\" :size=\"40\" icon=\"el-icon-user-solid\"></el-avatar>";
-											   		avatarHtml += 					"</el-badge>";
+											   		if(quote.avatarName == null || quote.avatarName == ''){
+												   		avatarHtml += 					"<el-badge value=\"员工\" type=\"warning\" class=\"avatar-badge\">";
+												   		avatarHtml += 						"<el-avatar shape=\"square\" :size=\"40\" icon=\"el-icon-user-solid\"></el-avatar>";
+												   		avatarHtml += 					"</el-badge>";
+											   		}
+											   		if(quote.avatarName != null && quote.avatarName != ''){
+											   			avatarHtml += 					"<el-badge value=\"员工\" type=\"warning\" class=\"avatar-badge\">";
+												   		avatarHtml += 					"<el-avatar shape=\"square\" :size=\"40\" src=\""+quote.avatarPath+"100x100/"+quote.avatarName+"\"></el-avatar>";
+												   		avatarHtml += 					"</el-badge>";
+											   		}
 											   		avatarHtml += 				"</div>";
 											   		avatarHtml += 			"</template>";
 												} 
@@ -956,7 +973,7 @@ export default({
 											    avatarHtml += 				""+quote.account+"";
 											    avatarHtml += 				"<div class=\"nickname\" >";
 											    
-											    if(quote.isStaff == false){
+											    if(quote.nickname != null && quote.nickname !=''){
 											    	avatarHtml += 					""+escapeHtml(quote.nickname)+"";
 											    }
 											   
@@ -1696,7 +1713,7 @@ export default({
 			
 			_self.$ajax({
 		        method: 'post',
-		        url: 'control/comment/manage?method=add',
+		        url: 'control/comment/manage?method=addComment',
 		        data: formData
 			})
 			.then(function (response) {
@@ -1756,7 +1773,7 @@ export default({
 			
 			this.$ajax.get('control/comment/manage', {
 			    params: {
-			    	method : 'edit',
+			    	method : 'editComment',
 			    	commentId: comment.id,
 			    }
 			})
@@ -1881,7 +1898,7 @@ export default({
 			
 			_self.$ajax({
 		        method: 'post',
-		        url: 'control/comment/manage?method=edit',
+		        url: 'control/comment/manage?method=editComment',
 		        data: formData
 			})
 			.then(function (response) {
@@ -2542,7 +2559,7 @@ export default({
 		    	
 				this.$ajax({
 			        method: 'post',
-			        url: 'control/comment/manage?method=delete',
+			        url: 'control/comment/manage?method=deleteComment',
 			        data: formData
 				})
 				.then(function (response) {

@@ -131,21 +131,38 @@ public class StaffServiceBean extends DaoSupport implements StaffService {
 		return query.getResultList();					
 	}
 	/**
-	 * 根据用户账号返回SysUsers实例对象。
-	 *@param userAccount 用户账号，比如admin等。
+	 * 根据员工账号返回SysUsers实例对象。
+	 *@param account 员工账号，比如admin等。
 	 *@return SysUsers实例对象。
 	 */
 	@Transactional(readOnly=true,propagation=Propagation.NOT_SUPPORTED)
-	public SysUsers findByUserAccount(String userAccount){
+	public SysUsers findByUserAccount(String account){
 		Query query = em.createQuery("" +
 				"select o from SysUsers o where o.userAccount=?1");
-				query.setParameter(1, userAccount);
+				query.setParameter(1, account);
 		List<SysUsers> list = query.getResultList();
-		SysUsers sysUsers = null;
 		for(SysUsers su :list){
-			sysUsers = su;
+			return su;
 		}
-		return sysUsers;
+		return null;
+	}
+	
+	/**
+	 * 根据员工呢称返回SysUsers实例对象。
+	 *@param nickname 呢称
+	 *@return SysUsers实例对象。
+	 */
+	@Transactional(readOnly=true,propagation=Propagation.NOT_SUPPORTED)
+	public SysUsers findByNickname(String nickname){
+		Query query = em.createQuery("" +
+				"select o from SysUsers o where o.nickname=?1");
+				query.setParameter(1, nickname);
+		List<SysUsers> list = query.getResultList();
+		
+		for(SysUsers su :list){
+			return su;
+		}
+		return null;
 	}
 	
 	/**
@@ -212,6 +229,15 @@ public class StaffServiceBean extends DaoSupport implements StaffService {
 			}
 		}
 			
+	}
+	
+	/**
+	 * 修改员工
+	 * @param sysUsers 用户
+	 */
+	public void updateUser(SysUsers sysUsers){
+		//修改员工
+		this.update(sysUsers);		
 	}
 	/**
 	 * 删除员工

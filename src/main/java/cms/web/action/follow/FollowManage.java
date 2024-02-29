@@ -10,12 +10,17 @@ import javax.annotation.Resource;
 
 import cms.bean.follow.Follow;
 import cms.bean.message.Remind;
+import cms.bean.question.Answer;
+import cms.bean.question.AnswerReply;
+import cms.bean.question.Question;
 import cms.bean.topic.Comment;
 import cms.bean.topic.Reply;
 import cms.bean.topic.Topic;
 import cms.bean.user.User;
 import cms.service.follow.FollowService;
 import cms.service.message.RemindService;
+import cms.service.question.AnswerService;
+import cms.service.question.QuestionService;
 import cms.service.topic.CommentService;
 import cms.service.topic.TopicService;
 import cms.utils.UUIDUtil;
@@ -33,7 +38,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 /**
- * 关注管理
+ * 关注组件
  *
  */
 @Component("followManage")
@@ -48,6 +53,9 @@ public class FollowManage {
     @Resource RemindManage remindManage;
     @Resource CommentService commentService;
     @Lazy @Resource FollowManage followManage;
+    
+    @Resource QuestionService questionService;
+    @Resource AnswerService answerService;
     
 	/**
 	 * 取得关注Id的用户Id(后N位)
@@ -155,6 +163,13 @@ public class FollowManage {
 				Date comment_sendTime = follow.getAddtime();
 				//最近回复发送时间
 				Date reply_sendTime = follow.getAddtime();
+				
+				//最近问题发送时间
+				Date question_sendTime = follow.getAddtime();
+				//最近答案发送时间
+				Date answer_sendTime = follow.getAddtime();
+				//最近答案回复发送时间
+				Date answerReply_sendTime = follow.getAddtime();
 
 				User user = userManage.query_cache_findUserByUserName(follow.getFriendUserName());
 				if(user != null){
@@ -180,6 +195,31 @@ public class FollowManage {
 					}
 					//发送回复提醒
 					this.sendReply(userId,userName,user.getId(),follow.getFriendUserName(),reply_sendTime);
+					
+					
+					Remind remind_170 =  remindService.findNewRemindByUserId(userId,170);//170:我关注的人提了问题 
+					if(remind_170 != null){
+						question_sendTime = new Timestamp(remind_170.getSendTimeFormat());
+					}
+					//发送问题提醒
+					this.sendQuestion(userId,userName,user.getId(),follow.getFriendUserName(),question_sendTime);
+					
+					Remind remind_180 =  remindService.findNewRemindByUserId(userId,180);//180.我关注的人回答了问题
+					if(remind_180 != null){
+						answer_sendTime = new Timestamp(remind_180.getSendTimeFormat());
+					}
+					//发送答案提醒
+					this.sendAnswer(userId,userName,user.getId(),follow.getFriendUserName(),answer_sendTime);
+					
+					
+					
+					Remind remind_190 =  remindService.findNewRemindByUserId(userId,190);//190.我关注的人发表了答案回复
+					if(remind_190 != null){
+						answerReply_sendTime = new Timestamp(remind_190.getSendTimeFormat());
+					}
+					//发送答案回复提醒
+					this.sendAnswerReply(userId,userName,user.getId(),follow.getFriendUserName(),answerReply_sendTime);
+					
 				}
 			}
 		}
@@ -283,7 +323,7 @@ public class FollowManage {
 	 * @param userName 用户名称
 	 * @param friendUserId 对方用户Id
 	 * @param friendUserName 对方用户名称
-	 * @param postTime 评论发表时间
+	 * @param postTime 评论回复发表时间
 	 */
 	private void sendReply(Long userId,String userName,Long friendUserId,String friendUserName,Date postTime){
 		
@@ -314,6 +354,154 @@ public class FollowManage {
 				
 				remind.setFriendTopicCommentId(reply.getCommentId());//对方的话题评论Id
 				remind.setFriendTopicReplyId(reply.getId());//对方的话题回复Id
+				
+				
+				Object remind_object = remindManage.createRemindObject(remind);
+				remindService.saveRemind(remind_object);
+				
+				//删除提醒缓存
+				remindManage.delete_cache_findUnreadRemindByUserId(userId);
+				
+			}
+
+			page++;
+		}
+	}
+	
+	
+	
+	
+	/**
+	 * 发送问题提醒
+	 * @param userId 用户Id
+	 * @param userName 用户名称
+	 * @param friendUserId 对方用户Id
+	 * @param friendUserName 对方用户名称
+	 * @param postTime 问题发表时间
+	 */
+	private void sendQuestion(Long userId,String userName,Long friendUserId,String friendUserName,Date postTime){
+		int page = 1;//分页 当前页
+		int maxresult = 200;// 每页显示记录数
+
+				
+		while(true){
+			//当前页
+			int firstindex = (page-1)*maxresult;
+			//查询问题
+			List<Question> questionList = questionService.findQuestionByPage(friendUserName,postTime,firstindex, maxresult);
+			
+			if(questionList == null || questionList.size() == 0){
+				break;
+			}
+			
+			
+			
+			//提交提醒
+			for(Question question : questionList){
+				Remind remind = new Remind();
+				remind.setId(remindManage.createRemindId(userId));
+				remind.setReceiverUserId(userId);//接收提醒用户Id
+				remind.setSenderUserId(friendUserId);//发送用户Id
+				remind.setTypeCode(170);//170:我关注的人提了问题
+				remind.setSendTimeFormat(question.getPostTime().getTime());//发送时间格式化
+				remind.setQuestionId(question.getId());//问题Id
+				
+				Object remind_object = remindManage.createRemindObject(remind);
+				remindService.saveRemind(remind_object);
+				
+				//删除提醒缓存
+				remindManage.delete_cache_findUnreadRemindByUserId(userId);
+			}
+
+			page++;
+		}
+	}
+	
+	
+	
+	/**
+	 * 发送答案提醒
+	 * @param userId 用户Id
+	 * @param userName 用户名称
+	 * @param friendUserId 对方用户Id
+	 * @param friendUserName 对方用户名称
+	 * @param postTime 答案发表时间
+	 */
+	private void sendAnswer(Long userId,String userName,Long friendUserId,String friendUserName,Date postTime){
+		int page = 1;//分页 当前页
+		int maxresult = 200;// 每页显示记录数
+		
+		while(true){
+			//当前页
+			int firstindex = (page-1)*maxresult;
+			//查询答案
+			List<Answer> answerList = answerService.findAnswerByPage(friendUserName,postTime,firstindex, maxresult);
+			if(answerList == null || answerList.size() == 0){
+				break;
+			}
+			
+			
+			
+			//提交提醒
+			for(Answer answer : answerList){
+				Remind remind = new Remind();
+				remind.setId(remindManage.createRemindId(userId));
+				remind.setReceiverUserId(userId);//接收提醒用户Id
+				remind.setSenderUserId(friendUserId);//发送用户Id
+				remind.setTypeCode(180);//180.我关注的人回答了问题
+				remind.setSendTimeFormat(answer.getPostTime().getTime());//发送时间格式化
+				remind.setQuestionId(answer.getQuestionId());//答案Id
+				remind.setFriendQuestionAnswerId(answer.getId());//对方的问题答案Id
+				
+				Object remind_object = remindManage.createRemindObject(remind);
+				remindService.saveRemind(remind_object);
+				
+				//删除提醒缓存
+				remindManage.delete_cache_findUnreadRemindByUserId(userId);
+				
+			}
+
+			page++;
+		}
+	}
+	
+	/**
+	 * 发送答案回复提醒
+	 * @param userId 用户Id
+	 * @param userName 用户名称
+	 * @param friendUserId 对方用户Id
+	 * @param friendUserName 对方用户名称
+	 * @param postTime 答案回复发表时间
+	 */
+	private void sendAnswerReply(Long userId,String userName,Long friendUserId,String friendUserName,Date postTime){
+		
+		int page = 1;//分页 当前页
+		int maxresult = 200;// 每页显示记录数
+		
+		while(true){
+			//当前页
+			int firstindex = (page-1)*maxresult;
+			//查询答案回复
+			List<AnswerReply> replyList = answerService.findReplyByPage(friendUserName,postTime,firstindex, maxresult);
+			if(replyList == null || replyList.size() == 0){
+				break;
+			}
+			
+			
+			
+			//提交提醒
+			for(AnswerReply reply : replyList){
+				Remind remind = new Remind();
+				remind.setId(remindManage.createRemindId(userId));
+				remind.setReceiverUserId(userId);//接收提醒用户Id
+				remind.setSenderUserId(friendUserId);//发送用户Id
+				remind.setTypeCode(190);//190.我关注的人发表了答案回复
+				remind.setSendTimeFormat(reply.getPostTime().getTime());//发送时间格式化
+				remind.setQuestionId(reply.getQuestionId());//问题Id
+				
+				
+				remind.setFriendQuestionAnswerId(reply.getAnswerId());//对方的问题答案Id
+				remind.setFriendQuestionReplyId(reply.getId());//对方的问题回复Id
 				
 				
 				Object remind_object = remindManage.createRemindObject(remind);

@@ -144,7 +144,7 @@ export default({
 			
 			_self.$ajax({
 		        method: 'post',
-		        url: 'control/systemSetting/manage?method=rebuildTopicIndex',
+		        url: 'control/systemSetting/manage?method=rebuildTopicIndex&a=a',//a=a参数的作用是仅增加连接符&
 		        data: formData
 			})
 			.then(function (response) {
@@ -200,7 +200,7 @@ export default({
   			
   			_self.$ajax({
   		        method: 'post',
-  		        url: 'control/systemSetting/manage?method=rebuildQuestionIndex',
+  		        url: 'control/systemSetting/manage?method=rebuildQuestionIndex&a=a',//a=a参数的作用是仅增加连接符&
   		        data: formData
   			})
   			.then(function (response) {
@@ -282,7 +282,7 @@ export default({
   			
   			_self.$ajax({
   		        method: 'post',
-  		        url: 'control/systemSetting/manage?method=updateDatabasePassword',
+  		        url: 'control/systemSetting/manage?method=updateDatabasePassword&a=a',//a=a参数的作用是仅增加连接符&
   		        data: formData
   			})
   			.then(function (response) {
@@ -339,7 +339,7 @@ export default({
 			
 			_self.$ajax({
 		        method: 'post',
-		        url: 'control/systemSetting/manage?method=clearAllCache',
+		        url: 'control/systemSetting/manage?method=clearAllCache&a=a',//a=a参数的作用是仅增加连接符&
 		        data: formData
 			})
 			.then(function (response) {
@@ -396,7 +396,7 @@ export default({
   			
   			_self.$ajax({
   		        method: 'post',
-  		        url: 'control/systemSetting/manage?method=deletePageViewData',
+  		        url: 'control/systemSetting/manage?method=deletePageViewData&a=a',//a=a参数的作用是仅增加连接符&
   		        data: formData
   			})
   			.then(function (response) {
@@ -452,7 +452,7 @@ export default({
   			
   			_self.$ajax({
   		        method: 'post',
-  		        url: 'control/systemSetting/manage?method=deleteUserLoginLogData',
+  		        url: 'control/systemSetting/manage?method=deleteUserLoginLogData&a=a',//a=a参数的作用是仅增加连接符&
   		        data: formData
   			})
   			.then(function (response) {

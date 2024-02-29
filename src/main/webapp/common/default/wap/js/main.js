@@ -515,6 +515,10 @@ var index_component = Vue.extend({
 								tagNameList.push(tagList[j].name);
 								if(_self.tagId == tagList[j].id){
 									_self.tagName = tagList[j].name;
+									
+									document.title = _self.tagName;
+									document.getElementsByName('keywords')[0].content = _self.tagName;
+									document.getElementsByName('description')[0].content = _self.tagName;
 									break;
 								}
 							}
@@ -958,6 +962,12 @@ var index_component = Vue.extend({
 			if(values[0] != null){
 				this.topicTagId = values[0].id;//发表话题标签Id
 				this.topicTagName = values[0].name;//发表话题标签名称
+			}
+			
+			if(this.tagName == '' ){
+				document.title = document.getElementsByName('_title')[0].content;
+				document.getElementsByName('keywords')[0].content  = "";
+				document.getElementsByName('description')[0].content  = "";
 			}
 		},
 		
@@ -1435,7 +1445,16 @@ var thread_component = Vue.extend({
 						
 							_self.topic = topic;
 							
-							
+							document.title = (topic.title != null ? topic.title : '');
+							 
+							 if(topic.summary != null && topic.summary != ""){
+								 let description = topic.summary;
+								 if(topic.summary.length >120){
+									 description = topic.summary.substring(0,120);
+								 }
+								 document.getElementsByName('keywords')[0].content = (topic.title != null ? topic.title : '');
+								 document.getElementsByName('description')[0].content = description;
+							 }
 							
 							_self.$nextTick(function() {
 								setTimeout(function() {
@@ -4521,6 +4540,19 @@ var askList_component = Vue.extend({
 			_self.queryAllTag();
 		},
 		
+		//关闭标签
+		closeTagChange : function() {
+			var _self = this;
+			
+			_self.popup_allTag = false;
+
+			if(_self.questionTagName == '' ){
+				document.title = document.getElementsByName('_title')[0].content;
+				document.getElementsByName('keywords')[0].content  = "";
+				document.getElementsByName('description')[0].content  = "";
+			}
+		},
+		
 		
 		//查询所有标签
 		queryAllTag : function() {
@@ -4534,6 +4566,11 @@ var askList_component = Vue.extend({
 				success : function success(result) {
 					if (result != "") {
 						var tagList = $.parseJSON(result);
+						
+						document.title = "";
+						document.getElementsByName('keywords')[0].content  = "";
+						document.getElementsByName('description')[0].content  = "";
+						
 						if (tagList != null && tagList.length > 0) {
 							_self.allTagList = tagList;
 							
@@ -4541,6 +4578,10 @@ var askList_component = Vue.extend({
 								var questionTag = tagList[i];
 								if(_self.questionTagId == questionTag.id){
 									_self.questionTagName = questionTag.name;
+									
+									document.title = questionTag.name;
+									document.getElementsByName('keywords')[0].content = questionTag.name;
+									document.getElementsByName('description')[0].content = questionTag.name;
 									break;
 								}
 								if (questionTag.childTag != null && questionTag.childTag.length > 0) {
@@ -4548,6 +4589,10 @@ var askList_component = Vue.extend({
 										var childQuestionTag = questionTag.childTag[j];
 										if(_self.questionTagId == childQuestionTag.id){
 											_self.questionTagName = childQuestionTag.name;
+											
+											document.title = childQuestionTag.name;
+											document.getElementsByName('keywords')[0].content = childQuestionTag.name;
+											document.getElementsByName('description')[0].content = childQuestionTag.name;
 											break;
 										}
 									}
@@ -4823,7 +4868,17 @@ var question_component = Vue.extend({
 							
 							_self.question = question;
 				
-							
+							document.title = (question.title != null ? question.title : '');
+							 
+							 if(question.summary != null && question.summary != ""){
+								 let description = question.summary;
+								 if(question.summary.length >120){
+									 description = question.summary.substring(0,120);
+								 }
+								 document.getElementsByName('keywords')[0].content = (question.title != null ? question.title : '');
+								 document.getElementsByName('description')[0].content = description;
+							 }
+							 
 							//生成首字符头像
 							_self.$nextTick(function() {
 								if(_self.question.avatarName == null || _self.question.avatarName == ''){

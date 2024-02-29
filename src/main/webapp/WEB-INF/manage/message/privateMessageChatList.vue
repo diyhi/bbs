@@ -228,7 +228,7 @@ export default({
 	        	
 				this.$ajax({
 			        method: 'post',
-			        url: 'control/privateMessage/manage?method=reductionPrivateMessage',
+			       	url: 'control/privateMessage/manage?method=reductionPrivateMessage&a=a',//a=a参数的作用是仅增加连接符&
 			        data: formData
 				})
 				.then(function (response) {

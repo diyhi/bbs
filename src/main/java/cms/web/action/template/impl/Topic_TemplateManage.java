@@ -22,6 +22,7 @@ import cms.bean.PageForm;
 import cms.bean.PageView;
 import cms.bean.QueryResult;
 import cms.bean.setting.SystemSetting;
+import cms.bean.staff.SysUsers;
 import cms.bean.template.Forum;
 import cms.bean.template.Forum_CommentRelated_Comment;
 import cms.bean.template.Forum_TopicRelated_HotTopic;
@@ -55,6 +56,7 @@ import cms.web.action.fileSystem.FileManage;
 import cms.web.action.lucene.TopicLuceneManage;
 import cms.web.action.mediaProcess.MediaProcessQueueManage;
 import cms.web.action.setting.SettingManage;
+import cms.web.action.staff.StaffManage;
 import cms.web.action.topic.CommentManage;
 import cms.web.action.topic.HotTopicManage;
 import cms.web.action.topic.TopicManage;
@@ -88,6 +90,8 @@ public class Topic_TemplateManage {
 	@Resource FileManage fileManage;
 	@Resource MediaProcessQueueManage mediaProcessQueueManage;
 	@Resource HotTopicManage hotTopicManage;
+	@Resource StaffManage staffManage;
+	
 	/**
 	 * 话题列表  -- 分页
 	 * @param forum
@@ -312,6 +316,7 @@ public class Topic_TemplateManage {
 					if(topic.getPostTime().equals(topic.getLastReplyTime())){//如果发贴时间等于回复时间，则不显示回复时间
 						topic.setLastReplyTime(null);
 					}
+					topic.setViewTotal(topic.getViewTotal()+topicManage.readLocalView(topic.getId()));
 					
 					if(topic.getIsStaff() == false){//会员
 						userRoleNameMap.put(topic.getUserName(), null);
@@ -376,6 +381,14 @@ public class Topic_TemplateManage {
 					}
 					
 				}else{
+					SysUsers sysUsers = staffManage.query_cache_findByUserAccount(topic.getUserName());
+					if(sysUsers != null){
+						topic.setNickname(sysUsers.getNickname());
+						if(sysUsers.getAvatarName() != null && !"".equals(sysUsers.getAvatarName().trim())){
+							topic.setAvatarPath(fileManage.fileServerAddress(request)+sysUsers.getAvatarPath());
+							topic.setAvatarName(sysUsers.getAvatarName());
+						}	
+					}
 					topic.setAccount(topic.getUserName());//员工用户名和账号是同一个
 				}
 				//话题允许查看的角色名称集合
@@ -389,14 +402,16 @@ public class Topic_TemplateManage {
 					}
 					
 				}
-				//用户角色名称集合
-				for (Map.Entry<String, List<String>> entry : userRoleNameMap.entrySet()) {
-					if(entry.getKey().equals(topic.getUserName())){
-						List<String> roleNameList = entry.getValue();
-						if(roleNameList != null && roleNameList.size() >0){
-							topic.setUserRoleNameList(roleNameList);
+				if(!topic.getIsStaff()){
+					//用户角色名称集合
+					for (Map.Entry<String, List<String>> entry : userRoleNameMap.entrySet()) {
+						if(entry.getKey().equals(topic.getUserName())){
+							List<String> roleNameList = entry.getValue();
+							if(roleNameList != null && roleNameList.size() >0){
+								topic.setUserRoleNameList(roleNameList);
+							}
+							break;
 						}
-						break;
 					}
 				}
 				
@@ -556,6 +571,7 @@ public class Topic_TemplateManage {
 					topicManage.addView(topicId, ip);
 				}
 				
+				topic.setViewTotal(topic.getViewTotal()+topicManage.readLocalView(topic.getId()));
 
 				//添加热门话题
 				hotTopicManage.addHotTopic(topic);
@@ -608,6 +624,14 @@ public class Topic_TemplateManage {
 					}
 					
 				}else{
+					SysUsers sysUsers = staffManage.query_cache_findByUserAccount(topic.getUserName());
+					if(sysUsers != null){
+						topic.setNickname(sysUsers.getNickname());
+						if(sysUsers.getAvatarName() != null && !"".equals(sysUsers.getAvatarName().trim())){
+							topic.setAvatarPath(fileManage.fileServerAddress(request)+sysUsers.getAvatarPath());
+							topic.setAvatarName(sysUsers.getAvatarName());
+						}	
+					}
 					topic.setAccount(topic.getUserName());//员工用户名和账号是同一个
 				}
 				
@@ -845,6 +869,21 @@ public class Topic_TemplateManage {
 		}else{
 			value.put("allowTopic",true);//允许提交话题
 		}
+		
+		//有提交权限的标签Id
+		List<Long> allowTagIdList = new ArrayList<Long>();
+		
+		List<Tag> tagList = tagService.findAllTag_cache();
+		if(tagList != null && tagList.size() >0){
+			for(Tag tag : tagList){
+				boolean flag = userRoleManage.isPermission(ResourceEnum._1002000, tag.getId());
+				if(flag){
+					allowTagIdList.add(tag.getId());
+				}
+			}
+		}
+		
+		value.put("allowTagIdList", allowTagIdList);//有提交权限的标签Id
 		
 		value.put("giveRedEnvelopeAmountMin",systemSetting.getGiveRedEnvelopeAmountMin());
 		value.put("giveRedEnvelopeAmountMax",systemSetting.getGiveRedEnvelopeAmountMax());
@@ -1139,6 +1178,14 @@ public class Topic_TemplateManage {
 					}
 					
 				}else{
+					SysUsers sysUsers = staffManage.query_cache_findByUserAccount(comment.getUserName());
+					if(sysUsers != null){
+						comment.setNickname(sysUsers.getNickname());
+						if(sysUsers.getAvatarName() != null && !"".equals(sysUsers.getAvatarName().trim())){
+							comment.setAvatarPath(fileManage.fileServerAddress(request)+sysUsers.getAvatarPath());
+							comment.setAvatarName(sysUsers.getAvatarName());
+						}	
+					}
 					comment.setAccount(comment.getUserName());//员工用户名和账号是同一个
 				}
 				
@@ -1219,6 +1266,14 @@ public class Topic_TemplateManage {
 									quote.setUserInfoStatus(-30);
 								}
 							}else{
+								SysUsers sysUsers = staffManage.query_cache_findByUserAccount(quote.getUserName());
+								if(sysUsers != null){
+									quote.setNickname(sysUsers.getNickname());
+									if(sysUsers.getAvatarName() != null && !"".equals(sysUsers.getAvatarName().trim())){
+										quote.setAvatarPath(fileManage.fileServerAddress(request)+sysUsers.getAvatarPath());
+										quote.setAvatarName(sysUsers.getAvatarName());
+									}	
+								}
 								quote.setAccount(quote.getUserName());//员工用户名和账号是同一个
 							}
 							
@@ -1237,14 +1292,16 @@ public class Topic_TemplateManage {
 					comment.setQuoteList(quoteList);
 				}
 				
-				//用户角色名称集合
-				for (Map.Entry<String, List<String>> entry : userRoleNameMap.entrySet()) {
-					if(entry.getKey().equals(comment.getUserName())){
-						List<String> roleNameList = entry.getValue();
-						if(roleNameList != null && roleNameList.size() >0){
-							comment.setUserRoleNameList(roleNameList);
+				if(!comment.getIsStaff()){
+					//用户角色名称集合
+					for (Map.Entry<String, List<String>> entry : userRoleNameMap.entrySet()) {
+						if(entry.getKey().equals(comment.getUserName())){
+							List<String> roleNameList = entry.getValue();
+							if(roleNameList != null && roleNameList.size() >0){
+								comment.setUserRoleNameList(roleNameList);
+							}
+							break;
 						}
-						break;
 					}
 				}
 				
@@ -1288,6 +1345,14 @@ public class Topic_TemplateManage {
 								}
 								
 							}else{
+								SysUsers sysUsers = staffManage.query_cache_findByUserAccount(reply.getUserName());
+								if(sysUsers != null){
+									reply.setNickname(sysUsers.getNickname());
+									if(sysUsers.getAvatarName() != null && !"".equals(sysUsers.getAvatarName().trim())){
+										reply.setAvatarPath(fileManage.fileServerAddress(request)+sysUsers.getAvatarPath());
+										reply.setAvatarName(sysUsers.getAvatarName());
+									}	
+								}
 								reply.setAccount(reply.getUserName());//员工用户名和账号是同一个
 							}
 							
@@ -1302,6 +1367,14 @@ public class Topic_TemplateManage {
 									}
 									
 								}else{
+									SysUsers sysUsers = staffManage.query_cache_findByUserAccount(reply.getFriendUserName());
+									if(sysUsers != null){
+										reply.setFriendNickname(sysUsers.getNickname());
+										if(sysUsers.getAvatarName() != null && !"".equals(sysUsers.getAvatarName().trim())){
+											reply.setFriendAvatarPath(fileManage.fileServerAddress(request)+sysUsers.getAvatarPath());
+											reply.setFriendAvatarName(sysUsers.getAvatarName());
+										}	
+									}
 									reply.setFriendAccount(reply.getFriendUserName());//员工用户名和账号是同一个
 									
 								}

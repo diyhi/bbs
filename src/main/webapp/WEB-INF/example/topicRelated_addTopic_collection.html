@@ -13,10 +13,10 @@
 	 <tbody> 
 		<tr> 
 		<tr> 
-			<td rowspan="9">topicRelated_addTopic_collection</td> 
-			<td rowspan="9">Map&ltString,Object></td>
+			<td rowspan="10">topicRelated_addTopic_collection</td> 
+			<td rowspan="10">Map&ltString,Object></td>
 			<td>键参数：availableTag<br>值内容说明：话题编辑器允许使用标签(配合KindEditor编辑器使用)<br>值类型：JSON格式List&ltString></td>
-			<td rowspan="9">添加话题界面显示返回值</td> 
+			<td rowspan="10">添加话题界面显示返回值</td> 
 		</tr>
 		<tr> 
 			<td>键参数：captchaKey<br>值内容说明：验证码编号 (根据'全站设置 - 基本设置 - 发表话题每分钟提交超过'参数计算是否含有值)<br>值类型：String </td>
@@ -29,6 +29,9 @@
 		</tr>
 		<tr> 
 			<td>键参数：giveRedEnvelopeAmountMin<br>值内容说明：发红包金额下限<br>值类型：BigDecimal</td>
+		</tr>
+		<tr> 
+			<td>键参数：allowTagIdList<br>值内容说明：有提交权限的标签Id<br>值类型：List&ltString></td>
 		</tr>
 		<tr> 
 			<td>键参数：giveRedEnvelopeAmountMax<br>值内容说明：发红包金额上限 空为无限制 0则不允许发红包<br>值类型：BigDecimal</td>

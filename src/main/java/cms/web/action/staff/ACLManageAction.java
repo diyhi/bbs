@@ -45,7 +45,7 @@ public class ACLManageAction {
 	@Resource StaffService staffService;//通过接口引用代理返回的对象
 	@Resource ACLService aclService;//通过接口引用代理返回的对象
 	@Resource SettingService settingService;
-	
+	@Resource StaffManage staffManage;
 
 	
 	/**-------------------------------------- 角色 ----------------------------------------**/
@@ -228,6 +228,8 @@ public class ACLManageAction {
 		
 		if(error.size() == 0){
 			aclService.saveRoles(sysRoles, sysRolesPermissionList);
+			staffManage.clear_staffPermissionMenu();
+			staffManage.clear_userAuthoritiesByName();
 		}
 
 		if(error.size() >0){
@@ -482,6 +484,8 @@ public class ACLManageAction {
 			
 			if(error.size() == 0){
 				aclService.updateRoles(sysRoles, sysRolesPermissionList);
+				staffManage.clear_staffPermissionMenu();
+				staffManage.clear_userAuthoritiesByName();
 			}
 		}
 		
@@ -542,6 +546,8 @@ public class ACLManageAction {
 			}
 			if(error.size() == 0){
 				aclService.deleteRoles(rolesId);
+				staffManage.clear_staffPermissionMenu();
+				staffManage.clear_userAuthoritiesByName();
 			}
 			
 		}else{

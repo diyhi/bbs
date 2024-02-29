@@ -9,6 +9,7 @@
 	</@object> 
 	
 	<title><#if question != null && question?? >${question.title}</#if> - ${title}</title>
+	<meta name="description" content="<#if question != null && question?? >${question.summary}</#if>"/>
 	<#-- 获取令牌 -->
 	<meta name="csrfToken" content="${token}"/>
 	<meta name="keywords" content="${title} - ${keywords}"/>

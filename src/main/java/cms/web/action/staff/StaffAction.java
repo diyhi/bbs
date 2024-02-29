@@ -22,6 +22,7 @@ import cms.service.setting.SettingService;
 import cms.service.staff.ACLService;
 import cms.service.staff.StaffService;
 import cms.utils.JsonUtils;
+import cms.web.action.fileSystem.FileManage;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -38,7 +39,7 @@ public class StaffAction {
 	@Resource StaffService staffService;//通过接口引用代理返回的对象
 	@Resource ACLService aclService;
 	@Resource SettingService settingService;
-	
+	@Resource FileManage fileManage;
 	/**
 	 * 员工列表
 	 * @param pageForm
@@ -74,6 +75,9 @@ public class StaffAction {
 				sysUserView.setFullName(sysUsers.getFullName());//姓名
 				sysUserView.setUserDuty(sysUsers.getUserDuty());//用户的职位
 				sysUserView.setIssys(sysUsers.isIssys());//是否是超级用户
+				sysUserView.setNickname(sysUsers.getNickname());
+				sysUserView.setAvatarPath(fileManage.fileServerAddress(request)+sysUsers.getAvatarPath());
+				sysUserView.setAvatarName(sysUsers.getAvatarName());
 				sysUserViewList.add(sysUserView);
 			}
 			qr.setResultlist(sysUserViewList);

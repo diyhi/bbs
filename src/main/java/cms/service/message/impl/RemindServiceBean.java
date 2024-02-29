@@ -73,6 +73,38 @@ public class RemindServiceBean extends DaoSupport<Remind> implements RemindServi
 		
 		
 	}
+	
+	/**
+	 * 设置全部提醒状态为已读
+	 * @param userId 用户Id
+	 */
+	public Integer updateAllRemindStatus(Long userId){
+		int i = 0;
+		Long time = new Date().getTime();
+		
+		//表编号
+		int tableNumber = remindConfig.userIdRemainder(userId);
+		if(tableNumber == 0){//默认对象
+			Query query = em.createQuery("update Remind o set o.status=:status, o.readTimeFormat=:readTimeFormat where o.receiverUserId=:receiverUserId and o.status <:status2")
+					.setParameter("status", 20)
+					.setParameter("readTimeFormat", time)
+					.setParameter("receiverUserId", userId)
+					.setParameter("status2", 20);
+					i += query.executeUpdate();
+			
+		}else{//带下划线对象
+			Query query = em.createQuery("update Remind_"+tableNumber+" o set o.status=:status, o.readTimeFormat=:readTimeFormat where o.receiverUserId=:receiverUserId and o.status <:status2")
+					.setParameter("status", 20)
+					.setParameter("readTimeFormat", time)
+					.setParameter("receiverUserId", userId)
+					.setParameter("status2", 20);
+					i += query.executeUpdate();
+		}
+
+		return i;
+		
+		
+	}
 	/**
 	 * 软删除提醒
 	 * @param userId 用户Id

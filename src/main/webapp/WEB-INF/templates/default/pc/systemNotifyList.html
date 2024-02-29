@@ -32,7 +32,14 @@
 		<@include action="${newPublic_4}"/>
 		
 		
-		<div class="systemNotifyTitle"><h2>全部系统通知</h2></div>
+		<div class="systemNotifyTitle">
+            <h2>全部系统通知</h2>
+            <div class="markAsReadButton">
+            	<span class="buttonBox">
+					<button type="button" class="payButton" onclick="javascript:allSystemNotifyMarkAsRead()">全部标记已读</button>
+				</span>
+            </div>
+        </div>
 		
 		
 		<#if pageView.records?exists> 
@@ -74,6 +81,58 @@
 
 
 <script type="text/javascript" language="javascript"> 
+
+//标记全部系统通知已读
+function allSystemNotifyMarkAsRead(){
+	var parameter = "";//URI参数
+	//从meta标签获取令牌
+	parameter += "&token="+getCsrf();
+	
+	if(parameter.indexOf("&") == 0){
+		parameter = parameter.substring(1,parameter.length);
+	}
+	post_request(function(value){
+		if(value != ""){
+			var returnValue = JSON.parse(value);//JSON转为对象
+			for(var key in returnValue){
+				if(key == "success"){	
+					var success = returnValue[key];	
+					if(success == "true"){
+						layer.msg('标记全部系统通知已读成功,3秒后刷新页面', 
+							{
+							  time: 3000 //3秒关闭（如果不配置，默认是3秒）
+							},function(){
+								//关闭后的操作
+					        	document.location.reload();//刷新页面
+							}
+						);
+					}
+				}else if(key == "error"){
+					var errorValue = returnValue[key];
+					var htmlValue = "";
+					var i = 0;
+					for(var error in errorValue){
+						if(error != ""){	
+							i++;
+							htmlValue += "&nbsp;&nbsp;"+i+"、"+errorValue[error]+"<br>";
+						}
+					}
+					
+					layer.open({
+					  type: 1,
+					  title: '错误', 
+					  skin: 'layui-layer-rim', //加上边框
+					  area: ['300px', '150px'], //宽高
+					  content: htmlValue
+					});
+					
+				}
+			}
+		}
+	},
+		getBasePath()+"user/control/allSystemNotifyMarkAsRead?timestamp=" + new Date().getTime(), true,parameter);	
+}
+
 
 //删除系统通知
 function deleteSystemNotify(id){

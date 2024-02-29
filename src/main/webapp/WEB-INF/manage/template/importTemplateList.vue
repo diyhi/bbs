@@ -332,7 +332,7 @@ export default({
 			}
 			_self.$ajax({
 		        method: 'post',
-		        url: 'control/template/manage?method=directoryRename',
+		        url: 'control/template/manage?method=directoryRename&a=a',//a=a参数的作用是仅增加连接符&
 		        data: formData
 			})
 			.then(function (response) {
@@ -395,7 +395,7 @@ export default({
 				
 				this.$ajax({
 			        method: 'post',
-			        url: 'control/template/manage?method=import',
+			        url: 'control/template/manage?method=import&a=a',//a=a参数的作用是仅增加连接符&
 			        data: formData
 				})
 				.then(function (response) {
@@ -512,7 +512,7 @@ export default({
 		    	
 				this.$ajax({
 			        method: 'post',
-			        url: 'control/template/manage?method=deleteExport',
+			        url: 'control/template/manage?method=deleteExport&a=a',//a=a参数的作用是仅增加连接符&
 			        data: formData
 				})
 				.then(function (response) {

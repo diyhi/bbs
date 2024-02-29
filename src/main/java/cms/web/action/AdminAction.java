@@ -27,6 +27,7 @@ import cms.utils.JsonUtils;
 import cms.utils.PathUtil;
 import cms.utils.WebUtil;
 import cms.web.action.fileSystem.FileManage;
+import cms.web.action.staff.StaffManage;
 
 import org.apache.commons.io.FileUtils;
 import org.springframework.http.ResponseEntity;
@@ -53,6 +54,7 @@ public class AdminAction {
 	@Resource FeedbackService feedbackService;
 	@Resource FileManage fileManage;
 	@Resource ReportService reportService;
+	@Resource StaffManage staffManage;
 	
 	/**
 	 * 后台管理框架页
@@ -60,21 +62,30 @@ public class AdminAction {
 	 */
 	@ResponseBody
 	@RequestMapping("control/manage/index") 
-	public String framework(ModelMap model){
+	public String framework(ModelMap model,HttpServletRequest request, HttpServletResponse response){
 		Map<String,Object> returnValue = new HashMap<String,Object>();
+		
+
 		SysUsers sysUserView = new SysUsers();
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		if(authentication != null){
-			 Object o = authentication.getPrincipal();
-			 if(o instanceof SysUsers){
-				 SysUsers sysUsers = (SysUsers)o;
+			Object principal = authentication.getPrincipal();
+			if(principal instanceof SysUsers){
+			String userId =((SysUsers)principal).getUserId();//用户Id
 				 
-				 sysUserView.setUserId(sysUsers.getUserId());//用户id
-				 sysUserView.setUserAccount(sysUsers.getUserAccount());//用户账号
-				 sysUserView.setFullName(sysUsers.getFullName());//姓名
-				 sysUserView.setUserDuty(sysUsers.getUserDuty());//用户的职位
-				 sysUserView.setIssys(sysUsers.isIssys());//是否是超级用户
-			 }
+				 
+				SysUsers sysUsers = (SysUsers)staffService.find(SysUsers.class, userId);
+				if(sysUsers != null){
+					sysUserView.setUserId(sysUsers.getUserId());//用户id
+					sysUserView.setUserAccount(sysUsers.getUserAccount());//用户账号
+					sysUserView.setFullName(sysUsers.getFullName());//姓名
+					sysUserView.setUserDuty(sysUsers.getUserDuty());//用户的职位
+					sysUserView.setIssys(sysUsers.isIssys());//是否是超级用户
+					sysUserView.setAvatarName(sysUsers.getAvatarName());
+					sysUserView.setAvatarPath(fileManage.fileServerAddress(request)+sysUsers.getAvatarPath());
+					returnValue.put("permissionMenuList", staffManage.query_staffPermissionMenu(sysUsers.getUserAccount()));
+				}
+			}
 		}
 		returnValue.put("sysUsers", sysUserView);
 		returnValue.put("fileStorageSystem", fileManage.getFileSystem());//文件存储系统 0.本地系统 10.SeaweedFS 20.MinIO 30.阿里云OSS

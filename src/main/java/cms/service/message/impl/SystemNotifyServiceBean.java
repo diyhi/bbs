@@ -284,7 +284,34 @@ public class SystemNotifyServiceBean extends DaoSupport<SystemNotify> implements
 		return i;
 	}
 	
-	
+	/**
+	 * 设置全部订阅系统通知状态为已读
+	 * @param userId 用户Id
+	 */
+	public Integer updateAllSubscriptionSystemNotifyStatus(Long userId){
+		int i = 0;
+		Date time = new Date();
+		//表编号
+		int tableNumber = subscriptionSystemNotifyConfig.userIdRemainder(userId);
+		if(tableNumber == 0){//默认对象
+			Query query = em.createQuery("update SubscriptionSystemNotify o set o.status=:status, o.readTime=:readTime where o.userId=:userId and o.status <:status2")
+					.setParameter("status", 20)
+					.setParameter("readTime", time)
+					.setParameter("userId", userId)
+					.setParameter("status2", 20);
+					i += query.executeUpdate();
+			
+		}else{//带下划线对象
+			Query query = em.createQuery("update SubscriptionSystemNotify_"+tableNumber+" o set o.status=:status, o.readTime=:readTime where o.userId=:userId and o.status <:status2")
+					.setParameter("status", 20)
+					.setParameter("readTime", time)
+					.setParameter("userId", userId)
+					.setParameter("status2", 20);
+					i += query.executeUpdate();
+		}
+
+		return i;
+	}
 	
 	/**
 	 * 根据用户Id查询最早的未读系统通知Id

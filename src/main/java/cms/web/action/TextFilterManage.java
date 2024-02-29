@@ -242,7 +242,7 @@ public class TextFilterManage {
 		if(editorTag == null || editorTag.isLink()){//超级链接
 			//超级链接
 			safelist.addTags("a")
-			.addAttributes("a", "href", "title","target","linkType")
+			.addAttributes("a", "href", "target","linkType")
 			.addProtocols("a", "href", "ftp", "http", "https", "mailto")
 			.addEnforcedAttribute("a", "rel", "nofollow");
 		}

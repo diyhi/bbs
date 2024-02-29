@@ -58,6 +58,15 @@ public interface QuestionService extends DAO<Question>{
 	 */
 	public List<Question> findQuestionByPage(int firstIndex, int maxResult);
 	/**
+	 * 分页查询问题
+	 * @param userName用户名称
+	 * @param postTime 问题发表时间
+	 * @param firstIndex 开始索引
+	 * @param maxResult 需要获取的记录数
+	 * @return
+	 */
+	public List<Question> findQuestionByPage(String userName,Date postTime,int firstIndex, int maxResult);
+	/**
 	 * 根据问题Id查询问题标签关联
 	 * @param questionId 问题Id
 	 * @return

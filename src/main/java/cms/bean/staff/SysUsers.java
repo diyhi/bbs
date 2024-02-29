@@ -61,6 +61,15 @@ public class SysUsers implements UserDetails ,java.io.Serializable{
 	/** 安全摘要 **/
 	@Column(length=32)
 	private String securityDigest;
+	/** 呢称 **/
+	@Column(length=50)
+	private String nickname;
+	/** 头像路径 不写入数据库**/
+	@Transient
+	private String avatarPath;
+	/** 头像名称 **/
+	@Column(length=50)
+	private String avatarName;
 	
 	/** 当前登录用户权限是否拥有本权限  **/
 	@Transient
@@ -92,7 +101,7 @@ public class SysUsers implements UserDetails ,java.io.Serializable{
    
     
     public SysUsers(){}
-    public SysUsers(String userId, String userAccount, String fullName,
+    public SysUsers(String userId, String userAccount, String fullName,String nickname,String avatarName,
 			String userPassword, String userDesc, boolean enabled,boolean issys,String securityDigest,
 			 String userDuty,  boolean accountNonExpired,
             boolean credentialsNonExpired, boolean accountNonLocked, Collection<GrantedAuthority> authorities) {
@@ -103,6 +112,8 @@ public class SysUsers implements UserDetails ,java.io.Serializable{
         this.userId = userId;
         this.userAccount = userAccount;
         this.fullName = fullName;
+        this.nickname = nickname;
+        this.avatarName = avatarName;
         this.userPassword = userPassword;
         this.userDesc = userDesc;
         this.issys = issys;
@@ -320,12 +331,32 @@ public class SysUsers implements UserDetails ,java.io.Serializable{
 	public void setCredentialsNonExpired(boolean credentialsNonExpired) {
 		this.credentialsNonExpired = credentialsNonExpired;
 	}
-
+	public String getNickname() {
+		return nickname;
+	}
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
+	}
 	public String getSecurityDigest() {
 		return securityDigest;
 	}
 	public void setSecurityDigest(String securityDigest) {
 		this.securityDigest = securityDigest;
+	}
+	public String getAvatarPath() {
+		if(this.avatarPath == null || "".equals(this.avatarPath.trim())){
+			this.avatarPath = "file/staffAvatar/";
+		}
+		return avatarPath;	
+	}
+	public void setAvatarPath(String avatarPath) {
+		this.avatarPath = avatarPath;
+	}
+	public String getAvatarName() {
+		return avatarName;
+	}
+	public void setAvatarName(String avatarName) {
+		this.avatarName = avatarName;
 	}
 	private static SortedSet<GrantedAuthority> sortAuthorities(Collection<GrantedAuthority> authorities) {
         Assert.notNull(authorities, "Cannot pass a null GrantedAuthority collection");

@@ -1640,6 +1640,8 @@ CREATE TABLE `sysusers` (
   `userPassword` varchar(255) DEFAULT NULL,
   `userAccount` varchar(30) DEFAULT NULL,
   `securityDigest` varchar(32) DEFAULT NULL,
+  `avatarName` varchar(50) DEFAULT NULL,
+  `nickname` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`userId`),
   UNIQUE KEY `UKi13uxat3wa9pt2glvqr05g7rn` (`userAccount`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

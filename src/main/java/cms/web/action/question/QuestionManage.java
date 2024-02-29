@@ -68,6 +68,18 @@ public class QuestionManage {
 	}
 	
 	/**
+	 * 读取问题本地展示次数
+	 * @param questionId 问题Id
+	 */
+	public Long readLocalView(Long questionId){
+		Long count = countMap.asMap().get(questionId);
+		if(count != null){
+			return count;
+		}
+		return 0L;
+	}
+	
+	/**
 	 * 提交问题展示次数到数据库(定时提交)
 	 */
 	@Scheduled(fixedDelay=600000)//10分钟

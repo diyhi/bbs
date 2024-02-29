@@ -287,7 +287,7 @@ export default({
 			
 			_self.$ajax({
 		        method: 'post',
-		        url: 'control/layout/manage?method=editLayoutCode',
+		        url: 'control/layout/manage?method=editLayoutCode&a=a',//a=a参数的作用是仅增加连接符&
 		        data: formData
 			})
 			.then(function (response) {

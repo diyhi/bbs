@@ -158,7 +158,28 @@ public class AnswerServiceBean extends DaoSupport<Answer> implements AnswerServi
 		return contentList;
 	}
 	
-	
+	/**
+	 * 分页查询答案
+	 * @param userName 用户名称
+	 * @param postTime 评论发表时间
+	 * @param firstIndex
+	 * @param maxResult
+	 * @return
+	 */
+	@Transactional(readOnly=true,propagation=Propagation.NOT_SUPPORTED)
+	public List<Answer> findAnswerByPage(String userName,Date postTime,int firstIndex, int maxResult){
+		String sql = "select o from Answer o where o.userName=?1 and o.postTime>?2";
+		Query query = em.createQuery(sql);	
+		query.setParameter(1, userName);
+		query.setParameter(2, postTime);
+		//索引开始,即从哪条记录开始
+		query.setFirstResult(firstIndex);
+		//获取多少条数据
+		query.setMaxResults(maxResult);
+		
+		List<Answer> answerList = query.getResultList();
+		return answerList;
+	}
 	
 	/**
 	 * 保存答案
@@ -535,10 +556,10 @@ public class AnswerServiceBean extends DaoSupport<Answer> implements AnswerServi
 	 * @param firstIndex
 	 * @param maxResult
 	 * @return
-	 
+	 */
 	@Transactional(readOnly=true,propagation=Propagation.NOT_SUPPORTED)
-	public List<Reply> findReplyByPage(String userName,Date postTime,int firstIndex, int maxResult){
-		String sql = "select o from Reply o where o.userName=?1 and o.postTime>?2";
+	public List<AnswerReply> findReplyByPage(String userName,Date postTime,int firstIndex, int maxResult){
+		String sql = "select o from AnswerReply o where o.userName=?1 and o.postTime>?2";
 		Query query = em.createQuery(sql);	
 		query.setParameter(1, userName);
 		query.setParameter(2, postTime);
@@ -547,9 +568,9 @@ public class AnswerServiceBean extends DaoSupport<Answer> implements AnswerServi
 		//获取多少条数据
 		query.setMaxResults(maxResult);
 		
-		List<Reply> replyList = query.getResultList();
+		List<AnswerReply> replyList = query.getResultList();
 		return replyList;
-	}*/
+	}
 	
 	/**
 	 * 修改回复

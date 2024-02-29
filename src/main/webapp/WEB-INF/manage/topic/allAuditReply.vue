@@ -31,7 +31,7 @@
 						<template #default="scope">
 							<el-popover effect="light" trigger="hover" placement="top">
 					        	<template #default>
-						            <p v-if="scope.row.isStaff == false">呢称: {{scope.row.nickname}}</p>
+						            <p v-if="scope.row.nickname != null && scope.row.nickname != ''">呢称: {{scope.row.nickname}}</p>
 						            <p>账号: {{scope.row.account}}</p>
 					        	</template>
 					        	<template #reference v-if="scope.row.isStaff == false">
@@ -49,9 +49,12 @@
 					        	
 					        	<template #reference v-if="scope.row.isStaff == true">
 					        		<div class="avatar-wrapper">
-										<el-badge value="员工" type="warning" class="avatar-badge">
+										<el-badge value="员工" type="warning" class="avatar-badge" v-if="scope.row.avatarName == null || scope.row.avatarName == ''">
 											<el-avatar :size="48" icon="el-icon-user-solid"></el-avatar>
 										</el-badge>
+										<el-badge value="员工" type="warning" class="avatar-badge" v-if="scope.row.avatarName != null && scope.row.avatarName != ''">
+	                                        <el-avatar :size="48" :src="scope.row.avatarPath+'100x100/'+scope.row.avatarName"></el-avatar>
+	                                    </el-badge>
 										<div class="avatar-text">{{scope.row.account}}</div>
 									</div>
 					        	</template>

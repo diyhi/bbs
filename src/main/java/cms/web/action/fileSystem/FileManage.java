@@ -316,6 +316,9 @@ public class FileManage {
     			localFileManage.lockRemoveFile("membershipCard",maxDeleteTime);//会员卡
     			
     			localFileManage.lockRemoveFile("report",maxDeleteTime);//删除举报图片文件
+    			
+    			localFileManage.lockRemoveFile("topicTag",maxDeleteTime);//删除话题标签图片文件
+    			localFileManage.lockRemoveFile("questionTag",maxDeleteTime);//删除问答标签图片文件
     		}
     	}
     	

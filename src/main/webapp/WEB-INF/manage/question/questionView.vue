@@ -16,9 +16,9 @@
 						<el-link class="item" href="javascript:void(0);" v-if="question.status == 10" @click="auditQuestion(question.id);">审核</el-link>
 						<el-link class="item" href="javascript:void(0);" @click="$router.push({path: '/admin/control/questionFavorite/list', query:{ visible:($route.query.visible != undefined ? $route.query.visible:''),questionView_beforeUrl:($route.query.questionView_beforeUrl != undefined ? $route.query.questionView_beforeUrl:''),questionId :question.id, answerId:($route.query.answerId != undefined ? $route.query.answerId:''), questionPage:($route.query.page != undefined ? $route.query.page:'')}})">收藏用户</el-link>
 						<el-link class="item" href="javascript:void(0);" @click="appendQuestionUI();">追加提问</el-link>
-						<el-link class="item" href="javascript:void(0);" @click="editQuestionUI();">修改</el-link>
 						<el-link class="item" href="javascript:void(0);" @click="$router.push({path: '/admin/control/questionReport/list', query:{ visible:($route.query.visible != undefined ? $route.query.visible:''),questionView_beforeUrl:($route.query.questionView_beforeUrl != undefined ? $route.query.questionView_beforeUrl:''),questionId :question.id, answerId:($route.query.answerId != undefined ? $route.query.answerId:''),questionPage:($route.query.page != undefined ? $route.query.page:''),parameterId:question.id,module:40}})">举报</el-link>
-                    	<el-link class="item" href="javascript:void(0);" @click="deleteQuestion(question.id)">删除</el-link>
+						<el-link class="item" href="javascript:void(0);" @click="editQuestionUI();">修改</el-link>
+						<el-link class="item" href="javascript:void(0);" @click="deleteQuestion(question.id)">删除</el-link>
 					</div>
 					<!-- 追加提问 -->
 					<div class="appendQuestion-post" v-show="appendQuestionFormView">
@@ -41,7 +41,7 @@
 						<div class="editQuestion">
 							<el-form label-width="auto"  @submit.native.prevent>
 								<el-form-item label="标题" :required="true" :error="error.title">
-									<el-input v-model.trim="title" maxlength="100" clearable="true" show-word-limit></el-input>
+									<el-input v-model.trim="title" maxlength="150" clearable="true" show-word-limit></el-input>
 								</el-form-item>
 								<el-form-item label="标签" :required="true" :error="error.tagId">
 									<el-select ref="question_tag_ref"  v-model="tagIdGroup" @remove-tag="processRemoveTag" @focus="loadQuestionTag"  style="width: 100%;" multiple :placeholder="select_placeholder" >
@@ -106,7 +106,7 @@
 		                	<div class="avatar">
 		                		<el-popover effect="light" trigger="hover" placement="top">
 						        	<template #default>
-						        		<p v-if="question.isStaff == false">呢称: {{question.nickname}}</p>
+						        		<p v-if="question.nickname != null && question.nickname != ''">呢称: {{question.nickname}}</p>
 							            <p>账号: {{question.account}}</p>
 							            <p v-if="question.userRoleNameList != null && question.userRoleNameList.length >0" >角色: 
 							            	<span class="questionViewModule_question-wrap_head_questionInfo_userRoleName" v-for="roleName in question.userRoleNameList" >{{roleName}}</span>
@@ -127,9 +127,12 @@
 						        	
 						        	<template #reference v-if="question.isStaff == true">
 						        		<div class="avatar-wrapper">
-											<el-badge value="员工" type="warning" class="avatar-badge">
+											<el-badge value="员工" type="warning" class="avatar-badge" v-if="question.avatarName == null || question.avatarName == ''">
 												<el-avatar shape="square" :size="64" icon="el-icon-user-solid"></el-avatar>
 											</el-badge>
+											<el-badge value="员工" type="warning" class="avatar-badge" v-if="question.avatarName != null && question.avatarName != ''">
+		                                        <el-avatar shape="square" :size="64" :src="question.avatarPath+'100x100/'+question.avatarName"></el-avatar>
+		                                    </el-badge>
 										</div>
 						        	</template>
 						        </el-popover>
@@ -223,7 +226,7 @@
 							<div class="avatarBox">
 		                		<el-popover effect="light" trigger="hover" placement="top">
 						        	<template #default>
-						        		<p v-if="answer.isStaff == false">呢称: {{answer.nickname}}</p>
+						        		<p v-if="answer.nickname != null && answer.nickname != ''">呢称: {{answer.nickname}}</p>
 							            <p>账号: {{answer.account}}</p>
 							            <p v-if="answer.userRoleNameList != null && answer.userRoleNameList.length >0" >角色: 
 							            	<span class="questionViewModule_question-wrap_head_questionInfo_userRoleName" v-for="roleName in answer.userRoleNameList" >{{roleName}}</span>
@@ -244,9 +247,12 @@
 						        	
 						        	<template #reference v-if="answer.isStaff == true">
 						        		<div class="avatar-wrapper">
-											<el-badge value="员工" type="warning" class="avatar-badge">
+											<el-badge value="员工" type="warning" class="avatar-badge" v-if="answer.avatarName == null || answer.avatarName == ''">
 												<el-avatar shape="square" :size="64" icon="el-icon-user-solid"></el-avatar>
 											</el-badge>
+											<el-badge value="员工" type="warning" class="avatar-badge" v-if="answer.avatarName != null && answer.avatarName != ''">
+		                                        <el-avatar shape="square" :size="64" :src="answer.avatarPath+'100x100/'+answer.avatarName"></el-avatar>
+		                                    </el-badge>
 										</div>
 						        	</template>
 						        </el-popover>
@@ -294,7 +300,7 @@
 											    	<div class="avatarBox">
 								                		<el-popover effect="light" trigger="hover" placement="top">
 												        	<template #default>
-												        		<p v-if="reply.isStaff == false">呢称: {{reply.nickname}}</p>
+												        		<p v-if="reply.nickname != null && reply.nickname != ''">呢称: {{reply.nickname}}</p>
 													            <p>账号: {{reply.account}}</p>
 													            <p v-if="reply.userRoleNameList != null && reply.userRoleNameList.length >0" >角色: 
 													            	<span class="questionViewModule_question-wrap_head_questionInfo_userRoleName" v-for="roleName in reply.userRoleNameList" >{{roleName}}</span>
@@ -315,8 +321,11 @@
 												        	
 												        	<template #reference v-if="reply.isStaff == true">
 												        		<div class="avatar-wrapper">
-																	<el-badge value="员工" type="warning" class="avatar-badge">
+																	<el-badge value="员工" type="warning" class="avatar-badge" v-if="reply.avatarName == null || reply.avatarName == ''">
 																		<el-avatar shape="square" :size="48" icon="el-icon-user-solid"></el-avatar>
+																	</el-badge>
+																	<el-badge value="员工" type="warning" class="avatar-badge" v-if="reply.avatarName != null && reply.avatarName != ''">
+																		<el-avatar shape="square" :size="48" :src="reply.avatarPath+'100x100/'+reply.avatarName"></el-avatar>
 																	</el-badge>
 																</div>
 												        	</template>
@@ -326,17 +335,14 @@
 												    	<h2 class="clearfix" >
 												    		
 												        	<div class="userName">
-												        		{{reply.account}}
 												        		<div class="nickname" >
 												        			{{reply.nickname}}
 												        			<i class="userRoleName" v-for="roleName in reply.userRoleNameList" >{{roleName}}</i>
 																    <i class="master" v-if="reply.userName == question.userName && reply.isStaff == question.isStaff">作者</i>
 												        		</div>
+												        		<div class="account" >{{reply.account}}<span class="time">{{reply.postTime}}</span></div>
 												        	</div>
-												        	
 												        </h2>
-							                        	
-							                          	<div class="time clearfix">{{reply.postTime}}</div>
 							                        </span>
 							                        
 							                        <span class="friendInfo" v-if="reply.friendUserName != null && reply.friendUserName != ''">
@@ -346,7 +352,7 @@
 	                                                    <div class="friendAvatarBox">
 	                                                        <el-popover effect="light" trigger="hover" placement="top">
 	                                                            <template #default>
-	                                                                <p v-if="reply.isFriendStaff == false">呢称: {{reply.friendNickname}}</p>
+	                                                                <p v-if="reply.friendNickname != null && reply.friendNickname != ''">呢称: {{reply.friendNickname}}</p>
 	                                                                <p>账号: {{reply.friendAccount}}</p>
 	                                                            </template>
 	                                                            <template #reference v-if="reply.isFriendStaff == false">
@@ -362,9 +368,12 @@
 	                                                            
 	                                                            <template #reference v-if="reply.isFriendStaff == true">
 	                                                                <div class="avatar-wrapper">
-	                                                                    <el-badge value="员工" type="warning" class="avatar-badge">
+	                                                                    <el-badge value="员工" type="warning" class="avatar-badge" v-if="reply.friendAvatarName == null || reply.friendAvatarName == ''">
 	                                                                        <el-avatar shape="square" :size="48" icon="el-icon-user-solid"></el-avatar>
 	                                                                    </el-badge>
+	                                                                    <el-badge value="员工" type="warning" class="avatar-badge" v-if="reply.friendAvatarName != null && reply.friendAvatarName != ''">
+																			<el-avatar shape="square" :size="48" :src="reply.friendAvatarPath+'100x100/'+reply.friendAvatarName"></el-avatar>
+																		</el-badge>
 	                                                                </div>
 	                                                            </template>
 	                                                        </el-popover>
@@ -1381,7 +1390,7 @@ export default({
 				
 				_self.$ajax({
 			        method: 'post',
-			        url: 'control/answer/manage?method=auditAnswerReply',
+			        url: 'control/answer/manage?method=auditAnswerReply&a=a',//a=a参数的作用是仅增加连接符&
 			        data: formData
 				})
 				.then(function (response) {
@@ -1568,7 +1577,7 @@ export default({
 			
 			_self.$ajax({
 		        method: 'post',
-		        url: 'control/answer/manage?method=add',
+		        url: 'control/answer/manage?method=add&a=a',//a=a参数的作用是仅增加连接符&
 		        data: formData
 			})
 			.then(function (response) {
@@ -1753,7 +1762,7 @@ export default({
 			
 			_self.$ajax({
 		        method: 'post',
-		        url: 'control/answer/manage?method=edit',
+		        url: 'control/answer/manage?method=edit&a=a',//a=a参数的作用是仅增加连接符&
 		        data: formData
 			})
 			.then(function (response) {
@@ -2988,7 +2997,7 @@ export default({
 		    	
 				this.$ajax({
 			        method: 'post',
-			        url: 'control/answer/manage?method=delete',
+			        url: 'control/answer/manage?method=delete&a=a',//a=a参数的作用是仅增加连接符&
 			        data: formData
 				})
 				.then(function (response) {

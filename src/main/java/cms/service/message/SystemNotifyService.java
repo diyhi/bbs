@@ -56,6 +56,11 @@ public interface SystemNotifyService extends DAO<SystemNotify>{
 	 */
 	public Integer updateSubscriptionSystemNotifyStatus(Long userId,List<String> subscriptionSystemNotifyIdList);
 	/**
+	 * 设置全部订阅系统通知状态为已读
+	 * @param userId 用户Id
+	 */
+	public Integer updateAllSubscriptionSystemNotifyStatus(Long userId);
+	/**
 	 * 根据用户Id查询最早的未读系统通知Id
 	 * @param userId 用户Id
 	 * @return

@@ -134,7 +134,7 @@ public class FeedbackFormAction {
 		}
 		//联系方式
 		if(contact != null && !"".equals(contact.trim())){
-			if(contact.trim().length() >100){
+			if(content.trim().length() >100){
 				error.put("contact", ErrorView._301.name());//不能超过100个字符
 			}else{
 				feedback.setContact(contact.trim());

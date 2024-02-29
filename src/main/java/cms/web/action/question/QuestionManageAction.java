@@ -65,6 +65,7 @@ import cms.web.action.TextFilterManage;
 import cms.web.action.fileSystem.FileManage;
 import cms.web.action.membershipCard.MembershipCardGiftTaskManage;
 import cms.web.action.payment.PaymentManage;
+import cms.web.action.staff.StaffManage;
 import cms.web.action.user.PointManage;
 import cms.web.action.user.UserManage;
 import cms.web.action.user.UserRoleManage;
@@ -94,6 +95,7 @@ public class QuestionManageAction {
 	@Resource PaymentManage paymentManage;
 	@Resource UserRoleManage userRoleManage;
 	@Resource MembershipCardGiftTaskManage membershipCardGiftTaskManage;
+	@Resource StaffManage staffManage;
 	
 	/**
 	 * 问题   查看
@@ -157,6 +159,14 @@ public class QuestionManageAction {
 					}
 					
 				}else{
+					SysUsers sysUsers = staffManage.query_cache_findByUserAccount(question.getUserName());
+					if(sysUsers != null){
+						question.setNickname(sysUsers.getNickname());
+						if(sysUsers.getAvatarName() != null && !"".equals(sysUsers.getAvatarName().trim())){
+							question.setAvatarPath(fileManage.fileServerAddress(request)+sysUsers.getAvatarPath());
+							question.setAvatarName(sysUsers.getAvatarName());
+						}	
+					}
 					question.setAccount(question.getUserName());//员工用户名和账号是同一个
 					
 				}
@@ -255,6 +265,14 @@ public class QuestionManageAction {
 								userRoleNameMap.put(answer.getUserName(), null);
 							}
 						}else{
+							SysUsers sysUsers = staffManage.query_cache_findByUserAccount(answer.getUserName());
+							if(sysUsers != null){
+								answer.setNickname(sysUsers.getNickname());
+								if(sysUsers.getAvatarName() != null && !"".equals(sysUsers.getAvatarName().trim())){
+									answer.setAvatarPath(fileManage.fileServerAddress(request)+sysUsers.getAvatarPath());
+									answer.setAvatarName(sysUsers.getAvatarName());
+								}	
+							}
 							answer.setAccount(answer.getUserName());//员工用户名和账号是同一个
 							
 						}
@@ -281,6 +299,14 @@ public class QuestionManageAction {
 									}
 									
 								}else{
+									SysUsers sysUsers = staffManage.query_cache_findByUserAccount(answerReply.getUserName());
+									if(sysUsers != null){
+										answerReply.setNickname(sysUsers.getNickname());
+										if(sysUsers.getAvatarName() != null && !"".equals(sysUsers.getAvatarName().trim())){
+											answerReply.setAvatarPath(fileManage.fileServerAddress(request)+sysUsers.getAvatarPath());
+											answerReply.setAvatarName(sysUsers.getAvatarName());
+										}	
+									}
 									answerReply.setAccount(answerReply.getUserName());//员工用户名和账号是同一个
 									
 								}
@@ -295,6 +321,14 @@ public class QuestionManageAction {
 										}
 										
 									}else{
+										SysUsers sysUsers = staffManage.query_cache_findByUserAccount(answerReply.getFriendUserName());
+										if(sysUsers != null){
+											answerReply.setFriendNickname(sysUsers.getNickname());
+											if(sysUsers.getAvatarName() != null && !"".equals(sysUsers.getAvatarName().trim())){
+												answerReply.setFriendAvatarPath(fileManage.fileServerAddress(request)+sysUsers.getAvatarPath());
+												answerReply.setFriendAvatarName(sysUsers.getAvatarName());
+											}	
+										}
 										answerReply.setFriendAccount(answerReply.getFriendUserName());//员工用户名和账号是同一个
 										
 									}

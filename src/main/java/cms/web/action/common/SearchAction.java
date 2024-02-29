@@ -44,6 +44,7 @@ import cms.bean.PageView;
 import cms.bean.QueryResult;
 import cms.bean.fulltext.SearchResult;
 import cms.bean.question.Question;
+import cms.bean.staff.SysUsers;
 import cms.bean.topic.ImageInfo;
 import cms.bean.topic.Tag;
 import cms.bean.topic.Topic;
@@ -63,6 +64,7 @@ import cms.web.action.fileSystem.FileManage;
 import cms.web.action.lucene.QuestionLuceneInit;
 import cms.web.action.lucene.TopicLuceneInit;
 import cms.web.action.lucene.TopicLuceneManage;
+import cms.web.action.staff.StaffManage;
 import cms.web.action.topic.TopicManage;
 import cms.web.action.user.UserManage;
 import cms.web.action.user.UserRoleManage;
@@ -85,6 +87,7 @@ public class SearchAction {
 	@Resource QuestionService questionService;
 	@Resource FileManage fileManage;
 	@Resource TopicManage topicManage;
+	@Resource StaffManage staffManage;
 	
 	/**
 	 * 搜索
@@ -165,6 +168,14 @@ public class SearchAction {
 										userRoleNameMap.put(t.getUserName(), null);
 										
 									}else{
+										SysUsers sysUsers = staffManage.query_cache_findByUserAccount(t.getUserName());
+										if(sysUsers != null){
+											t.setNickname(sysUsers.getNickname());
+											if(sysUsers.getAvatarName() != null && !"".equals(sysUsers.getAvatarName().trim())){
+												t.setAvatarPath(fileManage.fileServerAddress(request)+sysUsers.getAvatarPath());
+												t.setAvatarName(sysUsers.getAvatarName());
+											}	
+										}
 										t.setAccount(t.getUserName());//员工用户名和账号是同一个
 									}
 									searchResult.setTopic(t);
@@ -196,6 +207,14 @@ public class SearchAction {
 										userRoleNameMap.put(t.getUserName(), null);
 										
 									}else{
+										SysUsers sysUsers = staffManage.query_cache_findByUserAccount(t.getUserName());
+										if(sysUsers != null){
+											t.setNickname(sysUsers.getNickname());
+											if(sysUsers.getAvatarName() != null && !"".equals(sysUsers.getAvatarName().trim())){
+												t.setAvatarPath(fileManage.fileServerAddress(request)+sysUsers.getAvatarPath());
+												t.setAvatarName(sysUsers.getAvatarName());
+											}	
+										}
 										t.setAccount(t.getUserName());//员工用户名和账号是同一个
 									}
 									searchResult.setQuestion(t);
@@ -348,14 +367,16 @@ public class SearchAction {
 							}
 							
 						}
-						//用户角色名称集合
-						for (Map.Entry<String, List<String>> entry : userRoleNameMap.entrySet()) {
-							if(entry.getKey().equals(topic.getUserName())){
-								List<String> roleNameList = entry.getValue();
-								if(roleNameList != null && roleNameList.size() >0){
-									topic.setUserRoleNameList(roleNameList);
+						if(!topic.getIsStaff()){
+							//用户角色名称集合
+							for (Map.Entry<String, List<String>> entry : userRoleNameMap.entrySet()) {
+								if(entry.getKey().equals(topic.getUserName())){
+									List<String> roleNameList = entry.getValue();
+									if(roleNameList != null && roleNameList.size() >0){
+										topic.setUserRoleNameList(roleNameList);
+									}
+									break;
 								}
-								break;
 							}
 						}
 						
@@ -383,14 +404,16 @@ public class SearchAction {
 						}
 					}else if(searchResult.getIndexModule().equals(20)){//问题模块
 						Question question = searchResult.getQuestion();
-						//用户角色名称集合
-						for (Map.Entry<String, List<String>> entry : userRoleNameMap.entrySet()) {
-							if(entry.getKey().equals(question.getUserName())){
-								List<String> roleNameList = entry.getValue();
-								if(roleNameList != null && roleNameList.size() >0){
-									question.setUserRoleNameList(roleNameList);
+						if(!question.getIsStaff()){
+							//用户角色名称集合
+							for (Map.Entry<String, List<String>> entry : userRoleNameMap.entrySet()) {
+								if(entry.getKey().equals(question.getUserName())){
+									List<String> roleNameList = entry.getValue();
+									if(roleNameList != null && roleNameList.size() >0){
+										question.setUserRoleNameList(roleNameList);
+									}
+									break;
 								}
-								break;
 							}
 						}
 						//非正常状态用户清除显示数据

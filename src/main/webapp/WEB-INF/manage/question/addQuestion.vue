@@ -8,7 +8,7 @@
 			<div class="data-form" >
 				<el-form label-width="auto"  @submit.native.prevent>
 					<el-form-item label="标题" :required="true" :error="error.title" >
-						<el-input v-model.trim="title" maxlength="100" clearable="true" show-word-limit></el-input>
+						<el-input v-model.trim="title" maxlength="150" clearable="true" show-word-limit></el-input>
 					</el-form-item>
 					<el-form-item label="标签" :required="true" :error="error.tagId">
 						<el-select ref="question_tag_ref"  v-model="tagIdGroup" @remove-tag="processRemoveTag" @focus="loadQuestionTag"  style="width: 100%;" multiple :placeholder="select_placeholder" >

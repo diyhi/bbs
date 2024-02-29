@@ -63,6 +63,7 @@ import cms.web.action.SystemException;
 import cms.web.action.TextFilterManage;
 import cms.web.action.fileSystem.FileManage;
 import cms.web.action.filterWord.SensitiveWordFilterManage;
+import cms.web.action.follow.FollowManage;
 import cms.web.action.membershipCard.MembershipCardGiftTaskManage;
 import cms.web.action.payment.PaymentManage;
 import cms.web.action.question.AnswerManage;
@@ -103,6 +104,8 @@ public class QuestionFormAction {
 	@Resource AnswerService answerService;
 	@Resource PaymentManage paymentManage;
 	@Resource MembershipCardGiftTaskManage membershipCardGiftTaskManage;
+	@Resource FollowManage followManage;
+	
 	
 	/**
 	 * 问题  添加
@@ -550,7 +553,7 @@ public class QuestionFormAction {
 				//删除缓存
 				userManage.delete_cache_findUserById(accessUser.getUserId());
 				userManage.delete_cache_findUserByUserName(accessUser.getUserName());
-				
+				followManage.delete_cache_userUpdateFlag(accessUser.getUserName());
 				//异步执行会员卡赠送任务(长期任务类型)
 				membershipCardGiftTaskManage.async_triggerMembershipCardGiftTask(accessUser.getUserName());
 				
