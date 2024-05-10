@@ -74,10 +74,11 @@ public class TagServiceBean extends DaoSupport<Tag> implements TagService{
 	 */
 	@CacheEvict(value="findAllTag_cache",allEntries=true)
 	public Integer updateTag(Tag tag){
-		Query query = em.createQuery("update Tag o set o.name=?1, o.sort=?2 where o.id=?3")
+		Query query = em.createQuery("update Tag o set o.name=?1, o.sort=?2,o.image=?3 where o.id=?4")
 		.setParameter(1, tag.getName())
 		.setParameter(2, tag.getSort())
-		.setParameter(3, tag.getId());
+		.setParameter(3, tag.getImage())
+		.setParameter(4, tag.getId());
 		int i = query.executeUpdate();
 		return i;
 	}

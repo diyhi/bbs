@@ -8,6 +8,11 @@
 			<div class="data-table" >
 				<el-table ref="multipleTable" :data="tableData" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange" stripe empty-text="没有内容">
 					<el-table-column prop="name" label="标签名称" align="center" min-width="200"></el-table-column>
+					<el-table-column label="图片" align="center" width="200">
+						<template #default="scope">
+			          		<el-image v-if="scope.row.image != null && scope.row.image != ''" style="width: 120px; height: 120px" fit="contain" :src="scope.row.image+'?time='+new Date().getTime()" :preview-src-list="[scope.row.image+'?time='+new Date().getTime()]" hide-on-click-modal ></el-image>
+				    	</template>
+					</el-table-column>
 					<el-table-column prop="sort" label="排序" align="center" width="80"></el-table-column>
 					<el-table-column label="操作" align="center" width="200">
 						<template #default="scope">

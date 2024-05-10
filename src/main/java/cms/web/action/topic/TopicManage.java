@@ -501,10 +501,17 @@ public class TopicManage {
 			if(editor.isHideAmount()){//余额购买可见
 				tag.add("hideAmount");
 			}
-
+			if(editor.isMention()){//提及
+				tag.add("mention");
+			}
+			if(editor.isAi()){//人工智能
+				tag.add("ai");
+			}
 			if(editor.isFullscreen()){//全屏显示
 				tag.add("fullscreen");
 			}
+			
+			
 		}
 		return JsonUtils.toJSONString(tag);
 	}

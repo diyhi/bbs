@@ -36,9 +36,20 @@
 				<el-table ref="multipleTable" :data="tableData" tooltip-effect="dark" style="width: 100%" stripe empty-text="没有内容">
 					<el-table-column label="标题" align="center" >
 						<template #default="scope">
-							<el-link class="sourceTitle" href="javascript:void(0);" @click="$store.commit('setCacheNumber'); $router.push({path: '/admin/control/topic/manage/view', query:{ topicId : scope.row.topicId,id : $route.query.id,userName : encodeURIComponent(userName),beforeUrl:($route.query.beforeUrl != undefined ? $route.query.beforeUrl:'')}})">{{scope.row.topicTitle}}</el-link>
-						</template>
+							<el-link class="sourceTitle" v-if="scope.row.module == 10 || scope.row.module == 20 || scope.row.module == 30" href="javascript:void(0);" @click="$store.commit('setCacheNumber'); $router.push({path: '/admin/control/topic/manage/view', query:{ topicId : scope.row.topicId,id : $route.query.id,userName : encodeURIComponent(userName),beforeUrl:($route.query.beforeUrl != undefined ? $route.query.beforeUrl:'')}})">{{scope.row.topicTitle}}</el-link>
+							<el-link class="sourceTitle" v-if="scope.row.module == 40 || scope.row.module == 50 || scope.row.module == 60" href="javascript:void(0);" @click="$store.commit('setCacheNumber'); $router.push({path: '/admin/control/question/manage/view', query:{ questionId : scope.row.questionId,id : $route.query.id,userName : encodeURIComponent(userName),beforeUrl:($route.query.beforeUrl != undefined ? $route.query.beforeUrl:'')}})">{{scope.row.questionTitle}}</el-link>
+                    	</template>
 					</el-table-column>
+					<el-table-column label="模块" align="center" width="200">
+	                    <template #default="scope">
+	                        <span v-if="scope.row.module == 10">话题</span>
+	                        <span v-if="scope.row.module == 20">评论</span>
+	                        <span v-if="scope.row.module == 30">评论回复</span>
+	                        <span v-if="scope.row.module == 40">问题</span>
+	                        <span v-if="scope.row.module == 50">答案</span>
+	                        <span v-if="scope.row.module == 60">答案回复</span>
+	                    </template>
+	                </el-table-column>
 					<el-table-column prop="addtime" label="加入时间" align="center" width="170"></el-table-column>
 				</el-table>
 				<div class="pagination-wrapper" v-if="isShowPage">

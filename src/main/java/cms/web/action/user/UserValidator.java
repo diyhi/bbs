@@ -37,9 +37,14 @@ public class UserValidator implements Validator{
 					if(user.getAccount().length()>30){
 						errors.rejectValue("account","errors.required", new String[]{"账号不能超过30个字符"},"");
 					}
-					User u = userService.findUserByAccount(user.getAccount().trim());
-					if(u != null){
+					User u1 = userService.findUserByAccount(user.getAccount().trim());
+					if(u1 != null){
 						errors.rejectValue("account","errors.required", new String[]{"该账号已注册"},"");
+					}
+					
+					User u2 = userService.findUserByNickname(user.getAccount().trim());
+					if(u2 != null){
+						errors.rejectValue("account","errors.required", new String[]{"该账号不能和其他用户呢称相同"},"");
 					}
 				}else{
 					errors.rejectValue("account","errors.required", new String[]{"请填写账号"},"");

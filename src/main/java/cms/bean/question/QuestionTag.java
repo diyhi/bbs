@@ -43,7 +43,9 @@ public class QuestionTag implements Serializable{
 	/** 子标签 **/
 	@Transient
 	private List<QuestionTag> childTag = new ArrayList<QuestionTag>();
-	
+	/** 图片 **/
+	@Column(length=100)
+	private String image;
 	/** 添加子标签 **/
 	public void addChildTag(QuestionTag questionTag){
 		this.getChildTag().add(questionTag);
@@ -103,6 +105,14 @@ public class QuestionTag implements Serializable{
 
 	public void setChildTag(List<QuestionTag> childTag) {
 		this.childTag = childTag;
+	}
+
+	public String getImage() {
+		return image;
+	}
+
+	public void setImage(String image) {
+		this.image = image;
 	}
 	
 	

@@ -80,6 +80,47 @@ public class TemplateServiceBean extends DaoSupport<Layout> implements TemplateS
 		return this.findTemplateDir();
 	}
 
+	/**
+	 * 查询系统当前使用的模板
+	 * @return
+	 */
+	@Transactional(readOnly=true,propagation=Propagation.NOT_SUPPORTED)
+	public Templates findUseTemplate(){
+		
+		Query query = em.createQuery("select o from Templates o where o.uses=?1")
+		.setParameter(1, true);
+		
+		List<Templates> templatesList = query.getResultList();
+		if(templatesList != null && templatesList.size() >0){
+			for(Templates t :templatesList){
+				return t;
+			}
+		}
+		//如果没设置模板目录为使用,则默认第一个
+		Query all_query = em.createQuery("select o from Templates o");
+		//索引开始,即从哪条记录开始
+		all_query.setFirstResult(0);
+		//获取多少条数据
+		all_query.setMaxResults(1);
+		List<Templates> all_templatesList = all_query.getResultList();
+		if(all_templatesList != null && all_templatesList.size() >0){
+			for(Templates t :all_templatesList){
+				return t;
+			}
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * 查询系统当前使用的模板(目录为空时返回null) - 缓存
+	 * @return
+	 */
+	@Transactional(readOnly=true,propagation=Propagation.NOT_SUPPORTED)
+	@Cacheable(value="templateServiceBean_cache",key="'findUseTemplate_default'")
+	public Templates findUseTemplate_cache(){
+		return this.findUseTemplate();
+	}
 	
 	/**
 	 * 保存模板

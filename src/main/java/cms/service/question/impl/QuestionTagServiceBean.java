@@ -152,10 +152,11 @@ public class QuestionTagServiceBean extends DaoSupport<QuestionTag> implements Q
 	 */
 	@CacheEvict(value="findAllQuestionTag_cache",allEntries=true)
 	public Integer updateQuestionTag(QuestionTag questionTag){
-		Query query = em.createQuery("update QuestionTag o set o.name=?1, o.sort=?2 where o.id=?3")
+		Query query = em.createQuery("update QuestionTag o set o.name=?1, o.sort=?2,o.image=?3 where o.id=?4")
 		.setParameter(1, questionTag.getName())
 		.setParameter(2, questionTag.getSort())
-		.setParameter(3, questionTag.getId());
+		.setParameter(3, questionTag.getImage())
+		.setParameter(4, questionTag.getId());
 		int i = query.executeUpdate();
 		return i;
 	}

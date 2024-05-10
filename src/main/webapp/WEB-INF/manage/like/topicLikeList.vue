@@ -3,7 +3,7 @@
 	<div>
 		<div class="main likeModule">
 			<div class="navbar">
-				<el-button type="primary" plain size="small" @click="$router.push({path: '/admin/control/topic/manage/view', query:{ visible:($route.query.visible != undefined ? $route.query.visible:''),topicView_beforeUrl:($route.query.topicView_beforeUrl != undefined ? $route.query.topicView_beforeUrl:''),topicId :$route.query.topicId, commentId:($route.query.commentId != undefined ? $route.query.commentId:''), page:($route.query.topicPage != undefined ? $route.query.topicPage:'')}})">返回</el-button>
+				<el-button type="primary" plain size="small" @click="$router.push({path: '/admin/control/topic/manage/view', query:{ visible:($route.query.visible != undefined ? $route.query.visible:''),topicView_beforeUrl:($route.query.topicView_beforeUrl != undefined ? $route.query.topicView_beforeUrl:''),topicId :$route.query.topicId, commentId:($route.query.commentId != undefined ? $route.query.commentId:''), itemId:$route.query.itemId,likeModule:$route.query.likeModule,page:($route.query.topicPage != undefined ? $route.query.topicPage:'')}})">返回</el-button>
 			</div>
 			<div class="headInfo">
 				<div class="title">{{currentTopic.title}}</div>
@@ -54,7 +54,8 @@ export default({
 		    multipleSelection: [],
 		    
 		    currentTopic :'',
-		    
+		    itemId :'',//项目Id
+        	likeModule :10,//模块
 		  	id :'',
 			userName :'',//用户名称
 		    totalrecord : 0, //总记录数
@@ -82,6 +83,16 @@ export default({
 			this.userName = decodeURIComponent(this.$route.query.userName);
 			
 		}
+		
+		if(this.$route.query.itemId != undefined && this.$route.query.itemId != ''){
+			this.itemId = this.$route.query.itemId;
+			
+		}
+		if(this.$route.query.likeModule != undefined && this.$route.query.likeModule != ''){
+			this.likeModule = this.$route.query.likeModule;
+			
+		}
+		
 		if(this.$route.query.page != undefined && this.$route.query.page != ''){
 			this.currentpage = this.$route.query.page;
 		}
@@ -103,6 +114,9 @@ export default({
 			 _self.$ajax.get('control/topicLike/list', {
 				 params: {
 					topicId :_self.topicId,
+					itemId :_self.itemId,
+					likeModule :_self.likeModule,
+					
 					id :_self.id,
 					userName :_self.userName,
 				  	page :_self.currentpage
@@ -156,6 +170,9 @@ export default({
 					topicView_beforeUrl:(this.$route.query.topicView_beforeUrl != undefined ? this.$route.query.topicView_beforeUrl:''),
 					topicId :this.topicId,
 					commentId :(this.$route.query.commentId != undefined ? this.$route.query.commentId:''),
+					itemId :this.itemId,
+					likeModule :this.likeModule,
+					
 					topicPage :(this.$route.query.topicPage != undefined ? this.$route.query.topicPage:''),
 					page : page
 				}

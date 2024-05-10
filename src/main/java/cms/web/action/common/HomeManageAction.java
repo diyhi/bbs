@@ -114,6 +114,7 @@ import cms.utils.JsonUtils;
 import cms.utils.RefererCompare;
 import cms.utils.SHA;
 import cms.utils.SecureLink;
+import cms.utils.StringUtil;
 import cms.utils.UUIDUtil;
 import cms.utils.Verification;
 import cms.utils.WebUtil;
@@ -337,6 +338,20 @@ public class HomeManageAction {
       		
       		
       	}
+  		
+  		if(!returnValue.containsKey("user")){
+  			SysUsers sysUsers = staffManage.query_cache_findByUserAccount(_userName);
+  			if(sysUsers != null){//显示员工信息
+  				User admin_user = new User();
+  				admin_user.setId(-1L);
+  				admin_user.setAccount(sysUsers.getUserAccount());//账号
+  				admin_user.setNickname(sysUsers.getNickname());//呢称
+  				admin_user.setAvatarPath(fileManage.fileServerAddress(request)+sysUsers.getAvatarPath());//头像路径
+  				admin_user.setAvatarName(sysUsers.getAvatarName());//头像名称
+  				model.addAttribute("user", admin_user);
+          		returnValue.put("user", admin_user);
+  			}
+  		}
      	if(isAjax){
 			WebUtil.writeToWeb(JsonUtils.toJSONString(returnValue), "json", response);
 			return null;
@@ -345,6 +360,59 @@ public class HomeManageAction {
 			return "templates/"+dirName+"/"+accessSourceDeviceManage.accessDevices(request)+"/home";	
 		}
 	}	
+	
+	/**
+	 * 根据账号或呢称查询用户
+	 * @param keyword 关键字
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/user/control/queryUser",method=RequestMethod.GET) 
+	@ResponseBody
+	public String queryUser(ModelMap model,String keyword,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+
+	  	if(keyword != null && !"".equals(keyword.trim())){
+	  		User u1 = userService.findUserByAccount(keyword.trim());
+			if(u1 != null && u1.getState().equals(1) && u1.getCancelAccountTime().equals(-1L)){
+				
+				
+				//仅显示指定的字段
+    			User viewUser = new User();
+    			viewUser.setId(u1.getId());//Id
+    			viewUser.setUserName(u1.getUserName());//会员用户名
+    			viewUser.setAccount(u1.getAccount());//账号
+    			viewUser.setNickname(u1.getNickname());//呢称
+    			viewUser.setState(u1.getState());//用户状态
+    			viewUser.setPoint(u1.getPoint());//当前积分
+    			viewUser.setGradeId(u1.getGradeId());//等级Id
+    			viewUser.setGradeName(u1.getGradeName());//等级名称
+    			viewUser.setAvatarPath(fileManage.fileServerAddress(request)+u1.getAvatarPath());//头像路径
+    			viewUser.setAvatarName(u1.getAvatarName());//头像名称
+    			return JsonUtils.toJSONString(viewUser);
+			}else{
+				User u2 = userService.findUserByNickname(keyword.trim());
+				if(u2 != null && u2.getState().equals(1) && u2.getCancelAccountTime().equals(-1L)){
+					//仅显示指定的字段
+	    			User viewUser = new User();
+	    			viewUser.setId(u2.getId());//Id
+	    			viewUser.setUserName(u2.getUserName());//会员用户名
+	    			viewUser.setAccount(u2.getAccount());//账号
+	    			viewUser.setNickname(u2.getNickname());//呢称
+	    			viewUser.setState(u2.getState());//用户状态
+	    			viewUser.setPoint(u2.getPoint());//当前积分
+	    			viewUser.setGradeId(u2.getGradeId());//等级Id
+	    			viewUser.setGradeName(u2.getGradeName());//等级名称
+	    			viewUser.setAvatarPath(fileManage.fileServerAddress(request)+u2.getAvatarPath());//头像路径
+	    			viewUser.setAvatarName(u2.getAvatarName());//头像名称
+	    			return JsonUtils.toJSONString(viewUser);
+				}
+			}
+	  	}
+	  	
+	  	return "";
+	}
 	
 	/**
 	 * 我的话题列表
@@ -1071,6 +1139,7 @@ public class HomeManageAction {
 		
 		
 		if(formbean.getNickname() != null && !"".equals(formbean.getNickname().trim())){
+			formbean.setNickname(StringUtil.deleteWhitespace(formbean.getNickname()));
 			if(user.getNickname() == null || "".equals(user.getNickname().trim())){
 				if(formbean.getNickname().length()>15){
 					error.put("nickname", ErrorView._829.name());//呢称不能超过15个字符
@@ -4718,6 +4787,7 @@ public class HomeManageAction {
 		//获取登录用户
 	  	AccessUser accessUser = AccessUserThreadLocal.get();
 	  	
+	  	SystemSetting systemSetting = settingService.findSystemSetting_cache();
 	  	
 		//调用分页算法代码
 		PageView<Like> pageView = new PageView<Like>(settingService.findSystemSetting_cache().getForestagePageNumber(),pageForm.getPage(),10,request.getRequestURI(),request.getQueryString());
@@ -4727,9 +4797,114 @@ public class HomeManageAction {
 		QueryResult<Like> qr = likeService.findLikeByUserId(accessUser.getUserId(),accessUser.getUserName(),firstIndex,pageView.getMaxresult());
 		if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
 			for(Like like : qr.getResultlist()){
-				Topic topic = topicManage.queryTopicCache(like.getTopicId());//查询缓存
-				if(topic != null){
-					like.setTopicTitle(topic.getTitle());
+				
+				if(like.getModule().equals(10) || like.getModule().equals(20) || like.getModule().equals(30)){
+					Topic topic = topicManage.queryTopicCache(like.getTopicId());//查询缓存
+					if(topic != null){
+						like.setTopicTitle(topic.getTitle());
+					}
+					
+					if(like.getModule().equals(10)){//10:话题 
+						like.setSummary(topic.getSummary());
+					}else if(like.getModule().equals(20)){//20:评论
+						Comment comment = commentManage.query_cache_findByCommentId(like.getCommentId());//查询缓存
+						if(comment != null && comment.getStatus().equals(20)){
+							//不含标签内容
+							String text = textFilterManage.filterText(textFilterManage.specifyHtmlTagToText(comment.getContent()));
+							//清除空格&nbsp;
+							String trimSpace = cms.utils.StringUtil.replaceSpace(text).trim();
+							//摘要
+							if(trimSpace != null && !"".equals(trimSpace)){
+								if(systemSetting.isAllowFilterWord()){
+									String wordReplace = "";
+									if(systemSetting.getFilterWordReplace() != null){
+										wordReplace = systemSetting.getFilterWordReplace();
+									}
+									trimSpace = sensitiveWordFilterManage.filterSensitiveWord(trimSpace, wordReplace);
+								}
+								if(trimSpace.length() >180){
+									like.setSummary(trimSpace.substring(0, 180)+"..");
+								}else{
+									like.setSummary(trimSpace+"..");
+								}
+							}
+						}
+					}else if(like.getModule().equals(30)){//30:评论回复
+						Reply reply = commentManage.query_cache_findReplyByReplyId(like.getCommentReplyId());//查询缓存
+						if(reply != null && reply.getStatus().equals(20)){
+							//清除空格&nbsp;
+							String trimSpace = cms.utils.StringUtil.replaceSpace(reply.getContent()).trim();
+							//摘要
+							if(trimSpace != null && !"".equals(trimSpace)){
+								if(systemSetting.isAllowFilterWord()){
+									String wordReplace = "";
+									if(systemSetting.getFilterWordReplace() != null){
+										wordReplace = systemSetting.getFilterWordReplace();
+									}
+									trimSpace = sensitiveWordFilterManage.filterSensitiveWord(trimSpace, wordReplace);
+								}
+								if(trimSpace.length() >180){
+									like.setSummary(trimSpace.substring(0, 180)+"..");
+								}else{
+									like.setSummary(trimSpace+"..");
+								}
+							}
+						}
+					}
+				}
+				if(like.getModule().equals(40) || like.getModule().equals(50) || like.getModule().equals(60)){
+					Question question = questionManage.query_cache_findById(like.getQuestionId());//查询缓存
+					if(question != null){
+						like.setQuestionTitle(question.getTitle());
+					}
+					
+					if(like.getModule().equals(40)){//40:问题
+						like.setSummary(question.getSummary());
+					}else if(like.getModule().equals(50)){//50:答案
+						Answer answer = answerManage.query_cache_findByAnswerId(like.getAnswerId());//查询缓存
+						if(answer != null && answer.getStatus().equals(20)){
+							//不含标签内容
+							String text = textFilterManage.filterText(textFilterManage.specifyHtmlTagToText(answer.getContent()));
+							//清除空格&nbsp;
+							String trimSpace = cms.utils.StringUtil.replaceSpace(text).trim();
+							//摘要
+							if(trimSpace != null && !"".equals(trimSpace)){
+								if(systemSetting.isAllowFilterWord()){
+									String wordReplace = "";
+									if(systemSetting.getFilterWordReplace() != null){
+										wordReplace = systemSetting.getFilterWordReplace();
+									}
+									trimSpace = sensitiveWordFilterManage.filterSensitiveWord(trimSpace, wordReplace);
+								}
+								if(trimSpace.length() >180){
+									like.setSummary(trimSpace.substring(0, 180)+"..");
+								}else{
+									like.setSummary(trimSpace+"..");
+								}
+							}
+						}
+					}else if(like.getModule().equals(60)){//60:答案回复
+						AnswerReply answerReply = answerManage.query_cache_findReplyByReplyId(like.getAnswerReplyId());//查询缓存
+						if(answerReply != null && answerReply.getStatus().equals(20)){
+							//清除空格&nbsp;
+							String trimSpace = cms.utils.StringUtil.replaceSpace(answerReply.getContent()).trim();
+							//摘要
+							if(trimSpace != null && !"".equals(trimSpace)){
+								if(systemSetting.isAllowFilterWord()){
+									String wordReplace = "";
+									if(systemSetting.getFilterWordReplace() != null){
+										wordReplace = systemSetting.getFilterWordReplace();
+									}
+									trimSpace = sensitiveWordFilterManage.filterSensitiveWord(trimSpace, wordReplace);
+								}
+								if(trimSpace.length() >180){
+									like.setSummary(trimSpace.substring(0, 180)+"..");
+								}else{
+									like.setSummary(trimSpace+"..");
+								}
+							}
+						}
+					}
 				}
 			}
 		}
@@ -4769,19 +4944,35 @@ public class HomeManageAction {
 		
 		//处理CSRF令牌
 		csrfTokenManage.processCsrfToken(request, token,error);
-		
+			
 		//获取登录用户
 	  	AccessUser accessUser = AccessUserThreadLocal.get();
 	  	Like like = null;
 	  	//话题点赞Id
-	  	String topicLikeId = null;
+	  	String itemLikeId = null;
+	  	Integer module = null;
   		if(likeId == null || "".equals(likeId.trim())){
   			error.put("like", ErrorView._1730.name());//点赞Id不存在
   		}else{
   			like  = likeService.findById(likeId.trim());
   			if(like != null){
+  				module = like.getModule();
   				if(like.getUserName().equals(accessUser.getUserName())){
-  					topicLikeId = likeManage.createTopicLikeId(like.getTopicId(), accessUser.getUserId());
+  					if(like.getModule().equals(10)){
+  						itemLikeId = likeManage.createItemLikeId(like.getTopicId(), accessUser.getUserId());
+  					}else if(like.getModule().equals(20)){
+  						itemLikeId = likeManage.createItemLikeId(like.getCommentId(), accessUser.getUserId());
+  					}else if(like.getModule().equals(30)){
+  						itemLikeId = likeManage.createItemLikeId(like.getCommentReplyId(), accessUser.getUserId());
+  					}else if(like.getModule().equals(40)){
+  						itemLikeId = likeManage.createItemLikeId(like.getQuestionId(), accessUser.getUserId());
+  					}else if(like.getModule().equals(50)){
+  						itemLikeId = likeManage.createItemLikeId(like.getAnswerId(), accessUser.getUserId());
+  					}else if(like.getModule().equals(60)){
+  						itemLikeId = likeManage.createItemLikeId(like.getAnswerReplyId(), accessUser.getUserId());
+  					}
+  					
+  					
   				}else{
   					error.put("like", ErrorView._1760.name());//本点赞不属于当前用户
   				}
@@ -4791,13 +4982,37 @@ public class HomeManageAction {
   		}
   		
 		if(error.size() == 0){
-			int i = likeService.deleteLike(likeId.trim(),topicLikeId);
+			int i = likeService.deleteLike(likeId.trim(),itemLikeId,module);
 			if(i == 0){
 				error.put("like", ErrorView._1740.name());//删除点赞失败
 			}
-			//删除点赞缓存
-			likeManage.delete_cache_findTopicLikeById(topicLikeId);
-			likeManage.delete_cache_findLikeCountByTopicId(like.getTopicId());
+			
+			if(like.getModule().equals(10)){
+				//删除点赞缓存
+				likeManage.delete_cache_findTopicLikeById(itemLikeId);
+				likeManage.delete_cache_findLikeCountByTopicId(like.getTopicId());
+			}else if(like.getModule().equals(20)){
+				//删除点赞缓存
+				likeManage.delete_cache_findCommentLikeById(itemLikeId);
+				likeManage.delete_cache_findLikeCountByCommentId(like.getCommentId());
+			}else if(like.getModule().equals(30)){
+				//删除点赞缓存
+				likeManage.delete_cache_findCommentReplyLikeById(itemLikeId);
+				likeManage.delete_cache_findLikeCountByCommentReplyId(like.getCommentReplyId());
+			}else if(like.getModule().equals(40)){
+				//删除点赞缓存
+				likeManage.delete_cache_findQuestionLikeById(itemLikeId);
+				likeManage.delete_cache_findLikeCountByQuestionId(like.getQuestionId());
+			}else if(like.getModule().equals(50)){
+				//删除点赞缓存
+				likeManage.delete_cache_findAnswerLikeById(itemLikeId);
+				likeManage.delete_cache_findLikeCountByAnswerId(like.getAnswerId());
+			}else if(like.getModule().equals(60)){
+				//删除点赞缓存
+				likeManage.delete_cache_findAnswerReplyLikeById(itemLikeId);
+				likeManage.delete_cache_findLikeCountByAnswerReplyId(like.getAnswerReplyId());
+			}
+			
 		}
 		
 		Map<String,String> returnError = new HashMap<String,String>();//错误

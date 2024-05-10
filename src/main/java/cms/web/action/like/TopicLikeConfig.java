@@ -2,6 +2,9 @@ package cms.web.action.like;
 
 import javax.annotation.Resource;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 /**
  * 话题点赞配置
  *
@@ -28,7 +31,7 @@ public class TopicLikeConfig {
 	  * @return
 	 */
 	public Integer topicLikeIdRemainder(String topicLikeId){
-	   int topicId = likeManage.getTopicLikeId(topicLikeId);
+	   int topicId = likeManage.getItemLikeId(topicLikeId);
 	   return topicId % this.getTableQuantity();
 	} 
    /**

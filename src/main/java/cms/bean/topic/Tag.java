@@ -30,7 +30,9 @@ public class Tag implements Serializable{
 	private String name;
 	/** 排序 **/
 	private Integer sort = 0;
-	
+	/** 图片 **/
+	@Column(length=100)
+	private String image;
 	/** 标签下的话题允许查看的角色名称集合(默认角色除外) **/
 	@Transient
 	private List<String> allowRoleViewList = new ArrayList<String>();
@@ -59,6 +61,12 @@ public class Tag implements Serializable{
 	}
 	public void setAllowRoleViewList(List<String> allowRoleViewList) {
 		this.allowRoleViewList = allowRoleViewList;
+	}
+	public String getImage() {
+		return image;
+	}
+	public void setImage(String image) {
+		this.image = image;
 	}
 
 	

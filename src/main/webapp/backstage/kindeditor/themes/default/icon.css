@@ -106,6 +106,16 @@
 	display:inline-block;
 	vertical-align:top;
 }
+.icon-mention {
+	background-image: url(./mention.png);
+	display:inline-block;
+	vertical-align:top;
+}
+.icon-ai {
+	background-image: url(./ai.png);
+	display:inline-block;
+	vertical-align:top;
+}
 .icon-media {
 	background-position: 0px -528px;
 	width: 16px;

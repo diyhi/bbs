@@ -361,7 +361,58 @@
 	<cache name="likeManage_cache_findLikeCountByTopicId" maxElementsInMemory="900000" 
 		overflowToDisk="true"
 		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
+	<!-- 根据Id查询评论点赞 -->
+	<cache name="likeManage_cache_findCommentLikeById" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
+	<!-- 根据评论Id查询被点赞数量 -->
+	<cache name="likeManage_cache_findLikeCountByCommentId" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
+	<!-- 根据Id查询评论回复点赞 -->
+	<cache name="likeManage_cache_findCommentReplyLikeById" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
+	<!-- 根据评论回复Id查询被点赞数量 -->
+	<cache name="likeManage_cache_findLikeCountByCommentReplyId" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
 		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>		
+	<!-- 根据Id查询问题点赞 -->
+	<cache name="likeManage_cache_findQuestionLikeById" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
+	<!-- 根据问题Id查询被点赞数量 -->
+	<cache name="likeManage_cache_findLikeCountByQuestionId" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
+	<!-- 根据Id查询答案点赞 -->
+	<cache name="likeManage_cache_findAnswerLikeById" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
+	<!-- 根据答案Id查询被点赞数量 -->
+	<cache name="likeManage_cache_findLikeCountByAnswerId" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>
+	<!-- 根据Id查询答案回复点赞 -->
+	<cache name="likeManage_cache_findAnswerReplyLikeById" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>
+	<!-- 根据答案回复Id查询被点赞数量 -->
+	<cache name="likeManage_cache_findLikeCountByAnswerReplyId" maxElementsInMemory="900000" 
+		overflowToDisk="true"
+		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
+			
 	<!-- 根据Id查询问题收藏 -->
 	<cache name="favoriteManage_cache_findQuestionFavoriteById" maxElementsInMemory="900000" 
 		overflowToDisk="true"

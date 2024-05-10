@@ -2091,7 +2091,8 @@ var thread_component = Vue.extend({
 		//查询用户是否已经点赞该话题
 		queryAlreadyLiked : function() {
 			var _self = this;
-			var data = "topicId=" + _self.topicId; //提交参数
+			var data = "itemId=" + _self.topicId; //提交参数
+			data += "&module=10"
 			$.ajax({
 				type : "GET",
 				cache : false,
@@ -2111,7 +2112,8 @@ var thread_component = Vue.extend({
 		//查询话题点赞总数
 		queryLikeCount : function() {
 			var _self = this;
-			var data = "topicId=" + _self.topicId; //提交参数
+			var data = "itemId=" + _self.topicId; //提交参数
+			data += "&module=10"
 			$.ajax({
 				type : "GET",
 				cache : false,
@@ -2129,74 +2131,75 @@ var thread_component = Vue.extend({
 			});
 		},
 		//给话题点赞
-		addLike : function(id) {
-			var _self = this;
-			_self.$messagebox.confirm('确定点赞?').then(function (action) {
-				var parameter = "&topicId=" + id;
+				addLike : function(id,module) {
+					var _self = this;
+					_self.$messagebox.confirm('确定点赞?').then(function (action) {
+						var parameter = "&itemId=" + id;
 
-				//	alert(parameter);
-				//令牌
-				parameter += "&token=" + _self.$store.state.token;
-				$.ajax({
-					type : "POST",
-					cache : false,
-					async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
-					url : "user/control/like/add",
-					data : parameter,
-					success : function success(result) {
-						if (result != "") {
+						parameter += "&module=" + module;
+						//	alert(parameter);
+						//令牌
+						parameter += "&token=" + _self.$store.state.token;
+						$.ajax({
+							type : "POST",
+							cache : false,
+							async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
+							url : "user/control/like/add",
+							data : parameter,
+							success : function success(result) {
+								if (result != "") {
 
-							var returnValue = $.parseJSON(result);
+									var returnValue = $.parseJSON(result);
 
-							var value_success = "";
-							var value_error = null;
+									var value_success = "";
+									var value_error = null;
 
-							for (var key in returnValue) {
-								if (key == "success") {
-									value_success = returnValue[key];
-								} else if (key == "error") {
-									value_error = returnValue[key];
-								}
-							}
-
-							//加入成功
-							if (value_success == "true") {
-								_self.$toast({
-									message : "点赞成功",
-									duration : 3000,
-									className : "mint-ui-toast",
-								});
-
-								setTimeout(function() {
-									//刷新用户是否已经点赞该话题
-									_self.queryAlreadyLiked();
-									//刷新话题点赞总数
-									_self.queryLikeCount();
-								}, 3000);
-								
-							} else {
-								//显示错误
-								if (value_error != null) {
-
-
-									var htmlContent = "";
-									var count = 0;
-									for (var errorKey in value_error) {
-										var errorValue = value_error[errorKey];
-										count++;
-										htmlContent += count + ". " + errorValue + "<br>";
+									for (var key in returnValue) {
+										if (key == "success") {
+											value_success = returnValue[key];
+										} else if (key == "error") {
+											value_error = returnValue[key];
+										}
 									}
-									_self.$messagebox('提示', htmlContent);
 
+									//加入成功
+									if (value_success == "true") {
+										_self.$toast({
+											message : "点赞成功",
+											duration : 3000,
+											className : "mint-ui-toast",
+										});
+
+										setTimeout(function() {
+											//刷新用户是否已经点赞该话题
+											_self.queryAlreadyLiked();
+											//刷新话题点赞总数
+											_self.queryLikeCount();
+										}, 3000);
+										
+									} else {
+										//显示错误
+										if (value_error != null) {
+
+
+											var htmlContent = "";
+											var count = 0;
+											for (var errorKey in value_error) {
+												var errorValue = value_error[errorKey];
+												count++;
+												htmlContent += count + ". " + errorValue + "<br>";
+											}
+											_self.$messagebox('提示', htmlContent);
+
+										}
+									}
 								}
 							}
-						}
-					}
-				});
-			}).catch(function (err){//不捕获 Promise 的异常,若用户点击了取消按钮,会出现警告
-			    console.log(err);
-			});
-		},
+						});
+					}).catch(function (err){//不捕获 Promise 的异常,若用户点击了取消按钮,会出现警告
+					    console.log(err);
+					});
+				},
 		
 		//查询评论列表
 		queryCommentList : function() {

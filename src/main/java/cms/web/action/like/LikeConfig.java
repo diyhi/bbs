@@ -2,6 +2,9 @@ package cms.web.action.like;
 
 import javax.annotation.Resource;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 /**
  * 点赞配置
  *

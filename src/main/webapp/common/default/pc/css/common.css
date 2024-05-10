@@ -4025,6 +4025,19 @@ html,body{
     color:#e2b46e;
 	background-color:#f8e7c4;
 }
+.user-home-header .staff{
+	display: inline-block;
+	white-space:nowrap;
+    vertical-align: middle;
+    padding: 3px 4px;
+    font-size: 13px;
+    line-height: 14px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color:#4CD263;
+	background-color:#cafcc7;
+}
 .user-home-header .ipAddress{
 	font-size: 16px;
 	color: #86909c;

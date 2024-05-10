@@ -418,7 +418,7 @@
 					<div class="operating">
 						<div class="bottomInfo">
 							<mt-button type="default" plain @click.native="addFavorite(topic.id);"  :disabled="alreadyCollected" style="border: 1px solid #eee;color: #a9a9a9;border-radius: 6px;height: 36px;font-size: 16px;"><span class="cms-favorites icon"></span>{{favoriteCount}}{{alreadyCollected == true ? '已收藏':'收藏'}}</mt-button>
-						 	<mt-button type="default" plain @click.native="addLike(topic.id);"  :disabled="alreadyLiked" style="border: 1px solid #eee;color: #a9a9a9;border-radius: 6px;height: 36px;font-size: 16px;"><span class="cms-thumb-up icon"></span>{{likeCount}}{{alreadyLiked == true ? '已赞':'赞'}}</mt-button>
+						 	<mt-button type="default" plain @click.native="addLike(topic.id,10);"  :disabled="alreadyLiked" style="border: 1px solid #eee;color: #a9a9a9;border-radius: 6px;height: 36px;font-size: 16px;"><span class="cms-thumb-up icon"></span>{{likeCount}}{{alreadyLiked == true ? '已赞':'赞'}}</mt-button>
 						
 						</div>
 					</div> 
@@ -2397,6 +2397,7 @@
 		        <p class="userName">{{user.account}} <i class="userRoleName" v-for="(roleName,index) in user.userRoleNameList" >{{roleName}}</i></p>
 		        <p class="nickname" v-if="user.nickname != null && user.nickname != ''">{{user.nickname}}</p>
 		        <p class="grade" v-if="user.gradeName != null">{{user.gradeName}}</p>
+		        <p class="staff" v-if="user.id != null && user.id == -1">官方人员</p>
 		        <p class="ipAddress" v-if="user.ipAddress != null && user.ipAddress != ''">
 		    		<span class="cms-map-pin-line icon"></span>
 		    		<span class="ipAddressText">{{user.ipAddress}}</span>

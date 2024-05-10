@@ -6,12 +6,16 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import cms.bean.question.QuestionTag;
 import cms.bean.template.Forum;
 import cms.service.question.QuestionTagService;
+import cms.web.action.fileSystem.FileManage;
 import cms.web.action.question.QuestionTagManage;
 
 /**
@@ -22,6 +26,8 @@ import cms.web.action.question.QuestionTagManage;
 public class QuestionTag_TemplateManage {
 	@Resource QuestionTagService questionTagService; 
 	@Resource QuestionTagManage questionTagManage;
+	@Resource FileManage fileManage;
+	
 	
 	/**
 	 * 标签列表 -- 集合
@@ -32,11 +38,17 @@ public class QuestionTag_TemplateManage {
 		List<QuestionTag> new_questionTagList = new ArrayList<QuestionTag>();//排序后标签
 		
 		if(questionTagList != null && questionTagList.size() >0){
+			HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();  
 			
 			//组成排序数据
 			Iterator<QuestionTag> questionTag_iter = questionTagList.iterator();   
 			while(questionTag_iter.hasNext()){   
 				QuestionTag questionTag = questionTag_iter.next();
+				
+				
+				if(questionTag.getImage() != null && !"".equals(questionTag.getImage().trim())){
+					questionTag.setImage(fileManage.fileServerAddress(request)+questionTag.getImage());
+				}
 				
 				//如果是根节点
 				if(questionTag.getParentId().equals(0L)){

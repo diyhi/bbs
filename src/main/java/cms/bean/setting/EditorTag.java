@@ -85,7 +85,10 @@ public class EditorTag implements Serializable{
 	
 	/** 全屏显示 **/
 	private boolean fullscreen = false;
-	
+	/** 提及 **/
+	private boolean mention = false;
+	/** 人工智能 **/
+	private boolean ai = false;
 	
 	/**
 	 * 添加图片格式
@@ -327,6 +330,22 @@ public class EditorTag implements Serializable{
 
 	public void setCode(boolean code) {
 		this.code = code;
+	}
+
+	public boolean isMention() {
+		return mention;
+	}
+
+	public void setMention(boolean mention) {
+		this.mention = mention;
+	}
+
+	public boolean isAi() {
+		return ai;
+	}
+
+	public void setAi(boolean ai) {
+		this.ai = ai;
 	}
 
 }

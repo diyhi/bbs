@@ -31,6 +31,17 @@ public interface TemplateService extends DAO<Layout> {
 	 */
 	public String findTemplateDir_cache();
 	/**
+	 * 查询系统当前使用的模板
+	 * @return
+	 */
+	public Templates findUseTemplate();
+	
+	/**
+	 * 查询系统当前使用的模板(目录为空时返回null) - 缓存
+	 * @return
+	 */
+	public Templates findUseTemplate_cache();
+	/**
 	 * 保存模板
 	 * @param templates
 	 * @param layoutList 默认布局数据

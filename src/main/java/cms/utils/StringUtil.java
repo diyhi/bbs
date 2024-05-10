@@ -124,6 +124,15 @@ public class StringUtil {
     	//return html.toLowerCase().replaceAll("(?i)&nbsp;","");
     	return html.replaceAll("(?i)&nbsp;","");
     }
+    
+    /**
+     * 删除所有空格
+     * @param txt
+     * @return
+     */
+    public static String deleteWhitespace(String txt){
+    	return  StringUtils.deleteWhitespace(txt);
+    }
    
     /** 
      * 转义like语句中的 

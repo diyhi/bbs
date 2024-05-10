@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import cms.bean.setting.SystemSetting;
+import cms.bean.template.Templates;
 import cms.bean.thirdParty.WeChatConfig;
 import cms.bean.user.AccessUser;
 import cms.bean.user.RefreshUser;
@@ -224,8 +225,13 @@ public class TempletesInterceptor implements HandlerInterceptor {
 				String begin = mav.substring(0, 9);//取得templates
 				if("templates".equals(begin)){//如果以templates开头
 
-					//统计访问量
-					pageViewManage.addPV(request);
+					Templates template = templateService.findUseTemplate_cache();
+    		    	//是否验证CSRF
+    		    	boolean verifyCSRF = template.getVerifyCSRF();
+    		    	if(verifyCSRF){
+    		    		//统计访问量
+    					pageViewManage.addPV(request);
+    		    	}
 	
 	    			//获取URL参数
 			       	String queryString = request.getQueryString();

@@ -17,9 +17,11 @@ import cms.bean.QueryResult;
 import cms.bean.RequestResult;
 import cms.bean.ResultCode;
 import cms.bean.question.QuestionTag;
+import cms.bean.topic.Tag;
 import cms.service.question.QuestionTagService;
 import cms.service.setting.SettingService;
 import cms.utils.JsonUtils;
+import cms.web.action.fileSystem.FileManage;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -27,13 +29,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
- * 问题标签
+ * 问题标签管理列表
  *
  */
 @Controller
 public class QuestionTagAction {
 	@Resource QuestionTagService questionTagService;
 	@Resource SettingService settingService;
+	@Resource FileManage fileManage;
+	
+	
 	/**
 	 * 问题标签管理分页显示
 	 * parentId 父ID 
@@ -94,6 +99,15 @@ public class QuestionTagAction {
 			}
 			
 			returnValue.put("navigation", navigation);//标签导航
+		}
+		
+		if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
+			for(QuestionTag tag :qr.getResultlist()){
+				if(tag.getImage() != null && !"".equals(tag.getImage().trim())){
+					tag.setImage(fileManage.fileServerAddress(request)+tag.getImage());
+				}
+				
+			}
 		}
 		
 		if(error.size() >0){

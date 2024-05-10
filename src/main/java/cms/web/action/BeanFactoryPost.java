@@ -217,6 +217,93 @@ public class BeanFactoryPost implements BeanFactoryPostProcessor{
 			}
 		}
 		
+		
+		BeanDefinition commentLike_bd = beanFactory.getBeanDefinition("commentLikeConfig");
+		if(commentLike_bd != null){
+			MutablePropertyValues mutablePropertyValues = commentLike_bd.getPropertyValues();
+			TypedStringValue typedStringValue = (TypedStringValue)mutablePropertyValues.getPropertyValue("tableQuantity").getValue();
+
+			//评论点赞分表数量
+			Integer tableQuantity = Integer.parseInt(typedStringValue.getValue());
+			if(tableQuantity >1){
+				for(int i =1; i<tableQuantity; i++){
+					
+					//初始化评论点赞bean
+					CreateBean.createCommentLikeBean(i);
+				}	
+			}
+		}
+		
+		BeanDefinition commentReplyLike_bd = beanFactory.getBeanDefinition("commentReplyLikeConfig");
+		if(commentReplyLike_bd != null){
+			MutablePropertyValues mutablePropertyValues = commentReplyLike_bd.getPropertyValues();
+			TypedStringValue typedStringValue = (TypedStringValue)mutablePropertyValues.getPropertyValue("tableQuantity").getValue();
+
+			//评论回复点赞分表数量
+			Integer tableQuantity = Integer.parseInt(typedStringValue.getValue());
+			if(tableQuantity >1){
+				for(int i =1; i<tableQuantity; i++){
+					
+					//初始化评论回复点赞bean
+					CreateBean.createCommentReplyLikeBean(i);
+				}	
+			}
+		}
+
+		
+		
+		
+		
+		BeanDefinition questionLike_bd = beanFactory.getBeanDefinition("questionLikeConfig");
+		if(questionLike_bd != null){
+			MutablePropertyValues mutablePropertyValues = questionLike_bd.getPropertyValues();
+			TypedStringValue typedStringValue = (TypedStringValue)mutablePropertyValues.getPropertyValue("tableQuantity").getValue();
+
+			//问题点赞分表数量
+			Integer tableQuantity = Integer.parseInt(typedStringValue.getValue());
+			if(tableQuantity >1){
+				for(int i =1; i<tableQuantity; i++){
+					
+					//初始化问题点赞bean
+					CreateBean.createQuestionLikeBean(i);
+				}	
+			}
+		}
+		
+		
+		BeanDefinition answerLike_bd = beanFactory.getBeanDefinition("answerLikeConfig");
+		if(answerLike_bd != null){
+			MutablePropertyValues mutablePropertyValues = answerLike_bd.getPropertyValues();
+			TypedStringValue typedStringValue = (TypedStringValue)mutablePropertyValues.getPropertyValue("tableQuantity").getValue();
+
+			//答案点赞分表数量
+			Integer tableQuantity = Integer.parseInt(typedStringValue.getValue());
+			if(tableQuantity >1){
+				for(int i =1; i<tableQuantity; i++){
+					
+					//初始化答案点赞bean
+					CreateBean.createAnswerLikeBean(i);
+				}	
+			}
+		}
+		
+		BeanDefinition answerReplyLike_bd = beanFactory.getBeanDefinition("answerReplyLikeConfig");
+		if(answerReplyLike_bd != null){
+			MutablePropertyValues mutablePropertyValues = answerReplyLike_bd.getPropertyValues();
+			TypedStringValue typedStringValue = (TypedStringValue)mutablePropertyValues.getPropertyValue("tableQuantity").getValue();
+
+			//答案回复点赞分表数量
+			Integer tableQuantity = Integer.parseInt(typedStringValue.getValue());
+			if(tableQuantity >1){
+				for(int i =1; i<tableQuantity; i++){
+					
+					//初始化答案回复点赞bean
+					CreateBean.createAnswerReplyLikeBean(i);
+				}	
+			}
+		}
+		
+		
 		BeanDefinition follow_bd = beanFactory.getBeanDefinition("followConfig");
 		if(follow_bd != null){
 			MutablePropertyValues mutablePropertyValues = follow_bd.getPropertyValues();

@@ -1448,6 +1448,579 @@ public class CreateBean {
 	}
 	
 	/**
+	 * 创建评论点赞bean
+	 * @param number 表号
+	 */
+	public static void createCommentLikeBean(Integer tableNumber){
+		
+		//ClassPool：CtClass对象的容器   
+	    ClassPool pool = ClassPool.getDefault(); 
+	//    ClassClassPath classPath = new ClassClassPath(this.getClass());
+	    ClassClassPath classPath = new ClassClassPath(CreateBean.class);
+	    pool.insertClassPath(classPath);
+
+	      
+	    //通过ClassPool生成一个public新类HistoryOrder.java   
+	    CtClass ctClass = pool.makeClass("cms.bean.like.CommentLike_"+tableNumber); 
+
+        try {
+        	// 父类
+        	ctClass.setSuperclass(pool.get("cms.bean.like.CommentLikeEntity"));
+        	// 添加接口
+			ctClass.addInterface(pool.get("java.io.Serializable"));
+			
+			// 添加属性   
+			 ctClass.addField(CtField.make("private static final long serialVersionUID = 50000000000000000"+ tableNumber+"L;", ctClass));
+
+			//写入注解(Annotation) 
+			ClassFile cf = ctClass.getClassFile();  
+	        ConstPool cp = cf.getConstPool();
+ 
+	        //@Table(name="historyorder_0",indexes = {@Index(name="historyorder_idx", columnList="state,visible")})
+	        AnnotationsAttribute attr = new AnnotationsAttribute(cp, AnnotationsAttribute.visibleTag);
+	        
+	        //@Entity注解
+	        Annotation entity_a = new Annotation("javax.persistence.Entity", cp);
+	  	  	attr.addAnnotation(entity_a);
+	  	  	
+	        //@Table注解
+	        Annotation a = new Annotation("javax.persistence.Table", cp);
+	        a.addMemberValue("name", new StringMemberValue("commentlike_"+tableNumber, cp));
+	       
+	        Annotation index_a = new Annotation("javax.persistence.Index", cp);
+	        index_a.addMemberValue("name", new StringMemberValue("commentLike_1_idx", cp));
+	        index_a.addMemberValue("columnList", new StringMemberValue("commentId,addtime", cp));
+	        AnnotationMemberValue annotationMemberValue = new AnnotationMemberValue(cp);
+	        annotationMemberValue.setValue(index_a);
+
+	      
+
+	        MemberValue[] vals = new MemberValue[]{annotationMemberValue};
+
+	        ArrayMemberValue arrayMemberValue=new ArrayMemberValue(cp);//数组类型
+	        arrayMemberValue.setValue(vals);
+	      
+	        a.addMemberValue("indexes", arrayMemberValue);//数组类型
+	        attr.addAnnotation(a);
+	        cf.addAttribute(attr);
+	        cf.setVersionToJava5();
+
+	        
+		} catch (NotFoundException e) {
+			// TODO Auto-generated catch block
+		//	e.printStackTrace();
+			if (logger.isErrorEnabled()) {
+	            logger.error("评论点赞bean",e);
+	        }
+		}   catch (CannotCompileException e) {
+			// TODO Auto-generated catch block
+		//	e.printStackTrace();
+			if (logger.isErrorEnabled()) {
+	            logger.error("评论点赞bean",e);
+	        }
+		}   
+       
+        
+        
+        //把生成的class文件写入文件   
+        byte[] byteArr;
+        FileOutputStream fos = null;
+		try {
+			File file = new File(PathUtil.path()+File.separator+"WEB-INF"+File.separator+"classes"+File.separator+"cms"+File.separator+"bean"+File.separator+"like"+File.separator+"CommentLike_"+tableNumber+".class");
+			
+			if(!file.exists()){
+				byteArr = ctClass.toBytecode();
+				//	fos = new FileOutputStream(new File("C://HistoryOrder_5.class"));
+				fos = new FileOutputStream(file);
+				fos.write(byteArr); 
+			}
+			
+			
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+		//	e.printStackTrace();
+			if (logger.isErrorEnabled()) {
+	            logger.error("评论点赞bean",e);
+	        }
+		} catch (CannotCompileException e) {
+			// TODO Auto-generated catch block
+		//	e.printStackTrace();
+			if (logger.isErrorEnabled()) {
+	            logger.error("评论点赞bean",e);
+	        }
+		} finally {
+			if(fos != null){
+				try {
+					fos.close();
+				} catch (IOException e) {
+					if (logger.isErrorEnabled()) {
+			            logger.error("评论点赞bean",e);
+			        }
+				}  
+			}
+		} 
+	}
+	
+	/**
+	 * 创建评论回复点赞bean
+	 * @param number 表号
+	 */
+	public static void createCommentReplyLikeBean(Integer tableNumber){
+		
+		//ClassPool：CtClass对象的容器   
+	    ClassPool pool = ClassPool.getDefault(); 
+	//    ClassClassPath classPath = new ClassClassPath(this.getClass());
+	    ClassClassPath classPath = new ClassClassPath(CreateBean.class);
+	    pool.insertClassPath(classPath);
+
+	      
+	    //通过ClassPool生成一个public新类HistoryOrder.java   
+	    CtClass ctClass = pool.makeClass("cms.bean.like.CommentReplyLike_"+tableNumber); 
+
+        try {
+        	// 父类
+        	ctClass.setSuperclass(pool.get("cms.bean.like.CommentReplyLikeEntity"));
+        	// 添加接口
+			ctClass.addInterface(pool.get("java.io.Serializable"));
+			
+			// 添加属性   
+			 ctClass.addField(CtField.make("private static final long serialVersionUID = 51000000000000000"+ tableNumber+"L;", ctClass));
+
+			//写入注解(Annotation) 
+			ClassFile cf = ctClass.getClassFile();  
+	        ConstPool cp = cf.getConstPool();
+ 
+	        //@Table(name="historyorder_0",indexes = {@Index(name="historyorder_idx", columnList="state,visible")})
+	        AnnotationsAttribute attr = new AnnotationsAttribute(cp, AnnotationsAttribute.visibleTag);
+	        
+	        //@Entity注解
+	        Annotation entity_a = new Annotation("javax.persistence.Entity", cp);
+	  	  	attr.addAnnotation(entity_a);
+	  	  	
+	        //@Table注解
+	        Annotation a = new Annotation("javax.persistence.Table", cp);
+	        a.addMemberValue("name", new StringMemberValue("commentreplylike_"+tableNumber, cp));
+	       
+	        Annotation index_a = new Annotation("javax.persistence.Index", cp);
+	        index_a.addMemberValue("name", new StringMemberValue("commentReplyLike_1_idx", cp));
+	        index_a.addMemberValue("columnList", new StringMemberValue("replyId,addtime", cp));
+	        AnnotationMemberValue annotationMemberValue = new AnnotationMemberValue(cp);
+	        annotationMemberValue.setValue(index_a);
+
+	      
+
+	        MemberValue[] vals = new MemberValue[]{annotationMemberValue};
+
+	        ArrayMemberValue arrayMemberValue=new ArrayMemberValue(cp);//数组类型
+	        arrayMemberValue.setValue(vals);
+	      
+	        a.addMemberValue("indexes", arrayMemberValue);//数组类型
+	        attr.addAnnotation(a);
+	        cf.addAttribute(attr);
+	        cf.setVersionToJava5();
+
+	        
+		} catch (NotFoundException e) {
+			// TODO Auto-generated catch block
+		//	e.printStackTrace();
+			if (logger.isErrorEnabled()) {
+	            logger.error("评论回复点赞bean",e);
+	        }
+		}   catch (CannotCompileException e) {
+			// TODO Auto-generated catch block
+		//	e.printStackTrace();
+			if (logger.isErrorEnabled()) {
+	            logger.error("评论回复点赞bean",e);
+	        }
+		}   
+       
+        
+        //把生成的class文件写入文件   
+        byte[] byteArr;
+        FileOutputStream fos = null;
+		try {
+			File file = new File(PathUtil.path()+File.separator+"WEB-INF"+File.separator+"classes"+File.separator+"cms"+File.separator+"bean"+File.separator+"like"+File.separator+"CommentReplyLike_"+tableNumber+".class");
+			
+			if(!file.exists()){
+				byteArr = ctClass.toBytecode();
+				//	fos = new FileOutputStream(new File("C://HistoryOrder_5.class"));
+				fos = new FileOutputStream(file);
+				fos.write(byteArr); 
+			}
+			
+			
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+		//	e.printStackTrace();
+			if (logger.isErrorEnabled()) {
+	            logger.error("评论回复点赞bean",e);
+	        }
+		} catch (CannotCompileException e) {
+			// TODO Auto-generated catch block
+		//	e.printStackTrace();
+			if (logger.isErrorEnabled()) {
+	            logger.error("评论回复点赞bean",e);
+	        }
+		} finally {
+			if(fos != null){
+				try {
+					fos.close();
+				} catch (IOException e) {
+					if (logger.isErrorEnabled()) {
+			            logger.error("评论回复点赞bean",e);
+			        }
+				}  
+			}
+		} 
+	}
+	
+	
+	/**
+	 * 创建问题点赞bean
+	 * @param number 表号
+	 */
+	public static void createQuestionLikeBean(Integer tableNumber){
+		
+		//ClassPool：CtClass对象的容器   
+	    ClassPool pool = ClassPool.getDefault(); 
+	//    ClassClassPath classPath = new ClassClassPath(this.getClass());
+	    ClassClassPath classPath = new ClassClassPath(CreateBean.class);
+	    pool.insertClassPath(classPath);
+
+	      
+	    //通过ClassPool生成一个public新类HistoryOrder.java   
+	    CtClass ctClass = pool.makeClass("cms.bean.like.QuestionLike_"+tableNumber); 
+
+        try {
+        	// 父类
+        	ctClass.setSuperclass(pool.get("cms.bean.like.QuestionLikeEntity"));
+        	// 添加接口
+			ctClass.addInterface(pool.get("java.io.Serializable"));
+			
+			// 添加属性   
+			 ctClass.addField(CtField.make("private static final long serialVersionUID = 61000000000000000"+ tableNumber+"L;", ctClass));
+
+			//写入注解(Annotation) 
+			ClassFile cf = ctClass.getClassFile();  
+	        ConstPool cp = cf.getConstPool();
+ 
+	        //@Table(name="historyorder_0",indexes = {@Index(name="historyorder_idx", columnList="state,visible")})
+	        AnnotationsAttribute attr = new AnnotationsAttribute(cp, AnnotationsAttribute.visibleTag);
+	        
+	        //@Entity注解
+	        Annotation entity_a = new Annotation("javax.persistence.Entity", cp);
+	  	  	attr.addAnnotation(entity_a);
+	  	  	
+	        //@Table注解
+	        Annotation a = new Annotation("javax.persistence.Table", cp);
+	        a.addMemberValue("name", new StringMemberValue("questionlike_"+tableNumber, cp));
+	       
+	        Annotation index_a = new Annotation("javax.persistence.Index", cp);
+	        index_a.addMemberValue("name", new StringMemberValue("questionLike_1_idx", cp));
+	        index_a.addMemberValue("columnList", new StringMemberValue("questionId,addtime", cp));
+	        AnnotationMemberValue annotationMemberValue = new AnnotationMemberValue(cp);
+	        annotationMemberValue.setValue(index_a);
+
+	      
+
+	        MemberValue[] vals = new MemberValue[]{annotationMemberValue};
+
+	        ArrayMemberValue arrayMemberValue=new ArrayMemberValue(cp);//数组类型
+	        arrayMemberValue.setValue(vals);
+	      
+	        a.addMemberValue("indexes", arrayMemberValue);//数组类型
+	        attr.addAnnotation(a);
+	        cf.addAttribute(attr);
+	        cf.setVersionToJava5();
+
+	        
+		} catch (NotFoundException e) {
+			// TODO Auto-generated catch block
+		//	e.printStackTrace();
+			if (logger.isErrorEnabled()) {
+	            logger.error("问题点赞bean",e);
+	        }
+		}   catch (CannotCompileException e) {
+			// TODO Auto-generated catch block
+		//	e.printStackTrace();
+			if (logger.isErrorEnabled()) {
+	            logger.error("问题点赞bean",e);
+	        }
+		}   
+       
+        
+        //把生成的class文件写入文件   
+        byte[] byteArr;
+        FileOutputStream fos = null;
+		try {
+			File file = new File(PathUtil.path()+File.separator+"WEB-INF"+File.separator+"classes"+File.separator+"cms"+File.separator+"bean"+File.separator+"like"+File.separator+"QuestionLike_"+tableNumber+".class");
+			
+			if(!file.exists()){
+				byteArr = ctClass.toBytecode();
+				//	fos = new FileOutputStream(new File("C://HistoryOrder_5.class"));
+				fos = new FileOutputStream(file);
+				fos.write(byteArr); 
+			}
+			
+			
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+		//	e.printStackTrace();
+			if (logger.isErrorEnabled()) {
+	            logger.error("问题点赞bean",e);
+	        }
+		} catch (CannotCompileException e) {
+			// TODO Auto-generated catch block
+		//	e.printStackTrace();
+			if (logger.isErrorEnabled()) {
+	            logger.error("问题点赞bean",e);
+	        }
+		} finally {
+			if(fos != null){
+				try {
+					fos.close();
+				} catch (IOException e) {
+					if (logger.isErrorEnabled()) {
+			            logger.error("问题点赞bean",e);
+			        }
+				}  
+			}
+		} 
+	}
+	
+	
+	/**
+	 * 创建答案点赞bean
+	 * @param number 表号
+	 */
+	public static void createAnswerLikeBean(Integer tableNumber){
+		
+		//ClassPool：CtClass对象的容器   
+	    ClassPool pool = ClassPool.getDefault(); 
+	//    ClassClassPath classPath = new ClassClassPath(this.getClass());
+	    ClassClassPath classPath = new ClassClassPath(CreateBean.class);
+	    pool.insertClassPath(classPath);
+
+	      
+	    //通过ClassPool生成一个public新类HistoryOrder.java   
+	    CtClass ctClass = pool.makeClass("cms.bean.like.AnswerLike_"+tableNumber); 
+
+        try {
+        	// 父类
+        	ctClass.setSuperclass(pool.get("cms.bean.like.AnswerLikeEntity"));
+        	// 添加接口
+			ctClass.addInterface(pool.get("java.io.Serializable"));
+			
+			// 添加属性   
+			 ctClass.addField(CtField.make("private static final long serialVersionUID = 62000000000000000"+ tableNumber+"L;", ctClass));
+
+			//写入注解(Annotation) 
+			ClassFile cf = ctClass.getClassFile();  
+	        ConstPool cp = cf.getConstPool();
+ 
+	        //@Table(name="historyorder_0",indexes = {@Index(name="historyorder_idx", columnList="state,visible")})
+	        AnnotationsAttribute attr = new AnnotationsAttribute(cp, AnnotationsAttribute.visibleTag);
+	        
+	        //@Entity注解
+	        Annotation entity_a = new Annotation("javax.persistence.Entity", cp);
+	  	  	attr.addAnnotation(entity_a);
+	  	  	
+	        //@Table注解
+	        Annotation a = new Annotation("javax.persistence.Table", cp);
+	        a.addMemberValue("name", new StringMemberValue("answerlike_"+tableNumber, cp));
+	       
+	        Annotation index_a = new Annotation("javax.persistence.Index", cp);
+	        index_a.addMemberValue("name", new StringMemberValue("answerLike_1_idx", cp));
+	        index_a.addMemberValue("columnList", new StringMemberValue("answerId,addtime", cp));
+	        AnnotationMemberValue annotationMemberValue = new AnnotationMemberValue(cp);
+	        annotationMemberValue.setValue(index_a);
+
+	      
+
+	        MemberValue[] vals = new MemberValue[]{annotationMemberValue};
+
+	        ArrayMemberValue arrayMemberValue=new ArrayMemberValue(cp);//数组类型
+	        arrayMemberValue.setValue(vals);
+	      
+	        a.addMemberValue("indexes", arrayMemberValue);//数组类型
+	        attr.addAnnotation(a);
+	        cf.addAttribute(attr);
+	        cf.setVersionToJava5();
+
+	        
+		} catch (NotFoundException e) {
+			// TODO Auto-generated catch block
+		//	e.printStackTrace();
+			if (logger.isErrorEnabled()) {
+	            logger.error("答案点赞bean",e);
+	        }
+		}   catch (CannotCompileException e) {
+			// TODO Auto-generated catch block
+		//	e.printStackTrace();
+			if (logger.isErrorEnabled()) {
+	            logger.error("答案点赞bean",e);
+	        }
+		}   
+       
+        
+        //把生成的class文件写入文件   
+        byte[] byteArr;
+        FileOutputStream fos = null;
+		try {
+			File file = new File(PathUtil.path()+File.separator+"WEB-INF"+File.separator+"classes"+File.separator+"cms"+File.separator+"bean"+File.separator+"like"+File.separator+"AnswerLike_"+tableNumber+".class");
+			
+			if(!file.exists()){
+				byteArr = ctClass.toBytecode();
+				//	fos = new FileOutputStream(new File("C://HistoryOrder_5.class"));
+				fos = new FileOutputStream(file);
+				fos.write(byteArr); 
+			}
+			
+			
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+		//	e.printStackTrace();
+			if (logger.isErrorEnabled()) {
+	            logger.error("答案点赞bean",e);
+	        }
+		} catch (CannotCompileException e) {
+			// TODO Auto-generated catch block
+		//	e.printStackTrace();
+			if (logger.isErrorEnabled()) {
+	            logger.error("答案点赞bean",e);
+	        }
+		} finally {
+			if(fos != null){
+				try {
+					fos.close();
+				} catch (IOException e) {
+					if (logger.isErrorEnabled()) {
+			            logger.error("答案点赞bean",e);
+			        }
+				}  
+			}
+		} 
+	}
+	
+	/**
+	 * 创建答案回复点赞bean
+	 * @param number 表号
+	 */
+	public static void createAnswerReplyLikeBean(Integer tableNumber){
+		
+		//ClassPool：CtClass对象的容器   
+	    ClassPool pool = ClassPool.getDefault(); 
+	//    ClassClassPath classPath = new ClassClassPath(this.getClass());
+	    ClassClassPath classPath = new ClassClassPath(CreateBean.class);
+	    pool.insertClassPath(classPath);
+
+	      
+	    //通过ClassPool生成一个public新类HistoryOrder.java   
+	    CtClass ctClass = pool.makeClass("cms.bean.like.AnswerReplyLike_"+tableNumber); 
+
+        try {
+        	// 父类
+        	ctClass.setSuperclass(pool.get("cms.bean.like.AnswerReplyLikeEntity"));
+        	// 添加接口
+			ctClass.addInterface(pool.get("java.io.Serializable"));
+			
+			// 添加属性   
+			 ctClass.addField(CtField.make("private static final long serialVersionUID = 63000000000000000"+ tableNumber+"L;", ctClass));
+
+			//写入注解(Annotation) 
+			ClassFile cf = ctClass.getClassFile();  
+	        ConstPool cp = cf.getConstPool();
+ 
+	        //@Table(name="historyorder_0",indexes = {@Index(name="historyorder_idx", columnList="state,visible")})
+	        AnnotationsAttribute attr = new AnnotationsAttribute(cp, AnnotationsAttribute.visibleTag);
+	        
+	        //@Entity注解
+	        Annotation entity_a = new Annotation("javax.persistence.Entity", cp);
+	  	  	attr.addAnnotation(entity_a);
+	  	  	
+	        //@Table注解
+	        Annotation a = new Annotation("javax.persistence.Table", cp);
+	        a.addMemberValue("name", new StringMemberValue("answerreplylike_"+tableNumber, cp));
+	       
+	        Annotation index_a = new Annotation("javax.persistence.Index", cp);
+	        index_a.addMemberValue("name", new StringMemberValue("answerReplyLike_1_idx", cp));
+	        index_a.addMemberValue("columnList", new StringMemberValue("replyId,addtime", cp));
+	        AnnotationMemberValue annotationMemberValue = new AnnotationMemberValue(cp);
+	        annotationMemberValue.setValue(index_a);
+
+	      
+
+	        MemberValue[] vals = new MemberValue[]{annotationMemberValue};
+
+	        ArrayMemberValue arrayMemberValue=new ArrayMemberValue(cp);//数组类型
+	        arrayMemberValue.setValue(vals);
+	      
+	        a.addMemberValue("indexes", arrayMemberValue);//数组类型
+	        attr.addAnnotation(a);
+	        cf.addAttribute(attr);
+	        cf.setVersionToJava5();
+
+	        
+		} catch (NotFoundException e) {
+			// TODO Auto-generated catch block
+		//	e.printStackTrace();
+			if (logger.isErrorEnabled()) {
+	            logger.error("答案回复点赞bean",e);
+	        }
+		}   catch (CannotCompileException e) {
+			// TODO Auto-generated catch block
+		//	e.printStackTrace();
+			if (logger.isErrorEnabled()) {
+	            logger.error("答案回复点赞bean",e);
+	        }
+		}   
+
+
+      //把生成的class文件写入文件   
+        byte[] byteArr;
+        FileOutputStream fos = null;
+		try {
+			File file = new File(PathUtil.path()+File.separator+"WEB-INF"+File.separator+"classes"+File.separator+"cms"+File.separator+"bean"+File.separator+"like"+File.separator+"AnswerReplyLike_"+tableNumber+".class");
+			
+			if(!file.exists()){
+				byteArr = ctClass.toBytecode();
+				//	fos = new FileOutputStream(new File("C://HistoryOrder_5.class"));
+				fos = new FileOutputStream(file);
+				fos.write(byteArr); 
+			}
+			
+			
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+		//	e.printStackTrace();
+			if (logger.isErrorEnabled()) {
+	            logger.error("答案回复点赞bean",e);
+	        }
+		} catch (CannotCompileException e) {
+			// TODO Auto-generated catch block
+		//	e.printStackTrace();
+			if (logger.isErrorEnabled()) {
+	            logger.error("答案回复点赞bean",e);
+	        }
+		} finally {
+			if(fos != null){
+				try {
+					fos.close();
+				} catch (IOException e) {
+					if (logger.isErrorEnabled()) {
+			            logger.error("答案回复点赞bean",e);
+			        }
+				}  
+			}
+		} 
+	}
+	
+	/**
 	 * 创建关注bean
 	 * @param number 表号
 	 */

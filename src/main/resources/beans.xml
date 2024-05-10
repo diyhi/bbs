@@ -469,6 +469,31 @@ http://www.springframework.org/schema/task http://www.springframework.org/schema
         <!-- 话题点赞分表数量 -->
         <property name="tableQuantity" value="4" />    
     </bean>
+    <!-- 创建评论点赞配置 -->
+    <bean id="commentLikeConfig" class="cms.web.action.like.CommentLikeConfig" >
+        <!-- 评论点赞分表数量 -->
+        <property name="tableQuantity" value="4" />    
+    </bean>
+    <!-- 创建评论回复点赞配置 -->
+    <bean id="commentReplyLikeConfig" class="cms.web.action.like.CommentReplyLikeConfig" >
+        <!-- 评论回复点赞分表数量 -->
+        <property name="tableQuantity" value="4" />    
+    </bean>
+    <!-- 创建问题点赞配置 -->
+    <bean id="questionLikeConfig" class="cms.web.action.like.QuestionLikeConfig" >
+        <!-- 问题点赞分表数量 -->
+        <property name="tableQuantity" value="4" />    
+    </bean>
+    <!-- 创建答案点赞配置 -->
+    <bean id="answerLikeConfig" class="cms.web.action.like.AnswerLikeConfig" >
+        <!-- 答案点赞分表数量 -->
+        <property name="tableQuantity" value="4" />    
+    </bean>
+    <!-- 创建答案回复点赞配置 -->
+    <bean id="answerReplyLikeConfig" class="cms.web.action.like.AnswerReplyLikeConfig" >
+        <!-- 答案回复点赞分表数量 -->
+        <property name="tableQuantity" value="4" />    
+    </bean>
     
     <!-- 创建关注配置 -->
     <bean id="followConfig" class="cms.web.action.follow.FollowConfig" >

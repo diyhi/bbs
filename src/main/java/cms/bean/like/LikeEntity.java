@@ -17,7 +17,6 @@ import javax.persistence.Transient;
  *
  */
 @MappedSuperclass
-@Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
 public class LikeEntity implements Serializable{
 	private static final long serialVersionUID = -1496184788206840632L;
 	
@@ -48,12 +47,35 @@ public class LikeEntity implements Serializable{
 	@Temporal(TemporalType.TIMESTAMP)
 	protected Date addtime = new Date();
 	
+	/** 模块  10:话题  20:评论  30:评论回复  40:问题  50:答案  60:答案回复 **/
+	protected Integer module;
+	
 	/** 话题Id **/
 	protected Long topicId;
 
 	/** 话题标题 **/
 	@Transient
 	protected String topicTitle;
+	
+	/** 评论Id **/
+	protected Long commentId;
+	/** 评论回复Id **/
+	protected Long commentReplyId;
+	
+	/** 问题Id **/
+	protected Long questionId;
+	/** 问题标题 **/
+	@Transient
+	protected String questionTitle;
+	/** 答案Id **/
+	protected Long answerId;
+	/** 答案回复Id **/
+	protected Long answerReplyId;
+	
+	
+	/** 内容摘要 **/
+	@Transient
+	protected String summary;
 
 	public String getId() {
 		return id;
@@ -132,6 +154,70 @@ public class LikeEntity implements Serializable{
 
 	public void setAccount(String account) {
 		this.account = account;
+	}
+
+	public Integer getModule() {
+		return module;
+	}
+
+	public void setModule(Integer module) {
+		this.module = module;
+	}
+
+	public Long getCommentId() {
+		return commentId;
+	}
+
+	public void setCommentId(Long commentId) {
+		this.commentId = commentId;
+	}
+
+	public Long getCommentReplyId() {
+		return commentReplyId;
+	}
+
+	public void setCommentReplyId(Long commentReplyId) {
+		this.commentReplyId = commentReplyId;
+	}
+
+	public String getSummary() {
+		return summary;
+	}
+
+	public void setSummary(String summary) {
+		this.summary = summary;
+	}
+
+	public String getQuestionTitle() {
+		return questionTitle;
+	}
+
+	public void setQuestionTitle(String questionTitle) {
+		this.questionTitle = questionTitle;
+	}
+
+	public Long getAnswerId() {
+		return answerId;
+	}
+
+	public void setAnswerId(Long answerId) {
+		this.answerId = answerId;
+	}
+
+	public Long getAnswerReplyId() {
+		return answerReplyId;
+	}
+
+	public void setAnswerReplyId(Long answerReplyId) {
+		this.answerReplyId = answerReplyId;
+	}
+
+	public Long getQuestionId() {
+		return questionId;
+	}
+
+	public void setQuestionId(Long questionId) {
+		this.questionId = questionId;
 	}
 	
 	

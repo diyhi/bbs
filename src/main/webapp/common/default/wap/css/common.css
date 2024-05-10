@@ -3970,7 +3970,23 @@ html,body{
 	font-size: 14px;
 }
 .homeModule .homeHeader .user .grade{line-height:25px;background-repeat:no-repeat;background-position:left center;background-size:auto 100%;font-size:12px;height:23px;min-width:40px;display:inline-block;background-color:#56b7ff;border-radius:20px;text-align:center;padding-left: 10px;padding-right: 10px;}
-
+.homeModule .homeHeader .user .staff{
+	line-height:25px;
+	background-repeat:no-repeat;
+	background-position:left center;
+	background-size:auto 100%;
+	font-size:12px;
+	height:23px;
+	min-width:40px;
+	display:inline-block;
+	background-color:#56b7ff;
+	border-radius:20px;
+	text-align:center;
+	padding-left: 10px;
+	padding-right: 10px;
+	color:#15d327;
+	background-color:#cafcc7;
+}
 .homeModule .homeHeader .user .ipAddress{
 	font-weight:normal;font-size: 12px;
 }

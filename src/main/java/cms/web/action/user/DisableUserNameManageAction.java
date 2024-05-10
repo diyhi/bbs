@@ -72,9 +72,9 @@ public class DisableUserNameManageAction {
 			if(_name == null || "".equals(_name.trim())){
 				error.put("name", "不能仅用?号");
 			}
-			if(Verification.isString_1(formbean.getName().trim()) == false){
-				error.put("name", "只能输入由数字、26个英文字母、星号、问号或者下划线组成");//只能输入由数字、26个英文字母、星号或者下划线组成
-			}
+			//if(Verification.isString_1(formbean.getName().trim()) == false){
+			//	error.put("name", "只能输入由数字、26个英文字母、星号、问号或者下划线组成");//只能输入由数字、26个英文字母、星号或者下划线组成
+			//}
 			
 			disableUserName.setName(formbean.getName().trim());
 		}else{
@@ -154,9 +154,9 @@ public class DisableUserNameManageAction {
 			if(_name == null || "".equals(_name.trim())){
 				error.put("name", "不能仅用?号");
 			}
-			if(Verification.isString_1(formbean.getName().trim()) == false){
-				error.put("name", "只能输入由数字、26个英文字母、星号、问号或者下划线组成");//只能输入由数字、26个英文字母、星号或者下划线组成
-			}
+			//if(Verification.isString_1(formbean.getName().trim()) == false){
+			//	error.put("name", "只能输入由数字、26个英文字母、星号、问号或者下划线组成");//只能输入由数字、26个英文字母、星号或者下划线组成
+			//}
 			
 			
 			disableUserName.setName(formbean.getName().trim());

@@ -538,6 +538,13 @@
 						    <el-radio :label="false">关闭</el-radio>
 						</el-radio-group>
 					</el-form-item>
+					<el-form-item label="提及" v-show="activeTag == 20">
+						<span class="icon-mention" style="width: 16px;height: 16px;position: relative;top: 11px;margin-left: -9px;margin-right: 9px;"></span>
+						<el-radio-group class="radioPosition" disabled v-model="topicEditorTagObject.mention">
+						    <el-radio :label="true">打开</el-radio>
+						    <el-radio :label="false">关闭</el-radio>
+						</el-radio-group>
+					</el-form-item>
 					<el-form-item label="全屏显示" v-show="activeTag == 20">
 						<span class="toolbar-icon-url icon-fullscreen"></span>
 						<el-radio-group class="radioPosition"  v-model="topicEditorTagObject.fullscreen">
@@ -727,6 +734,13 @@
 						    <el-radio :label="false">关闭</el-radio>
 						</el-radio-group>
 					</el-form-item>
+					<el-form-item label="提及" v-show="activeTag == 30">
+						<span class="icon-mention" style="width: 16px;height: 16px;position: relative;top: 11px;margin-left: -9px;margin-right: 9px;"></span>
+						<el-radio-group class="radioPosition" disabled v-model="editorTagObject.mention">
+						    <el-radio :label="true">打开</el-radio>
+						    <el-radio :label="false">关闭</el-radio>
+						</el-radio-group>
+					</el-form-item>
 					<el-form-item label="全屏显示" v-show="activeTag == 30">
 						<span class="toolbar-icon-url icon-fullscreen"></span>
 						<el-radio-group class="radioPosition"  v-model="editorTagObject.fullscreen">
@@ -873,6 +887,13 @@
 						    <el-radio :label="false">关闭</el-radio>
 						</el-radio-group>
 					</el-form-item>
+					<el-form-item label="提及" v-show="activeTag == 40">
+						<span class="icon-mention" style="width: 16px;height: 16px;position: relative;top: 11px;margin-left: -9px;margin-right: 9px;"></span>
+						<el-radio-group class="radioPosition" disabled v-model="questionEditorTagObject.mention">
+						    <el-radio :label="true">打开</el-radio>
+						    <el-radio :label="false">关闭</el-radio>
+						</el-radio-group>
+					</el-form-item>
 					<el-form-item label="全屏显示" v-show="activeTag == 40">
 						<span class="toolbar-icon-url icon-fullscreen"></span>
 						<el-radio-group class="radioPosition"  v-model="questionEditorTagObject.fullscreen">
@@ -1015,6 +1036,13 @@
 					<el-form-item label="插入表情" v-show="activeTag == 50">
 						<span class="toolbar-icon-url icon-emoticons"></span>
 						<el-radio-group class="radioPosition"  v-model="answerEditorTagObject.emoticons">
+						    <el-radio :label="true">打开</el-radio>
+						    <el-radio :label="false">关闭</el-radio>
+						</el-radio-group>
+					</el-form-item>
+					<el-form-item label="提及" v-show="activeTag == 50">
+						<span class="icon-mention" style="width: 16px;height: 16px;position: relative;top: 11px;margin-left: -9px;margin-right: 9px;"></span>
+						<el-radio-group class="radioPosition" disabled v-model="answerEditorTagObject.mention">
 						    <el-radio :label="true">打开</el-radio>
 						    <el-radio :label="false">关闭</el-radio>
 						</el-radio-group>
@@ -1832,6 +1860,9 @@ export default({
 			if(_self.topicEditorTagObject.hideAmount != null){
 				formData.append('topicEditorTagObject.hideAmount', _self.topicEditorTagObject.hideAmount);
 			}
+			if(_self.topicEditorTagObject.mention != null){
+				formData.append('topicEditorTagObject.mention', _self.topicEditorTagObject.mention);
+			}
 			if(_self.topicEditorTagObject.fullscreen != null){
 				formData.append('topicEditorTagObject.fullscreen', _self.topicEditorTagObject.fullscreen);
 			}
@@ -1935,6 +1966,9 @@ export default({
 			if(_self.editorTagObject.emoticons != null){
 				formData.append('editorTagObject.emoticons', _self.editorTagObject.emoticons);
 			}
+			if(_self.editorTagObject.mention != null){
+				formData.append('editorTagObject.mention', _self.editorTagObject.mention);
+			}
 			if(_self.editorTagObject.fullscreen != null){
 				formData.append('editorTagObject.fullscreen', _self.editorTagObject.fullscreen);
 			}
@@ -2006,6 +2040,9 @@ export default({
 			if(_self.questionEditorTagObject.emoticons != null){
 				formData.append('questionEditorTagObject.emoticons', _self.questionEditorTagObject.emoticons);
 			}
+			if(_self.questionEditorTagObject.mention != null){
+				formData.append('questionEditorTagObject.mention', _self.questionEditorTagObject.mention);
+			}
 			if(_self.questionEditorTagObject.fullscreen != null){
 				formData.append('questionEditorTagObject.fullscreen', _self.questionEditorTagObject.fullscreen);
 			}
@@ -2075,6 +2112,9 @@ export default({
 			}
 			if(_self.answerEditorTagObject.emoticons != null){
 				formData.append('answerEditorTagObject.emoticons', _self.answerEditorTagObject.emoticons);
+			}
+			if(_self.answerEditorTagObject.mention != null){
+				formData.append('answerEditorTagObject.mention', _self.answerEditorTagObject.mention);
 			}
 			if(_self.answerEditorTagObject.fullscreen != null){
 				formData.append('answerEditorTagObject.fullscreen', _self.answerEditorTagObject.fullscreen);

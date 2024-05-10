@@ -17,7 +17,6 @@ import javax.persistence.Transient;
  *
  */
 @MappedSuperclass
-@Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
 public class TopicLikeEntity implements Serializable{
 	private static final long serialVersionUID = 3112294654438891737L;
 	

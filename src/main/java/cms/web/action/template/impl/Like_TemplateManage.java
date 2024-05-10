@@ -7,6 +7,11 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Component;
 
+import cms.bean.like.AnswerLike;
+import cms.bean.like.AnswerReplyLike;
+import cms.bean.like.CommentLike;
+import cms.bean.like.CommentReplyLike;
+import cms.bean.like.QuestionLike;
 import cms.bean.like.TopicLike;
 import cms.bean.template.Forum;
 import cms.bean.user.AccessUser;
@@ -24,47 +29,74 @@ public class Like_TemplateManage {
 	@Resource LikeManage likeManage;
 	
 	/**
-	 * 话题点赞总数  -- 实体对象
+	 * 点赞总数  -- 实体对象
 	 * @param forum 版块对象
 	 * @param parameter 参数
 	 */
 	public Long likeCount_entityBean(Forum forum,Map<String,Object> parameter,Map<String,Object> runtimeParameter){	
-		Long topicId = null;
+		Long itemId = null;
+		Integer module = null;
 		//获取参数
 		if(parameter != null && parameter.size() >0){		
 			for(Map.Entry<String,Object> paramIter : parameter.entrySet()) {
-				if("topicId".equals(paramIter.getKey())){
+				if("itemId".equals(paramIter.getKey())){
 					if(Verification.isNumeric(paramIter.getValue().toString())){
 						if(paramIter.getValue().toString().length() <=18){
-							topicId = Long.parseLong(paramIter.getValue().toString());	
+							itemId = Long.parseLong(paramIter.getValue().toString());	
+						}
+					}
+				}else if("module".equals(paramIter.getKey())){
+					if(Verification.isNumeric(paramIter.getValue().toString())){
+						if(paramIter.getValue().toString().length() <=2){
+							module = Integer.parseInt(paramIter.getValue().toString());
 						}
 					}
 				}
 			}
 		}
-		if(topicId != null && topicId >0L){
+		if(itemId != null && itemId >0L && module != null){
 			
-			//根据话题Id查询被收藏数量
-			return likeManage.query_cache_findLikeCountByTopicId(topicId);
-		}else{
-			return 0L;
+			//根据话题Id查询被点赞数量
+			if(module.equals(10)){
+				return likeManage.query_cache_findLikeCountByTopicId(itemId);
+		  	}else if(module.equals(20)){
+		  		return likeManage.query_cache_findLikeCountByCommentId(itemId);
+		  	}else if(module.equals(30)){
+		  		return likeManage.query_cache_findLikeCountByCommentReplyId(itemId);
+		  	}else if(module.equals(40)){
+				return likeManage.query_cache_findLikeCountByQuestionId(itemId);
+		  	}else if(module.equals(50)){
+		  		return likeManage.query_cache_findLikeCountByAnswerId(itemId);
+		  	}else if(module.equals(60)){
+		  		return likeManage.query_cache_findLikeCountByAnswerReplyId(itemId);
+		  	}
 		}
+			
+		return 0L;
+		
 	}
 	
 	/**
-	 * 用户是否已经点赞该话题  -- 实体对象
+	 * 用户是否已经点赞该项  -- 实体对象
 	 * @param forum 版块对象
 	 * @param parameter 参数
 	 */
 	public Boolean alreadyLiked_entityBean(Forum forum,Map<String,Object> parameter,Map<String,Object> runtimeParameter){	
-		Long topicId = null;
+		Long itemId = null;
+		Integer module = null;
 		//获取参数
 		if(parameter != null && parameter.size() >0){		
 			for(Map.Entry<String,Object> paramIter : parameter.entrySet()) {
-				if("topicId".equals(paramIter.getKey())){
+				if("itemId".equals(paramIter.getKey())){
 					if(Verification.isNumeric(paramIter.getValue().toString())){
 						if(paramIter.getValue().toString().length() <=18){
-							topicId = Long.parseLong(paramIter.getValue().toString());	
+							itemId = Long.parseLong(paramIter.getValue().toString());	
+						}
+					}
+				}else if("module".equals(paramIter.getKey())){
+					if(Verification.isNumeric(paramIter.getValue().toString())){
+						if(paramIter.getValue().toString().length() <=2){
+							module = Integer.parseInt(paramIter.getValue().toString());
 						}
 					}
 				}
@@ -80,17 +112,42 @@ public class Like_TemplateManage {
 				}
 			}
 		}
-		if(accessUser != null && topicId != null && topicId>0L){
-			//话题收藏Id
-		  	String topicLikeId = likeManage.createTopicLikeId(topicId, accessUser.getUserId());
+		if(accessUser != null && module != null && itemId != null && itemId>0L){
+			//项目收藏Id
+		  	String itemLikeId = likeManage.createItemLikeId(itemId, accessUser.getUserId());
 		  
-		  	TopicLike topicLike = likeManage.query_cache_findTopicLikeById(topicLikeId);
-	  		
-	  		if(topicLike != null){
-	  			return true;
+		  	if(module.equals(10)){
+		  		TopicLike topicLike = likeManage.query_cache_findTopicLikeById(itemLikeId);
+		  		if(topicLike != null){
+		  			return true;
+			  	}
+		  	}else if(module.equals(20)){
+		  		CommentLike commentLike = likeManage.query_cache_findCommentLikeById(itemLikeId);
+		  		if(commentLike != null){
+		  			return true;
+			  	}
+		  	}else if(module.equals(30)){
+		  		CommentReplyLike commentReplyLike = likeManage.query_cache_findCommentReplyLikeById(itemLikeId);
+		  		if(commentReplyLike != null){
+		  			return true;
+			  	}
+		  	}else if(module.equals(40)){
+		  		QuestionLike questionLike = likeManage.query_cache_findQuestionLikeById(itemLikeId);
+		  		if(questionLike != null){
+		  			return true;
+			  	}
+		  	}else if(module.equals(50)){
+		  		AnswerLike answerLike = likeManage.query_cache_findAnswerLikeById(itemLikeId);
+		  		if(answerLike != null){
+		  			return true;
+			  	}
+		  	}else if(module.equals(60)){
+		  		AnswerReplyLike answerReplyLike = likeManage.query_cache_findAnswerReplyLikeById(itemLikeId);
+		  		if(answerReplyLike != null){
+		  			return true;
+			  	}
 		  	}
-			
-			
+		  	
 		}
 		return false;
 	}

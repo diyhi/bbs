@@ -99,6 +99,9 @@
 						<i class="userRoleName">${roleName}</i>				
 					</#list>
 				</div>
+				<#if user.id != null && user.id == -1>
+					<div class="staff" >官方人员</div> 
+				</#if>
 				<#if user.ipAddress != null && user.ipAddress??>
 					<div class="ipAddress" >
 						<span><i class="cms-map-pin-line"></i> ${user.ipAddress}</span>

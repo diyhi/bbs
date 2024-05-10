@@ -110,9 +110,14 @@
 			<td>令牌错误</td>
 		</tr>
 		<tr> 
-			<td>topicLike</td> 
+			<td>itemLike</td> 
 			<td>String</td>
-			<td>话题点赞错误</td>
+			<td>项目点赞错误</td>
+		</tr>
+		<tr> 
+			<td>likeModule</td> 
+			<td>String</td>
+			<td>点赞模块错误</td>
 		</tr>
 		<tr> 
 			<td>like</td> 
@@ -136,10 +141,16 @@
 	</thead> 
 	 <tbody> 
 		<tr> 
-			<td>topicId</td> 
+			<td>itemId</td> 
 			<td>Long</td>
 			<td>是</td>
-			<td>话题Id</td> 
+			<td>项目Id 例如：话题Id</td> 
+		</tr>
+		<tr> 
+			<td>module</td> 
+			<td>Integer</td>
+			<td>是</td>
+			<td>模块  10:话题  20:评论  30:评论回复  40:问题  50:答案  60:答案回复</td> 
 		</tr>
 		<tr> 
 			<td>token</td> 
@@ -165,7 +176,8 @@
 	
 		var parameter = "";
 		//话题Id
-		parameter += "&topicId="+getUrlParam("topicId");//从URL中获取
+		parameter += "&itemId="+getUrlParam("topicId");//从URL中获取
+		parameter += "&module=10";
 		//从meta标签获取令牌
 		parameter += "&token="+getCsrf();
 

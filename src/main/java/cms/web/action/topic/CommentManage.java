@@ -124,7 +124,12 @@ public class CommentManage {
 			if(editor.isImage()){//图片
 				tag.add("image");
 			}
-			
+			if(editor.isMention()){//提及
+				tag.add("mention");
+			}
+			if(editor.isAi()){//人工智能
+				tag.add("ai");
+			}
 			if(editor.isFullscreen()){//全屏显示
 				tag.add("fullscreen");
 			}

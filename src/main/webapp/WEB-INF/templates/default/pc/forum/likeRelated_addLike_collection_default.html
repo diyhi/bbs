@@ -19,7 +19,8 @@
 			
 				var parameter = "";
 				//话题Id
-				parameter += "&topicId="+getUrlParam("topicId");//从URL中获取
+				parameter += "&itemId="+getUrlParam("topicId");//从URL中获取
+				parameter += "&module=10";
 				//获取令牌
 				parameter += "&token="+document.getElementById("token").value;
 			   	//删除第一个&号,防止因为多了&号而出现警告: Parameters: Invalid chunk ignored.信息
@@ -84,7 +85,7 @@
 			        	
 			        }
 				},
-					"queryAlreadyLiked?topicId="+topicId+"&timestamp=" + new Date().getTime(), true);
+					"queryAlreadyLiked?itemId="+topicId+"&module=10&timestamp=" + new Date().getTime(), true);
 			}
 			queryAlreadyLiked();
 		</script>
@@ -127,7 +128,7 @@
 		        	document.getElementById("likeCount").innerHTML = data;
 		        }
 			},
-				"queryLikeCount?topicId="+topicId+"&timestamp=" + new Date().getTime(), true);
+				"queryLikeCount?itemId="+topicId+"&module=10&timestamp=" + new Date().getTime(), true);
 							           
 		}
 		queryLikeCount();
