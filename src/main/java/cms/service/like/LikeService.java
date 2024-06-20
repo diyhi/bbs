@@ -32,6 +32,15 @@ public interface LikeService extends DAO<Like>{
 	 */
 	public Like findById(String likeId);
 	/**
+	 * 根据条件查询点赞(此方法没有使用数据库索引)
+	 * @param module 模块  10:话题  20:评论  30:评论回复  40:问题  50:答案  60:答案回复
+	 * @param userId 点赞的用户Id
+	 * @param userName 点赞的用户名称
+	 * @param itemId 项Id 话题Id、评论Id、评论回复Id、问题Id、答案Id、答案回复Id
+	 * @return
+	 */
+	public Like findLikeByCondition(Integer module,Long userId,String userName,Long itemId);
+	/**
 	 * 根据用户名称查询点赞分页
 	 * @param userId 用户Id
 	 * @param userName 用户名称

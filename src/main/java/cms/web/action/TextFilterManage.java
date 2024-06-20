@@ -7,17 +7,21 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 import cms.bean.MediaInfo;
 import cms.bean.setting.EditorTag;
 import cms.bean.topic.HideTagType;
+import cms.bean.user.User;
 import cms.bean.user.UserGrade;
+import cms.service.user.UserService;
 import cms.utils.CommentedProperties;
 import cms.utils.FileUtil;
 import cms.utils.HtmlEscape;
@@ -43,7 +47,8 @@ import com.google.common.net.InternetDomainName;
  */
 @Component("textFilterManage")
 public class TextFilterManage {
-
+	@Resource UserService userService;
+	
 	/**
 	 * 过滤参数
 	 * @return
@@ -289,6 +294,52 @@ public class TextFilterManage {
 		return safelist;
 	
 	}
+	
+	/**
+	 * 过滤回复参数
+	 * @return
+	 */
+	private Safelist filterReplyParameter(EditorTag editorTag){
+
+		Safelist safelist = Safelist.none();//只保留文本，其他所有的html内容均被删除
+		
+		
+		safelist.addTags("br");
+		safelist.addTags("p");
+		
+		if(editorTag == null || editorTag.isMention()){//超级链接
+			//超级链接
+			safelist.addTags("a")
+			.addAttributes("a", "href", "target","linkType","linktype")//kindeditor.js使用小写linktype
+			.addProtocols("a", "href", "ftp", "http", "https", "mailto")
+			.addEnforcedAttribute("a", "rel", "nofollow");
+		}
+		
+
+		if(editorTag == null || editorTag.isEmoticons()){//插入表情
+			//插入表情
+			safelist.addTags("img")
+			.addAttributes("img", "align", "alt", "src", "title", "border")
+			.addProtocols("img", "src", "http", "https");
+		}
+		
+		return safelist;
+	
+	}
+	/**
+	 * 回复富文本过滤标签
+	 * @param request
+	 * @param html 内容
+	 * @param editorTag 评论编辑器标签
+	 * @return
+	 */
+	public String filterReplyTag(HttpServletRequest request,String html,EditorTag editorTag) {  
+		if(StringUtils.isBlank(html)) return ""; 
+		Safelist safelist = this.filterReplyParameter(editorTag);
+		
+		return Jsoup.clean(html, domain(request),safelist,new OutputSettings().prettyPrint(false)); //prettyPrint(是否重新格式化)
+	}
+	
 	
 	/**
 	 * 文本过滤标签，只保留<br>标签
@@ -2062,5 +2113,157 @@ public class TextFilterManage {
 		}
 		
 		return domain;
+	}
+	
+	/**
+	 * 校正回复标签(删除前后&nbsp; <br> 和连续的空格或换行)
+	 * @param request
+	 * @param html 富文本内容
+	 * @return
+	 */
+	public Object[] correctionReplyTag(HttpServletRequest request,String html){
+		//@提及用户名称
+		LinkedHashSet<String> mentionUserNameList = new LinkedHashSet<String>();
+		//是否含有图片
+		boolean isImage = false;
+				
+		if(!StringUtils.isBlank(html)){
+			Document doc = Jsoup.parseBodyFragment(html);
+			
+			Elements elements_nbsp = doc.select(":matchText");  //将文本节点视为元素，因此允许您匹配和选择文本节点。
+			
+			for (Element element : elements_nbsp) {
+				//element.text(element.text().replace("\u00a0", " "));//&nbsp替换为空格
+				element.text(element.text());//&nbsp转为空格   Jsoup默认将&nbsp转为\u00a0
+				
+			}
+			
+			
+			Elements elements_br = doc.select("br");  
+			for (Element element : elements_br) {
+				if(element.previousElementSibling() != null && element.previousSibling() != null){
+					
+					if("br".equalsIgnoreCase(element.previousElementSibling().nodeName()) 
+							&& element.previousElementSibling().nodeName().equalsIgnoreCase(element.previousSibling().nodeName())){//前后元素相同为<br>标签的
+						element.remove();
+						continue;
+					}
+					
+					if("".equals(element.previousSibling().toString().trim())){//前一个元素或文本为空的
+						element.remove();
+						continue;
+					}
+				}
+			}
+			
+			Elements elements_br2 = doc.select("br");  
+			if(elements_br2.first() != null 
+					&& "br".equalsIgnoreCase(elements_br2.first().nodeName())
+					&& elements_br2.first().previousElementSibling() == null){//删除第一个br
+				elements_br2.first().remove();
+			}
+			if(elements_br2.last() != null 
+					&& "br".equalsIgnoreCase(elements_br2.last().nodeName())
+					&& (elements_br2.last().nextElementSibling() == null || "".equals(elements_br2.last().nextElementSibling().toString().trim()))){
+				
+				elements_br2.last().remove();
+		       
+			}//删除最后一个br
+			
+			Elements elements_p = doc.select("p");  
+			for (Element element : elements_p) {
+				//删除<p></p>
+				if(!element.hasText() && element.childrenSize() == 0){//element.hasText()：判断这个元素是否有任何文本内容（不仅仅是空白）。
+					element.remove();
+				}
+				//删除<p><br></p>
+				if(!element.hasText() && element.childrenSize() == 1 && "br".equalsIgnoreCase(element.firstChild().nodeName())){//element.hasText()：判断这个元素是否有任何文本内容（不仅仅是空白）。
+					element.remove();
+				}
+			}
+			
+			//表情
+			Elements image_elements = doc.select("img[src]");  
+			for (Element element : image_elements) {
+				isImage = true;
+				//font-size:14px;font-family:NSimSun;
+				String imageUrl = element.attr("src"); 
+				if(imageUrl != null && !"".equals(imageUrl.trim())){
+					 //表情图片
+					 if (this.isBindURL(request,imageUrl.trim(),"common/") ||
+							 this.isBindURL(request,imageUrl.trim(),"backstage/")) {  
+						 
+						//前后端一体架构内置svg表情图片
+						 if (this.isBindURL(request,imageUrl.trim(),"common/") ||
+								 this.isBindURL(request,imageUrl.trim(),"backstage/")) {  
+							 String extension = FileUtil.getExtension(imageUrl);
+							 if(extension != null && "svg".equalsIgnoreCase(extension.trim())){
+								 element.attr("width",  "32px");  
+								 element.attr("height",  "32px");  
+							 }
+			             }
+						 
+						 String processUrl = this.deleteBindURL(request,imageUrl.trim());
+						 element.attr("src",  processUrl);
+		             }else{
+		            	 //前后端分离架构内置svg表情图片
+		            	 if(this.isFrontEndURL(request,imageUrl.trim())){
+		            		 String processUrl = this.deleteFrontEndURL(request,imageUrl.trim());
+		            		 String extension = FileUtil.getExtension(imageUrl);
+							 if(extension != null && "svg".equalsIgnoreCase(extension.trim())){
+								 element.attr("width",  "32px");  
+								 element.attr("height",  "32px");  
+							 }
+		            		 element.attr("src",  processUrl);   
+		            	 }else{
+		            		 element.attr("src",  imageUrl);  
+		            	 }
+		             }
+					 
+					 
+					 
+				 }
+			}
+			
+			
+			Elements linkType_pngs = doc.select("a[linkType]");  
+			for (Element element : linkType_pngs) {  
+				String linkType = element.attr("linkType");
+				if(linkType != null && !"".equals(linkType.trim())){
+					if(linkType.trim().equalsIgnoreCase("mention")){//提及
+						String mention = element.text();
+						String keyword = StringUtils.removeStart(mention, "@");
+						if(keyword != null && !"".equals(keyword.trim())){
+							User viewUser = null;
+							User u1 = userService.findUserByAccount(keyword.trim());
+							if(u1 != null && u1.getState().equals(1) && u1.getCancelAccountTime().equals(-1L)){
+								viewUser = u1;
+								
+							}else{
+								User u2 = userService.findUserByNickname(keyword.trim());
+								if(u2 != null && u2.getState().equals(1) && u2.getCancelAccountTime().equals(-1L)){
+									viewUser = u2;
+								}
+							}
+							if(viewUser != null){
+								element.attr("href",  "user/control/home?userName="+viewUser.getUserName());
+								mentionUserNameList.add(viewUser.getUserName());
+							}else{
+								element.text(mention);
+								//element.empty();
+								element.unwrap(); //移除匹配的元素但保留他们的内容
+								
+							}
+						}
+						
+					}
+				}
+			}
+			
+			//prettyPrint(是否重新格式化)、outline(是否强制所有标签换行)、indentAmount(缩进长度)    doc.outputSettings().indentAmount(0).prettyPrint(false);
+			doc.outputSettings().prettyPrint(false);
+			html = doc.body().html();
+		}
+		return new Object[]{html,mentionUserNameList,isImage};
 	}
 }

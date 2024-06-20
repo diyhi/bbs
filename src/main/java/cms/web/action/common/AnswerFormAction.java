@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1329,26 +1330,33 @@ public class AnswerFormAction {
 		if(error != null && error.size() ==0){
 			if(content != null && !"".equals(content.trim())){
 				if(answer != null){
+content = textFilterManage.filterReplyTag(request,content.trim(),settingManage.readAnswerEditorTag());
+					
+					
+					Object[] object = textFilterManage.correctionReplyTag(request,content);
+					String replyContent = (String)object[0];
+					LinkedHashSet<String> mentionUserNameList = (LinkedHashSet<String>)object[1];//@提及用户名称
+					boolean isImage = (Boolean)object[2];//是否含有图片
 					//不含标签内容
 					String text = textFilterManage.filterText(content);
 					//清除空格&nbsp;
 					String trimSpace = cms.utils.StringUtil.replaceSpace(text).trim();
 					
-					if((!"".equals(text.trim()) && !"".equals(trimSpace))){
+					if(isImage == true || (!"".equals(text.trim()) && !"".equals(trimSpace))){
 						
 						if(systemSetting.isAllowFilterWord()){
 							String wordReplace = "";
 							if(systemSetting.getFilterWordReplace() != null){
 								wordReplace = systemSetting.getFilterWordReplace();
 							}
-							text = sensitiveWordFilterManage.filterSensitiveWord(text, wordReplace);
+							replyContent = sensitiveWordFilterManage.filterSensitiveWord(replyContent, wordReplace);
 						}
 						
 						answerReply.setAnswerId(answer.getId());
 						answerReply.setIsStaff(false);
 						answerReply.setUserName(accessUser.getUserName());
 						answerReply.setIp(IpAddress.getClientIpAddress(request));
-						answerReply.setContent(text);
+						answerReply.setContent(replyContent);
 						answerReply.setQuestionId(answer.getQuestionId());
 						
 						
@@ -1791,21 +1799,28 @@ public class AnswerFormAction {
 			
 			if(content != null && !"".equals(content.trim())){
 				
+				content = textFilterManage.filterReplyTag(request,content.trim(),settingManage.readAnswerEditorTag());
+				
+				
+				Object[] object = textFilterManage.correctionReplyTag(request,content);
+				String replyContent = (String)object[0];
+				LinkedHashSet<String> mentionUserNameList = (LinkedHashSet<String>)object[1];//@提及用户名称
+				boolean isImage = (Boolean)object[2];//是否含有图片
 				//不含标签内容
 				String text = textFilterManage.filterText(content);
 				//清除空格&nbsp;
 				String trimSpace = cms.utils.StringUtil.replaceSpace(text).trim();
 				
-				if((!"".equals(text.trim()) && !"".equals(trimSpace))){
+				if(isImage == true || (!"".equals(text.trim()) && !"".equals(trimSpace))){
 					
 					if(systemSetting.isAllowFilterWord()){
 						String wordReplace = "";
 						if(systemSetting.getFilterWordReplace() != null){
 							wordReplace = systemSetting.getFilterWordReplace();
 						}
-						text = sensitiveWordFilterManage.filterSensitiveWord(text, wordReplace);
+						replyContent = sensitiveWordFilterManage.filterSensitiveWord(replyContent, wordReplace);
 					}
-					answerReply.setContent(text);
+					answerReply.setContent(replyContent);
 				}else{	
 					error.put("content", ErrorView._101.name());//内容不能为空
 					

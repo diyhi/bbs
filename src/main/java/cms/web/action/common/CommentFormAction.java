@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1767,34 +1768,35 @@ public class CommentFormAction {
 		if(error != null && error.size() ==0){
 			if(content != null && !"".equals(content.trim())){
 				if(comment != null){
+content = textFilterManage.filterReplyTag(request,content.trim(),settingManage.readEditorTag());
+					
+					
+					Object[] object = textFilterManage.correctionReplyTag(request,content);
+					String replyContent = (String)object[0];
+					LinkedHashSet<String> mentionUserNameList = (LinkedHashSet<String>)object[1];//@提及用户名称
+					boolean isImage = (Boolean)object[2];//是否含有图片
 					//不含标签内容
 					String text = textFilterManage.filterText(content);
 					//清除空格&nbsp;
 					String trimSpace = cms.utils.StringUtil.replaceSpace(text).trim();
 					
-					if((!"".equals(text.trim()) && !"".equals(trimSpace))){
-						
+					if(isImage == true || (!"".equals(text.trim()) && !"".equals(trimSpace))){
 						if(systemSetting.isAllowFilterWord()){
 							String wordReplace = "";
 							if(systemSetting.getFilterWordReplace() != null){
 								wordReplace = systemSetting.getFilterWordReplace();
 							}
-							text = sensitiveWordFilterManage.filterSensitiveWord(text, wordReplace);
+							replyContent = sensitiveWordFilterManage.filterSensitiveWord(replyContent, wordReplace);
 						}
-						
 						reply.setCommentId(comment.getId());
 						reply.setIsStaff(false);
 						reply.setUserName(accessUser.getUserName());
 						reply.setIp(IpAddress.getClientIpAddress(request));
-						reply.setContent(text);
+						reply.setContent(replyContent);
 						reply.setTopicId(comment.getTopicId());
-						
-						
-
-					}else{	
+					}else{
 						error.put("content", ErrorView._101.name());//内容不能为空
-						
-					}	
+					}
 				}else{
 					error.put("reply", ErrorView._105.name());//评论不存在
 				}
@@ -2224,27 +2226,32 @@ public class CommentFormAction {
 			
 			
 			if(content != null && !"".equals(content.trim())){
+				content = textFilterManage.filterReplyTag(request,content.trim(),settingManage.readEditorTag());
 				
+				
+				Object[] object = textFilterManage.correctionReplyTag(request,content);
+				String replyContent = (String)object[0];
+				LinkedHashSet<String> mentionUserNameList = (LinkedHashSet<String>)object[1];//@提及用户名称
+				boolean isImage = (Boolean)object[2];//是否含有图片
 				//不含标签内容
 				String text = textFilterManage.filterText(content);
 				//清除空格&nbsp;
 				String trimSpace = cms.utils.StringUtil.replaceSpace(text).trim();
 				
-				if((!"".equals(text.trim()) && !"".equals(trimSpace))){
+				if(isImage == true || (!"".equals(text.trim()) && !"".equals(trimSpace))){
 					
 					if(systemSetting.isAllowFilterWord()){
 						String wordReplace = "";
 						if(systemSetting.getFilterWordReplace() != null){
 							wordReplace = systemSetting.getFilterWordReplace();
 						}
-						text = sensitiveWordFilterManage.filterSensitiveWord(text, wordReplace);
+						replyContent = sensitiveWordFilterManage.filterSensitiveWord(replyContent, wordReplace);
 					}
-					reply.setContent(text);
+					reply.setContent(replyContent);
 				}else{	
 					error.put("content", ErrorView._101.name());//内容不能为空
 					
 				}	
-				
 			}else{
 				error.put("content", ErrorView._101.name());//内容不能为空
 			}

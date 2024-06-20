@@ -158,6 +158,7 @@ public class FavoriteFormAction {
 				topicFavorite.setTopicId(topicId);
 				topicFavorite.setUserName(accessUser.getUserName());
 				topicFavorite.setPostUserName(topic.getUserName());
+				topicFavorite.setFavoriteId(favorites.getId());
 			}
 			
 			QuestionFavorite questionFavorite = null;
@@ -173,6 +174,7 @@ public class FavoriteFormAction {
 				questionFavorite.setQuestionId(questionId);
 				questionFavorite.setUserName(accessUser.getUserName());
 				questionFavorite.setPostUserName(question.getUserName());
+				questionFavorite.setFavoriteId(favorites.getId());
 			}
 			
 			

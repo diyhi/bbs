@@ -233,7 +233,7 @@ public class LikeFormAction {
 				topicLike.setTopicId(topic.getId());
 				topicLike.setUserName(accessUser.getUserName());
 				topicLike.setPostUserName(topic.getUserName());
-				
+				topicLike.setLikeId(like.getId());
 				try {
 					//保存点赞
 					likeService.saveLike(likeManage.createLikeObject(like),likeManage.createTopicLikeObject(topicLike));
@@ -283,7 +283,7 @@ public class LikeFormAction {
 				commentLike.setCommentId(comment.getId()); 
 				commentLike.setUserName(accessUser.getUserName());
 				commentLike.setPostUserName(comment.getUserName());
-				
+				commentLike.setLikeId(like.getId());
 				try {
 					//保存点赞
 					likeService.saveLike(likeManage.createLikeObject(like),likeManage.createCommentLikeObject(commentLike));
@@ -333,7 +333,7 @@ public class LikeFormAction {
 				commentReplyLike.setReplyId(commentReply.getId()); 
 				commentReplyLike.setUserName(accessUser.getUserName());
 				commentReplyLike.setPostUserName(commentReply.getUserName());
-				
+				commentReplyLike.setLikeId(like.getId());
 				try {
 					//保存点赞
 					likeService.saveLike(likeManage.createLikeObject(like),likeManage.createCommentReplyLikeObject(commentReplyLike));
@@ -384,7 +384,7 @@ public class LikeFormAction {
 				questionLike.setQuestionId(question.getId());
 				questionLike.setUserName(accessUser.getUserName());
 				questionLike.setPostUserName(question.getUserName());
-				
+				questionLike.setLikeId(like.getId());
 				try {
 					//保存点赞
 					likeService.saveLike(likeManage.createLikeObject(like),likeManage.createQuestionLikeObject(questionLike));
@@ -432,7 +432,7 @@ public class LikeFormAction {
 				answerLike.setAnswerId(answer.getId()); 
 				answerLike.setUserName(accessUser.getUserName());
 				answerLike.setPostUserName(answer.getUserName());
-				
+				answerLike.setLikeId(like.getId());
 				try {
 					//保存点赞
 					likeService.saveLike(likeManage.createLikeObject(like),likeManage.createAnswerLikeObject(answerLike));
@@ -482,7 +482,7 @@ public class LikeFormAction {
 				answerReplyLike.setReplyId(answerReply.getId()); 
 				answerReplyLike.setUserName(accessUser.getUserName());
 				answerReplyLike.setPostUserName(answerReply.getUserName());
-				
+				answerReplyLike.setLikeId(like.getId());
 				try {
 					//保存点赞
 					likeService.saveLike(likeManage.createLikeObject(like),likeManage.createAnswerReplyLikeObject(answerReplyLike));

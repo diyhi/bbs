@@ -324,27 +324,40 @@
 			<th width="30%">参数</th> 
 			<th width="20%">类型</th> 
 			<th width="10%">是否必填</th> 
-			<th width="40%">说明</th> 
+			<th width="40%" colspan="2">说明</th>
 		</tr> 
 	</thead> 
 	 <tbody>
 	 	<tr> 
 			<td>favoriteId</td> 
 			<td>String</td>
-			<td>是</td>
+			<td>按需填写</td>
 			<td>收藏夹Id</td> 
+			<td rowspan="3">这3个参数任选一个</td> 
+		</tr>
+		<tr> 
+			<td>topicId</td> 
+			<td>Long</td>
+			<td>按需填写</td>
+			<td>话题Id</td> 
+		</tr>
+		<tr> 
+			<td>questionId</td> 
+			<td>Long</td>
+			<td>按需填写</td>
+			<td>问题Id</td> 
 		</tr>
 		<tr> 
 			<td>token</td> 
 			<td>String</td>
 			<td>是</td>
-			<td>令牌</td> 
+			<td colspan="2">令牌</td> 
 		</tr>
 		<tr> 
 			<td>jumpUrl</td> 
 			<td>String</td>
 			<td>否</td>
-			<td>'提交表单 - 默认方式'提交成功后跳转路径,不填写默认跳转到表单提交页；参数必须经过encodeBase64URL编码后才能提交。例${encodeBase64URL('/index')}</td> 
+			<td colspan="2">'提交表单 - 默认方式'提交成功后跳转路径,不填写默认跳转到表单提交页；参数必须经过encodeBase64URL编码后才能提交。例${encodeBase64URL('/index')}</td> 
 		</tr>
 	</tbody> 
 </table>

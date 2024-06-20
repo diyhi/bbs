@@ -97,6 +97,91 @@ public class FavoriteServiceBean extends DaoSupport<Favorites> implements Favori
 	}
 	
 	/**
+	 * 根据条件查询收藏夹(此方法没有使用数据库索引)
+	 * @param module 模块 10:话题 20:问题 
+	 * @param userId 收藏夹的用户Id
+	 * @param userName 收藏夹的用户名称
+	 * @param itemId 项Id 话题Id或问题Id
+	 * @return
+	 */
+	@Transactional(readOnly=true, propagation=Propagation.NOT_SUPPORTED)
+	public Favorites findFavoriteByCondition(Integer module,Long userId,String userName,Long itemId){
+		
+		//表编号
+		int tableNumber = favoritesConfig.userIdRemainder(userId);
+		
+		Query query  = null;
+		
+		if(tableNumber == 0){//默认对象
+			String sql = "";
+			if(module.equals(10)){//话题
+				sql = "select o from Favorites o where o.topicId=?1 and o.userName=?2 and o.module=?3";
+			}else{//问题
+				sql = "select o from Favorites o where o.questionId=?1 and o.userName=?2 and o.module=?3";
+			}
+			
+			query = em.createQuery(sql);
+			query.setParameter(1, itemId);
+			query.setParameter(2, userName);
+			query.setParameter(3, module);
+			List<Favorites> list = query.getResultList();
+			for(Favorites f : list){
+				return f;
+			}
+		}else{//带下划线对象
+			String sql = "";
+			if(module.equals(10)){//话题
+				sql = "select o from Favorites_"+tableNumber+" o where o.topicId=?1 and o.userName=?2 and o.module=?3";
+			}else{//问题
+				sql = "select o from Favorites_"+tableNumber+" o where o.questionId=?1 and o.userName=?2 and o.module=?3";
+			}
+			
+			query = em.createQuery(sql);
+			query.setParameter(1, itemId);
+			query.setParameter(2, userName);
+			query.setParameter(3, module);
+			List<?> favorites_List= query.getResultList();
+			
+			try {
+				//带下划线对象
+				Class<?> c = Class.forName("cms.bean.favorite.Favorites_"+tableNumber);
+				Object object  = c.newInstance();
+				BeanCopier copier = BeanCopier.create(object.getClass(),Favorites.class, false); 
+				
+				for(int j = 0;j< favorites_List.size(); j++) {  
+					Object obj = favorites_List.get(j);
+					Favorites favorites = new Favorites();
+					copier.copy(obj,favorites, null);
+					return favorites;
+				}
+				
+				
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+			//	e.printStackTrace();
+				if (logger.isErrorEnabled()) {
+		            logger.error("根据条件查询收藏夹",e);
+		        }
+			} catch (InstantiationException e) {
+				// TODO Auto-generated catch block
+				//e.printStackTrace();
+				if (logger.isErrorEnabled()) {
+		            logger.error("根据条件查询收藏夹",e);
+		        }
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+			//	e.printStackTrace();
+				if (logger.isErrorEnabled()) {
+		            logger.error("根据条件查询收藏夹",e);
+		        }
+			}
+			
+		}
+		
+		return null;
+	}
+	
+	/**
 	 * 根据用户名称查询收藏夹分页
 	 * @param userId 用户Id
 	 * @param userName 用户名称

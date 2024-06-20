@@ -1073,6 +1073,8 @@ public class Question_TemplateManage {
 		SystemSetting systemSetting = settingService.findSystemSetting_cache();
 		if(systemSetting.isAllowAnswer()){
 			value.put("allowReply",true);//允许提交回复
+			value.put("availableTag", answerManage.replyAvailableTag());//回复编辑器允许使用标签
+			value.put("fileSystem", fileManage.getFileSystem());
 		}else{
 			value.put("allowReply",false);//不允许提交回复
 		}
@@ -1134,6 +1136,8 @@ public class Question_TemplateManage {
 		SystemSetting systemSetting = settingService.findSystemSetting_cache();
 		if(systemSetting.isAllowAnswer()){
 			value.put("allowReply",true);//允许提交回复
+			value.put("availableTag", answerManage.replyAvailableTag());//回复编辑器允许使用标签
+			value.put("fileSystem", fileManage.getFileSystem());
 		}else{
 			value.put("allowReply",false);//不允许提交回复
 		}

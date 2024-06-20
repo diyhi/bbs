@@ -40,9 +40,17 @@ import cms.bean.PageForm;
 import cms.bean.PageView;
 import cms.bean.QueryResult;
 import cms.bean.favorite.Favorites;
+import cms.bean.favorite.QuestionFavorite;
+import cms.bean.favorite.TopicFavorite;
 import cms.bean.follow.Follow;
 import cms.bean.follow.Follower;
+import cms.bean.like.AnswerLike;
+import cms.bean.like.AnswerReplyLike;
+import cms.bean.like.CommentLike;
+import cms.bean.like.CommentReplyLike;
 import cms.bean.like.Like;
+import cms.bean.like.QuestionLike;
+import cms.bean.like.TopicLike;
 import cms.bean.membershipCard.MembershipCardOrder;
 import cms.bean.message.PrivateMessage;
 import cms.bean.message.Remind;
@@ -4167,11 +4175,13 @@ public class HomeManageAction {
 	 * @param model
 	 * @param jumpUrl 跳转地址   页面post方式提交有效
 	 * @param token 令牌标记
-	 * @param remindId 收藏Id
+	 * @param favoriteId 收藏Id  favoriteId、topicId、questionId这3个参数任选一个
+	 * @param topicId 话题Id  favoriteId、topicId、questionId这3个参数任选一个
+	 * @param questionId 问题Id  favoriteId、topicId、questionId这3个参数任选一个
 	 */
 	@RequestMapping(value="/user/control/deleteFavorite", method=RequestMethod.POST)
 	@RoleAnnotation(resourceCode=ResourceEnum._3002000)
-	public String deleteFavorite(ModelMap model,String jumpUrl,String token,String favoriteId,
+	public String deleteFavorite(ModelMap model,String jumpUrl,String token,String favoriteId,Long topicId,Long questionId,
 			RedirectAttributes redirectAttrs,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
@@ -4193,6 +4203,45 @@ public class HomeManageAction {
 	  	String topicFavoriteId = null;
 	  	//问题收藏Id
 	  	String questionFavoriteId = null;
+	  	
+	  	
+	  	if(topicId != null && topicId >0L){
+	  		topicFavoriteId = favoriteManage.createTopicFavoriteId(topicId, accessUser.getUserId());
+	  		
+	  		TopicFavorite topicFavorite = favoriteService.findTopicFavoriteById(topicFavoriteId);
+	  		if(topicFavorite != null){
+	  			if(topicFavorite.getFavoriteId() != null && !"".equals(topicFavorite.getFavoriteId())){
+	  				favoriteId = topicFavorite.getFavoriteId();
+	  			}else{
+	  				//兼容6.3及之前版本的数据，6.4及之后的版本topicFavorite和QuestionFavorite增加了favoriteId字段
+	  				Favorites _favorites = favoriteService.findFavoriteByCondition(10, accessUser.getUserId(), accessUser.getUserName(), topicId);
+	  				if(_favorites != null){
+	  					favoriteId = _favorites.getId();
+	  				}
+	  			}
+	  		}
+	  				
+	  	}
+	  	
+	  	
+	  	
+	  	if(questionId != null && questionId >0L){
+	  		questionFavoriteId = favoriteManage.createQuestionFavoriteId(questionId, accessUser.getUserId());
+	  		QuestionFavorite questionFavorite = favoriteService.findQuestionFavoriteById(questionFavoriteId);
+	  		if(questionFavorite != null){
+	  			if(questionFavorite.getFavoriteId() != null && !"".equals(questionFavorite.getFavoriteId())){
+	  				favoriteId = questionFavorite.getFavoriteId();
+	  			}else{
+	  				//兼容6.3及之前版本的数据，6.4及之后的版本topicFavorite和QuestionFavorite增加了favoriteId字段
+	  				Favorites _favorites = favoriteService.findFavoriteByCondition(20, accessUser.getUserId(), accessUser.getUserName(), questionId);
+	  				if(_favorites != null){
+	  					favoriteId = _favorites.getId();
+	  				}
+	  			}
+	  		}
+	  	}
+	  	
+	  	
   		if(favoriteId == null || "".equals(favoriteId.trim())){
   			error.put("favorite", ErrorView._1530.name());//收藏Id不存在
   		}else{
@@ -4926,11 +4975,13 @@ public class HomeManageAction {
 	 * @param model
 	 * @param jumpUrl 跳转地址   页面post方式提交有效
 	 * @param token 令牌标记
-	 * @param likeId 点赞Id
+	 * @param likeId 点赞Id 只用本参数或下面两个参数
+	 * @param module 模块  10:话题  20:评论  30:评论回复  40:问题  50:答案  60:答案回复
+	 * @param itemId 项Id  话题Id、评论Id、评论回复Id、问题Id、答案Id、答案回复Id
 	 */
 	@RequestMapping(value="/user/control/deleteLike", method=RequestMethod.POST)
 	@RoleAnnotation(resourceCode=ResourceEnum._4002000)
-	public String deleteLike(ModelMap model,String jumpUrl,String token,String likeId,
+	public String deleteLike(ModelMap model,String jumpUrl,String token,String likeId,Integer module,Long itemId,
 			RedirectAttributes redirectAttrs,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
@@ -4948,9 +4999,101 @@ public class HomeManageAction {
 		//获取登录用户
 	  	AccessUser accessUser = AccessUserThreadLocal.get();
 	  	Like like = null;
-	  	//话题点赞Id
+	  	//项点赞Id
 	  	String itemLikeId = null;
-	  	Integer module = null;
+	  	Integer itemModule = null;
+	  	
+	  	
+	  	if(module != null && module >0 && itemId != null && itemId >0L){
+	  		
+	  		
+	  		itemLikeId = likeManage.createItemLikeId(itemId, accessUser.getUserId());
+	  		itemModule = module;
+	  		
+	  		if(module.equals(10)){//话题
+	  			TopicLike topicLike = likeService.findTopicLikeById(itemLikeId);
+		  		if(topicLike != null){
+		  			if(topicLike.getLikeId() != null && !"".equals(topicLike.getLikeId())){
+		  				likeId = topicLike.getLikeId();
+		  			}else{
+		  				//兼容6.3及之前版本的数据，6.4及之后的版本TopicLike、CommentLike、CommentReplyLike、QuestionLike、AnswerLike、AnswerReplyLike类增加了likeId字段
+		  				Like _like = likeService.findLikeByCondition(module, accessUser.getUserId(), accessUser.getUserName(), itemId);
+		  				if(_like != null){
+		  					likeId = _like.getId();
+		  				}
+		  			}
+		  		}
+	  		}else if(module.equals(20)){//评论
+	  			CommentLike commentLike = likeService.findCommentLikeById(itemLikeId);
+		  		if(commentLike != null){
+		  			if(commentLike.getLikeId() != null && !"".equals(commentLike.getLikeId())){
+		  				likeId = commentLike.getLikeId();
+		  			}else{
+		  				//兼容6.3及之前版本的数据，6.4及之后的版本TopicLike、CommentLike、CommentReplyLike、QuestionLike、AnswerLike、AnswerReplyLike类增加了likeId字段
+		  				Like _like = likeService.findLikeByCondition(module, accessUser.getUserId(), accessUser.getUserName(), itemId);
+		  				if(_like != null){
+		  					likeId = _like.getId();
+		  				}
+		  			}
+		  		}
+	  		}else if(module.equals(30)){//评论回复
+	  			CommentReplyLike commentReplyLike = likeService.findCommentReplyLikeById(itemLikeId);
+		  		if(commentReplyLike != null){
+		  			if(commentReplyLike.getLikeId() != null && !"".equals(commentReplyLike.getLikeId())){
+		  				likeId = commentReplyLike.getLikeId();
+		  			}else{
+		  				//兼容6.3及之前版本的数据，6.4及之后的版本TopicLike、CommentLike、CommentReplyLike、QuestionLike、AnswerLike、AnswerReplyLike类增加了likeId字段
+		  				Like _like = likeService.findLikeByCondition(module, accessUser.getUserId(), accessUser.getUserName(), itemId);
+		  				if(_like != null){
+		  					likeId = _like.getId();
+		  				}
+		  			}
+		  		}
+	  		}else if(module.equals(40)){//问题
+	  			QuestionLike questionLike = likeService.findQuestionLikeById(itemLikeId);
+		  		if(questionLike != null){
+		  			if(questionLike.getLikeId() != null && !"".equals(questionLike.getLikeId())){
+		  				likeId = questionLike.getLikeId();
+		  			}else{
+		  				//兼容6.3及之前版本的数据，6.4及之后的版本TopicLike、CommentLike、CommentReplyLike、QuestionLike、AnswerLike、AnswerReplyLike类增加了likeId字段
+		  				Like _like = likeService.findLikeByCondition(module, accessUser.getUserId(), accessUser.getUserName(), itemId);
+		  				if(_like != null){
+		  					likeId = _like.getId();
+		  				}
+		  			}
+		  		}
+	  		}else if(module.equals(50)){//答案
+	  			AnswerLike answerLike = likeService.findAnswerLikeById(itemLikeId);
+		  		if(answerLike != null){
+		  			if(answerLike.getLikeId() != null && !"".equals(answerLike.getLikeId())){
+		  				likeId = answerLike.getLikeId();
+		  			}else{
+		  				//兼容6.3及之前版本的数据，6.4及之后的版本TopicLike、CommentLike、CommentReplyLike、QuestionLike、AnswerLike、AnswerReplyLike类增加了likeId字段
+		  				Like _like = likeService.findLikeByCondition(module, accessUser.getUserId(), accessUser.getUserName(), itemId);
+		  				if(_like != null){
+		  					likeId = _like.getId();
+		  				}
+		  			}
+		  		}
+	  		}else if(module.equals(60)){//答案回复
+	  			AnswerReplyLike answerReplyLike = likeService.findAnswerReplyLikeById(itemLikeId);
+		  		if(answerReplyLike != null){
+		  			if(answerReplyLike.getLikeId() != null && !"".equals(answerReplyLike.getLikeId())){
+		  				likeId = answerReplyLike.getLikeId();
+		  			}else{
+		  				//兼容6.3及之前版本的数据，6.4及之后的版本TopicLike、CommentLike、CommentReplyLike、QuestionLike、AnswerLike、AnswerReplyLike类增加了likeId字段
+		  				Like _like = likeService.findLikeByCondition(module, accessUser.getUserId(), accessUser.getUserName(), itemId);
+		  				if(_like != null){
+		  					likeId = _like.getId();
+		  				}
+		  			}
+		  		}
+	  		}
+	  		
+	  				
+	  	}
+	  	
+	  	
   		if(likeId == null || "".equals(likeId.trim())){
   			error.put("like", ErrorView._1730.name());//点赞Id不存在
   		}else{

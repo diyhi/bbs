@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -688,7 +689,6 @@ public class AnswerManageAction {
 	
 	/**
 	 * 答案回复  添加页面显示
-	 * @param pageForm
 	 * @param model
 	 * @param answerId 答案Id
 	 */
@@ -697,7 +697,24 @@ public class AnswerManageAction {
 	public String addAnswerReplyUI(ModelMap model,Long answerId,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+		Map<String,String> error = new HashMap<String,String>();
+		Map<String,Object> returnValue = new HashMap<String,Object>();
+		
+		
+		returnValue.put("availableTag",answerManage.availableTag());
+
+		String username = "";
+		Object obj  =  SecurityContextHolder.getContext().getAuthentication().getPrincipal(); 
+		if(obj instanceof UserDetails){
+			username =((UserDetails)obj).getUsername();	
+		}
+		returnValue.put("userName", username);
+		
+		if(error.size()==0){
+			
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
+		}
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	/**
 	 * 答案回复  添加
@@ -735,12 +752,18 @@ public class AnswerManageAction {
 		
 		if(content != null && !"".equals(content.trim())){
 			if(answer != null){
+				content = textFilterManage.filterReplyTag(request,content.trim(),settingManage.readEditorTag());
+				Object[] object = textFilterManage.correctionReplyTag(request,content);
+				String replyContent = (String)object[0];
+				LinkedHashSet<String> mentionUserNameList = (LinkedHashSet<String>)object[1];//@提及用户名称
+				
+				boolean isImage = (Boolean)object[2];//是否含有图片
 				//不含标签内容
 				String text = textFilterManage.filterText(content);
 				//清除空格&nbsp;
 				String trimSpace = cms.utils.StringUtil.replaceSpace(text).trim();
 				
-				if((!"".equals(text.trim()) && !"".equals(trimSpace))){
+				if(isImage == true || (!"".equals(text.trim()) && !"".equals(trimSpace))){
 					String username = "";//用户名称
 					
 					Object obj  =  SecurityContextHolder.getContext().getAuthentication().getPrincipal(); 
@@ -753,10 +776,11 @@ public class AnswerManageAction {
 					answerReply.setAnswerId(answer.getId());
 					answerReply.setIsStaff(true);
 					answerReply.setUserName(username);
-					answerReply.setContent(text);
+					answerReply.setContent(replyContent);
 					answerReply.setQuestionId(answer.getQuestionId());
 					answerReply.setStatus(20);
 					answerReply.setIp(IpAddress.getClientIpAddress(request));
+					
 				}else{	
 					error.put("content", "回复内容不能为空");
 					
@@ -808,11 +832,23 @@ public class AnswerManageAction {
 					answerReply.setIpAddress(IpAddress.queryAddress(answerReply.getIp()));
 				}
 				returnValue.put("answerReply", answerReply);
-				return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
 			}
 		}else{
 			error.put("answerReplyId", "回复Id不能为空");
 		}
+		
+		returnValue.put("availableTag",answerManage.availableTag());
+
+		String username = "";
+		Object obj  =  SecurityContextHolder.getContext().getAuthentication().getPrincipal(); 
+		if(obj instanceof UserDetails){
+			username =((UserDetails)obj).getUsername();	
+		}
+		returnValue.put("userName", username);
+		if(error.size() ==0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
+		}
+		
 		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	/**
@@ -840,15 +876,21 @@ public class AnswerManageAction {
 				old_status = answerReply.getStatus();
 				answerReply.setStatus(status);
 				
+				content = textFilterManage.filterReplyTag(request,content.trim(),settingManage.readEditorTag());
+				Object[] object = textFilterManage.correctionReplyTag(request,content);
+				String replyContent = (String)object[0];
+				LinkedHashSet<String> mentionUserNameList = (LinkedHashSet<String>)object[1];//@提及用户名称
+				
+				boolean isImage = (Boolean)object[2];//是否含有图片
 				//不含标签内容
 				String text = textFilterManage.filterText(content);
 				//清除空格&nbsp;
 				String trimSpace = cms.utils.StringUtil.replaceSpace(text).trim();
 				
-				if((!"".equals(text.trim()) && !"".equals(trimSpace))){
+				if(isImage == true || (!"".equals(text.trim()) && !"".equals(trimSpace))){
 					String username = answerReply.getUserName();//用户名称
 					//修改回复
-					int i = answerService.updateReply(answerReplyId,text,username,status);
+					int i = answerService.updateReply(answerReplyId,replyContent,username,status);
 					
 					if(i >0 && !old_status.equals(status)){
 						User user = userManage.query_cache_findUserByUserName(answerReply.getUserName());

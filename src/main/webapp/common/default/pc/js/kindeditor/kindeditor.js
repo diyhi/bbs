@@ -7680,6 +7680,19 @@ _plugin('core', function(K) {
 		function pasteImageUpload(event,callback) {
 			var name = 'pasteImageUpload', lang = self.lang(name + '.');
 	
+			var falg = false;
+			var availableTagItems = K.undef(self.items, []);
+			for(var i = 0;i < availableTagItems.length;i++){
+				var item = availableTagItems[i];
+				if(item == "image"){//如果允许上传图片
+					falg = true;
+					break;
+				}
+			}
+			if(!falg){
+				return false;
+			}
+	
 		 	var items = event.event.clipboardData.items;
 		 	if (items){//chrome 
 		 		//上传图片数量

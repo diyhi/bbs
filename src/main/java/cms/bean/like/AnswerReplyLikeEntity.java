@@ -44,7 +44,10 @@ public class AnswerReplyLikeEntity implements Serializable{
 	/** 回复内容摘要 **/
 	@Transient
 	protected String summary;
-
+	/** 点赞Id **/
+	@Column(length=36)
+	protected String likeId;
+	
 	public String getId() {
 		return id;
 	}
@@ -107,6 +110,14 @@ public class AnswerReplyLikeEntity implements Serializable{
 
 	public void setSummary(String summary) {
 		this.summary = summary;
+	}
+
+	public String getLikeId() {
+		return likeId;
+	}
+
+	public void setLikeId(String likeId) {
+		this.likeId = likeId;
 	}
 
 	

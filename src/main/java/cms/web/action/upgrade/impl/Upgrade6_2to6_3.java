@@ -91,7 +91,7 @@ public class Upgrade6_2to6_3 {
   	 * @param upgradeService
   	 */
 	private static void insertSQL_disableusername(UpgradeService upgradeService){
-		String sql = "INSERT INTO `disableusername` (`id`,`name`) VALUES (NULL,'*@*'),(NULL,'*#*'),(NULL,'*!*'),(NULL,'*\\*');";
+		String sql = "INSERT INTO `disableusername` (`id`,`name`) VALUES (NULL,'*@*'),(NULL,'*#*'),(NULL,'*!*'),(NULL,'*\\\\*');";
 		
 		upgradeService.insertNativeSQL(sql);
 	}

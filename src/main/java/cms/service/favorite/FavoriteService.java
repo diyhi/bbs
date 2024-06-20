@@ -24,6 +24,15 @@ public interface FavoriteService extends DAO<Favorites>{
 	 */
 	public Favorites findById(String favoriteId);
 	/**
+	 * 根据条件查询收藏夹(此方法没有使用数据库索引)
+	 * @param module 模块 10:话题 20:问题 
+	 * @param userId 收藏夹的用户Id
+	 * @param userName 收藏夹的用户名称
+	 * @param itemId 项Id 话题Id或问题Id
+	 * @return
+	 */
+	public Favorites findFavoriteByCondition(Integer module,Long userId,String userName,Long itemId);
+	/**
 	 * 根据用户名称查询收藏夹分页
 	 * @param userId 用户Id
 	 * @param userName 用户名称

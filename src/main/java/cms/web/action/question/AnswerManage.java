@@ -136,6 +136,28 @@ public class AnswerManage {
 		}
 		return JsonUtils.toJSONString(tag);
 	}
+	/**
+	 * 回复编辑器允许使用标签
+	 * @return List<String> 类型json格式
+	*/
+	public String replyAvailableTag(){
+		List<String> tag = new ArrayList<String>();
+		EditorTag editor = settingManage.readAnswerEditorTag();
+		if(editor != null){
+			//tag.add("source");
+		
+			if(editor.isEmoticons()){//插入表情
+				tag.add("emoticons");
+			}
+			if(editor.isMention()){//提及
+				tag.add("mention");
+			}
+			if(editor.isAi()){//人工智能
+				tag.add("ai");
+			}
+		}
+		return JsonUtils.toJSONString(tag);
+	}
 	
 	/**
 	 * 回复排序

@@ -40,7 +40,10 @@ public class TopicLikeEntity implements Serializable{
 	/** 话题标题 **/
 	@Transient
 	protected String topicTitle;
-
+	/** 点赞Id **/
+	@Column(length=36)
+	protected String likeId;
+	
 	public String getId() {
 		return id;
 	}
@@ -86,6 +89,14 @@ public class TopicLikeEntity implements Serializable{
 
 	public void setPostUserName(String postUserName) {
 		this.postUserName = postUserName;
+	}
+
+	public String getLikeId() {
+		return likeId;
+	}
+
+	public void setLikeId(String likeId) {
+		this.likeId = likeId;
 	}
 	
 	

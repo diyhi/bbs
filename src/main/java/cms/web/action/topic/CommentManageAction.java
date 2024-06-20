@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -819,8 +820,24 @@ public class CommentManageAction {
 	@RequestMapping(params="method=addReply",method=RequestMethod.GET)
 	public String addReplyUI(ModelMap model,Long commentId,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		Map<String,String> error = new HashMap<String,String>();
+		Map<String,Object> returnValue = new HashMap<String,Object>();
+		
+		
+		returnValue.put("availableTag",commentManage.availableTag());
 
-		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,null));
+		String username = "";
+		Object obj  =  SecurityContextHolder.getContext().getAuthentication().getPrincipal(); 
+		if(obj instanceof UserDetails){
+			username =((UserDetails)obj).getUsername();	
+		}
+		returnValue.put("userName", username);
+		
+		if(error.size()==0){
+			
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
+		}
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	/**
 	 * 回复  添加
@@ -856,12 +873,18 @@ public class CommentManageAction {
 		
 		if(content != null && !"".equals(content.trim())){
 			if(comment != null){
+				content = textFilterManage.filterReplyTag(request,content.trim(),settingManage.readEditorTag());
+				Object[] object = textFilterManage.correctionReplyTag(request,content);
+				String replyContent = (String)object[0];
+				LinkedHashSet<String> mentionUserNameList = (LinkedHashSet<String>)object[1];//@提及用户名称
+				
+				boolean isImage = (Boolean)object[2];//是否含有图片
 				//不含标签内容
 				String text = textFilterManage.filterText(content);
 				//清除空格&nbsp;
 				String trimSpace = cms.utils.StringUtil.replaceSpace(text).trim();
 				
-				if((!"".equals(text.trim()) && !"".equals(trimSpace))){
+				if(isImage == true || (!"".equals(text.trim()) && !"".equals(trimSpace))){
 					String username = "";//用户名称
 					
 					Object obj  =  SecurityContextHolder.getContext().getAuthentication().getPrincipal(); 
@@ -871,13 +894,16 @@ public class CommentManageAction {
 					
 				
 					//回复
+					
 					reply.setCommentId(comment.getId());
 					reply.setIsStaff(true);
 					reply.setUserName(username);
-					reply.setContent(text);
+					reply.setContent(replyContent);
 					reply.setTopicId(comment.getTopicId());
 					reply.setStatus(20);
 					reply.setIp(IpAddress.getClientIpAddress(request));
+					
+					
 					
 				}else{	
 					error.put("content", "回复内容不能为空");
@@ -929,11 +955,24 @@ public class CommentManageAction {
 					reply.setIpAddress(IpAddress.queryAddress(reply.getIp()));
 				}
 				returnValue.put("reply", reply);
-				return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
 			}
 		}else{
 			error.put("replyId", "回复Id不能为空");
 		}
+		
+		returnValue.put("availableTag",commentManage.availableTag());
+
+		String username = "";
+		Object obj  =  SecurityContextHolder.getContext().getAuthentication().getPrincipal(); 
+		if(obj instanceof UserDetails){
+			username =((UserDetails)obj).getUsername();	
+		}
+		returnValue.put("userName", username);
+		
+		if(error.size() ==0){
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
+		}
+		
 		return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 	}
 	/**
@@ -972,15 +1011,21 @@ public class CommentManageAction {
 				old_status = reply.getStatus();
 				reply.setStatus(status);
 				
+				content = textFilterManage.filterReplyTag(request,content.trim(),settingManage.readEditorTag());
+				Object[] object = textFilterManage.correctionReplyTag(request,content);
+				String replyContent = (String)object[0];
+				LinkedHashSet<String> mentionUserNameList = (LinkedHashSet<String>)object[1];//@提及用户名称
+				
+				boolean isImage = (Boolean)object[2];//是否含有图片
 				//不含标签内容
 				String text = textFilterManage.filterText(content);
 				//清除空格&nbsp;
 				String trimSpace = cms.utils.StringUtil.replaceSpace(text).trim();
 				
-				if((!"".equals(text.trim()) && !"".equals(trimSpace))){
+				if(isImage == true || (!"".equals(text.trim()) && !"".equals(trimSpace))){
 					String username = reply.getUserName();//用户名称
 					//修改回复
-					int i = commentService.updateReply(replyId,text,username,status,new Date());
+					int i = commentService.updateReply(replyId,replyContent,username,status,new Date());
 					
 					if(i >0 && !old_status.equals(status)){
 						User user = userManage.query_cache_findUserByUserName(reply.getUserName());

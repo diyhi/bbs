@@ -189,6 +189,11 @@
 			<td>加入时间</td>
 		</tr>
 		<tr> 
+			<td>module</td> 
+			<td>Integer</td>
+			<td>模块  10:话题  20:评论  30:评论回复  40:问题  50:答案  60:答案回复</td>
+		</tr>
+		<tr> 
 			<td>topicId</td> 
 			<td>Long</td>
 			<td>话题Id</td>
@@ -197,6 +202,41 @@
 			<td>topicTitle</td> 
 			<td>String</td>
 			<td>话题标题</td>
+		</tr>
+		<tr> 
+			<td>commentId</td> 
+			<td>String</td>
+			<td>评论Id</td>
+		</tr>
+		<tr> 
+			<td>commentReplyId</td> 
+			<td>String</td>
+			<td>评论回复Id</td>
+		</tr>
+		<tr> 
+			<td>questionId</td> 
+			<td>String</td>
+			<td>问题Id</td>
+		</tr>
+		<tr> 
+			<td>questionTitle</td> 
+			<td>String</td>
+			<td>问题标题</td>
+		</tr>
+		<tr> 
+			<td>answerId</td> 
+			<td>String</td>
+			<td>答案Id</td>
+		</tr>
+		<tr> 
+			<td>answerReplyId</td> 
+			<td>String</td>
+			<td>答案回复Id</td>
+		</tr>
+		<tr> 
+			<td>summary</td> 
+			<td>String</td>
+			<td>内容摘要</td>
 		</tr>
 	</tbody> 
 </table>
@@ -334,15 +374,28 @@
 			<th width="30%">参数</th> 
 			<th width="20%">类型</th> 
 			<th width="10%">是否必填</th> 
-			<th width="40%">说明</th> 
+			<th width="40%" colspan="2">说明</th> 
 		</tr> 
 	</thead> 
 	 <tbody>
 	 	<tr> 
 			<td>likeId</td> 
 			<td>String</td>
-			<td>是</td>
+			<td>按需填写</td>
 			<td>点赞Id</td> 
+			<td rowspan="3">可以选择使用likeId或（module和itemId）</td> 
+		</tr>
+		<tr> 
+			<td>module</td> 
+			<td>Integer</td>
+			<td>按需填写</td>
+			<td>模块   10:话题  20:评论  30:评论回复  40:问题  50:答案  60:答案回复</td> 
+		</tr>
+		<tr> 
+			<td>itemId</td> 
+			<td>Long</td>
+			<td>按需填写</td>
+			<td>项Id 话题Id、评论Id、评论回复Id、问题Id、答案Id、答案回复Id</td> 
 		</tr>
 		<tr> 
 			<td>token</td> 

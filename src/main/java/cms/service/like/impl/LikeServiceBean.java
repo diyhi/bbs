@@ -109,6 +109,107 @@ public class LikeServiceBean extends DaoSupport<Like> implements LikeService{
 	}
 	
 	/**
+	 * 根据条件查询点赞(此方法没有使用数据库索引)
+	 * @param module 模块  10:话题  20:评论  30:评论回复  40:问题  50:答案  60:答案回复
+	 * @param userId 点赞的用户Id
+	 * @param userName 点赞的用户名称
+	 * @param itemId 项Id 话题Id、评论Id、评论回复Id、问题Id、答案Id、答案回复Id
+	 * @return
+	 */
+	@Transactional(readOnly=true, propagation=Propagation.NOT_SUPPORTED)
+	public Like findLikeByCondition(Integer module,Long userId,String userName,Long itemId){
+		
+		//表编号
+		int tableNumber = likeConfig.userIdRemainder(userId);
+		
+		Query query  = null;
+		
+		if(tableNumber == 0){//默认对象
+			String sql = "";
+			if(module.equals(10)){//话题
+				sql = "select o from Like o where o.topicId=?1 and o.userName=?2 and o.module=?3";
+			}else if(module.equals(20)){//评论
+				sql = "select o from Like o where o.commentId=?1 and o.userName=?2 and o.module=?3";
+			}else if(module.equals(30)){//评论回复
+				sql = "select o from Like o where o.commentReplyId=?1 and o.userName=?2 and o.module=?3";
+			}else if(module.equals(40)){//问题
+				sql = "select o from Like o where o.questionId=?1 and o.userName=?2 and o.module=?3";
+			}else if(module.equals(50)){//答案
+				sql = "select o from Like o where o.answerId=?1 and o.userName=?2 and o.module=?3";
+			}else if(module.equals(60)){//答案回复
+				sql = "select o from Like o where o.answerReplyId=?1 and o.userName=?2 and o.module=?3";
+			}
+			
+			query = em.createQuery(sql);
+			query.setParameter(1, itemId);
+			query.setParameter(2, userName);
+			query.setParameter(3, module);
+			List<Like> list = query.getResultList();
+			for(Like l : list){
+				return l;
+			}
+		}else{//带下划线对象
+			String sql = "";
+			if(module.equals(10)){//话题
+				sql = "select o from Like_"+tableNumber+" o where o.topicId=?1 and o.userName=?2 and o.module=?3";
+			}else if(module.equals(20)){//评论
+				sql = "select o from Like_"+tableNumber+" o where o.commentId=?1 and o.userName=?2 and o.module=?3";
+			}else if(module.equals(30)){//评论回复
+				sql = "select o from Like_"+tableNumber+" o where o.commentReplyId=?1 and o.userName=?2 and o.module=?3";
+			}else if(module.equals(40)){//问题
+				sql = "select o from Like_"+tableNumber+" o where o.questionId=?1 and o.userName=?2 and o.module=?3";
+			}else if(module.equals(50)){//答案
+				sql = "select o from Like_"+tableNumber+" o where o.answerId=?1 and o.userName=?2 and o.module=?3";
+			}else if(module.equals(60)){//答案回复
+				sql = "select o from Like_"+tableNumber+" o where o.answerReplyId=?1 and o.userName=?2 and o.module=?3";
+			}
+			
+			query = em.createQuery(sql);
+			query.setParameter(1, itemId);
+			query.setParameter(2, userName);
+			query.setParameter(3, module);
+			List<?> like_List= query.getResultList();
+			
+			try {
+				//带下划线对象
+				Class<?> c = Class.forName("cms.bean.like.Like_"+tableNumber);
+				Object object  = c.newInstance();
+				BeanCopier copier = BeanCopier.create(object.getClass(),Like.class, false); 
+				
+				for(int j = 0;j< like_List.size(); j++) {  
+					Object obj = like_List.get(j);
+					Like like = new Like();
+					copier.copy(obj,like, null);
+					return like;
+				}
+				
+				
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+			//	e.printStackTrace();
+				if (logger.isErrorEnabled()) {
+		            logger.error("根据条件查询点赞",e);
+		        }
+			} catch (InstantiationException e) {
+				// TODO Auto-generated catch block
+				//e.printStackTrace();
+				if (logger.isErrorEnabled()) {
+		            logger.error("根据条件查询点赞",e);
+		        }
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+			//	e.printStackTrace();
+				if (logger.isErrorEnabled()) {
+		            logger.error("根据条件查询点赞",e);
+		        }
+			}
+			
+		}
+		
+		return null;
+	}
+	
+	/**
 	 * 根据用户名称查询点赞分页
 	 * @param userId 用户Id
 	 * @param userName 用户名称

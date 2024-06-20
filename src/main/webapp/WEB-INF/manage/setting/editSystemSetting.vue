@@ -350,6 +350,12 @@
 							<el-col :span="6">秒</el-col>
 						</el-row>
 					</el-form-item> 
+					<el-form-item label="允许 @提及 用户最大数量" :error="error.allowMentionMaxNumber" v-show="activeTag == 10">
+						<el-row >
+							<el-col :span="6"><el-input v-model.trim="allowMentionMaxNumber" :required="true" maxlength="8" clearable="true" show-word-limit></el-input></el-col>
+						</el-row>
+						<div class="form-help" >空值为不限制</div>
+					</el-form-item>
 					<el-form-item label="前台分页数量" :error="error.forestagePageNumber" v-show="activeTag == 10">
 						<el-row >
 							<el-col :span="6"><el-input v-model.trim="forestagePageNumber" :required="true" maxlength="8" clearable="true" show-word-limit></el-input></el-col>
@@ -1155,6 +1161,7 @@ export default({
 			backstagePageNumber:'',
 			temporaryFileValidPeriod:'',
 			userSentSmsCount:'',
+			allowMentionMaxNumber:'',
 			
 			topicEditorTagObject:'',//话题编辑器
 			editorTagObject:'',//评论编辑器
@@ -1221,6 +1228,7 @@ export default({
 				backstagePageNumber:'',
 				temporaryFileValidPeriod:'',
 				userSentSmsCount:'',
+				allowMentionMaxNumber:'',
 				
 				topicEditorTagObject:{
 					imageFormat:'',
@@ -1435,6 +1443,9 @@ export default({
 			    				}
 			    				if(systemSetting.userSentSmsCount != null){
 			    					_self.userSentSmsCount = systemSetting.userSentSmsCount;
+			    				}
+			    				if(systemSetting.allowMentionMaxNumber != null){
+			    					_self.allowMentionMaxNumber = systemSetting.allowMentionMaxNumber;
 			    				}
 			    				if(systemSetting.topicEditorTagObject != null){//话题编辑器
 			    					let topicEditorTagObject = systemSetting.topicEditorTagObject;
@@ -1790,7 +1801,9 @@ export default({
 			if(_self.userSentSmsCount != null){
 				formData.append('userSentSmsCount', _self.userSentSmsCount);
 			}
-			
+			if(_self.allowMentionMaxNumber != null){
+				formData.append('allowMentionMaxNumber', _self.allowMentionMaxNumber);
+			}
 			
 			
 			//话题编辑器

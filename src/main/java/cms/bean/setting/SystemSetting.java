@@ -182,7 +182,8 @@ public class SystemSetting implements Serializable{
 	
 	/** 热门话题仅推荐发布N小时内的话题  空值为不限制 **/
 	private Integer topicHotRecommendedTime;
-
+	/** 允许 @提及 用户最大数量  空值为不限制 **/
+	private Integer allowMentionMaxNumber = 30;
 	/** 每用户每24小时内发送短信次数 **/
 	private Integer userSentSmsCount = 10;
 	/** 话题编辑器标签  json **/
@@ -773,6 +774,14 @@ public class SystemSetting implements Serializable{
 
 	public void setTopicHotRecommendedTime(Integer topicHotRecommendedTime) {
 		this.topicHotRecommendedTime = topicHotRecommendedTime;
+	}
+
+	public Integer getAllowMentionMaxNumber() {
+		return allowMentionMaxNumber;
+	}
+
+	public void setAllowMentionMaxNumber(Integer allowMentionMaxNumber) {
+		this.allowMentionMaxNumber = allowMentionMaxNumber;
 	}
 
 
