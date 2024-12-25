@@ -87,6 +87,30 @@ public class SystemSettingValidator implements Validator{
 		}else{
 			errors.rejectValue("privateMessage_submitQuantity","errors.required", new String[]{"不能为空"},"");
 		}
+		//AI助手每分钟提交超过
+		if(systemSetting.getAiAssistant_submitQuantity() != null){
+			if(systemSetting.getAiAssistant_submitQuantity() <0){
+				errors.rejectValue("aiAssistant_submitQuantity","errors.required", new String[]{"不能小于0"},"");
+			}
+		}else{
+			errors.rejectValue("aiAssistant_submitQuantity","errors.required", new String[]{"不能为空"},"");
+		}
+		//举报每分钟提交超过
+		if(systemSetting.getReport_submitQuantity() != null){
+			if(systemSetting.getReport_submitQuantity() <0){
+				errors.rejectValue("report_submitQuantity","errors.required", new String[]{"不能小于0"},"");
+			}
+		}else{
+			errors.rejectValue("report_submitQuantity","errors.required", new String[]{"不能为空"},"");
+		}
+		//举报图片允许最大上传数量
+		if(systemSetting.getReportMaxImageUpload() != null){
+			if(systemSetting.getReportMaxImageUpload() <0){
+				errors.rejectValue("reportMaxImageUpload","errors.required", new String[]{"不能小于0"},"");
+			}
+		}else{
+			errors.rejectValue("reportMaxImageUpload","errors.required", new String[]{"不能为空"},"");
+		}
 		
 		//提交问题最多可选择标签数量
 		if(systemSetting.getMaxQuestionTagQuantity() != null){

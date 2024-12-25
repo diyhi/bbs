@@ -96,6 +96,12 @@
 						</el-row>
 						<div class="form-help" >0为每次都出现验证码</div>
 					</el-form-item>
+					<el-form-item label="AI助手每分钟提交超过" :error="error.aiAssistant_submitQuantity" v-show="activeTag == 10">
+						<el-row >
+							<el-col :span="6"><el-input v-model.trim="aiAssistant_submitQuantity" :required="true" maxlength="8" clearable="true" show-word-limit></el-input></el-col>
+						</el-row>
+						<div class="form-help" >0为每次都出现验证码</div>
+					</el-form-item>
 					<el-form-item label="举报每分钟提交超过" :error="error.report_submitQuantity" v-show="activeTag == 10">
 						<el-row >
 							<el-col :span="6"><el-input v-model.trim="report_submitQuantity" :required="true" maxlength="8" clearable="true" show-word-limit></el-input></el-col>
@@ -1117,6 +1123,7 @@ export default({
 			question_submitQuantity:'',
 			answer_submitQuantity:'',
 			privateMessage_submitQuantity:'',
+			aiAssistant_submitQuantity:'',
 			report_submitQuantity:'',
 			reportMaxImageUpload:'',
 			maxQuestionTagQuantity:'',
@@ -1184,6 +1191,7 @@ export default({
 				question_submitQuantity:'',
 				answer_submitQuantity:'',
 				privateMessage_submitQuantity:'',
+				aiAssistant_submitQuantity:'',
 				report_submitQuantity:'',
 				reportMaxImageUpload:'',
 				maxQuestionTagQuantity:'',
@@ -1335,6 +1343,9 @@ export default({
 			    				}
 			    				if(systemSetting.privateMessage_submitQuantity != null){
 			    					_self.privateMessage_submitQuantity = systemSetting.privateMessage_submitQuantity;
+			    				}
+			    				if(systemSetting.aiAssistant_submitQuantity != null){
+			    					_self.aiAssistant_submitQuantity = systemSetting.aiAssistant_submitQuantity;
 			    				}
 			    				if(systemSetting.report_submitQuantity != null){
 			    					_self.report_submitQuantity = systemSetting.report_submitQuantity;
@@ -1665,9 +1676,10 @@ export default({
 			if(_self.answer_submitQuantity != null){
 				formData.append('answer_submitQuantity', _self.answer_submitQuantity);
 			}
-			if(_self.privateMessage_submitQuantity != null){
-				formData.append('privateMessage_submitQuantity', _self.privateMessage_submitQuantity);
+			if(_self.aiAssistant_submitQuantity != null){
+				formData.append('aiAssistant_submitQuantity', _self.aiAssistant_submitQuantity);
 			}
+			
 			if(_self.report_submitQuantity != null){
 				formData.append('report_submitQuantity', _self.report_submitQuantity);
 			}

@@ -630,7 +630,7 @@ public class HomeManageAction {
 			List<Long> topicIdList = new ArrayList<Long>();
 			for(Reply o :qr.getResultlist()){
     			o.setIp(null);//IP地址不显示
-    			
+    			o.setContent(textFilterManage.filterText(textFilterManage.specifyHtmlTagToText(o.getContent())));
     			if(!topicIdList.contains(o.getTopicId())){
     				topicIdList.add(o.getTopicId());
     			}
@@ -5765,7 +5765,7 @@ public class HomeManageAction {
 			List<Long> questionIdList = new ArrayList<Long>();
 			for(AnswerReply o :qr.getResultlist()){
     			o.setIp(null);//IP地址不显示
-    			
+    			o.setContent(textFilterManage.filterText(textFilterManage.specifyHtmlTagToText(o.getContent())));
     			if(!questionIdList.contains(o.getQuestionId())){
     				questionIdList.add(o.getQuestionId());
     			}

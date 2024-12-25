@@ -1466,7 +1466,7 @@ public class UserManageAction {
 			if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
 				List<Long> topicIdList = new ArrayList<Long>();
 				for(Comment o :qr.getResultlist()){
-	    			o.setContent(textFilterManage.filterText(o.getContent()));
+					o.setContent(textFilterManage.filterText(textFilterManage.specifyHtmlTagToText(o.getContent())));
 	    			if(!topicIdList.contains(o.getTopicId())){
 	    				topicIdList.add(o.getTopicId());
 	    			}
@@ -1556,7 +1556,7 @@ public class UserManageAction {
 				List<Long> topicIdList = new ArrayList<Long>();
 				for(Reply o :qr.getResultlist()){
 	    				
-	    			o.setContent(textFilterManage.filterText(o.getContent()));
+					o.setContent(textFilterManage.filterText(textFilterManage.specifyHtmlTagToText(o.getContent())));
 	    			if(!topicIdList.contains(o.getTopicId())){
 	    				topicIdList.add(o.getTopicId());
 	    			}
@@ -1730,7 +1730,7 @@ public class UserManageAction {
 			if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
 				List<Long> questionIdList = new ArrayList<Long>();
 				for(Answer o :qr.getResultlist()){
-	    			o.setContent(textFilterManage.filterText(o.getContent()));
+					o.setContent(textFilterManage.filterText(textFilterManage.specifyHtmlTagToText(o.getContent())));
 	    			if(!questionIdList.contains(o.getQuestionId())){
 	    				questionIdList.add(o.getQuestionId());
 	    			}
@@ -1816,7 +1816,7 @@ public class UserManageAction {
 				List<Long> questionIdList = new ArrayList<Long>();
 				for(AnswerReply o :qr.getResultlist()){
 	    				
-	    			o.setContent(textFilterManage.filterText(o.getContent()));
+					o.setContent(textFilterManage.filterText(textFilterManage.specifyHtmlTagToText(o.getContent())));
 	    			if(!questionIdList.contains(o.getQuestionId())){
 	    				questionIdList.add(o.getQuestionId());
 	    			}

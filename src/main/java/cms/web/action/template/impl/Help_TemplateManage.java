@@ -304,8 +304,12 @@ public class Help_TemplateManage {
 		List<HelpType> helpTypeList = new ArrayList<HelpType>();
 		
 		List<HelpType> allHelpType = helpTypeService.findAllHelpType();
-
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();  
+		
 		for(HelpType helpType : allHelpType){
+			if(helpType.getImage() != null && !"".equals(helpType.getImage().trim())){
+				helpType.setImage(fileManage.fileServerAddress(request)+helpType.getImage());
+			}
 			if(helpType.getChildNodeNumber() >0){//有子节点
 				List<HelpType> childHelpType = this.queryType(allHelpType,helpType.getId());
 				if(childHelpType != null && childHelpType.size() >0){

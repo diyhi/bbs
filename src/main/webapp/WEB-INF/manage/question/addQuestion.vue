@@ -161,7 +161,7 @@ export default({
 					   				        'superscript', 'clearhtml', 'quickformat', 'selectall', '|', 
 					   				        'formatblock', 'fontname', 'fontsize','fullscreen', '/', 'forecolor', 'hilitecolor', 'bold',
 					   				        'italic', 'underline', 'strikethrough', 'lineheight', 'removeformat', '|', 'image', 'multiimage',
-					   				         'media','embedVideo','uploadVideo', 'insertfile','emoticons','baidumap', 'table', 'hr',   'pagebreak',
+					   				         'media','embedVideo','uploadVideo', 'insertfile','emoticons', 'table', 'hr',   'pagebreak',
 					   				         'link', 'unlink'];
 		    			let uploadPath = "control/question/manage?method=upload&userName="+_self.userName+"&isStaff=true";
 			    		//创建富文本编辑器

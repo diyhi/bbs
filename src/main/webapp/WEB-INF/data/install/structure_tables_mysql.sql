@@ -1,6 +1,20 @@
 /*!40101 SET NAMES utf8 */;
 
 #
+# Structure for table "aiinterface"
+#
+
+CREATE TABLE `aiinterface` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `dynamicParameter` longtext,
+  `enable` bit(1) NOT NULL,
+  `interfaceProduct` int(11) DEFAULT NULL,
+  `name` varchar(100) DEFAULT NULL,
+  `version` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
 # Structure for table "answer"
 #
 
@@ -1970,6 +1984,7 @@ CREATE TABLE `systemsetting` (
   `topicHeatFactor` varchar(255) DEFAULT NULL,
   `topicHotRecommendedTime` int(11) DEFAULT NULL,
   `allowMentionMaxNumber` int(11) DEFAULT NULL,
+  `aiAssistant_submitQuantity` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

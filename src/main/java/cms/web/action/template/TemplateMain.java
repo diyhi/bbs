@@ -432,6 +432,11 @@ public class TemplateMain {
 				List<SupportLoginInterface> value = system_TemplateManage.thirdPartyLogin_collection(forum, submitParameter,runtimeParameter);
 				return value;
 			}	
+		}else if(forum.getForumChildType().equals("AI助手")){
+			if(forum.getDisplayType().equals("collection")){//集合
+				Map<String,Object> value = system_TemplateManage.aiAssistant_collection(forum, submitParameter,runtimeParameter);
+				return value;
+			}	
 		}
 		
 		

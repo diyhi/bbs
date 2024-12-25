@@ -62,6 +62,8 @@ public class SystemSetting implements Serializable{
 	private Integer privateMessage_submitQuantity = 5;
 	/** 提交问题最多可选择标签数量 **/
 	private Integer maxQuestionTagQuantity = 5;
+	/** AI助手每分钟提交超过N次出现验证码 **/
+	private Integer aiAssistant_submitQuantity = 5;
 	/** 举报每分钟提交超过N次出现验证码 **/
 	private Integer report_submitQuantity = 5;
 	/** 举报图片允许最大上传数量   0为不允许上传图片 **/
@@ -782,6 +784,14 @@ public class SystemSetting implements Serializable{
 
 	public void setAllowMentionMaxNumber(Integer allowMentionMaxNumber) {
 		this.allowMentionMaxNumber = allowMentionMaxNumber;
+	}
+
+	public Integer getAiAssistant_submitQuantity() {
+		return aiAssistant_submitQuantity;
+	}
+
+	public void setAiAssistant_submitQuantity(Integer aiAssistant_submitQuantity) {
+		this.aiAssistant_submitQuantity = aiAssistant_submitQuantity;
 	}
 
 

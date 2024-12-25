@@ -537,7 +537,7 @@ public class QuestionAction {
 		if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
 			List<Long> questionIdList = new ArrayList<Long>();
 			for(Answer o :qr.getResultlist()){
-    			o.setContent(textFilterManage.filterText(o.getContent()));
+				o.setContent(textFilterManage.filterText(textFilterManage.specifyHtmlTagToText(o.getContent())));
     			if(!questionIdList.contains(o.getQuestionId())){
     				questionIdList.add(o.getQuestionId());
     			}
@@ -627,7 +627,7 @@ public class QuestionAction {
 			List<Long> questionIdList = new ArrayList<Long>();
 			for(AnswerReply o :qr.getResultlist()){
     				
-    			o.setContent(textFilterManage.filterText(o.getContent()));
+				o.setContent(textFilterManage.filterText(textFilterManage.specifyHtmlTagToText(o.getContent())));
     			if(!questionIdList.contains(o.getQuestionId())){
     				questionIdList.add(o.getQuestionId());
     			}

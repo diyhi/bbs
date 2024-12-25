@@ -1,6 +1,7 @@
 package cms.web.action.template.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -105,5 +106,13 @@ public class System_TemplateManage {
 		return supportLoginInterfaceList;
 	}
 	
+	/**
+	 * AI助手(未实现)
+	 * @param forum
+	 */
+	public Map<String,Object> aiAssistant_collection(Forum forum,Map<String,Object> parameter,Map<String,Object> runtimeParameter){
+		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
+		return returnValue;
+	}
 }
 

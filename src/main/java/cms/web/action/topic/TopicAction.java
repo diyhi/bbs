@@ -526,7 +526,7 @@ public class TopicAction {
 		if(qr != null && qr.getResultlist() != null && qr.getResultlist().size() >0){
 			List<Long> topicIdList = new ArrayList<Long>();
 			for(Comment o :qr.getResultlist()){
-    			o.setContent(textFilterManage.filterText(o.getContent()));
+				o.setContent(textFilterManage.filterText(textFilterManage.specifyHtmlTagToText(o.getContent())));
     			if(!topicIdList.contains(o.getTopicId())){
     				topicIdList.add(o.getTopicId());
     			}
@@ -612,7 +612,7 @@ public class TopicAction {
 			List<Long> topicIdList = new ArrayList<Long>();
 			for(Reply o :qr.getResultlist()){
     				
-    			o.setContent(textFilterManage.filterText(o.getContent()));
+				o.setContent(textFilterManage.filterText(textFilterManage.specifyHtmlTagToText(o.getContent())));
     			if(!topicIdList.contains(o.getTopicId())){
     				topicIdList.add(o.getTopicId());
     			}

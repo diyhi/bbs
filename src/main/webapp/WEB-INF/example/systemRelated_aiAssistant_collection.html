@@ -1,0 +1,339 @@
+<table class="exampleTable" > 
+	<thead>
+		<tr> 
+			<th colspan="4">返回值</th>
+		</tr>
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="12%">类型</th> 
+			<th width="38%">集合内容</th> 
+			<th width="20%">说明</th> 
+		</tr> 
+	</thead> 
+	 <tbody> 
+		<tr> 
+		<tr> 
+			<td rowspan="5">systemRelated_aiAssistant_collection</td> 
+			<td rowspan="5">Map&ltString,Object></td>
+			<td>键参数：aiProductList<br>值内容说明：举报分类<br>值类型：值类型：List&lt<a style="color: #317ee7" onclick="anchorJump('#anchor_120'); return false;">AiProduct</a>></td>
+			<td rowspan="5">添加问题界面显示返回值</td> 
+		</tr>
+		<tr> 
+			<td>键参数：allowChat<br>值内容说明：是否允许对话<br>值类型：boolean</td>
+		</tr>
+		<tr> 
+			<td>键参数：isPermission<br>值内容说明：是否有使用权限<br>值类型：boolean</td>
+		</tr>
+		<tr> 
+			<td>键参数：formCaptcha<br>值内容说明：表单验证码<br>值类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_30'); return false;">FormCaptcha</a></td>
+		</tr>	
+	</tbody> 
+</table>
+
+
+
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">提交表单 - AJAX方式</th>
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td>请求路径</td> 
+			<td colspan="2">/user/control/aiAssistant.htm</td>
+		</tr>
+		<tr> 
+			<td>请求方式</td> 
+			<td colspan="2">POST</td>
+		</tr> 
+		<tr> 
+			<td>自定义请求头</td> 
+			<td colspan="2">协议头：X-Requested-With  值：XMLHttpRequest</td>
+		</tr>
+		<tr> 
+			<td>请求参数</td> 
+			<td colspan="2"><a style="color: #317ee7" onclick="anchorJump('#anchor_600'); return false;">参数表</a></td>
+		</tr>
+		<tr> 
+			<td width="30%" rowspan="4">提交返回</td> 
+			<td width="30%" rowspan="4">JSON格式值 类型:Map&ltString,Object></td>
+			<td width="40%">键参数：success<br>值内容说明：成功返回true 失败返回false<br>值类型：String</td> 
+		</tr>
+		<tr> 
+			<td>键参数：error<br>值内容说明：错误值集合<br>值类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_10'); return false;">Map&ltString,String></a></td> 
+		</tr>
+		<tr> 
+			<td>键参数：captchaKey<br>值内容说明：新验证码编号(当success参数返回false时并且根据'全站设置 - 基本设置 - AI助手每分钟提交超过'参数计算是否含有值)<br>值类型：String</td> 
+		</tr>
+		<tr> 
+			<td>键参数：chatInfo<br>值内容说明：对话信息<br>值类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_80'); return false;">ChatInfo</a></td> 
+		</tr>
+	</tbody> 
+</table>
+
+<table id="anchor_30" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">表单验证码 FormCaptcha</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>showCaptcha</td> 
+			<td>boolean</td>
+			<td>是否显示验证码 (根据'全站设置 - 基本设置 - 发表私信每分钟提交超过'参数计算是否含有值)</td>
+		</tr>
+		<tr> 
+			<td>captchaKey</td> 
+			<td>String</td>
+			<td>验证码编号</td>
+		</tr>
+		<tr> 
+			<td>说明</td> 
+			<td colspan="2">Freemarker模板不支持直接输出布尔类型(boolean),布尔类型对象输出要使用内建函数c将布尔值转换为字符串；例如布尔类型${formCaptcha.showCaptcha}要写成${formCaptcha.showCaptcha?c}才能正确显示；比较${formCaptcha.showCaptcha?c == 'true'}</td>
+		</tr>
+	</tbody>
+</table>
+
+
+
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">校验验证码</th>
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td>请求路径</td> 
+			<td colspan="2">checkCaptcha.htm</td>
+		</tr>
+		<tr> 
+			<td>请求方式</td> 
+			<td colspan="2">GET</td>
+		</tr> 
+		<tr> 
+			<td>返回类型</td> 
+			<td colspan="2">JSON</td>
+		</tr> 
+		<tr> 
+			<td>必填参数</td> 
+			<td colspan="2">
+				captchaKey : 验证码编号<br>
+				captchaValue : 验证码值  同一编号验证码每分钟提交次数不能超过60次,超出时验证码图片返回空字符
+			</td>
+		</tr>
+		<tr> 
+			<td width="30%" >提交返回</td> 
+			<td width="30%" >字符串格式值 类型:String</td>
+			<td width="40%">值内容说明：成功返回true 失败返回false<br>值类型：String</td> 
+		</tr>
+	</tbody> 
+</table>
+
+<table id="anchor_10"  class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">错误值 error</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	 <tbody> 
+	 	<tr> 
+			<td>token</td> 
+			<td>String</td>
+			<td>令牌错误</td>
+		</tr>
+		<tr> 
+			<td>captchaValue</td> 
+			<td>String</td>
+			<td>验证码错误</td>
+		</tr>
+		<tr> 
+			<td>assistant</td> 
+			<td>String</td>
+			<td>AI助手错误</td>
+		</tr>
+		<tr> 
+			<td>prompt</td> 
+			<td>String</td>
+			<td>提示词错误</td>
+		</tr>
+		<tr> 
+			<td>interfaceProduct</td> 
+			<td>String</td>
+			<td>接口产品错误</td>
+		</tr>
+	</tbody> 
+</table>
+
+
+<table id="anchor_80" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">对话信息 ChatInfo</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		
+		<tr> 
+			<td>requestId</td> 
+			<td>String</td>
+			<td>系统生成的标识。请求ID</td>
+		</tr>
+		<tr> 
+			<td>text</td> 
+			<td>String</td>
+			<td>模型生成的回复内容(Markdown格式)</td>
+		</tr>
+		<tr> 
+			<td>interfaceProduct</td> 
+			<td>Integer</td>
+			<td>接口产品 10:阿里云百炼大模型</td>
+		</tr>
+		<tr> 
+			<td>statusCode</td> 
+			<td>Integer</td>
+			<td>表示状态码，调用成功时为空值</td>
+		</tr>
+		<tr> 
+			<td>errorCode</td> 
+			<td>String</td>
+			<td>表示错误码，调用成功时为空值</td>
+		</tr>
+		<tr> 
+			<td>errorMessage</td> 
+			<td>String</td>
+			<td>表示失败详细信息，成功忽略</td>
+		</tr>
+	</tbody> 
+</table>
+<table id="anchor_120" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">AI大模型产品 AiProduct</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>interfaceProduct</td> 
+			<td>Integer</td>
+			<td>接口产品</td>
+		</tr>
+		<tr> 
+			<td>name</td> 
+			<td>String</td>
+			<td>名称</td>
+		</tr>
+	</tbody> 
+</table>
+
+
+
+
+
+<table id="anchor_600" class="exampleTable" > 
+	<thead>
+		<tr> 
+			<th colspan="4">提交AI助手参数</th>
+		</tr>
+		<tr> 
+			<th width="30%">参数</th> 
+			<th width="20%">类型</th> 
+			<th width="10%">是否必填</th> 
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	 <tbody> 
+		<tr> 
+			<td>prompt</td> 
+			<td>String</td>
+			<td>是</td>
+			<td>提示词</td> 
+		</tr>
+		<tr> 
+			<td>interfaceProduct</td> 
+			<td>Integer</td>
+			<td>是</td>
+			<td>接口产品</td> 
+		</tr>
+		<tr> 
+			<td>token</td> 
+			<td>String</td>
+			<td>是</td>
+			<td>令牌</td> 
+		</tr>
+		<tr> 
+			<td>captchaKey</td> 
+			<td>String</td>
+			<td>按需填写</td>
+			<td>验证码编号</td> 
+		</tr>
+		<tr> 
+			<td>captchaValue</td> 
+			<td>String</td>
+			<td>按需填写</td>
+			<td>验证码值 同一编号验证码每分钟提交次数不能超过60次,超出时验证码图片返回空字符</td> 
+		</tr>
+		<tr> 
+			<td>jumpUrl</td> 
+			<td>String</td>
+			<td>否</td>
+			<td>'提交表单 - 默认方式'提交成功后跳转路径,不填写默认跳转到表单提交页；参数必须经过encodeBase64URL编码后才能提交。例${encodeBase64URL('/index')}</td> 
+		</tr>
+	</tbody> 
+</table>
+
+<h2 style="margin:0;padding:0; margin-top: 10px;">示例</h2>
+<textarea name="exampleCode">
+	let formData = new FormData();
+        
+    formData.append('interfaceProduct', '10'); 
+    formData.append('prompt', '您好'); 
+
+    //验证码Key
+    formData.append('captchaKey', state.captchaKey);
+    //验证码值
+    if(state.captchaValue != ''){
+        formData.append('captchaValue', state.captchaValue.trim());
+    }
+            
+    axiosInstance({
+    	url: '/user/control/aiAssistant',
+        method: 'post',
+        data: formData,
+        showLoading: false,//是否显示加载图标
+        loadingMask:false,// 是否显示遮罩层
+        timeout: 0,// 定义请求超时时间
+     )
+     .then((response: AxiosResponse) => {
+        if(response){
+        	const result: any = response.data;       
+                        
+        }
+     })
+     .catch((error: any) =>{
+     	console.log(error);
+        state.allowSubmit = false;//提交按钮disabled状态
+     });
+</textarea>
