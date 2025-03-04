@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>bbs</groupId>
 	<artifactId>bbs</artifactId>
-	<version>6.5</version>
+	<version>6.6</version>
 	<packaging>war</packaging>
 	<name>bbs</name>
 	<description/>
@@ -942,6 +942,18 @@
 			</exclusions>
 		</dependency>
 		
+		<dependency>
+		    <groupId>com.googlecode.libphonenumber</groupId>
+		    <artifactId>libphonenumber</artifactId>
+		    <version>8.13.55</version>
+		</dependency>
+		
+		<!-- 阿里云短信 -->
+		<dependency>
+		    <groupId>com.aliyun</groupId>
+		    <artifactId>alibabacloud-dysmsapi20170525</artifactId>
+		    <version>3.0.2</version>
+		</dependency>
 		
 		<!-- 本地JAR -->
 		<dependency>
@@ -1046,6 +1058,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		<!-- 
 		<dependency>
 		    <groupId>com.aliyun</groupId>
 		    <artifactId>aliyun-java-sdk-dysmsapi</artifactId>
@@ -1056,7 +1069,7 @@
 					<artifactId>*</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
+		</dependency> -->
 		<dependency>
 		    <groupId>com.aliyun</groupId>
 		    <artifactId>aliyun-java-sdk-core</artifactId>

@@ -179,7 +179,12 @@ export default({
 			    if(result){
 			    	let returnValue = JSON.parse(result);
 			    	if(returnValue.code === 200){//成功
-			    		_self.templates = returnValue.data;
+			    		let mapData = returnValue.data;
+			    		for(let key in mapData){
+			    			if(key == "templates"){
+			    				_self.templates = mapData[key];
+			    			}
+			    		}
 			    	}else if(returnValue.code === 500){
 			    		let errorMap = returnValue.data;
 			    		for (let key in errorMap) {

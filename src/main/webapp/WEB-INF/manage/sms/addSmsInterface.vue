@@ -36,12 +36,21 @@
 						<el-form-item v-if="sendService.interfaceProduct == 1 && interfaceProduct ==1">
 						   {{sendService.serviceName}}
 						</el-form-item>
-						<el-form-item label="短信签名" v-if="sendService.interfaceProduct == 1 && interfaceProduct ==1" :required="true" :error="error.alidayu_signName.get(sendService.interfaceProduct+'_'+sendService.serviceId)">
+						<el-form-item label="国内短信签名" v-if="sendService.interfaceProduct == 1 && interfaceProduct ==1" :error="error.alidayu_signName.get(sendService.interfaceProduct+'_'+sendService.serviceId)">
 							<el-row><el-col :span="18"><el-input v-model.trim="alidayu_signName[index]" maxlength="80" clearable="true" show-word-limit></el-input></el-col></el-row>
 							<div class="form-help" >阿里云管理控制台审核通过的短信签名</div>
 						</el-form-item>
-						<el-form-item label="短信模板代码" v-if="sendService.interfaceProduct == 1 && interfaceProduct ==1" :required="true" :error="error.alidayu_templateCode.get(sendService.interfaceProduct+'_'+sendService.serviceId)">
+						<el-form-item label="国内短信模板代码" v-if="sendService.interfaceProduct == 1 && interfaceProduct ==1" :error="error.alidayu_templateCode.get(sendService.interfaceProduct+'_'+sendService.serviceId)">
 							<el-row><el-col :span="18"><el-input v-model.trim="alidayu_templateCode[index]" maxlength="80" clearable="true" show-word-limit></el-input></el-col></el-row>
+							<div class="form-help" >例如：SMS_1000000</div>
+						</el-form-item>
+						
+						<el-form-item label="国际短信签名" v-if="sendService.interfaceProduct == 1 && interfaceProduct ==1" :error="error.alidayu_internationalSignName.get(sendService.interfaceProduct+'_'+sendService.serviceId)">
+							<el-row><el-col :span="18"><el-input v-model.trim="alidayu_internationalSignName[index]" maxlength="80" clearable="true" show-word-limit></el-input></el-col></el-row>
+							<div class="form-help" >阿里云管理控制台审核通过的短信签名</div>
+						</el-form-item>
+						<el-form-item label="国际短信模板代码" v-if="sendService.interfaceProduct == 1 && interfaceProduct ==1" :error="error.alidayu_internationalTemplateCode.get(sendService.interfaceProduct+'_'+sendService.serviceId)">
+							<el-row><el-col :span="18"><el-input v-model.trim="alidayu_internationalTemplateCode[index]" maxlength="80" clearable="true" show-word-limit></el-input></el-col></el-row>
 							<div class="form-help" >例如：SMS_1000000</div>
 						</el-form-item>
 						
@@ -92,6 +101,8 @@ export default({
 			alidayu_accessKeySecret :'',
 			alidayu_signName:[],
 			alidayu_templateCode:[],
+			alidayu_internationalSignName:[],
+			alidayu_internationalTemplateCode:[],
 			
 			error : {
 				name :'',
@@ -101,6 +112,8 @@ export default({
 				alidayu_accessKeySecret :'',
 				alidayu_signName : new Map(),
 				alidayu_templateCode : new Map(),
+				alidayu_internationalSignName : new Map(),
+				alidayu_internationalTemplateCode : new Map(),
 			},
 			submitForm_disabled:false,//提交按钮是否禁用
 		};
@@ -141,6 +154,9 @@ export default({
 			    						let sendService = sendServiceList[i];
 			    						_self.alidayu_signName.push("");
 			    						_self.alidayu_templateCode.push("");
+			    						_self.alidayu_internationalSignName.push("");
+			    						_self.alidayu_internationalTemplateCode.push("");
+			    						
 			    						
 			    						let variable = sendService.alidayu_variable;
 			    						let variableList = [];
@@ -220,8 +236,18 @@ export default({
 				for(let i=0; i<_self.sendServiceList.length; i++){
 					let sendService = _self.sendServiceList[i];
 					
-					formData.append('alidayu_signName_'+sendService.interfaceProduct+"_"+sendService.serviceId, _self.alidayu_signName[i]);
-					formData.append('alidayu_templateCode_'+sendService.interfaceProduct+"_"+sendService.serviceId, _self.alidayu_templateCode[i]);
+					if(_self.alidayu_signName[i] != null){
+						formData.append('alidayu_signName_'+sendService.interfaceProduct+"_"+sendService.serviceId, _self.alidayu_signName[i]);
+					}
+					if(_self.alidayu_templateCode[i] != null){
+						formData.append('alidayu_templateCode_'+sendService.interfaceProduct+"_"+sendService.serviceId, _self.alidayu_templateCode[i]);
+					}
+					if(_self.alidayu_internationalSignName[i] != null){
+						formData.append('alidayu_internationalSignName_'+sendService.interfaceProduct+"_"+sendService.serviceId, _self.alidayu_internationalSignName[i]);
+					}
+					if(_self.alidayu_internationalTemplateCode[i] != null){
+						formData.append('alidayu_internationalTemplateCode_'+sendService.interfaceProduct+"_"+sendService.serviceId, _self.alidayu_internationalTemplateCode[i]);
+					}
 				}
 			}
 			

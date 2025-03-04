@@ -10193,12 +10193,17 @@ var login_component = Vue.extend({
 				//	data: data,
 				success : function success(result) {
 					if (result != "") {
-						var formCaptcha = $.parseJSON(result);
-						if (formCaptcha.showCaptcha == true) {
-							//alert(result);
-							_self.showCaptcha = true;
-							_self.captchaKey = formCaptcha.captchaKey;
-							_self.imgUrl = "captcha/" + formCaptcha.captchaKey + ".jpg";
+						var returnValue = $.parseJSON(result);
+						for (var key in returnValue) {
+							if (key == "formCaptcha") {
+								var formCaptcha = returnValue[key];
+								if (formCaptcha.showCaptcha == true) {
+									//alert(result);
+									_self.showCaptcha = true;
+									_self.captchaKey = formCaptcha.captchaKey;
+									_self.imgUrl = "captcha/" + formCaptcha.captchaKey + ".jpg";
+								}
+							}
 						}
 					}
 				}

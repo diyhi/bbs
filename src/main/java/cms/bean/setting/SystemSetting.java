@@ -2,6 +2,8 @@ package cms.bean.setting;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -48,6 +50,17 @@ public class SystemSetting implements Serializable{
 	@Transient
 	private AllowRegisterAccount allowRegisterAccountObject = new AllowRegisterAccount();
 
+	/** 多语言切换 存储JSON的languageSwitchingCodeList结构 **/
+	@Lob
+	private String languageSwitching;
+	@Transient
+	private List<String> languageSwitchingCodeList = new ArrayList<String>();
+	/** 多语言表单扩展 存储JSON的languageFormExtensionCodeList结构 **/
+	@Lob
+	private String languageFormExtension;
+	@Transient
+	private List<String> languageFormExtensionCodeList = new ArrayList<String>();
+	
 	/** 注册是否需要验证码 **/
 	private boolean registerCaptcha = true;
 
@@ -792,6 +805,38 @@ public class SystemSetting implements Serializable{
 
 	public void setAiAssistant_submitQuantity(Integer aiAssistant_submitQuantity) {
 		this.aiAssistant_submitQuantity = aiAssistant_submitQuantity;
+	}
+
+	public String getLanguageSwitching() {
+		return languageSwitching;
+	}
+
+	public void setLanguageSwitching(String languageSwitching) {
+		this.languageSwitching = languageSwitching;
+	}
+
+	public List<String> getLanguageSwitchingCodeList() {
+		return languageSwitchingCodeList;
+	}
+
+	public void setLanguageSwitchingCodeList(List<String> languageSwitchingCodeList) {
+		this.languageSwitchingCodeList = languageSwitchingCodeList;
+	}
+
+	public String getLanguageFormExtension() {
+		return languageFormExtension;
+	}
+
+	public void setLanguageFormExtension(String languageFormExtension) {
+		this.languageFormExtension = languageFormExtension;
+	}
+
+	public List<String> getLanguageFormExtensionCodeList() {
+		return languageFormExtensionCodeList;
+	}
+
+	public void setLanguageFormExtensionCodeList(List<String> languageFormExtensionCodeList) {
+		this.languageFormExtensionCodeList = languageFormExtensionCodeList;
 	}
 
 

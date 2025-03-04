@@ -160,7 +160,7 @@ public class QuestionTagManageAction {
 				String pathName = FileUtil.getFullPath(imagePath);
 				
 				//旧路径必须为file/questionTag/开头
-				if(imagePath.substring(0, 14).equals("file/questionTag/")){
+				if(imagePath.substring(0, 17).equals("file/questionTag/")){
 					//新路径名称
 					String newPathName = "file/questionTag/";
 					
@@ -336,7 +336,7 @@ public class QuestionTagManageAction {
 						String pathName = FileUtil.getFullPath(imagePath);
 						
 						//旧路径必须为file/questionTag/开头
-						if(imagePath.substring(0, 14).equals("file/questionTag/")){
+						if(imagePath.substring(0, 17).equals("file/questionTag/")){
 							//新路径名称
 							String newPathName = "file/questionTag/";
 							

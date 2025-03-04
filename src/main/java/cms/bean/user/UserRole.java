@@ -2,6 +2,8 @@ package cms.bean.user;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -23,6 +25,12 @@ public class UserRole implements Serializable{
 	/** 名称 **/
 	@Column(length=50)
 	private String name;
+	/** 多语言扩展  存储JSON格式的multiLanguageExtensionMap属性值    key:字段-语言（例如：name-en_US） value:内容 **/
+	@Lob
+	private String multiLanguageExtension;
+	/** 多语言扩展  key:字段-语言（例如：name-en_US） value:内容**/
+	@Transient
+	private Map<String,String> multiLanguageExtensionMap = new HashMap<String,String>();
 	/** 备注 **/
 	@Lob
 	private String remark;
@@ -90,6 +98,18 @@ public class UserRole implements Serializable{
 	}
 	public void setValidPeriodEnd(Date validPeriodEnd) {
 		this.validPeriodEnd = validPeriodEnd;
+	}
+	public String getMultiLanguageExtension() {
+		return multiLanguageExtension;
+	}
+	public void setMultiLanguageExtension(String multiLanguageExtension) {
+		this.multiLanguageExtension = multiLanguageExtension;
+	}
+	public Map<String, String> getMultiLanguageExtensionMap() {
+		return multiLanguageExtensionMap;
+	}
+	public void setMultiLanguageExtensionMap(Map<String, String> multiLanguageExtensionMap) {
+		this.multiLanguageExtensionMap = multiLanguageExtensionMap;
 	}
 	
 	

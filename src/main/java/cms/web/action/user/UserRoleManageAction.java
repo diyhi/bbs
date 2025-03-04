@@ -46,10 +46,13 @@ public class UserRoleManageAction {
 	@RequestMapping(params="method=add",method=RequestMethod.GET)
 	public String addUI(ModelMap model,UserRole userRole,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		Map<String,Object> returnValue = new HashMap<String,Object>();
 		//所有用户资源组集合
 		List<UserResourceGroup> userResourceGroupList = userRoleManage.readAllUserResourceGroup();
 		
-		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,userResourceGroupList));
+		returnValue.put("userResourceGroupList",userResourceGroupList);
+		
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
 	}
 	
 	/**

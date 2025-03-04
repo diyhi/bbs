@@ -6,10 +6,17 @@ import java.util.List;
 import javax.annotation.Resource;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
+import com.google.i18n.phonenumbers.NumberParseException;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.Phonenumber;
+
+import cms.bean.user.E164Format;
 import cms.bean.user.User;
 import cms.bean.user.UserState;
 import cms.service.user.UserService;
@@ -20,6 +27,7 @@ import cms.service.user.UserService;
  */
 @Component("userManage")
 public class UserManage {
+	private static final Logger logger = LogManager.getLogger(UserManage.class);
 	@Resource UserService userService;
 	
 	
@@ -83,7 +91,58 @@ public class UserManage {
 		
 	}
 	
+	/**
+	 * 处理区号
+	 * @param countryCode 区号
+	 * @return
+	 */
+	public String processCountryCode(String countryCode){
+		if(countryCode == null || "".equals(countryCode.trim())){
+			return "";
+		}
+		//如果是中国大陆区号，则省略+86
+		if("86".equals(countryCode.trim())){
+			return "";
+		}else if("+86".equals(countryCode.trim())){
+			return "";
+		}else{
+			if(StringUtils.startsWith(countryCode, "+")){
+				countryCode = countryCode.trim();
+			}else{
+				countryCode = "+"+countryCode.trim();
+			}
+		}
+		return countryCode;
+	}
 	
+	/**
+	 * 解析手机号码中的区号
+	 * @param mobilePhone 手机号码
+	 * @return
+	 */
+	public E164Format analyzeCountryCode(String mobilePhone){
+		E164Format e164Format = new E164Format();
+		
+		
+		if(StringUtils.startsWith(mobilePhone, "+")){
+			PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+			try {
+				Phonenumber.PhoneNumber number = phoneUtil.parse(mobilePhone, null);
+				e164Format.setCountryCode('+'+String.valueOf(number.getCountryCode()));
+				e164Format.setMobilePhone(String.valueOf(number.getNationalNumber()));
+			} catch (NumberParseException e) {
+				// TODO Auto-generated catch block
+				//e.printStackTrace();
+				if (logger.isErrorEnabled()) {
+		            logger.error("解析手机号码中的区号错误",e);
+		        }
+			}
+		}else{
+			e164Format.setMobilePhone(mobilePhone);
+		}
+		
+		return e164Format;
+	}
 
 	/**
 	 * 查询用户状态

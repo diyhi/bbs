@@ -7,6 +7,7 @@ import cms.bean.user.User;
 import cms.service.user.UserService;
 import cms.utils.Verification;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
@@ -69,7 +70,7 @@ public class UserValidator implements Validator{
 			    	if(user.getMobile().trim().length() >18){
 						errors.rejectValue("mobile","errors.required", new String[]{"手机号码超长"},"");
 					}else{
-						boolean mobile_verification = Verification.isPositiveInteger(user.getMobile().trim());//正整数
+						boolean mobile_verification = Verification.isPositiveInteger(StringUtils.removeStart(user.getMobile().trim(), "+"));//正整数
 						if(!mobile_verification){
 							errors.rejectValue("mobile","errors.required", new String[]{"手机号码不正确"},"");
 						}
@@ -81,7 +82,7 @@ public class UserValidator implements Validator{
 			    	if(user.getMobile().trim().length() >18){
 						errors.rejectValue("mobile","errors.required", new String[]{"手机号码超长"},"");
 					}else{
-						boolean mobile_verification = Verification.isPositiveInteger(user.getMobile().trim());//正整数
+						boolean mobile_verification = Verification.isPositiveInteger(StringUtils.removeStart(user.getMobile().trim(), "+"));//正整数
 						if(!mobile_verification){
 							errors.rejectValue("mobile","errors.required", new String[]{"手机号码不正确"},"");
 						}else{

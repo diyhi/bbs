@@ -78,6 +78,7 @@ import cms.bean.topic.Topic;
 import cms.bean.topic.TopicUnhide;
 import cms.bean.user.AccessUser;
 import cms.bean.user.DisableUserName;
+import cms.bean.user.E164Format;
 import cms.bean.user.FormCaptcha;
 import cms.bean.user.PointLog;
 import cms.bean.user.RefreshUser;
@@ -1742,7 +1743,12 @@ public class HomeManageAction {
 	    String captchaKey = UUIDUtil.getUUID32();
 	    model.addAttribute("captchaKey",captchaKey);
 	    returnValue.put("captchaKey",captchaKey);
-
+	    //是否允许国外手机号注册
+	  	boolean isAllowForeignCellPhoneRegistration = smsManage.isEnableInternationalSMS();
+	  		
+	  	returnValue.put("isAllowForeignCellPhoneRegistration",isAllowForeignCellPhoneRegistration);
+	  	model.addAttribute("isAllowForeignCellPhoneRegistration",isAllowForeignCellPhoneRegistration);
+	  	 
 	    if(isAjax){
 			WebUtil.writeToWeb(JsonUtils.toJSONString(returnValue), "json", response);
 			return null;
@@ -1759,7 +1765,7 @@ public class HomeManageAction {
 	 * @throws Exception
 	 */
 	@RequestMapping(value="/user/control/phoneBinding",method=RequestMethod.POST) 
-	public String phoneBinding(ModelMap model,String mobile,String smsCode,
+	public String phoneBinding(ModelMap model,String countryCode,String mobile,String smsCode,
 			String captchaKey,String captchaValue,String jumpUrl,
 			String token,RedirectAttributes redirectAttrs,
 			HttpServletRequest request, HttpServletResponse response)
@@ -1801,7 +1807,8 @@ public class HomeManageAction {
 	    }else{
 	    	error.put("mobile", ErrorView._851.name());//手机号不能为空
 	    }
-	    
+	    String _countryCode = userManage.processCountryCode(countryCode);
+    	
 	    
 	    if(smsCode != null && !"".equals(smsCode.trim())){
 	    	if(smsCode.trim().length() >6){
@@ -1810,7 +1817,7 @@ public class HomeManageAction {
 			    if(error.size() ==0){
 			    	
 			    	//生成绑定手机验证码标记
-		    		String numeric = smsManage.smsCode_generate(1,new_user.getPlatformUserId(), mobile.trim(),null);
+		    		String numeric = smsManage.smsCode_generate(1,new_user.getPlatformUserId(), _countryCode+mobile.trim(),null);
 		    		if(numeric != null){
 		    			if(!numeric.equals(smsCode)){
 		    				error.put("smsCode", ErrorView._850.name());//手机验证码错误
@@ -1827,12 +1834,12 @@ public class HomeManageAction {
 	    
 	    if(mobile != null && !"".equals(mobile.trim())){
 	    	 //删除绑定手机验证码标记
-		    smsManage.smsCode_delete(1,new_user.getPlatformUserId(), mobile.trim());
+		    smsManage.smsCode_delete(1,new_user.getPlatformUserId(), _countryCode+mobile.trim());
 		   
 	    }
 	    
 	    if(error.size() ==0){
-	    	userService.updateUserMobile(new_user.getUserName(),mobile.trim(),true);
+	    	userService.updateUserMobile(new_user.getUserName(),_countryCode+mobile.trim(),true);
 	    	//删除缓存
 			userManage.delete_cache_findUserById(new_user.getId());
 			userManage.delete_cache_findUserByUserName(new_user.getUserName());
@@ -1896,6 +1903,7 @@ public class HomeManageAction {
 	/**
 	 * 获取短信验证码
 	 * @param model
+	 * @param countryCode 区号
 	 * @param mobile 手机
 	 * @param module 模块  1.绑定手机  2.更换绑定手机第一步  3.更换绑定手机第二步
 	 * @param captchaKey
@@ -1908,7 +1916,7 @@ public class HomeManageAction {
 	 */
 	@RequestMapping(value="/user/control/getSmsCode",method=RequestMethod.POST) 
 	@ResponseBody//方式来做ajax,直接返回字符串
-	public String SMS_verificationCode(ModelMap model,String mobile,Integer module,
+	public String SMS_verificationCode(ModelMap model,String countryCode,String mobile,Integer module,
 			String captchaKey,String captchaValue,String token,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
@@ -1978,22 +1986,25 @@ public class HomeManageAction {
   	  			error.put("message", "用户不存在");
   	  		}else{
   	  			if(new_user.getMobile() != null && !"".equals(new_user.getMobile())){
-  	  				mobile = new_user.getMobile();
+  	  				E164Format e164Format = userManage.analyzeCountryCode(new_user.getMobile());
+	  				countryCode = e164Format.getCountryCode();//区号
+	  				mobile = e164Format.getMobilePhone();
   	  			}else{
   	  				error.put("message", "用户还没绑定手机");
   	  			}
   	  		}
   		}
 	    if(error.size() == 0){
+	    	countryCode = userManage.processCountryCode(countryCode);
 	    	String randomNumeric = RandomStringUtils.randomNumeric(6);
-	    	String errorInfo = smsManage.sendSms_code(new_user.getPlatformUserId(),mobile,randomNumeric);//6位随机数
+	    	String errorInfo = smsManage.sendSms_code(new_user.getPlatformUserId(),countryCode,mobile,randomNumeric);//6位随机数
 	    	if(errorInfo != null){
 	    		error.put("smsCode", errorInfo);
 	    	}else{
 	    		//删除绑定手机验证码标记
-	    	    smsManage.smsCode_delete(module,new_user.getPlatformUserId(), mobile.trim());
+	    	    smsManage.smsCode_delete(module,new_user.getPlatformUserId(), countryCode+mobile.trim());
 	    		//生成绑定手机验证码标记
-	    		smsManage.smsCode_generate(module,new_user.getPlatformUserId(), mobile.trim(),randomNumeric);
+	    		smsManage.smsCode_generate(module,new_user.getPlatformUserId(), countryCode+mobile.trim(),randomNumeric);
 	    		
 	    	}
 	    }
@@ -2046,9 +2057,16 @@ public class HomeManageAction {
 	  	AccessUser accessUser = AccessUserThreadLocal.get();
 	    
 	    User user = userService.findUserByUserName(accessUser.getUserName());
-	    if(user != null){
-	    	model.addAttribute("mobile",user.getMobile());
-		    returnValue.put("mobile",user.getMobile());
+	    if(user != null && user.getMobile() != null && !"".equals(user.getMobile().trim())){
+	    	E164Format e164Format = userManage.analyzeCountryCode(user.getMobile());
+			String countryCode = e164Format.getCountryCode();//区号
+			String mobile = e164Format.getMobilePhone();
+	    	
+	    	
+	    	model.addAttribute("countryCode",countryCode);
+	    	model.addAttribute("mobile",mobile);
+		    returnValue.put("countryCode",countryCode);
+		    returnValue.put("mobile",mobile);
 	    } 
    
 	    if(isAjax){
@@ -2191,7 +2209,11 @@ public class HomeManageAction {
 	    String captchaKey = UUIDUtil.getUUID32();
 	    model.addAttribute("captchaKey",captchaKey);
 	    returnValue.put("captchaKey",captchaKey);
-
+	    //是否允许国外手机号注册
+	  	boolean isAllowForeignCellPhoneRegistration = smsManage.isEnableInternationalSMS();
+	  		
+	  	returnValue.put("isAllowForeignCellPhoneRegistration",isAllowForeignCellPhoneRegistration);
+	  	model.addAttribute("isAllowForeignCellPhoneRegistration",isAllowForeignCellPhoneRegistration);
 	    if(isAjax){
 			WebUtil.writeToWeb(JsonUtils.toJSONString(returnValue), "json", response);
 			return null;
@@ -2208,7 +2230,7 @@ public class HomeManageAction {
 	 * @throws Exception
 	 */
 	@RequestMapping(value="/user/control/updatePhoneBinding/step2",method=RequestMethod.POST) 
-	public String updatePhoneBinding_2UI(ModelMap model,String mobile,String smsCode,
+	public String updatePhoneBinding_2UI(ModelMap model,String countryCode,String mobile,String smsCode,
 			String captchaKey,String captchaValue,String jumpUrl,
 			String token,RedirectAttributes redirectAttrs,
 			HttpServletRequest request, HttpServletResponse response)
@@ -2230,7 +2252,7 @@ public class HomeManageAction {
 	  	csrfTokenManage.processCsrfToken(request, token,error);
   		
 	    User new_user = userService.findUserByUserName(accessUser.getUserName());
-  		
+	    String _countryCode = userManage.processCountryCode(countryCode);
 	    
 	    if(mobile != null && !"".equals(mobile.trim())){
 	    	if(mobile.trim().length() >18){
@@ -2251,7 +2273,7 @@ public class HomeManageAction {
 				}
 				
 				if(new_user.getType().equals(20)){//用户类型 20: 手机用户
-		    		String platformUserId = userManage.thirdPartyUserIdToPlatformUserId(mobile.trim(),20);
+		    		String platformUserId = userManage.thirdPartyUserIdToPlatformUserId(_countryCode+mobile.trim(),20);
 		 			User mobile_user = userService.findUserByPlatformUserId(platformUserId);
 		 			
 		 	  		if(mobile_user != null){
@@ -2272,7 +2294,7 @@ public class HomeManageAction {
 			    if(error.size() ==0){
 			    	
 			    	//生成绑定手机验证码标记
-		    		String numeric = smsManage.smsCode_generate(3,new_user.getPlatformUserId(), mobile.trim(),null);
+		    		String numeric = smsManage.smsCode_generate(3,new_user.getPlatformUserId(), _countryCode+mobile.trim(),null);
 		    		if(numeric != null){
 		    			if(!numeric.equals(smsCode)){
 		    				error.put("smsCode", ErrorView._850.name());//手机验证码错误
@@ -2289,7 +2311,7 @@ public class HomeManageAction {
 	    
 	    if(mobile != null && !"".equals(mobile.trim())){
 	    	//删除绑定手机验证码标记
-		    smsManage.smsCode_delete(3,new_user.getPlatformUserId(), mobile.trim());
+		    smsManage.smsCode_delete(3,new_user.getPlatformUserId(), _countryCode+mobile.trim());
 	    }
 	    
 	    
@@ -2307,11 +2329,11 @@ public class HomeManageAction {
 	    
 	    if(error.size() ==0){
 	    	if(new_user.getType().equals(20)){//用户类型 20: 手机用户
-	    		String platformUserId = userManage.thirdPartyUserIdToPlatformUserId(mobile.trim(),20);
-	    		userService.updateUserMobile(new_user.getUserName(),mobile.trim(),true,platformUserId);
+	    		String platformUserId = userManage.thirdPartyUserIdToPlatformUserId(_countryCode+mobile.trim(),20);
+	    		userService.updateUserMobile(new_user.getUserName(),_countryCode+mobile.trim(),true,platformUserId);
 	    		
 	    	}else{
-	    		userService.updateUserMobile(new_user.getUserName(),mobile.trim(),true);
+	    		userService.updateUserMobile(new_user.getUserName(),_countryCode+mobile.trim(),true);
 	    	}
 	    	
 	    	

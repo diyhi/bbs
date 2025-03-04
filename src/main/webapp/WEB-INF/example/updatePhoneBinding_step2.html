@@ -21,6 +21,13 @@
 				类型：String
 			</td>
 		</tr>
+		<tr>  
+			<td>是否允许国外手机号注册</td> 
+			<td>
+				变量：isAllowForeignCellPhoneRegistration<br>
+				类型：boolean
+			</td>
+		</tr>
 	</tbody> 
 </table>
 
@@ -44,10 +51,13 @@
 			<td colspan="2">协议头：X-Requested-With  值：XMLHttpRequest</td>
 		</tr>
 		<tr> 
-			<td width="30%" >提交返回</td> 
-			<td width="30%" >JSON格式值 类型:Map&ltString,Object></td>
+			<td width="30%" rowspan="2">提交返回</td> 
+			<td width="30%" rowspan="2">JSON格式值 类型:Map&ltString,Object></td>
 			<td width="40%">键参数：captchaKey<br>值内容说明：验证码编号<br>值类型：String</td> 
-		</tr>		
+		</tr>	
+		<tr> 
+			<td>键参数：isAllowForeignCellPhoneRegistration<br>值内容说明：是否允许国外手机号注册<br>值类型：boolean</td> 
+		</tr>	
 	</tbody> 
 </table>
 

@@ -2,12 +2,15 @@ package cms.bean.topic;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Index;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -28,6 +31,12 @@ public class Tag implements Serializable{
 	/** 标签名称 **/
 	@Column(length=190)
 	private String name;
+	/** 多语言扩展  存储JSON格式的multiLanguageExtensionMap属性值    key:字段-语言（例如：name-en_US） value:内容 **/
+	@Lob
+	private String multiLanguageExtension;
+	/** 多语言扩展  key:字段-语言（例如：name-en_US） value:内容**/
+	@Transient
+	private Map<String,String> multiLanguageExtensionMap = new HashMap<String,String>();
 	/** 排序 **/
 	private Integer sort = 0;
 	/** 图片 **/
@@ -67,6 +76,18 @@ public class Tag implements Serializable{
 	}
 	public void setImage(String image) {
 		this.image = image;
+	}
+	public String getMultiLanguageExtension() {
+		return multiLanguageExtension;
+	}
+	public void setMultiLanguageExtension(String multiLanguageExtension) {
+		this.multiLanguageExtension = multiLanguageExtension;
+	}
+	public Map<String, String> getMultiLanguageExtensionMap() {
+		return multiLanguageExtensionMap;
+	}
+	public void setMultiLanguageExtensionMap(Map<String, String> multiLanguageExtensionMap) {
+		this.multiLanguageExtensionMap = multiLanguageExtensionMap;
 	}
 
 	

@@ -18,6 +18,7 @@ import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.joda.time.DateTime;
@@ -999,7 +1000,7 @@ public class UserManageAction {
 			    	if(formbean.getMobile().trim().length() >18){
 						error.put("mobile", "手机号码超长");
 					}else{
-						boolean mobile_verification = Verification.isPositiveInteger(formbean.getMobile().trim());//正整数
+						boolean mobile_verification = Verification.isPositiveInteger(StringUtils.removeStart(formbean.getMobile().trim(), "+"));//正整数
 						if(!mobile_verification){
 							error.put("mobile", "手机号码不正确");
 						}else{
@@ -1014,7 +1015,7 @@ public class UserManageAction {
 			    	if(formbean.getMobile().trim().length() >18){
 						error.put("mobile", "手机号码超长");
 					}else{
-						boolean mobile_verification = Verification.isPositiveInteger(formbean.getMobile().trim());//正整数
+						boolean mobile_verification = Verification.isPositiveInteger(StringUtils.removeStart(formbean.getMobile().trim(), "+"));//正整数
 						if(!mobile_verification){
 							error.put("mobile", "手机号码不正确");
 						}else{

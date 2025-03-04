@@ -17,10 +17,14 @@ public class SendService implements Serializable{
 	private Integer serviceId;
 	/** 服务名称 **/
 	private String serviceName;
-	/** 阿里大于短信签名 **/
+	/** 阿里云国内短信签名 **/
 	private String alidayu_signName;
-	/** 阿里大于短信模板代码 **/
+	/** 阿里云国内短信模板代码 **/
 	private String alidayu_templateCode;
+	/** 阿里云国际短信签名 **/
+	private String alidayu_internationalSignName;
+	/** 阿里云国际短信模板代码 **/
+	private String alidayu_internationalTemplateCode;
 	/** 阿里大于支持变量 key:变量字段  value:备注 **/
 	private Map<String,String> alidayu_variable = new LinkedHashMap<String,String>();
 	
@@ -60,6 +64,18 @@ public class SendService implements Serializable{
 	}
 	public void setAlidayu_variable(Map<String, String> alidayu_variable) {
 		this.alidayu_variable = alidayu_variable;
+	}
+	public String getAlidayu_internationalSignName() {
+		return alidayu_internationalSignName;
+	}
+	public void setAlidayu_internationalSignName(String alidayu_internationalSignName) {
+		this.alidayu_internationalSignName = alidayu_internationalSignName;
+	}
+	public String getAlidayu_internationalTemplateCode() {
+		return alidayu_internationalTemplateCode;
+	}
+	public void setAlidayu_internationalTemplateCode(String alidayu_internationalTemplateCode) {
+		this.alidayu_internationalTemplateCode = alidayu_internationalTemplateCode;
 	}
 	
 	

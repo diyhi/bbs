@@ -1396,6 +1396,7 @@ CREATE TABLE `questiontag` (
   `parentIdGroup` varchar(190) DEFAULT NULL,
   `sort` int(11) DEFAULT NULL,
   `image` varchar(100) DEFAULT NULL,
+  `multiLanguageExtension` longtext,
   PRIMARY KEY (`id`),
   KEY `questionTag_1_idx` (`sort`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -1985,6 +1986,8 @@ CREATE TABLE `systemsetting` (
   `topicHotRecommendedTime` int(11) DEFAULT NULL,
   `allowMentionMaxNumber` int(11) DEFAULT NULL,
   `aiAssistant_submitQuantity` int(11) DEFAULT NULL,
+  `languageFormExtension` longtext,
+  `languageSwitching` longtext,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -2033,6 +2036,7 @@ CREATE TABLE `tag` (
   `name` varchar(190) DEFAULT NULL,
   `sort` int(11) DEFAULT NULL,
   `image` varchar(100) DEFAULT NULL,
+  `multiLanguageExtension` longtext,
   PRIMARY KEY (`id`),
   KEY `tag_1_idx` (`sort`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -2625,6 +2629,7 @@ CREATE TABLE `userrole` (
   `remark` longtext,
   `sort` int(11) DEFAULT NULL,
   `userResourceFormat` longtext,
+  `multiLanguageExtension` longtext,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

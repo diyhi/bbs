@@ -217,6 +217,10 @@ public class UserFormManageAction {
 			}
 		}
 		
+		//是否允许国外手机号注册
+		boolean isAllowForeignCellPhoneRegistration = smsManage.isEnableInternationalSMS();
+		model.addAttribute("isAllowForeignCellPhoneRegistration",isAllowForeignCellPhoneRegistration);
+		returnValue.put("isAllowForeignCellPhoneRegistration",isAllowForeignCellPhoneRegistration);
 		
 		if(isAjax == true){
     		WebUtil.writeToWeb(JsonUtils.toJSONString(returnValue), "json", response);
@@ -235,6 +239,7 @@ public class UserFormManageAction {
 	 * @param captchaValue 验证码
 	 * @param thirdPartyOpenId 第三方用户获取唯一标识  例如微信公众号openid
 	 * @param smsCode 短信验证码
+	 * @param countryCode 区号
 	 * @param jumpUrl 跳转URL
 	 * @param token 令牌
 	 * @param redirectAttrs
@@ -245,7 +250,7 @@ public class UserFormManageAction {
 	 */
 	@RequestMapping(value="/register",method=RequestMethod.POST) 
 	public String register(ModelMap model,User formbean,
-			String captchaKey,String captchaValue,String thirdPartyOpenId,String smsCode,
+			String captchaKey,String captchaValue,String thirdPartyOpenId,String smsCode,String countryCode,
 			String jumpUrl,String token,RedirectAttributes redirectAttrs,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
@@ -374,6 +379,7 @@ public class UserFormManageAction {
 					user.setUserName(UUIDUtil.getUUID22());
 					user.setPlatformUserId(user.getUserName());
 				}else if(formbean.getType().equals(20) && allowRegisterAccount.isMobile()){//20: 手机用户
+					String _countryCode = userManage.processCountryCode(countryCode);
 					
 					if(formbean.getMobile() != null && !"".equals(formbean.getMobile().trim())){
 				    	if(formbean.getMobile().trim().length() >18){
@@ -385,7 +391,7 @@ public class UserFormManageAction {
 								
 							}else{
 								
-								String platformUserId = userManage.thirdPartyUserIdToPlatformUserId(formbean.getMobile().trim(),20);
+								String platformUserId = userManage.thirdPartyUserIdToPlatformUserId(_countryCode+formbean.getMobile().trim(),20);
 								User mobile_user = userService.findUserByPlatformUserId(platformUserId);
 								
 					      		if(mobile_user != null){
@@ -396,13 +402,13 @@ public class UserFormManageAction {
 						}
 				    	
 				    	//实名认证绑定手机
-						user.setMobile(formbean.getMobile().trim());
+						user.setMobile(_countryCode+formbean.getMobile().trim());
 						//是否实名认证
 						user.setRealNameAuthentication(true);
 						String id = UUIDUtil.getUUID22();
 						user.setUserName(id);//会员用户名
 						user.setAccount(userManage.queryUserIdentifier(20)+"-"+id);//用户名和账号可以用不相同的UUID
-						user.setPlatformUserId(userManage.thirdPartyUserIdToPlatformUserId(formbean.getMobile().trim(),20));
+						user.setPlatformUserId(userManage.thirdPartyUserIdToPlatformUserId(_countryCode+formbean.getMobile().trim(),20));
 				    }else{
 				    	error.put("mobile", ErrorView._851.name());//手机号不能为空
 				    }
@@ -415,7 +421,7 @@ public class UserFormManageAction {
 						    if(error.size() ==0){
 						    	
 						    	//生成绑定手机验证码标记
-					    		String numeric = smsManage.smsCode_generate(100,user.getPlatformUserId(), formbean.getMobile().trim(),null);
+					    		String numeric = smsManage.smsCode_generate(100,user.getPlatformUserId(), _countryCode+formbean.getMobile().trim(),null);
 					    		if(numeric != null){
 					    			if(!numeric.equals(smsCode)){
 					    				error.put("smsCode", ErrorView._850.name());//手机验证码错误
@@ -426,7 +432,7 @@ public class UserFormManageAction {
 					    		}
 					    		
 					    		//删除手机验证码标记
-					  		    smsManage.smsCode_delete(100,user.getPlatformUserId(), formbean.getMobile().trim());	
+					  		    smsManage.smsCode_delete(100,user.getPlatformUserId(), _countryCode+formbean.getMobile().trim());	
 						    }
 						}
 				    }else{
@@ -805,6 +811,7 @@ public class UserFormManageAction {
 	/**
 	 * 会员注册校验/验证码校验
 	 * @param account 账号
+	 * @param countryCode 区号
 	 * @param mobile 手机号
 	 * @param response
 	 * @return true 禁止  false 允许
@@ -812,7 +819,7 @@ public class UserFormManageAction {
 	 */
 	@RequestMapping(value="/userVerification",method=RequestMethod.GET) 
 	@ResponseBody//方式来做ajax,直接返回字符串
-	public String verification(ModelMap model,String account,String mobile,String captchaKey,String captchaValue,
+	public String verification(ModelMap model,String account,String countryCode,String mobile,String captchaKey,String captchaValue,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		if(account != null && !"".equals(account.trim())){
@@ -836,8 +843,8 @@ public class UserFormManageAction {
 			}
 		}
 		if(mobile != null && !"".equals(mobile.trim())){
-			
-			String platformUserId = userManage.thirdPartyUserIdToPlatformUserId(mobile.trim(),20);
+			String _countryCode = userManage.processCountryCode(countryCode);
+			String platformUserId = userManage.thirdPartyUserIdToPlatformUserId(_countryCode+mobile.trim(),20);
 			User mobile_user = userService.findUserByPlatformUserId(platformUserId);
 			
       		if(mobile_user != null){
@@ -934,7 +941,7 @@ public class UserFormManageAction {
 				
 			}
 		}
-		
+		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
 		FormCaptcha formCaptcha = new FormCaptcha();
 		boolean isCaptcha = false;
 		SystemSetting systemSetting = settingService.findSystemSetting_cache();
@@ -952,7 +959,12 @@ public class UserFormManageAction {
 			formCaptcha.setShowCaptcha(true);
 			formCaptcha.setCaptchaKey(UUIDUtil.getUUID32());
 		}
-		
+		returnValue.put("formCaptcha", formCaptcha);
+		//是否允许国外手机号注册
+		boolean isAllowForeignCellPhoneRegistration = smsManage.isEnableInternationalSMS();
+				
+		returnValue.put("isAllowForeignCellPhoneRegistration",isAllowForeignCellPhoneRegistration);
+				
 		
 		if(isAjax){
 			if(jumpUrl == null){
@@ -962,11 +974,12 @@ public class UserFormManageAction {
 		//	response.setHeader("login", "login?jumpUrl="+jumpUrl);//设置登录页面响应http头。用来激活Ajax请求处理方式 Session超时后的跳转
 		//	response.setHeader("login", Configuration.getUrl(request)+"login?jumpUrl="+jumpUrl);//设置登录页面响应http头。用来激活Ajax请求处理方式 Session超时后的跳转
 			
-			WebUtil.writeToWeb(JsonUtils.toJSONString(formCaptcha), "json", response);
+			WebUtil.writeToWeb(JsonUtils.toJSONString(returnValue), "json", response);
 			
 			return null;
 		}else{
 			model.addAttribute("formCaptcha", formCaptcha);
+			model.addAttribute("isAllowForeignCellPhoneRegistration",isAllowForeignCellPhoneRegistration);
 			if(jumpUrl == null || "".equals(jumpUrl.trim())){
 				String referer= request.getHeader("referer");  
 				if(referer != null && !"".equals(referer.trim())){
@@ -1019,6 +1032,7 @@ public class UserFormManageAction {
 	 * @param account 账号
 	 * @param password 密码
 	 * @param type 用户类型
+	 * @param countryCode 区号
 	 * @param mobile 手机号
 	 * @param rememberMe 记住密码
 	 * @param jumpUrl 跳转URL
@@ -1033,7 +1047,7 @@ public class UserFormManageAction {
 	 * @throws Exception
 	 */
 	@RequestMapping(value="/login",method=RequestMethod.POST) 
-	public String login(ModelMap model,String account, String password,Integer type,String mobile,Boolean rememberMe,String jumpUrl,
+	public String login(ModelMap model,String account, String password,Integer type,String countryCode,String mobile,Boolean rememberMe,String jumpUrl,
 			RedirectAttributes redirectAttrs,
 			String token,String captchaKey,String captchaValue,
 			String thirdPartyOpenId,
@@ -1047,7 +1061,7 @@ public class UserFormManageAction {
 		//是否需要验证码
 		boolean isCaptcha = false;
 		
-		
+		String _countryCode = userManage.processCountryCode(countryCode);
 		List<Integer> numbers = Arrays.asList(10,20); 
 		if(type != null && numbers.contains(type)){
 			if(type.equals(10)){//10:本地账号密码用户
@@ -1066,7 +1080,7 @@ public class UserFormManageAction {
 				}else{
 					mobile = mobile.trim();
 					
-					String platformUserId = userManage.thirdPartyUserIdToPlatformUserId(mobile.trim(),20);
+					String platformUserId = userManage.thirdPartyUserIdToPlatformUserId(_countryCode+mobile.trim(),20);
 					isCaptcha = captchaManage.login_isCaptcha(platformUserId);
 				}
 			}
@@ -1131,7 +1145,7 @@ public class UserFormManageAction {
 				//验证用户名
 				user = userService.findUserByAccount(account);
 			}else if(type.equals(20)){//20: 手机用户
-				String platformUserId = userManage.thirdPartyUserIdToPlatformUserId(mobile,20);
+				String platformUserId = userManage.thirdPartyUserIdToPlatformUserId(_countryCode+mobile,20);
 				user = userService.findUserByPlatformUserId(platformUserId);
 			}
 			
@@ -1227,7 +1241,7 @@ public class UserFormManageAction {
 				loginAccount = account;
 			}else if(type.equals(20)){//20: 手机用户 密码登录
 				if(mobile != null && !"".equals(mobile.trim())){
-					loginAccount = userManage.thirdPartyUserIdToPlatformUserId(mobile.trim(),20);
+					loginAccount = userManage.thirdPartyUserIdToPlatformUserId(_countryCode+mobile.trim(),20);
 				}
 			}
 		}
@@ -1292,7 +1306,7 @@ public class UserFormManageAction {
     					}
     				}else if(type.equals(20)){//20: 手机用户
     					if(mobile != null && !"".equals(mobile.trim())){
-    						String platformUserId = userManage.thirdPartyUserIdToPlatformUserId(mobile.trim(),20);
+    						String platformUserId = userManage.thirdPartyUserIdToPlatformUserId(_countryCode+mobile.trim(),20);
     						isCaptcha = captchaManage.login_isCaptcha(platformUserId);
     					}
     				}
@@ -1444,6 +1458,14 @@ public class UserFormManageAction {
 	    String captchaKey = UUIDUtil.getUUID32();
 	    model.addAttribute("captchaKey",captchaKey);
 	    returnValue.put("captchaKey",captchaKey);
+	    
+	    //是否允许国外手机号注册
+	  	boolean isAllowForeignCellPhoneRegistration = smsManage.isEnableInternationalSMS();
+	  		
+	  	returnValue.put("isAllowForeignCellPhoneRegistration",isAllowForeignCellPhoneRegistration);
+	  	model.addAttribute("isAllowForeignCellPhoneRegistration",isAllowForeignCellPhoneRegistration);
+	  	    
+	    
 	    if(isAjax){
 			WebUtil.writeToWeb(JsonUtils.toJSONString(returnValue), "json", response);
 			return null;
@@ -1460,6 +1482,7 @@ public class UserFormManageAction {
 	 * @param account 账号
 	 * @param type 用户类型
 	 * @param mobile 手机号
+	 * @param mobile 手机号
 	 * @param captchaKey
 	 * @param captchaValue
 	 * @param token
@@ -1470,7 +1493,7 @@ public class UserFormManageAction {
 	 * @throws Exception
 	 */
 	@RequestMapping(value="/findPassWord/step1",method=RequestMethod.POST) 
-	public String findPassWord_step1(ModelMap model,String account,Integer type,String mobile,
+	public String findPassWord_step1(ModelMap model,String account,Integer type,String countryCode,String mobile,
 			String captchaKey,String captchaValue,
 			String token,RedirectAttributes redirectAttrs,
 			HttpServletRequest request, HttpServletResponse response)
@@ -1509,7 +1532,7 @@ public class UserFormManageAction {
 			error.put("type", ErrorView._865.name());//用户类型不能为空
 		}
 	    
-	    
+		String _countryCode = userManage.processCountryCode(countryCode);
   		
 		//验证验证码
 		if(captchaKey != null && !"".equals(captchaKey.trim())){
@@ -1560,7 +1583,7 @@ public class UserFormManageAction {
 		    		 
 		    	}
 			}else if(type.equals(20)){//20: 手机用户
-				String platformUserId = userManage.thirdPartyUserIdToPlatformUserId(mobile.trim(),20);
+				String platformUserId = userManage.thirdPartyUserIdToPlatformUserId(_countryCode+mobile.trim(),20);
 				User mobile_user = userService.findUserByPlatformUserId(platformUserId);
 				if(mobile_user == null){
 		    		error.put("mobile", ErrorView._869.name());//手机用户不存在
@@ -1604,7 +1627,7 @@ public class UserFormManageAction {
     			returnValue.put("captchaKey", UUIDUtil.getUUID32());
     		}else{
     			returnValue.put("success", "true");
-    			returnValue.put("jumpUrl", "findPassWord/step2"+"?userName="+userName+"&mobile="+mobile);
+    			returnValue.put("jumpUrl", "findPassWord/step2"+"?userName="+userName+"&countryCode="+_countryCode+"&mobile="+mobile);
     		}
     		
     		WebUtil.writeToWeb(JsonUtils.toJSONString(returnValue), "json", response);
@@ -1615,6 +1638,7 @@ public class UserFormManageAction {
 				
 				redirectAttrs.addFlashAttribute("error", returnError);//重定向传参
 				redirectAttrs.addFlashAttribute("userName",userName);
+				redirectAttrs.addFlashAttribute("countryCode",_countryCode);
 				redirectAttrs.addFlashAttribute("mobile",mobile);
 				String referer = request.getHeader("referer");	
 
@@ -1627,7 +1651,7 @@ public class UserFormManageAction {
 					
 			}
 			
-			return "redirect:/findPassWord/step2?userName="+userName+"&mobile="+mobile;
+			return "redirect:/findPassWord/step2?userName="+userName+"&countryCode="+_countryCode+"&mobile="+mobile;
 
 		}
 	}

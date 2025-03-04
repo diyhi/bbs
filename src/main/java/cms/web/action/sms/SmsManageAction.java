@@ -47,7 +47,7 @@ public class SmsManageAction {
 	@Resource SmsService smsService;//通过接口引用代理返回的对象
 	@Resource MessageSource messageSource;
 	
-	private Map<Integer,String> smsInterfaceProductParameter = ImmutableMap.of(1, "阿里云通信");//ImmutableMap.of(1, "阿里云通信", 10, "云片");
+	private Map<Integer,String> smsInterfaceProductParameter = ImmutableMap.of(1, "阿里云短信");//ImmutableMap.of(1, "阿里云通信", 10, "云片");
 	
 	
 	/**
@@ -163,6 +163,9 @@ public class SmsManageAction {
 					if(sendService.getInterfaceProduct().equals(formbean.getInterfaceProduct())){
 						String signName = request.getParameter("alidayu_signName_"+sendService.getInterfaceProduct()+"_"+sendService.getServiceId());
 						String templateCode = request.getParameter("alidayu_templateCode_"+sendService.getInterfaceProduct()+"_"+sendService.getServiceId());
+						String internationalSignName = request.getParameter("alidayu_internationalSignName_"+sendService.getInterfaceProduct()+"_"+sendService.getServiceId());
+						String internationalTemplateCode = request.getParameter("alidayu_internationalTemplateCode_"+sendService.getInterfaceProduct()+"_"+sendService.getServiceId());
+						
 						int count = 0;//统计有值字段
 						if(signName != null && !"".equals(signName.trim())){
 							sendService.setAlidayu_signName(signName.trim());
@@ -178,6 +181,24 @@ public class SmsManageAction {
 							}
 							if(templateCode == null || "".equals(templateCode.trim())){
 								error.put("alidayu_templateCode_"+sendService.getInterfaceProduct()+"_"+sendService.getServiceId(), "短信模板代码不能为空");
+							}
+						}
+						
+						int internationalCount = 0;//统计有值字段
+						if(internationalSignName != null && !"".equals(internationalSignName.trim())){
+							sendService.setAlidayu_internationalSignName(internationalSignName.trim());
+							internationalCount++;
+						}
+						if(internationalTemplateCode != null && !"".equals(internationalTemplateCode.trim())){
+							sendService.setAlidayu_internationalTemplateCode(internationalTemplateCode.trim());
+							internationalCount++;
+						}
+						if(internationalCount == 1){
+							if(internationalSignName == null || "".equals(internationalSignName.trim())){
+								error.put("alidayu_internationalSignName_"+sendService.getInterfaceProduct()+"_"+sendService.getServiceId(), "短信签名不能为空");
+							}
+							if(internationalTemplateCode == null || "".equals(internationalTemplateCode.trim())){
+								error.put("alidayu_internationalTemplateCode_"+sendService.getInterfaceProduct()+"_"+sendService.getServiceId(), "短信模板代码不能为空");
 							}
 						}
 						
@@ -256,6 +277,8 @@ public class SmsManageAction {
 								if(sendService.getServiceId().equals(_sendService.getServiceId())){
 									sendService.setAlidayu_signName(_sendService.getAlidayu_signName());
 									sendService.setAlidayu_templateCode(_sendService.getAlidayu_templateCode());
+									sendService.setAlidayu_internationalSignName(_sendService.getAlidayu_internationalSignName());
+									sendService.setAlidayu_internationalTemplateCode(_sendService.getAlidayu_internationalTemplateCode());
 									break;
 								}
 							}
@@ -322,9 +345,10 @@ public class SmsManageAction {
 					sendServiceList = smsManage.createSendService(smsInterface.getInterfaceProduct());
 					
 					for(SendService sendService : sendServiceList){
-
 						String signName = request.getParameter("alidayu_signName_"+sendService.getInterfaceProduct()+"_"+sendService.getServiceId());
 						String templateCode = request.getParameter("alidayu_templateCode_"+sendService.getInterfaceProduct()+"_"+sendService.getServiceId());
+						String internationalSignName = request.getParameter("alidayu_internationalSignName_"+sendService.getInterfaceProduct()+"_"+sendService.getServiceId());
+						String internationalTemplateCode = request.getParameter("alidayu_internationalTemplateCode_"+sendService.getInterfaceProduct()+"_"+sendService.getServiceId());
 						int count = 0;//统计有值字段
 						if(signName != null && !"".equals(signName.trim())){
 							sendService.setAlidayu_signName(signName.trim());
@@ -340,6 +364,24 @@ public class SmsManageAction {
 							}
 							if(templateCode == null || "".equals(templateCode.trim())){
 								error.put("alidayu_templateCode_"+sendService.getInterfaceProduct()+"_"+sendService.getServiceId(), "短信模板代码不能为空");
+							}
+						}
+						
+						int internationalCount = 0;//统计有值字段
+						if(internationalSignName != null && !"".equals(internationalSignName.trim())){
+							sendService.setAlidayu_internationalSignName(internationalSignName.trim());
+							internationalCount++;
+						}
+						if(internationalTemplateCode != null && !"".equals(internationalTemplateCode.trim())){
+							sendService.setAlidayu_internationalTemplateCode(internationalTemplateCode.trim());
+							internationalCount++;
+						}
+						if(internationalCount == 1){
+							if(internationalSignName == null || "".equals(internationalSignName.trim())){
+								error.put("alidayu_internationalSignName_"+sendService.getInterfaceProduct()+"_"+sendService.getServiceId(), "短信签名不能为空");
+							}
+							if(internationalTemplateCode == null || "".equals(internationalTemplateCode.trim())){
+								error.put("alidayu_internationalTemplateCode_"+sendService.getInterfaceProduct()+"_"+sendService.getServiceId(), "短信模板代码不能为空");
 							}
 						}
 					}

@@ -55,9 +55,11 @@ public class ColumnManageAction {
 	public String execute(@RequestParam("dirName") String dirName,ModelMap model){
 		//错误
 		Map<String,String> error = new HashMap<String,String>();
+		Map<String,Object> returnValue = new HashMap<String,Object>();
 		if(dirName != null && !"".equals(dirName.trim())){
 			Templates templates = templateService.findTemplatebyDirName(dirName);
-			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,templates));
+			returnValue.put("templates",templates);
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
 		}else{
 			error.put("dirName", "目录名称不能为空");
 		}

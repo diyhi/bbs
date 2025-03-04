@@ -50,6 +50,7 @@ public class SmsFormAction {
 	 * 获取短信验证码
 	 * @param model
 	 * @param module 模块  100.注册  200.登录  300.找回密码
+	 * @param countryCode 区号
 	 * @param mobile 手机号
 	 * @param request
 	 * @param response
@@ -57,7 +58,7 @@ public class SmsFormAction {
 	 * @throws Exception
 	 */
 	@RequestMapping(value="/smsCode", method=RequestMethod.POST)
-	public String add(ModelMap model,Integer module,String mobile,
+	public String add(ModelMap model,Integer module,String countryCode,String mobile,
 			String captchaKey,String captchaValue,String token,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
@@ -132,7 +133,8 @@ public class SmsFormAction {
   			error.put("captchaValue", ErrorView._14.name());//验证码参数错误
   		}
 		
-
+  		String _countryCode = userManage.processCountryCode(countryCode);
+		
   		if(mobile != null && !"".equals(mobile.trim())){
 			if(mobile.trim().length() >18){
 				error.put("smsCode", "手机号码超长");
@@ -142,7 +144,7 @@ public class SmsFormAction {
 					error.put("smsCode", "手机号码不正确");
 				}else{
 					if(error.size() == 0 && module.equals(300)){
-						String platformUserId = userManage.thirdPartyUserIdToPlatformUserId(mobile.trim(),20);
+						String platformUserId = userManage.thirdPartyUserIdToPlatformUserId(_countryCode+mobile.trim(),20);
 						User mobile_user = userService.findUserByPlatformUserId(platformUserId);
 						if(mobile_user == null){
 				    		 error.put("smsCode", ErrorView._869.name());//手机用户不存在
@@ -155,17 +157,17 @@ public class SmsFormAction {
 		}
   		
   		if(error.size() == 0){
-  			String platformUserId = userManage.thirdPartyUserIdToPlatformUserId(mobile.trim(),20);
+  			String platformUserId = userManage.thirdPartyUserIdToPlatformUserId(_countryCode+mobile.trim(),20);
   			
 	    	String randomNumeric = RandomStringUtils.randomNumeric(6);
-	    	String errorInfo = smsManage.sendSms_code(platformUserId,mobile,randomNumeric);//6位随机数
+	    	String errorInfo = smsManage.sendSms_code(platformUserId,_countryCode,mobile,randomNumeric);//6位随机数
 	    	if(errorInfo != null){
 	    		error.put("smsCode", errorInfo);
 	    	}else{
 	    		//删除绑定手机验证码标记
-	    	    smsManage.smsCode_delete(module,platformUserId, mobile.trim());
+	    	    smsManage.smsCode_delete(module,platformUserId, _countryCode+mobile.trim());
 	    		//生成绑定手机验证码标记
-	    		smsManage.smsCode_generate(module,platformUserId, mobile.trim(),randomNumeric);
+	    		smsManage.smsCode_generate(module,platformUserId, _countryCode+mobile.trim(),randomNumeric);
 	    		
 	    	}
 	    }

@@ -7,17 +7,24 @@
 	 <tbody> 
 	 	<tr> 
 			<td  width="30%">请求路径</td> 
-			<td  width="70%" colspan="2">user/control/updatePhoneBinding/step1.htm</td>
+			<td  width="70%" colspan="3">user/control/updatePhoneBinding/step1.htm</td>
 		</tr>
 		<tr> 
 			<td>请求方式</td> 
-			<td colspan="2">GET</td>
+			<td colspan="3">GET</td>
 		</tr>
 		<tr> 
-			<td rowspan="2">返回值</td> 
+			<td rowspan="3">返回值</td> 
 			<td>验证码编号</td> 
 			<td>
 				变量：captchaKey<br>
+				类型：String
+			</td>
+		</tr>
+		<tr> 
+			<td>区号</td> 
+			<td>
+				变量：countryCode<br>
 				类型：String
 			</td>
 		</tr>
@@ -39,15 +46,15 @@
 	 <tbody> 
 	 	<tr> 
 			<td  width="30%">请求路径</td> 
-			<td  width="70%" colspan="2">user/control/updatePhoneBinding/step1.htm</td>
+			<td  width="70%" colspan="3">user/control/updatePhoneBinding/step1.htm</td>
 		</tr>
 		<tr> 
 			<td>请求方式</td> 
-			<td colspan="2">GET</td>
+			<td colspan="3">GET</td>
 		</tr>
 		<tr> 
 			<td>自定义请求头</td> 
-			<td colspan="2">协议头：X-Requested-With  值：XMLHttpRequest</td>
+			<td colspan="3">协议头：X-Requested-With  值：XMLHttpRequest</td>
 		</tr>
 		<tr> 
 			<td width="30%" rowspan="3">提交返回</td> 
@@ -55,8 +62,11 @@
 			<td width="40%">键参数：captchaKey<br>值内容说明：验证码编号<br>值类型：String</td> 
 		</tr>
 		<tr> 
+			<td>键参数：countryCode<br>值内容说明：区号<br>值类型：String</td> 
+		</tr>	
+		<tr> 
 			<td>键参数：mobile<br>值内容说明：手机号<br>值类型：String</td> 
-		</tr>		
+		</tr>	
 	</tbody> 
 </table>
 <table class="exampleTable" > 
@@ -282,6 +292,12 @@
 		</tr> 
 	</thead> 
 	 <tbody>
+	 	<tr> 
+			<td>countryCode</td> 
+			<td>String</td>
+			<td>按需填写</td>
+			<td>区号</td> 
+		</tr>
 	 	<tr> 
 			<td>mobile</td> 
 			<td>String</td>

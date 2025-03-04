@@ -10,7 +10,7 @@
 					<el-table-column prop="name" label="短信接口名称" align="center" ></el-table-column>
 					<el-table-column label="接口产品" align="center" >
 						<template #default="scope">
-							<span v-if="scope.row.interfaceProduct == 1">阿里云通信</span>
+							<span v-if="scope.row.interfaceProduct == 1">阿里云短信</span>
 						</template>
 					</el-table-column>
 					<el-table-column prop="uses" label="是否启用" align="center" min-width="100">

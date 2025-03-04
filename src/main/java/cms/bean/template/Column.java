@@ -2,7 +2,9 @@ package cms.bean.template;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -16,6 +18,8 @@ public class Column implements Serializable{
 	private Integer id;
 	/** 栏目名称 **/
 	private String name;
+	/** 多语言扩展  key:字段-语言（例如：name-en_US） value:内容**/
+	private Map<String,String> multiLanguageExtensionMap = new HashMap<String,String>();
 	/** 所属父类ID **/
 	private Integer parentId = 0;
 	/** 子栏目**/
@@ -93,6 +97,12 @@ public class Column implements Serializable{
 	}
 	public void setUrl(String url) {
 		this.url = url;
+	}
+	public Map<String, String> getMultiLanguageExtensionMap() {
+		return multiLanguageExtensionMap;
+	}
+	public void setMultiLanguageExtensionMap(Map<String, String> multiLanguageExtensionMap) {
+		this.multiLanguageExtensionMap = multiLanguageExtensionMap;
 	}
 
 	

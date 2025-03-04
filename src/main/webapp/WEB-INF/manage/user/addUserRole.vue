@@ -149,27 +149,33 @@ export default({
 			    	let returnValue = JSON.parse(result);
 			    	
 			    	if(returnValue.code === 200){//成功
-			    		let userResourceGroupList = returnValue.data;
-			    		if(userResourceGroupList != null && userResourceGroupList.length >0){
-			    			for (let i = 0; i <userResourceGroupList.length; i++) {
-								let userResourceGroup = userResourceGroupList[i];
-								
-								
-								//定义资源代码数组
-								let resourceCode_array = [];
+			    		let mapData = returnValue.data;
+			    		
+			    		for(let key in mapData){
+			    			if(key == "userResourceGroupList"){
+			    				let userResourceGroupList = mapData[key];
+                                if(userResourceGroupList != null && userResourceGroupList.length >0){
+					    			for (let i = 0; i <userResourceGroupList.length; i++) {
+										let userResourceGroup = userResourceGroupList[i];
+										
+										
+										//定义资源代码数组
+										let resourceCode_array = [];
+											
+										if(userResourceGroup.userResourceList != null && userResourceGroup.userResourceList.length >0){
+											for (let j = 0; j <userResourceGroup.userResourceList.length; j++) {
+												let userResource = userResourceGroup.userResourceList[j];
+												resourceCode_array.push(userResource.selected);
+											}
+										}
+										_self.resourceCodeGroup[i] = resourceCode_array;//把数组resourceCode_array作为resourceCodeGroup数组的元素传入
 									
-								if(userResourceGroup.userResourceList != null && userResourceGroup.userResourceList.length >0){
-									for (let j = 0; j <userResourceGroup.userResourceList.length; j++) {
-										let userResource = userResourceGroup.userResourceList[j];
-										resourceCode_array.push(userResource.selected);
+										userResourceGroup.index = i;//因为表格使用type="expand"方式展示时，scope.$index获取的索引不连续,所以在数据里直接设置索引
 									}
-								}
-								_self.resourceCodeGroup[i] = resourceCode_array;//把数组resourceCode_array作为resourceCodeGroup数组的元素传入
-							
-								userResourceGroup.index = i;//因为表格使用type="expand"方式展示时，scope.$index获取的索引不连续,所以在数据里直接设置索引
-							}
+					    		}
+					    		_self.userResourceGroupList = userResourceGroupList;
+			    			}
 			    		}
-			    		_self.userResourceGroupList = userResourceGroupList;
 			    	}else if(returnValue.code === 500){//错误
 			    		let errorMap = returnValue.data;
 			    		for (let key in errorMap) {   
