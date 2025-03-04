@@ -17,6 +17,9 @@ public class HtmlEscape {
 	 * @return
 	 */
 	public static String escape(String data){
+		if(data == null){
+			return "";
+		}
 		//  &：&amp; 
 		//  " ：&quot; 
 		//  < ：&lt; 
