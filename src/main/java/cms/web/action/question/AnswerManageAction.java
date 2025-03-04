@@ -45,6 +45,7 @@ import cms.service.question.QuestionService;
 import cms.service.setting.SettingService;
 import cms.service.user.UserService;
 import cms.utils.FileUtil;
+import cms.utils.HtmlEscape;
 import cms.utils.IpAddress;
 import cms.utils.JsonUtils;
 import cms.utils.UUIDUtil;
@@ -536,6 +537,7 @@ public class AnswerManageAction {
 		int fileSystem = fileManage.getFileSystem();
 		if(fileSystem ==10 || fileSystem == 20 || fileSystem == 30){//10.SeaweedFS 20.MinIO 30.阿里云OSS
 			if(fileName != null && !"".equals(fileName.trim()) && questionId != null && questionId >0L && number != null && !"".equals(number.trim())){
+				fileName = HtmlEscape.escape(fileName);
 				//取得文件后缀
 				String suffix = FileUtil.getExtension(fileName.trim()).toLowerCase();
 				EditorTag editorSiteObject = settingManage.readAnswerEditorTag();
@@ -587,6 +589,7 @@ public class AnswerManageAction {
 					if(editorSiteObject.isImage()){//允许上传图片
 						//当前图片文件名称
 						String sourceFileName = file.getOriginalFilename();
+						sourceFileName = HtmlEscape.escape(sourceFileName);
 						//文件大小
 						Long size = file.getSize();
 						//取得文件后缀

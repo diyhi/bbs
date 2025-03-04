@@ -80,6 +80,7 @@ import cms.service.user.UserGradeService;
 import cms.service.user.UserRoleService;
 import cms.service.user.UserService;
 import cms.utils.FileUtil;
+import cms.utils.HtmlEscape;
 import cms.utils.JsonUtils;
 import cms.utils.SHA;
 import cms.utils.UUIDUtil;
@@ -1965,7 +1966,6 @@ public class UserManageAction {
 		if(user != null){
 			//当前文件名称
 			String fileName = file.getOriginalFilename();
-			
 			//文件大小
 			Long size = file.getSize();
 			

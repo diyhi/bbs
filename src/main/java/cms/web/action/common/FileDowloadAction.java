@@ -21,6 +21,7 @@ import cms.service.setting.SettingService;
 import cms.service.template.TemplateService;
 import cms.utils.AES;
 import cms.utils.Base64;
+import cms.utils.HtmlEscape;
 import cms.utils.JsonUtils;
 import cms.web.action.AccessSourceDeviceManage;
 import cms.web.action.fileSystem.FileManage;
@@ -65,6 +66,7 @@ public class FileDowloadAction {
 			String link = parameterMap.get("link");	//文件链接	
 			String fileName = parameterMap.get("fileName");	//文件名称
 			String tagId = parameterMap.get("tagId");//话题标签Id
+			fileName = HtmlEscape.escape(fileName);
 			Long _tagId = Long.parseLong(tagId);
 			if(_tagId .equals(-1L)){//如果为-1,则是后台管理页面下载，不检查权限
 				return "redirect:"+fileManage.createSignLink(link,URLEncoder.encode(fileName,"UTF-8"),systemSetting.getFileSecureLinkSecret(),systemSetting.getFileSecureLinkExpire());

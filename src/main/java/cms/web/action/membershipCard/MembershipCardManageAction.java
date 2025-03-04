@@ -45,6 +45,7 @@ import cms.service.user.UserService;
 import cms.utils.CommentedProperties;
 import cms.utils.FileType;
 import cms.utils.FileUtil;
+import cms.utils.HtmlEscape;
 import cms.utils.JsonUtils;
 import cms.utils.UUIDUtil;
 import cms.utils.Verification;
@@ -1088,6 +1089,7 @@ public class MembershipCardManageAction {
 			
 			int fileSystem = fileManage.getFileSystem();
 			if(fileSystem ==10 || fileSystem == 20 || fileSystem == 30){//10.SeaweedFS 20.MinIO 30.阿里云OSS
+				fileName = HtmlEscape.escape(fileName);
 				if(fileName != null && !"".equals(fileName.trim())){
 					//取得文件后缀
 					String suffix = FileUtil.getExtension(fileName.trim()).toLowerCase();
@@ -1217,7 +1219,7 @@ public class MembershipCardManageAction {
 				if(file != null && !file.isEmpty()){
 					//当前文件名称
 					String sourceFileName = file.getOriginalFilename();
-					
+					sourceFileName = HtmlEscape.escape(sourceFileName);
 					String suffix = FileUtil.getExtension(sourceFileName).toLowerCase();
 
 					if(dir.equals("image")){
@@ -1348,7 +1350,7 @@ public class MembershipCardManageAction {
 							//上传成功
 							returnJson.put("error", 0);//0成功  1错误
 							returnJson.put("url", fileManage.fileServerAddress(request)+"file/membershipCard/"+date+"/file/"+newFileName);
-							returnJson.put("title", file.getOriginalFilename());//旧文件名称
+							returnJson.put("title", sourceFileName);//旧文件名称
 							return JsonUtils.toJSONString(returnJson);
 						}else{
 							errorMessage = "当前文件类型不允许上传";

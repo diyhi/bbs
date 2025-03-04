@@ -62,6 +62,7 @@ import cms.service.user.UserGradeService;
 import cms.service.user.UserService;
 import cms.utils.Base64;
 import cms.utils.FileUtil;
+import cms.utils.HtmlEscape;
 import cms.utils.IpAddress;
 import cms.utils.JsonUtils;
 import cms.utils.RefererCompare;
@@ -1664,7 +1665,7 @@ public class TopicFormAction {
 			if(flag){
 				DateTime dateTime = new DateTime();     
 				String date = dateTime.toString("yyyy-MM-dd");
-
+				fileName = HtmlEscape.escape(fileName);
 				
 				int fileSystem = fileManage.getFileSystem();
 				if(fileSystem ==10 || fileSystem == 20 || fileSystem == 30){//10.SeaweedFS 20.MinIO 30.阿里云OSS
@@ -1823,7 +1824,7 @@ public class TopicFormAction {
 										
 										//当前文件名称
 										String sourceFileName = file.getOriginalFilename();
-										
+										sourceFileName = HtmlEscape.escape(sourceFileName);
 										//文件大小
 										Long size = file.getSize();
 										//取得文件后缀
@@ -1883,7 +1884,7 @@ public class TopicFormAction {
 										
 										//当前文件名称
 										String sourceFileName = file.getOriginalFilename();
-										
+										sourceFileName = HtmlEscape.escape(sourceFileName);
 										//文件大小
 										Long size = file.getSize();
 										//取得文件后缀
@@ -1917,7 +1918,7 @@ public class TopicFormAction {
 												//上传成功
 												returnJson.put("error", 0);//0成功  1错误
 												returnJson.put("url", Configuration.getUrl(request)+"file/topic/"+date+"/file/"+newFileName);
-												returnJson.put("title", file.getOriginalFilename());//旧文件名称
+												returnJson.put("title", sourceFileName);//旧文件名称
 												return JsonUtils.toJSONString(returnJson);
 											}else{
 												errorMessage = "文件超出允许上传大小";
@@ -1942,7 +1943,7 @@ public class TopicFormAction {
 										
 										//当前文件名称
 										String sourceFileName = file.getOriginalFilename();
-										
+										sourceFileName = HtmlEscape.escape(sourceFileName);
 										//文件大小
 										Long size = file.getSize();
 										//取得文件后缀
@@ -1976,7 +1977,7 @@ public class TopicFormAction {
 												//上传成功
 												returnJson.put("error", 0);//0成功  1错误
 												returnJson.put("url", Configuration.getUrl(request)+"file/topic/"+date+"/media/"+newFileName);
-												returnJson.put("title", file.getOriginalFilename());//旧文件名称
+												returnJson.put("title", sourceFileName);//旧文件名称
 												return JsonUtils.toJSONString(returnJson);
 											}else{
 												errorMessage = "文件超出允许上传大小";
