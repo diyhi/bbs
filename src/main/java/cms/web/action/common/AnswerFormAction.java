@@ -47,7 +47,6 @@ import cms.service.template.TemplateService;
 import cms.service.user.UserService;
 import cms.utils.Base64;
 import cms.utils.FileUtil;
-import cms.utils.HtmlEscape;
 import cms.utils.IpAddress;
 import cms.utils.JsonUtils;
 import cms.utils.RefererCompare;
@@ -1011,8 +1010,6 @@ public class AnswerFormAction {
 		if(systemSetting.getCloseSite().equals(2)){
 			errorMessage = "只读模式不允许提交数据";
 		}else{
-			fileName = HtmlEscape.escape(fileName);
-			
 			//是否有当前功能操作权限
 			boolean flag_permission = userRoleManage.isPermission(ResourceEnum._2002000,null);
 			if(flag_permission){
@@ -1087,7 +1084,6 @@ public class AnswerFormAction {
 									
 									//当前图片文件名称
 									String sourceFileName = file.getOriginalFilename();
-									sourceFileName = HtmlEscape.escape(sourceFileName);
 									//当前图片类型
 								//	String imgType = file.getContentType();
 									//文件大小

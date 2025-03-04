@@ -44,7 +44,6 @@ import cms.service.topic.CommentService;
 import cms.service.topic.TopicService;
 import cms.utils.Base64;
 import cms.utils.FileUtil;
-import cms.utils.HtmlEscape;
 import cms.utils.IpAddress;
 import cms.utils.JsonUtils;
 import cms.utils.RefererCompare;
@@ -271,7 +270,6 @@ public class ReportFormAction {
 					if(authentication){
 						//取得文件后缀		
 						String ext = FileUtil.getExtension(image.getOriginalFilename());
-						ext = HtmlEscape.escape(ext);
 						//文件保存目录;分多目录主要是为了分散图片目录,提高检索速度
 						String pathDir = "file"+File.separator+"report"+File.separator + date +File.separator;;
 						//构建文件名称

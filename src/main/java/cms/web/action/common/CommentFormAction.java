@@ -50,7 +50,6 @@ import cms.service.topic.TopicService;
 import cms.service.user.UserService;
 import cms.utils.Base64;
 import cms.utils.FileUtil;
-import cms.utils.HtmlEscape;
 import cms.utils.IpAddress;
 import cms.utils.JsonUtils;
 import cms.utils.RefererCompare;
@@ -512,7 +511,6 @@ public class CommentFormAction {
 				if(flag_permission == false){
 					errorMessage = "权限不足";
 				}else{
-					fileName = HtmlEscape.escape(fileName);
 					//文件上传
 					int fileSystem = fileManage.getFileSystem();
 					if(fileSystem ==10 || fileSystem == 20 || fileSystem == 30){//10.SeaweedFS 20.MinIO 30.阿里云OSS
@@ -577,8 +575,6 @@ public class CommentFormAction {
 										
 										//当前图片文件名称
 										String sourceFileName = file.getOriginalFilename();
-										sourceFileName = HtmlEscape.escape(sourceFileName);
-										
 										//当前图片类型
 									//	String imgType = file.getContentType();
 										//文件大小

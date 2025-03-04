@@ -40,7 +40,6 @@ import cms.service.topic.CommentService;
 import cms.service.topic.TopicService;
 import cms.service.user.UserService;
 import cms.utils.FileUtil;
-import cms.utils.HtmlEscape;
 import cms.utils.IpAddress;
 import cms.utils.JsonUtils;
 import cms.utils.UUIDUtil;
@@ -510,7 +509,6 @@ public class CommentManageAction {
 		
 		int fileSystem = fileManage.getFileSystem();
 		if(fileSystem ==10 || fileSystem == 20 || fileSystem == 30){//10.SeaweedFS 20.MinIO 30.阿里云OSS
-			fileName = HtmlEscape.escape(fileName);
 			if(fileName != null && !"".equals(fileName.trim()) && topicId != null && topicId >0L && number != null && !"".equals(number.trim())){
 				//取得文件后缀
 				String suffix = FileUtil.getExtension(fileName.trim()).toLowerCase();
@@ -560,7 +558,6 @@ public class CommentManageAction {
 					if(editorSiteObject.isImage()){//允许上传图片
 						//当前图片文件名称
 						String sourceFileName = file.getOriginalFilename();
-						sourceFileName = HtmlEscape.escape(sourceFileName);
 						//文件大小
 						Long size = file.getSize();
 						//取得文件后缀

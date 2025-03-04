@@ -9726,7 +9726,7 @@ KindEditor.plugin('insertfile', function(K) {
 					if (K.trim(title) === '') {
 						title = url;
 					}
-					clickFn.call(self, url, title);
+					clickFn.call(self, url, K.escape(title));
 					self.edit.trigger();//触发事件
 				}
 			}
@@ -9999,6 +9999,12 @@ KindEditor.plugin('media', function(K) {
 								K.popupMessage(self.lang('invalidVideoCode'));
 								videoCodeBox[0].focus();
 	                            return;
+							}
+							
+							if(!K.trim(videoCode).toLowerCase().startsWith("<iframe")){
+								K.popupMessage(self.lang('invalidVideoCodeFormat'));
+								videoCodeBox[0].focus();
+								return;
 							}
 							
 							var iframe_obj = K(K(videoCode).get(0));

@@ -1513,6 +1513,7 @@ public class HomeManageAction {
 		if(error.size()==0 && imgFile != null && !imgFile.isEmpty()){
 			//当前文件名称
 			String fileName = imgFile.getOriginalFilename();
+			
 			//文件大小
 			Long size = imgFile.getSize();
 			
