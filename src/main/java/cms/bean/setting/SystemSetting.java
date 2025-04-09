@@ -44,12 +44,25 @@ public class SystemSetting implements Serializable{
 	
 	/** 是否允许注册
 	private boolean allowRegister = true; **/
-	/** 允许注册账号类型 json AllowRegisterAccount格式数据**/
-	@Lob
+	/** 允许注册账号类型 json AllowRegisterAccount格式数据 6.7版本库弃本字段，改为使用registerAccountType字段**/
+	/**@Lob
 	private String allowRegisterAccount;
 	@Transient
 	private AllowRegisterAccount allowRegisterAccountObject = new AllowRegisterAccount();
+	**/
 
+	/** 允许注册账号类型 存储JSON格式的registerAccountTypeCodeList结构 10、本地账号密码用户  20、手机用户  30、邮箱用户  40、微信用户  80、其他用户 **/
+	@Lob
+	private String allowRegisterAccountType;
+	@Transient
+	private List<Integer> allowRegisterAccountTypeCodeList = new ArrayList<Integer>();
+	
+	/** 允许登录账号类型 存储JSON格式的loginAccountTypeCodeList结构  10、本地账号密码用户  20、手机用户  30、邮箱用户  40、微信用户  80、其他用户**/
+	@Lob
+	private String allowLoginAccountType;
+	@Transient
+	private List<Integer> allowLoginAccountTypeCodeList = new ArrayList<Integer>();
+	
 	/** 多语言切换 存储JSON的languageSwitchingCodeList结构 **/
 	@Lob
 	private String languageSwitching;
@@ -284,14 +297,6 @@ public class SystemSetting implements Serializable{
 
 	public void setSupportAccessDevice(Integer supportAccessDevice) {
 		this.supportAccessDevice = supportAccessDevice;
-	}
-
-	public String getAllowRegisterAccount() {
-		return allowRegisterAccount;
-	}
-
-	public void setAllowRegisterAccount(String allowRegisterAccount) {
-		this.allowRegisterAccount = allowRegisterAccount;
 	}
 
 	public boolean isRegisterCaptcha() {
@@ -710,15 +715,6 @@ public class SystemSetting implements Serializable{
 	public void setQuestionRewardAmountMax(BigDecimal questionRewardAmountMax) {
 		this.questionRewardAmountMax = questionRewardAmountMax;
 	}
-
-	public AllowRegisterAccount getAllowRegisterAccountObject() {
-		return allowRegisterAccountObject;
-	}
-
-	public void setAllowRegisterAccountObject(AllowRegisterAccount allowRegisterAccountObject) {
-		this.allowRegisterAccountObject = allowRegisterAccountObject;
-	}
-
 	public BigDecimal getGiveRedEnvelopeAmountMin() {
 		return giveRedEnvelopeAmountMin;
 	}
@@ -837,6 +833,38 @@ public class SystemSetting implements Serializable{
 
 	public void setLanguageFormExtensionCodeList(List<String> languageFormExtensionCodeList) {
 		this.languageFormExtensionCodeList = languageFormExtensionCodeList;
+	}
+
+	public String getAllowRegisterAccountType() {
+		return allowRegisterAccountType;
+	}
+
+	public void setAllowRegisterAccountType(String allowRegisterAccountType) {
+		this.allowRegisterAccountType = allowRegisterAccountType;
+	}
+
+	public List<Integer> getAllowRegisterAccountTypeCodeList() {
+		return allowRegisterAccountTypeCodeList;
+	}
+
+	public void setAllowRegisterAccountTypeCodeList(List<Integer> allowRegisterAccountTypeCodeList) {
+		this.allowRegisterAccountTypeCodeList = allowRegisterAccountTypeCodeList;
+	}
+
+	public String getAllowLoginAccountType() {
+		return allowLoginAccountType;
+	}
+
+	public void setAllowLoginAccountType(String allowLoginAccountType) {
+		this.allowLoginAccountType = allowLoginAccountType;
+	}
+
+	public List<Integer> getAllowLoginAccountTypeCodeList() {
+		return allowLoginAccountTypeCodeList;
+	}
+
+	public void setAllowLoginAccountTypeCodeList(List<Integer> allowLoginAccountTypeCodeList) {
+		this.allowLoginAccountTypeCodeList = allowLoginAccountTypeCodeList;
 	}
 
 

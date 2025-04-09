@@ -18,7 +18,7 @@
 						{{account}}
 					</el-form-item>
 					<el-form-item label="手机" :required="type == 10? false :true" :error="error.mobile" >
-						<el-row><el-col :span="12"><el-input v-model.trim="mobile" maxlength="15" clearable="true" show-word-limit></el-input></el-col></el-row>
+						<el-row><el-col :span="12"><el-input v-model.trim="mobile" maxlength="18" clearable="true" show-word-limit></el-input></el-col></el-row>
 						<div class="form-help" >国内手机号：无区号的手机号码，例如 1390000****；国际/港澳台手机号格式：国际区号+号码，例如 +852000012****</div>
 					</el-form-item>
 					<el-form-item label="呢称" :error="error.nickname" >

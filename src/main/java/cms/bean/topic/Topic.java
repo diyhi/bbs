@@ -25,7 +25,7 @@ import cms.bean.MediaInfo;
  *
  */
 @Entity
-@Table(indexes = {@Index(name="topic_idx", columnList="tagId,status"),@Index(name="topic_3_idx", columnList="userName,postTime"),@Index(name="topic_5_idx", columnList="status,sort,lastReplyTime"),@Index(name="topic_6_idx", columnList="weight")})
+@Table(indexes = {@Index(name="topic_3_idx", columnList="userName,postTime"),@Index(name="topic_5_idx", columnList="status,sort,lastReplyTime"),@Index(name="topic_6_idx", columnList="weight"),@Index(name="topic_7_idx", columnList="tagIdGroup,status")})
 public class Topic implements Serializable{
 	private static final long serialVersionUID = -684257451052921859L;
 	
@@ -41,6 +41,10 @@ public class Topic implements Serializable{
 	/** 标签名称 **/
 	@Transient
 	private String tagName;
+	
+	/** 标签Id组 **/
+	@Column(length=50)
+	private String tagIdGroup;
 
 	/** 话题内容 **/
 	@Lob
@@ -343,6 +347,12 @@ public class Topic implements Serializable{
 	}
 	public void setWeight(Double weight) {
 		this.weight = weight;
+	}
+	public String getTagIdGroup() {
+		return tagIdGroup;
+	}
+	public void setTagIdGroup(String tagIdGroup) {
+		this.tagIdGroup = tagIdGroup;
 	}
 	
 }

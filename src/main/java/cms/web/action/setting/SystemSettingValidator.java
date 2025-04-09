@@ -3,6 +3,7 @@ package cms.web.action.setting;
 import java.math.BigDecimal;
 import java.util.List;
 
+import javax.annotation.Resource;
 
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -13,6 +14,8 @@ import cms.utils.CommentedProperties;
 
 @Component("systemSettingValidator")
 public class SystemSettingValidator implements Validator{
+	@Resource SettingManage settingManage;
+	
 	public boolean supports(Class<?> clazz) {//该校验器支持的目标类 
 		return clazz.equals(SystemSetting.class); 
 	}
@@ -38,7 +41,22 @@ public class SystemSettingValidator implements Validator{
 				errors.rejectValue("description","errors.required", new String[]{"不能超过200个字符"},"");
 			}
 		}
-
+		if(systemSetting.getAllowRegisterAccountTypeCodeList() != null && systemSetting.getAllowRegisterAccountTypeCodeList().size() >0){
+			for(Integer allowRegisterAccountTypeCode : systemSetting.getAllowRegisterAccountTypeCodeList()){
+				if(allowRegisterAccountTypeCode != null && !settingManage.getSupportAccountType().keySet().contains(allowRegisterAccountTypeCode)){
+					errors.rejectValue("allowRegisterAccountType","errors.required", new String[]{"当前账户类型不被支持"},"");
+				}
+				
+			}
+		}
+		if(systemSetting.getAllowLoginAccountTypeCodeList() != null && systemSetting.getAllowLoginAccountTypeCodeList().size() >0){
+			for(Integer allowLoginAccountTypeCode : systemSetting.getAllowLoginAccountTypeCodeList()){
+				if(allowLoginAccountTypeCode != null && !settingManage.getSupportAccountType().keySet().contains(allowLoginAccountTypeCode)){
+					errors.rejectValue("allowLoginAccountType","errors.required", new String[]{"当前账户类型不被支持"},"");
+				}
+				
+			}
+		}
 		//登录密码每分钟连续错误
 		if(systemSetting.getLogin_submitQuantity() != null){
 			if(systemSetting.getLogin_submitQuantity() <0){

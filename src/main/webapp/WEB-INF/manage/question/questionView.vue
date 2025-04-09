@@ -17,7 +17,7 @@
 						<el-link class="item" href="javascript:void(0);" @click="$router.push({path: '/admin/control/questionFavorite/list', query:{ visible:($route.query.visible != undefined ? $route.query.visible:''),questionView_beforeUrl:($route.query.questionView_beforeUrl != undefined ? $route.query.questionView_beforeUrl:''),questionId :question.id, answerId:($route.query.answerId != undefined ? $route.query.answerId:''), questionPage:($route.query.page != undefined ? $route.query.page:'')}})">收藏用户</el-link>
 						<el-link class="item" href="javascript:void(0);" @click="appendQuestionUI();">追加提问</el-link>
 						<el-link class="item" href="javascript:void(0);" @click="$router.push({path: '/admin/control/questionReport/list', query:{ visible:($route.query.visible != undefined ? $route.query.visible:''),questionView_beforeUrl:($route.query.questionView_beforeUrl != undefined ? $route.query.questionView_beforeUrl:''),questionId :question.id, answerId:($route.query.answerId != undefined ? $route.query.answerId:''),questionPage:($route.query.page != undefined ? $route.query.page:''),parameterId:question.id,module:40}})">举报</el-link>
-						<el-link class="item" href="javascript:void(0);" @click="editQuestionUI();">修改</el-link>
+                    	<el-link class="item" href="javascript:void(0);" @click="editQuestionUI();">修改</el-link>
 						<el-link class="item" href="javascript:void(0);" @click="deleteQuestion(question.id)">删除</el-link>
 					</div>
 					<!-- 追加提问 -->
@@ -85,13 +85,13 @@
 							<div class="questionTagNavigation">
 			            		<ul class="nav">
 			            			<li class="nav-item" v-for="questionTag in allTagList" >
-			            				<span :class="selectedTagClass(questionTag.id)"  @click="selectChildTag(questionTag.id)" >{{questionTag.name}}</span>
+			            				<span class="nav-link" :class="selectedTagClass.get(questionTag.id)"  @click="selectChildTag(questionTag.id)" >{{questionTag.name}}</span>
 									</li>
 			            		</ul>
 			            		<!-- 二级标签 -->
 								<div class="tab-content">
 									<div class="tab-pane">
-										<span :class="selectedChildTagClass(childQuestionTag.id)" @click="selectedTag(childQuestionTag)"  v-for="childQuestionTag in childTagList" >{{childQuestionTag.name}}</span>
+										<span class="child-tag" :class="selectedChildTagClass.get(childQuestionTag.id)" @click="selectedTag(childQuestionTag)"  v-for="childQuestionTag in childTagList" >{{childQuestionTag.name}}</span>
 									</div>
 								</div>
 							</div>
@@ -342,6 +342,7 @@
 												        		</div>
 												        		<div class="account" >{{reply.account}}<span class="time">{{reply.postTime}}</span></div>
 												        	</div>
+												        	
 												        </h2>
 							                        </span>
 							                        
@@ -581,6 +582,8 @@ export default({
 			maxDeposit : 0,//允许使用的预存款
 			maxPoint : 0,//允许使用的积分
 			
+			selectedTagClass:new Map(),//选中‘标签‘样式
+        	selectedChildTagClass:new Map(),//选中‘子标签‘样式
 			tagIdGroup : [], //标签Id组
 			options: [],//Select 选择器标签数据
 			editQuestionFormView:false,//修改问题表单是否显示
@@ -2246,7 +2249,7 @@ export default({
 					   				        'superscript', 'clearhtml', 'quickformat', 'selectall', '|', 
 					   				        'formatblock', 'fontname', 'fontsize','fullscreen', '/', 'forecolor', 'hilitecolor', 'bold',
 					   				        'italic', 'underline', 'strikethrough', 'lineheight', 'removeformat', '|', 'image', 'multiimage',
-					   				         'media','embedVideo','uploadVideo', 'insertfile','emoticons','table', 'hr',   'pagebreak',
+					   				         'media','embedVideo','uploadVideo', 'insertfile','emoticons', 'table', 'hr',   'pagebreak',
 					   				         'link', 'unlink'];
 					   		
 					   		//创建富文本编辑器
@@ -2453,6 +2456,9 @@ export default({
 								}
 							}
 						}
+						 _self.$nextTick(function() {
+                            _self.setTagClass();
+                        });
 			    	}else if(returnValue.code === 500){//错误
 			    		
 			    		
@@ -2468,7 +2474,7 @@ export default({
 		selectChildTag : function(questionTagId) {
 			var _self = this;
 			_self.selectedFirstTagId = questionTagId;
-			
+			_self.setTagClass();
 			if(_self.allTagList != '' && _self.allTagList.length >0){
 				for (var i= 0; i < _self.allTagList.length; i++) {
 					var questionTag = _self.allTagList[i];
@@ -2498,6 +2504,7 @@ export default({
 					if(selectedTag.value == childQuestionTag.id){
 						//删除标签
 						this.deleteTag(selectedTag.value);
+						this.setTagClass();
 						return;
 					}
 				}
@@ -2514,6 +2521,7 @@ export default({
 			this.tagIdGroup.push(childQuestionTag.id);
 			
 			this.select_placeholder = "";
+			this.setTagClass();
 		},
 		//删除标签
 		deleteTag : function(questionTagId) {
@@ -2543,38 +2551,35 @@ export default({
 			
 			
 		},
-		//选中一级标签样式
-		selectedTagClass : function(questionTagId) {
-			var className = "nav-link";
-			if(this.selectedFirstTagId == questionTagId){
-				className += " active";
-				
-			}
-			if(this.options != null && this.options.length >0){
-				for(var i=0; i<this.options.length; i++){
-					var selectedTag = this.options[i];
-					if(selectedTag.value == questionTagId){
-						className += " selected";
-					}
-				}
-				
-			}
-			return className;
-		},
-		
-		//选中二级标签样式
-		selectedChildTagClass : function(questionTagId) {
-			if(this.options != null && this.options.length >0){
-				for(var i=0; i<this.options.length; i++){
-					var selectedTag = this.options[i];
-					if(selectedTag.value == questionTagId){
-						return "child-tag selected";
-					}
-				}
-				
-			}
-			return "child-tag";
-		},
+		//设置一级标签样式
+		setTagClass : function() {
+	        this.selectedTagClass.clear();
+	        if(this.selectedFirstTagId != ''){
+	            this.selectedTagClass.set(this.selectedFirstTagId,"active");
+	            if(this.tagIdGroup != null && this.tagIdGroup.length >0){
+	                for(let i = 0; i <this.tagIdGroup.length; i++){
+	                    let tagId = this.tagIdGroup[i];
+	                    this.selectedTagClass.set(tagId,"selected");
+	                    if(this.selectedFirstTagId == tagId){
+	                    	this.selectedTagClass.set(tagId,"active selected");
+	                    }
+	                }
+	            }
+	        }
+	        this.setChildTagClass();
+	    },
+    
+
+	    //设置子标签样式
+	    setChildTagClass : function() {
+	        this.selectedChildTagClass.clear();
+	        if(this.tagIdGroup != null && this.tagIdGroup.length >0){
+	            for(let i = 0; i <this.tagIdGroup.length; i++){
+	                let tagId = this.tagIdGroup[i];
+	                this.selectedChildTagClass.set(tagId,"selected");
+	            }
+	        }
+	    },
 		
 		//添加回复对方表单
 		addReplyFriendUI : function(replyId) {

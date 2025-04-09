@@ -355,17 +355,18 @@ public class TopicServiceBean extends DaoSupport<Topic> implements TopicService{
 	 * @return
 	 */
 	public Integer updateTopic(Topic topic){
-		Query query = em.createQuery("update Topic o set o.title=?1, o.content=?2,o.summary=?3,o.tagId=?4,o.allow=?5,o.image=?6,o.status=?7,o.sort=?8,o.essence=?9 where o.id=?10")
+		Query query = em.createQuery("update Topic o set o.title=?1, o.content=?2,o.summary=?3,o.tagId=?4,o.tagIdGroup=?5,o.allow=?6,o.image=?7,o.status=?8,o.sort=?9,o.essence=?10 where o.id=?11")
 		.setParameter(1, topic.getTitle())
 		.setParameter(2, topic.getContent())
 		.setParameter(3, topic.getSummary())
 		.setParameter(4, topic.getTagId())
-		.setParameter(5, topic.isAllow())
-		.setParameter(6, topic.getImage())
-		.setParameter(7, topic.getStatus())
-		.setParameter(8, topic.getSort())
-		.setParameter(9, topic.getEssence())
-		.setParameter(10, topic.getId());
+		.setParameter(5, topic.getTagIdGroup())
+		.setParameter(6, topic.isAllow())
+		.setParameter(7, topic.getImage())
+		.setParameter(8, topic.getStatus())
+		.setParameter(9, topic.getSort())
+		.setParameter(10, topic.getEssence())
+		.setParameter(11, topic.getId());
 		int i = query.executeUpdate();
 		return i;
 	}

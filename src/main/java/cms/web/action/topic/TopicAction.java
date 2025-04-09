@@ -315,8 +315,11 @@ public class TopicAction {
 				paramValue.add("%/"+ _keyword+"%");	
 			}
 			if(_tagId != null && _tagId >0){//标签
-				param += " and o.tagId =?"+(paramValue.size()+1);
-				paramValue.add(_tagId);	
+				Tag tag = tagService.findById(_tagId);
+				if(tag != null){
+					param += " and o.tagIdGroup like ?"+(paramValue.size()+1)+" escape '/' ";
+					paramValue.add("/"+tag.getParentIdGroup()+_tagId+",%");	
+				}
 			}
 			if(_userName != null && !"".equals(_userName)){//用户
 				param += " and o.userName =?"+(paramValue.size()+1);

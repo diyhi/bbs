@@ -26,7 +26,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import cms.bean.ErrorView;
-import cms.bean.setting.AllowRegisterAccount;
+import cms.bean.setting.AllowLoginAccountType;
+import cms.bean.setting.AllowRegisterAccountType;
 import cms.bean.setting.SystemSetting;
 import cms.bean.thirdParty.WeiXinOpenId;
 import cms.bean.user.AccessUser;
@@ -126,7 +127,7 @@ public class UserFormManageAction {
 	    	errorDisplay = true;
 	    }
 		
-		if(jumpUrl == null || "".equals(jumpUrl.trim()) && isAjax == false){
+	  	if((jumpUrl == null || "".equals(jumpUrl.trim())) && isAjax == false){
 			String referer= request.getHeader("referer");  
 			if(referer != null && !"".equals(referer.trim())){
 				
@@ -209,13 +210,12 @@ public class UserFormManageAction {
 		}
 		
 		//允许注册账号类型
-		if(systemSetting.getAllowRegisterAccount() != null && !"".equals(systemSetting.getAllowRegisterAccount().trim())){
-			AllowRegisterAccount allowRegisterAccount = JsonUtils.toObject(systemSetting.getAllowRegisterAccount(), AllowRegisterAccount.class);
-			if(allowRegisterAccount != null){
-				model.addAttribute("allowRegisterAccount",allowRegisterAccount);
-				returnValue.put("allowRegisterAccount",allowRegisterAccount);
-			}
+		List<Integer> allowRegisterAccountTypeCodeList = new ArrayList<Integer>();
+		if(systemSetting.getAllowRegisterAccountType() != null && !"".equals(systemSetting.getAllowRegisterAccountType().trim())){
+			allowRegisterAccountTypeCodeList = JsonUtils.toObject(systemSetting.getAllowRegisterAccountType(), List.class);
 		}
+		model.addAttribute("allowRegisterAccountType",allowRegisterAccountTypeCodeList);
+		returnValue.put("allowRegisterAccountType",allowRegisterAccountTypeCodeList);
 		
 		//是否允许国外手机号注册
 		boolean isAllowForeignCellPhoneRegistration = smsManage.isEnableInternationalSMS();
@@ -278,11 +278,11 @@ public class UserFormManageAction {
 		
 		
 		//读取允许注册账号类型
-		AllowRegisterAccount allowRegisterAccount =  settingManage.readAllowRegisterAccount();
+		AllowRegisterAccountType allowRegisterAccountType = settingManage.readAllowRegisterAccountType();
 
-		if(allowRegisterAccount != null && (allowRegisterAccount.isLocal() || allowRegisterAccount.isMobile())){
+		if(allowRegisterAccountType != null && (allowRegisterAccountType.isLocal() || allowRegisterAccountType.isMobile() || allowRegisterAccountType.isEmail())){
 			if(formbean.getType() != null){
-				if(formbean.getType().equals(10) && allowRegisterAccount.isLocal()){//10:本地账号密码用户
+				if(formbean.getType().equals(10) && allowRegisterAccountType.isLocal()){//10:本地账号密码用户
 					if(systemSetting.isRegisterCaptcha()){//如果注册需要验证码
 						isCaptcha = true;
 						//验证验证码
@@ -378,7 +378,7 @@ public class UserFormManageAction {
 					}
 					user.setUserName(UUIDUtil.getUUID22());
 					user.setPlatformUserId(user.getUserName());
-				}else if(formbean.getType().equals(20) && allowRegisterAccount.isMobile()){//20: 手机用户
+				}else if(formbean.getType().equals(20) && allowRegisterAccountType.isMobile()){//20: 手机用户
 					String _countryCode = userManage.processCountryCode(countryCode);
 					
 					if(formbean.getMobile() != null && !"".equals(formbean.getMobile().trim())){
@@ -965,6 +965,14 @@ public class UserFormManageAction {
 				
 		returnValue.put("isAllowForeignCellPhoneRegistration",isAllowForeignCellPhoneRegistration);
 				
+		//允许登录账号类型
+		List<Integer> allowLoginAccountTypeCodeList = new ArrayList<Integer>();
+		if(systemSetting.getAllowLoginAccountType() != null && !"".equals(systemSetting.getAllowLoginAccountType().trim())){
+			allowLoginAccountTypeCodeList = JsonUtils.toObject(systemSetting.getAllowLoginAccountType(), List.class);
+		}
+		model.addAttribute("allowLoginAccountType",allowLoginAccountTypeCodeList);
+		returnValue.put("allowLoginAccountType",allowLoginAccountTypeCodeList);
+
 		
 		if(isAjax){
 			if(jumpUrl == null){
@@ -1064,7 +1072,13 @@ public class UserFormManageAction {
 		String _countryCode = userManage.processCountryCode(countryCode);
 		List<Integer> numbers = Arrays.asList(10,20); 
 		if(type != null && numbers.contains(type)){
+			//读取允许登录账号类型
+			AllowLoginAccountType allowLoginAccountType =  settingManage.readAllowLoginAccountType();
+			
 			if(type.equals(10)){//10:本地账号密码用户
+				if(!allowLoginAccountType.isLocal()){
+					error.put("login", "登录入口已关闭");
+				}
 				if(account == null || "".equals(account.trim())){
 					//账号不能为空
 					error.put("account", ErrorView._815.name());//账号不能为空
@@ -1074,6 +1088,9 @@ public class UserFormManageAction {
 					
 				}
 			}else if(type.equals(20)){//20: 手机用户
+				if(!allowLoginAccountType.isMobile()){
+					error.put("login", "登录入口已关闭");
+				}
 				if(mobile == null || "".equals(mobile.trim())){
 					//手机号不能为空
 					error.put("mobile", ErrorView._866.name());//手机号不能为空
@@ -1465,6 +1482,15 @@ public class UserFormManageAction {
 	  	returnValue.put("isAllowForeignCellPhoneRegistration",isAllowForeignCellPhoneRegistration);
 	  	model.addAttribute("isAllowForeignCellPhoneRegistration",isAllowForeignCellPhoneRegistration);
 	  	    
+	  	SystemSetting systemSetting = settingService.findSystemSetting_cache();
+	  	//允许登录账号类型
+  		List<Integer> allowLoginAccountTypeCodeList = new ArrayList<Integer>();
+  		if(systemSetting.getAllowLoginAccountType() != null && !"".equals(systemSetting.getAllowLoginAccountType().trim())){
+  			allowLoginAccountTypeCodeList = JsonUtils.toObject(systemSetting.getAllowLoginAccountType(), List.class);
+  		}
+  		model.addAttribute("allowLoginAccountType",allowLoginAccountTypeCodeList);
+  		returnValue.put("allowLoginAccountType",allowLoginAccountTypeCodeList);
+	  	
 	    
 	    if(isAjax){
 			WebUtil.writeToWeb(JsonUtils.toJSONString(returnValue), "json", response);

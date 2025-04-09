@@ -8602,12 +8602,11 @@ var register_component = Vue.extend({
 			mobile_field : false,//表单手机号字段
 			issue_field : true,//表单密码提示问题字段
 			answer_field : true,//表单密码提示答案字段
-			email_field : true,//表单邮箱字段
 			smsCode_field : false,//表单手机号验证码字段
 			
 			type : 10,//用户类型
 			userCustomList : [], //用户自定义注册功能项
-			allowRegisterAccount : '',//允许注册账号类型
+			allowRegisterAccountType : [],//允许注册账号类型
 			captchaKey : '', //验证码编号
 			captchaValue : '',
 			showCaptcha : false,
@@ -8617,7 +8616,6 @@ var register_component = Vue.extend({
 			confirmPassword : '', //确认密码
 			issue : '', //密码提示问题
 			answer : '', //密码提示答案
-			email : '', //邮箱
 			smsCode: '', //手机验证码
 			userBoundField : [], //用户自定义注册功能项绑定
 			mobile : '', //手机号
@@ -8633,7 +8631,6 @@ var register_component = Vue.extend({
 				confirmPassword : '', //确认密码
 				issue : '', //密码提示问题
 				answer : '', //密码提示答案
-				email : '', //邮箱
 				captchaValue : '', //验证码值
 				register: '', //注册错误	
 				mobile : '',//手机号
@@ -8643,6 +8640,7 @@ var register_component = Vue.extend({
 
 			agreement : true, //是否同意服务协议
 			allowSubmit:false,//提交按钮disabled状态
+			isLoadingComplete:false//是否加载完成
 		};
 	},
 	created : function() {
@@ -8674,7 +8672,6 @@ var register_component = Vue.extend({
 				this.mobile_field = false;
 				this.issue_field = true;
 				this.answer_field = true;
-				this.email_field = true;
 				this.smsCode_field = false;
 			}else if(type == 20){
 				this.type =20;//用户类型
@@ -8685,7 +8682,6 @@ var register_component = Vue.extend({
 				this.mobile_field = true;
 				this.issue_field = false;
 				this.answer_field = false;
-				this.email_field = false;
 				this.smsCode_field = true;
 			}
 			
@@ -8813,6 +8809,7 @@ var register_component = Vue.extend({
 				async : true, //默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。
 				url : "register",
 				success : function success(result) {
+					_self.isLoadingComplete = true;
 					var returnValue = $.parseJSON(result);
 					for (var key in returnValue) {
 						if (key == "userCustomList") {
@@ -8826,14 +8823,14 @@ var register_component = Vue.extend({
 								}
 
 							}
-						} else if (key == "allowRegisterAccount") {
-							_self.allowRegisterAccount = returnValue[key];
+						} else if (key == "allowRegisterAccountType") {
+							_self.allowRegisterAccountType = returnValue[key];
 							
-							if(_self.allowRegisterAccount.local){
+							if(_self.allowRegisterAccountType.indexOf(10) >-1){
 								_self.selectRegisterAccountType(10);
 								
 							}else{
-								if(_self.allowRegisterAccount.mobile){
+								if(_self.allowRegisterAccountType.indexOf(20) >-1){
 									_self.selectRegisterAccountType(20);
 								}
 							}
@@ -8972,7 +8969,6 @@ var register_component = Vue.extend({
 			_self.error.confirmPassword  = '';//确认密码
 			_self.error.issue = '';//密码提示问题
 			_self.error.answer = '';//密码提示答案
-			_self.error.email = '';//邮箱
 			_self.error.captchaValue  = '';//验证码值
 			_self.error.register = '';//注册错误
 			_self.customError =[];//用户自定义注册功能项错误提示
@@ -9033,12 +9029,6 @@ var register_component = Vue.extend({
 			var answer = _self.answer;
 			if (answer != "") {
 				parameter += "&answer=" + CryptoJS.SHA256(answer);
-			}
-
-			//邮箱
-			var email = _self.email;
-			if (email != "") {
-				parameter += "&email=" + encodeURIComponent(email);
 			}
 
 			//自定义表单
@@ -9142,8 +9132,6 @@ var register_component = Vue.extend({
 									_self.error.issue = errorValue;
 								} else if (error == "answer") { //密码提示答案
 									_self.error.answer = errorValue;
-								} else if (error == "email") { //邮箱
-									_self.error.email = errorValue;
 								} else if (error == "register") { //注册错误
 									_self.error.register = errorValue;
 								} else if (error == "captchaValue") { //验证码错误
@@ -9340,7 +9328,7 @@ var findPassWord_step1_component = Vue.extend({
 			
 			account_field : true,//表单账号字段
 			mobile_field : false,//表单手机号字段
-			
+			allowLoginAccountType: [],//允许登录账号类型
 			type : 10,//用户类型
 			mobile : '',//手机号
 			account : '',
@@ -9354,6 +9342,7 @@ var findPassWord_step1_component = Vue.extend({
 			},
 			
 			allowSubmit:false,//提交按钮disabled状态
+			isLoadingComplete:false//是否加载完成
 		};
 	},
 	created : function created() {
@@ -9390,12 +9379,24 @@ var findPassWord_step1_component = Vue.extend({
 				url : "findPassWord/step1",
 				success : function success(result) {
 					if (result != "") {
+						_self.isLoadingComplete = true;
 						var returnValue = $.parseJSON(result);
 						for (var key in returnValue) {
 							if (key == "captchaKey") {
 								var captchaKey = returnValue[key];
 								_self.captchaKey = captchaKey;
 								_self.imgUrl = "captcha/" + captchaKey + ".jpg";
+							}else if(key == "allowLoginAccountType") {
+								_self.allowLoginAccountType = returnValue[key];
+								if(_self.allowLoginAccountType && _self.allowLoginAccountType.length >0){
+			                        for(let i=0; i<_self.allowLoginAccountType.length; i++){
+			                            let type = _self.allowLoginAccountType[i];
+			                            if(type <= 30){
+			                            	_self.selectAccountType(type);
+			                                break;
+			                            }
+			                        }
+			                    }
 							}
 						}
 					}
@@ -10069,7 +10070,7 @@ var login_component = Vue.extend({
 			
 			account_field : true,//表单账号字段
 			mobile_field : false,//表单手机号字段
-			
+			allowLoginAccountType: [],//允许登录账号类型
 			type : 10,//用户类型
 			mobile : '',//手机号
 			account : '',
@@ -10090,6 +10091,7 @@ var login_component = Vue.extend({
 			jumpUrl : '',
 			
 			allowSubmit:false,//提交按钮disabled状态
+			isLoadingComplete:false//是否加载完成
 		};
 	},
 	
@@ -10193,6 +10195,7 @@ var login_component = Vue.extend({
 				//	data: data,
 				success : function success(result) {
 					if (result != "") {
+						_self.isLoadingComplete = true;
 						var returnValue = $.parseJSON(result);
 						for (var key in returnValue) {
 							if (key == "formCaptcha") {
@@ -10203,6 +10206,17 @@ var login_component = Vue.extend({
 									_self.captchaKey = formCaptcha.captchaKey;
 									_self.imgUrl = "captcha/" + formCaptcha.captchaKey + ".jpg";
 								}
+							}else if(key == "allowLoginAccountType") {
+								_self.allowLoginAccountType = returnValue[key];
+								if(_self.allowLoginAccountType && _self.allowLoginAccountType.length >0){
+			                        for(let i=0; i<_self.allowLoginAccountType.length; i++){
+			                            let type = _self.allowLoginAccountType[i];
+			                            if(type <= 30){
+			                            	_self.selectAccountType(type);
+			                                break;
+			                            }
+			                        }
+			                    }
 							}
 						}
 					}

@@ -31,8 +31,8 @@
 		<tr>  
 			<td>允许注册账号类型</td> 
 			<td>
-				变量：allowRegisterAccount<br>
-				类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_90'); return false;">AllowRegisterAccount</a>
+				变量：allowRegisterAccountType<br>
+				类型：List&ltInteger>
 			</td>
 		</tr>
 		<tr>  
@@ -76,7 +76,7 @@
 			<td>键参数：userCustomList<br>值内容说明：用户自定义注册功能项<br>值类型：List&lt<a style="color: #317ee7" onclick="anchorJump('#anchor_50'); return false;">UserCustom</a>></td>
 		</tr>
 		<tr> 
-			<td>键参数：allowRegisterAccount<br>值内容说明：允许注册账号类型<br>值类型：<a style="color: #317ee7" onclick="anchorJump('#anchor_90'); return false;">AllowRegisterAccount</a></td> 
+			<td>键参数：allowRegisterAccountType<br>值内容说明：允许注册账号类型<br>值类型：List&ltInteger></td> 
 		</tr>	
 		<tr> 
 			<td>键参数：isAllowForeignCellPhoneRegistration<br>值内容说明：是否允许国外手机号注册<br>值类型：boolean</td> 
@@ -203,35 +203,7 @@
 	</tbody>
 </table>
 
-<table id="anchor_90" class="exampleTable" > 
-	<thead> 
-		<tr> 
-			<th colspan="3">允许注册账号类型 AllowRegisterAccount</th>
-		</tr> 
-		<tr> 
-			<th width="30%">变量</th> 
-			<th width="30%">类型</th>
-			<th width="40%">说明</th> 
-		</tr> 
-	</thead> 
-	<tbody> 
-		<tr> 
-			<td>local</td> 
-			<td>boolean</td>
-			<td>本地账号密码用户</td>
-		</tr>
-		<tr> 
-			<td>mobile</td> 
-			<td>boolean</td>
-			<td>手机用户</td>
-		</tr>
-		<tr> 
-			<td>weChat</td> 
-			<td>boolean</td>
-			<td>微信用户</td>
-		</tr>
-	</tbody> 
-</table>
+
 
 <table class="exampleTable" > 
 	<thead> 
@@ -486,6 +458,11 @@
 			<td>手机号错误</td>
 		</tr>
 		<tr> 
+			<td>email</td> 
+			<td>String</td>
+			<td>邮箱错误</td>
+		</tr>
+		<tr> 
 			<td>password</td> 
 			<td>String</td>
 			<td>密码错误</td>
@@ -499,11 +476,6 @@
 			<td>answer</td> 
 			<td>String</td>
 			<td>密码提示答案</td>
-		</tr>
-		<tr> 
-			<td>email</td> 
-			<td>String</td>
-			<td>邮箱</td>
 		</tr>
 		<tr> 
 			<td>register</td> 
@@ -559,17 +531,17 @@
 			<td>按需填写</td>
 			<td>手机号</td> 
 		</tr>
+		<tr> 
+			<td>email</td> 
+			<td>String</td>
+			<td>按需填写</td>
+			<td>邮箱</td> 
+		</tr>
 	 	<tr> 
 			<td>password</td> 
 			<td>String</td>
 			<td>是</td>
 			<td>密码 必须执行sha256一次</td> 
-		</tr>
-		<tr> 
-			<td>email</td> 
-			<td>String</td>
-			<td>否</td>
-			<td>邮箱</td> 
 		</tr>
 		<tr> 
 			<td>issue</td> 
@@ -588,6 +560,12 @@
 			<td>String</td>
 			<td>按需填写</td>
 			<td>短信验证码</td> 
+		</tr>
+		<tr> 
+			<td>emailCode</td> 
+			<td>String</td>
+			<td>按需填写</td>
+			<td>邮箱验证码</td> 
 		</tr>
 		<tr> 
 			<td>captchaKey</td> 

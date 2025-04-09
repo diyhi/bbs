@@ -373,6 +373,22 @@ CREATE TABLE `disableusername` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 #
+# Structure for table "emailsetting"
+#
+
+CREATE TABLE `emailsetting` (
+  `id` int(11) NOT NULL,
+  `account` varchar(255) DEFAULT NULL,
+  `host` varchar(255) DEFAULT NULL,
+  `mail` longtext,
+  `password` varchar(255) DEFAULT NULL,
+  `port` int(11) DEFAULT NULL,
+  `version` bigint(20) DEFAULT NULL,
+  `supportedMailboxes` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+#
 # Structure for table "favorites_0"
 #
 
@@ -1974,7 +1990,6 @@ CREATE TABLE `systemsetting` (
   `questionRewardAmountMin` decimal(12,2) NOT NULL,
   `questionRewardPointMax` bigint(20) DEFAULT NULL,
   `questionRewardPointMin` bigint(20) DEFAULT NULL,
-  `allowRegisterAccount` longtext,
   `giveRedEnvelopeAmountMax` decimal(12,2) DEFAULT NULL,
   `giveRedEnvelopeAmountMin` decimal(12,2) NOT NULL,
   `allowReport` bit(1) NOT NULL,
@@ -1988,6 +2003,8 @@ CREATE TABLE `systemsetting` (
   `aiAssistant_submitQuantity` int(11) DEFAULT NULL,
   `languageFormExtension` longtext,
   `languageSwitching` longtext,
+  `allowLoginAccountType` longtext,
+  `allowRegisterAccountType` longtext,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -2037,6 +2054,9 @@ CREATE TABLE `tag` (
   `sort` int(11) DEFAULT NULL,
   `image` varchar(100) DEFAULT NULL,
   `multiLanguageExtension` longtext,
+  `childNodeNumber` int(11) DEFAULT NULL,
+  `parentId` bigint(20) DEFAULT NULL,
+  `parentIdGroup` varchar(190) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `tag_1_idx` (`sort`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -2129,11 +2149,12 @@ CREATE TABLE `topic` (
   `isMarkdown` bit(1) DEFAULT NULL,
   `markdownContent` longtext,
   `weight` double DEFAULT NULL,
+  `tagIdGroup` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `topic_idx` (`tagId`,`status`),
   KEY `topic_3_idx` (`userName`,`postTime`),
   KEY `topic_5_idx` (`status`,`sort`,`lastReplyTime`),
-  KEY `topic_6_idx` (`weight`)
+  KEY `topic_6_idx` (`weight`),
+  KEY `topic_7_idx` (`tagIdGroup`,`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
@@ -2386,7 +2407,7 @@ CREATE TABLE `upgradesystem` (
 CREATE TABLE `user` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `answer` varchar(80) DEFAULT NULL,
-  `email` varchar(60) DEFAULT NULL,
+  `email` varchar(100) DEFAULT NULL,
   `issue` varchar(50) DEFAULT NULL,
   `mobile` varchar(20) DEFAULT NULL,
   `password` varchar(160) DEFAULT NULL,

@@ -443,19 +443,13 @@ public class TopicFormAction {
 		if(tagId == null || tagId <=0L){
 			error.put("tagId", "标签不能为空");
 		}else{
-			List<Tag> tagList = tagService.findAllTag_cache();
-			if(tagList != null && tagList.size() >0){
-				for(Tag tag : tagList){
-					if(tag.getId().equals(tagId)){
-						topic.setTagId(tag.getId());
-						topic.setTagName(tag.getName());
-						break;
-					}
-					
-				}
-				if(topic.getTagId() == null){
-					error.put("tagId", "标签不存在");
-				}
+			Tag tag = tagService.findById_cache(tagId);
+			if(tag != null && tag.getChildNodeNumber()==0){
+				topic.setTagId(tag.getId());
+				topic.setTagName(tag.getName());
+				topic.setTagIdGroup(tag.getParentIdGroup()+tag.getId()+",");
+			}else{
+				error.put("tagId", "标签不存在");//标签不存在
 			}
 		}
 		if(title != null && !"".equals(title.trim())){

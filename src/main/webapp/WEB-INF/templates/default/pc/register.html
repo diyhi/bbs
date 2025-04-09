@@ -26,18 +26,19 @@
 <@include action="${newPublic_2}"/>
 <div class="skeleton">
 	<div class="main wrap backgroundModule" >
-		
+		<#assign accountType = allowRegisterAccountType>
 		<div class="registerModule">
 			<div class="tabs-nav">
 	        	<div>
-	        		<div id="local_tab" class="tabs-tab" <#if allowRegisterAccount.local != true> style='display: none;'</#if>>
+	        		<div id="local_tab" class="tabs-tab" <#if accountType?? && !accountType?seq_contains(10)> style='display: none;'</#if>>
 	        			<a href="javascript:void(0)" class="active">账号密码注册</a>
 	        		</div>
-        			<div id="mobile_tab" class="tabs-tab" <#if allowRegisterAccount.mobile != true> style='display: none;'</#if>>
+        			<div id="mobile_tab" class="tabs-tab" <#if accountType?? && !accountType?seq_contains(20)> style='display: none;'</#if>>
         				<a href="javascript:void(0)">手机号注册</a>
         			</div>
 	        	</div>
         	</div>
+        	
         	<div class="box">
         		<div class="form">
 					<!-- 令牌标记 -->
@@ -109,18 +110,6 @@
 			        			</div>
 			        		</div>
 		        			<div id="answer_prompt_error" class="form-field-prompt-error"></div>
-		        		</div>
-		        	</div>
-		        	<div class="form-field" >
-		        		<div id="email_field_error" class="form-field-container">
-			        		<div class="form-field-text">
-			        			<div class="form-field-input-container">
-				        			<input id="email" maxLength="30" class="form-field-text-input" type="text" value="" onfocus="inputBoxClickTip(this);" onblur="inputBoxOutTip(this);">
-				        			<label class="form-field-label">邮箱</label>
-			        			</div>
-			        		</div>
-		        			<div id="email_prompt_error" class="form-field-prompt-error"></div>
-		        			<div class="form-field-help">没有可以不填写</div>
 		        		</div>
 		        	</div>
 		        	
@@ -450,7 +439,6 @@
 			$("#mobile_field_error").parent().hide();
 			$("#issue_field_error").parent().show();
 			$("#answer_field_error").parent().show();
-			$("#email_field_error").parent().show();
 			$("#smsCode_field_error").parent().hide();
 		}
 		if(id == "mobile_tab"){//手机用户
@@ -458,7 +446,6 @@
 			$("#mobile_field_error").parent().show();
 			$("#issue_field_error").parent().hide();
 			$("#answer_field_error").parent().hide();
-			$("#email_field_error").parent().hide();
 			$("#smsCode_field_error").parent().show();
 		}
 	}
@@ -625,25 +612,6 @@
 				return false;
 			}
 		}
-		if(field == "email"){//邮箱
-			var email = $("#"+field).val().trim();
-			if(email != ""){
-				if(getStringLeng(email) > 60){
-					$("#"+field+"_prompt_error").html("邮箱地址不能超过60个字符");
-					$("#"+field+"_prompt_error").show();
-					$("#"+field+"_field_error").addClass("form-field-error");
-					return false;
-				}
-				var pattern =  /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/;
-            	if(!pattern.test(email)) { 
-            		$("#"+field+"_prompt_error").html("邮箱格式错误");
-					$("#"+field+"_prompt_error").show();
-					$("#"+field+"_field_error").addClass("form-field-error");
-					return false;
-            	}
-				
-			}
-		}
 		if(field == "smsCode"){//手机验证码
 			var smsCode = $("#"+field).val().trim();
 			if(smsCode == ""){
@@ -732,11 +700,7 @@
 			parameter += "&answer="+ CryptoJS.SHA256(answer);
 		}
 		
-		//邮箱
-		var email = $("#email").val().trim();
-		if(email != ""){
-			parameter += "&email="+encodeURIComponent(email);
-		}
+		
 		//手机验证码
 		var smsCode = $("#smsCode").val().trim();
 		if(smsCode != ""){

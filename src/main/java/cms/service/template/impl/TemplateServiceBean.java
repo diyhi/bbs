@@ -625,7 +625,7 @@ public class TemplateServiceBean extends DaoSupport<Layout> implements TemplateS
 	 * @return
 	 */
 	@Transactional(readOnly=true,propagation=Propagation.NOT_SUPPORTED)
-	@Cacheable(value="templateServiceBean_cache",key="'findForumById_'+#dirName")
+	@Cacheable(value="templateServiceBean_cache",key="'findForumById_'+#forumId")
 	public Forum findForumById_cache(Integer forumId){
 		return this.findForumById(forumId);
 	}

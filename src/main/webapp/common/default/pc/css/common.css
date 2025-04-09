@@ -3820,6 +3820,15 @@ html,body{
 	width: 30px;
 	height: 30px;
 }
+.loginModule .loginProhibited{
+	margin-top:10px;display: none;
+}
+.loginModule .loginProhibited .prohibited-wrap{
+	background: #fff;
+	padding:15px 15px 15px 15px;
+}
+.loginModule .loginProhibited .respond {background: #F7F8FA;border-radius:4px;line-height: 80px;text-align:center;}
+.loginModule .loginProhibited .respond p {font-size:20px;padding:8px;overflow:hidden;color: #A9AEB8;}
 
 
 /* 找回密码 */
@@ -3880,6 +3889,16 @@ html,body{
 }
 .findPassWordModule .submitButton-box a{width:100%;border-radius:3px;color:#fff;display: inline-block;height:44px;text-align: center;font-weight:normal; font-size:20px;line-height:44px;  background:#20a0ff;}
 .findPassWordModule .submitButton-box a:hover{background:#58b7ff;text-decoration:none;}
+.findPassWordModule .loginProhibited{
+	margin-top:10px;display: none;
+}
+.findPassWordModule .loginProhibited .prohibited-wrap{
+	background: #fff;
+	padding:15px 15px 15px 15px;
+}
+.findPassWordModule .loginProhibited .respond {background: #F7F8FA;border-radius:4px;line-height: 80px;text-align:center;}
+.findPassWordModule .loginProhibited .respond p {font-size:20px;padding:8px;overflow:hidden;color: #A9AEB8;}
+
 
 
 

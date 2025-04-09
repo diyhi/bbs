@@ -1,10 +1,13 @@
 package cms.web.action.setting;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
-import cms.bean.setting.AllowRegisterAccount;
+import cms.bean.setting.AllowLoginAccountType;
+import cms.bean.setting.AllowRegisterAccountType;
 import cms.bean.setting.EditorTag;
 import cms.bean.setting.SystemSetting;
 import cms.service.setting.SettingService;
@@ -21,6 +24,8 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import com.google.common.collect.ImmutableMap;
+
 /**
  * 设置管理
  *
@@ -35,6 +40,17 @@ public class SettingManage {
 	
 	@Resource UserService userService;
 	@Resource PageViewService pageViewService;
+	
+	/** 支持账户类型 **/
+	private Map<Integer,String> supportAccountTypeParameter = ImmutableMap.of(10,"本地账号密码用户", 20,"手机用户", 40,"微信用户");
+
+	/**
+	 * 获取账户类型
+	 * @return
+	 */
+	public Map<Integer,String> getSupportAccountType(){
+		return supportAccountTypeParameter;
+	}
 	
 	/**
 	 * 增加 用户每分钟提交次数
@@ -104,13 +120,61 @@ public class SettingManage {
 	 * 读取允许注册账号类型
 	 * @return
 	*/
-	public AllowRegisterAccount readAllowRegisterAccount(){
+	public AllowRegisterAccountType readAllowRegisterAccountType(){
+		AllowRegisterAccountType allowRegisterAccountType = new AllowRegisterAccountType();
 		SystemSetting systemSetting = settingService.findSystemSetting_cache();
-		if(systemSetting.getAllowRegisterAccount() != null && !"".equals(systemSetting.getAllowRegisterAccount().trim())){
-			return JsonUtils.toObject(systemSetting.getAllowRegisterAccount(), AllowRegisterAccount.class);
+		if(systemSetting.getAllowRegisterAccountType() != null && !"".equals(systemSetting.getAllowRegisterAccountType().trim())){
+			List<Integer> allowRegisterAccountTypeList = JsonUtils.toObject(systemSetting.getAllowRegisterAccountType(), List.class);
+			if(allowRegisterAccountTypeList != null && allowRegisterAccountTypeList.size() >0){
+				
+				for(Integer type : allowRegisterAccountTypeList){
+					if(type.equals(10)){//本地账号密码用户
+						allowRegisterAccountType.setLocal(true);
+					}else if(type.equals(20)){//手机用户
+						allowRegisterAccountType.setMobile(true);
+					}else if(type.equals(30)){//邮箱用户
+						allowRegisterAccountType.setEmail(true);
+					}else if(type.equals(40)){//微信用户
+						allowRegisterAccountType.setWeChat(true);
+					}else if(type.equals(80)){//其他用户
+						allowRegisterAccountType.setOther(true);
+					}
+				}
+			}
 		}
-		return null;
-	} 
+		return allowRegisterAccountType;
+		
+	}
+	
+	/**
+	 * 读取允许登录账号类型
+	 * @return
+	 */
+	public AllowLoginAccountType readAllowLoginAccountType(){
+		AllowLoginAccountType allowLoginAccountType = new AllowLoginAccountType();
+		SystemSetting systemSetting = settingService.findSystemSetting_cache();
+		if(systemSetting.getAllowLoginAccountType() != null && !"".equals(systemSetting.getAllowLoginAccountType().trim())){
+			List<Integer> allowLoginAccountTypeList = JsonUtils.toObject(systemSetting.getAllowLoginAccountType(), List.class);
+			if(allowLoginAccountTypeList != null && allowLoginAccountTypeList.size() >0){
+				
+				for(Integer type : allowLoginAccountTypeList){
+					if(type.equals(10)){//本地账号密码用户
+						allowLoginAccountType.setLocal(true);
+					}else if(type.equals(20)){//手机用户
+						allowLoginAccountType.setMobile(true);
+					}else if(type.equals(30)){//邮箱用户
+						allowLoginAccountType.setEmail(true);
+					}else if(type.equals(40)){//微信用户
+						allowLoginAccountType.setWeChat(true);
+					}else if(type.equals(80)){//其他用户
+						allowLoginAccountType.setOther(true);
+					}
+				}
+			}
+		}
+		return allowLoginAccountType;
+		
+	}
 	
 	/**
 	 * 读取话题编辑器允许使用标签

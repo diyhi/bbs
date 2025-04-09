@@ -994,51 +994,55 @@ public class UserManageAction {
 			
 			//平台用户Id
 			new_user.setPlatformUserId(user.getPlatformUserId());
-			if(user.getType().equals(10)){//10:本地账号密码用户
-				//手机
-				if(formbean.getMobile() != null && !"".equals(formbean.getMobile().trim())){
-			    	if(formbean.getMobile().trim().length() >18){
-						error.put("mobile", "手机号码超长");
-					}else{
-						boolean mobile_verification = Verification.isPositiveInteger(StringUtils.removeStart(formbean.getMobile().trim(), "+"));//正整数
-						if(!mobile_verification){
-							error.put("mobile", "手机号码不正确");
+			if(user.getCancelAccountTime().equals(-1L)){//未注销的用户
+				if(user.getType().equals(10)){//10:本地账号密码用户
+					//手机
+					if(formbean.getMobile() != null && !"".equals(formbean.getMobile().trim())){
+				    	if(formbean.getMobile().trim().length() >18){
+							error.put("mobile", "手机号码超长");
 						}else{
-							new_user.setMobile(formbean.getMobile().trim());
-						}
-					}
-			    }
-				
-			}else if(user.getType().equals(20)){//20: 手机用户
-				//手机
-				if(formbean.getMobile() != null && !"".equals(formbean.getMobile().trim())){
-			    	if(formbean.getMobile().trim().length() >18){
-						error.put("mobile", "手机号码超长");
-					}else{
-						boolean mobile_verification = Verification.isPositiveInteger(StringUtils.removeStart(formbean.getMobile().trim(), "+"));//正整数
-						if(!mobile_verification){
-							error.put("mobile", "手机号码不正确");
-						}else{
-							
-							if(!user.getMobile().equals(formbean.getMobile().trim())){
-								String platformUserId = userManage.thirdPartyUserIdToPlatformUserId(formbean.getMobile().trim(),20);
-								User mobile_user = userService.findUserByPlatformUserId(platformUserId);
-								
-					      		if(mobile_user != null){
-					      			error.put("mobile", "手机号码已注册");
-
-					      		}
+							boolean mobile_verification = Verification.isPositiveInteger(StringUtils.removeStart(formbean.getMobile().trim(), "+"));//正整数
+							if(!mobile_verification){
+								error.put("mobile", "手机号码不正确");
+							}else{
+								new_user.setMobile(formbean.getMobile().trim());
 							}
-							
-							new_user.setPlatformUserId(userManage.thirdPartyUserIdToPlatformUserId(formbean.getMobile().trim(),20));
-							new_user.setMobile(formbean.getMobile().trim());
 						}
-					}
-			    }else{
-			    	error.put("mobile", "手机号码不能为空");
-			    }
+				    }
+					
+				}else if(user.getType().equals(20)){//20: 手机用户
+					//手机
+					if(formbean.getMobile() != null && !"".equals(formbean.getMobile().trim())){
+				    	if(formbean.getMobile().trim().length() >18){
+							error.put("mobile", "手机号码超长");
+						}else{
+							boolean mobile_verification = Verification.isPositiveInteger(StringUtils.removeStart(formbean.getMobile().trim(), "+"));//正整数
+							if(!mobile_verification){
+								error.put("mobile", "手机号码不正确");
+							}else{
+								
+								if(!user.getMobile().equals(formbean.getMobile().trim())){
+									String platformUserId = userManage.thirdPartyUserIdToPlatformUserId(formbean.getMobile().trim(),20);
+									User mobile_user = userService.findUserByPlatformUserId(platformUserId);
+									
+						      		if(mobile_user != null){
+						      			error.put("mobile", "手机号码已注册");
+	
+						      		}
+								}
+								
+								new_user.setPlatformUserId(userManage.thirdPartyUserIdToPlatformUserId(formbean.getMobile().trim(),20));
+								new_user.setMobile(formbean.getMobile().trim());
+							}
+						}
+				    }else{
+				    	error.put("mobile", "手机号码不能为空");
+				    }
+				}
+			}else{//已注销
+				new_user.setMobile(user.getMobile().trim());
+				new_user.setEmail(user.getEmail().trim());
 			}
-			
 			
 			
 			//实名认证

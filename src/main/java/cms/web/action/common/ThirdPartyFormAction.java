@@ -20,7 +20,8 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import cms.bean.ErrorView;
-import cms.bean.setting.AllowRegisterAccount;
+import cms.bean.setting.AllowLoginAccountType;
+import cms.bean.setting.AllowRegisterAccountType;
 import cms.bean.setting.SystemSetting;
 import cms.bean.thirdParty.WeChatConfig;
 import cms.bean.thirdParty.WeiXinOpenId;
@@ -419,9 +420,9 @@ public class ThirdPartyFormAction {
 			if(user == null){//用户不存在，执行注册
 				
 				//读取允许注册账号类型
-				AllowRegisterAccount allowRegisterAccount =  settingManage.readAllowRegisterAccount();
+				AllowRegisterAccountType allowRegisterAccountType =  settingManage.readAllowRegisterAccountType();
 
-				if(allowRegisterAccount != null && allowRegisterAccount.isWeChat()){
+				if(allowRegisterAccountType != null && allowRegisterAccountType.isWeChat()){
 					user = new User();
 					String id = UUIDUtil.getUUID22();
 					user.setUserName(id);//会员用户名
@@ -457,7 +458,11 @@ public class ThirdPartyFormAction {
 		}
 		
 		
-			
+		//读取允许登录账号类型
+		AllowLoginAccountType allowLoginAccountType =  settingManage.readAllowLoginAccountType();
+		if(!allowLoginAccountType.isWeChat()){
+			error.put("register", "登录入口已关闭");
+		}
 		
 		//自动登录
 		if(error.size() == 0 && user != null){

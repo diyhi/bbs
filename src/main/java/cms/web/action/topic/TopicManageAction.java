@@ -602,6 +602,14 @@ public class TopicManageAction {
 		if(tagId == null || tagId <=0L){
 			error.put("tagId", "标签不能为空");
 		}else{
+			Tag tag = tagService.findById(tagId);
+			if(tag != null && tag.getChildNodeNumber()==0){
+				topic.setTagId(tag.getId());
+				topic.setTagName(tag.getName());
+				topic.setTagIdGroup(tag.getParentIdGroup()+tag.getId()+",");
+			}else{
+				error.put("tagId", "标签不存在");
+			}
 			
 			if(title != null && !"".equals(title.trim())){
 				topic.setTitle(title);
@@ -1148,15 +1156,10 @@ public class TopicManageAction {
 					//处理富文本路径
 					topic.setContent(fileManage.processRichTextFilePath(topic.getContent(),"topic"));
 				}
-				List<Tag> tagList = tagService.findAllTag();
-				if(tagList != null && tagList.size() >0){
-					for(Tag tag : tagList){
-						if(topic.getTagId().equals(tag.getId())){
-							topic.setTagName(tag.getName());
-							break;
-						}
-					}
-				}	
+				Tag tag = tagService.findById(topic.getTagId());
+				if(tag != null){
+					topic.setTagName(tag.getName());
+				}
 				
 				returnValue.put("topic", topic);
 				
@@ -1221,11 +1224,23 @@ public class TopicManageAction {
 			topic = topicService.findById(topicId);
 			if(topic != null && error.size() ==0){
 				old_status = topic.getStatus();
-				topic.setTagId(tagId);
-				topic.setTagName(tagName);
+				
 				topic.setAllow(allow);
 				topic.setStatus(status);
 				topic.setEssence(essence);
+				
+				if(tagId == null || tagId <=0L){
+					error.put("tagId", "标签不能为空");
+				}else{
+					Tag tag = tagService.findById(tagId);
+					if(tag != null && tag.getChildNodeNumber()==0){
+						topic.setTagId(tag.getId());
+						topic.setTagName(tag.getName());
+						topic.setTagIdGroup(tag.getParentIdGroup()+tag.getId()+",");
+					}else{
+						error.put("tagId", "标签不存在");
+					}
+				}
 				
 				if(topic.getImage() != null && !"".equals(topic.getImage().trim())){
 					oldBeforeImageList = JsonUtils.toGenericObject(topic.getImage().trim(),new TypeReference< List<ImageInfo> >(){});

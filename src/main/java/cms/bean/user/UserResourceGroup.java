@@ -17,6 +17,10 @@ public class UserResourceGroup implements Serializable{
 	private String name;
 	/** 类型 10:直接提交 20:预处理--标签 **/
 	private Integer type = 10;
+	/** 父标签Id **/
+	private Long parentTagId;
+	/** 父标签名称 **/
+	private String parentTagName;
 	/** 标签Id **/
 	private Long tagId;
 	/** 标签名称 **/
@@ -85,6 +89,22 @@ public class UserResourceGroup implements Serializable{
 
 	public void setSelected(Boolean selected) {
 		this.selected = selected;
+	}
+
+	public Long getParentTagId() {
+		return parentTagId;
+	}
+
+	public void setParentTagId(Long parentTagId) {
+		this.parentTagId = parentTagId;
+	}
+
+	public String getParentTagName() {
+		return parentTagName;
+	}
+
+	public void setParentTagName(String parentTagName) {
+		this.parentTagName = parentTagName;
 	}
 	
 	

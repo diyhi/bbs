@@ -3775,6 +3775,16 @@ html,body{
 .registerModule .registerInfo .tips{line-height:30px; margin-left: 115px}
 .registerModule .registerInfo .tips span{color: red;}
 .registerModule .registerInfo .selectName{min-height:22px; margin-top: 20px;margin-left: 8px;color:#888888; line-height: 22px; }
+.registerModule .tipsBox{
+	margin-top:10px;
+}
+.registerModule .tipsBox .tipsBox-wrap{
+	background: #fff;
+	padding:15px 15px 15px 15px;
+}
+.registerModule .tipsBox .respond {background: #F7F8FA;border-radius:4px;line-height: 80px;text-align:center;}
+.registerModule .tipsBox .respond p {font-size:16px;padding:8px;overflow:hidden;color: #A9AEB8;}
+
 
 /** 服务协议 **/
 .agreementModule{
@@ -3838,6 +3848,15 @@ html,body{
 .findPassWordModule .findPassWordTable .tips{height:30px;line-height:30px; margin-left: 115px}
 .findPassWordModule .findPassWordTable .tips span{color: red;}
 .findPassWordModule .findPassWordTable .successInfo{color: green; line-height:30px; margin-left: 115px;}
+.findPassWordModule .tipsBox{
+	margin-top:10px;
+}
+.findPassWordModule .tipsBox .tipsBox-wrap{
+	background: #fff;
+	padding:15px 15px 15px 15px;
+}
+.findPassWordModule .tipsBox .respond {background: #F7F8FA;border-radius:4px;line-height: 80px;text-align:center;}
+.findPassWordModule .tipsBox .respond p {font-size:16px;padding:8px;overflow:hidden;color: #A9AEB8;}
 
 
 /* 登录 */
@@ -3926,6 +3945,15 @@ html,body{
 	width: 35px;
 	height: 35px;
 }
+.loginModule .tipsBox{
+	margin-top:10px;
+}
+.loginModule .tipsBox .tipsBox-wrap{
+	background: #fff;
+	padding:15px 15px 15px 15px;
+}
+.loginModule .tipsBox .respond {background: #F7F8FA;border-radius:4px;line-height: 80px;text-align:center;}
+.loginModule .tipsBox .respond p {font-size:16px;padding:8px;overflow:hidden;color: #A9AEB8;}
 
 
 /* 用户中心页头 */

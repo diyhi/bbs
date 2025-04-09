@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 
 import cms.bean.ErrorView;
-import cms.bean.setting.AllowRegisterAccount;
+import cms.bean.setting.AllowRegisterAccountType;
 import cms.bean.setting.SystemSetting;
 import cms.bean.user.User;
 import cms.service.setting.SettingService;
@@ -79,9 +79,9 @@ public class SmsFormAction {
 	    	if(!numbers.contains(module)){
 	    		error.put("smsCode", ErrorView._23.name());//模块错误
 	    	}else{
-	    		AllowRegisterAccount allowRegisterAccount =  settingManage.readAllowRegisterAccount();
+	    		AllowRegisterAccountType allowRegisterAccountType = settingManage.readAllowRegisterAccountType();
 	    		if(module.equals(100)){//注册
-	    			if(allowRegisterAccount != null && allowRegisterAccount.isMobile()){
+	    			if(allowRegisterAccountType != null && allowRegisterAccountType.isMobile()){
 	    				isAllowSMS = true;
 	    			}
 				}

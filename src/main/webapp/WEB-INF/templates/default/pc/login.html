@@ -23,12 +23,13 @@
    	<div class="skeleton">
 		<div class="main wrap backgroundModule" >
 	        <div class="loginModule" >
+	        	<#assign accountType = allowLoginAccountType>
 	        	<div class="tabs-nav">
 		        	<div>
-		        		<div id="local_tab" class="tabs-tab">
+		        		<div id="local_tab" class="tabs-tab" <#if accountType?? && !accountType?seq_contains(10)> style='display: none;'</#if>>
 		        			<a href="javascript:void(0)" class="active">账号密码登录</a>
 		        		</div>
-	        			<div id="mobile_tab" class="tabs-tab">
+	        			<div id="mobile_tab" class="tabs-tab" <#if accountType?? && !accountType?seq_contains(20)> style='display: none;'</#if>>
 	        				<a href="javascript:void(0)">手机号登录</a>
 	        			</div>
 		        	</div>
@@ -93,6 +94,7 @@
 							</div>
 			        	</div>
 		        	</div>
+		        	
 	        		<div id="token_prompt_error" style="color: red;">${(error['token'])!}</div>
 	        		<div class="otherInfo">
 	        			<a href="findPassWord/step1" tabindex="8">找回密码？</a>
@@ -106,9 +108,18 @@
 						<a href="javascript:void(0);" onClick="javascript:ajaxSubmit()" tabindex="6">登&nbsp;录</a>
 					</div>
 					
-					<#-- 引入第三方登录模块 -->
-					<@include action="${systemRelated_thirdPartyLogin_1}"/>
+					
 	        	</div>
+	        	<div class="loginProhibited">
+					<div class="prohibited-wrap">
+						<div class="respond">
+							<p>已关闭登录</p>
+						</div>
+					</div>
+				</div>
+				
+				<#-- 引入第三方登录模块 -->
+				<@include action="${systemRelated_thirdPartyLogin_1}"/>
 	        </div>
 	        <div class="push"><!-- 将页脚固定在页面底部 --></div>
 		</div>
@@ -181,6 +192,42 @@
 					selectAccountType($(this).attr("id"));
 				});
 			});
+			
+			var isTab = false;
+			//如果没选择，则默认选第一项
+			$(".tabs-nav").find(".tabs-tab").each(function(){
+				if(!$(this).is(":hidden") && $(this).find("a").hasClass("active")){
+					isTab = true;
+				}
+	
+			});
+			if(!isTab){
+				$(".tabs-nav").find(".tabs-tab").each(function(){
+						$(this).find("a").removeClass("active");
+				});
+				$(".tabs-nav").find(".tabs-tab").each(function(){
+					if(!$(this).is(":hidden")){
+						$(this).find("a").addClass("active");
+						selectAccountType($(this).attr("id"));
+						return false;
+					}
+		
+				});
+			}
+				
+			
+			var isActive = false;
+			$(".tabs-nav").find(".tabs-tab").each(function(){
+				if(!$(this).is(":hidden")){
+					isActive = true;
+				}
+	
+			});
+			//如果全部隐藏
+			if(!isActive){
+				$(".loginModule").find(".box").hide();
+				$(".loginProhibited").show();
+			}
 		});
 		
 		function selectAccountType(id){

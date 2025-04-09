@@ -37,6 +37,16 @@ public class TagServiceBean extends DaoSupport<Tag> implements TagService{
 		return null;
 	}
 	/**
+	 * 根据Id查询标签
+	 * @param tagId 标签Id
+	 * @return
+	 */
+	@Transactional(readOnly=true, propagation=Propagation.NOT_SUPPORTED)
+	@Cacheable(value="tagServiceBean_cache",key="'findById_'+#tagId")
+	public Tag findById_cache(Long tagId){
+		return this.findById(tagId);
+	}
+	/**
 	 * 查询所有标签
 	 * @return
 	 */
@@ -51,7 +61,7 @@ public class TagServiceBean extends DaoSupport<Tag> implements TagService{
 	 * @return
 	 */
 	@Transactional(readOnly=true,propagation=Propagation.NOT_SUPPORTED)
-	@Cacheable(value="findAllTag_cache",key="'findAllTag_default'")
+	@Cacheable(value="tagServiceBean_cache",key="'findAllTag_default'")
 	public List<Tag> findAllTag_cache(){
 		return this.findAllTag();
 	}
@@ -61,7 +71,7 @@ public class TagServiceBean extends DaoSupport<Tag> implements TagService{
 	 * 保存标签
 	 * @param topic
 	 */
-	@CacheEvict(value="findAllTag_cache",allEntries=true)
+	@CacheEvict(value="tagServiceBean_cache",allEntries=true)
 	public void saveTag(Tag tag){
 		this.save(tag);
 	}
@@ -72,7 +82,7 @@ public class TagServiceBean extends DaoSupport<Tag> implements TagService{
 	 * @param tag
 	 * @return
 	 */
-	@CacheEvict(value="findAllTag_cache",allEntries=true)
+	@CacheEvict(value="tagServiceBean_cache",allEntries=true)
 	public Integer updateTag(Tag tag){
 		Query query = em.createQuery("update Tag o set o.name=?1, o.sort=?2,o.image=?3 where o.id=?4")
 		.setParameter(1, tag.getName())
@@ -87,7 +97,7 @@ public class TagServiceBean extends DaoSupport<Tag> implements TagService{
 	 * 删除标签
 	 * @param tagId 标签Id
 	 */
-	@CacheEvict(value="findAllTag_cache",allEntries=true)
+	@CacheEvict(value="tagServiceBean_cache",allEntries=true)
 	public Integer deleteTag(Long tagId){
 		int i = 0;
 		Query delete = em.createQuery("delete from Tag o where o.id=?1")

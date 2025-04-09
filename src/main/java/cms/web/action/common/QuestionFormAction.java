@@ -374,6 +374,9 @@ public class QuestionFormAction {
 		}else{
 			error.put("tagId", "标签不能为空");
 		}
+		if(questionTagAssociationList.size() == 0){
+			error.put("tagId", "标签不能为空");
+		}
 		
 		if(title != null && !"".equals(title.trim())){
 			if(systemSetting.isAllowFilterWord()){

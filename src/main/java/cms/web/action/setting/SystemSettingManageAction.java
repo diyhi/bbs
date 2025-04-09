@@ -22,7 +22,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import cms.bean.RequestResult;
 import cms.bean.ResultCode;
-import cms.bean.setting.AllowRegisterAccount;
 import cms.bean.setting.EditorTag;
 import cms.bean.setting.SystemNode;
 import cms.bean.setting.SystemSetting;
@@ -113,38 +112,40 @@ public class SystemSettingManageAction {
 
 		Map<String,Object> returnValue = new LinkedHashMap<String,Object>();
 		
-		SystemSetting systemSite = settingService.findSystemSetting();
+		SystemSetting systemSetting = settingService.findSystemSetting();
 	
-		if(systemSite.getAllowRegisterAccount() != null && !"".equals(systemSite.getAllowRegisterAccount().trim())){
-			AllowRegisterAccount allowRegisterAccount = JsonUtils.toObject(systemSite.getAllowRegisterAccount(), AllowRegisterAccount.class);
-			if(allowRegisterAccount != null){
-				systemSite.setAllowRegisterAccountObject(allowRegisterAccount);
+		if(systemSetting.getAllowRegisterAccountType() != null && !"".equals(systemSetting.getAllowRegisterAccountType().trim())){
+			List<Integer> allowRegisterAccountTypeCodeList = JsonUtils.toObject(systemSetting.getAllowRegisterAccountType(), List.class);
+			systemSetting.setAllowRegisterAccountTypeCodeList(allowRegisterAccountTypeCodeList);
+		}
+		if(systemSetting.getAllowLoginAccountType() != null && !"".equals(systemSetting.getAllowLoginAccountType().trim())){
+			List<Integer> allowLoginAccountTypeCodeList = JsonUtils.toObject(systemSetting.getAllowLoginAccountType(), List.class);
+			systemSetting.setAllowLoginAccountTypeCodeList(allowLoginAccountTypeCodeList);
+		}
+		
+		if(systemSetting.getEditorTag() != null && !"".equals(systemSetting.getEditorTag().trim())){
+			EditorTag editorTag = JsonUtils.toObject(systemSetting.getEditorTag(), EditorTag.class);
+			if(editorTag != null){
+				systemSetting.setEditorTagObject(editorTag);
 			}
 		}
 		
-		if(systemSite.getEditorTag() != null && !"".equals(systemSite.getEditorTag().trim())){
-			EditorTag editorTag = JsonUtils.toObject(systemSite.getEditorTag(), EditorTag.class);
+		if(systemSetting.getTopicEditorTag() != null && !"".equals(systemSetting.getTopicEditorTag().trim())){
+			EditorTag editorTag = JsonUtils.toObject(systemSetting.getTopicEditorTag(), EditorTag.class);
 			if(editorTag != null){
-				systemSite.setEditorTagObject(editorTag);
+				systemSetting.setTopicEditorTagObject(editorTag);
 			}
 		}
-		
-		if(systemSite.getTopicEditorTag() != null && !"".equals(systemSite.getTopicEditorTag().trim())){
-			EditorTag editorTag = JsonUtils.toObject(systemSite.getTopicEditorTag(), EditorTag.class);
+		if(systemSetting.getQuestionEditorTag() != null && !"".equals(systemSetting.getQuestionEditorTag().trim())){
+			EditorTag editorTag = JsonUtils.toObject(systemSetting.getQuestionEditorTag(), EditorTag.class);
 			if(editorTag != null){
-				systemSite.setTopicEditorTagObject(editorTag);
+				systemSetting.setQuestionEditorTagObject(editorTag);
 			}
 		}
-		if(systemSite.getQuestionEditorTag() != null && !"".equals(systemSite.getQuestionEditorTag().trim())){
-			EditorTag editorTag = JsonUtils.toObject(systemSite.getQuestionEditorTag(), EditorTag.class);
+		if(systemSetting.getAnswerEditorTag() != null && !"".equals(systemSetting.getAnswerEditorTag().trim())){
+			EditorTag editorTag = JsonUtils.toObject(systemSetting.getAnswerEditorTag(), EditorTag.class);
 			if(editorTag != null){
-				systemSite.setQuestionEditorTagObject(editorTag);
-			}
-		}
-		if(systemSite.getAnswerEditorTag() != null && !"".equals(systemSite.getAnswerEditorTag().trim())){
-			EditorTag editorTag = JsonUtils.toObject(systemSite.getAnswerEditorTag(), EditorTag.class);
-			if(editorTag != null){
-				systemSite.setAnswerEditorTagObject(editorTag);
+				systemSetting.setAnswerEditorTagObject(editorTag);
 			}
 		}
 		//允许上传图片格式
@@ -159,7 +160,9 @@ public class SystemSettingManageAction {
 		List<String> videoUploadFormatList = CommentedProperties.readRichTextAllowVideoUploadFormat();
 		returnValue.put("videoUploadFormatList",videoUploadFormatList);
 		
-		returnValue.put("systemSetting",systemSite);
+		returnValue.put("supportAccountType",settingManage.getSupportAccountType());//支持账户类型
+		
+		returnValue.put("systemSetting",systemSetting);
 		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
 	}
 	/**
@@ -183,7 +186,8 @@ public class SystemSettingManageAction {
 			}
 		}
 		if(error.size() ==0){
-			formbean.setAllowRegisterAccount(JsonUtils.toJSONString(formbean.getAllowRegisterAccountObject()));
+			formbean.setAllowRegisterAccountType(JsonUtils.toJSONString(formbean.getAllowRegisterAccountTypeCodeList()));
+			formbean.setAllowLoginAccountType(JsonUtils.toJSONString(formbean.getAllowLoginAccountTypeCodeList()));
 			formbean.setTopicEditorTag(JsonUtils.toJSONString(formbean.getTopicEditorTagObject()));
 			formbean.setEditorTag(JsonUtils.toJSONString(formbean.getEditorTagObject()));
 			formbean.setQuestionEditorTag(JsonUtils.toJSONString(formbean.getQuestionEditorTagObject()));

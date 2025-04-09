@@ -17,6 +17,12 @@ public interface TagService extends DAO<Tag>{
 	 */
 	public Tag findById(Long tagId);
 	/**
+	 * 根据Id查询标签
+	 * @param tagId 标签Id
+	 * @return
+	 */
+	public Tag findById_cache(Long tagId);
+	/**
 	 * 查询所有标签
 	 * @return
 	 */

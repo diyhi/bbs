@@ -2016,16 +2016,16 @@
 		
        	<div class="tabs-nav">
         	<div>
-        		<div class="tabs-tab" v-if="allowRegisterAccount.local == true">
+        		<div class="tabs-tab" v-if="allowRegisterAccountType.indexOf(10) >-1">
         			<span :class="registerType_tab_10" @click="selectRegisterAccountType(10);">账号密码注册</span>
         		</div>
-       			<div class="tabs-tab" v-if="allowRegisterAccount.mobile == true">
+       			<div class="tabs-tab" v-if="allowRegisterAccountType.indexOf(20) >-1">
        				<span :class="registerType_tab_20"  @click="selectRegisterAccountType(20);">手机号注册</span>
        			</div>
         	</div>
        	</div>
         
-		<div class="registerInfo ">
+		<div class="registerInfo " v-if="allowRegisterAccountType.indexOf(10) >-1 || allowRegisterAccountType.indexOf(20) >-1">
 			<ul>
 				<li v-show="account_field"><!-- @change.native="verificationUserName"这个属性与微信浏览器有可能会不兼容 -->
 		        	<mt-field v-model.trim="account" label="账号" placeholder="必填" type="text" ></mt-field>
@@ -2061,12 +2061,6 @@
 		        	<mt-field v-model.trim="answer" label="密码提示答案" placeholder="必填" type="text"></mt-field>
 		        	<p class="tips">
 				    	<span>{{error.answer}}</span>
-				    </p>
-		        </li>
-		        <li  v-show="email_field">
-		        	<mt-field v-model.trim="email" label="邮箱" placeholder="没有可不填" type="text"></mt-field>
-		        	<p class="tips">
-				    	<span>{{error.email}}</span>
 				    </p>
 		        </li>
 		       
@@ -2136,7 +2130,11 @@
 		        
 			</ul>
 		</div>
-	
+		<div class="tipsBox" v-if="isLoadingComplete && allowRegisterAccountType.indexOf(10) <=-1 &&  allowRegisterAccountType.indexOf(20) <=-1">
+            <div class="tipsBox-wrap">
+            	<div class="respond"><p>已关闭注册</p></div>
+            </div>
+         </div>
 	</div>
 
 	</div>
@@ -2173,16 +2171,16 @@
 		<div class="findPassWordModule">
 			<div class="tabs-nav">
 	        	<div>
-	        		<div class="tabs-tab" >
+	        		<div class="tabs-tab" v-if="allowLoginAccountType.indexOf(10) >-1">
 	        			<span :class="type_tab_10" @click="selectAccountType(10);">账号密码找回</span>
 	        		</div>
-	       			<div class="tabs-tab" @click="selectAccountType(20);">
-	       				<span :class="type_tab_20" >手机号找回</span>
+	       			<div class="tabs-tab" v-if="allowLoginAccountType.indexOf(20) >-1">
+	       				<span :class="type_tab_20" @click="selectAccountType(20);">手机号找回</span>
 	       			</div>
 	        	</div>
 	       	</div>
 			<div class="findPassWordTable">
-				<ul>
+				<ul v-if="allowLoginAccountType.indexOf(10) >-1 || allowLoginAccountType.indexOf(20) >-1">
 					<li v-show="account_field">
 						<mt-field v-model.trim="account" label="账号" placeholder="请输入用户名"  type="text"></mt-field>
 			        	<p class="tips">
@@ -2213,7 +2211,14 @@
 			        	<mt-button  type="primary" size="large" @mousedown.native="submitData" :disabled="allowSubmit" >提交</mt-button>
 			        </li> 
 				</ul>
+				
+				<div class="tipsBox" v-if="isLoadingComplete && allowLoginAccountType.indexOf(10) <=-1 &&  allowLoginAccountType.indexOf(20) <=-1">
+		            <div class="tipsBox-wrap">
+		            	<div class="respond"><p>已关闭此功能</p></div>
+		            </div>
+		         </div>
 			</div>
+			
 		</div>
 	</div>
 </template>
@@ -2312,57 +2317,64 @@
 	</mt-header>
 	<div class="loginModule" v-show="show_loginModule">   
 		<ul>
-			<div class="tabs-nav">
-	        	<div>
-	        		<div class="tabs-tab" >
-	        			<span :class="type_tab_10" @click="selectAccountType(10);">账号密码登录</span>
-	        		</div>
-	       			<div class="tabs-tab" @click="selectAccountType(20);">
-	       				<span :class="type_tab_20" >手机号登录</span>
-	       			</div>
-	        	</div>
-	       	</div>
-			
-			<li v-show="account_field">
-	        	<mt-field v-model.trim="account" label="账号" placeholder="请输入用户名"  type="text"></mt-field>
-	        	<p class="tips">
-			    	<span>{{error.account}}</span>
-			    </p>
-	        </li>
-	        <li v-show="mobile_field">
-		        	<mt-field v-model.trim="mobile" label="手机号" placeholder="请输入手机号" type="test"></mt-field>
+			<div v-if="allowLoginAccountType.indexOf(10) >-1 || allowLoginAccountType.indexOf(20) >-1">
+				<div class="tabs-nav">
+		        	<div>
+		        		<div class="tabs-tab" v-if="allowLoginAccountType.indexOf(10) >-1">
+		        			<span :class="type_tab_10" @click="selectAccountType(10);">账号密码登录</span>
+		        		</div>
+		       			<div class="tabs-tab" v-if="allowLoginAccountType.indexOf(20) >-1">
+		       				<span :class="type_tab_20" @click="selectAccountType(20);">手机号登录</span>
+		       			</div>
+		        	</div>
+		       	</div>
+				
+				<li v-show="account_field">
+		        	<mt-field v-model.trim="account" label="账号" placeholder="请输入用户名"  type="text"></mt-field>
 		        	<p class="tips">
-				    	<span>{{error.mobile}}</span>
+				    	<span>{{error.account}}</span>
 				    </p>
 		        </li>
-	        <li>
-	        	<mt-field v-model.trim="password" label="密码" placeholder="请输入密码" type="password"></mt-field>
-	        	<p class="tips">
-			    	<span>{{error.password}}</span>
-			    </p>
-	        </li>
-	        <li v-if="showCaptcha" style="">
-	        	<input type="hidden" v-model="captchaKey">
-	        	<mt-field v-model.trim="captchaValue"  @change.native="validation_captchaValue" label="验证码" placeholder="请输入验证码"  type="text">
+		        <li v-show="mobile_field">
+			        	<mt-field v-model.trim="mobile" label="手机号" placeholder="请输入手机号" type="test"></mt-field>
+			        	<p class="tips">
+					    	<span>{{error.mobile}}</span>
+					    </p>
+			        </li>
+		        <li>
+		        	<mt-field v-model.trim="password" label="密码" placeholder="请输入密码" type="password"></mt-field>
+		        	<p class="tips">
+				    	<span>{{error.password}}</span>
+				    </p>
+		        </li>
+		        <li v-if="showCaptcha" style="">
+		        	<input type="hidden" v-model="captchaKey">
+		        	<mt-field v-model.trim="captchaValue"  @change.native="validation_captchaValue" label="验证码" placeholder="请输入验证码"  type="text">
+						
+					</mt-field>
+					<div style="position: absolute;right: 0px;margin-top: -45px;">
+						<img :src="imgUrl" @click="replaceCaptcha" height="45px" width="120px" >
+					</div>
 					
-				</mt-field>
-				<div style="position: absolute;right: 0px;margin-top: -45px;">
-					<img :src="imgUrl" @click="replaceCaptcha" height="45px" width="120px" >
-				</div>
-				
-				<p class="tips">
-			    	<span>{{error.captchaValue}}</span>	
-			    </p>
-	        </li>
-	        <li>
-	        	<mt-cell title="自动登录">
-		        	<mt-switch v-model="rememberMe"></mt-switch>
-		        </mt-cell>
-	        	
-	        </li>
-	        <li style="margin-left: 5px;margin-right: 5px; margin-top: 10px; padding-bottom: 10px;">
-	        	<mt-button  type="primary" size="large" @mousedown.native="submitData" :disabled="allowSubmit" >登录</mt-button>
-	        </li> 
+					<p class="tips">
+				    	<span>{{error.captchaValue}}</span>	
+				    </p>
+		        </li>
+		        <li>
+		        	<mt-cell title="自动登录">
+			        	<mt-switch v-model="rememberMe"></mt-switch>
+			        </mt-cell>
+		        	
+		        </li>
+		        <li style="margin-left: 5px;margin-right: 5px; margin-top: 10px; padding-bottom: 10px;">
+		        	<mt-button  type="primary" size="large" @mousedown.native="submitData" :disabled="allowSubmit" >登录</mt-button>
+		        </li> 
+	        </div>
+	        <div class="tipsBox" v-if="isLoadingComplete && allowLoginAccountType.indexOf(10) <=-1 &&  allowLoginAccountType.indexOf(20) <=-1">
+	            <div class="tipsBox-wrap">
+	            	<div class="respond"><p>已关闭登录</p></div>
+	            </div>
+	        </div>
 	        <li>
 	        	<div class="info">
 	        		 <!-- router-link渲染成<div>标签 -->
@@ -2383,7 +2395,6 @@
 
 </div>
 </template>
-
 
 <!-- 用户中心页 -->
 <template id="home-template">

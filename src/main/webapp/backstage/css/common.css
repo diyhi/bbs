@@ -5011,4 +5011,52 @@ background-position: 0px 2px, 4px 35px, 29px 31px, 34px 6px;
 
 
 
+/** 选择账号类型 **/
+.selectSupportAccountTypeModule {
+    background: #fff;
+}
+.selectSupportAccountTypeModule .supportAccountTypeNavigation{
+	
+	font-size: 14px;
+	margin-top: -20px;
+}
+
+.selectSupportAccountTypeModule .supportAccountTypeNavigation .tab-content{
+	margin: 8px 0px 8px 0px;
+	cursor:pointer;
+}
+.selectSupportAccountTypeModule .supportAccountTypeNavigation .supportAccountType-tag {
+	display: inline-block;
+	font-size: 14px;
+	padding: 0px 8px;
+	height: 30px;
+	line-height: 30px;
+	border-radius: 3px;
+	background-color: #ecf5ff;
+	color:#359ff5;
+	margin-right: 8px;
+	margin-bottom: 8px;
+}
+.selectSupportAccountTypeModule .supportAccountTypeNavigation .selected{
+	position: relative;
+    transition: all 0.5s ease;
+}
+.selectSupportAccountTypeModule .supportAccountTypeNavigation .selected:after {
+	content: '✔';
+	height: 0px;
+	width: 0px;
+	position: absolute;
+	bottom: -3px;
+	right: -3px;
+	color: #42a5f5;
+    line-height: 6px;
+    border: 10px solid;
+    border-color: transparent transparent transparent transparent;
+    /**对号大小,设置小于12px的文字*/
+    display: inline-block;
+    font-size: 12px;
+    -webkit-text-size-adjust:none;
+    -webkit-transform : scale(0.6,0.6);/*缩放指定dom，但必须是block级*/
+    
+}
 

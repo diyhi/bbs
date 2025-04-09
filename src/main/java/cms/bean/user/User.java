@@ -67,7 +67,7 @@ public class User implements Serializable{
 	private Boolean allowUserDynamic = true;
 	
 	/** 邮箱地址 **/
-	@Column(length=60)
+	@Column(length=100)
 	private String email;
 	/** 密码提示问题 **/
 	@Column(length=50)

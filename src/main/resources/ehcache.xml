@@ -185,11 +185,11 @@
 		overflowToDisk="true"
 		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="600" 
 		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>	
-	<!-- 标签 - 查询所有标签 -->	
-	<cache name="findAllTag_cache" maxElementsInMemory="1" 
+	<!-- 标签 (更新一个全部刷新) -->	
+	<cache name="tagServiceBean_cache" maxElementsInMemory="99999999" 
 		overflowToDisk="true"
 		eternal="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" 
-		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>
+		memoryStoreEvictionPolicy="LFU" copyOnRead="true" copyOnWrite="true"/>		
 	<!-- 友情链接 - 查询所有友情链接 -->	
 	<cache name="findAllLinks_cache" maxElementsInMemory="1" 
 		overflowToDisk="true"

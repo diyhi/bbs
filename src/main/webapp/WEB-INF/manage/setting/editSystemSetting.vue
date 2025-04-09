@@ -47,11 +47,18 @@
 						</el-radio-group>
 						<div class="form-help" >仅支持前后端分离模板</div>
 					</el-form-item>
-					<el-form-item label="允许注册账号类型" :error="error.allowRegisterAccount" v-show="activeTag == 10">
-						<el-checkbox v-model="allowRegisterAccountObject.local">本地账号密码用户</el-checkbox>
-						<el-checkbox v-model="allowRegisterAccountObject.mobile">手机用户</el-checkbox>
-						<el-checkbox v-model="allowRegisterAccountObject.weChat">微信用户</el-checkbox>
-					</el-form-item>
+					<el-form-item label="允许注册账号类型" :error="error.allowRegisterAccountType" v-show="activeTag == 10">
+	                    <el-select ref="allowRegisterAccountTypeRef"  v-model="allowRegisterAccountTypeCodeGroup" size="large" @remove-tag="processRemoveAllowRegisterAccountType" @focus="loadAllowRegisterAccountType"  style="width: 100%;" multiple :placeholder="select_allowRegisterAccountType_placeholder" >
+	                        <el-option v-for="item in allowRegisterAccountTypeOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
+	                    </el-select>
+	                    <div class="form-help" >空则不允许注册账号</div>
+	                </el-form-item>
+	                <el-form-item label="允许登录账号类型" :error="error.allowLoginAccountType" v-show="activeTag == 10">
+	                    <el-select ref="allowLoginAccountTypeRef"  v-model="allowLoginAccountTypeCodeGroup" size="large" @remove-tag="processRemoveAllowLoginAccountType" @focus="loadAllowLoginAccountType"  style="width: 100%;" multiple :placeholder="select_allowLoginAccountType_placeholder" >
+	                        <el-option v-for="item in allowLoginAccountTypeOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
+	                    </el-select>
+	                    <div class="form-help" >空则不允许登录；第三方登录还需到’第三方登录接口列表‘设置</div>
+	                </el-form-item>
 					<el-form-item label="注册是否需要验证码" :error="error.registerCaptcha" v-show="activeTag == 10">
 						<el-radio-group v-model="registerCaptcha">
 						    <el-radio :label="true">需要</el-radio>
@@ -1090,7 +1097,32 @@
 					</el-form-item>
 				</el-form>
 				
-				
+				<div class="selectSupportAccountTypeModule">
+	                <!-- 允许注册账号类型 -->
+	                <el-dialog title="允许注册账号类型" v-model="popup_allowRegisterAccountType" :draggable="true"  @close="closeAllowRegisterAccountType">
+	                    <div class="supportAccountTypeNavigation">
+	                        <div class="tab-content">
+	                            <div class="tab-pane">
+	                                <span :class="selectedAllowRegisterAccountTypeClass.get(key)" @click="selectedAllowRegisterAccountType(key,value)"  v-for="([key, value], index) in supportAccountType.entries()" >
+	                                    {{value}}
+	                                </span>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </el-dialog>
+	                 <!-- 允许登录账号类型 -->
+	                <el-dialog title="允许登录账号类型" v-model="popup_allowLoginAccountType" :draggable="true"  @close="closeAllowLoginAccountType">
+	                    <div class="supportAccountTypeNavigation">
+	                        <div class="tab-content">
+	                            <div class="tab-pane">
+	                                <span :class="selectedAllowLoginAccountTypeClass.get(key)" @click="selectedAllowLoginAccountType(key,value)"  v-for="([key, value], index) in supportAccountType.entries()" >
+	                                    {{value}}
+	                                </span>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </el-dialog>
+	            </div>
 			</div>
 		</div>
 	</div>
@@ -1106,6 +1138,18 @@ export default({
 		return {
 			imageUploadFormatList :[],
 			
+			supportAccountType:new Map(),//支持账号类型
+	        popup_allowRegisterAccountType:false,//是否显示‘允许注册账号类型‘弹窗
+	        selectedAllowRegisterAccountTypeClass:new Map(),//选中‘允许注册账号类型‘样式
+	        select_allowRegisterAccountType_placeholder: '请选择',
+	        allowRegisterAccountTypeCodeGroup :[],//‘允许注册账号类型‘代码组
+	        allowRegisterAccountTypeOptions: [],//Select 选择器‘允许注册账号类型’数据
+	
+	        popup_allowLoginAccountType:false,//是否显示‘允许登录账号类型‘弹窗
+	        selectedAllowLoginAccountTypeClass:new Map(),//选中‘允许登录账号类型‘样式
+	        select_allowLoginAccountType_placeholder: '请选择',
+	        allowLoginAccountTypeCodeGroup :[],//‘允许登录账号类型‘代码组
+	        allowLoginAccountTypeOptions: [],//Select 选择器‘允许登录账号类型’数据
 			activeTag: "10",//选项卡
 			
 			title :'',
@@ -1115,7 +1159,6 @@ export default({
 			closeSitePrompt:'',
 			supportAccessDevice:1,
 			supportEditor:10,
-			allowRegisterAccountObject:'',
 			registerCaptcha:false,
 			login_submitQuantity:'',
 			topic_submitQuantity:'',
@@ -1183,7 +1226,8 @@ export default({
 				closeSitePrompt:'',
 				supportAccessDevice :'',
 				supportEditor :'',
-				allowRegisterAccountObject:'',
+				allowLoginAccountType :'',
+		        allowRegisterAccountType :'',
 				registerCaptcha :'',
 				login_submitQuantity:'',
 				topic_submitQuantity:'',
@@ -1272,6 +1316,192 @@ export default({
 	},
 	methods : {
 		
+		//允许注册账号类型 -- 关闭‘账号类型‘弹出框
+		closeAllowRegisterAccountType: function() { 
+	    	this.popup_allowRegisterAccountType = false;
+
+	    },
+	    //设置注册账号类型 -- 选中‘账号类型‘样式
+		setAllowRegisterAccountTypeClass : function() {
+	
+			for(let [code,name] of this.supportAccountType.entries()){
+	            this.selectedAllowRegisterAccountTypeClass.set(code,"supportAccountType-tag");
+	            if(this.allowRegisterAccountTypeCodeGroup != null && this.allowRegisterAccountTypeCodeGroup.length >0){
+	                for(let i = 0; i <this.allowRegisterAccountTypeCodeGroup.length; i++){
+	                    let code = this.allowRegisterAccountTypeCodeGroup[i];
+	                    this.selectedAllowRegisterAccountTypeClass.set(code,"supportAccountType-tag selected");
+	                  
+	                }
+	            }
+	        }
+		},
+		
+		
+		
+		
+		//允许注册账号类型 -- 选中‘账号类型‘
+		selectedAllowRegisterAccountType : function(code,name) {
+			//判断是否重复选择,如果重复则取消选择
+	        if(this.allowRegisterAccountTypeOptions != null && this.allowRegisterAccountTypeOptions.length >0){
+	            for(var i=0; i<this.allowRegisterAccountTypeOptions.length; i++){
+	                var selectedAllowRegisterAccountTypeOptions = this.allowRegisterAccountTypeOptions[i];
+	                if(selectedAllowRegisterAccountTypeOptions.value == code){
+	                    //删除‘账号类型‘
+	                    this.deleteAllowRegisterAccountType(selectedAllowRegisterAccountTypeOptions.value);
+	                    this.setAllowRegisterAccountTypeClass();
+	                    return;
+	                }
+	            }
+	            
+	        }
+	
+	        var o = new Object();
+	        o.value = code;
+	        o.label = name;
+	
+	        this.allowRegisterAccountTypeOptions.push(o);
+	        
+	        this.allowRegisterAccountTypeCodeGroup.push(code);
+	        
+	        this.select_allowRegisterAccountType_placeholder = "";
+	        this.setAllowRegisterAccountTypeClass();
+		},
+		//允许注册账号类型 -- 删除‘账号类型‘
+		deleteAllowRegisterAccountType : function(code) {
+			if(this.allowRegisterAccountTypeOptions != null && this.allowRegisterAccountTypeOptions.length >0){
+	            for(let i=0; i<this.allowRegisterAccountTypeOptions.length; i++){
+	                let selectedTag = this.allowRegisterAccountTypeOptions[i];
+	                if(selectedTag.value == code){
+	                    this.allowRegisterAccountTypeOptions.splice(i, 1);
+	                    
+	                    for(let j=0; j<this.allowRegisterAccountTypeCodeGroup.length; j++){
+	                        if(this.allowRegisterAccountTypeCodeGroup[j] == code){
+	                            this.allowRegisterAccountTypeCodeGroup.splice(j, 1);
+	                            break;
+	                        }
+	                        
+	                    }
+	                    
+	                    if(this.allowRegisterAccountTypeCodeGroup.length ==0){
+	                        this.select_allowRegisterAccountType_placeholder = "请选择";
+	                    }
+	                    return;
+	                }
+	            }
+	            
+	        }
+		},
+		//允许注册账号类型 -- 处理删除‘账号类型‘
+	    processRemoveAllowRegisterAccountType: function(val) { 
+			if(this.allowRegisterAccountTypeCodeGroup.length ==0){
+	            
+	            this.select_allowRegisterAccountType_placeholder = "请选择";
+	        }
+	    },
+		//允许注册账号类型 -- 加载‘账号类型‘
+	    loadAllowRegisterAccountType: function() { 
+	    	this.popup_allowRegisterAccountType = true;
+	        this.$refs.allowRegisterAccountTypeRef.blur();//使Select选择器失去焦点，并隐藏下拉框
+	        if(this.allowRegisterAccountTypeCodeGroup.length ==0){
+	            this.allowRegisterAccountTypeOptions.length = 0;//清空	
+	        }
+	    	this.setAllowRegisterAccountTypeClass();
+		},
+				
+				
+				
+						
+		//允许登录账号类型 -- 关闭‘账号类型‘弹出框
+		closeAllowLoginAccountType: function() { 
+	    	this.popup_allowLoginAccountType = false;
+
+	    },
+	    //设置登录账号类型 -- 选中‘账号类型‘样式
+		setAllowLoginAccountTypeClass : function() {
+	
+			for(let [code,name] of this.supportAccountType.entries()){
+	            this.selectedAllowLoginAccountTypeClass.set(code,"supportAccountType-tag");
+	            if(this.allowLoginAccountTypeCodeGroup != null && this.allowLoginAccountTypeCodeGroup.length >0){
+	                for(let i = 0; i <this.allowLoginAccountTypeCodeGroup.length; i++){
+	                    let code = this.allowLoginAccountTypeCodeGroup[i];
+	                    this.selectedAllowLoginAccountTypeClass.set(code,"supportAccountType-tag selected");
+	                  
+	                }
+	            }
+	        }
+		},
+		
+		
+		
+		
+		//允许登录账号类型 -- 选中‘账号类型‘
+		selectedAllowLoginAccountType : function(code,name) {
+			//判断是否重复选择,如果重复则取消选择
+	        if(this.allowLoginAccountTypeOptions != null && this.allowLoginAccountTypeOptions.length >0){
+	            for(var i=0; i<this.allowLoginAccountTypeOptions.length; i++){
+	                var selectedAllowLoginAccountTypeOptions = this.allowLoginAccountTypeOptions[i];
+	                if(selectedAllowLoginAccountTypeOptions.value == code){
+	                    //删除‘账号类型‘
+	                    this.deleteAllowLoginAccountType(selectedAllowLoginAccountTypeOptions.value);
+	                    this.setAllowLoginAccountTypeClass();
+	                    return;
+	                }
+	            }
+	            
+	        }
+	
+	        var o = new Object();
+	        o.value = code;
+	        o.label = name;
+	
+	        this.allowLoginAccountTypeOptions.push(o);
+	        
+	        this.allowLoginAccountTypeCodeGroup.push(code);
+	        
+	        this.select_allowLoginAccountType_placeholder = "";
+	        this.setAllowLoginAccountTypeClass();
+		},
+		//允许登录账号类型 -- 删除‘账号类型‘
+		deleteAllowLoginAccountType : function(code) {
+			if(this.allowLoginAccountTypeOptions != null && this.allowLoginAccountTypeOptions.length >0){
+	            for(let i=0; i<this.allowLoginAccountTypeOptions.length; i++){
+	                let selectedTag = this.allowLoginAccountTypeOptions[i];
+	                if(selectedTag.value == code){
+	                    this.allowLoginAccountTypeOptions.splice(i, 1);
+	                    
+	                    for(let j=0; j<this.allowLoginAccountTypeCodeGroup.length; j++){
+	                        if(this.allowLoginAccountTypeCodeGroup[j] == code){
+	                            this.allowLoginAccountTypeCodeGroup.splice(j, 1);
+	                            break;
+	                        }
+	                        
+	                    }
+	                    
+	                    if(this.allowLoginAccountTypeCodeGroup.length ==0){
+	                        this.select_allowLoginAccountType_placeholder = "请选择";
+	                    }
+	                    return;
+	                }
+	            }
+	            
+	        }
+		},
+		//允许登录账号类型 -- 处理删除‘账号类型‘
+	    processRemoveAllowLoginAccountType: function(val) { 
+			if(this.allowLoginAccountTypeCodeGroup.length ==0){
+	            
+	            this.select_allowLoginAccountType_placeholder = "请选择";
+	        }
+	    },
+		//允许登录账号类型 -- 加载‘账号类型‘
+	    loadAllowLoginAccountType: function() { 
+	    	this.popup_allowLoginAccountType = true;
+	        this.$refs.allowLoginAccountTypeRef.blur();//使Select选择器失去焦点，并隐藏下拉框
+	        if(this.allowLoginAccountTypeCodeGroup.length ==0){
+	            this.allowLoginAccountTypeOptions.length = 0;//清空	
+	        }
+	    	this.setAllowLoginAccountTypeClass();
+		},	
 				
 		 //查询基本设置
 	    queryEditSystemSetting: function(){
@@ -1303,8 +1533,12 @@ export default({
 			    				_self.fileUploadFormatList = mapData[key];
 			    			}else if(key == "videoUploadFormatList"){
 			    				_self.videoUploadFormatList = mapData[key];
+			    			}else if(key == "supportAccountType"){//支持注册账号类型
+                                _self.supportAccountType.clear();
+                                for (let code in mapData[key]) {
+                                    _self.supportAccountType.set(parseInt(code),mapData[key][code])
+                                }
 			    			}
-			    		
 			    			
 			    			if(systemSetting != null){
 			    				if(systemSetting.title != null){
@@ -1322,8 +1556,45 @@ export default({
 			    				}
 			    				_self.supportAccessDevice = systemSetting.supportAccessDevice;
 			    				_self.supportEditor = systemSetting.supportEditor;
-			    				if(systemSetting.allowRegisterAccountObject != null){
-			    					_self.allowRegisterAccountObject = systemSetting.allowRegisterAccountObject;
+			    					_self.allowRegisterAccountTypeCodeGroup.length =0;
+                                _self.allowRegisterAccountTypeOptions.length =0;
+                                if(systemSetting.allowRegisterAccountTypeCodeList != null && systemSetting.allowRegisterAccountTypeCodeList.length >0){
+			    					A:for(let i = 0; i <systemSetting.allowRegisterAccountTypeCodeList.length; i++){
+                                        let allowRegisterAccountTypeCode = systemSetting.allowRegisterAccountTypeCodeList[i];
+                                        for(let [code,name] of _self.supportAccountType.entries()){
+                                            if(code == allowRegisterAccountTypeCode){
+                                                _self.allowRegisterAccountTypeCodeGroup.push(allowRegisterAccountTypeCode);
+                                                let obj =new Object();
+                                                obj.value = allowRegisterAccountTypeCode;
+                                                obj.label = name;
+                                                _self.allowRegisterAccountTypeOptions.push(obj);
+                                                continue A;
+                                            }
+                                        }
+                                        
+                                    }
+                                    _self.select_allowRegisterAccountType_placeholder = "";
+			    				}
+
+                                _self.allowLoginAccountTypeCodeGroup.length =0;
+                                _self.allowLoginAccountTypeOptions.length =0;
+                                if(systemSetting.allowLoginAccountTypeCodeList != null && systemSetting.allowLoginAccountTypeCodeList.length >0){
+			    					A:for(let i = 0; i <systemSetting.allowLoginAccountTypeCodeList.length; i++){
+                                        let allowLoginAccountTypeCode = systemSetting.allowLoginAccountTypeCodeList[i];
+                                        
+                                        for(let [code,name] of _self.supportAccountType.entries()){
+                                            if(code == allowLoginAccountTypeCode){
+                                                _self.allowLoginAccountTypeCodeGroup.push(allowLoginAccountTypeCode);
+                                                let obj =new Object();
+                                                obj.value = allowLoginAccountTypeCode;
+                                                obj.label = name;
+                                                _self.allowLoginAccountTypeOptions.push(obj);
+                                                continue A;
+                                            }
+                                        }
+                                        
+                                    }
+                                    _self.select_allowLoginAccountType_placeholder = "";
 			    				}
 			    				_self.registerCaptcha = systemSetting.registerCaptcha;
 			    				if(systemSetting.login_submitQuantity != null){
@@ -1651,12 +1922,18 @@ export default({
 			if(_self.supportEditor != null){
 				formData.append('supportEditor', _self.supportEditor);
 			}
-			if(_self.allowRegisterAccountObject != null){
-				formData.append('allowRegisterAccountObject.local', _self.allowRegisterAccountObject.local);
-				formData.append('allowRegisterAccountObject.mobile', _self.allowRegisterAccountObject.mobile);
-				formData.append('allowRegisterAccountObject.weChat', _self.allowRegisterAccountObject.weChat);
-				formData.append('allowRegisterAccountObject.other', _self.allowRegisterAccountObject.other);
-			}
+			if(_self.allowRegisterAccountTypeCodeGroup != null && _self.allowRegisterAccountTypeCodeGroup.length >0){
+	            for(let i = 0; i <_self.allowRegisterAccountTypeCodeGroup.length; i++){
+	                let code = _self.allowRegisterAccountTypeCodeGroup[i];
+	                formData.append('allowRegisterAccountTypeCodeList', code); 
+	            }
+	        }
+	        if(_self.allowLoginAccountTypeCodeGroup != null && _self.allowLoginAccountTypeCodeGroup.length >0){
+	            for(let i = 0; i <_self.allowLoginAccountTypeCodeGroup.length; i++){
+	                let code = _self.allowLoginAccountTypeCodeGroup[i];
+	                formData.append('allowLoginAccountTypeCodeList', code); 
+	            }
+	        }
 			
 			if(_self.registerCaptcha != null){
 				formData.append('registerCaptcha', _self.registerCaptcha);
