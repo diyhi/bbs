@@ -73,28 +73,39 @@ public class WebUtil {
      * @param maxAge cookie存放的时间(以秒为单位,假如存放三天,即3*24*60*60; 如果值为0,cookie将随浏览器关闭而清除)
      * @param httpOnly 标记是否对Cookie使用 HttpOnly 标志。如果设置为true，客户端的 JavaScript 将无法访问Cookie
      */
-    public static void addCookie(HttpServletResponse response, String name, String value, int maxAge,boolean httpOnly) {
-    	
-    	if(value != null && !"".equals(value.trim())){
-    		try {
-    			value = URLEncoder.encode(value,"utf-8");
-    		} catch (UnsupportedEncodingException e) {
-    			// TODO Auto-generated catch block
-    		//	e.printStackTrace();
-    			if (logger.isErrorEnabled()) {
-    	            logger.error("添加cookie错误",e);
-    	        }
-    		}
-    	}
-    	
-        Cookie cookie = new Cookie(name, value);
-        cookie.setHttpOnly(httpOnly);
-        cookie.setPath("/");//根目录下的所有程序都可以访问cookie
-        if (maxAge>0) cookie.setMaxAge(maxAge);
-        
-        response.addCookie(cookie); ; 
+    public static void addCookie(HttpServletResponse response, HttpServletRequest request, String name, String value, int maxAge, boolean httpOnly) {
+    
+    if(value != null && !"".equals(value.trim())){
+        try {
+            value = URLEncoder.encode(value,"utf-8");
+        } catch (UnsupportedEncodingException e) {
+            if (logger.isErrorEnabled()) {
+                logger.error("添加cookie错误",e);
+            }
+        }
     }
     
+    Cookie cookie = new Cookie(name, value);
+    cookie.setHttpOnly(httpOnly);
+    cookie.setPath("/");//根目录下的所有程序都可以访问cookie
+    if (maxAge>0) cookie.setMaxAge(maxAge);
+    
+    // Fix: Set secure flag based on server configuration and request
+    boolean isSecure = false;
+    
+    // Check if server URL is HTTPS
+    if (ConfigUtils.isSecureServerEnabled()) {
+        isSecure = true;
+    }
+    
+    // Check if current request is secure
+    if (request != null && request.isSecure()) {
+        isSecure = true;
+    }
+    
+    cookie.setSecure(isSecure);
+    response.addCookie(cookie);
+}
     /**
      * 获取cookie的存活时间
      * @param request
