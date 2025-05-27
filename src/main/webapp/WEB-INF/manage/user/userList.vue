@@ -13,21 +13,26 @@
 				<el-table ref="multipleTable" :data="tableData" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange" stripe empty-text="没有内容">
 					<el-table-column type="selection" ></el-table-column>
 					<el-table-column label="账号" align="center">
-						<template #default="scope">
-				        	
-			          		<div class="multipleInfo-wrapper" >
-								<div>{{scope.row.account}}</div>
-								<div class="multipleInfo-wrapper-blue" v-if="scope.row.type ==20">
-									手机号{{scope.row.mobile}}
-								</div>
-								<div class="multipleInfo-wrapper-green" v-if="scope.row.type !=20 && scope.row.mobile !=null && scope.row.mobile !='' ">
+                    	<template #default="scope">
+                        
+                        	<div class="multipleInfo-wrapper" >
+                            <div>{{scope.row.account}}</div>
+				            	<div class="multipleInfo-wrapper-blue" v-if="scope.row.type ==20">
+				                 	手机号{{scope.row.mobile}}
+				                </div>
+				                <div class="multipleInfo-wrapper-green" v-if="scope.row.type !=20 && scope.row.mobile !=null && scope.row.mobile !='' ">
 									绑定手机{{scope.row.mobile}}
+				                </div>
+								<div class="multipleInfo-wrapper-tangerine" v-if="scope.row.type ==30">
+									邮箱{{scope.row.email}}
+								</div>
+								<div class="multipleInfo-wrapper-pink" v-if="scope.row.type !=30 && scope.row.email !=null && scope.row.email !='' ">
+									绑定邮箱{{scope.row.email}}
 								</div>
 								<el-tag effect="dark"  v-if="scope.row.cancelAccountTime !='-1'" type="danger" class="tag-wrapper">已注销</el-tag>
-							</div>
-				        	
+				              </div>  
 				    	</template>
-					</el-table-column>
+				    </el-table-column>
 					<el-table-column prop="nickname" label="呢称" align="center" ></el-table-column>
 					<el-table-column label="头像" align="center" min-width="100">
 						<template #default="scope">
@@ -47,7 +52,7 @@
 						<template #default="scope">
 							<el-tag effect="dark"  v-if="scope.row.type==10" type="warning" class="tag-wrapper">账号密码用户</el-tag>
 							<el-tag effect="dark"  v-if="scope.row.type==20" class="tag-wrapper" >手机用户</el-tag>
-							<el-tag effect="dark"  v-if="scope.row.type==30" type="info" class="tag-wrapper" >邮箱用户</el-tag>
+							<el-tag effect="dark"  v-if="scope.row.type==30" type="info" class="tag-wrapper-tangerine" >邮箱用户</el-tag>
 							<el-tag effect="dark"  v-if="scope.row.type==40" type="success" class="tag-wrapper" >微信用户</el-tag>
 							<el-tag effect="dark"  v-if="scope.row.type==80" class="tag-wrapper-purple" >其他用户</el-tag>
 				    	</template>

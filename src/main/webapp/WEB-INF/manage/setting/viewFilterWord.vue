@@ -102,8 +102,12 @@ export default({
 			    	let returnValue = JSON.parse(result);
 			    	
 			    	if(returnValue.code === 200){//成功
-			    		_self.filterWord = returnValue.data;
-			    		
+			    		let mapData = returnValue.data;
+			    		for(let key in mapData){
+			    			if(key == "filterWord"){
+			    				_self.filterWord = mapData[key];
+			    			}
+			    		}
 			    	}else if(returnValue.code === 500){//错误
 			    		
 			    	}

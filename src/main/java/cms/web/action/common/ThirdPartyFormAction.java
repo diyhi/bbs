@@ -493,9 +493,9 @@ public class ThirdPartyFormAction {
 				oAuthManage.addRefreshToken(refreshToken, new RefreshUser(accessToken,user.getId(),user.getUserName(),user.getAccount(),user.getNickname(),fileManage.fileServerAddress(request)+user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),false,openId));
 
 				//将访问令牌添加到Cookie
-				WebUtil.addCookie(response, "cms_accessToken", accessToken, 0);
+				WebUtil.addCookie(request,response, "cms_accessToken", accessToken, 0);
 				//将刷新令牌添加到Cookie
-				WebUtil.addCookie(response, "cms_refreshToken", refreshToken, 0);
+				WebUtil.addCookie(request,response, "cms_refreshToken", refreshToken, 0);
 				AccessUserThreadLocal.set(new AccessUser(user.getId(),user.getUserName(),user.getAccount(),user.getNickname(),fileManage.fileServerAddress(request)+user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),false,openId));
 				
 				//删除缓存

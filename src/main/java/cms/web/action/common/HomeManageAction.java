@@ -1324,9 +1324,9 @@ public class HomeManageAction {
 					oAuthManage.addOpenId(accessUser.getOpenId(),refreshToken);
 					
 					//将访问令牌添加到Cookie
-					WebUtil.addCookie(response, "cms_accessToken", accessToken, maxAge);
+					WebUtil.addCookie(request,response, "cms_accessToken", accessToken, maxAge);
 					//将刷新令牌添加到Cookie
-					WebUtil.addCookie(response, "cms_refreshToken", refreshToken, maxAge);
+					WebUtil.addCookie(request,response, "cms_refreshToken", refreshToken, maxAge);
 					
 					newAccessUser = new AccessUser(_user.getId(),_user.getUserName(),_user.getAccount(),_user.getNickname(),fileManage.fileServerAddress(request)+_user.getAvatarPath(),_user.getAvatarName(),_user.getSecurityDigest(),rememberMe,accessUser.getOpenId());
 					AccessUserThreadLocal.set(newAccessUser);

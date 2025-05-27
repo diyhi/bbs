@@ -205,9 +205,9 @@ public class OAuthManage {
 			}
 			
 			//将访问令牌添加到Cookie
-			WebUtil.addCookie(response, "cms_accessToken", newAccessToken, maxAge);
+			WebUtil.addCookie(request,response, "cms_accessToken", newAccessToken, maxAge);
 			//将刷新令牌添加到Cookie
-			WebUtil.addCookie(response, "cms_refreshToken", newRefreshToken, maxAge);
+			WebUtil.addCookie(request,response, "cms_refreshToken", newRefreshToken, maxAge);
 			
 			//写入登录日志
 			UserLoginLog userLoginLog = new UserLoginLog();

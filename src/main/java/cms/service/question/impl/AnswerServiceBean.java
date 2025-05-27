@@ -599,11 +599,11 @@ public class AnswerServiceBean extends DaoSupport<Answer> implements AnswerServi
 	 * @return
 	*/
 	public Integer updateReply(Long replyId,String content,String userName,Integer status,Date lastUpdateTime){
-		Query query = em.createQuery("update AnswerReply o set o.content=?1,o.userName=?2,o.status=?3,o.status=?4 where o.id=?5")
+		Query query = em.createQuery("update AnswerReply o set o.content=?1,o.userName=?2,o.status=?3,o.lastUpdateTime=?4 where o.id=?5")
 		.setParameter(1, content)
 		.setParameter(2, userName)
 		.setParameter(3, status)
-		.setParameter(4, status)
+		.setParameter(4, lastUpdateTime)
 		.setParameter(5, replyId);
 		int i = query.executeUpdate();
 		return i;

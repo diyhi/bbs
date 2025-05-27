@@ -308,17 +308,17 @@ public class TopicAction {
 			
 			if(_keyword != null){//标题
 				param += " and (o.title like ?"+(paramValue.size()+1)+" escape '/' ";
-				paramValue.add("%/"+ _keyword+"%");	
+				paramValue.add("%"+ cms.utils.StringUtil.escapeSQLLike(_keyword)+"%");	
 				
 				//内容
 				param += " or o.content like ?"+(paramValue.size()+1)+" escape '/' )";
-				paramValue.add("%/"+ _keyword+"%");	
+				paramValue.add("%"+ cms.utils.StringUtil.escapeSQLLike(_keyword)+"%");	
 			}
 			if(_tagId != null && _tagId >0){//标签
 				Tag tag = tagService.findById(_tagId);
 				if(tag != null){
 					param += " and o.tagIdGroup like ?"+(paramValue.size()+1)+" escape '/' ";
-					paramValue.add("/"+tag.getParentIdGroup()+_tagId+",%");	
+					paramValue.add(cms.utils.StringUtil.escapeSQLLike(tag.getParentIdGroup()+_tagId)+",%");	
 				}
 			}
 			if(_userName != null && !"".equals(_userName)){//用户

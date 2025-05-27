@@ -30,7 +30,7 @@ import org.joda.time.DateTime;
 @Table(name="user",uniqueConstraints = {
 		@UniqueConstraint(columnNames={"account"}),
 		@UniqueConstraint(columnNames={"platformUserId"}
-	)},indexes = {@Index(name="user_idx", columnList="state"),@Index(name="user_2_idx", columnList="userName")}
+	)},indexes = {@Index(name="user_idx", columnList="state"),@Index(name="user_2_idx", columnList="userName"),@Index(name="user_3_idx", columnList="nickname"),@Index(name="user_4_idx", columnList="mobile"),@Index(name="user_5_idx", columnList="email")}
 )//给user字段添加唯一性约束
 public class User implements Serializable{
 	private static final long serialVersionUID = 3692366870616346904L;

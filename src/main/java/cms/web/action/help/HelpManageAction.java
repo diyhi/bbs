@@ -1416,7 +1416,7 @@ public class HelpManageAction {
 		        }
 			}
 			jpql.append(" and o.name like ?").append((params.size()+1)).append(" escape '/' ");
-			params.add("%/"+ searchName_utf8.trim()+"%" );//加上查询参数
+			params.add("%"+ cms.utils.StringUtil.escapeSQLLike(searchName_utf8.trim())+"%" );//加上查询参数
 			
 		}
 		jpql.append(" and o.visible=?").append((params.size()+1));//and o.code=?1

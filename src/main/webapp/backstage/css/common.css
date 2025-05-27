@@ -343,6 +343,19 @@ ul {
     background-color: #8D4EDA !important;
     border-color: #8D4EDA !important;
 }
+.main .data-table .tag-wrapper-tangerine{
+    border-radius: 10px;
+    display: inline-block;
+    font-size: 12px;
+    height: 18px;
+    line-height: 18px;
+    padding: 0 6px;
+    text-align: center;
+    white-space: nowrap;
+    color: #fff;
+    background-color: #ff7f50 !important;
+    border-color: #ff7f50 !important;
+}
 .main .data-table .link{
 	 color: #409eff;
 }
@@ -440,6 +453,12 @@ ul {
 }
 .main .data-table .multipleInfo-wrapper-green{
 	color: #67c23a;
+}
+.main .data-table .multipleInfo-wrapper-tangerine{
+	color: #ff7f50
+}
+.main .data-table .multipleInfo-wrapper-pink{
+	color: #ff6b81;
 }
 .main .data-table .avatar-wrapper{
 	height: 76px;

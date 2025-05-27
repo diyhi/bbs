@@ -57,23 +57,25 @@ public class WebUtil {
 	
 	/**
      * 添加cookie
+     * @param request
      * @param response
      * @param name cookie的名称
      * @param value cookie的值
      * @param maxAge cookie存放的时间(以秒为单位,假如存放三天,即3*24*60*60; 如果值为0,cookie将随浏览器关闭而清除)
      */
-    public static void addCookie(HttpServletResponse response, String name, String value, int maxAge) {
-    	addCookie(response,name,value,maxAge,true);
+    public static void addCookie(HttpServletRequest request,HttpServletResponse response, String name, String value, int maxAge) {
+    	addCookie(request,response,name,value,maxAge,true);
     }
     /**
      * 添加cookie
+     * @param request
      * @param response
      * @param name cookie的名称
      * @param value cookie的值
      * @param maxAge cookie存放的时间(以秒为单位,假如存放三天,即3*24*60*60; 如果值为0,cookie将随浏览器关闭而清除)
      * @param httpOnly 标记是否对Cookie使用 HttpOnly 标志。如果设置为true，客户端的 JavaScript 将无法访问Cookie
      */
-    public static void addCookie(HttpServletResponse response, String name, String value, int maxAge,boolean httpOnly) {
+    public static void addCookie(HttpServletRequest request,HttpServletResponse response, String name, String value, int maxAge,boolean httpOnly) {
     	
     	if(value != null && !"".equals(value.trim())){
     		try {
@@ -91,6 +93,8 @@ public class WebUtil {
         cookie.setHttpOnly(httpOnly);
         cookie.setPath("/");//根目录下的所有程序都可以访问cookie
         if (maxAge>0) cookie.setMaxAge(maxAge);
+        
+        cookie.setSecure(StringUtils.startsWithIgnoreCase(request.getScheme(), "https") || request.isSecure());
         
         response.addCookie(cookie); ; 
     }

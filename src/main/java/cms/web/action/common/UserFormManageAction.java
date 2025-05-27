@@ -694,9 +694,9 @@ public class UserFormManageAction {
 				oAuthManage.addRefreshToken(refreshToken, new RefreshUser(accessToken,user.getId(),user.getUserName(),user.getAccount(),user.getNickname(),fileManage.fileServerAddress(request)+user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),false,openId));
 	
 				//将访问令牌添加到Cookie
-				WebUtil.addCookie(response, "cms_accessToken", accessToken, 0);
+				WebUtil.addCookie(request,response, "cms_accessToken", accessToken, 0);
 				//将刷新令牌添加到Cookie
-				WebUtil.addCookie(response, "cms_refreshToken", refreshToken, 0);
+				WebUtil.addCookie(request,response, "cms_refreshToken", refreshToken, 0);
 				AccessUserThreadLocal.set(new AccessUser(user.getId(),user.getUserName(),user.getAccount(),user.getNickname(),fileManage.fileServerAddress(request)+user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),false,openId));
 				
 				//删除缓存
@@ -917,9 +917,9 @@ public class UserFormManageAction {
 						//将令牌写入Cookie
 						
 						//将访问令牌添加到Cookie
-						WebUtil.addCookie(response, "cms_accessToken", refreshUser.getAccessToken(), maxAge);
+						WebUtil.addCookie(request,response, "cms_accessToken", refreshUser.getAccessToken(), maxAge);
 						//将刷新令牌添加到Cookie
-						WebUtil.addCookie(response, "cms_refreshToken", refreshToken, maxAge);
+						WebUtil.addCookie(request,response, "cms_refreshToken", refreshToken, maxAge);
 
 						
 						if(jumpUrl != null && !"".equals(jumpUrl.trim())){
@@ -1228,9 +1228,9 @@ public class UserFormManageAction {
 					}
 					
 					//将访问令牌添加到Cookie
-					WebUtil.addCookie(response, "cms_accessToken", accessToken, maxAge);
+					WebUtil.addCookie(request,response, "cms_accessToken", accessToken, maxAge);
 					//将刷新令牌添加到Cookie
-					WebUtil.addCookie(response, "cms_refreshToken", refreshToken, maxAge);
+					WebUtil.addCookie(request,response, "cms_refreshToken", refreshToken, maxAge);
 					AccessUserThreadLocal.set(new AccessUser(user.getId(),user.getUserName(),user.getAccount(),user.getNickname(),fileManage.fileServerAddress(request)+user.getAvatarPath(),user.getAvatarName(),user.getSecurityDigest(),rememberMe,openId));
 					
 					//异步执行会员卡赠送任务(长期任务类型)
@@ -1274,7 +1274,7 @@ public class UserFormManageAction {
     		}
 
 			//添加用户名到Cookie
-			WebUtil.addCookie(response, "cms_account", loginAccount, 60);
+			WebUtil.addCookie(request,response, "cms_account", loginAccount, 60);
 		}else{
 			//删除每分钟原来提交次数
 			settingManage.deleteSubmitQuantity("login", loginAccount);
@@ -2106,9 +2106,9 @@ public class UserFormManageAction {
 						//将令牌写入Cookie
 						
 						//将访问令牌添加到Cookie
-						WebUtil.addCookie(response, "cms_accessToken", refreshUser.getAccessToken(), maxAge);
+						WebUtil.addCookie(request,response, "cms_accessToken", refreshUser.getAccessToken(), maxAge);
 						//将刷新令牌添加到Cookie
-						WebUtil.addCookie(response, "cms_refreshToken", refreshToken, maxAge);
+						WebUtil.addCookie(request,response, "cms_refreshToken", refreshToken, maxAge);
 
 						AccessUser accessUser = oAuthManage.getAccessUserByAccessToken(refreshUser.getAccessToken());
 					

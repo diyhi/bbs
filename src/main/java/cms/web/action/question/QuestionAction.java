@@ -309,11 +309,11 @@ public class QuestionAction {
 			
 			if(_keyword != null){//标题
 				param += " and (o.title like ?"+(paramValue.size()+1)+" escape '/' ";
-				paramValue.add("%/"+ _keyword+"%");	
+				paramValue.add("%"+ cms.utils.StringUtil.escapeSQLLike(_keyword)+"%");	
 				
 				//内容
 				param += " or o.content like ?"+(paramValue.size()+1)+" escape '/' )";
-				paramValue.add("%/"+ _keyword+"%");	
+				paramValue.add("%"+ cms.utils.StringUtil.escapeSQLLike(_keyword)+"%");	
 			}
 			if(_tagId != null && _tagId >0){//标签
 				param += " and exists(select q.questionId from QuestionTagAssociation q where q.questionTagId = ?"+(paramValue.size()+1)+" and q.questionId=o.id) ";

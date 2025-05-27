@@ -162,7 +162,8 @@ public class UserAction {
 	 * @param pageForm
 	 * @param model
 	 * @param queryType 查询类型
-	 * @param account 账号
+	 * @param userTypeCode 查询用户类型
+	 * @param keyword 关键词
 	 * @param start_deposit 起始预存款
 	 * @param end_deposit 结束预存款 
 	 * @param start_point 起始积分
@@ -179,7 +180,7 @@ public class UserAction {
 	@ResponseBody
 	@RequestMapping("/control/user/search") 
 	public String search(ModelMap model,PageForm pageForm,
-			Integer searchType,String account,
+			Integer searchType,Integer userTypeCode,String keyword,
 			String start_point,String end_point,
 			String start_registrationDate,String end_registrationDate,
 			HttpServletRequest request, HttpServletResponse response)
@@ -190,24 +191,37 @@ public class UserAction {
 		}
 		//错误
 		Map<String,String> error = new HashMap<String,String>();
-
-		String _userName = null;
+		Map<String,Object> returnValue = new HashMap<String,Object>();
+		
 		Integer _start_point = null;//积分
 		Integer _end_point = null;//积分
 		Date _start_registrationDate = null;//注册日期
 		Date _end_registrationDate= null;//注册日期
 		
 		//验证参数
-		if(searchType.equals(1)){//用户名
-			if(account != null && !"".equals(account.trim())){
-				User user = userService.findUserByAccount(account.trim());
-				if(user != null){
-					_userName = user.getUserName();
-				}else{
-					error.put("account", "账号不存在");
-				}	
+		if(searchType.equals(1)){//用户
+			if(userTypeCode.equals(10)){//账号
+				if(keyword == null || "".equals(keyword.trim())){
+					error.put("keyword", "请填写账号");
+				}
+			}else if(userTypeCode.equals(20)){//呢称
+				if(keyword == null || "".equals(keyword.trim())){
+					error.put("keyword", "请填写呢称");
+				}
+			}else if(userTypeCode.equals(30)){//用户名
+				if(keyword == null || "".equals(keyword.trim())){
+					error.put("keyword", "请填写用户名");
+				}
+			}else if(userTypeCode.equals(40)){//手机号
+				if(keyword == null || "".equals(keyword.trim())){
+					error.put("keyword", "请填写手机号");
+				}
+			}else if(userTypeCode.equals(50)){//邮箱
+				if(keyword == null || "".equals(keyword.trim())){
+					error.put("keyword", "请填写邮箱");
+				}
 			}else{
-				error.put("account", "请填写账号");
+				error.put("userTypeCode", "请选择用户类型");
 			}	
 		}
 		if(searchType.equals(2)){//筛选条件
@@ -434,14 +448,78 @@ public class UserAction {
 		
 		if(error.size() == 0){
 			if(searchType.equals(1)){//用户名
-				User user = userService.findUserByUserName(_userName);
-				
-				if(user != null){
-					QueryResult<User> qr = new QueryResult<User>();
-					List<User> userList = new ArrayList<User>();
-					userList.add(user);
-					qr.setResultlist(userList);
-					qr.setTotalrecord(1L);
+				if(userTypeCode.equals(10)){//账号
+					User user = userService.findUserByAccount(keyword.trim());
+					
+					if(user != null){
+						QueryResult<User> qr = new QueryResult<User>();
+						List<User> userList = new ArrayList<User>();
+						userList.add(user);
+						qr.setResultlist(userList);
+						qr.setTotalrecord(1L);
+						pageView.setQueryResult(qr);
+					}
+				}else if(userTypeCode.equals(20)){//呢称
+					User user = userService.findUserByNickname(keyword.trim());
+					
+					if(user != null){
+						QueryResult<User> qr = new QueryResult<User>();
+						List<User> userList = new ArrayList<User>();
+						userList.add(user);
+						qr.setResultlist(userList);
+						qr.setTotalrecord(1L);
+						pageView.setQueryResult(qr);
+					}
+				}else if(userTypeCode.equals(30)){//用户名
+					User user = userService.findUserByUserName(keyword.trim());
+					
+					if(user != null){
+						QueryResult<User> qr = new QueryResult<User>();
+						List<User> userList = new ArrayList<User>();
+						userList.add(user);
+						qr.setResultlist(userList);
+						qr.setTotalrecord(1L);
+						pageView.setQueryResult(qr);
+					}
+				}else if(userTypeCode.equals(40)){//手机号
+					
+					StringBuffer jpql = new StringBuffer("");
+					//存放参数值
+					List<Object> params = new ArrayList<Object>();
+
+					jpql.append(" and o.mobile=?"+ (params.size()+1));
+					params.add(keyword.trim());
+					//删除第一个and
+					String _jpql = org.apache.commons.lang3.StringUtils.difference(" and", jpql.toString());
+					
+					//排序
+					LinkedHashMap<String,String> orderby = new LinkedHashMap<String,String>();
+					
+					orderby.put("id", "desc");//根据id字段降序排序
+					//调用分页算法类
+					QueryResult<User> qr = userService.getScrollData(User.class, firstIndex, pageView.getMaxresult(), _jpql, params.toArray(),orderby);
+					
+					//将查询结果集传给分页List
+					pageView.setQueryResult(qr);
+					
+				}else if(userTypeCode.equals(50)){//邮箱
+					StringBuffer jpql = new StringBuffer("");
+					//存放参数值
+					List<Object> params = new ArrayList<Object>();
+
+					jpql.append(" and o.email=?"+ (params.size()+1));
+					params.add(keyword.trim());
+					//删除第一个and
+					String _jpql = org.apache.commons.lang3.StringUtils.difference(" and", jpql.toString());
+					
+					//排序
+					LinkedHashMap<String,String> orderby = new LinkedHashMap<String,String>();
+					
+					orderby.put("id", "desc");//根据id字段降序排序
+					//调用分页算法类
+					QueryResult<User> qr = userService.getScrollData(User.class, firstIndex, pageView.getMaxresult(), _jpql, params.toArray(),orderby);
+					
+					//将查询结果集传给分页List
 					pageView.setQueryResult(qr);
 				}
 				
@@ -572,6 +650,8 @@ public class UserAction {
 			}
 		}
 		if(pageView.getRecords() != null && pageView.getRecords().size() >0){
+			//仅显示指定字段
+			List<User> userViewList = new ArrayList<User>();
 			List<UserGrade> userGradeList = userGradeService.findAllGrade();
 			for(User user : pageView.getRecords()){//取得所有用户
 				if(user.getType() >10){
@@ -589,15 +669,46 @@ public class UserAction {
 				if(user.getAvatarPath() != null && !"".contentEquals(user.getAvatarPath().trim())){
 					user.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
 				}
-				
+				User userView = new User();
+
+				userView.setId(user.getId());
+				userView.setUserName(user.getUserName());
+				userView.setAccount(user.getAccount());
+				userView.setNickname(user.getNickname());
+				userView.setCancelAccountTime(user.getCancelAccountTime());
+				userView.setAllowUserDynamic(user.getAllowUserDynamic());
+				userView.setEmail(user.getEmail());
+				userView.setIssue(user.getIssue());
+				userView.setMobile(user.getMobile());
+				userView.setId(user.getId());
+				userView.setRealNameAuthentication(user.isRealNameAuthentication());
+				userView.setRegistrationDate(user.getRegistrationDate());
+				userView.setRemarks(user.getRemarks());
+				userView.setPoint(user.getPoint());
+				userView.setDeposit(user.getDeposit());
+				userView.setType(user.getType());
+				userView.setPlatformUserId(user.getPlatformUserId());
+				userView.setState(user.getState());
+				userView.setUserVersion(user.getUserVersion());
+				userView.setUserRoleNameList(user.getUserRoleNameList());
+				userView.setGradeId(user.getGradeId());
+				userView.setGradeName(user.getGradeName());
+				userView.setAvatarPath(user.getAvatarPath());
+				userView.setAvatarName(user.getAvatarName());
+				userViewList.add(userView);
 			}
+			pageView.setRecords(userViewList);
 		}
+		
+		
+		returnValue.put("userCustomList", userCustomList);
+		returnValue.put("pageView",pageView);
 		
 		
 		if(error.size() >0){
 			return JsonUtils.toJSONString(new RequestResult(ResultCode.FAILURE,error));
 		}else{
-			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,pageView));
+			return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
 		}
 	}
 }

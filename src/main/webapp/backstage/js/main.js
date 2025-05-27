@@ -1876,7 +1876,7 @@ var routes = [
 	              			next();
 	              		}
 	              	},//修改会员卡赠送任务
-	              	{path : '/admin/control/membershipCardGiftTask/manage/membershipCardGiftItemList',component : () => loadModule('./admin/component/membershipCard/membershipCardGiftItemList.vue', options), name:'membershipCardGiftItemList',meta: {index:'2-200200-3',title:'获赠用户列表',cacheNumber:'0'}},//查询会员卡赠送项(获赠用户)
+	              	{path : '/admin/control/membershipCardGiftTask/manage/membershipCardGiftItemList',component : () => loadModule('./admin/component/membershipCard/membershipCardGiftItemList.vue', options), name:'membershipCardGiftItemList',meta: {parent:'2-200200-3',title:'获赠用户列表',cacheNumber:'0'}},//查询会员卡赠送项(获赠用户)
 	              	
 	              	{path : '/admin/control/redEnvelope/giveRedEnvelope/list',component : () => loadModule('./admin/component/redEnvelope/giveRedEnvelopeList.vue',options), name:'giveRedEnvelopeList',meta: {parent:'2-200100-2',title:'发红包列表'}},//发红包列表
 	              	{path : '/admin/control/redEnvelope/redEnvelopeAmountDistribution/list',component : () => loadModule('./admin/component/redEnvelope/redEnvelopeAmountDistributionList.vue',options), name:'redEnvelopeAmountDistributionList',meta: {parent:'2-200100-2',title:'发红包金额分配'}},//发红包金额分配

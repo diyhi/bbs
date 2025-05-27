@@ -135,26 +135,17 @@ public class StringUtil {
     }
    
     /** 
-     * 转义like语句中的 
-     * <code>'_'</code><code>'%'</code> 
-     * 将<code>'?'</code>转成sql的<code>'/_'</code> 
-     * 将<code>'%'</code>转成sql的<code>'/%'</code> 
-     * <p> 
-     *   例如搜索<code>?aa*bb?c_d%f</code>将转化成<br/> 
-     *   <code>_aa%bb_c/_d/%f</code> 
-     * </p> 
+     * 转义like语句中的通配符
      * @param likeStr 
-     * @return 
-     * @author <a href="http://jdkcn.com" mce_href="http://jdkcn.com">somebody</a> 
+     * @return
      */  
     public static String escapeSQLLike(String likeStr) {  
-        String str = StringUtils.replace(likeStr, "_", "/_");  
-        str = StringUtils.replace(str, "%",    "/%");  
-        str = StringUtils.replace(str, "?", "_");  
-        str = StringUtils.replace(str, "*", "%");  
+    	String str = StringUtils.replace(likeStr, "/",    "//");
+        str = StringUtils.replace(str, "%", "/%");
+        str = StringUtils.replace(str, "_", "/_");
+        str = StringUtils.replace(str, "[", "/[");
+        str = StringUtils.replace(str, "]", "/]");
         return str;  
     }  
 
-    
-    
 }

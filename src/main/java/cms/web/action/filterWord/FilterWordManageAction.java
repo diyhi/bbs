@@ -47,6 +47,8 @@ public class FilterWordManageAction {
 	public String view(ModelMap model,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
+		Map<String,Object> returnValue = new HashMap<String,Object>();
+		
 		String path = PathUtil.path()+File.separator+"WEB-INF"+File.separator+"data"+File.separator+"filterWord"+File.separator;
 		File file = new File(path+"word.txt");
 		
@@ -70,9 +72,10 @@ public class FilterWordManageAction {
 			filterWord.setLastModified(new Date(file.lastModified()));
 		}
 		
+		returnValue.put("filterWord", filterWord);
 		
 		
-		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,filterWord));
+		return JsonUtils.toJSONString(new RequestResult(ResultCode.SUCCESS,returnValue));
 	}
 	
 	

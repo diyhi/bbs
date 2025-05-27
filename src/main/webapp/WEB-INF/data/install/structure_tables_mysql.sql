@@ -384,7 +384,7 @@ CREATE TABLE `emailsetting` (
   `password` varchar(255) DEFAULT NULL,
   `port` int(11) DEFAULT NULL,
   `version` bigint(20) DEFAULT NULL,
-  `supportedMailboxes` varchar(255) DEFAULT NULL,
+  `supportedMailboxes` longtext,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -2432,7 +2432,10 @@ CREATE TABLE `user` (
   UNIQUE KEY `UKmtrfpdps3j0ce18c8xglgjf7n` (`platformUserId`),
   UNIQUE KEY `UKdnq7r8jcmlft7l8l4j79l1h74` (`account`),
   KEY `user_idx` (`state`),
-  KEY `user_2_idx` (`userName`)
+  KEY `user_2_idx` (`userName`),
+  KEY `user_3_idx` (`nickname`),
+  KEY `user_4_idx` (`mobile`),
+  KEY `user_5_idx` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 

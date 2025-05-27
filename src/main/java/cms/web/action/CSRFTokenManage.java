@@ -35,7 +35,7 @@ public class CSRFTokenManage {
 			String new_token = UUIDUtil.getUUID32();
 			//将令牌添加到Cookie
 			//将 CSRF cookie 指定为 HttpOnly 并不能提供任何实际的保护，因为 CSRF 只是为了防止跨域攻击。如果攻击者可以通过 JavaScript 读取 cookie，则浏览器认为他们已经在同一个域上了
-			WebUtil.addCookie(response, "cms_token",new_token , 0,false);
+			WebUtil.addCookie(request,response, "cms_token",new_token , 0,false);
 			CSRFTokenThreadLocal.set(new_token);
 		}
 	}

@@ -207,7 +207,7 @@ public class HelpTypeServiceBean extends DaoSupport<HelpType> implements HelpTyp
 			
 			if(helpType.getParentId() >0L){
 				//将父类计数减一
-				Query query = em.createQuery("update HelpType o set o.childNodeNumber=childNodeNumber-1 where o.id=?1")
+				Query query = em.createQuery("update HelpType o set o.childNodeNumber=o.childNodeNumber-1 where o.id=?1")
 				.setParameter(1, helpType.getParentId());
 				query.executeUpdate();
 			}
@@ -320,7 +320,7 @@ public class HelpTypeServiceBean extends DaoSupport<HelpType> implements HelpTyp
 		if(i_delete>0){
 			if(mergerHelpType.getParentId() >0L){
 				//将父类计数减一
-				Query query_ = em.createQuery("update HelpType o set o.childNodeNumber=childNodeNumber-1 where o.id=?1")
+				Query query_ = em.createQuery("update HelpType o set o.childNodeNumber=o.childNodeNumber-1 where o.id=?1")
 				.setParameter(1, mergerHelpType.getParentId());
 				query_.executeUpdate();
 			}

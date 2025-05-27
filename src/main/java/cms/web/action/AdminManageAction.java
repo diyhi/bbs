@@ -285,7 +285,7 @@ public class AdminManageAction {
     	}else{//登录失败
     		
     		if(username != null && !"".equals(username.trim())){
-    			WebUtil.addCookie(response, "cms_staffName", username, 120);
+    			WebUtil.addCookie(request,response, "cms_staffName", username, 120);
         		Integer original = staffManage.getLoginFailureCount(username);//原来总次数
         		if(original != null){
         			staffManage.addLoginFailureCount(username,original+1);
