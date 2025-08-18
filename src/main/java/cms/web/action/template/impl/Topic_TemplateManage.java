@@ -28,6 +28,7 @@ import cms.bean.template.Forum_CommentRelated_Comment;
 import cms.bean.template.Forum_TopicRelated_HotTopic;
 import cms.bean.template.Forum_TopicRelated_LikeTopic;
 import cms.bean.template.Forum_TopicRelated_Topic;
+import cms.bean.template.Forum_TopicRelated_TopicEssence;
 import cms.bean.topic.Comment;
 import cms.bean.topic.HideTagType;
 import cms.bean.topic.ImageInfo;
@@ -888,6 +889,8 @@ public class Topic_TemplateManage {
 		value.put("giveRedEnvelopeAmountMin",systemSetting.getGiveRedEnvelopeAmountMin());
 		value.put("giveRedEnvelopeAmountMax",systemSetting.getGiveRedEnvelopeAmountMax());
 		
+		value.put("maxVoteOptions", systemSetting.getTopicMaxVoteOptions());//发起投票选项数量
+		
 		value.put("availableTag", topicManage.availableTag());//话题编辑器允许使用标签
 		List<UserGrade> userGradeList = userGradeService.findAllGrade_cache();
 		value.put("userGradeList", JsonUtils.toJSONString(userGradeList));
@@ -1667,5 +1670,366 @@ public class Topic_TemplateManage {
 			value.put("allowReply",false);//不允许提交回复
 		}
 		return value;
+	}
+	
+	/**
+	 * 话题精华列表  -- 分页
+	 * @param forum
+	 */
+	public PageView<Topic> topicEssence_page(Forum forum,Map<String,Object> parameter,Map<String,Object> runtimeParameter){
+		
+		String formValueJSON = forum.getFormValue();//表单值
+		if(formValueJSON != null && !"".equals(formValueJSON)){
+			Forum_TopicRelated_TopicEssence forum_TopicRelated_TopicEssence = JsonUtils.toObject(formValueJSON,Forum_TopicRelated_TopicEssence.class);
+			if(forum_TopicRelated_TopicEssence != null){
+				int maxResult = settingService.findSystemSetting_cache().getForestagePageNumber();
+				//每页显示记录数
+				if(forum_TopicRelated_TopicEssence.getTopicEssence_maxResult() != null && forum_TopicRelated_TopicEssence.getTopicEssence_maxResult() >0){
+					maxResult = forum_TopicRelated_TopicEssence.getTopicEssence_maxResult();
+				}
+				
+				return this.topicEssence_SQL_Page(forum_TopicRelated_TopicEssence,parameter,runtimeParameter,maxResult);
+			}
+			
+		}
+		return null;
+	}
+	
+	/**
+	 * 话题精华SQL分页
+	 * @param maxResult 每页显示记录数
+	 */
+	private PageView<Topic> topicEssence_SQL_Page(Forum_TopicRelated_TopicEssence forum_TopicRelated_TopicEssence,Map<String,Object> parameter,Map<String,Object> runtimeParameter,int maxResult){
+		int page = 1;//分页 当前页
+		int pageCount=10;// 页码显示总数
+		int sort = 1;//排序
+		Long tagId = null;//标签Id
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();  
+		
+		
+		String requestURI = "";
+		String queryString = "";
+		
+		//排序
+		if(forum_TopicRelated_TopicEssence.getTopicEssence_sort() != null && forum_TopicRelated_TopicEssence.getTopicEssence_sort() >0){
+			sort = forum_TopicRelated_TopicEssence.getTopicEssence_sort();
+		}
+		
+		
+		
+		//页码显示总数
+		if(forum_TopicRelated_TopicEssence.getTopicEssence_pageCount() != null && forum_TopicRelated_TopicEssence.getTopicEssence_pageCount() >0){
+			pageCount = forum_TopicRelated_TopicEssence.getTopicEssence_pageCount();
+		}
+		//获取提交参数
+		if(parameter != null && parameter.size() >0){		
+			for(Map.Entry<String,Object> paramIter : parameter.entrySet()) {
+				
+				if("page".equals(paramIter.getKey())){
+					if(Verification.isNumeric(paramIter.getValue().toString())){
+						if(paramIter.getValue().toString().length() <=9){
+							page = Integer.parseInt(paramIter.getValue().toString());
+						}
+					}
+				}else if("tagId".equals(paramIter.getKey())){
+					if(Verification.isNumeric(paramIter.getValue().toString())){
+						if(paramIter.getValue().toString().length() <=18){
+							tagId = Long.parseLong(paramIter.getValue().toString());	
+						}
+					}
+				}
+			}
+		}
+	
+		AccessUser accessUser = null;
+
+		//获取运行时参数
+		if(runtimeParameter != null && runtimeParameter.size() >0){		
+			for(Map.Entry<String,Object> paramIter : runtimeParameter.entrySet()) {
+				if("requestURI".equals(paramIter.getKey())){
+					requestURI = (String)paramIter.getValue();
+				}else if("queryString".equals(paramIter.getKey())){
+					queryString = (String)paramIter.getValue();
+				}else if("accessUser".equals(paramIter.getKey())){
+					accessUser = (AccessUser)paramIter.getValue();
+				}
+			}
+		}
+		PageForm pageForm = new PageForm();
+		pageForm.setPage(page);
+		
+		//调用分页算法代码
+		PageView<Topic> pageView = new PageView<Topic>(maxResult,pageForm.getPage(),pageCount,requestURI,queryString);
+		//当前页
+		int firstIndex = (pageForm.getPage()-1)*pageView.getMaxresult();
+
+		//执行查询
+		StringBuffer jpql = new StringBuffer("");
+		//存放参数值
+		List<Object> params = new ArrayList<Object>();
+		
+		
+		
+		jpql.append(" and o.essence=?"+ (params.size()+1));
+		params.add(true);
+		
+		jpql.append(" and o.status=?"+ (params.size()+1));
+		params.add(20);
+		
+		//标签Id
+		if(tagId != null){
+			Tag tag = tagService.findById_cache(tagId);
+			if(tag != null){
+				jpql.append(" and o.tagIdGroup like ?"+ (params.size()+1)+" escape '/' ");//escpae '/'表示 对'/'后面的字符进行转义
+				params.add(cms.utils.StringUtil.escapeSQLLike(tag.getParentIdGroup()+tagId)+",%");//加上查询参数
+			}
+			//jpql.append(" and o.tagId=?"+ (params.size()+1));
+			//params.add(tagId);//加上查询参数
+		}
+		
+		//排序
+		LinkedHashMap<String,String> orderby = new LinkedHashMap<String,String>();
+		
+		orderby.put("sort", "desc");//优先级   大-->小
+		//排行依据
+		if(sort == 1){
+			orderby.put("id", "desc");//发布时间排序   新-->旧
+		}else if(sort == 2){
+			orderby.put("id", "asc");//发布时间排序  旧-->新
+		}
+		
+		
+		
+		//删除第一个and
+		String jpql_str = StringUtils.difference(" and", jpql.toString());
+		QueryResult<Topic> qr = topicService.getScrollData(Topic.class,firstIndex, maxResult, jpql_str, params.toArray(),orderby);
+
+		
+		if(qr.getResultlist() != null && qr.getResultlist().size() >0){
+			SystemSetting systemSetting = settingService.findSystemSetting_cache();
+			
+			for(Topic topic : qr.getResultlist()){
+
+				//话题内容隐藏标签MD5
+				String topicContentDigest_link = "";
+				String topicContentDigest_video = "";
+				String topicContentDigest_hide = "";
+				
+				String processContent = topic.getContent();
+				
+				
+				//处理隐藏标签
+				if(processContent != null && !"".equals(processContent.trim())){
+					List<Integer> visibleTagList = this.getVisibleTagList(accessUser,topic);
+					
+					
+					Integer topicContentUpdateMark = topicManage.query_cache_markUpdateTopicStatus(topic.getId(), Integer.parseInt(RandomStringUtils.randomNumeric(8)));
+					
+					//生成处理'隐藏标签'Id
+					String processHideTagId = topicManage.createProcessHideTagId(topic.getId(),topicContentUpdateMark, visibleTagList);
+					
+					//处理隐藏标签
+					processContent = topicManage.query_cache_processHiddenTag(processContent,visibleTagList,processHideTagId+"|"+topicContentDigest_link+"|"+ topicContentDigest_video);
+					
+					topicContentDigest_hide = cms.utils.MD5.getMD5(processHideTagId);
+				}
+				
+				//处理视频播放器标签
+				if(processContent != null && !"".equals(processContent.trim())){
+					//处理富文本路径
+					processContent = fileManage.processRichTextFilePath(processContent,"topic");
+					
+					Integer topicContentUpdateMark = topicManage.query_cache_markUpdateTopicStatus(topic.getId(), Integer.parseInt(RandomStringUtils.randomNumeric(8)));
+					
+					//生成处理'视频播放器'Id
+					String processVideoPlayerId = mediaProcessQueueManage.createProcessVideoPlayerId(topic.getId(),topicContentUpdateMark);
+					
+					//处理视频信息
+					List<MediaInfo> mediaInfoList = mediaProcessQueueManage.query_cache_processVideoInfo(Configuration.getUrl(request),processContent,processVideoPlayerId+"|"+topicContentDigest_hide,topic.getTagId(),systemSetting.getFileSecureLinkSecret());
+					topic.setMediaInfoList(mediaInfoList);
+					
+				}
+			}
+			
+			//查询标签名称
+			List<Tag> tagList = tagService.findAllTag_cache();
+			Map<Long,List<String>> tagRoleNameMap = new HashMap<Long,List<String>>();//标签角色名称 key:标签Id value:角色名称集合
+			Map<String,List<String>> userRoleNameMap = new HashMap<String,List<String>>();//用户角色名称 key:用户名称Id value:角色名称集合
+			Map<Long,Boolean> userViewPermissionMap = new HashMap<Long,Boolean>();//用户如果对话题项是否有查看权限  key:标签Id value:是否有查看权限
+			
+			if(tagList != null && tagList.size() >0){
+				for(Topic topic : qr.getResultlist()){
+					
+					//解析隐藏标签
+					Map<Integer,Object> analysisHiddenTagMap = topicManage.query_cache_analysisHiddenTag(topic.getContent(),topic.getId());
+					if(analysisHiddenTagMap != null && analysisHiddenTagMap.size() >0){
+						
+						//内容含有隐藏标签类型
+						LinkedHashMap<Integer,Boolean> hideTagTypeMap = new LinkedHashMap<Integer,Boolean>();//key:内容含有隐藏标签类型  10.输入密码可见  20.评论话题可见  30.达到等级可见 40.积分购买可见 50.余额购买可见  value:当前用户是否已对隐藏内容解锁
+						
+						//允许可见的隐藏标签
+						List<Integer> visibleTagList = this.getVisibleTagList(accessUser,topic);
+						
+						
+						for (HideTagType hideTagType : HideTagType.values()) {//按枚举类的顺序排序
+				            for (Map.Entry<Integer,Object> entry : analysisHiddenTagMap.entrySet()) {
+								if(entry.getKey().equals(hideTagType.getName())){
+									if(visibleTagList.contains(entry.getKey())){
+										hideTagTypeMap.put(entry.getKey(), true);
+										
+									}else{
+										hideTagTypeMap.put(entry.getKey(), false);
+									}
+									break;
+								}
+							}
+				        }
+						topic.setHideTagTypeMap(hideTagTypeMap);
+						
+					}
+					
+					topic.setIp(null);//IP地址不显示
+					topic.setContent(null);//话题内容不显示
+					if(topic.getPostTime().equals(topic.getLastReplyTime())){//如果发贴时间等于回复时间，则不显示回复时间
+						topic.setLastReplyTime(null);
+					}
+					topic.setViewTotal(topic.getViewTotal()+topicManage.readLocalView(topic.getId()));
+					
+					if(topic.getIsStaff() == false){//会员
+						userRoleNameMap.put(topic.getUserName(), null);
+					}
+					for(Tag tag: tagList){
+						if(topic.getTagId().equals(tag.getId())){
+							topic.setTagName(tag.getName());
+							tagRoleNameMap.put(tag.getId(), null);
+							userViewPermissionMap.put(tag.getId(), null);
+							
+							break;
+						}
+					}
+					
+					if(topic.getImage() != null && !"".equals(topic.getImage().trim())){
+						List<ImageInfo> imageInfoList = JsonUtils.toGenericObject(topic.getImage().trim(),new TypeReference< List<ImageInfo> >(){});
+						if(imageInfoList != null && imageInfoList.size() >0){
+							for(ImageInfo imageInfo : imageInfoList){
+								imageInfo.setPath(fileManage.fileServerAddress(request)+imageInfo.getPath());
+							}
+							topic.setImageInfoList(imageInfoList);
+						}
+					}
+					
+				}
+			}
+			
+			if(tagRoleNameMap != null && tagRoleNameMap.size() >0){
+				for (Map.Entry<Long, List<String>> entry : tagRoleNameMap.entrySet()) {
+					List<String> roleNameList = userRoleManage.queryAllowViewTopicRoleName(entry.getKey());
+					entry.setValue(roleNameList);
+				}
+			}
+			
+			if(userRoleNameMap != null && userRoleNameMap.size() >0){
+				for (Map.Entry<String, List<String>> entry : userRoleNameMap.entrySet()) {
+					List<String> roleNameList = userRoleManage.queryUserRoleName(entry.getKey());
+					entry.setValue(roleNameList);
+				}
+			}
+			if(userViewPermissionMap != null && userViewPermissionMap.size()>0){
+				for (Map.Entry<Long,Boolean> entry : userViewPermissionMap.entrySet()) {
+					//是否有当前功能操作权限
+					boolean flag = userRoleManage.isPermission(ResourceEnum._1001000,entry.getKey());
+					entry.setValue(flag);
+				}
+			}
+			
+			
+			for(Topic topic : qr.getResultlist()){
+				if(topic.getIsStaff() == false){//会员
+					User user = userManage.query_cache_findUserByUserName(topic.getUserName());
+					if(user != null){
+						topic.setAccount(user.getAccount());
+						topic.setNickname(user.getNickname());
+						topic.setAvatarPath(fileManage.fileServerAddress(request)+user.getAvatarPath());
+						topic.setAvatarName(user.getAvatarName());
+						
+						if(user.getCancelAccountTime() != -1L){//账号已注销
+							topic.setUserInfoStatus(-30);
+						}
+					}
+					
+				}else{
+					SysUsers sysUsers = staffManage.query_cache_findByUserAccount(topic.getUserName());
+					if(sysUsers != null){
+						topic.setNickname(sysUsers.getNickname());
+						if(sysUsers.getAvatarName() != null && !"".equals(sysUsers.getAvatarName().trim())){
+							topic.setAvatarPath(fileManage.fileServerAddress(request)+sysUsers.getAvatarPath());
+							topic.setAvatarName(sysUsers.getAvatarName());
+						}	
+					}
+					topic.setAccount(topic.getUserName());//员工用户名和账号是同一个
+				}
+				//话题允许查看的角色名称集合
+				for (Map.Entry<Long, List<String>> entry : tagRoleNameMap.entrySet()) {
+					if(entry.getKey().equals(topic.getTagId())){
+						List<String> roleNameList = entry.getValue();
+						if(roleNameList != null && roleNameList.size() >0){
+							topic.setAllowRoleViewList(roleNameList);
+						}
+						break;
+					}
+					
+				}
+				if(!topic.getIsStaff()){
+					//用户角色名称集合
+					for (Map.Entry<String, List<String>> entry : userRoleNameMap.entrySet()) {
+						if(entry.getKey().equals(topic.getUserName())){
+							List<String> roleNameList = entry.getValue();
+							if(roleNameList != null && roleNameList.size() >0){
+								topic.setUserRoleNameList(roleNameList);
+							}
+							break;
+						}
+					}
+				}
+				
+				//用户如果对话题项无查看权限，则不显示摘要、图片、视频
+				for (Map.Entry<Long,Boolean> entry : userViewPermissionMap.entrySet()) {
+					if(entry.getKey().equals(topic.getTagId())){
+						if(entry.getValue() != null && entry.getValue() == false){
+							topic.setImage(null);
+							topic.setImageInfoList(new ArrayList<ImageInfo>());
+							topic.setSummary("");
+							topic.setMediaInfoList(new ArrayList<MediaInfo>());
+						}
+						break;
+					}
+					
+				}
+				
+				
+			}
+			
+			
+			//非正常状态用户清除显示数据
+			for(Topic topic : qr.getResultlist()){
+				if(topic.getUserInfoStatus() <0){
+					topic.setUserName(null);
+					topic.setAccount(null);
+					topic.setNickname(null);
+					topic.setAvatarPath(null);
+					topic.setAvatarName(null);
+					topic.setUserRoleNameList(new ArrayList<String>());
+					topic.setTitle("");
+					topic.setContent("");
+					topic.setSummary("");
+				}
+			}
+			
+		}
+		
+		
+		//将查询结果集传给分页List
+		pageView.setQueryResult(qr);
+		return pageView;
 	}
 }

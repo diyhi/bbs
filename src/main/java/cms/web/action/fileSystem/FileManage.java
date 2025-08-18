@@ -109,7 +109,7 @@ public class FileManage {
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();  
 
 		if(html != null && !"".equals(html.trim())){
-			return textFilterManage.processFilePath(html, item, this.fileServerAddress(request));
+			return textFilterManage.processFilePath(html, item, this.fileServerAddress(request),true);
 		}
     	
 		return html;

@@ -1,0 +1,332 @@
+<table class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">返回值</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="20%">类型</th> 
+			<th width="50%">说明</th> 
+		</tr>
+	</thead> 
+	 <tbody> 
+		<tr> 
+			<td>topicRelated_topicEssence_page</td> 
+			<td><a style="color: #317ee7" onclick="anchorJump('#anchor_10'); return false;">PageView</a></td>
+			<td>话题精华分页</td> 
+		</tr> 
+	</tbody> 
+</table>
+
+<table id="anchor_10" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">分页 PageView</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>records</td> 
+			<td>List&lt<a style="color: #317ee7" onclick="anchorJump('#anchor_20'); return false;">Topic</a>></td>
+			<td>数据展示列表</td>
+		</tr>
+		<tr> 
+			<td>pageIndex</td> 
+			<td><a style="color: #317ee7" onclick="anchorJump('#anchor_30'); return false;">PageIndex</a></td>
+			<td>页码索引</td>
+		</tr>
+		<tr> 
+			<td>totalpage</td> 
+			<td>long</td>
+			<td>总页数</td>
+		</tr>
+		<tr> 
+			<td>maxresult</td> 
+			<td>long</td>
+			<td>每页显示记录数</td>
+		</tr>
+		<tr> 
+			<td>currentpage</td> 
+			<td>long</td>
+			<td>当前页</td>
+		</tr>
+		<tr> 
+			<td>pagecount</td> 
+			<td>long</td>
+			<td>页码显示总数</td>
+		</tr>
+		<tr> 
+			<td>onUrl</td> 
+			<td>String</td>
+			<td>上一页URL</td>
+		</tr>
+		<tr> 
+			<td>nextUrl</td> 
+			<td>String</td>
+			<td>下一页URL</td>
+		</tr>
+	</tbody> 
+</table>
+<table id="anchor_30" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">分页索引 PageIndex</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>startindex</td> 
+			<td>long</td>
+			<td>分页开始索引</td>
+		</tr>
+		<tr> 
+			<td>endindex</td> 
+			<td>long</td>
+			<td>分页结束索引</td>
+		</tr>
+	</tbody> 
+</table>
+<table id="anchor_20" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="4">话题精华 Topic</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%" colspan="2">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>id</td> 
+			<td>Long</td>
+			<td colspan="2">话题Id</td>
+		</tr>
+		<tr> 
+			<td>title</td> 
+			<td>String</td>
+			<td colspan="2">标题</td>
+		</tr>
+		<tr> 
+			<td>tagId</td> 
+			<td>Long</td>
+			<td colspan="2">标签Id</td>
+		</tr>
+		<tr> 
+			<td>tagName</td> 
+			<td>String</td>
+			<td colspan="2">标签名称</td>
+		</tr>
+		<tr> 
+			<td>summary</td> 
+			<td>String</td>
+			<td colspan="2">内容摘要(不含隐藏标签内的内容)</td>
+		</tr>
+		<tr> 
+			<td>imageInfoList</td> 
+			<td>List&lt<a style="color: #317ee7" onclick="anchorJump('#anchor_120'); return false;">ImageInfo</a>></td>
+			<td colspan="2">图片集合(不含隐藏标签内的图片)</td>
+		</tr>
+		<tr> 
+			<td>mediaInfoList</td> 
+			<td>List&lt<a style="color: #317ee7" onclick="anchorJump('#anchor_130'); return false;">MediaInfo</a>></td>
+			<td colspan="2">媒体文件信息集合(不含隐藏标签内的媒体文件)</td>
+		</tr>
+		<tr> 
+			<td>postTime</td> 
+			<td>Date</td>
+			<td colspan="2">发表时间</td>
+		</tr>
+		<tr> 
+			<td>lastReplyTime</td> 
+			<td>Date</td>
+			<td colspan="2">最后回复时间</td>
+		</tr>
+		<tr> 
+			<td>commentTotal</td> 
+			<td>Long</td>
+			<td colspan="2">评论总数</td>
+		</tr>
+		<tr> 
+			<td>allow</td> 
+			<td>boolean</td>
+			<td colspan="2">允许评论</td>
+		</tr>
+		<tr> 
+			<td>viewTotal</td> 
+			<td>Long</td>
+			<td colspan="2">查看总数</td>
+		</tr>
+		<tr> 
+			<td>userName</td> 
+			<td>String</td>
+			<td colspan="2">用户名称</td>
+		</tr>
+		<tr> 
+			<td>account</td> 
+			<td>String</td>
+			<td colspan="2">账号</td>
+		</tr>
+		<tr> 
+			<td>userRoleNameList</td> 
+			<td>List&ltString></td>
+			<td colspan="2">用户角色名称集合</td>
+		</tr>
+		<tr> 
+			<td>allowRoleViewList</td> 
+			<td>List&ltString></td>
+			<td colspan="2">话题允许查看的角色名称集合(默认角色除外)</td>
+		</tr>
+		<tr> 
+			<td>hideTagTypeMap</td> 
+			<td>Map&ltInteger,Boolean></td>
+			<td colspan="2">内容含有隐藏标签类型  key: 10.输入密码可见  20.评论话题可见  30.达到等级可见 40.积分购买可见 50.余额购买可见  value:当前用户是否已对隐藏内容解锁</td>
+		</tr>
+		<tr> 
+			<td>nickname</td> 
+			<td>String</td>
+			<td colspan="2">呢称</td>
+		</tr>
+		<tr> 
+			<td>userInfoStatus</td> 
+			<td>Integer</td>
+			<td colspan="2">用户信息状态 -30.账号已注销(不显示数据) -20.账号已逻辑删除(不显示数据) -10.账号已禁用(不显示数据)  0.正常 10.账号已禁用(显示数据) 20.账号已逻辑删除(显示数据)</td>
+		</tr>
+		<tr> 
+			<td>avatarPath</td> 
+			<td>String</td>
+			<td>头像路径</td>
+			<td width="15%" rowspan="2">页面上显示200*200头像示例${topic.avatarPath}${topic.avatarName}   &nbsp;&nbsp;显示100*100头像示例${topic.avatarPath}100x100/${topic.avatarName}</td> 
+		</tr>
+		<tr> 
+			<td>avatarName</td> 
+			<td>String</td>
+			<td>头像名称</td>
+		</tr>
+		<tr> 
+			<td>giveRedEnvelopeId</td> 
+			<td>String</td>
+			<td colspan="2">发红包Id</td>
+		</tr>
+		<tr> 
+			<td>isStaff</td> 
+			<td>boolean</td>
+			<td colspan="2">是否为员工</td>
+		</tr>
+		<tr> 
+			<td>sort</td> 
+			<td>Integer</td>
+			<td colspan="2">排序 默认为0</td>
+		</tr>
+		<tr> 
+			<td>essence</td> 
+			<td>Boolean</td>
+			<td colspan="2">是否为精华</td>
+		</tr>
+	</tbody> 
+</table>
+
+<table id="anchor_120" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">图片信息 ImageInfo</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>path</td> 
+			<td>String</td>
+			<td>图片路径</td>
+		</tr>
+		<tr> 
+			<td>name</td> 
+			<td>String</td>
+			<td>图片名称</td>
+		</tr>
+	</tbody> 
+</table>
+<table id="anchor_130" class="exampleTable" > 
+	<thead> 
+		<tr> 
+			<th colspan="3">媒体文件信息 MediaInfo</th>
+		</tr> 
+		<tr> 
+			<th width="30%">变量</th> 
+			<th width="30%">类型</th>
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	<tbody> 
+		<tr> 
+			<td>mediaUrl</td> 
+			<td>String</td>
+			<td>媒体文件URL</td>
+		</tr>
+		<tr> 
+			<td>cover</td> 
+			<td>String</td>
+			<td>封面文件</td>
+		</tr>
+		<tr> 
+			<td>thumbnail</td> 
+			<td>String</td>
+			<td>缩略图文件</td>
+		</tr>
+	</tbody> 
+</table>
+<table class="exampleTable" > 
+	<thead>
+		<tr> 
+			<th colspan="4">方法支持参数</th>
+		</tr>
+		<tr> 
+			<th width="30%">参数</th> 
+			<th width="20%">类型</th> 
+			<th width="10%">是否必填</th> 
+			<th width="40%">说明</th> 
+		</tr> 
+	</thead> 
+	 <tbody> 
+		<tr> 
+			<td>tagId</td> 
+			<td>Long</td>
+			<td>否</td>
+			<td>标签Id</td> 
+		</tr>
+		<tr> 
+			<td>page</td> 
+			<td>Integer</td>
+			<td>否</td>
+			<td>页码</td> 
+		</tr>
+	</tbody> 
+</table>
+<h2 style="margin:0;padding:0; margin-top: 10px;">示例</h2>
+<textarea name="exampleCode">
+<@function page="${url_page}" tagId="${url_tagId}">
+   	<#if topicRelated_topicEssence_page?exists && topicRelated_topicEssence_page.records?exists && topicRelated_topicEssence_page.records?size gt 0>
+		<#list topicRelated_topicEssence_page.records as topic>
+			<#-- 标题 -->
+			<a href="thread?topicId=${topic.id}">${topic.title}</a>
+			<#-- 发表时间 -->
+			${topic.postTime}
+		</#list>
+	</#if>
+</@function>
+</textarea>

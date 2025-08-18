@@ -129,6 +129,9 @@ public class Topic implements Serializable{
 	/** 发红包Id **/
 	@Column(length=32)
 	private String giveRedEnvelopeId;
+	/** 投票主题Id **/
+	@Column(length=32)
+	private String voteThemeId;
 	
 	/** 是否为员工 true:员工  false:会员 **/
 	private Boolean isStaff = false;
@@ -353,6 +356,12 @@ public class Topic implements Serializable{
 	}
 	public void setTagIdGroup(String tagIdGroup) {
 		this.tagIdGroup = tagIdGroup;
+	}
+	public String getVoteThemeId() {
+		return voteThemeId;
+	}
+	public void setVoteThemeId(String voteThemeId) {
+		this.voteThemeId = voteThemeId;
 	}
 	
 }

@@ -214,6 +214,13 @@ public class SystemSetting implements Serializable{
 	private Integer allowMentionMaxNumber = 30;
 	/** 每用户每24小时内发送短信次数 **/
 	private Integer userSentSmsCount = 10;
+	
+	
+	/** 话题发起投票选项数量 空值为不限制  0为不允许发起投票  **/
+	private Integer topicMaxVoteOptions = 0;
+	/** 问答发起投票选项数量 空值为不限制  0为不允许发起投票  **/
+	private Integer questionMaxVoteOptions = 0;
+	
 	/** 话题编辑器标签  json **/
 	@Lob
 	private String topicEditorTag;
@@ -867,6 +874,22 @@ public class SystemSetting implements Serializable{
 		this.allowLoginAccountTypeCodeList = allowLoginAccountTypeCodeList;
 	}
 
+	public Integer getTopicMaxVoteOptions() {
+		return topicMaxVoteOptions;
+	}
+
+	public void setTopicMaxVoteOptions(Integer topicMaxVoteOptions) {
+		this.topicMaxVoteOptions = topicMaxVoteOptions;
+	}
+
+	public Integer getQuestionMaxVoteOptions() {
+		return questionMaxVoteOptions;
+	}
+
+	public void setQuestionMaxVoteOptions(Integer questionMaxVoteOptions) {
+		this.questionMaxVoteOptions = questionMaxVoteOptions;
+	}
+	
 
 
 

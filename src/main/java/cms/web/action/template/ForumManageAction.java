@@ -47,6 +47,7 @@ import cms.bean.template.Forum_SystemRelated_SearchWord;
 import cms.bean.template.Forum_TopicRelated_HotTopic;
 import cms.bean.template.Forum_TopicRelated_LikeTopic;
 import cms.bean.template.Forum_TopicRelated_Topic;
+import cms.bean.template.Forum_TopicRelated_TopicEssence;
 import cms.bean.template.Layout;
 import cms.bean.template.Templates;
 import cms.bean.topic.Tag;
@@ -481,6 +482,11 @@ public class ForumManageAction{
 							returnValue.put("page_Forum_CommentRelated_Comment",JsonUtils.toGenericObject(forum.getFormValue(), new TypeReference<Forum_CommentRelated_Comment>(){}));	
 						}
 					}
+					if(forum.getForumChildType().equals("话题精华列表")){
+						if("page".equals(forum.getDisplayType())){//分页
+							returnValue.put("page_Forum_TopicRelated_TopicEssence",JsonUtils.toGenericObject(forum.getFormValue(), new TypeReference<Forum_TopicRelated_TopicEssence>(){}));	
+						}
+					}
 					
 					if(forum.getForumChildType().equals("问题列表")){
 						if("page".equals(forum.getDisplayType())){//分页
@@ -524,7 +530,7 @@ public class ForumManageAction{
 							
 							if(forum_CustomForumRelated_CustomHTML.getHtml_content() != null && !"".equals(forum_CustomForumRelated_CustomHTML.getHtml_content().trim())){
 								//处理富文本路径
-								forum_CustomForumRelated_CustomHTML.setHtml_content(textFilterManage.processFilePath(forum_CustomForumRelated_CustomHTML.getHtml_content(), "template", Configuration.getUrl(request)));
+								forum_CustomForumRelated_CustomHTML.setHtml_content(textFilterManage.processFilePath(forum_CustomForumRelated_CustomHTML.getHtml_content(), "template", Configuration.getUrl(request),false));
 							}
 							returnValue.put("entityBean_Forum_CustomForumRelated_CustomHTML",forum_CustomForumRelated_CustomHTML);	
 						}
@@ -1199,6 +1205,47 @@ public class ForumManageAction{
 				collection_Forum_TopicRelated_HotTopic.setHotTopic_id(UUIDUtil.getUUID32());
 				collection_Forum_TopicRelated_HotTopic.setHotTopic_maxResult(hotTopic_maxResult);//显示记录数
 				forum.setFormValue(JsonUtils.toJSONString(collection_Forum_TopicRelated_HotTopic));//加入表单值
+				
+			}
+		}
+		
+		
+		Forum_TopicRelated_TopicEssence page_Forum_TopicRelated_TopicEssence = new Forum_TopicRelated_TopicEssence();
+		
+		if(formbean.getForumChildType().equals("话题精华列表")){
+			if("page".equals(displayType)){//分页
+				String page_topicEssence_sort = request.getParameter("page_topicEssence_sort");//排序
+				String page_topicEssence_maxResult = request.getParameter("page_topicEssence_maxResult");//每页显示记录数
+				String page_topicEssence_pageCount = request.getParameter("page_topicEssence_pageCount");//页码显示总数
+	
+				Integer topicEssence_maxResult = null;//每页显示记录数
+				Integer topicEssence_pageCount = null;//页码显示总数
+
+				
+				//每页显示记录数
+				if(page_topicEssence_maxResult != null && !"".equals(page_topicEssence_maxResult.trim())){	
+					boolean page_topicEssence_maxResult_Verification = Verification.isPositiveIntegerZero(page_topicEssence_maxResult.trim());//非负整数（正整数+ 0）
+					if(!page_topicEssence_maxResult_Verification){
+						forumError.put("page_topicEssence_maxResult", "请填写数字！");
+					}else{
+						topicEssence_maxResult = Integer.parseInt(page_topicEssence_maxResult.trim());
+					}
+				}
+				//页码显示总数
+				if(page_topicEssence_pageCount != null && !"".equals(page_topicEssence_pageCount.trim())){
+					boolean page_topicEssence_pageCount_Verification = Verification.isPositiveIntegerZero(page_topicEssence_pageCount.trim());//非负整数（正整数+ 0）
+					if(!page_topicEssence_pageCount_Verification){
+						forumError.put("page_topicEssence_pageCount", "请填写数字！");
+					}else{
+						topicEssence_pageCount = Integer.parseInt(page_topicEssence_pageCount.trim());
+					}
+				}
+				
+				page_Forum_TopicRelated_TopicEssence.setTopicEssence_id(UUIDUtil.getUUID32());
+				page_Forum_TopicRelated_TopicEssence.setTopicEssence_sort(Integer.parseInt(page_topicEssence_sort));
+				page_Forum_TopicRelated_TopicEssence.setTopicEssence_maxResult(topicEssence_maxResult);//每页显示记录数
+				page_Forum_TopicRelated_TopicEssence.setTopicEssence_pageCount(topicEssence_pageCount);//页码显示总数
+				forum.setFormValue(JsonUtils.toJSONString(page_Forum_TopicRelated_TopicEssence));//加入表单值
 				
 			}
 		}

@@ -4870,13 +4870,12 @@ public class HomeManageAction {
 			for(Like like : qr.getResultlist()){
 				
 				if(like.getModule().equals(10) || like.getModule().equals(20) || like.getModule().equals(30)){
-					Topic topic = topicManage.queryTopicCache(like.getTopicId());//查询缓存
-					if(topic != null){
-						like.setTopicTitle(topic.getTitle());
-					}
-					
 					if(like.getModule().equals(10)){//10:话题 
-						like.setSummary(topic.getSummary());
+						Topic topic = topicManage.queryTopicCache(like.getTopicId());//查询缓存
+						if(topic != null){
+							like.setTopicTitle(topic.getTitle());
+							like.setSummary(topic.getSummary());
+						}
 					}else if(like.getModule().equals(20)){//20:评论
 						Comment comment = commentManage.query_cache_findByCommentId(like.getCommentId());//查询缓存
 						if(comment != null && comment.getStatus().equals(20)){

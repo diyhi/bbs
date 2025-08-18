@@ -751,9 +751,10 @@ public class TextFilterManage {
 	 * @param html 富文本内容
 	 * @param item 项目
 	 * @param url
+	 * @param prettyPrint 是否重新格式化
 	 * @return
 	 */
-	public String processFilePath(String html,String item,String url){
+	public String processFilePath(String html,String item,String url,boolean prettyPrint){
 		if(!StringUtils.isBlank(html)){
 			Document doc = Jsoup.parseBodyFragment(html);
 			
@@ -810,6 +811,7 @@ public class TextFilterManage {
 					}
 				}
 			}
+			doc.outputSettings().prettyPrint(prettyPrint);
 			html = doc.body().html();
 		}
 		return html;

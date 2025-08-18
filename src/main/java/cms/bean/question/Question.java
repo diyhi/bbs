@@ -87,6 +87,10 @@ public class Question implements Serializable{
 	/** 查看总数 **/
 	private Long viewTotal = 0L;
 	
+	/** 投票主题Id **/
+	@Column(length=32)
+	private String voteThemeId;
+	
 	/** 用户名称 **/
 	@Column(length=30)
 	private String userName;
@@ -346,6 +350,16 @@ public class Question implements Serializable{
 
 	public void setMarkdownContent(String markdownContent) {
 		this.markdownContent = markdownContent;
+	}
+
+
+	public String getVoteThemeId() {
+		return voteThemeId;
+	}
+
+
+	public void setVoteThemeId(String voteThemeId) {
+		this.voteThemeId = voteThemeId;
 	}
 	
 	

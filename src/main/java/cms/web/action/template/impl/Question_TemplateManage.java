@@ -562,6 +562,7 @@ public class Question_TemplateManage {
 		value.put("questionRewardAmountMin",systemSetting.getQuestionRewardAmountMin());
 		value.put("questionRewardAmountMax",systemSetting.getQuestionRewardAmountMax());
 		
+		value.put("maxVoteOptions", systemSetting.getQuestionMaxVoteOptions());//发起投票选项数量
 		
 		value.put("maxQuestionTagQuantity", systemSetting.getMaxQuestionTagQuantity());//提交问题最多可选择标签数量
 		

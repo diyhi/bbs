@@ -135,6 +135,12 @@ public class TemplateMain {
 				PageView<Topic> value = topic_TemplateManage.topic_page(forum, submitParameter,runtimeParameter);
 				return value;
 			}
+		}else if(forum.getForumChildType().equals("话题精华列表")){
+			if(forum.getDisplayType().equals("page")){//分页
+				
+				PageView<Topic> value = topic_TemplateManage.topicEssence_page(forum, submitParameter,runtimeParameter);
+				return value;
+			}
 		}else if(forum.getForumChildType().equals("相似话题")){
 			if(forum.getDisplayType().equals("collection")){//集合
 				

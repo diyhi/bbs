@@ -1241,6 +1241,7 @@ CREATE TABLE `question` (
   `point` bigint(20) DEFAULT NULL,
   `isMarkdown` bit(1) DEFAULT NULL,
   `markdownContent` longtext,
+  `voteThemeId` varchar(32) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `question_1_idx` (`userName`,`postTime`),
   KEY `question_4_idx` (`status`,`sort`,`lastAnswerTime`),
@@ -2005,6 +2006,8 @@ CREATE TABLE `systemsetting` (
   `languageSwitching` longtext,
   `allowLoginAccountType` longtext,
   `allowRegisterAccountType` longtext,
+  `questionMaxVoteOptions` int(11) DEFAULT NULL,
+  `topicMaxVoteOptions` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -2150,11 +2153,13 @@ CREATE TABLE `topic` (
   `markdownContent` longtext,
   `weight` double DEFAULT NULL,
   `tagIdGroup` varchar(50) DEFAULT NULL,
+  `voteThemeId` varchar(32) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `topic_3_idx` (`userName`,`postTime`),
   KEY `topic_5_idx` (`status`,`sort`,`lastReplyTime`),
   KEY `topic_6_idx` (`weight`),
-  KEY `topic_7_idx` (`tagIdGroup`,`status`)
+  KEY `topic_7_idx` (`tagIdGroup`,`status`),
+  KEY `topic_8_idx` (`essence`,`status`,`sort`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 

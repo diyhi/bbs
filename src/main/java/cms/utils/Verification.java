@@ -38,7 +38,7 @@ public class Verification {
 	private static Pattern ZIP = Pattern.compile("^[0-9]{6}$");
 
 	/** 邮箱 **/
-	private static Pattern EMAIL = Pattern.compile("^([a-zA-Z0-9]+[_|\\_|\\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\\_|\\.]?)*[a-zA-Z0-9]+\\.[a-zA-Z]{2,3}$");
+	private static Pattern EMAIL = Pattern.compile("^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$");
 	
 	/** 座机 **/
 	private static Pattern PHONE = Pattern.compile("1([\\d]{10})|((\\+[0-9]{2,4})?\\(?[0-9]+\\)?-?)?[0-9]{7,8}");
