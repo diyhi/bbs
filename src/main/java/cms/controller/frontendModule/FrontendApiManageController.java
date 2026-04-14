@@ -47,7 +47,7 @@ public class FrontendApiManageController {
         Map<String,Object> returnValue = new HashMap<String,Object>();
         List<DynamicRouteGroupDTO> allRouteGroupDTOs = frontendApiService.getAllCustomRouteGroup();
         returnValue.put("customDynamicRouteGroupList",allRouteGroupDTOs);
-
+        returnValue.put("multiLanguageExtensionParameterMap", new LinkedHashMap<String,String>());
         return new RequestResult(ResultCode.SUCCESS, returnValue);
     }
 
@@ -94,7 +94,7 @@ public class FrontendApiManageController {
         returnValue.put("frontendApi",frontendApi);
         List<DynamicRouteGroupDTO> allRouteGroupDTOs = frontendApiService.getAllCustomRouteGroup();
         returnValue.put("customDynamicRouteGroupList",allRouteGroupDTOs);
-
+        returnValue.put("multiLanguageExtensionParameterMap", new LinkedHashMap<String,String>());
         return new RequestResult(ResultCode.SUCCESS, returnValue);
     }
 
