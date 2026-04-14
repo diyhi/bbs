@@ -1,208 +1,157 @@
 package cms.service.question;
 
-import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
+import cms.dto.PageView;
+import cms.dto.question.AppendQuestionRequest;
+import cms.dto.question.QuestionRequest;
+import cms.model.question.Answer;
+import cms.model.question.AnswerReply;
+import cms.model.question.Question;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.Map;
 
-
-import cms.bean.payment.PaymentLog;
-import cms.bean.question.Question;
-import cms.bean.question.QuestionTagAssociation;
-import cms.bean.user.PointLog;
-import cms.service.besa.DAO;
-
 /**
- * 问题管理接口
- *
+ * 问题服务
  */
-public interface QuestionService extends DAO<Question>{
-	/**
-	 * 根据Id查询问题
-	 * @param questionId 问题Id
-	 * @return
-	 */
-	public Question findById(Long questionId);
-	/**
-	 * 根据Id集合查询问题
-	 * @param questionIdList 问题Id集合
-	 * @return
-	 */
-	public List<Question> findByIdList(List<Long> questionIdList);
-	/**
-	 * 根据Id集合查询问题标题
-	 * @param questionIdList 问题Id集合
-	 * @return
-	 */
-	public List<Question> findTitleByIdList(List<Long> questionIdList);
-	/**
-	 * 根据问题Id集合查询问题
-	 * @param questionIdList 话题Id集合
-	 * @return
-	 */
-	public List<Question> findQuestionByQuestionIdList(List<Long> questionIdList);
-	/**
-	 * 分页查询问题内容
-	 * @param firstIndex
-	 * @param maxResult
-	 * @param userName 用户名称
-	 * @param isStaff 是否为员工
-	 * @return
-	 */
-	public List<Question> findQuestionContentByPage(int firstIndex, int maxResult,String userName,boolean isStaff);
-	/**
-	 * 分页查询问题
-	 * @param firstIndex 开始索引
-	 * @param maxResult 需要获取的记录数
-	 * @return
-	 */
-	public List<Question> findQuestionByPage(int firstIndex, int maxResult);
-	/**
-	 * 分页查询问题
-	 * @param userName用户名称
-	 * @param postTime 问题发表时间
-	 * @param firstIndex 开始索引
-	 * @param maxResult 需要获取的记录数
-	 * @return
-	 */
-	public List<Question> findQuestionByPage(String userName,Date postTime,int firstIndex, int maxResult);
-	/**
-	 * 根据问题Id查询问题标签关联
-	 * @param questionId 问题Id
-	 * @return
-	 */
-	public List<QuestionTagAssociation> findQuestionTagAssociationByQuestionId(Long questionId);
-	/**
-	 * 保存问题
-	 * @param question 问题
-	 * @param questionTagAssociationList 问题标签关联集合
-	 * @param point 扣减用户积分
-	 * @param pointLog 积分日志
-	 * @param amount 扣减用户预存款
-	 * @param paymentLog 支付日志
-	 */
-	public void saveQuestion(Question question,List<QuestionTagAssociation> questionTagAssociationList,Long point,PointLog pointLog,BigDecimal amount,PaymentLog paymentLog);
-	/**
-	 * 追加问题
-	 * @param questionId 问题Id
-	 * @param appendContent 追加问题内容 AppendQuestionItem对象的JSON格式加上逗号
-	 * @return
-	 */
-	public Integer saveAppendQuestion(Long questionId,String appendContent);
-	/**
-	 * 修改追加问题
-	 * @param questionId 问题Id
-	 * @param appendContent 追加问题内容
-	 * @return
-	 */
-	public Integer updateAppendQuestion(Long questionId,String appendContent);
-	/**
-	 * 增加展示次数
-	 * @param countMap key: 话题Id value:展示次数
-	 * @return
-	 */
-	public int addViewCount(Map<Long,Long> countMap);
-	/**
-	 * 修改采纳答案Id
-	 * @param questionId 问题Id
-	 * @param answerId 答案Id
-	 * @return
-	 */
-	public int updateAdoptionAnswerId(Long questionId, Long answerId);
-	/**
-	 * 修改问题
-	 * @param question 问题
-	 * @param questionTagAssociationList 问题标签关联集合
-	 * @param changePointSymbol 变更积分符号 true：问题增加积分  false：问题减少积分
-	 * @param changePoint 变更积分
-	 * @param changeAmountSymbol 变更金额符号 true：问题增加金额  false：问题减少金额
-	 * @param changeAmount 变更金额
-	 * @param pointLogObject 用户悬赏积分日志
-	 * @param paymentLogObject 用户悬赏金额日志
-	 * @return
-	 */
-	public Integer updateQuestion(Question question,List<QuestionTagAssociation> questionTagAssociationList,
-			boolean changePointSymbol,Long changePoint, boolean changeAmountSymbol, BigDecimal changeAmount,Object pointLogObject,Object paymentLogObject);
-	/**
-	 * 修改问题最后回答时间
-	 * @param questionId 问题Id
-	 * @param lastAnswerTime 最后回答时间
-	 * @return
-	 */
-	public Integer updateQuestionAnswerTime(Long questionId,Date lastAnswerTime);
-	/**
-	 * 修改问题状态
-	 * @param questionId 问题Id
-	 * @param status 状态
-	 * @return
-	 */
-	public int updateQuestionStatus(Long questionId,Integer status);
-	/**
-	 * 修改问题标签Id
-	 * @param old_tagId 旧标签Id
-	 * @param new_tagId 新标签Id
-	 * @return
-	 */
-	public Integer updateTagId(Long old_tagId,Long new_tagId);
-	/**
-	 * 根据标签Id删除问题标签关联
-	 * @param questionTagId 问题标签Id
-	 * @return
-	 */
-	public Integer deleteQuestionTagAssociation(Long questionTagId);
-	/**
-	 * 根据用户名称集合删除问题标签关联
-	 * @param userNameList 用户名称集合
-	 * @return
-	 */
-	public Integer deleteQuestionTagAssociationByUserId(List<String> userNameList);
-	/**
-	 * 还原问题
-	 * @param questionList 问题集合
-	 * @return
-	 */
-	public Integer reductionQuestion(List<Question> questionList);
-	
-	/**
-	 * 标记删除问题
-	 * @param questionId 问题Id
-	 * @return
-	 */
-	public Integer markDelete(Long questionId);
-	/**
-	 * 删除问题
-	 * @param questionId 问题Id
-	 * @param userName 用户名称
-	 * @param point 扣减用户积分
-	 * @param pointLogObject 积分日志
-	 * @param amount 扣减用户预存款
-	 * @param paymentLogObject 支付日志
-	 * @return
-	 */
-	public Integer deleteQuestion(Long questionId,String userName,Long point,Object pointLogObject,BigDecimal amount,Object paymentLogObject);
-	/**
-	 * 根据用户名称集合删除问题
-	 * @param userNameList 用户名称集合
-	 * @return
-	 */
-	public Integer deleteQuestion(List<String> userNameList);
-	/**
-	 * 增加总答案数
-	 * @param questionId 问题Id
-	 * @param quantity 数量
-	 * @return
-	 */
-	public int addAnswerTotal(Long questionId,Long quantity);
-	/**
-	 * 减少总答案数
-	 * @param questionId 问题Id
-	 * @param quantity 数量
-	 * @return
-	 */
-	public int subtractAnswerTotal(Long questionId,Long quantity);
-	/**
-	 * 查询待审核问题数量
-	 * @return
-	 */
-	public Long auditQuestionCount();
+public interface QuestionService {
+
+    /**
+     * 获取问题列表
+     * @param page 页码
+     * @param visible 是否可见
+     * @param fileServerAddress 文件服务器地址
+     * @return
+     */
+    public PageView<Question> getQuestionList(int page, Boolean visible, String fileServerAddress);
+
+    /**
+     * 获取问题明细
+     * @param questionId 问题Id
+     * @param answerId 答案Id
+     * @param page 页码
+     * @param request 请求信息
+     * @return
+     */
+    public Map<String,Object> getQuestionDetail(Long questionId, Long answerId, Integer page, HttpServletRequest request);
+
+    /**
+     * 获取问题添加界面信息
+     * @return
+     */
+    public Map<String, Object> getAddQuestionViewModel();
+    /**
+     * 添加问题
+     * @param questionRequest 问题表单
+     * @param request 请求信息
+     */
+    public void addQuestion(QuestionRequest questionRequest, HttpServletRequest request);
+    /**
+     * 上传文件
+     * @param dir 上传类型，分别为image、media、file
+     * @param userName 用户名称
+     * @param isStaff 是否是员工   true:员工   false:会员
+     * @param fileName 文件名称 预签名时有值
+     * @param fileServerAddress 文件服务器地址
+     * @param file 文件
+     * @return
+     */
+    public Map<String, Object> uploadFile(String dir, String userName,Boolean isStaff, String fileName, String fileServerAddress, MultipartFile file);
+
+
+    /**
+     * 获取修改问题界面信息
+     * @param questionId 问题Id
+     * @return
+     */
+    public Map<String, Object> getEditQuestionViewModel(Long questionId);
+    /**
+     * 修改问题
+     * @param questionRequest 问题表单
+     * @param request 请求信息
+     */
+    public void editQuestion(QuestionRequest questionRequest, HttpServletRequest request);
+    /**
+     * 获取问题追加界面信息
+     * @param questionId 问题Id
+     * @return
+     */
+    public Map<String, Object> getAddAdditionalQuestionViewModel(Long questionId);
+    /**
+     * 追加问题
+     * @param appendQuestionRequest 追加问题表单
+     * @param request 请求信息
+     */
+    public void appendQuestion(AppendQuestionRequest appendQuestionRequest, HttpServletRequest request);
+    /**
+     * 获取修改追加问题界面信息
+     * @param questionId 问题Id
+     * @param appendQuestionItemId 追加问题Id
+     * @return
+     */
+    public Map<String, Object> getEditAdditionalQuestionViewModel(Long questionId,String appendQuestionItemId);
+
+    /**
+     * 修改追加问题
+     * @param appendQuestionRequest 追加问题表单
+     * @param request 请求信息
+     */
+    public void editAppendQuestion(AppendQuestionRequest appendQuestionRequest, HttpServletRequest request);
+    /**
+     * 删除问题
+     * @param questionId 问题Id集合
+     */
+    public void deleteQuestion(Long[] questionId);
+    /**
+     * 删除追加问题
+     * @param questionId 问题Id集合
+     */
+    public void deleteAdditionalQuestion(Long questionId,String appendQuestionItemId);
+    /**
+     * 还原问题
+     * @param questionId 问题Id集合
+     */
+    public void reductionQuestion(Long[] questionId);
+    /**
+     * 审核问题
+     * @param questionId 问题Id
+     */
+    public void auditQuestion(Long questionId);
+    /**
+     * 获取问题搜索
+     * @param page 页码
+     * @param dataSource 数据源
+     * @param keyword 关键词
+     * @param tagId 标签Id
+     * @param tagName 标签名称
+     * @param account 账号
+     * @param start_postTime 起始发贴时间
+     * @param end_postTime 结束发贴时间
+     * @param fileServerAddress 文件服务器地址
+     * @return
+     */
+    public PageView<Question> getSearch(int page, Integer dataSource,String keyword,String tagId,String tagName,String account,
+                                        String start_postTime,String end_postTime,String fileServerAddress);
+    /**
+     * 获取全部待审核问题
+     * @param page 页码
+     * @param fileServerAddress 文件服务器地址
+     * @return
+     */
+    public PageView<Question> getPendingQuestions(int page, String fileServerAddress);
+
+    /**
+     * 获取全部待审核答案
+     * @param page 页码
+     * @param fileServerAddress 文件服务器地址
+     * @return
+     */
+    public PageView<Answer> getAllPendingAnswers(int page, String fileServerAddress);
+    /**
+     * 获取全部待审核回复
+     * @param page 页码
+     * @param fileServerAddress 文件服务器地址
+     * @return
+     */
+    public PageView<AnswerReply> getAllPendingReplies(int page, String fileServerAddress);
 }

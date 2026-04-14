@@ -1,45 +1,28 @@
 package cms.service.thumbnail;
 
+import cms.dto.thumbnail.ThumbnailRequest;
+import cms.model.thumbnail.Thumbnail;
+
 import java.util.List;
 
-import cms.bean.thumbnail.Thumbnail;
-import cms.service.besa.DAO;
-
 /**
- * 缩略图DAO接口
- *
+ * 缩略图服务
  */
-public interface ThumbnailService extends DAO<Thumbnail> {
-	/**
-	 * 查询所有缩略图
-	 * @return
-	 */
-	public List<Thumbnail> findAllThumbnail();
-	/**
-	 * 查询所有缩略图 缓存
-	 * @return
-	 */
-	public List<Thumbnail> findAllThumbnail_cache();
-	/**
-	 * 根据缩略图Id查询缩略图
-	 * @param thumbnailId
-	 * @return
-	 */
-	public Thumbnail findByThumbnailId(Integer thumbnailId);
-	/**
-	 * 根据规格组查询缩略图
-	 * @param specificationGroup 规格组
-	 * @return
-	 */
-	public Thumbnail findThumbnailBySpecificationGroup(String specificationGroup);
-	/**
-	 * 保存缩略图
-	 * @param thumbnail
-	 */
-	public void saveThumbnail(Thumbnail thumbnail);
-	/**
-	 * 删除缩略图
-	 * @param thumbnailId 缩略图Id
-	 */
-	public int deleteThumbnail(Integer thumbnailId);
+public interface ThumbnailService {
+
+    /**
+     * 获取缩略图列表
+     */
+    public List<Thumbnail> getThumbnailList();
+
+    /**
+     * 添加缩略图
+     * @param thumbnailRequest 缩略图表单
+     */
+    public void addThumbnail(ThumbnailRequest thumbnailRequest);
+    /**
+     * 删除缩略图
+     * @param thumbnailId 缩略图Id
+     */
+    public void deleteThumbnail(Integer thumbnailId);
 }

@@ -1,24 +1,19 @@
 package cms.service.statistic;
 
-import java.util.Date;
-import java.util.List;
-
-import cms.bean.statistic.PV;
-import cms.service.besa.DAO;
+import cms.dto.PageForm;
+import cms.dto.PageView;
+import cms.model.statistic.PV;
 
 /**
- * 页面访问量
- *
+ * 页面浏览量服务
  */
-public interface PageViewService extends DAO<PV>{
-	/**
-	 * 保存访问量
-	 * @param pvList 访问量集合
-	 */
-	public void savePageView(List<PV> pvList);
-	/**
-	 * 删除访问量
-	 * @param endTime 结束时间
-	 */
-	public void deletePageView(Date endTime);
+public interface PageViewService {
+
+    /**
+     * 获取页面浏览量列表
+     * @param page 页码
+     * @param start_times 起始时间
+     * @param end_times 结束时间
+     */
+    public PageView<PV> getPageViewList(int page, String start_times, String end_times);
 }

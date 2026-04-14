@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--设定Log4j2内部的日志级别:
+    级别顺序（低到高）：all < trace <debug < info < warn < error < fatal <off
+    只对Log4j本身的事件有效,可以不设置,当设置成TRACE时,会看到log4j2内部各种详细输出
+    -->
+<!--monitorInterval：Log4j能够自动检测修改配置 文件和重新配置本身，设置间隔秒数 -->
+<configuration status="fatal" monitorInterval="5">
+
+    <!--全局变量配置-->
+    <Properties>
+        <!-- 定义日志存储的路径，不要配置相对路径 ${custom:rootDir}\dataStore\log\-->
+        <property name="FILE_PATH" value="${custom:fullPath}" />
+    </Properties>
+
+    <appenders>
+    	<!-- 控制台信息 -->
+        <console name="Console" target="SYSTEM_OUT">
+            <!--输出日志的格式  %d{yyyy-MM-dd HH:mm:ss} %m%n -->
+            <PatternLayout pattern="%d{HH:mm:ss} %-5level %logger{36} - %msg%n" disableAnsi="false" noConsoleNoAnsi="false"/>
+
+            <!--控制台只输出level及其以上级别的信息（onMatch），其他的直接拒绝（onMismatch）生产环境设为off关闭控制台日志输出 -->
+            <ThresholdFilter level="all" onMatch="ACCEPT" onMismatch="DENY"/>
+
+        </console>
+
+		<!-- 文件滚动记录类型的日志输出源   fileName:当前正在操作的日志文件的文件名     filePattern:归档后的日志文件的文件名格式，其中`%d{yyyy-MM-dd-HH}`用来自动填充日期   %i的数字越大，文件越新-->
+		<RollingFile name="InfoRollingFile" fileName="${FILE_PATH}/info.log" filePattern="${FILE_PATH}/info_%d{yyyy-MM-dd}_%i.log">
+            <!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch）-->
+            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
+            <!-- 滚动记录输出模板 -->
+            <PatternLayout pattern="%-d{yyyy-MM-dd HH:mm:ss} [ %p ] [ %c ] %m%n"/>
+            <!-- 指定记录文件的封存策略，该策略主要是完成周期性的日志文件封存工作 -->
+            <Policies>
+                <!-- 基于时间进行日志的切割   interval:切割的间隔为1月, 即每天进行一次日志的归档，如果filePattern中配置的文件重命名规则是/WEB-INF/log/info_%d{yyyy-MM-dd HH-mm}-%i，最小的时间粒度是mm，即分钟，TimeBasedTriggeringPolicy指定的size是1，结合起来就是每2分钟生成一个新文件。如果改成%d{yyyy-MM-dd HH}，最小粒度为小时，则每2个小时生成一个文件。 -->
+                <!-- modulate:修正时间范围, 从0时开始计数。若modulate=true，则封存时间将以0点为边界进行偏移计算。比如，modulate=true，interval=4hours，那么假设上次封存日志的时间为03:00，则下次封存日志的时间为04:00，之后的封存时间 -->
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <!-- 基于日志文件体积的触发策略   size:当日志文件体积大于size指定的值时，触发Rolling -->
+                <SizeBasedTriggeringPolicy size="50MB"/>
+            </Policies>
+            <!-- 文件封存的覆盖策略 DefaultRolloverStrategy属性如不设置，则默认为最多同一文件夹下7个文件开始覆盖  max:生成分割（封存）文件的个数-->
+            <DefaultRolloverStrategy max="100"/>
+        </RollingFile>
+    </appenders>
+
+    <!--Logger节点用来单独指定日志的形式，比如要为指定包下的class指定不同的日志级别等。-->
+    <!--然后定义loggers，只有定义了logger并引入的appender，appender才会生效-->
+    <loggers>
+        <!--监控系统信息-->
+        <!--过滤掉spring的一些无用的DEBUG信息  若是additivity设为false，则 子Logger 只会在自己的appender里输出，而不会在 父Logger 的appender里输出。-->
+        <Logger name="org.springframework" level="warn" additivity="false">
+            <AppenderRef ref="Console"/>
+        </Logger>
+        <Logger name="org.ehcache.core.EhcacheManager" level="warn" additivity="false">
+            <AppenderRef ref="Console" />
+        </Logger>
+        <Logger name="org.ehcache.jsr107.Eh107CacheManager" level="warn" additivity="false">
+            <AppenderRef ref="Console"/>
+        </Logger>
+        <!--屏蔽控制台打印视频切片信息-->
+        <Logger name="net.bramp.ffmpeg" level="warn" additivity="false">
+            <AppenderRef ref="Console"/>
+        </Logger>
+
+        <!-- 屏蔽访问URL不存在时控制台警告  例如：WARN org.springframework.web.servlet.PageNotFound - No mapping for GET /control/tag/list
+        <Logger name="org.springframework.web.servlet.PageNotFound" level="error" additivity="false">
+            <AppenderRef ref="Console"/>
+        </Logger> -->
+
+		<!-- 根日志，所有日志的父节点 级别顺序（低到高）：all < trace <debug < info < warn < error < fatal <off -->
+        <root level="info">
+            <appender-ref ref="Console"/>
+            <appender-ref ref="InfoRollingFile"/>
+        </root>
+    </loggers>
+
+</configuration>

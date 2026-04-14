@@ -1,66 +1,52 @@
 package cms.service.report;
 
+import cms.dto.report.ReportTypeRequest;
+import cms.model.report.ReportType;
 
 import java.util.List;
-import cms.bean.report.ReportType;
-import cms.service.besa.DAO;
+import java.util.Map;
 
 /**
- * 举报分类管理接口
- *
+ * 举报分类服务
  */
-public interface ReportTypeService extends DAO<ReportType>{
-	
-	/** 
-	 * 根据Id查询分类
-	 * @param reportTypeId 分类Id
-	 * @return
-	 */
-	public ReportType findById(String reportTypeId);
-	/**
-	 * 根据分类查询所有父分类
-	 * @param reportType 分类
-	 * @return
-	 */
-	public List<ReportType> findAllParentById(ReportType reportType);
-	
-	/**
-	 * 根据分类Id查询子分类(下一节点)
-	 * @param reportTypeId 分类Id
-	 * @return
-	 */
-	public List<ReportType> findChildTypeById(String reportTypeId);
-	
-	/**
-	 * 查询所有举报分类
-	 * @return
-	 */
-	public List<ReportType> findAllReportType();
-	
-	/**
-	 * 查询所有举报分类 - 缓存
-	 * @return
-	 */
-	public List<ReportType> findAllReportType_cache();
+public interface ReportTypeService {
 
-	
-	/**
-	 * 保存分类
-	 * @param reportType
-	 */
-	public void saveReportType(ReportType reportType);
-	
-
-	/**
-	 * 修改分类
-	 * @param reportType
-	 * @return
-	 */
-	public Integer updateReportType(ReportType reportType);
-	
-	/**
-	 * 删除分类
-	 * @param reportType 分类
-	 */
-	public Integer deleteReportType(ReportType reportType);
+    /**
+     * 获取举报分类列表
+     * @param page 页码
+     * @param parentId 父Id
+     */
+    public Map<String,Object> getReportTypeList(int page,String parentId);
+    /**
+     * 获取添加举报分类界面信息
+     * @param parentId 父Id
+     * @return
+     */
+    public Map<String,Object> getAddReportTypeViewModel(String parentId);
+    /**
+     * 添加举报分类
+     * @param reportTypeRequest 举报分类表单
+     */
+    public void addReportType(ReportTypeRequest reportTypeRequest);
+    /**
+     * 获取修改举报分类界面信息
+     * @param reportTypeId 举报分类Id
+     * @return
+     */
+    public Map<String,Object> getEditReportTypeViewModel(String reportTypeId);
+    /**
+     * 修改举报分类
+     * @param reportTypeRequest 举报分类表单
+     */
+    public void editReportType(ReportTypeRequest reportTypeRequest);
+    /**
+     * 删除举报分类
+     * @param reportTypeId 举报分类Id
+     */
+    public void deleteReportType(String reportTypeId);
+    /**
+     * 查询所有举报分类
+     * @return
+     */
+    public List<ReportType> getAllType();
 }

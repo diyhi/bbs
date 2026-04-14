@@ -17,6 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @param <T> 设置对象的类型
  */
+//@javax.annotation.concurrent.ThreadSafe
 public final class ConcurrentHashSet<T> extends AbstractSet<T> {
 	  private final ConcurrentHashMap<T, Boolean> mMap;
 	
@@ -56,7 +57,7 @@ public final class ConcurrentHashSet<T> extends AbstractSet<T> {
 	  /**
 	   * 将元素添加到集合中，前提是该元素尚未加入集合
 	   *
-	   * @param 要添加到集合中的元素
+	   * @param element 要添加到集合中的元素
 	   * @return 如果该集合尚未包含指定元素，则返回 true
 	   */
 	  public boolean addIfAbsent(T element) {

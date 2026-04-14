@@ -1,0 +1,161 @@
+bbs:
+  #论坛外部目录，例如D:\bbs  不能以斜杆结尾。如果为空，则目录为jar文件的同级bbs目录
+  externalDirectory:
+  #是否允许显示图形界面安装系统
+  allowInstallSystem: true
+
+  # 跨域允许的域名,多个域名用英文逗号分割。如果nginx已配置了跨域参数，则本参数不需要配置。示例：http://localhost:3000,http://127.0.0.1:3000
+  allowedOrigins: http://localhost:3000,http://127.0.0.1:3000,http://192.168.0.2:3000,http://192.168.0.2:8085,http://127.0.0.1:3001
+
+  admin:
+    accessToken-expiration: 7200 # 管理员账号访问令牌过期时间 单位/秒  半小时
+    refreshToken-expiration: 604800 # 管理员账号刷新令牌过期时间 单位/秒  7天
+    failedLoginCount: 3  # 管理员登录失败超过N次出现验证码 0为每次登录都出现验证码
+  sharding:
+    pointLogConfig_tableQuantity: 4 #积分日志配置分表数量
+    userLoginLogConfig_tableQuantity: 4 #用户登录日志配置分表数量
+    staffLoginLogConfig_tableQuantity: 4 #员工登录日志配置分表数量
+    privateMessageConfig_tableQuantity: 4 #私信配置分表数量
+    subscriptionSystemNotifyConfig_tableQuantity: 4 #订阅系统通知配置分表数量
+    remindConfig_tableQuantity: 4 #提醒配置分表数量
+    favoritesConfig_tableQuantity: 4 #收藏夹配置分表数量
+    topicFavoriteConfig_tableQuantity: 4 #话题收藏配置分表数量
+    topicUnhideConfig_tableQuantity: 4 #话题取消隐藏配置分表数量
+    userDynamicConfig_tableQuantity: 4 #用户动态配置分表数量
+    likeConfig_tableQuantity: 4 #点赞配置分表数量
+    topicLikeConfig_tableQuantity: 4 #话题点赞配置分表数量
+    commentLikeConfig_tableQuantity: 4 #评论点赞配置分表数量
+    commentReplyLikeConfig_tableQuantity: 4 #评论回复点赞配置分表数量
+    questionLikeConfig_tableQuantity: 4 #问题点赞配置分表数量
+    answerLikeConfig_tableQuantity: 4 #答案点赞配置分表数量
+    answerReplyLikeConfig_tableQuantity: 4 #答案回复点赞配置分表数量
+    followConfig_tableQuantity: 4 #关注配置分表数量
+    followerConfig_tableQuantity: 4 #粉丝配置分表数量
+    paymentLogConfig_tableQuantity: 4 #支付日志配置分表数量
+    questionFavoriteConfig_tableQuantity: 4 #问题收藏配置分表数量
+    receiveRedEnvelopeConfig_tableQuantity: 4 #收红包配置分表数量
+    membershipCardGiftItemConfig_tableQuantity: 4 #会员卡赠送项配置分表数量
+
+
+#jasypt加密的盐值
+jasypt:
+  encryptor:
+    #建议仅在测试中使用，生产环境写在系统变量里
+    password: 123456  #加密盐值
+    algorithm: PBEWithMD5AndDES
+    iv-generator-classname: org.jasypt.iv.NoIvGenerator
+spring:
+  #数据库
+  datasource:
+
+    #账号配置
+    url: jdbc:mysql://127.0.0.1:3306/bbs-jdk21?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&zeroDateTimeBehavior=CONVERT_TO_NULL&allowPublicKeyRetrieval=true&useSSL=false&rewriteBatchedStatements=true
+    username: root
+    #加密由ENC()包裹
+    password: ENC(H8RxvgIzAJRfwLV10qFukA==)
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    #hikari数据库连接池
+    hikari:
+      minimum-idle: 5 #最小空闲连接数量
+      idle-timeout: 600000 #空闲连接存活最大时间，默认600000（10分钟）
+      maximum-pool-size: 100 #连接池最大连接数，默认是10
+      auto-commit: true  #此属性控制从池返回的连接的默认自动提交行为,默认值：true
+      max-lifetime: 1800000 #此属性控制池中连接的最长生命周期，值0表示无限生命周期，默认1800000即30分钟
+      connection-timeout: 30000 #数据库连接超时时间,默认30秒，即30000
+      connection-test-query: SELECT 1
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.MySQLDialect #需要MySQL8.0以上版本
+    show-sql: false
+    open-in-view: false #不允许事务外访问懒加载的数据
+    properties:
+      hibernate.format_sql: true
+      hibernate.max_fetch_depth: 3
+      hibernate.jdbc.batch_size: 25
+      #hibernate.jdbc.batch_versioned_data: true #如果你想让你的JDBC驱动从executeBatch()返回正确的行计数 , 那么将此属性设为true(开启这个选项通常是安全的). 同时，Hibernate将为自动版本化的数据使用批量DML. 默认值为false
+      hibernate.generate_statistics: false #打开hibernate统计信息
+      #hibernate.hbm2ddl.auto: update
+      hibernate.order_updates: true
+      hibernate.physical_naming_strategy: cms.config.MyPhysicalNamingStrategy
+      hibernate.use_second_level_cache: false
+      hibernate.cache.use_query_cache: false
+
+  web:
+    resources:
+      addMappings: false #false表示不加入默认的静态资源路径处理。  为true时处理/**,所有匹配不到的接口请求将由ResourceHttpRequestHandler处理、获取并返回。而ResourceHttpRequestHandler内部将会查找对应的静态资源，如果查不到将直接response.sendError()最终重定向到/error视图,最终交给springboot默认的/error控制器处理。  注意：spring boot 2.6路径为 spring.web.resources.addMappings
+  servlet:
+    multipart:
+      max-file-size: 1000MB #文件上传单个数据大小
+      max-request-size: 1000MB #文件上传总数据大小
+  cache:
+    # 缓存类型 jcache、redis、none(不使用缓存)
+    type: jcache
+#内嵌服务器配置
+server:
+  #服务端口
+  port: 8080
+  #servlet:
+    #context-path: /api #上下文路径
+  forward-headers-strategy: native  # native：这是推荐的方式。由Tomcat处理所有标准的 X-Forwarded-* 请求头。 framework：让 Spring Framework 来处理请求头
+  #Tomcat服务器
+  tomcat:
+    #basedir: D:\test\tomcat-tmp #内置tomcat临时目录
+    #relaxed-query-chars: '|,{,},[,],^' #允许在查询参数中使用特殊字符
+    #uri编码
+    uri-encoding: UTF-8
+
+    max-part-count: 300 #multipart/form-data上传文件含有多表单字段时需要设置，否则报错Failed to parse multipart servlet request
+    #访问日志
+    accesslog:
+      enabled: false #是否启用访问日志
+      directory: D:\test\tomcat-access-logs #日志文件的目录。可以是绝对的，也可以是相对于 Tomcat 基础目录的。
+      buffered: true #是否缓冲输出，使其仅定期刷新
+      file-date-format: .yyyy-MM-dd #放置在日志文件名中的日期格式
+      pattern: '%{X-FORWARDED-FOR}i %l %u %t %r %s %b' #访问日志的格式模式
+      prefix: access_log #日志前缀文件名
+      rename-on-rotate: false #是否推迟在文件名中包含日期戳直到轮换时间
+      request-attributes-enabled: false #为请求使用的 IP 地址、主机名、协议和端口设置请求属性
+      rotate: true #是否启用访问日志轮换
+      suffix: .log #日志后缀文件名
+
+#日志
+logging:
+  config: classpath:log4j2.xml
+
+#HttpClient配置
+http:
+  maxTotal: 500 #设置连接总数
+  defaultMaxPerRoute: 100 #设置每个主机最大的并发数
+  connectionRequestTimeout: 5000 #从连接池中获取到连接的最长时间
+  connectTimeout: 2000 #设置创建连接的最长时间
+  socketTimeout: 15000 #数据传输的最长时间
+  maxIdleTime: 1 #空闲时间(用于定期清理空闲连接)
+
+# 验证码配置
+kaptcha:
+  border: "no"  #是否有边框，默认为 yes，可选 yes、no
+  border.color: 105,179,90 #边框颜色 默认为Color.BLACKkaptcha.border.thickness 边框粗细度 默认为1
+  image:
+    width: 120 #宽度默认为200
+    height: 40 #图片高度 默认为50
+  textproducer:
+    font:
+      color: 31,31,31 #文本字符颜色 默认为Color.BLACK
+      size: 38 #文本字符大小 默认为40
+      names: 宋体,楷体,微软雅黑,Gloria Hallelujah #文本字体样式 FormiaScript,Maragsa Display,Gloria Hallelujah,宋体,楷体,微软雅黑  默认为new Font("Arial", 1, fontSize), new Font("Courier", 1, fontSize)
+    char:
+      space: 2 #文本字符间距 默认为2
+      length: 4 #文本字符长度 默认为5
+  noise:
+    color: 31,31,31 #噪点颜色 默认为Color.BLACK black
+  word:
+    impl: cms.config.DefaultWordRenderer #文本字符渲染
+  obscurificator:
+    impl: com.google.code.kaptcha.impl.WaterRipple #图片样式  com.google.code.kaptcha.impl.WaterRipple水纹     com.google.code.kaptcha.impl.ShadowGimpy阴影效果   cms.web.action.FishEyeGimpy鱼眼效果
+  background:
+    clear:
+      from: 255,255,255 #背景颜色渐变，开始颜色
+      to: 255,255,255 #背景颜色渐变，结束颜色
+  session:
+    key: code # 存储session的KEY名称

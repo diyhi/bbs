@@ -1,6 +1,7 @@
 package cms.utils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Properties;
@@ -9,6 +10,7 @@ import java.util.Map.Entry;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.core.io.ClassPathResource;
 
 
 /**
@@ -18,7 +20,7 @@ import org.apache.logging.log4j.Logger;
 public class DisablePath {
 	private static final Logger logger = LogManager.getLogger(DisablePath.class);
 	 
-	private static Set<String> disablePathSet = new HashSet<String>();//URL禁止路径
+	private static final Set<String> disablePathSet = new HashSet<String>();//URL禁止路径
 	
 	/**
 	 * 禁止路径初始化
@@ -26,9 +28,11 @@ public class DisablePath {
 	static{
 		Properties props = new Properties();   
 		//取得当前系统使用的目录
-        try {
-			props.load(DisablePath.class.getClassLoader()   
-			        .getResourceAsStream("disablePath.properties"));//得到当前类的类加载器,以流的方式读取配置文件   
+		
+		org.springframework.core.io.Resource resource = new ClassPathResource("/disablePath.properties");//读取配置文件
+    	
+		try (InputStream is = resource.getInputStream()){
+			props.load(is);//得到当前类的类加载器,以流的方式读取配置文件
 			
 			Iterator itr = props.entrySet().iterator();
 	        while (itr.hasNext()){
@@ -38,9 +42,7 @@ public class DisablePath {
 	            	disablePathSet.add(e.getValue().toString().trim().toLowerCase());
 	            }
 	        }
-
 		} catch (IOException e) {
-		//	e.printStackTrace();
 			if (logger.isErrorEnabled()) {
 	            logger.error("禁止路径初始化",e);
 	        }

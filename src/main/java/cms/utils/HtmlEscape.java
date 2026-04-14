@@ -13,7 +13,7 @@ public class HtmlEscape {
 	
 	/**
 	 * 转义
-	 * @param data
+	 * @param data 数据
 	 * @return
 	 */
 	public static String escape(String data){
@@ -37,9 +37,11 @@ public class HtmlEscape {
 		return data;
 	}
 	
+	
+	
 	/**
 	 * 转义符号 ( 小于号转为 &lt; 大于号转为&gt; )
-	 * @param input
+	 * @param input 输入数据
 	 * @return
 	 */
 	public static String escapeSymbol(String input){
@@ -75,5 +77,26 @@ public class HtmlEscape {
 		}
 		
 		return null;
+	}
+	
+	
+	/**
+	 * Lucene的QueryParser.escape(keyword)转义方法
+	 * Returns a String where those characters that QueryParser
+	 * expects to be escaped are escaped by a preceding <code>\</code>.
+	 */
+	public static String lucene_escape(String s) {
+	    StringBuilder sb = new StringBuilder();
+	    for (int i = 0; i < s.length(); i++) {
+	      char c = s.charAt(i);
+	      // These characters are part of the query syntax and must be escaped
+	      if (c == '\\' || c == '+' || c == '-' || c == '!' || c == '(' || c == ')' || c == ':'
+	        || c == '^' || c == '[' || c == ']' || c == '\"' || c == '{' || c == '}' || c == '~'
+	        || c == '*' || c == '?' || c == '|' || c == '&' || c == '/') {
+	        sb.append('\\');
+	      }
+	      sb.append(c);
+	    }
+	    return sb.toString();
 	}
 }

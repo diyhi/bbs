@@ -4,6 +4,7 @@ package cms.utils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * 让普通的java类获取spring 的bean配置
@@ -12,6 +13,7 @@ import org.springframework.context.ApplicationContextAware;
  * OrderService orderService = (OrderService)SpringConfigTool.getContext().getBean("orderServiceBean");
  *
  */
+@Configuration
 public class SpringConfigTool implements ApplicationContextAware{
 	/* 第一种写法 */
 	

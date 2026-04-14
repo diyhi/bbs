@@ -8,7 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -30,9 +30,9 @@ public class FileAuthorizationDetection {
 		
 		final String[] info = {null};//如果需要内部类修改局部变量，并且能传到外部类。因为final只是不能改变它的指向,但是可以改变它的属性,所以可以用数组来代替
 		//检测路径
-		String path = PathUtil.path()+File.separator;
+		String path = PathUtil.defaultExternalDirectory()+File.separator;
 		//排除目录路径
-		String excludeDirectoryPath = PathUtil.path()+File.separator+"file"+File.separator;
+		String excludeDirectoryPath = PathUtil.defaultExternalDirectory()+File.separator+"file"+File.separator;
 
 		try {
 			
@@ -42,7 +42,7 @@ public class FileAuthorizationDetection {
 				@Override
 				public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
 					//排除路径
-			    	if(StringUtils.startsWithIgnoreCase(dir.toString(), excludeDirectoryPath)){	
+			    	if(Strings.CI.startsWith(dir.toString(), excludeDirectoryPath)){
 			    		return FileVisitResult.SKIP_SIBLINGS;//代表“继续访问”，但不访问该文件或目录的兄弟文件或目录
 		    		}
 					return FileVisitResult.CONTINUE;//代表“继续访问”的后续行为
@@ -56,7 +56,7 @@ public class FileAuthorizationDetection {
 							//Files.isWritable判断文件夹是否可写方法不可靠，对于匿名(只读)访问一个网络共享文件夹,isWritable返回是true (匿名用户只有读取权限的共享文件夹Files.isWritable(...)总是返回true)
 							
 							
-							info[0] = dir+(Files.isReadable(dir) == false ? " [目录不可读]":"")+(Files.isWritable(dir) == false ? " [目录不可写]":"");
+							info[0] = dir+(!Files.isReadable(dir) ? " [目录不可读]":"")+(!Files.isWritable(dir) ? " [目录不可写]":"");
 							return FileVisitResult.TERMINATE;//代表“终止访问”的后续行为
 						}
 					}
@@ -70,7 +70,7 @@ public class FileAuthorizationDetection {
 					if(!Files.isHidden(file)){//如果不是隐藏文件
 						//检测文件夹权限
 						if(!Files.isReadable(file) || !Files.isWritable(file)){
-								info[0] = file+(Files.isReadable(file) == false ? " [文件不可读]":"")+(Files.isWritable(file) == false ? " [文件不可写]":"");
+								info[0] = file+(!Files.isReadable(file) ? " [文件不可读]":"")+(!Files.isWritable(file) ? " [文件不可写]":"");
 							return FileVisitResult.TERMINATE;//代表“终止访问”的后续行为
 						}
 					}

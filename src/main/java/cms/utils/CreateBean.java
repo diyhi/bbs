@@ -32,7 +32,7 @@ public class CreateBean {
 
 	/**
 	 * 创建积分日志bean
-	 * @param number 表号
+	 * @param tableNumber 表号
 	 */
 	public static void createPointLogBean(Integer tableNumber){
 		
@@ -44,11 +44,11 @@ public class CreateBean {
 
 	      
 	    //通过ClassPool生成一个public新类HistoryOrder.java   
-	    CtClass ctClass = pool.makeClass("cms.bean.user.PointLog_"+tableNumber); 
+	    CtClass ctClass = pool.makeClass("cms.model.user.PointLog_"+tableNumber); 
 
         try {
         	// 父类
-        	ctClass.setSuperclass(pool.get("cms.bean.user.PointLogEntity"));
+        	ctClass.setSuperclass(pool.get("cms.model.user.PointLogEntity"));
         	// 添加接口
 			ctClass.addInterface(pool.get("java.io.Serializable"));
 			
@@ -63,14 +63,14 @@ public class CreateBean {
 	        AnnotationsAttribute attr = new AnnotationsAttribute(cp, AnnotationsAttribute.visibleTag);
 	        
 	        //@Entity注解
-	        Annotation entity_a = new Annotation("javax.persistence.Entity", cp);
+	        Annotation entity_a = new Annotation("jakarta.persistence.Entity", cp);
 	  	  	attr.addAnnotation(entity_a);
 	  	  	
 	        //@Table注解
-	        Annotation a = new Annotation("javax.persistence.Table", cp);
+	        Annotation a = new Annotation("jakarta.persistence.Table", cp);
 	        a.addMemberValue("name", new StringMemberValue("pointlog_"+tableNumber, cp));
 	       
-	        Annotation index_a = new Annotation("javax.persistence.Index", cp);
+	        Annotation index_a = new Annotation("jakarta.persistence.Index", cp);
 	        index_a.addMemberValue("name", new StringMemberValue("pointlog_idx", cp));
 	        index_a.addMemberValue("columnList", new StringMemberValue("userName,times", cp));
 	        AnnotationMemberValue annotationMemberValue = new AnnotationMemberValue(cp);
@@ -106,7 +106,7 @@ public class CreateBean {
         byte[] byteArr;
         FileOutputStream fos = null;
 		try {
-			File file = new File(PathUtil.path()+File.separator+"WEB-INF"+File.separator+"classes"+File.separator+"cms"+File.separator+"bean"+File.separator+"user"+File.separator+"PointLog_"+tableNumber+".class");
+			File file = new File(PathUtil.rootPath()+File.separator+"cms"+File.separator+"model"+File.separator+"user"+File.separator+"PointLog_"+tableNumber+".class");
 			
 			if(!file.exists()){
 				byteArr = ctClass.toBytecode();
@@ -147,7 +147,7 @@ public class CreateBean {
 	
 	/**
 	 * 创建用户登录日志bean
-	 * @param number 表号
+	 * @param tableNumber 表号
 	 */
 	public static void createUserLoginLogBean(Integer tableNumber){
 		
@@ -159,11 +159,11 @@ public class CreateBean {
 
 	      
 	    //通过ClassPool生成一个public新类UserLoginLog_?.java   
-	    CtClass ctClass = pool.makeClass("cms.bean.user.UserLoginLog_"+tableNumber); 
+	    CtClass ctClass = pool.makeClass("cms.model.user.UserLoginLog_"+tableNumber); 
 
         try {
         	// 父类
-        	ctClass.setSuperclass(pool.get("cms.bean.user.UserLoginLogEntity"));
+        	ctClass.setSuperclass(pool.get("cms.model.user.UserLoginLogEntity"));
         	// 添加接口
 			ctClass.addInterface(pool.get("java.io.Serializable"));
 			
@@ -178,14 +178,14 @@ public class CreateBean {
 	        AnnotationsAttribute attr = new AnnotationsAttribute(cp, AnnotationsAttribute.visibleTag);
 	        
 	        //@Entity注解
-	        Annotation entity_a = new Annotation("javax.persistence.Entity", cp);
+	        Annotation entity_a = new Annotation("jakarta.persistence.Entity", cp);
 	  	  	attr.addAnnotation(entity_a);
 	  	  	
 	        //@Table注解
-	        Annotation a = new Annotation("javax.persistence.Table", cp);
+	        Annotation a = new Annotation("jakarta.persistence.Table", cp);
 	        a.addMemberValue("name", new StringMemberValue("userloginlog_"+tableNumber, cp));
 	       
-	        Annotation index_a = new Annotation("javax.persistence.Index", cp);
+	        Annotation index_a = new Annotation("jakarta.persistence.Index", cp);
 	        index_a.addMemberValue("name", new StringMemberValue("userLoginLog_idx", cp));
 	        index_a.addMemberValue("columnList", new StringMemberValue("userId,logonTime", cp));
 	        AnnotationMemberValue annotationMemberValue = new AnnotationMemberValue(cp);
@@ -224,7 +224,7 @@ public class CreateBean {
         byte[] byteArr;
         FileOutputStream fos = null;
 		try {
-			File file = new File(PathUtil.path()+File.separator+"WEB-INF"+File.separator+"classes"+File.separator+"cms"+File.separator+"bean"+File.separator+"user"+File.separator+"UserLoginLog_"+tableNumber+".class");
+			File file = new File(PathUtil.rootPath()+File.separator+"cms"+File.separator+"model"+File.separator+"user"+File.separator+"UserLoginLog_"+tableNumber+".class");
 			
 			if(!file.exists()){
 				byteArr = ctClass.toBytecode();
@@ -265,7 +265,7 @@ public class CreateBean {
 	
 	/**
 	 * 创建员工登录日志bean
-	 * @param number 表号
+	 * @param tableNumber 表号
 	 */
 	public static void createStaffLoginLogBean(Integer tableNumber){
 		
@@ -277,11 +277,11 @@ public class CreateBean {
 
 	      
 	    //通过ClassPool生成一个public新类UserLoginLog_?.java   
-	    CtClass ctClass = pool.makeClass("cms.bean.staff.StaffLoginLog_"+tableNumber); 
+	    CtClass ctClass = pool.makeClass("cms.model.staff.StaffLoginLog_"+tableNumber); 
 
         try {
         	// 父类
-        	ctClass.setSuperclass(pool.get("cms.bean.staff.StaffLoginLogEntity"));
+        	ctClass.setSuperclass(pool.get("cms.model.staff.StaffLoginLogEntity"));
         	// 添加接口
 			ctClass.addInterface(pool.get("java.io.Serializable"));
 			
@@ -296,14 +296,14 @@ public class CreateBean {
 	        AnnotationsAttribute attr = new AnnotationsAttribute(cp, AnnotationsAttribute.visibleTag);
 	        
 	        //@Entity注解
-	        Annotation entity_a = new Annotation("javax.persistence.Entity", cp);
+	        Annotation entity_a = new Annotation("jakarta.persistence.Entity", cp);
 	  	  	attr.addAnnotation(entity_a);
 	  	  	
 	        //@Table注解
-	        Annotation a = new Annotation("javax.persistence.Table", cp);
+	        Annotation a = new Annotation("jakarta.persistence.Table", cp);
 	        a.addMemberValue("name", new StringMemberValue("staffloginlog_"+tableNumber, cp));
 	       
-	        Annotation index_a = new Annotation("javax.persistence.Index", cp);
+	        Annotation index_a = new Annotation("jakarta.persistence.Index", cp);
 	        index_a.addMemberValue("name", new StringMemberValue("staffLoginLog_idx", cp));
 	        index_a.addMemberValue("columnList", new StringMemberValue("staffId,logonTime", cp));
 	        AnnotationMemberValue annotationMemberValue = new AnnotationMemberValue(cp);
@@ -342,7 +342,7 @@ public class CreateBean {
         byte[] byteArr;
         FileOutputStream fos = null;
 		try {
-			File file = new File(PathUtil.path()+File.separator+"WEB-INF"+File.separator+"classes"+File.separator+"cms"+File.separator+"bean"+File.separator+"staff"+File.separator+"StaffLoginLog_"+tableNumber+".class");
+			File file = new File(PathUtil.rootPath()+File.separator+"cms"+File.separator+"model"+File.separator+"staff"+File.separator+"StaffLoginLog_"+tableNumber+".class");
 			
 			if(!file.exists()){
 				byteArr = ctClass.toBytecode();
@@ -384,7 +384,7 @@ public class CreateBean {
 	
 	/**
 	 * 创建私信bean
-	 * @param number 表号
+	 * @param tableNumber 表号
 	 */
 	public static void createPrivateMessageBean(Integer tableNumber){
 		
@@ -396,11 +396,11 @@ public class CreateBean {
 
 	      
 	    //通过ClassPool生成一个public新类HistoryOrder.java   
-	    CtClass ctClass = pool.makeClass("cms.bean.message.PrivateMessage_"+tableNumber); 
+	    CtClass ctClass = pool.makeClass("cms.model.message.PrivateMessage_"+tableNumber); 
 
         try {
         	// 父类
-        	ctClass.setSuperclass(pool.get("cms.bean.message.PrivateMessageEntity"));
+        	ctClass.setSuperclass(pool.get("cms.model.message.PrivateMessageEntity"));
         	// 添加接口
 			ctClass.addInterface(pool.get("java.io.Serializable"));
 			
@@ -415,21 +415,21 @@ public class CreateBean {
 	        AnnotationsAttribute attr = new AnnotationsAttribute(cp, AnnotationsAttribute.visibleTag);
 	        
 	        //@Entity注解
-	        Annotation entity_a = new Annotation("javax.persistence.Entity", cp);
+	        Annotation entity_a = new Annotation("jakarta.persistence.Entity", cp);
 	  	  	attr.addAnnotation(entity_a);
 	  	  	
 	        //@Table注解
-	        Annotation a = new Annotation("javax.persistence.Table", cp);
+	        Annotation a = new Annotation("jakarta.persistence.Table", cp);
 	        a.addMemberValue("name", new StringMemberValue("privatemessage_"+tableNumber, cp));
 	       
-	        Annotation index_a = new Annotation("javax.persistence.Index", cp);
+	        Annotation index_a = new Annotation("jakarta.persistence.Index", cp);
 	        index_a.addMemberValue("name", new StringMemberValue("privateMessage_1_idx", cp));
 	        index_a.addMemberValue("columnList", new StringMemberValue("userId,status,sendTimeFormat", cp));
 	        AnnotationMemberValue annotationMemberValue = new AnnotationMemberValue(cp);
 	        annotationMemberValue.setValue(index_a);
 
 	        
-	        Annotation index_b = new Annotation("javax.persistence.Index", cp);
+	        Annotation index_b = new Annotation("jakarta.persistence.Index", cp);
 	        index_b.addMemberValue("name", new StringMemberValue("privateMessage_2_idx", cp));
 	        index_b.addMemberValue("columnList", new StringMemberValue("userId,friendUserId,status,sendTimeFormat", cp));
 	        AnnotationMemberValue annotationMemberValue_b = new AnnotationMemberValue(cp);
@@ -465,7 +465,7 @@ public class CreateBean {
         byte[] byteArr;
         FileOutputStream fos = null;
 		try {
-			File file = new File(PathUtil.path()+File.separator+"WEB-INF"+File.separator+"classes"+File.separator+"cms"+File.separator+"bean"+File.separator+"message"+File.separator+"PrivateMessage_"+tableNumber+".class");
+			File file = new File(PathUtil.rootPath()+File.separator+"cms"+File.separator+"model"+File.separator+"message"+File.separator+"PrivateMessage_"+tableNumber+".class");
 			
 			if(!file.exists()){
 				byteArr = ctClass.toBytecode();
@@ -506,7 +506,7 @@ public class CreateBean {
 	
 	/**
 	 * 创建订阅系统通知bean
-	 * @param number 表号
+	 * @param tableNumber 表号
 	 */
 	public static void createSubscriptionSystemNotifyBean(Integer tableNumber){
 		
@@ -518,11 +518,11 @@ public class CreateBean {
 
 	      
 	    //通过ClassPool生成一个public新类HistoryOrder.java   
-	    CtClass ctClass = pool.makeClass("cms.bean.message.SubscriptionSystemNotify_"+tableNumber); 
+	    CtClass ctClass = pool.makeClass("cms.model.message.SubscriptionSystemNotify_"+tableNumber); 
 
         try {
         	// 父类
-        	ctClass.setSuperclass(pool.get("cms.bean.message.SubscriptionSystemNotifyEntity"));
+        	ctClass.setSuperclass(pool.get("cms.model.message.SubscriptionSystemNotifyEntity"));
         	// 添加接口
 			ctClass.addInterface(pool.get("java.io.Serializable"));
 			
@@ -537,21 +537,21 @@ public class CreateBean {
 	        AnnotationsAttribute attr = new AnnotationsAttribute(cp, AnnotationsAttribute.visibleTag);
 	        
 	        //@Entity注解
-	        Annotation entity_a = new Annotation("javax.persistence.Entity", cp);
+	        Annotation entity_a = new Annotation("jakarta.persistence.Entity", cp);
 	  	  	attr.addAnnotation(entity_a);
 	  	  	
 	        //@Table注解
-	        Annotation a = new Annotation("javax.persistence.Table", cp);
+	        Annotation a = new Annotation("jakarta.persistence.Table", cp);
 	        a.addMemberValue("name", new StringMemberValue("subscriptionsystemnotify_"+tableNumber, cp));
 	       
-	        Annotation index_a = new Annotation("javax.persistence.Index", cp);
+	        Annotation index_a = new Annotation("jakarta.persistence.Index", cp);
 	        index_a.addMemberValue("name", new StringMemberValue("subscriptionSystemNotify_1_idx", cp));
 	        index_a.addMemberValue("columnList", new StringMemberValue("systemNotifyId", cp));
 	        AnnotationMemberValue annotationMemberValue = new AnnotationMemberValue(cp);
 	        annotationMemberValue.setValue(index_a);
 
 	
-	        Annotation index_b = new Annotation("javax.persistence.Index", cp);
+	        Annotation index_b = new Annotation("jakarta.persistence.Index", cp);
 	        index_b.addMemberValue("name", new StringMemberValue("subscriptionSystemNotify_2_idx", cp));
 	        index_b.addMemberValue("columnList", new StringMemberValue("userId,status,systemNotifyId", cp));
 	        AnnotationMemberValue annotationMemberValue_b = new AnnotationMemberValue(cp);
@@ -587,7 +587,7 @@ public class CreateBean {
         byte[] byteArr;
         FileOutputStream fos = null;
 		try {
-			File file = new File(PathUtil.path()+File.separator+"WEB-INF"+File.separator+"classes"+File.separator+"cms"+File.separator+"bean"+File.separator+"message"+File.separator+"SubscriptionSystemNotify_"+tableNumber+".class");
+			File file = new File(PathUtil.rootPath()+File.separator+"cms"+File.separator+"model"+File.separator+"message"+File.separator+"SubscriptionSystemNotify_"+tableNumber+".class");
 			
 			if(!file.exists()){
 				byteArr = ctClass.toBytecode();
@@ -625,7 +625,7 @@ public class CreateBean {
 	
 	/**
 	 * 创建提醒bean
-	 * @param number 表号
+	 * @param tableNumber 表号
 	 */
 	public static void createRemindBean(Integer tableNumber){
 		
@@ -637,11 +637,11 @@ public class CreateBean {
 
 	      
 	    //通过ClassPool生成一个public新类HistoryOrder.java   
-	    CtClass ctClass = pool.makeClass("cms.bean.message.Remind_"+tableNumber); 
+	    CtClass ctClass = pool.makeClass("cms.model.message.Remind_"+tableNumber); 
 
         try {
         	// 父类
-        	ctClass.setSuperclass(pool.get("cms.bean.message.RemindEntity"));
+        	ctClass.setSuperclass(pool.get("cms.model.message.RemindEntity"));
         	// 添加接口
 			ctClass.addInterface(pool.get("java.io.Serializable"));
 			
@@ -656,32 +656,32 @@ public class CreateBean {
 	        AnnotationsAttribute attr = new AnnotationsAttribute(cp, AnnotationsAttribute.visibleTag);
 	        
 	        //@Entity注解
-	        Annotation entity_a = new Annotation("javax.persistence.Entity", cp);
+	        Annotation entity_a = new Annotation("jakarta.persistence.Entity", cp);
 	  	  	attr.addAnnotation(entity_a);
 	  	  	
 	        //@Table注解
-	        Annotation a = new Annotation("javax.persistence.Table", cp);
+	        Annotation a = new Annotation("jakarta.persistence.Table", cp);
 	        a.addMemberValue("name", new StringMemberValue("remind_"+tableNumber, cp));
 	       
-	        Annotation index_a = new Annotation("javax.persistence.Index", cp);
+	        Annotation index_a = new Annotation("jakarta.persistence.Index", cp);
 	        index_a.addMemberValue("name", new StringMemberValue("remind_1_idx", cp));
 	        index_a.addMemberValue("columnList", new StringMemberValue("receiverUserId,status,sendTimeFormat", cp));
 	        AnnotationMemberValue annotationMemberValue = new AnnotationMemberValue(cp);
 	        annotationMemberValue.setValue(index_a);
 
-	        Annotation index_b = new Annotation("javax.persistence.Index", cp);
+	        Annotation index_b = new Annotation("jakarta.persistence.Index", cp);
 	        index_b.addMemberValue("name", new StringMemberValue("remind_2_idx", cp));
 	        index_b.addMemberValue("columnList", new StringMemberValue("topicId", cp));
 	        AnnotationMemberValue annotationMemberValue_b = new AnnotationMemberValue(cp);
 	        annotationMemberValue_b.setValue(index_b);
 	        
-	        Annotation index_c = new Annotation("javax.persistence.Index", cp);
+	        Annotation index_c = new Annotation("jakarta.persistence.Index", cp);
 	        index_c.addMemberValue("name", new StringMemberValue("remind_3_idx", cp));
 	        index_c.addMemberValue("columnList", new StringMemberValue("receiverUserId,typeCode,sendTimeFormat", cp));
 	        AnnotationMemberValue annotationMemberValue_c = new AnnotationMemberValue(cp);
 	        annotationMemberValue_c.setValue(index_c);
 	        
-	        Annotation index_d = new Annotation("javax.persistence.Index", cp);
+	        Annotation index_d = new Annotation("jakarta.persistence.Index", cp);
 	        index_d.addMemberValue("name", new StringMemberValue("remind_4_idx", cp));
 	        index_d.addMemberValue("columnList", new StringMemberValue("questionId", cp));
 	        AnnotationMemberValue annotationMemberValue_d = new AnnotationMemberValue(cp);
@@ -718,7 +718,7 @@ public class CreateBean {
         byte[] byteArr;
         FileOutputStream fos = null;
 		try {
-			File file = new File(PathUtil.path()+File.separator+"WEB-INF"+File.separator+"classes"+File.separator+"cms"+File.separator+"bean"+File.separator+"message"+File.separator+"Remind_"+tableNumber+".class");
+			File file = new File(PathUtil.rootPath()+File.separator+"cms"+File.separator+"model"+File.separator+"message"+File.separator+"Remind_"+tableNumber+".class");
 			
 			if(!file.exists()){
 				byteArr = ctClass.toBytecode();
@@ -756,7 +756,7 @@ public class CreateBean {
 	
 	/**
 	 * 创建收藏夹bean
-	 * @param number 表号
+	 * @param tableNumber 表号
 	 */
 	public static void createFavoritesBean(Integer tableNumber){
 		
@@ -768,11 +768,11 @@ public class CreateBean {
 
 	      
 	    //通过ClassPool生成一个public新类HistoryOrder.java   
-	    CtClass ctClass = pool.makeClass("cms.bean.favorite.Favorites_"+tableNumber); 
+	    CtClass ctClass = pool.makeClass("cms.model.favorite.Favorites_"+tableNumber); 
 
         try {
         	// 父类
-        	ctClass.setSuperclass(pool.get("cms.bean.favorite.FavoritesEntity"));
+        	ctClass.setSuperclass(pool.get("cms.model.favorite.FavoritesEntity"));
         	// 添加接口
 			ctClass.addInterface(pool.get("java.io.Serializable"));
 			
@@ -787,14 +787,14 @@ public class CreateBean {
 	        AnnotationsAttribute attr = new AnnotationsAttribute(cp, AnnotationsAttribute.visibleTag);
 	        
 	        //@Entity注解
-	        Annotation entity_a = new Annotation("javax.persistence.Entity", cp);
+	        Annotation entity_a = new Annotation("jakarta.persistence.Entity", cp);
 	  	  	attr.addAnnotation(entity_a);
 	  	  	
 	        //@Table注解
-	        Annotation a = new Annotation("javax.persistence.Table", cp);
+	        Annotation a = new Annotation("jakarta.persistence.Table", cp);
 	        a.addMemberValue("name", new StringMemberValue("favorites_"+tableNumber, cp));
 	       
-	        Annotation index_a = new Annotation("javax.persistence.Index", cp);
+	        Annotation index_a = new Annotation("jakarta.persistence.Index", cp);
 	        index_a.addMemberValue("name", new StringMemberValue("favorites_1_idx", cp));
 	        index_a.addMemberValue("columnList", new StringMemberValue("userName,addtime", cp));
 	        AnnotationMemberValue annotationMemberValue = new AnnotationMemberValue(cp);
@@ -832,7 +832,7 @@ public class CreateBean {
         byte[] byteArr;
         FileOutputStream fos = null;
 		try {
-			File file = new File(PathUtil.path()+File.separator+"WEB-INF"+File.separator+"classes"+File.separator+"cms"+File.separator+"bean"+File.separator+"favorite"+File.separator+"Favorites_"+tableNumber+".class");
+			File file = new File(PathUtil.rootPath()+File.separator+"cms"+File.separator+"model"+File.separator+"favorite"+File.separator+"Favorites_"+tableNumber+".class");
 			
 			if(!file.exists()){
 				byteArr = ctClass.toBytecode();
@@ -870,7 +870,7 @@ public class CreateBean {
 	
 	/**
 	 * 创建话题收藏bean
-	 * @param number 表号
+	 * @param tableNumber 表号
 	 */
 	public static void createTopicFavoriteBean(Integer tableNumber){
 		
@@ -882,11 +882,11 @@ public class CreateBean {
 
 	      
 	    //通过ClassPool生成一个public新类HistoryOrder.java   
-	    CtClass ctClass = pool.makeClass("cms.bean.favorite.TopicFavorite_"+tableNumber); 
+	    CtClass ctClass = pool.makeClass("cms.model.favorite.TopicFavorite_"+tableNumber); 
 
         try {
         	// 父类
-        	ctClass.setSuperclass(pool.get("cms.bean.favorite.TopicFavoriteEntity"));
+        	ctClass.setSuperclass(pool.get("cms.model.favorite.TopicFavoriteEntity"));
         	// 添加接口
 			ctClass.addInterface(pool.get("java.io.Serializable"));
 			
@@ -901,14 +901,14 @@ public class CreateBean {
 	        AnnotationsAttribute attr = new AnnotationsAttribute(cp, AnnotationsAttribute.visibleTag);
 	        
 	        //@Entity注解
-	        Annotation entity_a = new Annotation("javax.persistence.Entity", cp);
+	        Annotation entity_a = new Annotation("jakarta.persistence.Entity", cp);
 	  	  	attr.addAnnotation(entity_a);
 	  	  	
 	        //@Table注解
-	        Annotation a = new Annotation("javax.persistence.Table", cp);
+	        Annotation a = new Annotation("jakarta.persistence.Table", cp);
 	        a.addMemberValue("name", new StringMemberValue("topicfavorite_"+tableNumber, cp));
 	       
-	        Annotation index_a = new Annotation("javax.persistence.Index", cp);
+	        Annotation index_a = new Annotation("jakarta.persistence.Index", cp);
 	        index_a.addMemberValue("name", new StringMemberValue("topicFavorite_1_idx", cp));
 	        index_a.addMemberValue("columnList", new StringMemberValue("topicId,addtime", cp));
 	        AnnotationMemberValue annotationMemberValue = new AnnotationMemberValue(cp);
@@ -946,7 +946,7 @@ public class CreateBean {
         byte[] byteArr;
         FileOutputStream fos = null;
 		try {
-			File file = new File(PathUtil.path()+File.separator+"WEB-INF"+File.separator+"classes"+File.separator+"cms"+File.separator+"bean"+File.separator+"favorite"+File.separator+"TopicFavorite_"+tableNumber+".class");
+			File file = new File(PathUtil.rootPath()+File.separator+"cms"+File.separator+"model"+File.separator+"favorite"+File.separator+"TopicFavorite_"+tableNumber+".class");
 			
 			if(!file.exists()){
 				byteArr = ctClass.toBytecode();
@@ -984,7 +984,7 @@ public class CreateBean {
 	
 	/**
 	 * 创建话题取消隐藏bean
-	 * @param number 表号
+	 * @param tableNumber 表号
 	 */
 	public static void createTopicUnhideBean(Integer tableNumber){
 		
@@ -996,11 +996,11 @@ public class CreateBean {
 
 	      
 	    //通过ClassPool生成一个public新类HistoryOrder.java   
-	    CtClass ctClass = pool.makeClass("cms.bean.topic.TopicUnhide_"+tableNumber); 
+	    CtClass ctClass = pool.makeClass("cms.model.topic.TopicUnhide_"+tableNumber); 
 
         try {
         	// 父类
-        	ctClass.setSuperclass(pool.get("cms.bean.topic.UnhideEntity"));
+        	ctClass.setSuperclass(pool.get("cms.model.topic.UnhideEntity"));
         	// 添加接口
 			ctClass.addInterface(pool.get("java.io.Serializable"));
 			
@@ -1015,14 +1015,14 @@ public class CreateBean {
 	        AnnotationsAttribute attr = new AnnotationsAttribute(cp, AnnotationsAttribute.visibleTag);
 	        
 	        //@Entity注解
-	        Annotation entity_a = new Annotation("javax.persistence.Entity", cp);
+	        Annotation entity_a = new Annotation("jakarta.persistence.Entity", cp);
 	  	  	attr.addAnnotation(entity_a);
 	  	  	
 	        //@Table注解
-	        Annotation a = new Annotation("javax.persistence.Table", cp);
+	        Annotation a = new Annotation("jakarta.persistence.Table", cp);
 	        a.addMemberValue("name", new StringMemberValue("topicunhide_"+tableNumber, cp));
 	       
-	        Annotation index_a = new Annotation("javax.persistence.Index", cp);
+	        Annotation index_a = new Annotation("jakarta.persistence.Index", cp);
 	        index_a.addMemberValue("name", new StringMemberValue("topicunhide_1_idx", cp));
 	        index_a.addMemberValue("columnList", new StringMemberValue("topicId,cancelTime", cp));
 	        AnnotationMemberValue annotationMemberValue = new AnnotationMemberValue(cp);
@@ -1060,7 +1060,7 @@ public class CreateBean {
         byte[] byteArr;
         FileOutputStream fos = null;
 		try {
-			File file = new File(PathUtil.path()+File.separator+"WEB-INF"+File.separator+"classes"+File.separator+"cms"+File.separator+"bean"+File.separator+"topic"+File.separator+"TopicUnhide_"+tableNumber+".class");
+			File file = new File(PathUtil.rootPath()+File.separator+"cms"+File.separator+"model"+File.separator+"topic"+File.separator+"TopicUnhide_"+tableNumber+".class");
 			
 			if(!file.exists()){
 				byteArr = ctClass.toBytecode();
@@ -1098,7 +1098,7 @@ public class CreateBean {
 	
 	/**
 	 * 创建用户动态bean
-	 * @param number 表号
+	 * @param tableNumber 表号
 	 */
 	public static void createUserDynamicBean(Integer tableNumber){
 		
@@ -1110,11 +1110,11 @@ public class CreateBean {
 
 	      
 	    //通过ClassPool生成一个public新类HistoryOrder.java   
-	    CtClass ctClass = pool.makeClass("cms.bean.user.UserDynamic_"+tableNumber); 
+	    CtClass ctClass = pool.makeClass("cms.model.user.UserDynamic_"+tableNumber); 
 
         try {
         	// 父类
-        	ctClass.setSuperclass(pool.get("cms.bean.user.UserDynamicEntity"));
+        	ctClass.setSuperclass(pool.get("cms.model.user.UserDynamicEntity"));
         	// 添加接口
 			ctClass.addInterface(pool.get("java.io.Serializable"));
 			
@@ -1129,20 +1129,20 @@ public class CreateBean {
 	        AnnotationsAttribute attr = new AnnotationsAttribute(cp, AnnotationsAttribute.visibleTag);
 	        
 	        //@Entity注解
-	        Annotation entity_a = new Annotation("javax.persistence.Entity", cp);
+	        Annotation entity_a = new Annotation("jakarta.persistence.Entity", cp);
 	  	  	attr.addAnnotation(entity_a);
 	  	  	
 	        //@Table注解
-	        Annotation a = new Annotation("javax.persistence.Table", cp);
+	        Annotation a = new Annotation("jakarta.persistence.Table", cp);
 	        a.addMemberValue("name", new StringMemberValue("userDynamic_"+tableNumber, cp));
 	       
-	        Annotation index_a = new Annotation("javax.persistence.Index", cp);
+	        Annotation index_a = new Annotation("jakarta.persistence.Index", cp);
 	        index_a.addMemberValue("name", new StringMemberValue("userDynamic_1_idx", cp));
 	        index_a.addMemberValue("columnList", new StringMemberValue("userName,status,postTime", cp));
 	        AnnotationMemberValue annotationMemberValue = new AnnotationMemberValue(cp);
 	        annotationMemberValue.setValue(index_a);
 	       
-	        Annotation index_e = new Annotation("javax.persistence.Index", cp);
+	        Annotation index_e = new Annotation("jakarta.persistence.Index", cp);
 	        index_e.addMemberValue("name", new StringMemberValue("userDynamic_5_idx", cp));
 	        index_e.addMemberValue("columnList", new StringMemberValue("functionIdGroup,userName,module", cp));
 	        AnnotationMemberValue annotationMemberValue_e = new AnnotationMemberValue(cp);
@@ -1181,7 +1181,7 @@ public class CreateBean {
         byte[] byteArr;
         FileOutputStream fos = null;
 		try {
-			File file = new File(PathUtil.path()+File.separator+"WEB-INF"+File.separator+"classes"+File.separator+"cms"+File.separator+"bean"+File.separator+"user"+File.separator+"UserDynamic_"+tableNumber+".class");
+			File file = new File(PathUtil.rootPath()+File.separator+"cms"+File.separator+"model"+File.separator+"user"+File.separator+"UserDynamic_"+tableNumber+".class");
 			
 			if(!file.exists()){
 				byteArr = ctClass.toBytecode();
@@ -1221,7 +1221,7 @@ public class CreateBean {
 	
 	/**
 	 * 创建点赞bean
-	 * @param number 表号
+	 * @param tableNumber 表号
 	 */
 	public static void createLikeBean(Integer tableNumber){
 		
@@ -1233,11 +1233,11 @@ public class CreateBean {
 
 	      
 	    //通过ClassPool生成一个public新类HistoryOrder.java   
-	    CtClass ctClass = pool.makeClass("cms.bean.like.Like_"+tableNumber); 
+	    CtClass ctClass = pool.makeClass("cms.model.like.Like_"+tableNumber); 
 
         try {
         	// 父类
-        	ctClass.setSuperclass(pool.get("cms.bean.like.LikeEntity"));
+        	ctClass.setSuperclass(pool.get("cms.model.like.LikeEntity"));
         	// 添加接口
 			ctClass.addInterface(pool.get("java.io.Serializable"));
 			
@@ -1252,14 +1252,14 @@ public class CreateBean {
 	        AnnotationsAttribute attr = new AnnotationsAttribute(cp, AnnotationsAttribute.visibleTag);
 	        
 	        //@Entity注解
-	        Annotation entity_a = new Annotation("javax.persistence.Entity", cp);
+	        Annotation entity_a = new Annotation("jakarta.persistence.Entity", cp);
 	  	  	attr.addAnnotation(entity_a);
 	  	  	
 	        //@Table注解
-	        Annotation a = new Annotation("javax.persistence.Table", cp);
+	        Annotation a = new Annotation("jakarta.persistence.Table", cp);
 	        a.addMemberValue("name", new StringMemberValue("like_"+tableNumber, cp));
 	       
-	        Annotation index_a = new Annotation("javax.persistence.Index", cp);
+	        Annotation index_a = new Annotation("jakarta.persistence.Index", cp);
 	        index_a.addMemberValue("name", new StringMemberValue("like_1_idx", cp));
 	        index_a.addMemberValue("columnList", new StringMemberValue("userName,addtime", cp));
 	        AnnotationMemberValue annotationMemberValue = new AnnotationMemberValue(cp);
@@ -1297,7 +1297,7 @@ public class CreateBean {
         byte[] byteArr;
         FileOutputStream fos = null;
 		try {
-			File file = new File(PathUtil.path()+File.separator+"WEB-INF"+File.separator+"classes"+File.separator+"cms"+File.separator+"bean"+File.separator+"like"+File.separator+"Like_"+tableNumber+".class");
+			File file = new File(PathUtil.rootPath()+File.separator+"cms"+File.separator+"model"+File.separator+"like"+File.separator+"Like_"+tableNumber+".class");
 			
 			if(!file.exists()){
 				byteArr = ctClass.toBytecode();
@@ -1335,7 +1335,7 @@ public class CreateBean {
 	
 	/**
 	 * 创建话题点赞bean
-	 * @param number 表号
+	 * @param tableNumber 表号
 	 */
 	public static void createTopicLikeBean(Integer tableNumber){
 		
@@ -1347,11 +1347,11 @@ public class CreateBean {
 
 	      
 	    //通过ClassPool生成一个public新类HistoryOrder.java   
-	    CtClass ctClass = pool.makeClass("cms.bean.like.TopicLike_"+tableNumber); 
+	    CtClass ctClass = pool.makeClass("cms.model.like.TopicLike_"+tableNumber); 
 
         try {
         	// 父类
-        	ctClass.setSuperclass(pool.get("cms.bean.like.TopicLikeEntity"));
+        	ctClass.setSuperclass(pool.get("cms.model.like.TopicLikeEntity"));
         	// 添加接口
 			ctClass.addInterface(pool.get("java.io.Serializable"));
 			
@@ -1366,14 +1366,14 @@ public class CreateBean {
 	        AnnotationsAttribute attr = new AnnotationsAttribute(cp, AnnotationsAttribute.visibleTag);
 	        
 	        //@Entity注解
-	        Annotation entity_a = new Annotation("javax.persistence.Entity", cp);
+	        Annotation entity_a = new Annotation("jakarta.persistence.Entity", cp);
 	  	  	attr.addAnnotation(entity_a);
 	  	  	
 	        //@Table注解
-	        Annotation a = new Annotation("javax.persistence.Table", cp);
+	        Annotation a = new Annotation("jakarta.persistence.Table", cp);
 	        a.addMemberValue("name", new StringMemberValue("topiclike_"+tableNumber, cp));
 	       
-	        Annotation index_a = new Annotation("javax.persistence.Index", cp);
+	        Annotation index_a = new Annotation("jakarta.persistence.Index", cp);
 	        index_a.addMemberValue("name", new StringMemberValue("topicLike_1_idx", cp));
 	        index_a.addMemberValue("columnList", new StringMemberValue("topicId,addtime", cp));
 	        AnnotationMemberValue annotationMemberValue = new AnnotationMemberValue(cp);
@@ -1411,7 +1411,7 @@ public class CreateBean {
         byte[] byteArr;
         FileOutputStream fos = null;
 		try {
-			File file = new File(PathUtil.path()+File.separator+"WEB-INF"+File.separator+"classes"+File.separator+"cms"+File.separator+"bean"+File.separator+"like"+File.separator+"TopicLike_"+tableNumber+".class");
+			File file = new File(PathUtil.rootPath()+File.separator+"cms"+File.separator+"model"+File.separator+"like"+File.separator+"TopicLike_"+tableNumber+".class");
 			
 			if(!file.exists()){
 				byteArr = ctClass.toBytecode();
@@ -1447,9 +1447,10 @@ public class CreateBean {
 		} 
 	}
 	
+	
 	/**
 	 * 创建评论点赞bean
-	 * @param number 表号
+	 * @param tableNumber 表号
 	 */
 	public static void createCommentLikeBean(Integer tableNumber){
 		
@@ -1461,11 +1462,11 @@ public class CreateBean {
 
 	      
 	    //通过ClassPool生成一个public新类HistoryOrder.java   
-	    CtClass ctClass = pool.makeClass("cms.bean.like.CommentLike_"+tableNumber); 
+	    CtClass ctClass = pool.makeClass("cms.model.like.CommentLike_"+tableNumber); 
 
         try {
         	// 父类
-        	ctClass.setSuperclass(pool.get("cms.bean.like.CommentLikeEntity"));
+        	ctClass.setSuperclass(pool.get("cms.model.like.CommentLikeEntity"));
         	// 添加接口
 			ctClass.addInterface(pool.get("java.io.Serializable"));
 			
@@ -1480,14 +1481,14 @@ public class CreateBean {
 	        AnnotationsAttribute attr = new AnnotationsAttribute(cp, AnnotationsAttribute.visibleTag);
 	        
 	        //@Entity注解
-	        Annotation entity_a = new Annotation("javax.persistence.Entity", cp);
+	        Annotation entity_a = new Annotation("jakarta.persistence.Entity", cp);
 	  	  	attr.addAnnotation(entity_a);
 	  	  	
 	        //@Table注解
-	        Annotation a = new Annotation("javax.persistence.Table", cp);
+	        Annotation a = new Annotation("jakarta.persistence.Table", cp);
 	        a.addMemberValue("name", new StringMemberValue("commentlike_"+tableNumber, cp));
 	       
-	        Annotation index_a = new Annotation("javax.persistence.Index", cp);
+	        Annotation index_a = new Annotation("jakarta.persistence.Index", cp);
 	        index_a.addMemberValue("name", new StringMemberValue("commentLike_1_idx", cp));
 	        index_a.addMemberValue("columnList", new StringMemberValue("commentId,addtime", cp));
 	        AnnotationMemberValue annotationMemberValue = new AnnotationMemberValue(cp);
@@ -1521,12 +1522,11 @@ public class CreateBean {
 		}   
        
         
-        
-        //把生成的class文件写入文件   
+      //把生成的class文件写入文件   
         byte[] byteArr;
         FileOutputStream fos = null;
 		try {
-			File file = new File(PathUtil.path()+File.separator+"WEB-INF"+File.separator+"classes"+File.separator+"cms"+File.separator+"bean"+File.separator+"like"+File.separator+"CommentLike_"+tableNumber+".class");
+			File file = new File(PathUtil.rootPath()+File.separator+"cms"+File.separator+"model"+File.separator+"like"+File.separator+"CommentLike_"+tableNumber+".class");
 			
 			if(!file.exists()){
 				byteArr = ctClass.toBytecode();
@@ -1564,7 +1564,7 @@ public class CreateBean {
 	
 	/**
 	 * 创建评论回复点赞bean
-	 * @param number 表号
+	 * @param tableNumber 表号
 	 */
 	public static void createCommentReplyLikeBean(Integer tableNumber){
 		
@@ -1576,11 +1576,11 @@ public class CreateBean {
 
 	      
 	    //通过ClassPool生成一个public新类HistoryOrder.java   
-	    CtClass ctClass = pool.makeClass("cms.bean.like.CommentReplyLike_"+tableNumber); 
+	    CtClass ctClass = pool.makeClass("cms.model.like.CommentReplyLike_"+tableNumber); 
 
         try {
         	// 父类
-        	ctClass.setSuperclass(pool.get("cms.bean.like.CommentReplyLikeEntity"));
+        	ctClass.setSuperclass(pool.get("cms.model.like.CommentReplyLikeEntity"));
         	// 添加接口
 			ctClass.addInterface(pool.get("java.io.Serializable"));
 			
@@ -1595,14 +1595,14 @@ public class CreateBean {
 	        AnnotationsAttribute attr = new AnnotationsAttribute(cp, AnnotationsAttribute.visibleTag);
 	        
 	        //@Entity注解
-	        Annotation entity_a = new Annotation("javax.persistence.Entity", cp);
+	        Annotation entity_a = new Annotation("jakarta.persistence.Entity", cp);
 	  	  	attr.addAnnotation(entity_a);
 	  	  	
 	        //@Table注解
-	        Annotation a = new Annotation("javax.persistence.Table", cp);
+	        Annotation a = new Annotation("jakarta.persistence.Table", cp);
 	        a.addMemberValue("name", new StringMemberValue("commentreplylike_"+tableNumber, cp));
 	       
-	        Annotation index_a = new Annotation("javax.persistence.Index", cp);
+	        Annotation index_a = new Annotation("jakarta.persistence.Index", cp);
 	        index_a.addMemberValue("name", new StringMemberValue("commentReplyLike_1_idx", cp));
 	        index_a.addMemberValue("columnList", new StringMemberValue("replyId,addtime", cp));
 	        AnnotationMemberValue annotationMemberValue = new AnnotationMemberValue(cp);
@@ -1636,11 +1636,11 @@ public class CreateBean {
 		}   
        
         
-        //把生成的class文件写入文件   
+      //把生成的class文件写入文件   
         byte[] byteArr;
         FileOutputStream fos = null;
 		try {
-			File file = new File(PathUtil.path()+File.separator+"WEB-INF"+File.separator+"classes"+File.separator+"cms"+File.separator+"bean"+File.separator+"like"+File.separator+"CommentReplyLike_"+tableNumber+".class");
+			File file = new File(PathUtil.rootPath()+File.separator+"cms"+File.separator+"model"+File.separator+"like"+File.separator+"CommentReplyLike_"+tableNumber+".class");
 			
 			if(!file.exists()){
 				byteArr = ctClass.toBytecode();
@@ -1679,7 +1679,7 @@ public class CreateBean {
 	
 	/**
 	 * 创建问题点赞bean
-	 * @param number 表号
+	 * @param tableNumber 表号
 	 */
 	public static void createQuestionLikeBean(Integer tableNumber){
 		
@@ -1691,11 +1691,11 @@ public class CreateBean {
 
 	      
 	    //通过ClassPool生成一个public新类HistoryOrder.java   
-	    CtClass ctClass = pool.makeClass("cms.bean.like.QuestionLike_"+tableNumber); 
+	    CtClass ctClass = pool.makeClass("cms.model.like.QuestionLike_"+tableNumber); 
 
         try {
         	// 父类
-        	ctClass.setSuperclass(pool.get("cms.bean.like.QuestionLikeEntity"));
+        	ctClass.setSuperclass(pool.get("cms.model.like.QuestionLikeEntity"));
         	// 添加接口
 			ctClass.addInterface(pool.get("java.io.Serializable"));
 			
@@ -1710,14 +1710,14 @@ public class CreateBean {
 	        AnnotationsAttribute attr = new AnnotationsAttribute(cp, AnnotationsAttribute.visibleTag);
 	        
 	        //@Entity注解
-	        Annotation entity_a = new Annotation("javax.persistence.Entity", cp);
+	        Annotation entity_a = new Annotation("jakarta.persistence.Entity", cp);
 	  	  	attr.addAnnotation(entity_a);
 	  	  	
 	        //@Table注解
-	        Annotation a = new Annotation("javax.persistence.Table", cp);
+	        Annotation a = new Annotation("jakarta.persistence.Table", cp);
 	        a.addMemberValue("name", new StringMemberValue("questionlike_"+tableNumber, cp));
 	       
-	        Annotation index_a = new Annotation("javax.persistence.Index", cp);
+	        Annotation index_a = new Annotation("jakarta.persistence.Index", cp);
 	        index_a.addMemberValue("name", new StringMemberValue("questionLike_1_idx", cp));
 	        index_a.addMemberValue("columnList", new StringMemberValue("questionId,addtime", cp));
 	        AnnotationMemberValue annotationMemberValue = new AnnotationMemberValue(cp);
@@ -1751,11 +1751,11 @@ public class CreateBean {
 		}   
        
         
-        //把生成的class文件写入文件   
+      //把生成的class文件写入文件   
         byte[] byteArr;
         FileOutputStream fos = null;
 		try {
-			File file = new File(PathUtil.path()+File.separator+"WEB-INF"+File.separator+"classes"+File.separator+"cms"+File.separator+"bean"+File.separator+"like"+File.separator+"QuestionLike_"+tableNumber+".class");
+			File file = new File(PathUtil.rootPath()+File.separator+"cms"+File.separator+"model"+File.separator+"like"+File.separator+"QuestionLike_"+tableNumber+".class");
 			
 			if(!file.exists()){
 				byteArr = ctClass.toBytecode();
@@ -1794,7 +1794,7 @@ public class CreateBean {
 	
 	/**
 	 * 创建答案点赞bean
-	 * @param number 表号
+	 * @param tableNumber 表号
 	 */
 	public static void createAnswerLikeBean(Integer tableNumber){
 		
@@ -1806,11 +1806,11 @@ public class CreateBean {
 
 	      
 	    //通过ClassPool生成一个public新类HistoryOrder.java   
-	    CtClass ctClass = pool.makeClass("cms.bean.like.AnswerLike_"+tableNumber); 
+	    CtClass ctClass = pool.makeClass("cms.model.like.AnswerLike_"+tableNumber); 
 
         try {
         	// 父类
-        	ctClass.setSuperclass(pool.get("cms.bean.like.AnswerLikeEntity"));
+        	ctClass.setSuperclass(pool.get("cms.model.like.AnswerLikeEntity"));
         	// 添加接口
 			ctClass.addInterface(pool.get("java.io.Serializable"));
 			
@@ -1825,14 +1825,14 @@ public class CreateBean {
 	        AnnotationsAttribute attr = new AnnotationsAttribute(cp, AnnotationsAttribute.visibleTag);
 	        
 	        //@Entity注解
-	        Annotation entity_a = new Annotation("javax.persistence.Entity", cp);
+	        Annotation entity_a = new Annotation("jakarta.persistence.Entity", cp);
 	  	  	attr.addAnnotation(entity_a);
 	  	  	
 	        //@Table注解
-	        Annotation a = new Annotation("javax.persistence.Table", cp);
+	        Annotation a = new Annotation("jakarta.persistence.Table", cp);
 	        a.addMemberValue("name", new StringMemberValue("answerlike_"+tableNumber, cp));
 	       
-	        Annotation index_a = new Annotation("javax.persistence.Index", cp);
+	        Annotation index_a = new Annotation("jakarta.persistence.Index", cp);
 	        index_a.addMemberValue("name", new StringMemberValue("answerLike_1_idx", cp));
 	        index_a.addMemberValue("columnList", new StringMemberValue("answerId,addtime", cp));
 	        AnnotationMemberValue annotationMemberValue = new AnnotationMemberValue(cp);
@@ -1866,11 +1866,11 @@ public class CreateBean {
 		}   
        
         
-        //把生成的class文件写入文件   
+      //把生成的class文件写入文件   
         byte[] byteArr;
         FileOutputStream fos = null;
 		try {
-			File file = new File(PathUtil.path()+File.separator+"WEB-INF"+File.separator+"classes"+File.separator+"cms"+File.separator+"bean"+File.separator+"like"+File.separator+"AnswerLike_"+tableNumber+".class");
+			File file = new File(PathUtil.rootPath()+File.separator+"cms"+File.separator+"model"+File.separator+"like"+File.separator+"AnswerLike_"+tableNumber+".class");
 			
 			if(!file.exists()){
 				byteArr = ctClass.toBytecode();
@@ -1908,7 +1908,7 @@ public class CreateBean {
 	
 	/**
 	 * 创建答案回复点赞bean
-	 * @param number 表号
+	 * @param tableNumber 表号
 	 */
 	public static void createAnswerReplyLikeBean(Integer tableNumber){
 		
@@ -1920,11 +1920,11 @@ public class CreateBean {
 
 	      
 	    //通过ClassPool生成一个public新类HistoryOrder.java   
-	    CtClass ctClass = pool.makeClass("cms.bean.like.AnswerReplyLike_"+tableNumber); 
+	    CtClass ctClass = pool.makeClass("cms.model.like.AnswerReplyLike_"+tableNumber); 
 
         try {
         	// 父类
-        	ctClass.setSuperclass(pool.get("cms.bean.like.AnswerReplyLikeEntity"));
+        	ctClass.setSuperclass(pool.get("cms.model.like.AnswerReplyLikeEntity"));
         	// 添加接口
 			ctClass.addInterface(pool.get("java.io.Serializable"));
 			
@@ -1939,14 +1939,14 @@ public class CreateBean {
 	        AnnotationsAttribute attr = new AnnotationsAttribute(cp, AnnotationsAttribute.visibleTag);
 	        
 	        //@Entity注解
-	        Annotation entity_a = new Annotation("javax.persistence.Entity", cp);
+	        Annotation entity_a = new Annotation("jakarta.persistence.Entity", cp);
 	  	  	attr.addAnnotation(entity_a);
 	  	  	
 	        //@Table注解
-	        Annotation a = new Annotation("javax.persistence.Table", cp);
+	        Annotation a = new Annotation("jakarta.persistence.Table", cp);
 	        a.addMemberValue("name", new StringMemberValue("answerreplylike_"+tableNumber, cp));
 	       
-	        Annotation index_a = new Annotation("javax.persistence.Index", cp);
+	        Annotation index_a = new Annotation("jakarta.persistence.Index", cp);
 	        index_a.addMemberValue("name", new StringMemberValue("answerReplyLike_1_idx", cp));
 	        index_a.addMemberValue("columnList", new StringMemberValue("replyId,addtime", cp));
 	        AnnotationMemberValue annotationMemberValue = new AnnotationMemberValue(cp);
@@ -1978,13 +1978,13 @@ public class CreateBean {
 	            logger.error("答案回复点赞bean",e);
 	        }
 		}   
-
-
+       
+        
       //把生成的class文件写入文件   
         byte[] byteArr;
         FileOutputStream fos = null;
 		try {
-			File file = new File(PathUtil.path()+File.separator+"WEB-INF"+File.separator+"classes"+File.separator+"cms"+File.separator+"bean"+File.separator+"like"+File.separator+"AnswerReplyLike_"+tableNumber+".class");
+			File file = new File(PathUtil.rootPath()+File.separator+"cms"+File.separator+"model"+File.separator+"like"+File.separator+"AnswerReplyLike_"+tableNumber+".class");
 			
 			if(!file.exists()){
 				byteArr = ctClass.toBytecode();
@@ -2022,7 +2022,7 @@ public class CreateBean {
 	
 	/**
 	 * 创建关注bean
-	 * @param number 表号
+	 * @param tableNumber 表号
 	 */
 	public static void createFollowBean(Integer tableNumber){
 		
@@ -2034,11 +2034,11 @@ public class CreateBean {
 
 	      
 	    //通过ClassPool生成一个public新类HistoryOrder.java   
-	    CtClass ctClass = pool.makeClass("cms.bean.follow.Follow_"+tableNumber); 
+	    CtClass ctClass = pool.makeClass("cms.model.follow.Follow_"+tableNumber); 
 
         try {
         	// 父类
-        	ctClass.setSuperclass(pool.get("cms.bean.follow.FollowEntity"));
+        	ctClass.setSuperclass(pool.get("cms.model.follow.FollowEntity"));
         	// 添加接口
 			ctClass.addInterface(pool.get("java.io.Serializable"));
 			
@@ -2053,14 +2053,14 @@ public class CreateBean {
 	        AnnotationsAttribute attr = new AnnotationsAttribute(cp, AnnotationsAttribute.visibleTag);
 	        
 	        //@Entity注解
-	        Annotation entity_a = new Annotation("javax.persistence.Entity", cp);
+	        Annotation entity_a = new Annotation("jakarta.persistence.Entity", cp);
 	  	  	attr.addAnnotation(entity_a);
 	  	  	
 	        //@Table注解
-	        Annotation a = new Annotation("javax.persistence.Table", cp);
+	        Annotation a = new Annotation("jakarta.persistence.Table", cp);
 	        a.addMemberValue("name", new StringMemberValue("follow_"+tableNumber, cp));
 	       
-	        Annotation index_a = new Annotation("javax.persistence.Index", cp);
+	        Annotation index_a = new Annotation("jakarta.persistence.Index", cp);
 	        index_a.addMemberValue("name", new StringMemberValue("follow_1_idx", cp));
 	        index_a.addMemberValue("columnList", new StringMemberValue("userName,addtime", cp));
 	        AnnotationMemberValue annotationMemberValue = new AnnotationMemberValue(cp);
@@ -2098,7 +2098,7 @@ public class CreateBean {
         byte[] byteArr;
         FileOutputStream fos = null;
 		try {
-			File file = new File(PathUtil.path()+File.separator+"WEB-INF"+File.separator+"classes"+File.separator+"cms"+File.separator+"bean"+File.separator+"follow"+File.separator+"Follow_"+tableNumber+".class");
+			File file = new File(PathUtil.rootPath()+File.separator+"cms"+File.separator+"model"+File.separator+"follow"+File.separator+"Follow_"+tableNumber+".class");
 			
 			if(!file.exists()){
 				byteArr = ctClass.toBytecode();
@@ -2136,7 +2136,7 @@ public class CreateBean {
 	
 	/**
 	 * 创建粉丝bean
-	 * @param number 表号
+	 * @param tableNumber 表号
 	 */
 	public static void createFollowerBean(Integer tableNumber){
 		
@@ -2148,11 +2148,11 @@ public class CreateBean {
 
 	      
 	    //通过ClassPool生成一个public新类HistoryOrder.java   
-	    CtClass ctClass = pool.makeClass("cms.bean.follow.Follower_"+tableNumber); 
+	    CtClass ctClass = pool.makeClass("cms.model.follow.Follower_"+tableNumber); 
 
         try {
         	// 父类
-        	ctClass.setSuperclass(pool.get("cms.bean.follow.FollowerEntity"));
+        	ctClass.setSuperclass(pool.get("cms.model.follow.FollowerEntity"));
         	// 添加接口
 			ctClass.addInterface(pool.get("java.io.Serializable"));
 			
@@ -2167,14 +2167,14 @@ public class CreateBean {
 	        AnnotationsAttribute attr = new AnnotationsAttribute(cp, AnnotationsAttribute.visibleTag);
 	        
 	        //@Entity注解
-	        Annotation entity_a = new Annotation("javax.persistence.Entity", cp);
+	        Annotation entity_a = new Annotation("jakarta.persistence.Entity", cp);
 	  	  	attr.addAnnotation(entity_a);
 	  	  	
 	        //@Table注解
-	        Annotation a = new Annotation("javax.persistence.Table", cp);
+	        Annotation a = new Annotation("jakarta.persistence.Table", cp);
 	        a.addMemberValue("name", new StringMemberValue("follower_"+tableNumber, cp));
 	       
-	        Annotation index_a = new Annotation("javax.persistence.Index", cp);
+	        Annotation index_a = new Annotation("jakarta.persistence.Index", cp);
 	        index_a.addMemberValue("name", new StringMemberValue("follower_1_idx", cp));
 	        index_a.addMemberValue("columnList", new StringMemberValue("userName,addtime", cp));
 	        AnnotationMemberValue annotationMemberValue = new AnnotationMemberValue(cp);
@@ -2212,7 +2212,7 @@ public class CreateBean {
         byte[] byteArr;
         FileOutputStream fos = null;
 		try {
-			File file = new File(PathUtil.path()+File.separator+"WEB-INF"+File.separator+"classes"+File.separator+"cms"+File.separator+"bean"+File.separator+"follow"+File.separator+"Follower_"+tableNumber+".class");
+			File file = new File(PathUtil.rootPath()+File.separator+"cms"+File.separator+"model"+File.separator+"follow"+File.separator+"Follower_"+tableNumber+".class");
 			
 			if(!file.exists()){
 				byteArr = ctClass.toBytecode();
@@ -2251,7 +2251,7 @@ public class CreateBean {
 	
 	/**
 	 * 创建支付日志bean
-	 * @param number 表号
+	 * @param tableNumber 表号
 	 */
 	public static void createPaymentLogBean(Integer tableNumber){
 		
@@ -2263,11 +2263,11 @@ public class CreateBean {
 
 	      
 	    //通过ClassPool生成一个public新类HistoryOrder.java   
-	    CtClass ctClass = pool.makeClass("cms.bean.payment.PaymentLog_"+tableNumber); 
+	    CtClass ctClass = pool.makeClass("cms.model.payment.PaymentLog_"+tableNumber); 
 
         try {
         	// 父类
-        	ctClass.setSuperclass(pool.get("cms.bean.payment.PaymentLogEntity"));
+        	ctClass.setSuperclass(pool.get("cms.model.payment.PaymentLogEntity"));
         	// 添加接口
 			ctClass.addInterface(pool.get("java.io.Serializable"));
 			
@@ -2282,14 +2282,14 @@ public class CreateBean {
 	        AnnotationsAttribute attr = new AnnotationsAttribute(cp, AnnotationsAttribute.visibleTag);
 	        
 	        //@Entity注解
-	        Annotation entity_a = new Annotation("javax.persistence.Entity", cp);
+	        Annotation entity_a = new Annotation("jakarta.persistence.Entity", cp);
 	  	  	attr.addAnnotation(entity_a);
 	  	  	
 	        //@Table注解
-	        Annotation a = new Annotation("javax.persistence.Table", cp);
+	        Annotation a = new Annotation("jakarta.persistence.Table", cp);
 	        a.addMemberValue("name", new StringMemberValue("paymentlog_"+tableNumber, cp));
 	       
-	        Annotation index_a = new Annotation("javax.persistence.Index", cp);
+	        Annotation index_a = new Annotation("jakarta.persistence.Index", cp);
 	        index_a.addMemberValue("name", new StringMemberValue("paymentlog_idx", cp));
 	        index_a.addMemberValue("columnList", new StringMemberValue("userName,times", cp));
 	        AnnotationMemberValue annotationMemberValue = new AnnotationMemberValue(cp);
@@ -2325,7 +2325,7 @@ public class CreateBean {
         byte[] byteArr;
         FileOutputStream fos = null;
 		try {
-			File file = new File(PathUtil.path()+File.separator+"WEB-INF"+File.separator+"classes"+File.separator+"cms"+File.separator+"bean"+File.separator+"payment"+File.separator+"PaymentLog_"+tableNumber+".class");
+			File file = new File(PathUtil.rootPath()+File.separator+"cms"+File.separator+"model"+File.separator+"payment"+File.separator+"PaymentLog_"+tableNumber+".class");
 			
 			if(!file.exists()){
 				byteArr = ctClass.toBytecode();
@@ -2365,7 +2365,7 @@ public class CreateBean {
 	
 	/**
 	 * 创建问题收藏bean
-	 * @param number 表号
+	 * @param tableNumber 表号
 	 */
 	public static void createQuestionFavoriteBean(Integer tableNumber){
 		
@@ -2377,11 +2377,11 @@ public class CreateBean {
 
 	      
 	    //通过ClassPool生成一个public新类HistoryOrder.java   
-	    CtClass ctClass = pool.makeClass("cms.bean.favorite.QuestionFavorite_"+tableNumber); 
+	    CtClass ctClass = pool.makeClass("cms.model.favorite.QuestionFavorite_"+tableNumber); 
 
         try {
         	// 父类
-        	ctClass.setSuperclass(pool.get("cms.bean.favorite.QuestionFavoriteEntity"));
+        	ctClass.setSuperclass(pool.get("cms.model.favorite.QuestionFavoriteEntity"));
         	// 添加接口
 			ctClass.addInterface(pool.get("java.io.Serializable"));
 			
@@ -2396,14 +2396,14 @@ public class CreateBean {
 	        AnnotationsAttribute attr = new AnnotationsAttribute(cp, AnnotationsAttribute.visibleTag);
 	        
 	        //@Entity注解
-	        Annotation entity_a = new Annotation("javax.persistence.Entity", cp);
+	        Annotation entity_a = new Annotation("jakarta.persistence.Entity", cp);
 	  	  	attr.addAnnotation(entity_a);
 	  	  	
 	        //@Table注解
-	        Annotation a = new Annotation("javax.persistence.Table", cp);
+	        Annotation a = new Annotation("jakarta.persistence.Table", cp);
 	        a.addMemberValue("name", new StringMemberValue("questionfavorite_"+tableNumber, cp));
 	       
-	        Annotation index_a = new Annotation("javax.persistence.Index", cp);
+	        Annotation index_a = new Annotation("jakarta.persistence.Index", cp);
 	        index_a.addMemberValue("name", new StringMemberValue("questionFavorite_1_idx", cp));
 	        index_a.addMemberValue("columnList", new StringMemberValue("questionId,addtime", cp));
 	        AnnotationMemberValue annotationMemberValue = new AnnotationMemberValue(cp);
@@ -2441,7 +2441,7 @@ public class CreateBean {
         byte[] byteArr;
         FileOutputStream fos = null;
 		try {
-			File file = new File(PathUtil.path()+File.separator+"WEB-INF"+File.separator+"classes"+File.separator+"cms"+File.separator+"bean"+File.separator+"favorite"+File.separator+"QuestionFavorite_"+tableNumber+".class");
+			File file = new File(PathUtil.rootPath()+File.separator+"cms"+File.separator+"model"+File.separator+"favorite"+File.separator+"QuestionFavorite_"+tableNumber+".class");
 			
 			if(!file.exists()){
 				byteArr = ctClass.toBytecode();
@@ -2476,9 +2476,11 @@ public class CreateBean {
 			}
 		} 
 	}
+	
+	
 	/**
 	 * 创建收红包bean
-	 * @param number 表号
+	 * @param tableNumber 表号
 	 */
 	public static void createReceiveRedEnvelopeBean(Integer tableNumber){
 		
@@ -2490,11 +2492,11 @@ public class CreateBean {
 
 	      
 	    //通过ClassPool生成一个public新类HistoryOrder.java   
-	    CtClass ctClass = pool.makeClass("cms.bean.redEnvelope.ReceiveRedEnvelope_"+tableNumber); 
+	    CtClass ctClass = pool.makeClass("cms.model.redEnvelope.ReceiveRedEnvelope_"+tableNumber); 
 
         try {
         	// 父类
-        	ctClass.setSuperclass(pool.get("cms.bean.redEnvelope.ReceiveRedEnvelopeEntity"));
+        	ctClass.setSuperclass(pool.get("cms.model.redEnvelope.ReceiveRedEnvelopeEntity"));
         	// 添加接口
 			ctClass.addInterface(pool.get("java.io.Serializable"));
 			
@@ -2509,14 +2511,14 @@ public class CreateBean {
 	        AnnotationsAttribute attr = new AnnotationsAttribute(cp, AnnotationsAttribute.visibleTag);
 	        
 	        //@Entity注解
-	        Annotation entity_a = new Annotation("javax.persistence.Entity", cp);
+	        Annotation entity_a = new Annotation("jakarta.persistence.Entity", cp);
 	  	  	attr.addAnnotation(entity_a);
 	  	  	
 	        //@Table注解
-	        Annotation a = new Annotation("javax.persistence.Table", cp);
+	        Annotation a = new Annotation("jakarta.persistence.Table", cp);
 	        a.addMemberValue("name", new StringMemberValue("receiveredenvelope_"+tableNumber, cp));
 	       
-	        Annotation index_a = new Annotation("javax.persistence.Index", cp);
+	        Annotation index_a = new Annotation("jakarta.persistence.Index", cp);
 	        index_a.addMemberValue("name", new StringMemberValue("receiveRedEnvelope_1_idx", cp));
 	        index_a.addMemberValue("columnList", new StringMemberValue("receiveUserId,receiveTime", cp));
 	        AnnotationMemberValue annotationMemberValue = new AnnotationMemberValue(cp);
@@ -2554,7 +2556,7 @@ public class CreateBean {
         byte[] byteArr;
         FileOutputStream fos = null;
 		try {
-			File file = new File(PathUtil.path()+File.separator+"WEB-INF"+File.separator+"classes"+File.separator+"cms"+File.separator+"bean"+File.separator+"redEnvelope"+File.separator+"ReceiveRedEnvelope_"+tableNumber+".class");
+			File file = new File(PathUtil.rootPath()+File.separator+"cms"+File.separator+"model"+File.separator+"redEnvelope"+File.separator+"ReceiveRedEnvelope_"+tableNumber+".class");
 			
 			if(!file.exists()){
 				byteArr = ctClass.toBytecode();
@@ -2592,7 +2594,7 @@ public class CreateBean {
 	
 	/**
 	 * 创建会员卡赠送项bean
-	 * @param number 表号
+	 * @param tableNumber 表号
 	 */
 	public static void createMembershipCardGiftItem(Integer tableNumber){
 		
@@ -2604,11 +2606,11 @@ public class CreateBean {
 
 	      
 	    //通过ClassPool生成一个public新类HistoryOrder.java   
-	    CtClass ctClass = pool.makeClass("cms.bean.membershipCard.MembershipCardGiftItem_"+tableNumber); 
+	    CtClass ctClass = pool.makeClass("cms.model.membershipCard.MembershipCardGiftItem_"+tableNumber); 
 
         try {
         	// 父类
-        	ctClass.setSuperclass(pool.get("cms.bean.membershipCard.MembershipCardGiftItemEntity"));
+        	ctClass.setSuperclass(pool.get("cms.model.membershipCard.MembershipCardGiftItemEntity"));
         	// 添加接口
 			ctClass.addInterface(pool.get("java.io.Serializable"));
 			
@@ -2623,14 +2625,14 @@ public class CreateBean {
 	        AnnotationsAttribute attr = new AnnotationsAttribute(cp, AnnotationsAttribute.visibleTag);
 	        
 	        //@Entity注解
-	        Annotation entity_a = new Annotation("javax.persistence.Entity", cp);
+	        Annotation entity_a = new Annotation("jakarta.persistence.Entity", cp);
 	  	  	attr.addAnnotation(entity_a);
 	  	  	
 	        //@Table注解
-	        Annotation a = new Annotation("javax.persistence.Table", cp);
+	        Annotation a = new Annotation("jakarta.persistence.Table", cp);
 	        a.addMemberValue("name", new StringMemberValue("membershipcardgiftitem_"+tableNumber, cp));
 	       
-	        Annotation index_a = new Annotation("javax.persistence.Index", cp);
+	        Annotation index_a = new Annotation("jakarta.persistence.Index", cp);
 	        index_a.addMemberValue("name", new StringMemberValue("membershipCardGiftItem_idx", cp));
 	        index_a.addMemberValue("columnList", new StringMemberValue("membershipCardGiftTaskId", cp));
 	        AnnotationMemberValue annotationMemberValue = new AnnotationMemberValue(cp);
@@ -2666,7 +2668,7 @@ public class CreateBean {
         byte[] byteArr;
         FileOutputStream fos = null;
 		try {
-			File file = new File(PathUtil.path()+File.separator+"WEB-INF"+File.separator+"classes"+File.separator+"cms"+File.separator+"bean"+File.separator+"membershipCard"+File.separator+"MembershipCardGiftItem_"+tableNumber+".class");
+			File file = new File(PathUtil.rootPath()+File.separator+"cms"+File.separator+"model"+File.separator+"membershipCard"+File.separator+"MembershipCardGiftItem_"+tableNumber+".class");
 			
 			if(!file.exists()){
 				byteArr = ctClass.toBytecode();

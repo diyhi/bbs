@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<base href="${baseURL}">
+	<title>安装轻论坛系统</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link rel="shortcut icon" type="image/x-icon" href="favicon.ico" media="screen" />
+
+</head>
+
+
+
+
+<script type="text/javascript">
+/**
+ * POST方式提交
+ * @param callback 回调
+ * @param urladdress 提交地址
+ * @param async 是否异步 true:异步  false:同步
+ * @param params 提交参数 格式："v1=" + value1 + "&v2=" + value2
+ */
+function post_request(callback, urladdress, async,params){   
+	var xmlhttp = null;
+	if (window.XMLHttpRequest) {
+		try {
+			xmlhttp = new XMLHttpRequest();
+			xmlhttp.overrideMimeType("text/html;charset=UTF-8");//
+		} catch (e) {}
+	} else if (window.ActiveXObject) {
+		try {
+			xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+		} catch (e) {
+			try {
+				xmlhttp = new ActiveXObject("Msxml2.XMLHttp");
+			} catch (e) {
+				try {
+					xmlhttp = new ActiveXObject("Msxml3.XMLHttp");
+				} catch (e) {}
+			}
+		}
+	}   
+    xmlhttp.open('POST', urladdress, async);
+    //定义传输的文件HTTP头信息    
+	xmlhttp.setRequestHeader("Content-Type","application/x-www-form-urlencoded"); 
+	xmlhttp.setRequestHeader("X-Requested-With","XMLHttpRequest");//标记报头为AJAX方式
+    xmlhttp.onreadystatechange = function(){
+    	if (xmlhttp.readyState == 4) {//readystate 
+			try{
+		    	if(xmlhttp.status == 200){
+					callback(xmlhttp.responseText);
+				}else{
+					callback("没找到此页面:"+ urladdress +"");
+				}
+	        } catch(e){
+	        	callback("发送请求失败，请重试" + e);
+	        }
+		}
+	};
+    //发送POST数据    
+	xmlhttp.send(params);  
+}
+
+
+//提交
+function sureSubmit(){
+	//按钮设置 disabled="disabled"
+	document.getElementById("submitForm").disabled=true;
+
+	//清空所有错误提示
+	var error_tag = getElementsByName_pseudo("span", "error");
+	for(var i = 0;i < error_tag.length; i++) {
+		error_tag[i].innerHTML="";
+	}
+
+
+	var parameter = "";//URI参数
+	
+	var databasePassword = document.getElementById("databasePassword").value;
+	if(trim(databasePassword) != ""){
+		parameter += "&databasePassword="+encodeURIComponent(trim(databasePassword));
+	}
+	
+	var userAccount = document.getElementById("userAccount").value;
+	if(trim(userAccount) != ""){
+		parameter += "&userAccount="+encodeURIComponent(trim(userAccount));
+	}
+	
+	var userPassword = document.getElementById("userPassword").value;
+	if(trim(userPassword) != ""){
+		parameter += "&userPassword="+encodeURIComponent(trim(userPassword));
+	}
+	
+	var confirmPassword = document.getElementById("confirmPassword").value;
+	if(userPassword != trim(confirmPassword)){
+		document.getElementById("confirmPassword_error").innerHTML = "两次密码不相等";
+		document.getElementById("submitForm").disabled=false;
+		return;
+	}
+	
+	if(parameter.indexOf("&") == 0){
+		parameter = parameter.substring(1,parameter.length);
+	}
+	
+	post_request(function(value){
+		if(value != ""){
+			var returnValue = JSON.parse(value);
+			    
+	    	if(returnValue.code === 200){//成功
+	    		document.getElementById("success").style.display = '';
+    			document.getElementById("install").style.display = 'none';
+    			if(document.getElementById("folder")){
+    				document.getElementById("folder").style.display = 'none';
+    			}
+    			
+
+	    	}else if(returnValue.code === 500){//错误
+	    		var errorMap = returnValue.data;
+	    		for (var key in errorMap){	
+	    			document.getElementById(key+"_error").innerHTML = errorMap[key];
+	    	    }
+	    	    
+	    	}
+			document.getElementById("submitForm").disabled=false;
+		}
+	},
+		getBasePath()+"install?timestamp=" + new Date().getTime(), true,parameter);	
+}
+
+
+//获取系统base路径
+function getBasePath(){
+	var paras = document.getElementsByTagName("base");
+	return paras[0]["href"];
+}
+
+//去掉字符串前后空格
+function trim(str){   
+    str = str.replace(/^(\s|\u00A0)+/,'');   
+    for(var i=str.length-1; i>=0; i--){   
+        if(/\S/.test(str.charAt(i))){   
+            str = str.substring(0, i+1);   
+            break;   
+        }   
+    }   
+    return str; 
+} 
+
+//取得表格的伪属性("类型:如tr;td ","name值")
+var getElementsByName_pseudo = function(tag, name){
+    var returns = document.getElementsByName(name);
+    if(returns.length > 0) return returns;
+    returns = new Array();
+    var e = document.getElementsByTagName(tag);
+    for(var i = 0; i < e.length; i++){
+        if(e[i].getAttribute("name") == name){
+            returns[returns.length] = e[i];
+        }
+    }
+    return returns;
+};	
+
+</script>
+
+
+<body>
+<div class="installModule" >
+	<div id="success" class="result" style="display: none;">
+		<div class="result-icon">
+			<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" class="icon-success">
+				<path d="M24,4 C35.045695,4 44,12.954305 44,24 C44,35.045695 35.045695,44 24,44 C12.954305,44 4,35.045695 4,24 C4,12.954305 12.954305,4 24,4 Z M34.5548098,16.4485711 C33.9612228,15.8504763 32.9988282,15.8504763 32.4052412,16.4485711 L32.4052412,16.4485711 L21.413757,27.5805811 L21.413757,27.5805811 L21.4034642,27.590855 C21.0097542,27.9781674 20.3766105,27.9729811 19.9892981,27.5792711 L19.9892981,27.5792711 L15.5947588,23.1121428 C15.0011718,22.514048 14.0387772,22.514048 13.4451902,23.1121428 C12.8516033,23.7102376 12.8516033,24.6799409 13.4451902,25.2780357 L13.4451902,25.2780357 L19.6260786,31.5514289 C20.2196656,32.1495237 21.1820602,32.1495237 21.7756472,31.5514289 L21.7756472,31.5514289 L34.5548098,18.614464 C35.1483967,18.0163692 35.1483967,17.0466659 34.5548098,16.4485711 Z"></path>
+			</svg>
+		</div>
+		<div class="result-title">
+			<p>安装成功</p>
+		</div>
+		<div class="result-subtitle">
+			<p>请重启jar包服务自动初始化数据</p>
+		</div>
+	</div>
+	<table id="install" class="table"> 
+		<thead> 
+			<tr> 
+				<th colspan="2">安装轻论坛系统</th>
+			</tr> 
+		</thead>
+		<tbody> 
+			<tr> 
+				<td class="name"><span class="required">*</span>数据库密码：</td> 
+				<td>
+					<input type="password" class="form-text" id="databasePassword" value="" size="50">
+			    	<span id="databasePassword_error" name="error" class="error"></span>
+			    	<span id="databaseName_error" name="error" class="error"></span>
+			    	<span id="databaseLink_error" name="error" class="error"></span>
+			    	<br>
+			    	<span class="help">本参数只作为验证管理员使用，数据库密码需要在application.yml中设置</span>
+				</td> 
+			</tr> 
+			<tr> 
+				<td class="name"><span class="required">*</span>后台管理员账号：</td> 
+				<td>
+					<input class="form-text" id="userAccount" value="" size="50">
+			    	<span id="userAccount_error" name="error" class="error"></span>
+				</td> 
+			</tr> 
+			<tr> 
+				<td class="name"><span class="required">*</span>后台管理员密码：</td> 
+				<td>
+					<input type="password" class="form-text" id="userPassword"  value="" size="50">
+			    	<span id="userPassword_error" name="error" class="error"></span>
+				</td> 
+			</tr> 
+			<tr> 
+				<td class="name"><span class="required">*</span>后台管理员确认密码：</td> 
+				<td>
+					<input type="password" class="form-text" id="confirmPassword" value="" size="50">
+			    	<span id="confirmPassword_error" name="error" class="error"></span>
+				</td> 
+			</tr> 
+			
+			<tr> 
+				<td colSpan="2" class="button">
+					<span class="submitButton"><INPUT id="submitForm"  type="button" value="提交" onClick="javascript:sureSubmit();"></span>
+			        
+					<div id="status_error" name="error" class="error">${status}</div>
+					
+			        <div id="installSystem_error" name="error" class="error"></div>
+				</td> 
+			</tr> 
+			
+		</tbody> 
+	</table>
+	<br><br>
+	<#if folderInfoMap?? && folderInfoMap?size gt 0>
+	<table id="folder" class="table"> 
+		<thead> 
+			<tr> 
+				<th colspan="2">创建目录</th>
+			</tr> 
+		</thead>
+		<tbody> 
+			
+			<#list folderInfoMap as key, value>
+				<tr> 
+					<td class="name" style="width: 40%">${key}：</td> 
+					<td>
+						<#if value == 1>
+							<span style="color: #909399;">文件夹已存在 </span>
+						<#elseif value == 2>
+							<span style="color: #E6A23C;">当前路径为文件</span>
+						<#elseif value == 3>
+						 	<span style="color: #F56C6C;">创建失败</span>
+						<#elseif value == 4>
+							<span style="color: #67C23A;">创建成功</span>
+						</#if>
+					</td> 
+				</tr> 
+			</#list>
+		</tbody> 
+	</table>
+	<br><br>
+	</#if>
+</div>
+</body>
+<style>
+    body {
+        margin: 0px;
+        color: #606266;
+        background-color: #ffffff;
+        font-size:14px;
+        font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
+    }
+    html,body{
+        height:100%;/*overflow-y:hidden;margin:0 auto;*/
+    }
+
+    a {
+        outline: none;
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: none;
+    }
+    div {
+        padding-right: 0px; padding-left: 0px; padding-bottom: 0px; margin: 0px; padding-top: 0px
+    }
+    ul {
+        padding-right: 0px; padding-left: 0px; padding-bottom: 0px; margin: 0px; padding-top: 0px;
+
+    }
+    /* 去除黑点 */
+    ul,ol {list-style:none;}
+    dl {
+        padding-right: 0px; padding-left: 0px; padding-bottom: 0px; margin: 0px; padding-top: 0px
+    }
+
+
+
+    textarea {
+        resize: none;
+    }
+
+    body,ul,ol,li,dl,dd,p,h1,h2,h3,h4,h5,h6,form,fieldset{
+        margin: 0;
+        padding: 0;
+    }
+
+    table {
+        empty-cells: show;
+        border-collapse: collapse;
+    }
+
+    caption,th {
+        text-align: left;
+        font-weight: 400;
+    }
+
+    ul li{
+        list-style: none;
+    }
+
+    h1,h2,h3,h4,h5,h6 {
+        font-size: 1em;
+    }
+
+    em,cite,i {
+        font-style: normal;
+    }
+
+    a img {
+        border: none;
+    }
+
+    label {
+        cursor: pointer;
+    }
+
+    body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input,textarea,p,blockquote,th,td,hr,button {
+        margin: 0;
+        padding: 0;
+    }
+
+    table {
+        border-collapse: collapse;
+        border-spacing: 0;
+    }
+
+    caption,th {
+        text-align: left;
+        font-weight: normal;
+    }
+
+    html,body,fieldset,img,iframe,abbr {
+        border: 0;
+    }
+
+    html {
+        -webkit-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+    }
+
+    i,em {
+        font-style: normal;
+    }
+
+    ol,ul,li {
+        list-style: none;
+    }
+
+    h1,h2,h3,h4,h5,h6,small {
+        font-size: 100%;
+        font-weight: normal
+    }
+
+    textarea {
+        overflow: auto;
+        resize: none;
+    }
+
+    label {
+        cursor: default;
+    }
+    button {
+        outline: none;
+    }
+
+    a,button {
+        cursor: pointer;
+    }
+    ul {
+        list-style: none;
+        margin: 0px;
+        padding: 0px;
+    }
+
+
+
+    .clearfix {
+        zoom: 1;
+    }
+    .clearfix:after {
+        content: ".";
+        display: block;
+        height: 0;
+        clear: both;
+        visibility: hidden;
+    }
+
+    .installModule{
+        width: 900px;
+        margin: 0px auto;
+        margin-top: 30px;
+
+    }
+    .installModule .table {
+        width: 900px;
+    }
+    .installModule th {
+        color: #303133;
+        text-align: center;
+        font-size: 16px;
+    }
+    .installModule th,
+    .installModule td {
+        padding: 6px 13px;
+        border: 1px solid #E4E7ED;
+    }
+    .installModule tr {
+        background-color: #fff;
+        border-top: 1px solid #E4E7ED;
+        line-height: 24px;
+        color: #606266;
+    }
+    .installModule .name{
+        text-align: right;
+        width: 25%;
+    }
+    .installModule .button{
+        text-align: center;
+    }
+    .installModule .help{
+        color: #909399;
+        line-height: 20px;
+        margin-top: 8px;
+    }
+    .installModule .required{
+        color: #F56C6C;
+    }
+    .installModule .error{
+        color: #F56C6C;
+        line-height: 28px;
+    }
+    .installModule .date-input{outline: none;border:1px solid #ddd;background:url(../images/dateSelect.gif) center right no-repeat #f7f7f7;cursor:pointer;font:13px tahoma,arial;height:22px;width:150px;padding-bottom: 2px;margin-top: 2px;margin-bottom: 2px;}
+
+    .installModule .form-text{
+        outline: none; height:22px; line-height:22px; padding:2px 4px;border:1px solid;border-color:#cdcdcd #cdcdcd #cdcdcd #cdcdcd;background:#fff;border-radius:2px;margin-top: 2px;margin-bottom: 2px;
+    }
+    .installModule .form-text:disabled{
+        border: 1px solid #e6e6e6;
+        background-color: #fbfbfb;
+        color:#c9c9c9;
+        border-radius:2px;
+    }
+    .installModule .submitButton{ display:inline-block; vertical-align:middle; padding:1px 0; margin:0 1px; background:#1e9fff;outline: none;}
+    .installModule .submitButton span,
+    .installModule .submitButton input{ float:left; display:inline; margin:0 -1px; height:30px; line-height:30px; padding:0 18px; font-size:18px; border:0; overflow:visible; background:#1e9fff; color:#fff; cursor:pointer; font-family:Microsoft Yahei,simsun,sans-serif;}
+    .installModule .submitButton:hover,
+    .installModule .submitButton:hover span,
+    .installModule .submitButton:hover input{background:#0191e4;}
+    .installModule .submitButton input:disabled{
+        border: 1px solid #e6e6e6;
+        background-color: #fbfbfb;
+        color:#c9c9c9;
+        margin-top: -1px;
+        margin-bottom: -1px;
+        border-radius:2px;
+    }
+
+
+    .installModule .result {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        text-align: center;
+        box-sizing: border-box;
+        padding: 40px 30px;
+    }
+    .installModule .result .icon-success {
+        fill: #67c23a;
+    }
+    .installModule .result .result-icon svg {
+        width: 64px;
+        height: 64px;
+    }
+    .installModule .result-title {
+        margin-top: 20px;
+    }
+    .installModule .result-title p {
+        margin: 0;
+        font-size: 20px;
+        color: #303133;
+        line-height: 1.3;
+    }
+    .installModule .result-subtitle {
+        margin-top: 10px;
+    }
+    .installModule .result-subtitle p {
+        margin: 0;
+        font-size: 15px;
+        color: #606266;
+        line-height: 1.3;
+    }
+
+</style>
+</html>

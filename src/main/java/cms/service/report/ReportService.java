@@ -1,103 +1,81 @@
 package cms.service.report;
 
+import cms.dto.PageView;
+import cms.dto.report.ReportRequest;
+import cms.model.report.Report;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Date;
-import java.util.List;
+import java.util.Map;
 
-import cms.bean.report.Report;
-import cms.service.besa.DAO;
 
 /**
- * 举报管理接口
- *
+ * 举报服务
  */
-public interface ReportService extends DAO<Report> {
-	
-	/**
-	 * 根据Id查询举报
-	 * @param reportId 举报Id
-	 * @return
-	 */
-	public Report findById(Long reportId);
-	
-	/**
-	 * 根据Id集合查询举报
-	 * @param reportIdList 举报Id集合
-	 * @return
-	 */
-	public List<Report> findByIdList(List<Long> reportIdList);
-	/**
-	 * 根据参数条件查询举报是否存在
-	 * @param userName 用户名称
-	 * @param parameterId 参数Id
-	 * @param module 模块
-	 * @param status 状态
-	 * @return
-	 */
-	public boolean findByCondition(String userName,String parameterId,Integer module,Integer status);
-	/**
-	 * 待处理举报数量
-	 * @return
-	 */
-	public Long reportCount();
-	
-	/**
-	 * 保存举报
-	 * @param report
-	 */
-	public void saveReport(Report report);
-	/**
-	 * 修改举报分类Id
-	 * @param old_tagId 旧分类Id
-	 * @param new_tagId 新分类Id
-	 * @return
-	 */
-	public Integer updateTypeId(String old_typeId,String new_typeId);
-	/**
-	 * 修改举报信息
-	 * @param reportId 举报Id
-	 * @param status 状态
-	 * @param processResult 处理结果
-	 * @param remark 备注
-	 * @param processCompleteTime 处理完成时间
-	 * @param staffAccount 员工账号
-	 * @param version 版本号
-	 * @return
-	 */
-	public int updateReportInfo(Long reportId, Integer status, String processResult,String remark,Date processCompleteTime,String staffAccount,Integer version);
-	/**
-	 * 修改举报信息
-	 * @param reportId 举报Id
-	 * @param reportTypeId 举报分类Id
-	 * @param status 状态
-	 * @param processResult 处理结果
-	 * @param reason 理由
-	 * @param remark 备注
-	 * @param processCompleteTime 处理完成时间 
-	 * @param staffAccount 员工账号
-	 * @param imageData 图片数据
-	 * @param version 版本号
-	 * @return
-	 */
-	public int updateReportInfo(Long reportId, String reportTypeId,Integer status, String processResult,String reason,String remark,Date processCompleteTime,String staffAccount,String imageData,Integer version);
-	/**
-	 * 标记删除举报
-	 * @param reportId 举报Id
-	 * @param mark 标记  用户删除1000   员工删除100000
-	 * @return
-	 */
-	public Integer markDelete(Long reportId,Integer mark);
-	/**
-	 * 删除举报
-	 * @param reportId 举报Id
-	 * @return
-	 */
-	public Integer deleteReport(Long reportId);
-	/**
-	 * 还原举报
-	 * @param reportId 举报Id
-	 * @param status 状态
-	 * @return
-	 */
-	public Integer reductionReport(Long reportId,Integer status);
+public interface ReportService {
+
+    /**
+     * 获取举报列表
+     * @param page 页码
+     * @param visible 是否可见
+     * @param request 请求信息
+     */
+    public PageView<Report> getReportList(int page, Boolean visible, HttpServletRequest request);
+    /**
+     * 获取话题举报列表
+     * @param page 页码
+     * @param parameterId 参数Id
+     * @param module 模块
+     * @param topicId 话题Id
+     * @param request 请求信息
+     * @return
+     */
+    public Map<String,Object> getTopicReportList(int page,String parameterId,Integer module,Long topicId, HttpServletRequest request);
+    /**
+     * 获取问题举报列表
+     * @param page 页码
+     * @param parameterId 参数Id
+     * @param module 模块
+     * @param questionId 问题Id
+     * @param request 请求信息
+     * @return
+     */
+    public Map<String,Object> getQuestionReportList(int page,String parameterId,Integer module,Long questionId, HttpServletRequest request);
+    /**
+     * 获取用户举报列表
+     * @param page 页码
+     * @param userName 用户名称
+     * @param request 请求信息
+     * @return
+     */
+    public Map<String,Object> getUserReportList(int page,String userName, HttpServletRequest request);
+    /**
+     * 举报处理
+     * @param reportRequest 举报表单
+     */
+    public void reportHandle(ReportRequest reportRequest);
+    /**
+     * 获取修改举报界面信息
+     * @param reportId 举报Id
+     * @param request 请求信息
+     * @return
+     */
+    public Map<String,Object> getEditReportViewModel(Long reportId, HttpServletRequest request);
+    /**
+     * 修改举报
+     * @param reportRequest 举报表单
+     * @param imageFile 图片
+     * @param request 请求信息
+     */
+    public void editReport(ReportRequest reportRequest, MultipartFile[] imageFile, HttpServletRequest request);
+    /**
+     * 删除举报
+     * @param reportId 举报Id集合
+     */
+    public void deleteReport(Long[] reportId);
+    /**
+     * 还原举报
+     * @param reportId 举报Id集合
+     */
+    public void reductionReport(Long[] reportId);
 }

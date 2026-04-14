@@ -27,7 +27,7 @@ public class UniqueBlockingQueue<T> extends AbstractQueue<T> implements Blocking
 	/**
 	 * UniqueBlockingQueue 的构造函数
 	 *
-	 * @param 阻塞队列的容量
+	 * @param capacity 阻塞队列的容量
 	 */
 	public UniqueBlockingQueue(int capacity) {
 	    mBlockingQueue = new LinkedBlockingQueue<>(capacity);
@@ -99,8 +99,8 @@ public class UniqueBlockingQueue<T> extends AbstractQueue<T> implements Blocking
 	}
 	/**
 	 * 从指定的队列中移除所有可用的元素，并将它们添加到给定的集合中。 不删除唯一标记
-	 * @param c
-	 * @param maxElements
+	 * @param c 集合
+	 * @param maxElements 最大元素数
 	 * @return
 	 */
 	public int drainTo2(Collection<? super T> c, int maxElements) {

@@ -73,7 +73,7 @@ public class Coding {
 
 	            bis.close();
 	        } catch ( Exception e ) {
-	            e.printStackTrace();
+	            //e.printStackTrace();
 	            if (logger.isErrorEnabled()) {
 		            logger.error("判定文件是GBK还是UTF-8编码",e);
 		        }

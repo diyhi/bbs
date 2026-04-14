@@ -20,18 +20,16 @@ public class SHA {
 	 * @param data 数据
 	 * @return
 	 */
-	public static String sha1Hex(String data) { 
-		String sha1Hex = org.apache.commons.codec.digest.DigestUtils.sha1Hex(data);
-		return sha1Hex;
+	public static String sha1Hex(String data) {
+        return org.apache.commons.codec.digest.DigestUtils.sha1Hex(data);
     } 
 	/**
 	 * sha256加密
 	 * @param data 数据
 	 * @return
 	 */
-	public static String sha256Hex(String data) { 
-		String sha256Hex = org.apache.commons.codec.digest.DigestUtils.sha256Hex(data);  
-		return sha256Hex;
+	public static String sha256Hex(String data) {
+        return org.apache.commons.codec.digest.DigestUtils.sha256Hex(data);
     } 
    
 	/**

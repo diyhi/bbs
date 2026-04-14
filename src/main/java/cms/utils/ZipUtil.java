@@ -1,15 +1,16 @@
 package cms.utils;
 
 
+import cms.dto.ZipPack;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.compress.utils.IOUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import cms.bean.ZipPack;
+
 
 import java.io.*;
 import java.util.ArrayList;
@@ -25,40 +26,40 @@ public class ZipUtil {
 	
 	/**
 	 * 遍历zip文件内容
-	 * @param zipFile
-	 * @param callback
+	 * @param zipFile zip格式文件
+	 * @param callback 回调
 	 */
 	public static void iterate(File zipFile, ZipCallback callback) {
-        ZipArchiveInputStream is = null;
-        try {
-            is = new ZipArchiveInputStream(new BufferedInputStream(new FileInputStream(zipFile), BUFFER_SIZE));
+
+        try (ZipArchiveInputStream is = new ZipArchiveInputStream(
+                new BufferedInputStream(new FileInputStream(zipFile), BUFFER_SIZE));) {
+
             ZipArchiveEntry entry = null;
 
-            while ((entry = is.getNextZipEntry()) != null) {
+            while ((entry = is.getNextEntry()) != null) {
                 callback.process(entry);
             }
-        } catch(Exception e) {
-           // e.printStackTrace();
+        } catch (Exception e) {
+            // e.printStackTrace();
             if (logger.isErrorEnabled()) {
-	            logger.error("遍历zip文件内容",e);
-	        }
-        } finally {
-            IOUtils.closeQuietly(is);
+                logger.error("遍历zip文件内容", e);
+            }
         }
-	}
-	
+    }
 	/**
 	 * 遍历文件名称
-	 * @param zipFile
+	 * @param zipFile zip格式文件
 	 */
 	public static List<String> iterateFileName(File zipFile) {
-        ZipArchiveInputStream is = null;
+
         List<String> fileNames = new ArrayList<String>();
 
-        try {
-            is = new ZipArchiveInputStream(new BufferedInputStream(new FileInputStream(zipFile), BUFFER_SIZE));
+
+        try (ZipArchiveInputStream is = new ZipArchiveInputStream(
+                new BufferedInputStream(new FileInputStream(zipFile), BUFFER_SIZE));) {
+
             ZipArchiveEntry entry = null;
-            while ((entry = is.getNextZipEntry()) != null) {
+            while ((entry = is.getNextEntry()) != null) {
                 fileNames.add(entry.getName());
             }
         } catch(Exception e) {
@@ -66,8 +67,6 @@ public class ZipUtil {
         	if (logger.isErrorEnabled()) {
 	            logger.error("遍历文件名称",e);
 	        }
-        } finally {
-            IOUtils.closeQuietly(is);
         }
         return fileNames;
 	}
@@ -102,12 +101,13 @@ public class ZipUtil {
      * @param entryPath 压缩内文件逻辑路径。如static/
      */
     public static void pack(String sourceDir, String targetZip,String excludeDirectory,String entryPath){
-        if(!entryPath.endsWith(File.separator)&&entryPath != null && !entryPath.isEmpty()){
+        if(entryPath != null && !entryPath.isEmpty() && !entryPath.endsWith(File.separator) ){
             entryPath+=File.separator;
         }
-        ZipArchiveOutputStream out = null;
-        try {
-            out = new ZipArchiveOutputStream(new BufferedOutputStream(new FileOutputStream(new File(targetZip))));
+
+        try (ZipArchiveOutputStream out = new ZipArchiveOutputStream(
+                new BufferedOutputStream(new FileOutputStream(new File(targetZip))));) {
+
             out.setEncoding("UTF-8");
             pack(out, sourceDir,excludeDirectory, entryPath);
 
@@ -117,8 +117,10 @@ public class ZipUtil {
         	if (logger.isErrorEnabled()) {
 	            logger.error("压缩",e);
 	        }
-        } finally {
-            IOUtils.closeQuietly(out);
+        } catch (IOException e) {
+            if (logger.isErrorEnabled()) {
+                logger.error("压缩IO错误",e);
+            }
         }
     }
     
@@ -128,17 +130,18 @@ public class ZipUtil {
      * @param targetZip 输出文件
      * @param excludeDirectory 排除目录下的文件
      */
-    public static void pack(List<ZipPack> zipPackList, String targetZip,String excludeDirectory){
-    	
-    	ZipArchiveOutputStream out = null;
-        try {
-            out = new ZipArchiveOutputStream(new BufferedOutputStream(new FileOutputStream(new File(targetZip))));
+    public static void pack(List<ZipPack> zipPackList, String targetZip, String excludeDirectory){
+
+
+        try (ZipArchiveOutputStream out = new ZipArchiveOutputStream(
+                new BufferedOutputStream(new FileOutputStream(new File(targetZip))));) {
+
             out.setEncoding("UTF-8");
             for (ZipPack zipPack : zipPackList) {  
             	String sourceDir = zipPack.getSource();
             	String entryPath = zipPack.getEntryPath();
             	
-            	if(!entryPath.endsWith(File.separator)&&entryPath != null && !entryPath.isEmpty()){
+            	if(entryPath != null && !entryPath.isEmpty() && !entryPath.endsWith(File.separator)){
                     entryPath+=File.separator;
                 }
             
@@ -163,8 +166,10 @@ public class ZipUtil {
         	if (logger.isErrorEnabled()) {
 	            logger.error("压缩",e);
 	        }
-        } finally {
-            IOUtils.closeQuietly(out);
+        } catch (IOException e) {
+            if (logger.isErrorEnabled()) {
+                logger.error("压缩IO错误",e);
+            }
         }
     	
     	
@@ -175,7 +180,7 @@ public class ZipUtil {
     /**
      * 把一个目录打包到一个指定的zip文件中
      * 
-     * @param out
+     * @param out 输出
      * @param sourceDir 待压缩目录
      * @param excludeDirectory 排除目录下的文件
      * @param entryPath zip中文件的逻辑路径
@@ -199,7 +204,7 @@ public class ZipUtil {
             	
             	//判断开始部分是否与二参数相同。不区分大小写
 	    		//StringUtils.startsWithIgnoreCase("中国共和国人民", "中国")
-	    		if(excludeDirectoryPath != null && StringUtils.startsWithIgnoreCase(files[i].getAbsolutePath(), excludeDirectoryPath)){
+	    		if(excludeDirectoryPath != null && Strings.CI.startsWith(files[i].getAbsolutePath(), excludeDirectoryPath)){
 	    			//添加目录
 	    			addDirectoryToZip(files[i], out, entryPath);
 	    			continue;
@@ -264,9 +269,9 @@ public class ZipUtil {
     
     /**
      * 添加目录到Zip
-     * @param file
-     * @param out
-     * @param entryPath
+     * @param file 文件
+     * @param out 输出
+     * @param entryPath 路径
      */
     private static void addDirectoryToZip(File file, ZipArchiveOutputStream out, String entryPath) {
         
@@ -287,42 +292,42 @@ public class ZipUtil {
         	if (logger.isErrorEnabled()) {
 	            logger.error("添加目录到Zip",e);
 	        }
-        } finally {
-           
         }
     }
     
     
     /**
      * 添加文件到Zip
-     * @param file
-     * @param out
-     * @param entryPath
+     * @param file 文件
+     * @param out 输出
+     * @param entryPath 路径
      */
     private static void addFileToZip(File file, ZipArchiveOutputStream out, String entryPath) {
-        InputStream ins = null;
+
+        String path=entryPath + file.getName();
+        if(file.isDirectory()){
+            path=formatDirPath(path); //为了在压缩文件中包含空文件夹
+        }
+        ZipArchiveEntry entry = new ZipArchiveEntry(path);
+        entry.setTime(file.lastModified());
+        // entry.setSize(files[i].length());
+
         try {
              
-            String path=entryPath + file.getName();
-            if(file.isDirectory()){
-                path=formatDirPath(path); //为了在压缩文件中包含空文件夹
-            }
-            ZipArchiveEntry entry = new ZipArchiveEntry(path);
-            entry.setTime(file.lastModified());
-            // entry.setSize(files[i].length());
+
             out.putArchiveEntry(entry);
             if(!file.isDirectory()){
-                ins = new BufferedInputStream(new FileInputStream(file.getAbsolutePath()));
-                IOUtils.copy(ins, out);
+                try (InputStream ins = new BufferedInputStream(new FileInputStream(file.getAbsolutePath()));) {
+
+                    IOUtils.copy(ins, out);
+                }
             }
             out.closeArchiveEntry();
         } catch (IOException e) {
           //  e.printStackTrace();
         	if (logger.isErrorEnabled()) {
-	            logger.error("添加文件到Zip",e);
+	            logger.error("添加文件到Zip--"+path,e);
 	        }
-        } finally {
-            IOUtils.closeQuietly(ins);
         }
     }
 
@@ -355,7 +360,7 @@ public class ZipUtil {
         try {
             ins = new ZipArchiveInputStream(new BufferedInputStream(new FileInputStream(zipPath)), "UTF-8");
             ZipArchiveEntry entry = null;
-            while ((entry = ins.getNextZipEntry()) != null) {
+            while ((entry = ins.getNextEntry()) != null) {
             	//执行目录检查，过滤文件路径名称包含"../"这种特殊字符
             	String name = FileUtil.toRelativePath(entry.getName());
                 if (entry.isDirectory()) {

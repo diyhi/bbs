@@ -1,0 +1,113 @@
+package cms.model.topic;
+
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.Lob;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+import lombok.Getter;
+import lombok.Setter;
+
+/**
+ * 回复
+ *
+ */
+@Getter
+@Setter
+@Entity
+@Table(name="reply",indexes = {@Index(name="reply_1_idx", columnList="commentId,status"),@Index(name="reply_2_idx", columnList="topicId"),@Index(name="reply_3_idx", columnList="userName,isStaff")})
+public class Reply implements Serializable{
+	@Serial
+    private static final long serialVersionUID = 4931492011929337590L;
+	
+	/** Id **/
+	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+	/** 是否是员工   true:员工   false:会员 **/
+	private Boolean isStaff = false;
+	/** 用户名称 **/
+	@Column(length=30)
+	private String userName;
+	/** 账号 **/
+	@Transient
+	private String account;
+	/** 呢称 **/
+	@Transient
+	private String nickname;
+	/** 头像路径 **/
+	@Transient
+	private String avatarPath;
+	/** 头像名称 **/
+	@Transient
+	private String avatarName;
+	
+	/** 对方回复Id **/
+	private Long friendReplyId;
+	/** 对方回复Id组 **/
+	@Lob
+	private String friendReplyIdGroup = ",0,";
+	/** 对方是否是员工   true:员工   false:会员 **/
+	private Boolean isFriendStaff = false;
+	/** 对方用户名称 **/
+	@Column(length=30)
+	private String friendUserName;
+	/** 对方账号 **/
+	@Transient
+	private String friendAccount;
+	/** 对方呢称 **/
+	@Transient
+	private String friendNickname;
+	/** 对方头像路径 **/
+	@Transient
+	private String friendAvatarPath;
+	/** 对方头像名称 **/
+	@Transient
+	private String friendAvatarName;
+	
+	
+	
+	/** 用户信息状态 -30.账号已注销(不显示数据) -20.账号已逻辑删除(不显示数据) -10.账号已禁用(不显示数据)  0.正常 10.账号已禁用(显示数据) 20.账号已逻辑删除(显示数据) **/
+	@Transient
+	private Integer userInfoStatus = 0;
+	/** IP **/
+	@Column(length=45)
+	private String ip;
+	/** IP归属地 **/
+	@Transient
+	private String ipAddress;
+	/** 话题Id **/
+	private Long topicId;
+	/** 话题标题 **/
+	@Transient
+	private String topicTitle;
+	/** 回复内容 **/
+	@Lob
+	private String content;
+	/** 评论Id **/
+	private Long commentId;
+	/** 回复时间 **/
+    @Column(columnDefinition = "DATETIME")
+    private LocalDateTime postTime = LocalDateTime.now();
+	/** 最后修改时间 **/
+    @Column(columnDefinition = "DATETIME")
+    private LocalDateTime lastUpdateTime;
+	
+	/** 状态 10.待审核 20.已发布 **/
+	private Integer status = 10;
+	
+	/** 用户角色名称集合 **/
+	@Transient
+	private List<String> userRoleNameList = new ArrayList<String>();
+	
+
+}

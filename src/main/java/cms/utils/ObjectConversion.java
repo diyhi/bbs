@@ -1,6 +1,9 @@
 package cms.utils;
 
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -22,6 +25,7 @@ public class ObjectConversion {
 	public static final String DATE = "Date";
 	public static final String TIME = "Time";
 	public static final String TIMESTAMP = "Timestamp";
+    public static final String LOCALDATETIME = "LocalDateTime";
 
 	public static final String STRING = "String";
 	public static final String BOOLEAN = "Boolean";
@@ -57,7 +61,26 @@ public class ObjectConversion {
 		        DateTime dateTime = DateTime.parse(value.toString(), timestamp_format); 
 				return (T)dateTime.toDate();
 			}	
-		}else if(STRING.equals(type)){
+		}else if(LOCALDATETIME.equals(type)){
+            if(value != null){
+                // 如果 JPA 已经返回了 java.time.LocalDateTime
+                if (value instanceof LocalDateTime) {
+                    return (T) value;
+                }
+                //从 JPA/JDBC 返回的是 java.sql.Timestamp
+                if (value instanceof java.sql.Timestamp) {
+                    // java.sql.Timestamp 自带 toLocalDateTime() 方法，完美兼容
+                    return (T) ((java.sql.Timestamp) value).toLocalDateTime();
+                }
+
+                if (value instanceof java.util.Date) {
+                    // 通过 Instant 和系统时区进行安全转换
+                    return (T) ((java.util.Date) value).toInstant()
+                            .atZone(ZoneId.systemDefault())
+                            .toLocalDateTime();
+                }
+            }
+        }else if(STRING.equals(type)){
 			if(value != null){
 				return (T)value.toString();
 			}	
@@ -72,4 +95,26 @@ public class ObjectConversion {
 		
 	}
 
+
+    /**
+     * 将 Joda-Time DateTime 转换为 Java 8 LocalDateTime。
+     * 转换时会基于原始 DateTime 所携带的时区。
+     * @param jodaDateTime Joda-Time DateTime 对象
+     * @return Java 8 的 LocalDateTime 对象
+
+    public static LocalDateTime convertJodaToJdk8(DateTime jodaDateTime) {
+
+        //获取 Joda DateTime 的毫秒数
+        long epochMilli = jodaDateTime.getMillis();
+
+        //将 Joda 的时区 ID 转换为 Java 8 的 ZoneId
+        ZoneId zoneId = ZoneId.of(jodaDateTime.getZone().getID());
+
+        //基于毫秒数创建 Java 8 的 Instant
+        Instant instant = Instant.ofEpochMilli(epochMilli);
+
+        //将 Instant 应用到 ZoneId，得到 ZonedDateTime，再获取 LocalDateTime
+        return LocalDateTime.ofInstant(instant, zoneId);
+    }*/
+	
 }

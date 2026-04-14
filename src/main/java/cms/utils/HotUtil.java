@@ -23,37 +23,35 @@ public class HotUtil {
 	public static Map<String,Object> parseTopicHeatFactor(String topicHeatFactor) {
 		Map<String,Object> heatMap = new HashMap<String,Object>();
 		
-		if(topicHeatFactor != null && !"".equals(topicHeatFactor.trim())){
+		if(topicHeatFactor != null && !topicHeatFactor.trim().isEmpty()){
 			String[] factorGroup = topicHeatFactor.trim().split("\\|");
-			if(factorGroup != null && factorGroup.length >0){
-				for(String factor : factorGroup){
-					
-					String[] paramGroup = factor.trim().split("=");
-					if(paramGroup != null && paramGroup.length==2){
-						if(paramGroup[0].trim().equals("评论") && Verification.isPositiveIntegerZero(paramGroup[1].trim())){
-							long number =  Long.parseLong(paramGroup[1].trim());
-							if(number >=0L && number <=99999L){
-								heatMap.put("评论", number);
-							}
-						}else if(paramGroup[0].trim().equals("点赞") && Verification.isPositiveIntegerZero(paramGroup[1].trim())){
-							long number =  Long.parseLong(paramGroup[1].trim());
-							if(number >=0L && number <=99999L){
-								heatMap.put("点赞", number);
-							}
-						}else if(paramGroup[0].trim().equals("浏览量") && Verification.isPositiveIntegerZero(paramGroup[1].trim())){
-							long number =  Long.parseLong(paramGroup[1].trim());
-							if(number >=0L && number <=99999L){
-								heatMap.put("浏览量", number);
-							}
-						}else if(paramGroup[0].trim().equals("重力因子") && Verification.isAmount(paramGroup[1].trim())){
-							double number = Double.parseDouble(paramGroup[1].trim());
-							if(number >=0.1d && number <=2d){
-								heatMap.put("重力因子", number);
-							}
-						}
-					}
-				}
-			}
+            for(String factor : factorGroup){
+
+                String[] paramGroup = factor.trim().split("=");
+                if(paramGroup.length==2){
+                    if(paramGroup[0].trim().equals("评论") && Verification.isPositiveIntegerZero(paramGroup[1].trim())){
+                        long number =  Long.parseLong(paramGroup[1].trim());
+                        if(number >=0L && number <=99999L){
+                            heatMap.put("评论", number);
+                        }
+                    }else if(paramGroup[0].trim().equals("点赞") && Verification.isPositiveIntegerZero(paramGroup[1].trim())){
+                        long number =  Long.parseLong(paramGroup[1].trim());
+                        if(number >=0L && number <=99999L){
+                            heatMap.put("点赞", number);
+                        }
+                    }else if(paramGroup[0].trim().equals("浏览量") && Verification.isPositiveIntegerZero(paramGroup[1].trim())){
+                        long number =  Long.parseLong(paramGroup[1].trim());
+                        if(number >=0L && number <=99999L){
+                            heatMap.put("浏览量", number);
+                        }
+                    }else if(paramGroup[0].trim().equals("重力因子") && Verification.isAmount(paramGroup[1].trim())){
+                        double number = Double.parseDouble(paramGroup[1].trim());
+                        if(number >=0.1d && number <=2d){
+                            heatMap.put("重力因子", number);
+                        }
+                    }
+                }
+            }
 		}
 		return heatMap;
 	}

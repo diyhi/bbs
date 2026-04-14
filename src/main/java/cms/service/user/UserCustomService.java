@@ -1,49 +1,41 @@
 package cms.service.user;
 
-import java.util.List;
 
-import cms.bean.user.UserCustom;
-import cms.bean.user.UserInputValue;
-import cms.service.besa.DAO;
+import cms.dto.user.UserCustomRequest;
+import cms.model.user.UserCustom;
+
+import java.util.List;
+import java.util.Map;
 
 /**
- * 用户自定义注册功能项接口
- *
+ * 用户自定义注册功能项服务
  */
-public interface UserCustomService extends DAO<UserCustom>{
-	/**
-	 * 根据Id查询用户自定义注册功能项
-	 */
-	public UserCustom findUserCustomById(Integer userCustomId);
-	/**
-	 * 查询所有用户自定义注册功能项
-	 */
-	public List<UserCustom> findAllUserCustom();
-	
-	/**
-	 * 查询所有用户自定义注册功能项
-	 */
-	public List<UserCustom> findAllUserCustom_cache();
-	/**
-	 * 根据用户名称查询自定义项值
-	 * @param userId 用户Id
-	 * @return
-	 */
-	public List<UserInputValue> findUserInputValueByUserName(Long userId);
-	/**
-	 * 保存自定义项
-	 * @param userCustom 用户自定义项
-	 */
-	public void saveUserCustom(UserCustom userCustom);
-	/**
-	 * 修改自定义项值
-	 * @param userCustom 自定义项
-	 * @param deleteItem 删除自定义单选按钮.多选按钮.下拉列表  key参数
-	 */
-	public Integer updateUserCustom(UserCustom userCustom,List<String> deleteItem);
-	/**
-	 * 删除自定义项值
-	 * @param userCustomId 自定义项Id
-	 */
-	public Integer deleteUserCustom(Integer userCustomId);
+public interface UserCustomService {
+
+    /**
+     * 获取所有用户自定义注册功能项
+     */
+    public List<UserCustom> getAllUserCustom();
+    /**
+     * 添加用户自定义注册功能项
+     * @param userCustomRequest 用户自定义注册功能项表单
+     */
+    public void addUserCustom(UserCustomRequest userCustomRequest);
+    /**
+     * 获取修改用户自定义注册功能项界面信息
+     * @param userCustomId 用户自定义注册功能项Id
+     * @return
+     */
+    public Map<String,Object> getEditUserCustomViewModel(Integer userCustomId);
+
+    /**
+     * 修改用户自定义注册功能项
+     * @param userCustomRequest 用户自定义注册功能项表单
+     */
+    public void editUserCustom(UserCustomRequest userCustomRequest);
+    /**
+     * 删除用户自定义注册功能项
+     * @param id 用户自定义注册功能项Id
+     */
+    public void deleteUserCustom(Integer id);
 }

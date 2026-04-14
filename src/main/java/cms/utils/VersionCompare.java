@@ -8,9 +8,9 @@ public class VersionCompare {
 	
 	/**
 	 * 比较 不含字母比较 例如：5.5.3和5.7.10
-	 * @param v1
-	 * @param v2
-	 * @return -1 0 1
+	 * @param v1 版本号
+	 * @param v2 版本号
+	 * @return
 	 */
 	public static int compare(String v1,String v2){
         int i=0,j=0,x=0,y=0;

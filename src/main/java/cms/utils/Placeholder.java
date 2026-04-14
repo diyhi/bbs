@@ -1,12 +1,8 @@
 package cms.utils;
 
-import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.text.StrSubstitutor;
-
-
-
+import org.apache.commons.text.StringSubstitutor;
 
 
 /**
@@ -29,7 +25,7 @@ public class Placeholder {
 	 */
 	public static String replace(String source,Map<String, Object> parameter,String prefix, String suffix,boolean enableSubstitutionInVariables){
 		//StrSubstitutor不是线程安全的类
-		StrSubstitutor strSubstitutor = new StrSubstitutor(parameter,prefix, suffix);
+        StringSubstitutor strSubstitutor = new StringSubstitutor(parameter,prefix, suffix);
 		//是否在变量名称中进行替换
 		strSubstitutor.setEnableSubstitutionInVariables(enableSubstitutionInVariables);
 		return strSubstitutor.replace(source);

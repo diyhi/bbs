@@ -1,104 +1,87 @@
 package cms.service.staff;
 
-import java.util.List;
-import java.util.Set;
+import cms.dto.admin.AdminAuthorization;
+import cms.model.staff.SysUsers;
+import org.springframework.web.multipart.MultipartFile;
 
-import org.springframework.security.core.GrantedAuthority;
-
-import cms.bean.QueryResult;
-import cms.bean.staff.StaffLoginLog;
-import cms.bean.staff.SysUsers;
-import cms.bean.staff.SysUsersRoles;
-import cms.service.besa.DAO;
+import java.util.Map;
 
 /**
- * 系统设置
- * @author Administrator
- *
+ * 员工服务
  */
-public interface StaffService extends DAO{
-	
-	/**
-	 * 得到用户权限
-	 *@param userAccount 用户账号
-	 *@return
-	 */
-	public List<GrantedAuthority> loadUserAuthoritiesByName(String userAccount);
-	/**
-	 * 得到所有权限
-	 *@return
-	 */
-	public List<GrantedAuthority> loadAllAuthorities();
-	/**
-	 * 根据用户账号得到用户角色Id
-	 *@param userAccount 用户账号
-	 *@return
-	 */
-	public List<String> findRoleIdByUserAccount(String userAccount);
-	/**
-	 * 根据用户账号取得权限Id
-	 *@param userAccount 用户账号
-	 *@return
-	 */
-	public List<String> findPermissionIdByUserAccount(String userAccount);
-	/**
-	 * 根据员工账号返回SysUsers实例对象。
-	 *@param account 员工账号，比如admin等。
-	 *@return SysUsers实例对象。
-	 */
-	public SysUsers findByUserAccount(String account);
-	
-	/**
-	 * 根据员工呢称返回SysUsers实例对象。
-	 *@param nickname 呢称
-	 *@return SysUsers实例对象。
-	 */
-	public SysUsers findByNickname(String nickname);
-	/**
-	 * 根据员工名称查询员工安全摘要
-	 * @param userName 用户名称
-	 */
-	public String findSecurityDigestByStaffName(String staffName);
-	/**
-	 * 保存员工
-	 * @param sysUsers 用户
-	 * @param sysUsersRoleList 用户角色
-	 */
-	public void saveUser(SysUsers sysUsers, Set<SysUsersRoles> sysUsersRoleList);
-	/**
-	 * 修改员工
-	 * @param sysUsers 用户
-	 * @param usersRoleList 用户角色
-	 */
-	public void updateUser(SysUsers sysUsers, Set<SysUsersRoles> usersRoleList);
-	/**
-	 * 修改员工
-	 * @param sysUsers 用户
-	 */
-	public void updateUser(SysUsers sysUsers);
-	/**
-	 * 删除员工
-	 * @param staffId 员工Id
-	 * @param userAccount 用户账号
-	 */
-	public void deleteUser(String staffId,String userAccount);
-	
-	
-	/**
-	 * 保存员工登录日志
-	 * 先由staffLoginLogManage.createStaffLoginLogObject();方法生成对象再保存
-	 * @param staffLoginLog 员工登录日志
-	 */
-	public void saveStaffLoginLog(Object staffLoginLog);
-	
-	
-	/**
-	 * 员工登录日志分页
-	 * @param staffId 员工Id
-	 * @param firstIndex 索引开始,即从哪条记录开始
-	 * @param maxResult 获取多少条数据
-	 */
-	public QueryResult<StaffLoginLog> findStaffLoginLogPage(String staffId,int firstIndex, int maxResult);
-	
-	
+public interface StaffService {
+
+    /**
+     * 获取员工列表
+     * @param page 页码
+     * @param fileServerAddress 文件服务器随机地址
+     * @return
+     */
+    public Map<String,Object> getStaffList(int page,String fileServerAddress);
+
+    /**
+     * 获取添加员工界面信息
+     * @param username 员工账号
+     * @param isSysAdmin 是否为超级用户
+     * @return
+     */
+    public Map<String,Object> getAddStaffViewModel(String username,boolean isSysAdmin);
+
+    /**
+     * 添加员工
+     * @param sysUsersForm 员工表单
+     * @param repeatPassword 重复密码
+     * @param sysRolesId 角色Id集合
+     * @param width 图片宽
+     * @param height 图片高
+     * @param x X轴
+     * @param y Y轴
+     * @param file 头像文件
+     */
+    public void addStaff(SysUsers sysUsersForm, String repeatPassword, String[] sysRolesId, Integer width, Integer height, Integer x, Integer y,MultipartFile file);
+
+    /**
+     * 获取修改员工界面信息
+     * @param userId 员工Id
+     * @param fileServerAddress 文件服务器随机地址
+     * @return
+     */
+    public Map<String,Object> getEditStaffViewModel(String userId,String fileServerAddress);
+    /**
+     * 修改员工
+     * @param sysUsersForm   员工表单
+     * @param userId   员工Id
+     * @param repeatPassword 重复密码
+     * @param sysRolesId     角色Id集合
+     * @param width          图片宽
+     * @param height         图片高
+     * @param x              X轴
+     * @param y              Y轴
+     * @param file           头像文件
+     */
+    public void editStaff(SysUsers sysUsersForm,String userId, String repeatPassword, String[] sysRolesId, Integer width, Integer height, Integer x, Integer y, MultipartFile file);
+
+    /**
+     * 获取员工修改自身界面信息
+     * @param fileServerAddress 文件服务器随机地址
+     * @return
+     */
+    public Map<String,Object> getEditStaffSelfViewModel(String fileServerAddress);
+    /**
+     * 修改员工自身信息
+     * @param sysUsersForm   员工表单
+     * @param repeatPassword 重复密码
+     * @param sysRolesId     角色Id集合
+     * @param width          图片宽
+     * @param height         图片高
+     * @param x              X轴
+     * @param y              Y轴
+     * @param file           头像文件
+     */
+    public void editSelfInfo(SysUsers sysUsersForm,String repeatPassword, String[] sysRolesId, Integer width, Integer height, Integer x, Integer y, MultipartFile file);
+        /**
+         * 删除员工
+         * @param userId   员工Id
+         */
+    public void deleteStaff(String userId);
 }

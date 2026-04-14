@@ -29,7 +29,7 @@ public class SqlScriptRunner {
 
 	private static final String DEFAULT_DELIMITER = ";";
 
-	private Connection connection;
+	private final Connection connection;
 	//遇到错误是否停止执行
 	private boolean stopOnError;
 	//遇到错误停止执行是否抛出异常
@@ -114,7 +114,7 @@ public class SqlScriptRunner {
 	}
 	/**
 	 * 执行完整脚本
-	 * @param reader
+	 * @param reader 字符输入流
 	 */
 	private void executeFullScript(Reader reader) {
 	    StringBuilder script = new StringBuilder();
@@ -140,7 +140,7 @@ public class SqlScriptRunner {
 	}
 	/**
 	 * 逐行执行
-	 * @param reader
+	 * @param reader 字符输入流
 	 */
 	private void executeLineByLine(Reader reader) {
 	    StringBuilder command = new StringBuilder();
@@ -148,7 +148,7 @@ public class SqlScriptRunner {
 	    	BufferedReader lineReader = new BufferedReader(reader);
 	    	String line;
 	    	while ((line = lineReader.readLine()) != null) {
-	        command = handleLine(command, line);
+	            command = handleLine(command, line);
 	    	}
 	    	commitConnection();
 	    	checkForMissingLineTerminator(command);
@@ -221,7 +221,7 @@ public class SqlScriptRunner {
 	}
 	/**
 	 * 检查丢失行终结符
-	 * @param command
+	 * @param command 命令
 	 */
 	private void checkForMissingLineTerminator(StringBuilder command) {
 	    if (command != null && command.toString().trim().length() > 0) {
@@ -261,7 +261,7 @@ public class SqlScriptRunner {
 	}
 	/**
 	 * 执行语句
-	 * @param command
+	 * @param command 命令
 	 * @throws SQLException
 	 */
 	private void executeStatement(String command) throws SQLException {
@@ -319,8 +319,8 @@ public class SqlScriptRunner {
 	}
 	/**
 	 * 打印结果
-	 * @param statement
-	 * @param hasResults
+	 * @param statement Statement对象
+	 * @param hasResults 有结果
 	 */
 	private void printResults(Statement statement, boolean hasResults) {
 		try {

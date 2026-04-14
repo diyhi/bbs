@@ -55,12 +55,6 @@ public class CommentedProperties{
 	//富文本嵌入视频地址白名单
 	private static List<String> embedVideoWhiteList = null;
 	
-	//OAuth2配置参数
-	private static Map<String,Object> oauth2Map = null;
-	
-	//crossOrigin配置参数
-	private static Map<String,Object> crossOriginMap = null;
-	
 	/**
 	 * 内部属性表
 	 */
@@ -86,8 +80,8 @@ public class CommentedProperties{
 
 	/**
 	 * 设置一个属性，如果key已经存在，那么将其对应value值覆盖。
-	 * @param key
-	 * @param value
+	 * @param key 键
+	 * @param value 值
 	 * @return
 	 */
 	public String setProperty(String key, String value) {
@@ -117,7 +111,7 @@ public class CommentedProperties{
 	/**
 	 * 根据key获取属性表中相应的value。
 	 * 
-	 * @param key
+	 * @param key 键
 	 * @return
 	 */
 	public String getProperty(String key) {
@@ -128,8 +122,8 @@ public class CommentedProperties{
 	 * 根据key获取属性表中相应的value。
 	 * 如果没找到相应的value，返回defaultValue。
 	 * 
-	 * @param key
-	 * @param defaultValue
+	 * @param key 键
+	 * @param defaultValue 默认值
 	 * @return
 	 */
 	public String getProperty(String key, String defaultValue) {
@@ -139,7 +133,7 @@ public class CommentedProperties{
 	/**
 	 * 从一个字符流中读取属性到属性表中
 	 * 
-	 * @param reader
+	 * @param reader 字符流
 	 * @throws IOException
 	 */
 	public synchronized void load(Reader reader) throws IOException {
@@ -149,7 +143,7 @@ public class CommentedProperties{
 	/**
 	 * 从一个字节流中读取属性到属性表中
 	 * 
-	 * @param inStream
+	 * @param inStream 字节流
 	 * @throws IOException
 	 */
 	public synchronized void load(InputStream inStream) throws IOException {
@@ -159,8 +153,8 @@ public class CommentedProperties{
 	/**
 	 * 从一个字节流中读取属性到属性表中
 	 * 
-	 * @param inStream
-	 * @param charset
+	 * @param inStream 字节流
+	 * @param charset 编码
 	 * @throws IOException
 	 */
 	public synchronized void load(InputStream inStream, String charset) throws IOException {
@@ -197,7 +191,7 @@ public class CommentedProperties{
 	/**
 	 * 将属性表中的属性写到字符流里面。
 	 * 
-	 * @param writer
+	 * @param writer 字符输出流
 	 * @throws IOException
 	 */
 	public void store(Writer writer) throws IOException {
@@ -207,7 +201,7 @@ public class CommentedProperties{
 	/**
 	 * 将属性表中的属性写到字符流里面。
 	 * 
-	 * @param bufferedWriter
+	 * @param bufferedWriter 字符输出的缓冲区
 	 * @throws IOException
 	 */
 	public void store(BufferedWriter bufferedWriter) throws IOException {
@@ -217,7 +211,7 @@ public class CommentedProperties{
 	/**
 	 * 将属性表中的属性写到字节流里面。
 	 * 
-	 * @param out
+	 * @param out 字节流
 	 * @throws IOException
 	 */
 	public void store(OutputStream out) throws IOException {
@@ -228,7 +222,7 @@ public class CommentedProperties{
 	 * 如果属性表中某个key对应的value值和参数value相同
 	 * 那么返回true，否则返回false。
 	 * 
-	 * @param value
+	 * @param value 值
 	 * @return
 	 */
 	public boolean containsValue(String value) {
@@ -238,7 +232,7 @@ public class CommentedProperties{
 	/**
 	 * 如果属性表中存在参数key，返回true，否则返回false。
 	 * 
-	 * @param key
+	 * @param key 键
 	 * @return
 	 */
 	public boolean containsKey(String key) {
@@ -713,16 +707,13 @@ public class CommentedProperties{
 				for(String propertyName : propertyNameList){
 					if(propertyName.trim().equals("imageUploadFormat")){
 						String value = props.getProperty(propertyName.trim());
-						if(value != null && !"".equals(value.trim())){
+						if(value != null && !value.trim().isEmpty()){
 							String[] values = value.trim().split(",");
-							if(values != null && values.length >0){
-								for(String format : values){
-									if(format != null && !"".equals(format.trim())){
-										_imageUploadFormatList.add(format.trim());
-									}
-									
-								}
-							}
+                            for(String format : values){
+                                if(format != null && !format.trim().isEmpty()){
+                                    _imageUploadFormatList.add(format.trim());
+                                }
+                            }
 						}
 					}
 				}
@@ -763,11 +754,11 @@ public class CommentedProperties{
 				for(String propertyName : propertyNameList){
 					if(propertyName.trim().equals("fileUploadFormat")){
 						String value = props.getProperty(propertyName.trim());
-						if(value != null && !"".equals(value.trim())){
+						if(value != null && !value.trim().isEmpty()){
 							String[] values = value.trim().split(",");
 							if(values != null && values.length >0){
 								for(String format : values){
-									if(format != null && !"".equals(format.trim())){
+									if(format != null && !format.trim().isEmpty()){
 										_fileUploadFormatList.add(format.trim());
 									}
 									
@@ -812,16 +803,14 @@ public class CommentedProperties{
 				for(String propertyName : propertyNameList){
 					if(propertyName.trim().equals("videoUploadFormat")){
 						String value = props.getProperty(propertyName.trim());
-						if(value != null && !"".equals(value.trim())){
+						if(value != null && !value.trim().isEmpty()){
 							String[] values = value.trim().split(",");
-							if(values != null && values.length >0){
-								for(String format : values){
-									if(format != null && !"".equals(format.trim())){
-										_videoUploadFormatList.add(format.trim());
-									}
-									
-								}
-							}
+                            for(String format : values){
+                                if(format != null && !format.trim().isEmpty()){
+                                    _videoUploadFormatList.add(format.trim());
+                                }
+
+                            }
 						}
 					}
 				}
@@ -844,7 +833,7 @@ public class CommentedProperties{
 	 * @return
 	 */
 	public static List<String> readRichTextAllowEmbedVideoWhiteList(){	
-		if(embedVideoWhiteList != null && embedVideoWhiteList.size() >0){
+		if(embedVideoWhiteList != null && !embedVideoWhiteList.isEmpty()){
 			return embedVideoWhiteList;
 		}
 		//嵌入视频地址白名单
@@ -858,20 +847,18 @@ public class CommentedProperties{
 			props.load(resource.getInputStream(),"utf-8");
 			
 			Set<String> propertyNameList = props.propertyNames();
-			if(propertyNameList != null && propertyNameList.size() >0){
+			if(propertyNameList != null && !propertyNameList.isEmpty()){
 				for(String propertyName : propertyNameList){
 					if(propertyName.trim().equals("embedVideoWhite")){
 						String value = props.getProperty(propertyName.trim());
-						if(value != null && !"".equals(value.trim())){
+						if(value != null && !value.trim().isEmpty()){
 							String[] values = value.trim().split(",");
-							if(values != null && values.length >0){
-								for(String format : values){
-									if(format != null && !"".equals(format.trim())){
-										_embedVideoWhiteList.add(format.trim());
-									}
-									
-								}
-							}
+                            for(String format : values){
+                                if(format != null && !format.trim().isEmpty()){
+                                    _embedVideoWhiteList.add(format.trim());
+                                }
+
+                            }
 						}
 					}
 				}
@@ -885,111 +872,6 @@ public class CommentedProperties{
 	        }
 		}
 		return _embedVideoWhiteList;	
-
-	}
-	
-	
-	/**
-	 * 读取oauth2.properties参数
-	 * @return
-	 */
-	public static Map<String,Object> readOAuth2(){	
-		if(oauth2Map != null && oauth2Map.size() >0){
-			return oauth2Map;
-		}
-		//OAuth2配置参数
-		Map<String,Object> _oauth2Map = new HashMap<String,Object>();
-		
-		
-		org.springframework.core.io.Resource resource = new ClassPathResource("/oauth2.properties");//读取配置文件
-		CommentedProperties props = new CommentedProperties();
-
-		try {
-			props.load(resource.getInputStream(),"utf-8");
-			
-			Set<String> propertyNameList = props.propertyNames();
-			if(propertyNameList != null && propertyNameList.size() >0){
-				for(String propertyName : propertyNameList){
-					if(propertyName.trim().equals("oauth2.secret")){
-						String value = props.getProperty(propertyName.trim());
-						if(value != null && !"".equals(value.trim())){
-							_oauth2Map.put("secret", value.trim());
-						}else{//如果为空，则密钥为随机数
-							_oauth2Map.put("secret", UUIDUtil.getUUID32());
-						}
-					}else if(propertyName.trim().equals("oauth2.accessTokenValiditySeconds")){
-						String value = props.getProperty(propertyName.trim());
-						if(value != null && !"".equals(value.trim())){
-							_oauth2Map.put("accessTokenValiditySeconds", Integer.parseInt(value.trim()));
-						}
-					}else if(propertyName.trim().equals("oauth2.refreshTokenValiditySeconds")){
-						String value = props.getProperty(propertyName.trim());
-						if(value != null && !"".equals(value.trim())){
-							_oauth2Map.put("refreshTokenValiditySeconds", Integer.parseInt(value.trim()));
-						}
-					}else if(propertyName.trim().equals("oauth2.loginFailureNumber")){
-						String value = props.getProperty(propertyName.trim());
-						if(value != null && !"".equals(value.trim())){
-							_oauth2Map.put("loginFailureNumber", Integer.parseInt(value.trim()));
-						}
-					}
-					
-					
-				}
-				
-				oauth2Map = _oauth2Map;
-			}
-	
-		} catch (IOException e) {
-			if (logger.isErrorEnabled()) {
-	            logger.error("读取配置文件oauth2.properties错误",e);
-	        }
-		}
-		return _oauth2Map;	
-
-	}
-	
-	
-	/**
-	 * 读取crossOrigin.properties参数
-	 * @return
-	 */
-	public static Map<String,Object> readCrossOrigin(){	
-		if(crossOriginMap != null && crossOriginMap.size() >0){
-			return crossOriginMap;
-		}
-		//OAuth2配置参数
-		Map<String,Object> _crossOriginMap = new HashMap<String,Object>();
-		
-		
-		org.springframework.core.io.Resource resource = new ClassPathResource("/crossOrigin.properties");//读取配置文件
-		CommentedProperties props = new CommentedProperties();
-
-		try {
-			props.load(resource.getInputStream(),"utf-8");
-			
-			Set<String> propertyNameList = props.propertyNames();
-			if(propertyNameList != null && propertyNameList.size() >0){
-				for(String propertyName : propertyNameList){
-					if(propertyName.trim().equals("allowedOrigins")){
-						String value = props.getProperty(propertyName.trim());
-						if(value != null && !"".equals(value.trim())){
-							_crossOriginMap.put("allowedOrigins", value.trim());
-						}
-					}
-					
-					
-				}
-				
-				crossOriginMap = _crossOriginMap;
-			}
-	
-		} catch (IOException e) {
-			if (logger.isErrorEnabled()) {
-	            logger.error("读取配置文件crossOrigin.properties错误",e);
-	        }
-		}
-		return _crossOriginMap;	
 
 	}
 	

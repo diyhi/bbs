@@ -1,6 +1,6 @@
 package cms.utils;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -13,50 +13,31 @@ public class Base64 {
 	 private static final Logger logger = LogManager.getLogger(Base64.class);
 	/**
 	 * 安全的Base64编码(将Base64中的URL非法字符如+,/=转为其他字符, 见RFC3548). 
-	 * @param data
+	 * @param data 数据
 	 * @return
 	 */
 	public static String encodeBase64URL(String data){
-		String d = "";
-		try {
-			if(data != null && !"".equals(data)){
-				d = org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(data.getBytes("UTF-8"));
-			}
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-		//	e.printStackTrace();
-			if (logger.isErrorEnabled()) {
-	            logger.error("安全的Base64编码(将Base64中的URL非法字符如+,/=转为其他字符, 见RFC3548)",e);
-	        }
-		}
-		return d;
+        if(data != null && !data.isEmpty()){
+            return org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(data.getBytes(StandardCharsets.UTF_8 ));
+        }
+		return "";
 	}
 	
 	/**
 	 * 安全的Base64解码
-	 * @param data
+	 * @param data 数据
 	 * @return
 	 */
 	public static String decodeBase64URL(String data){
-		String d = "";
-		try {
-			if(data != null && !"".equals(data)){
-				d = new String(org.apache.commons.codec.binary.Base64.decodeBase64(data),"UTF-8");
-			}
-			
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			//e.printStackTrace();
-			if (logger.isErrorEnabled()) {
-	            logger.error("安全的Base64解码",e);
-	        }
-		}
-		return d;
+        if(data != null && !data.isEmpty()){
+            return new String(org.apache.commons.codec.binary.Base64.decodeBase64(data),StandardCharsets.UTF_8);
+        }
+		return "";
 	}
 	
 	
 	
-	private static char[] base64EncodeChars = new char[]{ 
+	private static final char[] base64EncodeChars = new char[]{
 	    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 
 	    'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 
 	    'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 
@@ -65,7 +46,7 @@ public class Base64 {
 	    'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 
 	    'w', 'x', 'y', 'z', '0', '1', '2', '3', 
 	    '4', '5', '6', '7', '8', '9', '+', '/'}; 
-    private static byte[] base64DecodeChars = new byte[]{ 
+    private static final byte[] base64DecodeChars = new byte[]{
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 62, -1, -1, -1, 63, 
@@ -140,33 +121,5 @@ public class Base64 {
             sb.append((char) (((b3 & 0x03) << 6) | b4)); 
         } 
         return sb.toString(); 
-    } 
-
-	
-	
-	/**
-	 * byte数组编码
-	 * @param data
-	 * @return
-	
-	public static String encodeBase64(byte[] data){
-		String d = "";
-		if(data != null && data.length >0){
-			d = org.apache.commons.codec.binary.Base64.encodeBase64String(data);
-		}
-		return d;
-	} */
-	
-	/**
-	 * Base64字符串解码
-	 * @param data
-	 * @return
-	 
-	public static byte[] decodeBase64(String data){
-		byte[] d = null;
-		if(data != null && !"".equals(data)){
-			d = org.apache.commons.codec.binary.Base64.decodeBase64(data);
-		}
-		return d;
-	}*/
+    }
 }

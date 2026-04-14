@@ -1,202 +1,131 @@
 package cms.service.topic;
 
-import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
+import cms.dto.PageView;
+import cms.dto.topic.TopicRequest;
+import cms.model.topic.Comment;
+import cms.model.topic.Reply;
+import cms.model.topic.Topic;
+import cms.model.topic.TopicUnhide;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.Map;
 
-
-import cms.bean.QueryResult;
-import cms.bean.payment.PaymentLog;
-import cms.bean.platformShare.TopicUnhidePlatformShare;
-import cms.bean.redEnvelope.GiveRedEnvelope;
-import cms.bean.topic.Topic;
-import cms.bean.topic.TopicUnhide;
-import cms.service.besa.DAO;
-
 /**
- * 话题
- *
+ * 话题服务
  */
-public interface TopicService extends DAO<Topic>{
-	/**
-	 * 根据Id查询话题
-	 * @param topicId 话题Id
-	 * @return
-	 */
-	public Topic findById(Long topicId);
-	/**
-	 * 根据Id集合查询话题
-	 * @param topicIdList 话题Id集合
-	 * @return
-	 */
-	public List<Topic> findByIdList(List<Long> topicIdList);
-	/**
-	 * 根据Id集合查询话题标题
-	 * @param topicIdList 话题Id集合
-	 * @return
-	 */
-	public List<Topic> findTitleByIdList(List<Long> topicIdList);
-	/**
-	 * 根据话题Id集合查询话题
-	 * @param topicIdList 话题Id集合
-	 * @return
-	 */
-	public List<Topic> findTopicByTopicIdList(List<Long> topicIdList);
-	/**
-	 * 分页查询话题内容
-	 * @param firstIndex
-	 * @param maxResult
-	 * @param userName 用户名称
-	 * @param isStaff 是否为员工
-	 * @return
-	 */
-	public Map<Long,String> findTopicContentByPage(int firstIndex, int maxResult,String userName,boolean isStaff);
-	/**
-	 * 分页查询话题
-	 * @param firstIndex 开始索引
-	 * @param maxResult 需要获取的记录数
-	 * @return
-	 */
-	public List<Topic> findTopicByPage(int firstIndex, int maxResult);
-	/**
-	 * 分页查询话题
-	 * @param userName用户名称
-	 * @param postTime 话题发表时间
-	 * @param firstIndex 开始索引
-	 * @param maxResult 需要获取的记录数
-	 * @return
-	 */
-	public List<Topic> findTopicByPage(String userName,Date postTime,int firstIndex, int maxResult);
-	/**
-	 * 查询热门话题
-	 * @param maxResult 需要获取的记录数
-	 * @return
-	 */
-	public List<Topic> findHotTopic(int maxResult);
-	/**
-	 * 查询热门话题 - 缓存
-	 * @return
-	 */
-	public List<Topic> findHotTopic_cache(int maxResult);
-	/**
-	 * 保存话题
-	 * @param topic
-	 * @param giveRedEnvelope 发红包
-	 * @param userName 用户名称
-	 * @param amount 扣减用户预存款
-	 * @param paymentLog 支付日志
-	 */
-	public void saveTopic(Topic topic,GiveRedEnvelope giveRedEnvelope,String userName,BigDecimal amount,PaymentLog paymentLog);
-	/**
-	 * 修改话题
-	 * @param topic
-	 * @return
-	 */
-	public Integer updateTopic(Topic topic);
-	/**
-	 * 前台用户修改话题
-	 * @param topic
-	 * @return
-	 */
-	public Integer updateTopic2(Topic topic);
-	/**
-	 * 还原话题
-	 * @param topicList 话题集合
-	 * @return
-	 */
-	public Integer reductionTopic(List<Topic> topicList);
-	/**
-	 * 标记删除话题
-	 * @param topicId 话题Id
-	 * @return
-	 */
-	public Integer markDelete(Long topicId);
-	/**
-	 * 修改话题最后回复时间
-	 * @param topicId 话题Id
-	 * @param lastReplyTime 最后回复时间
-	 * @return
-	 */
-	public Integer updateTopicReplyTime(Long topicId,Date lastReplyTime);
-	/**
-	 * 删除话题
-	 * @param topicId 话题Id
-	 * @param giveRedEnvelope 发红包
-	 * @param userName 用户名称
-	 * @param amount 返还用户金额
-	 * @param paymentLogObject 支付日志
-	 * @return
-	 */
-	public Integer deleteTopic(Long topicId,GiveRedEnvelope giveRedEnvelope,String userName,BigDecimal amount,Object paymentLogObject);
-	/**
-	 * 查询待审核话题数量
-	 * @return
-	 */
-	public Long auditTopicCount();
-	/**
-	 * 增加展示次数
-	 * @param countMap key: 话题Id value:展示次数
-	 * @return
-	 */
-	public int addViewCount(Map<Long,Long> countMap);
-	/**
-	 * 增加权重
-	 * @param countMap key: 话题Id value:权重
-	 * @return
-	 */
-	public int addWeightCount(Map<Long,Double> countMap);
-	/**
-	 * 修改话题状态
-	 * @param topicId 话题Id
-	 * @param status 状态
-	 * @return
-	 */
-	public int updateTopicStatus(Long topicId,Integer status);
-	/**
-	 * 增加总评论数
-	 * @param topicId 话题Id
-	 * @param quantity 数量
-	 * @return
-	 */
-	public int addCommentTotal(Long topicId,Long quantity);
-	/**
-	 * 减少总评论数
-	 * @param topicId 话题Id
-	 * @param quantity 数量
-	 * @return
-	 */
-	public int subtractCommentTotal(Long topicId,Long quantity);
-	
-	/**
-	 * 保存'话题取消隐藏'
-	 * @param topicUnhide
-	 * @param hideTagType 隐藏标签类型
-	 * @param point 积分
-	 * @param consumption_userName 消费用户名称
-	 * @param consumption_pointLogObject 消费积分日志
-	 * @param income_userName 收入用户名称
-	 * @param income_pointLogObject 收入积分日志
-	 * @param consumption_amount 消费金额
-	 * @param consumption_paymentLogObjec 用户消费金额日志
-	 * @param income_paymentLogObject 用户收入金额日志
-	 * @param userShare_amount 用户分成金额
-	 * @param topicUnhidePlatformShare 平台分成
-	 */
-	public void saveTopicUnhide(Object topicUnhide,Integer hideTagType,Long point,String consumption_userName,Object consumption_pointLogObject,String income_userName,Object income_pointLogObject,
-			BigDecimal consumption_amount,BigDecimal userShare_amount,Object consumption_paymentLogObject, Object income_paymentLogObject,TopicUnhidePlatformShare topicUnhidePlatformShare);
-	/**
-	 * 根据Id查询'话题取消隐藏'
-	 * @param topicUnhideId 话题取消隐藏Id
-	 * @return
-	 */
-	public TopicUnhide findTopicUnhideById(String topicUnhideId);
-	/**
-	 * 根据话题Id查询话题取消隐藏用户列表
-	 * @param firstIndex 索引开始,即从哪条记录开始
-	 * @param maxResult 获取多少条数据
-	 * @param topicId 话题Id
-	 * @return
-	 */
-	public QueryResult<TopicUnhide> findTopicUnhidePageByTopicId(int firstIndex, int maxResult,Long topicId);
+public interface TopicService {
+    /**
+     * 获取话题列表
+     * @param page 页码
+     * @param visible 是否可见
+     * @param fileServerAddress 文件服务器地址
+     * @return
+     */
+    public PageView<Topic> getTopicList(int page, Boolean visible, String fileServerAddress);
+
+    /**
+     * 获取话题明细
+     * @param topicId 话题Id
+     * @param commentId 评论Id
+     * @param page 页码
+     * @param request 请求信息
+     * @return
+     */
+    public Map<String,Object> getTopicDetail(Long topicId, Long commentId, Integer page, HttpServletRequest request);
+    /**
+     * 获取添加话题界面信息
+     * @return
+     */
+    public Map<String,Object> getAddTopicViewModel();
+    /**
+     * 添加话题
+     * @param topicRequest 话题表单
+     * @param request 请求信息
+     */
+    public void addTopic(TopicRequest topicRequest,HttpServletRequest request);
+    /**
+     * 上传文件
+     * @param dir 上传类型，分别为image、media、file
+     * @param userName 用户名称
+     * @param isStaff 是否是员工   true:员工   false:会员
+     * @param fileName 文件名称 预签名时有值
+     * @param fileServerAddress 文件服务器地址
+     * @param file 文件
+     * @return
+     */
+    public Map<String, Object> uploadFile(String dir, String userName,Boolean isStaff, String fileName, String fileServerAddress, MultipartFile file);
+    /**
+     * 获取修改话题界面信息
+     * @param topicId 话题Id
+     * @return
+     */
+    public Map<String,Object> getEditTopicViewModel(Long topicId);
+    /**
+     * 修改话题
+     * @param topicRequest 话题表单
+     * @param request 请求信息
+     */
+    public void editTopic(TopicRequest topicRequest,HttpServletRequest request);
+    /**
+     * 删除话题
+     * @param topicId 话题Id集合
+     */
+    public void deleteTopic(Long[] topicId);
+
+    /**
+     * 还原话题
+     * @param topicId 话题Id集合
+     */
+    public void reductionTopic(Long[] topicId);
+    /**
+     * 审核话题
+     * @param topicId 话题Id
+     */
+    public void auditTopic(Long topicId);
+    /**
+     * 获取话题搜索
+     * @param page 页码
+     * @param dataSource 数据源
+     * @param keyword 关键词
+     * @param tagId 标签Id
+     * @param tagName 标签名称
+     * @param account 账号
+     * @param start_postTime 起始发贴时间
+     * @param end_postTime 结束发贴时间
+     * @param fileServerAddress 文件服务器地址
+     * @return
+     */
+    public PageView<Topic> getSearch(int page, Integer dataSource,String keyword,String tagId,String tagName,String account,
+                                     String start_postTime,String end_postTime,String fileServerAddress);
+
+    /**
+     * 获取全部待审核话题
+     * @param page 页码
+     * @param fileServerAddress 文件服务器地址
+     * @return
+     */
+    public PageView<Topic> getPendingTopics(int page, String fileServerAddress);
+    /**
+     * 获取全部待审核评论
+     * @param page 页码
+     * @param fileServerAddress 文件服务器地址
+     * @return
+     */
+    public PageView<Comment> getAllPendingComments(int page,String fileServerAddress);
+    /**
+     * 获取全部待审核回复
+     * @param page 页码
+     * @param fileServerAddress 文件服务器地址
+     * @return
+     */
+    public PageView<Reply> getAllPendingReplies(int page, String fileServerAddress);
+    /**
+     * 获取话题取消隐藏列表
+     * @param page 页码
+     * @param topicId 话题Id
+     * @param fileServerAddress 文件服务器地址
+     * @return
+     */
+    public Map<String,Object> getUnhiddenTopics(int page,Long topicId,String fileServerAddress);
 }

@@ -1,81 +1,71 @@
 package cms.service.membershipCard;
 
-import java.util.List;
+import cms.dto.PageView;
+import cms.dto.membershipCard.MembershipCardRequest;
+import cms.model.membershipCard.MembershipCard;
+import cms.model.membershipCard.MembershipCardOrder;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.web.multipart.MultipartFile;
 
-import cms.bean.QueryResult;
-import cms.bean.membershipCard.MembershipCard;
-import cms.bean.membershipCard.MembershipCardOrder;
-import cms.bean.membershipCard.Specification;
-import cms.bean.user.UserRoleGroup;
-import cms.service.besa.DAO;
+import java.util.Map;
 
 /**
- * 会员卡接口
- *
+ * 会员卡服务
  */
-public interface MembershipCardService extends DAO<MembershipCard>{
-	/**
-	 * 根据Id查询会员卡
-	 * @param membershipCard 会员卡Id
-	 * @return
-	 */
-	public MembershipCard findById(Long membershipCardId);
-	/**
-	 * 根据会员卡Id查询规格
-	 * @param membershipCard 会员卡Id
-	 * @return
-	 */
-	public List<Specification> findSpecificationByMembershipCardId(Long membershipCardId);
-	/**
-	 * 根据规格Id查询规格
-	 * @param specificationId 规格Id
-	 * @return
-	 */
-	public Specification findSpecificationBySpecificationId(Long specificationId);
-	/**
-	 * 查询所有会员卡
-	 * @return
-	 */
-	public List<MembershipCard> findAllMembershipCard();
-	/**
-	 * 保存会员卡
-	 * @param membershipCard 会员卡
-	 */
-	public void saveMembershipCard(MembershipCard membershipCard);
+public interface MembershipCardService {
 
-
-	/**
-	 * 修改会员卡
-	 * @param membershipCard 会员卡
-	 * @param add_specificationList 添加规格集合
-	 * @param update_specificationList 修改规格集合
-	 * @param delete_specificationIdList 删除规格Id集合
-	 * @return
-	 */
-	public Integer updateMembershipCard(MembershipCard membershipCard,List<Specification> add_specificationList,
-			List<Specification> update_specificationList,List<Long> delete_specificationIdList);
-	
-	/**
-	 * 删除会员卡
-	 * @param membershipCardId 会员卡Id
-	 */
-	public Integer deleteMembershipCard(Long membershipCardId);
-	/**
-	 * 根据用户名称查询会员卡订单分页
-	 * @param userName 用户名称
-	 * @param firstIndex 索引开始,即从哪条记录开始
-	 * @param maxResult 获取多少条数据
-	 * @return
-	 */
-	public QueryResult<MembershipCardOrder> findMembershipCardOrderByUserName(String userName,int firstIndex, int maxResult);
-	/**
-	 * 保存会员卡订单
-	 * @param membershipCardOrder 会员卡订单
-	 * @param add_userRoleGroup 增加用户角色组
-	 * @param update_userRoleGroup 修改用户角色组
-	 * @param pointLog 积分支付日志
-	 * @param paymentLog 预存款支付日志
-	 */
-	public void saveMembershipCardOrder(MembershipCardOrder membershipCardOrder,UserRoleGroup add_userRoleGroup,UserRoleGroup update_userRoleGroup,
-			Object pointLog,Object paymentLog);
+    /**
+     * 获取会员卡列表
+     * @param page 页码
+     */
+    public PageView<MembershipCard> getMembershipCardList(int page);
+    /**
+     * 获取会员卡订单列表
+     * @param page 页码
+     * @param fileServerAddress 文件服务器随机地址
+     */
+    public PageView<MembershipCardOrder> getMembershipCardOrderList(int page, String fileServerAddress);
+    /**
+     * 获取用户会员卡订单列表
+     * @param page 页码
+     * @param userName 用户名称
+     */
+    public Map<String,Object> getUserMembershipCardOrderList(int page, String userName);
+    /**
+     * 获取添加会员卡界面信息
+     * @return
+     */
+    public Map<String,Object> getAddMembershipCardViewModel();
+    /**
+     * 添加会员卡
+     * @param membershipCardRequest 会员卡表单
+     * @param request 请求信息
+     */
+    public void addMembershipCard(MembershipCardRequest membershipCardRequest, HttpServletRequest request);
+    /**
+     * 获取修改会员卡界面信息
+     * @param membershipCardId 会员卡Id
+     * @return
+     */
+    public Map<String,Object> getEditMembershipCardViewModel(Long membershipCardId);
+    /**
+     * 修改会员卡
+     * @param membershipCardRequest 会员卡表单
+     * @param request 请求信息
+     */
+    public void editMembershipCard(MembershipCardRequest membershipCardRequest, HttpServletRequest request);
+    /**
+     * 上传文件
+     * @param dir 上传类型，分别为image、media、file
+     * @param fileName 文件名称 预签名时有值
+     * @param fileServerAddress 文件服务器地址
+     * @param file 文件
+     * @return
+     */
+    public Map<String, Object> uploadFile(String dir, String fileName, String fileServerAddress, MultipartFile file);
+    /**
+     * 删除会员卡
+     * @param membershipCardId 会员卡Id
+     */
+    public void deleteMembershipCard(Long membershipCardId);
 }

@@ -4,7 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-
+/**
+ * UUID工具
+ * @author Gao
+ *
+ */
 public class UUIDUtil {
 
 	public static String getUUID22() {   
@@ -19,7 +23,7 @@ public class UUIDUtil {
     }  
     
     public static String getUUID32() {   
-		String uuid = java.util.UUID.randomUUID().toString();
+		String uuid = UUID.randomUUID().toString();
 		uuid = uuid.replaceAll("-","");//删除横杆
         return uuid;
     }  
@@ -102,10 +106,8 @@ public class UUIDUtil {
 	/**
 	 * 将字符串转换为长整型数字
 	 * 
-	 * @param s
-	 *            数字字符串
-	 * @param radix
-	 *            进制数
+	 * @param s 数字字符串
+	 * @param radix 进制数
 	 * @return
 	 */
 	private static long toNumber(String s, int radix) {

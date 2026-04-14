@@ -1,7 +1,9 @@
 package cms.utils;
 import java.util.List;
 import java.util.StringTokenizer;       
-import org.apache.commons.lang3.StringUtils;    
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
+
 /**
  * 字符串工具类
  *
@@ -9,14 +11,14 @@ import org.apache.commons.lang3.StringUtils;
 public class StringUtil {
 	/**            
 	 * 解析一个带 token 分隔符的字符串，这个方法的效率比直接调用String的split()方法快大约1倍   
-	 * @param tokenedStr            
-	 * @param token           
+	 * @param tokenStr 令带 token 分隔符的字符串
+	 * @param token 令牌
 	 * @return String[]            
 	 */           
-	public static String[] splitString(String tokenedStr, String token) {       
+	public static String[] splitString(String tokenStr, String token) {
 		String[] ids = null;                  
-		if (tokenedStr != null) {                           
-			StringTokenizer st = new StringTokenizer(tokenedStr, token);      
+		if (tokenStr != null) {
+			StringTokenizer st = new StringTokenizer(tokenStr, token);
 			final int arraySize = st.countTokens();                        
 			if (arraySize > 0) {                                 
 				ids = new String[arraySize];                                 
@@ -117,35 +119,38 @@ public class StringUtil {
     } */
     /**
      * 替换空格&nbsp;
-     * @param html
+     * @param html HTML
      * @return
      */
     public static String replaceSpace(String html){
     	//return html.toLowerCase().replaceAll("(?i)&nbsp;","");
     	return html.replaceAll("(?i)&nbsp;","");
     }
-    
     /**
      * 删除所有空格
-     * @param txt
+     * @param txt 文本
      * @return
      */
     public static String deleteWhitespace(String txt){
     	return  StringUtils.deleteWhitespace(txt);
     }
+    
+   
    
     /** 
      * 转义like语句中的通配符
-     * @param likeStr 
+     * @param likeStr like语句
      * @return
      */  
     public static String escapeSQLLike(String likeStr) {  
-    	String str = StringUtils.replace(likeStr, "/",    "//");
-        str = StringUtils.replace(str, "%", "/%");
-        str = StringUtils.replace(str, "_", "/_");
-        str = StringUtils.replace(str, "[", "/[");
-        str = StringUtils.replace(str, "]", "/]");
+    	String str = Strings.CS.replace(likeStr, "/",    "//");
+        str = Strings.CS.replace(str, "%", "/%");
+        str = Strings.CS.replace(str, "_", "/_");
+        str = Strings.CS.replace(str, "[", "/[");
+        str = Strings.CS.replace(str, "]", "/]");
         return str;  
     }  
 
+    
+    
 }

@@ -1,6 +1,7 @@
 package cms.utils;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 /**
  * 文件大小换算
@@ -32,13 +33,13 @@ public class FileSize {
 	    }else if(longSize>=SIZE_MB&&longSize<SIZE_GB){
 		    BigDecimal longs=new BigDecimal(Double.valueOf(longSize+"").toString());
 		    BigDecimal sizeMB=new BigDecimal(Double.valueOf(SIZE_MB+"").toString());
-		    String result=longs.divide(sizeMB, SACLE,BigDecimal.ROUND_HALF_UP).toString();
+		    String result=longs.divide(sizeMB, SACLE, RoundingMode.HALF_UP).toString();
 		    //double result=this.longSize/(double)SIZE_MB;
 		    return result+"GB";
 	    }else{
 		     BigDecimal longs=new BigDecimal(Double.valueOf(longSize+"").toString());
 		     BigDecimal sizeMB=new BigDecimal(Double.valueOf(SIZE_GB+"").toString());
-		     String result=longs.divide(sizeMB, SACLE,BigDecimal.ROUND_HALF_UP).toString();
+		     String result=longs.divide(sizeMB, SACLE,RoundingMode.HALF_UP).toString();
 		     return result+"TB";
 	    }   
 	   
