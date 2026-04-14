@@ -1,4 +1,4 @@
-# 巡云轻论坛系统<br><br>
+# 巡云轻论坛 Spring Boot 4.x 版本<br><br>
 ##  前台电脑版前端请移步至 [https://gitee.com/diyhi/bbs-web-pc-jdk21 ](https://gitee.com/diyhi/bbs-web-pc-jdk21 )
 ##  管理后台前端请移步至 [https://gitee.com/diyhi/bbs-web-admin-jdk21](https://gitee.com/diyhi/bbs-web-admin-jdk21 ) 
 <br>
